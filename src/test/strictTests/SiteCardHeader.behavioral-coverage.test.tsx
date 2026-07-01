@@ -6,7 +6,10 @@ import type { Monitor, Site } from "@shared/types";
 import type { ChangeEvent, ReactNode } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SiteCardHeader } from "../../components/Dashboard/SiteCard/SiteCardHeader";
 
 interface MonitorSelectorMockProperties {
     monitors: Site["monitors"];
@@ -28,14 +31,14 @@ interface ActionButtonGroupMockProperties {
 }
 
 const monitorSelectorProps = vi.hoisted(
-    () => [] as MonitorSelectorMockProperties[]
+    () => safeCastTo<MonitorSelectorMockProperties[]>([])
 );
 const actionButtonGroupProps = vi.hoisted(
-    () => [] as ActionButtonGroupMockProperties[]
+    () => safeCastTo<ActionButtonGroupMockProperties[]>([])
 );
 
 vi.mock(
-    "../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: (props: MonitorSelectorMockProperties) => {
             monitorSelectorProps.push(props);
@@ -43,9 +46,9 @@ vi.mock(
                 <button
                     data-testid="mock-monitor-selector"
                     onClick={() =>
-                        props.onChange({
+                        { props.onChange({
                             target: { value: "monitor-2" },
-                        } as ChangeEvent<HTMLSelectElement>)
+                        } as ChangeEvent<HTMLSelectElement>); }
                     }
                     type="button"
                 >
@@ -57,14 +60,14 @@ vi.mock(
 );
 
 vi.mock(
-    "../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => ({
         ActionButtonGroup: (props: ActionButtonGroupMockProperties) => {
             actionButtonGroupProps.push(props);
             return (
                 <button
                     data-testid="mock-check-now"
-                    onClick={() => props.onCheckNow()}
+                    onClick={() => { props.onCheckNow(); }}
                     type="button"
                 >
                     check-now
@@ -74,17 +77,15 @@ vi.mock(
     })
 );
 
-vi.mock("../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
+vi.mock(import('../../components/Dashboard/SiteCard/SiteCardFooter'), () => ({
     SiteCardFooter: () => <div data-testid="mock-site-card-footer" />,
 }));
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children }: { children?: ReactNode }) => (
         <span data-testid="mock-themed-text">{children}</span>
     ),
 }));
-
-import { SiteCardHeader } from "../../components/Dashboard/SiteCard/SiteCardHeader";
 
 describe("SiteCardHeader coverage", () => {
     const baseMonitor: Monitor = {
@@ -142,16 +143,16 @@ describe("SiteCardHeader coverage", () => {
         );
 
         fireEvent.click(screen.getByTestId("mock-monitor-selector"));
-        expect(interactions.onMonitorIdChange).toHaveBeenCalled();
+        expect(interactions.onMonitorIdChange).toHaveBeenCalledWith();
 
         fireEvent.click(screen.getByTestId("mock-check-now"));
-        expect(interactions.onCheckNow).toHaveBeenCalled();
+        expect(interactions.onCheckNow).toHaveBeenCalledWith();
 
-        expect(monitorSelectorProps[0]).toMatchObject({
+        expect(arrayFirst(monitorSelectorProps)).toMatchObject({
             monitors: baseSite.monitors,
             selectedMonitorId: "monitor-1",
         });
-        expect(actionButtonGroupProps[0]).toMatchObject({
+        expect(arrayFirst(actionButtonGroupProps)).toMatchObject({
             allMonitorsRunning: false,
             disabled: false,
             isLoading: false,
@@ -190,7 +191,7 @@ describe("SiteCardHeader coverage", () => {
             />
         );
 
-        expect(actionButtonGroupProps[0]).toMatchObject({
+        expect(arrayFirst(actionButtonGroupProps)).toMatchObject({
             disabled: true,
             isLoading: true,
         });
@@ -225,12 +226,12 @@ describe("SiteCardHeader coverage", () => {
             />
         );
 
-        expect(actionButtonGroupProps[0]).toMatchObject({
+        expect(arrayFirst(actionButtonGroupProps)).toMatchObject({
             allMonitorsRunning: true,
             isMonitoring: false,
             disabled: false,
         });
-        expect(monitorSelectorProps[0]).toMatchObject({
+        expect(arrayFirst(monitorSelectorProps)).toMatchObject({
             selectedMonitorId: "monitor-2",
         });
     });

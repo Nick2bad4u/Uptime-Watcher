@@ -443,8 +443,8 @@ export class MonitorManager {
             config,
             host: this.createEnhancedLifecycleHost(),
             identifier,
-            ...(isDefined(monitorId) ? { monitorId } : {}),
-            ...(isDefined(monitorAction) ? { monitorAction } : {}),
+            ...(isDefined(monitorId) && { monitorId }),
+            ...(isDefined(monitorAction) && { monitorAction }),
         });
     }
 
@@ -500,8 +500,8 @@ export class MonitorManager {
             config,
             host: this.createEnhancedLifecycleHost(),
             identifier,
-            ...(isDefined(monitorId) ? { monitorId } : {}),
-            ...(isDefined(monitorAction) ? { monitorAction } : {}),
+            ...(isDefined(monitorId) && { monitorId }),
+            ...(isDefined(monitorAction) && { monitorAction }),
         });
     }
 

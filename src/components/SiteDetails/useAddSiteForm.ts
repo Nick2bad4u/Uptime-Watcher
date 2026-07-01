@@ -527,11 +527,13 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         const currentFields = getFields(monitorType);
         const lookup: Record<string, string> = monitorFieldValues;
         for (const field of currentFields) {
-            if (field.required) {
-                const rawValue = lookup[field.name] ?? "";
-                if (rawValue.trim().length === 0) {
-                    return false;
-                }
+            if (!field.required) {
+                continue;
+            }
+
+            const rawValue = lookup[field.name] ?? "";
+            if (rawValue.trim().length === 0) {
+                return false;
             }
         }
 

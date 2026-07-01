@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
+import { describe, expect, it } from "vitest";
 
 describe("tryGetErrorCode()", () => {
     it("returns undefined for non-objects", () => {

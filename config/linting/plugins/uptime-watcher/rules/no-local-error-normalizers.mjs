@@ -91,17 +91,17 @@ export const noLocalErrorNormalizersRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow local error-normalizer helper declarations (use shared errorHandling utilities instead)",
             recommended: true,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-local-error-normalizers.md",
         },
-        schema: [],
         messages: {
             noLocalErrorNormalizers:
                 "Do not declare a local '{{name}}' helper. Import it from '@shared/utils/errorHandling' instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -419,7 +419,7 @@ export async function retryWithAbort<T>(
             return await operation();
         } catch (error) {
             lastError =
-                error instanceof Error ? error : new Error(String(error));
+                Error.isError(error) ? error : new Error(String(error));
 
             // Don't delay after the last attempt
             if (attempt === maxRetries) {
@@ -481,7 +481,7 @@ export async function retryWithAbort<T>(
  * @public
  */
 export function isAbortError(error: unknown): boolean {
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         const codeCandidate: unknown = Reflect.get(error, "code");
         if (codeCandidate === "ERR_CANCELED") {
             return true;
@@ -557,23 +557,23 @@ export async function raceWithAbort<T>(
     }
 
     return new Promise<T>((resolve, reject) => {
-        let settled = false;
-        let listenerAttached = false;
+        let isSettled = false;
+        let isListenerAttached = false;
 
         function rejectWith(reason: unknown): void {
             const error =
-                reason instanceof Error ? reason : new Error(String(reason));
+                Error.isError(reason) ? reason : new Error(String(reason));
             reject(error);
         }
 
         function handleAbort(): void {
-            if (settled) {
+            if (isSettled) {
                 return;
             }
 
-            settled = true;
-            if (listenerAttached) {
-                listenerAttached = false;
+            isSettled = true;
+            if (isListenerAttached) {
+                isListenerAttached = false;
                 signal.removeEventListener("abort", handleAbort);
             }
             rejectWith(
@@ -582,26 +582,26 @@ export async function raceWithAbort<T>(
         }
 
         function settleResolved(value: T): void {
-            if (settled) {
+            if (isSettled) {
                 return;
             }
 
-            settled = true;
-            if (listenerAttached) {
-                listenerAttached = false;
+            isSettled = true;
+            if (isListenerAttached) {
+                isListenerAttached = false;
                 signal.removeEventListener("abort", handleAbort);
             }
             resolve(value);
         }
 
         function settleRejected(reason: unknown): void {
-            if (settled) {
+            if (isSettled) {
                 return;
             }
 
-            settled = true;
-            if (listenerAttached) {
-                listenerAttached = false;
+            isSettled = true;
+            if (isListenerAttached) {
+                isListenerAttached = false;
                 signal.removeEventListener("abort", handleAbort);
             }
             rejectWith(reason);
@@ -613,7 +613,7 @@ export async function raceWithAbort<T>(
         }
 
         signal.addEventListener("abort", handleAbort);
-        listenerAttached = true;
+        isListenerAttached = true;
 
         const resolveOperation = async (): Promise<void> => {
             try {

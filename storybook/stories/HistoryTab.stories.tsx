@@ -73,17 +73,17 @@ export const DefaultHistory: Story = {
 
         await step("Verify initial history summary", async () => {
             const summary = await canvas.findByText(/24 of 24 records/i);
-            void expect(summary).not.toHaveTextContent(/\(down filter\)/i);
+            void expect(summary).not.toHaveTextContent(/\(down filter\)/iv);
         });
 
         await step("Filter to down records", async () => {
             const downFilterButton = await canvas.findByRole("button", {
-                name: /down/i,
+                name: /down/iv,
             });
             await userEvent.click(downFilterButton);
 
             const summary = await canvas.findByText(/0 of 24 records/i);
-            void expect(summary).toHaveTextContent(/\(down filter\)/i);
+            void expect(summary).toHaveTextContent(/\(down filter\)/iv);
         });
 
         await step("Adjust visible history count", async () => {
@@ -93,7 +93,7 @@ export const DefaultHistory: Story = {
             void expect(showSelect).toHaveValue("10");
 
             const summary = await canvas.findByText(/0 of 24 records/i);
-            void expect(summary).toHaveTextContent(/\(down filter\)/i);
+            void expect(summary).toHaveTextContent(/\(down filter\)/iv);
         });
     },
 };

@@ -34,7 +34,7 @@ export function validateGuardReportPayload(
     options: GuardReportValidationOptions
 ): ParameterValueValidationResult {
     const recordResult = requireRecordParamValue(value, "guardReport");
-    if (recordResult.ok === false) {
+    if (!recordResult.ok) {
         return recordResult.error;
     }
 

@@ -4,7 +4,8 @@
  * Tests all exported functions to achieve 100% function coverage
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => {
@@ -66,7 +67,7 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             expect(safeStringify(0)).toBe("0");
             expect(safeStringify(-123)).toBe("-123");
             expect(safeStringify(3.14)).toBe("3.14");
-            expect(safeStringify(Number.NaN)).toBe("NaN");
+            expect(safeStringify(NaN)).toBe("NaN");
             expect(safeStringify(Infinity)).toBe("Infinity");
             expect(safeStringify(-Infinity)).toBe("-Infinity");
         });
@@ -194,7 +195,7 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             expect(safeStringify(new Date("2023-01-01"))).toContain(
                 "2023-01-01"
             );
-            expect(safeStringify(/test/)).toBe("{}"); // RegExp serializes to empty object
+            expect(safeStringify(/test/v)).toBe("{}"); // RegExp serializes to empty object
             expect(safeStringify(new Error("test"))).toBe("{}"); // Error serializes to empty object
         });
 
@@ -277,9 +278,7 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             const objWithToJSON = {
                 name: "test",
                 value: 123,
-                toJSON() {
-                    return { custom: "serialization" };
-                },
+                toJSON: () => ({ custom: "serialization" }),
             };
 
             expect(safeStringify(objWithToJSON)).toBe(

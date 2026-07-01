@@ -9,9 +9,9 @@
 
 import { describe, expect, it } from "vitest";
 
-import { statusUpdateSchema } from "../../validation/statusUpdateSchemas";
 import type { StatusUpdate } from "../../types";
 
+import { statusUpdateSchema } from "../../validation/statusUpdateSchemas";
 import { createValidHttpMonitor } from "./testHelpers";
 
 const createValidStatusUpdate = (): StatusUpdate => {

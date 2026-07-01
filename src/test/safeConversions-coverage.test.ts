@@ -4,7 +4,6 @@
  * @file Direct function call tests for safeConversions to ensure coverage
  */
 
-import { describe, expect, it } from "vitest";
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -17,12 +16,13 @@ import {
     safeParseTimeout,
     safeParseTimestamp,
 } from "@shared/utils/safeConversions";
+import { describe, expect, it } from "vitest";
 
 describe("safeConversions Direct Function Coverage", () => {
     it("should call safeNumberConversion function", () => {
         expect(safeNumberConversion("123")).toBe(123);
         expect(safeNumberConversion("invalid")).toBe(0);
-        const defaultNaN = Number.NaN;
+        const defaultNaN = NaN;
         const sanitizedResult = safeNumberConversion("invalid", defaultNaN);
         expect(Number.isNaN(sanitizedResult)).toBeFalsy();
         expect(sanitizedResult).toBe(0);

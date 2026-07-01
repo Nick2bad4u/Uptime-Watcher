@@ -4,7 +4,7 @@
  * @module ElectronUtils
  *
  * @file Comprehensive tests for Electron utility functions in the Uptime
- *   Watcher application.
+ *   Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,7 +15,12 @@
  * @tags ["test", "electron", "utils"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { isDevelopment } from "@shared/utils/environment";
+import { app } from "electron";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import the module under test
+import { isDev } from "../electronUtils.js";
 
 // Mock dependencies
 vi.mock("electron", () => ({
@@ -27,11 +32,6 @@ vi.mock("electron", () => ({
 vi.mock("../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(() => false),
 }));
-
-// Import the module under test
-import { isDev } from "../electronUtils.js";
-import { app } from "electron";
-import { isDevelopment } from "@shared/utils/environment";
 
 describe("ElectronUtils", () => {
     beforeEach(() => {
@@ -60,10 +60,10 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = false;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
@@ -81,10 +81,10 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = true;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
@@ -102,10 +102,10 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = false;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
@@ -123,10 +123,10 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = true;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
@@ -165,11 +165,11 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = false;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(typeof result).toBe("boolean");
-            expect(result).toBeTruthy();
+            expect(typeof isResult).toBe("boolean");
+            expect(isResult).toBeTruthy();
         });
 
         it("should return consistent results for same input conditions", async ({
@@ -186,14 +186,14 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = false;
 
             // Act - call multiple times with same conditions
-            const result1 = isDev();
-            const result2 = isDev();
-            const result3 = isDev();
+            const isResult1 = isDev();
+            const isResult2 = isDev();
+            const isResult3 = isDev();
 
             // Assert
-            expect(result1).toBe(result2);
-            expect(result2).toBe(result3);
-            expect(result1).toBeTruthy();
+            expect(isResult1).toBe(isResult2);
+            expect(isResult2).toBe(isResult3);
+            expect(isResult1).toBeTruthy();
         });
 
         it("should properly use logical AND operation", async ({
@@ -237,9 +237,9 @@ describe("ElectronUtils", () => {
                 vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
                 (app as any).isPackaged = isPackaged;
 
-                const result = isDev();
+                const isResult = isDev();
 
-                expect(result).toBe(expected);
+                expect(isResult).toBe(expected);
                 expect(isDevelopment).toHaveBeenCalled();
             }
         });
@@ -300,10 +300,10 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = false;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             // Verify that we're actually checking the app.isPackaged property
             expect(app.isPackaged).toBeDefined();
         });
@@ -322,10 +322,10 @@ describe("ElectronUtils", () => {
             (app as any).isPackaged = false;
 
             // Act
-            const result = isDev();
+            const isResult = isDev();
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(isDevelopment).toHaveBeenCalledTimes(1);
         });
 
@@ -352,8 +352,8 @@ describe("ElectronUtils", () => {
                 vi.mocked(isDevelopment).mockReturnValue(isDevelopmentResult);
                 (app as any).isPackaged = isPackaged;
 
-                const result = isDev();
-                expect(typeof result).toBe("boolean");
+                const isResult = isDev();
+                expect(typeof isResult).toBe("boolean");
             }
         });
     });
@@ -374,10 +374,10 @@ describe("ElectronUtils", () => {
 
             // Act & Assert
             const startTime = Date.now();
-            const result = isDev();
+            const isResult = isDev();
             const endTime = Date.now();
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(endTime - startTime).toBeLessThan(10); // Should complete in under 10ms
         });
 
@@ -402,7 +402,7 @@ describe("ElectronUtils", () => {
 
             // Assert
             expect(results).toHaveLength(100);
-            expect(results.every((result) => result === true)).toBeTruthy();
+            expect(results.every(Boolean)).toBeTruthy();
             expect(isDevelopment).toHaveBeenCalledTimes(100);
         });
     });

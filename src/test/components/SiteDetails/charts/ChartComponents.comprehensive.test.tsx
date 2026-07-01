@@ -1,16 +1,18 @@
+import type { ChartOptions } from "chart.js";
+
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import type { ChartOptions } from "chart.js";
 import "@testing-library/jest-dom/vitest"; // Add matcher/type augmentation for Vitest
 
-import { ResponseTimeChart } from "../../../../components/SiteDetails/charts/ResponseTimeChart";
-import { StatusChart } from "../../../../components/SiteDetails/charts/StatusChart";
-import { UptimeChart } from "../../../../components/SiteDetails/charts/UptimeChart";
 import type {
     ResponseTimeChartData,
     StatusBarChartData,
     UptimeChartData,
 } from "../../../../services/chartConfig";
+
+import { ResponseTimeChart } from "../../../../components/SiteDetails/charts/ResponseTimeChart";
+import { StatusChart } from "../../../../components/SiteDetails/charts/StatusChart";
+import { UptimeChart } from "../../../../components/SiteDetails/charts/UptimeChart";
 
 // Mock react-chartjs-2 components
 type ChartJsMockComponentProperties = Readonly<{
@@ -18,21 +20,21 @@ type ChartJsMockComponentProperties = Readonly<{
     options?: unknown;
 }>;
 
-vi.mock("react-chartjs-2", () => ({
+vi.mock(import('react-chartjs-2'), () => ({
     Line: ({ data, options }: ChartJsMockComponentProperties) => (
-        <div data-testid="line-chart" data-chart-type="line">
+        <div data-chart-type="line" data-testid="line-chart">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>
             <div data-testid="chart-options">{JSON.stringify(options)}</div>
         </div>
     ),
     Doughnut: ({ data, options }: ChartJsMockComponentProperties) => (
-        <div data-testid="doughnut-chart" data-chart-type="doughnut">
+        <div data-chart-type="doughnut" data-testid="doughnut-chart">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>
             <div data-testid="chart-options">{JSON.stringify(options)}</div>
         </div>
     ),
     Bar: ({ data, options }: ChartJsMockComponentProperties) => (
-        <div data-testid="bar-chart" data-chart-type="bar">
+        <div data-chart-type="bar" data-testid="bar-chart">
             <div data-testid="chart-data">{JSON.stringify(data)}</div>
             <div data-testid="chart-options">{JSON.stringify(options)}</div>
         </div>
@@ -532,6 +534,7 @@ describe("ChartComponents", () => {
 
             expect(screen.getByTestId("bar-chart")).toBeInTheDocument();
         });
+
         it("should handle horizontal bar configuration", ({
             task,
             annotate,

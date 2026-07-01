@@ -1,10 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+
+import { objectValues } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MonitoringService } from "../../services/MonitoringService";
 
 const monitoringApi = vi.hoisted(() => ({
     checkSiteNow:
@@ -53,7 +56,7 @@ const getHelpersMock = vi.hoisted(() =>
     }))
 );
 
-vi.mock("../../services/utils/createIpcServiceHelpers", () => ({
+vi.mock(import('../../services/utils/createIpcServiceHelpers'), () => ({
     getIpcServiceHelpers: getHelpersMock,
 }));
 
@@ -63,12 +66,12 @@ const loggerMock = vi.hoisted(() => ({
     info: vi.fn(),
     warn: vi.fn(),
 }));
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: loggerMock,
 }));
 
 const ensureErrorMock = vi.hoisted(() => vi.fn((error: unknown) => error));
-vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
@@ -78,12 +81,10 @@ vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     };
 });
 
-import { MonitoringService } from "../../services/MonitoringService";
-
 describe("MonitoringService edge cases", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        for (const fn of Object.values(monitoringApi)) fn.mockReset();
+        for (const fn of objectValues(monitoringApi)) fn.mockReset();
     });
 
     it("initializes through ensureInitialized", async () => {

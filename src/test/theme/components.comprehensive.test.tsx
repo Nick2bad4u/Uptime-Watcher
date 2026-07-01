@@ -6,10 +6,16 @@
  * component to ensure robust behavior and complete coverage.
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { createElement } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { safeCastTo } from "ts-extras";
 import "@testing-library/jest-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { ThemedButtonProperties } from "../../theme/components/ThemedButton";
+import type { ThemedCardProperties } from "../../theme/components/ThemedCard";
+import type { ThemedCheckboxProperties } from "../../theme/components/ThemedCheckbox";
+import type { ThemedIconButtonProperties } from "../../theme/components/ThemedIconButton";
 
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
@@ -17,18 +23,14 @@ import { ThemedCard } from "../../theme/components/ThemedCard";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedIconButton } from "../../theme/components/ThemedIconButton";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
-import type { ThemedButtonProperties } from "../../theme/components/ThemedButton";
-import type { ThemedCardProperties } from "../../theme/components/ThemedCard";
-import type { ThemedCheckboxProperties } from "../../theme/components/ThemedCheckbox";
-import type { ThemedIconButtonProperties } from "../../theme/components/ThemedIconButton";
 
 // Mock the theme hook
 const mockUseTheme = vi.fn();
 const mockUseThemeClasses = vi.fn();
 
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
     return {
         ...actual,
         useTheme: () => mockUseTheme(),
@@ -37,7 +39,7 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
 });
 
 // Mock status utilities
-vi.mock("../../utils/status", () => {
+vi.mock(import('../../utils/status'), () => {
     const formatStatusLabel = vi.fn(
         (status: string) => status.charAt(0).toUpperCase() + status.slice(1)
     );
@@ -65,13 +67,13 @@ vi.mock("../../utils/status", () => {
 });
 
 // Mock time utilities
-vi.mock("../../utils/time", () => ({
+vi.mock(import('../../utils/time'), () => ({
     formatResponseTime: vi.fn((time?: number) => (time ? `${time}ms` : "0ms")),
 }));
 
 // Mock constants (partial to preserve other exports used by stores/settings)
-vi.mock("../../constants", async (importOriginal) => {
-    const actual = (await importOriginal()) as typeof import("../../constants");
+vi.mock(import('../../constants'), async (importOriginal) => {
+    const actual = (await importOriginal());
     return {
         ...actual,
         ARIA_LABEL: "aria-label",
@@ -177,11 +179,11 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "xs",
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
                 "xl",
+                "xs",
             ] as const;
 
             for (const size of sizes) {
@@ -205,14 +207,14 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const variants = [
-                "primary",
-                "secondary",
-                "tertiary",
+                "error",
                 "ghost",
                 "outline",
+                "primary",
+                "secondary",
                 "success",
+                "tertiary",
                 "warning",
-                "error",
             ] as const;
 
             for (const variant of variants) {
@@ -237,8 +239,8 @@ describe("Theme Components - Comprehensive Coverage", () => {
 
             const types = [
                 "button",
-                "submit",
                 "reset",
+                "submit",
             ] as const;
 
             for (const type of types) {
@@ -364,10 +366,10 @@ describe("Theme Components - Comprehensive Coverage", () => {
                 <ThemedButton
                     {...defaultProps}
                     aria-label="Test Button"
-                    title="Button Title"
-                    style={style}
                     className="custom-button"
                     iconColor="#ff0000"
+                    style={style}
+                    title="Button Title"
                 />
             );
 
@@ -412,8 +414,8 @@ describe("Theme Components - Comprehensive Coverage", () => {
             render(
                 <ThemedCard
                     {...defaultProps}
-                    title="Card Title"
                     subtitle="Card Subtitle"
+                    title="Card Title"
                 />
             );
 
@@ -658,11 +660,11 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "xs",
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
                 "xl",
+                "xs",
             ] as const;
 
             for (const size of sizes) {
@@ -686,14 +688,14 @@ describe("Theme Components - Comprehensive Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const variants = [
-                "primary",
-                "secondary",
-                "tertiary",
+                "error",
                 "ghost",
                 "outline",
+                "primary",
+                "secondary",
                 "success",
+                "tertiary",
                 "warning",
-                "error",
             ] as const;
 
             for (const variant of variants) {

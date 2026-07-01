@@ -125,8 +125,8 @@ export class GoogleDriveAuthFlow {
                 accessToken: token.access_token,
                 expiresAt: now + (token.expires_in ?? 3600) * 1000,
                 refreshToken: token.refresh_token,
-                ...(token.scope ? { scope: token.scope } : {}),
-                ...(token.token_type ? { tokenType: token.token_type } : {}),
+                ...(token.scope && { scope: token.scope }),
+                ...(token.token_type && { tokenType: token.token_type }),
             };
         } finally {
             await server.close();
@@ -140,7 +140,7 @@ export class GoogleDriveAuthFlow {
     }): Promise<GoogleTokenResponse> {
         return requestGoogleOAuthToken({
             clientId: this.clientId,
-            ...(this.clientSecret ? { clientSecret: this.clientSecret } : {}),
+            ...(this.clientSecret && { clientSecret: this.clientSecret }),
             operationLabel: "token exchange",
             params: {
                 code: args.code,

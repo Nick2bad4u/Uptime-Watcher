@@ -19,79 +19,80 @@
 
 /* eslint-disable prefer-named-capture-group */
 
-import { describe, expect, beforeEach, afterEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { arrayFirst, arrayJoin, isEmpty, objectKeys, safeCastTo     } from "ts-extras";
+import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // --- Type declarations to help TS infer fast-check outputs ---
 interface MonitorState {
-    id: number;
-    name: string;
-    url: string;
-    type: "http" | "ping" | "dns" | "port";
-    status: "up" | "down" | "pending" | "paused";
-    interval: number;
-    timeout: number;
-    retries: number;
+    createdAt: Date;
     enabled: boolean;
-    lastChecked: Date | null;
-    responseTime: number | null;
-    uptime: number;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-interface SiteState {
     id: number;
+    interval: number;
+    lastChecked: Date | null;
     name: string;
-    url: string;
-    monitors: number[];
-    status: "up" | "down" | "mixed" | "unknown";
-    overallUptime: number;
-    createdAt: Date;
+    responseTime: null | number;
+    retries: number;
+    status: "down" | "paused" | "pending" | "up";
+    timeout: number;
+    type: "dns" | "http" | "ping" | "port";
     updatedAt: Date;
+    uptime: number;
+    url: string;
 }
 
 interface SettingsState {
-    theme: "light" | "dark" | "auto";
-    language: "en" | "es" | "fr" | "de";
-    notifications: {
-        enabled: boolean;
-        desktop: boolean;
-        email: boolean;
-        sound: boolean;
-    };
+    language: "de" | "en" | "es" | "fr";
     monitoring: {
         defaultInterval: number;
         defaultTimeout: number;
-        maxRetries: number;
         enableAnalytics: boolean;
+        maxRetries: number;
     };
+    notifications: {
+        desktop: boolean;
+        email: boolean;
+        enabled: boolean;
+        sound: boolean;
+    };
+    theme: "auto" | "dark" | "light";
     ui: {
-        sidebarCollapsed: boolean;
-        showTooltips: boolean;
         animationsEnabled: boolean;
         compactMode: boolean;
+        showTooltips: boolean;
+        sidebarCollapsed: boolean;
     };
 }
 
+interface SiteState {
+    createdAt: Date;
+    id: number;
+    monitors: number[];
+    name: string;
+    overallUptime: number;
+    status: "down" | "mixed" | "unknown" | "up";
+    updatedAt: Date;
+    url: string;
+}
+
 type StateAction =
+    | { payload: any; type: "BULK_STATUS_UPDATE" | "UPDATE_STATUS"; }
     | {
+          payload: MonitorState | Partial<MonitorState>;
           type:
               | "ADD_MONITOR"
-              | "UPDATE_MONITOR"
               | "DELETE_MONITOR"
-              | "TOGGLE_MONITOR";
-          payload: Partial<MonitorState> | MonitorState;
+              | "TOGGLE_MONITOR"
+              | "UPDATE_MONITOR";
       }
     | {
-          type: "ADD_SITE" | "UPDATE_SITE" | "DELETE_SITE";
+          payload: object | Partial<SettingsState>;
+          type: "RESET_SETTINGS" | "UPDATE_SETTINGS";
+      }
+    | {
           payload: Partial<SiteState> | SiteState;
-      }
-    | {
-          type: "UPDATE_SETTINGS" | "RESET_SETTINGS";
-          payload: Partial<SettingsState> | object;
-      }
-    | { type: "UPDATE_STATUS" | "BULK_STATUS_UPDATE"; payload: any };
+          type: "ADD_SITE" | "DELETE_SITE" | "UPDATE_SITE";
+      };
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for State Management
@@ -101,69 +102,69 @@ type StateAction =
  * Generates monitor state objects for testing
  */
 const monitorStateData = fc.record<MonitorState>({
-    id: fc.integer({ min: 1, max: 10_000 }),
-    name: fc
-        .string({ minLength: 1, maxLength: 255 })
-        .filter((s) => s.trim().length > 0),
-    url: fc.webUrl(),
-    type: fc.constantFrom("http", "ping", "dns", "port"),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
-    interval: fc.integer({ min: 1000, max: 300_000 }),
-    timeout: fc.integer({ min: 1000, max: 30_000 }),
-    retries: fc.integer({ min: 0, max: 5 }),
+    createdAt: fc.date(),
     enabled: fc.boolean(),
+    id: fc.integer({ max: 10_000, min: 1 }),
+    interval: fc.integer({ max: 300_000, min: 1000 }),
     lastChecked: fc.oneof(fc.date(), fc.constant(null)),
+    name: fc
+        .string({ maxLength: 255, minLength: 1 })
+        .filter((s) => s.trim().length > 0),
     responseTime: fc.oneof(
-        fc.integer({ min: 0, max: 30_000 }),
+        fc.integer({ max: 30_000, min: 0 }),
         fc.constant(null)
     ),
-    uptime: fc.double({ min: 0, max: 100 }),
-    createdAt: fc.date(),
+    retries: fc.integer({ max: 5, min: 0 }),
+    status: fc.constantFrom("up", "down", "pending", "paused"),
+    timeout: fc.integer({ max: 30_000, min: 1000 }),
+    type: fc.constantFrom("http", "ping", "dns", "port"),
     updatedAt: fc.date(),
+    uptime: fc.double({ max: 100, min: 0 }),
+    url: fc.webUrl(),
 });
 
 /**
  * Generates site state objects for testing
  */
 const siteStateData = fc.record<SiteState>({
-    id: fc.integer({ min: 1, max: 1000 }),
-    name: fc
-        .string({ minLength: 1, maxLength: 255 })
-        .filter((s) => s.trim().length > 0),
-    url: fc.webUrl(),
-    monitors: fc.array(fc.integer({ min: 1, max: 10_000 }), {
-        minLength: 0,
-        maxLength: 10,
-    }),
-    status: fc.constantFrom("up", "down", "mixed", "unknown"),
-    overallUptime: fc.double({ min: 0, max: 100 }),
     createdAt: fc.date(),
+    id: fc.integer({ max: 1000, min: 1 }),
+    monitors: fc.array(fc.integer({ max: 10_000, min: 1 }), {
+        maxLength: 10,
+        minLength: 0,
+    }),
+    name: fc
+        .string({ maxLength: 255, minLength: 1 })
+        .filter((s) => s.trim().length > 0),
+    overallUptime: fc.double({ max: 100, min: 0 }),
+    status: fc.constantFrom("up", "down", "mixed", "unknown"),
     updatedAt: fc.date(),
+    url: fc.webUrl(),
 });
 
 /**
- * Generates application settings state for testing
+ * Generates app settings state for testing
  */
 const settingsStateData = fc.record<SettingsState>({
-    theme: fc.constantFrom("light", "dark", "auto"),
     language: fc.constantFrom("en", "es", "fr", "de"),
+    monitoring: fc.record({
+        defaultInterval: fc.integer({ max: 300_000, min: 1000 }),
+        defaultTimeout: fc.integer({ max: 30_000, min: 1000 }),
+        enableAnalytics: fc.boolean(),
+        maxRetries: fc.integer({ max: 10, min: 0 }),
+    }),
     notifications: fc.record({
-        enabled: fc.boolean(),
         desktop: fc.boolean(),
         email: fc.boolean(),
+        enabled: fc.boolean(),
         sound: fc.boolean(),
     }),
-    monitoring: fc.record({
-        defaultInterval: fc.integer({ min: 1000, max: 300_000 }),
-        defaultTimeout: fc.integer({ min: 1000, max: 30_000 }),
-        maxRetries: fc.integer({ min: 0, max: 10 }),
-        enableAnalytics: fc.boolean(),
-    }),
+    theme: fc.constantFrom("light", "dark", "auto"),
     ui: fc.record({
-        sidebarCollapsed: fc.boolean(),
-        showTooltips: fc.boolean(),
         animationsEnabled: fc.boolean(),
         compactMode: fc.boolean(),
+        showTooltips: fc.boolean(),
+        sidebarCollapsed: fc.boolean(),
     }),
 });
 
@@ -173,45 +174,45 @@ const settingsStateData = fc.record<SettingsState>({
 const stateActions: fc.Arbitrary<StateAction> = fc.oneof(
     // Monitor actions
     fc.record({
+        payload: fc.oneof(monitorStateData, fc.record({ id: fc.integer() })),
         type: fc.constantFrom(
             "ADD_MONITOR",
             "UPDATE_MONITOR",
             "DELETE_MONITOR",
             "TOGGLE_MONITOR"
         ),
-        payload: fc.oneof(monitorStateData, fc.record({ id: fc.integer() })),
     }),
     // Site actions
     fc.record({
-        type: fc.constantFrom("ADD_SITE", "UPDATE_SITE", "DELETE_SITE"),
         payload: fc.oneof(siteStateData, fc.record({ id: fc.integer() })),
+        type: fc.constantFrom("ADD_SITE", "UPDATE_SITE", "DELETE_SITE"),
     }),
     // Settings actions
     fc.record({
-        type: fc.constantFrom("UPDATE_SETTINGS", "RESET_SETTINGS"),
         payload: fc.oneof(settingsStateData, fc.record({})),
+        type: fc.constantFrom("UPDATE_SETTINGS", "RESET_SETTINGS"),
     }),
     // Status actions
     fc.record({
-        type: fc.constantFrom("UPDATE_STATUS", "BULK_STATUS_UPDATE"),
         payload: fc.oneof(
             fc.record({ monitorId: fc.integer(), status: fc.string() }),
             fc.array(
                 fc.record({ monitorId: fc.integer(), status: fc.string() })
             )
         ),
+        type: fc.constantFrom("UPDATE_STATUS", "BULK_STATUS_UPDATE"),
     })
-) as unknown as fc.Arbitrary<StateAction>;
+);
 
 // =============================================================================
 // State Management Fuzzing Tests
 // =============================================================================
 
-describe("Comprehensive State Management Fuzzing", () => {
+describe("comprehensive State Management Fuzzing", () => {
     let performanceMetrics: {
         action: string;
-        time: number;
         payload: any;
+        time: number;
     }[] = [];
 
     beforeEach(() => {
@@ -240,22 +241,20 @@ describe("Comprehensive State Management Fuzzing", () => {
 
         performanceMetrics.push({
             action: actionName,
-            time: endTime - startTime,
             payload: args,
+            time: endTime - startTime,
         });
 
         return result;
     }
 
-    describe("State Mutation Safety", () => {
+    describe("state Mutation Safety", () => {
         fcTest.prop([monitorStateData])(
             "Monitor state updates should be immutable",
             (monitorData: MonitorState) => {
                 // Mock store with immutable update logic
                 const monitors = new Map<number, MonitorState>();
                 const mockStore = {
-                    monitors,
-
                     addMonitor: (monitor: MonitorState): MonitorState => {
                         // Validate monitor data
                         if (!monitor.id || monitor.id <= 0) {
@@ -268,14 +267,22 @@ describe("Comprehensive State Management Fuzzing", () => {
                         // Create immutable copy
                         const newMonitor = {
                             ...monitor,
-                            name: monitor.name.trim(),
                             createdAt: new Date(monitor.createdAt),
+                            name: monitor.name.trim(),
                             updatedAt: new Date(),
                         };
 
                         monitors.set(monitor.id, newMonitor);
                         return newMonitor;
                     },
+
+                    getMonitor: (id: number): MonitorState | null => {
+                        const monitor = monitors.get(id);
+                        // Return deep copy to prevent mutation
+                        return monitor ? { ...monitor } : null;
+                    },
+
+                    monitors,
 
                     updateMonitor: (
                         id: number,
@@ -296,12 +303,6 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                         monitors.set(id, updated);
                         return updated;
-                    },
-
-                    getMonitor: (id: number): MonitorState | null => {
-                        const monitor = monitors.get(id);
-                        // Return deep copy to prevent mutation
-                        return monitor ? { ...monitor } : null;
                     },
                 };
 
@@ -328,6 +329,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                 );
 
                 expect(retrievedMonitor).not.toBeNull();
+
                 if (retrievedMonitor) {
                     expect(retrievedMonitor).not.toBe(addedMonitor); // Different reference
                     expect(retrievedMonitor.id).toBe(addedMonitor.id);
@@ -336,14 +338,15 @@ describe("Comprehensive State Management Fuzzing", () => {
         );
 
         fcTest.prop([
-            fc.array(monitorStateData, { minLength: 1, maxLength: 20 }),
+            fc.array(monitorStateData, { maxLength: 20, minLength: 1 }),
             fc.array(
                 fc.record({
-                    id: fc.integer({ min: 1, max: 20 }),
+                    id: fc.integer({ max: 20, min: 1 }),
                     updates: fc.record({
+                        enabled: fc.oneof(fc.boolean(), fc.constant(undefined)),
                         name: fc.oneof(
                             fc
-                                .string({ minLength: 1, maxLength: 100 })
+                                .string({ maxLength: 100, minLength: 1 })
                                 .filter((s) => s.trim().length > 0),
                             fc.constant(undefined)
                         ),
@@ -351,10 +354,9 @@ describe("Comprehensive State Management Fuzzing", () => {
                             fc.constantFrom("up", "down", "pending", "paused"),
                             fc.constant(undefined)
                         ),
-                        enabled: fc.oneof(fc.boolean(), fc.constant(undefined)),
                     }),
                 }),
-                { minLength: 1, maxLength: 10 }
+                { maxLength: 10, minLength: 1 }
             ),
         ])(
             "Bulk state updates should maintain consistency",
@@ -363,26 +365,24 @@ describe("Comprehensive State Management Fuzzing", () => {
                 updates: {
                     id: number;
                     updates: {
+                        enabled?: boolean | undefined;
                         name?: string | undefined;
                         status?:
-                            | "up"
                             | "down"
-                            | "pending"
                             | "paused"
+                            | "pending"
+                            | "up"
                             | undefined;
-                        enabled?: boolean | undefined;
                     };
                 }[]
             ) => {
                 const bulkMonitors = new Map<number, any>();
                 const mockBulkStore = {
-                    monitors: bulkMonitors,
-
                     bulkAdd: (
                         monitors: MonitorState[]
                     ): {
-                        results: MonitorState[];
                         errors: string[];
+                        results: MonitorState[];
                         total: number;
                     } => {
                         const results: MonitorState[] = [];
@@ -412,26 +412,26 @@ describe("Comprehensive State Management Fuzzing", () => {
                             }
                         }
 
-                        return { results, errors, total: monitors.length };
+                        return { errors, results, total: monitors.length };
                     },
 
                     bulkUpdate: (
                         updateRequests: {
                             id: number;
                             updates: {
+                                enabled?: boolean | undefined;
                                 name?: string | undefined;
                                 status?:
-                                    | "up"
                                     | "down"
-                                    | "pending"
                                     | "paused"
+                                    | "pending"
+                                    | "up"
                                     | undefined;
-                                enabled?: boolean | undefined;
                             };
                         }[]
                     ): {
-                        results: MonitorState[];
                         errors: string[];
+                        results: MonitorState[];
                         total: number;
                     } => {
                         const results: MonitorState[] = [];
@@ -463,16 +463,18 @@ describe("Comprehensive State Management Fuzzing", () => {
                         }
 
                         return {
-                            results,
                             errors,
+                            results,
                             total: updateRequests.length,
                         };
                     },
 
                     getState: () => ({
-                        monitors: [...bulkMonitors.values()],
                         count: bulkMonitors.size,
+                        monitors: [...bulkMonitors.values()],
                     }),
+
+                    monitors: bulkMonitors,
                 };
 
                 // Test bulk operations
@@ -490,6 +492,7 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                 // Property: Successfully added monitors should be in state
                 const state = mockBulkStore.getState();
+
                 expect(state.monitors).toHaveLength(addResult.results.length);
 
                 // Test bulk updates
@@ -510,7 +513,9 @@ describe("Comprehensive State Management Fuzzing", () => {
                     const currentState = mockBulkStore.monitors.get(
                         updatedMonitor.id
                     );
+
                     expect(currentState).not.toBeNull();
+
                     if (currentState) {
                         expect(currentState.updatedAt).toBeInstanceOf(Date);
                     }
@@ -519,11 +524,50 @@ describe("Comprehensive State Management Fuzzing", () => {
         );
     });
 
-    describe("Action Validation and Dispatch", () => {
+    describe("action Validation and Dispatch", () => {
         fcTest.prop([stateActions])(
             "State actions should be validated before dispatch",
             (action: StateAction) => {
                 const mockActionDispatcher = {
+                    dispatch(actionToDispatch: StateAction): {
+                        error: null | string;
+                        payload: any;
+                        success: boolean;
+                        type?: string;
+                    } {
+                        const validator =
+                            this.validators[
+                                safeCastTo<keyof typeof this.validators>(actionToDispatch.type)
+                            ];
+
+                        if (!validator) {
+                            return {
+                                error: `Unknown action type: ${actionToDispatch.type}`,
+                                payload: null,
+                                success: false,
+                            };
+                        }
+
+                        const validationErrors = validator(
+                            actionToDispatch.payload
+                        );
+
+                        if (validationErrors.length > 0) {
+                            return {
+                                error: `Validation failed: ${arrayJoin(validationErrors, ", ")}`,
+                                payload: actionToDispatch.payload,
+                                success: false,
+                            };
+                        }
+
+                        return {
+                            error: null,
+                            payload: actionToDispatch.payload,
+                            success: true,
+                            type: actionToDispatch.type,
+                        };
+                    },
+
                     validators: {
                         ADD_MONITOR: (payload: any) => {
                             const errors: string[] = [];
@@ -537,24 +581,6 @@ describe("Comprehensive State Management Fuzzing", () => {
                             if (!payload.url) errors.push("Missing URL");
                             return errors;
                         },
-                        UPDATE_MONITOR: (payload: any) => {
-                            const errors: string[] = [];
-                            if (!payload.id || payload.id <= 0)
-                                errors.push("Invalid ID");
-                            return errors;
-                        },
-                        DELETE_MONITOR: (payload: any) => {
-                            const errors: string[] = [];
-                            if (!payload.id || payload.id <= 0)
-                                errors.push("Invalid ID");
-                            return errors;
-                        },
-                        TOGGLE_MONITOR: (payload: any) => {
-                            const errors: string[] = [];
-                            if (!payload.id || payload.id <= 0)
-                                errors.push("Invalid ID");
-                            return errors;
-                        },
                         ADD_SITE: (payload: any) => {
                             const errors: string[] = [];
                             if (!payload.id || payload.id <= 0)
@@ -566,7 +592,13 @@ describe("Comprehensive State Management Fuzzing", () => {
                                 errors.push("Invalid name");
                             return errors;
                         },
-                        UPDATE_SITE: (payload: any) => {
+                        BULK_STATUS_UPDATE: (payload: any) => {
+                            const errors: string[] = [];
+                            if (!Array.isArray(payload))
+                                errors.push("Payload must be an array");
+                            return errors;
+                        },
+                        DELETE_MONITOR: (payload: any) => {
                             const errors: string[] = [];
                             if (!payload.id || payload.id <= 0)
                                 errors.push("Invalid ID");
@@ -578,21 +610,39 @@ describe("Comprehensive State Management Fuzzing", () => {
                                 errors.push("Invalid ID");
                             return errors;
                         },
+                        RESET_SETTINGS: () => [], // Reset settings has no validation
+                        TOGGLE_MONITOR: (payload: any) => {
+                            const errors: string[] = [];
+                            if (!payload.id || payload.id <= 0)
+                                errors.push("Invalid ID");
+                            return errors;
+                        },
+                        UPDATE_MONITOR: (payload: any) => {
+                            const errors: string[] = [];
+                            if (!payload.id || payload.id <= 0)
+                                errors.push("Invalid ID");
+                            return errors;
+                        },
                         UPDATE_SETTINGS: (payload: any) => {
                             const errors: string[] = [];
                             if (
                                 payload.theme &&
                                 ![
-                                    "light",
-                                    "dark",
                                     "auto",
+                                    "dark",
+                                    "light",
                                 ].includes(payload.theme)
                             ) {
                                 errors.push("Invalid theme");
                             }
                             return errors;
                         },
-                        RESET_SETTINGS: () => [], // Reset settings has no validation
+                        UPDATE_SITE: (payload: any) => {
+                            const errors: string[] = [];
+                            if (!payload.id || payload.id <= 0)
+                                errors.push("Invalid ID");
+                            return errors;
+                        },
                         UPDATE_STATUS: (payload: any) => {
                             const errors: string[] = [];
                             if (!payload.monitorId || payload.monitorId <= 0)
@@ -600,51 +650,6 @@ describe("Comprehensive State Management Fuzzing", () => {
                             if (!payload.status) errors.push("Missing status");
                             return errors;
                         },
-                        BULK_STATUS_UPDATE: (payload: any) => {
-                            const errors: string[] = [];
-                            if (!Array.isArray(payload))
-                                errors.push("Payload must be an array");
-                            return errors;
-                        },
-                    },
-
-                    dispatch(actionToDispatch: StateAction): {
-                        success: boolean;
-                        error: string | null;
-                        payload: any;
-                        type?: string;
-                    } {
-                        const validator =
-                            this.validators[
-                                actionToDispatch.type as keyof typeof this.validators
-                            ];
-
-                        if (!validator) {
-                            return {
-                                success: false,
-                                error: `Unknown action type: ${actionToDispatch.type}`,
-                                payload: null,
-                            };
-                        }
-
-                        const validationErrors = validator(
-                            actionToDispatch.payload
-                        );
-
-                        if (validationErrors.length > 0) {
-                            return {
-                                success: false,
-                                error: `Validation failed: ${validationErrors.join(", ")}`,
-                                payload: actionToDispatch.payload,
-                            };
-                        }
-
-                        return {
-                            success: true,
-                            error: null,
-                            payload: actionToDispatch.payload,
-                            type: actionToDispatch.type,
-                        };
                     },
                 };
 
@@ -656,15 +661,15 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                 // Property: Dispatcher should never throw
                 expect(result).toHaveProperty("success");
-                expect(typeof result.success).toBe("boolean");
+                expect(result.success).toBeTypeOf("boolean");
 
                 // Property: Unknown action types should be rejected
                 if (
-                    !Object.keys(mockActionDispatcher.validators).includes(
+                    !objectKeys(mockActionDispatcher.validators).includes(
                         action.type
                     )
                 ) {
-                    expect(result.success).toBeFalsy();
+                    expect(result.success).toBe(false);
                     expect(result.error).toContain("Unknown action type");
                 }
 
@@ -674,19 +679,16 @@ describe("Comprehensive State Management Fuzzing", () => {
                     action.payload &&
                     (!action.payload.id || action.payload.id <= 0)
                 ) {
-                    expect(result.success).toBeFalsy();
+                    expect(result.success).toBe(false);
                     expect(result.error).toContain("Invalid ID");
                 }
             }
         );
 
-        fcTest.prop([fc.array(stateActions, { minLength: 1, maxLength: 20 })])(
+        fcTest.prop([fc.array(stateActions, { maxLength: 20, minLength: 1 })])(
             "Action queue should process actions in order",
             (actionQueue: StateAction[]) => {
                 const mockActionQueue = {
-                    queue: [] as any[],
-                    processed: [] as any[],
-
                     enqueue(actionsToQueue: StateAction[]): {
                         queued: number;
                         totalInQueue: number;
@@ -697,11 +699,12 @@ describe("Comprehensive State Management Fuzzing", () => {
                             totalInQueue: this.queue.length,
                         };
                     },
+                    processed: safeCastTo<any[]>([]),
 
                     processQueue(): {
                         processed: number;
-                        results: any[];
                         queueEmpty: boolean;
+                        results: any[];
                     } {
                         const results: any[] = [];
 
@@ -721,12 +724,12 @@ describe("Comprehensive State Management Fuzzing", () => {
                             } catch (error) {
                                 const failed = {
                                     ...action,
-                                    processedAt: new Date(),
-                                    success: false,
                                     error:
-                                        error instanceof Error
+                                        Error.isError(error)
                                             ? error.message
                                             : "Unknown error",
+                                    processedAt: new Date(),
+                                    success: false,
                                 };
 
                                 this.processed.push(failed);
@@ -736,10 +739,12 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                         return {
                             processed: results.length,
+                            queueEmpty: isEmpty(this.queue),
                             results,
-                            queueEmpty: this.queue.length === 0,
                         };
                     },
+
+                    queue: safeCastTo<any[]>([]),
                 };
 
                 // Enqueue actions
@@ -760,7 +765,7 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                 // Property: All actions should be processed
                 expect(processResult.processed).toBe(actionQueue.length);
-                expect(processResult.queueEmpty).toBeTruthy();
+                expect(processResult.queueEmpty).toBe(true);
                 expect(processResult.results).toHaveLength(actionQueue.length);
 
                 // Property: Actions should be processed in order
@@ -771,53 +776,20 @@ describe("Comprehensive State Management Fuzzing", () => {
         );
     });
 
-    describe("State Persistence and Recovery", () => {
+    describe("state Persistence and Recovery", () => {
         fcTest.prop([
             fc.record({
                 monitors: fc.array(monitorStateData, {
-                    minLength: 0,
                     maxLength: 10,
+                    minLength: 0,
                 }),
-                sites: fc.array(siteStateData, { minLength: 0, maxLength: 5 }),
                 settings: settingsStateData,
+                sites: fc.array(siteStateData, { maxLength: 5, minLength: 0 }),
             }),
         ])(
             "State persistence should maintain data integrity",
             (stateSnapshot) => {
                 const mockPersistence = {
-                    serialize(state: typeof stateSnapshot) {
-                        try {
-                            // Simulate state serialization with validation
-                            const serialized = JSON.stringify(
-                                state,
-                                (_key, value) => {
-                                    if (value instanceof Date) {
-                                        return {
-                                            __type: "Date",
-                                            value: value.toISOString(),
-                                        };
-                                    }
-                                    return value;
-                                }
-                            );
-
-                            return {
-                                success: true,
-                                data: serialized,
-                                size: serialized.length,
-                            };
-                        } catch (error) {
-                            return {
-                                success: false,
-                                error:
-                                    error instanceof Error
-                                        ? error.message
-                                        : "Serialization failed",
-                                data: null,
-                            };
-                        }
-                    },
-
                     deserialize(serializedData: string) {
                         try {
                             const parsed = JSON.parse(
@@ -839,7 +811,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                                         (key === "createdAt" ||
                                             key === "updatedAt" ||
                                             key === "lastChecked") &&
-                                        /^[+-]?\d{4,6}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(
+                                        /^[+-]?\d{4,6}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/u.test(
                                             value
                                         )
                                     ) {
@@ -855,18 +827,51 @@ describe("Comprehensive State Management Fuzzing", () => {
                             );
 
                             return {
-                                success: true,
                                 state: parsed,
+                                success: true,
                                 valid: this.validateState(parsed),
                             };
                         } catch (error) {
                             return {
-                                success: false,
                                 error:
-                                    error instanceof Error
+                                    Error.isError(error)
                                         ? error.message
                                         : "Deserialization failed",
                                 state: null,
+                                success: false,
+                            };
+                        }
+                    },
+
+                    serialize(state: typeof stateSnapshot) {
+                        try {
+                            // Simulate state serialization with validation
+                            const serialized = JSON.stringify(
+                                state,
+                                (_key, value) => {
+                                    if (value instanceof Date) {
+                                        return {
+                                            __type: "Date",
+                                            value: value.toISOString(),
+                                        };
+                                    }
+                                    return value;
+                                }
+                            );
+
+                            return {
+                                data: serialized,
+                                size: serialized.length,
+                                success: true,
+                            };
+                        } catch (error) {
+                            return {
+                                data: null,
+                                error:
+                                    Error.isError(error)
+                                        ? error.message
+                                        : "Serialization failed",
+                                success: false,
                             };
                         }
                     },
@@ -876,7 +881,7 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                         if (!state || typeof state !== "object") {
                             errors.push("Invalid state object");
-                            return { valid: false, errors };
+                            return { errors, valid: false };
                         }
 
                         if (state.monitors && !Array.isArray(state.monitors)) {
@@ -894,7 +899,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                             errors.push("Settings must be object");
                         }
 
-                        return { valid: errors.length === 0, errors };
+                        return { errors, valid: isEmpty(errors) };
                     },
                 };
 
@@ -906,11 +911,11 @@ describe("Comprehensive State Management Fuzzing", () => {
                 );
 
                 expect(serialResult).toHaveProperty("success");
-                expect(typeof serialResult.success).toBe("boolean");
+                expect(serialResult.success).toBeTypeOf("boolean");
 
                 if (serialResult.success && serialResult.data) {
                     // Property: Serialized data should be valid JSON string
-                    expect(typeof serialResult.data).toBe("string");
+                    expect(serialResult.data).toBeTypeOf("string");
                     expect(serialResult.size).toBeGreaterThan(0);
 
                     // Test deserialization
@@ -920,7 +925,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                         serialResult.data
                     );
 
-                    expect(deserialResult.success).toBeTruthy();
+                    expect(deserialResult.success).toBe(true);
 
                     if (deserialResult.success && deserialResult.state) {
                         // Property: Deserialized state should match original structure
@@ -939,10 +944,10 @@ describe("Comprehensive State Management Fuzzing", () => {
                         // Property: Date objects should be restored (if they were valid originally)
                         if (
                             stateSnapshot.monitors.length > 0 &&
-                            stateSnapshot.monitors[0]
+                            arrayFirst(stateSnapshot.monitors)
                         ) {
                             const originalDate =
-                                stateSnapshot.monitors[0].createdAt;
+                                arrayFirst(stateSnapshot.monitors).createdAt;
                             const deserializedDate =
                                 deserialResult.state.monitors[0]?.createdAt;
 
@@ -954,7 +959,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                                 expect(deserializedDate).toBeInstanceOf(Date);
                                 expect(
                                     Number.isNaN(deserializedDate.getTime())
-                                ).toBeFalsy();
+                                ).toBe(false);
                             } else {
                                 // If the original date was invalid (NaN), it becomes null during serialization
                                 expect(deserializedDate).toBeNull();
@@ -1002,11 +1007,11 @@ describe("Comprehensive State Management Fuzzing", () => {
                             // Try fixing common JSON issues
                             () => {
                                 let fixed = corruptedDataStr.replaceAll(
-                                    /,(\s*[\]}])/g,
-                                    "$1"
+                                    /,(?=\s*[\]}])/gu,
+                                    ""
                                 ); // Remove trailing commas
                                 fixed = fixed.replaceAll(
-                                    /([,{]\s*)(\w+):/g,
+                                    /([,{]\s*)(\w+):/gu,
                                     '$1"$2":'
                                 ); // Quote unquoted keys
                                 const result = JSON.parse(fixed);
@@ -1024,29 +1029,29 @@ describe("Comprehensive State Management Fuzzing", () => {
                             // Return default state
                             () => ({
                                 monitors: [],
-                                sites: [],
                                 settings: {
-                                    theme: "light",
                                     language: "en",
-                                    notifications: {
-                                        enabled: true,
-                                        desktop: false,
-                                        email: false,
-                                        sound: false,
-                                    },
                                     monitoring: {
                                         defaultInterval: 60_000,
                                         defaultTimeout: 30_000,
-                                        maxRetries: 3,
                                         enableAnalytics: true,
+                                        maxRetries: 3,
                                     },
+                                    notifications: {
+                                        desktop: false,
+                                        email: false,
+                                        enabled: true,
+                                        sound: false,
+                                    },
+                                    theme: "light",
                                     ui: {
-                                        sidebarCollapsed: false,
-                                        showTooltips: true,
                                         animationsEnabled: true,
                                         compactMode: false,
+                                        showTooltips: true,
+                                        sidebarCollapsed: false,
                                     },
                                 },
+                                sites: [],
                             }),
                         ];
 
@@ -1059,32 +1064,32 @@ describe("Comprehensive State Management Fuzzing", () => {
                             try {
                                 const result = recoveryStrategy();
                                 attempts.push({
+                                    result,
                                     strategy: i,
                                     success: true,
-                                    result,
                                 });
                                 return {
+                                    attempts,
                                     recovered: true,
                                     state: result,
-                                    attempts,
                                     strategy: i,
                                 };
                             } catch (error) {
                                 attempts.push({
-                                    strategy: i,
-                                    success: false,
                                     error:
-                                        error instanceof Error
+                                        Error.isError(error)
                                             ? error.message
                                             : "Unknown error",
+                                    strategy: i,
+                                    success: false,
                                 });
                             }
                         }
 
                         return {
+                            attempts,
                             recovered: false,
                             state: null,
-                            attempts,
                             strategy: -1,
                         };
                     },
@@ -1099,7 +1104,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                 // Property: Recovery should never throw
                 expect(recoveryResult).toHaveProperty("recovered");
                 expect(recoveryResult).toHaveProperty("attempts");
-                expect(Array.isArray(recoveryResult.attempts)).toBeTruthy();
+                expect(Array.isArray(recoveryResult.attempts)).toBe(true);
 
                 // Property: Recovery should try multiple strategies
                 expect(recoveryResult.attempts.length).toBeGreaterThan(0);
@@ -1107,7 +1112,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                 // Property: If recovery succeeds, state should be valid
                 if (recoveryResult.recovered) {
                     expect(recoveryResult.state).not.toBeNull();
-                    expect(typeof recoveryResult.state).toBe("object");
+                    expect(recoveryResult.state).toBeTypeOf("object");
                     expect(recoveryResult.strategy).toBeGreaterThanOrEqual(0);
                 }
 
@@ -1121,23 +1126,21 @@ describe("Comprehensive State Management Fuzzing", () => {
 
                 if (successfulStrategies.length > 0) {
                     // Should stop at first successful strategy
-                    expect(recoveryResult.recovered).toBeTruthy();
+                    expect(recoveryResult.recovered).toBe(true);
                 }
             }
         );
     });
 
-    describe("Performance and Concurrency", () => {
+    describe("performance and Concurrency", () => {
         fcTest.prop(
-            [fc.array(stateActions, { minLength: 50, maxLength: 200 })],
-            { timeout: 10_000, numRuns: 3 }
+            [fc.array(stateActions, { maxLength: 200, minLength: 50 })],
+            { numRuns: 3, timeout: 10_000 }
         )(
             "High-frequency state updates should maintain performance",
             (highFrequencyActions) => {
                 const mockHighPerfStore = {
-                    state: new Map(),
                     actionCount: 0,
-
                     batchProcess: (actions: typeof highFrequencyActions) => {
                         const startTime = performance.now();
                         const results: any[] = [];
@@ -1151,9 +1154,9 @@ describe("Comprehensive State Management Fuzzing", () => {
                                 mockHighPerfStore.actionCount++;
                                 results.push({
                                     actionIndex: i + index,
-                                    type: action.type,
                                     processed: true,
                                     timestamp: performance.now(),
+                                    type: action.type,
                                 });
                             }
                         }
@@ -1162,15 +1165,17 @@ describe("Comprehensive State Management Fuzzing", () => {
                         const totalTime = endTime - startTime;
 
                         return {
-                            processed: results.length,
-                            totalTime,
-                            averageTime: totalTime / results.length,
                             actionsPerSecond: Math.round(
                                 results.length / (totalTime / 1000)
                             ),
+                            averageTime: totalTime / results.length,
+                            processed: results.length,
                             results,
+                            totalTime,
                         };
                     },
+
+                    state: new Map(),
                 };
 
                 const result = measureStateAction(
@@ -1192,6 +1197,7 @@ describe("Comprehensive State Management Fuzzing", () => {
                 expect(result.results).toHaveLength(
                     highFrequencyActions.length
                 );
+
                 for (let i = 0; i < Math.min(10, result.results.length); i++) {
                     expect(result.results[i].actionIndex).toBe(i);
                 }

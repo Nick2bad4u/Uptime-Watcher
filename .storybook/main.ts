@@ -5,7 +5,7 @@ import config from "../storybook/main.ts";
 
 const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
     ? ((): typeof config.stories => {
-          const normalizedStories = Array.from(config.stories);
+          const normalizedStories = [...config.stories];
 
           for (const [index, entry] of normalizedStories.entries()) {
               if (typeof entry === "string" && entry.startsWith("./")) {
@@ -21,9 +21,9 @@ const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
  * Storybook configuration shim used to bridge the new `storybook/` directory
  * structure with tooling that still expects `.storybook/` entry points.
  */
-const storybookConfig: StorybookConfig = {
+const storybookConfig = {
     ...config,
     stories,
-};
+} satisfies StorybookConfig;
 
 export default storybookConfig;

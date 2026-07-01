@@ -377,7 +377,7 @@ async function withTimeout<T>(args: {
     readonly timeoutMs: number;
 }): Promise<T> {
     const { onTimeout, promise, timeoutMs } = args;
-    let timeoutId: NodeJS.Timeout | undefined = undefined;
+    let timeoutId: NodeJS.Timeout | undefined;
     const TIMEOUT = Symbol("timeout");
 
     try {
@@ -461,7 +461,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 const rawResponse: unknown = await withTimeout({
                     onTimeout: () =>
                         new IpcError(
-                            `Timed out verifying IPC handler for channel '${String(channel)}'`,
+                            `Timed out verifying IPC handler for channel '${channel}'`,
                             channel,
                             undefined,
                             {
@@ -486,7 +486,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 
                 if (!verificationResult.registered) {
                     preloadDiagnosticsLogger.error(
-                        `[IPC Bridge] No handler registered for channel '${String(channel)}'.`,
+                        `[IPC Bridge] No handler registered for channel '${channel}'.`,
                         undefined,
                         {
                             availableChannels:
@@ -494,7 +494,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                         }
                     );
                     throw new IpcError(
-                        `No handler registered for channel '${String(channel)}'`,
+                        `No handler registered for channel '${channel}'`,
                         channel,
                         undefined,
                         {
@@ -514,7 +514,7 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
 
                 // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
                 throw new IpcError(
-                    `Failed verifying handler for channel '${String(channel)}': ${getUserFacingErrorDetail(
+                    `Failed verifying handler for channel '${channel}': ${getUserFacingErrorDetail(
                         error
                     )}`,
                     channel,
@@ -712,7 +712,7 @@ export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
                 domain,
                 guard: guardName,
                 payloadType: Array.isArray(result) ? "array" : typeof result,
-                ...(payloadPreview ? { payloadPreview } : {}),
+                ...(payloadPreview && { payloadPreview }),
                 reason: options.reason ?? "response-validation",
             }
         );
@@ -729,7 +729,7 @@ export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
                 domain,
                 phase: "invoke-result-validation",
             },
-            ...(payloadPreview ? { payloadPreview } : {}),
+            ...(payloadPreview && { payloadPreview }),
             reason: options.reason ?? "response-validation",
         });
 

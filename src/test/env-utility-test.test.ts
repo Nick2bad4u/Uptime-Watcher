@@ -2,8 +2,8 @@
  * Simple utility coverage test with environment imports.
  */
 
-import { describe, expect, it } from "vitest";
 import { getEnvironment, getNodeEnv } from "@shared/utils/environment";
+import { describe, expect, it } from "vitest";
 
 describe("Environment Utility Coverage Test", () => {
     it("should test environment functions", ({ task, annotate }) => {

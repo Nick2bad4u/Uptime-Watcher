@@ -2,14 +2,13 @@
  * Unit coverage for cloud object key normalization.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
-    DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
     assertCloudObjectKey,
+    DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
     normalizeCloudObjectKey,
     normalizeProviderObjectKey,
 } from "@shared/utils/cloudKeyNormalization";
+import { describe, expect, it } from "vitest";
 
 describe("cloudKeyNormalization", () => {
     it("normalizes Windows separators and strips leading slashes by default", () => {
@@ -53,7 +52,7 @@ describe("cloudKeyNormalization", () => {
     });
 
     it("assertCloudObjectKey rejects empty and trailing slash keys", () => {
-        expect(() => assertCloudObjectKey("")).toThrow("cannot be empty");
-        expect(() => assertCloudObjectKey("backups/")).toThrow("must not end");
+        expect(() => { assertCloudObjectKey(""); }).toThrow("cannot be empty");
+        expect(() => { assertCloudObjectKey("backups/"); }).toThrow("must not end");
     });
 });

@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { validateOAuthAuthorizeUrl } from "@electron/services/cloud/providers/oauthAuthorizeUrl";
+import { describe, expect, it } from "vitest";
 
 describe("validateOAuthAuthorizeUrl()", () => {
     it("accepts https URLs", () => {
@@ -21,9 +20,9 @@ describe("validateOAuthAuthorizeUrl()", () => {
         expect(() =>
             validateOAuthAuthorizeUrl({
                 providerName: "Test",
-                url: "http://example.com/oauth?x=1",
+                url: "https://example.com/oauth?x=1",
             })
-        ).toThrow(/unexpected.*OAuth URL/iu);
+        ).toThrow(/unexpected.*oauth url/iv);
     });
 
     it("rejects non-https schemes (mailto)", () => {
@@ -32,7 +31,7 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "mailto:test@example.com",
             })
-        ).toThrow(/unexpected.*OAuth URL/iu);
+        ).toThrow(/unexpected.*oauth url/iv);
     });
 
     it("rejects disallowed schemes (file)", () => {
@@ -41,7 +40,7 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "file:///C:/Windows/System32",
             })
-        ).toThrow(/disallowed.*OAuth URL/iu);
+        ).toThrow(/disallowed.*oauth url/iv);
     });
 
     it("rejects credential-bearing URLs", () => {
@@ -50,6 +49,6 @@ describe("validateOAuthAuthorizeUrl()", () => {
                 providerName: "Test",
                 url: "https://user:pass@example.com/oauth",
             })
-        ).toThrow(/disallowed.*OAuth URL/iu);
+        ).toThrow(/disallowed.*oauth url/iv);
     });
 });

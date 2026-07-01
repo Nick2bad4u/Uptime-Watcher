@@ -21,7 +21,7 @@ export function isRetryNonErrorThrownError(
     value: unknown
 ): value is Error & { readonly cause: unknown } {
     return (
-        value instanceof Error &&
+        Error.isError(value) &&
         Reflect.get(value, RETRY_NON_ERROR_THROWN_MARKER) === true
     );
 }
@@ -127,7 +127,7 @@ function resolveDelayMs(args: {
 }
 
 function raiseNonRetryableRetryError(error: unknown): never {
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         throw error;
     }
 
@@ -269,7 +269,7 @@ export async function withRetry<T>(
         throw new Error("[withRetry] Operation failed without an error");
     }
 
-    if (lastError instanceof Error) {
+    if (Error.isError(lastError)) {
         throw lastError;
     }
 

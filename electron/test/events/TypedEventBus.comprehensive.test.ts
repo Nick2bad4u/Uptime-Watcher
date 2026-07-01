@@ -4,20 +4,21 @@
  */
 
 import {
-    describe,
-    it,
-    expect,
-    beforeEach,
-    vi,
     afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
     type Mock,
+    vi,
 } from "vitest";
+
 import {
-    TypedEventBus,
     createTypedEventBus,
-    type EventMiddleware,
     type EventBusDiagnostics,
+    type EventMiddleware,
     type EventPayloadValue,
+    TypedEventBus,
 } from "../../events/TypedEventBus";
 
 // Mock logger to prevent actual logging during tests
@@ -43,20 +44,20 @@ vi.mock("@shared/utils/correlation", () => ({
 
 // Define comprehensive test event types
 interface TestEvents extends Record<string, EventPayloadValue> {
-    "string-event": string;
-    "number-event": number;
-    "object-event": { data: string; nested: { value: number } };
+    [key: string]: EventPayloadValue;
+    [key: symbol]: EventPayloadValue;
     "array-event": number[];
-    "object-with-meta": { data: string; _meta: string };
     "complex-object": {
         id: string;
         items: { name: string; value: number }[];
     };
-    "primitive-boolean": boolean;
     "null-event": null;
+    "number-event": number;
+    "object-event": { data: string; nested: { value: number } };
+    "object-with-meta": { _meta: string; data: string; };
+    "primitive-boolean": boolean;
+    "string-event": string;
     "undefined-event": undefined;
-    [key: string]: EventPayloadValue;
-    [key: symbol]: EventPayloadValue;
 }
 
 describe("TypedEventBus - Comprehensive Coverage", () => {
@@ -263,7 +264,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             bus.registerMiddleware(mockMiddleware);
             bus.registerMiddleware(mockMiddleware2);
 
-            expect(() => bus.registerMiddleware(vi.fn())).toThrow(
+            expect(() => { bus.registerMiddleware(vi.fn()); }).toThrow(
                 "Maximum middleware limit (2) exceeded. Consider increasing maxMiddleware or combining middleware functions."
             );
         });
@@ -310,8 +311,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
-            const removed = eventBus.removeMiddleware(mockMiddleware);
-            expect(removed).toBeTruthy();
+            const isRemoved = eventBus.removeMiddleware(mockMiddleware);
+            expect(isRemoved).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should return false when removing non-existent middleware", async ({
@@ -327,8 +328,8 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.registerMiddleware(mockMiddleware);
             const nonExistentMiddleware = vi.fn();
 
-            const removed = eventBus.removeMiddleware(nonExistentMiddleware);
-            expect(removed).toBeFalsy();
+            const isRemoved = eventBus.removeMiddleware(nonExistentMiddleware);
+            expect(isRemoved).toBeFalsy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should clear all middleware", async ({ task, annotate }) => {
@@ -925,7 +926,7 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             eventBus.onTyped("string-event", mockListener);
 
             const bigIntValue =
-                BigInt(123_456_789_012_345_678_901_234_567_890n);
+                123_456_789_012_345_678_901_234_567_890n;
 
             await eventBus.emitTyped("string-event", bigIntValue as any);
 
@@ -1047,13 +1048,13 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             expect(eventBus.getDiagnostics().middlewareCount).toBe(3);
 
-            const removed = eventBus.removeMiddleware(duplicateMiddleware);
-            expect(removed).toBeTruthy();
+            const isRemoved = eventBus.removeMiddleware(duplicateMiddleware);
+            expect(isRemoved).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(2);
 
             // Should only remove first occurrence
-            const secondRemove = eventBus.removeMiddleware(duplicateMiddleware);
-            expect(secondRemove).toBeTruthy();
+            const isSecondRemove = eventBus.removeMiddleware(duplicateMiddleware);
+            expect(isSecondRemove).toBeTruthy();
             expect(eventBus.getDiagnostics().middlewareCount).toBe(1);
         });
         it("should handle middleware processing with empty middleware array", async () => {

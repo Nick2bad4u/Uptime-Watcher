@@ -176,7 +176,7 @@ export interface ChartData {
     /** Datasets for the chart */
     datasets: ChartDatasetConfig[];
     /** Labels for the chart */
-    labels?: Array<number | string>;
+    labels?: (number | string)[];
 }
 
 /**
@@ -212,7 +212,7 @@ export interface ChartDatasetConfig {
     /** Border width */
     borderWidth?: number;
     /** Dataset data points */
-    data: Array<ChartDataPoint | number>;
+    data: (ChartDataPoint | number)[];
     /** Whether to fill the area under the line */
     fill?: boolean;
     /** Dataset label */

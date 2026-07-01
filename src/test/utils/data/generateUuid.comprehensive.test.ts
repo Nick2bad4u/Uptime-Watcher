@@ -11,7 +11,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { generateUuid } from "../../../utils/data/generateUuid";
 
-const FALLBACK_ID_REGEX = /^site-[\da-z]{12}-\d{16}$/;
+const FALLBACK_ID_REGEX = /^site-[\da-z]{12}-\d{16}$/v;
 
 const toBaseThirtySixSixChars = (value: number): string =>
     value.toString(36).padStart(6, "0").slice(-6);
@@ -24,7 +24,7 @@ interface CryptoLike {
 function installCryptoMock(cryptoValue: CryptoLike | undefined): {
     restore: () => void;
 } {
-    const original = globalThis.crypto;
+    const original = crypto;
     // The runtime property is writable in tests; TS type is readonly.
     globalThis.crypto = cryptoValue as unknown as Crypto;
     return {
@@ -40,10 +40,10 @@ describe(generateUuid, () => {
         vi.useRealTimers();
     });
 
-    describe("Native crypto.randomUUID Behavior", () => {
+    describe("native crypto.randomUUID Behavior", () => {
         it("should use crypto.randomUUID when available", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
@@ -72,8 +72,8 @@ describe(generateUuid, () => {
         });
 
         it("should tolerate crypto.randomUUID returning an empty string", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
@@ -92,10 +92,10 @@ describe(generateUuid, () => {
         });
     });
 
-    describe("Fallback Behavior", () => {
+    describe("fallback Behavior", () => {
         it("should use the fallback format when crypto is unavailable", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
@@ -120,8 +120,8 @@ describe(generateUuid, () => {
         });
 
         it("should fall back when crypto.randomUUID exists but throws, and should prefer crypto.getRandomValues when available", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
@@ -169,8 +169,8 @@ describe(generateUuid, () => {
         });
 
         it("should fall back to the deterministic strategy when crypto.getRandomValues throws", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
@@ -200,10 +200,10 @@ describe(generateUuid, () => {
         });
     });
 
-    describe("Uniqueness", () => {
+    describe("uniqueness", () => {
         it("should generate unique fallback IDs under rapid successive calls", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
@@ -218,6 +218,7 @@ describe(generateUuid, () => {
                 const ids = Array.from({ length: 1000 }, () => generateUuid());
 
                 expect(new Set(ids).size).toBe(ids.length);
+
                 for (const id of ids) {
                     expect(id).toMatch(FALLBACK_ID_REGEX);
                 }

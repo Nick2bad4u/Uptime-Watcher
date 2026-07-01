@@ -1,6 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
 import { fetchGoogleAccountLabel } from "@electron/services/cloud/providers/googleDrive/fetchGoogleAccountLabel";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe(fetchGoogleAccountLabel, () => {
     beforeEach(() => {

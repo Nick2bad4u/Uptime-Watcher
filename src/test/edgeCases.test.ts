@@ -1,5 +1,5 @@
 /**
- * Edge cases test file. Basic tests for edge cases in the application.
+ * Edge cases test file. Basic tests for edge cases in the app.
  */
 
 import { describe, expect, it } from "vitest";
@@ -31,7 +31,7 @@ describe("Edge Cases", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        const testValue = undefined;
+        const testValue;
         expect(testValue).toBeUndefined();
     });
 });

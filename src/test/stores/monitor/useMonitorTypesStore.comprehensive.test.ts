@@ -5,28 +5,31 @@
  * all state management, actions, error handling, and IPC interactions.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, renderHook } from "@testing-library/react";
 import type {
     Monitor,
-    MonitorType,
     MonitorFieldDefinition,
+    MonitorType,
 } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
-import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+
+import { act, renderHook } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock dependencies (partial mock to preserve exports like ApplicationError)
-vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
     return {
         ...actual,
         ensureError: vi.fn((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         ),
         withErrorHandling: vi.fn(async (operation, store) => {
             // Simulate the real withErrorHandling behavior
@@ -36,7 +39,7 @@ vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
                 return await operation();
             } catch (error: unknown) {
                 const errorMessage =
-                    error instanceof Error ? error.message : String(error);
+                    Error.isError(error) ? error.message : String(error);
                 store.setError(errorMessage);
                 throw error;
             } finally {
@@ -46,7 +49,7 @@ vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     };
 });
 
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -84,9 +87,7 @@ const createMonitorTypeConfig = (
                 type: "url",
             },
         ] satisfies MonitorTypeConfig["fields"]),
-    ...(overrides.uiConfig === undefined
-        ? {}
-        : { uiConfig: overrides.uiConfig }),
+    ...(overrides.uiConfig !== undefined && { uiConfig: overrides.uiConfig }),
 });
 
 describe(useMonitorTypesStore, () => {
@@ -134,7 +135,7 @@ describe(useMonitorTypesStore, () => {
             expect(result.current.isLoaded).toBeFalsy();
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
             expect(result.current.monitorTypes).toEqual([]);
         });
     });
@@ -193,7 +194,7 @@ describe(useMonitorTypesStore, () => {
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
             expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.fieldConfigs).toEqual({
-                http: mockMonitorTypes[0]!.fields,
+                http: arrayFirst(mockMonitorTypes)!.fields,
                 ping: mockMonitorTypes[1]!.fields,
             });
             expect(
@@ -736,7 +737,7 @@ describe(useMonitorTypesStore, () => {
                 };
             });
 
-            const config = result.current.getFieldConfig("http" as MonitorType);
+            const config = result.current.getFieldConfig("http");
             expect(config).toEqual(httpFields);
         });
 
@@ -768,7 +769,7 @@ describe(useMonitorTypesStore, () => {
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            const config = result.current.getFieldConfig("http" as MonitorType);
+            const config = result.current.getFieldConfig("http");
             expect(config).toBeUndefined();
         });
     });
@@ -793,7 +794,7 @@ describe(useMonitorTypesStore, () => {
             useErrorStore.getState().clearStoreError("monitor-types");
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
         });
 
         it("should support operation loading lifecycle", async ({
@@ -837,7 +838,7 @@ describe(useMonitorTypesStore, () => {
 
             const mockMonitorTypes: MonitorTypeConfig[] = [
                 {
-                    type: "http" as MonitorType,
+                    type: "http",
                     displayName: "HTTP",
                     description: "HTTP monitoring",
                     version: "1.0",
@@ -882,9 +883,9 @@ describe(useMonitorTypesStore, () => {
 
             // Get field config
             const fieldConfig = result.current.getFieldConfig(
-                "http" as MonitorType
+                "http"
             );
-            expect(fieldConfig).toEqual(mockMonitorTypes[0]!.fields);
+            expect(fieldConfig).toEqual(arrayFirst(mockMonitorTypes)!.fields);
 
             // Validate monitor data
             let validationResult: ValidationResult;
@@ -940,7 +941,7 @@ describe(useMonitorTypesStore, () => {
 
             // Then recover with successful call
             const mockMonitorTypes: MonitorTypeConfig[] = [
-                createMonitorTypeConfig({ type: "http" as MonitorType }),
+                createMonitorTypeConfig({ type: safeCastTo<MonitorType>("http") }),
             ];
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
@@ -953,7 +954,7 @@ describe(useMonitorTypesStore, () => {
 
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
             expect(result.current.isLoaded).toBeTruthy();
             expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
         });
@@ -970,13 +971,13 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Data Loading", "type");
 
             const mockMonitorTypes: MonitorTypeConfig[] = [
-                createMonitorTypeConfig({ type: "http" as MonitorType }),
+                createMonitorTypeConfig({ type: safeCastTo<MonitorType>("http") }),
             ];
 
             // Delay the first call
             mockElectronAPI.monitorTypes.getMonitorTypes.mockReturnValue(
                 new Promise((resolve) =>
-                    setTimeout(() => resolve(mockMonitorTypes), 100)
+                    setTimeout(() => { resolve(mockMonitorTypes); }, 100)
                 )
             );
 

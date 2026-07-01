@@ -1,5 +1,5 @@
 /**
- * Centralized error store for managing application errors and loading states.
+ * Centralized error store for managing app errors and loading states.
  * Provides global error handling and store-specific error tracking.
  *
  * @remarks
@@ -10,8 +10,8 @@
  * - Operation-specific loading states for fine-grained UI feedback
  * - Centralized error clearing and recovery mechanisms
  *
- * The store integrates with the application's error boundary system and
- * provides standardized error handling patterns across all application stores.
+ * The store integrates with the app's error boundary system and
+ * provides standardized error handling patterns across all app stores.
  *
  * @example
  *
@@ -41,13 +41,13 @@ import type { ErrorStore } from "./types";
 import { logStoreAction } from "../utils";
 
 /**
- * Zustand store for centralized error management across the application.
+ * Zustand store for centralized error management across the app.
  *
  * @remarks
  * This store provides a unified interface for handling errors and loading
- * states throughout the application. It supports both global error states and
+ * states throughout the app. It supports both global error states and
  * store-specific error isolation to prevent error cross-contamination between
- * different parts of the application.
+ * different parts of the app.
  *
  * @public
  */

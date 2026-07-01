@@ -29,14 +29,14 @@ const CustomFallback = ({
 }) => (
     <div data-testid="custom-fallback">
         <p>Custom error: {error?.message}</p>
-        <button onClick={onRetry} data-testid="custom-retry">
+        <button data-testid="custom-retry" onClick={onRetry}>
             Custom Retry
         </button>
     </div>
 );
 
 // Mock logger to avoid console output during tests
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
     },
@@ -66,7 +66,7 @@ describe(ErrorBoundary, () => {
 
             expect(screen.getByTestId("normal-content")).toBeInTheDocument();
             expect(
-                screen.queryByText(/Something went wrong/)
+                screen.queryByText(/Something went wrong/v)
             ).not.toBeInTheDocument();
         });
 
@@ -121,7 +121,7 @@ describe(ErrorBoundary, () => {
                 screen.queryByTestId("normal-content")
             ).not.toBeInTheDocument();
             expect(
-                screen.getByText(/Something went wrong/)
+                screen.getByText(/Something went wrong/v)
             ).toBeInTheDocument();
         });
 
@@ -236,7 +236,7 @@ describe(ErrorBoundary, () => {
 
             // Should show error initially
             expect(
-                screen.getByText(/Something went wrong/)
+                screen.getByText(/Something went wrong/v)
             ).toBeInTheDocument();
 
             // Fix the condition to stop throwing
@@ -342,7 +342,7 @@ describe(ErrorBoundary, () => {
 
             // Should show error
             expect(
-                screen.getByText(/Something went wrong/)
+                screen.getByText(/Something went wrong/v)
             ).toBeInTheDocument();
 
             // Fix the component state
@@ -510,6 +510,6 @@ describe("withErrorBoundary HOC", () => {
 
         render(<WrappedComponent />);
 
-        expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+        expect(screen.getByText(/Something went wrong/v)).toBeInTheDocument();
     });
 });

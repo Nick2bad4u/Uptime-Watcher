@@ -3,7 +3,7 @@
  * DISABLED: Test had complex mock setup issues - to be refactored later
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("Resilient Database Operations Integration", () => {
     describe("MonitorRepository.findById with Operational Hooks", () => {

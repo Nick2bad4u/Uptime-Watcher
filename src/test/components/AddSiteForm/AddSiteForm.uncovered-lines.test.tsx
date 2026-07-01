@@ -1,33 +1,44 @@
 import type { Site } from "@shared/types";
-import React from "react";
 import type {
     ButtonHTMLAttributes,
     HTMLAttributes,
     PropsWithChildren,
 } from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import * as React from "react";
 import "@testing-library/jest-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
+// Import the mocked handleSubmit
+import { handleSubmit } from "../../../components/AddSiteForm/Submit";
+// Import the mocked logger to access the spies
+import { logger } from "../../../services/logger";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
-import { createMockSite } from "../../utils/mockFactories";
 import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../../utils/createSitesStoreMock";
+import { createMockSite } from "../../utils/mockFactories";
 
 // Mock logger service with inline functions
-vi.mock("../../../constants", async (importOriginal) => {
+vi.mock(import('../../../constants'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../../constants");
+        (await importOriginal());
     return {
         ...actual,
         ARIA_LABEL: "aria-label",
         TRANSITION_ALL: "transition-all",
     };
 });
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -36,22 +47,10 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-// Import the mocked logger to access the spies
-import { logger } from "../../../services/logger";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-
 // Mock the handleSubmit function
-vi.mock("../../../components/AddSiteForm/Submit", () => ({
+vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
     handleSubmit: vi.fn(),
 }));
-
-// Import the mocked handleSubmit
-import { handleSubmit } from "../../../components/AddSiteForm/Submit";
-import {
-    sampleOne,
-    siteIdentifierArbitrary,
-    siteNameArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock console.error to capture error handling
 const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -85,7 +84,7 @@ interface GlobalWithSitesStoreMock {
 const globalWithMock = globalThis as unknown as GlobalWithSitesStoreMock;
 globalWithMock.__useSitesStoreMock_uncovered__ = useSitesStoreMock;
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -95,7 +94,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
             throw new Error("useSitesStore mock was not initialized");
         }
 
-        return hook(selector, equality) as Result | typeof sitesStoreState;
+        return hook(selector, equality);
     },
 }));
 
@@ -107,7 +106,7 @@ const resetSitesStoreState = (): void => {
     });
 };
 
-vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
+vi.mock(import('../../../stores/monitor/useMonitorTypesStore'), () => ({
     useMonitorTypesStore: () => ({
         monitorTypes: [
             "http",
@@ -120,14 +119,14 @@ vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
     }),
 }));
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(
         (
             selector?: (state: {
                 clearError: () => void;
+                formError?: unknown;
                 isLoading: boolean;
                 lastError: string | undefined;
-                formError?: unknown;
             }) => unknown
         ) => {
             const state = {
@@ -152,7 +151,7 @@ const mockSetFormError = vi.fn();
 const mockClearError = vi.fn();
 const mockOnSuccess = vi.fn();
 
-vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
     useAddSiteForm: () => ({
         // Form state
         addMode: "new",
@@ -194,7 +193,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     }),
 }));
 
-vi.mock("../../../hooks/useMonitorFields", () => ({
+vi.mock(import('../../../hooks/useMonitorFields'), () => ({
     useMonitorFields: () => ({
         getFieldsForMonitorType: vi.fn(() => []),
         isLoading: false,
@@ -202,7 +201,7 @@ vi.mock("../../../hooks/useMonitorFields", () => ({
     }),
 }));
 
-vi.mock("../../../hooks/useDynamicHelpText", () => ({
+vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: () => ({
         getHelpText: vi.fn(() => ""),
         isLoading: false,
@@ -220,7 +219,7 @@ type SelectFieldMockProperties = Readonly<{
     options?: readonly SelectOption[];
 }>;
 
-vi.mock("../../../components/AddSiteForm/SelectField", () => ({
+vi.mock(import('../../../components/AddSiteForm/SelectField'), () => ({
     SelectField: ({ onChange, options, id }: SelectFieldMockProperties) => (
         <select data-testid={id} onChange={(e) => onChange?.(e.target.value)}>
             {options?.map((option) => (
@@ -242,7 +241,7 @@ type RadioGroupMockProperties = Readonly<{
     options?: readonly SelectOption[];
 }>;
 
-vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
+vi.mock(import('../../../components/AddSiteForm/RadioGroup'), () => ({
     RadioGroup: ({ onChange, options, id }: RadioGroupMockProperties) => {
         React.useEffect(() => {
             // Trigger an invalid add mode value once on mount to exercise the
@@ -255,9 +254,9 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
                 {options?.map((option) => (
                     <label key={option.value}>
                         <input
+                            onChange={(e) => onChange?.(e.target.value)}
                             type="radio"
                             value={option.value}
-                            onChange={(e) => onChange?.(e.target.value)}
                         />
                         {option.label}
                     </label>
@@ -273,12 +272,12 @@ type TextFieldMockProperties = Readonly<{
     type?: string;
 }>;
 
-vi.mock("../../../components/AddSiteForm/TextField", () => ({
+vi.mock(import('../../../components/AddSiteForm/TextField'), () => ({
     TextField: ({ onChange, id, type }: TextFieldMockProperties) => (
         <input
             data-testid={id}
-            type={type || "text"}
             onChange={(e) => onChange?.(e.target.value)}
+            type={type || "text"}
         />
     ),
 }));
@@ -287,7 +286,7 @@ type DynamicMonitorFieldsMockProperties = Readonly<{
     monitorType: string;
 }>;
 
-vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
+vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
     DynamicMonitorFields: ({
         monitorType: _monitorType,
     }: DynamicMonitorFieldsMockProperties) => (
@@ -299,7 +298,7 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     ),
 }));
 
-vi.mock("../../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: () => ({
         monitorTypes: [
             { id: "http", label: "HTTP/HTTPS" },
@@ -317,9 +316,9 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
     }),
 }));
 
-vi.mock("../../../constants", async (importOriginal) => {
+vi.mock(import('../../../constants'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../../constants");
+        (await importOriginal());
     return {
         ...actual,
         CHECK_INTERVALS: [
@@ -335,11 +334,11 @@ vi.mock("../../../constants", async (importOriginal) => {
     };
 });
 
-vi.mock("../../../utils/data/generateUuid", () => ({
+vi.mock(import('../../../utils/data/generateUuid'), () => ({
     generateUuid: () => "mock-uuid",
 }));
 
-vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: () => false,
 }));
 
@@ -357,13 +356,13 @@ type ErrorAlertMockProperties = Readonly<{
     onDismiss: () => void;
 }>;
 
-vi.mock("../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({ children }: ThemedBoxMockProperties) => (
         <div className="themed-box">{children}</div>
     ),
 }));
 
-vi.mock("../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({ children, onClick, type }: ThemedButtonMockProperties) => (
         <button className="themed-button" onClick={onClick} type={type}>
             {children}
@@ -371,13 +370,13 @@ vi.mock("../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children }: ThemedTextMockProperties) => (
         <span className="themed-text">{children}</span>
     ),
 }));
 
-vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
+vi.mock(import('../../../components/common/ErrorAlert/ErrorAlert'), () => ({
     ErrorAlert: ({ message, onDismiss }: ErrorAlertMockProperties) => (
         <div data-testid="error-alert">
             {message}
@@ -386,7 +385,7 @@ vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
     ),
 }));
 
-vi.mock("../../../components/AddSiteForm/Submit", () => ({
+vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
     handleSubmit: vi.fn(),
 }));
 
@@ -489,9 +488,9 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(mockResetForm).toHaveBeenCalled();
+            expect(mockResetForm).toHaveBeenCalledWith();
         });
-        expect(mockOnSuccess).toHaveBeenCalled();
+        expect(mockOnSuccess).toHaveBeenCalledWith();
     });
 
     it("should cover dynamic field change handlers", async ({
@@ -599,11 +598,11 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         });
 
         // Find and click the clear button in the error alert
-        const clearButton = screen.getByRole("button", { name: /clear/i });
+        const clearButton = screen.getByRole("button", { name: /clear/iv });
         fireEvent.click(clearButton);
 
         await waitFor(() => {
-            expect(mockClearError).toHaveBeenCalled();
+            expect(mockClearError).toHaveBeenCalledWith();
         });
         expect(mockSetFormError).toHaveBeenCalledWith(undefined);
     });
@@ -671,7 +670,7 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         // The sites.map logic should be executed when rendering existing site options
         await waitFor(() => {
             expect(
-                screen.getByRole("button", { name: /add/i })
+                screen.getByRole("button", { name: /add/iv })
             ).toBeInTheDocument();
             // The mapping logic creates options from sites array
             // This test ensures that code path is exercised

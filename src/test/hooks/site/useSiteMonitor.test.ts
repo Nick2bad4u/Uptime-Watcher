@@ -4,24 +4,25 @@
  * @file Src/test/hooks/site/useSiteMonitor.test.ts
  */
 
-import { renderHook, act } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import React from "react";
-import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
-import { createMockSite, createMockMonitor } from "../../utils/mockFactories";
-
 import type { Site } from "@shared/types";
+import type * as React from "react";
+
+import { act, renderHook } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
 
+import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
 import { createSitesStoreMock } from "../../utils/createSitesStoreMock";
+import { createMockMonitor, createMockSite } from "../../utils/mockFactories";
 
 const useSitesStoreMockRef = vi.hoisted(() => ({
-    current: undefined as SelectorHookMock<any> | undefined,
+    current: safeCastTo<SelectorHookMock<any> | undefined>(undefined),
 }));
 
 // Mock the dependencies
-vi.mock("../../../stores/sites/useSitesStore", async () => {
+vi.mock(import('../../../stores/sites/useSitesStore'), async () => {
     const { createSelectorHookMock } =
         await import("../../utils/createSelectorHookMock");
     const { createSitesStoreMock } =
@@ -223,7 +224,7 @@ describe("useSiteMonitor Hook", () => {
             const { result } = renderHook(() => useSiteMonitor(mockSite));
 
             expect(result.current.filteredHistory).toHaveLength(2);
-            expect(result.current.filteredHistory[0]?.status).toBe("up");
+            expect(arrayFirst(result.current.filteredHistory)?.status).toBe("up");
         });
 
         it("should handle monitor with no history", async ({

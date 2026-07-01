@@ -4,9 +4,7 @@ import { MIN_CHECK_INTERVAL } from "./constants";
 
 const JITTER_PERCENTAGE = 0.1;
 
-// Backoff must be able to exceed typical monitoring intervals; otherwise
-// repeated failures won't slow down and can amplify provider throttling or
-// local resource contention.
+// Backoff must be able to exceed typical monitoring intervals; otherwise repeated failures won't slow down and can amplify provider throttling or local resource contention.
 //
 // NOTE: This is a global cap. The effective cap is `max(baseIntervalMs, cap)`
 // so user-configured intervals are never reduced by the backoff logic.

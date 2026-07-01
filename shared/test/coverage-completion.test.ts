@@ -2,10 +2,10 @@
  * @file Tests to achieve 100% coverage for remaining uncovered lines
  */
 
+import { validateMonitorField } from "@shared/validation/monitorSchemas";
 import { describe, expect, it } from "vitest";
 
-import { safeStringify } from "../../shared/utils/stringConversion";
-import { validateMonitorField } from "@shared/validation/monitorSchemas";
+import { safeStringify } from "../utils/stringConversion";
 
 describe("100% Coverage - Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89", () => {

@@ -1,9 +1,9 @@
 /**
- * Hook for synchronizing data when the application window gains focus.
+ * Hook for synchronizing data when the app window gains focus.
  *
  * @remarks
  * Provides functionality to automatically refresh data from the backend when
- * users return to the application after being away. Uses window focus events to
+ * users return to the app after being away. Uses window focus events to
  * trigger full backend synchronization when enabled. Errors are handled
  * internally by the store's error handling system through
  * {@link useSitesStore}'s `withErrorHandling` wrapper, so the fire-and-forget
@@ -17,7 +17,7 @@ import { useCallback, useEffect } from "react";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 
 /**
- * Custom hook that synchronizes application data when the window gains focus.
+ * Custom hook that synchronizes app data when the window gains focus.
  *
  * @example
  *

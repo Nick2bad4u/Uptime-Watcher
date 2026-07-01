@@ -5,16 +5,16 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    BASE_MONITOR_TYPES,
+    DEFAULT_MONITOR_STATUS,
+    DEFAULT_SITE_STATUS,
     isComputedSiteStatus,
     isMonitorStatus,
     isSiteStatus,
-    validateMonitor,
-    type MonitorStatus,
     type Monitor,
-    BASE_MONITOR_TYPES,
     MONITOR_STATUS,
-    DEFAULT_MONITOR_STATUS,
-    DEFAULT_SITE_STATUS,
+    type MonitorStatus,
+    validateMonitor,
 } from "../types";
 
 describe("shared/types.ts main functions", () => {
@@ -31,7 +31,7 @@ describe("shared/types.ts main functions", () => {
             const validMonitor: Monitor = {
                 id: "monitor3",
                 type: "ping" as const,
-                status: "up" as MonitorStatus,
+                status: "up",
                 checkInterval: 45,
                 timeout: 25,
                 retryAttempts: 1,
@@ -43,8 +43,8 @@ describe("shared/types.ts main functions", () => {
             };
 
             // First check the actual validation
-            const result = validateMonitor(validMonitor);
-            expect(result).toBeTruthy();
+            const isResult = validateMonitor(validMonitor);
+            expect(isResult).toBeTruthy();
         });
     });
 });
@@ -319,7 +319,7 @@ describe("shared/types.ts function coverage", () => {
             const validMonitor: Monitor = {
                 id: "monitor1",
                 type: "http" as const,
-                status: "up" as MonitorStatus,
+                status: "up",
                 checkInterval: 60,
                 timeout: 30,
                 retryAttempts: 3,

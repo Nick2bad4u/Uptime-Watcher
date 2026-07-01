@@ -3,28 +3,27 @@
  *   addresses 25.98% coverage by testing all public and private methods
  */
 
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    type MockedFunction,
-} from "vitest";
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
     Site,
 } from "@shared/types";
-import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import type { MonitorRow } from "@shared/types/database";
+import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Database } from "node-sqlite3-wasm";
 
-import { SiteWriterService } from "../../../services/database/SiteWriterService";
-import { createMonitorSignature } from "../../../services/database/siteWriterService/monitorPersistenceUtils";
-import { SiteNotFoundError } from "../../../services/database/interfaces";
-import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockedFunction,
+    vi,
+} from "vitest";
+
 import type { DatabaseService } from "../../../services/database/DatabaseService";
+import type { MonitoringConfig } from "../../../services/database/interfaces";
 import type {
     MonitorRepository,
     MonitorRepositoryTransactionAdapter,
@@ -33,9 +32,12 @@ import type {
     SiteRepository,
     SiteRepositoryTransactionAdapter,
 } from "../../../services/database/SiteRepository";
-import type { Logger } from "@shared/utils/logger/interfaces";
-import type { MonitoringConfig } from "../../../services/database/interfaces";
+import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
+
 import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
+import { SiteNotFoundError } from "../../../services/database/interfaces";
+import { SiteWriterService } from "../../../services/database/SiteWriterService";
+import { createMonitorSignature } from "../../../services/database/siteWriterService/monitorPersistenceUtils";
 
 // Helper function to create complete Monitor objects
 const createCompleteMonitor = (
@@ -123,7 +125,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 },
             ]),
             update: vi.fn(),
-        } satisfies MonitorRepositoryTransactionAdapter as MonitorRepositoryTransactionAdapter;
+        } satisfies MonitorRepositoryTransactionAdapter;
 
         mockMonitorRepository = {
             createTransactionAdapter: vi
@@ -396,7 +398,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 true
             );
 
-            const result = await siteWriterService.deleteSite(
+            const isResult = await siteWriterService.deleteSite(
                 mockSitesCache,
                 "test-site"
             );
@@ -416,7 +418,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 "test-site"
             );
             expect(siteAdapter.delete).toHaveBeenCalledWith("test-site");
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Site removed successfully from database: test-site"
             );
@@ -443,7 +445,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 false
             );
 
-            const result = await siteWriterService.deleteSite(
+            const isResult = await siteWriterService.deleteSite(
                 mockSitesCache,
                 "nonexistent-site"
             );
@@ -462,7 +464,7 @@ describe("SiteWriterService Coverage Tests", () => {
                 "nonexistent-site"
             );
             expect(siteAdapter.delete).toHaveBeenCalledWith("nonexistent-site");
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "Site not found in database for removal: nonexistent-site"
             );

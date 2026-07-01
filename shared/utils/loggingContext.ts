@@ -171,7 +171,7 @@ const collectSecretReplacements = (value: string): SecretReplacement[] => {
         // Only treat `key=` patterns as secret-bearing when they appear at a
         // boundary (i.e., not in the middle of another identifier). This
         // prevents substring matches such as `token=` inside `access_token=`.
-        return !/[a-z0-9_]/u.test(previousChar);
+        return !/[0-9_a-z]/u.test(previousChar);
     };
 
     for (const key of SECRET_QUERY_KEYS) {
@@ -195,7 +195,7 @@ const applySecretReplacements = (
         return value;
     }
 
-    const sorted = Array.from(replacements).toSorted(
+    const sorted = [...replacements].toSorted(
         (left, right) => right.startIndex - left.startIndex
     );
 
@@ -214,7 +214,7 @@ const maskAuthTokens = (value: string): string => {
     const masked = value.replaceAll(
         // Strip the entire scheme+token (policy/tests prefer not leaking even
         // the presence of auth headers).
-        /(?:basic|bearer|token)\s+[-\w.~+/]+=*/giu,
+        /(?:basic|bearer|token)\s+[\w+\-./~]+=*/giu,
         SECRET_PLACEHOLDER
     );
 
@@ -291,19 +291,15 @@ function normalizeNonPlainObject(
         };
     }
 
-    if (candidate instanceof Error) {
+    if (Error.isError(candidate)) {
         const errorWithCause = safeCastTo(candidate);
         return {
             kind: "normalized",
             value: {
                 message: normalizeLogString(candidate.message),
                 name: normalizeLogString(candidate.name),
-                ...(candidate.stack
-                    ? { stack: normalizeLogString(candidate.stack) }
-                    : {}),
-                ...(objectHasIn(castUnchecked<UnknownRecord>(errorWithCause), "cause")
-                    ? { cause: normalize(errorWithCause.cause) }
-                    : {}),
+                ...(candidate.stack && { stack: normalizeLogString(candidate.stack) }),
+                ...(objectHasIn(castUnchecked<UnknownRecord>(errorWithCause), "cause") && { cause: normalize(errorWithCause.cause) }),
             } satisfies UnknownRecord,
         };
     }
@@ -369,11 +365,7 @@ export const normalizeLogValue = (value: unknown): unknown => {
         if (isRecord(candidate)) {
             const sanitizedRecord: UnknownRecord = {};
             for (const [key, entry] of objectEntries(candidate)) {
-                if (isSecretMetadataKey(key)) {
-                    sanitizedRecord[key] = SECRET_PLACEHOLDER;
-                } else {
-                    sanitizedRecord[key] = normalize(entry);
-                }
+                sanitizedRecord[key] = isSecretMetadataKey(key) ? SECRET_PLACEHOLDER : normalize(entry);
             }
             return sanitizedRecord;
         }

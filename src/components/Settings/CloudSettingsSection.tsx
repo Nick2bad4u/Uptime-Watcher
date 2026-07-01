@@ -172,7 +172,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     }, [connectGoogleDrive, fireAndForget]);
     const confirmDisconnect = useCallback(
         async function confirmDisconnectCallback(): Promise<void> {
-            const confirmed = await requestConfirmation({
+            const isConfirmed = await requestConfirmation({
                 confirmLabel: "Disconnect",
                 message:
                     "Disconnect the current cloud provider and clear stored credentials?",
@@ -180,7 +180,7 @@ export const CloudSettingsSection = (): JSX.Element => {
                 tone: "danger",
             });
 
-            if (!confirmed) {
+            if (!isConfirmed) {
                 return;
             }
 
@@ -225,14 +225,14 @@ export const CloudSettingsSection = (): JSX.Element => {
         ): Promise<void> {
             const entry = backups.find((backup) => backup.key === key);
 
-            const confirmed = await requestConfirmation({
+            const isConfirmed = await requestConfirmation({
                 confirmLabel: "Restore",
                 message: `Restore backup '${entry?.fileName ?? key}'? This will overwrite your current database.`,
                 title: "Restore Backup",
                 tone: "danger",
             });
 
-            if (!confirmed) {
+            if (!isConfirmed) {
                 return;
             }
 
@@ -256,14 +256,14 @@ export const CloudSettingsSection = (): JSX.Element => {
         async function confirmDeleteBackupCallback(key: string): Promise<void> {
             const entry = backups.find((backup) => backup.key === key);
 
-            const confirmed = await requestConfirmation({
+            const isConfirmed = await requestConfirmation({
                 confirmLabel: "Delete",
                 message: `Delete remote backup '${entry?.fileName ?? key}'? This cannot be undone.`,
                 title: "Delete Remote Backup",
                 tone: "danger",
             });
 
-            if (!confirmed) {
+            if (!isConfirmed) {
                 return;
             }
 
@@ -320,7 +320,7 @@ export const CloudSettingsSection = (): JSX.Element => {
     const handleClearEncryptionKey = useCallback(
         function handleClearEncryptionKeyCallback(): void {
             fireAndForget(async () => {
-                const confirmed = await requestConfirmation({
+                const isConfirmed = await requestConfirmation({
                     confirmLabel: "Clear key",
                     message:
                         "Clear the locally cached encryption key? You will need to re-enter the passphrase to sync or restore encrypted backups on this device.",
@@ -328,7 +328,7 @@ export const CloudSettingsSection = (): JSX.Element => {
                     tone: "danger",
                 });
 
-                if (!confirmed) {
+                if (!isConfirmed) {
                     return;
                 }
 
@@ -354,7 +354,7 @@ export const CloudSettingsSection = (): JSX.Element => {
                 return;
             }
 
-            const confirmed = await requestConfirmation({
+            const isConfirmed = await requestConfirmation({
                 confirmLabel: args.deleteSource
                     ? "Encrypt + delete"
                     : "Encrypt",
@@ -365,7 +365,7 @@ export const CloudSettingsSection = (): JSX.Element => {
                 tone: args.deleteSource ? "danger" : "default",
             });
 
-            if (!confirmed) {
+            if (!isConfirmed) {
                 return;
             }
 
@@ -404,7 +404,7 @@ export const CloudSettingsSection = (): JSX.Element => {
                 return;
             }
 
-            const confirmed = await requestConfirmation({
+            const isConfirmed = await requestConfirmation({
                 confirmLabel: "Reset remote sync",
                 message:
                     "Reset the remote sync history and re-seed from this device? Other devices may lose unsynced changes and will need to resync.",
@@ -412,14 +412,11 @@ export const CloudSettingsSection = (): JSX.Element => {
                 tone: "danger",
             });
 
-            if (!confirmed) {
+            if (!isConfirmed) {
                 return;
             }
 
-            const uniqueDeviceCount = new Set([
-                ...preview.deviceIds,
-                ...preview.operationDeviceIds,
-            ]).size;
+            const uniqueDeviceCount = new Set(Iterator.concat(preview.deviceIds, preview.operationDeviceIds)).size;
             const expected = `RESET ${uniqueDeviceCount}`;
             const typed = await requestPrompt({
                 confirmLabel: "Confirm reset",
@@ -472,29 +469,24 @@ export const CloudSettingsSection = (): JSX.Element => {
         [configureFilesystemProvider, fireAndForget]
     );
 
-    const syncEnabled = status?.syncEnabled ?? false;
-    const connected = status?.connected ?? false;
+    const isSyncEnabled = status?.syncEnabled ?? false;
+    const isConnected = status?.connected ?? false;
 
     const syncEnabledControl = useMemo(
         (): JSX.Element => (
             <div className="flex items-center gap-2">
                 <ThemedCheckbox
                     aria-label="Enable cloud sync"
-                    checked={syncEnabled}
-                    disabled={!connected || isSettingSyncEnabled}
+                    checked={isSyncEnabled}
+                    disabled={!isConnected || isSettingSyncEnabled}
                     onChange={handleSyncEnabledChange}
                 />
                 <ThemedText size="sm" variant="secondary">
-                    {syncEnabled ? "Enabled" : "Disabled"}
+                    {isSyncEnabled ? "Enabled" : "Disabled"}
                 </ThemedText>
             </div>
         ),
-        [
-            connected,
-            handleSyncEnabledChange,
-            isSettingSyncEnabled,
-            syncEnabled,
-        ]
+        [handleSyncEnabledChange, isConnected, isSettingSyncEnabled, isSyncEnabled]
     );
 
     return (

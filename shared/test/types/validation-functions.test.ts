@@ -5,11 +5,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    type BaseValidationResult,
     createFailureResult,
     createSuccessResult,
     isValidationResult,
     type ValidationResult,
-    type BaseValidationResult,
 } from "../../types/validation";
 
 describe("shared/types/validation function coverage", () => {

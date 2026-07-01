@@ -3,7 +3,8 @@
  * Targeting lines 86-89 specifically
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Final Coverage", () => {
@@ -41,8 +42,7 @@ describe("String Conversion - Final Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // While we can't easily make typeof return an unknown value in normal JavaScript,
-            // we can at least ensure our default case is structured correctly
+            // While we can't easily make typeof return an unknown value in normal JavaScript, we can at least ensure our default case is structured correctly
 
             // Create a mock object that might simulate unusual typeof behavior
             const mockValue = {
@@ -76,7 +76,7 @@ describe("String Conversion - Final Coverage", () => {
             expect(safeStringify(0)).toBe("0");
             expect(safeStringify(false)).toBe("false");
             expect(safeStringify("")).toBe("");
-            expect(safeStringify(Number.NaN)).toBe("NaN");
+            expect(safeStringify(NaN)).toBe("NaN");
 
             // These should reach the switch statement's undefined case
             expect(safeStringify(undefined)).toBe("");

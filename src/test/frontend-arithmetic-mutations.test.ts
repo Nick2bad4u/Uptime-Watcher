@@ -13,7 +13,7 @@
  * @tags ["mutation-testing", "arithmetic", "stryker", "frontend"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Frontend ArithmeticOperator Mutation Tests", () => {
     beforeEach(() => {
@@ -52,7 +52,7 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             expect(correctSmallWidth).toBe(720); // 800 * 0.9 = 720
 
             const mutatedSmallWidth = Math.min(smallViewport / 0.9, maxAllowed);
-            expect(mutatedSmallWidth).toBe(888.888_888_888_888_9); // 800 / 0.9 = 888.89
+            expect(mutatedSmallWidth).toBe(888.8888888888889); // 800 / 0.9 = 888.89
 
             // The correct calculation should be smaller for small viewports
             expect(correctSmallWidth).toBeLessThan(smallViewport);
@@ -84,7 +84,7 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
 
             // Mutated calculation would divide
             const mutatedMaxHeight = Math.min(viewportH / 0.9, maxAllowed);
-            expect(mutatedMaxHeight).toBe(666.666_666_666_666_6); // 600 / 0.9 = 666.67
+            expect(mutatedMaxHeight).toBe(666.6666666666666); // 600 / 0.9 = 666.67
 
             // Correct value should be less than viewport
             expect(correctMaxHeight).toBeLessThan(viewportH);
@@ -102,10 +102,8 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: UI Layout", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: src/components/SiteDetails/ScreenshotThumbnail.tsx, Line: 140
-            // Original: let top = rect.top - overlayH - 16;
-            // Mutated: rect.top - overlayH + 16
+            // This test specifically targets the mutation: File: src/components/SiteDetails/ScreenshotThumbnail.tsx, Line: 140 Original: let top = rect.top - overlayH - 16; Mutated:
+            // rect.top - overlayH + 16
 
             const rect = { top: 500 };
             const overlayH = 200;
@@ -135,9 +133,8 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: UI Layout", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test targets multiple mutations in Line: 141
-            // Original: let left = rect.left + rect.width / 2 - overlayW / 2;
-            // Various mutants: +/-, different divisions
+            // This test targets multiple mutations in Line: 141 Original:
+            // let left = rect.left + rect.width / 2 - overlayW / 2; Various mutants: +/-, different divisions
 
             const rect = { left: 100, width: 200 };
             const overlayW = 50;
@@ -181,10 +178,8 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: UI Layout", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: src/components/SiteDetails/ScreenshotThumbnail.tsx, Line: 144
-            // Original: top = rect.bottom + 16;
-            // Mutated: rect.bottom - 16
+            // This test specifically targets the mutation: File: src/components/SiteDetails/ScreenshotThumbnail.tsx, Line: 144 Original: top = rect.bottom + 16; Mutated:
+            // rect.bottom - 16
 
             const rect = { bottom: 300 };
             const gap = 16;
@@ -226,18 +221,18 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // Correct overflow check
             const overlayRight = left + overlayW; // 950 + 100 = 1050
             const viewportLimit = viewportW - margin; // 1000 - 8 = 992
-            const correctOverflow = overlayRight > viewportLimit; // 1050 > 992 = true
-            expect(correctOverflow).toBeTruthy();
+            const isCorrectOverflow = overlayRight > viewportLimit; // 1050 > 992 = true
+            expect(isCorrectOverflow).toBeTruthy();
 
             // Mutant 1: left - overlayW
             const mutant1Left = left - overlayW; // 950 - 100 = 850
-            const mutant1Overflow = mutant1Left > viewportLimit; // 850 > 992 = false
-            expect(mutant1Overflow).toBeFalsy();
+            const isMutant1Overflow = mutant1Left > viewportLimit; // 850 > 992 = false
+            expect(isMutant1Overflow).toBeFalsy();
 
             // Mutant 2: viewportW + 8
             const mutant2Limit = viewportW + margin; // 1000 + 8 = 1008
-            const mutant2Overflow = overlayRight > mutant2Limit; // 1050 > 1008 = true
-            expect(mutant2Overflow).toBeTruthy();
+            const isMutant2Overflow = overlayRight > mutant2Limit; // 1050 > 1008 = true
+            expect(isMutant2Overflow).toBeTruthy();
 
             // With different values where mutant 2 would fail
             const left2 = 950;
@@ -248,11 +243,11 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // Both should be true here, but with values in between:
             const leftBetween = 945;
             const overlayRightBetween = leftBetween + overlayW; // 1045
-            const correctOverflowBetween = overlayRightBetween > viewportLimit; // 1045 > 992 = true
-            const mutant2OverflowBetween = overlayRightBetween > mutant2Limit; // 1045 > 1008 = true
+            const isCorrectOverflowBetween = overlayRightBetween > viewportLimit; // 1045 > 992 = true
+            const isMutant2OverflowBetween = overlayRightBetween > mutant2Limit; // 1045 > 1008 = true
 
-            expect(correctOverflowBetween).toBeTruthy();
-            expect(mutant2OverflowBetween).toBeTruthy();
+            expect(isCorrectOverflowBetween).toBeTruthy();
+            expect(isMutant2OverflowBetween).toBeTruthy();
 
             // Try values that would show the difference
             const leftEdge = 936; // Exactly at edge for mutant
@@ -269,11 +264,11 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // Let's try smaller overlay to find difference
             const leftTest = 1000;
             const overlayRightTest = leftTest + overlayW; // 1100
-            const correctOverflowTest = overlayRightTest > viewportLimit; // 1100 > 992 = true
-            const mutant2OverflowTest = overlayRightTest > mutant2Limit; // 1100 > 1008 = true
+            const isCorrectOverflowTest = overlayRightTest > viewportLimit; // 1100 > 992 = true
+            const isMutant2OverflowTest = overlayRightTest > mutant2Limit; // 1100 > 1008 = true
 
-            expect(correctOverflowTest).toBeTruthy();
-            expect(mutant2OverflowTest).toBeTruthy();
+            expect(isCorrectOverflowTest).toBeTruthy();
+            expect(isMutant2OverflowTest).toBeTruthy();
         });
 
         it("should check vertical overflow correctly (kills top - overlayH and viewportH + 8 mutants)", async ({
@@ -298,21 +293,21 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             // Correct overflow check
             const overlayBottom = top + overlayH; // 650 + 100 = 750
             const viewportLimit = viewportH - margin; // 700 - 8 = 692
-            const correctOverflow = overlayBottom > viewportLimit; // 750 > 692 = true
-            expect(correctOverflow).toBeTruthy();
+            const isCorrectOverflow = overlayBottom > viewportLimit; // 750 > 692 = true
+            expect(isCorrectOverflow).toBeTruthy();
 
             // Mutant 1: top - overlayH
             const mutant1Bottom = top - overlayH; // 650 - 100 = 550
-            const mutant1Overflow = mutant1Bottom > viewportLimit; // 550 > 692 = false
-            expect(mutant1Overflow).toBeFalsy();
+            const isMutant1Overflow = mutant1Bottom > viewportLimit; // 550 > 692 = false
+            expect(isMutant1Overflow).toBeFalsy();
 
             // Mutant 2: viewportH + 8
             const mutant2Limit = viewportH + margin; // 700 + 8 = 708
-            const mutant2Overflow = overlayBottom > mutant2Limit; // 750 > 708 = true
-            expect(mutant2Overflow).toBeTruthy();
+            const isMutant2Overflow = overlayBottom > mutant2Limit; // 750 > 708 = true
+            expect(isMutant2Overflow).toBeTruthy();
 
             // Verify the difference between correct and mutants
-            expect(correctOverflow).not.toBe(mutant1Overflow);
+            expect(isCorrectOverflow).not.toBe(isMutant1Overflow);
             // Note: mutant2Overflow might be same as correctOverflow in this case,
             // but would differ with overlayBottom between 692 and 708
         });
@@ -513,10 +508,8 @@ describe("Frontend ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Error Handling", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: src/stores/error/ErrorBoundary.tsx, Line: 122
-            // Original: retryCount: prevState.retryCount + 1,
-            // Mutated: prevState.retryCount - 1
+            // This test specifically targets the mutation: File: src/stores/error/ErrorBoundary.tsx, Line: 122 Original: retryCount: prevState.retryCount + 1, Mutated:
+            // prevState.retryCount - 1
 
             const prevRetryCount = 2;
 

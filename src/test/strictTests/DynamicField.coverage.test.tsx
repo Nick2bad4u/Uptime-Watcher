@@ -5,11 +5,14 @@
 import type { ReactNode } from "react";
 
 import { render, screen } from "@testing-library/react";
+import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DynamicField } from "../../components/AddSiteForm/DynamicField";
 
 const loggerErrorMock = vi.hoisted(() => vi.fn());
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: loggerErrorMock,
@@ -42,16 +45,16 @@ interface SelectFieldMockProps {
     value: string;
 }
 
-const textFieldProps = vi.hoisted(() => [] as TextFieldMockProps[]);
-const selectFieldProps = vi.hoisted(() => [] as SelectFieldMockProps[]);
+const textFieldProps = vi.hoisted(() => safeCastTo<TextFieldMockProps[]>([]));
+const selectFieldProps = vi.hoisted(() => safeCastTo<SelectFieldMockProps[]>([]));
 
-vi.mock("../../components/AddSiteForm/TextField", () => ({
+vi.mock(import('../../components/AddSiteForm/TextField'), () => ({
     TextField: (props: TextFieldMockProps) => {
         textFieldProps.push(props);
         return (
             <input
                 data-testid={`text-field-${props.id}`}
-                onChange={(event) => props.onChange(event.currentTarget.value)}
+                onChange={(event) => { props.onChange(event.currentTarget.value); }}
                 type={props.type}
                 value={props.value}
             />
@@ -59,13 +62,13 @@ vi.mock("../../components/AddSiteForm/TextField", () => ({
     },
 }));
 
-vi.mock("../../components/AddSiteForm/SelectField", () => ({
+vi.mock(import('../../components/AddSiteForm/SelectField'), () => ({
     SelectField: (props: SelectFieldMockProps) => {
         selectFieldProps.push(props);
         return (
             <select
                 data-testid={`select-field-${props.id}`}
-                onChange={(event) => props.onChange(event.currentTarget.value)}
+                onChange={(event) => { props.onChange(event.currentTarget.value); }}
                 value={props.value}
             >
                 {(props.options ?? []).map((option) => (
@@ -84,11 +87,9 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: themedTextMock.component,
 }));
-
-import { DynamicField } from "../../components/AddSiteForm/DynamicField";
 
 describe("DynamicField coverage", () => {
     beforeEach(() => {
@@ -114,8 +115,8 @@ describe("DynamicField coverage", () => {
             />
         );
 
-        expect(textFieldProps[0]).toBeDefined();
-        const numericProps = textFieldProps[0]!;
+        expect(arrayFirst(textFieldProps)).toBeDefined();
+        const numericProps = arrayFirst(textFieldProps)!;
         expect(numericProps).toMatchObject({
             max: 8081,
             min: 1,
@@ -154,8 +155,8 @@ describe("DynamicField coverage", () => {
             />
         );
 
-        expect(selectFieldProps[0]).toBeDefined();
-        const selectProps = selectFieldProps[0]!;
+        expect(arrayFirst(selectFieldProps)).toBeDefined();
+        const selectProps = arrayFirst(selectFieldProps)!;
         selectProps.onChange("stage");
         expect(onChange).toHaveBeenCalledWith("stage");
         expect(selectProps).toMatchObject({
@@ -178,7 +179,7 @@ describe("DynamicField coverage", () => {
             />
         );
 
-        const selectProps = selectFieldProps.at(-1);
+        const selectProps = arrayAt(selectFieldProps, -1);
         expect(selectProps?.options).toEqual([]);
         selectProps?.onChange("us-east");
         expect(onChange).toHaveBeenCalledWith("us-east");
@@ -200,8 +201,8 @@ describe("DynamicField coverage", () => {
             />
         );
 
-        expect(textFieldProps[0]).toBeDefined();
-        const textProps = textFieldProps[0]!;
+        expect(arrayFirst(textFieldProps)).toBeDefined();
+        const textProps = arrayFirst(textFieldProps)!;
         textProps.onChange("prod.example.com");
         expect(textChange).toHaveBeenLastCalledWith("prod.example.com");
 
@@ -242,7 +243,7 @@ describe("DynamicField coverage", () => {
             />
         );
 
-        const textProps = textFieldProps.at(-1);
+        const textProps = arrayAt(textFieldProps, -1);
         expect(textProps).toMatchObject({
             disabled: true,
             helpText: "Provide a friendly display name",

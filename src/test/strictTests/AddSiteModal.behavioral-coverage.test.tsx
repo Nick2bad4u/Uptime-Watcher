@@ -11,15 +11,18 @@ import {
     waitFor,
     within,
 } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
 
 const themeState = vi.hoisted(() => ({
     isDark: false,
 }));
 
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
     return {
         ...actual,
         useTheme: () => ({
@@ -29,14 +32,14 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
 });
 
 const addSiteFormMock = vi.hoisted(() => ({
-    lastOnSuccess: undefined as undefined | (() => void),
+    lastOnSuccess: safeCastTo<(() => void) | undefined>(undefined),
     component: ({ onSuccess }: { onSuccess: () => void }) => {
         addSiteFormMock.lastOnSuccess = onSuccess;
         return <div data-testid="add-site-form-mock" />;
     },
 }));
 
-vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
+vi.mock(import('../../components/AddSiteForm/AddSiteForm'), () => ({
     AddSiteForm: addSiteFormMock.component,
 }));
 
@@ -46,7 +49,7 @@ const themedBoxMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../theme/components/ThemedBox'), () => ({
     ThemedBox: themedBoxMock.component,
 }));
 
@@ -56,11 +59,9 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: themedTextMock.component,
 }));
-
-import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
 
 describe("AddSiteModal coverage", () => {
     beforeEach(() => {

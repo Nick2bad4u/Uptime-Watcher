@@ -3,33 +3,34 @@
  * renderer and main processes.
  */
 
-import { describe, beforeEach, afterEach, it, expect, vi } from "vitest";
-import { ipcRenderer } from "electron";
-import type { IpcRendererEvent } from "electron";
-
-import {
-    createTypedInvoker,
-    createVoidInvoker,
-    createEventManager,
-    IpcError,
-    resetDiagnosticsVerificationStateForTesting,
-    type IpcResponse,
-} from "../../../preload/core/bridgeFactory";
+import type { Site } from "@shared/types";
 import type {
     IpcHandlerVerificationResult,
     IpcInvokeChannel,
     IpcInvokeChannelParams,
 } from "@shared/types/ipc";
+import type { IpcRendererEvent } from "electron";
+
 import {
     DATA_CHANNELS,
     DIAGNOSTICS_CHANNELS,
-    MONITORING_CHANNELS,
     MONITOR_TYPES_CHANNELS,
+    MONITORING_CHANNELS,
     SETTINGS_CHANNELS,
     SITES_CHANNELS,
     STATE_SYNC_CHANNELS,
 } from "@shared/types/preload";
-import type { Site } from "@shared/types";
+import { ipcRenderer } from "electron";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    createEventManager,
+    createTypedInvoker,
+    createVoidInvoker,
+    IpcError,
+    type IpcResponse,
+    resetDiagnosticsVerificationStateForTesting,
+} from "../../../preload/core/bridgeFactory";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),

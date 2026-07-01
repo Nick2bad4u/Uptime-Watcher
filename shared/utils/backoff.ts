@@ -19,8 +19,6 @@
 /** Supported retry backoff strategies. */
 import { isFinite as isFiniteNumber } from "ts-extras";
 
-export type BackoffStrategy = "exponential" | "linear";
-
 /**
  * Parameters for {@link calculateBackoffDelayMs}.
  */
@@ -48,6 +46,8 @@ export interface BackoffDelayOptions {
     /** Backoff strategy. */
     readonly strategy: BackoffStrategy;
 }
+
+export type BackoffStrategy = "exponential" | "linear";
 
 /**
  * Computes a retry delay in milliseconds.

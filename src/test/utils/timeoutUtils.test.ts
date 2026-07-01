@@ -8,10 +8,9 @@
  * Tests both traditional scenarios and property-based fuzzing for robustness.
  */
 
-import { describe, expect, it } from "vitest";
-import { test, fc } from "@fast-check/vitest";
-
+import { fc, test } from "@fast-check/vitest";
 import { standardTestAnnotationAsync } from "@shared/test/testUtils";
+import { describe, expect, it } from "vitest";
 
 import {
     DEFAULT_REQUEST_TIMEOUT_SECONDS,
@@ -28,11 +27,11 @@ import {
     timeoutSecondsToMs,
 } from "../../utils/timeoutUtils";
 
-describe("Timeout Utilities", () => {
+describe("timeout Utilities", () => {
     describe(clampTimeoutMs, () => {
         it("should return the input when within valid range", async ({
-            task,
             annotate,
+            task,
         }) => {
             await standardTestAnnotationAsync(
                 task,
@@ -43,12 +42,13 @@ describe("Timeout Utilities", () => {
             );
 
             const validTimeout = 30_000; // 30 seconds
+
             expect(clampTimeoutMs(validTimeout)).toBe(validTimeout);
         });
 
         it("should clamp to minimum when below range", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -56,12 +56,13 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const belowMin = TIMEOUT_CONSTRAINTS_MS.MIN - 1000;
+
             expect(clampTimeoutMs(belowMin)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
         });
 
         it("should clamp to maximum when above range", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -69,10 +70,11 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const aboveMax = TIMEOUT_CONSTRAINTS_MS.MAX + 1000;
+
             expect(clampTimeoutMs(aboveMax)).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
         });
 
-        it("should handle edge values", async ({ task, annotate }) => {
+        it("should handle edge values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -87,8 +89,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle zero and negative values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -99,21 +101,22 @@ describe("Timeout Utilities", () => {
             expect(clampTimeoutMs(-5000)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
         });
 
-        it("should handle fractional values", async ({ task, annotate }) => {
+        it("should handle fractional values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const fractional = 15_000.5;
+
             expect(clampTimeoutMs(fractional)).toBe(fractional);
         });
     });
 
     describe(clampTimeoutSeconds, () => {
         it("should return the input when within valid range", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -121,12 +124,13 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const validTimeout = 30; // 30 seconds
+
             expect(clampTimeoutSeconds(validTimeout)).toBe(validTimeout);
         });
 
         it("should clamp to minimum when below range", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -134,12 +138,13 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const belowMin = TIMEOUT_CONSTRAINTS.MIN - 1;
+
             expect(clampTimeoutSeconds(belowMin)).toBe(TIMEOUT_CONSTRAINTS.MIN);
         });
 
         it("should clamp to maximum when above range", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -147,10 +152,11 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const aboveMax = TIMEOUT_CONSTRAINTS.MAX + 1;
+
             expect(clampTimeoutSeconds(aboveMax)).toBe(TIMEOUT_CONSTRAINTS.MAX);
         });
 
-        it("should handle edge values", async ({ task, annotate }) => {
+        it("should handle edge values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -165,8 +171,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle zero and negative values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -177,21 +183,22 @@ describe("Timeout Utilities", () => {
             expect(clampTimeoutSeconds(-5)).toBe(TIMEOUT_CONSTRAINTS.MIN);
         });
 
-        it("should handle fractional values", async ({ task, annotate }) => {
+        it("should handle fractional values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const fractional = 15.5;
+
             expect(clampTimeoutSeconds(fractional)).toBe(fractional);
         });
     });
 
     describe(getTimeoutSeconds, () => {
         it("should convert monitor timeout from ms to seconds", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -199,12 +206,13 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Monitoring", "type");
 
             const timeoutMs = 15_000; // 15 seconds
+
             expect(getTimeoutSeconds(timeoutMs)).toBe(15);
         });
 
         it("should return default when monitor timeout is undefined", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -217,7 +225,7 @@ describe("Timeout Utilities", () => {
             );
         });
 
-        it("should handle zero timeout", async ({ task, annotate }) => {
+        it("should handle zero timeout", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -227,8 +235,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle fractional milliseconds", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -238,7 +246,7 @@ describe("Timeout Utilities", () => {
             expect(getTimeoutSeconds(1500)).toBe(1.5);
         });
 
-        it("should handle large timeout values", async ({ task, annotate }) => {
+        it("should handle large timeout values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -250,23 +258,23 @@ describe("Timeout Utilities", () => {
 
     describe(isValidTimeoutMs, () => {
         it("should return true for valid timeout values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimeoutMs(5000)).toBeTruthy();
-            expect(isValidTimeoutMs(30_000)).toBeTruthy();
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBeTruthy();
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBeTruthy();
+            expect(isValidTimeoutMs(5000)).toBe(true);
+            expect(isValidTimeoutMs(30_000)).toBe(true);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBe(true);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBe(true);
         });
 
         it("should return false for values below minimum", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -275,14 +283,14 @@ describe("Timeout Utilities", () => {
 
             expect(
                 isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN - 1)
-            ).toBeFalsy();
-            expect(isValidTimeoutMs(0)).toBeFalsy();
-            expect(isValidTimeoutMs(-1000)).toBeFalsy();
+            ).toBe(false);
+            expect(isValidTimeoutMs(0)).toBe(false);
+            expect(isValidTimeoutMs(-1000)).toBe(false);
         });
 
         it("should return false for values above maximum", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -291,51 +299,52 @@ describe("Timeout Utilities", () => {
 
             expect(
                 isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX + 1)
-            ).toBeFalsy();
-            expect(isValidTimeoutMs(Number.MAX_SAFE_INTEGER)).toBeFalsy();
+            ).toBe(false);
+            expect(isValidTimeoutMs(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimeoutMs(Number.POSITIVE_INFINITY)).toBeFalsy();
-            expect(isValidTimeoutMs(Number.NEGATIVE_INFINITY)).toBeFalsy();
-            expect(isValidTimeoutMs(Number.NaN)).toBeFalsy();
+            expect(isValidTimeoutMs(Infinity)).toBe(false);
+            expect(isValidTimeoutMs(Number.NEGATIVE_INFINITY)).toBe(false);
+            expect(isValidTimeoutMs(NaN)).toBe(false);
         });
 
-        it("should handle fractional values", async ({ task, annotate }) => {
+        it("should handle fractional values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const fractionalValid = TIMEOUT_CONSTRAINTS_MS.MIN + 0.5;
-            expect(isValidTimeoutMs(fractionalValid)).toBeTruthy();
+
+            expect(isValidTimeoutMs(fractionalValid)).toBe(true);
         });
     });
 
     describe(isValidTimeoutSeconds, () => {
         it("should return true for valid timeout values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimeoutSeconds(5)).toBeTruthy();
-            expect(isValidTimeoutSeconds(30)).toBeTruthy();
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBeTruthy();
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBeTruthy();
+            expect(isValidTimeoutSeconds(5)).toBe(true);
+            expect(isValidTimeoutSeconds(30)).toBe(true);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBe(true);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBe(true);
         });
 
         it("should return false for values below minimum", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -344,14 +353,14 @@ describe("Timeout Utilities", () => {
 
             expect(
                 isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN - 1)
-            ).toBeFalsy();
-            expect(isValidTimeoutSeconds(0)).toBeFalsy();
-            expect(isValidTimeoutSeconds(-1)).toBeFalsy();
+            ).toBe(false);
+            expect(isValidTimeoutSeconds(0)).toBe(false);
+            expect(isValidTimeoutSeconds(-1)).toBe(false);
         });
 
         it("should return false for values above maximum", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -360,36 +369,37 @@ describe("Timeout Utilities", () => {
 
             expect(
                 isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX + 1)
-            ).toBeFalsy();
-            expect(isValidTimeoutSeconds(Number.MAX_SAFE_INTEGER)).toBeFalsy();
+            ).toBe(false);
+            expect(isValidTimeoutSeconds(Number.MAX_SAFE_INTEGER)).toBe(false);
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidTimeoutSeconds(Number.POSITIVE_INFINITY)).toBeFalsy();
-            expect(isValidTimeoutSeconds(Number.NEGATIVE_INFINITY)).toBeFalsy();
-            expect(isValidTimeoutSeconds(Number.NaN)).toBeFalsy();
+            expect(isValidTimeoutSeconds(Infinity)).toBe(false);
+            expect(isValidTimeoutSeconds(Number.NEGATIVE_INFINITY)).toBe(false);
+            expect(isValidTimeoutSeconds(NaN)).toBe(false);
         });
 
-        it("should handle fractional values", async ({ task, annotate }) => {
+        it("should handle fractional values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const fractionalValid = TIMEOUT_CONSTRAINTS.MIN + 0.5;
-            expect(isValidTimeoutSeconds(fractionalValid)).toBeTruthy();
+
+            expect(isValidTimeoutSeconds(fractionalValid)).toBe(true);
         });
     });
 
     describe(timeoutMsToSeconds, () => {
         it("should convert milliseconds to seconds correctly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -401,7 +411,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutMsToSeconds(30_000)).toBe(30);
         });
 
-        it("should handle zero", async ({ task, annotate }) => {
+        it("should handle zero", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -411,8 +421,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should handle fractional milliseconds", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -423,7 +433,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutMsToSeconds(2750)).toBe(2.75);
         });
 
-        it("should handle large values", async ({ task, annotate }) => {
+        it("should handle large values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -434,8 +444,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should preserve precision for small values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -446,7 +456,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutMsToSeconds(100)).toBe(0.1);
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -463,8 +473,8 @@ describe("Timeout Utilities", () => {
 
     describe(timeoutSecondsToMs, () => {
         it("should convert seconds to milliseconds correctly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -476,7 +486,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(30)).toBe(30_000);
         });
 
-        it("should handle zero", async ({ task, annotate }) => {
+        it("should handle zero", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -485,7 +495,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(0)).toBe(0);
         });
 
-        it("should handle fractional seconds", async ({ task, annotate }) => {
+        it("should handle fractional seconds", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -495,7 +505,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(2.75)).toBe(2750);
         });
 
-        it("should handle large values", async ({ task, annotate }) => {
+        it("should handle large values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -506,8 +516,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should preserve precision for small values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -518,7 +528,7 @@ describe("Timeout Utilities", () => {
             expect(timeoutSecondsToMs(0.1)).toBe(100);
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
             await annotate("Category: Utility", "category");
@@ -533,10 +543,10 @@ describe("Timeout Utilities", () => {
         });
     });
 
-    describe("Conversion consistency", () => {
+    describe("conversion consistency", () => {
         it("should maintain round-trip conversion accuracy", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -546,12 +556,13 @@ describe("Timeout Utilities", () => {
             const originalMs = 15_000;
             const convertedSeconds = timeoutMsToSeconds(originalMs);
             const backToMs = timeoutSecondsToMs(convertedSeconds);
+
             expect(backToMs).toBe(originalMs);
         });
 
         it("should maintain round-trip conversion for fractional values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -561,14 +572,15 @@ describe("Timeout Utilities", () => {
             const originalSeconds = 15.5;
             const convertedMs = timeoutSecondsToMs(originalSeconds);
             const backToSeconds = timeoutMsToSeconds(convertedMs);
+
             expect(backToSeconds).toBe(originalSeconds);
         });
     });
 
-    describe("Integration with constants", () => {
+    describe("integration with constants", () => {
         it("should work correctly with constraint constants", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -576,10 +588,10 @@ describe("Timeout Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test that MIN/MAX constants work with validation functions
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBeTruthy();
-            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBeTruthy();
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBeTruthy();
-            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBeTruthy();
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MIN)).toBe(true);
+            expect(isValidTimeoutMs(TIMEOUT_CONSTRAINTS_MS.MAX)).toBe(true);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MIN)).toBe(true);
+            expect(isValidTimeoutSeconds(TIMEOUT_CONSTRAINTS.MAX)).toBe(true);
 
             // Test conversion consistency with constants
             expect(timeoutSecondsToMs(TIMEOUT_CONSTRAINTS.MIN)).toBe(
@@ -591,8 +603,8 @@ describe("Timeout Utilities", () => {
         });
 
         it("should work correctly with default timeout constant", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -602,7 +614,7 @@ describe("Timeout Utilities", () => {
             expect(getTimeoutSeconds()).toBe(DEFAULT_REQUEST_TIMEOUT_SECONDS);
             expect(
                 isValidTimeoutSeconds(DEFAULT_REQUEST_TIMEOUT_SECONDS)
-            ).toBeTruthy();
+            ).toBe(true);
         });
     });
 
@@ -611,7 +623,7 @@ describe("Timeout Utilities", () => {
      * These tests use property-based testing to systematically explore the
      * timeout utility function behavior across all possible inputs.
      */
-    describe("Property-Based Fuzzing Tests", () => {
+    describe("property-Based Fuzzing Tests", () => {
         describe("clampTimeoutMs property tests", () => {
             test.prop([fc.integer()])(
                 "should always return a value within valid bounds",
@@ -652,7 +664,7 @@ describe("Timeout Utilities", () => {
                     const result = clampTimeoutMs(input);
 
                     // Property: Result should be finite and within bounds
-                    expect(Number.isFinite(result)).toBeTruthy();
+                    expect(Number.isFinite(result)).toBe(true);
                     expect(result).toBeGreaterThanOrEqual(
                         TIMEOUT_CONSTRAINTS_MS.MIN
                     );
@@ -664,7 +676,7 @@ describe("Timeout Utilities", () => {
 
             test.prop([
                 fc.oneof(
-                    fc.constant(Number.NaN),
+                    fc.constant(NaN),
                     fc.constant(Infinity),
                     fc.constant(-Infinity)
                 ),
@@ -674,7 +686,7 @@ describe("Timeout Utilities", () => {
                 // Property: Should handle special values gracefully
                 // NaN with Math.max/min returns NaN, which is the actual behavior
                 if (Number.isNaN(input)) {
-                    expect(Number.isNaN(result)).toBeTruthy();
+                    expect(Number.isNaN(result)).toBe(true);
                 }
                 // Infinity should clamp to max
                 if (input === Infinity) {
@@ -710,19 +722,19 @@ describe("Timeout Utilities", () => {
             );
 
             test.prop([
-                fc.float({ min: 0, max: Math.fround(1000), noNaN: true }),
+                fc.float({ max: Math.fround(1000), min: 0, noNaN: true }),
             ])("should handle fractional seconds correctly", (input) => {
                 const result = clampTimeoutSeconds(input);
 
                 // Property: Result should preserve precision when within bounds
-                expect(Number.isFinite(result)).toBeTruthy();
+                expect(Number.isFinite(result)).toBe(true);
                 expect(result).toBeGreaterThanOrEqual(TIMEOUT_CONSTRAINTS.MIN);
                 expect(result).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS.MAX);
             });
         });
 
         describe("timeoutMsToSeconds property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 1_000_000 })])(
+            test.prop([fc.integer({ max: 1_000_000, min: 0 })])(
                 "should accurately convert milliseconds to seconds",
                 (ms) => {
                     const result = timeoutMsToSeconds(ms);
@@ -737,7 +749,7 @@ describe("Timeout Utilities", () => {
 
             test.prop([
                 fc
-                    .float({ min: 0, max: Math.fround(1_000_000) })
+                    .float({ max: Math.fround(1_000_000), min: 0 })
                     .filter((x) => !Number.isNaN(x)),
             ])("should handle fractional milliseconds", (ms) => {
                 const result = timeoutMsToSeconds(ms);
@@ -759,7 +771,7 @@ describe("Timeout Utilities", () => {
         });
 
         describe("timeoutSecondsToMs property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 1000 })])(
+            test.prop([fc.integer({ max: 1000, min: 0 })])(
                 "should accurately convert seconds to milliseconds",
                 (seconds) => {
                     const result = timeoutSecondsToMs(seconds);
@@ -774,7 +786,7 @@ describe("Timeout Utilities", () => {
 
             test.prop([
                 fc
-                    .float({ min: Math.fround(0), max: Math.fround(1000) })
+                    .float({ max: Math.fround(1000), min: Math.fround(0) })
                     .filter(
                         (num) => Number.isFinite(num) && !Number.isNaN(num)
                     ),
@@ -789,67 +801,67 @@ describe("Timeout Utilities", () => {
         describe("isValidTimeoutMs property tests", () => {
             test.prop([
                 fc.integer({
-                    min: TIMEOUT_CONSTRAINTS_MS.MIN,
                     max: TIMEOUT_CONSTRAINTS_MS.MAX,
+                    min: TIMEOUT_CONSTRAINTS_MS.MIN,
                 }),
             ])(
                 "should return true for all values within valid range",
                 (timeoutMs) => {
-                    expect(isValidTimeoutMs(timeoutMs)).toBeTruthy();
+                    expect(isValidTimeoutMs(timeoutMs)).toBe(true);
                 }
             );
 
             test.prop([fc.integer({ max: TIMEOUT_CONSTRAINTS_MS.MIN - 1 })])(
                 "should return false for values below minimum",
                 (timeoutMs) => {
-                    expect(isValidTimeoutMs(timeoutMs)).toBeFalsy();
+                    expect(isValidTimeoutMs(timeoutMs)).toBe(false);
                 }
             );
 
             test.prop([fc.integer({ min: TIMEOUT_CONSTRAINTS_MS.MAX + 1 })])(
                 "should return false for values above maximum",
                 (timeoutMs) => {
-                    expect(isValidTimeoutMs(timeoutMs)).toBeFalsy();
+                    expect(isValidTimeoutMs(timeoutMs)).toBe(false);
                 }
             );
 
             test.prop([
                 fc.oneof(
-                    fc.constant(Number.NaN),
+                    fc.constant(NaN),
                     fc.constant(Infinity),
                     fc.constant(-Infinity)
                 ),
             ])("should handle special numeric values", (input) => {
-                const result = isValidTimeoutMs(input);
+                const isResult = isValidTimeoutMs(input);
 
                 // Property: Special values should be invalid
-                expect(result).toBeFalsy();
+                expect(isResult).toBe(false);
             });
         });
 
         describe("isValidTimeoutSeconds property tests", () => {
             test.prop([
                 fc.integer({
-                    min: TIMEOUT_CONSTRAINTS.MIN,
                     max: TIMEOUT_CONSTRAINTS.MAX,
+                    min: TIMEOUT_CONSTRAINTS.MIN,
                 }),
             ])(
                 "should return true for all values within valid range",
                 (timeoutSeconds) => {
-                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeTruthy();
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBe(true);
                 }
             );
 
             test.prop([
                 fc.float({
-                    min: TIMEOUT_CONSTRAINTS.MIN,
                     max: Math.fround(TIMEOUT_CONSTRAINTS.MAX),
+                    min: TIMEOUT_CONSTRAINTS.MIN,
                     noNaN: true,
                 }),
             ])(
                 "should handle fractional seconds within range",
                 (timeoutSeconds) => {
-                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeTruthy();
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBe(true);
                 }
             );
 
@@ -863,7 +875,7 @@ describe("Timeout Utilities", () => {
             ])(
                 "should return false for values below minimum",
                 (timeoutSeconds) => {
-                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeFalsy();
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBe(false);
                 }
             );
 
@@ -877,13 +889,13 @@ describe("Timeout Utilities", () => {
             ])(
                 "should return false for values above maximum",
                 (timeoutSeconds) => {
-                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBeFalsy();
+                    expect(isValidTimeoutSeconds(timeoutSeconds)).toBe(false);
                 }
             );
         });
 
         describe("getTimeoutSeconds property tests", () => {
-            test.prop([fc.integer({ min: 1000, max: 300_000 })])(
+            test.prop([fc.integer({ max: 300_000, min: 1000 })])(
                 "should convert valid milliseconds to seconds correctly",
                 (monitorTimeout) => {
                     const result = getTimeoutSeconds(monitorTimeout);
@@ -914,8 +926,8 @@ describe("Timeout Utilities", () => {
             );
         });
 
-        describe("Cross-function property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 1000 })])(
+        describe("cross-function property tests", () => {
+            test.prop([fc.integer({ max: 1000, min: 0 })])(
                 "ms->seconds->ms conversion should be identity for whole seconds",
                 (seconds) => {
                     const ms = timeoutSecondsToMs(seconds);
@@ -930,8 +942,8 @@ describe("Timeout Utilities", () => {
 
             test.prop([
                 fc.integer({
-                    min: TIMEOUT_CONSTRAINTS_MS.MIN,
                     max: TIMEOUT_CONSTRAINTS_MS.MAX,
+                    min: TIMEOUT_CONSTRAINTS_MS.MIN,
                 }),
             ])(
                 "valid ms values should remain valid after clamping",
@@ -940,14 +952,14 @@ describe("Timeout Utilities", () => {
 
                     // Property: Valid inputs should be unchanged by clamping
                     expect(clamped).toBe(validMs);
-                    expect(isValidTimeoutMs(clamped)).toBeTruthy();
+                    expect(isValidTimeoutMs(clamped)).toBe(true);
                 }
             );
 
             test.prop([
                 fc.integer({
-                    min: TIMEOUT_CONSTRAINTS.MIN,
                     max: TIMEOUT_CONSTRAINTS.MAX,
+                    min: TIMEOUT_CONSTRAINTS.MIN,
                 }),
             ])(
                 "valid second values should remain valid after clamping",
@@ -956,7 +968,7 @@ describe("Timeout Utilities", () => {
 
                     // Property: Valid inputs should be unchanged by clamping
                     expect(clamped).toBe(validSeconds);
-                    expect(isValidTimeoutSeconds(clamped)).toBeTruthy();
+                    expect(isValidTimeoutSeconds(clamped)).toBe(true);
                 }
             );
 
@@ -967,8 +979,8 @@ describe("Timeout Utilities", () => {
                     const clampedSeconds = clampTimeoutSeconds(input);
 
                     // Property: Clamping should always produce valid values
-                    expect(isValidTimeoutMs(clampedMs)).toBeTruthy();
-                    expect(isValidTimeoutSeconds(clampedSeconds)).toBeTruthy();
+                    expect(isValidTimeoutMs(clampedMs)).toBe(true);
+                    expect(isValidTimeoutSeconds(clampedSeconds)).toBe(true);
                 }
             );
         });

@@ -3,20 +3,20 @@
  *   coverage
  */
 
-import { describe, expect, it } from "vitest";
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { describe, expect, it } from "vitest";
 
 import {
+    type HistoryRow,
     isValidHistoryRow,
     isValidMonitorRow,
     isValidSettingsRow,
     isValidSiteRow,
-    safeGetRowProperty,
-    type HistoryRow,
     type MonitorRow,
+    safeGetRowProperty,
     type SettingsRow,
     type SiteRow,
 } from "../../types/database";

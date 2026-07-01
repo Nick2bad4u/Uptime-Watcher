@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { isValidUrl } from "../../validation/validatorUtils";
+import { beforeAll, describe, expect, it } from "vitest";
+
 // Import ALL functions from typeGuards to ensure coverage
 import {
     hasProperties,
@@ -19,6 +19,7 @@ import {
     isValidPort,
     isValidTimestamp,
 } from "../../utils/typeGuards";
+import { isValidUrl } from "../../validation/validatorUtils";
 
 describe("Type Guards - Comprehensive Coverage", () => {
     // COVERAGE CRITICAL: Call every function to ensure 100% coverage
@@ -32,8 +33,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            // Call ALL functions using both named imports and namespace import
-            // This ensures that every function in ts is executed
+            // Call ALL functions using both named imports and namespace import This ensures that every function in ts
+            // is executed
 
             // Test basic object for multiple functions
             const sampleRecord = { alpha: 1, beta: 2 };
@@ -480,7 +481,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isDate(new Date("invalid"))).toBeFalsy();
-            expect(isDate(new Date(Number.NaN))).toBeFalsy();
+            expect(isDate(new Date(NaN))).toBeFalsy();
         });
 
         it("should return false for non-Date values", async ({
@@ -560,8 +561,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             class CustomError extends Error {
-                constructor(message?: string) {
-                    super(message);
+                constructor(message?: string, options?: ErrorOptions) {
+                    super(message, options);
                     this.name = "CustomError";
                 }
             }
@@ -616,7 +617,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             expect(isFiniteNumber(Infinity)).toBeFalsy();
             expect(isFiniteNumber(-Infinity)).toBeFalsy();
-            expect(isFiniteNumber(Number.POSITIVE_INFINITY)).toBeFalsy();
+            expect(isFiniteNumber(Infinity)).toBeFalsy();
             expect(isFiniteNumber(Number.NEGATIVE_INFINITY)).toBeFalsy();
         });
 
@@ -626,8 +627,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
-            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(isFiniteNumber(NaN)).toBeFalsy();
+            expect(isFiniteNumber(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -773,7 +774,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(Number.NaN)).toBeFalsy();
+            expect(isNonNegativeNumber(NaN)).toBeFalsy();
             expect(isNonNegativeNumber("5")).toBeFalsy();
             expect(isNonNegativeNumber(null)).toBeFalsy();
         });
@@ -870,7 +871,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             expect(isNonNullObject(new Date())).toBeTruthy();
             expect(isNonNullObject(new Error("test error"))).toBeTruthy();
-            expect(isNonNullObject(/regex/)).toBeTruthy();
+            expect(isNonNullObject(/regex/v)).toBeTruthy();
         });
 
         it("should return false for functions", async ({ task, annotate }) => {
@@ -909,8 +910,8 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(Number.NaN)).toBeFalsy();
-            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber(NaN)).toBeFalsy();
+            expect(isNumber(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -983,7 +984,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
 
             expect(isObject(new Date())).toBeTruthy();
             expect(isObject(new Error("test error"))).toBeTruthy();
-            expect(isObject(/regex/)).toBeTruthy();
+            expect(isObject(/regex/v)).toBeTruthy();
             expect(isObject(new Map())).toBeTruthy();
             expect(isObject(new Set())).toBeTruthy();
         });
@@ -1087,7 +1088,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(Number.NaN)).toBeFalsy();
+            expect(isPositiveNumber(NaN)).toBeFalsy();
             expect(isPositiveNumber(0)).toBeFalsy();
             expect(isPositiveNumber("5")).toBeFalsy();
             expect(isPositiveNumber(null)).toBeFalsy();
@@ -1237,7 +1238,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isValidPort(Number.NaN)).toBeFalsy();
+            expect(isValidPort(NaN)).toBeFalsy();
             expect(isValidPort(Infinity)).toBeFalsy();
             expect(isValidPort(-Infinity)).toBeFalsy();
         });
@@ -1317,7 +1318,7 @@ describe("Type Guards - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(isValidTimestamp(NaN)).toBeFalsy();
             expect(isValidTimestamp(Infinity)).toBeFalsy();
             expect(isValidTimestamp(-Infinity)).toBeFalsy();
         });
@@ -1370,14 +1371,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
                 ])
             ) {
                 const typedData = data as {
+                    active: unknown;
+                    config: unknown;
+                    created: unknown;
                     id: unknown;
                     name: unknown;
                     port: unknown;
-                    url: unknown;
-                    active: unknown;
-                    created: unknown;
                     tags: unknown;
-                    config: unknown;
+                    url: unknown;
                 };
                 expect(isPositiveNumber(typedData.id)).toBeTruthy();
                 expect(isString(typedData.name)).toBeTruthy();

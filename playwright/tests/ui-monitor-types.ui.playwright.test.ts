@@ -8,17 +8,21 @@
  * remain stable.
  */
 
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 import { BASE_MONITOR_TYPES } from "@shared/types";
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
+import type { DynamicFieldInput } from "../utils/ui-helpers";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     closeSiteDetails,
     createSiteViaModal,
@@ -31,8 +35,6 @@ import {
     submitAddSiteForm,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
-import type { DynamicFieldInput } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 /**
  * Monitor creation metadata derived from the runtime monitor type registry.
@@ -215,7 +217,7 @@ const buildMonitorScenario = (
         dynamicFields,
         monitorType: config.type,
         siteLabel: config.displayName,
-        ...(urlValue ? { url: urlValue } : {}),
+        ...(urlValue && { url: urlValue }),
     } satisfies MonitorCreationScenario;
 };
 
@@ -288,7 +290,7 @@ test.describe(
             void completion;
 
             const timeoutOutcome = new Promise<"timeout">((resolve) => {
-                timeoutHandle = setTimeout(() => resolve("timeout"), timeoutMs);
+                timeoutHandle = setTimeout(() => { resolve("timeout"); }, timeoutMs);
             });
 
             const outcome = await Promise.race([completion, timeoutOutcome]);
@@ -393,17 +395,15 @@ test.describe(
 
                 const typedConfigs = filterMonitorTypeConfigs(monitorConfigs);
 
-                expect(typedConfigs.length).toBeGreaterThan(0);
+                expect.soft(typedConfigs.length).toBeGreaterThan(0);
 
-                const actualTypes = Array.from(
-                    new Set(typedConfigs.map((config) => config.type))
-                ).sort((first, second) => first.localeCompare(second));
+                const actualTypes = [...new Set(typedConfigs.map((config) => config.type))].sort((first, second) => first.localeCompare(second));
 
-                const expectedTypes = Array.from(BASE_MONITOR_TYPES).sort(
+                const expectedTypes = [...BASE_MONITOR_TYPES].sort(
                     (first, second) => first.localeCompare(second)
                 );
 
-                expect(actualTypes).toStrictEqual(expectedTypes);
+                expect.soft(actualTypes).toStrictEqual(expectedTypes);
 
                 const scenarios = typedConfigs
                     .map(buildMonitorScenario)
@@ -411,7 +411,7 @@ test.describe(
                         first.monitorType.localeCompare(second.monitorType)
                     );
 
-                expect(scenarios).toHaveLength(expectedTypes.length);
+                expect.soft(scenarios).toHaveLength(expectedTypes.length);
 
                 const createdSiteNames: string[] = [];
 
@@ -434,19 +434,19 @@ test.describe(
                             dynamicFields: scenario.dynamicFields,
                             monitorType: scenario.monitorType,
                             name: siteName,
-                            ...(scenario.url ? { url: scenario.url } : {}),
+                            ...(scenario.url && { url: scenario.url }),
                         });
                     });
                 }
 
                 const expectedSiteCount = scenarios.length;
                 const siteCountLabel = page.getByTestId("site-count-label");
-                await expect(siteCountLabel).toHaveText(
+                await expect.soft(siteCountLabel).toHaveText(
                     new RegExp(`Tracking ${expectedSiteCount} sites?`)
                 );
 
                 // Open one of the created sites to ensure details render after bulk creation.
-                expect(
+                expect.soft(
                     createdSiteNames.length,
                     "expected at least one created site"
                 ).toBeGreaterThan(0);
@@ -455,7 +455,7 @@ test.describe(
                     throw new Error("expected at least one created site");
                 }
                 await openSiteDetails(page, lastSite);
-                await expect(page.getByTestId("site-overview-tab")).toBeVisible(
+                await expect.soft(page.getByTestId("site-overview-tab")).toBeVisible(
                     {
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     }
@@ -482,10 +482,10 @@ test.describe(
 
                 await openSiteDetails(page, httpSiteName);
                 const siteOverviewTab = page.getByTestId("site-overview-tab");
-                await expect(siteOverviewTab).toBeVisible({
+                await expect.soft(siteOverviewTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     siteOverviewTab.getByText(httpHost, { exact: false })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
@@ -513,10 +513,10 @@ test.describe(
 
                 await openSiteDetails(page, portSiteName);
                 const siteOverviewTab = page.getByTestId("site-overview-tab");
-                await expect(siteOverviewTab).toBeVisible({
+                await expect.soft(siteOverviewTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     siteOverviewTab.getByText(`${hostValue}:${portValue}`, {
                         exact: false,
                     })
@@ -542,10 +542,10 @@ test.describe(
 
                 await openSiteDetails(page, pingSiteName);
                 const siteOverviewTab = page.getByTestId("site-overview-tab");
-                await expect(siteOverviewTab).toBeVisible({
+                await expect.soft(siteOverviewTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     siteOverviewTab.getByText(pingHost, { exact: false })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
@@ -561,32 +561,32 @@ test.describe(
                 await openAddSiteModal(page);
                 const formElements = await getAddSiteFormElements(page);
 
-                const urlField = page.getByLabel(/URL/i).first();
-                await expect(urlField).toBeVisible({
+                const urlField = page.getByLabel(/url/iv).first();
+                await expect.soft(urlField).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 await formElements.monitorTypeSelect.selectOption("port");
-                await expect(page.getByLabel(/Host/i)).toBeVisible({
+                await expect.soft(page.getByLabel(/host/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(page.getByLabel(/Port/i)).toBeVisible({
+                await expect.soft(page.getByLabel(/port/iv)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(urlField).toBeHidden({
+                await expect.soft(urlField).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 await formElements.monitorTypeSelect.selectOption("ping");
-                await expect(page.getByLabel(/Host/i)).toBeVisible({
+                await expect.soft(page.getByLabel(/host/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(page.getByLabel(/Port/i)).toBeHidden({
+                await expect.soft(page.getByLabel(/port/iv)).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 await formElements.monitorTypeSelect.selectOption("http");
-                await expect(urlField).toBeVisible({
+                await expect.soft(urlField).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 

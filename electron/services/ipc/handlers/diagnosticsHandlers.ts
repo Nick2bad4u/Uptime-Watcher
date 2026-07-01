@@ -70,10 +70,10 @@ const normalizeDiagnosticsReportPayload = (
     payloadPreviewTruncated: boolean;
     sanitizedReport: PreloadGuardDiagnosticsReport;
 } => {
-    let metadataTruncated = false;
-    let payloadPreviewTruncated = false;
+    let isMetadataTruncated = false;
+    let isPayloadPreviewTruncated = false;
 
-    let metadata: undefined | UnknownRecord = undefined;
+    let metadata: undefined | UnknownRecord;
     if (report.metadata) {
         const sanitizedMetadata = normalizeLogValue(report.metadata);
         if (isUnknownRecord(sanitizedMetadata)) {
@@ -83,12 +83,12 @@ const normalizeDiagnosticsReportPayload = (
             ) {
                 metadata = sanitizedMetadata;
             } else {
-                metadataTruncated = true;
+                isMetadataTruncated = true;
             }
         }
     }
 
-    let payloadPreview: string | undefined = undefined;
+    let payloadPreview: string | undefined;
     if (typeof report.payloadPreview === "string") {
         const sanitizedPreview = normalizeLogValue(report.payloadPreview);
         if (typeof sanitizedPreview === "string") {
@@ -96,7 +96,7 @@ const normalizeDiagnosticsReportPayload = (
                 sanitizedPreview,
                 MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES
             );
-            payloadPreviewTruncated = truncated;
+            isPayloadPreviewTruncated = truncated;
             payloadPreview = value;
         }
     }
@@ -105,14 +105,14 @@ const normalizeDiagnosticsReportPayload = (
         channel: report.channel,
         guard: report.guard,
         timestamp: report.timestamp,
-        ...(report.reason ? { reason: report.reason } : {}),
-        ...(metadata ? { metadata } : {}),
-        ...(payloadPreview ? { payloadPreview } : {}),
+        ...(report.reason && { reason: report.reason }),
+        ...(metadata && { metadata }),
+        ...(payloadPreview && { payloadPreview }),
     };
 
     return {
-        metadataTruncated,
-        payloadPreviewTruncated,
+        metadataTruncated: isMetadataTruncated,
+        payloadPreviewTruncated: isPayloadPreviewTruncated,
         sanitizedReport,
     };
 };
@@ -149,7 +149,7 @@ export function registerDiagnosticsHandlers({
             const isRegistered = setHas(registeredHandlerSet, channelRaw);
 
             const availableChannels = includeInventory
-                ? Array.from(registeredHandlers).toSorted((left, right) =>
+                ? [...registeredHandlers].toSorted((left, right) =>
                       left.localeCompare(right)
                   )
                 : [];
@@ -208,15 +208,9 @@ export function registerDiagnosticsHandlers({
             const logMetadata: PreloadGuardDiagnosticsLogMetadata = {
                 channel: report.channel,
                 guard: report.guard,
-                ...(isDefined(report.metadata)
-                    ? { metadata: report.metadata }
-                    : {}),
-                ...(isDefined(report.payloadPreview)
-                    ? { payloadPreview: report.payloadPreview }
-                    : {}),
-                ...(isDefined(report.reason)
-                    ? { reason: report.reason }
-                    : {}),
+                ...(isDefined(report.metadata) && { metadata: report.metadata }),
+                ...(isDefined(report.payloadPreview) && { payloadPreview: report.payloadPreview }),
+                ...(isDefined(report.reason) && { reason: report.reason }),
                 timestamp: report.timestamp,
             };
 
@@ -242,7 +236,7 @@ export function registerDiagnosticsHandlers({
                 metadataTruncated,
                 payloadPreviewLength: report.payloadPreview?.length ?? 0,
                 payloadPreviewTruncated,
-                ...(report.reason ? { reason: report.reason } : {}),
+                ...(report.reason && { reason: report.reason }),
                 timestamp: report.timestamp,
             });
         },

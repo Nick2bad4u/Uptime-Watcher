@@ -5,13 +5,13 @@
  *   lines
  */
 
-import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import {
     validateMonitorData,
     validateMonitorField,
 } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
+import { describe, expect, it } from "vitest";
 
 describe("Schemas Fuzzing - Lines 404,488", () => {
     describe("validateMonitorField - Line 404 Unknown field error", () => {
@@ -21,25 +21,25 @@ describe("Schemas Fuzzing - Lines 404,488", () => {
                 // Target line 404: Unknown field error
                 if (
                     ![
-                        "name",
-                        "type",
-                        "interval",
-                        "timeout",
-                        "retries",
-                        "url",
-                        "port",
-                        "host",
-                        "method",
-                        "headers",
                         "body",
                         "followRedirects",
+                        "headers",
+                        "host",
+                        "interval",
                         "maxRedirects",
+                        "method",
+                        "name",
+                        "port",
+                        "retries",
+                        "timeout",
+                        "type",
+                        "url",
                         "validateSSL",
                     ].includes(fieldName)
                 ) {
                     expect(() =>
                         validateMonitorField("http", fieldName, value)
-                    ).toThrow(/Unknown field/);
+                    ).toThrow(/Unknown field/v);
                 }
             }
         );

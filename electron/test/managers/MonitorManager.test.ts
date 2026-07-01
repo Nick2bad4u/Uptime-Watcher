@@ -4,7 +4,7 @@
  * @module MonitorManager
  *
  * @file Comprehensive tests for monitoring service management in the Uptime
- *   Watcher application.
+ *   Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,9 +15,11 @@
  * @tags ["monitor", "test", "management", "core"]
  */
 
-import { MonitorManager } from "../../managers/MonitorManager";
-import { vi, describe, beforeEach, it, expect } from "vitest";
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MonitorManager } from "../../managers/MonitorManager";
 
 describe(MonitorManager, () => {
     let manager: MonitorManager;

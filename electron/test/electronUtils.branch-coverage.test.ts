@@ -7,7 +7,7 @@
  * NODE_ENV=development and app.isPackaged status.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Hoist mocks to top level
 const mockApp = {

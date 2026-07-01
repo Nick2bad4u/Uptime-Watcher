@@ -1,19 +1,19 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-vi.unmock("../../../services/monitoring/MonitorScheduler");
-
 import type { Site } from "@shared/types";
 
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
-import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
+import { isDev } from "../../../electronUtils";
 import {
     DEFAULT_MONITOR_TIMEOUT_SECONDS,
     MIN_CHECK_INTERVAL,
     MONITOR_TIMEOUT_BUFFER_MS,
     SECONDS_TO_MS_MULTIPLIER,
 } from "../../../services/monitoring/constants";
-import { isDev } from "../../../electronUtils";
+import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 import { logger } from "../../../utils/logger";
+
+vi.unmock("../../../services/monitoring/MonitorScheduler");
 
 vi.mock("../../../electronUtils");
 vi.mock("../../../utils/logger", () => {
@@ -98,12 +98,12 @@ describe(MonitorScheduler, () => {
     });
 
     it("returns false when attempting to start a monitor without an ID", () => {
-        const result = scheduler.startMonitor(
+        const isResult = scheduler.startMonitor(
             "site-1",
             createMonitor({ id: "" })
         );
 
-        expect(result).toBeFalsy();
+        expect(isResult).toBeFalsy();
     });
 
     it("clamps short intervals to the minimum, runs immediately, and emits schedule telemetry", async () => {
@@ -129,14 +129,14 @@ describe(MonitorScheduler, () => {
             ([eventName]) => eventName === "monitor:schedule-updated"
         );
         const schedulePayload = scheduleEvent?.[1] as
+            | undefined
             | {
                   backoffAttempt: number;
                   delayMs: number;
                   monitorId: string;
                   siteIdentifier: string;
                   timestamp: number;
-              }
-            | undefined;
+              };
         expect(schedulePayload).toMatchObject({
             backoffAttempt: 0,
             monitorId: "monitor-1",
@@ -203,9 +203,9 @@ describe(MonitorScheduler, () => {
         scheduler.startMonitor("site-1", createMonitor());
         expect(scheduler.getActiveCount()).toBe(1);
 
-        const stopped = scheduler.stopMonitor("site-1", "monitor-1");
+        const isStopped = scheduler.stopMonitor("site-1", "monitor-1");
 
-        expect(stopped).toBeTruthy();
+        expect(isStopped).toBeTruthy();
         expect(scheduler.getActiveCount()).toBe(0);
         expect(scheduler.getActiveMonitors()).toEqual([]);
     });

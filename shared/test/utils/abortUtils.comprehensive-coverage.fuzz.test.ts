@@ -133,9 +133,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
         test("filters out null/undefined signals", () => {
             const additionalSignals = [
+                new AbortController().signal,
                 null,
                 undefined,
-                new AbortController().signal,
             ] as AbortSignal[];
             const signal = createCombinedAbortSignal({ additionalSignals });
 
@@ -285,7 +285,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                 const controller = new AbortController();
 
                 // Abort after a quarter of the sleep time to give more margin
-                setTimeout(() => controller.abort(), sleepMs / 4);
+                setTimeout(() => { controller.abort(); }, sleepMs / 4);
 
                 const startTime = Date.now();
                 await expect(sleep(sleepMs, controller.signal)).rejects.toThrow(
@@ -387,7 +387,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             });
 
             // Abort after first attempt
-            setTimeout(() => controller.abort(), 50);
+            setTimeout(() => { controller.abort(); }, 50);
 
             await expect(
                 retryWithAbort(operation, {
@@ -573,7 +573,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             "returns false for non-Error values",
             (value) => {
                 fc.pre(
-                    !(value instanceof Error) &&
+                    !(Error.isError(value)) &&
                         !(value instanceof DOMException)
                 );
 
@@ -616,7 +616,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             controller.abort();
 
             const operation = new Promise((resolve) => {
-                setTimeout(() => resolve("success"), 1000);
+                setTimeout(() => { resolve("success"); }, 1000);
             });
 
             await expect(
@@ -660,7 +660,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
         test("sets up abort listener before racing", async () => {
             const controller = new AbortController();
             const operation = new Promise((resolve) => {
-                setTimeout(() => resolve("success"), 100);
+                setTimeout(() => { resolve("success"); }, 100);
             });
 
             // Abort immediately to test listener setup
@@ -708,9 +708,9 @@ describe("abortUtils comprehensive fuzzing tests", () => {
         test.prop([fc.integer({ min: 10, max: 100 })])(
             "createAbortableOperation integrates with sleep correctly",
             async (sleepTime) => {
-                let sleepCalled = false;
+                let isSleepCalled = false;
                 const operation = async (signal: AbortSignal) => {
-                    sleepCalled = true;
+                    isSleepCalled = true;
                     // Don't actually sleep, just test the structure
                     expect(signal).toBeInstanceOf(AbortSignal);
                     expect(sleepTime).toBeGreaterThan(0);
@@ -721,7 +721,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
                     timeoutMs: sleepTime * 3, // Ensure timeout doesn't trigger
                 });
 
-                expect(sleepCalled).toBeTruthy();
+                expect(isSleepCalled).toBeTruthy();
                 expect(result).toBe("completed");
             }
         );
@@ -740,7 +740,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
             };
 
             // Abort after first attempt
-            setTimeout(() => controller.abort(), 50);
+            setTimeout(() => { controller.abort(); }, 50);
 
             await expect(
                 retryWithAbort(operation, {
@@ -857,7 +857,7 @@ describe("abortUtils comprehensive fuzzing tests", () => {
 
                 // Create race conditions with some controllers
                 if (i % 2 === 0) {
-                    setTimeout(() => controller.abort(), 1);
+                    setTimeout(() => { controller.abort(); }, 1);
                 }
             }
 

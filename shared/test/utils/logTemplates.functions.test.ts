@@ -1,7 +1,8 @@
 /**
  * Additional tests for logTemplates functions that need coverage
  */
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import {
     createTemplateLogger,
     interpolateLogTemplate,

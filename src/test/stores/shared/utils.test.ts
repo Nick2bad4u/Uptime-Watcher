@@ -2,22 +2,29 @@
  * Tests for shared store utilities
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { logger } from "@app/services/logger";
 import { test } from "@fast-check/vitest";
+import {
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
+} from "@shared/utils/environment";
 import * as fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { logStoreAction } from "../../../stores/utils";
 
 /** Arbitrary for generating valid store names */
 const storeNameArbitrary = fc
     .string({ minLength: 1, maxLength: 50 })
     .filter((value) => value.trim().length > 0)
-    .map((value) => value.replaceAll(/\s/g, ""))
+    .map((value) => value.replaceAll(/\s/gv, ""))
     .filter((value) => /^[\w-]+$/u.test(value));
 
 /** Arbitrary for generating valid action names */
 const actionNameArbitrary = fc
     .string({ minLength: 1, maxLength: 50 })
     .filter((value) => value.trim().length > 0)
-    .map((value) => value.replaceAll(/\s/g, ""))
+    .map((value) => value.replaceAll(/\s/gv, ""))
     .filter((value) => /^[\w-]+$/u.test(value));
 
 /** Arbitrary for generating valid payload objects */
@@ -29,13 +36,6 @@ const payloadArbitrary = fc.oneof(
     fc.boolean(),
     fc.constant(null)
 );
-
-import { logStoreAction } from "../../../stores/utils";
-import {
-    resetProcessSnapshotOverrideForTesting,
-    setProcessSnapshotOverrideForTesting,
-} from "@shared/utils/environment";
-import { logger } from "@app/services/logger";
 
 const mockLogger = vi.mocked(logger);
 

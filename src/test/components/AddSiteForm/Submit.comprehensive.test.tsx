@@ -1,26 +1,32 @@
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    type MockedFunction,
-} from "vitest";
-import { test, fc } from "@fast-check/vitest";
-import "@testing-library/jest-dom";
-import { handleSubmit } from "../../../components/AddSiteForm/Submit";
-import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
-import type { Logger } from "../../../services/logger";
 import type { ValidationResult } from "@shared/types/validation";
+import type { UnknownRecord } from "type-fest";
+
+import "@testing-library/jest-dom";
+import { fc, test } from "@fast-check/vitest";
 import {
     sampleOne,
     siteIdentifierArbitrary,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { arrayAt, arrayJoin, safeCastTo   } from "ts-extras";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockedFunction,
+    vi,
+} from "vitest";
+import { objectEntries } from "ts-extras";
+
+import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
+import type { Logger } from "../../../services/logger";
+
+import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 
 // Mock the validation functions
-vi.mock("../../../utils/monitorValidation", () => ({
+vi.mock(import('../../../utils/monitorValidation'), () => ({
     createMonitorObject: vi.fn(() => ({
         id: "mock-monitor-id",
         type: "http",
@@ -42,7 +48,7 @@ vi.mock("../../../utils/monitorValidation", () => ({
 }));
 
 // Mock the error handling utility
-vi.mock("../../../utils/errorHandling", () => ({
+vi.mock(import('../../../utils/errorHandling'), () => ({
     withUtilityErrorHandling: vi.fn(
         async (fn, operationName, fallbackValue, shouldThrow = false) => {
             try {
@@ -69,7 +75,7 @@ vi.mock("../../../utils/errorHandling", () => ({
 }));
 
 // Mock the fallbacks
-vi.mock("../../../utils/fallbacks", () => ({
+vi.mock(import('../../../utils/fallbacks'), () => ({
     truncateForLogging: vi.fn((str) => str),
 }));
 
@@ -120,11 +126,11 @@ interface ValidationModuleMock {
     createMonitorObject: MockedFunction<
         MonitorValidationModule["createMonitorObject"]
     >;
-    validateMonitorFormData: MockedFunction<
-        MonitorValidationModule["validateMonitorFormData"]
-    >;
     validateMonitorFieldClientSide: MockedFunction<
         MonitorValidationModule["validateMonitorFieldClientSide"]
+    >;
+    validateMonitorFormData: MockedFunction<
+        MonitorValidationModule["validateMonitorFormData"]
     >;
 }
 
@@ -257,9 +263,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             // Call with correct signature (event, properties)
             await handleSubmit(mockEvent, properties);
 
-            expect(mockEvent.preventDefault).toHaveBeenCalled();
-            expect(properties.createSite).toHaveBeenCalled();
-            expect(properties.onSuccess).toHaveBeenCalled();
+            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+            expect(properties.createSite).toHaveBeenCalledWith();
+            expect(properties.onSuccess).toHaveBeenCalledWith();
             expect(validationModule.createMonitorObject).toHaveBeenCalledWith(
                 properties.monitorType,
                 expect.objectContaining({ url: properties.url })
@@ -289,7 +295,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(mockEvent.preventDefault).toHaveBeenCalled();
+            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
             expect(properties.setFormError).toHaveBeenCalledWith(
                 "Invalid URL format"
             );
@@ -326,9 +332,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(mockEvent.preventDefault).toHaveBeenCalled();
-            expect(properties.addMonitorToSite).toHaveBeenCalled();
-            expect(properties.onSuccess).toHaveBeenCalled();
+            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+            expect(properties.addMonitorToSite).toHaveBeenCalledWith();
+            expect(properties.onSuccess).toHaveBeenCalledWith();
             expect(validationModule.createMonitorObject).toHaveBeenCalledWith(
                 properties.monitorType,
                 expect.objectContaining({ url: properties.url })
@@ -354,14 +360,14 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
         const intermediateCharacters = [
             ...terminalCharacters,
             " ",
+            "#",
+            "+",
             "-",
-            "_",
             ".",
             "/",
             ":",
-            "#",
-            "+",
             "@",
+            "_",
         ] as const;
 
         const nonBlankSiteNameArbitrary = fc
@@ -373,7 +379,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             )
             .map(
                 ([prefixChars, lastChar]) =>
-                    `${prefixChars.join("")}${lastChar}`
+                    `${arrayJoin(prefixChars, "")}${lastChar}`
             );
 
         const whitespaceCharacters = [
@@ -381,7 +387,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             "\t",
             "\n",
             "\r",
-            "\u00A0",
+            "\u{A0}",
         ] as const;
 
         const whitespaceOnlyStringArbitrary = fc
@@ -389,29 +395,29 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 maxLength: 50,
                 minLength: 1,
             })
-            .map((chars) => chars.join(""));
+            .map((chars) => arrayJoin(chars, ""));
 
         const nonWhitespaceTerminalCharacters = [
             ...terminalCharacters,
             "!",
-            "?",
-            ".",
             "#",
             ")",
+            ".",
+            "?",
         ] as const;
 
         const errorMessageBodyCharacters = [
             ...terminalCharacters,
             " ",
+            "#",
+            "(",
+            ")",
             "-",
-            "_",
             ".",
             "/",
             ":",
-            "#",
             "@",
-            "(",
-            ")",
+            "_",
         ] as const;
 
         const validationErrorMessageArbitrary = fc
@@ -421,7 +427,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 }),
                 fc.constantFrom(...nonWhitespaceTerminalCharacters)
             )
-            .map(([bodyChars, lastChar]) => `${bodyChars.join("")}${lastChar}`);
+            .map(([bodyChars, lastChar]) => `${arrayJoin(bodyChars, "")}${lastChar}`);
 
         const submissionFailureMessageArbitrary = fc
             .tuple(
@@ -431,7 +437,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 }),
                 fc.constantFrom(...nonWhitespaceTerminalCharacters)
             )
-            .map(([bodyChars, lastChar]) => `${bodyChars.join("")}${lastChar}`);
+            .map(([bodyChars, lastChar]) => `${arrayJoin(bodyChars, "")}${lastChar}`);
 
         const concurrencyPropertyParameters = {
             ...basePropertyParameters,
@@ -470,9 +476,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(properties.createSite).toHaveBeenCalled();
-                expect(properties.onSuccess).toHaveBeenCalled();
+                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                expect(properties.createSite).toHaveBeenCalledWith();
+                expect(properties.onSuccess).toHaveBeenCalledWith();
                 expect(
                     validationModule.createMonitorObject
                 ).toHaveBeenCalledWith(
@@ -483,7 +489,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 // Verify form data characteristics
                 expect(formData.siteName.trim().length).toBeGreaterThan(0);
                 expect(formData.siteName.length).toBeLessThanOrEqual(100);
-                expect(formData.url).toMatch(/^https?:\/\//);
+                expect(formData.url).toMatch(/^https?:\/\//v);
                 expect([
                     "http",
                     "port",
@@ -523,8 +529,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(properties.setFormError).toHaveBeenCalled();
+                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                expect(properties.setFormError).toHaveBeenCalledWith();
                 expect(properties.createSite).not.toHaveBeenCalled();
                 expect(
                     validationModule.createMonitorObject
@@ -568,8 +574,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(properties.createSite).toHaveBeenCalled();
+                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                expect(properties.createSite).toHaveBeenCalledWith();
 
                 // Verify Port config characteristics
                 expect(portConfig.port).toBeGreaterThanOrEqual(1);
@@ -586,7 +592,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             [
                 fc.oneof(
                     whitespaceOnlyStringArbitrary,
-                    fc.constantFrom("", "   ", "\t", "\n"),
+                    fc.constantFrom("", ' '.repeat(3), "\t", "\n"),
                     fc.constant(null),
                     fc.constant(undefined)
                 ),
@@ -609,8 +615,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(properties.setFormError).toHaveBeenCalled();
+                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                expect(properties.setFormError).toHaveBeenCalledWith();
                 expect(properties.createSite).not.toHaveBeenCalled();
 
                 // Form should handle invalid input without crashing
@@ -663,9 +669,9 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, propertiesWithReject);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(propertiesWithReject.createSite).toHaveBeenCalled();
-                expect(propertiesWithReject.setFormError).toHaveBeenCalled();
+                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                expect(propertiesWithReject.createSite).toHaveBeenCalledWith();
+                expect(propertiesWithReject.setFormError).toHaveBeenCalledWith();
 
                 // Verify error characteristics
                 expect([
@@ -688,7 +694,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             async (addMode) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
                 const properties = createMockProperties({
-                    addMode: addMode as any,
+                    addMode: addMode,
                     // Provide valid selectedExistingSite for "existing" mode to pass validation
                     ...(addMode === "existing" && {
                         selectedExistingSite: "existing-site-id",
@@ -701,14 +707,14 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 await handleSubmit(mockEvent, properties);
 
-                expect(mockEvent.preventDefault).toHaveBeenCalled();
-                expect(properties.onSuccess).toHaveBeenCalled();
+                expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+                expect(properties.onSuccess).toHaveBeenCalledWith();
 
                 // Verify mode-specific behavior
                 if (addMode === "new") {
-                    expect(properties.createSite).toHaveBeenCalled();
+                    expect(properties.createSite).toHaveBeenCalledWith();
                 } else {
-                    expect(properties.addMonitorToSite).toHaveBeenCalled();
+                    expect(properties.addMonitorToSite).toHaveBeenCalledWith();
                 }
 
                 expect(["new", "existing"]).toContain(addMode);
@@ -744,7 +750,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 // Process all submissions
                 for (const { mockEvent, properties } of submissions) {
                     await handleSubmit(mockEvent, properties);
-                    expect(mockEvent.preventDefault).toHaveBeenCalled();
+                    expect(mockEvent.preventDefault).toHaveBeenCalledWith();
                 }
 
                 // Verify submission characteristics
@@ -943,16 +949,13 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 expect(
                     validationModule.validateMonitorFormData
-                ).toHaveBeenCalled();
+                ).toHaveBeenCalledWith();
                 const calls =
                     validationModule.validateMonitorFormData.mock.calls;
-                const lastCall = calls.at(-1);
-                const formData = (lastCall?.[1] ?? {}) as Record<
-                    string,
-                    unknown
-                >;
+                const lastCall = arrayAt(calls, -1);
+                const formData = safeCastTo<UnknownRecord>(lastCall?.[1] ?? {});
 
-                for (const [key, value] of Object.entries(
+                for (const [key, value] of objectEntries(
                     scenario.expectation
                 )) {
                     if (value === undefined) {

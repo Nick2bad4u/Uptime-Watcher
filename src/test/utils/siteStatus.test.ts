@@ -2,7 +2,8 @@
  * Tests for site status utility exports
  */
 
-import { describe, it, expect } from "vitest";
+import type { MonitorStatus, SiteForStatus, SiteStatus } from "@shared/types";
+
 import { fc, test } from "@fast-check/vitest";
 import {
     calculateSiteMonitoringStatus,
@@ -11,7 +12,8 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
-import type { SiteStatus, MonitorStatus, SiteForStatus } from "@shared/types";
+import { arrayFirst, isEmpty, safeCastTo   } from "ts-extras";
+import { describe, expect, it } from "vitest";
 /**
  * Site Status Utility Tests
  *
@@ -20,66 +22,66 @@ import type { SiteStatus, MonitorStatus, SiteForStatus } from "@shared/types";
 
 describe("siteStatus exports", () => {
     it("should export calculateSiteMonitoringStatus function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
         await annotate("Type: Export Operation", "type");
 
-        expect(typeof calculateSiteMonitoringStatus).toBe("function");
+        expect(calculateSiteMonitoringStatus).toBeTypeOf("function");
     });
 
     it("should export calculateSiteStatus function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
         await annotate("Type: Export Operation", "type");
 
-        expect(typeof calculateSiteStatus).toBe("function");
+        expect(calculateSiteStatus).toBeTypeOf("function");
     });
 
     it("should export getSiteDisplayStatus function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
         await annotate("Type: Export Operation", "type");
 
-        expect(typeof getSiteDisplayStatus).toBe("function");
+        expect(getSiteDisplayStatus).toBeTypeOf("function");
     });
 
     it("should export getSiteStatusDescription function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
         await annotate("Type: Export Operation", "type");
 
-        expect(typeof getSiteStatusDescription).toBe("function");
+        expect(getSiteStatusDescription).toBeTypeOf("function");
     });
 
     it("should export getSiteStatusVariant function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
         await annotate("Type: Export Operation", "type");
 
-        expect(typeof getSiteStatusVariant).toBe("function");
+        expect(getSiteStatusVariant).toBeTypeOf("function");
     });
 
-    it("should export SiteStatus type", async ({ task, annotate }) => {
+    it("should export SiteStatus type", async ({ annotate, task }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
         await annotate("Category: Utility", "category");
@@ -87,12 +89,13 @@ describe("siteStatus exports", () => {
 
         // Type test - if this compiles, the type is exported correctly
         const status: SiteStatus = "up";
+
         expect(status).toBe("up");
     });
 
     it("should have working calculateSiteStatus function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
@@ -102,12 +105,13 @@ describe("siteStatus exports", () => {
         // Basic functional test with empty monitors array
         const testSite: SiteForStatus = { monitors: [] };
         const result = calculateSiteStatus(testSite);
+
         expect(result).toBe("unknown");
     });
 
     it("should have working getSiteDisplayStatus function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
@@ -119,12 +123,13 @@ describe("siteStatus exports", () => {
             monitors: [{ monitoring: true, status: "up" }],
         };
         const result = getSiteDisplayStatus(testSite);
+
         expect(result).toBe("up");
     });
 
     it("should have working getSiteStatusDescription function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
@@ -136,13 +141,14 @@ describe("siteStatus exports", () => {
             monitors: [{ monitoring: true, status: "up" }],
         };
         const result = getSiteStatusDescription(testSite);
-        expect(typeof result).toBe("string");
+
+        expect(result).toBeTypeOf("string");
         expect(result.length).toBeGreaterThan(0);
     });
 
     it("should have working getSiteStatusVariant function", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: siteStatus", "component");
@@ -151,36 +157,37 @@ describe("siteStatus exports", () => {
 
         // Basic functional test
         const result = getSiteStatusVariant("up");
-        expect(typeof result).toBe("string");
+
+        expect(result).toBeTypeOf("string");
         expect(result.length).toBeGreaterThan(0);
     });
 });
 
 describe("siteStatus Property-based Tests", () => {
     // Arbitraries for test data generation
-    const monitorStatusArb = fc.constantFrom(
+    const monitorStatusArb = safeCastTo<fc.Arbitrary<MonitorStatus>>(fc.constantFrom(
         "up",
         "down",
         "pending",
         "paused"
-    ) as fc.Arbitrary<MonitorStatus>;
-    const siteStatusArb = fc.constantFrom(
+    ));
+    const siteStatusArb = safeCastTo<fc.Arbitrary<SiteStatus>>(fc.constantFrom(
         "up",
         "down",
         "pending",
         "paused",
         "mixed",
         "unknown"
-    ) as fc.Arbitrary<SiteStatus>;
+    ));
 
     const monitorArb = fc.record({
         monitoring: fc.boolean(),
         status: monitorStatusArb,
     });
 
-    const siteForStatusArb = fc.record({
-        monitors: fc.array(monitorArb, { minLength: 0, maxLength: 10 }),
-    }) as fc.Arbitrary<SiteForStatus>;
+    const siteForStatusArb = safeCastTo<fc.Arbitrary<SiteForStatus>>(fc.record({
+        monitors: fc.array(monitorArb, { maxLength: 10, minLength: 0 }),
+    }));
 
     describe(calculateSiteMonitoringStatus, () => {
         test.prop([siteForStatusArb])(
@@ -210,7 +217,7 @@ describe("siteStatus Property-based Tests", () => {
             }
         );
 
-        test.prop([fc.array(monitorArb, { minLength: 1, maxLength: 5 })])(
+        test.prop([fc.array(monitorArb, { maxLength: 5, minLength: 1 })])(
             "should return running when all monitors are monitoring",
             (monitors) => {
                 const site: SiteForStatus = {
@@ -218,11 +225,12 @@ describe("siteStatus Property-based Tests", () => {
                 };
 
                 const result = calculateSiteMonitoringStatus(site);
+
                 expect(result).toBe("running");
             }
         );
 
-        test.prop([fc.array(monitorArb, { minLength: 1, maxLength: 5 })])(
+        test.prop([fc.array(monitorArb, { maxLength: 5, minLength: 1 })])(
             "should return stopped when no monitors are monitoring",
             (monitors) => {
                 const site: SiteForStatus = {
@@ -233,6 +241,7 @@ describe("siteStatus Property-based Tests", () => {
                 };
 
                 const result = calculateSiteMonitoringStatus(site);
+
                 expect(result).toBe("stopped");
             }
         );
@@ -254,13 +263,13 @@ describe("siteStatus Property-based Tests", () => {
                     "unknown",
                 ]).toContain(result);
 
-                if (site.monitors.length === 0) {
+                if (isEmpty(site.monitors)) {
                     expect(result).toBe("unknown");
                 }
             }
         );
 
-        test.prop([monitorStatusArb, fc.integer({ min: 1, max: 5 })])(
+        test.prop([monitorStatusArb, fc.integer({ max: 5, min: 1 })])(
             "should return single status when all monitors have same status",
             (status, count) => {
                 const site: SiteForStatus = {
@@ -271,11 +280,12 @@ describe("siteStatus Property-based Tests", () => {
                 };
 
                 const result = calculateSiteStatus(site);
+
                 expect(result).toBe(status);
             }
         );
 
-        test.prop([fc.array(monitorArb, { minLength: 2, maxLength: 5 })])(
+        test.prop([fc.array(monitorArb, { maxLength: 5, minLength: 2 })])(
             "should return mixed when monitors have different statuses",
             (monitors) => {
                 // Ensure we have at least 2 different statuses
@@ -284,7 +294,7 @@ describe("siteStatus Property-based Tests", () => {
                     "down",
                     "degraded",
                 ];
-                const status1 = differentStatuses[0];
+                const status1 = arrayFirst(differentStatuses);
                 const status2 = differentStatuses[1];
                 if (!status1 || !status2) {
                     throw new Error("Expected status values to be defined");
@@ -329,8 +339,9 @@ describe("siteStatus Property-based Tests", () => {
                     "unknown",
                 ]).toContain(result);
 
-                if (site.monitors.length === 0) {
+                if (isEmpty(site.monitors)) {
                     expect(result).toBe("unknown");
+
                     return; // Early return for empty monitors case
                 }
 
@@ -342,6 +353,7 @@ describe("siteStatus Property-based Tests", () => {
                 if (monitoringCount === 0) {
                     // No monitors are actively monitoring
                     expect(result).toBe("paused");
+
                     return;
                 }
 
@@ -358,7 +370,7 @@ describe("siteStatus Property-based Tests", () => {
             }
         );
 
-        test.prop([fc.array(monitorArb, { minLength: 1, maxLength: 5 })])(
+        test.prop([fc.array(monitorArb, { maxLength: 5, minLength: 1 })])(
             "should return paused when no monitors are monitoring",
             (monitors) => {
                 const site: SiteForStatus = {
@@ -369,6 +381,7 @@ describe("siteStatus Property-based Tests", () => {
                 };
 
                 const result = getSiteDisplayStatus(site);
+
                 expect(result).toBe("paused");
             }
         );
@@ -381,7 +394,7 @@ describe("siteStatus Property-based Tests", () => {
                 const result = getSiteStatusDescription(site);
 
                 // Property: Should always return a non-empty string
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(0);
 
                 // Property: Should contain monitor count information for sites with monitors
@@ -392,13 +405,13 @@ describe("siteStatus Property-based Tests", () => {
                 }
 
                 // Property: Should mention "No monitors" for empty sites
-                if (site.monitors.length === 0) {
+                if (isEmpty(site.monitors)) {
                     expect(result.toLowerCase()).toContain("no monitors");
                 }
             }
         );
 
-        test.prop([monitorStatusArb, fc.integer({ min: 1, max: 10 })])(
+        test.prop([monitorStatusArb, fc.integer({ max: 10, min: 1 })])(
             "should include monitor count in description",
             (status, count) => {
                 const site: SiteForStatus = {
@@ -409,6 +422,7 @@ describe("siteStatus Property-based Tests", () => {
                 };
 
                 const result = getSiteStatusDescription(site);
+
                 expect(result).toContain(count.toString());
             }
         );
@@ -434,6 +448,7 @@ describe("siteStatus Property-based Tests", () => {
             "should return success variant for up status",
             (status) => {
                 const result = getSiteStatusVariant(status);
+
                 expect(result).toBe("success");
             }
         );
@@ -442,6 +457,7 @@ describe("siteStatus Property-based Tests", () => {
             "should return error variant for error states",
             (status) => {
                 const result = getSiteStatusVariant(status);
+
                 expect(result).toBe("error");
             }
         );
@@ -450,6 +466,7 @@ describe("siteStatus Property-based Tests", () => {
             "should return warning variant for warning states",
             (status) => {
                 const result = getSiteStatusVariant(status);
+
                 expect(result).toBe("warning");
             }
         );
@@ -458,12 +475,13 @@ describe("siteStatus Property-based Tests", () => {
             "should return info variant for pending status",
             (status) => {
                 const result = getSiteStatusVariant(status);
+
                 expect(result).toBe("info");
             }
         );
     });
 
-    describe("Integration Properties", () => {
+    describe("integration Properties", () => {
         test.prop([siteForStatusArb])(
             "getSiteDisplayStatus and getSiteStatusDescription should be consistent",
             (site) => {
@@ -474,28 +492,34 @@ describe("siteStatus Property-based Tests", () => {
                 const lowerDescription = description.toLowerCase();
 
                 switch (displayStatus) {
-                    case "up": {
-                        expect(lowerDescription).toMatch(/up|running/);
-                        break;
-                    }
                     case "down": {
                         expect(lowerDescription).toContain("down");
-                        break;
-                    }
-                    case "pending": {
-                        expect(lowerDescription).toContain("pending");
-                        break;
-                    }
-                    case "paused": {
-                        expect(lowerDescription).toContain("paused");
+
                         break;
                     }
                     case "mixed": {
                         expect(lowerDescription).toContain("mixed");
+
+                        break;
+                    }
+                    case "paused": {
+                        expect(lowerDescription).toContain("paused");
+
+                        break;
+                    }
+                    case "pending": {
+                        expect(lowerDescription).toContain("pending");
+
                         break;
                     }
                     case "unknown": {
-                        expect(lowerDescription).toMatch(/unknown|no monitors/);
+                        expect(lowerDescription).toMatch(/no monitors|unknown/v);
+
+                        break;
+                    }
+                    case "up": {
+                        expect(lowerDescription).toMatch(/running|up/v);
+
                         break;
                     }
                 }
@@ -512,6 +536,7 @@ describe("siteStatus Property-based Tests", () => {
                 expect(() => getSiteStatusDescription(site)).not.toThrow();
 
                 const displayStatus = getSiteDisplayStatus(site);
+
                 expect(() => getSiteStatusVariant(displayStatus)).not.toThrow();
             }
         );

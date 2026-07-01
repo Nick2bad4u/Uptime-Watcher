@@ -3,9 +3,10 @@
  * exposure to renderer process.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createCorrelationAwareInvokeMock } from "./utils/ipcCorrelationTestUtils";
 
 describe("Electron Preload Script", () => {
@@ -13,8 +14,8 @@ describe("Electron Preload Script", () => {
     let mockIpcRenderer: {
         invoke: ReturnType<typeof vi.fn>;
         on: ReturnType<typeof vi.fn>;
-        removeListener: ReturnType<typeof vi.fn>;
         removeAllListeners: ReturnType<typeof vi.fn>;
+        removeListener: ReturnType<typeof vi.fn>;
         send: ReturnType<typeof vi.fn>;
     };
     let mockSite: Site;
@@ -55,7 +56,7 @@ describe("Electron Preload Script", () => {
                     history: [],
                 },
             ],
-        } as Site;
+        };
 
         const invokeMock = createCorrelationAwareInvokeMock();
         invokeMock.mockImplementation((channel: string) => {
@@ -693,7 +694,7 @@ describe("Electron Preload Script", () => {
                 const identifier = "test-site-123";
                 const monitorId = mockSite.monitors[0]?.id ?? "http-monitor";
 
-                const monitor = mockSite.monitors[0] as Monitor;
+                const monitor = mockSite.monitors[0]!;
                 const update: StatusUpdate = {
                     monitor,
                     monitorId,
@@ -1295,7 +1296,7 @@ describe("Electron Preload Script", () => {
                 const listener = listenerCall![1];
 
                 // Simulate IPC event
-                const monitor = mockSite.monitors[0] as Monitor | undefined;
+                const monitor = mockSite.monitors[0];
 
                 if (!monitor) {
                     throw new Error("Expected mock monitor to be defined");

@@ -5,8 +5,6 @@
  * touches.
  */
 
-type StorageName = "localStorage" | "sessionStorage";
-
 type MaybeStorage =
     | null
     | undefined
@@ -27,6 +25,8 @@ interface StorageLike {
     removeItem: (key: string) => void;
     setItem: (key: string, value: string) => void;
 }
+
+type StorageName = "localStorage" | "sessionStorage";
 
 /**
  * Determines whether a candidate value is a function.
@@ -86,7 +86,7 @@ const readStorageCandidate = (
         return undefined;
     } catch (error: unknown) {
         if (
-            error instanceof Error &&
+            Error.isError(error) &&
             error.message.includes(LOCAL_STORAGE_INITIALIZATION_ERROR)
         ) {
             removePropertyIfConfigurable(target, name);
@@ -117,11 +117,11 @@ const defineStorageProperty = (
  * environments.
  */
 class MemoryStorage implements StorageLike {
-    readonly #store = new Map<string, string>();
-
     public get length(): number {
         return this.#store.size;
     }
+
+    readonly #store = new Map<string, string>();
 
     public clear(): void {
         this.#store.clear();
@@ -184,7 +184,7 @@ const installStorage = (name: StorageName): void => {
     defineStorageProperty(globalThis, name, storage);
 
     const windowCandidate = Reflect.get(globalThis, "window");
-    // eslint-disable-next-line sonarjs/different-types-comparison, @typescript-eslint/no-unnecessary-condition -- null check is required for DOM Storage parity
+    // eslint-disable-next-line sonarjs/different-types-comparison -- null check is required for DOM Storage parity
     if (typeof windowCandidate === "object" && windowCandidate !== null) {
         const maybeStorage = readStorageCandidate(windowCandidate, name);
         if (!isStorageLike(maybeStorage)) {

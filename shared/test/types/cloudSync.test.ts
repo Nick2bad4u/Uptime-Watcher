@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
+import { describe, expect, it } from "vitest";
 
 describe("cloudSync", () => {
     it("preserves leading and trailing whitespace in JSON string values", () => {

@@ -2,7 +2,7 @@ import { isDefined, isPresent } from "ts-extras";
 
 /**
  * Database value conversion utilities. Provides type-safe conversions between
- * application types and database values.
+ * app types and database values.
  */
 
 /**
@@ -37,7 +37,7 @@ export type DbValue = null | number | string;
  */
 
 export function convertToDbValue(value: unknown): DbValue | undefined {
-    let result: DbValue | undefined = undefined;
+    let result: DbValue | undefined;
 
     if (value === null) {
         result = null;
@@ -71,10 +71,12 @@ export function addBooleanField(
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
-    if (isDefined(value)) {
-        updateFields.push(`${fieldName} = ?`);
-        updateValues.push(value ? 1 : 0);
+    if (!isDefined(value)) {
+        return;
     }
+
+    updateFields.push(`${fieldName} = ?`);
+    updateValues.push(value ? 1 : 0);
 }
 
 /**
@@ -129,11 +131,13 @@ export function addNumberField(
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
-    if (isDefined(value)) {
-        updateFields.push(`${fieldName} = ?`);
-        const convertedValue = safeNumberConvert(value);
-        updateValues.push(convertedValue ?? value);
+    if (!isDefined(value)) {
+        return;
     }
+
+    updateFields.push(`${fieldName} = ?`);
+    const convertedValue = safeNumberConvert(value);
+    updateValues.push(convertedValue ?? value);
 }
 
 /**
@@ -162,12 +166,14 @@ export function addStringField(
     updateFields: string[],
     updateValues: DbValue[]
 ): void {
-    if (isDefined(value)) {
-        updateFields.push(`${fieldName} = ?`);
-        // Handle runtime type coercion for tests that pass non-string values
-        const stringValue = typeof value === "string" ? value : String(value);
-        updateValues.push(stringValue);
+    if (!isDefined(value)) {
+        return;
     }
+
+    updateFields.push(`${fieldName} = ?`);
+    // Handle runtime type coercion for tests that pass non-string values
+    const stringValue = typeof value === "string" ? value : String(value);
+    updateValues.push(stringValue);
 }
 
 /**

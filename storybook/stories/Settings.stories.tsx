@@ -73,6 +73,12 @@ const withSettingsEnvironment: Decorator = (StoryComponent, context) => {
                             },
                         } satisfies SerializedDatabaseBackupResult;
                     },
+                    fullResyncSites: async () => {
+                        action("sites/fullResyncSites")();
+                        useSitesStore.setState({
+                            sites: [...sampleSites],
+                        });
+                    },
                     restoreSqliteBackup: async () => {
                         action("sites/restoreSqliteBackup")();
                         return {
@@ -91,13 +97,7 @@ const withSettingsEnvironment: Decorator = (StoryComponent, context) => {
                             restoredAt: Date.now(),
                         };
                     },
-                    fullResyncSites: async () => {
-                        action("sites/fullResyncSites")();
-                        useSitesStore.setState({
-                            sites: Array.from(sampleSites),
-                        });
-                    },
-                    sites: Array.from(sampleSites),
+                    sites: [...sampleSites],
                 },
                 false
             );
@@ -140,8 +140,8 @@ const SettingsPreview = ({ onClose }: SettingsProperties): JSX.Element => (
 
 const meta: Meta<SettingsStoryArgs> = {
     args: {
-        onClose: action("settings/onClose"),
         isDark: false,
+        onClose: action("settings/onClose"),
     },
     component: SettingsPreview,
     decorators: [

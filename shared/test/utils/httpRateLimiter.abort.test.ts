@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-
 import { HttpRateLimiter } from "@shared/utils/httpRateLimiter";
+import { describe, expect, it, vi } from "vitest";
 
 describe("HttpRateLimiter abort support", () => {
     it("rejects without invoking the operation when aborted while waiting for a slot", async () => {
@@ -16,7 +15,7 @@ describe("HttpRateLimiter abort support", () => {
 
             let resolveSlow: () => void = () => {};
             const slowBarrier = new Promise<boolean>((resolve) => {
-                resolveSlow = () => resolve(true);
+                resolveSlow = () => { resolve(true); };
             });
 
             const slowOperation = vi.fn(async () => {

@@ -14,7 +14,7 @@
  * @tags ["mutation-testing", "validation", "schemas", "arrays"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 describe("Shared Validation Array Declaration Mutation Tests", () => {
@@ -403,6 +403,15 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                 const validationRules: string[] = [];
 
                 switch (monitorType) {
+                    case "dns": {
+                        requiredFields.push("hostname", "recordType");
+                        optionalFields.push("resolver", "timeout");
+                        validationRules.push(
+                            "hostname-format",
+                            "record-type-valid"
+                        );
+                        break;
+                    }
                     case "http": {
                         requiredFields.push("url", "method");
                         optionalFields.push("headers", "timeout");
@@ -413,15 +422,6 @@ describe("Shared Validation Array Declaration Mutation Tests", () => {
                         requiredFields.push("host");
                         optionalFields.push("packets", "timeout");
                         validationRules.push("host-format", "packets-range");
-                        break;
-                    }
-                    case "dns": {
-                        requiredFields.push("hostname", "recordType");
-                        optionalFields.push("resolver", "timeout");
-                        validationRules.push(
-                            "hostname-format",
-                            "record-type-valid"
-                        );
                         break;
                     }
                     default: {

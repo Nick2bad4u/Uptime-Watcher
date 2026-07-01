@@ -5,8 +5,9 @@
  * Vitest's built-in task and annotate properties.
  */
 
-import { beforeEach } from "vitest";
 import fc from "fast-check";
+import { beforeEach } from "vitest";
+
 import { resolveFastCheckEnvOverrides } from "./utils/fastCheckEnv";
 
 // Increase Node.js process listener limits for tests to prevent MaxListenersExceededWarning
@@ -50,9 +51,7 @@ fc.configureGlobal({
     // examples: [],          // add any concrete inputs you want always tested
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
-    // RNG / reproducibility
-    // seed: undefined,    // set a specific number to reproduce runs
-    // randomType: 'xorshift128plus', // default; change if you need a different generator
+    // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,

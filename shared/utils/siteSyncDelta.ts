@@ -44,7 +44,7 @@ export function calculateSiteSyncDelta(
     const addedSites: Site[] = [];
     const updatedSites: Site[] = [];
 
-    for (const [identifier, nextSite] of nextMap.entries()) {
+    for (const [identifier, nextSite] of nextMap) {
         const previousSite = previousMap.get(identifier);
 
         if (!previousSite) {

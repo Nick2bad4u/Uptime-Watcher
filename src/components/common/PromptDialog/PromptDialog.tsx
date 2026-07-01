@@ -1,5 +1,5 @@
 /**
- * Central prompt dialog overlay rendered at the application root.
+ * Central prompt dialog overlay rendered at the app root.
  */
 
 import type { JSX } from "react/jsx-runtime";

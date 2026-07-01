@@ -12,6 +12,40 @@ export type JsonPayloadParseResult =
     | { readonly ok: true; readonly payload: unknown };
 
 /**
+ * Extracts a nested value from a JSON-compatible payload using a dot path.
+ *
+ * @param payload - Payload to traverse.
+ * @param path - Dot/bracket path (e.g. `data.items[0].name`).
+ *
+ * @returns Resolved value or `undefined` when not found.
+ *
+ * @internal
+ */
+export function extractJsonValueAtPath(
+    payload: unknown,
+    path: string
+): unknown {
+    return extractMonitorValueAtPath(payload, path, {
+        allowArrayIndexTokens: true,
+    });
+}
+
+/**
+ * Type guard for parse failures.
+ *
+ * @param result - Parse result to inspect.
+ *
+ * @returns `true` when the payload failed to parse.
+ *
+ * @internal
+ */
+export function isParseFailure(
+    result: JsonPayloadParseResult
+): result is { readonly error: Error; readonly ok: false } {
+    return !result.ok;
+}
+
+/**
  * Parses an HTTP payload into JSON when it is a string.
  *
  * @param data - Raw payload from the HTTP response.
@@ -42,40 +76,6 @@ export function parseJsonPayload(
     }
 
     return { ok: true, payload: data };
-}
-
-/**
- * Type guard for parse failures.
- *
- * @param result - Parse result to inspect.
- *
- * @returns `true` when the payload failed to parse.
- *
- * @internal
- */
-export function isParseFailure(
-    result: JsonPayloadParseResult
-): result is { readonly error: Error; readonly ok: false } {
-    return !result.ok;
-}
-
-/**
- * Extracts a nested value from a JSON-compatible payload using a dot path.
- *
- * @param payload - Payload to traverse.
- * @param path - Dot/bracket path (e.g. `data.items[0].name`).
- *
- * @returns Resolved value or `undefined` when not found.
- *
- * @internal
- */
-export function extractJsonValueAtPath(
-    payload: unknown,
-    path: string
-): unknown {
-    return extractMonitorValueAtPath(payload, path, {
-        allowArrayIndexTokens: true,
-    });
 }
 
 /**

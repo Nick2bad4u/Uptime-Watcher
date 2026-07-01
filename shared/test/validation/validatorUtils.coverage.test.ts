@@ -3,7 +3,8 @@
  * specific uncovered lines: 203, 250-253
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { isValidHost, isValidPort } from "../../validation/validatorUtils";
 
 describe("ValidatorUtils - Complete Coverage", () => {
@@ -80,7 +81,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             expect(isValidPort(false)).toBeFalsy();
             expect(isValidPort(Symbol("test"))).toBeFalsy();
             expect(isValidPort(() => {})).toBeFalsy();
-            expect(isValidPort(/regex/)).toBeFalsy();
+            expect(isValidPort(/regex/v)).toBeFalsy();
             expect(isValidPort(new Date())).toBeFalsy();
         });
 
@@ -134,7 +135,7 @@ describe("ValidatorUtils - Complete Coverage", () => {
             // Test edge cases that might behave differently
             expect(isValidPort(1)).toBeTruthy();
             expect(isValidPort("1")).toBeTruthy();
-            expect(isValidPort(Number.NaN)).toBeFalsy();
+            expect(isValidPort(NaN)).toBeFalsy();
             expect(isValidPort(Infinity)).toBeFalsy();
             expect(isValidPort(-Infinity)).toBeFalsy();
         });
@@ -152,21 +153,13 @@ describe("ValidatorUtils - Complete Coverage", () => {
 
             // Objects with custom toString/valueOf
             const customStringObj = {
-                toString() {
-                    return "80";
-                },
-                valueOf() {
-                    return 80;
-                },
+                toString: () => "80",
+                valueOf: () => 80,
             };
 
             const customNumberObj = {
-                toString() {
-                    return "invalid";
-                },
-                valueOf() {
-                    return 80;
-                },
+                toString: () => "invalid",
+                valueOf: () => 80,
             };
 
             // These should still return false because they're objects, not strings/numbers
@@ -186,9 +179,9 @@ describe("ValidatorUtils - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Primitive wrappers are objects, not primitives
-            expect(isValidPort(Number(80))).toBeTruthy();
-            expect(isValidPort(String("80"))).toBeTruthy();
-            expect(isValidHost(String("localhost"))).toBeTruthy();
+            expect(isValidPort(80)).toBeTruthy();
+            expect(isValidPort("80")).toBeTruthy();
+            expect(isValidHost("localhost")).toBeTruthy();
         });
     });
 });

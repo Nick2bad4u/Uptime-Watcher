@@ -97,16 +97,16 @@ export const electronNoShellOpenExternalRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description: "disallow direct shell.openExternal usage",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-shell-open-external.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "Do not call shell.openExternal directly. Use electron/services/shell/openExternalUtils.ts instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

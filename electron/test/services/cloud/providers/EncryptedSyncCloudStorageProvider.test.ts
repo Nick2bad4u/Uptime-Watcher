@@ -1,19 +1,18 @@
+import type {
+    CloudObjectEntry,
+    CloudStorageProvider,
+} from "@electron/services/cloud/providers/CloudStorageProvider.types";
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
-
-import { describe, expect, it } from "vitest";
 
 import {
     derivePassphraseKey,
     generateEncryptionSalt,
     isEncryptedPayload,
 } from "@electron/services/cloud/crypto/cloudCrypto";
-import { EncryptedSyncCloudStorageProvider } from "@electron/services/cloud/providers/EncryptedSyncCloudStorageProvider";
 import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
-import type {
-    CloudObjectEntry,
-    CloudStorageProvider,
-} from "@electron/services/cloud/providers/CloudStorageProvider.types";
+import { EncryptedSyncCloudStorageProvider } from "@electron/services/cloud/providers/EncryptedSyncCloudStorageProvider";
+import { describe, expect, it } from "vitest";
 
 class InMemoryProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;

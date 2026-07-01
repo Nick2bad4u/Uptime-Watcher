@@ -12,9 +12,10 @@
  * @since 2024
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { describe, expect, it, vi } from "vitest";
+
 import {
     castIpcResponse,
     isArray,
@@ -378,15 +379,15 @@ describe("TypeHelpers utilities fuzzing tests", () => {
         test.prop([fc.anything()])(
             "type guards should be consistent with each other",
             (value) => {
-                const arrayResult = isArray(value);
-                const recordResult = isRecord(value);
+                const isArrayResult = isArray(value);
+                const isRecordResult = isRecord(value);
 
                 // Arrays and records are mutually exclusive - ensure both guards work correctly
-                if (arrayResult) {
-                    expect(recordResult).toBeFalsy();
+                if (isArrayResult) {
+                    expect(isRecordResult).toBeFalsy();
                     expect(Array.isArray(value)).toBeTruthy();
-                } else if (recordResult) {
-                    expect(arrayResult).toBeFalsy();
+                } else if (isRecordResult) {
+                    expect(isArrayResult).toBeFalsy();
                     expect(
                         value !== null &&
                             typeof value === "object" &&
@@ -401,7 +402,7 @@ describe("TypeHelpers utilities fuzzing tests", () => {
                         !Array.isArray(value);
                     if (isObjectButNotRecord) {
                         // This is an edge case where value is object-like but doesn't pass isRecord test
-                        expect(recordResult).toBeFalsy();
+                        expect(isRecordResult).toBeFalsy();
                     }
                 }
 

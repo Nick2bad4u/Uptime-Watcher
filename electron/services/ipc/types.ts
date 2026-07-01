@@ -7,13 +7,6 @@ import type { IpcResponse as SharedIpcResponse } from "@shared/types/ipc";
 import type { Promisable, UnknownArray } from "type-fest";
 
 /**
- * Canonical IPC response shape used by Electron IPC handlers.
- *
- * @typeParam T - Payload type carried by a successful IPC response.
- */
-export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
-
-/**
  * Parameters for IPC handler wrapper configuration.
  *
  * @public
@@ -31,6 +24,14 @@ export interface IpcHandlerConfig<
 }
 
 /**
+ * Function signature for validating IPC parameter arrays prior to handler
+ * execution.
+ */
+export type IpcParameterValidator = (
+    params: Readonly<UnknownArray>
+) => null | string[];
+
+/**
  * Validation function type for IPC parameters.
  *
  * @param params - The parameters to validate
@@ -41,12 +42,11 @@ export interface IpcHandlerConfig<
  */
 
 /**
- * Function signature for validating IPC parameter arrays prior to handler
- * execution.
+ * Canonical IPC response shape used by Electron IPC handlers.
+ *
+ * @typeParam T - Payload type carried by a successful IPC response.
  */
-export type IpcParameterValidator = (
-    params: Readonly<UnknownArray>
-) => null | string[];
+export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
 
 /**
  * Validates an IPC handler's _success_ payload.

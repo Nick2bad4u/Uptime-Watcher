@@ -1,17 +1,17 @@
-import * as fs from "node:fs/promises";
-import * as os from "node:os";
-import * as path from "node:path";
-
-import { FilesystemCloudStorageProvider } from "@electron/services/cloud/providers/FilesystemCloudStorageProvider";
-import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
-import { SyncEngine } from "@electron/services/sync/SyncEngine";
 import type { Monitor, Site } from "@shared/types";
-import { isRecord } from "@shared/utils/typeHelpers";
+
 import {
     DEFAULT_CHECK_INTERVAL,
     DEFAULT_REQUEST_TIMEOUT,
 } from "@electron/constants";
+import { FilesystemCloudStorageProvider } from "@electron/services/cloud/providers/FilesystemCloudStorageProvider";
+import { SyncEngine } from "@electron/services/sync/SyncEngine";
 import { logger } from "@electron/utils/logger";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { isRecord } from "@shared/utils/typeHelpers";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 /* eslint-disable unicorn/numeric-separators-style -- Test constants like 1_000 / 60_000 don't match the project's strict grouping rule; readability here is preferred. */
@@ -28,7 +28,7 @@ class InMemorySettingsAdapter {
     }
 
     public async getAll(): Promise<Record<string, string>> {
-        return Object.fromEntries(this.store.entries());
+        return Object.fromEntries(this.store);
     }
 
     public async set(key: string, value: string): Promise<void> {
@@ -222,7 +222,7 @@ describe("SyncEngine (ADR-016)", () => {
                 overwrite: true,
             });
 
-            const monitorId = globalThis.crypto.randomUUID();
+            const monitorId = crypto.randomUUID();
             const opObjectKey = "sync/devices/remote-device/ops/2-0-9.ndjson";
             const ops = [
                 {
@@ -403,7 +403,7 @@ describe("SyncEngine (ADR-016)", () => {
 
             const remoteDeviceId = "remote";
             const siteId = "example.com";
-            const monitorId = globalThis.crypto.randomUUID();
+            const monitorId = crypto.randomUUID();
 
             const opsKey = "sync/devices/remote/ops/2-0-4.ndjson";
             const ops = [
@@ -555,7 +555,7 @@ describe("SyncEngine (ADR-016)", () => {
 
             const remoteDeviceId = "remote";
             const siteId = "invalid.example";
-            const monitorId = globalThis.crypto.randomUUID();
+            const monitorId = crypto.randomUUID();
 
             // Build a remote monitor that will pass CloudSyncMonitorConfig
             // parsing but will fail strict monitor validation because it's
@@ -698,9 +698,9 @@ describe("SyncEngine (ADR-016)", () => {
             });
 
             const siteId = "example.com";
-            const monitorId = globalThis.crypto.randomUUID();
+            const monitorId = crypto.randomUUID();
 
-            // Create remote ops defining a valid http monitor/site. We then force
+            // Create remote ops defining a valid HTTP monitor/site. We then force
             // orchestrator.addSite to throw to emulate a validation failure.
             const opsKey = `sync/devices/remote/ops/${Date.now()}-0-9.ndjson`;
             const ops = [
@@ -928,7 +928,7 @@ describe("SyncEngine (ADR-016)", () => {
 
             const providerWithRecording = {
                 deleteObject: async (key: string) =>
-                    await recordingProvider.deleteObject(key),
+                    { await recordingProvider.deleteObject(key); },
                 downloadBackup: async (
                     ...args: Parameters<
                         FilesystemCloudStorageProvider["downloadBackup"]
@@ -998,7 +998,7 @@ describe("SyncEngine (ADR-016)", () => {
 
             // Simulate local clock behind resetAt.
             vi.setSystemTime(new Date(1_000));
-            await engine.syncNow(providerWithRecording as any);
+            await engine.syncNow(providerWithRecording);
 
             const opKey = uploadedKeys.find((key) =>
                 key.startsWith("sync/devices/device-a/ops/")
@@ -1008,7 +1008,7 @@ describe("SyncEngine (ADR-016)", () => {
             const fileName = opKey!.split("/").at(-1);
             expect(fileName).toBeTruthy();
 
-            const createdAtRaw = fileName!.split("-")[0];
+            const createdAtRaw = fileName!.split("-", 1)[0];
             expect(Number(createdAtRaw)).toBeGreaterThanOrEqual(2_000);
         } finally {
             vi.useRealTimers();

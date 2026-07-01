@@ -115,15 +115,11 @@ describe("Monitoring Types", () => {
 
             // Mock implementation to test interface
             const mockService: IMonitorService = {
-                async check(_monitor) {
-                    return {
+                check: async (_monitor) => ({
                         status: "up",
                         responseTime: 100,
-                    };
-                },
-                getType() {
-                    return "http";
-                },
+                    }),
+                getType: () => "http",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>
                 ): void {
@@ -146,15 +142,11 @@ describe("Monitoring Types", () => {
             await annotate("Type: Business Logic", "type");
 
             const mockService: IMonitorService = {
-                async check(_monitor) {
-                    return {
+                check: async (_monitor) => ({
                         status: "up",
                         responseTime: 150,
-                    };
-                },
-                getType() {
-                    return "port";
-                },
+                    }),
+                getType: () => "port",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>
                 ): void {

@@ -86,7 +86,7 @@ export function collectDuplicateSiteIdentifiers(
         counts.set(identifier, (counts.get(identifier) ?? 0) + 1);
     }
 
-    const entries: IdentifierCountEntry[] = Array.from(counts.entries());
+    const entries: IdentifierCountEntry[] = [...counts];
 
     return entries
         .filter((entry): entry is IdentifierCountEntry => entry[1] > 1)
@@ -129,7 +129,7 @@ export function sanitizeSitesByIdentifier(
     if (isEmpty(duplicates)) {
         return {
             duplicates,
-            sanitizedSites: Array.from(sites),
+            sanitizedSites: [...sites],
         };
     }
 
@@ -137,10 +137,12 @@ export function sanitizeSitesByIdentifier(
     const sanitizedSites: Site[] = [];
 
     for (const site of sites) {
-        if (!setHas(seen, site.identifier)) {
-            seen.add(site.identifier);
-            sanitizedSites.push(site);
+        if (setHas(seen, site.identifier)) {
+            continue;
         }
+
+        seen.add(site.identifier);
+        sanitizedSites.push(site);
     }
 
     return {

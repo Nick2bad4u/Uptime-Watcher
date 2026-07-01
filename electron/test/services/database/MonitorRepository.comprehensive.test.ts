@@ -4,19 +4,21 @@
  * coverage.
  */
 
+import type { Site } from "@shared/types";
+
 import {
-    describe,
-    it,
-    expect,
-    beforeEach,
-    vi,
     afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
     type MockedObject,
+    vi,
 } from "vitest";
 
-import { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { Site } from "@shared/types";
+
+import { MonitorRepository } from "../../../services/database/MonitorRepository";
 
 describe("MonitorRepository - Comprehensive Coverage", () => {
     let repository: MonitorRepository;
@@ -282,9 +284,9 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 .mockReturnValueOnce({ changes: 1 }) // Delete history
                 .mockReturnValueOnce({ changes: 1 }); // Delete monitor
 
-            const result = await repository.delete("monitor-123");
+            const isResult = await repository.delete("monitor-123");
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
         it("should return false when monitor not found", async ({
@@ -300,9 +302,9 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
                 .mockReturnValueOnce({ changes: 0 }) // No history
                 .mockReturnValueOnce({ changes: 0 }); // No monitor
 
-            const result = await repository.delete("nonexistent");
+            const isResult = await repository.delete("nonexistent");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
         it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -461,10 +463,10 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const statuses = [
-                "up",
                 "down",
-                "pending",
                 "paused",
+                "pending",
+                "up",
             ] as const;
 
             for (const status of statuses) {

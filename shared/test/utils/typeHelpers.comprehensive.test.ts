@@ -3,7 +3,9 @@
  * functions
  */
 
-import { describe, it, expect, expectTypeOf } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
+
+import { isNumber, isString } from "../../utils/typeGuards";
 import {
     castIpcResponse,
     isArray,
@@ -11,7 +13,6 @@ import {
     safePropertyAccess,
     validateAndConvert,
 } from "../../utils/typeHelpers";
-import { isNumber, isString } from "../../utils/typeGuards";
 
 describe("Shared Type Helpers", () => {
     describe(castIpcResponse, () => {
@@ -117,7 +118,7 @@ describe("Shared Type Helpers", () => {
             await annotate("Component: Type Helpers", "component");
             await annotate("Operation: Number Type Guard", "operation");
 
-            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber(NaN)).toBeFalsy();
             expect(isNumber("123")).toBeFalsy();
             expect(isNumber(null)).toBeFalsy();
             expect(isNumber(undefined)).toBeFalsy();

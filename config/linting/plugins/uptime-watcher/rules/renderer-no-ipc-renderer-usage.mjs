@@ -16,7 +16,7 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 // Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
- * ESLint rule forbidding ipcRenderer usage in renderer application code.
+ * ESLint rule forbidding ipcRenderer usage in renderer app code.
  *
  * @remarks
  * Renderer IPC must flow through the preload bridge (`window.electronAPI`) and
@@ -263,17 +263,17 @@ export const rendererNoIpcRendererUsageRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow ipcRenderer usage in src/*; use the preload bridge and services instead.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-ipc-renderer-usage.md",
         },
-        schema: [],
         messages: {
             noIpcRenderer:
                 "Do not use ipcRenderer in renderer code. Use window.electronAPI via src/services/* instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

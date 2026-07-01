@@ -4,9 +4,10 @@
 
 import type { Monitor, StatusHistory } from "@shared/types";
 
-import { render, screen } from "@testing-library/react";
-import { describe, expect } from "vitest";
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { render, screen } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 import { MonitoringStatusDisplay } from "../../../components/SiteDetails/MonitoringStatusDisplay";
 import {
@@ -22,7 +23,7 @@ const MAX_PORT = 65_535;
 
 const identifierArbitrary = fc
     .string({ maxLength: 16, minLength: 3 })
-    .filter((value) => /^[a-zA-Z0-9-]+$/u.test(value));
+    .filter((value) => /^[-0-9A-Za-z]+$/u.test(value));
 
 const monitorStatusArbitrary = fc.constantFrom(
     "up",
@@ -47,7 +48,7 @@ const statusHistoryArbitrary = fc.array(
         timestamp: fc
             .nat({ max: TIMESTAMP_RANGE })
             .map((offset) => BASE_TIMESTAMP + offset),
-    }) as fc.Arbitrary<StatusHistory>,
+    }),
     { maxLength: 4, minLength: 1 }
 );
 
@@ -86,7 +87,7 @@ const monitorArbitrary = fc
         type: monitorTypeArbitrary,
         url: fc.option(fc.webUrl(), { nil: undefined }),
     })
-    .map((raw) => raw as Monitor);
+    .map((raw) => safeCastTo<Monitor>(raw));
 
 describe("MonitoringStatusDisplay fast-check coverage", () => {
     it("renders empty state when no monitors are provided", () => {

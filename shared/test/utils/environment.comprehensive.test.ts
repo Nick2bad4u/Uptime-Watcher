@@ -7,6 +7,7 @@ import {
     it,
     vi,
 } from "vitest";
+
 import type { ProcessSnapshot } from "../../utils/environment";
 
 /**
@@ -17,7 +18,7 @@ import type { ProcessSnapshot } from "../../utils/environment";
 
 type EnvironmentModule = typeof import("../../utils/environment");
 
-let environmentModule: EnvironmentModule | undefined = undefined;
+let environmentModule: EnvironmentModule | undefined;
 
 let mockProcessEnv: Record<string, string | undefined> = {};
 let mockProcessVersions: ProcessSnapshot["versions"] = { node: "18.0.0" };
@@ -63,10 +64,7 @@ const cloneVersions = (
 const buildProcessSnapshot = (
     overrides: Partial<ProcessSnapshot> = {}
 ): ProcessSnapshot => {
-    const defaultEnv = (mockProcess.env ?? {}) as Record<
-        string,
-        string | undefined
-    >;
+    const defaultEnv = (mockProcess.env ?? {});
     const env = Object.hasOwn(overrides, "env")
         ? (overrides.env ?? {})
         : cloneRecord(defaultEnv);
@@ -78,7 +76,7 @@ const buildProcessSnapshot = (
 };
 
 const applyProcessSnapshot = (
-    snapshot: ProcessSnapshot | null
+    snapshot: null | ProcessSnapshot
 ): EnvironmentModule => {
     const module = ensureEnvironmentModule();
     module.setProcessSnapshotOverrideForTesting(snapshot);
@@ -309,12 +307,12 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isBrowserEnvironment", () => {
-        let originalWindow: any = undefined;
-        let originalDocument: any = undefined;
+        let originalWindow: any;
+        let originalDocument: any;
 
         beforeEach(() => {
-            originalWindow = globalThis.window;
-            originalDocument = globalThis.document;
+            originalWindow = globalThis;
+            originalDocument = document;
         });
 
         afterEach(() => {
@@ -559,7 +557,7 @@ describe("Environment Detection Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const envModule = applyMockProcessSnapshot({
-                versions: {} as any,
+                versions: {},
             });
 
             expect(envModule.isNodeEnvironment()).toBeFalsy();
@@ -575,7 +573,7 @@ describe("Environment Detection Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const envModule = applyMockProcessSnapshot({
-                versions: { node: "" } as any,
+                versions: { node: "" },
             });
 
             expect(envModule.isNodeEnvironment()).toBeFalsy();

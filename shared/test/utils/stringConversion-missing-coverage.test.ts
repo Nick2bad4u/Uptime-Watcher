@@ -47,8 +47,7 @@ describe("StringConversion - Missing Coverage", () => {
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            // The default case is hard to hit because TypeScript covers most types
-            // But we can try to create edge cases or use type manipulation
+            // The default case is hard to hit because TypeScript covers most types But we can try to create edge cases or use type manipulation
 
             // Try to create an object with unusual typeof behavior
             const weirdObject = Object.create(null);
@@ -166,8 +165,7 @@ describe("StringConversion - Missing Coverage", () => {
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            // The default case is designed for unknown types that typeof might return
-            // in future JavaScript versions or edge cases
+            // The default case is designed for unknown types that typeof might return in future JavaScript versions or edge cases
 
             // Test undefined specifically
             const undefinedValue = undefined;
@@ -179,9 +177,7 @@ describe("StringConversion - Missing Coverage", () => {
                 const proxy = new Proxy(
                     {},
                     {
-                        get() {
-                            return undefined;
-                        },
+                        get: () => undefined,
                     }
                 );
 

@@ -5,23 +5,24 @@
  *   dynamic help text loading hook.
  */
 
-import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { MonitorType } from "@shared/types";
+
+import { renderHook, waitFor } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { getMonitorHelpTexts } from "../../utils/monitorUiHelpers";
 
 // Mock the logger module
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         warn: vi.fn(),
     },
 }));
 
 // Mock the getMonitorHelpTexts utility
-vi.mock("../../utils/monitorUiHelpers", () => ({
+vi.mock(import('../../utils/monitorUiHelpers'), () => ({
     getMonitorHelpTexts: vi.fn(),
 }));
 
@@ -221,7 +222,7 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: "http" as MonitorType } }
+                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
             );
 
             // Wait for first load
@@ -231,7 +232,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.primary).toBe("HTTP help");
 
             // Change monitor type
-            rerender({ monitorType: "ping" as MonitorType });
+            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
 
             // Should start loading again
             expect(result.current.isLoading).toBeTruthy();
@@ -272,7 +273,7 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: "http" as MonitorType } }
+                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
             );
 
             // Wait for first load to fail
@@ -282,7 +283,7 @@ describe("useDynamicHelpText Hook", () => {
             expect(result.current.error).toBe("First error");
 
             // Change monitor type
-            rerender({ monitorType: "ping" as MonitorType });
+            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
 
             // Should clear error during loading
             expect(result.current.isLoading).toBeTruthy();
@@ -367,14 +368,14 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: "http" as MonitorType } }
+                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
             );
 
             // Should be loading first request
             expect(result.current.isLoading).toBeTruthy();
 
             // Change monitor type before first request resolves
-            rerender({ monitorType: "ping" as MonitorType });
+            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
 
             // Should start loading second request
             expect(result.current.isLoading).toBeTruthy();
@@ -486,11 +487,11 @@ describe("useDynamicHelpText Hook", () => {
             const { result, rerender } = renderHook(
                 ({ monitorType }: { monitorType: MonitorType }) =>
                     useDynamicHelpText(monitorType),
-                { initialProps: { monitorType: "http" as MonitorType } }
+                { initialProps: { monitorType: safeCastTo<MonitorType>("http") } }
             );
 
             // Quickly change types
-            rerender({ monitorType: "ping" as MonitorType });
+            rerender({ monitorType: safeCastTo<MonitorType>("ping") });
             rerender({ monitorType: "tcp" as MonitorType });
 
             // Wait for final result

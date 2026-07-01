@@ -16,26 +16,6 @@ import type { Except } from "type-fest";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 /**
- * Discrete monitor status counters used by the UI.
- *
- * @public
- */
-export interface MonitorStatusCounts {
-    /** Total monitors currently reporting `degraded`. */
-    readonly degraded: number;
-    /** Total monitors currently reporting `down`. */
-    readonly down: number;
-    /** Total monitors currently paused. */
-    readonly paused: number;
-    /** Total monitors currently reporting `pending`. */
-    readonly pending: number;
-    /** Total monitors tracked across all sites. */
-    readonly total: number;
-    /** Total monitors currently reporting `up`. */
-    readonly up: number;
-}
-
-/**
  * Composite metrics describing the global monitoring state.
  *
  * @public
@@ -55,6 +35,26 @@ export interface GlobalMonitoringMetrics {
     readonly totalSites: number;
     /** Global uptime percentage rounded to the nearest integer. */
     readonly uptimePercentage: number;
+}
+
+/**
+ * Discrete monitor status counters used by the UI.
+ *
+ * @public
+ */
+export interface MonitorStatusCounts {
+    /** Total monitors currently reporting `degraded`. */
+    readonly degraded: number;
+    /** Total monitors currently reporting `down`. */
+    readonly down: number;
+    /** Total monitors currently paused. */
+    readonly paused: number;
+    /** Total monitors currently reporting `pending`. */
+    readonly pending: number;
+    /** Total monitors tracked across all sites. */
+    readonly total: number;
+    /** Total monitors currently reporting `up`. */
+    readonly up: number;
 }
 
 /**

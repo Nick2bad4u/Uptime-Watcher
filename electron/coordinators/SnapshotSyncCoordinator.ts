@@ -24,13 +24,6 @@ import { attachForwardedMetadata } from "../utils/eventMetadataForwarding";
 import { fireAndForgetLogged } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 
-type ManualCheckCompletedPayload = UptimeEvents["monitor:check-completed"];
-
-type EmitTyped = <TEventName extends EventKey<UptimeEvents>>(
-    eventName: TEventName,
-    payload: EventPayload<UptimeEvents, TEventName>
-) => Promise<void>;
-
 /**
  * Dependencies required to synchronize cache and state snapshots.
  */
@@ -41,6 +34,13 @@ export interface SnapshotSyncCoordinatorDependencies {
     readonly siteManager: SiteManager;
 }
 
+type EmitTyped = <TEventName extends EventKey<UptimeEvents>>(
+    eventName: TEventName,
+    payload: EventPayload<UptimeEvents, TEventName>
+) => Promise<void>;
+
+type ManualCheckCompletedPayload = UptimeEvents["monitor:check-completed"];
+
 /**
  * Coordinates snapshot/state synchronization and cache-related flows.
  *
@@ -50,13 +50,20 @@ export interface SnapshotSyncCoordinatorDependencies {
  * existing runtime behaviour and typed event contracts.
  */
 export class SnapshotSyncCoordinator {
-    private readonly siteManager: SiteManager;
-
-    private readonly monitorManager: MonitorManager;
+    private readonly busId: string;
 
     private readonly emitTyped: EmitTyped;
 
-    private readonly busId: string;
+    private readonly monitorManager: MonitorManager;
+
+    private readonly siteManager: SiteManager;
+
+    public constructor(dependencies: SnapshotSyncCoordinatorDependencies) {
+        this.siteManager = dependencies.siteManager;
+        this.monitorManager = dependencies.monitorManager;
+        this.emitTyped = dependencies.emitTyped;
+        this.busId = dependencies.busId;
+    }
 
     private static extractMonitorSnapshotFromResult(
         result: StatusUpdate | undefined
@@ -104,105 +111,16 @@ export class SnapshotSyncCoordinator {
         return this.siteManager.emitSitesStateSynchronized(payload);
     }
 
-    /**
-     * Handles the update sites cache request asynchronously.
-     *
-     * @remarks
-     * Extracted from {@link electron/UptimeOrchestrator#UptimeOrchestrator}
-     * without behavioural changes.
-     */
-    private async handleUpdateSitesCacheRequest(
-        data: UpdateSitesCacheRequestData
-    ): Promise<void> {
-        const timestamp = Date.now();
-
-        await this.siteManager.updateSitesCache(
-            data.sites,
-            "UptimeOrchestrator.handleUpdateSitesCacheRequest",
-            {
-                action: STATE_SYNC_ACTION.BULK_SYNC,
-                emitSyncEvent: true,
-                siteIdentifier: "all",
-                sites: data.sites,
-                source: STATE_SYNC_SOURCE.CACHE,
-                timestamp,
-            }
-        );
-
-        // CRITICAL: Set up monitoring for each loaded site
-        const setupResults = await Promise.allSettled(
-            data.sites.map(async (site) => {
-                try {
-                    await this.monitorManager.setupSiteForMonitoring(site);
-                    return { site: site.identifier, success: true } as const;
-                } catch (error) {
-                    logger.error(
-                        `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
-                        error
-                    );
-                    return {
-                        error,
-                        site: site.identifier,
-                        success: false,
-                    } as const;
-                }
-            })
-        );
-
-        // Validate that critical sites were set up successfully
-        const successful = setupResults.filter(
-            (result) => result.status === "fulfilled" && result.value.success
-        ).length;
-        const failed = setupResults.length - successful;
-
-        if (failed > 0) {
-            const criticalFailures = setupResults.filter(
-                (result) =>
-                    result.status === "rejected" || !result.value.success
-            ).length;
-
-            if (criticalFailures > 0) {
-                const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
-                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
-                // For critical operations, we might want to emit an error event
-                await this.emitTyped("system:error", {
-                    context: "site-monitoring-setup",
-                    error: new Error(errorMessage),
-                    recovery:
-                        "Check site configurations and restart monitoring",
-                    severity: "high",
-                    timestamp: Date.now(),
-                });
-            } else {
-                logger.warn(
-                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
-                );
-            }
-        } else {
-            logger.info(
-                `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
-            );
-        }
-    }
-
-    /** Handles the get sites from cache request asynchronously. */
-    private async handleGetSitesFromCacheRequest(): Promise<void> {
-        const sites = this.siteManager.getSitesFromCache();
-        await this.emitTyped(
-            "internal:database:get-sites-from-cache-response",
-            {
-                operation: "get-sites-from-cache-response",
-                sites,
-                timestamp: Date.now(),
-            }
-        );
-    }
-
-    public constructor(dependencies: SnapshotSyncCoordinatorDependencies) {
-        this.siteManager = dependencies.siteManager;
-        this.monitorManager = dependencies.monitorManager;
-        this.emitTyped = dependencies.emitTyped;
-        this.busId = dependencies.busId;
+    /** Event handler for retrieving sites from cache. */
+    public handleGetSitesFromCacheRequestedEvent(): void {
+        fireAndForgetLogged({
+            logger,
+            message:
+                "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
+            task: async () => {
+                await this.handleGetSitesFromCacheRequest();
+            },
+        });
     }
 
     /** Event handler for manual monitor check completion events. */
@@ -387,15 +305,97 @@ export class SnapshotSyncCoordinator {
         });
     }
 
-    /** Event handler for retrieving sites from cache. */
-    public handleGetSitesFromCacheRequestedEvent(): void {
-        fireAndForgetLogged({
-            logger,
-            message:
-                "[UptimeOrchestrator] Error handling get-sites-from-cache-requested:",
-            task: async () => {
-                await this.handleGetSitesFromCacheRequest();
-            },
-        });
+    /** Handles the get sites from cache request asynchronously. */
+    private async handleGetSitesFromCacheRequest(): Promise<void> {
+        const sites = this.siteManager.getSitesFromCache();
+        await this.emitTyped(
+            "internal:database:get-sites-from-cache-response",
+            {
+                operation: "get-sites-from-cache-response",
+                sites,
+                timestamp: Date.now(),
+            }
+        );
+    }
+
+    /**
+     * Handles the update sites cache request asynchronously.
+     *
+     * @remarks
+     * Extracted from {@link electron/UptimeOrchestrator#UptimeOrchestrator}
+     * without behavioural changes.
+     */
+    private async handleUpdateSitesCacheRequest(
+        data: UpdateSitesCacheRequestData
+    ): Promise<void> {
+        const timestamp = Date.now();
+
+        await this.siteManager.updateSitesCache(
+            data.sites,
+            "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+            {
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                emitSyncEvent: true,
+                siteIdentifier: "all",
+                sites: data.sites,
+                source: STATE_SYNC_SOURCE.CACHE,
+                timestamp,
+            }
+        );
+
+        // CRITICAL: Set up monitoring for each loaded site
+        const setupResults = await Promise.allSettled(
+            data.sites.map(async (site) => {
+                try {
+                    await this.monitorManager.setupSiteForMonitoring(site);
+                    return { site: site.identifier, success: true } as const;
+                } catch (error) {
+                    logger.error(
+                        `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
+                        error
+                    );
+                    return {
+                        error,
+                        site: site.identifier,
+                        success: false,
+                    } as const;
+                }
+            })
+        );
+
+        // Validate that critical sites were set up successfully
+        const successful = setupResults.filter(
+            (result) => result.status === "fulfilled" && result.value.success
+        ).length;
+        const failed = setupResults.length - successful;
+
+        if (failed > 0) {
+            const criticalFailures = setupResults.filter(
+                (result) =>
+                    result.status === "rejected" || !result.value.success
+            ).length;
+
+            if (criticalFailures > 0) {
+                const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
+                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
+                // For critical operations, we might want to emit an error event
+                await this.emitTyped("system:error", {
+                    context: "site-monitoring-setup",
+                    error: new Error(errorMessage),
+                    recovery:
+                        "Check site configurations and restart monitoring",
+                    severity: "high",
+                    timestamp: Date.now(),
+                });
+            } else {
+                logger.warn(
+                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
+                );
+            }
+        } else {
+            logger.info(
+                `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
+            );
+        }
     }
 }

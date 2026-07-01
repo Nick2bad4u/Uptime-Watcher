@@ -1,8 +1,7 @@
-import { describe, expect, it } from "vitest";
-
 import type { SecretStore } from "@electron/services/cloud/secrets/SecretStore";
 
 import { deleteProviderSecretsBestEffort } from "@electron/services/cloud/internal/providerSecretCleanup";
+import { describe, expect, it } from "vitest";
 
 class ThrowingSecretStore implements SecretStore {
     private readonly keys = new Map<string, string>();

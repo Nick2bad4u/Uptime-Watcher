@@ -19,19 +19,21 @@
  */
 
 import {
-    describe,
-    expect,
-    it,
-    vi,
-    beforeEach,
-    type MockedFunction,
-} from "vitest";
-import fc from "fast-check";
-import type { SiteRow } from "../../services/database/utils/mappers/siteMapper";
-import {
     isValidMonitorId,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
+import fc from "fast-check";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockedFunction,
+    vi,
+} from "vitest";
+
+import type { SiteRow } from "../../services/database/utils/mappers/siteMapper";
+
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
@@ -43,7 +45,7 @@ const SIMULATED_TRANSACTION_FAILURE = new Error(
 const SITE_ROW_ARBITRARY: fc.Arbitrary<SiteRow> = fc
     .record({
         identifier: fc
-            .stringMatching(/^[\dA-Za-z][\w-]{0,63}$/)
+            .stringMatching(/^[\dA-Za-z][\w-]{0,63}$/u)
             .filter((value) => isValidSiteIdentifier(value)),
         name: fc.option(fc.string({ minLength: 1, maxLength: 128 }), {
             nil: undefined,
@@ -86,10 +88,10 @@ interface PreparedStatementMock {
 describe("Database Operations Fuzzing Tests", () => {
     let mockDatabaseService: any;
     let mockDb: {
-        run: MockedFunction<any>;
-        get: MockedFunction<any>;
         all: MockedFunction<any>;
+        get: MockedFunction<any>;
         prepare: MockedFunction<any>;
+        run: MockedFunction<any>;
     };
     let siteRepository: SiteRepository;
     let monitorRepository: MonitorRepository;
@@ -135,7 +137,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         monitors: fc.array(
                             fc.record({
                                 id: fc.string({ minLength: 1, maxLength: 50 }),
-                                type: fc.constant("http"), // Use only http type to match schema
+                                type: fc.constant("http"), // Use only HTTP type to match schema
                                 url: fc.string({
                                     minLength: 1,
                                     maxLength: 200,
@@ -224,15 +226,15 @@ describe("Database Operations Fuzzing Tests", () => {
                     mockDb.run.mockReturnValue({ changes: 0 });
 
                     // Should return boolean and not throw
-                    const result = await siteRepository.delete(identifier);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = await siteRepository.delete(identifier);
+                    expect(typeof isResult).toBe("boolean");
 
                     if (isValidSiteIdentifier(identifier)) {
                         expect(
                             mockDatabaseService.executeTransaction
                         ).toHaveBeenCalled();
                     } else {
-                        expect(result).toBeFalsy();
+                        expect(isResult).toBeFalsy();
                     }
                 }),
                 { numRuns: 20 }
@@ -343,7 +345,7 @@ describe("Database Operations Fuzzing Tests", () => {
                     // Align with shared schemas: identifiers must contain non-whitespace.
                     fc
                         .string({ minLength: 1, maxLength: 64 })
-                        .filter((value) => /\S/u.test(value)),
+                        .filter((value) => /\S/v.test(value)),
                     fc.record({
                         type: fc.constant("http"),
                         url: fc.string({ minLength: 1, maxLength: 200 }),
@@ -362,7 +364,7 @@ describe("Database Operations Fuzzing Tests", () => {
                     // Site identifiers must contain non-whitespace and respect max length.
                     fc
                         .string({ minLength: 1, maxLength: 100 })
-                        .filter((value) => /\S/u.test(value)),
+                        .filter((value) => /\S/v.test(value)),
                     async (
                         monitorId: string,
                         monitorData: any,
@@ -414,7 +416,7 @@ describe("Database Operations Fuzzing Tests", () => {
                         expect(
                             result === null || result === undefined
                         ).toBeTruthy(); // null or undefined
-                    } catch (error) {
+                    } catch {
                         // Method may throw for invalid IDs, which is acceptable
                     }
                 }),
@@ -439,7 +441,7 @@ describe("Database Operations Fuzzing Tests", () => {
                                     siteIdentifier
                                 );
                             expect(Array.isArray(result)).toBeTruthy();
-                        } catch (error) {
+                        } catch {
                             // Method may throw for invalid identifiers, which is acceptable
                         }
                     }
@@ -452,7 +454,7 @@ describe("Database Operations Fuzzing Tests", () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc
-                        .stringMatching(/^[\dA-Za-z][\w-]{0,63}$/)
+                        .stringMatching(/^[\dA-Za-z][\w-]{0,63}$/u)
                         .filter((value) => isValidMonitorId(value)),
                     async (monitorId: string) => {
                         mockDatabaseService.executeTransaction.mockClear();
@@ -462,15 +464,15 @@ describe("Database Operations Fuzzing Tests", () => {
                         mockDb.run.mockReturnValue({ changes: 0 });
 
                         // Should return boolean and not throw
-                        const result =
+                        const isResult =
                             await monitorRepository.delete(monitorId);
-                        expect(typeof result).toBe("boolean");
+                        expect(typeof isResult).toBe("boolean");
                         expect(
                             mockDatabaseService.executeTransaction
                         ).toHaveBeenCalled();
 
                         // Also assert the boolean result is stable.
-                        expect(typeof result).toBe("boolean");
+                        expect(typeof isResult).toBe("boolean");
                     }
                 ),
                 { numRuns: 20 }
@@ -513,10 +515,12 @@ describe("Database Operations Fuzzing Tests", () => {
             ];
 
             for (const [sql] of getAllCalls) {
-                if (typeof sql === "string") {
-                    expect(sql).toContain("?"); // Should use parameterized queries
-                    expect(sql).not.toContain(testIdentifier); // Should not contain raw input
+                if (typeof sql !== "string") {
+                    continue;
                 }
+
+                expect(sql).toContain("?"); // Should use parameterized queries
+                expect(sql).not.toContain(testIdentifier); // Should not contain raw input
             }
         });
     });

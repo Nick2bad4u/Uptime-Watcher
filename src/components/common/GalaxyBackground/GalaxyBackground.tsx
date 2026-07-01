@@ -1,4 +1,5 @@
-import React, { useId, useMemo } from "react";
+import * as React from "react";
+import { useId, useMemo } from "react";
 
 import "./GalaxyBackground.css";
 import {

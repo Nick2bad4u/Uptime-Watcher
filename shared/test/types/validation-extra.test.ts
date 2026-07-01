@@ -7,8 +7,8 @@
  * @file Function coverage validation for validation type helpers
  */
 
-import { describe, it, expect } from "vitest";
 import * as validation from "@shared/types/validation";
+import { describe, expect, it } from "vitest";
 
 describe("Function Coverage Validation", () => {
     it("should call all exported functions to ensure 100% function coverage", async ({
@@ -28,7 +28,7 @@ describe("Function Coverage Validation", () => {
         // Call each function with minimal valid inputs to register coverage
         validation.createFailureResult(["test error"]);
         validation.createSuccessResult("test data");
-        validation.isValidationResult({ success: true } as any);
+        validation.isValidationResult({ success: true });
 
         // Verify basic functionality
         const failureResult = validation.createFailureResult(["test error"]);

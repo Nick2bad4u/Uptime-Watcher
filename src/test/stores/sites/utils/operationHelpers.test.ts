@@ -2,23 +2,41 @@
  * Tests for operationHelpers.ts - covering all branches and scenarios.
  */
 
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    afterEach,
-    afterAll,
-    type Mock,
-} from "vitest";
 import type { Site } from "@shared/types";
+
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
+import { arrayAt } from "ts-extras";
+import {
+    afterAll,
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type Mock,
+    vi,
+} from "vitest";
+
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
-import { createMockFunction } from "../../../utils/mockFactories";
+
+import { logger } from "../../../../services/logger";
+import { updateMonitorInSite } from "../../../../stores/sites/utils/monitorOperations";
+// Import after mocking
+import {
+    applySavedSiteToStore,
+    getSiteByIdentifier,
+    updateMonitorAndSave,
+    withSiteOperation,
+    withSiteOperationReturning,
+} from "../../../../stores/sites/utils/operationHelpers";
+import { logStoreAction } from "../../../../stores/utils";
+import { createStoreErrorHandler } from "../../../../stores/utils/storeErrorHandling";
 import { installElectronApiMock } from "../../../utils/electronApiMock";
+import { createMockFunction } from "../../../utils/mockFactories";
 
 // Mock the error catalog
-vi.mock("../../../../../shared/utils/errorCatalog", () => ({
+vi.mock(import('../../../../../shared/utils/errorCatalog'), () => ({
     ERROR_CATALOG: {
         sites: {
             NOT_FOUND: "Site not found",
@@ -27,19 +45,19 @@ vi.mock("../../../../../shared/utils/errorCatalog", () => ({
 }));
 
 // Mock the error handling utility
-vi.mock("../../../../../shared/utils/errorHandling", () => ({
+vi.mock(import('../../../../../shared/utils/errorHandling'), () => ({
     withErrorHandling: vi.fn(),
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
 }));
 
 // Mock the store action logging
-vi.mock("../../../../stores/utils", () => ({
+vi.mock(import('../../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -49,12 +67,12 @@ vi.mock("../../../../services/logger", () => ({
 }));
 
 // Mock the store error handling
-vi.mock("../../../../stores/utils/storeErrorHandling", () => ({
+vi.mock(import('../../../../stores/utils/storeErrorHandling'), () => ({
     createStoreErrorHandler: vi.fn(),
 }));
 
 // Mock the monitor operations
-vi.mock("../../../../stores/sites/utils/monitorOperations", () => ({
+vi.mock(import('../../../../stores/sites/utils/monitorOperations'), () => ({
     updateMonitorInSite: vi.fn(),
 }));
 
@@ -75,21 +93,6 @@ const { restore: restoreElectronApi } = installElectronApiMock(mockElectronAPI);
 afterAll(() => {
     restoreElectronApi();
 });
-
-// Import after mocking
-import {
-    applySavedSiteToStore,
-    getSiteByIdentifier,
-    updateMonitorAndSave,
-    withSiteOperation,
-    withSiteOperationReturning,
-} from "../../../../stores/sites/utils/operationHelpers";
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { logStoreAction } from "../../../../stores/utils";
-import { createStoreErrorHandler } from "../../../../stores/utils/storeErrorHandling";
-import { updateMonitorInSite } from "../../../../stores/sites/utils/monitorOperations";
-import { logger } from "../../../../services/logger";
-import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 const mockLogStoreAction = vi.mocked(logStoreAction);
@@ -290,7 +293,7 @@ describe("OperationHelpers", () => {
                 name: "Updated Duplicate",
             };
 
-            expect(() => applySavedSiteToStore(savedSite, mockDeps)).toThrow(
+            expect(() => { applySavedSiteToStore(savedSite, mockDeps); }).toThrow(
                 DuplicateSiteIdentifierError
             );
             expect(setSitesSpy).not.toHaveBeenCalled();
@@ -429,8 +432,8 @@ describe("OperationHelpers", () => {
             ).rejects.toThrow("API Error");
 
             expect(getSitesSpy).toHaveBeenCalledTimes(1);
-            expect(mockUpdateMonitorInSite).toHaveBeenCalled();
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
+            expect(mockUpdateMonitorInSite).toHaveBeenCalledWith();
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith();
             expect(setSitesSpy).not.toHaveBeenCalled();
         });
     });
@@ -481,7 +484,7 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
             // Get the operation passed to withErrorHandling
-            const [wrappedOperation] = mockWithErrorHandling.mock.calls.at(-1)!;
+            const [wrappedOperation] = arrayAt(mockWithErrorHandling.mock.calls, -1)!;
 
             mockLogStoreAction.mockClear();
 
@@ -532,7 +535,7 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(2);
 
             const [wrappedOperationAgain] =
-                mockWithErrorHandling.mock.calls.at(-1)!;
+                arrayAt(mockWithErrorHandling.mock.calls, -1)!;
 
             mockLogStoreAction.mockClear();
             mockOperation.mockClear();
@@ -610,7 +613,7 @@ describe("OperationHelpers", () => {
 
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSites = vi.fn().mockRejectedValue(syncError);
+            vi.spyOn(mockDeps, 'syncSites').mockImplementation().mockRejectedValue(syncError);
             const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
@@ -790,7 +793,7 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
             const [wrappedOperationReturn] =
-                mockWithErrorHandling.mock.calls.at(-1)!;
+                arrayAt(mockWithErrorHandling.mock.calls, -1)!;
 
             mockLogStoreAction.mockClear();
 
@@ -859,7 +862,7 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
             const [wrappedOperationReturnAgain] =
-                mockWithErrorHandling.mock.calls.at(-1)!;
+                arrayAt(mockWithErrorHandling.mock.calls, -1)!;
 
             mockLogStoreAction.mockClear();
 
@@ -942,7 +945,7 @@ describe("OperationHelpers", () => {
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
-            mockDeps.syncSites = vi.fn().mockRejectedValue(syncError);
+            vi.spyOn(mockDeps, 'syncSites').mockImplementation().mockRejectedValue(syncError);
             const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
@@ -1087,11 +1090,11 @@ describe("OperationHelpers", () => {
             await annotate("Type: Data Retrieval", "type");
 
             const sitesWithNulls = [
+                mockSites[0],
+                mockSites[1],
+                null,
                 null,
                 undefined,
-                mockSites[0],
-                null,
-                mockSites[1],
             ] as any;
             getSitesSpy.mockReturnValue(sitesWithNulls);
 

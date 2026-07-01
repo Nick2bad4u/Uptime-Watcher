@@ -3,6 +3,7 @@
  * branch coverage by testing edge cases
  */
 
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import ThemeManager - make sure it's the actual class
@@ -30,7 +31,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock document as undefined to simulate SSR
-            const originalDocument = globalThis.document;
+            const originalDocument = document;
             Object.defineProperty(globalThis, "document", {
                 value: undefined,
                 writable: true,
@@ -77,7 +78,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock window as undefined to simulate SSR
-            const originalWindow = globalThis.window;
+            const originalWindow = globalThis;
             Object.defineProperty(globalThis, "window", {
                 value: undefined,
                 writable: true,
@@ -88,7 +89,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             expect(typeof cleanup).toBe("function");
 
             // Cleanup function should not throw
-            expect(() => cleanup()).not.toThrow();
+            expect(() => { cleanup(); }).not.toThrow();
 
             // Restore window
             Object.defineProperty(globalThis, "window", {
@@ -122,12 +123,12 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: mockRemoveEventListener,
             };
 
-            const originalWindowMatchMedia = window.matchMedia;
-            const originalGlobalMatchMedia = globalThis.matchMedia;
+            const originalWindowMatchMedia = matchMedia;
+            const originalGlobalMatchMedia = matchMedia;
 
             const matchMediaStub = vi.fn(() => mockMediaQuery);
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 writable: true,
                 value: matchMediaStub,
@@ -148,7 +149,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             );
 
             // Simulate a media query change event
-            const handler = mockEventListener.mock.calls[0]?.[1];
+            const handler = arrayFirst(mockEventListener.mock.calls)?.[1];
             const mockEvent = { matches: true } as MediaQueryListEvent;
             handler?.(mockEvent);
 
@@ -162,7 +163,7 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 handler
             );
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 writable: true,
                 value: originalWindowMatchMedia,
@@ -196,11 +197,11 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: vi.fn(),
             };
 
-            const originalWindowMatchMedia = window.matchMedia;
-            const originalGlobalMatchMedia = globalThis.matchMedia;
+            const originalWindowMatchMedia = matchMedia;
+            const originalGlobalMatchMedia = matchMedia;
             const matchMediaStub = vi.fn(() => mockMediaQuery);
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 writable: true,
                 value: matchMediaStub,
@@ -214,17 +215,17 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             themeManager.onSystemThemeChange(mockCallback);
 
             // Get the handler function that was registered
-            const handler = mockEventListener.mock.calls[0]?.[1];
+            const handler = arrayFirst(mockEventListener.mock.calls)?.[1];
 
             // Simulate theme change to dark
-            handler?.({ matches: true } as MediaQueryListEvent);
+            handler?.({ matches: true });
             expect(mockCallback).toHaveBeenCalledWith(true);
 
             // Simulate theme change to light
-            handler({ matches: false } as MediaQueryListEvent);
+            handler({ matches: false });
             expect(mockCallback).toHaveBeenCalledWith(false);
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 writable: true,
                 value: originalWindowMatchMedia,
@@ -285,17 +286,18 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 toggle: vi.fn(),
             };
 
-            Object.defineProperty(document, "body", {
-                value: { classList: mockBodyClassList },
-                writable: true,
-            });
-
-            Object.defineProperty(document, "documentElement", {
-                value: {
-                    classList: mockDocumentElementClassList,
-                    style: { setProperty: vi.fn(), removeProperty: vi.fn() },
+            Object.defineProperties(document, {
+                body: {
+                    value: { classList: mockBodyClassList },
+                    writable: true,
                 },
-                writable: true,
+                documentElement: {
+                    value: {
+                        classList: mockDocumentElementClassList,
+                        style: { setProperty: vi.fn(), removeProperty: vi.fn() },
+                    },
+                    writable: true,
+                },
             });
 
             // Test with dark theme
@@ -336,34 +338,35 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             const mockAdd = vi.fn();
             const mockContains = vi.fn().mockReturnValue(true); // Simulate existing classes
 
-            Object.defineProperty(document, "body", {
-                value: {
-                    classList: {
-                        add: mockAdd,
-                        remove: mockRemove,
-                        contains: mockContains,
+            Object.defineProperties(document, {
+                body: {
+                    value: {
+                        classList: {
+                            add: mockAdd,
+                            remove: mockRemove,
+                            contains: mockContains,
+                        },
                     },
+                    writable: true,
                 },
-                writable: true,
-            });
-
-            Object.defineProperty(document, "documentElement", {
-                value: {
-                    classList: {
-                        add: vi.fn(),
-                        remove: vi.fn(),
-                        contains: vi.fn().mockReturnValue(true),
+                documentElement: {
+                    value: {
+                        classList: {
+                            add: vi.fn(),
+                            remove: vi.fn(),
+                            contains: vi.fn().mockReturnValue(true),
+                        },
+                        style: { setProperty: vi.fn() },
                     },
-                    style: { setProperty: vi.fn() },
+                    writable: true,
                 },
-                writable: true,
             });
 
             // Apply multiple themes to test the remove logic for all theme types
             const themes = [
-                "light",
                 "dark",
                 "high-contrast",
+                "light",
             ] as const;
 
             for (const themeName of themes) {
@@ -372,9 +375,9 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             }
 
             // Verify that theme classes are being properly added
-            expect(mockAdd).toHaveBeenCalled();
+            expect(mockAdd).toHaveBeenCalledWith();
             // Verify that old theme classes are being removed when switching themes
-            expect(mockRemove).toHaveBeenCalled();
+            expect(mockRemove).toHaveBeenCalledWith();
         });
 
         it("should test cleanup function returned by onSystemThemeChange", async ({
@@ -397,11 +400,11 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: mockRemoveEventListener,
             };
 
-            const originalWindowMatchMedia = window.matchMedia;
-            const originalGlobalMatchMedia = globalThis.matchMedia;
+            const originalWindowMatchMedia = matchMedia;
+            const originalGlobalMatchMedia = matchMedia;
             const matchMediaStub = vi.fn(() => mockMediaQuery);
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 writable: true,
                 value: matchMediaStub,
@@ -416,9 +419,9 @@ describe("ThemeManager - Branch Coverage Completion", () => {
 
             // Test that cleanup function actually calls removeEventListener
             cleanup();
-            expect(mockRemoveEventListener).toHaveBeenCalled();
+            expect(mockRemoveEventListener).toHaveBeenCalledWith();
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 writable: true,
                 value: originalWindowMatchMedia,

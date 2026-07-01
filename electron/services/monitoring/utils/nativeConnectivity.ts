@@ -6,7 +6,7 @@ import { createAbortError, isAbortError } from "@shared/utils/abortError";
  * @remarks
  * This module provides reliable connectivity checking without requiring
  * elevated privileges or external system utilities. It uses Node.js built-in
- * modules (net, dns, fetch) to perform connectivity tests that are more
+ * modules (net, DNS, fetch) to perform connectivity tests that are more
  * reliable and cross-platform compatible than ICMP ping.
  *
  * Key advantages over ping package:
@@ -120,16 +120,18 @@ async function checkTcpPort(
 
     return new Promise((resolve, reject) => {
         const socket = new net.Socket();
-        let resolved = false;
+        let isResolved = false;
 
         const cleanup = (listener?: () => void): void => {
-            if (!resolved) {
-                resolved = true;
-                socket.removeAllListeners();
-                socket.destroy();
-                if (signal && listener) {
-                    signal.removeEventListener("abort", listener);
-                }
+            if (isResolved) {
+                return;
+            }
+
+            isResolved = true;
+            socket.removeAllListeners();
+            socket.destroy();
+            if (signal && listener) {
+                signal.removeEventListener("abort", listener);
             }
         };
 
@@ -188,7 +190,7 @@ async function checkTcpPort(
 }
 
 /**
- * DNS resolution check using Node.js dns module
+ * DNS resolution check using Node.js DNS module
  *
  * @param host - Target hostname to resolve
  * @param timeout - Resolution timeout in milliseconds
@@ -234,9 +236,7 @@ async function checkDnsResolution(
         : undefined;
 
     try {
-        const raceCandidates: Array<
-            Promise<string[] | typeof ABORTED | typeof TIMEOUT>
-        > = [dns.resolve4(host), timeoutPromise];
+        const raceCandidates: Promise<string[] | typeof ABORTED | typeof TIMEOUT>[] = [dns.resolve4(host), timeoutPromise];
 
         if (abortPromise) {
             raceCandidates.push(abortPromise);
@@ -336,14 +336,14 @@ async function checkTcpPorts(
  * }
  * ```
  *
- * @param url - Complete URL to check (including protocol)
+ * @param URL - Complete URL to check (including protocol)
  * @param timeout - Request timeout in milliseconds
  *
  * @returns Promise resolving to MonitorCheckResult
  */
 export async function checkHttpConnectivity(
     url: string,
-    timeout: number = 5000,
+    timeout = 5000,
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
     const startTime = performance.now();
@@ -364,7 +364,8 @@ export async function checkHttpConnectivity(
                 responseTime,
                 status: "up",
             };
-        } else if (response.status >= 500) {
+        }
+        if (response.status >= 500) {
             // Server errors indicate the service is down
             return {
                 details: `HTTP ${response.status} - ${response.statusText}`,
@@ -431,7 +432,7 @@ export async function checkConnectivity(
     }
 
     const opts = { ...DEFAULT_OPTIONS, ...options };
-    let tcpProbeError: unknown = undefined;
+    let tcpProbeError: unknown;
 
     // Defensive normalization: optional fields can still become `undefined`
     // depending on call sites (e.g., schema parsing or partial spreads). The
@@ -498,7 +499,7 @@ export async function checkConnectivity(
     }
 
     return {
-        details: `Failed to connect to ${String(normalizedHost)}`,
+        details: `Failed to connect to ${normalizedHost}`,
         error:
             isDefined(tcpProbeError)
                 ? getUserFacingErrorDetail(tcpProbeError)

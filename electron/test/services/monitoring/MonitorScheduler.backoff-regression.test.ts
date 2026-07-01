@@ -2,7 +2,12 @@
  * Regression coverage for MonitorScheduler backoff cap behavior.
  */
 
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
+import { logger } from "../../../utils/logger";
 
 vi.mock("node:crypto", () => ({
     // Choose the midpoint so MonitorScheduler's
@@ -13,11 +18,6 @@ vi.mock("node:crypto", () => ({
 }));
 
 vi.unmock("../../../services/monitoring/MonitorScheduler");
-
-import type { Site } from "@shared/types";
-
-import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import { logger } from "../../../utils/logger";
 
 vi.mock("../../../utils/logger", () => {
     const createLoggerMock = () => ({

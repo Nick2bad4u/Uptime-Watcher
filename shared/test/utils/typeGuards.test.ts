@@ -6,11 +6,8 @@
  * behavior.
  */
 
-import { describe, expect, it, vi, beforeAll, afterAll } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+import { fc, test } from "@fast-check/vitest";
 import {
-    isObject,
-    isNumber,
     hasProperties,
     hasProperty,
     isArray,
@@ -21,11 +18,14 @@ import {
     isFunction,
     isNonNegativeNumber,
     isNonNullObject,
+    isNumber,
+    isObject,
     isPositiveNumber,
     isString,
     isValidPort,
     isValidTimestamp,
 } from "@shared/utils/typeGuards";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 describe("typeGuards", () => {
     describe(isObject, () => {
@@ -94,7 +94,7 @@ describe("typeGuards", () => {
 
             expect(isObject(new Date())).toBeTruthy();
             expect(isObject(new Error("test error"))).toBeTruthy();
-            expect(isObject(/regex/)).toBeTruthy();
+            expect(isObject(/regex/v)).toBeTruthy();
         });
     });
 
@@ -122,7 +122,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -506,7 +506,7 @@ describe("typeGuards", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isDate(new Date("invalid"))).toBeFalsy();
-            expect(isDate(new Date(Number.NaN))).toBeFalsy();
+            expect(isDate(new Date(NaN))).toBeFalsy();
         });
 
         it("should return false for non-Date values", async ({
@@ -597,7 +597,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(isFiniteNumber(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -686,7 +686,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNonNegativeNumber(Number.NaN)).toBeFalsy();
+            expect(isNonNegativeNumber(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -804,7 +804,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isPositiveNumber(Number.NaN)).toBeFalsy();
+            expect(isPositiveNumber(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -908,7 +908,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidPort(Number.NaN)).toBeFalsy();
+            expect(isValidPort(NaN)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({
@@ -1061,7 +1061,7 @@ describe("typeGuards", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            expect(isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(isValidTimestamp(NaN)).toBeFalsy();
             expect(isValidTimestamp(Infinity)).toBeFalsy();
             expect(isValidTimestamp(-Infinity)).toBeFalsy();
         });

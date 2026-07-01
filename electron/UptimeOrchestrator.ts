@@ -139,7 +139,7 @@ import { diagnosticsLogger, logger } from "./utils/logger";
 const ORCHESTRATOR_BUS_ID = "UptimeOrchestrator" as const;
 
 /**
- * Core application orchestrator responsible for wiring together the monitoring,
+ * Core app orchestrator responsible for wiring together the monitoring,
  * database, and event-bus subsystems in the Electron main process.
  *
  * @public
@@ -153,7 +153,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * coordination, and transaction management. All database operations are
      * routed through this manager following the repository pattern. Provides
      * atomic operations and proper error handling for data persistence across
-     * the application.
+     * the app.
      *
      * @internal
      */
@@ -318,7 +318,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Exports all application data as a JSON string.
+     * Exports all app data as a JSON string.
      *
      * @returns Promise resolving to the exported data string.
      */
@@ -331,7 +331,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Imports application data from a JSON string.
+     * Imports app data from a JSON string.
      *
      * @param data - The JSON data string to import.
      *
@@ -340,10 +340,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public async importData(data: string): Promise<boolean> {
         return this.runWithContext(
             async () => {
-                const importSucceeded =
+                const isImportSucceeded =
                     await this.databaseManager.importData(data);
 
-                if (!importSucceeded) {
+                if (!isImportSucceeded) {
                     return false;
                 }
 
@@ -473,7 +473,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Resets all application settings to their default values.
+     * Resets all app settings to their default values.
      *
      * @remarks
      * This method delegates to the DatabaseManager to reset all settings to

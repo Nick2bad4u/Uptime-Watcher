@@ -9,9 +9,8 @@
  * @since 2024
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { ensureError } from "@shared/utils/errorHandling";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SystemService } from "../../services/SystemService";
 
@@ -44,16 +43,16 @@ const mockElectronAPI = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
-vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
     return {
@@ -119,7 +118,7 @@ describe("SystemService", () => {
             await expect(SystemService.initialize()).rejects.toThrow(
                 "String error"
             );
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(error);
         });
 
@@ -127,7 +126,7 @@ describe("SystemService", () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
             await expect(SystemService.initialize()).rejects.toThrow("null");
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });
     });
@@ -272,7 +271,7 @@ describe("SystemService", () => {
             );
 
             await expect(SystemService.quitAndInstall()).rejects.toThrow(
-                /Invalid response received from quitAndInstall/
+                /Invalid response received from quitAndInstall/v
             );
         });
 

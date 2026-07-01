@@ -87,9 +87,9 @@ describe("objectSafety comprehensive fuzzing tests", () => {
         test.prop([fc.record({ bool: fc.boolean() }), fc.boolean()])(
             "handles boolean properties correctly",
             (obj, fallback) => {
-                const result = safeObjectAccess(obj, "bool", fallback);
-                expect(result).toBe(obj.bool);
-                expect(typeof result).toBe("boolean");
+                const isResult = safeObjectAccess(obj, "bool", fallback);
+                expect(isResult).toBe(obj.bool);
+                expect(typeof isResult).toBe("boolean");
             }
         );
 
@@ -133,7 +133,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             const obj = { test: 42 };
 
             let callCount = 0;
-            let receivedValue: unknown = undefined;
+            let receivedValue: unknown;
             const validator = (value: unknown): value is number => {
                 callCount++;
                 receivedValue = value;
@@ -151,7 +151,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             const obj = { test: "string-value" };
 
             let callCount = 0;
-            let receivedValue: unknown = undefined;
+            let receivedValue: unknown;
             const numberValidator = (value: unknown): value is number => {
                 callCount++;
                 receivedValue = value;
@@ -175,7 +175,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
                 ],
                 func: () => "function",
                 date: new Date(),
-                regex: /test/,
+                regex: /test/v,
             };
 
             expect(safeObjectAccess(complexObj, "nested", null)).toBe(

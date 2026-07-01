@@ -1,8 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
+import type { CloudStatusSummary } from "@shared/types/cloud";
 
 import { fireEvent, render, screen } from "@testing-library/react";
-
-import type { CloudStatusSummary } from "@shared/types/cloud";
+import { describe, expect, it, vi } from "vitest";
 
 import { CloudProviderSetupPanel } from "../components/Settings/cloud/CloudProviderSetupPanel";
 
@@ -58,7 +57,7 @@ describe(CloudProviderSetupPanel, () => {
             screen.getByRole("tab", { name: "Local folder" })
         ).toBeInTheDocument();
         expect(
-            screen.getByRole("tab", { name: /WebDAV/iu })
+            screen.getByRole("tab", { name: /webdav/iv })
         ).toBeInTheDocument();
     });
 

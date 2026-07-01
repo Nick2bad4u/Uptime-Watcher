@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { GoogleDriveTokenManager } from "@electron/services/cloud/providers/googleDrive/GoogleDriveTokenManager";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InMemorySecretStore } from "../../../../utils/InMemorySecretStore";
-import { GoogleDriveTokenManager } from "@electron/services/cloud/providers/googleDrive/GoogleDriveTokenManager";
 
 const axiosPost = vi.hoisted(() => vi.fn());
 

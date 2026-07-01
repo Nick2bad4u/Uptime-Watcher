@@ -7,10 +7,12 @@
  * impacts global thresholds, so we cover the key render + interaction paths.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
-
+import { safeCastTo } from "ts-extras";
 import "@testing-library/jest-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { PromptDialog } from "../../../../components/common/PromptDialog/PromptDialog";
 
 interface PromptRequest {
     cancelLabel: string;
@@ -25,15 +27,13 @@ const promptControls = vi.hoisted(() => ({
     cancel: vi.fn(),
     confirm: vi.fn(),
     setValue: vi.fn(),
-    request: null as null | PromptRequest,
+    request: safeCastTo<null | PromptRequest>(null),
     value: "",
 }));
 
-vi.mock("../../../../stores/ui/usePromptDialogStore", () => ({
+vi.mock(import('../../../../stores/ui/usePromptDialogStore'), () => ({
     usePromptDialogControls: () => promptControls,
 }));
-
-import { PromptDialog } from "../../../../components/common/PromptDialog/PromptDialog";
 
 describe(PromptDialog, () => {
     beforeEach(() => {
@@ -56,7 +56,7 @@ describe(PromptDialog, () => {
             title: "Prompt title",
             type: "text",
         };
-        promptControls.value = "   ";
+        promptControls.value = ' '.repeat(3);
 
         render(<PromptDialog />);
 

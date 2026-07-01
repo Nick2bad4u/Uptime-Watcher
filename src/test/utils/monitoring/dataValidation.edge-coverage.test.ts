@@ -3,19 +3,20 @@
  * targeting line 48 (catch block in safeGetHostname)
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { safeGetHostname } from "../../../utils/monitoring/dataValidation";
 
 // Mock isValidUrl to return true but still allow URL constructor to fail
-vi.mock("../../../../shared/validation/validatorUtils", () => ({
+vi.mock(import('../../../../shared/validation/validatorUtils'), () => ({
     isValidUrl: vi.fn(() => true), // Always return true to bypass early validation
 }));
 
-describe("DataValidation - Complete Coverage", () => {
+describe("dataValidation - Complete Coverage", () => {
     describe("safeGetHostname catch block coverage (line 48)", () => {
         it("should handle URL constructor throwing an error despite passing validation", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -26,7 +27,7 @@ describe("DataValidation - Complete Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             // Mock URL constructor to throw an error
-            const originalURL = globalThis.URL;
+            const originalURL = URL;
             const mockURL = vi.fn(() => {
                 throw new Error("Invalid URL");
             }) as any;
@@ -35,6 +36,7 @@ describe("DataValidation - Complete Coverage", () => {
             try {
                 // This should trigger the catch block since URL constructor throws
                 const result = safeGetHostname("https://example.com");
+
                 expect(result).toBe("");
             } finally {
                 // Restore original URL constructor
@@ -43,8 +45,8 @@ describe("DataValidation - Complete Coverage", () => {
         });
 
         it("should handle URL constructor throwing for edge case URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -55,7 +57,7 @@ describe("DataValidation - Complete Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             // Create a scenario where isValidUrl might pass but URL constructor fails
-            const originalURL = globalThis.URL;
+            const originalURL = URL;
 
             // Mock URL to throw for specific inputs but work for others
             const mockURL = vi.fn((url: string) => {
@@ -70,6 +72,7 @@ describe("DataValidation - Complete Coverage", () => {
             try {
                 // This should trigger the catch block
                 const result = safeGetHostname("https://edge-case.com");
+
                 expect(result).toBe("");
 
                 // Verify the mock was called
@@ -81,8 +84,8 @@ describe("DataValidation - Complete Coverage", () => {
         });
 
         it("should handle different types of URL constructor errors", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -92,17 +95,17 @@ describe("DataValidation - Complete Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
-            const originalURL = globalThis.URL;
+            const originalURL = URL;
 
             // Test different error types
             const testCases = [
-                { url: "error1", error: new Error("Generic error") },
-                { url: "error2", error: new TypeError("Type error") },
-                { url: "error3", error: new RangeError("Range error") },
-                { url: "error4", error: "String error" },
+                { error: new Error("Generic error"), url: "error1" },
+                { error: new TypeError("Type error"), url: "error2" },
+                { error: new RangeError("Range error"), url: "error3" },
+                { error: "String error", url: "error4" },
             ];
 
-            for (const { url, error } of testCases) {
+            for (const { error, url } of testCases) {
                 const mockURL = vi.fn(() => {
                     throw error;
                 }) as any;
@@ -111,6 +114,7 @@ describe("DataValidation - Complete Coverage", () => {
 
                 try {
                     const result = safeGetHostname(url);
+
                     expect(result).toBe("");
                 } finally {
                     globalThis.URL = originalURL;
@@ -119,8 +123,8 @@ describe("DataValidation - Complete Coverage", () => {
         });
 
         it("should handle URL constructor throwing with complex error objects", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -130,16 +134,17 @@ describe("DataValidation - Complete Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
-            const originalURL = globalThis.URL;
+            const originalURL = URL;
 
             const mockURL = vi.fn(() => {
-                throw { message: "Complex error object", code: 500 };
+                throw { code: 500, message: "Complex error object" };
             }) as any;
 
             globalThis.URL = mockURL;
 
             try {
                 const result = safeGetHostname("https://complex-error.com");
+
                 expect(result).toBe("");
             } finally {
                 globalThis.URL = originalURL;
@@ -147,14 +152,14 @@ describe("DataValidation - Complete Coverage", () => {
         });
     });
 
-    describe("Comprehensive edge cases for other functions", () => {
+    describe("comprehensive edge cases for other functions", () => {
         afterEach(() => {
             vi.clearAllMocks();
         });
 
         it("should test complete integration scenarios", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -165,15 +170,8 @@ describe("DataValidation - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Reset mocks to normal behavior for integration tests
-            vi.doMock("../../../../shared/validation/validatorUtils", () => ({
-                isValidUrl: (url: string) => {
-                    try {
-                        new URL(url);
-                        return true;
-                    } catch {
-                        return false;
-                    }
-                },
+            vi.doMock(import('../../../../shared/validation/validatorUtils'), () => ({
+                isValidUrl: (url: string) => URL.canParse(url),
             }));
 
             // Test with real URLs to ensure normal functionality

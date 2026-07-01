@@ -349,7 +349,7 @@ export class FilesystemCloudStorageProvider
     }): Promise<CloudObjectEntry> {
         await this.ensureAppRoot();
         const key = FilesystemCloudStorageProvider.normalizeObjectKey(args.key);
-        const overwrite = args.overwrite ?? false;
+        const isOverwrite = args.overwrite ?? false;
 
         let tempPath: null | string = null;
 
@@ -392,12 +392,12 @@ export class FilesystemCloudStorageProvider
                 }
             };
 
-            const targetExists = await fs
+            const isTargetExists = await fs
                 .lstat(targetPath)
                 .then((stat) => stat.isFile() && !stat.isSymbolicLink())
                 .catch(() => false);
 
-            if (!overwrite && targetExists) {
+            if (!isOverwrite && isTargetExists) {
                 throw new CloudProviderOperationError(
                     `Filesystem cloud object already exists: ${key}`,
                     {
@@ -409,7 +409,7 @@ export class FilesystemCloudStorageProvider
                 );
             }
 
-            if (!targetExists) {
+            if (!isTargetExists) {
                 await renameTempToTarget();
                 return await toCloudObjectEntry(key, targetPath);
             }

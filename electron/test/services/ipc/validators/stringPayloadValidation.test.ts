@@ -1,10 +1,9 @@
-import { describe, expect, it } from "vitest";
-
+import { validateDiagnosticsPayloadPreview } from "@electron/services/ipc/validators/utils/diagnosticsValidation";
 import {
     validateOptionalStringPayload,
     validateRequiredStringPayload,
 } from "@electron/services/ipc/validators/utils/stringPayloadValidation";
-import { validateDiagnosticsPayloadPreview } from "@electron/services/ipc/validators/utils/diagnosticsValidation";
+import { describe, expect, it } from "vitest";
 
 describe("stringPayloadValidation", () => {
     describe("validateRequiredStringPayload behavior", () => {

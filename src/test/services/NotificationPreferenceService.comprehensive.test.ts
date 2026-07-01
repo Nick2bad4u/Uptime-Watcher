@@ -2,9 +2,11 @@
  * Comprehensive coverage for NotificationPreferenceService.
  */
 
+import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
+import { NotificationPreferenceService } from "../../services/NotificationPreferenceService";
 
 // Hoisted mocks must be declared before the module under test is imported.
 const ensureInitializedMock = vi.hoisted(() => vi.fn(async () => {}));
@@ -20,7 +22,7 @@ const wrapMock = vi.hoisted(() =>
         ) =>
             vi.fn(async (preferences: NotificationPreferenceUpdate) => {
                 await ensureInitializedMock();
-                return handler(window.electronAPI!, preferences);
+                return handler(globalThis.electronAPI, preferences);
             })
     )
 );
@@ -32,11 +34,9 @@ const getHelpersMock = vi.hoisted(() =>
     }))
 );
 
-vi.mock("../../services/utils/createIpcServiceHelpers", () => ({
+vi.mock(import('../../services/utils/createIpcServiceHelpers'), () => ({
     getIpcServiceHelpers: getHelpersMock,
 }));
-
-import { NotificationPreferenceService } from "../../services/NotificationPreferenceService";
 
 const createElectronApi = () => ({
     notifications: {
@@ -89,7 +89,7 @@ describe("NotificationPreferenceService", () => {
         };
 
         const bridge = (
-            window.electronAPI as unknown as ReturnType<
+            globalThis.electronAPI as unknown as ReturnType<
                 typeof createElectronApi
             >
         ).notifications;
@@ -109,7 +109,7 @@ describe("NotificationPreferenceService", () => {
     });
 
     it("throws a descriptive error when the electronAPI bridge is unavailable", async () => {
-        (window as any).electronAPI = undefined;
+        (globalThis as any).electronAPI = undefined;
 
         await expect(
             NotificationPreferenceService.updatePreferences({
@@ -121,7 +121,7 @@ describe("NotificationPreferenceService", () => {
     });
 
     it("throws when the notifications bridge lacks an updatePreferences method", async () => {
-        (window as any).electronAPI = {
+        (globalThis as any).electronAPI = {
             notifications: {},
         };
 
@@ -142,7 +142,7 @@ describe("NotificationPreferenceService", () => {
 
         await expect(
             NotificationPreferenceService.updatePreferences(invalidPreferences)
-        ).rejects.toThrow(/Invalid notification preferences:/u);
+        ).rejects.toThrow(/Invalid notification preferences:/v);
 
         expect(ensureInitializedMock).toHaveBeenCalledTimes(1);
     });

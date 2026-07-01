@@ -1,9 +1,10 @@
-import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
+import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 
 import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 
-import { createHash } from "node:crypto";
 describe("CloudService", () => {
     let baseDirectory: string;
     let fs: (typeof import("node:fs"))["promises"];
@@ -209,9 +210,9 @@ describe("CloudService", () => {
 
     it("treats corrupted stored filesystem baseDirectory as unconfigured", async () => {
         const settings = new Map<string, string>([
-            ["cloud.provider", "filesystem"],
             // Invalid due to leading whitespace.
             ["cloud.filesystem.baseDirectory", ` ${baseDirectory}`],
+            ["cloud.provider", "filesystem"],
         ]);
 
         const syncEngine = {

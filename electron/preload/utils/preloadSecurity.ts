@@ -46,13 +46,6 @@ const isPlaywrightAutomationFlagSet = (
 };
 
 /**
- * Determines whether the preload bridge is running under Playwright automation.
- */
-export function detectPlaywrightAutomation(processCandidate: unknown): boolean {
-    return isPlaywrightAutomationFlagSet(toAutomationProcess(processCandidate));
-}
-
-/**
  * Deep-freeze an API object graph before exposing it to the renderer.
  */
 export function deepFreezeInPlace(root: unknown): void {
@@ -84,4 +77,11 @@ export function deepFreezeInPlace(root: unknown): void {
             Object.freeze(current);
         }
     }
+}
+
+/**
+ * Determines whether the preload bridge is running under Playwright automation.
+ */
+export function detectPlaywrightAutomation(processCandidate: unknown): boolean {
+    return isPlaywrightAutomationFlagSet(toAutomationProcess(processCandidate));
 }

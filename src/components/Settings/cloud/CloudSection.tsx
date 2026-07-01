@@ -179,8 +179,8 @@ export const CloudSection = ({
     status,
     syncEnabledControl,
 }: CloudSectionProperties): JSX.Element => {
-    const configured = status?.configured ?? false;
-    const connected = status?.connected ?? false;
+    const isConfigured = status?.configured ?? false;
+    const isConnected = status?.connected ?? false;
 
     const lastSyncLabel = formatOptionalTimestamp(status?.lastSyncAt ?? null);
     const lastBackupLabel = formatOptionalTimestamp(
@@ -188,20 +188,20 @@ export const CloudSection = ({
     );
 
     const encryptionMode = status?.encryptionMode ?? "none";
-    const encryptionLocked = status?.encryptionLocked ?? false;
-    const syncEnabled = status?.syncEnabled ?? false;
+    const isEncryptionLocked = status?.encryptionLocked ?? false;
+    const isSyncEnabled = status?.syncEnabled ?? false;
 
     const plaintextBackupCount = backups.filter(
         (backup) => !backup.encrypted
     ).length;
 
     const encryptionLabel = resolveEncryptionStatusLabel({
-        locked: encryptionLocked,
+        locked: isEncryptionLocked,
         mode: encryptionMode,
     });
 
     const encryptionActionLabel = resolveEncryptionActionLabel({
-        locked: encryptionLocked,
+        locked: isEncryptionLocked,
         mode: encryptionMode,
         working: isSettingEncryptionPassphrase,
     });
@@ -339,19 +339,13 @@ export const CloudSection = ({
     );
     const encryptionActionButtonIcon = useMemo(() => {
         const IconComponent =
-            encryptionMode === "passphrase" && encryptionLocked
+            encryptionMode === "passphrase" && isEncryptionLocked
                 ? UnlockIcon
                 : LockIcon;
         return <IconComponent aria-hidden size={buttonIconSize} />;
-    }, [
-        buttonIconSize,
-        encryptionLocked,
-        encryptionMode,
-        LockIcon,
-        UnlockIcon,
-    ]);
+    }, [buttonIconSize, encryptionMode, isEncryptionLocked, LockIcon, UnlockIcon]);
 
-    const notConfiguredHint = renderCloudNotConfiguredHint({ configured });
+    const notConfiguredHint = renderCloudNotConfiguredHint({ configured: isConfigured });
 
     return (
         <SettingsSection
@@ -433,7 +427,7 @@ export const CloudSection = ({
 
                     <div className="mt-3 flex flex-wrap gap-2">
                         <ThemedButton
-                            disabled={!connected || isRequestingSyncNow}
+                            disabled={!isConnected || isRequestingSyncNow}
                             icon={syncNowButtonIcon}
                             onClick={onRequestSyncNow}
                             size="sm"
@@ -468,7 +462,7 @@ export const CloudSection = ({
                     <div className="mt-3 flex flex-wrap gap-2">
                         <ThemedButton
                             disabled={
-                                !connected || isSettingEncryptionPassphrase
+                                !isConnected || isSettingEncryptionPassphrase
                             }
                             icon={encryptionActionButtonIcon}
                             onClick={onSetEncryptionPassphrase}
@@ -494,7 +488,7 @@ export const CloudSection = ({
 
                 <RemoteBackupsPanel
                     backups={backups}
-                    connected={connected}
+                    connected={isConnected}
                     deletingBackupKey={deletingBackupKey}
                     isListingBackups={isListingBackups}
                     isUploadingBackup={isUploadingBackup}
@@ -507,8 +501,8 @@ export const CloudSection = ({
 
                 {plaintextBackupCount > 0 ? (
                     <BackupMigrationPanel
-                        connected={connected}
-                        encryptionLocked={encryptionLocked}
+                        connected={isConnected}
+                        encryptionLocked={isEncryptionLocked}
                         encryptionMode={encryptionMode}
                         isMigratingBackups={isMigratingBackups}
                         lastResult={lastBackupMigrationResult}
@@ -523,8 +517,8 @@ export const CloudSection = ({
                 ) : null}
 
                 <CloudSyncMaintenanceControl
-                    connected={connected}
-                    encryptionLocked={encryptionLocked}
+                    connected={isConnected}
+                    encryptionLocked={isEncryptionLocked}
                     encryptionMode={encryptionMode}
                     isRefreshingPreview={isRefreshingRemoteSyncResetPreview}
                     isResetting={isResettingRemoteSyncState}
@@ -533,7 +527,7 @@ export const CloudSection = ({
                     onResetRemoteSyncState={onResetRemoteSyncState}
                     preview={remoteSyncResetPreview}
                     status={status}
-                    syncEnabled={syncEnabled}
+                    syncEnabled={isSyncEnabled}
                 />
 
                 {notConfiguredHint}

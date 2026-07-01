@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { STATUS_KIND } from "@shared/types";
+import { describe, expect, it } from "vitest";
 
 import {
     handleCheckError,

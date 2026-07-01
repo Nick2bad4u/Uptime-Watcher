@@ -24,13 +24,13 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock("../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
-vi.mock("../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../stores/utils'), async (importOriginal) => {
     const actual = await importOriginal<typeof import("../../stores/utils")>();
 
     return {
@@ -44,7 +44,7 @@ vi.mock("../../stores/utils", async (importOriginal) => {
     };
 });
 
-vi.mock("../../../shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('../../../shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../shared/utils/errorHandling")
@@ -53,7 +53,7 @@ vi.mock("../../../shared/utils/errorHandling", async (importOriginal) => {
     return {
         ...actual,
         ensureError: vi.fn((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         ),
         withErrorHandling: vi.fn((fn) => fn()),
     };
@@ -72,7 +72,7 @@ const mockStateSyncService = {
     }),
 };
 
-vi.mock("../../services/StateSyncService", () => ({
+vi.mock(import('../../services/StateSyncService'), () => ({
     StateSyncService: mockStateSyncService,
 }));
 
@@ -170,11 +170,11 @@ describe("Store Alias Methods", () => {
                 await import("../../stores/updates/useUpdatesStore");
 
             const statusValues = [
-                "idle",
                 "checking",
-                "downloading",
                 "downloaded",
+                "downloading",
                 "error",
+                "idle",
             ] as const;
 
             for (const status of statusValues) {

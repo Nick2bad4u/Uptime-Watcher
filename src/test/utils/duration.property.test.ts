@@ -10,18 +10,18 @@
  * @since 2025-09-05
  */
 
-import { describe, expect } from "vitest";
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
+import { describe, expect, it, test } from "vitest";
 
 import { calculateMaxDuration } from "../../utils/duration";
 
-describe("Duration Utils Property-Based Tests", () => {
+describe("duration Utils Property-Based Tests", () => {
     /**
      * Custom arbitraries for testing duration parameters
      */
-    const reasonableTimeout = fc.double({ min: 0.1, max: 300, noNaN: true }); // 0.1s to 5 minutes
-    const reasonableRetries = fc.integer({ min: 0, max: 10 }); // 0 to 10 retries
+    const reasonableTimeout = fc.double({ max: 300, min: 0.1, noNaN: true }); // 0.1s to 5 minutes
+    const reasonableRetries = fc.integer({ max: 10, min: 0 }); // 0 to 10 retries
     const edgeCaseTimeout = fc.oneof(
         fc.constant(0),
         fc.constant(0.1),
@@ -44,10 +44,10 @@ describe("Duration Utils Property-Based Tests", () => {
                 const result = calculateMaxDuration(timeout, retries);
 
                 // Should be a string
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
 
                 // Should match one of the valid patterns: Ns, Nm, Nh (where N is a positive integer)
-                expect(result).toMatch(/^\d+[hms]$/);
+                expect(result).toMatch(/^\d+[hms]$/v);
 
                 // Should not be empty
                 expect(result.length).toBeGreaterThan(1);
@@ -82,7 +82,7 @@ describe("Duration Utils Property-Based Tests", () => {
         );
 
         test.prop([
-            fc.double({ min: 0.1, max: 10, noNaN: true }),
+            fc.double({ max: 10, min: 0.1, noNaN: true }),
             fc.constant(0),
         ])(
             "should handle zero retries correctly (no backoff time)",
@@ -101,7 +101,7 @@ describe("Duration Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.constant(1), fc.integer({ min: 1, max: 5 })])(
+        test.prop([fc.constant(1), fc.integer({ max: 5, min: 1 })])(
             "should calculate exponential backoff correctly for known cases",
             (timeout, retries) => {
                 const result = calculateMaxDuration(timeout, retries);
@@ -127,7 +127,7 @@ describe("Duration Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([reasonableTimeout, fc.integer({ min: 1, max: 10 })])(
+        test.prop([reasonableTimeout, fc.integer({ max: 10, min: 1 })])(
             "should always include backoff time when retries > 0",
             (timeout, retries) => {
                 // Skip very small timeouts that might result in the same value after Math.ceil
@@ -149,14 +149,14 @@ describe("Duration Utils Property-Based Tests", () => {
 
                     // Convert to consistent unit (seconds) for comparison
                     switch (unit) {
-                        case "s": {
-                            return numericPart;
+                        case "h": {
+                            return numericPart * 3600;
                         }
                         case "m": {
                             return numericPart * 60;
                         }
-                        case "h": {
-                            return numericPart * 3600;
+                        case "s": {
+                            return numericPart;
                         }
                         default: {
                             return numericPart;
@@ -183,16 +183,18 @@ describe("Duration Utils Property-Based Tests", () => {
                 ).not.toThrow();
 
                 const result = calculateMaxDuration(timeout, retries);
-                expect(result).toMatch(/^\d+[hms]$/);
+
+                expect(result).toMatch(/^\d+[hms]$/v);
 
                 // Should produce reasonable results for edge cases
                 const numericPart = Number.parseInt(result.slice(0, -1), 10);
+
                 expect(numericPart).toBeGreaterThan(0);
                 expect(numericPart).toBeLessThan(10_000); // Should not produce unreasonably large values
             }
         );
 
-        test("should handle specific known test cases", () => {
+        it("should handle specific known test cases", () => {
             // Test case 1: Small timeout, no retries
             expect(calculateMaxDuration(5, 0)).toBe("5s");
 
@@ -208,12 +210,13 @@ describe("Duration Utils Property-Based Tests", () => {
 
             // Test case 5: Multiple retries with exponential backoff
             const result = calculateMaxDuration(10, 3);
+
             // Expected: (10 * 4) + (0.5 + 1 + 2) = 40 + 3.5 = 43.5 -> ceil(43.5) = 44s
             expect(result).toBe("44s");
         });
 
         test.prop([
-            fc.double({ min: 0.001, max: 1, noNaN: true }),
+            fc.double({ max: 1, min: 0.001, noNaN: true }),
             reasonableRetries,
         ])(
             "should handle fractional timeouts correctly",
@@ -221,10 +224,11 @@ describe("Duration Utils Property-Based Tests", () => {
                 const result = calculateMaxDuration(fractionalTimeout, retries);
 
                 // Should not crash and should return valid format
-                expect(result).toMatch(/^\d+[hms]$/);
+                expect(result).toMatch(/^\d+[hms]$/v);
 
                 // Result should be reasonable (at least 1 second due to Math.ceil)
                 const numericPart = Number.parseInt(result.slice(0, -1), 10);
+
                 expect(numericPart).toBeGreaterThan(0);
             }
         );
@@ -249,14 +253,14 @@ describe("Duration Utils Property-Based Tests", () => {
                     const unit = result.slice(-1);
 
                     switch (unit) {
-                        case "s": {
-                            return numericPart;
+                        case "h": {
+                            return numericPart * 3600;
                         }
                         case "m": {
                             return numericPart * 60;
                         }
-                        case "h": {
-                            return numericPart * 3600;
+                        case "s": {
+                            return numericPart;
                         }
                         default: {
                             return numericPart;
@@ -291,14 +295,14 @@ describe("Duration Utils Property-Based Tests", () => {
                     const unit = result.slice(-1);
 
                     switch (unit) {
-                        case "s": {
-                            return numericPart;
+                        case "h": {
+                            return numericPart * 3600;
                         }
                         case "m": {
                             return numericPart * 60;
                         }
-                        case "h": {
-                            return numericPart * 3600;
+                        case "s": {
+                            return numericPart;
                         }
                         default: {
                             return numericPart;
@@ -316,8 +320,8 @@ describe("Duration Utils Property-Based Tests", () => {
         );
     });
 
-    describe("Exponential backoff formula verification", () => {
-        test.prop([fc.integer({ min: 1, max: 8 })])(
+    describe("exponential backoff formula verification", () => {
+        test.prop([fc.integer({ max: 8, min: 1 })])(
             "should cap individual backoff delays at 5 seconds",
             (retryIndex) => {
                 // Test the individual backoff calculation from the formula
@@ -334,7 +338,7 @@ describe("Duration Utils Property-Based Tests", () => {
             }
         );
 
-        test("should calculate correct backoff sequence", () => {
+        it("should calculate correct backoff sequence", () => {
             const expectedBackoffs = [
                 0.5, // 0.5 * 2^0 = 0.5
                 1, // 0.5 * 2^1 = 1
@@ -346,13 +350,14 @@ describe("Duration Utils Property-Based Tests", () => {
 
             for (const [i, expectedBackoff] of expectedBackoffs.entries()) {
                 const calculated = Math.min(0.5 * 2 ** i, 5);
+
                 expect(calculated).toBe(expectedBackoff);
             }
         });
     });
 
-    describe("Time formatting edge cases", () => {
-        test("should handle boundary values correctly", () => {
+    describe("time formatting edge cases", () => {
+        it("should handle boundary values correctly", () => {
             // Test second/minute boundary
             expect(calculateMaxDuration(59, 0)).toBe("59s");
             expect(calculateMaxDuration(60, 0)).toBe("1m");
@@ -364,12 +369,12 @@ describe("Duration Utils Property-Based Tests", () => {
             expect(calculateMaxDuration(3661, 0)).toBe("2h"); // Ceil(3661/3600) = 2
         });
 
-        test.prop([fc.double({ min: 60, max: 3599, noNaN: true })])(
+        test.prop([fc.double({ max: 3599, min: 60, noNaN: true })])(
             "should format minutes correctly for values in minute range",
             (timeInSeconds) => {
                 const result = calculateMaxDuration(timeInSeconds, 0);
 
-                expect(result).toMatch(/^\d+m$/);
+                expect(result).toMatch(/^\d+m$/v);
 
                 const minutes = Number.parseInt(result.slice(0, -1), 10);
                 const expectedMinutes = Math.ceil(timeInSeconds / 60);
@@ -382,12 +387,12 @@ describe("Duration Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.double({ min: 3600, max: 10_800, noNaN: true })])(
+        test.prop([fc.double({ max: 10_800, min: 3600, noNaN: true })])(
             "should format hours correctly for values in hour range",
             (timeInSeconds) => {
                 const result = calculateMaxDuration(timeInSeconds, 0);
 
-                expect(result).toMatch(/^\d+h$/);
+                expect(result).toMatch(/^\d+h$/v);
 
                 const hours = Number.parseInt(result.slice(0, -1), 10);
                 const expectedHours = Math.ceil(timeInSeconds / 3600);
@@ -398,8 +403,8 @@ describe("Duration Utils Property-Based Tests", () => {
         );
     });
 
-    describe("Performance and robustness", () => {
-        test.prop([reasonableTimeout, fc.integer({ min: 0, max: 20 })])(
+    describe("performance and robustness", () => {
+        test.prop([reasonableTimeout, fc.integer({ max: 20, min: 0 })])(
             "should handle larger retry counts without performance issues",
             (timeout, retries) => {
                 const startTime = performance.now();
@@ -413,18 +418,18 @@ describe("Duration Utils Property-Based Tests", () => {
                 expect(executionTime).toBeLessThan(5);
 
                 // Should still return valid result
-                expect(result).toMatch(/^\d+[hms]$/);
+                expect(result).toMatch(/^\d+[hms]$/v);
             }
         );
 
-        test("should handle extreme values gracefully", () => {
+        it("should handle extreme values gracefully", () => {
             // Large timeout
             expect(() => calculateMaxDuration(10_000, 0)).not.toThrow();
-            expect(calculateMaxDuration(10_000, 0)).toMatch(/^\d+h$/);
+            expect(calculateMaxDuration(10_000, 0)).toMatch(/^\d+h$/v);
 
             // Many retries
             expect(() => calculateMaxDuration(1, 100)).not.toThrow();
-            expect(calculateMaxDuration(1, 100)).toMatch(/^\d+[hms]$/);
+            expect(calculateMaxDuration(1, 100)).toMatch(/^\d+[hms]$/v);
 
             // Very small timeout
             expect(() => calculateMaxDuration(0.001, 0)).not.toThrow();
@@ -432,8 +437,8 @@ describe("Duration Utils Property-Based Tests", () => {
         });
 
         test.prop([
-            fc.double({ min: 0.1, max: 100, noNaN: true }),
-            fc.integer({ min: 0, max: 10 }),
+            fc.double({ max: 100, min: 0.1, noNaN: true }),
+            fc.integer({ max: 10, min: 0 }),
         ])("should be deterministic for same inputs", (timeout, retries) => {
             const result1 = calculateMaxDuration(timeout, retries);
             const result2 = calculateMaxDuration(timeout, retries);

@@ -4,9 +4,10 @@
  * @file Comprehensive tests for ThemedTooltip component
  */
 
-import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+
 import {
     ThemedTooltip,
     type ThemedTooltipProperties,
@@ -574,7 +575,7 @@ describe(ThemedTooltip, () => {
 
             render(
                 <ThemedTooltip content="Focus tooltip">
-                    <input type="text" placeholder="Focus me" />
+                    <input placeholder="Focus me" type="text" />
                 </ThemedTooltip>
             );
 
@@ -799,8 +800,8 @@ describe(ThemedTooltip, () => {
             rerender(
                 <ThemedTooltip
                     {...defaultProps}
-                    content="Content 1"
                     className="class1"
+                    content="Content 1"
                 />
             );
             expect(tooltipContainer).toHaveAttribute("title", "Content 1");
@@ -809,8 +810,8 @@ describe(ThemedTooltip, () => {
             rerender(
                 <ThemedTooltip
                     {...defaultProps}
-                    content="Content 2"
                     className="class2"
+                    content="Content 2"
                 />
             );
             expect(tooltipContainer).toHaveAttribute("title", "Content 2");
@@ -819,8 +820,8 @@ describe(ThemedTooltip, () => {
             rerender(
                 <ThemedTooltip
                     {...defaultProps}
-                    content="Content 3"
                     className="class3"
+                    content="Content 3"
                 />
             );
             expect(tooltipContainer).toHaveAttribute("title", "Content 3");
@@ -865,8 +866,8 @@ describe(ThemedTooltip, () => {
 
             render(
                 <ThemedTooltip
-                    content="Complete tooltip with all features"
                     className="integration-test custom-style"
+                    content="Complete tooltip with all features"
                 >
                     <div>
                         <span>Complex content</span>

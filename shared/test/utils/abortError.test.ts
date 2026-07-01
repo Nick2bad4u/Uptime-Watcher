@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { describe, expect, it } from "vitest";
 
 describe("abortError", () => {
     it("creates a standardized AbortError", () => {

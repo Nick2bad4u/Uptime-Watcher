@@ -10,9 +10,11 @@
  * calculations.
  */
 
+import type { Monitor, Site } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { MonitorManager } from "../../managers/MonitorManager";
-import type { Site, Monitor } from "@shared/types";
 
 // Hoist the mock function to avoid initialization issues
 const mockInterpolateLogTemplate = vi.hoisted(() =>
@@ -158,7 +160,7 @@ describe("MonitorManager arithmetic mutations", () => {
 
     describe("DEFAULT_CHECK_INTERVAL / 1000 division for seconds conversion", () => {
         it("should correctly convert 300000ms to 300s (kills / -> * mutation)", async () => {
-            // Arrange: Create a site with monitors that will trigger interval application
+            // Arrange: Create a site with monitors that will trigger interval app
             const testSite: Site = {
                 identifier: "test-site",
                 name: "Test Site",
@@ -175,7 +177,7 @@ describe("MonitorManager arithmetic mutations", () => {
                         timeout: 0,
                         retryAttempts: 0,
                         history: [],
-                    } as Monitor,
+                    },
                 ],
             };
 
@@ -187,7 +189,7 @@ describe("MonitorManager arithmetic mutations", () => {
                 testSite.monitors
             );
 
-            // Act: Setup site for monitoring (this triggers the interval application and division)
+            // Act: Setup site for monitoring (this triggers the interval app and division)
             await manager.setupSiteForMonitoring(testSite);
 
             // Assert: Verify the interpolation was called with the correct seconds value
@@ -226,7 +228,7 @@ describe("MonitorManager arithmetic mutations", () => {
                         timeout: 0,
                         retryAttempts: 0,
                         history: [],
-                    } as Monitor,
+                    },
                 ],
             };
 
@@ -266,7 +268,7 @@ describe("MonitorManager arithmetic mutations", () => {
                         timeout: 0,
                         retryAttempts: 0,
                         history: [],
-                    } as Monitor,
+                    },
                 ],
             };
 

@@ -52,7 +52,7 @@ const applyDeltaToSites = (
     const { addedSites, updatedSites } = sanitizedDelta;
 
     const updatedByIdentifier = new Map(
-        updatedSites.map((site) => [site.identifier, site] as const)
+        updatedSites.map((site) => [site, site.identifier] as const)
     );
 
     const nextSites: Site[] = [];
@@ -102,7 +102,7 @@ const applyDeltaToSites = (
  *
  * @remarks
  * Extracted from `useSiteSync.ts` to keep store orchestration separate from the
- * event application logic.
+ * event app logic.
  */
 export function createStateSyncEventHandler(
     options: CreateStateSyncEventHandlerOptions
@@ -112,7 +112,7 @@ export function createStateSyncEventHandler(
     const logSyncEventReceived = (event: StateSyncEventData): void => {
         const { action, revision, siteIdentifier, source, timestamp } = event;
 
-        let sitesCount: number | undefined = undefined;
+        let sitesCount: number | undefined;
         if (action === STATE_SYNC_ACTION.BULK_SYNC) {
             const { sites } = event;
             sitesCount = sites.length;
@@ -125,7 +125,7 @@ export function createStateSyncEventHandler(
             siteIdentifier,
             source,
             timestamp,
-            ...(typeof sitesCount === "number" ? { sitesCount } : {}),
+            ...((typeof sitesCount === "number") && { sitesCount }),
         });
     };
 

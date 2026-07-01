@@ -3,20 +3,22 @@
  *   Targets achieving 100% test coverage with advanced property-based testing
  */
 
-import { fc } from "@fast-check/vitest";
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
+import { fc } from "@fast-check/vitest";
+import { safeCastTo } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import the functions to test
 import {
     downloadFile,
+    type FileDownloadOptions,
     generateBackupFileName,
     handleSQLiteBackupDownload,
-    type FileDownloadOptions,
 } from "../../../../stores/sites/utils/fileDownload";
 
 // Mock logger
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -36,14 +38,14 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
         // Mock Blob
         mockBlob = vi.fn();
-        global.Blob = mockBlob;
+        globalThis.Blob = mockBlob;
 
         // Mock URL with createObjectURL and revokeObjectURL
         mockURL = {
             createObjectURL: vi.fn(),
             revokeObjectURL: vi.fn(),
         };
-        global.URL = mockURL;
+        globalThis.URL = mockURL;
 
         // Mock anchor element
         mockAnchor = {
@@ -61,7 +63,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 append: vi.fn(),
             },
         };
-        global.document = mockDocument;
+        globalThis.document = mockDocument;
 
         // Default successful mocks
         mockDocument.createElement.mockReturnValue(mockAnchor);
@@ -88,7 +90,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         };
 
                         // Should not throw
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => { downloadFile(options); }).not.toThrow();
 
                         // Verify Blob creation
                         expect(mockBlob).toHaveBeenCalledWith([buffer], {
@@ -107,8 +109,8 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expect(mockDocument.body.append).toHaveBeenCalledWith(
                             mockAnchor
                         );
-                        expect(mockAnchor.click).toHaveBeenCalled();
-                        expect(mockAnchor.remove).toHaveBeenCalled();
+                        expect(mockAnchor.click).toHaveBeenCalledWith();
+                        expect(mockAnchor.remove).toHaveBeenCalledWith();
 
                         // Verify cleanup
                         expect(mockURL.revokeObjectURL).toHaveBeenCalledWith(
@@ -136,7 +138,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("createObjectURL failed");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => { downloadFile(options); }).toThrow(
                             "createObjectURL failed"
                         );
                     }
@@ -170,7 +172,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         // Should not throw as the implementation falls back to a direct click
                         // without requiring DOM attachment.
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => { downloadFile(options); }).not.toThrow();
 
                         // Primary attempt + fallback attempt.
                         expect(
@@ -199,10 +201,10 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("DOM manipulation failed");
                         });
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => { downloadFile(options); }).not.toThrow();
 
                         // Should still try to click even with DOM error
-                        expect(mockAnchor.click).toHaveBeenCalled();
+                        expect(mockAnchor.click).toHaveBeenCalledWith();
                     }
                 )
             );
@@ -224,7 +226,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("createElement not available");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => { downloadFile(options); }).toThrow(
                             "createElement not available"
                         );
                     }
@@ -248,7 +250,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("Click failed");
                         });
 
-                        expect(() => downloadFile(options)).toThrow(
+                        expect(() => { downloadFile(options); }).toThrow(
                             "Click failed"
                         );
                     }
@@ -272,8 +274,8 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw "string error"; // Non-Error object
                         });
 
-                        expect(() => downloadFile(options)).not.toThrow();
-                        expect(mockAnchor.click).toHaveBeenCalled();
+                        expect(() => { downloadFile(options); }).not.toThrow();
+                        expect(mockAnchor.click).toHaveBeenCalledWith();
                     }
                 )
             );
@@ -296,7 +298,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             throw new Error("appendChild failed");
                         });
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => { downloadFile(options); }).not.toThrow();
                     }
                 )
             );
@@ -316,7 +318,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         );
 
                         // Should contain timestamp
-                        expect(fileName).toMatch(/\d{4}-\d{2}-\d{2}/);
+                        expect(fileName).toMatch(/\d{4}-\d{2}-\d{2}/v);
 
                         // Should use provided prefix or default
                         const expectedPrefix = prefix || "backup";
@@ -339,10 +341,10 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 fc.property(
                     fc
                         .string({ minLength: 1, maxLength: 20 })
-                        .filter((s) => /^[\w-]+$/.test(s)),
+                        .filter((s) => /^[\w-]+$/u.test(s)),
                     fc
                         .string({ minLength: 1, maxLength: 10 })
-                        .filter((s) => /^[\w-]+$/.test(s)),
+                        .filter((s) => /^[\w-]+$/u.test(s)),
                     (prefix, extension) => {
                         const fileName = generateBackupFileName(
                             prefix,
@@ -362,7 +364,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
         it("should handle default parameters", () => {
             const fileName = generateBackupFileName();
-            expect(fileName).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/);
+            expect(fileName).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/v);
         });
     });
 
@@ -389,7 +391,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             const [parts, options] = lastCall!;
             expect(Array.isArray(parts)).toBeTruthy();
             expect(parts).toHaveLength(1);
-            const [first] = parts as unknown[];
+            const [first] = safeCastTo<unknown[]>(parts);
             expect(first).toBeInstanceOf(Uint8Array);
             expect(first as Uint8Array).toHaveLength(expected);
             expect(options).toEqual({ type: "application/x-sqlite3" });
@@ -409,11 +411,11 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).resolves.not.toThrow();
 
-                        expect(downloadFunction).toHaveBeenCalled();
+                        expect(downloadFunction).toHaveBeenCalledWith();
                         expectBlobCalledWithLength(backupData.length);
-                        expect(mockURL.createObjectURL).toHaveBeenCalled();
-                        expect(mockAnchor.click).toHaveBeenCalled();
-                        expect(mockURL.revokeObjectURL).toHaveBeenCalled();
+                        expect(mockURL.createObjectURL).toHaveBeenCalledWith();
+                        expect(mockAnchor.click).toHaveBeenCalledWith();
+                        expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
                     }
                 )
             );
@@ -462,7 +464,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow("Download trigger failed");
 
-                        expect(mockURL.revokeObjectURL).toHaveBeenCalled();
+                        expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
                     }
                 )
             );
@@ -485,7 +487,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow("Download trigger failed");
 
-                        expect(mockURL.revokeObjectURL).toHaveBeenCalled();
+                        expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
                     }
                 )
             );
@@ -520,7 +522,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                                 // Expected for error scenarios
                             }
 
-                            expect(mockURL.revokeObjectURL).toHaveBeenCalled();
+                            expect(mockURL.revokeObjectURL).toHaveBeenCalledWith();
                         }
                     }
                 )
@@ -540,7 +542,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow(errorMessage);
 
-                        expect(downloadFunction).toHaveBeenCalled();
+                        expect(downloadFunction).toHaveBeenCalledWith();
                         expect(mockBlob).not.toHaveBeenCalled();
                         expect(mockURL.createObjectURL).not.toHaveBeenCalled();
                     }
@@ -557,7 +559,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 mimeType: "text/plain",
             };
 
-            expect(() => downloadFile(options)).not.toThrow();
+            expect(() => { downloadFile(options); }).not.toThrow();
             expect(mockBlob).toHaveBeenCalledWith([options.buffer], {
                 type: "text/plain",
             });
@@ -573,7 +575,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             fileName: longFileName,
                         };
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => { downloadFile(options); }).not.toThrow();
                         expect(mockAnchor.download).toBe(longFileName);
                     }
                 )
@@ -592,7 +594,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             fileName,
                         };
 
-                        expect(() => downloadFile(options)).not.toThrow();
+                        expect(() => { downloadFile(options); }).not.toThrow();
                         expect(mockAnchor.download).toBe(fileName);
                     }
                 )
@@ -606,7 +608,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 // No mimeType provided
             };
 
-            expect(() => downloadFile(options)).not.toThrow();
+            expect(() => { downloadFile(options); }).not.toThrow();
             expect(mockBlob).toHaveBeenCalledWith([options.buffer], {
                 type: "application/octet-stream",
             });

@@ -33,7 +33,7 @@ declare module "./eventTypes" {
          * Emitted when a configuration setting is changed.
          *
          * @remarks
-         * Used to propagate configuration changes throughout the application.
+         * Used to propagate configuration changes throughout the app.
          *
          * @param newValue - The new value of the setting.
          * @param oldValue - The previous value of the setting.
@@ -101,7 +101,7 @@ declare module "./eventTypes" {
              * @remarks
              * Indicates the source of the backup operation: "manual" for
              * user-initiated backups, "scheduled" for automatic backups, or
-             * "shutdown" for application shutdown backups.
+             * "shutdown" for app shutdown backups.
              */
             triggerType: "manual" | "scheduled" | "shutdown";
         };

@@ -265,7 +265,7 @@ const isValidHeaderName = (value: string): boolean => {
         return false;
     }
 
-    return Array.from(value).every((char) => {
+    return [...value].every((char) => {
         const codePoint = char.codePointAt(0);
 
         if (!isDefined(codePoint)) {

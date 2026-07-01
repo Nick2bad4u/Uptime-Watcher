@@ -1,31 +1,30 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import fc from "fast-check";
-
-import {
-    DEFAULT_MONITOR_STATUS,
-    STATUS_KIND,
-    type Monitor,
-    type MonitorType,
-    type Site,
-} from "@shared/types";
-
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
 } from "@shared/constants/monitoring";
-
 import {
-    createDefaultMonitor,
-    normalizeMonitor,
-    findMonitorInSite,
-    updateMonitorInSite,
-    addMonitorToSite,
-    removeMonitorFromSite,
-    validateMonitorExists,
-    monitorOperations,
-} from "../stores/sites/utils/monitorOperations";
+    DEFAULT_MONITOR_STATUS,
+    type Monitor,
+    type MonitorType,
+    type Site,
+    STATUS_KIND,
+} from "@shared/types";
 import { validateMonitor } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import fc from "fast-check";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    addMonitorToSite,
+    createDefaultMonitor,
+    findMonitorInSite,
+    monitorOperations,
+    normalizeMonitor,
+    removeMonitorFromSite,
+    updateMonitorInSite,
+    validateMonitorExists,
+} from "../stores/sites/utils/monitorOperations";
 
 // Mock crypto.randomUUID
 const mockUUID = "mock-uuid-123";
@@ -123,7 +122,7 @@ describe("monitorOperations", () => {
                 retryAttempts: 3,
                 status: "up",
                 timeout: 5000,
-                type: "port" as MonitorType,
+                type: "port",
             };
 
             const monitor = createDefaultMonitor(overrides);
@@ -231,7 +230,7 @@ describe("monitorOperations", () => {
                 id: 123,
                 monitoring: true,
                 status: "up" as const,
-                type: "http" as MonitorType,
+                type: safeCastTo<MonitorType>("http"),
             };
 
             expect(
@@ -317,7 +316,7 @@ describe("monitorOperations", () => {
                 id: "test-id",
                 monitoring: true,
                 status: "invalid-status",
-                type: "http" as MonitorType,
+                type: safeCastTo<MonitorType>("http"),
             };
 
             expect(
@@ -339,7 +338,7 @@ describe("monitorOperations", () => {
                 id: "test-id",
                 monitoring: true,
                 status: 123,
-                type: "http" as MonitorType,
+                type: safeCastTo<MonitorType>("http"),
             };
 
             expect(
@@ -382,7 +381,7 @@ describe("monitorOperations", () => {
                 id: "test-id",
                 monitoring: "true",
                 status: "up",
-                type: "http" as MonitorType,
+                type: safeCastTo<MonitorType>("http"),
             };
 
             expect(
@@ -425,7 +424,7 @@ describe("monitorOperations", () => {
                 id: "test-id",
                 monitoring: true,
                 status: "up",
-                type: "http" as MonitorType,
+                type: safeCastTo<MonitorType>("http"),
             };
 
             expect(
@@ -450,7 +449,7 @@ describe("monitorOperations", () => {
                     };
 
                     expect(
-                        validateMonitor(monitor as unknown as Monitor)
+                        validateMonitor(monitor)
                     ).toBeTruthy();
                 })
             );
@@ -494,9 +493,9 @@ describe("monitorOperations", () => {
             await annotate("Type: Business Logic", "type");
 
             const statusValues = [
+                "down",
                 "pending",
                 "up",
-                "down",
             ] as const;
 
             for (const status of statusValues) {
@@ -563,7 +562,7 @@ describe("monitorOperations", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = normalizeMonitor({ type: "http" as MonitorType });
+            const result = normalizeMonitor({ type: "http" });
             expect(result.type).toBe("http");
         });
 
@@ -784,7 +783,7 @@ describe("monitorOperations", () => {
             await annotate("Type: Data Retrieval", "type");
 
             const result = findMonitorInSite(mockSite, "monitor-1");
-            expect(result).toEqual(mockSite.monitors[0]);
+            expect(result).toEqual(arrayFirst(mockSite.monitors));
         });
 
         it("should return undefined for non-existent monitor", async ({
@@ -873,8 +872,8 @@ describe("monitorOperations", () => {
 
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
 
-            expect(result.monitors[0]).toEqual({
-                ...mockSite.monitors[0],
+            expect(arrayFirst(result.monitors)).toEqual({
+                ...arrayFirst(mockSite.monitors),
                 ...updates,
                 activeOperations: [],
                 url: "https://example.com",
@@ -924,8 +923,8 @@ describe("monitorOperations", () => {
 
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
 
-            expect(result.monitors[0]).toEqual({
-                ...mockSite.monitors[0],
+            expect(arrayFirst(result.monitors)).toEqual({
+                ...arrayFirst(mockSite.monitors),
                 responseTime: 250,
                 activeOperations: [],
                 url: "https://example.com",
@@ -940,10 +939,10 @@ describe("monitorOperations", () => {
 
             const result = updateMonitorInSite(mockSite, "monitor-1", {});
             // When empty updates are applied, normalizeMonitor still ensures all fields are present
-            expect(result.monitors[0]).toEqual({
-                ...mockSite.monitors[0],
+            expect(arrayFirst(result.monitors)).toEqual({
+                ...arrayFirst(mockSite.monitors),
                 activeOperations: [], // normalizeMonitor adds this field
-                url: "https://example.com", // Default for http type
+                url: "https://example.com", // Default for HTTP type
             });
         });
     });
@@ -989,7 +988,7 @@ describe("monitorOperations", () => {
             const result = addMonitorToSite(mockSite, newMonitor);
 
             expect(result.monitors).toHaveLength(2);
-            expect(result.monitors[0]).toEqual(mockSite.monitors[0]);
+            expect(arrayFirst(result.monitors)).toEqual(arrayFirst(mockSite.monitors));
             expect(result.monitors[1]).toEqual(newMonitor);
         });
 
@@ -1044,7 +1043,7 @@ describe("monitorOperations", () => {
             const result = addMonitorToSite(siteWithNoMonitors, newMonitor);
 
             expect(result.monitors).toHaveLength(1);
-            expect(result.monitors[0]).toEqual(newMonitor);
+            expect(arrayFirst(result.monitors)).toEqual(newMonitor);
         });
     });
 
@@ -1088,7 +1087,7 @@ describe("monitorOperations", () => {
             const result = removeMonitorFromSite(mockSite, "monitor-1");
 
             expect(result.monitors).toHaveLength(1);
-            expect(result.monitors[0]).toEqual(mockSite.monitors[1]);
+            expect(arrayFirst(result.monitors)).toEqual(mockSite.monitors[1]);
         });
 
         it("should handle non-existent monitor gracefully", async ({
@@ -1129,7 +1128,7 @@ describe("monitorOperations", () => {
 
             const siteWithOneMonitor: Site = {
                 ...mockSite,
-                monitors: [mockSite.monitors[0]!],
+                monitors: [arrayFirst(mockSite.monitors)!],
             };
 
             const result = removeMonitorFromSite(

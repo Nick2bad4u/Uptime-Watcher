@@ -3,10 +3,10 @@
  * useSiteStats hook
  */
 
-import { renderHook } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
-
 import type { StatusHistory } from "@shared/types";
+
+import { renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import { useSiteStats } from "../hooks/site/useSiteStats";
 

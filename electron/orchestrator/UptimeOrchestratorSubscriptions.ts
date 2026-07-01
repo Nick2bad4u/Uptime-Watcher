@@ -35,15 +35,15 @@ export interface UptimeOrchestratorSubscriptionsOptions {
 export class UptimeOrchestratorSubscriptions {
     private readonly eventBus: TypedEventBus<OrchestratorEvents>;
 
+    private readonly eventForwardingCoordinator: Pick<
+        OrchestratorEventForwardingCoordinator,
+        "register" | "unregister"
+    >;
+
     private readonly eventHandlers: UptimeOrchestratorEventHandlers;
 
     private readonly historyLimitCoordinator: Pick<
         HistoryLimitCoordinator,
-        "register" | "unregister"
-    >;
-
-    private readonly eventForwardingCoordinator: Pick<
-        OrchestratorEventForwardingCoordinator,
         "register" | "unregister"
     >;
 

@@ -1,22 +1,23 @@
-import { describe, test, expect } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { describe, expect, test } from "vitest";
+
+import * as environment from "../../utils/environment";
+import * as errorCatalog from "../../utils/errorCatalog";
 import * as objectSafety from "../../utils/objectSafety";
+import * as safeConversions from "../../utils/safeConversions";
+import * as siteStatus from "../../utils/siteStatus";
+import * as stringConversion from "../../utils/stringConversion";
 import * as guardUtils from "../../utils/typeGuards";
+import { validateMonitorType } from "../../utils/validation";
 import { getMonitorValidationErrors } from "../../validation/monitorSchemas";
 import { validateSiteData } from "../../validation/siteSchemas";
-import { validateMonitorType } from "../../utils/validation";
 
 const validation = {
     getMonitorValidationErrors,
     validateMonitorType,
-    validateSite: (site: unknown) => validateSiteData(site as any).success,
+    validateSite: (site: unknown) => validateSiteData(site).success,
 };
-import * as siteStatus from "../../utils/siteStatus";
-import * as errorCatalog from "../../utils/errorCatalog";
-import * as environment from "../../utils/environment";
-import * as safeConversions from "../../utils/safeConversions";
-import * as stringConversion from "../../utils/stringConversion";
 
 /** Arbitrary for generating test objects with various properties */
 const testRecordArbitrary = fc.record({
@@ -93,7 +94,7 @@ describe("Corrected Function Coverage Tests", () => {
                 (record, fallbackValue) => {
                     const result = objectSafety.safeObjectAccess(
                         record,
-                        "nonExistentKey" as keyof typeof record,
+                        "nonExistentKey",
                         fallbackValue
                     );
                     expect(result).toBe(fallbackValue);

@@ -1,5 +1,5 @@
 /**
- * Main entry point for the Uptime Watcher React application.
+ * Main entry point for the Uptime Watcher React app.
  *
  * @remarks
  * This module initializes the React root and renders the main {@link App}
@@ -19,7 +19,7 @@ import { logger } from "./services/logger";
 import "./index.css";
 
 /**
- * Initializes and renders the Uptime Watcher React application.
+ * Initializes and renders the Uptime Watcher React app.
  *
  * @remarks
  * -
@@ -52,7 +52,7 @@ function initializeApp(): void {
     );
 }
 
-// Initialize the application
+// Initialize the app
 try {
     initializeApp();
 } catch (error) {

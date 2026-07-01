@@ -5,7 +5,7 @@
  * coverage from 88.59% to above 90% threshold.
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 // Target specific modules with low function coverage
 describe("Final 90% Function Coverage Push", () => {
@@ -26,7 +26,7 @@ describe("Final 90% Function Coverage Push", () => {
             const testValue1 = "test";
             const testValue2 = 123;
             const testValue3 = null;
-            const testValue4 = undefined;
+            const testValue4;
             const testValue5 = {};
             const testValue6: string[] = [];
 
@@ -93,8 +93,8 @@ describe("Final 90% Function Coverage Push", () => {
             mockEvent.preventDefault();
             mockEvent.stopPropagation();
 
-            expect(mockEvent.preventDefault).toHaveBeenCalled();
-            expect(mockEvent.stopPropagation).toHaveBeenCalled();
+            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
+            expect(mockEvent.stopPropagation).toHaveBeenCalledWith();
         });
 
         it("should test form validation helpers", async ({
@@ -278,7 +278,7 @@ describe("Final 90% Function Coverage Push", () => {
                 str.length > length
                     ? `${str.slice(0, Math.max(0, length))}...`
                     : str;
-            const sanitize = (str: string) => str.replaceAll(/[<>]/g, "");
+            const sanitize = (str: string) => str.replaceAll(/[<>]/gv, "");
 
             expect(capitalize("hello")).toBe("Hello");
             expect(truncate("hello world", 5)).toBe("hello...");
@@ -435,7 +435,7 @@ describe("Final 90% Function Coverage Push", () => {
 
             const baseConfig = { timeout: 5000, retries: 3, enabled: true };
             const override = { timeout: 10_000 };
-            const required: ("timeout" | "retries" | "enabled")[] = [
+            const required: ("enabled" | "retries" | "timeout")[] = [
                 "timeout",
                 "retries",
             ];
@@ -516,13 +516,15 @@ describe("Final 90% Function Coverage Push", () => {
                 fn: T,
                 limit: number
             ): T => {
-                let inThrottle: boolean;
+                let isInThrottle: boolean;
                 return ((...args: Parameters<T>) => {
-                    if (!inThrottle) {
-                        fn(...args);
-                        inThrottle = true;
-                        setTimeout(() => (inThrottle = false), limit);
+                    if (isInThrottle) {
+                        return;
                     }
+
+                    fn(...args);
+                    isInThrottle = true;
+                    setTimeout(() => (isInThrottle = false), limit);
                 }) as T;
             };
 
@@ -565,7 +567,7 @@ describe("Final 90% Function Coverage Push", () => {
                 }) as T;
             };
 
-            const expensiveFunction = vi.fn((x: number) => x * x);
+            const expensiveFunction = vi.fn((x: number) => x ** 2);
             const memoizedFunction = memoize(expensiveFunction);
 
             // Test memoization

@@ -4,7 +4,7 @@ import { scrollToSiteCard } from "../../../utils/dom/scrollToSiteCard";
 
 describe(scrollToSiteCard, () => {
     it("scrolls the matching element inside the site list container", () => {
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         const sidebarButton = document.createElement("button");
         sidebarButton.dataset["siteIdentifier"] = "example.com";
@@ -29,7 +29,7 @@ describe(scrollToSiteCard, () => {
     });
 
     it("does not throw when CSS.escape is missing and identifier contains quotes", () => {
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         const originalCss = Reflect.get(globalThis, "CSS");
         Reflect.set(globalThis, "CSS", undefined);
@@ -46,7 +46,7 @@ describe(scrollToSiteCard, () => {
             siteList.append(card);
             document.body.append(siteList);
 
-            expect(() => scrollToSiteCard('a"b')).not.toThrow();
+            expect(() => { scrollToSiteCard('a"b'); }).not.toThrow();
             expect(cardScrollSpy).toHaveBeenCalledTimes(1);
         } finally {
             Reflect.set(globalThis, "CSS", originalCss);
@@ -54,7 +54,8 @@ describe(scrollToSiteCard, () => {
     });
 
     it("is a no-op when the site list container is missing", () => {
-        document.body.innerHTML = "";
-        expect(() => scrollToSiteCard("example.com")).not.toThrow();
+        document.body.replaceChildren();
+
+        expect(() => { scrollToSiteCard("example.com"); }).not.toThrow();
     });
 });

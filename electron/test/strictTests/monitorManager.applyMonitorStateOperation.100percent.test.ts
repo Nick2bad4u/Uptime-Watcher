@@ -1,12 +1,20 @@
-import { describe, expect, it, vi } from "vitest";
-
 import type { Monitor, Site } from "@shared/types";
+
+import { describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+
+import { applyMonitorStateOperation } from "../../managers/monitorManager/applyMonitorStateOperation";
+import {
+    createMockEventBus,
+    createMockStandardizedCache,
+    createTestMonitor,
+    createTestSite,
+} from "../utils/enhanced-testUtilities";
 
 vi.mock("../../utils/operationalHooks", () => ({
     withDatabaseOperation: async <T>(
@@ -16,15 +24,6 @@ vi.mock("../../utils/operationalHooks", () => ({
         _context: unknown
     ) => operation(),
 }));
-
-import { applyMonitorStateOperation } from "../../managers/monitorManager/applyMonitorStateOperation";
-
-import {
-    createMockEventBus,
-    createMockStandardizedCache,
-    createTestMonitor,
-    createTestSite,
-} from "../utils/enhanced-testUtilities";
 
 describe(applyMonitorStateOperation, () => {
     it("updates cache, persists changes, and emits status-changed when the monitor exists in the site", async () => {

@@ -7,8 +7,9 @@
  * handling.
  */
 
+import { fc, test } from "@fast-check/vitest";
 import { describe, expect } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -169,9 +170,9 @@ describe("SafeConversions - Property-Based Tests", () => {
 
         test("should handle special float cases correctly", () => {
             const specialCases = [
-                [Number.POSITIVE_INFINITY, 0],
+                [Infinity, 0],
                 [Number.NEGATIVE_INFINITY, 0],
-                [Number.NaN, 0],
+                [NaN, 0],
             ];
 
             for (const [input, expected] of specialCases) {
@@ -418,7 +419,7 @@ describe("SafeConversions - Property-Based Tests", () => {
             expect(typeof props.stringValue).toBe("string");
 
             // Functions that should behave similarly for numeric strings
-            if (/^-?\d+(?:\.\d+)?$/.test(props.stringValue)) {
+            if (/^-?\d+(?:\.\d+)?$/v.test(props.stringValue)) {
                 const numberResult = safeNumberConversion(props.stringValue);
                 const floatResult = safeParseFloat(props.stringValue);
 

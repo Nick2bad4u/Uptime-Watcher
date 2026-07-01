@@ -3,7 +3,8 @@
  * specific uncovered branches in service classes
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { safeInteger } from "@shared/validation/validatorUtils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock all external dependencies
 vi.mock("electron", () => ({
@@ -26,8 +27,6 @@ vi.mock("../utils/logger", () => ({
         debug: vi.fn(),
     },
 }));
-
-import { safeInteger } from "@shared/validation/validatorUtils";
 
 describe("Service Edge Cases - Missing Branch Coverage", () => {
     beforeEach(() => {
@@ -56,7 +55,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             for (const error of errors) {
                 expect(() => {
                     // Simulate error handling paths
-                    if (error instanceof Error) {
+                    if (Error.isError(error)) {
                         const { message } = error;
                         expect(typeof message).toBe("string");
                     } else if (
@@ -87,7 +86,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 Promise.resolve("success"),
                 Promise.reject(new Error("async error")),
                 new Promise((resolve) =>
-                    setTimeout(() => resolve("delayed"), 1)
+                    setTimeout(() => { resolve("delayed"); }, 1)
                 ),
                 Promise.resolve(null),
                 Promise.resolve(undefined),
@@ -142,7 +141,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         return;
                     }
 
-                    const enabled = Boolean(config.enabled);
+                    const isEnabled = Boolean(config.enabled);
                     const timeout = safeInteger(
                         config.timeout,
                         5000,
@@ -151,7 +150,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     );
                     const retries = safeInteger(config.retries, 3, 0, 10);
 
-                    expect(typeof enabled).toBe("boolean");
+                    expect(typeof isEnabled).toBe("boolean");
                     expect(typeof timeout).toBe("number");
                     expect(typeof retries).toBe("number");
                 }).not.toThrow();
@@ -236,14 +235,14 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             await annotate("Type: Validation", "type");
 
             // Simple boolean validation test
-            const result1 = true;
-            const result2 = false;
+            const isResult1 = true;
+            const isResult2 = false;
 
-            expect(typeof result1).toBe("boolean");
-            expect(result1).toBeTruthy();
+            expect(typeof isResult1).toBe("boolean");
+            expect(isResult1).toBeTruthy();
 
-            expect(typeof result2).toBe("boolean");
-            expect(result2).toBeFalsy();
+            expect(typeof isResult2).toBe("boolean");
+            expect(isResult2).toBeFalsy();
 
             // Test validation logic exists
             const hasValidationLogic = typeof Boolean === "function";
@@ -266,7 +265,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 (_, i) =>
                     new Promise((resolve) =>
                         setTimeout(
-                            () => resolve(`result-${i}`),
+                            () => { resolve(`result-${i}`); },
                             Math.random() * 10
                         )
                     )
@@ -282,7 +281,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                 results.every(
                     (result) =>
                         typeof result === "string" &&
-                        String(result).startsWith("result-")
+                        result.startsWith("result-")
                 )
             ).toBeTruthy();
         });
@@ -344,7 +343,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         } catch (error) {
                             // Log error but don't rethrow
                             const errorMessage =
-                                error instanceof Error
+                                Error.isError(error)
                                     ? error.message
                                     : String(error);
                             expect(typeof errorMessage).toBe("string");
@@ -361,13 +360,13 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const timeoutOperations = [
-                new Promise((resolve) => setTimeout(() => resolve("fast"), 1)),
+                new Promise((resolve) => setTimeout(() => { resolve("fast"); }, 1)),
                 new Promise((resolve) =>
-                    setTimeout(() => resolve("medium"), 5)
+                    setTimeout(() => { resolve("medium"); }, 5)
                 ),
-                new Promise((resolve) => setTimeout(() => resolve("slow"), 10)),
+                new Promise((resolve) => setTimeout(() => { resolve("slow"); }, 10)),
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error("timeout")), 15)
+                    setTimeout(() => { reject(new Error("timeout")); }, 15)
                 ),
             ];
 
@@ -411,17 +410,17 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     let nextState: string;
 
                     switch (state) {
+                        case "error":
+                        case "success": {
+                            nextState = "completed";
+                            break;
+                        }
                         case "initial": {
                             nextState = "loading";
                             break;
                         }
                         case "loading": {
                             nextState = "success";
-                            break;
-                        }
-                        case "success":
-                        case "error": {
-                            nextState = "completed";
                             break;
                         }
                         default: {
@@ -452,11 +451,11 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             ];
 
             const validStates = new Set([
+                "completed",
+                "error",
                 "initial",
                 "loading",
                 "success",
-                "error",
-                "completed",
             ]);
 
             for (const testCase of stateValidationCases) {
@@ -501,7 +500,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                         } catch (error) {
                             // Handle handler errors gracefully
                             const errorMessage =
-                                error instanceof Error
+                                Error.isError(error)
                                     ? error.message
                                     : String(error);
                             expect(typeof errorMessage).toBe("string");
@@ -535,11 +534,13 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             for (const event of events) {
                 expect(() => {
                     // Event listener management
-                    if (typeof event === "string" && event) {
-                        listeners.set(event, []);
-                        const eventListeners = listeners.get(event);
-                        expect(Array.isArray(eventListeners)).toBeTruthy();
+                    if (typeof event !== "string" || !event) {
+                        return;
                     }
+
+                    listeners.set(event, []);
+                    const eventListeners = listeners.get(event);
+                    expect(Array.isArray(eventListeners)).toBeTruthy();
                 }).not.toThrow();
             }
 

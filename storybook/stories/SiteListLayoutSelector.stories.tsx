@@ -19,8 +19,8 @@ type SiteListLayoutSelectorMeta = Meta<typeof SiteListLayoutSelector>;
 const meta: SiteListLayoutSelectorMeta = {
     args: {
         cardPresentation: "grid",
-        listDensity: "comfortable",
         layout: "card-large",
+        listDensity: "comfortable",
         onLayoutChange: action("site-list/layout-change"),
         onListDensityChange: action("site-list/density-change"),
         onPresentationChange: action("site-list/presentation-change"),

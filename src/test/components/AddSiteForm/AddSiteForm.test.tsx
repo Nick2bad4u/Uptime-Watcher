@@ -2,13 +2,16 @@
  * Basic tests for AddSiteForm component
  */
 
-import { describe, expect, it, vi, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import * as React from "react";
 import "@testing-library/jest-dom";
-import React from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+// Import the component under test
+import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock all dependencies
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             clearError: vi.fn(),
@@ -21,7 +24,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     }),
 }));
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             addMonitorToSite: vi.fn().mockResolvedValue(undefined),
@@ -34,7 +37,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
     }),
 }));
 
-vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
     useAddSiteForm: vi.fn(() => ({
         // Current hook-based form API shape (minimal subset for these smoke
         // tests). The enhanced AddSiteForm tests exercise the full surface;
@@ -101,7 +104,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: vi.fn(() => ({
         monitorTypes: [
             { id: "http", label: "HTTP/HTTPS" },
@@ -118,7 +121,7 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/useDynamicHelpText", () => ({
+vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: vi.fn(() => ({
         helpText: "Default help text",
         error: null,
@@ -126,16 +129,16 @@ vi.mock("../../../hooks/useDynamicHelpText", () => ({
     })),
 }));
 
-vi.mock("../../../components/AddSiteForm/Submit", () => ({
+vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
     handleSubmit: vi.fn(),
 }));
 
-vi.mock("../../../utils/data/generateUuid", () => ({
+vi.mock(import('../../../utils/data/generateUuid'), () => ({
     generateUuid: vi.fn(() => "test-uuid-123"),
 }));
 
 // Mock FormFields components
-vi.mock("../../../components/AddSiteForm/FormFields", () => ({
+vi.mock(import('../../../components/AddSiteForm/FormFields'), () => ({
     RadioGroup: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="radio-group">{children}</div>
     ),
@@ -147,13 +150,13 @@ vi.mock("../../../components/AddSiteForm/FormFields", () => ({
     ),
 }));
 
-vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
+vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
     DynamicMonitorFields: () => (
         <div data-testid="dynamic-monitor-fields">Dynamic fields</div>
     ),
 }));
 
-vi.mock("../../../theme/components", () => ({
+vi.mock(import('../../../theme/components'), () => ({
     ThemedBox: ({ children, ...props }: any) => (
         <div data-testid="themed-box" {...props}>
             {children}
@@ -171,9 +174,6 @@ vi.mock("../../../theme/components", () => ({
     ),
 }));
 
-// Import the component under test
-import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
-
 let activeRenderCleanup: (() => void) | null = null;
 
 const renderForm = async (): Promise<void> => {
@@ -184,7 +184,7 @@ const renderForm = async (): Promise<void> => {
     };
     await waitFor(() => {
         expect(
-            screen.getByRole("button", { name: /add/i })
+            screen.getByRole("button", { name: /add/iv })
         ).toBeInTheDocument();
     });
 };

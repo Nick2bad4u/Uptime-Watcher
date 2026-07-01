@@ -5,6 +5,7 @@
  * to push function coverage from 88.93% to 90%+
  */
 
+import { objectKeys } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 describe("Final Function Coverage Push", () => {
@@ -123,15 +124,15 @@ describe("Final Function Coverage Push", () => {
             url: "https://example.com",
             monitors: [],
         };
-        const siteResult = siteSchemas.validateSiteData(validSite).success;
+        const isSiteResult = siteSchemas.validateSiteData(validSite).success;
         expect(
-            typeof siteResult === "boolean" || typeof siteResult === "object"
+            typeof isSiteResult === "boolean" || typeof isSiteResult === "object"
         ).toBeTruthy();
 
         const invalidSite = {};
-        const siteResult2 = siteSchemas.validateSiteData(invalidSite).success;
+        const isSiteResult2 = siteSchemas.validateSiteData(invalidSite).success;
         expect(
-            typeof siteResult2 === "boolean" || typeof siteResult2 === "object"
+            typeof isSiteResult2 === "boolean" || typeof isSiteResult2 === "object"
         ).toBeTruthy();
     });
 
@@ -149,7 +150,7 @@ describe("Final Function Coverage Push", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        // eslint-disable-next-line unicorn/no-keyword-prefix
+
         const typeGuards = await import("../../shared/utils/typeGuards");
 
         // Test isObject
@@ -161,7 +162,7 @@ describe("Final Function Coverage Push", () => {
         // Test isNumber
         expect(typeGuards.isNumber(123)).toBeTruthy();
         expect(typeGuards.isNumber("123")).toBeFalsy();
-        expect(typeGuards.isNumber(Number.NaN)).toBeFalsy();
+        expect(typeGuards.isNumber(NaN)).toBeFalsy();
 
         // Test hasProperties
         expect(
@@ -198,7 +199,7 @@ describe("Final Function Coverage Push", () => {
         // Test isFiniteNumber
         expect(typeGuards.isFiniteNumber(123)).toBeTruthy();
         expect(typeGuards.isFiniteNumber(Infinity)).toBeFalsy();
-        expect(typeGuards.isFiniteNumber(Number.NaN)).toBeFalsy();
+        expect(typeGuards.isFiniteNumber(NaN)).toBeFalsy();
 
         // Test isFunction
         expect(typeGuards.isFunction(() => {})).toBeTruthy();
@@ -250,7 +251,7 @@ describe("Final Function Coverage Push", () => {
 
         // Test environment functions
         const environment = await import("../../shared/utils/environment");
-        for (const key of Object.keys(environment)) {
+        for (const key of objectKeys(environment)) {
             const fn = (environment as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -258,7 +259,7 @@ describe("Final Function Coverage Push", () => {
                     fn("test");
                     fn(true);
                     fn(123);
-                } catch (error: unknown) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
@@ -266,7 +267,7 @@ describe("Final Function Coverage Push", () => {
 
         // Test errorCatalog functions
         const errorCatalog = await import("../../shared/utils/errorCatalog");
-        for (const key of Object.keys(errorCatalog)) {
+        for (const key of objectKeys(errorCatalog)) {
             const fn = (errorCatalog as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -274,7 +275,7 @@ describe("Final Function Coverage Push", () => {
                     fn("test");
                     fn("test", {});
                     fn("test", {}, "extra");
-                } catch (error: unknown) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
@@ -282,7 +283,7 @@ describe("Final Function Coverage Push", () => {
 
         // Test jsonSafety functions
         const jsonSafety = await import("../../shared/utils/jsonSafety");
-        for (const key of Object.keys(jsonSafety)) {
+        for (const key of objectKeys(jsonSafety)) {
             const fn = (jsonSafety as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -291,7 +292,7 @@ describe("Final Function Coverage Push", () => {
                     fn('{"test": true}', () => true);
                     fn("[1,2,3]", () => true);
                     fn({ test: true }, "fallback");
-                } catch (error) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
@@ -299,7 +300,7 @@ describe("Final Function Coverage Push", () => {
 
         // Test objectSafety functions
         const objectSafety = await import("../../shared/utils/objectSafety");
-        for (const key of Object.keys(objectSafety)) {
+        for (const key of objectKeys(objectSafety)) {
             const fn = (objectSafety as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -319,7 +320,7 @@ describe("Final Function Coverage Push", () => {
                         fn({ a: 1, b: 2 }, ["a"]);
                         fn({ a: 1, b: 2 }, () => {});
                     }
-                } catch (error) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
@@ -328,7 +329,7 @@ describe("Final Function Coverage Push", () => {
         // Test safeConversions functions
         const safeConversions =
             await import("../../shared/utils/safeConversions");
-        for (const key of Object.keys(safeConversions)) {
+        for (const key of objectKeys(safeConversions)) {
             const fn = (safeConversions as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -339,7 +340,7 @@ describe("Final Function Coverage Push", () => {
                     fn("30000");
                     fn("5000");
                     fn("80");
-                } catch (error) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
@@ -348,7 +349,7 @@ describe("Final Function Coverage Push", () => {
         // Test stringConversion functions
         const stringConversion =
             await import("../../shared/utils/stringConversion");
-        for (const key of Object.keys(stringConversion)) {
+        for (const key of objectKeys(stringConversion)) {
             const fn = (stringConversion as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -358,17 +359,17 @@ describe("Final Function Coverage Push", () => {
                     fn(true);
                     fn({});
                     fn([]);
-                } catch (error) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
         }
 
         // Test typeHelpers functions
-        // eslint-disable-next-line unicorn/no-keyword-prefix
+
         const typeHelpers = await import("../../shared/utils/typeHelpers");
-        for (const key of Object.keys(typeHelpers)) {
-            // eslint-disable-next-line unicorn/no-keyword-prefix
+        for (const key of objectKeys(typeHelpers)) {
+
             const fn = (typeHelpers as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -378,7 +379,7 @@ describe("Final Function Coverage Push", () => {
                     fn([]);
                     fn(123);
                     fn(true);
-                } catch (error) {
+                } catch {
                     // Function called, coverage counts
                 }
             }
@@ -387,7 +388,7 @@ describe("Final Function Coverage Push", () => {
         // Test validatorUtils functions
         const validatorUtils =
             await import("../../shared/validation/validatorUtils");
-        for (const key of Object.keys(validatorUtils)) {
+        for (const key of objectKeys(validatorUtils)) {
             const fn = (validatorUtils as any)[key];
             if (typeof fn === "function") {
                 try {
@@ -399,7 +400,7 @@ describe("Final Function Coverage Push", () => {
                     fn("127.0.0.1");
                     fn(80);
                     fn(30_000);
-                } catch (error) {
+                } catch {
                     // Function called, coverage counts
                 }
             }

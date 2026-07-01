@@ -213,14 +213,12 @@ export const electronBrowserwindowRequireSecureWebpreferencesRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require hardened BrowserWindow webPreferences (contextIsolation, sandbox, nodeIntegration, webviewTag)",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-browserwindow-require-secure-webpreferences.md",
         },
-        schema: [],
         messages: {
             missingWebPreferences:
                 "BrowserWindow options must include a webPreferences object with secure defaults.",
@@ -231,5 +229,7 @@ export const electronBrowserwindowRequireSecureWebpreferencesRule = {
             incorrectSetting:
                 "BrowserWindow webPreferences must set {{key}} to {{expected}}.",
         },
+        schema: [],
+        type: "problem",
     },
 };

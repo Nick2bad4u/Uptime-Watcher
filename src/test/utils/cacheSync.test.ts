@@ -3,15 +3,14 @@
  * invalidation event handling and frontend cache clearing.
  */
 
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockInstance } from "vitest";
-import { fc, test } from "@fast-check/vitest";
-import { logger } from "../../services/logger";
-import { ensureError } from "@shared/utils/errorHandling";
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
 } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
+import type { MockInstance } from "vitest";
+
+import { fc, test } from "@fast-check/vitest";
 import {
     CACHE_INVALIDATION_REASON,
     CACHE_INVALIDATION_REASON_VALUES,
@@ -19,17 +18,22 @@ import {
     CACHE_INVALIDATION_TYPE_VALUES,
     type CacheInvalidatedEventData,
 } from "@shared/types/events";
+import { ensureError } from "@shared/utils/errorHandling";
+import { arrayAt, objectAssign, safeCastTo   } from "ts-extras";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { logger } from "../../services/logger";
 import { clearMonitorTypeCache } from "../../utils/monitorTypeHelper";
 
 // Mock dependencies
-vi.mock("../../services/logger");
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock(import('../../services/logger'));
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     ensureError: vi.fn(),
     convertError: vi.fn(),
     withErrorHandling: vi.fn(),
     withUtilityErrorHandling: vi.fn(),
 }));
-vi.mock("../../utils/monitorTypeHelper", () => ({
+vi.mock(import('../../utils/monitorTypeHelper'), () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
 }));
 
@@ -43,14 +47,14 @@ const sitesStoreState: { fullResyncSites: AsyncStoreOperation } = {
     fullResyncSites: async () => undefined,
 };
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
     __esModule: true,
     useMonitorTypesStore: {
         getState: () => monitorStoreState,
     },
 }));
 
-vi.mock("../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../stores/sites/useSitesStore'), () => ({
     __esModule: true,
     useSitesStore: {
         getState: () => sitesStoreState,
@@ -79,7 +83,7 @@ const mockEventsService = {
     onUpdateStatus: createSubscriptionMock(),
 };
 
-vi.mock("../../services/EventsService", () => ({
+vi.mock(import('../../services/EventsService'), () => ({
     EventsService: mockEventsService,
 }));
 
@@ -224,24 +228,24 @@ const normalizeCacheInvalidatedEvent = (
     }
 
     const normalized = buildCacheInvalidatedEvent(
-        candidate as Partial<CacheInvalidatedEventData>
+        candidate
     );
 
-    Object.assign(candidate as Record<string, unknown>, normalized);
+    objectAssign(candidate as UnknownRecord, normalized);
 
     return normalized;
 };
 
 const expectCacheInvalidationHandler = (
     mock: ReturnType<typeof vi.fn>
-): ((event: CacheInvalidatedEventData) => unknown | Promise<unknown>) => {
+): ((event: CacheInvalidatedEventData) => Promise<unknown> | unknown) => {
     const calls = mock.mock.calls;
     expect(calls.length).toBeGreaterThan(0);
-    const handler = calls.at(-1)?.[0];
+    const handler = arrayAt(calls, -1)?.[0];
     expect(handler).toBeTypeOf("function");
-    return handler as (
+    return safeCastTo<(
         event: CacheInvalidatedEventData
-    ) => unknown | Promise<unknown>;
+    ) => Promise<unknown> | unknown>(handler);
 };
 
 const triggerCacheInvalidation = async (
@@ -262,12 +266,12 @@ const setOnCacheInvalidatedHandler = (
     const invokeHandler = async (
         callback: (
             event: CacheInvalidatedEventData
-        ) => unknown | Promise<unknown>
+        ) => Promise<unknown> | unknown
     ): Promise<() => void> => {
         const cleanup = await (
             handler as unknown as (
-                cb: (event: unknown) => unknown | Promise<unknown>
-            ) => Promise<(() => void) | undefined> | (() => void) | undefined
+                cb: (event: unknown) => Promise<unknown> | unknown
+            ) => (() => void) | Promise<(() => void) | undefined> | undefined
         )(async (candidate: unknown) =>
             callback(
                 normalize
@@ -276,7 +280,7 @@ const setOnCacheInvalidatedHandler = (
             )
         );
 
-        return (cleanup ?? noopCleanup) as () => void;
+        return (cleanup ?? noopCleanup);
     };
 
     mockEventsService.onCacheInvalidated.mockImplementation(
@@ -284,18 +288,18 @@ const setOnCacheInvalidatedHandler = (
             invokeHandler(
                 callback as (
                     event: CacheInvalidatedEventData
-                ) => unknown | Promise<unknown>
+                ) => Promise<unknown> | unknown
             )
     );
 
-    const electronWindow = globalThis.window as typeof globalThis.window & {
+    const electronWindow = globalThis as typeof globalThis.window & {
         electronAPI: MockElectronAPI;
     };
 
     electronWindow.electronAPI.events.onCacheInvalidated = ((
         callback: (
             event: CacheInvalidatedEventData
-        ) => unknown | Promise<unknown>
+        ) => Promise<unknown> | unknown
     ) =>
         invokeHandler(
             callback
@@ -325,18 +329,18 @@ describe("cacheSync", () => {
         vi.clearAllMocks();
         monitorRefreshSpy = vi.fn(async () => {
             await mockRefreshMonitorTypes();
-        }) as unknown as MockInstance<() => Promise<void>>;
+        });
         monitorStoreState.refreshMonitorTypes =
             monitorRefreshSpy as unknown as AsyncStoreOperation;
 
         sitesResyncSpy = vi.fn(async () => {
             await mockFullResyncSites();
-        }) as unknown as MockInstance<() => Promise<void>>;
+        });
         sitesStoreState.fullResyncSites =
             sitesResyncSpy as unknown as AsyncStoreOperation;
 
         mockEnsureError.mockImplementation((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         );
         mockRefreshMonitorTypes.mockImplementation(async () => {
             // No-op default implementation
@@ -370,7 +374,7 @@ describe("cacheSync", () => {
                 await annotate("Type: Business Logic", "type");
 
                 // Mock window as undefined
-                const originalWindow = globalThis.window;
+                const originalWindow = globalThis;
 
                 delete (globalThis as any).window;
 
@@ -458,7 +462,7 @@ describe("cacheSync", () => {
                 expect(typeof cleanup).toBe("function");
 
                 cleanup();
-                expect(mockCleanup).toHaveBeenCalled();
+                expect(mockCleanup).toHaveBeenCalledWith();
             });
 
             it("should handle 'all' cache invalidation type", async ({
@@ -1105,7 +1109,7 @@ describe("cacheSync", () => {
                         identifier: "",
                         type: CACHE_INVALIDATION_TYPE.MONITOR,
                     }),
-                } as CacheInvalidatedEventData;
+                };
 
                 await Promise.resolve(invalidationHandler(invalidationData));
                 await flushAsyncOperations();
@@ -1160,9 +1164,7 @@ describe("cacheSync", () => {
                 const overrides: Partial<CacheInvalidatedEventData> = {
                     reason: invalidationData.reason,
                     type: invalidationData.type,
-                    ...(invalidationData.identifier === undefined
-                        ? {}
-                        : { identifier: invalidationData.identifier }),
+                    ...(invalidationData.identifier !== undefined && { identifier: invalidationData.identifier }),
                 };
 
                 const dispatchedEvent = await triggerCacheInvalidation(
@@ -1179,7 +1181,7 @@ describe("cacheSync", () => {
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.ALL ||
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.MONITOR
                 ) {
-                    expect(mockClearMonitorTypeCache).toHaveBeenCalled();
+                    expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
                 }
             }
         );
@@ -1214,7 +1216,7 @@ describe("cacheSync", () => {
                         "[CacheSync] Clearing monitor-related caches",
                         { identifier: dispatchedEvent.identifier }
                     );
-                    expect(mockClearMonitorTypeCache).toHaveBeenCalled();
+                    expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
                 } else if (
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.SITE
                 ) {
@@ -1242,9 +1244,7 @@ describe("cacheSync", () => {
                 const overrides: Partial<CacheInvalidatedEventData> = {
                     reason: invalidationData.reason,
                     type: invalidationData.type,
-                    ...(invalidationData.identifier === undefined
-                        ? {}
-                        : { identifier: invalidationData.identifier }),
+                    ...(invalidationData.identifier !== undefined && { identifier: invalidationData.identifier }),
                 };
 
                 const dispatchedEvent = await triggerCacheInvalidation(
@@ -1352,7 +1352,7 @@ describe("cacheSync", () => {
                 expect(typeof cleanup).toBe("function");
 
                 // Property: Cleanup function should not throw
-                expect(() => cleanup()).not.toThrow();
+                expect(() => { cleanup(); }).not.toThrow();
 
                 // Property: Warning should be logged when cache sync is not available
                 if (!normalizedEnvironment.hasWindow) {

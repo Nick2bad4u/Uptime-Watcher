@@ -3,12 +3,15 @@
  * coverage with focus on rendering, data handling, and edge cases.
  */
 
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
-import type { HTMLAttributes, PropsWithChildren } from "react";
-import { HistoryChart } from "../../components/common/HistoryChart";
 import type { StatusHistory } from "@shared/types";
+import type { HTMLAttributes, PropsWithChildren } from "react";
+
+import { render, screen } from "@testing-library/react";
+import * as React from "react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { HistoryChart } from "../../components/common/HistoryChart";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock MiniChartBar component
@@ -19,7 +22,7 @@ type MiniChartBarMockProperties = Readonly<{
     timestamp: number;
 }>;
 
-vi.mock("../../theme/components/MiniChartBar", () => ({
+vi.mock(import('../../theme/components/MiniChartBar'), () => ({
     MiniChartBar: ({
         status,
         responseTime,
@@ -27,11 +30,11 @@ vi.mock("../../theme/components/MiniChartBar", () => ({
         className,
     }: MiniChartBarMockProperties) => (
         <div
-            data-testid="mini-chart-bar"
-            data-status={status}
-            data-response-time={responseTime}
-            data-timestamp={timestamp}
             className={className}
+            data-response-time={responseTime}
+            data-status={status}
+            data-testid="mini-chart-bar"
+            data-timestamp={timestamp}
             title={`${status} - ${responseTime}ms at ${new Date(timestamp).toLocaleString()}`}
         />
     ),
@@ -43,7 +46,7 @@ type ThemedTextMockProperties = PropsWithChildren<
         Readonly<{ size?: string; variant?: string }>
 >;
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         children,
         size,
@@ -52,10 +55,10 @@ vi.mock("../../theme/components/ThemedText", () => ({
         ...props
     }: ThemedTextMockProperties) => (
         <span
-            data-testid="themed-text"
-            data-size={size}
-            data-variant={variant}
             className={className}
+            data-size={size}
+            data-testid="themed-text"
+            data-variant={variant}
             {...props}
         >
             {children}
@@ -67,9 +70,9 @@ vi.mock("../../theme/components/ThemedText", () => ({
  * Helper function to create status history records
  */
 const createStatusHistory = (
-    status: "up" | "down",
+    status: "down" | "up",
     timestamp: number,
-    responseTime: number = 100,
+    responseTime = 100,
     details?: string
 ): StatusHistory => ({
     status,
@@ -107,7 +110,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             expect(screen.getByTestId("themed-text")).toHaveTextContent(
@@ -133,9 +136,9 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Test Chart"
-                    history={history}
                     className="custom-chart-class"
+                    history={history}
+                    title="Test Chart"
                 />
             );
 
@@ -162,7 +165,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             const chartContainer = screen.getByRole("region");
@@ -188,7 +191,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             // Check main container exists
@@ -227,14 +230,14 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             const bars = screen.getAllByTestId("mini-chart-bar");
             expect(bars).toHaveLength(3);
 
             // After toReversed(), order should be oldest-first for display
-            expect(bars[0]).toHaveAttribute("data-timestamp", "1000");
+            expect(arrayFirst(bars)).toHaveAttribute("data-timestamp", "1000");
             expect(bars[1]).toHaveAttribute("data-timestamp", "2000");
             expect(bars[2]).toHaveAttribute("data-timestamp", "3000");
         });
@@ -260,7 +263,7 @@ describe("HistoryChart - Complete Coverage", () => {
             );
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             const bars = screen.getAllByTestId("mini-chart-bar");
@@ -286,9 +289,9 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Test Chart"
                     history={history}
                     maxItems={30}
+                    title="Test Chart"
                 />
             );
 
@@ -317,9 +320,9 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Test Chart"
                     history={history}
                     maxItems={100}
+                    title="Test Chart"
                 />
             );
 
@@ -347,7 +350,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             const bars = screen.getAllByTestId("mini-chart-bar");
@@ -357,9 +360,9 @@ describe("HistoryChart - Complete Coverage", () => {
             // After toReversed(): [down@1234567890, up@1234567891] (oldest first for display)
 
             // Check first bar (down@1234567890 is older, shown first after reversal)
-            expect(bars[0]).toHaveAttribute("data-status", "down");
-            expect(bars[0]).toHaveAttribute("data-response-time", "0");
-            expect(bars[0]).toHaveAttribute("data-timestamp", "1234567890");
+            expect(arrayFirst(bars)).toHaveAttribute("data-status", "down");
+            expect(arrayFirst(bars)).toHaveAttribute("data-response-time", "0");
+            expect(arrayFirst(bars)).toHaveAttribute("data-timestamp", "1234567890");
 
             // Check second bar (up@1234567891 is newer, shown second after reversal)
             expect(bars[1]).toHaveAttribute("data-status", "up");
@@ -388,7 +391,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Test Chart" history={history} />
+                <HistoryChart history={history} title="Test Chart" />
             );
 
             const bars = screen.getAllByTestId("mini-chart-bar");
@@ -396,7 +399,7 @@ describe("HistoryChart - Complete Coverage", () => {
 
             // After toReversed(): [down@500, up@1000, up@2000] (oldest first)
             // Verify all bars are rendered (React would skip duplicates with same key)
-            expect(bars[0]).toHaveAttribute("data-response-time", "0"); // Down@500
+            expect(arrayFirst(bars)).toHaveAttribute("data-response-time", "0"); // Down@500
             expect(bars[1]).toHaveAttribute("data-response-time", "151"); // Up@1000
             expect(bars[2]).toHaveAttribute("data-response-time", "150"); // Up@2000
         });
@@ -418,7 +421,7 @@ describe("HistoryChart - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const { container } = renderWithTheme(
-                <HistoryChart title="Empty Chart" history={[]} />
+                <HistoryChart history={[]} title="Empty Chart" />
             );
 
             expect(container.firstChild).toBeNull();
@@ -440,7 +443,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Single Item Chart" history={history} />
+                <HistoryChart history={history} title="Single Item Chart" />
             );
 
             expect(screen.getByTestId("themed-text")).toHaveTextContent(
@@ -467,9 +470,9 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Zero Max Items"
                     history={history}
                     maxItems={0}
+                    title="Zero Max Items"
                 />
             );
 
@@ -495,16 +498,16 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="One Max Item"
                     history={history}
                     maxItems={1}
+                    title="One Max Item"
                 />
             );
 
             const bars = screen.getAllByTestId("mini-chart-bar");
             expect(bars).toHaveLength(1);
             // Should show the first item (newest)
-            expect(bars[0]).toHaveAttribute("data-timestamp", "2000");
+            expect(arrayFirst(bars)).toHaveAttribute("data-timestamp", "2000");
         });
 
         it("should handle very large responseTime values", ({
@@ -526,7 +529,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Large Response Time" history={history} />
+                <HistoryChart history={history} title="Large Response Time" />
             );
 
             const bar = screen.getByTestId("mini-chart-bar");
@@ -549,7 +552,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Zero Response Time" history={history} />
+                <HistoryChart history={history} title="Zero Response Time" />
             );
 
             const bar = screen.getByTestId("mini-chart-bar");
@@ -574,8 +577,8 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Negative Response Time"
                     history={history}
+                    title="Negative Response Time"
                 />
             );
 
@@ -599,7 +602,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Old Timestamp" history={history} />
+                <HistoryChart history={history} title="Old Timestamp" />
             );
 
             const bar = screen.getByTestId("mini-chart-bar");
@@ -623,7 +626,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Future Timestamp" history={history} />
+                <HistoryChart history={history} title="Future Timestamp" />
             );
 
             const bar = screen.getByTestId("mini-chart-bar");
@@ -654,7 +657,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Custom Title Text" history={history} />
+                <HistoryChart history={history} title="Custom Title Text" />
             );
 
             const titleElement = screen.getByTestId("themed-text");
@@ -678,7 +681,7 @@ describe("HistoryChart - Complete Coverage", () => {
                 createStatusHistory("up", Date.now(), 150),
             ];
 
-            renderWithTheme(<HistoryChart title="" history={history} />);
+            renderWithTheme(<HistoryChart history={history} title="" />);
 
             const titleElement = screen.getByTestId("themed-text");
             expect(titleElement).toHaveTextContent("");
@@ -704,8 +707,8 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Chart & Analysis (24h) — Status: 99.9%"
                     history={history}
+                    title="Chart & Analysis (24h) — Status: 99.9%"
                 />
             );
 
@@ -732,7 +735,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title={longTitle} history={history} />
+                <HistoryChart history={history} title={longTitle} />
             );
 
             const titleElement = screen.getByTestId("themed-text");
@@ -797,7 +800,7 @@ describe("HistoryChart - Complete Coverage", () => {
             ];
 
             renderWithTheme(
-                <HistoryChart title="Reversed Order Test" history={history} />
+                <HistoryChart history={history} title="Reversed Order Test" />
             );
 
             const bars = screen.getAllByTestId("mini-chart-bar");
@@ -805,7 +808,7 @@ describe("HistoryChart - Complete Coverage", () => {
             // Original order: [3000, 2000, 1000]
             // After slice(0, 3): [3000, 2000, 1000]
             // After toReversed(): [1000, 2000, 3000]
-            expect(bars[0]).toHaveAttribute("data-timestamp", "1000");
+            expect(arrayFirst(bars)).toHaveAttribute("data-timestamp", "1000");
             expect(bars[1]).toHaveAttribute("data-timestamp", "2000");
             expect(bars[2]).toHaveAttribute("data-timestamp", "3000");
         });
@@ -834,9 +837,9 @@ describe("HistoryChart - Complete Coverage", () => {
 
             renderWithTheme(
                 <HistoryChart
-                    title="Slice Test"
                     history={history}
                     maxItems={3}
+                    title="Slice Test"
                 />
             );
 
@@ -845,7 +848,7 @@ describe("HistoryChart - Complete Coverage", () => {
 
             // Slice(0, 3) takes first 3: [5000, 4000, 3000]
             // toReversed() makes: [3000, 4000, 5000]
-            expect(bars[0]).toHaveAttribute("data-timestamp", "3000");
+            expect(arrayFirst(bars)).toHaveAttribute("data-timestamp", "3000");
             expect(bars[1]).toHaveAttribute("data-timestamp", "4000");
             expect(bars[2]).toHaveAttribute("data-timestamp", "5000");
         });

@@ -9,7 +9,7 @@
  * These helpers provide a standardized, constructible alternative.
  */
 
-import { vi, type Mock, type MockInstance } from "vitest";
+import { type Mock, type MockInstance, vi } from "vitest";
 
 /**
  * A Vitest mock function that is also constructable via `new`.

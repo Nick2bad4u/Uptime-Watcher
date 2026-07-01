@@ -39,7 +39,7 @@ const getServiceOrThrow = (
  */
 export function createServicesByTypeAndStrategyRegistry(args: {
     readonly getServiceForType: (type: Monitor["type"]) => IMonitorService;
-    readonly registeredTypes: ReadonlyArray<Monitor["type"]>;
+    readonly registeredTypes: readonly Monitor["type"][];
 }): {
     readonly servicesByType: Map<Monitor["type"], IMonitorService>;
     readonly strategyRegistry: MonitorStrategyRegistry;

@@ -5,12 +5,14 @@
  * @vitest-environment jsdom
  */
 
+import type { Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
+
+import { arrayFirst } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
-
-import { SiteService } from "../../services/SiteService";
 import { logger } from "../../services/logger";
+import { SiteService } from "../../services/SiteService";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -19,9 +21,9 @@ const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(
     () =>
         class extends Error {
-            public readonly diagnostics: Record<string, unknown>;
+            public readonly diagnostics: UnknownRecord;
 
-            public constructor(diagnostics: Record<string, unknown>) {
+            public constructor(diagnostics: UnknownRecord) {
                 super(MOCK_BRIDGE_ERROR_MESSAGE);
                 this.name = "ElectronBridgeNotReadyError";
                 this.diagnostics = diagnostics;
@@ -29,13 +31,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock the logger
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -81,7 +83,7 @@ const createMockSiteSnapshot = (identifier: string): Site => ({
 
 // Also set up window.electronAPI for JSDOM environment
 (globalThis as any).window = globalThis;
-(globalThis.window as any).electronAPI = {
+(globalThis as any).electronAPI = {
     monitoring: {},
     sites: {
         addSite: vi.fn(),
@@ -301,7 +303,7 @@ describe("SiteService Critical Coverage Tests", () => {
             ).mockReturnValue(
                 new Promise((_, reject) => {
                     setTimeout(
-                        () => reject(new Error("Operation timeout")),
+                        () => { reject(new Error("Operation timeout")); },
                         100
                     );
                 })
@@ -412,7 +414,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.sites.getSites
             ).toHaveBeenCalledTimes(1);
             expect(Array.isArray(sites)).toBeTruthy();
-            expect(sites[0]?.identifier).toBe("site-123");
+            expect(arrayFirst(sites)?.identifier).toBe("site-123");
         });
 
         it("should throw when any site snapshot is invalid", async () => {

@@ -2,7 +2,8 @@
  * Debug test to isolate TypedEventBus issue
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ServiceContainer } from "../../services/ServiceContainer";
 
 // Mock logger to prevent noise

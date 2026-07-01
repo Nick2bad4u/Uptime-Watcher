@@ -7,22 +7,23 @@
  * edge cases and validate invariants across all status utility functions.
  */
 
-import { describe, expect, it } from "vitest";
 import { test, fc } from "@fast-check/vitest";
+import { describe, expect, it } from "vitest";
+
 import {
+    createStatusIdentifier,
     formatStatusWithIcon,
     getStatusIcon,
-    createStatusIdentifier,
     type StatusIdentifier,
     type StatusWithIcon,
 } from "../../utils/status";
 
-describe("Status Utilities", () => {
+describe("status Utilities", () => {
     describe(getStatusIcon, () => {
-        describe("Standard status icons", () => {
+        describe("standard status icons", () => {
             it("should return down icon for 'down' status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -33,8 +34,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return mixed icon for 'mixed' status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -45,8 +46,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return paused icon for 'paused' status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -57,8 +58,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return pending icon for 'pending' status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -69,8 +70,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return unknown icon for 'unknown' status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -81,8 +82,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return up icon for 'up' status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -93,10 +94,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Case insensitive handling", () => {
+        describe("case insensitive handling", () => {
             it("should handle uppercase status values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -112,8 +113,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle mixed case status values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -129,8 +130,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle weird casing combinations", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -146,10 +147,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Unknown status handling", () => {
+        describe("unknown status handling", () => {
             it("should return default icon for unknown status strings", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -165,8 +166,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return default icon for empty strings", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -177,8 +178,8 @@ describe("Status Utilities", () => {
             });
 
             it("should return default icon for whitespace-only strings", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -186,14 +187,14 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(getStatusIcon(" ")).toBe("⚪");
-                expect(getStatusIcon("   ")).toBe("⚪");
+                expect(getStatusIcon(' '.repeat(3))).toBe("⚪");
                 expect(getStatusIcon("\t")).toBe("⚪");
                 expect(getStatusIcon("\n")).toBe("⚪");
             });
 
             it("should return default icon for special characters", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -207,10 +208,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Edge cases", () => {
+        describe("edge cases", () => {
             it("should handle numeric status representations", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -225,8 +226,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle status with extra whitespace", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -240,8 +241,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle very long strings", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -249,12 +250,13 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const longString = "a".repeat(1000);
+
                 expect(getStatusIcon(longString)).toBe("⚪");
             });
 
             it("should handle unicode characters", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -270,10 +272,10 @@ describe("Status Utilities", () => {
     });
 
     describe(formatStatusWithIcon, () => {
-        describe("Standard status formatting", () => {
+        describe("standard status formatting", () => {
             it("should format 'down' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -281,12 +283,13 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const formatted: StatusWithIcon = formatStatusWithIcon("down");
+
                 expect(formatted).toBe("❌ Down");
             });
 
             it("should format 'up' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -294,12 +297,13 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const formatted: StatusWithIcon = formatStatusWithIcon("up");
+
                 expect(formatted).toBe("✅ Up");
             });
 
             it("should format 'mixed' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -307,12 +311,13 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const formatted: StatusWithIcon = formatStatusWithIcon("mixed");
+
                 expect(formatted).toBe("🔄 Mixed");
             });
 
             it("should format 'paused' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -323,8 +328,8 @@ describe("Status Utilities", () => {
             });
 
             it("should format 'pending' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -335,8 +340,8 @@ describe("Status Utilities", () => {
             });
 
             it("should format 'unknown' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -347,8 +352,8 @@ describe("Status Utilities", () => {
             });
 
             it("should format 'degraded' status correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -359,10 +364,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Capitalization handling", () => {
+        describe("capitalization handling", () => {
             it("should properly capitalize lowercase status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -374,8 +379,8 @@ describe("Status Utilities", () => {
             });
 
             it("should properly format uppercase status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -387,8 +392,8 @@ describe("Status Utilities", () => {
             });
 
             it("should properly format mixed case status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -400,8 +405,8 @@ describe("Status Utilities", () => {
             });
 
             it("should properly format already capitalized status", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -413,10 +418,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Unknown status formatting", () => {
+        describe("unknown status formatting", () => {
             it("should format unknown statuses with default icon", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -429,8 +434,8 @@ describe("Status Utilities", () => {
             });
 
             it("should format single character statuses", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -444,8 +449,8 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Edge cases", () => {
-            it("should handle empty string", async ({ task, annotate }) => {
+        describe("edge cases", () => {
+            it("should handle empty string", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
                 await annotate("Category: Utility", "category");
@@ -455,8 +460,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle whitespace-only strings", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -464,12 +469,12 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 expect(formatStatusWithIcon(" ")).toBe("⚪  "); // First char uppercased, rest lowercased
-                expect(formatStatusWithIcon("   ")).toBe("⚪    ");
+                expect(formatStatusWithIcon(' '.repeat(3))).toBe("⚪    ");
             });
 
             it("should handle special characters correctly", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -484,8 +489,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle very long status strings", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -493,14 +498,15 @@ describe("Status Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const longStatus = "verylongstatusname";
+
                 expect(formatStatusWithIcon(longStatus)).toBe(
                     "⚪ Verylongstatusname"
                 );
             });
 
             it("should handle unicode characters", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -512,7 +518,7 @@ describe("Status Utilities", () => {
                 expect(formatStatusWithIcon("🔴test")).toBe("⚪ 🔴test");
             });
 
-            it("should handle numeric strings", async ({ task, annotate }) => {
+            it("should handle numeric strings", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
                 await annotate("Category: Utility", "category");
@@ -524,10 +530,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Integration with icon selection", () => {
+        describe("integration with icon selection", () => {
             it("should use correct icons based on case-insensitive matching", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -540,8 +546,8 @@ describe("Status Utilities", () => {
             });
 
             it("should maintain text formatting independently of icon selection", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -555,10 +561,10 @@ describe("Status Utilities", () => {
             });
         });
 
-        describe("Multi-word status handling (edge case behavior)", () => {
+        describe("multi-word status handling (edge case behavior)", () => {
             it("should handle hyphenated statuses", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -574,8 +580,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle space-separated statuses", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -591,8 +597,8 @@ describe("Status Utilities", () => {
             });
 
             it("should handle underscore-separated statuses", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: status", "component");
@@ -609,10 +615,10 @@ describe("Status Utilities", () => {
         });
     });
 
-    describe("Comprehensive edge cases and integration", () => {
+    describe("comprehensive edge cases and integration", () => {
         it("should handle all known statuses consistently in both functions", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
@@ -638,7 +644,7 @@ describe("Status Utilities", () => {
                 // Verify formatted string starts with the icon
                 expect(formatted).toMatch(
                     new RegExp(
-                        `^${icon.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`)} `
+                        `^${icon.replaceAll(/[$()*+.?[\\\]^{|}]/gu, "$&")} `
                     )
                 );
 
@@ -646,13 +652,14 @@ describe("Status Utilities", () => {
                 const expectedText =
                     status.charAt(0).toUpperCase() +
                     status.slice(1).toLowerCase();
+
                 expect(formatted).toBe(`${icon} ${expectedText}`);
             }
         });
 
         it("should handle unknown statuses consistently in both functions", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
@@ -677,13 +684,14 @@ describe("Status Utilities", () => {
                 const expectedText =
                     status.charAt(0).toUpperCase() +
                     status.slice(1).toLowerCase();
+
                 expect(formatted).toBe(`⚪ ${expectedText}`);
             }
         });
 
         it("should maintain consistency across different case variations", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: status", "component");
@@ -717,17 +725,17 @@ describe("Status Utilities", () => {
      * explore edge cases and validate invariants across all status utility
      * functions.
      */
-    describe("Property-Based Fuzzing Tests", () => {
+    describe("property-Based Fuzzing Tests", () => {
         describe("getStatusIcon property tests", () => {
             // Known status values for property testing
-            const knownStatuses = [
+            const knownStatuses = new Set([
                 "down",
                 "mixed",
                 "paused",
                 "pending",
                 "unknown",
                 "up",
-            ];
+            ]);
             const statusIcons = {
                 down: "❌",
                 mixed: "🔄",
@@ -778,7 +786,7 @@ describe("Status Utilities", () => {
             test.prop([
                 fc
                     .string()
-                    .filter((s) => !knownStatuses.includes(s.toLowerCase())),
+                    .filter((s) => !knownStatuses.has(s.toLowerCase())),
             ])(
                 "should return default icon for unknown statuses",
                 (unknownStatus) => {
@@ -792,7 +800,7 @@ describe("Status Utilities", () => {
             test.prop([
                 fc.oneof(
                     fc.constant(""),
-                    fc.constant("   "),
+                    fc.constant(' '.repeat(3)),
                     fc.constant("\t\n")
                 ),
             ])(
@@ -802,7 +810,7 @@ describe("Status Utilities", () => {
 
                     // Property: Empty/whitespace should return default icon
                     expect(result).toBe("⚪");
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
                 }
             );
@@ -813,7 +821,7 @@ describe("Status Utilities", () => {
                     const result = getStatusIcon(status);
 
                     // Property: Result must always be a non-empty string
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
                 }
             );
@@ -847,7 +855,7 @@ describe("Status Utilities", () => {
                     expect(result).toContain(expectedText);
 
                     // Property: Should have proper spacing
-                    expect(result).toMatch(/^.+ .+$/);
+                    expect(result).toMatch(/^.+ .+$/u);
                 }
             );
 
@@ -859,17 +867,19 @@ describe("Status Utilities", () => {
                     const result = formatStatusWithIcon(status);
 
                     // Property: Should always contain an icon and text separated by space
-                    expect(result).toMatch(/^.+ .+$/);
+                    expect(result).toMatch(/^.+ .+$/u);
 
                     // Property: Should contain expected icon
                     const expectedIcon = getStatusIcon(status);
-                    expect(result.startsWith(expectedIcon)).toBeTruthy();
+
+                    expect(result.startsWith(expectedIcon)).toBe(true);
 
                     // Property: Text portion should be properly formatted
                     // The text part is: first char uppercase + rest lowercase
                     const expectedText =
                         status.charAt(0).toUpperCase() +
                         status.slice(1).toLowerCase();
+
                     expect(result).toContain(expectedText);
                 }
             );
@@ -881,7 +891,7 @@ describe("Status Utilities", () => {
                     const iconResult = getStatusIcon(status);
 
                     // Property: Formatted result should start with the icon from getStatusIcon
-                    expect(formattedResult.startsWith(iconResult)).toBeTruthy();
+                    expect(formattedResult.startsWith(iconResult)).toBe(true);
                 }
             );
 
@@ -905,6 +915,7 @@ describe("Status Utilities", () => {
                     // Both should produce the same capitalized text
                     const lowercaseText = lowercaseParts.slice(1).join(" ");
                     const uppercaseText = uppercaseParts.slice(1).join(" ");
+
                     expect(lowercaseText).toBe(uppercaseText);
                 }
             );
@@ -912,13 +923,13 @@ describe("Status Utilities", () => {
 
         describe("createStatusIdentifier property tests", () => {
             test.prop([
-                fc.string({ minLength: 1, maxLength: 30 }).filter((s) => {
+                fc.string({ maxLength: 30, minLength: 1 }).filter((s) => {
                     // Filter to valid inputs that produce valid camelCase
-                    if (!/^[a-zA-Z\s_-]+$/u.test(s)) return false;
+                    if (!/^[A-Za-z\s\-_]+$/u.test(s)) return false;
                     if (s.trim().length === 0) return false;
 
                     // Test that the function would produce valid camelCase
-                    const words = s.toLowerCase().split(/[\s_-]+/);
+                    const words = s.toLowerCase().split(/[\s_-]+/u);
                     const camelCased = words
                         .map((word, index) =>
                             index === 0
@@ -930,7 +941,7 @@ describe("Status Utilities", () => {
                     // Must produce valid camelCase: non-empty and starts with lowercase
                     return (
                         camelCased.length > 0 &&
-                        /^[a-z][\dA-Za-z]*$/u.test(camelCased)
+                        /^[a-z][\dA-Za-z]*$/v.test(camelCased)
                     );
                 }),
             ])("should create valid camelCase identifiers", (statusText) => {
@@ -938,11 +949,11 @@ describe("Status Utilities", () => {
                     createStatusIdentifier(statusText);
 
                 // Property: Result should be a non-empty string
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(0);
 
                 // Property: Result should be valid camelCase (starts with lowercase, no spaces/special chars)
-                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/u);
 
                 // Property: Should not contain original separators
                 expect(result).not.toContain(" ");
@@ -961,7 +972,7 @@ describe("Status Utilities", () => {
                 const result: StatusIdentifier = createStatusIdentifier(phrase);
 
                 // Property: Should create valid identifier
-                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/u);
 
                 // Property: Should start with lowercase
                 const firstChar = result[0];
@@ -970,6 +981,7 @@ describe("Status Utilities", () => {
                         "Expected result to have at least one character"
                     );
                 }
+
                 expect(firstChar).toBe(firstChar.toLowerCase());
 
                 // Property: Should be longer than any single word (compound identifier)
@@ -991,8 +1003,8 @@ describe("Status Utilities", () => {
 
             test.prop([
                 fc
-                    .string({ minLength: 1, maxLength: 20 })
-                    .filter((s) => /^[a-zA-Z]+$/u.test(s)),
+                    .string({ maxLength: 20, minLength: 1 })
+                    .filter((s) => /^[a-zA-Z]+$/v.test(s)),
             ])(
                 "should handle alphabetic strings without separators",
                 (text) => {
@@ -1007,9 +1019,9 @@ describe("Status Utilities", () => {
             test.prop([
                 fc.array(
                     fc
-                        .string({ minLength: 1, maxLength: 10 })
-                        .filter((s) => /^[a-zA-Z]+$/u.test(s)),
-                    { minLength: 2, maxLength: 5 }
+                        .string({ maxLength: 10, minLength: 1 })
+                        .filter((s) => /^[a-zA-Z]+$/v.test(s)),
+                    { maxLength: 5, minLength: 2 }
                 ),
             ])("should combine multiple words into camelCase", (words) => {
                 const phrase = words.join(" ");
@@ -1020,17 +1032,18 @@ describe("Status Utilities", () => {
                 if (!firstWord) {
                     throw new Error("Expected at least one word");
                 }
-                expect(result.startsWith(firstWord.toLowerCase())).toBeTruthy();
+
+                expect(result.startsWith(firstWord.toLowerCase())).toBe(true);
 
                 // Property: Should not contain spaces
                 expect(result).not.toContain(" ");
 
                 // Property: Should be camelCase pattern
-                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/u);
             });
         });
 
-        describe("Cross-function property tests", () => {
+        describe("cross-function property tests", () => {
             const knownStatuses = [
                 "down",
                 "mixed",
@@ -1047,11 +1060,11 @@ describe("Status Utilities", () => {
                     const formatted = formatStatusWithIcon(status);
 
                     // Property: Formatted string should start with the icon
-                    expect(formatted.startsWith(icon)).toBeTruthy();
+                    expect(formatted.startsWith(icon)).toBe(true);
 
                     // Property: Both functions should handle same input consistently
-                    expect(typeof icon).toBe("string");
-                    expect(typeof formatted).toBe("string");
+                    expect(icon).toBeTypeOf("string");
+                    expect(formatted).toBeTypeOf("string");
                     expect(icon.length).toBeGreaterThan(0);
                     expect(formatted.length).toBeGreaterThan(icon.length);
                 }
@@ -1076,11 +1089,11 @@ describe("Status Utilities", () => {
             test.prop([
                 fc.string({ minLength: 1 }).filter((s) => {
                     // Filter to valid inputs that produce valid camelCase
-                    if (!/^[a-zA-Z\s_-]+$/u.test(s)) return false;
+                    if (!/^[A-Za-z\s\-_]+$/u.test(s)) return false;
                     if (s.trim().length === 0) return false;
 
                     // Test that the function would produce valid camelCase
-                    const words = s.toLowerCase().split(/[\s_-]+/);
+                    const words = s.toLowerCase().split(/[\s_-]+/u);
                     const camelCased = words
                         .map((word, index) =>
                             index === 0
@@ -1092,7 +1105,7 @@ describe("Status Utilities", () => {
                     // Must produce valid camelCase: non-empty and starts with lowercase
                     return (
                         camelCased.length > 0 &&
-                        /^[a-z][\dA-Za-z]*$/u.test(camelCased)
+                        /^[a-z][\dA-Za-z]*$/v.test(camelCased)
                     );
                 }),
             ])(
@@ -1104,7 +1117,7 @@ describe("Status Utilities", () => {
                     const result = createStatusIdentifier(text);
 
                     // Property: Should produce valid identifier
-                    expect(result).toMatch(/^[a-z][\dA-Za-z]*$/);
+                    expect(result).toMatch(/^[a-z][\dA-Za-z]*$/u);
                     expect(result.length).toBeGreaterThan(0);
                 }
             );

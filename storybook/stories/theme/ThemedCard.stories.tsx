@@ -10,23 +10,23 @@ const NewSiteIcon = AppIcons.ui.site;
 const AnalyticsIcon = AppIcons.ui.analytics;
 
 const meta: Meta<typeof ThemedCard> = {
-    component: ThemedCard,
     args: {
-        title: "Site Availability",
-        subtitle: "Last 24 hours",
-        icon: <CardIcon />,
         children: (
             <ThemedText>
                 Monitor uptime, response time, and incidents for every site in
                 your workspace.
             </ThemedText>
         ),
+        icon: <CardIcon />,
+        subtitle: "Last 24 hours",
+        title: "Site Availability",
     },
     argTypes: {
         onClick: { action: "clicked" },
         onMouseEnter: { action: "hover" },
         onMouseLeave: { action: "leave" },
     },
+    component: ThemedCard,
     parameters: {
         layout: "padded",
     },
@@ -47,13 +47,17 @@ export const Clickable: Story = {
 };
 
 export const WithAction: Story = {
+    args: {
+        hoverable: true,
+        icon: <CardIcon />,
+    },
     render: (args) => (
         <ThemedCard {...args}>
             <ThemedText>
                 Quickly add new monitors with sensible defaults and templates
                 for common protocols.
             </ThemedText>
-            <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem" }}>
+            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
                 <ThemedButton icon={<NewSiteIcon />} variant="primary">
                     New Site
                 </ThemedButton>
@@ -63,8 +67,4 @@ export const WithAction: Story = {
             </div>
         </ThemedCard>
     ),
-    args: {
-        icon: <CardIcon />,
-        hoverable: true,
-    },
 };

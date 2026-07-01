@@ -84,17 +84,17 @@ export const electronNoDirectIpcHandleRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow ipcMain.handle/handleOnce outside the centralized IPC registration helper.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-direct-ipc-handle.md",
         },
-        schema: [],
         messages: {
             useStandardizedRegistration:
                 "Do not call ipcMain.{{method}} directly. Register IPC handlers via registerStandardizedIpcHandler in electron/services/ipc/utils.ts.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -55,7 +55,7 @@ function describeValue(v: unknown): string {
  */
 export function assertNever(
     value: never,
-    context: string = "exhaustive-check"
+    context = "exhaustive-check"
 ): never {
     throw new Error(
         `[${context}] Reached unreachable code with value: ${describeValue(value)}`

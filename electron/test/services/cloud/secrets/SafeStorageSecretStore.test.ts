@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-
 import { SafeStorageSecretStore } from "@electron/services/cloud/secrets/SecretStore";
+import { describe, expect, it, vi } from "vitest";
 
 vi.mock("electron", () => ({
     safeStorage: {

@@ -146,16 +146,16 @@ export const electronBrowserwindowRequirePreloadRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description: "require BrowserWindow webPreferences.preload",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-browserwindow-require-preload.md",
         },
-        schema: [],
         messages: {
             missingPreload:
                 "BrowserWindow webPreferences must set a preload script (webPreferences.preload).",
         },
+        schema: [],
+        type: "problem",
     },
 };

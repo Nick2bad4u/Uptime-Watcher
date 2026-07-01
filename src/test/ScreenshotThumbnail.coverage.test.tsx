@@ -2,24 +2,23 @@
  * Test to cover remaining uncovered lines in ScreenshotThumbnail component
  */
 
-import { render, screen, act, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import "@testing-library/jest-dom";
-
-import { installElectronApiMock } from "./utils/electronApiMock";
-
-import {
-    ScreenshotThumbnail,
-    type ScreenshotThumbnailProperties,
-} from "../components/SiteDetails/ScreenshotThumbnail";
 import {
     sampleOne,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    ScreenshotThumbnail,
+    type ScreenshotThumbnailProperties,
+} from "../components/SiteDetails/ScreenshotThumbnail";
+import { installElectronApiMock } from "./utils/electronApiMock";
 
 // Mock logger
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -37,19 +36,19 @@ vi.mock("../services/logger", () => {
 });
 
 // Mock stores/utils
-vi.mock("../stores/utils", () => ({
+vi.mock(import('../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
 // Mock SystemService
-vi.mock("../services/SystemService", () => ({
+vi.mock(import('../services/SystemService'), () => ({
     SystemService: {
         openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
 
 // Mock useTheme hook
-vi.mock("../theme/useTheme", () => ({
+vi.mock(import('../theme/useTheme'), () => ({
     useTheme: () => ({
         themeName: "dark" as const,
     }),
@@ -59,7 +58,7 @@ vi.mock("../theme/useTheme", () => ({
 const mockOpenExternal = vi.fn();
 
 // Mock useUIStore hook
-vi.mock("../stores/ui/useUiStore", () => ({
+vi.mock(import('../stores/ui/useUiStore'), () => ({
     useUIStore: (
         selector?: (state: { openExternal: typeof mockOpenExternal }) => unknown
     ) => {
@@ -72,7 +71,7 @@ vi.mock("../stores/ui/useUiStore", () => ({
 }));
 
 // Mock useMount hook
-vi.mock("../hooks/useMount", () => {
+vi.mock(import('../hooks/useMount'), () => {
     const calledCallbacks = new WeakSet();
     return {
         useMount: vi.fn(
@@ -91,7 +90,7 @@ vi.mock("../hooks/useMount", () => {
 });
 
 // Prevent JSDOM navigation errors by mocking HTMLAnchorElement.prototype.click
-HTMLAnchorElement.prototype.click = vi.fn();
+vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation();
 
 // Mock the anchor element href setter to use hash URLs to prevent JSDOM navigation errors
 const originalSetAttribute = Element.prototype.setAttribute;
@@ -102,9 +101,9 @@ Element.prototype.setAttribute = function (name: string, value: string) {
         value.startsWith("http")
     ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
-        return originalSetAttribute.call(this, name, "#");
+        originalSetAttribute.call(this, name, "#"); return;
     }
-    return originalSetAttribute.call(this, name, value);
+    originalSetAttribute.call(this, name, value);
 };
 
 // Mock window properties
@@ -161,12 +160,11 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // Mock getBoundingClientRect for all elements
-        Element.prototype.getBoundingClientRect = vi
-            .fn()
+        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation()
             .mockReturnValue(createMockBoundingClientRect());
 
         // Set up document.body for portal mounting
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
     });
 
     afterEach(() => {

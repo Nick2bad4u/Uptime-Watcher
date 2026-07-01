@@ -3,17 +3,20 @@
  * window API declarations.
  */
 
-import { describe, expect, it } from "vitest";
-
-import { MONITOR_STATUS, STATUS_HISTORY_VALUES } from "@shared/types";
 import type {
-    MonitorType,
     Monitor,
+    MonitorType,
     Site,
     StatusHistory,
     StatusUpdate,
 } from "@shared/types";
+
+import { MONITOR_STATUS, STATUS_HISTORY_VALUES } from "@shared/types";
+import { arrayFirst, objectValues, safeCastTo   } from "ts-extras";
+import { describe, expect, it } from "vitest";
+
 import type { UpdateStatus } from "../stores/types";
+
 import { createMonitorTypeConfig } from "./utils/createMonitorTypeConfig";
 
 const createTestMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
@@ -163,7 +166,7 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const statuses = Object.values(MONITOR_STATUS);
+            const statuses = objectValues(MONITOR_STATUS);
 
             for (const status of statuses) {
                 const monitor: Monitor = {
@@ -247,7 +250,7 @@ describe("Types Module", () => {
             };
 
             expect(site.monitors).toHaveLength(2);
-            expect(site.monitors[0]?.type).toBe("http");
+            expect(arrayFirst(site.monitors)?.type).toBe("http");
             expect(site.monitors[1]?.type).toBe("port");
         });
 
@@ -390,7 +393,7 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const statuses = Object.values(MONITOR_STATUS);
+            const statuses = objectValues(MONITOR_STATUS);
             const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
@@ -539,16 +542,16 @@ describe("Types Module", () => {
                         Promise.resolve({
                             ...site,
                             identifier: "new-id",
-                        } as Site),
+                        }),
                     removeMonitor: () => Promise.resolve(true),
                     removeSite: () => Promise.resolve(true),
                     updateSite: () =>
-                        Promise.resolve({
+                        Promise.resolve(safeCastTo<Site>({
                             identifier: "updated-id",
                             monitors: [],
                             monitoring: false,
                             name: "Updated",
-                        } as Site),
+                        })),
                 },
                 monitorTypes: {
                     formatMonitorDetail: () =>
@@ -657,7 +660,7 @@ describe("Types Module", () => {
                 monitoring: false,
             };
 
-            expect(site.monitors[0]).toBe(monitor);
+            expect(arrayFirst(site.monitors)).toBe(monitor);
         });
 
         it("should allow StatusHistory in Monitor history array", ({
@@ -687,7 +690,7 @@ describe("Types Module", () => {
                 retryAttempts: 0,
             };
 
-            expect(monitor.history[0]).toBe(history);
+            expect(arrayFirst(monitor.history)).toBe(history);
         });
 
         it("should allow Site in StatusUpdate", ({ task, annotate }) => {
@@ -743,8 +746,8 @@ describe("Types Module", () => {
             expect(minimalMonitor.responseTime).toBe(0);
             expect(minimalMonitor.lastChecked).toBeUndefined();
             expect(minimalMonitor.monitoring).toBeFalsy();
-            expect(minimalMonitor.checkInterval).toBe(+0);
-            expect(minimalMonitor.timeout).toBe(+0);
+            expect(minimalMonitor.checkInterval).toBe(0);
+            expect(minimalMonitor.timeout).toBe(0);
             expect(minimalMonitor.retryAttempts).toBe(0);
         });
 

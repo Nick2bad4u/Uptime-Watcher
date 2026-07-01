@@ -15,8 +15,8 @@
  * @packageDocumentation
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import { safeStringify } from "../../utils/stringConversion";
@@ -171,7 +171,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
         });
 
         it("should handle special number values", () => {
-            expect(safeStringify(Number.NaN)).toBe("NaN");
+            expect(safeStringify(NaN)).toBe("NaN");
             expect(safeStringify(Infinity)).toBe("Infinity");
             expect(safeStringify(-Infinity)).toBe("-Infinity");
             expect(safeStringify(0)).toBe("0");
@@ -309,7 +309,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
                 const result = safeStringify(value);
 
                 // Should be safe for console.log
-                expect(() => console.log(result)).not.toThrow();
+                expect(() => { console.log(result); }).not.toThrow();
 
                 // Should not contain dangerous characters for basic HTML display
                 // (though proper HTML escaping would still be needed)

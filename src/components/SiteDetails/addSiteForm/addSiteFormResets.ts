@@ -49,12 +49,12 @@ export function resetFieldsForMonitorType(args: {
 }): void {
     const { currentFieldNames, currentValues, setters } = args;
 
-    const fieldResetters: Array<{
+    const fieldResetters: {
         readonly defaultValue: string;
         readonly name: string;
         readonly setter: (value: string) => void;
         readonly value: string;
-    }> = [
+    }[] = [
         {
             defaultValue: DEFAULT_ADD_SITE_MONITOR_FIELD_VALUES.baselineUrl,
             name: "baselineUrl",

@@ -44,14 +44,14 @@ export interface DataApiInterface extends DataDomainBridge {
     downloadSqliteBackup: DataDomainBridge["downloadSqliteBackup"];
 
     /**
-     * Exports all application data to a JSON string
+     * Exports all app data to a JSON string
      *
      * @returns Promise resolving to exported data as JSON string
      */
     exportData: DataDomainBridge["exportData"];
 
     /**
-     * Imports application data from a JSON string
+     * Imports app data from a JSON string
      *
      * @returns Promise resolving to a boolean success flag
      */
@@ -95,7 +95,7 @@ function createDataApi(): DataApiInterface {
             ),
 
             /**
-             * Exports all application data to a JSON string
+             * Exports all app data to a JSON string
              *
              * @returns Promise resolving to exported data as JSON string
              */
@@ -109,9 +109,9 @@ function createDataApi(): DataApiInterface {
             ),
 
             /**
-             * Imports application data from a JSON string
+             * Imports app data from a JSON string
              *
-             * @param jsonData - JSON string containing application data to
+             * @param jsonData - JSON string containing app data to
              *   import
              *
              * @returns Promise resolving to a boolean success flag

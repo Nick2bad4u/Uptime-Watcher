@@ -4,7 +4,6 @@
  * @file Direct function call tests for typeHelpers to ensure coverage
  */
 
-import { describe, expect, it } from "vitest";
 import {
     castIpcResponse,
     isArray,
@@ -12,6 +11,7 @@ import {
     safePropertyAccess,
     validateAndConvert,
 } from "@shared/utils/typeHelpers";
+import { describe, expect, it } from "vitest";
 
 describe("typeHelpers Direct Function Coverage", () => {
     it("should call castIpcResponse function", () => {

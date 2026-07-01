@@ -115,7 +115,7 @@ export const SiteOverviewTab = ({
 
     // Calculate site-level statistics
     const siteDisplayStatus = getSiteDisplayStatus(site);
-    const allMonitorsRunning =
+    const isAllMonitorsRunning =
         site.monitors.length > 0 &&
         site.monitors.every((monitor) => monitor.monitoring);
     const runningMonitors = site.monitors.filter(
@@ -580,7 +580,7 @@ export const SiteOverviewTab = ({
             {/* Site Actions */}
             <ThemedCard icon={actionsIcon} title="Site Actions">
                 <div className="flex flex-wrap items-center gap-4">
-                    {allMonitorsRunning ? (
+                    {isAllMonitorsRunning ? (
                         <ThemedButton
                             className="flex min-w-50 items-center justify-center gap-1"
                             disabled={isLoading}

@@ -1,6 +1,8 @@
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
-
 import type { Site, StatusUpdate } from "@shared/types";
+
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+
 import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateSnapshot";
 
 import {
@@ -10,19 +12,19 @@ import {
 
 const ensureErrorMock = vi.hoisted(() =>
     vi.fn((error: unknown) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     )
 );
 
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     ensureError: ensureErrorMock,
     withErrorHandling: vi.fn(
-        async (operation: () => Promise<void>) => await operation()
+        async (operation: () => Promise<void>) => { await operation(); }
     ),
 }));
 
 const logStoreActionMock = vi.hoisted(() => vi.fn());
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: logStoreActionMock,
 }));
 
@@ -32,7 +34,7 @@ const loggerMock = vi.hoisted(() => ({
     info: vi.fn(),
     warn: vi.fn(),
 }));
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: loggerMock,
 }));
 
@@ -326,7 +328,7 @@ describe("useSiteMonitoring edge cases", () => {
             );
             expect(setSites).toHaveBeenCalledTimes(2);
             expect(
-                currentSites[0]?.monitors.find(
+                arrayFirst(currentSites)?.monitors.find(
                     (monitor) => monitor.id === "monitor-revert"
                 )?.monitoring
             ).toBeTruthy();
@@ -388,7 +390,7 @@ describe("useSiteMonitoring edge cases", () => {
             await pending;
 
             expect(
-                currentSites[0]?.monitors.find(
+                arrayFirst(currentSites)?.monitors.find(
                     (monitor) => monitor.id === "monitor-individual"
                 )?.monitoring
             ).toBeFalsy();

@@ -19,12 +19,14 @@
  *   3. Math.min/Math.max bounds checking logic
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { arrayJoin } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 
 // Mock the theme system
-vi.mock("../../../theme/ThemeContext", () => ({
+vi.mock(import('../../../theme/ThemeContext'), () => ({
     useTheme: () => ({
         currentTheme: {
             name: "light",
@@ -55,8 +57,8 @@ vi.mock("../../../theme/ThemeContext", () => ({
 }));
 
 // Mock utilities
-vi.mock("../../../utils", () => ({
-    cn: (...classes: string[]) => classes.filter(Boolean).join(" "),
+vi.mock(import('../../../utils'), () => ({
+    cn: (...classes: string[]) => arrayJoin(classes.filter(Boolean), " "),
 }));
 
 describe("ThemedProgress - Arithmetic Mutations", () => {
@@ -68,7 +70,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation where division is changed to multiplication", () => {
             // Test case where (value / max) should equal 0.5 (50%)
             // If mutated to (value * max), result would be 2500 (250000%)
-            render(<ThemedProgress value={50} max={100} />);
+            render(<ThemedProgress max={100} value={50} />);
 
             const progressBar = screen.getByRole("progressbar");
 
@@ -84,7 +86,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with decimal division results", () => {
             // Test case: 33 / 100 = 0.33 (33%)
             // If mutated to 33 * 100 = 3300 (330000%, clamped to 100%)
-            render(<ThemedProgress value={33} max={100} />);
+            render(<ThemedProgress max={100} value={33} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -97,7 +99,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with non-standard max values", () => {
             // Test case: 150 / 300 = 0.5 (50%)
             // If mutated to 150 * 300 = 45000 (4500000%, clamped to 100%)
-            render(<ThemedProgress value={150} max={300} />);
+            render(<ThemedProgress max={300} value={150} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -108,7 +110,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with small max values", () => {
             // Test case: 1 / 2 = 0.5 (50%)
             // If mutated to 1 * 2 = 2 (200%, clamped to 100%)
-            render(<ThemedProgress value={1} max={2} />);
+            render(<ThemedProgress max={2} value={1} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -121,7 +123,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation where multiplication is changed to division", () => {
             // Test case: (50 / 100) * 100 = 50%
             // If mutated to (50 / 100) / 100 = 0.005 (0.005%)
-            render(<ThemedProgress value={50} max={100} />);
+            render(<ThemedProgress max={100} value={50} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -135,7 +137,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with high precision values", () => {
             // Test case: (0.75 / 1) * 100 = 75%
             // If mutated to (0.75 / 1) / 100 = 0.0075 (0.0075%)
-            render(<ThemedProgress value={0.75} max={1} />);
+            render(<ThemedProgress max={1} value={0.75} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -146,7 +148,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with percentage edge cases", () => {
             // Test case: (99 / 100) * 100 = 99%
             // If mutated to (99 / 100) / 100 = 0.0099 (0.0099%)
-            render(<ThemedProgress value={99} max={100} />);
+            render(<ThemedProgress max={100} value={99} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -160,7 +162,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
             // Test case where percentage calculation exceeds 100%
             // Normal: Math.min(Math.max((150 / 100) * 100, 0), 100) = 100%
             // If Math.min is mutated: Math.max((150 / 100) * 100, 0) = 150%
-            render(<ThemedProgress value={150} max={100} />);
+            render(<ThemedProgress max={100} value={150} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -174,7 +176,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with extreme overflow values", () => {
             // Test case: Math.min(Math.max((1000 / 100) * 100, 0), 100) = 100%
             // If Math.min is mutated: Math.max((1000 / 100) * 100, 0) = 1000%
-            render(<ThemedProgress value={1000} max={100} />);
+            render(<ThemedProgress max={100} value={1000} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -188,7 +190,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
             // Test case where percentage calculation is negative
             // Normal: Math.min(Math.max((-50 / 100) * 100, 0), 100) = 0%
             // If Math.max is mutated: Math.min((-50 / 100) * 100, 100) = -50%
-            render(<ThemedProgress value={-50} max={100} />);
+            render(<ThemedProgress max={100} value={-50} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -202,7 +204,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with zero and negative edge cases", () => {
             // Test case: Math.min(Math.max((0 / 100) * 100, 0), 100) = 0%
             // Component should handle zero correctly regardless of mutations
-            render(<ThemedProgress value={0} max={100} />);
+            render(<ThemedProgress max={100} value={0} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -213,7 +215,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutation with negative max values", () => {
             // Edge case: Math.min(Math.max((50 / -100) * 100, 0), 100) = 0%
             // If Math.max is mutated: Math.min((50 / -100) * 100, 100) = -50%
-            render(<ThemedProgress value={50} max={-100} />);
+            render(<ThemedProgress max={-100} value={50} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -226,7 +228,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect multiple arithmetic mutations in complex scenarios", () => {
             // Complex case testing multiple potential mutation points
             // Original: Math.min(Math.max((75 / 150) * 100, 0), 100) = 50%
-            render(<ThemedProgress value={75} max={150} />);
+            render(<ThemedProgress max={150} value={75} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -239,7 +241,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutations with fractional inputs", () => {
             // Test with fractional values that could reveal arithmetic mutations
             // Original: Math.min(Math.max((2.5 / 5) * 100, 0), 100) = 50%
-            render(<ThemedProgress value={2.5} max={5} />);
+            render(<ThemedProgress max={5} value={2.5} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -250,7 +252,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should detect mutations with very small values", () => {
             // Test with small values where mutations would be more apparent
             // Original: Math.min(Math.max((0.01 / 0.1) * 100, 0), 100) = 10%
-            render(<ThemedProgress value={0.01} max={0.1} />);
+            render(<ThemedProgress max={0.1} value={0.01} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -261,7 +263,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
         it("should handle edge case of zero max value", () => {
             // Edge case: division by zero scenario
             // Math.min(Math.max((50 / 0) * 100, 0), 100) - should handle gracefully
-            render(<ThemedProgress value={50} max={0} />);
+            render(<ThemedProgress max={0} value={50} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -275,7 +277,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
     describe("Percentage Calculation Integration", () => {
         it("should verify percentage calculation with standard inputs", () => {
             // Test standard percentage calculation: 25% progress
-            render(<ThemedProgress value={25} max={100} />);
+            render(<ThemedProgress max={100} value={25} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -285,7 +287,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
 
         it("should verify percentage calculation with custom max values", () => {
             // Test with non-100 max: 60 out of 200 = 30%
-            render(<ThemedProgress value={60} max={200} />);
+            render(<ThemedProgress max={200} value={60} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();
@@ -295,7 +297,7 @@ describe("ThemedProgress - Arithmetic Mutations", () => {
 
         it("should verify percentage calculation with decimal precision", () => {
             // Test decimal precision: 1/3 = 33.333...%
-            render(<ThemedProgress value={1} max={3} />);
+            render(<ThemedProgress max={3} value={1} />);
 
             const progressBar = screen.getByRole("progressbar");
             expect(progressBar).toBeInTheDocument();

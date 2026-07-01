@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { getStatusIcon, formatStatusWithIcon } from "../utils/status";
+import { formatStatusWithIcon, getStatusIcon } from "../utils/status";
 
 describe("Status Utils", () => {
     describe(getStatusIcon, () => {

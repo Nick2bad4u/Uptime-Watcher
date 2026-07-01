@@ -1,5 +1,5 @@
 /**
- * Tests for application services index exports. Validates that all services are
+ * Tests for app services index exports. Validates that all services are
  * properly exported.
  */
 

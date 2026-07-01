@@ -14,7 +14,7 @@
  * @file Unit tests for arrow function mutations in backend Electron code.
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 describe("Backend Arrow Function Mutation Tests", () => {
     describe("electron/preload.ts - IPC Function Definitions", () => {
@@ -230,7 +230,7 @@ describe("Backend Arrow Function Mutation Tests", () => {
             const filterCallbackMutated = (): undefined => undefined;
 
             const filteredOperations = operations.filter(() =>
-                filterCallbackMutated()
+                { filterCallbackMutated(); }
             );
 
             // Undefined is falsy, so all items are filtered out

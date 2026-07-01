@@ -108,10 +108,10 @@ export function deleteSiteWithAdapters(
         // eslint-disable-next-line ex/use-error-cause -- SiteDeletionError normalizes the provided cause internally.
         throw new SiteDeletionError("monitors", identifier, { cause: error });
     }
-    const siteDeleted = siteAdapter.delete(identifier);
+    const isSiteDeleted = siteAdapter.delete(identifier);
 
     return {
         monitorCount: monitors.length,
-        siteDeleted,
+        siteDeleted: isSiteDeleted,
     } satisfies SiteDeletionOperationResult;
 }

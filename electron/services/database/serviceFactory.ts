@@ -4,7 +4,7 @@
  * @remarks
  * Provides factory functions and adapter classes for creating database services
  * with standardized configurations. Includes logger adapters and cache factory
- * functions for consistent service instantiation across the application.
+ * functions for consistent service instantiation across the app.
  *
  * @packageDocumentation
  */

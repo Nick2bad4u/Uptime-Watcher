@@ -1,5 +1,5 @@
 import type { Site } from "@shared/types";
-import type { Tagged } from "type-fest";
+import type { ArrayElement, Tagged  } from "type-fest";
 
 /**
  * Represents a temporary optimistic lock applied to a monitor's monitoring
@@ -59,7 +59,7 @@ export const isOptimisticLockKey = (
  */
 export const buildMonitoringLockKey = (
     siteIdentifier: Site["identifier"],
-    monitorId: Site["monitors"][number]["id"]
+    monitorId: ArrayElement<Site["monitors"]>["id"]
 ): OptimisticLockKey => {
     const key = `${siteIdentifier}${LOCK_KEY_SEPARATOR}${monitorId}`;
 

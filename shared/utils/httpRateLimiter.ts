@@ -42,7 +42,7 @@ export interface HttpRateLimiterConfig {
     /**
      * Optional key derivation function.
      *
-     * @defaultValue (url) =\> new URL(url)
+     * @defaultValue (URL) =\> new URL(URL)
      */
     readonly toKey?: (url: string) => string;
 }

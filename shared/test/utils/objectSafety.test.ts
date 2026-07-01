@@ -11,9 +11,9 @@
  * @since 2024
  */
 
-import { describe, expect, it, test } from "vitest";
 import { fc } from "@fast-check/vitest";
 import * as objectSafetyModule from "@shared/utils/objectSafety";
+import { describe, expect, it, test } from "vitest";
 
 describe("shared/utils/objectSafety Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
@@ -52,10 +52,10 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
 
             // Test safeObjectIteration with null input (should not throw)
             expect(() =>
-                objectSafetyModule.safeObjectIteration(
+                { objectSafetyModule.safeObjectIteration(
                     null,
                     (k, v) => `${k}:${v}`
-                )
+                ); }
             ).not.toThrow();
 
             // Test safeObjectOmit function
@@ -221,12 +221,14 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                         // Should contain all other keys that were in original object
                         const originalKeys = Object.keys(obj);
                         for (const key of originalKeys) {
-                            if (!keysToOmit.includes(key as any)) {
-                                expect(result).toHaveProperty(key);
-                                expect((result as any)[key]).toBe(
-                                    (obj as any)[key]
-                                );
+                            if (keysToOmit.includes(key as any)) {
+                                continue;
                             }
+
+                            expect(result).toHaveProperty(key);
+                            expect((result as any)[key]).toBe(
+                                (obj as any)[key]
+                            );
                         }
                     }
                 )
@@ -241,7 +243,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                     (nullishObj, keys) => {
                         const result = objectSafetyModule.safeObjectOmit(
                             nullishObj,
-                            keys as any
+                            keys
                         );
                         expect(result).toEqual({});
                     }
@@ -398,7 +400,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                         expect(numberResult).toBe(obj.numberProp);
 
                         // Boolean validator
-                        const booleanResult =
+                        const isBooleanResult =
                             objectSafetyModule.safeObjectAccess(
                                 obj,
                                 "booleanProp",
@@ -406,8 +408,8 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
                                 (val): val is boolean =>
                                     typeof val === "boolean"
                             );
-                        expect(typeof booleanResult).toBe("boolean");
-                        expect(booleanResult).toBe(obj.booleanProp);
+                        expect(typeof isBooleanResult).toBe("boolean");
+                        expect(isBooleanResult).toBe(obj.booleanProp);
                     }
                 )
             );

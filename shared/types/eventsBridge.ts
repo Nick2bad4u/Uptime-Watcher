@@ -9,24 +9,6 @@
  */
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 
-type CacheInvalidatedPayload = RendererEventPayloadMap["cache:invalidated"];
-type HistoryLimitUpdatedPayload =
-    RendererEventPayloadMap["settings:history-limit-updated"];
-type MonitorCheckCompletedPayload =
-    RendererEventPayloadMap["monitor:check-completed"];
-type MonitorDownPayload = RendererEventPayloadMap["monitor:down"];
-type MonitoringStartedPayload = RendererEventPayloadMap["monitoring:started"];
-type MonitoringStoppedPayload = RendererEventPayloadMap["monitoring:stopped"];
-type MonitorStatusChangedPayload =
-    RendererEventPayloadMap["monitor:status-changed"];
-type MonitorUpPayload = RendererEventPayloadMap["monitor:up"];
-type SiteAddedPayload = RendererEventPayloadMap["site:added"];
-type SiteRemovedPayload = RendererEventPayloadMap["site:removed"];
-type SiteUpdatedPayload = RendererEventPayloadMap["site:updated"];
-type StateSyncEventPayload = RendererEventPayloadMap["state-sync-event"];
-type TestEventPayload = RendererEventPayloadMap["test-event"];
-type UpdateStatusPayload = RendererEventPayloadMap["update-status"];
-
 /**
  * Contract for the preload events bridge exposed to the renderer.
  *
@@ -207,3 +189,21 @@ export interface EventsDomainBridge {
      */
     readonly removeAllListeners: () => void;
 }
+type CacheInvalidatedPayload = RendererEventPayloadMap["cache:invalidated"];
+type HistoryLimitUpdatedPayload =
+    RendererEventPayloadMap["settings:history-limit-updated"];
+type MonitorCheckCompletedPayload =
+    RendererEventPayloadMap["monitor:check-completed"];
+type MonitorDownPayload = RendererEventPayloadMap["monitor:down"];
+type MonitoringStartedPayload = RendererEventPayloadMap["monitoring:started"];
+type MonitoringStoppedPayload = RendererEventPayloadMap["monitoring:stopped"];
+type MonitorStatusChangedPayload =
+    RendererEventPayloadMap["monitor:status-changed"];
+type MonitorUpPayload = RendererEventPayloadMap["monitor:up"];
+type SiteAddedPayload = RendererEventPayloadMap["site:added"];
+type SiteRemovedPayload = RendererEventPayloadMap["site:removed"];
+type SiteUpdatedPayload = RendererEventPayloadMap["site:updated"];
+type StateSyncEventPayload = RendererEventPayloadMap["state-sync-event"];
+type TestEventPayload = RendererEventPayloadMap["test-event"];
+
+type UpdateStatusPayload = RendererEventPayloadMap["update-status"];

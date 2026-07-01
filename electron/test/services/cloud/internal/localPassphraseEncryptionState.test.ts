@@ -1,14 +1,13 @@
-import { describe, expect, it } from "vitest";
-
-import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
-import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
-
 import {
     SECRET_KEY_ENCRYPTION_DERIVED_KEY,
     SETTINGS_KEY_ENCRYPTION_MODE,
     SETTINGS_KEY_ENCRYPTION_SALT,
 } from "@electron/services/cloud/internal/cloudServiceSettings";
 import { persistLocalPassphraseEncryptionState } from "@electron/services/cloud/internal/localPassphraseEncryptionState";
+import { describe, expect, it } from "vitest";
+
+import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
+import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
 
 describe(persistLocalPassphraseEncryptionState, () => {
     it("stores passphrase mode, salt, and encoded derived key", async () => {

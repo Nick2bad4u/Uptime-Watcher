@@ -14,28 +14,11 @@ import { type DropboxTokens, parseDropboxTokens } from "./DropboxTokens";
 
 const TOKEN_REFRESH_SAFETY_WINDOW_MS = 60_000;
 
-function nowEpochMs(): number {
-    return Date.now();
-}
-
-function isThenable(value: unknown): value is PromiseLike<unknown> {
-    return (
-        typeof value === "object" &&
-        value !== null &&
-        objectHasIn(castUnchecked<UnknownRecord>(value), "then") &&
-        typeof safeCastTo<{ then?: unknown }>(value).then === "function"
-    );
-}
-
 /**
  * Manages persisted Dropbox OAuth tokens including refresh.
  */
 export class DropboxTokenManager {
     private readonly appKey: string;
-
-    private readonly secretStore: SecretStore;
-
-    private readonly tokenStorageKey: string;
 
     private readonly authFactory: (tokens: DropboxTokens) => Pick<
         Except<DropboxAuth, "refreshAccessToken"> & {
@@ -61,26 +44,66 @@ export class DropboxTokenManager {
      */
     private readonly refreshSingleFlight: () => Promise<DropboxTokens>;
 
-    public async getStoredTokens(): Promise<DropboxTokens | undefined> {
-        return readStoredJsonSecret({
-            clear: () => this.clearTokens(),
-            logger,
-            logPrefix: "[DropboxTokenManager]",
-            parse: parseDropboxTokens,
-            secretStore: this.secretStore,
-            storageKey: this.tokenStorageKey,
+    private readonly secretStore: SecretStore;
+
+    private readonly tokenStorageKey: string;
+
+    public constructor(args: {
+        appKey: string;
+        authFactory?: (
+            tokens: DropboxTokens
+        ) => Pick<
+            DropboxAuth,
+            | "getAccessToken"
+            | "getAccessTokenExpiresAt"
+            | "getRefreshToken"
+            | "refreshAccessToken"
+            | "setAccessToken"
+            | "setAccessTokenExpiresAt"
+            | "setClientId"
+            | "setRefreshToken"
+        >;
+        clientFactory?: (
+            accessToken: string
+        ) => Pick<Dropbox, "authTokenRevoke">;
+        secretStore: SecretStore;
+        tokenStorageKey: string;
+    }) {
+        this.appKey = args.appKey;
+        this.secretStore = args.secretStore;
+        this.tokenStorageKey = args.tokenStorageKey;
+
+        this.authFactory =
+            args.authFactory ??
+            ((tokens): DropboxAuth =>
+                new DropboxAuth({
+                    accessToken: tokens.accessToken,
+                    accessTokenExpiresAt: new Date(tokens.expiresAtEpochMs),
+                    clientId: this.appKey,
+                    refreshToken: tokens.refreshToken,
+                }));
+
+        this.clientFactory =
+            args.clientFactory ??
+            ((accessToken): Dropbox =>
+                new Dropbox({
+                    accessToken,
+                }));
+
+        this.refreshSingleFlight = createSingleFlight(async () => {
+            const tokens = await this.getStoredTokens();
+            if (!tokens) {
+                throw new Error("Dropbox is not connected");
+            }
+
+            const refreshed = await this.refreshTokens(tokens);
+            await this.storeTokens(refreshed);
+            return refreshed;
         });
     }
 
     public async clearTokens(): Promise<void> {
         await this.secretStore.deleteSecret(this.tokenStorageKey);
-    }
-
-    public async storeTokens(tokens: DropboxTokens): Promise<void> {
-        await this.secretStore.setSecret(
-            this.tokenStorageKey,
-            JSON.stringify(tokens)
-        );
     }
 
     public async getAccessToken(): Promise<string> {
@@ -96,6 +119,17 @@ export class DropboxTokenManager {
 
         const refreshed = await this.refreshSingleFlight();
         return refreshed.accessToken;
+    }
+
+    public async getStoredTokens(): Promise<DropboxTokens | undefined> {
+        return readStoredJsonSecret({
+            clear: () => this.clearTokens(),
+            logger,
+            logPrefix: "[DropboxTokenManager]",
+            parse: parseDropboxTokens,
+            secretStore: this.secretStore,
+            storageKey: this.tokenStorageKey,
+        });
     }
 
     public async refreshTokens(tokens: DropboxTokens): Promise<DropboxTokens> {
@@ -165,57 +199,23 @@ export class DropboxTokenManager {
         }
     }
 
-    public constructor(args: {
-        appKey: string;
-        authFactory?: (
-            tokens: DropboxTokens
-        ) => Pick<
-            DropboxAuth,
-            | "getAccessToken"
-            | "getAccessTokenExpiresAt"
-            | "getRefreshToken"
-            | "refreshAccessToken"
-            | "setAccessToken"
-            | "setAccessTokenExpiresAt"
-            | "setClientId"
-            | "setRefreshToken"
-        >;
-        clientFactory?: (
-            accessToken: string
-        ) => Pick<Dropbox, "authTokenRevoke">;
-        secretStore: SecretStore;
-        tokenStorageKey: string;
-    }) {
-        this.appKey = args.appKey;
-        this.secretStore = args.secretStore;
-        this.tokenStorageKey = args.tokenStorageKey;
-
-        this.authFactory =
-            args.authFactory ??
-            ((tokens): DropboxAuth =>
-                new DropboxAuth({
-                    accessToken: tokens.accessToken,
-                    accessTokenExpiresAt: new Date(tokens.expiresAtEpochMs),
-                    clientId: this.appKey,
-                    refreshToken: tokens.refreshToken,
-                }));
-
-        this.clientFactory =
-            args.clientFactory ??
-            ((accessToken): Dropbox =>
-                new Dropbox({
-                    accessToken,
-                }));
-
-        this.refreshSingleFlight = createSingleFlight(async () => {
-            const tokens = await this.getStoredTokens();
-            if (!tokens) {
-                throw new Error("Dropbox is not connected");
-            }
-
-            const refreshed = await this.refreshTokens(tokens);
-            await this.storeTokens(refreshed);
-            return refreshed;
-        });
+    public async storeTokens(tokens: DropboxTokens): Promise<void> {
+        await this.secretStore.setSecret(
+            this.tokenStorageKey,
+            JSON.stringify(tokens)
+        );
     }
+}
+
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        objectHasIn(castUnchecked<UnknownRecord>(value), "then") &&
+        typeof safeCastTo<{ then?: unknown }>(value).then === "function"
+    );
+}
+
+function nowEpochMs(): number {
+    return Date.now();
 }

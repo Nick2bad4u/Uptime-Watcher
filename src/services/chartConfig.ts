@@ -35,7 +35,7 @@ import type { Theme } from "../theme/types";
  * Bundle of chart options returned by {@link createChartConfigs}.
  *
  * @remarks
- * Provides preconfigured Chart.js options scoped to the application's
+ * Provides preconfigured Chart.js options scoped to the app's
  * monitoring dashboard. Consumers typically spread these options when rendering
  * `<Bar />`, `<Doughnut />`, or `<Line />` components.
  *
@@ -61,20 +61,20 @@ export interface ChartConfigs {
  */
 export interface ResponseTimeChartData extends ChartData<"line"> {
     /** Dataset configuration for response time line chart */
-    datasets: Array<{
+    datasets: {
         /** Fill color for area under the line */
         backgroundColor: string;
         /** Line color */
         borderColor: string;
         /** Response time data points (null for missing data) */
-        data: Array<null | number>;
+        data: (null | number)[];
         /** Whether to fill area under the line */
         fill: boolean;
         /** Chart legend label */
         label: string;
         /** Line curve smoothness (0-1) */
         tension: number;
-    }>;
+    }[];
 }
 
 /**
@@ -89,7 +89,7 @@ export interface ResponseTimeChartData extends ChartData<"line"> {
  */
 export interface StatusBarChartData extends ChartData<"bar"> {
     /** Dataset configuration for status bar chart */
-    datasets: Array<{
+    datasets: {
         /** Fill colors for each bar */
         backgroundColor: string[];
         /** Border colors for each bar */
@@ -100,7 +100,7 @@ export interface StatusBarChartData extends ChartData<"bar"> {
         data: number[];
         /** Chart legend label */
         label: string;
-    }>;
+    }[];
     /** Status category labels for x-axis */
     labels: string[];
 }
@@ -116,7 +116,7 @@ export interface StatusBarChartData extends ChartData<"bar"> {
  */
 export interface UptimeChartData extends ChartData<"doughnut"> {
     /** Dataset configuration for uptime doughnut chart */
-    datasets: Array<{
+    datasets: {
         /** Segment colors for each status */
         backgroundColor: string[];
         /** Border colors for each segment */
@@ -125,7 +125,7 @@ export interface UptimeChartData extends ChartData<"doughnut"> {
         borderWidth: number;
         /** Uptime percentage data for each status */
         data: number[];
-    }>;
+    }[];
     /** Status labels for legend */
     labels: string[];
 }
@@ -241,7 +241,7 @@ interface BaseChartConfigCommon {
  *
  * @remarks
  * Centralizes all chart configurations to ensure consistency and
- * maintainability across the application. The service automatically applies
+ * maintainability across the app. The service automatically applies
  * theme colors, fonts, and spacing to all chart configurations.
  *
  * @public

@@ -4,16 +4,17 @@
  * @packageDocumentation
  */
 
-import { describe, expect, vi } from "vitest";
-import * as fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
+import { describe, expect, vi } from "vitest";
+
 import {
-    createCombinedAbortSignal,
     createAbortableOperation,
-    sleep,
-    retryWithAbort,
+    createCombinedAbortSignal,
     isAbortError,
     raceWithAbort,
+    retryWithAbort,
+    sleep,
 } from "../../utils/abortUtils.js";
 
 describe("AbortUtils Fuzzing Tests", () => {
@@ -34,9 +35,9 @@ describe("AbortUtils Fuzzing Tests", () => {
         ])("should create valid AbortSignal from options", async (options) => {
             // Normalize null values to undefined for exact optional properties
             const normalizedOptions: {
-                timeoutMs?: number;
-                reason?: string;
                 additionalSignals?: AbortSignal[];
+                reason?: string;
+                timeoutMs?: number;
             } = {};
 
             if (options.timeoutMs !== null && options.timeoutMs !== undefined) {
@@ -227,7 +228,7 @@ describe("AbortUtils Fuzzing Tests", () => {
 
                 // Abort after short delay
                 setTimeout(
-                    () => controller.abort(),
+                    () => { controller.abort(); },
                     Math.max(2, Math.floor(ms / 2))
                 );
 
@@ -316,7 +317,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 });
 
                 // Abort after short delay
-                setTimeout(() => controller.abort(), 10);
+                setTimeout(() => { controller.abort(); }, 10);
 
                 await expect(retryPromise).rejects.toThrow(
                     "Operation was aborted"
@@ -413,7 +414,7 @@ describe("AbortUtils Fuzzing Tests", () => {
             expect(isAbortError(error)).toBeFalsy();
         });
 
-        test.prop([fc.anything().filter((x) => !(x instanceof Error))])(
+        test.prop([fc.anything().filter((x) => !(Error.isError(x)))])(
             "should return false for non-Error values",
             (value) => {
                 expect(isAbortError(value)).toBeFalsy();
@@ -442,7 +443,7 @@ describe("AbortUtils Fuzzing Tests", () => {
             async (result, delayMs) => {
                 const controller = new AbortController();
                 const operation = new Promise<string>((resolve) => {
-                    setTimeout(() => resolve(result), delayMs);
+                    setTimeout(() => { resolve(result); }, delayMs);
                 });
 
                 const raceResult = await raceWithAbort(
@@ -460,7 +461,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 const controller = new AbortController();
                 const operation = new Promise<string>((resolve) => {
                     setTimeout(
-                        () => resolve("should not resolve"),
+                        () => { resolve("should not resolve"); },
                         delayMs + 100 // Operation takes longer than abort delay
                     );
                 });
@@ -468,7 +469,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 const racePromise = raceWithAbort(operation, controller.signal);
 
                 // Abort after delayMs
-                setTimeout(() => controller.abort(), delayMs);
+                setTimeout(() => { controller.abort(); }, delayMs);
 
                 await expect(racePromise).rejects.toThrow(
                     "Operation was aborted"
@@ -577,7 +578,7 @@ describe("AbortUtils Fuzzing Tests", () => {
                 });
 
                 // Abort during first retry - ensure it happens before operation completes
-                setTimeout(() => controller.abort(), timeoutMs);
+                setTimeout(() => { controller.abort(); }, timeoutMs);
 
                 await expect(retryPromise).rejects.toThrow(
                     "Operation was aborted"

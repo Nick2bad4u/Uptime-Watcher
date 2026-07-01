@@ -8,11 +8,13 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import { ChartConfigService } from "../../services/chartConfig";
+import { beforeEach, describe, expect, vi } from "vitest";
+
 import type { Theme } from "../../theme/types";
+
+import { ChartConfigService } from "../../services/chartConfig";
 
 describe("ChartConfigService - Property-Based Fuzzing Tests", () => {
     let chartConfig: ChartConfigService;

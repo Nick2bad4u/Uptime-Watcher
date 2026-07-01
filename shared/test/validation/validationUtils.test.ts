@@ -2,12 +2,13 @@
  * @file Tests for shared validation utilities
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
     isNonEmptyString,
-    isValidUrl,
     isValidFQDN,
     isValidIdentifier,
+    isValidUrl,
     safeInteger,
 } from "../../validation/validatorUtils";
 
@@ -37,7 +38,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isNonEmptyString("")).toBeFalsy();
-            expect(isNonEmptyString("   ")).toBeFalsy(); // Only whitespace
+            expect(isNonEmptyString(' '.repeat(3))).toBeFalsy(); // Only whitespace
             expect(isNonEmptyString(null)).toBeFalsy();
             expect(isNonEmptyString(undefined)).toBeFalsy();
             expect(isNonEmptyString(123)).toBeFalsy();
@@ -158,7 +159,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidIdentifier("")).toBeFalsy();
-            expect(isValidIdentifier("   ")).toBeFalsy();
+            expect(isValidIdentifier(' '.repeat(3))).toBeFalsy();
             expect(isValidIdentifier("test@name")).toBeFalsy();
             expect(isValidIdentifier("test.name")).toBeFalsy();
             expect(isValidIdentifier("test name")).toBeFalsy();
@@ -212,7 +213,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(safeInteger(Number.NaN, 1)).toBe(1);
+            expect(safeInteger(NaN, 1)).toBe(1);
             expect(safeInteger(Infinity, 2)).toBe(2);
             expect(safeInteger(-Infinity, 3)).toBe(3);
         });

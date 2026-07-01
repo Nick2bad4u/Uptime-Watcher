@@ -16,9 +16,9 @@ interface BaseMonitorData {
     monitoring: boolean;
     responseTime: number;
     retryAttempts: number;
-    status: "up" | "down" | "pending" | "paused";
+    status: "down" | "paused" | "pending" | "up";
     timeout: number;
-    type: "http" | "port" | "ping";
+    type: "http" | "ping" | "port";
 }
 
 interface HttpMonitorData extends BaseMonitorData {
@@ -27,14 +27,14 @@ interface HttpMonitorData extends BaseMonitorData {
 }
 
 interface PortMonitorData extends BaseMonitorData {
-    type: "port";
     host: string;
     port: number;
+    type: "port";
 }
 
 interface PingMonitorData extends BaseMonitorData {
-    type: "ping";
     host: string;
+    type: "ping";
 }
 
 interface SiteData {
@@ -42,15 +42,15 @@ interface SiteData {
     id: string;
     monitors: any[];
     name: string;
-    status: "up" | "down" | "pending" | "paused";
+    status: "down" | "paused" | "pending" | "up";
     updatedAt: Date;
 }
 
 interface StatusHistoryData {
-    responseTime: number;
-    status: "up" | "down";
-    timestamp: number;
     details?: string;
+    responseTime: number;
+    status: "down" | "up";
+    timestamp: number;
 }
 
 /**
@@ -82,7 +82,7 @@ export function createValidBaseMonitor(
         (result as any).lastChecked = new Date();
     }
 
-    return result as BaseMonitorData;
+    return result;
 }
 
 /**
@@ -103,7 +103,7 @@ export const createValidHttpMonitor = (
         ...baseMonitor,
         url: "https://example.com",
         ...overrides,
-        type: "http", // Ensure type is always http
+        type: "http", // Ensure type is always HTTP
     };
 };
 
@@ -194,5 +194,5 @@ export function createValidStatusHistory(
         (result as any).details = "Response successful";
     }
 
-    return result as StatusHistoryData;
+    return result;
 }

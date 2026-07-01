@@ -4,14 +4,17 @@
  * @remarks
  * This module provides utilities specifically designed to handle the complex
  * modal workflows and state management patterns used in the Uptime Watcher
- * Electron application. These utilities ensure reliable test execution by
+ * Electron app. These utilities ensure reliable test execution by
  * providing proper wait strategies, element selection, and error handling.
  */
 
-import type { Page, Locator } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+
 import { expect } from "@playwright/test";
+
 import type { Site } from "@/shared/types";
 import type { ConfirmDialogRequest } from "@/stores/ui/useConfirmDialogStore";
+
 import { isIsolatedUserDataPage } from "./userDataDirectoryRegistry";
 
 /**
@@ -20,10 +23,10 @@ import { isIsolatedUserDataPage } from "./userDataDirectoryRegistry";
 export const WAIT_TIMEOUTS = {
     SHORT: 2000,
     MEDIUM: 5000,
-    LONG: 20000,
-    VERY_LONG: 60000,
+    LONG: 20_000,
+    VERY_LONG: 60_000,
     MODAL_ANIMATION: 1000,
-    APP_INITIALIZATION: 30000, // Increased from 15000 to 30000 for complex database loading
+    APP_INITIALIZATION: 30_000, // Increased from 15000 to 30000 for complex database loading
 } as const;
 
 /**
@@ -114,16 +117,16 @@ export const FORM_SELECTORS = {
  * populated during automated add-site workflows.
  */
 export interface DynamicFieldInput {
-    /** Accessible label associated with the underlying form control. */
-    readonly label: string;
-    /** Value that should be applied to the control. */
-    readonly value: string;
     /**
      * Optional hint describing the control type. The helper treats fields as
      * text inputs by default and switches to select handling when this value is
      * set to "select".
      */
-    readonly inputType?: "text" | "select";
+    readonly inputType?: "select" | "text";
+    /** Accessible label associated with the underlying form control. */
+    readonly label: string;
+    /** Value that should be applied to the control. */
+    readonly value: string;
 }
 
 /**
@@ -137,8 +140,10 @@ export interface DynamicFieldInput {
  * types are exercised.
  */
 export interface CreateSiteOptions {
+    /** Optional collection of monitor-specific dynamic fields to populate. */
+    readonly dynamicFields?: readonly DynamicFieldInput[];
     /**
-     * Optional monitor type identifier supported by the application (defaults
+     * Optional monitor type identifier supported by the app (defaults
      * to HTTP).
      */
     readonly monitorType?: string;
@@ -146,8 +151,6 @@ export interface CreateSiteOptions {
     readonly name?: string;
     /** Optional site URL to associate with the new monitor. */
     readonly url?: string;
-    /** Optional collection of monitor-specific dynamic fields to populate. */
-    readonly dynamicFields?: readonly DynamicFieldInput[];
 }
 
 /**
@@ -168,7 +171,7 @@ export interface CreatedSiteResult {
  * @returns Safe pattern fragment with metacharacters escaped.
  */
 function escapeForRegex(value: string): string {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return RegExp.escape(value);
 }
 
 /**
@@ -194,11 +197,11 @@ export function getSiteCardLocator(page: Page, siteName: string): Locator {
  */
 export async function ensureCardLayout(page: Page): Promise<void> {
     const largeLayoutButton = page.getByRole("button", { name: "Large" });
-    const layoutSelectorVisible = await largeLayoutButton
+    const isLayoutSelectorVisible = await largeLayoutButton
         .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
         .catch(() => false);
 
-    if (!layoutSelectorVisible) {
+    if (!isLayoutSelectorVisible) {
         return;
     }
 
@@ -235,7 +238,7 @@ export async function waitForAppInitialization(
         .waitFor({ state: "attached", timeout })
         .catch(() => undefined);
 
-    await expect(appContainer).toBeVisible({ timeout });
+    await expect.soft(appContainer).toBeVisible({ timeout });
 
     // Wait for the core dashboard region to render either the list or empty state
     await page.waitForFunction(
@@ -264,15 +267,15 @@ export async function waitForAppInitialization(
         timeout: WAIT_TIMEOUTS.SHORT,
     });
 
-    await expect(
+    await expect.soft(
         page
             .getByRole("banner")
-            .getByRole("button", { name: /Add (new )?site/i })
+            .getByRole("button", { name: /add (new )?site/i })
     ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 }
 
 /**
- * Removes every persisted site in the application by calling the electron
+ * Removes every persisted site in the app by calling the electron
  * bridge.
  *
  * @remarks
@@ -332,7 +335,7 @@ export async function removeAllSites(page: Page): Promise<void> {
  * For the default Playwright flow—where the Electron helper provisions an
  * isolated userData directory per run—the helper avoids forcing a reload.
  * Reloading in headless Electron intermittently closes the window before the
- * renderer is ready, so the helper simply waits for the application to finish
+ * renderer is ready, so the helper simply waits for the app to finish
  * bootstrapping after clearing storage.
  *
  * @param page - The Playwright page bound to the primary renderer window.
@@ -340,7 +343,7 @@ export async function removeAllSites(page: Page): Promise<void> {
 export async function resetApplicationState(page: Page): Promise<void> {
     await page.waitForLoadState("domcontentloaded");
 
-    const usingIsolatedUserData = isIsolatedUserDataPage(page);
+    const isUsingIsolatedUserData = isIsolatedUserDataPage(page);
 
     await page.evaluate(() => {
         try {
@@ -366,7 +369,7 @@ export async function resetApplicationState(page: Page): Promise<void> {
         return;
     }
 
-    if (!usingIsolatedUserData) {
+    if (!isUsingIsolatedUserData) {
         await page.reload({ waitUntil: "domcontentloaded" });
         await removeAllSites(page);
         return;
@@ -389,8 +392,8 @@ export async function waitForDashboard(
     page: Page,
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
-    await expect(
-        page.getByRole("region", { name: /Monitoring overview/i })
+    await expect.soft(
+        page.getByRole("region", { name: /monitoring overview/iv })
     ).toBeVisible({ timeout });
 }
 
@@ -408,8 +411,8 @@ export async function openAddSiteModal(page: Page): Promise<void> {
     // Find and click the add site button
     const addSiteButton = page
         .getByRole("banner")
-        .getByRole("button", { name: /Add (new )?site/i });
-    await expect(addSiteButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+        .getByRole("button", { name: /add (new )?site/i });
+    await expect.soft(addSiteButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
     // Short debounce to allow the animated header control to settle before
     // interaction. Using a targeted timeout here has proven more robust than
     // repeated trial clicks for this specific control.
@@ -426,7 +429,7 @@ export async function openAddSiteModal(page: Page): Promise<void> {
 
     // Wait for modal overlay to appear
     const addSiteFormContainer = page.getByTestId("add-site-form");
-    await expect(addSiteFormContainer).toBeVisible({
+    await expect.soft(addSiteFormContainer).toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 
@@ -435,7 +438,7 @@ export async function openAddSiteModal(page: Page): Promise<void> {
         .filter({ has: addSiteFormContainer })
         .first();
 
-    await expect(addSiteDialog).toBeVisible({
+    await expect.soft(addSiteDialog).toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 }
@@ -471,10 +474,8 @@ export async function createSiteViaModal(
     const formData: Parameters<typeof fillAddSiteForm>[1] = {
         name: siteName,
         monitorType,
-        ...(siteUrl ? { url: siteUrl } : {}),
-        ...(options.dynamicFields
-            ? { dynamicFields: options.dynamicFields }
-            : {}),
+        ...(siteUrl && { url: siteUrl }),
+        ...(options.dynamicFields && { dynamicFields: options.dynamicFields }),
     };
 
     await fillAddSiteForm(page, formData);
@@ -501,7 +502,7 @@ export async function createSiteViaModal(
     });
 
     const siteIdentifier = await page.evaluate<
-        string | null,
+        null | string,
         { targetName: string }
     >(
         async ({ targetName }) => {
@@ -559,24 +560,19 @@ async function waitForMonitorCountSoft(
     await waitForAppInitialization(page);
 
     const deadline = Date.now() + timeout;
-    let lastCount: number | null = null;
+    let lastCount: null | number = null;
 
     while (Date.now() < deadline) {
         const electronCount = await getElectronSiteCount(page).catch(
             () => null
         );
-        if (typeof electronCount === "number") {
-            lastCount = electronCount;
-        } else {
-            lastCount = await getMonitorCountFromDom(page).catch(() => null);
-        }
+        lastCount = typeof electronCount === "number" ? electronCount : (await getMonitorCountFromDom(page).catch(() => null));
 
         if (lastCount === expectedCount) {
             return true;
         }
 
-        // Use a small polling interval without relying on explicit timeouts
-        // that trigger Playwright lint warnings.
+        // Use a small polling interval without relying on explicit timeouts that trigger Playwright lint warnings.
 
         await new Promise((resolve) => {
             setTimeout(resolve, 250);
@@ -628,7 +624,7 @@ export async function closeModal(
     }
 
     // Wait for modal to disappear
-    await expect(modalOverlay).not.toBeVisible({
+    await expect.soft(modalOverlay).not.toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 }
@@ -641,26 +637,26 @@ export async function closeModal(
  * @returns Object containing form element locators
  */
 export async function getAddSiteFormElements(page: Page): Promise<{
+    monitorTypeSelect: Locator;
     siteNameInput: Locator;
     siteUrlInput: Locator;
-    monitorTypeSelect: Locator;
     submitButton: Locator;
 }> {
     // Ensure modal is open first
     const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
+    await expect.soft(dialog).toBeVisible();
 
     // Prefer specific labels. Avoid ambiguous `.or(...)` unions here: if both
     // sides match, Playwright can act on the wrong element depending on DOM
     // order.
-    const siteNameInput = dialog.getByLabel(/Site Name/i);
+    const siteNameInput = dialog.getByLabel(/site name/i);
     const siteUrlInput = dialog
-        .getByLabel(/URL/i)
-        .or(dialog.getByRole("textbox", { name: /url/i }));
-    const monitorTypeSelect = dialog.getByLabel(/Monitor Type/i);
+        .getByLabel(/url/iv)
+        .or(dialog.getByRole("textbox", { name: /url/iv }));
+    const monitorTypeSelect = dialog.getByLabel(/monitor type/iv);
     const submitButton = dialog
         .getByTestId("add-site-submit")
-        .or(dialog.getByRole("button", { name: /Add Site|Create|Submit/i }));
+        .or(dialog.getByRole("button", { name: /add site|create|submit/i }));
 
     return {
         siteNameInput,
@@ -685,16 +681,16 @@ export async function getAddSiteFormElements(page: Page): Promise<{
 export async function fillAddSiteForm(
     page: Page,
     siteData: {
+        dynamicFields?: readonly DynamicFieldInput[];
+        monitorType?: string;
         name: string;
         url?: string;
-        monitorType?: string;
-        dynamicFields?: readonly DynamicFieldInput[];
     }
 ): Promise<void> {
     const formElements = await getAddSiteFormElements(page);
     const modalForm = page
         .getByRole("dialog")
-        .getByRole("form", { name: /Add Site Form/i });
+        .getByRole("form", { name: /add site form/i });
 
     // Fill site name
     await formElements.siteNameInput.fill(siteData.name);
@@ -702,9 +698,9 @@ export async function fillAddSiteForm(
     // Select monitor type if provided to ensure dynamic fields render before
     // additional inputs are processed.
     if (siteData.monitorType) {
-        const monitorTypeVisible =
+        const isMonitorTypeVisible =
             await formElements.monitorTypeSelect.isVisible();
-        if (monitorTypeVisible) {
+        if (isMonitorTypeVisible) {
             await formElements.monitorTypeSelect.selectOption(
                 siteData.monitorType
             );
@@ -712,10 +708,10 @@ export async function fillAddSiteForm(
     }
 
     if (siteData.url) {
-        const urlInputVisible = await formElements.siteUrlInput
+        const isUrlInputVisible = await formElements.siteUrlInput
             .isVisible()
             .catch(() => false);
-        if (urlInputVisible) {
+        if (isUrlInputVisible) {
             await formElements.siteUrlInput.fill(siteData.url);
         }
     }
@@ -732,12 +728,12 @@ export async function fillAddSiteForm(
         await fieldLocator.scrollIntoViewIfNeeded().catch(() => undefined);
 
         if (field.inputType === "select") {
-            await expect(fieldLocator).toBeEnabled({
+            await expect.soft(fieldLocator).toBeEnabled({
                 timeout: WAIT_TIMEOUTS.MEDIUM,
             });
             await fieldLocator.selectOption(field.value);
         } else {
-            await expect(fieldLocator).toBeEditable({
+            await expect.soft(fieldLocator).toBeEditable({
                 timeout: WAIT_TIMEOUTS.MEDIUM,
             });
             await fieldLocator.fill(field.value);
@@ -777,11 +773,11 @@ export async function openSiteDetails(
     await ensureCardLayout(page);
 
     const siteCard = getSiteCardLocator(page, siteName);
-    const cardVisible = await siteCard
+    const isCardVisible = await siteCard
         .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
         .catch(() => false);
 
-    if (cardVisible) {
+    if (isCardVisible) {
         try {
             await siteCard.click({
                 timeout: WAIT_TIMEOUTS.MEDIUM,
@@ -848,7 +844,7 @@ export async function waitForSiteMonitoringHydration(
                     '[data-testid^="monitor-status-"]'
                 ).length > 0;
             const activeMatch =
-                statusDisplay.textContent?.match(/(\d+)\/1 active/);
+                /(\d+)\/1 active/v.exec(statusDisplay.textContent);
 
             return Boolean(activeMatch) && hasMonitorEntries;
         },
@@ -886,13 +882,13 @@ export async function openSiteDetailsSettingsTab(
         .first();
 
     await settingsButton.scrollIntoViewIfNeeded();
-    await expect(settingsButton).toBeVisible({
+    await expect.soft(settingsButton).toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 
     await settingsButton.click({ timeout: WAIT_TIMEOUTS.LONG });
 
-    await expect(siteDetailsModal.getByTestId("settings-tab")).toBeVisible({
+    await expect.soft(siteDetailsModal.getByTestId("settings-tab")).toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 }
@@ -918,11 +914,11 @@ async function openSiteDetailsViaSidebar(
         .getByRole("button", { name: "Expand sidebar" })
         .first();
 
-    const sidebarCollapsed = await expandSidebarButton
+    const isSidebarCollapsed = await expandSidebarButton
         .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
         .catch(() => false);
 
-    if (sidebarCollapsed) {
+    if (isSidebarCollapsed) {
         await expandSidebarButton.evaluate((node) => {
             (node as HTMLButtonElement).click();
         });
@@ -971,7 +967,7 @@ export async function ensureSiteDetailsHeaderState(
         return;
     }
 
-    await expect(async () => {
+    await expect.soft(async () => {
         const toggleButton = siteDetailsModal
             .getByRole("button", { name: toggleButtonName })
             .first();
@@ -1039,8 +1035,8 @@ export async function openSettingsModal(page: Page): Promise<void> {
         .first();
 
     await settingsButton.scrollIntoViewIfNeeded().catch(() => undefined);
-    await page.evaluate(() => window.scrollTo({ left: 0, top: 0 }));
-    await expect(settingsButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    await page.evaluate(() => { window.scrollTo({ left: 0, top: 0 }); });
+    await expect.soft(settingsButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
     try {
         await settingsButton.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
@@ -1089,7 +1085,7 @@ export async function toggleTheme(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
     const themeToggle = page.getByRole("button", {
-        name: /Switch to (light|dark) theme/i,
+        name: /switch to (dark|light) theme/i,
     });
     await themeToggle.click();
 
@@ -1190,12 +1186,10 @@ export async function waitForConfirmDialogRequest(
             getText('[data-testid="confirm-dialog-cancel"]') ?? "Cancel";
         const confirmElement = dialogElement.querySelector(
             '[data-testid="confirm-dialog-confirm"]'
-        ) as HTMLElement | null;
+        );
         const confirmLabel = confirmElement?.textContent?.trim() ?? "Confirm";
         const confirmClassName = confirmElement?.className ?? "";
-        const tone: "default" | "danger" = /themed-button--error/.test(
-            confirmClassName
-        )
+        const tone: "danger" | "default" = confirmClassName.includes('themed-button--error')
             ? "danger"
             : "default";
 
@@ -1224,10 +1218,8 @@ export async function waitForConfirmDialogRequest(
             message,
             title,
             tone,
-            ...(typeof details === "string" && details.length > 0
-                ? { details }
-                : {}),
-        } as ConfirmDialogRequest;
+            ...(typeof details === "string" && details.length > 0 && { details }),
+        };
     });
 }
 
@@ -1237,7 +1229,7 @@ export async function waitForConfirmDialogRequest(
  */
 export async function resolveConfirmDialog(
     page: Page,
-    action: "confirm" | "cancel"
+    action: "cancel" | "confirm"
 ): Promise<void> {
     await page.evaluate((desiredAction) => {
         const automationTarget = globalThis as typeof globalThis & {
@@ -1334,7 +1326,7 @@ export async function closeSiteDetails(page: Page): Promise<void> {
  *
  * @returns Site count when available from the preload bridge, otherwise null.
  */
-async function getElectronSiteCount(page: Page): Promise<number | null> {
+async function getElectronSiteCount(page: Page): Promise<null | number> {
     const result = await page
         .evaluate(async () => {
             const globalTarget = globalThis as typeof globalThis & {
@@ -1372,13 +1364,13 @@ async function getElectronSiteCount(page: Page): Promise<number | null> {
  *
  * @returns Parsed monitor count from the DOM or null when inaccessible.
  */
-async function getMonitorCountFromDom(page: Page): Promise<number | null> {
-    const emptyStateVisible = await page
+async function getMonitorCountFromDom(page: Page): Promise<null | number> {
+    const isEmptyStateVisible = await page
         .getByTestId("empty-state")
         .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
         .catch(() => false);
 
-    if (emptyStateVisible) {
+    if (isEmptyStateVisible) {
         return 0;
     }
 
@@ -1391,7 +1383,7 @@ async function getMonitorCountFromDom(page: Page): Promise<number | null> {
         return null;
     }
 
-    const match = labelText.match(/Tracking\s+(\d+)/iu);
+    const match = /tracking\s+(\d+)/iv.exec(labelText);
     return match?.[1] ? Number.parseInt(match[1], 10) : null;
 }
 

@@ -3,8 +3,9 @@
  * functions f:11 and f:12 to improve coverage
  */
 
-import { describe, test, expect } from "vitest";
 import * as fc from "fast-check";
+import { describe, expect, test } from "vitest";
+
 import {
     isStandardizedCacheKey,
     parseCacheKey,
@@ -77,7 +78,7 @@ describe("cacheKeys fuzzing tests", () => {
                                     "monitor",
                                     "site",
                                     "validation",
-                                ].includes(s.split(":")[0] || "")
+                                ].includes(s.split(":", 1)[0] || "")
                         ) // Invalid patterns
                     ),
                     (invalidKey) => {
@@ -130,7 +131,7 @@ describe("cacheKeys fuzzing tests", () => {
                     validCacheKeyPart,
                     (prefix, identifier) => {
                         const key = `${prefix}:${identifier}`;
-                        const result = parseCacheKey(key as any);
+                        const result = parseCacheKey(key);
                         expect(result).toEqual({
                             prefix: prefix,
                             identifier: identifier,
@@ -155,7 +156,7 @@ describe("cacheKeys fuzzing tests", () => {
                     validCacheKeyPart,
                     (prefix, operation, identifier) => {
                         const key = `${prefix}:${operation}:${identifier}`;
-                        const result = parseCacheKey(key as any);
+                        const result = parseCacheKey(key);
                         expect(result).toEqual({
                             prefix: prefix,
                             identifier: identifier,
@@ -206,7 +207,7 @@ describe("cacheKeys fuzzing tests", () => {
                         expect(isStandardizedCacheKey(key)).toBeTruthy();
 
                         // Parse should work
-                        const parsed = parseCacheKey(key as any);
+                        const parsed = parseCacheKey(key);
                         expect(parsed.prefix).toBe(prefix);
                         expect(parsed.identifier).toBe(identifier);
                         expect(parsed.operation).toBe(operation || undefined);
@@ -225,7 +226,7 @@ describe("cacheKeys fuzzing tests", () => {
 
                     if (isValid) {
                         // If key is valid, parsing should not throw
-                        const parsed = parseCacheKey(testKey as any);
+                        const parsed = parseCacheKey(testKey);
                         expect(parsed).toHaveProperty("prefix");
                         expect(parsed).toHaveProperty("identifier");
                         expect(parsed.prefix).toBeTruthy();

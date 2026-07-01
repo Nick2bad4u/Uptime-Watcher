@@ -3,14 +3,15 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     createSiteViaModal,
     getSiteCardLocator,
@@ -19,10 +20,9 @@ import {
     removeAllSites,
     resetApplicationState,
     resolveConfirmDialog,
-    waitForConfirmDialogRequest,
     WAIT_TIMEOUTS,
+    waitForConfirmDialogRequest,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 test.describe(
     "site removal - modern ui",
@@ -76,7 +76,7 @@ test.describe(
                 const removeButton = siteDetailsModal
                     .getByRole("button", { name: "Remove Site" })
                     .first();
-                await expect(removeButton).toBeVisible({
+                await expect.soft(removeButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await expect
@@ -90,9 +90,7 @@ test.describe(
                                     return "missing-modal";
                                 }
 
-                                const buttons = Array.from(
-                                    modal.querySelectorAll("button")
-                                ) as HTMLButtonElement[];
+                                const buttons = [...modal.querySelectorAll("button")] as HTMLButtonElement[];
                                 const target = buttons.find((button) =>
                                     button.textContent
                                         ?.trim()
@@ -118,15 +116,15 @@ test.describe(
                     page,
                     WAIT_TIMEOUTS.LONG
                 );
-                expect(confirmRequest).not.toBeNull();
-                expect(confirmRequest?.title).toBe("Remove Site");
+                expect.soft(confirmRequest).not.toBeNull();
+                expect.soft(confirmRequest?.title).toBe("Remove Site");
 
                 const confirmationDialog = page.getByTestId("confirm-dialog");
 
-                await expect(confirmationDialog).toBeVisible({
+                await expect.soft(confirmationDialog).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     confirmationDialog.getByText(siteName, {
                         exact: false,
                     })
@@ -134,17 +132,17 @@ test.describe(
 
                 await resolveConfirmDialog(page, "cancel");
 
-                await expect(confirmationDialog).toBeHidden({
+                await expect.soft(confirmationDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect(
+                await expect.soft(
                     page
                         .getByRole("navigation", { name: "Monitored sites" })
                         .getByRole("button", { name: new RegExp(siteName) })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await expect(getSiteCardLocator(page, siteName)).toBeVisible({
+                await expect.soft(getSiteCardLocator(page, siteName)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
             }
@@ -180,9 +178,7 @@ test.describe(
                                     return "missing-modal";
                                 }
 
-                                const buttons = Array.from(
-                                    modal.querySelectorAll("button")
-                                ) as HTMLButtonElement[];
+                                const buttons = [...modal.querySelectorAll("button")] as HTMLButtonElement[];
                                 const target = buttons.find((button) =>
                                     button.textContent
                                         ?.trim()
@@ -208,41 +204,41 @@ test.describe(
                     page,
                     WAIT_TIMEOUTS.LONG
                 );
-                expect(confirmRequest).not.toBeNull();
-                expect(confirmRequest?.title).toBe("Remove Site");
+                expect.soft(confirmRequest).not.toBeNull();
+                expect.soft(confirmRequest?.title).toBe("Remove Site");
 
                 const confirmationDialog = page.getByTestId("confirm-dialog");
 
-                await expect(confirmationDialog).toBeVisible({
+                await expect.soft(confirmationDialog).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await resolveConfirmDialog(page, "confirm");
 
-                await expect(confirmationDialog).toBeHidden({
+                await expect.soft(confirmationDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 const siteDetailsDialog = page.getByRole("dialog", {
                     name: "Site details",
                 });
-                await expect(siteDetailsDialog).toBeHidden({
+                await expect.soft(siteDetailsDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
                 const navigation = page.getByRole("navigation", {
                     name: "Monitored sites",
                 });
-                await expect(navigation.getByRole("button")).toHaveCount(0, {
+                await expect.soft(navigation.getByRole("button")).toHaveCount(0, {
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
-                await expect(
+                await expect.soft(
                     navigation.getByText("No sites match your search.")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await expect(page.getByTestId("empty-state")).toBeVisible({
+                await expect.soft(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     page.getByText("No sites are being monitored")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
             }

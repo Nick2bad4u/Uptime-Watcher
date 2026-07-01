@@ -1,5 +1,4 @@
 import "@testing-library/jest-dom";
-
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,7 +8,7 @@ import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
-vi.mock("../../../components/AddSiteForm/Submit", () => ({
+vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
     handleSubmit: vi.fn(),
 }));
 
@@ -20,7 +19,7 @@ const monitorFieldErrorState = vi.hoisted(() => ({
 /**
  * Mock monitor field configs so the suite is deterministic (no IPC).
  */
-vi.mock("@app/hooks/useMonitorFields", () => ({
+vi.mock(import('@app/hooks/useMonitorFields'), () => ({
     useMonitorFields: vi.fn(() => ({
         error: monitorFieldErrorState.shouldError
             ? "Failed to load monitor field configurations"
@@ -41,6 +40,16 @@ vi.mock("@app/hooks/useMonitorFields", () => ({
                         },
                     ];
                 }
+                case "ping": {
+                    return [
+                        {
+                            label: "Host",
+                            name: "host",
+                            required: true,
+                            type: "text",
+                        },
+                    ];
+                }
                 case "port": {
                     return [
                         {
@@ -54,16 +63,6 @@ vi.mock("@app/hooks/useMonitorFields", () => ({
                             name: "port",
                             required: true,
                             type: "number",
-                        },
-                    ];
-                }
-                case "ping": {
-                    return [
-                        {
-                            label: "Host",
-                            name: "host",
-                            required: true,
-                            type: "text",
                         },
                     ];
                 }
@@ -154,7 +153,7 @@ describe("AddSiteForm (comprehensive)", () => {
         ).toBeVisible();
 
         // Default monitor type is expected to be HTTP in the add-site flow.
-        expect(screen.getByRole("textbox", { name: /url/i })).toBeVisible();
+        expect(screen.getByRole("textbox", { name: /url/iv })).toBeVisible();
     });
 
     it("renders an error alert when monitor fields fail to load", ({
@@ -187,7 +186,7 @@ describe("AddSiteForm (comprehensive)", () => {
         const user = userEvent.setup();
         render(<AddSiteForm />);
 
-        const monitorTypeSelect = screen.getByLabelText(/monitor type/i);
+        const monitorTypeSelect = screen.getByLabelText(/monitor type/iv);
 
         // Monitor type options are loaded asynchronously via useMonitorTypes.
         await waitFor(() => {
@@ -197,7 +196,7 @@ describe("AddSiteForm (comprehensive)", () => {
         await user.selectOptions(monitorTypeSelect, "port");
 
         expect(screen.getByRole("textbox", { name: /host/i })).toBeVisible();
-        expect(screen.getByRole("spinbutton", { name: /port/i })).toBeVisible();
+        expect(screen.getByRole("spinbutton", { name: /port/iv })).toBeVisible();
     });
 
     it("wires submit to handleSubmit", async ({ task, annotate }) => {
@@ -214,7 +213,7 @@ describe("AddSiteForm (comprehensive)", () => {
             "Test"
         );
         await user.type(
-            screen.getByRole("textbox", { name: /url/i }),
+            screen.getByRole("textbox", { name: /url/iv }),
             "https://example.com"
         );
 

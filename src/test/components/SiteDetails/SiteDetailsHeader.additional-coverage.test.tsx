@@ -4,12 +4,8 @@
  * Targets uncovered line 72 in the openExternal call
  */
 
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-
-import { SiteDetailsHeader } from "../../../components/SiteDetails/SiteDetailsHeader";
 import type { Monitor, Site } from "@shared/types";
+
 import {
     monitorIdArbitrary,
     sampleOne,
@@ -17,6 +13,12 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SiteDetailsHeader } from "../../../components/SiteDetails/SiteDetailsHeader";
 
 const sampledSiteName = sampleOne(siteNameArbitrary);
 const sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
@@ -30,11 +32,11 @@ const mockSetHeaderCollapsed = vi.fn();
 const mockStoreState = {
     openExternal: mockOpenExternal,
     setSiteDetailsHeaderCollapsed: mockSetHeaderCollapsed,
-    siteDetailsHeaderCollapsedState: {} as Record<string, boolean>,
+    siteDetailsHeaderCollapsedState: safeCastTo<Record<string, boolean>>({}),
     toggleSiteDetailsHeaderCollapsed: mockToggleHeaderCollapsed,
 };
 
-vi.mock("../../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../../stores/ui/useUiStore'), () => ({
     useUIStore: (selector?: (state: typeof mockStoreState) => unknown) =>
         typeof selector === "function"
             ? selector(mockStoreState)
@@ -42,7 +44,7 @@ vi.mock("../../../stores/ui/useUiStore", () => ({
 }));
 
 // Mock the theme hooks
-vi.mock("../../../hooks/useThemeStyles", () => ({
+vi.mock(import('../../../hooks/useThemeStyles'), () => ({
     useThemeStyles: () => ({
         headerStyle: { backgroundColor: "#ffffff" },
         overlayStyle: { opacity: 0.1 },
@@ -51,7 +53,7 @@ vi.mock("../../../hooks/useThemeStyles", () => ({
 }));
 
 // Mock the ScreenshotThumbnail component
-vi.mock("../../../components/SiteDetails/ScreenshotThumbnail", () => ({
+vi.mock(import('../../../components/SiteDetails/ScreenshotThumbnail'), () => ({
     ScreenshotThumbnail: ({
         siteName,
         url,
@@ -60,8 +62,8 @@ vi.mock("../../../components/SiteDetails/ScreenshotThumbnail", () => ({
         url: string;
     }) => (
         <div
-            data-testid="screenshot-thumbnail"
             data-site-name={siteName}
+            data-testid="screenshot-thumbnail"
             data-url={url}
         >
             Screenshot for {siteName}
@@ -70,12 +72,12 @@ vi.mock("../../../components/SiteDetails/ScreenshotThumbnail", () => ({
 }));
 
 // Mock theme components
-vi.mock("../../../theme/components", () => ({
-    StatusIndicator: ({ status, size }: { status: string; size: string }) => (
+vi.mock(import('../../../theme/components'), () => ({
+    StatusIndicator: ({ status, size }: { size: string; status: string; }) => (
         <div
-            data-testid="status-indicator"
-            data-status={status}
             data-size={size}
+            data-status={status}
+            data-testid="status-indicator"
         >
             Status: {status}
         </div>
@@ -86,14 +88,14 @@ vi.mock("../../../theme/components", () => ({
         </span>
     ),
     ThemedIconButton: ({ onClick, children, ariaLabel, ...props }: any) => (
-        <button onClick={onClick} aria-label={ariaLabel} {...props}>
+        <button aria-label={ariaLabel} onClick={onClick} {...props}>
             {children}
         </button>
     ),
 }));
 
 // Mock MonitoringStatusDisplay
-vi.mock("../../../components/SiteDetails/MonitoringStatusDisplay", () => ({
+vi.mock(import('../../../components/SiteDetails/MonitoringStatusDisplay'), () => ({
     MonitoringStatusDisplay: ({ monitors }: any) => (
         <div data-testid="monitoring-status-display">
             Monitoring {monitors.length} monitors
@@ -161,8 +163,8 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
-                    site={mockSite}
                     selectedMonitor={mockHttpMonitor}
+                    site={mockSite}
                 />
             );
 
@@ -216,8 +218,8 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
-                    site={mockSite}
                     selectedMonitor={httpMonitorNoUrl}
+                    site={mockSite}
                 />
             );
 
@@ -284,8 +286,8 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
-                    site={siteSpecial}
                     selectedMonitor={httpMonitorSpecial}
+                    site={siteSpecial}
                 />
             );
 
@@ -326,8 +328,8 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
-                    site={mockSite}
                     selectedMonitor={monitorWithWhitespace}
+                    site={mockSite}
                 />
             );
 
@@ -366,8 +368,8 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
-                    site={mockSite}
                     selectedMonitor={invalidUrlMonitor}
+                    site={mockSite}
                 />
             );
 
@@ -442,7 +444,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                 screen.queryByTestId("monitoring-status-display")
             ).not.toBeInTheDocument();
             expect(
-                screen.getByRole("button", { name: /expand header/i })
+                screen.getByRole("button", { name: /expand header/iv })
             ).toBeInTheDocument();
         });
     });
@@ -463,11 +465,11 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
+                    selectedMonitor={mockHttpMonitor}
                     site={{
                         ...mockSite,
                         monitors: [mockHttpMonitor],
                     }}
-                    selectedMonitor={mockHttpMonitor}
                 />
             );
 
@@ -491,11 +493,11 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             render(
                 <SiteDetailsHeader
                     onClose={noop}
+                    selectedMonitor={mockHttpMonitor}
                     site={{
                         ...mockSite,
                         monitors: [mockHttpMonitor],
                     }}
-                    selectedMonitor={mockHttpMonitor}
                 />
             );
 

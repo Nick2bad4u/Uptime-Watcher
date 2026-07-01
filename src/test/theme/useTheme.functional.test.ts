@@ -3,7 +3,7 @@
  * due to complex mock setup requirements.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("useTheme Hooks - Functional Tests", () => {
     it("should be implemented when theme system is stabilized", async ({

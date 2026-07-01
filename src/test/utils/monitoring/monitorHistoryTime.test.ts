@@ -19,7 +19,7 @@ describe(getLatestHistoryTimestamp, () => {
 
     it("ignores non-finite timestamp entries", () => {
         const latest = getLatestHistoryTimestamp([
-            { timestamp: Number.NaN },
+            { timestamp: NaN },
             { timestamp: Number.NEGATIVE_INFINITY },
             { timestamp: 2500 },
         ]);

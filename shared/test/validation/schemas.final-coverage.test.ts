@@ -3,7 +3,8 @@
  * specific uncovered lines: 312, 326, 430, 484
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
     validateMonitorData,
     validateMonitorField,
@@ -192,7 +193,7 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 123n,
                 function testFunction() {},
                 new Date("invalid"),
-                /regex/,
+                /regex/v,
             ];
 
             for (const testCase of testCases) {
@@ -294,20 +295,20 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 // Test with valid value
                 const validValue = (() => {
                     switch (test.field) {
-                        case "port": {
-                            return 8080;
-                        }
-                        case "timeout": {
-                            return 5000;
-                        }
                         case "checkInterval": {
                             return 30_000;
+                        }
+                        case "host": {
+                            return "example.com";
+                        }
+                        case "port": {
+                            return 8080;
                         }
                         case "retryAttempts": {
                             return 3;
                         }
-                        case "host": {
-                            return "example.com";
+                        case "timeout": {
+                            return 5000;
                         }
                         default: {
                             return "https://example.com";
@@ -333,20 +334,20 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                 // Test with invalid value
                 const invalidValue = (() => {
                     switch (test.field) {
-                        case "port": {
-                            return -1;
-                        }
-                        case "timeout": {
-                            return -1;
-                        }
                         case "checkInterval": {
+                            return -1;
+                        }
+                        case "host": {
+                            return "";
+                        }
+                        case "port": {
                             return -1;
                         }
                         case "retryAttempts": {
                             return -1;
                         }
-                        case "host": {
-                            return "";
+                        case "timeout": {
+                            return -1;
                         }
                         default: {
                             return "invalid-url";

@@ -118,7 +118,7 @@ export const SyncMaintenancePanel = ({
     const canReset =
         connected &&
         syncEnabled &&
-        !(encryptionMode === "passphrase" && encryptionLocked) &&
+        (encryptionMode !== "passphrase" || !encryptionLocked) &&
         hasPreview;
 
     const statusText = resolveSyncResetStatusText({

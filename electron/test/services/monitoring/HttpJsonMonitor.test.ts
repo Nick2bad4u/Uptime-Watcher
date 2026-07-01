@@ -2,9 +2,10 @@
  * Test suite for HttpJsonMonitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpJsonMonitor } from "../../../services/monitoring/HttpJsonMonitor";
@@ -143,7 +144,7 @@ describe(HttpJsonMonitor, () => {
             timeout: 5000,
             type: "http-json",
             url: "https://example.com/health",
-        } as Site["monitors"][0];
+        };
     });
 
     afterEach(() => {
@@ -228,7 +229,7 @@ describe(HttpJsonMonitor, () => {
     });
 
     it("returns error result when JSON configuration is invalid", async () => {
-        const invalidMonitor = { ...monitor } as Site["monitors"][0];
+        const invalidMonitor = { ...monitor };
         Reflect.deleteProperty(invalidMonitor, "jsonPath");
 
         const result = await monitorService.check(invalidMonitor);

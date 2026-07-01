@@ -1,7 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { ThemeManager } from "../theme/ThemeManager";
-import { lightTheme, darkTheme } from "../theme/themes";
+import { safeCastTo } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { Theme } from "../theme/types";
+
+import { ThemeManager } from "../theme/ThemeManager";
+import { darkTheme, lightTheme } from "../theme/themes";
 
 // Mock DOM environment
 Object.defineProperty(globalThis, "matchMedia", {
@@ -15,7 +18,7 @@ Object.defineProperty(globalThis, "matchMedia", {
                 media: query,
                 onchange: null,
                 removeEventListener: vi.fn(),
-            }) as unknown as MediaQueryList
+            })
     ),
 });
 
@@ -86,7 +89,7 @@ describe(ThemeManager, () => {
 
             themeManager.applyTheme(lightTheme);
 
-            expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
+            expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith();
             expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
                 "theme-light"
             );
@@ -100,7 +103,7 @@ describe(ThemeManager, () => {
 
             themeManager.applyTheme(darkTheme);
 
-            expect(mockDocumentElement.style.setProperty).toHaveBeenCalled();
+            expect(mockDocumentElement.style.setProperty).toHaveBeenCalledWith();
             expect(mockBodyClassList.classList.add).toHaveBeenCalledWith(
                 "theme-dark"
             );
@@ -155,7 +158,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Retrieval", "type");
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue({
+            vi.mocked(matchMedia).mockReturnValue({
                 addEventListener: vi.fn(),
                 dispatchEvent: vi.fn(),
                 matches: true,
@@ -180,7 +183,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue({
+            vi.mocked(matchMedia).mockReturnValue({
                 matches: true,
             } as any);
 
@@ -198,7 +201,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue({
+            vi.mocked(matchMedia).mockReturnValue({
                 matches: false,
             } as any);
 
@@ -216,7 +219,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalWindow = globalThis.window;
+            const originalWindow = globalThis;
             // Intentionally deleting window for testing fallback behavior
             delete (globalThis as any).window;
 
@@ -288,7 +291,7 @@ describe(ThemeManager, () => {
                 removeEventListener: vi.fn(),
             };
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue(
+            vi.mocked(matchMedia).mockReturnValue(
                 mockMediaQuery as any
             );
 
@@ -315,7 +318,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalWindow = globalThis.window;
+            const originalWindow = globalThis;
             // Intentionally deleting window for testing fallback behavior
             delete (globalThis as any).window;
 
@@ -323,7 +326,7 @@ describe(ThemeManager, () => {
             const cleanup = themeManager.onSystemThemeChange(callback);
 
             expect(typeof cleanup).toBe("function");
-            expect(() => cleanup()).not.toThrow();
+            expect(() => { cleanup(); }).not.toThrow();
 
             globalThis.window = originalWindow;
         });
@@ -386,7 +389,7 @@ describe(ThemeManager, () => {
             const manager = ThemeManager.getInstance();
 
             // Create a theme with null/undefined properties to test all edge cases
-            const themeWithNullProps = {
+            const themeWithNullProps = safeCastTo<Theme>({
                 name: "null-test",
                 isDark: false,
                 colors: null,
@@ -394,7 +397,7 @@ describe(ThemeManager, () => {
                 borderRadius: null,
                 shadows: undefined,
                 typography: null,
-            } as any as Theme;
+            } as any);
 
             // This should not throw even with null/undefined properties
             expect(() => {
@@ -418,7 +421,7 @@ describe(ThemeManager, () => {
 
             const manager = ThemeManager.getInstance();
 
-            const themeWithPartialTypography = {
+            const themeWithPartialTypography = safeCastTo<Theme>({
                 name: "partial-typography",
                 isDark: false,
                 colors: {},
@@ -429,7 +432,7 @@ describe(ThemeManager, () => {
                     fontSize: null, // Test null fontSize
                     fontFamily: undefined, // Test undefined fontFamily
                 },
-            } as any as Theme;
+            } as any);
 
             expect(() => {
                 manager.generateCSSVariables(themeWithPartialTypography);
@@ -447,7 +450,7 @@ describe(ThemeManager, () => {
 
             const manager = ThemeManager.getInstance();
 
-            const themeWithEmptyObjects = {
+            const themeWithEmptyObjects = safeCastTo<Theme>({
                 name: "empty-objects",
                 isDark: false,
                 colors: {},
@@ -455,7 +458,7 @@ describe(ThemeManager, () => {
                 borderRadius: {},
                 shadows: {},
                 typography: {},
-            } as any as Theme;
+            } as any);
 
             const result = manager.generateCSSVariables(themeWithEmptyObjects);
             expect(result).toBe(":root {\n\n}"); // Should return empty CSS block for empty objects
@@ -472,7 +475,7 @@ describe(ThemeManager, () => {
 
             const manager = ThemeManager.getInstance();
 
-            const themeWithComplexColors = {
+            const themeWithComplexColors = safeCastTo<Theme>({
                 name: "complex-colors",
                 isDark: false,
                 colors: {
@@ -486,7 +489,7 @@ describe(ThemeManager, () => {
                 borderRadius: {},
                 shadows: {},
                 typography: {},
-            } as any as Theme;
+            } as any);
 
             expect(() => {
                 manager.generateCSSVariables(themeWithComplexColors);
@@ -505,30 +508,30 @@ describe(ThemeManager, () => {
             const manager = ThemeManager.getInstance();
 
             // Test with theme that has some properties as null to trigger the private method null checks
-            const themeWithNullBorderRadius = {
+            const themeWithNullBorderRadius = safeCastTo<Theme>({
                 ...lightTheme,
                 borderRadius: null,
-            } as any as Theme;
+            } as any);
 
-            const themeWithNullSpacing = {
+            const themeWithNullSpacing = safeCastTo<Theme>({
                 ...lightTheme,
                 spacing: null,
-            } as any as Theme;
+            } as any);
 
-            const themeWithNullShadows = {
+            const themeWithNullShadows = safeCastTo<Theme>({
                 ...lightTheme,
                 shadows: null,
-            } as any as Theme;
+            } as any);
 
-            const themeWithNullColors = {
+            const themeWithNullColors = safeCastTo<Theme>({
                 ...lightTheme,
                 colors: null,
-            } as any as Theme;
+            } as any);
 
-            const themeWithNullTypography = {
+            const themeWithNullTypography = safeCastTo<Theme>({
                 ...lightTheme,
                 typography: null,
-            } as any as Theme;
+            } as any);
 
             // Test with typography that has null fontSize specifically (line 330)
             const themeWithNullFontSize = {
@@ -537,7 +540,7 @@ describe(ThemeManager, () => {
                     ...lightTheme.typography,
                     fontSize: null,
                 } as any,
-            } as any as Theme;
+            };
 
             // These should all complete without throwing, exercising the null checks
             expect(() =>
@@ -561,20 +564,20 @@ describe(ThemeManager, () => {
 
             // Also test applyTheme method which calls the apply methods directly
             expect(() =>
-                manager.applyTheme(themeWithNullBorderRadius)
+                { manager.applyTheme(themeWithNullBorderRadius); }
             ).not.toThrow();
             expect(() =>
-                manager.applyTheme(themeWithNullSpacing)
+                { manager.applyTheme(themeWithNullSpacing); }
             ).not.toThrow();
             expect(() =>
-                manager.applyTheme(themeWithNullShadows)
+                { manager.applyTheme(themeWithNullShadows); }
             ).not.toThrow();
-            expect(() => manager.applyTheme(themeWithNullColors)).not.toThrow();
+            expect(() => { manager.applyTheme(themeWithNullColors); }).not.toThrow();
             expect(() =>
-                manager.applyTheme(themeWithNullTypography)
+                { manager.applyTheme(themeWithNullTypography); }
             ).not.toThrow();
             expect(() =>
-                manager.applyTheme(themeWithNullFontSize)
+                { manager.applyTheme(themeWithNullFontSize); }
             ).not.toThrow();
         });
 
@@ -590,11 +593,11 @@ describe(ThemeManager, () => {
             const manager = ThemeManager.getInstance();
 
             // Mock document to be undefined to trigger line 302
-            const originalDocument = globalThis.document;
+            const originalDocument = document;
             delete (globalThis as any).document;
 
             // This should handle undefined document gracefully
-            expect(() => manager.applyTheme(lightTheme)).not.toThrow();
+            expect(() => { manager.applyTheme(lightTheme); }).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;

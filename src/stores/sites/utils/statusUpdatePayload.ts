@@ -59,8 +59,7 @@ export function buildMonitoringLifecycleTelemetry(args: {
     const monitorCountValue = event.monitorCount;
     const siteCountValue = event.siteCount;
     const timestampValue = event.timestamp;
-    const { activeMonitors } = event;
-    const { reason } = event;
+    const {activeMonitors, reason} = event;
 
     const monitorCount =
         isDefined(monitorCountValue) && typeof monitorCountValue === "number"
@@ -77,10 +76,10 @@ export function buildMonitoringLifecycleTelemetry(args: {
 
     return {
         phase,
-        ...(isDefined(timestamp) ? { timestamp } : {}),
-        ...(isDefined(monitorCount) ? { monitorCount } : {}),
-        ...(isDefined(siteCount) ? { siteCount } : {}),
-        ...(typeof activeMonitors === "number" ? { activeMonitors } : {}),
-        ...(typeof reason === "string" ? { reason } : {}),
+        ...(isDefined(timestamp) && { timestamp }),
+        ...(isDefined(monitorCount) && { monitorCount }),
+        ...(isDefined(siteCount) && { siteCount }),
+        ...((typeof activeMonitors === "number") && { activeMonitors }),
+        ...((typeof reason === "string") && { reason }),
     } satisfies SitesTelemetryPayload;
 }

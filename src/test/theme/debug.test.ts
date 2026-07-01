@@ -2,8 +2,9 @@
  * Debug test to investigate the availability description issue
  */
 
-import { describe, expect, it } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
 import { useAvailabilityColors } from "../../theme/useTheme";
 
 describe("Debug Availability Description", () => {

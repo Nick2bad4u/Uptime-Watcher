@@ -18,7 +18,7 @@ import { monitorStatusEnumValues } from "./statusValidationPrimitives";
  *
  * @remarks
  * Uses {@link Date.parse} for validation, mirroring the parsing strategy used
- * throughout the application when interpreting status update timestamps.
+ * throughout the app when interpreting status update timestamps.
  */
 const isoTimestampSchema: z.ZodType<string> = z
     .string()
@@ -107,8 +107,7 @@ export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
 // returning the shared `StatusUpdate` interface. With `--isolatedDeclarations`
 // and strict settings, Zod's inferred output type for complex discriminated
 // monitor/site unions can become noisy (e.g. optionalizing required fields).
-// The runtime schema is the source of truth; we cast the type for ergonomic,
-// stable typing across IPC boundaries.
+// The runtime schema is the source of truth; we cast the type for ergonomic, stable typing across IPC boundaries.
 
 export const typedStatusUpdateSchema: z.ZodType<StatusUpdate> =
     castUnchecked(statusUpdateSchema);

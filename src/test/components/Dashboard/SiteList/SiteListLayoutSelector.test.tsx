@@ -2,22 +2,25 @@
  * Unit tests for the refreshed SiteListLayoutSelector segmented control.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import type { ReactNode } from "react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+
+import "@testing-library/jest-dom";
+import type { UnknownRecord } from "type-fest";
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteListLayoutSelector } from "../../../../components/Dashboard/SiteList/SiteListLayoutSelector";
 
-vi.mock("../../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock(import('../../../../components/common/Tooltip/Tooltip'), () => ({
     Tooltip: ({
         children,
     }: {
-        children: (props: Record<string, unknown>) => ReactNode;
+        children: (props: UnknownRecord) => ReactNode;
     }) => <>{children({})}</>,
 }));
 
-vi.mock("../../../../utils/icons", () => {
+vi.mock(import('../../../../utils/icons'), () => {
     const createIcon = (name: string) => {
         const Icon = ({
             className,
@@ -74,8 +77,8 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
-                listDensity="comfortable"
                 layout="card-large"
+                listDensity="comfortable"
                 onLayoutChange={onLayoutChange}
                 onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}
@@ -96,8 +99,8 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
-                listDensity="comfortable"
                 layout="card-large"
+                listDensity="comfortable"
                 onLayoutChange={onLayoutChange}
                 onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}
@@ -116,8 +119,8 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
-                listDensity="comfortable"
                 layout="list"
+                listDensity="comfortable"
                 onLayoutChange={onLayoutChange}
                 onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}
@@ -138,8 +141,8 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
-                listDensity="comfortable"
                 layout="list"
+                listDensity="comfortable"
                 onLayoutChange={onLayoutChange}
                 onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}

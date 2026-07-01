@@ -3,9 +3,11 @@
  * Targets specific uncovered functions identified in coverage analysis
  */
 
-import { describe, it, expect, vi } from "vitest";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { objectKeys } from "ts-extras";
+import { describe, expect, it, vi } from "vitest";
 
 describe("Function Coverage Boost Tests", () => {
     describe("Uncovered validation functions", () => {
@@ -285,7 +287,7 @@ describe("Function Coverage Boost Tests", () => {
                     await import("../../shared/utils/cacheKeys");
 
                 // Test any exported functions that might exist
-                const moduleKeys = Object.keys(cacheModule);
+                const moduleKeys = objectKeys(cacheModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (cacheModule as any)[key];
                     if (typeof exportedValue === "function") {
@@ -313,18 +315,18 @@ describe("Function Coverage Boost Tests", () => {
                     await import("../../shared/utils/environment");
 
                 if (envModule.isDevelopment) {
-                    const result = envModule.isDevelopment();
-                    expect(typeof result).toBe("boolean");
+                    const isResult = envModule.isDevelopment();
+                    expect(typeof isResult).toBe("boolean");
                 }
 
                 if (envModule.isProduction) {
-                    const result = envModule.isProduction();
-                    expect(typeof result).toBe("boolean");
+                    const isResult = envModule.isProduction();
+                    expect(typeof isResult).toBe("boolean");
                 }
 
                 if (envModule.isTest) {
-                    const result = envModule.isTest();
-                    expect(typeof result).toBe("boolean");
+                    const isResult = envModule.isTest();
+                    expect(typeof isResult).toBe("boolean");
                 }
             } catch (error: unknown) {
                 console.log(
@@ -347,7 +349,7 @@ describe("Function Coverage Boost Tests", () => {
                 const objectSafetyModule =
                     await import("../../shared/utils/objectSafety");
 
-                const moduleKeys = Object.keys(objectSafetyModule);
+                const moduleKeys = objectKeys(objectSafetyModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (objectSafetyModule as any)[key];
                     if (typeof exportedValue === "function") {
@@ -388,7 +390,7 @@ describe("Function Coverage Boost Tests", () => {
                 const helpersModule =
                     await import("../../shared/utils/typeHelpers");
 
-                const moduleKeys = Object.keys(helpersModule);
+                const moduleKeys = objectKeys(helpersModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (helpersModule as any)[key];
                     if (typeof exportedValue === "function") {
@@ -413,7 +415,7 @@ describe("Function Coverage Boost Tests", () => {
                 const guardsModule =
                     await import("../../shared/utils/typeGuards");
 
-                const moduleKeys = Object.keys(guardsModule);
+                const moduleKeys = objectKeys(guardsModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (guardsModule as any)[key];
                     if (typeof exportedValue === "function") {
@@ -502,7 +504,7 @@ describe("Function Coverage Boost Tests", () => {
 
             vi.resetModules();
 
-            vi.doMock("../utils/cache", () => ({
+            vi.doMock(import('../utils/cache'), () => ({
                 AppCaches: {
                     general: createCache(),
                     monitorTypes: createCache(),
@@ -510,7 +512,7 @@ describe("Function Coverage Boost Tests", () => {
                 },
             }));
 
-            vi.doMock("@shared/utils/errorHandling", () => ({
+            vi.doMock(import('@shared/utils/errorHandling'), () => ({
                 withUtilityErrorHandling: vi.fn(
                     async <T>(
                         operation: () => Promise<T>,
@@ -526,7 +528,7 @@ describe("Function Coverage Boost Tests", () => {
                 ),
             }));
 
-            vi.doMock("../stores/monitor/useMonitorTypesStore", () => {
+            vi.doMock(import('../stores/monitor/useMonitorTypesStore'), () => {
                 const loadMonitorTypes = vi.fn().mockResolvedValue(undefined);
                 const state = {
                     clearError: vi.fn(),
@@ -552,7 +554,7 @@ describe("Function Coverage Boost Tests", () => {
                 };
             });
 
-            vi.doMock("../services/MonitorTypesService", () => ({
+            vi.doMock(import('../services/MonitorTypesService'), () => ({
                 MonitorTypesService: {
                     formatMonitorDetail: vi.fn().mockResolvedValue("detail"),
                     formatMonitorTitleSuffix: vi
@@ -585,7 +587,7 @@ describe("Function Coverage Boost Tests", () => {
                     expect(Array.isArray(analyticsTypes)).toBeTruthy();
                 }
 
-                const moduleKeys = Object.keys(monitorUiModule);
+                const moduleKeys = objectKeys(monitorUiModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (monitorUiModule as any)[key];
                     if (typeof exportedValue === "function") {
@@ -651,7 +653,7 @@ describe("Function Coverage Boost Tests", () => {
                 }
 
                 // Test other exported functions
-                const moduleKeys = Object.keys(fallbacksModule);
+                const moduleKeys = objectKeys(fallbacksModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (fallbacksModule as any)[key];
                     if (typeof exportedValue === "function") {
@@ -680,7 +682,7 @@ describe("Function Coverage Boost Tests", () => {
                     await import("../utils/monitorValidation");
 
                 // Test exported functions
-                const moduleKeys = Object.keys(monitorValidationModule);
+                const moduleKeys = objectKeys(monitorValidationModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (monitorValidationModule as any)[key];
                     if (typeof exportedValue === "function") {

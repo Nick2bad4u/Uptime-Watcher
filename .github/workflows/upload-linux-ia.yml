@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Upload Linux Distributables To Archive Org
+name: Upload Linux Distributables to Archive Org
 run-name: Upload Linux distributables to Archive.org
 
 on:

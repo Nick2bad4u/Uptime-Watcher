@@ -155,17 +155,17 @@ export const rendererNoWindowOpenRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow window.open in renderer code so external navigation stays behind the main-process boundary",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-window-open.md",
         },
-        schema: [],
         messages: {
             avoidWindowOpen:
                 "Do not use window.open in renderer code. Use SystemService.openExternal() instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

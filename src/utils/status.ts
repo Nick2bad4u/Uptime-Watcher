@@ -4,7 +4,7 @@
  * @remarks
  * Provides emoji icons and formatting for different status types. This utility
  * module centralizes status formatting logic to ensure consistent display of
- * monitor and site statuses throughout the application interface. All status
+ * monitor and site statuses throughout the app interface. All status
  * values are expected to be lowercase single-word strings.
  *
  * @public
@@ -21,13 +21,6 @@ import { arrayJoin } from "ts-extras";
 import { AppIcons } from "./icons";
 
 /**
- * Normalized representation of a status decorated with an icon glyph.
- *
- * @public
- */
-export type StatusWithIcon = `${string} ${string}`;
-
-/**
  * Strongly typed identifier derived from a status label.
  *
  * @remarks
@@ -40,6 +33,13 @@ export type StatusIdentifier<T extends string = string> = Tagged<
     CamelCase<T>,
     "status-identifier"
 >;
+
+/**
+ * Normalized representation of a status decorated with an icon glyph.
+ *
+ * @public
+ */
+export type StatusWithIcon = `${string} ${string}`;
 
 /**
  * Union of status literals used for UI presentation.
@@ -80,27 +80,42 @@ const normalizeStatus = (status: string): KnownStatus | null => {
     return null;
 };
 /**
- * Get the icon component for a given status. Provides visual indicators for
- * different monitoring states using the shared {@link AppIcons} catalog.
+ * Type-safe status identifier generator using CamelCase transformation.
  *
  * @remarks
- * Status comparison is case-insensitive. Supports standard monitoring states:
- * down, mixed, paused, pending, unknown, up. Unknown statuses return a neutral
- * icon.
+ * Uses type-fest's CamelCase utility to generate type-safe identifiers from
+ * status strings. This demonstrates the practical usage of type-fest string
+ * transformation utilities for API design and identifier generation.
  *
- * @param status - The status string to get an icon for.
+ * @example Type-safe status identifiers:
  *
- * @returns Unicode glyph representing the status or a neutral icon for unknown
- *   statuses.
+ * ```typescript
+ * const statusId = createStatusIdentifier("service down");
+ * // Result: "serviceDown" with type CamelCase<"service down">
+ *
+ * const compositeId = createStatusIdentifier("monitor status check");
+ * // Result: "monitorStatusCheck" with proper type inference
+ * ```
+ *
+ * @param statusText - Status text to convert to camelCase identifier
+ *
+ * @returns CamelCase identifier with proper type inference
  *
  * @public
  */
-export function getStatusIcon(status: string): string {
-    const knownStatus = normalizeStatus(status);
-    const glyph =
-        knownStatus === null ? undefined : STATUS_ICON_GLYPHS[knownStatus];
+export function createStatusIdentifier<T extends string>(
+    statusText: T
+): StatusIdentifier<T> {
+    // Simple camelCase conversion avoiding complex regex patterns
+    const words = statusText.toLowerCase().split(/[\s\-_]+/u);
+    const camelCased = arrayJoin(
+        words.map((word, index) =>
+            index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
+        ),
+        ""
+    );
 
-    return typeof glyph === "string" ? glyph : "⚪";
+    return castUnchecked<StatusIdentifier<T>>(camelCased);
 }
 
 /**
@@ -141,6 +156,30 @@ export function formatStatusWithIcon(status: string): StatusWithIcon {
 }
 
 /**
+ * Get the icon component for a given status. Provides visual indicators for
+ * different monitoring states using the shared {@link AppIcons} catalog.
+ *
+ * @remarks
+ * Status comparison is case-insensitive. Supports standard monitoring states:
+ * down, mixed, paused, pending, unknown, up. Unknown statuses return a neutral
+ * icon.
+ *
+ * @param status - The status string to get an icon for.
+ *
+ * @returns Unicode glyph representing the status or a neutral icon for unknown
+ *   statuses.
+ *
+ * @public
+ */
+export function getStatusIcon(status: string): string {
+    const knownStatus = normalizeStatus(status);
+    const glyph =
+        knownStatus === null ? undefined : STATUS_ICON_GLYPHS[knownStatus];
+
+    return typeof glyph === "string" ? glyph : "⚪";
+}
+
+/**
  * Resolve the React icon component corresponding to a status string.
  *
  * @param status - Status string to convert to an icon component.
@@ -155,44 +194,4 @@ export function getStatusIconComponent(status: string): IconType {
         knownStatus === null ? undefined : STATUS_ICON_COMPONENTS[knownStatus];
 
     return icon ?? AppIcons.ui.info;
-}
-
-/**
- * Type-safe status identifier generator using CamelCase transformation.
- *
- * @remarks
- * Uses type-fest's CamelCase utility to generate type-safe identifiers from
- * status strings. This demonstrates the practical usage of type-fest string
- * transformation utilities for API design and identifier generation.
- *
- * @example Type-safe status identifiers:
- *
- * ```typescript
- * const statusId = createStatusIdentifier("service down");
- * // Result: "serviceDown" with type CamelCase<"service down">
- *
- * const compositeId = createStatusIdentifier("monitor status check");
- * // Result: "monitorStatusCheck" with proper type inference
- * ```
- *
- * @param statusText - Status text to convert to camelCase identifier
- *
- * @returns CamelCase identifier with proper type inference
- *
- * @public
- */
-export function createStatusIdentifier<T extends string>(
-    statusText: T
-): StatusIdentifier<T> {
-    // Simple camelCase conversion avoiding complex regex patterns
-    // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
-    const words = statusText.toLowerCase().split(/[\s_-]+/u);
-    const camelCased = arrayJoin(
-        words.map((word, index) =>
-            index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)
-        ),
-        ""
-    );
-
-    return castUnchecked<StatusIdentifier<T>>(camelCased);
 }

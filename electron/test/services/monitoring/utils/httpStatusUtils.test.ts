@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,8 +15,8 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect } from "vitest";
 import { determineMonitorStatus } from "@shared/utils/httpStatusUtils";
+import { describe, expect, it } from "vitest";
 
 describe("HTTP Status Utils", () => {
     describe(determineMonitorStatus, () => {
@@ -136,7 +136,7 @@ describe("HTTP Status Utils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(determineMonitorStatus(200.5)).toBe("down"); // Float
-            expect(determineMonitorStatus(Number.NaN)).toBe("down");
+            expect(determineMonitorStatus(NaN)).toBe("down");
             expect(determineMonitorStatus(Infinity)).toBe("down");
             expect(determineMonitorStatus(-Infinity)).toBe("down");
         });

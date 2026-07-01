@@ -4,8 +4,8 @@
  * Provides utilities to take screenshots with consistent naming and location.
  */
 
-import type { Page } from "@playwright/test";
-import type { ElectronApplication } from "@playwright/test";
+import type { ElectronApplication, Page  } from "@playwright/test";
+
 import { test } from "@playwright/test";
 
 /**
@@ -37,15 +37,15 @@ export const SCREENSHOT_CONFIG = {
  * @param options - Optional screenshot options
  */
 export async function takeScreenshot(
-    pageOrApp: Page | Awaited<ReturnType<ElectronApplication["firstWindow"]>>,
+    pageOrApp: Awaited<ReturnType<ElectronApplication["firstWindow"]>>  ,
     name: string,
     options: Parameters<Page["screenshot"]>[0] = {}
 ): Promise<void> {
     const testInfo = test.info();
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const timestamp = new Date().toISOString().replaceAll(/[.:]/gv, "-");
 
     // Create a unique filename with test context
-    const filename = `${testInfo.project.name}-${testInfo.title.replace(/[^a-zA-Z0-9]/g, "-")}-${name}-${timestamp}.png`;
+    const filename = `${testInfo.project.name}-${testInfo.title.replaceAll(/[^0-9a-z]/gi, "-")}-${name}-${timestamp}.png`;
     const path = `${SCREENSHOT_CONFIG.baseDir}/${filename}`;
 
     await pageOrApp.screenshot({
@@ -75,7 +75,7 @@ export async function takeScreenshot(
  * @param step - Debug step description
  */
 export async function debugScreenshot(
-    pageOrApp: Page | Awaited<ReturnType<ElectronApplication["firstWindow"]>>,
+    pageOrApp: Awaited<ReturnType<ElectronApplication["firstWindow"]>>  ,
     step: string
 ): Promise<void> {
     await takeScreenshot(pageOrApp, `debug-${step}`);

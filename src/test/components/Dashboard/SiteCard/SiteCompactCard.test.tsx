@@ -1,10 +1,11 @@
+import type { Monitor, Site, StatusHistory } from "@shared/types";
+import type { ReactNode } from "react";
+
+import { STATUS_KIND } from "@shared/types";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
+import { arrayAt, arrayFirst  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { Monitor, Site, StatusHistory } from "@shared/types";
-import { STATUS_KIND } from "@shared/types";
 
 import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteCompactCard";
 import { getMonitorTypeDisplayLabel } from "../../../../utils/fallbacks";
@@ -13,11 +14,11 @@ const mockUseSite = vi.hoisted(() => vi.fn());
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
 const actionButtonCalls: { disabled: boolean; isMonitoring: boolean }[] = [];
 
-vi.mock("../../../../hooks/site/useSite", () => ({
+vi.mock(import('../../../../hooks/site/useSite'), () => ({
     useSite: mockUseSite,
 }));
 
-vi.mock("../../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({ children, onClick }: any) => (
         <div data-testid="themed-box" onClick={onClick}>
             {children}
@@ -25,26 +26,26 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
         <span>{children}</span>
     ),
 }));
 
-vi.mock("../../../../theme/components/StatusIndicator", () => ({
+vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
     StatusIndicator: ({ status }: { status: string }) => (
         <span data-testid={`status-indicator-${status}`} />
     ),
 }));
 
-vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
+vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => ({
     MarqueeText: ({ text }: { text: string }) => (
         <span data-testid="marquee-text">{text}</span>
     ),
 }));
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: ({ selectedMonitorId, onChange }: any) => {
             monitorSelectorCalls.push({ selectedMonitorId });
@@ -63,7 +64,7 @@ vi.mock(
 );
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => ({
         ActionButtonGroup: ({ disabled, isMonitoring, onCheckNow }: any) => {
             actionButtonCalls.push({ disabled, isMonitoring });
@@ -119,7 +120,7 @@ describe(SiteCompactCard, () => {
             isLoading: false,
             isMonitoring: true,
             latestSite: baseSite,
-            monitor: baseSite.monitors[0],
+            monitor: arrayFirst(baseSite.monitors),
             responseTime: 180,
             selectedMonitorId: "monitor-1",
             status: "degraded",
@@ -134,15 +135,15 @@ describe(SiteCompactCard, () => {
         render(<SiteCompactCard {...props} />);
 
         const marqueeTexts = screen.getAllByTestId("marquee-text");
-        expect(marqueeTexts[0]).toHaveTextContent("Production");
+        expect(arrayFirst(marqueeTexts)).toHaveTextContent("Production");
         expect(marqueeTexts[1]).toHaveTextContent(
             getMonitorTypeDisplayLabel(baseMonitor.type)
         );
         expect(screen.getByText("42")).toBeInTheDocument();
 
         await user.click(screen.getByTestId("themed-box"));
-        expect(siteState.handleCardClick).toHaveBeenCalled();
-        expect(monitorSelectorCalls.at(-1)).toEqual({
+        expect(siteState.handleCardClick).toHaveBeenCalledWith();
+        expect(arrayAt(monitorSelectorCalls, -1)).toEqual({
             selectedMonitorId: "monitor-1",
         });
     });
@@ -150,13 +151,13 @@ describe(SiteCompactCard, () => {
     it("passes monitoring state to action buttons and handlers", async () => {
         render(<SiteCompactCard site={baseSite} />);
 
-        expect(actionButtonCalls.at(-1)).toEqual({
+        expect(arrayAt(actionButtonCalls, -1)).toEqual({
             disabled: false,
             isMonitoring: true,
         });
 
         await user.click(screen.getByTestId("action-group"));
-        expect(siteState.handleCheckNow).toHaveBeenCalled();
+        expect(siteState.handleCheckNow).toHaveBeenCalledWith();
     });
 
     it("shows fallback monitor summary when no monitor is selected", () => {
@@ -198,7 +199,7 @@ describe(SiteCompactCard, () => {
             "1/2",
         ]);
 
-        expect(actionButtonCalls.at(-1)).toEqual({
+        expect(arrayAt(actionButtonCalls, -1)).toEqual({
             disabled: true,
             isMonitoring: true,
         });

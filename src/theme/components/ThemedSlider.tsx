@@ -2,7 +2,7 @@
  * Themed slider component with consistent styling and accessibility support.
  *
  * @remarks
- * Provides a range input that adopts the application's theme tokens for the
+ * Provides a range input that adopts the app's theme tokens for the
  * track and thumb. The component exposes the standard set of range input
  * properties alongside accessibility attributes, ensuring a11y-compliant volume
  * and intensity controls throughout the UI surface.

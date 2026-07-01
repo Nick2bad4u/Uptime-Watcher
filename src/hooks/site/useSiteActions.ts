@@ -19,22 +19,6 @@ import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 
-function runLoggedSiteOperation(args: {
-    readonly onSuccess: () => void;
-    readonly operation: () => Promise<void>;
-    readonly siteIdentifier: string;
-}): void {
-    // Fire-and-forget: actions may outlive the component that initiated them.
-    void (async (): Promise<void> => {
-        try {
-            await args.operation();
-            args.onSuccess();
-        } catch (error) {
-            logger.site.error(args.siteIdentifier, ensureError(error));
-        }
-    })();
-}
-
 /**
  * Result interface for the useSiteActions hook.
  *
@@ -329,4 +313,20 @@ export function useSiteActions(
         handleStopMonitoring,
         handleStopSiteMonitoring,
     };
+}
+
+function runLoggedSiteOperation(args: {
+    readonly onSuccess: () => void;
+    readonly operation: () => Promise<void>;
+    readonly siteIdentifier: string;
+}): void {
+    // Fire-and-forget: actions may outlive the component that initiated them.
+    void (async (): Promise<void> => {
+        try {
+            await args.operation();
+            args.onSuccess();
+        } catch (error) {
+            logger.site.error(args.siteIdentifier, ensureError(error));
+        }
+    })();
 }

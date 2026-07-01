@@ -127,7 +127,7 @@ export const StateSyncService: StateSyncServiceContract = {
      * Ensures the preload bridge is initialized prior to invoking IPC.
      *
      * @remarks
-     * Call this during application startup to ensure subsequent state-sync
+     * Call this during app startup to ensure subsequent state-sync
      * operations do not pay the initialization cost on first use.
      *
      * @returns A promise that resolves when the `stateSync` bridge is ready for
@@ -164,7 +164,7 @@ export const StateSyncService: StateSyncServiceContract = {
         "onStateSyncEvent",
         async (api, handler: (event: StateSyncEventData) => void) => {
             let pendingRecovery: null | Promise<void> = null;
-            let subscriptionActive = true;
+            let isSubscriptionActive = true;
             let pendingRecoveryExpectation: null | {
                 appliedLocally: boolean;
                 expectedRevision: number;
@@ -238,7 +238,7 @@ export const StateSyncService: StateSyncServiceContract = {
                             }
                         );
 
-                        if (!subscriptionActive) {
+                        if (!isSubscriptionActive) {
                             return;
                         }
 
@@ -421,7 +421,7 @@ export const StateSyncService: StateSyncServiceContract = {
             );
 
             return (): void => {
-                subscriptionActive = false;
+                isSubscriptionActive = false;
                 clearPendingRecoveryExpectation();
                 pendingRecovery = null;
                 normalizedCleanup();

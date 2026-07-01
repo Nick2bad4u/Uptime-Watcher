@@ -91,6 +91,23 @@ export const isIpcCorrelationEnvelope = (
 };
 
 /**
+ * Response structure returned by the diagnostics IPC handler verification.
+ *
+ * @public
+ */
+export interface IpcHandlerVerificationResult {
+    /** Ordered list of registered IPC channels exposed by the main process. */
+    availableChannels: readonly string[];
+    /** Channel name that was requested by the preload bridge. */
+    channel: string;
+    /**
+     * Indicates whether the requested channel is registered in the main
+     * process.
+     */
+    registered: boolean;
+}
+
+/**
  * Serialized database backup result returned to the renderer process.
  *
  * @remarks
@@ -152,23 +169,6 @@ export interface SerializedDatabaseRestoreResult {
 }
 
 /**
- * Response structure returned by the diagnostics IPC handler verification.
- *
- * @public
- */
-export interface IpcHandlerVerificationResult {
-    /** Ordered list of registered IPC channels exposed by the main process. */
-    availableChannels: readonly string[];
-    /** Channel name that was requested by the preload bridge. */
-    channel: string;
-    /**
-     * Indicates whether the requested channel is registered in the main
-     * process.
-     */
-    registered: boolean;
-}
-
-/**
  * Runtime type guard for {@link IpcHandlerVerificationResult}.
  *
  * @remarks
@@ -198,6 +198,16 @@ export const isIpcHandlerVerificationResult = (
 };
 
 /**
+ * Supported IPC diagnostics channels constrained by {@link IpcDiagnosticsEvent}.
+ */
+export type IpcDiagnosticsChannel = IpcDiagnosticsEvent["channel"];
+
+/**
+ * Tagged union describing all diagnostics payloads emitted over IPC.
+ */
+export type IpcDiagnosticsEvent = Simplify<ExclusifyUnion<RawDiagnosticsEvent>>;
+
+/**
  * Structured metadata logged when verifying IPC handler registration.
  */
 export interface IpcHandlerVerificationLogMetadata {
@@ -208,60 +218,11 @@ export interface IpcHandlerVerificationLogMetadata {
 }
 
 /**
- * Structured payload emitted when a preload guard rejects an incoming event.
+ * Union of all IPC channel identifiers supported by {@link IpcInvokeChannelMap}.
  *
- * @remarks
- * Enables centralized diagnostics by forwarding guard failures, along with
- * contextual metadata, to the Electron main process.
+ * @public
  */
-export type PreloadGuardDiagnosticsReport = Simplify<{
-    /** IPC channel associated with the rejected payload. */
-    channel: string;
-    /** Name of the guard function that rejected the payload. */
-    guard: string;
-    /** Additional metadata describing the guard context. */
-    metadata?: UnknownRecord;
-    /** Serialized preview of the rejected payload for debugging. */
-    payloadPreview?: string;
-    /** Optional human-readable reason supplied by the guard. */
-    reason?: string;
-    /** Timestamp (milliseconds since Unix epoch) when the guard triggered. */
-    timestamp: number;
-}>;
-
-/**
- * Log metadata emitted when a preload guard rejects an incoming payload.
- */
-export interface PreloadGuardDiagnosticsLogMetadata {
-    channel: string;
-    guard: string;
-    metadata?: UnknownRecord;
-    payloadPreview?: string;
-    reason?: string;
-    timestamp: number;
-}
-
-type RawDiagnosticsEvent =
-    | {
-          channel: "diagnostics-report-preload-guard";
-          payload: PreloadGuardDiagnosticsReport;
-          type: "preload-guard";
-      }
-    | {
-          channel: "diagnostics-verify-ipc-handler";
-          payload: IpcHandlerVerificationResult;
-          type: "handler-verification";
-      };
-
-/**
- * Tagged union describing all diagnostics payloads emitted over IPC.
- */
-export type IpcDiagnosticsEvent = Simplify<ExclusifyUnion<RawDiagnosticsEvent>>;
-
-/**
- * Supported IPC diagnostics channels constrained by {@link IpcDiagnosticsEvent}.
- */
-export type IpcDiagnosticsChannel = IpcDiagnosticsEvent["channel"];
+export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
 
 /**
  * Mapping of IPC invoke channel names to their parameter tuples and result
@@ -473,11 +434,50 @@ export interface IpcInvokeChannelMap {
 }
 
 /**
- * Union of all IPC channel identifiers supported by {@link IpcInvokeChannelMap}.
- *
- * @public
+ * Log metadata emitted when a preload guard rejects an incoming payload.
  */
-export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
+export interface PreloadGuardDiagnosticsLogMetadata {
+    channel: string;
+    guard: string;
+    metadata?: UnknownRecord;
+    payloadPreview?: string;
+    reason?: string;
+    timestamp: number;
+}
+
+/**
+ * Structured payload emitted when a preload guard rejects an incoming event.
+ *
+ * @remarks
+ * Enables centralized diagnostics by forwarding guard failures, along with
+ * contextual metadata, to the Electron main process.
+ */
+export type PreloadGuardDiagnosticsReport = Simplify<{
+    /** IPC channel associated with the rejected payload. */
+    channel: string;
+    /** Name of the guard function that rejected the payload. */
+    guard: string;
+    /** Additional metadata describing the guard context. */
+    metadata?: UnknownRecord;
+    /** Serialized preview of the rejected payload for debugging. */
+    payloadPreview?: string;
+    /** Optional human-readable reason supplied by the guard. */
+    reason?: string;
+    /** Timestamp (milliseconds since Unix epoch) when the guard triggered. */
+    timestamp: number;
+}>;
+
+type RawDiagnosticsEvent =
+    | {
+          channel: "diagnostics-report-preload-guard";
+          payload: PreloadGuardDiagnosticsReport;
+          type: "preload-guard";
+      }
+    | {
+          channel: "diagnostics-verify-ipc-handler";
+          payload: IpcHandlerVerificationResult;
+          type: "handler-verification";
+      };
 
 /**
  * Runtime parameter-count mapping for each IPC invoke channel.

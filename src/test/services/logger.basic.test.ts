@@ -3,7 +3,7 @@
  * logger functionality without complex mocking
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock electron-log/renderer with explicit mock functions
 const mockDebug = vi.fn();
@@ -13,7 +13,7 @@ const mockError = vi.fn();
 const mockVerbose = vi.fn();
 const mockSilly = vi.fn();
 
-vi.mock("electron-log/renderer", () => ({
+vi.mock(import('electron-log/renderer'), () => ({
     default: {
         debug: mockDebug,
         info: mockInfo,
@@ -691,9 +691,7 @@ describe("Logger Service - Basic Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Need to test the getLogTransport function indirectly
-            // This function is internal and called during logger initialization
-            // Let's test through configuration scenarios that might trigger it
+            // Need to test the getLogTransport function indirectly This function is internal and called during logger initialization Let's test through configuration scenarios that might trigger it
 
             // Test by dynamically importing with different transport scenarios
             vi.resetModules();
@@ -715,7 +713,7 @@ describe("Logger Service - Basic Coverage", () => {
                 },
             };
 
-            vi.doMock("electron-log/renderer", () => ({
+            vi.doMock(import('electron-log/renderer'), () => ({
                 default: mockLogWithoutFile,
             }));
 

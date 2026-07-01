@@ -8,11 +8,11 @@ const WarningIcon = AppIcons.status.warning;
 const InfoIcon = AppIcons.ui.info;
 
 const meta: Meta<typeof ThemedBadge> = {
-    component: ThemedBadge,
     args: {
         children: "Badge",
         variant: "primary",
     },
+    component: ThemedBadge,
     parameters: {
         layout: "centered",
     },
@@ -27,25 +27,25 @@ export const Primary: Story = {};
 
 export const Success: Story = {
     args: {
-        variant: "success",
-        icon: <SuccessIcon />,
         children: "Operational",
+        icon: <SuccessIcon />,
+        variant: "success",
     },
 };
 
 export const Warning: Story = {
     args: {
-        variant: "warning",
-        icon: <WarningIcon />,
         children: "Degraded",
+        icon: <WarningIcon />,
+        variant: "warning",
     },
 };
 
 export const InfoSmall: Story = {
     args: {
-        variant: "info",
-        size: "sm",
-        icon: <InfoIcon />,
         children: "Info",
+        icon: <InfoIcon />,
+        size: "sm",
+        variant: "info",
     },
 };

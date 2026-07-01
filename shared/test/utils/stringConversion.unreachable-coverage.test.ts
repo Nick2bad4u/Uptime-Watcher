@@ -3,7 +3,8 @@
  * targets the unreachable code paths for 100% coverage
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Unreachable Code Coverage", () => {

@@ -4,9 +4,10 @@
  */
 
 import { describe, expect, test } from "vitest";
+
 import {
-    validateMonitorField,
     validateMonitorData,
+    validateMonitorField,
 } from "../../validation/monitorSchemas";
 
 describe("Schemas - 100% Coverage Tests", () => {

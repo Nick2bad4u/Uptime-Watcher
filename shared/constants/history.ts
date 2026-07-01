@@ -36,9 +36,9 @@ export class HistoryLimitMaximumExceededError extends RangeError {
 
     public readonly candidate: number;
 
-    public constructor(args: { candidate: number; maxLimit: number }) {
+    public constructor(args: { candidate: number; maxLimit: number }, options: ErrorOptions) {
         super(
-            `History limit exceeds maximum of ${args.maxLimit}, received: ${args.candidate}`
+            `History limit exceeds maximum of ${args.maxLimit}, received: ${args.candidate}`, options
         );
         this.name = "HistoryLimitMaximumExceededError";
         this.candidate = args.candidate;
@@ -72,7 +72,7 @@ export const DEFAULT_HISTORY_LIMIT: number =
  *
  * @param candidate - History limit provided by a consumer.
  * @param rules - Rules to use when normalising the value. Defaults to the
- *   shared history limit rules used across the application.
+ *   shared history limit rules used across the app.
  *
  * @returns The normalised history limit ready for persistence.
  *

@@ -2,11 +2,12 @@
  * Tests for shared error handling utilities
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-    withErrorHandling,
     type ErrorHandlingBackendContext,
     type ErrorHandlingFrontendStore,
+    withErrorHandling,
 } from "../../utils/errorHandling";
 
 describe("Error Handling Utils", () => {
@@ -255,7 +256,7 @@ describe("Error Handling Utils", () => {
             originalError.stack = "original stack trace";
             const operation = vi.fn().mockRejectedValue(originalError);
 
-            let caughtError: any = undefined;
+            let caughtError: any;
             try {
                 await withErrorHandling(operation, mockBackendContext);
             } catch (error) {

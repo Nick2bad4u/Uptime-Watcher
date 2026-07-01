@@ -15,45 +15,28 @@ import type {
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 /**
- * Attachment state metadata for a realtime listener channel.
+ * Common site monitoring operations interface. Shared between different
+ * monitoring-related modules.
+ *
+ * @public
  */
-export interface ListenerAttachmentState {
-    /** Whether the listener attached successfully. */
-    readonly attached: boolean;
-    /** Unique listener identifier or scope. */
-    readonly name: string;
-}
-
-/**
- * Summary returned after attempting to subscribe to status updates.
- */
-export interface StatusUpdateSubscriptionSummary {
-    /** Collected errors encountered while attaching listeners. */
-    errors: string[];
-    /** Total number of listeners the subscription attempted to attach. */
-    expectedListeners: number;
-    /** Number of listeners successfully attached. */
-    listenersAttached: number;
-    /** Attachment diagnostics for each listener scope. */
-    listenerStates: ListenerAttachmentState[];
-    /** Human-friendly message describing the outcome. */
-    message: string;
-    /** Whether the subscription succeeded and listeners are active. */
-    subscribed: boolean;
-    /** Convenience success flag mirroring overall subscription status. */
-    success: boolean;
-}
-
-/**
- * Summary returned after unsubscribing from status updates.
- */
-export interface StatusUpdateUnsubscribeResult {
-    /** Human-readable description of the unsubscription outcome. */
-    message: string;
-    /** Whether the unsubscription request completed successfully. */
-    success: boolean;
-    /** Indicates if listeners were detached as part of the operation. */
-    unsubscribed: boolean;
+export interface BaseSiteMonitoring {
+    /** Check a site now */
+    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
+    /** Start monitoring for a site */
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    /** Start monitoring for a specific site monitor */
+    startSiteMonitorMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+    /** Stop monitoring for a site */
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    /** Stop monitoring for a specific site monitor */
+    stopSiteMonitorMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
 }
 
 /**
@@ -121,48 +104,6 @@ export interface BaseSiteOperations {
 }
 
 /**
- * Common site monitoring operations interface. Shared between different
- * monitoring-related modules.
- *
- * @public
- */
-export interface BaseSiteMonitoring {
-    /** Check a site now */
-    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
-    /** Start monitoring for a site */
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Start monitoring for a specific site monitor */
-    startSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    /** Stop monitoring for a site */
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    /** Stop monitoring for a specific site monitor */
-    stopSiteMonitorMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-}
-
-/**
- * Common site synchronization operations interface. Shared between different
- * sync-related modules.
- *
- * @public
- */
-export interface BaseSiteSync {
-    /** Full resync from backend */
-    fullResyncSites: () => Promise<void>;
-    /** Get sync status */
-    getSyncStatus: () => Promise<StateSyncStatusSummary>;
-    /** Subscribe to sync events */
-    subscribeToSyncEvents: () => () => void;
-    /** Sync sites from backend */
-    syncSites: () => Promise<void>;
-}
-
-/**
  * Common site state management interface. Shared between different state
  * modules.
  *
@@ -216,4 +157,63 @@ export interface BaseSiteSubscriptions {
     ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Unsubscribe from status updates */
     unsubscribeFromStatusUpdates: () => StatusUpdateUnsubscribeResult;
+}
+
+/**
+ * Common site synchronization operations interface. Shared between different
+ * sync-related modules.
+ *
+ * @public
+ */
+export interface BaseSiteSync {
+    /** Full resync from backend */
+    fullResyncSites: () => Promise<void>;
+    /** Get sync status */
+    getSyncStatus: () => Promise<StateSyncStatusSummary>;
+    /** Subscribe to sync events */
+    subscribeToSyncEvents: () => () => void;
+    /** Sync sites from backend */
+    syncSites: () => Promise<void>;
+}
+
+/**
+ * Attachment state metadata for a realtime listener channel.
+ */
+export interface ListenerAttachmentState {
+    /** Whether the listener attached successfully. */
+    readonly attached: boolean;
+    /** Unique listener identifier or scope. */
+    readonly name: string;
+}
+
+/**
+ * Summary returned after attempting to subscribe to status updates.
+ */
+export interface StatusUpdateSubscriptionSummary {
+    /** Collected errors encountered while attaching listeners. */
+    errors: string[];
+    /** Total number of listeners the subscription attempted to attach. */
+    expectedListeners: number;
+    /** Number of listeners successfully attached. */
+    listenersAttached: number;
+    /** Attachment diagnostics for each listener scope. */
+    listenerStates: ListenerAttachmentState[];
+    /** Human-friendly message describing the outcome. */
+    message: string;
+    /** Whether the subscription succeeded and listeners are active. */
+    subscribed: boolean;
+    /** Convenience success flag mirroring overall subscription status. */
+    success: boolean;
+}
+
+/**
+ * Summary returned after unsubscribing from status updates.
+ */
+export interface StatusUpdateUnsubscribeResult {
+    /** Human-readable description of the unsubscription outcome. */
+    message: string;
+    /** Whether the unsubscription request completed successfully. */
+    success: boolean;
+    /** Indicates if listeners were detached as part of the operation. */
+    unsubscribed: boolean;
 }

@@ -1,13 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { fc } from "@fast-check/vitest";
 import type { Database } from "node-sqlite3-wasm";
+
+import { fc } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import all functions from databaseSchema
 import {
-    createDatabaseTables,
     createDatabaseIndexes,
-    setupMonitorTypeValidation,
     createDatabaseSchema,
+    createDatabaseTables,
+    setupMonitorTypeValidation,
 } from "../../services/database/utils/schema/databaseSchema";
 
 // Mock dependencies
@@ -121,11 +122,11 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         for (let i = 0; i < executionCount; i++) {
                             if (shouldSucceed) {
                                 expect(() =>
-                                    createDatabaseTables(testDb)
+                                    { createDatabaseTables(testDb); }
                                 ).not.toThrow();
                             } else {
                                 expect(() =>
-                                    createDatabaseTables(testDb)
+                                    { createDatabaseTables(testDb); }
                                 ).toThrow();
                             }
                         }
@@ -158,11 +159,11 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         for (let i = 0; i < numberOfCalls; i++) {
                             if (shouldFail) {
                                 expect(() =>
-                                    createDatabaseIndexes(testDb)
+                                    { createDatabaseIndexes(testDb); }
                                 ).toThrow();
                             } else {
                                 expect(() =>
-                                    createDatabaseIndexes(testDb)
+                                    { createDatabaseIndexes(testDb); }
                                 ).not.toThrow();
                             }
                         }
@@ -183,7 +184,7 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                     ({ callCount, shouldLog: _shouldLog }) => {
                         for (let i = 0; i < callCount; i++) {
                             expect(() =>
-                                setupMonitorTypeValidation()
+                                { setupMonitorTypeValidation(); }
                             ).not.toThrow();
                         }
                     }
@@ -217,11 +218,11 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
 
                         if (dbOperationsSucceed) {
                             expect(() =>
-                                createDatabaseSchema(testDb)
+                                { createDatabaseSchema(testDb); }
                             ).not.toThrow();
                         } else {
                             expect(() =>
-                                createDatabaseSchema(testDb)
+                                { createDatabaseSchema(testDb); }
                             ).toThrow();
                         }
                     }
@@ -255,31 +256,33 @@ describe("DatabaseSchema Simple Fuzzing Tests", () => {
                         // These functions should not accept user input directly
                         // They use fixed SQL statements
                         expect(() =>
-                            createDatabaseTables(testDb)
+                            { createDatabaseTables(testDb); }
                         ).not.toThrow();
                         expect(() =>
-                            createDatabaseIndexes(testDb)
+                            { createDatabaseIndexes(testDb); }
                         ).not.toThrow();
                         expect(() =>
-                            setupMonitorTypeValidation()
+                            { setupMonitorTypeValidation(); }
                         ).not.toThrow();
                         expect(() =>
-                            createDatabaseSchema(testDb)
+                            { createDatabaseSchema(testDb); }
                         ).not.toThrow();
 
                         // Verify that SQL statements are fixed and not influenced by external data
                         const calls = runSpy.mock.calls.flat();
                         for (const call of calls) {
-                            if (typeof call === "string") {
-                                const normalizedCall = call
-                                    .toLowerCase()
-                                    .replaceAll(/\s+/g, " ")
-                                    .trim();
-                                // Should only contain expected database operations
-                                expect(normalizedCall).toMatch(
-                                    /^(?:create table if not exists|create index if not exists|begin transaction|commit|rollback)/
-                                );
+                            if (typeof call !== "string") {
+                                continue;
                             }
+
+                            const normalizedCall = call
+                                .toLowerCase()
+                                .replaceAll(/\s+/gv, " ")
+                                .trim();
+                            // Should only contain expected database operations
+                            expect(normalizedCall).toMatch(
+                                /^(?:begin transaction|commit|create index if not exists|create table if not exists|rollback)/v
+                            );
                         }
                     }
                 )

@@ -1,6 +1,6 @@
 import type { Jsonifiable } from "type-fest";
 /**
- * String conversion utilities for safe type conversion across the application.
+ * String conversion utilities for safe type conversion across the app.
  *
  * @remarks
  * Provides consistent and robust string conversion handling for database
@@ -20,12 +20,10 @@ const COMPLEX_OBJECT_PLACEHOLDER = "[Complex Object]" as const;
 const isJsonSerializableObject = (
     value: object
 ): value is Jsonifiable & object =>
-    !(
-        value instanceof Map ||
-        value instanceof Set ||
-        value instanceof WeakMap ||
-        value instanceof WeakSet
-    );
+    !(value instanceof Map) &&
+        !(value instanceof Set) &&
+        !(value instanceof WeakMap) &&
+        !(value instanceof WeakSet);
 
 /**
  * Safely converts any value to a string, handling all JavaScript types with

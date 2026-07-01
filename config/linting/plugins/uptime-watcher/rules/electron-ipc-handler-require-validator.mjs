@@ -71,45 +71,48 @@ export const electronIpcHandlerRequireValidatorRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                if (node.callee?.type === "Identifier") {
-                    if (node.callee.name !== "registerStandardizedIpcHandler") {
-                        // Also enforce registrar usage in handler modules.
-                        if (
-                            registrarFunctionNames.has(node.callee.name) &&
-                            (node.arguments ?? []).length < 3
-                        ) {
-                            context.report({
-                                messageId: "missingValidator",
-                                node: node.callee,
-                            });
-                        }
+                if (node.callee?.type !== "Identifier") {
+                    return;
+                }
 
-                        return;
-                    }
-
-                    if ((node.arguments ?? []).length < 3) {
+                if (node.callee.name !== "registerStandardizedIpcHandler") {
+                    // Also enforce registrar usage in handler modules.
+                    if (
+                        registrarFunctionNames.has(node.callee.name) &&
+                        (node.arguments ?? []).length < 3
+                    ) {
                         context.report({
                             messageId: "missingValidator",
                             node: node.callee,
                         });
                     }
+
+                    return;
                 }
+
+                if ((node.arguments ?? []).length < 3) {
+                    context.report({
+                        messageId: "missingValidator",
+                        node: node.callee,
+                    });
+                }
+
             },
         };
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require providing a validator argument when registering IPC handlers via registerStandardizedIpcHandler",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-ipc-handler-require-validator.md",
         },
-        schema: [],
         messages: {
             missingValidator:
                 "IPC handlers must include a request validator to validate payloads at the boundary.",
         },
+        schema: [],
+        type: "problem",
     },
 };

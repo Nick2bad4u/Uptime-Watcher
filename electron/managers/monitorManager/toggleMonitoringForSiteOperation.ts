@@ -38,9 +38,9 @@ export async function toggleMonitoringForSiteOperation(
 ): Promise<boolean> {
     const { eventEmitter, identifier, monitorId, operation, toggle } = args;
 
-    const result = await toggle();
+    const isResult = await toggle();
 
-    if (!result) {
+    if (!isResult) {
         return false;
     }
 
@@ -49,7 +49,7 @@ export async function toggleMonitoringForSiteOperation(
             identifier,
             operation: "started",
             timestamp: Date.now(),
-            ...(monitorId ? { monitorId } : {}),
+            ...(monitorId && { monitorId }),
         };
 
         await eventEmitter.emitTyped("internal:monitor:started", payload);
@@ -63,7 +63,7 @@ export async function toggleMonitoringForSiteOperation(
         operation: "stopped",
         reason,
         timestamp: Date.now(),
-        ...(monitorId ? { monitorId } : {}),
+        ...(monitorId && { monitorId }),
     };
 
     await eventEmitter.emitTyped("internal:monitor:stopped", payload);

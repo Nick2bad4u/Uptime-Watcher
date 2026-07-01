@@ -14,10 +14,10 @@ import { action } from "storybook/actions";
 
 type IndicatorVariant =
     | "connecting"
-    | "healthy"
     | "degraded"
+    | "disabled"
     | "failed"
-    | "disabled";
+    | "healthy";
 
 const isIndicatorVariant = (value: unknown): value is IndicatorVariant =>
     value === "connecting" ||
@@ -102,7 +102,7 @@ const cloneSummary = (
     summary
         ? {
               ...summary,
-              errors: Array.from(summary.errors),
+              errors: [...summary.errors],
               listenerStates: summary.listenerStates.map((listener) => ({
                   ...listener,
               })),
@@ -120,21 +120,21 @@ const variantConfig: Record<
         retry: healthySummary,
         summary: undefined,
     },
-    healthy: {
-        retry: healthySummary,
-        summary: healthySummary,
-    },
     degraded: {
         retry: healthySummary,
         summary: degradedSummary,
+    },
+    disabled: {
+        retry: disabledSummary,
+        summary: disabledSummary,
     },
     failed: {
         retry: degradedSummary,
         summary: failedSummary,
     },
-    disabled: {
-        retry: disabledSummary,
-        summary: disabledSummary,
+    healthy: {
+        retry: healthySummary,
+        summary: healthySummary,
     },
 };
 

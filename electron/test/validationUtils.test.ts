@@ -2,17 +2,17 @@
  * @file Tests for shared validation utilities
  */
 
-import { describe, it, expect } from "vitest";
 import {
     isNonEmptyString,
-    isValidUrl,
     isValidFQDN,
     isValidIdentifier,
+    isValidIdentifierArray,
     isValidInteger,
     isValidNumeric,
-    isValidIdentifierArray,
+    isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
+import { describe, expect, it } from "vitest";
 
 describe("Shared Validation Utils", () => {
     describe(isNonEmptyString, () => {
@@ -37,7 +37,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             expect(isNonEmptyString("")).toBeFalsy();
-            expect(isNonEmptyString("   ")).toBeFalsy(); // Only whitespace
+            expect(isNonEmptyString(' '.repeat(3))).toBeFalsy(); // Only whitespace
             expect(isNonEmptyString(null)).toBeFalsy();
             expect(isNonEmptyString(undefined)).toBeFalsy();
             expect(isNonEmptyString(123)).toBeFalsy();
@@ -138,7 +138,7 @@ describe("Shared Validation Utils", () => {
             await annotate("Component: Shared Validation Utils", "component");
 
             expect(isValidIdentifier("")).toBeFalsy();
-            expect(isValidIdentifier("   ")).toBeFalsy();
+            expect(isValidIdentifier(' '.repeat(3))).toBeFalsy();
             expect(isValidIdentifier("test@name")).toBeFalsy();
             expect(isValidIdentifier("test.name")).toBeFalsy();
             expect(isValidIdentifier("test name")).toBeFalsy();
@@ -180,7 +180,7 @@ describe("Shared Validation Utils", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Shared Validation Utils", "component");
 
-            expect(safeInteger(Number.NaN, 1)).toBe(1);
+            expect(safeInteger(NaN, 1)).toBe(1);
             expect(safeInteger(Infinity, 2)).toBe(2);
             expect(safeInteger(-Infinity, 3)).toBe(3);
         });

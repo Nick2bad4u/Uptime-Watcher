@@ -6,7 +6,7 @@
  * This class provides robust monitor checking capabilities with operation
  * correlation to prevent race conditions in concurrent monitoring scenarios. It
  * integrates with the operation registry and timeout management system to
- * ensure safe, coordinated monitor operations across the application.
+ * ensure safe, coordinated monitor operations across the app.
  *
  * Key features:
  *
@@ -505,7 +505,7 @@ export class EnhancedMonitorChecker {
                 this.operationCoordinator
             ),
             executeMonitorCheck: (context) => this.executeMonitorCheck(context),
-            ...(externalSignal ? { externalSignal } : {}),
+            ...(externalSignal && { externalSignal }),
             handleSuccessfulCheck: (siteArg, monitorArg, checkResult) =>
                 this.handleSuccessfulCheck(siteArg, monitorArg, checkResult),
             logger,
@@ -560,7 +560,7 @@ export class EnhancedMonitorChecker {
             runServiceCheck: (innerArgs) => this.runServiceCheck(innerArgs),
             saveHistoryEntry: (monitorArg, checkResult) =>
                 this.saveHistoryEntry(monitorArg, checkResult),
-            ...(signal ? { signal } : {}),
+            ...(signal && { signal }),
             site,
         });
     }
@@ -637,8 +637,7 @@ export class EnhancedMonitorChecker {
         });
     }
 
-    // NOTE: buildCheckResultFromServiceResult/resolveStatusUpdateDetails are
-    // extracted to ./utils/monitorCheckResultNormalization.
+    // NOTE: buildCheckResultFromServiceResult/resolveStatusUpdateDetails are extracted to ./utils/monitorCheckResultNormalization.
 
     public constructor(config: EnhancedMonitorCheckConfig) {
         this.config = config;

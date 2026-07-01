@@ -3,7 +3,7 @@
  * management.
  *
  * Uses centralized error store for consistent error handling across the
- * application.
+ * app.
  *
  * @packageDocumentation
  */
@@ -326,8 +326,8 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "deleteSite",
             async () => {
-                const removed = await deps.services.site.removeSite(identifier);
-                if (!removed) {
+                const isRemoved = await deps.services.site.removeSite(identifier);
+                if (!isRemoved) {
                     throw new Error(
                         `Site removal failed for ${identifier}: Backend returned false`
                     );
@@ -434,7 +434,7 @@ export const createSiteOperationsActions = (
             telemetry: {
                 monitorId,
                 siteIdentifier,
-                ...(isDefined(retryAttempts) ? { retryAttempts } : {}),
+                ...(isDefined(retryAttempts) && { retryAttempts }),
             },
             value: retryAttempts,
         });
@@ -453,7 +453,7 @@ export const createSiteOperationsActions = (
             telemetry: {
                 monitorId,
                 siteIdentifier,
-                ...(isDefined(timeout) ? { timeout } : {}),
+                ...(isDefined(timeout) && { timeout }),
             },
             value: timeout,
         });

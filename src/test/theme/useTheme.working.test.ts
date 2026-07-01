@@ -8,9 +8,9 @@ import "@testing-library/jest-dom";
 
 // Import the hooks directly
 import {
-    useTheme,
     useAvailabilityColors,
     useStatusColors,
+    useTheme,
     useThemeClasses,
     useThemeValue,
 } from "../../theme/useTheme";
@@ -272,7 +272,7 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getAvailabilityColor(110)).toBe(
                 "string"
             );
-            expect(typeof result.current.getAvailabilityColor(Number.NaN)).toBe(
+            expect(typeof result.current.getAvailabilityColor(NaN)).toBe(
                 "string"
             );
         });

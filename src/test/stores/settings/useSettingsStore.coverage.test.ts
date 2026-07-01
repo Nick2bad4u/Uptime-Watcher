@@ -7,7 +7,7 @@ describe("useSettingsStore (module coverage)", () => {
     });
 
     it("should load and expose a zustand store", async () => {
-        vi.doMock("../../../services/SettingsService", () => ({
+        vi.doMock(import('../../../services/SettingsService'), () => ({
             SettingsService: {
                 getHistoryLimit: vi.fn(async () => 50),
                 setHistoryLimit: vi.fn(async () => ({

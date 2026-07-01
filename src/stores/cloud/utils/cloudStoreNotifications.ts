@@ -38,8 +38,8 @@ export function enqueueCloudToast(args: {
 }): string {
     // Store actions are allowed to use Zustand stores directly.
     const toast = useAlertStore.getState().enqueueToast({
-        ...(isDefined(args.message) ? { message: args.message } : {}),
-        ...(isDefined(args.ttlMs) ? { ttlMs: args.ttlMs } : {}),
+        ...(isDefined(args.message) && { message: args.message }),
+        ...(isDefined(args.ttlMs) && { ttlMs: args.ttlMs }),
         title: args.title,
         variant: args.variant,
     });
@@ -76,7 +76,7 @@ export async function dispatchSystemNotificationIfEnabled(request: {
 
     try {
         await AppNotificationService.notifyAppEvent({
-            ...(isDefined(request.body) ? { body: request.body } : {}),
+            ...(isDefined(request.body) && { body: request.body }),
             title: request.title,
         });
     } catch (error: unknown) {

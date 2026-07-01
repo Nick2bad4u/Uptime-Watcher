@@ -8,13 +8,18 @@
  * "/tmp/backup.db", sizeBytes: 8, }, }),
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
     Site,
 } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+import type { ArrayElement } from "type-fest";
+
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -33,7 +38,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -56,16 +61,16 @@ const mockMonitoringService = vi.hoisted(() => ({
     stopMonitoringForSite: vi.fn(),
 }));
 
-vi.mock("../../../services/SiteService", () => ({
+vi.mock(import('../../../services/SiteService'), () => ({
     SiteService: mockSiteService,
 }));
 
-vi.mock("../../../services/MonitoringService", () => ({
+vi.mock(import('../../../services/MonitoringService'), () => ({
     MonitoringService: mockMonitoringService,
 }));
 
 // Mock services first - these need to be hoisted above imports
-vi.mock("../../../services/DataService", () => ({
+vi.mock(import('../../../services/DataService'), () => ({
     DataService: {
         isConnected: vi.fn().mockReturnValue(true),
         downloadSqliteBackup: vi
@@ -77,7 +82,7 @@ vi.mock("../../../services/DataService", () => ({
     },
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -86,9 +91,9 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../shared/utils/errorHandling", () => ({
+vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
     withErrorHandling: vi.fn(async (operation, context) => {
         try {
@@ -100,13 +105,11 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     }),
 }));
 
-vi.mock("../../../../shared/utils", () => ({
+vi.mock(import('../../../../shared/utils'), () => ({
     // Add any shared utils that might be imported
     validateInput: vi.fn().mockReturnValue({ isValid: true }),
     formatError: vi.fn((error) => error.message),
 }));
-
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the electron API
 const createStartSummary = (
@@ -227,7 +230,7 @@ const mockElectronAPI = {
 };
 
 // Mock the global electronAPI
-Object.defineProperty(global, "window", {
+Object.defineProperty(globalThis, "window", {
     value: {
         electronAPI: mockElectronAPI,
     },
@@ -236,8 +239,8 @@ Object.defineProperty(global, "window", {
 
 const createValidMonitor = (
     id: string,
-    overrides: Partial<Site["monitors"][number]> = {}
-): Site["monitors"][number] => ({
+    overrides: Partial<ArrayElement<Site["monitors"]>> = {}
+): ArrayElement<Site["monitors"]> => ({
     checkInterval: 60_000,
     history: [],
     id,
@@ -453,7 +456,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             // Read fresh state after mutation to avoid stale snapshot
             const sites = useSitesStore.getState().sites;
             expect(sites).toHaveLength(1);
-            expect(sites[0]).toEqual(testSite);
+            expect(arrayFirst(sites)).toEqual(testSite);
         });
     });
 
@@ -548,7 +551,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             const syncStatus = await store.getSyncStatus();
             expect(syncStatus).toEqual(mockSyncStatus);
-            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
+            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalledWith();
 
             await store.syncSites();
             await store.fullResyncSites();
@@ -626,7 +629,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             store.setSites([site1]);
             const updatedStore3 = useSitesStore.getState();
             expect(updatedStore3.sites).toHaveLength(1);
-            expect(updatedStore3.sites[0]).toEqual(site1);
+            expect(arrayFirst(updatedStore3.sites)).toEqual(site1);
 
             // Test removing site
             store.removeSite("site-1");

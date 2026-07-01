@@ -8,15 +8,14 @@
  * The previous validation utilities have been deleted.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { validateMonitorType } from "@shared/utils/validation";
 import {
     getMonitorValidationErrors,
     validateMonitorData,
 } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { validateMonitorType } from "@shared/utils/validation";
+import { describe, expect, it } from "vitest";
 
 describe("Canonical validation coverage", () => {
     it("validateMonitorType behaves as a strict type guard", () => {

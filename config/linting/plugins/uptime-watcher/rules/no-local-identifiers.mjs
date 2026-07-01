@@ -97,12 +97,15 @@ export const noLocalIdentifiersRule = {
     },
 
     meta: {
-        type: "problem",
+        defaultOptions: [{ banned: [] }],
         docs: {
             description:
                 "disallow defining local helper identifiers that should be imported from shared utilities",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-local-identifiers.md",
+        },
+        messages: {
+            banned: "Local definition of '{{name}}' is not allowed. {{details}}",
         },
         schema: [
             {
@@ -146,9 +149,6 @@ export const noLocalIdentifiersRule = {
                 },
             },
         ],
-        defaultOptions: [{ banned: [] }],
-        messages: {
-            banned: "Local definition of '{{name}}' is not allowed. {{details}}",
-        },
+        type: "problem",
     },
 };

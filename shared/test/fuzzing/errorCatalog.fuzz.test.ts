@@ -6,23 +6,24 @@
  * @since 2024
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+
 import {
-    ERROR_CATALOG,
-    SITE_ERRORS,
-    MONITOR_ERRORS,
-    VALIDATION_ERRORS,
-    SYSTEM_ERRORS,
-    NETWORK_ERRORS,
     DATABASE_ERRORS,
-    IPC_ERRORS,
+    ERROR_CATALOG,
     formatErrorMessage,
+    IPC_ERRORS,
     isKnownErrorMessage,
+    MONITOR_ERRORS,
+    NETWORK_ERRORS,
+    SITE_ERRORS,
+    SYSTEM_ERRORS,
+    VALIDATION_ERRORS,
 } from "../../utils/errorCatalog";
 
-const SAFE_PLACEHOLDER_KEY_REGEX = /^[A-Za-z0-9_-]+$/u;
+const SAFE_PLACEHOLDER_KEY_REGEX = /^[\w-]+$/u;
 const RESERVED_PLACEHOLDER_KEYS = new Set([
     "__proto__",
     "constructor",
@@ -74,7 +75,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
 
                 for (const key of keys) {
                     // Keys should be uppercase with underscores
-                    expect(key).toMatch(/^[A-Z_]+$/);
+                    expect(key).toMatch(/^[A-Z_]+$/v);
                     expect(key.length).toBeGreaterThan(0);
                 }
             }
@@ -166,7 +167,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             "should handle multiple parameter replacements",
             (template, paramPairs) => {
                 let templateWithPlaceholders = template;
-                const params: Record<string, string | number> = {};
+                const params: Record<string, number | string> = {};
 
                 for (const [key, value] of paramPairs) {
                     templateWithPlaceholders += ` {${key}}`;
@@ -272,17 +273,17 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
         test.prop([fc.string()])(
             "should return boolean for any string input",
             (message) => {
-                const result = isKnownErrorMessage(message);
-                expect(typeof result).toBe("boolean");
+                const isResult = isKnownErrorMessage(message);
+                expect(typeof isResult).toBe("boolean");
             }
         );
 
         test("should return true for all catalog error messages", () => {
             // Test all error messages from all categories
-            for (const [_categoryName, category] of Object.entries(
+            for (const category of Object.values(
                 ERROR_CATALOG
             )) {
-                for (const [_errorKey, errorValue] of Object.entries(
+                for (const errorValue of Object.values(
                     category
                 )) {
                     if (typeof errorValue === "string") {
@@ -352,8 +353,8 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             (input) => {
                 expect(() => isKnownErrorMessage(input)).not.toThrow();
 
-                const result = isKnownErrorMessage(input);
-                expect(typeof result).toBe("boolean");
+                const isResult = isKnownErrorMessage(input);
+                expect(typeof isResult).toBe("boolean");
             }
         );
     });
@@ -385,9 +386,9 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
             for (const category of Object.values(ERROR_CATALOG)) {
                 for (const message of Object.values(category)) {
                     // Messages should start with capital letter
-                    expect((message as string)[0]).toMatch(/[A-Z]/);
+                    expect((message as string)[0]).toMatch(/[A-Z]/v);
                     // Messages should be well-formed sentences (can end with periods)
-                    expect(message as string).toMatch(/^[A-Z].*[\d.A-Za-z]$/);
+                    expect(message as string).toMatch(/^[A-Z].*[\d.A-Za-z]$/v);
                 }
             }
         });

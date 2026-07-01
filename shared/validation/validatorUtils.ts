@@ -161,7 +161,7 @@ export function isValidIdentifier(value: unknown): value is string {
 
     // Allow alphanumeric characters, hyphens, and underscores
 
-    const cleanedValue = value.replaceAll(/[_-]/gu, "");
+    const cleanedValue = value.replaceAll(/[-_]/gu, "");
 
     // Must have at least one alphanumeric character remaining
 
@@ -391,11 +391,7 @@ const hasDisallowedUrlCharacters = (
         return true;
     }
 
-    if (!allowBackticks && value.includes("`")) {
-        return true;
-    }
-
-    return false;
+    return (!allowBackticks && value.includes("`"));
 };
 
 /**

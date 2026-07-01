@@ -70,185 +70,6 @@ export interface MonitorHelpTexts {
 }
 
 /**
- * Retrieves monitor type configuration with automatic caching.
- *
- * @remarks
- * Checks the cache before performing a backend lookup and stores successful
- * results back into the cache for subsequent lookups.
- *
- * @param monitorType - The monitor type to get configuration for.
- * @param signal - Optional `AbortSignal` for cancellation.
- *
- * @returns Promise resolving to the monitor type configuration or `undefined`
- *   when not found.
- *
- * @internal
- */
-async function getConfig(
-    monitorType: MonitorType,
-    signal?: AbortSignal
-): Promise<MonitorTypeConfig | undefined> {
-    if (signal?.aborted) {
-        return undefined;
-    }
-
-    const buildMonitorConfigCacheKey = (monitorTypeName: MonitorType): string =>
-        CacheKeys.config.byName(`monitor-config-${monitorTypeName}`);
-
-    const cacheKey = buildMonitorConfigCacheKey(monitorType);
-
-    // Try to get from cache first
-    const cached = AppCaches.uiHelpers.get(cacheKey);
-    if (cached && isMonitorTypeConfig(cached)) {
-        return cached;
-    }
-
-    // Check abort signal again before backend call
-    if (signal?.aborted) {
-        return undefined;
-    }
-
-    // Get from backend and cache
-    const config = await getMonitorTypeConfig(monitorType);
-    if (config) {
-        AppCaches.uiHelpers.set(cacheKey, config);
-    }
-
-    return config;
-}
-
-/**
- * Executes a monitor UI helper operation with standardized error handling.
- *
- * @typeParam T - Result type returned by the operation.
- *
- * @param description - Context string used for logging and error messaging.
- * @param fallback - Value returned when the operation fails.
- * @param operation - Callback encapsulating the operation logic.
- *
- * @returns Result of the operation or the fallback value on failure.
- */
-async function runMonitorUiOperation<T>(
-    description: string,
-    fallback: T,
-    operation: () => Promise<T>
-): Promise<T> {
-    return withUtilityErrorHandling(operation, description, fallback);
-}
-
-/**
- * Reads a derived value from a monitor type configuration with shared guards.
- *
- * @typeParam T - Result type returned by the selector.
- *
- * @param monitorType - Monitor type whose configuration is required.
- * @param description - Context string used for logging and error messaging.
- * @param fallback - Value returned when extraction fails.
- * @param selector - Selector applied to the configuration object.
- * @param signal - Optional abort signal for cancellation.
- *
- * @returns Result produced by the selector or the fallback value on failure.
- */
-async function readMonitorUiConfigValue<T>(
-    monitorType: MonitorType,
-    description: string,
-    fallback: T,
-    selector: (config: MonitorTypeConfig | undefined) => Promisable<T>,
-    signal?: AbortSignal
-): Promise<T> {
-    // If the caller already cancelled, return the fallback immediately.
-    // This avoids logging aborted work as an error.
-    if (signal?.aborted) {
-        return fallback;
-    }
-
-    return runMonitorUiOperation(description, fallback, async () => {
-        try {
-            const config = await getConfig(monitorType, signal);
-            return await selector(config);
-        } catch (error: unknown) {
-            if (signal?.aborted === true || isAbortError(error)) {
-                return fallback;
-            }
-
-            throw error;
-        }
-    });
-}
-
-/**
- * Clears the configuration cache.
- *
- * @remarks
- * Removes all cached monitor type configurations. Useful for tests or when
- * monitor types change and require cache invalidation.
- *
- * @public
- */
-export function clearConfigCache(): void {
-    AppCaches.uiHelpers.clear();
-}
-
-/**
- * Get the default monitor ID from a list of monitor IDs.
- *
- * @remarks
- * Returns the first element of the array if it exists; otherwise, an empty
- * string.
- *
- * @param monitorIds - Array of monitor IDs.
- *
- * @returns First monitor identifier in the list or an empty string when the
- *   collection is empty.
- *
- * @public
- */
-export function getDefaultMonitorId(monitorIds: readonly string[]): string {
-    return arrayFirst(monitorIds) ?? "";
-}
-
-/**
- * Check if monitor type supports advanced analytics.
- *
- * @param monitorType - Type of monitor.
- *
- * @returns `true` when the monitor supports advanced analytics; otherwise
- *   `false`.
- *
- * @public
- */
-export async function supportsAdvancedAnalytics(
-    monitorType: MonitorType
-): Promise<boolean> {
-    return readMonitorUiConfigValue(
-        monitorType,
-        `Check advanced analytics support for ${monitorType}`,
-        false,
-        (config) => config?.uiConfig?.supportsAdvancedAnalytics ?? false
-    );
-}
-
-/**
- * Check if monitor type supports response time analytics.
- *
- * @param monitorType - Type of monitor.
- *
- * @returns `true` when the monitor provides response time analytics.
- *
- * @public
- */
-export async function supportsResponseTime(
-    monitorType: MonitorType
-): Promise<boolean> {
-    return readMonitorUiConfigValue(
-        monitorType,
-        `Check response time support for ${monitorType}`,
-        false,
-        (config) => config?.uiConfig?.supportsResponseTime ?? false
-    );
-}
-
-/**
  * Check if all monitor types in array support advanced analytics.
  *
  * @param monitorTypes - Array of monitor types to check.
@@ -296,6 +117,19 @@ export async function allSupportsResponseTime(
         "Check response time support for multiple types",
         false
     );
+}
+
+/**
+ * Clears the configuration cache.
+ *
+ * @remarks
+ * Removes all cached monitor type configurations. Useful for tests or when
+ * monitor types change and require cache invalidation.
+ *
+ * @public
+ */
+export function clearConfigCache(): void {
+    AppCaches.uiHelpers.clear();
 }
 
 /**
@@ -388,6 +222,24 @@ export async function getAnalyticsLabel(
 }
 
 /**
+ * Get the default monitor ID from a list of monitor IDs.
+ *
+ * @remarks
+ * Returns the first element of the array if it exists; otherwise, an empty
+ * string.
+ *
+ * @param monitorIds - Array of monitor IDs.
+ *
+ * @returns First monitor identifier in the list or an empty string when the
+ *   collection is empty.
+ *
+ * @public
+ */
+export function getDefaultMonitorId(monitorIds: readonly string[]): string {
+    return arrayFirst(monitorIds) ?? "";
+}
+
+/**
  * Get help text for monitor type form fields.
  *
  * @param monitorType - Type of monitor.
@@ -464,4 +316,152 @@ export async function shouldShowUrl(
         false,
         (config) => config?.uiConfig?.display?.showUrl ?? false
     );
+}
+
+/**
+ * Check if monitor type supports advanced analytics.
+ *
+ * @param monitorType - Type of monitor.
+ *
+ * @returns `true` when the monitor supports advanced analytics; otherwise
+ *   `false`.
+ *
+ * @public
+ */
+export async function supportsAdvancedAnalytics(
+    monitorType: MonitorType
+): Promise<boolean> {
+    return readMonitorUiConfigValue(
+        monitorType,
+        `Check advanced analytics support for ${monitorType}`,
+        false,
+        (config) => config?.uiConfig?.supportsAdvancedAnalytics ?? false
+    );
+}
+
+/**
+ * Check if monitor type supports response time analytics.
+ *
+ * @param monitorType - Type of monitor.
+ *
+ * @returns `true` when the monitor provides response time analytics.
+ *
+ * @public
+ */
+export async function supportsResponseTime(
+    monitorType: MonitorType
+): Promise<boolean> {
+    return readMonitorUiConfigValue(
+        monitorType,
+        `Check response time support for ${monitorType}`,
+        false,
+        (config) => config?.uiConfig?.supportsResponseTime ?? false
+    );
+}
+
+/**
+ * Retrieves monitor type configuration with automatic caching.
+ *
+ * @remarks
+ * Checks the cache before performing a backend lookup and stores successful
+ * results back into the cache for subsequent lookups.
+ *
+ * @param monitorType - The monitor type to get configuration for.
+ * @param signal - Optional `AbortSignal` for cancellation.
+ *
+ * @returns Promise resolving to the monitor type configuration or `undefined`
+ *   when not found.
+ *
+ * @internal
+ */
+async function getConfig(
+    monitorType: MonitorType,
+    signal?: AbortSignal
+): Promise<MonitorTypeConfig | undefined> {
+    if (signal?.aborted) {
+        return undefined;
+    }
+
+    const buildMonitorConfigCacheKey = (monitorTypeName: MonitorType): string =>
+        CacheKeys.config.byName(`monitor-config-${monitorTypeName}`);
+
+    const cacheKey = buildMonitorConfigCacheKey(monitorType);
+
+    // Try to get from cache first
+    const cached = AppCaches.uiHelpers.get(cacheKey);
+    if (cached && isMonitorTypeConfig(cached)) {
+        return cached;
+    }
+
+    // Check abort signal again before backend call
+    if (signal?.aborted) {
+        return undefined;
+    }
+
+    // Get from backend and cache
+    const config = await getMonitorTypeConfig(monitorType);
+    if (config) {
+        AppCaches.uiHelpers.set(cacheKey, config);
+    }
+
+    return config;
+}
+
+/**
+ * Reads a derived value from a monitor type configuration with shared guards.
+ *
+ * @typeParam T - Result type returned by the selector.
+ *
+ * @param monitorType - Monitor type whose configuration is required.
+ * @param description - Context string used for logging and error messaging.
+ * @param fallback - Value returned when extraction fails.
+ * @param selector - Selector applied to the configuration object.
+ * @param signal - Optional abort signal for cancellation.
+ *
+ * @returns Result produced by the selector or the fallback value on failure.
+ */
+async function readMonitorUiConfigValue<T>(
+    monitorType: MonitorType,
+    description: string,
+    fallback: T,
+    selector: (config: MonitorTypeConfig | undefined) => Promisable<T>,
+    signal?: AbortSignal
+): Promise<T> {
+    // If the caller already cancelled, return the fallback immediately.
+    // This avoids logging aborted work as an error.
+    if (signal?.aborted) {
+        return fallback;
+    }
+
+    return runMonitorUiOperation(description, fallback, async () => {
+        try {
+            const config = await getConfig(monitorType, signal);
+            return await selector(config);
+        } catch (error: unknown) {
+            if (signal?.aborted === true || isAbortError(error)) {
+                return fallback;
+            }
+
+            throw error;
+        }
+    });
+}
+
+/**
+ * Executes a monitor UI helper operation with standardized error handling.
+ *
+ * @typeParam T - Result type returned by the operation.
+ *
+ * @param description - Context string used for logging and error messaging.
+ * @param fallback - Value returned when the operation fails.
+ * @param operation - Callback encapsulating the operation logic.
+ *
+ * @returns Result of the operation or the fallback value on failure.
+ */
+async function runMonitorUiOperation<T>(
+    description: string,
+    fallback: T,
+    operation: () => Promise<T>
+): Promise<T> {
+    return withUtilityErrorHandling(operation, description, fallback);
 }

@@ -4,7 +4,8 @@
  * @file ServiceContainer Core Services Tests
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ServiceContainer } from "../../services/ServiceContainer.js";
 
 // Mock the TypedEventBus module with factory function

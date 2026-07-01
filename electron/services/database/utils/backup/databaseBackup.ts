@@ -11,7 +11,7 @@ import { BACKUP_DB_FILE_NAME } from "../../../../constants";
 import { logger } from "../../../../utils/logger";
 import { DATABASE_SCHEMA_VERSION } from "../schema/databaseSchema";
 
-export const DEFAULT_BACKUP_RETENTION_HINT_DAYS: number = 30;
+export const DEFAULT_BACKUP_RETENTION_HINT_DAYS = 30;
 
 /**
  * Metadata describing a serialized SQLite backup artifact.
@@ -100,7 +100,7 @@ export function computeDatabaseBackupChecksum(buffer: Buffer): string {
  *
  * @remarks
  * Used when validating/annotating externally-provided backup payloads, where
- * the schema version may differ from the currently running application.
+ * the schema version may differ from the currently running app.
  */
 export function readDatabaseSchemaVersionFromFile(filePath: string): number {
     const database = new sqlite3.Database(filePath, {
@@ -138,12 +138,14 @@ function extractPragmaMessages(
     const messages: string[] = [];
 
     for (const row of rows) {
-        if (row && typeof row === "object") {
-            const value: unknown = Reflect.get(row, column);
+        if (!row || typeof row !== "object") {
+            continue;
+        }
 
-            if (typeof value === "string" && value.length > 0) {
-                messages.push(value);
-            }
+        const value: unknown = Reflect.get(row, column);
+
+        if (typeof value === "string" && value.length > 0) {
+            messages.push(value);
         }
     }
 

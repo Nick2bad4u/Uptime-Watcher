@@ -1,9 +1,9 @@
 /**
- * Centralized constants for the Uptime Watcher application.
+ * Centralized constants for the Uptime Watcher app.
  *
  * @remarks
  * Contains configuration values, UI constants, fallback data, and type
- * definitions used throughout the frontend application. This module serves as
+ * definitions used throughout the frontend app. This module serves as
  * the single source of truth for application-wide constants to ensure
  * consistency and maintainability.
  *
@@ -26,6 +26,7 @@
  */
 
 import type { MonitorTypeOption as SharedMonitorTypeOption } from "@shared/types/monitorTypes";
+import type { ArrayValues } from "type-fest";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 
@@ -33,7 +34,7 @@ import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
  * CSS transition timing for consistent animations.
  *
  * @remarks
- * Provides consistent transition timing across the application for smooth user
+ * Provides consistent transition timing across the app for smooth user
  * interface animations. This value ensures all UI transitions feel cohesive and
  * respond at the same speed.
  *
@@ -67,16 +68,16 @@ export const TRANSITION_ALL = "all 0.2s ease-in-out";
 export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly SharedMonitorTypeOption[] =
     [
         {
+            label: "CDN Edge Consistency",
+            value: "cdn-edge-consistency",
+        },
+        {
+            label: "DNS (Domain Lookup)",
+            value: "dns",
+        },
+        {
             label: "HTTP (Website/API)",
             value: "http",
-        },
-        {
-            label: "HTTP Keyword Match",
-            value: "http-keyword",
-        },
-        {
-            label: "HTTP Status Code",
-            value: "http-status",
         },
         {
             label: "HTTP Header Value",
@@ -87,20 +88,32 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly SharedMonitorTypeOption[] =
             value: "http-json",
         },
         {
+            label: "HTTP Keyword Match",
+            value: "http-keyword",
+        },
+        {
             label: "HTTP Latency",
             value: "http-latency",
         },
         {
-            label: "Port (Host/Port)",
-            value: "port",
+            label: "HTTP Status Code",
+            value: "http-status",
         },
         {
             label: "Ping (Host)",
             value: "ping",
         },
         {
-            label: "DNS (Domain Lookup)",
-            value: "dns",
+            label: "Port (Host/Port)",
+            value: "port",
+        },
+        {
+            label: "Replication Lag",
+            value: "replication",
+        },
+        {
+            label: "Server Heartbeat",
+            value: "server-heartbeat",
         },
         {
             label: "SSL Certificate",
@@ -109,18 +122,6 @@ export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly SharedMonitorTypeOption[] =
         {
             label: "WebSocket Keepalive",
             value: "websocket-keepalive",
-        },
-        {
-            label: "Server Heartbeat",
-            value: "server-heartbeat",
-        },
-        {
-            label: "Replication Lag",
-            value: "replication",
-        },
-        {
-            label: "CDN Edge Consistency",
-            value: "cdn-edge-consistency",
         },
     ] as const;
 
@@ -440,8 +441,8 @@ export const CHART_TIME_PERIODS: ChartTimePeriods = {
  */
 export const CHART_TIME_RANGES = [
     "1h",
-    "24h",
     "7d",
+    "24h",
     "30d",
 ] as const;
 
@@ -451,7 +452,7 @@ export const CHART_TIME_RANGES = [
  * @remarks
  * Provides type safety for chart time range selection components.
  */
-export type ChartTimeRange = (typeof CHART_TIME_RANGES)[number];
+export type ChartTimeRange = ArrayValues<typeof CHART_TIME_RANGES>;
 
 /**
  * Common ARIA attribute constants for accessibility.

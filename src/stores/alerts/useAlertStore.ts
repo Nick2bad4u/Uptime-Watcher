@@ -40,7 +40,7 @@ const nextFallbackAlertCounter = (() => {
 const generateAlertId = (): string => {
     const cryptoObject = safeCastTo<
         (Crypto & { randomUUID?: () => string }) | undefined
-    >(globalThis.crypto);
+    >(crypto);
     if (cryptoObject?.randomUUID) {
         return cryptoObject.randomUUID();
     }

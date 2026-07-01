@@ -30,13 +30,13 @@ const meta: Meta<typeof SiteDetailsHeader> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
-
 interface SiteDetailsHeaderScenario {
     readonly httpMonitor: Monitor;
     readonly pingMonitor: Monitor;
     readonly site: Site;
 }
+
+type Story = StoryObj<typeof meta>;
 
 /**
  * Builds a canonical story scenario with representative monitors.

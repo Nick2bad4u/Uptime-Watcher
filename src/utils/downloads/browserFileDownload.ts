@@ -10,6 +10,12 @@
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
+/** Optional warning logger used by download helpers. */
+export interface BrowserDownloadWarnLogger {
+    /** Logs a non-fatal warning raised during download triggering. */
+    warn: (message: string, error: Error) => void;
+}
+
 /**
  * Thrown when the download anchor cannot be attached to the DOM.
  */
@@ -18,37 +24,6 @@ export class FileDownloadDomAttachmentError extends Error {
         super(message, options);
         this.name = "FileDownloadDomAttachmentError";
     }
-}
-
-/** Optional warning logger used by download helpers. */
-export interface BrowserDownloadWarnLogger {
-    /** Logs a non-fatal warning raised during download triggering. */
-    warn: (message: string, error: Error) => void;
-}
-
-/**
- * Creates an object URL for the provided blob and guarantees cleanup.
- */
-export function withObjectUrl(
-    blob: Blob,
-    run: (objectURL: string) => void
-): void {
-    const objectURL = URL.createObjectURL(blob);
-    try {
-        run(objectURL);
-    } finally {
-        URL.revokeObjectURL(objectURL);
-    }
-}
-
-function createDownloadAnchor(
-    objectURL: string,
-    fileName: string
-): HTMLAnchorElement {
-    const anchor = document.createElement("a");
-    anchor.href = objectURL;
-    anchor.download = fileName;
-    return anchor;
 }
 
 /**
@@ -83,7 +58,7 @@ export function clickDownloadAnchor(args: {
         anchor.click();
     } catch (domError) {
         const error =
-            domError instanceof Error
+            Error.isError(domError)
                 ? domError
                 : new Error(getUserFacingErrorDetail(domError));
         warnLogger?.warn("DOM click failed, retrying direct click", error);
@@ -96,6 +71,22 @@ export function clickDownloadAnchor(args: {
             // Ignore cleanup errors.
         }
     }
+}
+
+/**
+ * Creates and triggers a file download from an {@link ArrayBuffer}.
+ */
+export function triggerArrayBufferDownload(args: {
+    attachToDom: boolean;
+    buffer: ArrayBuffer;
+    fileName: string;
+    mimeType: string;
+    warnLogger?: BrowserDownloadWarnLogger | undefined;
+}): void {
+    const { attachToDom, buffer, fileName, mimeType, warnLogger } = args;
+    const blob = new Blob([buffer], { type: mimeType });
+
+    triggerBlobDownload({ attachToDom, blob, fileName, warnLogger });
 }
 
 /**
@@ -116,17 +107,26 @@ export function triggerBlobDownload(args: {
 }
 
 /**
- * Creates and triggers a file download from an {@link ArrayBuffer}.
+ * Creates an object URL for the provided blob and guarantees cleanup.
  */
-export function triggerArrayBufferDownload(args: {
-    attachToDom: boolean;
-    buffer: ArrayBuffer;
-    fileName: string;
-    mimeType: string;
-    warnLogger?: BrowserDownloadWarnLogger | undefined;
-}): void {
-    const { attachToDom, buffer, fileName, mimeType, warnLogger } = args;
-    const blob = new Blob([buffer], { type: mimeType });
+export function withObjectUrl(
+    blob: Blob,
+    run: (objectURL: string) => void
+): void {
+    const objectURL = URL.createObjectURL(blob);
+    try {
+        run(objectURL);
+    } finally {
+        URL.revokeObjectURL(objectURL);
+    }
+}
 
-    triggerBlobDownload({ attachToDom, blob, fileName, warnLogger });
+function createDownloadAnchor(
+    objectURL: string,
+    fileName: string
+): HTMLAnchorElement {
+    const anchor = document.createElement("a");
+    anchor.href = objectURL;
+    anchor.download = fileName;
+    return anchor;
 }

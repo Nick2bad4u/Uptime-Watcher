@@ -2,17 +2,16 @@
  * Comprehensive coverage for shared error handling utilities.
  */
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-
 import {
     ApplicationError,
     convertError,
     ensureError,
-    withErrorHandling,
-    withUtilityErrorHandling,
     type ErrorHandlingBackendContext,
     type ErrorHandlingFrontendStore,
+    withErrorHandling,
+    withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 afterEach(() => {
     vi.restoreAllMocks();
@@ -79,7 +78,7 @@ describe(convertError, () => {
     });
 
     it("provides informative messages for whitespace strings", () => {
-        const result = convertError("   ");
+        const result = convertError(' '.repeat(3));
 
         expect(result.error).toBeInstanceOf(Error);
         expect(result.error.message).toBe("[whitespace-only string]");

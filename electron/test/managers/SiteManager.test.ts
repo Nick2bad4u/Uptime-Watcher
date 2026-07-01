@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,13 +15,16 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { SiteManager } from "../../managers/SiteManager";
-import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
+import type { Site } from "@shared/types";
+
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
-import type { Site } from "@shared/types";
-import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+
+import { SiteManager } from "../../managers/SiteManager";
+import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
 
 describe(SiteManager, () => {
     let manager: SiteManager;
@@ -146,7 +149,7 @@ describe(SiteManager, () => {
             );
 
             const createSiteSpy = vi
-                .spyOn(manager["siteWriterService"], "createSite")
+                .spyOn(manager.siteWriterService, "createSite")
                 .mockResolvedValue(newSite);
 
             const result = await manager.addSite(newSite);
@@ -252,7 +255,7 @@ describe(SiteManager, () => {
 
             // Mock the siteRepositoryService method directly
             vi.spyOn(
-                manager["siteRepositoryService"],
+                manager.siteRepositoryService,
                 "getSitesFromDatabase"
             ).mockResolvedValue(cachedSites);
 
@@ -295,7 +298,7 @@ describe(SiteManager, () => {
 
             // Mock the siteRepositoryService method directly
             vi.spyOn(
-                manager["siteRepositoryService"],
+                manager.siteRepositoryService,
                 "getSitesFromDatabase"
             ).mockResolvedValue(dbSites);
 
@@ -330,7 +333,7 @@ describe(SiteManager, () => {
 
             // Mock the siteWriterService.deleteSite method directly
             const mockDeleteSite = vi
-                .spyOn(manager["siteWriterService"], "deleteSite")
+                .spyOn(manager.siteWriterService, "deleteSite")
                 .mockResolvedValue(true);
 
             mockDependencies.siteRepository.delete.mockResolvedValue(true);
@@ -341,13 +344,13 @@ describe(SiteManager, () => {
                 }
             );
 
-            const result = await manager.removeSite("site1");
+            const isResult = await manager.removeSite("site1");
 
             expect(mockDeleteSite).toHaveBeenCalledWith(
                 expect.anything(),
                 "site1"
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -388,16 +391,16 @@ describe(SiteManager, () => {
             );
 
             const deleteSiteSpy = vi
-                .spyOn(manager["siteWriterService"], "deleteSite")
+                .spyOn(manager.siteWriterService, "deleteSite")
                 .mockResolvedValue(false);
 
-            const result = await manager.removeSite("nonexistent");
+            const isResult = await manager.removeSite("nonexistent");
 
             expect(deleteSiteSpy).toHaveBeenCalledWith(
                 expect.anything(),
                 "nonexistent"
             );
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
 
@@ -463,12 +466,12 @@ describe(SiteManager, () => {
             });
             // Mock the siteWriterService.updateSite method
             const mockUpdateSite = vi
-                .spyOn(manager["siteWriterService"], "updateSite")
+                .spyOn(manager.siteWriterService, "updateSite")
                 .mockResolvedValue(updatedSite);
 
             // Mock the siteRepositoryService.getSitesFromDatabase method
             const mockGetSitesFromDatabase = vi
-                .spyOn(manager["siteRepositoryService"], "getSitesFromDatabase")
+                .spyOn(manager.siteRepositoryService, "getSitesFromDatabase")
                 .mockResolvedValue([updatedSite]);
 
             // Mock the updateSitesCache method
@@ -541,7 +544,7 @@ describe(SiteManager, () => {
         it("removes the specified monitor via SiteWriterService", async () => {
             mockDependencies.eventEmitter.emitTyped.mockClear();
             const site = buildSite();
-            manager["sitesCache"].set(site.identifier, site);
+            manager.sitesCache.set(site.identifier, site);
 
             const persistedSite: Site = {
                 ...site,
@@ -549,13 +552,13 @@ describe(SiteManager, () => {
             };
 
             const updateSpy = vi
-                .spyOn(manager["siteWriterService"], "updateSite")
+                .spyOn(manager.siteWriterService, "updateSite")
                 .mockResolvedValue(persistedSite);
 
             const result = await manager.removeMonitor(site.identifier, "mon1");
 
             expect(updateSpy).toHaveBeenCalledWith(
-                manager["sitesCache"],
+                manager.sitesCache,
                 site.identifier,
                 {
                     monitors: [expect.objectContaining({ id: "mon2" })],
@@ -586,10 +589,10 @@ describe(SiteManager, () => {
             mockDependencies.eventEmitter.emitTyped.mockClear();
             const site = buildSite();
             site.monitors = [structuredClone(site.monitors[0]!)];
-            manager["sitesCache"].set(site.identifier, site);
+            manager.sitesCache.set(site.identifier, site);
 
             const updateSpy = vi
-                .spyOn(manager["siteWriterService"], "updateSite")
+                .spyOn(manager.siteWriterService, "updateSite")
                 .mockResolvedValue(site);
 
             await expect(
@@ -601,10 +604,10 @@ describe(SiteManager, () => {
 
         it("throws when the monitor is not found", async () => {
             const site = buildSite();
-            manager["sitesCache"].set(site.identifier, site);
+            manager.sitesCache.set(site.identifier, site);
 
             const updateSpy = vi
-                .spyOn(manager["siteWriterService"], "updateSite")
+                .spyOn(manager.siteWriterService, "updateSite")
                 .mockResolvedValue(site);
 
             await expect(
@@ -617,10 +620,10 @@ describe(SiteManager, () => {
         it("hydrates the cache from the database when the site is absent", async () => {
             mockDependencies.eventEmitter.emitTyped.mockClear();
             const site = buildSite();
-            manager["sitesCache"].clear();
+            manager.sitesCache.clear();
 
             const dbSpy = vi
-                .spyOn(manager["siteRepositoryService"], "getSiteFromDatabase")
+                .spyOn(manager.siteRepositoryService, "getSiteFromDatabase")
                 .mockResolvedValue(structuredClone(site));
 
             const persistedSite: Site = {
@@ -629,7 +632,7 @@ describe(SiteManager, () => {
             };
 
             const updateSpy = vi
-                .spyOn(manager["siteWriterService"], "updateSite")
+                .spyOn(manager.siteWriterService, "updateSite")
                 .mockResolvedValue(persistedSite);
 
             const result = await manager.removeMonitor(site.identifier, "mon1");
@@ -654,7 +657,7 @@ describe(SiteManager, () => {
             ];
 
             // Spy on the actual cache methods that will be called
-            const replaceAllSpy = vi.spyOn(manager["sitesCache"], "replaceAll");
+            const replaceAllSpy = vi.spyOn(manager.sitesCache, "replaceAll");
 
             await manager.updateSitesCache(sites);
 
@@ -674,7 +677,7 @@ describe(SiteManager, () => {
         });
         it("should handle initialization errors", async () => {
             // Mock an error in the initialization process
-            vi.spyOn(manager["sitesCache"], "clear").mockImplementation(() => {
+            vi.spyOn(manager.sitesCache, "clear").mockImplementation(() => {
                 throw new Error("Cache initialization failed");
             });
             await expect(manager.initialize()).rejects.toThrow(
@@ -693,15 +696,15 @@ describe(SiteManager, () => {
             };
 
             // Mock the cache get method
-            vi.spyOn(manager["sitesCache"], "get").mockReturnValue(testSite);
+            vi.spyOn(manager.sitesCache, "get").mockReturnValue(testSite);
 
             const result = manager.getSiteFromCache("site1");
 
             expect(result).toEqual(testSite);
-            expect(manager["sitesCache"].get).toHaveBeenCalledWith("site1");
+            expect(manager.sitesCache.get).toHaveBeenCalledWith("site1");
         });
         it("should return undefined when site does not exist in cache", () => {
-            vi.spyOn(manager["sitesCache"], "get").mockReturnValue(undefined);
+            vi.spyOn(manager.sitesCache, "get").mockReturnValue(undefined);
 
             const result = manager.getSiteFromCache("nonexistent");
 
@@ -728,17 +731,17 @@ describe(SiteManager, () => {
             ];
 
             // Mock the cache getAll method
-            vi.spyOn(manager["sitesCache"], "getAll").mockReturnValue(
+            vi.spyOn(manager.sitesCache, "getAll").mockReturnValue(
                 testSites
             );
 
             const result = manager.getSitesFromCache();
 
             expect(result).toEqual(testSites);
-            expect(manager["sitesCache"].getAll).toHaveBeenCalled();
+            expect(manager.sitesCache.getAll).toHaveBeenCalled();
         });
         it("should return empty array when cache is empty", () => {
-            vi.spyOn(manager["sitesCache"], "getAll").mockReturnValue([]);
+            vi.spyOn(manager.sitesCache, "getAll").mockReturnValue([]);
 
             const result = manager.getSitesFromCache();
 
@@ -750,7 +753,7 @@ describe(SiteManager, () => {
             const cache = manager.getSitesCache();
 
             expect(cache).toBeDefined();
-            expect(cache).toBe(manager["sitesCache"]);
+            expect(cache).toBe(manager.sitesCache);
         });
         it("should return a cache with proper configuration", () => {
             const cache = manager.getSitesCache();
@@ -772,7 +775,7 @@ describe(SiteManager, () => {
 
                 // Use reflection to call private method
                 await expect(
-                    manager["validateSite"](validSite)
+                    manager.validateSite(validSite)
                 ).resolves.not.toThrow();
             });
             it("should throw validation error for invalid site", async () => {
@@ -796,13 +799,13 @@ describe(SiteManager, () => {
                     }
                 );
                 await expect(
-                    manager["validateSite"](invalidSite)
+                    manager.validateSite(invalidSite)
                 ).rejects.toThrow();
             });
         });
         describe("createMonitoringConfig", () => {
             it("should create monitoring configuration", () => {
-                const config = manager["createMonitoringConfig"]();
+                const config = manager.createMonitoringConfig();
 
                 expect(config).toBeDefined();
                 expect(typeof config.setHistoryLimit).toBe("function");
@@ -811,7 +814,7 @@ describe(SiteManager, () => {
                 expect(typeof config.stopMonitoring).toBe("function");
             });
             it("should create config with proper methods", async () => {
-                const config = manager["createMonitoringConfig"]();
+                const config = manager.createMonitoringConfig();
 
                 // Test that the methods exist and are callable
                 await expect(
@@ -824,7 +827,7 @@ describe(SiteManager, () => {
                             name: "Test Site",
                             monitoring: true,
                             monitors: [],
-                        } as Site,
+                        },
                         []
                     )
                 ).resolves.toBeUndefined();
@@ -883,12 +886,12 @@ describe(SiteManager, () => {
                 };
 
                 const dbSpy = vi.spyOn(
-                    manager["siteRepositoryService"],
+                    manager.siteRepositoryService,
                     "getSiteFromDatabase"
                 );
-                manager["sitesCache"].set(site.identifier, site);
+                manager.sitesCache.set(site.identifier, site);
 
-                const snapshot = await manager["getSiteSnapshotForMutation"](
+                const snapshot = await manager.getSiteSnapshotForMutation(
                     site.identifier
                 );
 
@@ -920,28 +923,28 @@ describe(SiteManager, () => {
                 };
 
                 vi.spyOn(
-                    manager["siteRepositoryService"],
+                    manager.siteRepositoryService,
                     "getSiteFromDatabase"
                 ).mockResolvedValue(site);
 
-                const snapshot = await manager["getSiteSnapshotForMutation"](
+                const snapshot = await manager.getSiteSnapshotForMutation(
                     site.identifier
                 );
 
                 expect(snapshot).toEqual(site);
-                expect(manager["sitesCache"].get(site.identifier)).toEqual(
+                expect(manager.sitesCache.get(site.identifier)).toEqual(
                     site
                 );
             });
 
             it("throws when the site cannot be located", async () => {
                 vi.spyOn(
-                    manager["siteRepositoryService"],
+                    manager.siteRepositoryService,
                     "getSiteFromDatabase"
                 ).mockResolvedValue(undefined);
 
                 await expect(
-                    manager["getSiteSnapshotForMutation"]("missing-site")
+                    manager.getSiteSnapshotForMutation("missing-site")
                 ).rejects.toThrow(
                     "Site with identifier missing-site not found"
                 );
@@ -959,36 +962,36 @@ describe(SiteManager, () => {
 
                 // Mock the repository service
                 vi.spyOn(
-                    manager["siteRepositoryService"],
+                    manager.siteRepositoryService,
                     "getSiteFromDatabase"
                 ).mockResolvedValue(testSite);
-                vi.spyOn(manager["sitesCache"], "set").mockImplementation(
+                vi.spyOn(manager.sitesCache, "set").mockImplementation(
                     () => {}
                 );
 
                 await expect(
-                    manager["loadSiteInBackground"]("site1")
+                    manager.loadSiteInBackground("site1")
                 ).resolves.not.toThrow();
 
                 expect(
-                    manager["siteRepositoryService"].getSiteFromDatabase
+                    manager.siteRepositoryService.getSiteFromDatabase
                 ).toHaveBeenCalledWith("site1");
-                expect(manager["sitesCache"].set).toHaveBeenCalledWith(
+                expect(manager.sitesCache.set).toHaveBeenCalledWith(
                     "site1",
                     testSite
                 );
             });
             it("should handle site not found in background load", async () => {
                 // Set up cache spy for this test
-                const cacheSpy = vi.spyOn(manager["sitesCache"], "set");
+                const cacheSpy = vi.spyOn(manager.sitesCache, "set");
 
                 vi.spyOn(
-                    manager["siteRepositoryService"],
+                    manager.siteRepositoryService,
                     "getSiteFromDatabase"
                 ).mockResolvedValue(undefined);
 
                 await expect(
-                    manager["loadSiteInBackground"]("nonexistent")
+                    manager.loadSiteInBackground("nonexistent")
                 ).resolves.not.toThrow();
 
                 // Should not attempt to set cache when site is not found
@@ -996,13 +999,13 @@ describe(SiteManager, () => {
             });
             it("should handle background load errors", async () => {
                 vi.spyOn(
-                    manager["siteRepositoryService"],
+                    manager.siteRepositoryService,
                     "getSiteFromDatabase"
                 ).mockRejectedValue(new Error("Database error"));
 
                 // Should not throw error but should handle it gracefully
                 await expect(
-                    manager["loadSiteInBackground"]("site1")
+                    manager.loadSiteInBackground("site1")
                 ).resolves.not.toThrow();
             });
         });
@@ -1019,14 +1022,14 @@ describe(SiteManager, () => {
 
             // Mock multiple operations running concurrently
             vi.spyOn(
-                manager["siteWriterService"],
+                manager.siteWriterService,
                 "createSite"
             ).mockResolvedValue(testSite);
             vi.spyOn(
-                manager["siteRepositoryService"],
+                manager.siteRepositoryService,
                 "getSitesFromDatabase"
             ).mockResolvedValue([testSite]);
-            vi.spyOn(manager["sitesCache"], "get").mockReturnValue(testSite);
+            vi.spyOn(manager.sitesCache, "get").mockReturnValue(testSite);
 
             const promises = [
                 manager.addSite(testSite),
@@ -1041,8 +1044,8 @@ describe(SiteManager, () => {
             ]);
         });
         it("should handle empty cache scenarios", () => {
-            vi.spyOn(manager["sitesCache"], "getAll").mockReturnValue([]);
-            vi.spyOn(manager["sitesCache"], "get").mockReturnValue(undefined);
+            vi.spyOn(manager.sitesCache, "getAll").mockReturnValue([]);
+            vi.spyOn(manager.sitesCache, "get").mockReturnValue(undefined);
 
             const sitesFromCache = manager.getSitesFromCache();
             const siteFromCache = manager.getSiteFromCache("any");
@@ -1061,7 +1064,7 @@ describe(SiteManager, () => {
             }));
 
             const replaceAllSpy = vi
-                .spyOn(manager["sitesCache"], "replaceAll")
+                .spyOn(manager.sitesCache, "replaceAll")
                 .mockImplementation(() => {});
 
             await expect(
@@ -1090,7 +1093,7 @@ describe(SiteManager, () => {
                 }
             );
             await expect(
-                manager["validateSite"](malformedSite)
+                manager.validateSite(malformedSite)
             ).rejects.toThrow();
         });
     });
@@ -1105,7 +1108,7 @@ describe(SiteManager, () => {
 
             const { logger } = await import("../../utils/logger");
             const errorSpy = vi.spyOn(logger, "error");
-            const replaceAllSpy = vi.spyOn(manager["sitesCache"], "replaceAll");
+            const replaceAllSpy = vi.spyOn(manager.sitesCache, "replaceAll");
 
             const duplicateSites: Site[] = [
                 {

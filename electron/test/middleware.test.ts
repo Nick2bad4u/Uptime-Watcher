@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,20 +15,23 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { EventPayloadValue } from "../events/TypedEventBus";
+
 import {
+    composeMiddleware,
+    createDebugMiddleware,
+    createErrorHandlingMiddleware,
+    createFilterMiddleware,
     createLoggingMiddleware,
     createMetricsMiddleware,
-    createErrorHandlingMiddleware,
     createRateLimitMiddleware,
     createValidationMiddleware,
-    createFilterMiddleware,
-    createDebugMiddleware,
-    composeMiddleware,
     MIDDLEWARE_STACKS,
 } from "../events/middleware";
 import { logger } from "../utils/logger";
-import type { EventPayloadValue } from "../events/TypedEventBus";
+
 const asEventPayload = (value: unknown): EventPayloadValue =>
     value as EventPayloadValue;
 
@@ -130,11 +133,7 @@ describe("middleware.ts", () => {
 
             const emitted = metricsCallback.mock.calls.map(
                 (c) =>
-                    c[0] as {
-                        name: string;
-                        type: "counter" | "timing";
-                        value: number;
-                    }
+                    c[0]
             );
             const counterMetrics = emitted.filter((m) => m.type === "counter");
             const timingMetrics = emitted.filter((m) => m.type === "timing");
@@ -150,7 +149,8 @@ describe("middleware.ts", () => {
                 value: 2,
             });
 
-            // Timing metrics should be small (processing time ~25ms). A mutant using '+' would create a huge value (≈ Date.now()*2)
+            // Timing metrics should be small (processing time ~25ms).
+            // A mutant using '+' would create a huge value (≈ Date.now()*2)
             expect(timingMetrics).not.toHaveLength(0);
             for (const metric of timingMetrics) {
                 expect(metric.value).toBeGreaterThanOrEqual(0);

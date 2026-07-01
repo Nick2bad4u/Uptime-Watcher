@@ -3,27 +3,29 @@
  * coverage for all validation functions
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import type { ValidationResult } from "../../types/validation";
+
 import {
     baseMonitorSchema,
-    httpMonitorSchema,
     httpKeywordMonitorSchema,
+    type HttpMonitor,
+    httpMonitorSchema,
     httpStatusMonitorSchema,
-    portMonitorSchema,
+    type Monitor,
     monitorSchema,
     monitorSchemas,
+    type PortMonitor,
+    portMonitorSchema,
     validateMonitorData,
     validateMonitorField,
-    type HttpMonitor,
-    type PortMonitor,
-    type Monitor,
 } from "../../validation/monitorSchemas";
 import {
+    type Site,
     siteSchema,
     validateSiteData,
-    type Site,
 } from "../../validation/siteSchemas";
-import type { ValidationResult } from "../../types/validation";
 import { createValidBaseMonitor } from "./testHelpers";
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
@@ -216,10 +218,10 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const statuses = [
-                "up",
                 "down",
-                "pending",
                 "paused",
+                "pending",
+                "up",
             ] as const;
             for (const status of statuses) {
                 const validData = {
@@ -992,8 +994,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
             expect(result.data).toEqual(httpData);
-            expect(result.metadata!["monitorType"]).toBe("http");
-            expect(result.metadata!["validatedDataSize"]).toBeGreaterThan(0);
+            expect(result.metadata!.monitorType).toBe("http");
+            expect(result.metadata!.validatedDataSize).toBeGreaterThan(0);
         });
 
         it("should validate port monitor data successfully", async ({
@@ -1024,7 +1026,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
             expect(result.data).toEqual(portData);
-            expect(result.metadata!["monitorType"]).toBe("port");
+            expect(result.metadata!.monitorType).toBe("port");
         });
 
         it("should validate HTTP keyword monitor data successfully", async ({
@@ -1093,7 +1095,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(result.success).toBeFalsy();
             expect(result.errors).toContain("Unknown monitor type: unknown");
-            expect(result.metadata!["monitorType"]).toBe("unknown");
+            expect(result.metadata!.monitorType).toBe("unknown");
         });
 
         it("should handle validation errors with multiple issues", async ({
@@ -1121,7 +1123,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
-            expect(result.metadata!["monitorType"]).toBe("http");
+            expect(result.metadata!.monitorType).toBe("http");
         });
 
         it("should handle Zod errors and categorize warnings", async ({
@@ -1164,7 +1166,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
-            expect(result.metadata!["monitorType"]).toBe("http");
+            expect(result.metadata!.monitorType).toBe("http");
         });
     });
 
@@ -1182,8 +1184,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             );
 
             expect(result.success).toBeTruthy();
-            expect(result.metadata!["fieldName"]).toBe("url");
-            expect(result.metadata!["monitorType"]).toBe("http");
+            expect(result.metadata!.fieldName).toBe("url");
+            expect(result.metadata!.monitorType).toBe("http");
         });
 
         it("should validate port host field", async ({ task, annotate }) => {
@@ -1195,8 +1197,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateMonitorField("port", "host", "example.com");
 
             expect(result.success).toBeTruthy();
-            expect(result.metadata!["fieldName"]).toBe("host");
-            expect(result.metadata!["monitorType"]).toBe("port");
+            expect(result.metadata!.fieldName).toBe("host");
+            expect(result.metadata!.monitorType).toBe("port");
         });
 
         it("should validate port number field", async ({ task, annotate }) => {
@@ -1208,8 +1210,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateMonitorField("port", "port", 8080);
 
             expect(result.success).toBeTruthy();
-            expect(result.metadata!["fieldName"]).toBe("port");
-            expect(result.metadata!["monitorType"]).toBe("port");
+            expect(result.metadata!.fieldName).toBe("port");
+            expect(result.metadata!.monitorType).toBe("port");
         });
 
         it("should validate common fields", async ({ task, annotate }) => {
@@ -1232,7 +1234,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             for (const { name, value } of commonFields) {
                 const result = validateMonitorField("http", name, value);
                 expect(result.success).toBeTruthy();
-                expect(result.metadata!["fieldName"]).toBe(name);
+                expect(result.metadata!.fieldName).toBe(name);
             }
         });
 
@@ -1250,7 +1252,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(result.success).toBeFalsy();
             expect(result.errors).toContain("Unknown monitor type: unknown");
-            expect(result.metadata!["monitorType"]).toBe("unknown");
+            expect(result.metadata!.monitorType).toBe("unknown");
         });
 
         it("should handle invalid field values", async ({ task, annotate }) => {
@@ -1263,7 +1265,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
 
             expect(result.success).toBeFalsy();
             expect(result.errors.length).toBeGreaterThan(0);
-            expect(result.metadata!["fieldName"]).toBe("url");
+            expect(result.metadata!.fieldName).toBe("url");
         });
 
         it("should handle unknown field names", async ({ task, annotate }) => {
@@ -1330,8 +1332,8 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             expect(result.success).toBeTruthy();
             expect(result.errors).toHaveLength(0);
             expect(result.data).toEqual(siteData);
-            expect(result.metadata!["siteIdentifier"]).toBe("test-site");
-            expect(result.metadata!["monitorCount"]).toBe(1);
+            expect(result.metadata!.siteIdentifier).toBe("test-site");
+            expect(result.metadata!.monitorCount).toBe(1);
         });
 
         it("should handle validation errors", async ({ task, annotate }) => {
@@ -1411,7 +1413,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             const result = validateSiteData(complexSite);
 
             expect(result.success).toBeTruthy();
-            expect(result.metadata!["monitorCount"]).toBe(2);
+            expect(result.metadata!.monitorCount).toBe(2);
         });
     });
 

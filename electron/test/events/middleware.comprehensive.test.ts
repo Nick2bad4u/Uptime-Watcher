@@ -3,7 +3,20 @@
  * edge cases and untested branches in middleware.ts
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { EventPayloadValue } from "../../events/TypedEventBus";
+
+import {
+    composeMiddleware,
+    createDebugMiddleware,
+    createErrorHandlingMiddleware,
+    createLoggingMiddleware,
+    createValidationMiddleware,
+    MIDDLEWARE_STACKS,
+} from "../../events/middleware";
+// Import mocked logger after it's been mocked
+import { logger as mockLogger } from "../../utils/logger";
 
 // Mock logger first - must be at top level before imports
 vi.mock("../../utils/logger", () => ({
@@ -25,19 +38,6 @@ vi.mock("../../utils/logger", () => ({
 vi.mock("../../../shared/utils/environment", () => ({
     isDevelopment: vi.fn(() => false), // Default to production mode
 }));
-
-import {
-    createLoggingMiddleware,
-    createErrorHandlingMiddleware,
-    createValidationMiddleware,
-    createDebugMiddleware,
-    composeMiddleware,
-    MIDDLEWARE_STACKS,
-} from "../../events/middleware";
-
-// Import mocked logger after it's been mocked
-import { logger as mockLogger } from "../../utils/logger";
-import type { EventPayloadValue } from "../../events/TypedEventBus";
 
 const asEventPayload = (value: unknown): EventPayloadValue =>
     value as EventPayloadValue;
@@ -361,7 +361,7 @@ describe("middleware.ts - Additional Coverage", () => {
             // Should log completion with timing
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 expect.stringMatching(
-                    /Completed event 'verbose:event' in \d+ms/
+                    /Completed event 'verbose:event' in \d+ms/v
                 )
             );
 
@@ -389,7 +389,7 @@ describe("middleware.ts - Additional Coverage", () => {
 
             // Should still log completion with timing
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                expect.stringMatching(/Completed event 'simple:event' in \d+ms/)
+                expect.stringMatching(/Completed event 'simple:event' in \d+ms/v)
             );
 
             expect(next).toHaveBeenCalled();

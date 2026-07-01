@@ -38,6 +38,12 @@ export interface SiteSnapshotDetails {
 }
 
 /**
+ * Non-empty subset of {@link SiteSyncDelta} describing concrete changes.
+ */
+export type SiteSyncDeltaChangeSet =
+    RequireAtLeastOne<SiteSyncDeltaChangeSetBase>;
+
+/**
  * Result of preparing a site synchronization payload including deltas.
  *
  * @public
@@ -54,12 +60,6 @@ interface SiteSyncDeltaChangeSetBase {
     removedSiteIdentifiers?: SiteSyncDelta["removedSiteIdentifiers"];
     updatedSites?: SiteSyncDelta["updatedSites"];
 }
-
-/**
- * Non-empty subset of {@link SiteSyncDelta} describing concrete changes.
- */
-export type SiteSyncDeltaChangeSet =
-    RequireAtLeastOne<SiteSyncDeltaChangeSetBase>;
 
 /**
  * Delta guaranteed to contain at least one addition, removal, or update.
@@ -86,42 +86,6 @@ export function deriveSiteSnapshot(sites: Site[]): SiteSnapshotDetails {
         duplicates: duplicates.map((entry) => ({ ...entry })),
         sanitizedSites: sanitizedSites.map((site) => structuredClone(site)),
     } satisfies SiteSnapshotDetails;
-}
-
-/**
- * Creates a defensive clone of a site snapshot using {@link structuredClone}.
- */
-function cloneSites(sites: Site[]): Site[] {
-    return sites.map((site) => structuredClone(site));
-}
-
-/**
- * Derives sanitized site data and computes the synchronization delta against a
- * previous snapshot.
- *
- * @param options - Options controlling snapshot preparation. Provide the
- *   candidate site collection and an optional baseline snapshot for delta
- *   computation.
- *
- * @returns Sanitized sites, delta details, and a cloned emission snapshot.
- */
-export function prepareSiteSyncSnapshot({
-    previousSnapshot = [],
-    sites,
-}: {
-    previousSnapshot?: Site[];
-    sites: Site[];
-}): SiteSyncSnapshotDetails {
-    const snapshot = deriveSiteSnapshot(sites);
-    const emissionSnapshot = cloneSites(snapshot.sanitizedSites);
-    const delta = calculateSiteSyncDelta(previousSnapshot, emissionSnapshot);
-
-    return {
-        delta,
-        duplicates: snapshot.duplicates,
-        emissionSnapshot,
-        sanitizedSites: snapshot.sanitizedSites,
-    } satisfies SiteSyncSnapshotDetails;
 }
 
 /**
@@ -159,6 +123,42 @@ export function deriveSiteSyncChangeSet(
  */
 export function hasSiteSyncChanges(delta: SiteSyncDelta): boolean {
     return deriveSiteSyncChangeSet(delta) !== null;
+}
+
+/**
+ * Derives sanitized site data and computes the synchronization delta against a
+ * previous snapshot.
+ *
+ * @param options - Options controlling snapshot preparation. Provide the
+ *   candidate site collection and an optional baseline snapshot for delta
+ *   computation.
+ *
+ * @returns Sanitized sites, delta details, and a cloned emission snapshot.
+ */
+export function prepareSiteSyncSnapshot({
+    previousSnapshot = [],
+    sites,
+}: {
+    previousSnapshot?: Site[];
+    sites: Site[];
+}): SiteSyncSnapshotDetails {
+    const snapshot = deriveSiteSnapshot(sites);
+    const emissionSnapshot = cloneSites(snapshot.sanitizedSites);
+    const delta = calculateSiteSyncDelta(previousSnapshot, emissionSnapshot);
+
+    return {
+        delta,
+        duplicates: snapshot.duplicates,
+        emissionSnapshot,
+        sanitizedSites: snapshot.sanitizedSites,
+    } satisfies SiteSyncSnapshotDetails;
+}
+
+/**
+ * Creates a defensive clone of a site snapshot using {@link structuredClone}.
+ */
+function cloneSites(sites: Site[]): Site[] {
+    return sites.map((site) => structuredClone(site));
 }
 
 const normalizeDateValue = (value: unknown): Date | undefined => {
@@ -273,6 +273,77 @@ export const isSiteSnapshot = (candidate: unknown): candidate is Site => {
 };
 
 /**
+ * Merges canonical monitor data with an optional overlay, preserving canonical
+ * fields while allowing overlay overrides for mutable values (history,
+ * monitoring flags, etc.).
+ *
+ * @param canonicalMonitor - Monitor snapshot sourced from the cache or
+ *   database.
+ * @param overlaySource - Optional overlay or alternate monitor snapshot to
+ *   layer on top of the canonical data.
+ *
+ * @returns A monitor snapshot combining canonical data with overlay values.
+ */
+export function mergeMonitorSnapshots(
+    canonicalMonitor: Monitor,
+    overlaySource?: Monitor | MonitorSnapshotOverlay
+): Monitor {
+    const overlay = toMonitorSnapshotOverlay(overlaySource);
+
+    if (!overlay) {
+        return canonicalMonitor;
+    }
+
+    return {
+        ...canonicalMonitor,
+        ...overlay,
+        history: overlay.history ?? canonicalMonitor.history,
+    } satisfies Monitor;
+}
+
+/**
+ * Combines a canonical site snapshot with overlay details, including the set of
+ * monitor overlays provided by the source payload.
+ *
+ * @param canonicalSite - Primary site snapshot used as the base state.
+ * @param overlaySource - Overlay or partial site snapshot providing updated
+ *   monitoring flags or monitor snapshots.
+ *
+ * @returns Site snapshot enriched with overlay data when available.
+ */
+export function mergeSiteSnapshots(
+    canonicalSite: Site,
+    overlaySource?: Site | SiteSnapshotOverlay
+): Site {
+    const overlay = toSiteSnapshotOverlay(overlaySource);
+
+    if (!overlay) {
+        return canonicalSite;
+    }
+
+    const overlayMonitors = new Map<string, MonitorSnapshotOverlay>();
+    overlay.monitors?.forEach((candidate) => {
+        const snapshot = toMonitorSnapshotOverlay(candidate);
+        if (snapshot) {
+            overlayMonitors.set(candidate.id, snapshot);
+        }
+    });
+
+    const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
+        mergeMonitorSnapshots(
+            canonicalMonitor,
+            overlayMonitors.get(canonicalMonitor.id)
+        )
+    );
+
+    return {
+        ...canonicalSite,
+        monitoring: overlay.monitoring ?? canonicalSite.monitoring,
+        monitors,
+    } satisfies Site;
+}
+
+/**
  * Derives a normalized overlay describing the mutable portions of a monitor
  * snapshot.
  *
@@ -363,75 +434,4 @@ export function toSiteSnapshotOverlay(
     }
 
     return hasOverlayValues(overlay) ? overlay : undefined;
-}
-
-/**
- * Merges canonical monitor data with an optional overlay, preserving canonical
- * fields while allowing overlay overrides for mutable values (history,
- * monitoring flags, etc.).
- *
- * @param canonicalMonitor - Monitor snapshot sourced from the cache or
- *   database.
- * @param overlaySource - Optional overlay or alternate monitor snapshot to
- *   layer on top of the canonical data.
- *
- * @returns A monitor snapshot combining canonical data with overlay values.
- */
-export function mergeMonitorSnapshots(
-    canonicalMonitor: Monitor,
-    overlaySource?: Monitor | MonitorSnapshotOverlay
-): Monitor {
-    const overlay = toMonitorSnapshotOverlay(overlaySource);
-
-    if (!overlay) {
-        return canonicalMonitor;
-    }
-
-    return {
-        ...canonicalMonitor,
-        ...overlay,
-        history: overlay.history ?? canonicalMonitor.history,
-    } satisfies Monitor;
-}
-
-/**
- * Combines a canonical site snapshot with overlay details, including the set of
- * monitor overlays provided by the source payload.
- *
- * @param canonicalSite - Primary site snapshot used as the base state.
- * @param overlaySource - Overlay or partial site snapshot providing updated
- *   monitoring flags or monitor snapshots.
- *
- * @returns Site snapshot enriched with overlay data when available.
- */
-export function mergeSiteSnapshots(
-    canonicalSite: Site,
-    overlaySource?: Site | SiteSnapshotOverlay
-): Site {
-    const overlay = toSiteSnapshotOverlay(overlaySource);
-
-    if (!overlay) {
-        return canonicalSite;
-    }
-
-    const overlayMonitors = new Map<string, MonitorSnapshotOverlay>();
-    overlay.monitors?.forEach((candidate) => {
-        const snapshot = toMonitorSnapshotOverlay(candidate);
-        if (snapshot) {
-            overlayMonitors.set(candidate.id, snapshot);
-        }
-    });
-
-    const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
-        mergeMonitorSnapshots(
-            canonicalMonitor,
-            overlayMonitors.get(canonicalMonitor.id)
-        )
-    );
-
-    return {
-        ...canonicalSite,
-        monitoring: overlay.monitoring ?? canonicalSite.monitoring,
-        monitors,
-    } satisfies Site;
 }

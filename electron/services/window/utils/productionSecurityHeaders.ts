@@ -9,7 +9,43 @@ import type { Arrayable } from "type-fest";
 
 import { arrayJoin } from "ts-extras";
 
+/**
+ * Inputs for {@link applyProductionDocumentSecurityHeaders}.
+ */
+export interface ApplyProductionDocumentSecurityHeadersArgs {
+    /** Production CSP header value. */
+    productionCsp: string;
+    /** Existing headers from Electron (may be undefined). */
+    responseHeaders: ElectronResponseHeaders | undefined;
+}
+
 export type ElectronResponseHeaders = Record<string, Arrayable<string>>;
+
+/**
+ * Applies strict production security headers to a response header set.
+ */
+export function applyProductionDocumentSecurityHeaders(
+    args: ApplyProductionDocumentSecurityHeadersArgs
+): ElectronResponseHeaders {
+    const { productionCsp, responseHeaders } = args;
+
+    const hardenedHeaders: ElectronResponseHeaders = {
+        "Content-Security-Policy": [productionCsp],
+        "Permissions-Policy": [
+            "camera=(), microphone=(), geolocation=(), fullscreen=()",
+        ],
+        "Referrer-Policy": ["no-referrer"],
+        "X-Content-Type-Options": ["nosniff"],
+        "X-Frame-Options": ["DENY"],
+    };
+
+    return responseHeaders
+        ? {
+              ...responseHeaders,
+              ...hardenedHeaders,
+          }
+        : hardenedHeaders;
+}
 
 /**
  * Build the production Content-Security-Policy header value.
@@ -36,40 +72,4 @@ export function getProductionCspHeaderValue(): string {
         ],
         "; "
     );
-}
-
-/**
- * Inputs for {@link applyProductionDocumentSecurityHeaders}.
- */
-export interface ApplyProductionDocumentSecurityHeadersArgs {
-    /** Production CSP header value. */
-    productionCsp: string;
-    /** Existing headers from Electron (may be undefined). */
-    responseHeaders: ElectronResponseHeaders | undefined;
-}
-
-/**
- * Applies strict production security headers to a response header set.
- */
-export function applyProductionDocumentSecurityHeaders(
-    args: ApplyProductionDocumentSecurityHeadersArgs
-): ElectronResponseHeaders {
-    const { productionCsp, responseHeaders } = args;
-
-    const hardenedHeaders: ElectronResponseHeaders = {
-        "Content-Security-Policy": [productionCsp],
-        "Permissions-Policy": [
-            "camera=(), microphone=(), geolocation=(), fullscreen=()",
-        ],
-        "Referrer-Policy": ["no-referrer"],
-        "X-Content-Type-Options": ["nosniff"],
-        "X-Frame-Options": ["DENY"],
-    };
-
-    return responseHeaders
-        ? {
-              ...responseHeaders,
-              ...hardenedHeaders,
-          }
-        : hardenedHeaders;
 }

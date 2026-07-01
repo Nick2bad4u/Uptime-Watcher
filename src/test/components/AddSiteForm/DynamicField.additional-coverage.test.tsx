@@ -7,19 +7,19 @@
  * - Line 188: Logger error call for invalid numeric input
  */
 
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-import React from "react";
-
 import type { MonitorFieldDefinition } from "@shared/types";
 
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import * as React from "react";
+import { describe, expect, it, vi } from "vitest";
+
+import { DynamicField } from "../../../components/AddSiteForm/DynamicField";
 import { logger } from "../../../services/logger";
 import { ThemeProvider } from "../../../theme/components/ThemeProvider";
-import { DynamicField } from "../../../components/AddSiteForm/DynamicField";
 
 // Mock the logger
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -321,10 +321,10 @@ describe("DynamicField - Additional Coverage", () => {
 
             renderWithTheme(
                 <DynamicField
+                    disabled={true}
                     field={mockField}
                     onChange={mockOnChange}
                     value={8080}
-                    disabled={true}
                 />
             );
 

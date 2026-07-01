@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,7 +15,8 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 
 describe(MonitorRepository, () => {

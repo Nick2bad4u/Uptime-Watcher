@@ -72,17 +72,17 @@ export const rendererNoImportInternalServiceUtilsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow importing src/services/utils/* outside src/services/*.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-import-internal-service-utils.md",
         },
-        schema: [],
         messages: {
             noInternalUtils:
                 "Do not import internal service utilities (src/services/utils/*) outside the service layer. Use the public service APIs instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

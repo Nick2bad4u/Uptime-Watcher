@@ -6,8 +6,8 @@
  *   and validate all cache key generation, parsing, and validation functions.
  */
 
-import { describe, it, expect } from "vitest";
 import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 import {
     CacheKeys,
@@ -88,7 +88,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                             .filter((s) => !s.includes(":")), // Single character
                         fc
                             .string()
-                            .filter((s) => /\s/.test(s) && !s.includes(":")), // String with whitespace but no colons
+                            .filter((s) => /\s/v.test(s) && !s.includes(":")), // String with whitespace but no colons
                         fc
                             .string({ minLength: 1, maxLength: 100 })
                             .filter((s) => !s.includes(":")), // Long string
@@ -270,9 +270,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                     validCacheKeyPart,
                     (prefix, identifier) => {
                         const key = `${prefix}:${identifier}`;
-                        const result = isStandardizedCacheKey(key);
+                        const isResult = isStandardizedCacheKey(key);
 
-                        expect(result).toBeTruthy();
+                        expect(isResult).toBeTruthy();
                         return true;
                     }
                 ),
@@ -288,9 +288,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                     validCacheKeyPart,
                     (prefix, operation, identifier) => {
                         const key = `${prefix}:${operation}:${identifier}`;
-                        const result = isStandardizedCacheKey(key);
+                        const isResult = isStandardizedCacheKey(key);
 
-                        expect(result).toBeTruthy();
+                        expect(isResult).toBeTruthy();
                         return true;
                     }
                 ),
@@ -312,9 +312,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                         fc.constant("invalid:operation:") // Missing final part
                     ),
                     (invalidKey) => {
-                        const result = isStandardizedCacheKey(invalidKey);
+                        const isResult = isStandardizedCacheKey(invalidKey);
 
-                        expect(result).toBeFalsy();
+                        expect(isResult).toBeFalsy();
                         return true;
                     }
                 ),
@@ -333,9 +333,9 @@ describe("Cache Keys - Property-Based Tests", () => {
                     fc.string({ minLength: 1, maxLength: 50 }),
                     (invalidPrefix, identifier) => {
                         const key = `${invalidPrefix}:${identifier}`;
-                        const result = isStandardizedCacheKey(key);
+                        const isResult = isStandardizedCacheKey(key);
 
-                        expect(result).toBeFalsy();
+                        expect(isResult).toBeFalsy();
                         return true;
                     }
                 ),
@@ -351,10 +351,10 @@ describe("Cache Keys - Property-Based Tests", () => {
                         fc.string({ minLength: 100, maxLength: 200 }) // Very long strings
                     ),
                     (testString) => {
-                        const result = isStandardizedCacheKey(testString);
+                        const isResult = isStandardizedCacheKey(testString);
 
                         // Result should always be a boolean
-                        expect(typeof result).toBe("boolean");
+                        expect(typeof isResult).toBe("boolean");
 
                         return true;
                     }
@@ -371,7 +371,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                     validCacheKeyPart,
                     (prefix, identifier) => {
                         const key =
-                            `${prefix}:${identifier}` as StandardizedCacheKey;
+                            `${prefix}:${identifier}`;
                         const result = parseCacheKey(key);
 
                         expect(result.prefix).toBe(prefix);
@@ -393,7 +393,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                     validCacheKeyPart,
                     (prefix, operation, identifier) => {
                         const key =
-                            `${prefix}:${operation}:${identifier}` as StandardizedCacheKey;
+                            `${prefix}:${operation}:${identifier}`;
                         const result = parseCacheKey(key);
 
                         expect(result.prefix).toBe(prefix);
@@ -430,12 +430,12 @@ describe("Cache Keys - Property-Based Tests", () => {
                         ) {
                             // These should throw errors (empty or has leading/trailing spaces)
                             expect(() =>
-                                parseCacheKey(key as StandardizedCacheKey)
+                                parseCacheKey(key)
                             ).toThrow();
                         } else {
                             // Valid long identifiers should parse correctly
                             const result = parseCacheKey(
-                                key as StandardizedCacheKey
+                                key
                             );
                             expect(result.prefix).toBe(prefix);
                             expect(result.identifier).toBe(identifier);
@@ -458,7 +458,7 @@ describe("Cache Keys - Property-Based Tests", () => {
                     ),
                     (invalidKey) => {
                         expect(() => {
-                            parseCacheKey(invalidKey as StandardizedCacheKey);
+                            parseCacheKey(invalidKey);
                         }).toThrow("Invalid cache key format:");
 
                         return true;
@@ -495,7 +495,7 @@ describe("Cache Keys - Property-Based Tests", () => {
 
                             // Each key should be parseable
                             const parsed = parseCacheKey(
-                                key as StandardizedCacheKey
+                                key
                             );
                             expect(parsed.prefix).toBeTruthy();
                             expect(parsed.identifier).toBeDefined();
@@ -539,13 +539,13 @@ describe("Cache Keys - Property-Based Tests", () => {
 
                     // Parsed identifiers should match
                     const configParsed = parseCacheKey(
-                        configKey as StandardizedCacheKey
+                        configKey
                     );
                     const monitorParsed = parseCacheKey(
-                        monitorKey as StandardizedCacheKey
+                        monitorKey
                     );
                     const siteParsed = parseCacheKey(
-                        siteKey as StandardizedCacheKey
+                        siteKey
                     );
 
                     expect(configParsed.identifier).toBe(identifier);

@@ -209,7 +209,7 @@ async function validateCheckInterval(
             return validationResult.success ? [] : validationResult.errors;
         },
         "Validate check interval",
-        [`Check interval validation failed`]
+        ["Check interval validation failed"]
     );
 }
 
@@ -420,7 +420,7 @@ export async function handleSubmit(
 
     clearError();
 
-    const result = await withUtilityErrorHandling(
+    const isResult = await withUtilityErrorHandling(
         async () => {
             const monitor = createMonitor(properties, monitorValidationFields);
             await performSubmission(properties, monitor);
@@ -431,7 +431,7 @@ export async function handleSubmit(
         false // Return false on failure
     );
 
-    if (!result) {
+    if (!isResult) {
         setFormError("Failed to add site/monitor. Please try again.");
     }
 }

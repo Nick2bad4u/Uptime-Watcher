@@ -1,5 +1,5 @@
 /**
- * Deterministic state application for cloud sync operations (ADR-016).
+ * Deterministic state app for cloud sync operations (ADR-016).
  */
 
 import type {
@@ -32,8 +32,8 @@ function compareStrings(a: string, b: string): number {
         return 0;
     }
 
-    const aChars = Array.from(a);
-    const bChars = Array.from(b);
+    const aChars = [...a];
+    const bChars = [...b];
     const length = Math.min(aChars.length, bChars.length);
 
     for (let index = 0; index < length; index += 1) {
@@ -274,11 +274,11 @@ function applyOperation(
     }
 
     const existingDeletion = entity.deleted;
-    const deletionWinsOverWrite =
+    const isDeletionWinsOverWrite =
         isDefined(existingDeletion) &&
         compareCloudSyncWriteKey(write, existingDeletion) < 0;
 
-    if (deletionWinsOverWrite) {
+    if (isDeletionWinsOverWrite) {
         return;
     }
 
@@ -330,7 +330,7 @@ export function applyCloudSyncOperationsToState(
 ): CloudSyncState {
     const state = cloneState(initialState);
 
-    const sorted = Array.from(operations).toSorted(
+    const sorted = [...operations].toSorted(
         compareOperationsDeterministic
     );
     for (const operation of sorted) {
@@ -348,7 +348,7 @@ export function applyCloudSyncOperations(
 ): CloudSyncState {
     const state = createEmptyState();
 
-    const sorted = Array.from(operations).toSorted(
+    const sorted = [...operations].toSorted(
         compareOperationsDeterministic
     );
     for (const operation of sorted) {

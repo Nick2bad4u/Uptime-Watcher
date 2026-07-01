@@ -3,18 +3,18 @@
  * This test file is designed to execute all functions and cover all branches
  */
 
-import { describe, expect, it } from "vitest";
 import {
+    type HistoryRow,
     isValidHistoryRow,
     isValidMonitorRow,
     isValidSettingsRow,
     isValidSiteRow,
-    safeGetRowProperty,
-    type HistoryRow,
     type MonitorRow,
+    safeGetRowProperty,
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
+import { describe, expect, it } from "vitest";
 
 describe("Shared Database Types - Complete Coverage", () => {
     describe(isValidHistoryRow, () => {
@@ -327,7 +327,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const row = {
                 monitorId: "test",
                 status: "up",
-                timestamp: Number.NaN,
+                timestamp: NaN,
             };
 
             expect(isValidHistoryRow(row)).toBeFalsy();
@@ -821,7 +821,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const row = {
-                key: "   ",
+                key: ' '.repeat(3),
                 value: "some-value",
             };
 
@@ -1075,7 +1075,7 @@ describe("Shared Database Types - Complete Coverage", () => {
                 2,
                 3,
             ]);
-            expect(safeGetRowProperty(row, "nullProp", "default")).toBe(null);
+            expect(safeGetRowProperty(row, "nullProp", "default")).toBeNull();
             expect(safeGetRowProperty(row, "zeroProp", 999)).toBe(0);
             expect(safeGetRowProperty(row, "falseProp", true)).toBeFalsy();
             expect(safeGetRowProperty(row, "emptyStringProp", "default")).toBe(
@@ -1214,12 +1214,12 @@ describe("Shared Database Types - Complete Coverage", () => {
                 "default"
             );
             const numberResult = safeGetRowProperty(row, "numberVal", 0);
-            const boolResult = safeGetRowProperty(row, "boolVal", false);
+            const isBoolResult = safeGetRowProperty(row, "boolVal", false);
             const dateResult = safeGetRowProperty(row, "dateVal", new Date(0));
 
             expect(typeof stringResult).toBe("string");
             expect(typeof numberResult).toBe("number");
-            expect(typeof boolResult).toBe("boolean");
+            expect(typeof isBoolResult).toBe("boolean");
             expect(dateResult).toBeInstanceOf(Date);
         });
     });
@@ -1311,7 +1311,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             const nanRow = {
                 monitorId: "test",
                 status: "up",
-                timestamp: Number.NaN,
+                timestamp: NaN,
             };
             expect(isValidHistoryRow(nanRow)).toBeFalsy();
         });

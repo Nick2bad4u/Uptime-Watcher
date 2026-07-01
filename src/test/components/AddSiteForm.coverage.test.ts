@@ -2,6 +2,7 @@
  * Tests for AddSiteForm component focusing on achieving high coverage
  */
 
+import { objectEntries, objectValues, setHas   } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 describe("AddSiteForm Component Coverage Tests", () => {
@@ -36,9 +37,9 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             const baseMonitorTypes = new Set(["http", "port"]);
 
-            expect(baseMonitorTypes.has("http")).toBeTruthy();
-            expect(baseMonitorTypes.has("port")).toBeTruthy();
-            expect(baseMonitorTypes.has("invalid")).toBeFalsy();
+            expect(setHas(baseMonitorTypes, "http")).toBeTruthy();
+            expect(setHas(baseMonitorTypes, "port")).toBeTruthy();
+            expect(setHas(baseMonitorTypes, "invalid")).toBeFalsy();
         });
 
         it("should handle numeric validation", async ({ task, annotate }) => {
@@ -50,7 +51,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             const testCases = [
                 { value: "5000", expected: 5000, isValid: true },
                 { value: "0", expected: 0, isValid: true },
-                { value: "invalid", expected: Number.NaN, isValid: false },
+                { value: "invalid", expected: NaN, isValid: false },
                 { value: "", expected: 0, isValid: true }, // Empty string converts to 0
             ];
 
@@ -117,7 +118,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 10_000
             );
             expect(mockHandlers.setMonitorType).toHaveBeenCalledWith("port");
-            expect(mockHandlers.resetForm).toHaveBeenCalled();
+            expect(mockHandlers.resetForm).toHaveBeenCalledWith();
         });
     });
 
@@ -326,8 +327,8 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 showButtonLoading: false,
             };
 
-            for (const state of Object.values(loadingStates)) {
-                expect(typeof state).toBe("boolean");
+            for (const isState of objectValues(loadingStates)) {
+                expect(typeof isState).toBe("boolean");
             }
         });
     });
@@ -345,7 +346,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             mockEvent.preventDefault();
-            expect(mockEvent.preventDefault).toHaveBeenCalled();
+            expect(mockEvent.preventDefault).toHaveBeenCalledWith();
             expect(mockEvent.target.value).toBe("test-value");
         });
     });
@@ -406,7 +407,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
 
             // Test calling the callback
             props.onSuccess();
-            expect(props.onSuccess).toHaveBeenCalled();
+            expect(props.onSuccess).toHaveBeenCalledWith();
         });
     });
 
@@ -427,8 +428,8 @@ describe("AddSiteForm Component Coverage Tests", () => {
             resetForm();
             onSuccess();
 
-            expect(resetForm).toHaveBeenCalled();
-            expect(onSuccess).toHaveBeenCalled();
+            expect(resetForm).toHaveBeenCalledWith();
+            expect(onSuccess).toHaveBeenCalledWith();
         });
     });
 
@@ -461,7 +462,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
             };
 
             cleanup();
-            expect(mockClearTimeout).toHaveBeenCalled();
+            expect(mockClearTimeout).toHaveBeenCalledWith();
         });
     });
 
@@ -487,7 +488,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 logger: { error: vi.fn() },
             };
 
-            for (const [key, value] of Object.entries(dependencies)) {
+            for (const [key, value] of objectEntries(dependencies)) {
                 expect(value).toBeDefined();
                 if (key !== "logger") {
                     expect(typeof value).toBe("function");

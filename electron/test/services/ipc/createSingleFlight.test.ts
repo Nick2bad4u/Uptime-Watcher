@@ -6,14 +6,13 @@
  * amplification by deduplicating concurrent calls to expensive operations.
  */
 
-import { describe, expect, it, vi } from "vitest";
-
 import { createSingleFlight } from "@shared/utils/singleFlight";
+import { describe, expect, it, vi } from "vitest";
 
 interface Deferred<T> {
     readonly promise: Promise<T>;
-    resolve: (value: T) => void;
     reject: (error: unknown) => void;
+    resolve: (value: T) => void;
 }
 
 function createDeferred<T>(): Deferred<T> {

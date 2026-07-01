@@ -25,5 +25,5 @@ export declare function convertHashLinksToBangLinksInComment(
  * Mutates an array of TypeDoc comment display parts in-place.
  */
 export declare function convertHashLinksToBangLinksInParts(
-    parts: Array<Record<string, unknown>>
+    parts: Record<string, unknown>[]
 ): void;

@@ -1,9 +1,9 @@
 /**
- * Updates store for managing application updates and notifications.
+ * Updates store for managing app updates and notifications.
  *
  * @remarks
  * This store manages the complete update lifecycle for the Electron
- * application, including checking for updates, downloading updates, tracking
+ * app, including checking for updates, downloading updates, tracking
  * progress, and applying updates. It provides a centralized state management
  * solution for update-related UI components and handles communication with the
  * Electron main process for update operations.
@@ -100,12 +100,12 @@ const UPDATES_PERSIST_CONFIG = createPersistConfig<
 }));
 
 /**
- * Zustand store for managing application updates and update lifecycle.
+ * Zustand store for managing app updates and update lifecycle.
  *
  * @remarks
  * This store provides comprehensive update management functionality including
  * checking for updates, download progress tracking, and update installation
- * with persistence for update status across application sessions.
+ * with persistence for update status across app sessions.
  *
  * @public
  */

@@ -26,7 +26,7 @@ interface DisposeOptions {
  * @remarks
  * Tracks disposers for typed event bus subscriptions (and arbitrary cleanup
  * functions) so they can be disposed together. Prevents leaked listeners when
- * services register numerous handlers across the application lifecycle.
+ * services register numerous handlers across the app lifecycle.
  *
  * @public
  */
@@ -51,13 +51,13 @@ export class ScopedSubscriptionManager {
      *   invocations are ignored to maintain idempotency.
      */
     public track(disposer: () => void): () => void {
-        let active = true;
+        let isActive = true;
         const executeDisposer = (): void => {
-            if (!active) {
+            if (!isActive) {
                 return;
             }
 
-            active = false;
+            isActive = false;
             this.disposers.delete(executeDisposer);
             disposer();
         };
@@ -101,7 +101,7 @@ export class ScopedSubscriptionManager {
     public clearAll(options: DisposeOptions = {}): void {
         const errors: unknown[] = [];
 
-        const trackedDisposers = Array.from(this.disposers);
+        const trackedDisposers = [...this.disposers];
         for (let index = trackedDisposers.length - 1; index >= 0; index -= 1) {
             const disposer = trackedDisposers[index];
             if (disposer) {

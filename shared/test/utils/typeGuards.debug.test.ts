@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 // Import directly from the correct path
 import { isObject } from "../../utils/typeGuards";
 
@@ -13,18 +14,18 @@ describe("typeGuards Debug Test", () => {
         await annotate("Type: Business Logic", "type");
 
         // Call the function directly to ensure coverage
-        const result1 = isObject({ test: "value" });
-        const result2 = isObject(null);
-        const result3 = isObject([]);
-        const result4 = isObject("string");
-        const result5 = isObject(123);
-        const result6 = isObject(undefined);
+        const isResult1 = isObject({ test: "value" });
+        const isResult2 = isObject(null);
+        const isResult3 = isObject([]);
+        const isResult4 = isObject("string");
+        const isResult5 = isObject(123);
+        const isResult6 = isObject(undefined);
 
-        expect(result1).toBeTruthy();
-        expect(result2).toBeFalsy();
-        expect(result3).toBeFalsy();
-        expect(result4).toBeFalsy();
-        expect(result5).toBeFalsy();
-        expect(result6).toBeFalsy();
+        expect(isResult1).toBeTruthy();
+        expect(isResult2).toBeFalsy();
+        expect(isResult3).toBeFalsy();
+        expect(isResult4).toBeFalsy();
+        expect(isResult5).toBeFalsy();
+        expect(isResult6).toBeFalsy();
     });
 });

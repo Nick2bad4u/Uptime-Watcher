@@ -111,12 +111,131 @@ interface UseThemeReturn {
 }
 
 /**
+ * Hook for availability-based styling and color management.
+ *
+ * @remarks
+ * Provides theme-aware color mapping and variant selection based on uptime
+ * percentage values. Includes availability descriptions and styling variants
+ * for consistent presentation of uptime data.
+ *
+ * @example
+ *
+ * ```typescript
+ * const { getAvailabilityColor, getAvailabilityDescription } =
+ *     useAvailabilityColors();
+ *
+ * const color = getAvailabilityColor(99.5); // Returns success color
+ * const desc = getAvailabilityDescription(99.5); // Returns "Very Good"
+ * ```
+ *
+ * @returns Object containing availability color and variant functions
+ */
+export function useAvailabilityColors(): UseAvailabilityColorsReturn {
+    const { currentTheme } = useTheme();
+
+    const getAvailabilityColor = useCallback(
+        (percentage: number) => {
+            // Clamp percentage between 0 and 100
+            const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+            // Use theme colors for consistency - aligned with description
+            // thresholds
+            if (clampedPercentage >= 99.9) {
+                return currentTheme.colors.status.up; // Excellent
+            }
+            if (clampedPercentage >= 99) {
+                return currentTheme.colors.success; // Very Good
+            }
+            if (clampedPercentage >= 95) {
+                return currentTheme.colors.success; // Good
+            }
+            if (clampedPercentage >= 90) {
+                return currentTheme.colors.status.pending; // Fair
+            }
+            if (clampedPercentage >= 80) {
+                return currentTheme.colors.warning; // Poor
+            }
+            if (clampedPercentage >= 50) {
+                return currentTheme.colors.error; // Critical
+            }
+            return currentTheme.colors.status.down; // Failed
+        },
+        [
+            currentTheme.colors.error,
+            currentTheme.colors.status.down,
+            currentTheme.colors.status.pending,
+            currentTheme.colors.status.up,
+            currentTheme.colors.success,
+            currentTheme.colors.warning,
+        ]
+    );
+
+    const getAvailabilityVariant = useCallback((percentage: number) => {
+        const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+        if (clampedPercentage >= 95) {
+            return "success";
+        }
+        if (clampedPercentage >= 80) {
+            return "warning";
+        }
+        return "danger";
+    }, []);
+
+    const getAvailabilityDescription = useCallback((percentage: number) => {
+        const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+        if (clampedPercentage >= 99.9) {
+            return "Excellent";
+        }
+        if (clampedPercentage >= 99) {
+            return "Very Good";
+        }
+        if (clampedPercentage >= 95) {
+            return "Good";
+        }
+        if (clampedPercentage >= 90) {
+            return "Fair";
+        }
+        if (clampedPercentage >= 80) {
+            return "Poor";
+        }
+        if (clampedPercentage >= 50) {
+            return "Critical";
+        }
+        return "Failed";
+    }, []);
+
+    return {
+        getAvailabilityColor,
+        getAvailabilityDescription,
+        getAvailabilityVariant,
+    };
+}
+
+/**
+ * Hook for accessing theme-aware status colors.
+ *
+ * @returns Object containing status colors from the current theme
+ */
+export function useStatusColors(): UseStatusColorsReturn {
+    const { currentTheme } = useTheme();
+
+    return {
+        down: currentTheme.colors.status.down,
+        pending: currentTheme.colors.status.pending,
+        unknown: currentTheme.colors.status.unknown,
+        up: currentTheme.colors.status.up,
+    };
+}
+
+/**
  * Main theme hook providing comprehensive theme management functionality.
  *
  * @remarks
  * This hook provides a complete theming solution with system integration, color
  * utilities, and automatic updates. It serves as the primary interface for all
- * theme-related operations throughout the application.
+ * theme-related operations throughout the app.
  *
  * @example
  *
@@ -327,114 +446,6 @@ export function useTheme(): UseThemeReturn {
         themeVersion,
         /** Toggle between light and dark themes */
         toggleTheme,
-    };
-}
-
-/**
- * Hook for availability-based styling and color management.
- *
- * @remarks
- * Provides theme-aware color mapping and variant selection based on uptime
- * percentage values. Includes availability descriptions and styling variants
- * for consistent presentation of uptime data.
- *
- * @example
- *
- * ```typescript
- * const { getAvailabilityColor, getAvailabilityDescription } =
- *     useAvailabilityColors();
- *
- * const color = getAvailabilityColor(99.5); // Returns success color
- * const desc = getAvailabilityDescription(99.5); // Returns "Very Good"
- * ```
- *
- * @returns Object containing availability color and variant functions
- */
-export function useAvailabilityColors(): UseAvailabilityColorsReturn {
-    const { currentTheme } = useTheme();
-
-    const getAvailabilityColor = useCallback(
-        (percentage: number) => {
-            // Clamp percentage between 0 and 100
-            const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
-            // Use theme colors for consistency - aligned with description
-            // thresholds
-            if (clampedPercentage >= 99.9) {
-                return currentTheme.colors.status.up; // Excellent
-            } else if (clampedPercentage >= 99) {
-                return currentTheme.colors.success; // Very Good
-            } else if (clampedPercentage >= 95) {
-                return currentTheme.colors.success; // Good
-            } else if (clampedPercentage >= 90) {
-                return currentTheme.colors.status.pending; // Fair
-            } else if (clampedPercentage >= 80) {
-                return currentTheme.colors.warning; // Poor
-            } else if (clampedPercentage >= 50) {
-                return currentTheme.colors.error; // Critical
-            }
-            return currentTheme.colors.status.down; // Failed
-        },
-        [
-            currentTheme.colors.error,
-            currentTheme.colors.status.down,
-            currentTheme.colors.status.pending,
-            currentTheme.colors.status.up,
-            currentTheme.colors.success,
-            currentTheme.colors.warning,
-        ]
-    );
-
-    const getAvailabilityVariant = useCallback((percentage: number) => {
-        const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
-        if (clampedPercentage >= 95) {
-            return "success";
-        } else if (clampedPercentage >= 80) {
-            return "warning";
-        }
-        return "danger";
-    }, []);
-
-    const getAvailabilityDescription = useCallback((percentage: number) => {
-        const clampedPercentage = Math.max(0, Math.min(100, percentage));
-
-        if (clampedPercentage >= 99.9) {
-            return "Excellent";
-        } else if (clampedPercentage >= 99) {
-            return "Very Good";
-        } else if (clampedPercentage >= 95) {
-            return "Good";
-        } else if (clampedPercentage >= 90) {
-            return "Fair";
-        } else if (clampedPercentage >= 80) {
-            return "Poor";
-        } else if (clampedPercentage >= 50) {
-            return "Critical";
-        }
-        return "Failed";
-    }, []);
-
-    return {
-        getAvailabilityColor,
-        getAvailabilityDescription,
-        getAvailabilityVariant,
-    };
-}
-
-/**
- * Hook for accessing theme-aware status colors.
- *
- * @returns Object containing status colors from the current theme
- */
-export function useStatusColors(): UseStatusColorsReturn {
-    const { currentTheme } = useTheme();
-
-    return {
-        down: currentTheme.colors.status.down,
-        pending: currentTheme.colors.status.pending,
-        unknown: currentTheme.colors.status.unknown,
-        up: currentTheme.colors.status.up,
     };
 }
 

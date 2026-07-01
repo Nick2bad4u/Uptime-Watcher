@@ -420,8 +420,8 @@ export class MonitorUnknownFieldError extends Error {
 
     public readonly monitorType: string;
 
-    public constructor(args: { fieldName: string; monitorType: string }) {
-        super(`Unknown field: ${args.fieldName}`);
+    public constructor(args: { fieldName: string; monitorType: string }, options: ErrorOptions) {
+        super(`Unknown field: ${args.fieldName}`, options);
         this.name = "MonitorUnknownFieldError";
         this.fieldName = args.fieldName;
         this.monitorType = args.monitorType;
@@ -554,7 +554,7 @@ export function getMonitorValidationErrors(candidate: unknown): string[] {
 
     const result = validateMonitorData(rawKind, candidate);
 
-    return result.success ? [] : Array.from(result.errors);
+    return result.success ? [] : [...result.errors];
 }
 
 /**

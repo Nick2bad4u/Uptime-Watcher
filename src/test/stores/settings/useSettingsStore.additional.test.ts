@@ -3,9 +3,11 @@
  */
 
 import { renderHook } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../error/useErrorStore", () => ({
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+
+vi.mock(import('../error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             setError: vi.fn(),
@@ -15,7 +17,7 @@ vi.mock("../error/useErrorStore", () => ({
     },
 }));
 
-vi.mock("../utils", () => ({
+vi.mock(import('../utils'), () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, errorHandling) => {
         try {
@@ -35,7 +37,7 @@ vi.mock("../utils", () => ({
         } catch (error: unknown) {
             if (errorHandling?.setError) {
                 errorHandling.setError(
-                    error instanceof Error ? error.message : String(error)
+                    Error.isError(error) ? error.message : String(error)
                 );
             }
             if (errorHandling?.setLoading) {
@@ -47,7 +49,7 @@ vi.mock("../utils", () => ({
     }),
 }));
 
-vi.mock("../../constants", () => ({
+vi.mock(import('../../constants'), () => ({
     DEFAULT_HISTORY_LIMIT: 1000,
 }));
 
@@ -57,7 +59,7 @@ const mockResetSettings = vi.fn();
 const mockUpdateHistoryLimit = vi.fn();
 
 globalThis.window = {
-    ...globalThis.window,
+    ...globalThis,
     electronAPI: {
         settings: {
             getHistoryLimit: mockGetHistoryLimit,
@@ -66,8 +68,6 @@ globalThis.window = {
         },
     },
 } as any;
-
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 describe("useSettingsStore - Additional Coverage", () => {
     beforeEach(() => {

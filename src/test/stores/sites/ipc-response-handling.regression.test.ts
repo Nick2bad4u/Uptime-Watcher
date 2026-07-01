@@ -1,12 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { Site } from "@shared/types";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteService } from "../../../services/SiteService";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 import { createMockSite } from "../../utils/mockFactories";
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     waitForElectronBridge: vi.fn(async () => undefined),
 }));
 
@@ -50,7 +50,7 @@ describe("IPC response handling regression", () => {
 
         sitesApi.addSite.mockRejectedValueOnce(new Error("IPC failed"));
 
-        await expect(SiteService.addSite(site)).rejects.toThrow(/IPC failed/);
+        await expect(SiteService.addSite(site)).rejects.toThrow(/IPC failed/v);
     });
 
     it("SiteService.getSites returns backend data", async () => {

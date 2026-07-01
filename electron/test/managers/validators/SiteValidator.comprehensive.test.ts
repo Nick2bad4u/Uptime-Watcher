@@ -3,8 +3,14 @@
  * coverage and edge cases
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { MonitorValidator as MonitorValidatorType } from "../../../managers/validators/MonitorValidator";
+
+import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
+import { SiteValidator } from "../../../managers/validators/SiteValidator";
 
 const monitorValidatorCtor = vi.hoisted(() => {
     const wrapper = vi.fn(function MockMonitorValidator() {
@@ -30,10 +36,6 @@ vi.mock("../../../managers/validators/MonitorValidator", () => ({
     MonitorValidator: monitorValidatorCtor,
 }));
 
-import { SiteValidator } from "../../../managers/validators/SiteValidator";
-import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
-import type { Site } from "@shared/types";
-
 describe("SiteValidator - Comprehensive Coverage", () => {
     let siteValidator: SiteValidator;
     let mockMonitorValidator: Partial<MonitorValidator>;
@@ -46,7 +48,7 @@ describe("SiteValidator - Comprehensive Coverage", () => {
 
         const latestInstance = monitorValidatorCtor.latestInstance;
         mockMonitorValidator = (latestInstance ??
-            new monitorValidatorCtor()) as Partial<MonitorValidator>;
+            new monitorValidatorCtor());
     });
 
     describe("Constructor", () => {
@@ -81,8 +83,8 @@ describe("SiteValidator - Comprehensive Coverage", () => {
                 monitors: [],
             };
 
-            const result = siteValidator.shouldIncludeInExport(site);
-            expect(result).toBeTruthy();
+            const isResult = siteValidator.shouldIncludeInExport(site);
+            expect(isResult).toBeTruthy();
         });
 
         it("should return false for empty string identifier", async ({
@@ -101,8 +103,8 @@ describe("SiteValidator - Comprehensive Coverage", () => {
                 monitors: [],
             };
 
-            const result = siteValidator.shouldIncludeInExport(site);
-            expect(result).toBeFalsy();
+            const isResult = siteValidator.shouldIncludeInExport(site);
+            expect(isResult).toBeFalsy();
         });
     });
 

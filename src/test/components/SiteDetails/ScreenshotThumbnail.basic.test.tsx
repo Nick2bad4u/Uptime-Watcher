@@ -8,8 +8,9 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { useEffect } from "react";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { safeCastTo } from "ts-extras";
 import "@testing-library/jest-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     ScreenshotThumbnail,
@@ -23,11 +24,11 @@ let mockUIState = {
 
 // Mock theme state
 let mockThemeState = {
-    themeName: "light" as string,
+    themeName: safeCastTo<string>("light"),
 };
 
 // Mock stores and hooks
-vi.mock("../../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../../stores/ui/useUiStore'), () => ({
     useUIStore: vi.fn((selector?: (state: typeof mockUIState) => unknown) => {
         const state = {
             openExternal: mockUIState.openExternal,
@@ -37,16 +38,16 @@ vi.mock("../../../stores/ui/useUiStore", () => ({
     }),
 }));
 
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useTheme: vi.fn(() => ({
         themeName: mockThemeState.themeName,
     })),
 }));
 
-vi.mock("../../../hooks/useMount", () => ({
+vi.mock(import('../../../hooks/useMount'), () => ({
     useMount: (
         init: (() => void) | undefined,
-        cleanup?: (() => void) | undefined
+        cleanup?: (() => void)
     ) => {
         useEffect(() => {
             if (init) init();
@@ -58,7 +59,7 @@ vi.mock("../../../hooks/useMount", () => ({
 }));
 
 // Mock constants
-vi.mock("../../../constants", () => ({
+vi.mock(import('../../../constants'), () => ({
     UI_DELAYS: {
         STATE_UPDATE_DEFER: 16,
         HOVER_DELAY: 200,
@@ -66,7 +67,7 @@ vi.mock("../../../constants", () => ({
 }));
 
 // Mock React portal to simplify testing
-vi.mock("react-dom", async (importOriginal) => {
+vi.mock(import('react-dom'), async (importOriginal) => {
     const actual = await importOriginal<typeof import("react-dom")>();
     return {
         ...actual,
@@ -89,16 +90,17 @@ Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
     })),
 });
 
-Object.defineProperty(window, "innerWidth", {
-    writable: true,
-    configurable: true,
-    value: 1920,
-});
-
-Object.defineProperty(window, "innerHeight", {
-    writable: true,
-    configurable: true,
-    value: 1080,
+Object.defineProperties(globalThis, {
+    innerWidth: {
+        writable: true,
+        configurable: true,
+        value: 1920,
+    },
+    innerHeight: {
+        writable: true,
+        configurable: true,
+        value: 1080,
+    },
 });
 
 const createThumbnailProps = (
@@ -126,25 +128,26 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
         };
 
         // Reset DOM mocks
-        Object.defineProperty(window, "innerWidth", {
-            writable: true,
-            configurable: true,
-            value: 1920,
-        });
-
-        Object.defineProperty(window, "innerHeight", {
-            writable: true,
-            configurable: true,
-            value: 1080,
+        Object.defineProperties(globalThis, {
+            innerWidth: {
+                writable: true,
+                configurable: true,
+                value: 1920,
+            },
+            innerHeight: {
+                writable: true,
+                configurable: true,
+                value: 1080,
+            },
         });
 
         // Mock document.body for portal
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
     });
 
     afterEach(() => {
         vi.clearAllMocks();
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
     });
 
     describe("Basic Rendering", () => {
@@ -274,10 +277,10 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
             render(<ScreenshotThumbnail {...props} />);
 
             // Look for the text pattern including the space after colon
-            expect(screen.getByText(/Preview:\s*$/)).toBeInTheDocument();
+            expect(screen.getByText(/Preview:\s*$/v)).toBeInTheDocument();
             // The alt text includes trailing space for empty siteName
             expect(
-                screen.getByAltText(/Screenshot of\s*$/)
+                screen.getByAltText(/Screenshot of\s*$/v)
             ).toBeInTheDocument();
         });
 

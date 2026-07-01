@@ -6,9 +6,10 @@
  */
 
 import { describe, expect, test } from "vitest";
+
 import {
-    isAbortError,
     createCombinedAbortSignal,
+    isAbortError,
     raceWithAbort,
 } from "../../utils/abortUtils.js";
 
@@ -16,13 +17,13 @@ class SpyAbortSignal {
     public aborted = false;
 
     public readonly addCalls: {
-        readonly type: string;
         readonly listener: EventListenerOrEventListenerObject;
+        readonly type: string;
     }[] = [];
 
     public readonly removeCalls: {
-        readonly type: string;
         readonly listener: EventListenerOrEventListenerObject;
+        readonly type: string;
     }[] = [];
 
     private readonly abortListeners =
@@ -205,12 +206,12 @@ describe("AbortUtils Function Coverage Tests", () => {
 
         test("should reject when signal aborts during operation", async () => {
             const operation = new Promise((resolve) => {
-                setTimeout(() => resolve("success"), 200);
+                setTimeout(() => { resolve("success"); }, 200);
             });
             const controller = new AbortController();
 
             // Abort after 100ms
-            setTimeout(() => controller.abort(), 100);
+            setTimeout(() => { controller.abort(); }, 100);
 
             await expect(
                 raceWithAbort(operation, controller.signal)

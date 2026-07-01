@@ -25,7 +25,7 @@ const createEmitWarningSuppressor =
         let message = "";
         if (typeof warning === "string") {
             message = warning;
-        } else if (warning instanceof Error) {
+        } else if (Error.isError(warning)) {
             const { message: errorMessage } = warning;
             message = errorMessage;
         }

@@ -4,25 +4,25 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL } from "../utils/testData";
 import {
     closeModal,
     fillAddSiteForm,
     openAddSiteModal,
     removeAllSites,
-    submitAddSiteForm,
     resetApplicationState,
-    waitForDialogTeardown,
+    submitAddSiteForm,
     WAIT_TIMEOUTS,
+    waitForDialogTeardown,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL } from "../utils/testData";
 
 const MALICIOUS_SITE_NAME = '<script>alert("xss")</script>';
 
@@ -63,7 +63,7 @@ test.describe(
             async () => {
                 test.setTimeout(60_000);
                 await page.evaluate(() => {
-                    const global = window as unknown as {
+                    const global = globalThis as unknown as {
                         __alertCalled__?: boolean;
                         alert: typeof window.alert;
                     };
@@ -84,17 +84,17 @@ test.describe(
                 const maliciousCard = page
                     .getByTestId("site-card")
                     .filter({ hasText: 'alert("xss")' });
-                await expect(maliciousCard).toBeVisible({
+                await expect.soft(maliciousCard).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                const alertTriggered = await page.evaluate(() => {
-                    const global = window as unknown as {
+                const isAlertTriggered = await page.evaluate(() => {
+                    const global = globalThis as unknown as {
                         __alertCalled__?: boolean;
                     };
                     return Boolean(global.__alertCalled__);
                 });
-                expect(alertTriggered).toBe(false);
+                expect.soft(isAlertTriggered).toBe(false);
             }
         );
 
@@ -111,7 +111,7 @@ test.describe(
                 }
 
                 await openAddSiteModal(page);
-                await expect(page.getByTestId("add-site-form")).toBeVisible({
+                await expect.soft(page.getByTestId("add-site-form")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await closeModal(page, "escape");
@@ -127,23 +127,23 @@ test.describe(
             },
             async () => {
                 await page.setViewportSize({ width: 360, height: 640 });
-                await expect(page.getByTestId("empty-state")).toBeVisible({
+                await expect.soft(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     page
                         .getByRole("banner")
                         .getByRole("button", { name: /add new site/i })
                 ).toBeVisible();
 
                 await page.setViewportSize({ width: 1920, height: 1080 });
-                await expect(page.getByTestId("empty-state")).toBeVisible({
+                await expect.soft(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     page
                         .getByRole("banner")
-                        .getByRole("button", { name: /Open settings/i })
+                        .getByRole("button", { name: /open settings/i })
                 ).toBeVisible();
             }
         );

@@ -3,6 +3,7 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+
 import { SiteManager } from "../../managers/SiteManager";
 
 // Mock logger first
@@ -223,9 +224,9 @@ describe("SiteManager Mock Debug", () => {
         const siteManager = new SiteManager(mockDeps);
 
         // Test that the cache is properly mocked
-        const cache = siteManager["sitesCache"];
-        const writer = siteManager["siteWriterService"];
-        const repo = siteManager["siteRepositoryService"];
+        const cache = siteManager.sitesCache;
+        const writer = siteManager.siteWriterService;
+        const repo = siteManager.siteRepositoryService;
 
         // Force output by throwing an error with the details we need
         const debugInfo = {

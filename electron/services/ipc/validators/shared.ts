@@ -56,7 +56,7 @@ import { validateRequiredStringPayload } from "./utils/stringPayloadValidation";
 const MAX_IMPORT_DATA_PAYLOAD_BYTES: number = MAX_IPC_JSON_IMPORT_BYTES;
 
 /** Maximum byte budget accepted for user-supplied restore filenames. */
-const MAX_RESTORE_FILE_NAME_BYTES: number = 512;
+const MAX_RESTORE_FILE_NAME_BYTES = 512;
 
 /** Maximum byte budget accepted for monitor validation payloads over IPC. */
 const MAX_MONITOR_VALIDATION_DATA_BYTES: number = 256 * 1024;
@@ -122,7 +122,7 @@ const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
         const errors: string[] = [];
 
         const recordResult = requireRecordParamValue(payload, "payload");
-        if (recordResult.ok === false) {
+        if (!recordResult.ok) {
             return recordResult.error;
         }
 

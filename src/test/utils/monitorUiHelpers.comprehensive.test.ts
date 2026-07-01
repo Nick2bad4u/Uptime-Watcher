@@ -1,14 +1,31 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Monitor } from "@shared/types";
-import type { MonitorType } from "@shared/types";
-import type { ValidationResult } from "@shared/types/validation";
+import type { Monitor, MonitorType  } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
+
 import { CacheKeys } from "@shared/utils/cacheKeys";
+import { safeCastTo } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MonitorTypesService } from "../../services/MonitorTypesService";
+import {
+    allSupportsAdvancedAnalytics,
+    allSupportsResponseTime,
+    clearConfigCache,
+    formatMonitorDetail,
+    formatMonitorTitleSuffix,
+    getAnalyticsLabel,
+    getDefaultMonitorId,
+    getMonitorHelpTexts,
+    getTypesWithFeature,
+    shouldShowUrl,
+    supportsAdvancedAnalytics,
+    supportsResponseTime,
+} from "../../utils/monitorUiHelpers";
 
 const cacheMocks = vi.hoisted(() => ({
+    clear: vi.fn(),
     get: vi.fn(),
     set: vi.fn(),
-    clear: vi.fn(),
 }));
 
 const monitorTypeHelperMocks = vi.hoisted(() => ({
@@ -20,21 +37,21 @@ const monitorTypesServiceMocks = vi.hoisted(() => ({
     formatMonitorDetail: vi.fn(),
     formatMonitorTitleSuffix: vi.fn(),
     getMonitorTypes: vi.fn(),
-    validateMonitorData: vi.fn(),
     initialize: vi.fn(),
+    validateMonitorData: vi.fn(),
 }));
 
 const monitorTypesStoreState = vi.hoisted(() => ({
     clearError: vi.fn(),
-    fieldConfigs: {} as Record<string, unknown>,
+    fieldConfigs: {},
     formatMonitorDetail: vi.fn(),
     formatMonitorTitleSuffix: vi.fn(),
     getFieldConfig: vi.fn(),
     isLoaded: true,
     isLoading: false,
-    lastError: undefined as unknown,
+    lastError: undefined,
     loadMonitorTypes: vi.fn(),
-    monitorTypes: [] as MonitorTypeConfig[],
+    monitorTypes: safeCastTo<MonitorTypeConfig[]>([]),
     refreshMonitorTypes: vi.fn(),
     setError: vi.fn(),
     setLoading: vi.fn(),
@@ -45,17 +62,17 @@ const mockCacheGet = cacheMocks.get;
 const mockCacheSet = cacheMocks.set;
 const mockCacheClear = cacheMocks.clear;
 
-vi.mock("../../utils/cache", () => ({
+vi.mock(import('../../utils/cache'), () => ({
     AppCaches: {
         uiHelpers: {
+            clear: cacheMocks.clear,
             get: cacheMocks.get,
             set: cacheMocks.set,
-            clear: cacheMocks.clear,
         },
     },
 }));
 
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     withUtilityErrorHandling: vi.fn(
         async <T>(
             operation: () => Promise<T>,
@@ -75,38 +92,22 @@ const mockGetAvailableMonitorTypes =
     monitorTypeHelperMocks.getAvailableMonitorTypes;
 const mockGetMonitorTypeConfig = monitorTypeHelperMocks.getMonitorTypeConfig;
 
-vi.mock("../../utils/monitorTypeHelper", () => ({
+vi.mock(import('../../utils/monitorTypeHelper'), () => ({
     getAvailableMonitorTypes: monitorTypeHelperMocks.getAvailableMonitorTypes,
     getMonitorTypeConfig: monitorTypeHelperMocks.getMonitorTypeConfig,
 }));
 
-vi.mock("../../services/MonitorTypesService", () => ({
+vi.mock(import('../../services/MonitorTypesService'), () => ({
     MonitorTypesService: monitorTypesServiceMocks,
 }));
 
 const loadMonitorTypesMock = monitorTypesStoreState.loadMonitorTypes;
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
     useMonitorTypesStore: {
         getState: () => monitorTypesStoreState,
     },
 }));
-
-import {
-    allSupportsAdvancedAnalytics,
-    allSupportsResponseTime,
-    clearConfigCache,
-    formatMonitorDetail,
-    formatMonitorTitleSuffix,
-    getAnalyticsLabel,
-    getDefaultMonitorId,
-    getMonitorHelpTexts,
-    getTypesWithFeature,
-    shouldShowUrl,
-    supportsAdvancedAnalytics,
-    supportsResponseTime,
-} from "../../utils/monitorUiHelpers";
-import { MonitorTypesService } from "../../services/MonitorTypesService";
 
 const configMap = new Map<string, MonitorTypeConfig>();
 
@@ -118,10 +119,9 @@ const createConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
 ): MonitorTypeConfig => {
     const baseConfig = {
-        type: overrides.type ?? type,
-        displayName:
-            overrides.displayName ?? `${String(type).toUpperCase()} Monitor`,
         description: overrides.description ?? "Monitor configuration",
+        displayName:
+            overrides.displayName ?? `${type.toUpperCase()} Monitor`,
         fields:
             overrides.fields ??
             ([
@@ -134,6 +134,7 @@ const createConfig = (
                     type: "url",
                 },
             ] satisfies MonitorTypeConfig["fields"]),
+        type: overrides.type ?? type,
         version: overrides.version ?? "1.0.0",
     } satisfies Omit<MonitorTypeConfig, "uiConfig">;
 
@@ -156,7 +157,7 @@ const createConfig = (
                 ...detailFormatsRest,
                 analyticsLabel:
                     analyticsLabel ??
-                    `${String(type).toUpperCase()} Response Time`,
+                    `${type.toUpperCase()} Response Time`,
             },
             display: {
                 ...displayRest,
@@ -256,8 +257,9 @@ describe(supportsAdvancedAnalytics, () => {
             },
         });
 
-        const result = await supportsAdvancedAnalytics("http");
-        expect(result).toBeTruthy();
+        const isResult = await supportsAdvancedAnalytics("http");
+
+        expect(isResult).toBe(true);
     });
 
     it("returns false when the configuration does not enable the feature", async () => {
@@ -267,8 +269,9 @@ describe(supportsAdvancedAnalytics, () => {
             },
         });
 
-        const result = await supportsAdvancedAnalytics("http");
-        expect(result).toBeFalsy();
+        const isResult = await supportsAdvancedAnalytics("http");
+
+        expect(isResult).toBe(false);
     });
 
     it("fetches configuration when cache is empty", async () => {
@@ -283,9 +286,9 @@ describe(supportsAdvancedAnalytics, () => {
             })
         );
 
-        const result = await supportsAdvancedAnalytics("http");
+        const isResult = await supportsAdvancedAnalytics("http");
 
-        expect(result).toBeTruthy();
+        expect(isResult).toBe(true);
         expect(mockGetMonitorTypeConfig).toHaveBeenCalledWith("http");
         expect(mockCacheSet).toHaveBeenCalledWith(
             getCacheKeyForType("http"),
@@ -302,8 +305,9 @@ describe(supportsAdvancedAnalytics, () => {
         mockCacheGet.mockReturnValue(undefined);
         mockGetMonitorTypeConfig.mockRejectedValueOnce(new Error("boom"));
 
-        const result = await supportsAdvancedAnalytics("http");
-        expect(result).toBeFalsy();
+        const isResult = await supportsAdvancedAnalytics("http");
+
+        expect(isResult).toBe(false);
     });
 });
 
@@ -315,8 +319,9 @@ describe(supportsResponseTime, () => {
             },
         });
 
-        const result = await supportsResponseTime("ping");
-        expect(result).toBeTruthy();
+        const isResult = await supportsResponseTime("ping");
+
+        expect(isResult).toBe(true);
     });
 
     it("returns false when response time support is absent", async () => {
@@ -326,8 +331,9 @@ describe(supportsResponseTime, () => {
             },
         });
 
-        const result = await supportsResponseTime("ping");
-        expect(result).toBeFalsy();
+        const isResult = await supportsResponseTime("ping");
+
+        expect(isResult).toBe(false);
     });
 
     it("returns false when configuration retrieval fails", async () => {
@@ -335,8 +341,9 @@ describe(supportsResponseTime, () => {
         mockCacheGet.mockReturnValue(undefined);
         mockGetMonitorTypeConfig.mockRejectedValueOnce(new Error("failed"));
 
-        const result = await supportsResponseTime("ping");
-        expect(result).toBeFalsy();
+        const isResult = await supportsResponseTime("ping");
+
+        expect(isResult).toBe(false);
     });
 });
 
@@ -353,8 +360,9 @@ describe(allSupportsAdvancedAnalytics, () => {
             },
         });
 
-        const result = await allSupportsAdvancedAnalytics(["http", "port"]);
-        expect(result).toBeTruthy();
+        const isResult = await allSupportsAdvancedAnalytics(["http", "port"]);
+
+        expect(isResult).toBe(true);
     });
 
     it("returns false when at least one type does not support advanced analytics", async () => {
@@ -369,8 +377,9 @@ describe(allSupportsAdvancedAnalytics, () => {
             },
         });
 
-        const result = await allSupportsAdvancedAnalytics(["http", "port"]);
-        expect(result).toBeFalsy();
+        const isResult = await allSupportsAdvancedAnalytics(["http", "port"]);
+
+        expect(isResult).toBe(false);
     });
 });
 
@@ -387,8 +396,9 @@ describe(allSupportsResponseTime, () => {
             },
         });
 
-        const result = await allSupportsResponseTime(["http", "dns"]);
-        expect(result).toBeTruthy();
+        const isResult = await allSupportsResponseTime(["http", "dns"]);
+
+        expect(isResult).toBe(true);
     });
 
     it("returns false when any type lacks response time support", async () => {
@@ -403,8 +413,9 @@ describe(allSupportsResponseTime, () => {
             },
         });
 
-        const result = await allSupportsResponseTime(["http", "dns"]);
-        expect(result).toBeFalsy();
+        const isResult = await allSupportsResponseTime(["http", "dns"]);
+
+        expect(isResult).toBe(false);
     });
 });
 
@@ -425,6 +436,7 @@ describe(formatMonitorDetail, () => {
         ).mockRejectedValueOnce(new Error("service down"));
 
         const result = await formatMonitorDetail("http", "200");
+
         expect(result).toBe("200");
     });
 });
@@ -447,6 +459,7 @@ describe(formatMonitorTitleSuffix, () => {
         ).mockRejectedValueOnce(new Error("bad format"));
 
         const result = await formatMonitorTitleSuffix("http", monitor);
+
         expect(result).toBe("");
     });
 });
@@ -462,6 +475,7 @@ describe(getAnalyticsLabel, () => {
         });
 
         const result = await getAnalyticsLabel("http");
+
         expect(result).toBe("Custom Analytics");
     });
 
@@ -469,6 +483,7 @@ describe(getAnalyticsLabel, () => {
         configMap.clear();
 
         const result = await getAnalyticsLabel("http");
+
         expect(result).toBe("HTTP Response Time");
     });
 
@@ -487,6 +502,7 @@ describe(getAnalyticsLabel, () => {
         );
 
         const result = await getAnalyticsLabel("http");
+
         expect(result).toBe("Fetched Label");
         expect(mockCacheSet).toHaveBeenCalledWith(
             getCacheKeyForType("http"),
@@ -513,6 +529,7 @@ describe(getMonitorHelpTexts, () => {
         });
 
         const result = await getMonitorHelpTexts("http");
+
         expect(result).toEqual({
             primary: "Primary text",
             secondary: "Secondary text",
@@ -522,6 +539,7 @@ describe(getMonitorHelpTexts, () => {
     it("returns an empty object when help texts are unavailable", async () => {
         configMap.clear();
         const result = await getMonitorHelpTexts("http");
+
         expect(result).toEqual({});
     });
 });
@@ -549,6 +567,7 @@ describe(getTypesWithFeature, () => {
         ]);
 
         const result = await getTypesWithFeature("responseTime");
+
         expect(result).toEqual(["http"]);
     });
 
@@ -567,6 +586,7 @@ describe(getTypesWithFeature, () => {
         ]);
 
         const result = await getTypesWithFeature("advancedAnalytics");
+
         expect(result).toEqual(["http"]);
     });
 });
@@ -581,14 +601,16 @@ describe(shouldShowUrl, () => {
             },
         });
 
-        const result = await shouldShowUrl("http");
-        expect(result).toBeTruthy();
+        const isResult = await shouldShowUrl("http");
+
+        expect(isResult).toBe(true);
     });
 
     it("returns false when configuration is missing", async () => {
         configMap.clear();
-        const result = await shouldShowUrl("http");
-        expect(result).toBeFalsy();
+        const isResult = await shouldShowUrl("http");
+
+        expect(isResult).toBe(false);
     });
 });
 
@@ -605,6 +627,7 @@ describe(getDefaultMonitorId, () => {
 describe(clearConfigCache, () => {
     it("clears the cached configuration entries", () => {
         storeConfig("http");
+
         expect(configMap.size).toBe(1);
 
         clearConfigCache();

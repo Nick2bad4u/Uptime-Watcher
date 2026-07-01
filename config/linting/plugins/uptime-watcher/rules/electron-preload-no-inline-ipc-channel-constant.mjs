@@ -92,7 +92,7 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
 
                 // Heuristic: most channel constants are ALL_CAPS with CHANNEL
                 // In the name.
-                if (!/CHANNEL/v.test(node.id.name)) {
+                if (!node.id.name.includes('CHANNEL')) {
                     return;
                 }
 
@@ -109,17 +109,17 @@ export const electronPreloadNoInlineIpcChannelConstantRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow defining inline *_CHANNEL string constants in electron/preload; use shared channel constants instead.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-preload-no-inline-ipc-channel-constant.md",
         },
-        schema: [],
         messages: {
             noInlineChannelConstant:
                 "Do not define IPC channel string constants here. Import canonical channel constants from @shared/types/preload (or another shared registry).",
         },
+        schema: [],
+        type: "problem",
     },
 };

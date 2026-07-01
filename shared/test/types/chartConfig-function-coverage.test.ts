@@ -7,6 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { hasPlugins, hasScales } from "../../types/chartConfig";
 
 describe("Chart Config Function Coverage", () => {

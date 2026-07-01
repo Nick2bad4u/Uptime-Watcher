@@ -3,25 +3,30 @@
  * components.
  */
 
+import type { UnknownArray, UnknownRecord  } from "type-fest";
+
+import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import * as matchers from "@testing-library/jest-dom/matchers";
 import fc from "fast-check";
-import { beforeEach, expect, vi, type MockInstance } from "vitest";
-import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
-
-import { EventEmitter } from "node:events";
 import { webcrypto } from "node:crypto";
+import { EventEmitter } from "node:events";
+import { safeCastTo, stringSplit  } from "ts-extras";
+import { beforeEach, expect, type MockInstance, vi } from "vitest";
 
 import { useErrorStore } from "../stores/error/useErrorStore";
+// Custom test context setup for task and annotate properties
+// Note: The actual type definitions are in src/types/vitest-context.d.ts
+import "./vitest-context-setup";
 
 // Stub problematic aria-query literal-role metadata to avoid SyntaxError
 // crashes originating from third-party role maps while keeping matchers
 // available. Vitest hoists vi.mock calls, so these apply before consumers are
 // loaded.
-vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles", () => ({
+vi.mock(import('aria-query/lib/etc/roles/ariaLiteralRoles'), () => ({
     __esModule: true as const,
     default: [] as const,
 }));
-vi.mock("aria-query/lib/etc/roles/ariaLiteralRoles.js", () => ({
+vi.mock(import('aria-query/lib/etc/roles/ariaLiteralRoles.js'), () => ({
     __esModule: true as const,
     default: [] as const,
 }));
@@ -44,7 +49,7 @@ process.emitWarning = ((warning: unknown, ...args: unknown[]) => {
     const message =
         typeof warning === "string"
             ? warning
-            : warning instanceof Error
+            : Error.isError(warning)
               ? warning.message
               : "";
 
@@ -58,7 +63,7 @@ process.emitWarning = ((warning: unknown, ...args: unknown[]) => {
     }
 
     originalEmitWarning(warning, ...args);
-}) as typeof process.emitWarning;
+});
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment
@@ -78,7 +83,7 @@ process.removeAllListeners("unhandledRejection");
 process.on("unhandledRejection", (reason: unknown) => {
     // Only suppress expected test error messages
     if (
-        reason instanceof Error &&
+        Error.isError(reason) &&
         (reason.message.includes("Always fails") ||
             reason.message.includes("Fails") ||
             reason.message.includes("Operation was aborted") ||
@@ -98,7 +103,7 @@ process.on("unhandledRejection", (reason: unknown) => {
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
+const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -134,9 +139,7 @@ fc.configureGlobal({
     // examples: [],          // add any concrete inputs you want always tested
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
-    // RNG / reproducibility
-    // seed: undefined,    // set a specific number to reproduce runs
-    // randomType: 'xorshift128plus', // default; change if you need a different generator
+    // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,
@@ -146,7 +149,7 @@ fc.configureGlobal({
 let windowOpenSpy: MockInstance | undefined;
 
 if (typeof window !== "undefined" && typeof window.open === "function") {
-    windowOpenSpy = vi.spyOn(window, "open").mockReturnValue(null);
+    windowOpenSpy = vi.spyOn(globalThis, "open").mockReturnValue(null);
 }
 
 beforeEach(() => {
@@ -181,9 +184,9 @@ class MockResizeObserver {
 
     constructor(callback: ResizeObserverCallback) {
         this.callback = callback;
-        this.observe = vi.fn();
-        this.unobserve = vi.fn();
-        this.disconnect = vi.fn();
+        vi.spyOn(this, 'observe').mockImplementation();
+        vi.spyOn(this, 'unobserve').mockImplementation();
+        vi.spyOn(this, 'disconnect').mockImplementation();
     }
 
     /**
@@ -202,10 +205,10 @@ globalThis.ResizeObserver =
  * `localStorage` or `sessionStorage` shim via experimental flags.
  */
 interface StorageShim {
-    readonly length: number;
     clear: () => void;
-    getItem: (key: string) => string | null;
-    key: (index: number) => string | null;
+    getItem: (key: string) => null | string;
+    key: (index: number) => null | string;
+    readonly length: number;
     removeItem: (key: string) => void;
     setItem: (key: string, value: string) => void;
 }
@@ -240,17 +243,13 @@ const createStorageShim = (): StorageShim => {
         clear(): void {
             storage.clear();
         },
-        getItem(key: string): string | null {
-            return storage.has(key) ? (storage.get(key) ?? null) : null;
-        },
-        key(index: number): string | null {
-            return [...storage.keys()][index] ?? null;
-        },
+        getItem: (key: string): null | string => storage.has(key) ? (storage.get(key) ?? null) : null,
+        key: (index: number): null | string => [...storage.keys()][index] ?? null,
         removeItem(key: string): void {
             storage.delete(key);
         },
         setItem(key: string, value: string): void {
-            storage.set(key, String(value));
+            storage.set(key, value);
         },
     } satisfies StorageShim;
 };
@@ -265,7 +264,7 @@ const hasValidStorage = (candidate: unknown): candidate is StorageShim => {
     }
 
     const descriptor = Reflect.getOwnPropertyDescriptor(candidate, "length");
-    const lengthValue = (candidate as { length?: unknown }).length;
+    const lengthValue = (safeCastTo<{ length?: unknown }>(candidate)).length;
     const hasLength =
         typeof lengthValue === "number" ||
         (typeof descriptor?.get === "function" &&
@@ -277,7 +276,7 @@ const hasValidStorage = (candidate: unknown): candidate is StorageShim => {
 
     return STORAGE_METHODS.every(
         (method) =>
-            typeof (candidate as Record<string, unknown>)[method] === "function"
+            typeof (candidate as UnknownRecord)[method] === "function"
     );
 };
 
@@ -308,13 +307,13 @@ const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 const cssParseWarningSignature = "Could not parse CSS stylesheet";
 
-const containsCssParseWarning = (args: readonly unknown[]): boolean =>
+const containsCssParseWarning = (args: Readonly<UnknownArray>): boolean =>
     args.some((argument) => {
         if (typeof argument === "string") {
             return argument.includes(cssParseWarningSignature);
         }
 
-        if (argument instanceof Error) {
+        if (Error.isError(argument)) {
             return argument.message.includes(cssParseWarningSignature);
         }
 
@@ -338,22 +337,23 @@ console.error = suppressCssParseWarning(originalConsoleError);
 console.warn = suppressCssParseWarning(originalConsoleWarn);
 
 // Mock window.matchMedia for theme tests
-Object.defineProperty(globalThis, "matchMedia", {
-    writable: true,
-    value: vi.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-    })),
-});
-
-Object.defineProperty(globalThis, "crypto", {
-    configurable: true,
-    value: webcrypto,
-    writable: true,
+Object.defineProperties(globalThis, {
+    matchMedia: {
+        writable: true,
+        value: vi.fn().mockImplementation((query) => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        })),
+    },
+    crypto: {
+        configurable: true,
+        value: webcrypto,
+        writable: true,
+    },
 });
 
 // Mock document.body.classList for theme tests
@@ -369,7 +369,7 @@ Object.defineProperty(document.body, "classList", {
 
 // Individual tests should manage their own DOM setup for getElementById
 
-vi.mock("electron-log/renderer", () => ({
+vi.mock(import('electron-log/renderer'), () => ({
     default: {
         info: vi.fn(),
         error: vi.fn(),
@@ -472,19 +472,19 @@ const mockTheme = {
     typography: {
         fontFamily: {
             mono: [
-                "SF Mono",
-                "Monaco",
                 "Inconsolata",
-                "Roboto Mono",
+                "Monaco",
                 "monospace",
+                "Roboto Mono",
+                "SF Mono",
             ] as const,
             sans: [
-                "Inter",
-                "system-ui",
+                "Arial",
                 "Avenir",
                 "Helvetica",
-                "Arial",
+                "Inter",
                 "sans-serif",
+                "system-ui",
             ] as const,
         },
         fontSize: {
@@ -522,7 +522,7 @@ const mockTheme = {
 };
 
 // Mock theme context globally with complete functionality
-vi.mock("../theme/useTheme", () => ({
+vi.mock(import('../theme/useTheme'), () => ({
     useTheme: () => ({
         ...mockTheme,
         availableThemes: [
@@ -532,7 +532,7 @@ vi.mock("../theme/useTheme", () => ({
         ],
         currentTheme: mockTheme,
         getColor: vi.fn((path: string) => {
-            const keys = path.split(".");
+            const keys = stringSplit(path, ".");
             let value: any = mockTheme.colors;
             for (const key of keys) {
                 if (value && typeof value === "object" && key in value) {
@@ -606,7 +606,7 @@ vi.mock("../theme/useTheme", () => ({
             borderColor: `var(--color-border-${variant})`,
         })),
         getColor: vi.fn((path: string) => {
-            const keys = path.split(".");
+            const keys = stringSplit(path, ".");
             let value: any = mockTheme.colors;
             for (const key of keys) {
                 if (value && typeof value === "object" && key in value) {
@@ -635,10 +635,6 @@ vi.mock("../theme/useTheme", () => ({
 
 // Export mocks for use in individual tests
 export { mockTheme };
-
-// Custom test context setup for task and annotate properties
-// Note: The actual type definitions are in src/types/vitest-context.d.ts
-import "./vitest-context-setup";
 
 // Provide global fail function if not already defined
 if ((globalThis as any).fail === undefined) {

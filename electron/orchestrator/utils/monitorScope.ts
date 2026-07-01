@@ -2,9 +2,6 @@
  * Utilities for handling site-vs-monitor scoped orchestrator operations.
  */
 
-/** Supported monitoring operation kinds that can be site- or monitor-scoped. */
-export type MonitorScopedOperationKind = "start" | "stop";
-
 /**
  * Standardized error-context metadata for operations that can target an entire
  * site or a specific monitor.
@@ -19,6 +16,9 @@ export interface MonitorScopedOperationContext {
     readonly message: string;
     readonly operation: string;
 }
+
+/** Supported monitoring operation kinds that can be site- or monitor-scoped. */
+export type MonitorScopedOperationKind = "start" | "stop";
 
 const isNonEmptyString = (value: unknown): value is string =>
     typeof value === "string" && value.length > 0;

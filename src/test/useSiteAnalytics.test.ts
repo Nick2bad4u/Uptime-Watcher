@@ -3,23 +3,25 @@
  * calculations with full coverage including edge cases.
  */
 
+import type { Monitor, StatusHistory } from "@shared/types";
+
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Theme } from "../theme/types";
 import type { TimePeriod } from "../utils/time";
 
 import {
-    useSiteAnalytics,
-    useChartData,
     SiteAnalyticsUtils,
+    useChartData,
+    useSiteAnalytics,
 } from "../hooks/site/useSiteAnalytics";
-import type { Monitor, StatusHistory } from "@shared/types";
 
 // Mock constants to avoid dependency issues
-vi.mock("../constants", () => ({
+vi.mock(import('../constants'), () => ({
     CHART_TIME_PERIODS: {
-        "1h": 60 * 60 * 1000,
+        "1h": 60 ** 2 * 1000,
         "7d": 7 * 24 * 60 * 60 * 1000,
         "12h": 12 * 60 * 60 * 1000,
         "24h": 24 * 60 * 60 * 1000,
@@ -27,7 +29,7 @@ vi.mock("../constants", () => ({
     },
 }));
 
-vi.mock("../utils/time", () => ({
+vi.mock(import('../utils/time'), () => ({
     TIME_PERIOD_LABELS: {
         "1h": "Last Hour",
         "7d": "Last 7 Days",
@@ -45,7 +47,7 @@ describe(useSiteAnalytics, () => {
 
     const createStatusRecord = (
         timestamp: number,
-        status: "up" | "down",
+        status: "down" | "up",
         responseTime: number
     ): StatusHistory => ({
         responseTime,
@@ -397,9 +399,9 @@ describe(useSiteAnalytics, () => {
             );
             // Duration should be t1 - t0 (1000ms)
             expect(result.current.downtimePeriods).toHaveLength(1);
-            expect(result.current.downtimePeriods[0]?.duration).toBe(1000);
+            expect(arrayFirst(result.current.downtimePeriods)?.duration).toBe(1000);
             // Mutated (end + start) would yield ~ t1 + t0 (a huge number, certainly > now)
-            expect(result.current.downtimePeriods[0]?.duration).toBeLessThan(
+            expect(arrayFirst(result.current.downtimePeriods)?.duration).toBeLessThan(
                 10_000
             );
         });
@@ -700,7 +702,7 @@ describe(useSiteAnalytics, () => {
                 {
                     initialProps: {
                         monitor: mockMonitorWithHistory,
-                        timeRange: "24h" as TimePeriod,
+                        timeRange: safeCastTo<TimePeriod>("24h"),
                     },
                 }
             );
@@ -710,7 +712,7 @@ describe(useSiteAnalytics, () => {
             // Rerender with same props
             rerender({
                 monitor: mockMonitorWithHistory,
-                timeRange: "24h" as TimePeriod,
+                timeRange: safeCastTo<TimePeriod>("24h"),
             });
 
             expect(result.current).toBe(firstResult); // Should be the exact same object reference
@@ -731,7 +733,7 @@ describe(useSiteAnalytics, () => {
                 {
                     initialProps: {
                         monitor: mockMonitorWithHistory,
-                        timeRange: "24h" as TimePeriod,
+                        timeRange: safeCastTo<TimePeriod>("24h"),
                     },
                 }
             );
@@ -746,7 +748,7 @@ describe(useSiteAnalytics, () => {
                 ],
             };
 
-            rerender({ monitor: newMonitor, timeRange: "24h" as TimePeriod });
+            rerender({ monitor: newMonitor, timeRange: safeCastTo<TimePeriod>("24h") });
 
             expect(result.current).not.toBe(firstResult);
             expect(result.current.totalChecks).toBe(
@@ -769,7 +771,7 @@ describe(useSiteAnalytics, () => {
                 {
                     initialProps: {
                         monitor: mockMonitorWithHistory,
-                        timeRange: "24h" as TimePeriod,
+                        timeRange: safeCastTo<TimePeriod>("24h"),
                     },
                 }
             );
@@ -778,7 +780,7 @@ describe(useSiteAnalytics, () => {
 
             rerender({
                 monitor: mockMonitorWithHistory,
-                timeRange: "1h" as TimePeriod,
+                timeRange: safeCastTo<TimePeriod>("1h"),
             });
 
             expect(result.current).not.toBe(firstResult);
@@ -934,7 +936,7 @@ describe(useChartData, () => {
         expect(result.current.lineChartData).toBeDefined();
         expect(result.current.lineChartData.datasets).toHaveLength(1);
 
-        const dataset = result.current.lineChartData.datasets[0];
+        const dataset = arrayFirst(result.current.lineChartData.datasets);
         expect(dataset).toBeDefined();
         expect(dataset?.label).toBe("Response Time");
         expect(dataset?.borderColor).toBe("#3b82f6");
@@ -952,7 +954,7 @@ describe(useChartData, () => {
             useChartData(mockMonitor, mockTheme)
         );
 
-        const dataset = result.current.lineChartData.datasets[0];
+        const dataset = arrayFirst(result.current.lineChartData.datasets);
         expect(dataset).toBeDefined();
         expect(dataset?.data).toEqual([
             { x: 1000, y: 200 },
@@ -971,7 +973,7 @@ describe(useChartData, () => {
             useChartData(mockMonitor, mockTheme)
         );
 
-        const dataset = result.current.lineChartData.datasets[0];
+        const dataset = arrayFirst(result.current.lineChartData.datasets);
         expect(dataset).toBeDefined();
         expect(dataset?.pointBackgroundColor).toEqual([
             "#10b981", // Up - success color
@@ -1000,7 +1002,7 @@ describe(useChartData, () => {
             useChartData(emptyMonitor, mockTheme)
         );
 
-        const dataset = result.current.lineChartData.datasets[0];
+        const dataset = arrayFirst(result.current.lineChartData.datasets);
         expect(dataset).toBeDefined();
         expect(dataset?.data).toHaveLength(0);
         expect(dataset?.pointBackgroundColor).toHaveLength(0);
@@ -1025,7 +1027,7 @@ describe(useChartData, () => {
             useChartData(unsortedMonitor, mockTheme)
         );
 
-        const dataset = result.current.lineChartData.datasets[0];
+        const dataset = arrayFirst(result.current.lineChartData.datasets);
         expect(dataset).toBeDefined();
         expect(dataset?.data).toEqual([
             { x: 1000, y: 200 },
@@ -1084,7 +1086,7 @@ describe(useChartData, () => {
         rerender({ monitor: newMonitor, theme: mockTheme });
 
         expect(result.current).not.toBe(firstResult);
-        expect(result.current.lineChartData.datasets[0]?.data).toHaveLength(4);
+        expect(arrayFirst(result.current.lineChartData.datasets)?.data).toHaveLength(4);
     });
 });
 

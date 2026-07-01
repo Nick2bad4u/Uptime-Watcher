@@ -40,7 +40,7 @@ export function useInAppAlertTonePreview(args: {
             return;
         }
 
-        window.clearTimeout(volumePreviewTimeoutRef.current);
+        globalThis.clearTimeout(volumePreviewTimeoutRef.current);
         volumePreviewTimeoutRef.current = null;
     }, []);
 
@@ -84,7 +84,7 @@ export function useInAppAlertTonePreview(args: {
                 return;
             }
 
-            volumePreviewTimeoutRef.current = window.setTimeout(() => {
+            volumePreviewTimeoutRef.current = globalThis.setTimeout(() => {
                 volumePreviewTimeoutRef.current = null;
                 void playInAppAlertTone();
             }, 180);
@@ -109,10 +109,12 @@ export function useInAppAlertTonePreview(args: {
     // Stop preview when sound is disabled.
     useEffect(
         function stopPreviewWhenSoundDisabled(): void {
-            if (!inAppAlertsSoundEnabled) {
-                clearVolumePreviewTimeout();
-                setPendingVolume(inAppAlertVolume);
+            if (inAppAlertsSoundEnabled) {
+                return;
             }
+
+            clearVolumePreviewTimeout();
+            setPendingVolume(inAppAlertVolume);
         },
         [
             clearVolumePreviewTimeout,

@@ -2,21 +2,24 @@
  * @file Fixed tests for MonitorFactory using correct API
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-    getMonitor,
-    getMonitorWithResult,
-    getAvailableMonitorTypes,
-    clearMonitorFactoryCache,
-    updateMonitorConfig,
-    MonitorConfigurationError,
-} from "../../../services/monitoring/MonitorFactory";
-import * as MonitorTypeRegistry from "../../../services/monitoring/MonitorTypeRegistry";
+import type { Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type {
     IMonitorService,
     MonitorServiceConfig,
 } from "../../../services/monitoring/types";
-import type { Site } from "@shared/types";
+
+import {
+    clearMonitorFactoryCache,
+    getAvailableMonitorTypes,
+    getMonitor,
+    getMonitorWithResult,
+    MonitorConfigurationError,
+    updateMonitorConfig,
+} from "../../../services/monitoring/MonitorFactory";
+import * as MonitorTypeRegistry from "../../../services/monitoring/MonitorTypeRegistry";
 
 describe("MonitorFactory - Fixed", () => {
     let mockMonitorConfig: MonitorServiceConfig;
@@ -181,7 +184,7 @@ describe("MonitorFactory - Fixed", () => {
             getMonitor("ping", mockMonitorConfig);
 
             // Clear cache should not throw
-            expect(() => clearMonitorFactoryCache()).not.toThrow();
+            expect(() => { clearMonitorFactoryCache(); }).not.toThrow();
         });
     });
 
@@ -199,7 +202,7 @@ describe("MonitorFactory - Fixed", () => {
                 timeout: 10_000,
                 userAgent: "Updated-Agent/1.0",
             };
-            expect(() => updateMonitorConfig(newConfig)).not.toThrow();
+            expect(() => { updateMonitorConfig(newConfig); }).not.toThrow();
         });
     });
 });

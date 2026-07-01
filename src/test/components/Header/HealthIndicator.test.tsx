@@ -32,6 +32,7 @@ describe(HealthIndicator, () => {
                 "Expected health indicator root element to be present"
             );
         }
+
         expect(indicatorRoot).toHaveClass("health-badge");
         expect(indicatorRoot).toHaveAttribute(
             "data-health-color",
@@ -39,6 +40,7 @@ describe(HealthIndicator, () => {
         );
 
         const dot = indicatorRoot.querySelector(".health-dot");
+
         expect(dot).toHaveAttribute("data-health-color", "health-warning");
 
         expect(screen.getByText("97.5%")).toBeInTheDocument();
@@ -63,6 +65,7 @@ describe(HealthIndicator, () => {
                 "Expected health indicator root element to be present after initial render"
             );
         }
+
         expect(initialRoot).toHaveAttribute(
             "data-health-color",
             "health-success"
@@ -86,6 +89,7 @@ describe(HealthIndicator, () => {
                 "Expected health indicator root element to be present after rerender"
             );
         }
+
         expect(indicatorRoot).toHaveAttribute(
             "data-health-color",
             "health-critical"

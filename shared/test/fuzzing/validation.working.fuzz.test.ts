@@ -13,9 +13,10 @@
  * @packageDocumentation
  */
 
-import { describe, expect } from "vitest";
-import fc from "fast-check";
 import { test as fcTest } from "@fast-check/vitest";
+import fc from "fast-check";
+import { describe, expect } from "vitest";
+
 import { validateMonitorType } from "../../utils/validation";
 import {
     validateMonitorData,
@@ -74,9 +75,9 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         fcTest.prop([fc.string()])(
             "fuzzing should correctly validate monitor types",
             (type) => {
-                const result = validateMonitorType(type);
+                const isResult = validateMonitorType(type);
 
-                expect(typeof result).toBe("boolean");
+                expect(typeof isResult).toBe("boolean");
 
                 // Should return true only for valid monitor types
                 const validTypes = [
@@ -86,9 +87,9 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                     "dns",
                 ];
                 if (validTypes.includes(type)) {
-                    expect(result).toBeTruthy();
+                    expect(isResult).toBeTruthy();
                 } else {
-                    expect(result).toBeFalsy();
+                    expect(isResult).toBeFalsy();
                 }
             }
         );
@@ -107,9 +108,9 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         fcTest.prop([malformedSiteArbitrary])(
             "should handle malformed site objects gracefully",
             (site) => {
-                const result = validateSiteData(site as any).success;
+                const isResult = validateSiteData(site).success;
 
-                expect(typeof result).toBe("boolean");
+                expect(typeof isResult).toBe("boolean");
 
                 // For malformed inputs, should generally be invalid (false)
                 if (
@@ -117,7 +118,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                     site === undefined ||
                     typeof site !== "object"
                 ) {
-                    expect(result).toBeFalsy();
+                    expect(isResult).toBeFalsy();
                 }
             }
         );
@@ -126,7 +127,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             "should never throw an error for any input",
             (input) => {
                 expect(() => {
-                    validateSiteData(input as any);
+                    validateSiteData(input);
                 }).not.toThrow();
             }
         );
@@ -136,7 +137,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         fcTest.prop([malformedSiteArbitrary])(
             "should handle malformed site objects gracefully",
             (site) => {
-                const result = validateSiteData(site as any);
+                const result = validateSiteData(site);
 
                 expect(typeof result).toBe("object");
                 expect(result).toHaveProperty("success");
@@ -160,7 +161,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             "should never throw an error for any input",
             (input) => {
                 expect(() => {
-                    validateSiteData(input as any);
+                    validateSiteData(input);
                 }).not.toThrow();
             }
         );
@@ -170,7 +171,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
         fcTest.prop([fc.string(), malformedMonitorArbitrary])(
             "should handle malformed monitor objects gracefully",
             (monitorType, monitor) => {
-                const result = validateMonitorData(monitorType, monitor as any);
+                const result = validateMonitorData(monitorType, monitor);
 
                 expect(typeof result).toBe("object");
                 expect(result).toHaveProperty("success");
@@ -194,7 +195,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             "should never throw an error for any input",
             (monitorType, input) => {
                 expect(() => {
-                    validateMonitorData(monitorType, input as any);
+                    validateMonitorData(monitorType, input);
                 }).not.toThrow();
             }
         );
@@ -211,7 +212,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                 const result = validateMonitorField(
                     monitorType,
                     fieldName,
-                    input as any
+                    input
                 );
 
                 expect(typeof result).toBe("object");
@@ -230,7 +231,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             "should never throw an error for any input",
             (monitorType, fieldName, input) => {
                 expect(() => {
-                    validateMonitorField(monitorType, fieldName, input as any);
+                    validateMonitorField(monitorType, fieldName, input);
                 }).not.toThrow();
             }
         );
@@ -243,13 +244,13 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                 fc.constant([]),
                 fc.constant(new Date()),
                 fc.constant(new Error("test")),
-                fc.constant(/test/),
+                fc.constant(/test/v),
                 fc.constant(Symbol("test"))
             ),
         ])("should handle special object types", (specialObject) => {
             expect(() => {
-                validateSiteData(specialObject as any);
-                validateMonitorData("http", specialObject as any);
+                validateSiteData(specialObject);
+                validateMonitorData("http", specialObject);
             }).not.toThrow();
         });
 
@@ -257,9 +258,9 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             fc.oneof(
                 fc.constant(Number.MAX_VALUE),
                 fc.constant(Number.MIN_VALUE),
-                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Infinity),
                 fc.constant(Number.NEGATIVE_INFINITY),
-                fc.constant(Number.NaN)
+                fc.constant(NaN)
             ),
         ])("should handle extreme numeric values", (numericValue) => {
             const testObject = {
@@ -268,14 +269,14 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             };
 
             expect(() => {
-                validateSiteData(testObject as any);
+                validateSiteData(testObject);
             }).not.toThrow();
         });
 
         fcTest.prop([
             fc.oneof(
                 fc.string({ minLength: 0, maxLength: 0 }), // Empty string
-                fc.constant("   "), // Whitespace
+                fc.constant(' '.repeat(3)), // Whitespace
                 fc.constant("\n\t\r"), // Newlines and tabs
                 fc.string({ minLength: 1000, maxLength: 2000 }), // Very long string
                 fc.string()
@@ -288,7 +289,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             };
 
             expect(() => {
-                validateSiteData(testObject as any);
+                validateSiteData(testObject);
             }).not.toThrow();
         });
     });
@@ -314,7 +315,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
                 };
 
                 expect(() => {
-                    const result = validateSiteData(maliciousObject as any);
+                    const result = validateSiteData(maliciousObject);
                     expect(result).toHaveProperty("success");
                     expect(result).toHaveProperty("errors");
                 }).not.toThrow();
@@ -337,7 +338,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
             };
 
             expect(() => {
-                const result = validateSiteData(testObject as any);
+                const result = validateSiteData(testObject);
                 expect(typeof result).toBe("object");
             }).not.toThrow();
         });

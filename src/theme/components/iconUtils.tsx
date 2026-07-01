@@ -4,26 +4,6 @@ import type { CSSProperties, ReactNode } from "react";
 const colorStylesCache = new Map<string, CSSProperties>();
 
 /**
- * Get or create a cached color style object
- *
- * @param color - The color value
- *
- * @returns Cached color style object
- *
- * @internal
- */
-function getColorStyle(color: string): CSSProperties {
-    let style = colorStylesCache.get(color);
-    if (!style) {
-        style = {
-            color,
-        };
-        colorStylesCache.set(color, style);
-    }
-    return style;
-}
-
-/**
  * Get the CSS class for an icon color
  *
  * @param color - The color name
@@ -87,4 +67,24 @@ export function renderColoredIcon(icon: ReactNode, color?: string): ReactNode {
         return <span style={colorStyle}>{icon}</span>;
     }
     return icon;
+}
+
+/**
+ * Get or create a cached color style object
+ *
+ * @param color - The color value
+ *
+ * @returns Cached color style object
+ *
+ * @internal
+ */
+function getColorStyle(color: string): CSSProperties {
+    let style = colorStylesCache.get(color);
+    if (!style) {
+        style = {
+            color,
+        };
+        colorStylesCache.set(color, style);
+    }
+    return style;
 }

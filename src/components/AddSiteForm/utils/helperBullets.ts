@@ -31,7 +31,7 @@ export interface BuildAddSiteFormHelperBulletsArgs {
 const normalizeText = (value: string): string => {
     const lower = value.trim().toLowerCase();
     let collapsedWhitespace = "";
-    let lastWasWhitespace = false;
+    let isLastWasWhitespace = false;
 
     for (const character of lower) {
         const isWhitespace =
@@ -41,13 +41,13 @@ const normalizeText = (value: string): string => {
             character === "\r";
 
         if (isWhitespace) {
-            if (!lastWasWhitespace) {
+            if (!isLastWasWhitespace) {
                 collapsedWhitespace += " ";
-                lastWasWhitespace = true;
+                isLastWasWhitespace = true;
             }
         } else {
             collapsedWhitespace += character;
-            lastWasWhitespace = false;
+            isLastWasWhitespace = false;
         }
     }
 
@@ -71,14 +71,8 @@ const shouldHideFooterHelpText = (value: string): boolean => {
     }
 
     // Interval guidance is shown as an explicit, more actionable footer bullet.
-    if (
-        normalized.includes("monitoring interval") ||
-        normalized.includes("check interval")
-    ) {
-        return true;
-    }
-
-    return false;
+    return (normalized.includes("monitoring interval") ||
+        normalized.includes("check interval"));
 };
 
 /**

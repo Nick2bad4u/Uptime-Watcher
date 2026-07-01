@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import React from "react";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import * as React from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { logger } from "../services/logger";
 
 // Mock the logger
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("../services/logger", () => {
 
 // Mock the settings store
 const mockUpdateSettings = vi.fn();
-vi.mock("../stores/settings/useSettingsStore", () => ({
+vi.mock(import('../stores/settings/useSettingsStore'), () => ({
     useSettingsStore: vi.fn(() => ({
         settings: {
             autoStart: true,
@@ -56,10 +56,10 @@ const selectorAwareUseSitesStore = vi.fn(
     ) =>
         (typeof selector === "function"
             ? selector(mockSitesStore)
-            : mockSitesStore) as unknown
+            : mockSitesStore)
 );
 
-vi.mock("../stores/sites/useSitesStore", () => ({
+vi.mock(import('../stores/sites/useSitesStore'), () => ({
     useSitesStore: selectorAwareUseSitesStore,
 }));
 
@@ -80,32 +80,32 @@ describe("Settings - Invalid Key Logging", () => {
         // Create a component that will trigger the invalid key scenario
         const TestComponent = () => {
             interface SettingsType {
-                theme: string;
                 autoStart: boolean;
                 autoUpdate: boolean;
+                historyLimit: number;
                 inAppAlertsEnabled: boolean;
                 inAppAlertsSoundEnabled: boolean;
-                systemNotificationsEnabled: boolean;
-                systemNotificationsSoundEnabled: boolean;
+                logLevel: string;
+                minimizeToTray: boolean;
                 port: number;
                 retryAttempts: number;
-                timeout: number;
-                minimizeToTray: boolean;
                 startMinimized: boolean;
                 stayAlive: boolean;
-                logLevel: string;
-                historyLimit: number;
+                systemNotificationsEnabled: boolean;
+                systemNotificationsSoundEnabled: boolean;
+                theme: string;
+                timeout: number;
             }
 
             const allowedKeys = new Set<keyof SettingsType>([
-                "systemNotificationsEnabled",
-                "systemNotificationsSoundEnabled",
+                "autoStart",
+                "historyLimit",
                 "inAppAlertsEnabled",
                 "inAppAlertsSoundEnabled",
-                "autoStart",
                 "minimizeToTray",
+                "systemNotificationsEnabled",
+                "systemNotificationsSoundEnabled",
                 "theme",
-                "historyLimit",
             ]);
 
             const handleSettingChange = (

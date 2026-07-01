@@ -53,7 +53,7 @@ const StubReload = ({
 
             if (vitest?.spyOn) {
                 try {
-                    const spy = vitest.spyOn(window.location, "reload");
+                    const spy = vitest.spyOn(location, "reload");
                     spy.mockImplementation(reloadStub);
                     cleanupRef.current = (): void => {
                         spy.mockRestore();
@@ -65,7 +65,7 @@ const StubReload = ({
             }
 
             try {
-                const originalLocation = window.location;
+                const originalLocation = location;
                 const proxyLocation: Location = new Proxy(originalLocation, {
                     get(target, property, receiver): unknown {
                         if (property === "reload") {
@@ -89,13 +89,13 @@ const StubReload = ({
                     },
                 });
 
-                Object.defineProperty(window, "location", {
+                Object.defineProperty(globalThis, "location", {
                     configurable: true,
                     value: proxyLocation,
                 });
 
                 cleanupRef.current = (): void => {
-                    Object.defineProperty(window, "location", {
+                    Object.defineProperty(globalThis, "location", {
                         configurable: true,
                         value: originalLocation,
                     });

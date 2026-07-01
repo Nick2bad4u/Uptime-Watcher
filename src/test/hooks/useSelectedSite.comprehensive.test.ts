@@ -2,27 +2,31 @@
  * @file Comprehensive tests for useSelectedSite hook.
  */
 
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Mocked } from "vitest";
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+import type { Mocked } from "vitest";
+
+import { arrayFirst } from "ts-extras";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { SitesStore } from "../../stores/sites/types";
+import type { ChartTimeRange } from "../../stores/types";
 import type {
     InterfaceDensity,
     SiteDetailsTab,
     UIStore,
 } from "../../stores/ui/types";
+
 import { DEFAULT_SITE_TABLE_COLUMN_WIDTHS } from "../../stores/ui/useUiStore";
-import type { ChartTimeRange } from "../../stores/types";
 
 let useSelectedSite: typeof import("../../hooks/useSelectedSite").useSelectedSite;
 let renderHook: typeof import("@testing-library/react").renderHook;
 
-vi.mock("../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn(),
 }));
 
-vi.mock("../../stores/ui/useUiStore", async () => {
+vi.mock(import('../../stores/ui/useUiStore'), async () => {
     const actual = await vi.importActual<
         typeof import("../../stores/ui/useUiStore")
     >("../../stores/ui/useUiStore");
@@ -289,7 +293,7 @@ describe("useSelectedSite", () => {
             renderHook(() => useSelectedSite());
 
             expect(mockUseUIStore).toHaveBeenCalledWith(expect.any(Function));
-            const selector = mockUseUIStore.mock.calls[0]?.[0];
+            const selector = arrayFirst(mockUseUIStore.mock.calls)?.[0];
             const selection = selector?.(
                 createMockUiStore({
                     selectedSiteIdentifier: "abc",
@@ -307,7 +311,7 @@ describe("useSelectedSite", () => {
             expect(mockUseSitesStore).toHaveBeenCalledWith(
                 expect.any(Function)
             );
-            const selector = mockUseSitesStore.mock.calls[0]?.[0];
+            const selector = arrayFirst(mockUseSitesStore.mock.calls)?.[0];
             const sites = selector?.(
                 createMockSitesStore({ sites: mockSites })
             );

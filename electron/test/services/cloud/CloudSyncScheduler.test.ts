@@ -2,9 +2,8 @@
  * Unit tests for the CloudSyncScheduler polling/backoff loop.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import { CloudSyncScheduler } from "@electron/services/cloud/CloudSyncScheduler";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockLogger = vi.hoisted(() => ({
     warn: vi.fn(),

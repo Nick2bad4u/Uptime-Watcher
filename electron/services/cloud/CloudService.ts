@@ -143,7 +143,7 @@ export class CloudService {
             logger.warn(`[CloudService] Operation '${operationName}' failed`, {
                 message: resolved.message,
                 name: resolved.name,
-                ...(providerDetails ? { providerDetails } : {}),
+                ...(providerDetails && { providerDetails }),
             });
             throw resolved;
         }
@@ -401,7 +401,7 @@ export class CloudService {
 
     private async buildStatusSummary(): Promise<CloudStatusSummary> {
         const providerKind = await this.settings.get(SETTINGS_KEY_PROVIDER);
-        const syncEnabled = parseBooleanSetting(
+        const isSyncEnabled = parseBooleanSetting(
             await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
         );
         const lastBackupAt = parseNumberSetting(
@@ -436,7 +436,7 @@ export class CloudService {
             lastError,
             lastSyncAt,
             localEncryptionMode,
-            syncEnabled,
+            syncEnabled: isSyncEnabled,
         };
 
         if (!providerKind) {

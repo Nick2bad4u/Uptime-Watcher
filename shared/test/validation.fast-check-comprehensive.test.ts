@@ -12,28 +12,27 @@
  */
 
 import { fc, it } from "@fast-check/vitest";
-import { describe, expect } from "vitest";
 import validator from "validator";
-
-// Import all validation functions to test
-import {
-    isNonEmptyString,
-    isValidFQDN,
-    isValidIdentifier,
-    isValidIdentifierArray,
-    isValidInteger,
-    isValidNumeric,
-    isValidHost,
-    isValidPort,
-    isValidUrl,
-    safeInteger,
-} from "../validation/validatorUtils";
+import { describe, expect } from "vitest";
 
 import {
     validateMonitorData,
     validateMonitorField,
 } from "../validation/monitorSchemas";
 import { validateSiteData } from "../validation/siteSchemas";
+// Import all validation functions to test
+import {
+    isNonEmptyString,
+    isValidFQDN,
+    isValidHost,
+    isValidIdentifier,
+    isValidIdentifierArray,
+    isValidInteger,
+    isValidNumeric,
+    isValidPort,
+    isValidUrl,
+    safeInteger,
+} from "../validation/validatorUtils";
 
 describe("Comprehensive Validation Module Fast-Check Tests", () => {
     describe("validatorUtils.ts Functions", () => {
@@ -48,7 +47,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.oneof(
                     fc.constant(""),
-                    fc.constant("   "),
+                    fc.constant(' '.repeat(3)),
                     fc.constant("\t\n\r"),
                     fc.integer(),
                     fc.boolean(),
@@ -66,10 +65,10 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([fc.string()])(
                 "should handle all strings consistently",
                 (str) => {
-                    const result = isNonEmptyString(str);
-                    const expected =
+                    const isResult = isNonEmptyString(str);
+                    const isExpected =
                         typeof str === "string" && str.trim().length > 0;
-                    expect(result).toBe(expected);
+                    expect(isResult).toBe(isExpected);
                 }
             );
         });
@@ -106,8 +105,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 "should validate all string inputs consistently",
                 (str) => {
                     // Should not throw and return boolean
-                    const result = isValidFQDN(str);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidFQDN(str);
+                    expect(typeof isResult).toBe("boolean");
                 }
             );
         });
@@ -116,11 +115,11 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.string({ minLength: 1, maxLength: 50 }).filter((s) => {
                     // Must contain at least one alphanumeric character when hyphens/underscores are removed
-                    const cleanedValue = s.replaceAll(/[_-]/gu, "");
+                    const cleanedValue = s.replaceAll(/[-_]/gu, "");
                     return (
                         cleanedValue.length > 0 &&
-                        /^[\dA-Za-z]+$/.test(cleanedValue) &&
-                        /^[\w-]+$/.test(s)
+                        /^[\dA-Za-z]+$/v.test(cleanedValue) &&
+                        /^[\w-]+$/u.test(s)
                     );
                 }),
             ])("should return true for valid identifiers", (validId) => {
@@ -130,7 +129,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.oneof(
                     fc.constant(""),
-                    fc.constant("   "),
+                    fc.constant(' '.repeat(3)),
                     fc.string().filter((s) => s.includes(" ")),
                     fc.string().filter((s) => s.includes("@")),
                     fc.integer(),
@@ -143,8 +142,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([fc.anything()])(
                 "should handle any input type",
                 (value) => {
-                    const result = isValidIdentifier(value);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidIdentifier(value);
+                    expect(typeof isResult).toBe("boolean");
                 }
             );
         });
@@ -153,11 +152,11 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([
                 fc.array(
                     fc.string({ minLength: 1, maxLength: 20 }).filter((s) => {
-                        const cleanedValue = s.replaceAll(/[_-]/gu, "");
+                        const cleanedValue = s.replaceAll(/[-_]/gu, "");
                         return (
                             cleanedValue.length > 0 &&
-                            /^[\dA-Za-z]+$/.test(cleanedValue) &&
-                            /^[\w-]+$/.test(s)
+                            /^[\dA-Za-z]+$/v.test(cleanedValue) &&
+                            /^[\w-]+$/u.test(s)
                         );
                     }),
                     { minLength: 0, maxLength: 10 }
@@ -195,8 +194,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([fc.anything()])(
                 "should handle any input type",
                 (value) => {
-                    const result = isValidIdentifierArray(value);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidIdentifierArray(value);
+                    expect(typeof isResult).toBe("boolean");
                 }
             );
         });
@@ -252,8 +251,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     fc.constantFrom(
                         null,
                         undefined,
-                        Number.NaN,
-                        Number.POSITIVE_INFINITY,
+                        NaN,
+                        Infinity,
                         Number.NEGATIVE_INFINITY
                     )
                 ),
@@ -307,8 +306,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     fc.constantFrom(
                         null,
                         undefined,
-                        Number.NaN,
-                        Number.POSITIVE_INFINITY,
+                        NaN,
+                        Infinity,
                         Number.NEGATIVE_INFINITY
                     )
                 ),
@@ -347,8 +346,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([fc.anything()])(
                 "should handle any input type",
                 (value) => {
-                    const result = isValidHost(value);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidHost(value);
+                    expect(typeof isResult).toBe("boolean");
                 }
             );
         });
@@ -378,7 +377,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                             s.includes(".")
                         );
                     }),
-                    fc.constantFrom(null, undefined, Number.NaN)
+                    fc.constantFrom(null, undefined, NaN)
                 ),
             ])("should return false for invalid ports", (invalidPort) => {
                 expect(isValidPort(invalidPort)).toBeFalsy();
@@ -387,8 +386,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([fc.anything()])(
                 "should handle any input type",
                 (value) => {
-                    const result = isValidPort(value);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidPort(value);
+                    expect(typeof isResult).toBe("boolean");
                 }
             );
         });
@@ -423,8 +422,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
             it.prop([fc.anything()])(
                 "should handle any input type",
                 (value) => {
-                    const result = isValidUrl(value);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidUrl(value);
+                    expect(typeof isResult).toBe("boolean");
                 }
             );
         });
@@ -457,7 +456,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                         "Infinity",
                         ""
                     ),
-                    fc.constantFrom(null, undefined, Number.NaN)
+                    fc.constantFrom(null, undefined, NaN)
                 ),
             ])(
                 "should return default when input is invalid",
@@ -536,18 +535,18 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 fc.string().filter(
                     (s) =>
                         ![
-                            "http",
-                            "port",
-                            "ping",
-                            "dns",
-                            "valueOf",
                             "__proto__",
                             "constructor",
-                            "toString",
-                            "toLocaleString",
+                            "dns",
                             "hasOwnProperty",
+                            "http",
                             "isPrototypeOf",
+                            "ping",
+                            "port",
                             "propertyIsEnumerable",
+                            "toLocaleString",
+                            "toString",
+                            "valueOf",
                         ].includes(s)
                 ),
             ])("should reject invalid monitor types", (invalidType) => {
@@ -632,24 +631,32 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 let value: unknown = null; // Initialize to avoid ESLint rule conflicts
 
                 switch (fieldName) {
-                    case "id": {
-                        value = "test-id";
-                        break;
-                    }
-                    case "type": {
-                        value = type;
-                        break;
-                    }
-                    case "monitoring": {
-                        value = true;
+                    case "activeOperations": {
+                        value = [];
                         break;
                     }
                     case "checkInterval": {
                         value = 10_000;
                         break;
                     }
-                    case "timeout": {
-                        value = 5000;
+                    case "history": {
+                        value = [];
+                        break;
+                    }
+                    case "id": {
+                        value = "test-id";
+                        break;
+                    }
+                    case "lastChecked": {
+                        value = new Date();
+                        break;
+                    }
+                    case "monitoring": {
+                        value = true;
+                        break;
+                    }
+                    case "responseTime": {
+                        value = 100;
                         break;
                     }
                     case "retryAttempts": {
@@ -660,20 +667,12 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                         value = "up";
                         break;
                     }
-                    case "responseTime": {
-                        value = 100;
+                    case "timeout": {
+                        value = 5000;
                         break;
                     }
-                    case "lastChecked": {
-                        value = new Date();
-                        break;
-                    }
-                    case "history": {
-                        value = [];
-                        break;
-                    }
-                    case "activeOperations": {
-                        value = [];
+                    case "type": {
+                        value = type;
                         break;
                     }
                     default: {
@@ -691,18 +690,18 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 fc.string().filter(
                     (s) =>
                         ![
-                            "http",
-                            "port",
-                            "ping",
-                            "dns",
-                            "valueOf",
                             "__proto__",
                             "constructor",
-                            "toString",
-                            "toLocaleString",
+                            "dns",
                             "hasOwnProperty",
+                            "http",
                             "isPrototypeOf",
+                            "ping",
+                            "port",
                             "propertyIsEnumerable",
+                            "toLocaleString",
+                            "toString",
+                            "valueOf",
                         ].includes(s)
                 ),
             ])("should reject invalid monitor types", (invalidType) => {
@@ -839,7 +838,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     } catch (error) {
                         // If validateMonitorField throws for unknown field, that's expected
                         if (
-                            error instanceof Error &&
+                            Error.isError(error) &&
                             error.message.includes("Unknown field")
                         ) {
                             // This is expected behavior for unknown fields
@@ -885,8 +884,8 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     ];
 
                     // All results should be booleans
-                    for (const result of results) {
-                        expect(typeof result).toBe("boolean");
+                    for (const isResult of results) {
+                        expect(typeof isResult).toBe("boolean");
                     }
                 }
             );

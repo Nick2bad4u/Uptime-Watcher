@@ -9,8 +9,8 @@ import {
 describe("Database Types - Missing Coverage", () => {
     describe("RowValidationUtils.isValidTimestamp coverage", () => {
         test("should handle invalid string timestamps through isValidHistoryRow (line 208)", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
@@ -25,12 +25,12 @@ describe("Database Types - Missing Coverage", () => {
             // This should hit line 208 where we return false for string values that don't convert to valid numbers
             // Testing through isValidHistoryRow which uses the internal isValidTimestamp
             const historyRowWithInvalidTimestamp = {
-                id: 1,
-                monitor_id: "test-id",
-                status: "up" as const,
-                response_time: 100,
                 checked_at: "invalid-timestamp", // This should trigger the uncovered line
                 details: null,
+                id: 1,
+                monitor_id: "test-id",
+                response_time: 100,
+                status: "up" as const,
             };
 
             expect(
@@ -39,8 +39,8 @@ describe("Database Types - Missing Coverage", () => {
         });
 
         test("should handle invalid string timestamps through isValidMonitorRow", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
@@ -53,21 +53,21 @@ describe("Database Types - Missing Coverage", () => {
             annotate("Type: Monitoring", "type");
 
             const monitorRowWithInvalidTimestamp = {
-                id: 1,
-                site_id: "site-1",
-                monitor_id: "monitor-1",
-                type: "http",
-                name: "Test Monitor",
-                url: "https://example.com",
-                status: "up" as const,
-                monitoring: 1,
-                response_time: 100,
                 check_interval: 60_000,
-                timeout: 5000,
-                retry_attempts: 3,
-                last_checked: "not-a-number", // This should trigger the uncovered line
                 created_at: Date.now(),
+                id: 1,
+                last_checked: "not-a-number", // This should trigger the uncovered line
+                monitor_id: "monitor-1",
+                monitoring: 1,
+                name: "Test Monitor",
+                response_time: 100,
+                retry_attempts: 3,
+                site_id: "site-1",
+                status: "up" as const,
+                timeout: 5000,
+                type: "http",
                 updated_at: Date.now(),
+                url: "https://example.com",
             };
 
             expect(
@@ -76,8 +76,8 @@ describe("Database Types - Missing Coverage", () => {
         });
 
         test("should handle invalid string timestamps through isValidSiteRow", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
@@ -90,22 +90,22 @@ describe("Database Types - Missing Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const siteRowWithInvalidTimestamp = {
-                id: 1,
-                site_id: "site-1",
-                name: "Test Site",
-                url: "https://example.com",
-                description: "Test description",
-                is_active: 1,
                 created_at: "", // Empty string should trigger the uncovered line
+                description: "Test description",
+                id: 1,
+                is_active: 1,
+                name: "Test Site",
+                site_id: "site-1",
                 updated_at: Date.now(),
+                url: "https://example.com",
             };
 
             expect(isValidSiteRow(siteRowWithInvalidTimestamp)).toBeFalsy();
         });
 
         test("should handle edge case string timestamps that become NaN", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: database-missing-coverage", "component");
@@ -132,12 +132,12 @@ describe("Database Types - Missing Coverage", () => {
 
             for (const invalidTimestamp of testCases) {
                 const historyRow = {
-                    id: 1,
-                    monitor_id: "test-id",
-                    status: "up" as const,
-                    response_time: 100,
                     checked_at: invalidTimestamp,
                     details: null,
+                    id: 1,
+                    monitor_id: "test-id",
+                    response_time: 100,
+                    status: "up" as const,
                 };
 
                 expect(isValidHistoryRow(historyRow)).toBeFalsy();

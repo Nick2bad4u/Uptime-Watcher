@@ -164,17 +164,17 @@ export const loggerNoErrorInContextRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow passing Error objects via { error: ... } context to logger.error/warn; pass as the dedicated error argument instead",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/logger-no-error-in-context.md",
         },
-        schema: [],
         messages: {
             avoidErrorContext:
                 "Do not pass Error objects via { error: ... } when calling logger. Pass the Error as the dedicated error argument instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -4,7 +4,7 @@
 export interface CloudSyncResetResult {
     completedAt: number;
     deletedObjects: number;
-    failedDeletions: Array<{ key: string; message: string }>;
+    failedDeletions: { key: string; message: string }[];
     resetAt: number;
     seededSnapshotKey?: string | undefined;
     startedAt: number;

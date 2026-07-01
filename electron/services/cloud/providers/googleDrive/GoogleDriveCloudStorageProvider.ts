@@ -583,7 +583,7 @@ export class GoogleDriveCloudStorageProvider
                 pageSize: GOOGLE_DRIVE_LIST_PAGE_SIZE,
                 q: `'${escapeGoogleDriveQueryStringLiteral(folderId)}' in parents and trashed = false`,
                 spaces: "appDataFolder",
-                ...(pageToken ? { pageToken } : {}),
+                ...(pageToken && { pageToken }),
             };
 
             // eslint-disable-next-line no-await-in-loop -- Drive pagination requests must be sequential.

@@ -85,8 +85,7 @@ describe("ObjectSafety - Missing Coverage", () => {
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            // Test the defensive programming check at the start of the function
-            // These tests specifically target lines 125-126
+            // Test the defensive programming check at the start of the function These tests specifically target lines 125-126
 
             // Test with null
             const nullResult = safeObjectOmit(null as any, ["key1", "key2"]);

@@ -8,7 +8,7 @@
  * logging. It integrates with the operational hooks system for consistent error
  * handling and event emission across the monitoring system.
  *
- * All connectivity operations use native Node.js modules (net, dns, fetch) for
+ * All connectivity operations use native Node.js modules (net, DNS, fetch) for
  * consistent behavior across Windows, macOS, and Linux platforms without
  * requiring elevated privileges or external system utilities. The module
  * provides both single-attempt and retry-enabled connectivity functions.
@@ -244,7 +244,7 @@ export async function performPingCheckWithRetry(
                 // cardinality. Include the host in the operational context
                 // instead.
                 operationName: "connectivity-check",
-                ...(signal ? { signal } : {}),
+                ...(signal && { signal }),
             }
         );
     } catch (error) {

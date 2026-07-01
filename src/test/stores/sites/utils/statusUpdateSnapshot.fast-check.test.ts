@@ -6,13 +6,9 @@
  * workflow rules in `docs/Guides/TOOLS_AND_COMMANDS_GUIDE.md` by combining
  * deterministic scenarios with fast-check property coverage. The goal is to
  * exercise the fallback logging path, history merge semantics, and general
- * snapshot application guarantees that were previously uncovered in
+ * snapshot app guarantees that were previously uncovered in
  * `src/stores/sites/utils/statusUpdateHandler.ts`.
  */
-
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { test } from "@fast-check/vitest";
-import * as fc from "fast-check";
 
 import type {
     Monitor,
@@ -20,19 +16,24 @@ import type {
     Site,
     StatusHistoryStatus,
 } from "@shared/types";
+import type { ArrayElement } from "type-fest";
+
+import { test } from "@fast-check/vitest";
 import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "@shared/types";
+import {
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
+} from "@shared/utils/environment";
+import * as fc from "fast-check";
+import { isEmpty } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     applyStatusUpdateSnapshot,
     type StatusUpdateSnapshotPayload,
 } from "../../../../stores/sites/utils/statusUpdateSnapshot";
 
-import {
-    resetProcessSnapshotOverrideForTesting,
-    setProcessSnapshotOverrideForTesting,
-} from "@shared/utils/environment";
-
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -41,7 +42,7 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-type MonitorHistoryEntry = Required<Monitor>["history"][number];
+type MonitorHistoryEntry = ArrayElement<Required<Monitor>["history"]>;
 
 const createHistoryEntry = (
     status: StatusHistoryStatus,
@@ -67,7 +68,7 @@ const createMonitor = (overrides: Partial<Monitor> = {}): Monitor =>
         lastChecked:
             overrides.lastChecked ?? new Date("2024-01-01T00:00:00.000Z"),
         ...overrides,
-    }) as Monitor;
+    });
 
 const createSite = (
     identifier: string,
@@ -79,7 +80,7 @@ const createSite = (
         monitoring: overrides.monitoring ?? true,
         monitors: overrides.monitors ?? [...monitors],
         name: overrides.name ?? `Site ${identifier}`,
-    }) as Site;
+    });
 
 const ensureSite = (site: Site | undefined): Site => {
     expect(site).toBeDefined();
@@ -250,7 +251,7 @@ describe(applyStatusUpdateSnapshot, () => {
             expect(updatedMonitor?.status).toBe(nextStatus);
 
             const expectedHistory =
-                snapshotHistory.length === 0 && existingHistory.length > 0
+                isEmpty(snapshotHistory) && existingHistory.length > 0
                     ? existingHistory
                     : snapshotHistory;
             expect(updatedMonitor?.history).toEqual(expectedHistory);

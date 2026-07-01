@@ -1,8 +1,6 @@
 /**
- * Comprehensive tests for deterministic cloud sync state application.
+ * Comprehensive tests for deterministic cloud sync state app.
  */
-
-import { describe, expect, it } from "vitest";
 
 import type { CloudSyncOperation } from "@shared/types/cloudSync";
 import type { CloudSyncState } from "@shared/types/cloudSyncState";
@@ -11,6 +9,7 @@ import {
     applyCloudSyncOperations,
     applyCloudSyncOperationsToState,
 } from "@shared/utils/cloudSyncState";
+import { describe, expect, it } from "vitest";
 
 function setField(
     partial: Omit<CloudSyncOperation, "kind"> & {
@@ -26,14 +25,14 @@ function setField(
 
 function deleteEntity(
     partial: Omit<CloudSyncOperation, "kind"> & {
-        entityType: "monitor" | "settings" | "site";
         entityId: string;
+        entityType: "monitor" | "settings" | "site";
     }
 ): CloudSyncOperation {
     return {
         kind: "delete-entity",
         ...partial,
-    } as CloudSyncOperation;
+    };
 }
 
 describe("cloudSyncState", () => {

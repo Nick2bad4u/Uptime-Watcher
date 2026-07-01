@@ -158,17 +158,17 @@ export const electronOpenDevtoolsRequireDevOnlyRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require openDevTools() calls to be in dev-only code paths",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-open-devtools-require-dev-only.md",
         },
-        schema: [],
         messages: {
             mustBeDevOnly:
                 "openDevTools() must only be called from dev-only code paths (put it in a method/function whose name includes 'dev').",
         },
+        schema: [],
+        type: "problem",
     },
 };

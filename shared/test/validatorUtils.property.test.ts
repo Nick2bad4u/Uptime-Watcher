@@ -27,30 +27,29 @@
  * - Performance testing with large inputs
  */
 
-import { describe, it, expect } from "vitest";
-import { test, fc } from "@fast-check/vitest";
-
+import { fc, test } from "@fast-check/vitest";
 // Import all validator utility functions
 import {
     isNonEmptyString,
     isValidFQDN,
-    isValidIdentifier,
-    isValidUrl,
     isValidHost,
-    isValidPort,
+    isValidIdentifier,
     isValidIdentifierArray,
     isValidInteger,
     isValidNumeric,
+    isValidPort,
+    isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
+import { describe, expect, it } from "vitest";
 
 describe("Validator Utils Property-Based Tests", () => {
     describe(isNonEmptyString, () => {
         test.prop([
             fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
         ])("should return true for all non-empty strings", (nonEmptyString) => {
-            const result = isNonEmptyString(nonEmptyString);
-            expect(result).toBeTruthy();
+            const isResult = isNonEmptyString(nonEmptyString);
+            expect(isResult).toBeTruthy();
         });
 
         test.prop([
@@ -61,29 +60,29 @@ describe("Validator Utils Property-Based Tests", () => {
         ])(
             "should return false for empty or whitespace-only strings",
             (emptyString) => {
-                const result = isNonEmptyString(emptyString);
-                expect(result).toBeFalsy();
+                const isResult = isNonEmptyString(emptyString);
+                expect(isResult).toBeFalsy();
             }
         );
 
         test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string values",
             (nonString) => {
-                const result = isNonEmptyString(nonString);
-                expect(result).toBeFalsy();
+                const isResult = isNonEmptyString(nonString);
+                expect(isResult).toBeFalsy();
             }
         );
 
         test.prop([fc.string()])(
             "should have consistent behavior with string trimming",
             (str) => {
-                const result = isNonEmptyString(str);
-                const trimmedEmpty = str.trim().length === 0;
+                const isResult = isNonEmptyString(str);
+                const isTrimmedEmpty = str.trim().length === 0;
 
-                if (trimmedEmpty) {
-                    expect(result).toBeFalsy();
+                if (isTrimmedEmpty) {
+                    expect(isResult).toBeFalsy();
                 } else {
-                    expect(result).toBeTruthy();
+                    expect(isResult).toBeTruthy();
                 }
             }
         );
@@ -95,13 +94,13 @@ describe("Validator Utils Property-Based Tests", () => {
                 "emoji 🚀 test",
                 "unicode ñáéíóú",
                 "mixed αβγ symbols",
-                "zero\u0000width",
-                "\u200B\u200C\u200D", // Zero-width characters
+                "zero\u{0}width",
+                "\u{200B}\u{200C}\u{200D}", // Zero-width characters
             ];
 
             for (const str of specialStrings) {
-                const result = isNonEmptyString(str);
-                expect(result).toBe(str.trim().length > 0);
+                const isResult = isNonEmptyString(str);
+                expect(isResult).toBe(str.trim().length > 0);
             }
         });
     });
@@ -110,8 +109,8 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([fc.domain()])(
             "should return true for fast-check generated domains",
             (domain) => {
-                const result = isValidFQDN(domain);
-                expect(result).toBeTruthy();
+                const isResult = isValidFQDN(domain);
+                expect(isResult).toBeTruthy();
             }
         );
 
@@ -129,16 +128,16 @@ describe("Validator Utils Property-Based Tests", () => {
         ])(
             "should return false for invalid domain formats",
             (invalidDomain) => {
-                const result = isValidFQDN(invalidDomain);
-                expect(result).toBeFalsy();
+                const isResult = isValidFQDN(invalidDomain);
+                expect(isResult).toBeFalsy();
             }
         );
 
         test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string inputs",
             (nonString) => {
-                const result = isValidFQDN(nonString);
-                expect(result).toBeFalsy();
+                const isResult = isValidFQDN(nonString);
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -185,10 +184,10 @@ describe("Validator Utils Property-Based Tests", () => {
             // Generate identifiers that must have at least one alphanumeric character
             fc
                 .string({ minLength: 1 })
-                .filter((s) => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s)),
+                .filter((s) => /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u.test(s)),
         ])("should return true for valid identifier patterns", (identifier) => {
-            const result = isValidIdentifier(identifier);
-            expect(result).toBeTruthy();
+            const isResult = isValidIdentifier(identifier);
+            expect(isResult).toBeTruthy();
         });
 
         test.prop([
@@ -202,16 +201,16 @@ describe("Validator Utils Property-Based Tests", () => {
         ])(
             "should return false for invalid identifier patterns",
             (invalidIdentifier) => {
-                const result = isValidIdentifier(invalidIdentifier);
-                expect(result).toBeFalsy();
+                const isResult = isValidIdentifier(invalidIdentifier);
+                expect(isResult).toBeFalsy();
             }
         );
 
         test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string inputs",
             (nonString) => {
-                const result = isValidIdentifier(nonString);
-                expect(result).toBeFalsy();
+                const isResult = isValidIdentifier(nonString);
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -230,7 +229,7 @@ describe("Validator Utils Property-Based Tests", () => {
 
             const invalidIdentifiers = [
                 "", // Empty
-                "   ", // Whitespace only
+                ' '.repeat(3), // Whitespace only
                 "test@email", // Special characters
                 "test.name", // Dots not allowed
                 "test name", // Spaces not allowed
@@ -252,9 +251,9 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([fc.webUrl().filter((url) => !url.includes("'"))])(
             "should align with URL parsing for fast-check generated URLs",
             (url) => {
-                const result = isValidUrl(url);
+                const isResult = isValidUrl(url);
 
-                const expected = (() => {
+                const isExpected = (() => {
                     try {
                         const parsed = new URL(url);
                         return (
@@ -267,8 +266,8 @@ describe("Validator Utils Property-Based Tests", () => {
                     }
                 })();
 
-                const hasSchemeOnly = /^[a-z][a-z\d+\-.]*:\/\/$/iu.test(url);
-                const endsWithBareScheme = url.endsWith("://");
+                const hasSchemeOnly = /^[a-z][\d+\-.a-z]*:\/\/$/iv.test(url);
+                const isEndsWithBareScheme = url.endsWith("://");
 
                 const hasNestedSchemeFragment = (() => {
                     const separatorIndex = url.indexOf("://");
@@ -287,14 +286,14 @@ describe("Validator Utils Property-Based Tests", () => {
                     );
                 })();
 
-                const normalizedExpected =
+                const isNormalizedExpected =
                     hasSchemeOnly ||
-                    endsWithBareScheme ||
+                    isEndsWithBareScheme ||
                     hasNestedSchemeFragment
                         ? false
-                        : expected;
+                        : isExpected;
 
-                expect(result).toBe(normalizedExpected);
+                expect(isResult).toBe(isNormalizedExpected);
             }
         );
 
@@ -309,15 +308,15 @@ describe("Validator Utils Property-Based Tests", () => {
                     .filter((s) => !s.includes("://"))
             ),
         ])("should return false for invalid URL formats", (invalidUrl) => {
-            const result = isValidUrl(invalidUrl);
-            expect(result).toBeFalsy();
+            const isResult = isValidUrl(invalidUrl);
+            expect(isResult).toBeFalsy();
         });
 
         test.prop([fc.anything().filter((x) => typeof x !== "string")])(
             "should return false for non-string inputs",
             (nonString) => {
-                const result = isValidUrl(nonString);
-                expect(result).toBeFalsy();
+                const isResult = isValidUrl(nonString);
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -367,8 +366,8 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([fc.oneof(fc.domain(), fc.ipV4(), fc.constant("localhost"))])(
             "should return true for valid host formats",
             (host) => {
-                const result = isValidHost(host);
-                expect(result).toBeTruthy();
+                const isResult = isValidHost(host);
+                expect(isResult).toBeTruthy();
             }
         );
 
@@ -382,13 +381,13 @@ describe("Validator Utils Property-Based Tests", () => {
                     .string({ minLength: 1, maxLength: 5 })
                     .filter(
                         (s) =>
-                            /[^\d.A-Za-z-]/.test(s) &&
-                            !/^(?:\d+\.){3}\d+$/.test(s)
+                            /[^\d\-.a-z]/i.test(s) &&
+                            !/^(?:\d+\.){3}\d+$/v.test(s)
                     )
             ),
         ])("should return false for invalid host formats", (invalidHost) => {
-            const result = isValidHost(invalidHost);
-            expect(result).toBeFalsy();
+            const isResult = isValidHost(invalidHost);
+            expect(isResult).toBeFalsy();
         });
 
         it("should validate specific host cases", () => {
@@ -427,8 +426,8 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([fc.integer({ min: 1, max: 65_535 })])(
             "should return true for valid port numbers",
             (port) => {
-                const result = isValidPort(port);
-                expect(result).toBeTruthy();
+                const isResult = isValidPort(port);
+                expect(isResult).toBeTruthy();
             }
         );
 
@@ -438,8 +437,8 @@ describe("Validator Utils Property-Based Tests", () => {
                 fc.integer({ min: 65_536, max: 100_000 })
             ),
         ])("should return false for invalid port numbers", (invalidPort) => {
-            const result = isValidPort(invalidPort);
-            expect(result).toBeFalsy();
+            const isResult = isValidPort(invalidPort);
+            expect(isResult).toBeFalsy();
         });
 
         test.prop([
@@ -449,8 +448,8 @@ describe("Validator Utils Property-Based Tests", () => {
         ])(
             "should return false for non-number/non-string inputs",
             (nonNumber) => {
-                const result = isValidPort(nonNumber);
-                expect(result).toBeFalsy();
+                const isResult = isValidPort(nonNumber);
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -468,7 +467,7 @@ describe("Validator Utils Property-Based Tests", () => {
                 -1,
                 65_536,
                 70_000,
-                Number.NaN,
+                NaN,
                 Infinity,
                 -Infinity,
             ];
@@ -531,13 +530,13 @@ describe("Validator Utils Property-Based Tests", () => {
                 // Generate identifiers that must have at least one alphanumeric character
                 fc
                     .string({ minLength: 1 })
-                    .filter((s) => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s))
+                    .filter((s) => /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u.test(s))
             ),
         ])(
             "should return true for arrays of valid identifiers",
             (identifierArray) => {
-                const result = isValidIdentifierArray(identifierArray);
-                expect(result).toBeTruthy();
+                const isResult = isValidIdentifierArray(identifierArray);
+                expect(isResult).toBeTruthy();
             }
         );
 
@@ -556,8 +555,8 @@ describe("Validator Utils Property-Based Tests", () => {
         ])(
             "should return false for invalid identifier arrays",
             (invalidArray) => {
-                const result = isValidIdentifierArray(invalidArray);
-                expect(result).toBeFalsy();
+                const isResult = isValidIdentifierArray(invalidArray);
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -605,8 +604,8 @@ describe("Validator Utils Property-Based Tests", () => {
         test.prop([fc.integer().map((n) => n.toString())])(
             "should return true for string representations of integers",
             (intString) => {
-                const result = isValidInteger(intString);
-                expect(result).toBeTruthy();
+                const isResult = isValidInteger(intString);
+                expect(isResult).toBeTruthy();
             }
         );
 
@@ -620,8 +619,8 @@ describe("Validator Utils Property-Based Tests", () => {
                 fc.anything().filter((x) => typeof x !== "string")
             ),
         ])("should return false for non-integer strings", (nonIntString) => {
-            const result = isValidInteger(nonIntString);
-            expect(result).toBeFalsy();
+            const isResult = isValidInteger(nonIntString);
+            expect(isResult).toBeFalsy();
         });
 
         it("should validate integer strings with bounds", () => {
@@ -639,8 +638,8 @@ describe("Validator Utils Property-Based Tests", () => {
         ])(
             "should return true for string representations of numbers",
             (numString) => {
-                const result = isValidNumeric(numString);
-                expect(result).toBeTruthy();
+                const isResult = isValidNumeric(numString);
+                expect(isResult).toBeTruthy();
             }
         );
 
@@ -650,8 +649,8 @@ describe("Validator Utils Property-Based Tests", () => {
                 fc.anything().filter((x) => typeof x !== "string")
             ),
         ])("should return false for non-numeric strings", (nonNumString) => {
-            const result = isValidNumeric(nonNumString);
-            expect(result).toBeFalsy();
+            const isResult = isValidNumeric(nonNumString);
+            expect(isResult).toBeFalsy();
         });
 
         it("should validate numeric strings with bounds", () => {
@@ -760,7 +759,7 @@ describe("Validator Utils Property-Based Tests", () => {
             ];
 
             for (const str of unicodeStrings) {
-                // Should not crash on unicode input
+                // Should not crash on Unicode input
                 expect(() => {
                     isNonEmptyString(str);
                     isValidIdentifier(str);

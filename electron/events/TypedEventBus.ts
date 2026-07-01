@@ -281,11 +281,11 @@ export class TypedEventBus<
      * Middleware functions are executed in order during event emission. Used
      * for cross-cutting concerns like logging, validation, and rate limiting.
      */
-    private readonly middlewares: Array<MiddlewareExecutor<EventMap>> = [];
+    private readonly middlewares: MiddlewareExecutor<EventMap>[] = [];
 
     private readonly middlewareExecutors = new Map<
         EventMiddleware<EventMap>,
-        Array<MiddlewareExecutor<EventMap>>
+        MiddlewareExecutor<EventMap>[]
     >();
 
     /**

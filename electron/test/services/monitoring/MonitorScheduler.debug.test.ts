@@ -2,12 +2,12 @@
  * @file Simple debug test for MonitorScheduler to verify method existence
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 
 // Unmock MonitorScheduler for this test file so we can test the real implementation
 vi.unmock("../../../services/monitoring/MonitorScheduler");
-
-import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
 
 describe("MonitorScheduler Debug", () => {
     it("should have performImmediateCheck method", async ({

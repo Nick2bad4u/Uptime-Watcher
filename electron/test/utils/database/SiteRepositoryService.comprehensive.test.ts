@@ -7,23 +7,23 @@
  * error handling, event emission, and orchestration workflows.
  */
 
+import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
-
-import type { TypedEventBus } from "../../../events/TypedEventBus";
 import type { UptimeEvents } from "../../../events/eventTypes";
+import type { TypedEventBus } from "../../../events/TypedEventBus";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
+import type {
+    MonitoringConfig,
+    SiteLoadingConfig,
+} from "../../../services/database/interfaces";
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../../services/database/SiteRepository";
 import type { SiteRow } from "../../../services/database/utils/mappers/siteMapper";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
-import type { Logger } from "@shared/utils/logger/interfaces";
-import type {
-    MonitoringConfig,
-    SiteLoadingConfig,
-} from "../../../services/database/interfaces";
 
 import { SiteLoadingError } from "../../../services/database/interfaces";
 import {
@@ -40,10 +40,10 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
     let siteRepositoryService: SiteRepositoryService;
     let siteLoadingOrchestrator: SiteLoadingOrchestrator;
     let mockRepositories: {
-        site: SiteRepository;
-        monitor: MonitorRepository;
         history: HistoryRepository;
+        monitor: MonitorRepository;
         settings: SettingsRepository;
+        site: SiteRepository;
     };
     let mockLogger: Logger;
     let mockEventEmitter: TypedEventBus<UptimeEvents>;

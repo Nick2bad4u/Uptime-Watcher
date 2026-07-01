@@ -20,9 +20,11 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { arrayAt, objectKeys, objectValues   } from "ts-extras";
+import { beforeEach, describe, expect, vi } from "vitest";
+
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Test utilities for error store state management
@@ -37,7 +39,7 @@ const createTestErrorStore = () => {
     const clearedState = useErrorStore.getState();
     if (
         clearedState.lastError !== undefined ||
-        Object.keys(clearedState.storeErrors).length > 0
+        objectKeys(clearedState.storeErrors).length > 0
     ) {
         throw new Error(
             `Store errors not properly cleared: ${JSON.stringify({
@@ -59,7 +61,7 @@ const arbitraries = {
         .filter((s) => s.trim().length > 0),
 
     /** Generate empty error message */
-    emptyError: fc.constantFrom("", "   ", "\n", "\t"),
+    emptyError: fc.constantFrom("", ' '.repeat(3), "\n", "\t"),
 
     /** Generate store name */
     storeName: fc.constantFrom(
@@ -229,7 +231,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             for (const error of errorMessages) store.setError(error);
 
             // Assert - last error should win
-            const lastError = errorMessages.at(-1);
+            const lastError = arrayAt(errorMessages, -1);
             expect(useErrorStore.getState().lastError).toBe(lastError);
         });
 
@@ -280,10 +282,10 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
         ])("should handle rapid loading state changes", (loadingStates) => {
             store = createTestErrorStore();
             // Act - rapidly toggle loading states
-            for (const loading of loadingStates) store.setLoading(loading);
+            for (const isLoading of loadingStates) store.setLoading(isLoading);
 
             // Assert - last state should win
-            const lastLoadingState = loadingStates.at(-1);
+            const lastLoadingState = arrayAt(loadingStates, -1);
             expect(useErrorStore.getState().isLoading).toBe(lastLoadingState);
         });
 
@@ -385,7 +387,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     store.setStoreError(storeName, error);
 
                 // Assert - last error should win
-                const lastError = errorMessages.at(-1);
+                const lastError = arrayAt(errorMessages, -1);
                 expect(store.getStoreError(storeName)).toBe(lastError);
             }
         );
@@ -413,10 +415,10 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.setOperationLoading(config.operation, config.loading);
 
                 // Assert
-                const retrievedLoading = useErrorStore
+                const isRetrievedLoading = useErrorStore
                     .getState()
                     .getOperationLoading(config.operation);
-                expect(retrievedLoading).toBe(config.loading);
+                expect(isRetrievedLoading).toBe(config.loading);
                 expect(
                     useErrorStore.getState().operationLoading[config.operation]
                 ).toBe(config.loading);
@@ -442,10 +444,10 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     operationName,
                     expectedLoading,
                 ] of expectedFinalState) {
-                    const retrievedLoading = useErrorStore
+                    const isRetrievedLoading = useErrorStore
                         .getState()
                         .getOperationLoading(operationName);
-                    expect(retrievedLoading).toBe(expectedLoading);
+                    expect(isRetrievedLoading).toBe(expectedLoading);
                 }
             }
         );
@@ -458,11 +460,11 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             (operationName, loadingStates) => {
                 store = createTestErrorStore();
                 // Act - rapidly update operation loading
-                for (const loading of loadingStates)
-                    store.setOperationLoading(operationName, loading);
+                for (const isLoading of loadingStates)
+                    store.setOperationLoading(operationName, isLoading);
 
                 // Assert - last state should win
-                const lastLoadingState = loadingStates.at(-1);
+                const lastLoadingState = arrayAt(loadingStates, -1);
                 expect(store.getOperationLoading(operationName)).toBe(
                     lastLoadingState
                 );
@@ -485,10 +487,10 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 ).toBeFalsy();
 
                 // Act & Assert - should return false for non-existent operations
-                const loading = useErrorStore
+                const isLoading = useErrorStore
                     .getState()
                     .getOperationLoading(operationName);
-                expect(loading).toBeFalsy();
+                expect(isLoading).toBeFalsy();
             }
         );
 
@@ -565,13 +567,13 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.clearAllErrors();
 
                 // Act - clear again should not crash
-                expect(() => store.clearAllErrors()).not.toThrow();
+                expect(() => { store.clearAllErrors(); }).not.toThrow();
 
                 // Assert - state should remain clean
                 expect(useErrorStore.getState().lastError).toBeUndefined();
                 // Note: isLoading is NOT cleared by clearAllErrors - it's a separate global loading state
                 expect(
-                    Object.keys(useErrorStore.getState().storeErrors)
+                    objectKeys(useErrorStore.getState().storeErrors)
                 ).toHaveLength(0);
                 // Note: operationLoading is NOT cleared by clearAllErrors - these are separate operation states
             }
@@ -682,7 +684,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             for (const error of errorMessages) store.setError(error);
 
             // Assert - final error should be set
-            const finalError = errorMessages.at(-1);
+            const finalError = arrayAt(errorMessages, -1);
             expect(useErrorStore.getState().lastError).toBe(finalError);
         });
 
@@ -713,8 +715,8 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 }
 
                 // Assert - final states should be set
-                const finalStoreError = storeErrors.at(-1);
-                const finalLoadingState = loadingStates.at(-1);
+                const finalStoreError = arrayAt(storeErrors, -1);
+                const finalLoadingState = arrayAt(loadingStates, -1);
 
                 expect(store.getStoreError(storeName)).toBe(finalStoreError);
                 expect(store.getOperationLoading(operationName)).toBe(
@@ -784,7 +786,7 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
             expect(useErrorStore.getState().lastError).toBeUndefined();
             // Note: isLoading is NOT cleared by clearAllErrors - it's a separate global loading state
             expect(
-                Object.keys(useErrorStore.getState().storeErrors)
+                objectKeys(useErrorStore.getState().storeErrors)
             ).toHaveLength(0);
             // Note: operationLoading is NOT cleared by clearAllErrors - these are separate operation states
         });
@@ -823,15 +825,15 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 expect(typeof store.operationLoading).toBe("object");
 
                 // Store errors should all be strings or undefined
-                for (const error of Object.values(store.storeErrors)) {
+                for (const error of objectValues(store.storeErrors)) {
                     expect(
                         typeof error === "string" || error === undefined
                     ).toBeTruthy();
                 }
 
                 // Operation loadings should all be booleans
-                for (const loading of Object.values(store.operationLoading)) {
-                    expect(typeof loading).toBe("boolean");
+                for (const isLoading of objectValues(store.operationLoading)) {
+                    expect(typeof isLoading).toBe("boolean");
                 }
             }
         );
@@ -910,10 +912,10 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     operationName,
                     expectedLoading,
                 ] of expectedFinalState) {
-                    const retrievedLoading = useErrorStore
+                    const isRetrievedLoading = useErrorStore
                         .getState()
                         .getOperationLoading(operationName);
-                    expect(retrievedLoading).toBe(expectedLoading);
+                    expect(isRetrievedLoading).toBe(expectedLoading);
                 }
 
                 // Non-existent operations should return false

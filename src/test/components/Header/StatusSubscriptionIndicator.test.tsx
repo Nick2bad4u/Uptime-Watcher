@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { StatusUpdateSubscriptionSummary } from "../../../stores/sites/baseTypes";
@@ -62,14 +63,13 @@ const singleChannelSummary: StatusUpdateSubscriptionSummary = {
 const mockStore = {
     retryStatusSubscription:
         vi.fn<() => Promise<StatusUpdateSubscriptionSummary>>(),
-    statusSubscriptionSummary: healthySummary as
-        | StatusUpdateSubscriptionSummary
-        | undefined,
+    statusSubscriptionSummary: safeCastTo<| StatusUpdateSubscriptionSummary
+        | undefined>(healthySummary),
 };
 
 type Selector<State, Result> = (state: State) => Result;
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: <Result,>(selector?: Selector<typeof mockStore, Result>) =>
         typeof selector === "function" ? selector(mockStore) : mockStore,
 }));

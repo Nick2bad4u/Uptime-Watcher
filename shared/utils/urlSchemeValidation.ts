@@ -16,7 +16,7 @@
 import { arrayJoin } from "ts-extras";
 
 export function isSchemeOnlyUrl(value: string): boolean {
-    return /^[a-z][\d+.a-z-]*:\/\/$/iu.test(value);
+    return /^[a-z][\d+\-.a-z]*:\/\/$/iu.test(value);
 }
 
 /**
@@ -55,14 +55,8 @@ export function hasHttpAuthorityDelimiterIssue(
         return true;
     }
 
-    if (
-        normalizedValue.startsWith("https:") &&
-        normalizedValue.slice(6, 8) !== "//"
-    ) {
-        return true;
-    }
-
-    return false;
+    return (normalizedValue.startsWith("https:") &&
+        normalizedValue.slice(6, 8) !== "//");
 }
 
 /**

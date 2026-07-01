@@ -30,16 +30,16 @@ import {
 } from "./utils/stringValidation";
 
 /** Maximum byte budget accepted for cloud backup object keys. */
-const MAX_BACKUP_KEY_BYTES: number = 2048;
+const MAX_BACKUP_KEY_BYTES = 2048;
 
 /** Maximum byte budget accepted for encryption passphrases. */
-const MAX_ENCRYPTION_PASSPHRASE_BYTES: number = 1024;
+const MAX_ENCRYPTION_PASSPHRASE_BYTES = 1024;
 
 export const validateCloudFilesystemProviderConfig: IpcParameterValidator =
     createParamValidator(1, [
         (config): ParameterValueValidationResult => {
             const recordResult = requireRecordParamValue(config, "config");
-            if (recordResult.ok === false) {
+            if (!recordResult.ok) {
                 return recordResult.error;
             }
 
@@ -48,7 +48,7 @@ export const validateCloudFilesystemProviderConfig: IpcParameterValidator =
                 record["baseDirectory"],
                 "baseDirectory"
             );
-            if (requiredString.ok === false) {
+            if (!requiredString.ok) {
                 return requiredString.error;
             }
 
@@ -120,7 +120,7 @@ export const validateCloudEnableSyncConfig: IpcParameterValidator =
     createParamValidator(1, [
         (config): ParameterValueValidationResult => {
             const recordResult = requireRecordParamValue(config, "config");
-            if (recordResult.ok === false) {
+            if (!recordResult.ok) {
                 return recordResult.error;
             }
 
@@ -138,7 +138,7 @@ export const validateCloudBackupMigrationRequest: IpcParameterValidator =
             const errors: string[] = [];
 
             const recordResult = requireRecordParamValue(config, "config");
-            if (recordResult.ok === false) {
+            if (!recordResult.ok) {
                 return recordResult.error;
             }
 
@@ -178,7 +178,7 @@ export const validateEncryptionPassphrasePayload: IpcParameterValidator =
                 candidate,
                 "passphrase"
             );
-            if (requiredString.ok === false) {
+            if (!requiredString.ok) {
                 return requiredString.error;
             }
 
@@ -225,7 +225,7 @@ export function createBackupKeyValidator(
     return createParamValidator(1, [
         (value): ParameterValueValidationResult => {
             const requiredString = requireStringParamValue(value, paramName);
-            if (requiredString.ok === false) {
+            if (!requiredString.ok) {
                 return requiredString.error;
             }
 

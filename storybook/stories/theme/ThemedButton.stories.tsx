@@ -9,15 +9,15 @@ const WarningIcon = AppIcons.status.warning;
 const SuccessIcon = AppIcons.status.upAlt;
 
 const meta: Meta<typeof ThemedButton> = {
-    component: ThemedButton,
     args: {
         children: "Primary Action",
-        variant: "primary",
         size: "md",
+        variant: "primary",
     },
     argTypes: {
         onClick: { action: "clicked" },
     },
+    component: ThemedButton,
     parameters: {
         layout: "centered",
     },
@@ -32,53 +32,53 @@ export const Primary: Story = {};
 
 export const Secondary: Story = {
     args: {
-        variant: "secondary",
         children: "Secondary",
+        variant: "secondary",
     },
 };
 
 export const WithLeadingIcon: Story = {
     args: {
-        icon: <DownloadIcon />,
         children: "Download",
+        icon: <DownloadIcon />,
     },
 };
 
 export const WithTrailingIcon: Story = {
     args: {
+        children: "Add Monitor",
         icon: <AddIcon />,
         iconPosition: "right",
-        children: "Add Monitor",
     },
 };
 
 export const Loading: Story = {
     args: {
-        loading: true,
         children: "Validating...",
+        loading: true,
     },
 };
 
 export const Destructive: Story = {
     args: {
-        variant: "error",
-        icon: <WarningIcon />,
         children: "Remove",
+        icon: <WarningIcon />,
+        variant: "error",
     },
 };
 
 export const Success: Story = {
     args: {
-        variant: "success",
-        icon: <SuccessIcon />,
         children: "Complete",
+        icon: <SuccessIcon />,
+        variant: "success",
     },
 };
 
 export const FullWidth: Story = {
     args: {
-        fullWidth: true,
         children: "Full width button",
+        fullWidth: true,
     },
     parameters: {
         layout: "padded",

@@ -39,6 +39,28 @@ export async function enableSync(
 }
 
 /**
+ * Previews a remote sync reset by counting remote `sync/` objects and reading
+ * the current manifest.
+ */
+export async function previewResetRemoteSyncState(
+    ctx: CloudServiceOperationContext
+): Promise<CloudSyncResetPreview> {
+    return ctx.runCloudOperation("previewResetRemoteSyncState", async () => {
+        const provider = await ctx.resolveProviderOrThrow({
+            requireEncryptionUnlocked: false,
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const manifest =
+            (await transport.readManifest()) ??
+            ProviderCloudSyncTransport.createEmptyManifest();
+
+        const syncObjects = await provider.listObjects("sync/");
+        return buildCloudSyncResetPreview({ manifest, syncObjects });
+    });
+}
+
+/**
  * Requests a sync cycle as soon as possible.
  */
 export async function requestSyncNow(
@@ -81,27 +103,5 @@ export async function resetRemoteSyncState(
             provider,
             syncEngine: ctx.syncEngine,
         });
-    });
-}
-
-/**
- * Previews a remote sync reset by counting remote `sync/` objects and reading
- * the current manifest.
- */
-export async function previewResetRemoteSyncState(
-    ctx: CloudServiceOperationContext
-): Promise<CloudSyncResetPreview> {
-    return ctx.runCloudOperation("previewResetRemoteSyncState", async () => {
-        const provider = await ctx.resolveProviderOrThrow({
-            requireEncryptionUnlocked: false,
-        });
-
-        const transport = ProviderCloudSyncTransport.create(provider);
-        const manifest =
-            (await transport.readManifest()) ??
-            ProviderCloudSyncTransport.createEmptyManifest();
-
-        const syncObjects = await provider.listObjects("sync/");
-        return buildCloudSyncResetPreview({ manifest, syncObjects });
     });
 }

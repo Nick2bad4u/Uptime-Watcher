@@ -4,15 +4,18 @@
  * and update notifications.
  */
 
-import { act, render, screen, waitFor } from "@testing-library/react";
 import type { RenderResult } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
+
+import type { Theme } from "../theme/types";
 
 import { App } from "../App";
 import { UI_DELAYS } from "../constants";
@@ -22,20 +25,19 @@ import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
 import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
-import { useTheme } from "../theme/useTheme";
 import { darkTheme, lightTheme } from "../theme/themes";
-import type { Theme } from "../theme/types";
+import { useTheme } from "../theme/useTheme";
 
 // Mock all required modules
-vi.mock("../hooks/useBackendFocusSync", () => ({
+vi.mock(import('../hooks/useBackendFocusSync'), () => ({
     useBackendFocusSync: vi.fn(),
 }));
 
-vi.mock("../hooks/useSelectedSite", () => ({
+vi.mock(import('../hooks/useSelectedSite'), () => ({
     useSelectedSite: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         app: {
             started: vi.fn(),
@@ -52,23 +54,23 @@ vi.mock("../services/logger", () => {
     };
 });
 
-vi.mock("../utils/cacheSync", () => ({
+vi.mock(import('../utils/cacheSync'), () => ({
     setupCacheSync: vi.fn(() => vi.fn()),
 }));
 
-vi.mock("../components/Header/Header", () => ({
+vi.mock(import('../components/Header/Header'), () => ({
     Header: () => <header data-testid="header">Header</header>,
 }));
 
-vi.mock("../components/Dashboard/SiteList/SiteList", () => ({
+vi.mock(import('../components/Dashboard/SiteList/SiteList'), () => ({
     SiteList: () => <div data-testid="site-list">Site List</div>,
 }));
 
-vi.mock("../components/AddSiteForm/AddSiteForm", () => ({
+vi.mock(import('../components/AddSiteForm/AddSiteForm'), () => ({
     AddSiteForm: () => <div data-testid="add-site-form">Add Site Form</div>,
 }));
 
-vi.mock("../components/Settings/Settings", () => ({
+vi.mock(import('../components/Settings/Settings'), () => ({
     Settings: ({ onClose }: { onClose: () => void }) => (
         <div data-testid="settings-modal">
             <button data-testid="close-settings" onClick={onClose}>
@@ -78,7 +80,7 @@ vi.mock("../components/Settings/Settings", () => ({
     ),
 }));
 
-vi.mock("../components/SiteDetails/SiteDetails", () => ({
+vi.mock(import('../components/SiteDetails/SiteDetails'), () => ({
     SiteDetails: ({ onClose, site }: { onClose: () => void; site: any }) => (
         <div data-testid="site-details-modal">
             <span data-testid="site-details-identifier">{site.identifier}</span>
@@ -89,13 +91,13 @@ vi.mock("../components/SiteDetails/SiteDetails", () => ({
     ),
 }));
 
-vi.mock("../stores/error/useErrorStore");
-vi.mock("../stores/settings/useSettingsStore");
-vi.mock("../stores/sites/useSitesStore");
-vi.mock("../stores/ui/useUiStore");
-vi.mock("../stores/updates/useUpdatesStore");
-vi.mock("../theme/useTheme");
-vi.mock("../services/NotificationPreferenceService", () => ({
+vi.mock(import('../stores/error/useErrorStore'));
+vi.mock(import('../stores/settings/useSettingsStore'));
+vi.mock(import('../stores/sites/useSitesStore'));
+vi.mock(import('../stores/ui/useUiStore'));
+vi.mock(import('../stores/updates/useUpdatesStore'));
+vi.mock(import('../theme/useTheme'));
+vi.mock(import('../services/NotificationPreferenceService'), () => ({
     NotificationPreferenceService: {
         initialize: vi.fn().mockResolvedValue(undefined),
         updatePreferences: vi.fn().mockResolvedValue(undefined),
@@ -110,7 +112,7 @@ const mockUseUpdatesStore = vi.mocked(useUpdatesStore);
 const mockUseTheme = vi.mocked(useTheme);
 
 // Mock environment functions
-vi.mock("../../shared/utils/environment", () => ({
+vi.mock(import('../../shared/utils/environment'), () => ({
     isDevelopment: vi.fn(() => false),
     isProduction: vi.fn(() => true),
 }));
@@ -356,12 +358,12 @@ describe("App Component - Comprehensive Coverage", () => {
         });
 
         // Mock store static functions
-        (mockUseSitesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(defaultSitesStore);
-        (mockUseSettingsStore as any).getState = vi
-            .fn()
-            .mockReturnValue(defaultSettingsStore);
+        vi.spyOn(mockUseSitesStore as any, "getState").mockReturnValue(
+            defaultSitesStore
+        );
+        vi.spyOn(mockUseSettingsStore as any, "getState").mockReturnValue(
+            defaultSettingsStore
+        );
     });
 
     describe("Basic Rendering", () => {
@@ -1153,7 +1155,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             // Wait for initialization to complete
             await waitFor(() => {
-                expect(mockCacheSync.setupCacheSync).toHaveBeenCalled();
+                expect(mockCacheSync.setupCacheSync).toHaveBeenCalledWith();
             });
 
             unmountApp(utils);
@@ -1199,7 +1201,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await renderApp();
 
             await waitFor(() => {
-                expect(subscribeToStatusUpdates).toHaveBeenCalled();
+                expect(subscribeToStatusUpdates).toHaveBeenCalledWith();
             });
 
             // Simulate a status update

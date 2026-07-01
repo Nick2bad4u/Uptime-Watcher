@@ -164,7 +164,7 @@ const COUNT_RESULT_VALIDATION: RowValidationOptions<CountResult> = {
  * result to the expected type.
  *
  * @param db - Database instance
- * @param sql - INSERT SQL with RETURNING clause
+ * @param SQL - INSERT SQL with RETURNING clause
  * @param params - Query parameters
  *
  * @returns Inserted record with generated fields
@@ -190,7 +190,7 @@ export function insertWithReturning<TRow extends object = UnknownRecord>(
  * This function handles COUNT() queries which return `{count: number}`.
  *
  * @param db - Database instance
- * @param sql - SQL query that returns a count
+ * @param SQL - SQL query that returns a count
  * @param params - Query parameters
  *
  * @returns Count result object
@@ -239,21 +239,21 @@ export function queryForIds(
 
     const validRows: IdOnlyResult[] = [];
 
-    rows.forEach((row) => {
+    for (const row of rows) {
         if (!isSharedRecord(row)) {
-            return;
+            continue;
         }
 
         const candidateId = row["id"];
         if (typeof candidateId === "number" && isFiniteNumber(candidateId)) {
             validRows.push({ id: candidateId });
-            return;
+            continue;
         }
 
         if (typeof candidateId === "string" && candidateId.length > 0) {
             validRows.push({ id: candidateId });
         }
-    });
+    }
 
     return validRows;
 }
@@ -266,7 +266,7 @@ export function queryForIds(
  * this when you know the SQL structure and expected return type.
  *
  * @param db - Database instance
- * @param sql - SQL query string
+ * @param SQL - SQL query string
  * @param params - Query parameters
  *
  * @returns Array of records
@@ -290,7 +290,7 @@ export function queryForRecords<T extends object = UnknownRecord>(
  * Callers should cast the result to the expected type.
  *
  * @param db - Database instance
- * @param sql - SQL query string
+ * @param SQL - SQL query string
  * @param params - Query parameters
  *
  * @returns Single record or undefined
@@ -337,15 +337,9 @@ const isValidHistoryEntryRow = (
         return false;
     }
 
-    if (
-        isDefined(responseTime) &&
-        typeof responseTime !== "number" &&
-        typeof responseTime !== "string"
-    ) {
-        return false;
-    }
-
-    return true;
+    return !isDefined(responseTime) ||
+        typeof responseTime === "number" ||
+        typeof responseTime === "string";
 };
 
 const HISTORY_ROW_VALIDATION: RowValidationOptions<HistoryRow> = {

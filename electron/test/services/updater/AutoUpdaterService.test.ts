@@ -4,8 +4,7 @@
  */
 
 import { autoUpdater } from "electron-updater";
-
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
 
@@ -336,7 +335,7 @@ describe(AutoUpdaterService, () => {
             handler();
 
             // Should not throw
-            expect(() => handler()).not.toThrow();
+            expect(() => { handler(); }).not.toThrow();
         });
         it("should call callback when set", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

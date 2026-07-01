@@ -3,16 +3,17 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
+
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import {
     createSiteViaModal,
-    getSiteCardLocator,
     ensureCardLayout,
+    getSiteCardLocator,
     removeAllSites,
     resetApplicationState,
     WAIT_TIMEOUTS,
@@ -74,11 +75,11 @@ test.describe(
                     };
                 });
 
-                expect(properties).not.toBeNull();
-                expect(
+                expect.soft(properties).not.toBeNull();
+                expect.soft(
                     properties?.highlight.trim().length ?? 0
                 ).toBeGreaterThan(0);
-                expect(
+                expect.soft(
                     properties?.borderWeak.trim().length ?? 0
                 ).toBeGreaterThan(0);
             }
@@ -96,33 +97,29 @@ test.describe(
 
                 await ensureCardLayout(page);
 
-                const initialClasses = await page.evaluate(() => {
-                    return (
+                const initialClasses = await page.evaluate(() => (
                         document.querySelector(".site-grid")?.className ?? ""
-                    );
-                });
-                expect(initialClasses).toContain("site-grid--stacked");
+                    ));
+                expect.soft(initialClasses).toContain("site-grid--stacked");
 
                 const listButton = page.getByRole("button", { name: "List" });
                 await listButton.click();
 
                 const table = page.getByRole("table");
-                await expect(table).toBeVisible();
+                await expect.soft(table).toBeVisible();
 
                 const largeButton = page.getByRole("button", { name: "Large" });
                 await largeButton.click();
 
-                await expect(table).toBeHidden({ timeout: 5000 });
+                await expect.soft(table).toBeHidden({ timeout: 5000 });
 
                 const miniButton = page.getByRole("button", { name: "Mini" });
                 await miniButton.click();
 
-                const compactClasses = await page.evaluate(() => {
-                    return (
+                const compactClasses = await page.evaluate(() => (
                         document.querySelector(".site-grid")?.className ?? ""
-                    );
-                });
-                expect(compactClasses).toContain("site-grid--compact");
+                    ));
+                expect.soft(compactClasses).toContain("site-grid--compact");
             }
         );
 
@@ -139,7 +136,7 @@ test.describe(
 
                 await ensureCardLayout(page);
 
-                await expect(
+                await expect.soft(
                     getSiteCardLocator(page, createdSite.name)
                 ).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
@@ -149,13 +146,13 @@ test.describe(
                 await largeButton.click();
 
                 const gridButton = page.getByRole("button", { name: "Grid" });
-                await expect(gridButton).toHaveAttribute(
+                await expect.soft(gridButton).toHaveAttribute(
                     "aria-pressed",
-                    /true|false/
+                    /false|true/v
                 );
 
                 await gridButton.click();
-                await expect(gridButton).toHaveAttribute(
+                await expect.soft(gridButton).toHaveAttribute(
                     "aria-pressed",
                     "true",
                     { timeout: WAIT_TIMEOUTS.MEDIUM }
@@ -179,7 +176,7 @@ test.describe(
                     name: "Stacked",
                 });
                 await stackedButton.click();
-                await expect(stackedButton).toHaveAttribute(
+                await expect.soft(stackedButton).toHaveAttribute(
                     "aria-pressed",
                     "true",
                     { timeout: WAIT_TIMEOUTS.MEDIUM }

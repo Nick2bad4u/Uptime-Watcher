@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { STATUS_KIND } from "@shared/types";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {
     AlertStore,
@@ -11,11 +11,11 @@ import type {
 import { StatusAlertToaster } from "../../../components/Alerts/StatusAlertToaster";
 import { useAlertStore } from "../../../stores/alerts/useAlertStore";
 
-vi.mock("../../../stores/alerts/useAlertStore", () => ({
+vi.mock(import('../../../stores/alerts/useAlertStore'), () => ({
     useAlertStore: vi.fn(),
 }));
 
-vi.mock("../../../components/Alerts/StatusAlertToast", () => ({
+vi.mock(import('../../../components/Alerts/StatusAlertToast'), () => ({
     StatusAlertToast: ({
         alert,
         onDismiss,
@@ -25,7 +25,7 @@ vi.mock("../../../components/Alerts/StatusAlertToast", () => ({
     }) => (
         <div
             data-testid={`status-alert-${alert.id}`}
-            onClick={() => onDismiss(alert.id)}
+            onClick={() => { onDismiss(alert.id); }}
         >
             {alert.id}
         </div>
@@ -59,7 +59,7 @@ describe(StatusAlertToaster, () => {
             dismissToast,
             enqueueAlert: vi.fn(),
             enqueueToast: vi.fn(),
-        } as AlertStore;
+        };
 
         mockedUseAlertStore.mockImplementation(
             <T,>(selector: (state: AlertStore) => T): T => selector(mockState)
@@ -94,10 +94,10 @@ describe(StatusAlertToaster, () => {
 
         render(<StatusAlertToaster />);
 
-        const renderedAlerts = screen.getAllByTestId(/status-alert-/);
+        const renderedAlerts = screen.getAllByTestId(/status-alert-/v);
         expect(renderedAlerts).toHaveLength(2);
 
-        const firstAlert = renderedAlerts[0]!;
+        const firstAlert = arrayFirst(renderedAlerts)!;
         fireEvent.click(firstAlert);
         expect(dismissAlert).toHaveBeenCalledWith("alert-1");
     });

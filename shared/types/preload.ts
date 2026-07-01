@@ -15,14 +15,17 @@ import type {
 } from "./ipc";
 
 /**
- * Resolves to the appropriate promise result type for a channel.
+ * Creates a typed preload bridge from a domain/channel mapping.
  *
- * @internal
+ * @public
  */
-type BridgeResult<TChannel extends IpcInvokeChannel> =
-    IpcInvokeChannelResult<TChannel> extends undefined
-        ? Promise<void>
-        : Promise<IpcInvokeChannelResult<TChannel>>;
+export type DomainBridge<
+    TMapping extends {
+        readonly [Key in keyof TMapping]: IpcInvokeChannel;
+    },
+> = {
+    readonly [Key in keyof TMapping]: IpcBridgeMethod<TMapping[Key]>;
+};
 
 /**
  * Function signature for invoking a typed IPC channel.
@@ -39,17 +42,14 @@ export type IpcBridgeMethod<TChannel extends IpcInvokeChannel> = (
 ) => BridgeResult<TChannel>;
 
 /**
- * Creates a typed preload bridge from a domain/channel mapping.
+ * Resolves to the appropriate promise result type for a channel.
  *
- * @public
+ * @internal
  */
-export type DomainBridge<
-    TMapping extends {
-        readonly [Key in keyof TMapping]: IpcInvokeChannel;
-    },
-> = {
-    readonly [Key in keyof TMapping]: IpcBridgeMethod<TMapping[Key]>;
-};
+type BridgeResult<TChannel extends IpcInvokeChannel> =
+    IpcInvokeChannelResult<TChannel> extends undefined
+        ? Promise<void>
+        : Promise<IpcInvokeChannelResult<TChannel>>;
 
 /**
  * Mapping from data domain bridge methods to IPC channels.
@@ -404,13 +404,6 @@ const SYSTEM_CHANNELS_DEFINITION: SystemChannelMap = {
 export const SYSTEM_CHANNELS: SystemChannelMap = SYSTEM_CHANNELS_DEFINITION;
 
 /**
- * Renderer-facing preload bridge for system-domain IPC interactions.
- *
- * @public
- */
-export type SystemDomainBridge = DomainBridge<typeof SYSTEM_CHANNELS>;
-
-/**
  * Shared shape of the Electron bridge API exposed to the renderer.
  *
  * @public
@@ -430,3 +423,10 @@ export interface ElectronBridgeApi<
     readonly stateSync: StateSyncDomainBridge;
     readonly system: TSystemApi;
 }
+
+/**
+ * Renderer-facing preload bridge for system-domain IPC interactions.
+ *
+ * @public
+ */
+export type SystemDomainBridge = DomainBridge<typeof SYSTEM_CHANNELS>;

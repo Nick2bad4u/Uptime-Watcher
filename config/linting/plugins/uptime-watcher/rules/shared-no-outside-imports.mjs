@@ -112,22 +112,23 @@ export const sharedNoOutsideImportsRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                if (
-                    node.callee.type === "Identifier" &&
-                    node.callee.name === "require" &&
-                    node.arguments.length > 0
-                ) {
-                    const [firstArgument] = node.arguments;
-                    if (
-                        firstArgument?.type === "Literal" &&
-                        typeof firstArgument.value === "string"
-                    ) {
-                        handleModuleSpecifier(
-                            firstArgument,
-                            firstArgument.value
-                        );
-                    }
+                if (node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length === 0) {
+                    return;
                 }
+
+                const [firstArgument] = node.arguments;
+                if (
+                    firstArgument?.type === "Literal" &&
+                    typeof firstArgument.value === "string"
+                ) {
+                    handleModuleSpecifier(
+                        firstArgument,
+                        firstArgument.value
+                    );
+                }
+
             },
 
             /**
@@ -157,17 +158,17 @@ export const sharedNoOutsideImportsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow shared layer modules from importing renderer or Electron runtime code",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/shared-no-outside-imports.md",
         },
-        schema: [],
         messages: {
             noExternalImports:
                 'Shared modules must not import from "{{module}}". Shared code should remain platform agnostic.',
         },
+        schema: [],
+        type: "problem",
     },
 };

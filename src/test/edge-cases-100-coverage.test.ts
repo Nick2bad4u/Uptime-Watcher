@@ -7,18 +7,19 @@
  * behaves as expected when failures occur.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// Import utilities to test
-import { generateUuid } from "../utils/data/generateUuid";
 import {
     ensureError,
     withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
+import { arrayAt, arrayFirst  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import utilities to test
+import { generateUuid } from "../utils/data/generateUuid";
 import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 // Mock logger
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         error: vi.fn(),
         warn: vi.fn(),
@@ -50,7 +51,7 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/);
+            expect(uuid).toMatch(/^site-\w+-\d+$/v);
         });
 
         it("should handle undefined crypto", () => {
@@ -61,7 +62,7 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/);
+            expect(uuid).toMatch(/^site-\w+-\d+$/v);
         });
 
         it("should handle crypto without randomUUID method", () => {
@@ -71,7 +72,7 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/);
+            expect(uuid).toMatch(/^site-\w+-\d+$/v);
         });
 
         it("should use crypto.randomUUID when available", () => {
@@ -85,7 +86,7 @@ describe("100% Coverage Edge Cases", () => {
 
             const uuid = generateUuid();
             expect(uuid).toBe(mockUuid);
-            expect(crypto.randomUUID).toHaveBeenCalled();
+            expect(crypto.randomUUID).toHaveBeenCalledWith();
         });
 
         it("should generate consistent fallback format", () => {
@@ -97,8 +98,8 @@ describe("100% Coverage Edge Cases", () => {
             const uuid1 = generateUuid();
             const uuid2 = generateUuid();
 
-            expect(uuid1).toMatch(/^site-\w+-\d+$/);
-            expect(uuid2).toMatch(/^site-\w+-\d+$/);
+            expect(uuid1).toMatch(/^site-\w+-\d+$/v);
+            expect(uuid2).toMatch(/^site-\w+-\d+$/v);
             expect(uuid1).not.toBe(uuid2); // Should be different
         });
     });
@@ -182,7 +183,7 @@ describe("100% Coverage Edge Cases", () => {
                 false
             );
             expect(result).toBe("success");
-            expect(operation).toHaveBeenCalled();
+            expect(operation).toHaveBeenCalledWith();
         });
 
         it("should handle async operation failure with fallback", async () => {
@@ -306,7 +307,7 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(typeof wrapper).toBe("function");
             await wrapper();
-            expect(asyncOp).toHaveBeenCalled();
+            expect(asyncOp).toHaveBeenCalledWith();
         });
 
         it("should handle async error wrapper with success case", async () => {
@@ -314,11 +315,11 @@ describe("100% Coverage Edge Cases", () => {
             const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
 
             expect(typeof wrapper).toBe("function");
-            expect(() => wrapper()).not.toThrow();
+            expect(() => { wrapper(); }).not.toThrow();
 
             // Wait for async operation to complete
             await new Promise((resolve) => setTimeout(resolve, 10));
-            expect(asyncOp).toHaveBeenCalled();
+            expect(asyncOp).toHaveBeenCalledWith();
         });
 
         it("should handle multiple async wrapper calls", async () => {
@@ -341,7 +342,7 @@ describe("100% Coverage Edge Cases", () => {
                 false,
                 0,
                 "",
-                Number.NaN,
+                NaN,
             ];
 
             for (const value of falsyValues) {
@@ -433,7 +434,7 @@ describe("100% Coverage Edge Cases", () => {
             }
 
             // Last one should be the same instance
-            expect(results.at(-1)).toBe(errors.at(-1));
+            expect(arrayAt(results, -1)).toBe(arrayAt(errors, -1));
         });
 
         it("should handle rapid async operations", async () => {
@@ -476,7 +477,7 @@ describe("100% Coverage Edge Cases", () => {
 
             const results = await Promise.all(promises);
 
-            expect(results[0]).toBe("success-1");
+            expect(arrayFirst(results)).toBe("success-1");
             expect(results[1]).toBe("fallback-1");
             expect(results[2]).toBe("success-2");
             expect(results[3]).toBe("fallback-3");
@@ -522,7 +523,7 @@ describe("100% Coverage Edge Cases", () => {
         });
 
         it("should handle NaN as error", () => {
-            const result = ensureError(Number.NaN);
+            const result = ensureError(NaN);
             expect(result).toBeInstanceOf(Error);
             expect(result.message).toBe("NaN");
         });

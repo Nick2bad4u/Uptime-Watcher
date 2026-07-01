@@ -4,32 +4,32 @@
  * cases.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { EventKey, TypedEventBus } from "../../../events/TypedEventBus";
-import type { Site } from "@shared/types";
-import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
-import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
 import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
-import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
 import type { DatabaseCommandContext } from "../../../services/commands/databaseCommandContext";
-import { logger as backendLogger } from "../../../utils/logger";
+import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
+import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
+import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 import {
     DatabaseCommand,
     DatabaseCommandExecutor,
     DownloadBackupCommand,
     ExportDataCommand,
-    ImportDataCommand,
-    RestoreBackupCommand,
-    LoadSitesCommand,
     type IDatabaseCommand,
+    ImportDataCommand,
+    LoadSitesCommand,
+    RestoreBackupCommand,
 } from "../../../services/commands/DatabaseCommands";
-
+import { logger as backendLogger } from "../../../utils/logger";
 import {
-    createMockServiceFactory as createEnhancedServiceFactory,
     createMockEventBus as createEnhancedEventBus,
+    createMockServiceFactory as createEnhancedServiceFactory,
     createTestSite as createEnhancedTestSite,
 } from "../../utils/enhanced-testUtilities";
 
@@ -43,7 +43,7 @@ const createMockCache = () => {
     const mockCache: Partial<StandardizedCache<Site>> & {
         replaceAll: ReturnType<typeof vi.fn>;
     } = {
-        clear: vi.fn(() => cache.clear()),
+        clear: vi.fn(() => { cache.clear(); }),
         delete: vi.fn((key: string) => cache.delete(key)),
         entries: vi.fn(() => cache.entries()),
         get: vi.fn((key: string) => cache.get(key)),
@@ -53,7 +53,7 @@ const createMockCache = () => {
             cache.set(key, value);
             return mockCache as unknown as StandardizedCache<Site>;
         }),
-        size: 0 as unknown as number,
+        size: 0,
         replaceAll: vi.fn((items: { data: Site; key: string }[]) => {
             mockCache.clear?.();
             for (const item of items) {
@@ -154,9 +154,9 @@ describe("DatabaseCommands", () => {
 
         beforeEach(() => {
             command = new TestDatabaseCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as unknown as StandardizedCache<Site>
+                mockCache
             );
         });
 
@@ -568,9 +568,9 @@ describe("DatabaseCommands", () => {
             );
 
             command = new DownloadBackupCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as unknown as StandardizedCache<Site>
+                mockCache
             );
         });
 
@@ -670,9 +670,9 @@ describe("DatabaseCommands", () => {
             );
 
             command = new ExportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>
+                mockCache
             );
         });
 
@@ -693,7 +693,7 @@ describe("DatabaseCommands", () => {
                 "internal:database:data-exported",
                 expect.objectContaining({
                     success: true,
-                    fileName: expect.stringMatching(/^export-\d+\.json$/),
+                    fileName: expect.stringMatching(/^export-\d+\.json$/v),
                     operation: "data-exported",
                 })
             );
@@ -782,14 +782,14 @@ describe("DatabaseCommands", () => {
             );
 
             command = new ImportDataCommand({
-                cache: mockCache as StandardizedCache<Site>,
+                cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
                 data: '{"sites": [{"identifier": "test1"}], "settings": {}}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
                 updateHistoryLimit: mockUpdateHistoryLimit as unknown as (
                     limit: number
                 ) => Promise<void>,
@@ -809,9 +809,9 @@ describe("DatabaseCommands", () => {
             const originalSite = createTestSite("original");
             mockCache.getAll = vi.fn().mockReturnValue([originalSite]);
 
-            const result = await command.execute();
+            const isResult = await command.execute();
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(
                 mockImportExportService.importDataFromJson
             ).toHaveBeenCalledWith(
@@ -937,7 +937,7 @@ describe("DatabaseCommands", () => {
                 sites: duplicateSites,
             });
 
-            await expect(command.execute()).rejects.toThrow(/duplicate/i);
+            await expect(command.execute()).rejects.toThrow(/duplicate/iv);
             expect(
                 mockImportExportService.persistImportedData
             ).not.toHaveBeenCalled();
@@ -1003,14 +1003,14 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Validation", "type");
 
             const invalidCommand = new ImportDataCommand({
-                cache: mockCache as StandardizedCache<Site>,
+                cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
                 data: "",
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1034,14 +1034,14 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Validation", "type");
 
             const invalidCommand = new ImportDataCommand({
-                cache: mockCache as StandardizedCache<Site>,
+                cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
                 data: "   \n\t   ",
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1065,14 +1065,14 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Validation", "type");
 
             const invalidCommand = new ImportDataCommand({
-                cache: mockCache as StandardizedCache<Site>,
+                cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
                 data: '{"invalid": json}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1090,14 +1090,14 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Error Handling", "type");
 
             const invalidCommand = new ImportDataCommand({
-                cache: mockCache as StandardizedCache<Site>,
+                cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
                 data: "",
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1127,14 +1127,14 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Validation", "type");
 
             const invalidCommand = new ImportDataCommand({
-                cache: mockCache as StandardizedCache<Site>,
+                cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
                 data: '{"sites": [], "settings": {}}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory:
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
             });
 
             const result = await invalidCommand.validate();
@@ -1164,10 +1164,10 @@ describe("DatabaseCommands", () => {
         let command: RestoreBackupCommand;
         let payload: { buffer: Buffer; fileName: string };
         let restoreResult: {
-            metadata: { checksum: string; schemaVersion: number } & Record<
+            metadata: Record<
                 string,
                 unknown
-            >;
+            > & { checksum: string; schemaVersion: number };
             preRestoreBackup: {
                 buffer: Buffer;
                 fileName: string;
@@ -1310,9 +1310,9 @@ describe("DatabaseCommands", () => {
             );
 
             command = new LoadSitesCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>
+                mockCache
             );
         });
 
@@ -1469,29 +1469,29 @@ describe("DatabaseCommands", () => {
 
             const commands = [
                 new DownloadBackupCommand(
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                    mockCache as StandardizedCache<Site>
+                    mockCache
                 ),
                 new ExportDataCommand(
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                    mockCache as StandardizedCache<Site>
+                    mockCache
                 ),
                 new ImportDataCommand({
-                    cache: mockCache as StandardizedCache<Site>,
+                    cache: mockCache,
                     configurationManager:
                         mockConfigurationManager as unknown as ConfigurationManager,
                     data: '{"sites": [], "settings": {}}',
                     eventEmitter:
                         mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                     serviceFactory:
-                        mockServiceFactory as unknown as DatabaseServiceFactory,
+                        mockServiceFactory,
                 }),
                 new LoadSitesCommand(
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                    mockServiceFactory,
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                    mockCache as StandardizedCache<Site>
+                    mockCache
                 ),
             ];
 
@@ -1527,9 +1527,9 @@ describe("DatabaseCommands", () => {
             );
 
             const command = new ExportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as unknown as StandardizedCache<Site>
+                mockCache
             );
 
             // Should still throw the event emission error
@@ -1554,9 +1554,9 @@ describe("DatabaseCommands", () => {
             });
 
             const command = new DownloadBackupCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as unknown as StandardizedCache<Site>
+                mockCache
             );
 
             await expect(command.execute()).rejects.toThrow(
@@ -1586,9 +1586,9 @@ describe("DatabaseCommands", () => {
             );
 
             const command = new LoadSitesCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
+                mockServiceFactory,
                 mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as unknown as StandardizedCache<Site>
+                mockCache
             );
 
             await expect(command.execute()).rejects.toThrow(

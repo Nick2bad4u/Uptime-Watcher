@@ -10,16 +10,16 @@
  * @since 2024
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isInteger } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SettingsService } from "../../services/SettingsService";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock dependencies using vi.hoisted for proper initialization order
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -52,18 +52,18 @@ const mockElectronAPI = vi.hoisted(() => ({
 }));
 
 // Mock modules
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Backwards-compatible alias for existing assertions
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
-vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
     return {
@@ -135,7 +135,7 @@ describe("SettingsService", () => {
             await expect(SettingsService.initialize()).rejects.toThrow(
                 "String error"
             );
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(error);
         });
 
@@ -143,7 +143,7 @@ describe("SettingsService", () => {
             mockWaitForElectronBridge.mockRejectedValue(null);
 
             await expect(SettingsService.initialize()).rejects.toThrow("null");
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
             expect(vi.mocked(ensureError)).toHaveBeenCalledWith(null);
         });
     });
@@ -236,11 +236,11 @@ describe("SettingsService", () => {
                     expectWarn: true,
                 },
                 {
-                    value: Number.POSITIVE_INFINITY,
+                    value: Infinity,
                     expected: defaultLimit,
                     expectWarn: true,
                 },
-                { value: Number.NaN, expected: defaultLimit, expectWarn: true },
+                { value: NaN, expected: defaultLimit, expectWarn: true },
             ];
 
             for (const { expected, expectWarn, value } of cases) {
@@ -413,7 +413,7 @@ describe("SettingsService", () => {
             }
 
             const rejectingEdgeCases = [
-                Number.POSITIVE_INFINITY,
+                Infinity,
                 Number.NEGATIVE_INFINITY,
             ];
 
@@ -687,7 +687,7 @@ describe("SettingsService", () => {
 
         it("should handle special numeric values", async () => {
             const specialValues = [
-                Number.NaN,
+                NaN,
                 Infinity,
                 -Infinity,
                 0,
@@ -697,7 +697,7 @@ describe("SettingsService", () => {
             for (const value of specialValues) {
                 mockLogger.warn.mockClear();
 
-                if (Number.isFinite(value) && Number.isInteger(value)) {
+                if (Number.isFinite(value) && isInteger(value)) {
                     mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                         value
                     );
@@ -715,7 +715,7 @@ describe("SettingsService", () => {
                     expect(mockLogger.warn).not.toHaveBeenCalled();
                 } else {
                     mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
-                        value as number
+                        value
                     );
                     await expect(
                         SettingsService.updateHistoryLimit(value)

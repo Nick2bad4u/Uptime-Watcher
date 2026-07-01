@@ -6,15 +6,15 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../stores/ui/useConfirmDialogStore", () => ({
+import { useConfirmDialog } from "../../../hooks/ui/useConfirmDialog";
+import {
+    type ConfirmDialogOptions,
+    requestConfirmation,
+} from "../../../stores/ui/useConfirmDialogStore";
+
+vi.mock(import('../../../stores/ui/useConfirmDialogStore'), () => ({
     requestConfirmation: vi.fn(),
 }));
-
-import {
-    requestConfirmation,
-    type ConfirmDialogOptions,
-} from "../../../stores/ui/useConfirmDialogStore";
-import { useConfirmDialog } from "../../../hooks/ui/useConfirmDialog";
 
 const mockRequestConfirmation = vi.mocked(requestConfirmation);
 

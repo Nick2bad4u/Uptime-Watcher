@@ -6,9 +6,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-    withErrorHandling,
     type ErrorHandlingBackendContext,
     type ErrorHandlingFrontendStore,
+    withErrorHandling,
 } from "../../utils/errorHandling";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {

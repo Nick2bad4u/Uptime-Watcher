@@ -4,6 +4,13 @@ import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { IpcValidators } from "../IpcValidators";
 
 /**
+ * Result returned by {@link requireStringParamValue}.
+ */
+export type StringParamValueResult =
+    | { readonly error: readonly string[]; readonly ok: false }
+    | { readonly ok: true; readonly value: string };
+
+/**
  * Rules for validating string safety constraints.
  *
  * @internal
@@ -46,13 +53,6 @@ export function collectStringSafetyErrors(
 
     return errors;
 }
-
-/**
- * Result returned by {@link requireStringParamValue}.
- */
-export type StringParamValueResult =
-    | { readonly error: readonly string[]; readonly ok: false }
-    | { readonly ok: true; readonly value: string };
 
 /**
  * Ensures an IPC parameter is a string and returns the normalized value.

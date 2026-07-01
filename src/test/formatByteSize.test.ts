@@ -1,5 +1,5 @@
+import { fc, test } from "@fast-check/vitest";
 import { describe, expect, it } from "vitest";
-import { test, fc } from "@fast-check/vitest";
 
 import { formatByteSize } from "../utils/formatting/formatByteSize";
 
@@ -23,8 +23,8 @@ describe(formatByteSize, () => {
         await annotate("Type: Error Handling", "type");
 
         expect(formatByteSize(-1)).toBe("-1");
-        expect(formatByteSize(Number.NaN)).toBe("NaN");
-        expect(formatByteSize(Number.POSITIVE_INFINITY)).toBe("Infinity");
+        expect(formatByteSize(NaN)).toBe("NaN");
+        expect(formatByteSize(Infinity)).toBe("Infinity");
     });
 
     it("uses IEC units and stable rounding", async ({ task, annotate }) => {
@@ -48,7 +48,7 @@ describe(formatByteSize, () => {
 
             expect(typeof result).toBe("string");
             expect(result.length).toBeGreaterThan(0);
-            expect(result).toMatch(/\s(?:B|KB|MB|GB|TB)$/);
+            expect(result).toMatch(/\s(?:B|GB|KB|MB|TB)$/v);
         }
     );
 });

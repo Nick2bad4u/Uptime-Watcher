@@ -34,8 +34,8 @@ export function validateOAuthAuthorizeUrl(args: {
         requireHttps: true,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-    if (validation.ok === false) {
+
+    if (!validation.ok) {
         if (validation.reason === EXTERNAL_OPEN_HTTPS_REQUIRED_REASON) {
             throw new Error(
                 `Refusing to open unexpected ${args.providerName} OAuth URL: ${validation.safeUrlForLogging}`

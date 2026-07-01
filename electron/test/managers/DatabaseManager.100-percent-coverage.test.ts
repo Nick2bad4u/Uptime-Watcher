@@ -3,30 +3,36 @@
  *   methods with proper mocking and error scenarios
  */
 
+import type { Site } from "@shared/types";
+
 import {
-    describe,
-    it,
-    expect,
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
+import {
     beforeEach,
-    vi,
+    describe,
+    expect,
+    it,
     type MockedFunction,
+    vi,
 } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
-import type { Site } from "@shared/types";
-import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
+// Import after mocks so DatabaseManager uses mocked dependencies
 import {
-    DEFAULT_HISTORY_LIMIT_RULES,
-    normalizeHistoryLimit,
-} from "@shared/constants/history";
+    DatabaseManager,
+    type DatabaseManagerDependencies,
+} from "../../managers/DatabaseManager";
 
 // Mock all external dependencies
 vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
@@ -161,12 +167,6 @@ vi.mock("../../shared/utils/errorHandling", () => {
         withErrorHandling: mockWithErrorHandling,
     };
 });
-
-// Import after mocks so DatabaseManager uses mocked dependencies
-import {
-    DatabaseManager,
-    type DatabaseManagerDependencies,
-} from "../../managers/DatabaseManager";
 
 describe("DatabaseManager - 100% Coverage", () => {
     let databaseManager: DatabaseManager;
@@ -573,10 +573,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             mockCommandExecutor.execute.mockResolvedValue(undefined);
 
             // Act
-            const result = await databaseManager.importData(importData);
+            const isResult = await databaseManager.importData(importData);
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockCommandExecutor.execute).toHaveBeenCalled();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:update-sites-cache-requested",
@@ -605,10 +605,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             );
 
             // Act
-            const result = await databaseManager.importData(importData);
+            const isResult = await databaseManager.importData(importData);
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 expect.objectContaining({
@@ -640,10 +640,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             ).mockRejectedValue(new Error("Event error"));
 
             // Act
-            const result = await databaseManager.importData(importData);
+            const isResult = await databaseManager.importData(importData);
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             // Should still attempt to emit the event
             expect(mockEventEmitter.emitTyped).toHaveBeenCalled();
         });
@@ -797,7 +797,7 @@ describe("DatabaseManager - 100% Coverage", () => {
                 databaseManager.setHistoryLimit(undefined as any)
             ).rejects.toThrow(TypeError);
             await expect(
-                databaseManager.setHistoryLimit(Number.NaN)
+                databaseManager.setHistoryLimit(NaN)
             ).rejects.toThrow(TypeError);
         });
 
@@ -1213,8 +1213,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            // This test verifies that error handling is working by ensuring operations
-            // complete successfully even with potential errors in dependencies
+            // This test verifies that error handling is working by ensuring operations complete successfully even with potential errors in dependencies
 
             // Act - This should use withErrorHandling internally
             await databaseManager.initialize();
@@ -1250,8 +1249,8 @@ describe("DatabaseManager - 100% Coverage", () => {
                 "Complex error"
             );
 
-            const importResult = await databaseManager.importData("{}");
-            expect(importResult).toBeFalsy();
+            const isImportResult = await databaseManager.importData("{}");
+            expect(isImportResult).toBeFalsy();
         });
     });
 });

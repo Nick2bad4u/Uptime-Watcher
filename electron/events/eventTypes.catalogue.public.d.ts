@@ -346,14 +346,14 @@ declare module "./eventTypes" {
          * @param environment - The runtime environment ("development",
          *   "production", or "test").
          * @param timestamp - Unix timestamp (ms) when startup completed.
-         * @param version - The application version string.
+         * @param version - The app version string.
          */
         "system:startup": {
             /** The runtime environment ("development", "production", or "test"). */
             environment: "development" | "production" | "test";
             /** Unix timestamp (ms) when startup completed. */
             timestamp: number;
-            /** The application version string. */
+            /** The app version string. */
             version: string;
         };
     }

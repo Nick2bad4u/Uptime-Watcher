@@ -3,12 +3,13 @@
  *   loading states, timeouts, and cleanup behavior
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 
 // Mock the constants
-vi.mock("../../constants", () => ({
+vi.mock(import('../../constants'), () => ({
     UI_DELAYS: {
         LOADING_BUTTON: 100,
         STATE_UPDATE_DEFER: 50,
@@ -184,7 +185,7 @@ describe(useDelayedButtonLoading, () => {
             unmount();
 
             // Assert
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
         });
 
         it("should clear previous timeout when isLoading changes rapidly", async ({
@@ -381,7 +382,7 @@ describe(useDelayedButtonLoading, () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock zero delays
-            vi.doMock("../../constants", () => ({
+            vi.doMock(import('../../constants'), () => ({
                 UI_DELAYS: {
                     LOADING_BUTTON: 0,
                     STATE_UPDATE_DEFER: 0,

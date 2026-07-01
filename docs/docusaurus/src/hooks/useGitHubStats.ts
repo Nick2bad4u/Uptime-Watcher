@@ -87,7 +87,7 @@ export function useGitHubStats(): UseGitHubStatsReturn {
                 setStats(jsonData);
             } catch (caughtError) {
                 setError(
-                    caughtError instanceof Error
+                    Error.isError(caughtError)
                         ? caughtError.message
                         : "Unknown error"
                 );
@@ -109,7 +109,7 @@ export function useGitHubStats(): UseGitHubStatsReturn {
  * package.json.
  *
  * @returns Loading, error, and semantic version information for the published
- *   application.
+ *   app.
  */
 export function usePackageVersion(): UsePackageVersionReturn {
     const [version, setVersion] = useState("12.5.0");
@@ -135,7 +135,7 @@ export function usePackageVersion(): UsePackageVersionReturn {
                 setVersion(jsonData.version);
             } catch (caughtError) {
                 setError(
-                    caughtError instanceof Error
+                    Error.isError(caughtError)
                         ? caughtError.message
                         : "Unknown error"
                 );

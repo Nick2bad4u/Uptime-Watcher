@@ -5,9 +5,8 @@
  *   when users omit explicit site names.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
+import { describe, expect, it } from "vitest";
 
 describe("DEFAULT_SITE_NAME", () => {
     it("matches the documented fallback label", () => {

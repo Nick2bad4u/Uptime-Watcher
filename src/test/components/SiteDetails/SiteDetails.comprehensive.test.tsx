@@ -2,12 +2,8 @@
  * Comprehensive tests for SiteDetails component
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import React from "react";
-import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
-import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 import type { Monitor, Site } from "@shared/types";
+
 import {
     monitorIdArbitrary,
     sampleOne,
@@ -15,6 +11,12 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import * as React from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
+import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 
 const sampledSiteName = sampleOne(siteNameArbitrary);
 const sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
@@ -38,12 +40,12 @@ Object.defineProperty(globalThis, "matchMedia", {
                 media: query,
                 onchange: null,
                 removeEventListener: vi.fn(),
-            }) as unknown as MediaQueryList
+            })
     ),
 });
 
 // Also mock the theme manager to avoid deep dependencies
-vi.mock("../../../theme/ThemeManager", () => ({
+vi.mock(import('../../../theme/ThemeManager'), () => ({
     ThemeManager: {
         getTheme: vi.fn(() => "light"),
         getSystemThemePreference: vi.fn(() => "light"),
@@ -51,7 +53,7 @@ vi.mock("../../../theme/ThemeManager", () => ({
     },
 }));
 
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useTheme: vi.fn(() => ({
         currentTheme: {
             colors: {
@@ -140,14 +142,14 @@ vi.mock("../../../theme/useTheme", () => ({
     ),
 }));
 
-vi.mock("../../../services/chartConfig", () => {
+vi.mock(import('../../../services/chartConfig'), () => {
     const ChartConfigServiceMock = vi.fn(function ChartConfigServiceMock(
         this: any
     ) {
-        this.getLineChartConfig = vi.fn(() => ({}));
-        this.getBarChartConfig = vi.fn(() => ({}));
-        this.getDoughnutChartConfig = vi.fn(() => ({}));
-        this.getBaseConfig = vi.fn(() => ({}));
+        vi.spyOn(this, 'getLineChartConfig').mockReturnValue({});
+        vi.spyOn(this, 'getBarChartConfig').mockReturnValue({});
+        vi.spyOn(this, 'getDoughnutChartConfig').mockReturnValue({});
+        vi.spyOn(this, 'getBaseConfig').mockReturnValue({});
     });
 
     return {
@@ -155,18 +157,18 @@ vi.mock("../../../services/chartConfig", () => {
     };
 });
 
-vi.mock("../../../theme/components", () => ({
+vi.mock(import('../../../theme/components'), () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div {...props}>{children}</div>
     )),
 }));
 
 // Mock the hook and all dependencies
-vi.mock("../../../hooks/site/useSiteDetails", () => ({
+vi.mock(import('../../../hooks/site/useSiteDetails'), () => ({
     useSiteDetails: vi.fn(),
 }));
 
-vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
+vi.mock(import('../../../components/SiteDetails/SiteDetailsHeader'), () => ({
     SiteDetailsHeader: vi.fn(({ site, selectedMonitor }) => (
         <div data-testid="site-details-header">
             <span>Site: {site?.name || "Unknown"}</span>
@@ -175,25 +177,25 @@ vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
     )),
 }));
 
-vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
+vi.mock(import('../../../components/SiteDetails/SiteDetailsNavigation'), () => ({
     SiteDetailsNavigation: vi.fn(
         ({ setActiveSiteDetailsTab, activeSiteDetailsTab }) => (
             <div data-testid="site-details-navigation">
                 <button
-                    onClick={() => setActiveSiteDetailsTab("overview")}
                     data-testid="overview-tab"
+                    onClick={() => setActiveSiteDetailsTab("overview")}
                 >
                     Overview
                 </button>
                 <button
-                    onClick={() => setActiveSiteDetailsTab("history")}
                     data-testid="history-tab"
+                    onClick={() => setActiveSiteDetailsTab("history")}
                 >
                     History
                 </button>
                 <button
-                    onClick={() => setActiveSiteDetailsTab("analytics")}
                     data-testid="analytics-tab"
+                    onClick={() => setActiveSiteDetailsTab("analytics")}
                 >
                     Analytics
                 </button>
@@ -203,41 +205,41 @@ vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
     ),
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/OverviewTab'), () => ({
     OverviewTab: vi.fn(() => (
         <div data-testid="overview-tab-content">Overview Content</div>
     )),
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/SiteOverviewTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/SiteOverviewTab'), () => ({
     SiteOverviewTab: vi.fn(() => (
         <div data-testid="site-overview-tab-content">Site Overview Content</div>
     )),
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/HistoryTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/HistoryTab'), () => ({
     HistoryTab: vi.fn(() => (
         <div data-testid="history-tab-content">History Content</div>
     )),
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/AnalyticsTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/AnalyticsTab'), () => ({
     AnalyticsTab: vi.fn(() => (
         <div data-testid="analytics-tab-content">Analytics Content</div>
     )),
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/SettingsTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/SettingsTab'), () => ({
     SettingsTab: vi.fn(() => (
         <div data-testid="settings-tab-content">Settings Content</div>
     )),
 }));
 
-vi.mock("../../../components/error/DefaultErrorFallback", () => ({
+vi.mock(import('../../../components/error/DefaultErrorFallback'), () => ({
     DefaultErrorFallback: vi.fn(({ error, resetErrorBoundary }) => (
         <div data-testid="error-fallback">
             <p>Error: {error?.message}</p>
-            <button onClick={resetErrorBoundary} data-testid="reset-error">
+            <button data-testid="reset-error" onClick={resetErrorBoundary}>
                 Reset
             </button>
         </div>
@@ -340,7 +342,7 @@ const mockUseSiteDetailsReturn = {
 const renderSiteDetails = (site = mockSite, onClose = vi.fn()) =>
     render(
         <MockBrowserRouter>
-            <SiteDetails site={site} onClose={onClose} />
+            <SiteDetails onClose={onClose} site={site} />
         </MockBrowserRouter>
     );
 
@@ -397,7 +399,7 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(customSite);
 
-            expect(useSiteDetails).toHaveBeenCalled();
+            expect(useSiteDetails).toHaveBeenCalledWith();
         });
 
         it("should render default overview tab content", ({
@@ -807,7 +809,7 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(differentSite);
 
-            expect(useSiteDetails).toHaveBeenCalled();
+            expect(useSiteDetails).toHaveBeenCalledWith();
         });
 
         it("should handle minimal site data", ({ task, annotate }) => {
@@ -829,7 +831,7 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(minimalSite);
 
-            expect(useSiteDetails).toHaveBeenCalled();
+            expect(useSiteDetails).toHaveBeenCalledWith();
         });
 
         it("should handle special characters in site data", ({
@@ -854,7 +856,7 @@ describe(SiteDetails, () => {
 
             renderSiteDetails(specialSite);
 
-            expect(useSiteDetails).toHaveBeenCalled();
+            expect(useSiteDetails).toHaveBeenCalledWith();
         });
     });
 
@@ -876,7 +878,7 @@ describe(SiteDetails, () => {
             renderSiteDetails();
 
             // The hook should be called indicating component mounted
-            expect(useSiteDetails).toHaveBeenCalled();
+            expect(useSiteDetails).toHaveBeenCalledWith();
         });
 
         it("should handle component updates correctly", async ({
@@ -924,12 +926,12 @@ describe(SiteDetails, () => {
             // Rerender with different site
             rerender(
                 <MockBrowserRouter>
-                    <SiteDetails site={updatedSite} onClose={vi.fn()} />
+                    <SiteDetails onClose={vi.fn()} site={updatedSite} />
                 </MockBrowserRouter>
             );
 
             await waitFor(() => {
-                expect(useSiteDetails).toHaveBeenCalled();
+                expect(useSiteDetails).toHaveBeenCalledWith();
             });
         });
     });
@@ -1000,7 +1002,7 @@ describe(SiteDetails, () => {
             // Re-render with same props
             rerender(
                 <MockBrowserRouter>
-                    <SiteDetails site={mockSite} onClose={vi.fn()} />
+                    <SiteDetails onClose={vi.fn()} site={mockSite} />
                 </MockBrowserRouter>
             );
 

@@ -3,28 +3,6 @@ import type { Monitor } from "@shared/types";
 import { arrayJoin, isDefined } from "ts-extras";
 
 /**
- * Creates a stable signature representing a monitor's configuration.
- *
- * @remarks
- * Used for detecting newly-added monitors that do not yet have IDs. Excludes
- * runtime properties like status/lastChecked/responseTime.
- */
-export function createMonitorSignature(monitor: Monitor): string {
-    return arrayJoin(
-        [
-            `type:${monitor.type}`,
-            `host:${monitor.host ?? ""}`,
-            `port:${monitor.port ?? ""}`,
-            `url:${monitor.url ?? ""}`,
-            `checkInterval:${monitor.checkInterval}`,
-            `timeout:${monitor.timeout}`,
-            `retryAttempts:${monitor.retryAttempts}`,
-        ],
-        "|"
-    );
-}
-
-/**
  * Builds a monitor update payload while preserving runtime state.
  *
  * @remarks
@@ -64,4 +42,26 @@ export function buildMonitorUpdateData(
     }
 
     return updateData;
+}
+
+/**
+ * Creates a stable signature representing a monitor's configuration.
+ *
+ * @remarks
+ * Used for detecting newly-added monitors that do not yet have IDs. Excludes
+ * runtime properties like status/lastChecked/responseTime.
+ */
+export function createMonitorSignature(monitor: Monitor): string {
+    return arrayJoin(
+        [
+            `type:${monitor.type}`,
+            `host:${monitor.host ?? ""}`,
+            `port:${monitor.port ?? ""}`,
+            `url:${monitor.url ?? ""}`,
+            `checkInterval:${monitor.checkInterval}`,
+            `timeout:${monitor.timeout}`,
+            `retryAttempts:${monitor.retryAttempts}`,
+        ],
+        "|"
+    );
 }

@@ -6,9 +6,11 @@
  * including validation, conversion, and error handling scenarios.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { StatusHistory } from "@shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     historyEntryToRow,
     isValidHistoryRow,
@@ -287,7 +289,7 @@ describe("historyMapper utilities", () => {
             const invalidRow = {
                 monitorId: "monitor-123",
                 status: "up",
-                timestamp: Number.NaN,
+                timestamp: NaN,
                 responseTime: 150,
             } as any;
 
@@ -586,7 +588,7 @@ describe("historyMapper utilities", () => {
 
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
-                status: "invalid" as any,
+                status: "invalid",
                 timestamp: TEST_TIMESTAMP,
                 responseTime: 150,
             };
@@ -650,8 +652,8 @@ describe("historyMapper utilities", () => {
             const row: DatabaseHistoryRow = {
                 monitorId: "monitor-123",
                 status: "up",
-                timestamp: Number.NaN,
-                responseTime: Number.NaN,
+                timestamp: NaN,
+                responseTime: NaN,
             };
 
             const beforeTime = Date.now();

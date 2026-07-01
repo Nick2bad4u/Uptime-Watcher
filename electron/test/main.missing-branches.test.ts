@@ -3,7 +3,7 @@
  * uncovered branches and edge cases
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Enhanced mocking for missing branches
 const mockLog = {
@@ -12,7 +12,7 @@ const mockLog = {
         file: {
             level: "info",
             fileName: "uptime-watcher-main.log",
-            maxSize: 1024 * 1024 * 5,
+            maxSize: 1024 ** 2 * 5,
             format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}",
         },
         console: {
@@ -82,7 +82,7 @@ vi.mock("electron", () => {
     };
 });
 
-// Mock the application service to prevent actual initialization
+// Mock the app service to prevent actual initialization
 vi.mock("../services/application/ApplicationService", () => ({
     ApplicationService: vi.fn(function ApplicationServiceMock() {
         return {

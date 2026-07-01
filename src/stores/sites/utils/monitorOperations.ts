@@ -130,12 +130,12 @@ export function updateMonitorInSite(
     updates: Partial<Monitor>
 ): Site {
     // Updates may be contaminated; rely on normalizeMonitor for sanitation.
-    let monitorFound = false;
+    let isMonitorFound = false;
     const updatedMonitors: Monitor[] = [];
 
     for (const monitor of site.monitors) {
         if (monitor.id === monitorId) {
-            monitorFound = true;
+            isMonitorFound = true;
 
             // Preserve the original monitor ID throughout the update process.
             const originalId = monitor.id;
@@ -172,7 +172,7 @@ export function updateMonitorInSite(
         }
     }
 
-    if (!monitorFound) {
+    if (!isMonitorFound) {
         throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
     }
 

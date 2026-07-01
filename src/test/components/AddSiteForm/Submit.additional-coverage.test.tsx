@@ -3,28 +3,31 @@
  * Targeting specific lines: 109-122, 176, 298-307, 422
  */
 
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    type MockedFunction,
-} from "vitest";
-import "@testing-library/jest-dom";
-import { handleSubmit } from "../../../components/AddSiteForm/Submit";
-import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
-import type { Logger } from "../../../services/logger";
 import type { ValidationResult } from "@shared/types/validation";
+
+import "@testing-library/jest-dom";
 import {
     sampleOne,
     siteIdentifierArbitrary,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockedFunction,
+    vi,
+} from "vitest";
+
+import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
+import type { Logger } from "../../../services/logger";
+
+import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 
 // Mock the validation functions
-vi.mock("../../../utils/monitorValidation", () => ({
+vi.mock(import('../../../utils/monitorValidation'), () => ({
     createMonitorObject: vi.fn(() => ({
         id: "mock-monitor-id",
         type: "http",
@@ -62,12 +65,12 @@ vi.mock("../../../utils/monitorValidation", () => ({
 }));
 
 // Mock the error handling utility
-vi.mock("../../../utils/errorHandling", () => ({
+vi.mock(import('../../../utils/errorHandling'), () => ({
     withUtilityErrorHandling: vi.fn((fn) => fn()),
 }));
 
 // Mock the fallbacks
-vi.mock("../../../utils/fallbacks", () => ({
+vi.mock(import('../../../utils/fallbacks'), () => ({
     truncateForLogging: vi.fn((str) => str),
 }));
 
@@ -124,11 +127,11 @@ interface ValidationModuleMock {
     createMonitorObject: MockedFunction<
         MonitorValidationModule["createMonitorObject"]
     >;
-    validateMonitorFormData: MockedFunction<
-        MonitorValidationModule["validateMonitorFormData"]
-    >;
     validateMonitorFieldClientSide: MockedFunction<
         MonitorValidationModule["validateMonitorFieldClientSide"]
+    >;
+    validateMonitorFormData: MockedFunction<
+        MonitorValidationModule["validateMonitorFormData"]
     >;
 }
 
@@ -262,7 +265,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.createSite).toHaveBeenCalled();
+            expect(properties.createSite).toHaveBeenCalledWith();
         });
 
         it("should handle port monitor type submission (lines 115-120)", async ({
@@ -291,7 +294,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.createSite).toHaveBeenCalled();
+            expect(properties.createSite).toHaveBeenCalledWith();
         });
 
         it("should handle unknown monitor type with default case (lines 121-122)", async ({
@@ -349,7 +352,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             await handleSubmit(mockEvent, properties);
 
             // Should set form error for missing existing site selection
-            expect(properties.setFormError).toHaveBeenCalled();
+            expect(properties.setFormError).toHaveBeenCalledWith();
         });
     });
 
@@ -381,7 +384,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.addMonitorToSite).toHaveBeenCalled();
+            expect(properties.addMonitorToSite).toHaveBeenCalledWith();
         });
 
         it("should handle port monitor in existing mode field assignment (lines 302-306)", async ({
@@ -412,7 +415,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
             await handleSubmit(mockEvent, properties);
 
-            expect(properties.addMonitorToSite).toHaveBeenCalled();
+            expect(properties.addMonitorToSite).toHaveBeenCalledWith();
         });
 
         it("should handle unsupported monitor type with error (line 307)", async ({
@@ -470,7 +473,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             await handleSubmit(mockEvent, properties);
 
             // The createSite method should have been called
-            expect(properties.createSite).toHaveBeenCalled();
+            expect(properties.createSite).toHaveBeenCalledWith();
         });
     });
 });

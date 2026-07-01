@@ -4,14 +4,6 @@ const SQLITE_EXTENSION = ".sqlite" as const;
 const PLAYWRIGHT_BACKUP_DIRECTORY = "playwright-backups" as const;
 
 /**
- * Ensures a SQLite backup file path has a `.sqlite` extension.
- */
-export function ensureSqliteFileExtension(rawPath: string): string {
-    const ext = path.extname(rawPath);
-    return ext.length > 0 ? rawPath : `${rawPath}${SQLITE_EXTENSION}`;
-}
-
-/**
  * Builds a deterministic Playwright automation backup path.
  */
 export function buildPlaywrightBackupPath(args: {
@@ -24,4 +16,12 @@ export function buildPlaywrightBackupPath(args: {
     );
 
     return ensureSqliteFileExtension(path.join(automationDir, args.fileName));
+}
+
+/**
+ * Ensures a SQLite backup file path has a `.sqlite` extension.
+ */
+export function ensureSqliteFileExtension(rawPath: string): string {
+    const ext = path.extname(rawPath);
+    return ext.length > 0 ? rawPath : `${rawPath}${SQLITE_EXTENSION}`;
 }

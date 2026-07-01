@@ -7,10 +7,9 @@
  * exercised with realistic monitor objects.
  */
 
-import { describe, expect, it } from "vitest";
-
-import { MONITOR_STATUS, type Monitor, type MonitorType } from "@shared/types";
 import { assertMonitorType, isMonitorOfType } from "@shared/typeGuards/monitor";
+import { type Monitor, MONITOR_STATUS, type MonitorType } from "@shared/types";
+import { describe, expect, it } from "vitest";
 
 function createMonitor(type: MonitorType): Monitor {
     return {
@@ -69,7 +68,7 @@ describe("Monitor type guards", () => {
 
             const monitor = createMonitor("http");
 
-            expect(() => assertMonitorType(monitor, "http")).not.toThrow();
+            expect(() => { assertMonitorType(monitor, "http"); }).not.toThrow();
         });
 
         it("throws with default context when types do not match", async ({
@@ -83,7 +82,7 @@ describe("Monitor type guards", () => {
 
             const monitor = createMonitor("port");
 
-            expect(() => assertMonitorType(monitor, "http")).toThrow(
+            expect(() => { assertMonitorType(monitor, "http"); }).toThrow(
                 "Expected monitor to be type 'http', received 'port'"
             );
         });
@@ -100,7 +99,7 @@ describe("Monitor type guards", () => {
             const monitor = createMonitor("dns");
 
             expect(() =>
-                assertMonitorType(monitor, "http", "monitor config")
+                { assertMonitorType(monitor, "http", "monitor config"); }
             ).toThrow(
                 "Expected monitor config to be type 'http', received 'dns'"
             );

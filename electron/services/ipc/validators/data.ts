@@ -27,6 +27,17 @@ import { validateImportDataPayload, validateRestorePayload } from "./shared";
 import { createNoParamsValidator } from "./utils/commonValidators";
 
 /**
+ * Interface for data handler validators.
+ */
+interface DataHandlerValidatorsInterface {
+    downloadSqliteBackup: IpcParameterValidator;
+    exportData: IpcParameterValidator;
+    importData: IpcParameterValidator;
+    restoreSqliteBackup: IpcParameterValidator;
+    saveSqliteBackup: IpcParameterValidator;
+}
+
+/**
  * Formats a Zod `safeParse` error value.
  *
  * @remarks
@@ -60,17 +71,6 @@ function getSafeParseError(validation: unknown): unknown {
     }
 
     return safeCastTo<{ readonly error?: unknown }>(validation).error;
-}
-
-/**
- * Interface for data handler validators.
- */
-interface DataHandlerValidatorsInterface {
-    downloadSqliteBackup: IpcParameterValidator;
-    exportData: IpcParameterValidator;
-    importData: IpcParameterValidator;
-    restoreSqliteBackup: IpcParameterValidator;
-    saveSqliteBackup: IpcParameterValidator;
 }
 
 export const DataHandlerValidators: DataHandlerValidatorsInterface = {

@@ -6,7 +6,7 @@
  * Provides consistent patterns for async operations with observability, retry
  * logic, and event-driven architecture support. This utility standardizes how
  * backend operations handle failures, emit events, and provide monitoring
- * visibility across the application.
+ * visibility across the app.
  *
  * Key features:
  *
@@ -91,18 +91,16 @@ function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
 
     const { cause, message: errorMessage, name: errorName } = error;
 
-    const causeError = cause instanceof Error ? cause : undefined;
+    const causeError = Error.isError(cause) ? cause : undefined;
 
     return {
         errorMessage,
         errorName,
-        ...(errorCode ? { errorCode } : {}),
-        ...(causeError
-            ? {
+        ...(errorCode && { errorCode }),
+        ...(causeError && {
                   errorCauseMessage: causeError.message,
                   errorCauseName: causeError.name,
-              }
-            : {}),
+              }),
     };
 }
 
@@ -290,13 +288,13 @@ export interface OperationalHooksConfig<T = unknown> {
  * Generate a unique operation ID for tracking using crypto.randomUUID().
  */
 function generateOperationId(): OperationId {
-    if (typeof globalThis.crypto.randomUUID !== "function") {
+    if (typeof crypto.randomUUID !== "function") {
         throw new TypeError(
             "crypto.randomUUID is unavailable for operation ID generation"
         );
     }
 
-    const candidate = `op_${Date.now()}_${globalThis.crypto
+    const candidate = `op_${Date.now()}_${crypto
         .randomUUID()
         .slice(0, 8)}`;
     return operationIdSchema.parse(candidate);
@@ -376,7 +374,7 @@ async function handleFailure<T>(
     attempt: number,
     operationId: OperationId,
     context: OperationalHookContext,
-    throwOnFailure: boolean = true,
+    throwOnFailure = true,
     logLevel: OperationalLogLevel = "error"
 ): Promise<T> {
     const { emitEvents, eventEmitter, onFailure } = config;
@@ -398,7 +396,7 @@ async function handleFailure<T>(
         try {
             await eventEmitter.emitTyped("database:transaction-completed", {
                 duration,
-                ...(isAbortError(error) ? { cancelled: true } : {}),
+                ...(isAbortError(error) && { cancelled: true }),
                 lifecycleStage: "failure",
                 operation: `${operationName}:failed`,
                 success: false,
@@ -480,7 +478,7 @@ async function handleRetry<T>(
     attempt: number,
     operationId: OperationId,
     backoff: "exponential" | "linear" = "exponential",
-    initialDelay: number = 100
+    initialDelay = 100
 ): Promise<void> {
     const { onRetry, signal } = config;
 

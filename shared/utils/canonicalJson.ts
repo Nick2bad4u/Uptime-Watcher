@@ -10,10 +10,6 @@ import type { JsonObject } from "type-fest";
 
 import { objectEntries } from "ts-extras";
 
-function isJsonRecord(value: JsonValue): value is JsonObject {
-    return !Array.isArray(value) && typeof value === "object" && value !== null;
-}
-
 /**
  * Returns a JSON value with all object keys sorted recursively.
  */
@@ -42,4 +38,8 @@ export function createCanonicalJsonValue(value: JsonValue): JsonValue {
  */
 export function stringifyJsonValueStable(value: JsonValue): string {
     return JSON.stringify(createCanonicalJsonValue(value));
+}
+
+function isJsonRecord(value: JsonValue): value is JsonObject {
+    return !Array.isArray(value) && typeof value === "object" && value !== null;
 }

@@ -4,12 +4,12 @@
  * Tests all exported functions to achieve 100% function coverage
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import all functions from environment utils
 import {
-    getEnvVar,
     getEnvironment,
+    getEnvVar,
     getNodeEnv,
     isBrowserEnvironment,
     isDevelopment,
@@ -19,8 +19,8 @@ import {
 } from "../../utils/environment";
 
 describe("shared/utils/environment.ts - Complete Function Coverage", () => {
-    const originalProcess = globalThis.process;
-    const originalWindow = globalThis.window;
+    const originalProcess = process;
+    const originalWindow = globalThis;
 
     beforeEach(() => {
         // Reset global state before each test

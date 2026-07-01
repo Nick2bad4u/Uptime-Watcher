@@ -3,18 +3,18 @@
  * shared/types/validation.ts
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
     type BaseValidationResult,
+    createFailureResult,
+    createSuccessResult,
     type FormValidationResult,
+    isValidationResult,
     type MonitorConfigValidationResult,
     type ThemeValidationResult,
     type ValidationMetadata,
     type ValidationResult,
-    createFailureResult,
-    createSuccessResult,
-    isValidationResult,
 } from "../../types/validation";
 
 describe("Validation Types and Functions", () => {

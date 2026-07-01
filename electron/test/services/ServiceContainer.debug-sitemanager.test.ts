@@ -2,7 +2,9 @@
  * Debug test to understand SiteManager mocking issue
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ServiceContainer } from "../../services/ServiceContainer";
 
 // Create hoisted mock factory for TypedEventBus using constructor pattern
 const mockTypedEventBus = vi.hoisted(() => {
@@ -108,8 +110,6 @@ vi.mock("../../services/database/DatabaseService", () => ({
         }),
     },
 }));
-
-import { ServiceContainer } from "../../services/ServiceContainer";
 
 describe("Debug SiteManager Mock", () => {
     let container: ServiceContainer;

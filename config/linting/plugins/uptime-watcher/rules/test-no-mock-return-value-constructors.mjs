@@ -93,17 +93,11 @@ export const testNoMockReturnValueConstructorsRule = {
                 const callee = unwrapExpression(node.callee);
 
                 // Vi.mocked(...)
-                if (
-                    callee?.type === "MemberExpression" &&
+                return callee?.type === "MemberExpression" &&
                     callee.object?.type === "Identifier" &&
                     callee.object.name === "vi" &&
                     callee.property?.type === "Identifier" &&
-                    callee.property.name === "mocked"
-                ) {
-                    return true;
-                }
-
-                return false;
+                    callee.property.name === "mocked";
             },
             unwrapExpression = (/** @type {any} */ node) => {
                 let current = node;
@@ -188,16 +182,16 @@ export const testNoMockReturnValueConstructorsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow mockReturnValue/mockReturnValueOnce on likely constructors (use constructible helper/mockImplementation(function...))",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/test-no-mock-return-value-constructors.md",
         },
-        schema: [],
         messages: {
             banned: "Avoid {{method}} on '{{name}}'. Vitest implements it with an arrow function, which cannot be used with `new`. Prefer {{replacement}} instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

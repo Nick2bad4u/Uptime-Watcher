@@ -17,9 +17,10 @@
  * @since 2024
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { describe, expect, vi } from "vitest";
+
 import {
     safeObjectAccess,
     safeObjectIteration,
@@ -109,7 +110,7 @@ describe("objectSafety.ts fuzzing tests", () => {
             const validator = vi
                 .fn()
                 .mockReturnValue(
-                    validatorResult as boolean
+                    validatorResult!
                 ) as unknown as ValidatorFunction;
 
             const result = safeObjectAccess(obj, key, fallback, validator);
@@ -193,7 +194,7 @@ describe("objectSafety.ts fuzzing tests", () => {
                     throw new Error("Callback error");
                 });
 
-                expect(() => safeObjectIteration(obj, callback)).not.toThrow();
+                expect(() => { safeObjectIteration(obj, callback); }).not.toThrow();
                 expect(consoleSpy).toHaveBeenCalledWith(
                     "Object iteration failed for context:",
                     "Safe object iteration",
@@ -467,10 +468,10 @@ describe("objectSafety.ts fuzzing tests", () => {
                 expect(values).toHaveLength(objValues.length);
 
                 for (const value of values) {
-                    const containsValue = objValues.some((candidate) =>
+                    const isContainsValue = objValues.some((candidate) =>
                         Object.is(candidate, value)
                     );
-                    expect(containsValue).toBeTruthy();
+                    expect(isContainsValue).toBeTruthy();
                 }
             }
         );

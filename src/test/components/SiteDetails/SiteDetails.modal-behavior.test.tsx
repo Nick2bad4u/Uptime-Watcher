@@ -1,9 +1,12 @@
 import "@testing-library/jest-dom";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type { Site } from "@shared/types";
 import type { HTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import type { UnknownRecord } from "type-fest";
+
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AnalyticsTabProperties } from "../../../components/SiteDetails/tabs/AnalyticsTab";
@@ -17,15 +20,15 @@ import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 
 const waitForAnimationMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 
-vi.mock("../../../hooks/site/useSiteDetails", () => ({
+vi.mock(import('../../../hooks/site/useSiteDetails'), () => ({
     useSiteDetails: vi.fn(),
 }));
 
-vi.mock("../../../utils/time/waitForAnimation", () => ({
+vi.mock(import('../../../utils/time/waitForAnimation'), () => ({
     waitForAnimation: waitForAnimationMock,
 }));
 
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useTheme: () => ({
         currentTheme: {
             colors: {
@@ -42,7 +45,7 @@ vi.mock("../../../theme/useTheme", () => ({
     }),
 }));
 
-vi.mock("../../../services/chartConfig", () => ({
+vi.mock(import('../../../services/chartConfig'), () => ({
     ChartConfigService: class {
         getLineChartConfig() {
             return { kind: "line" };
@@ -64,25 +67,25 @@ const analyticsTabProps: AnalyticsTabProperties[] = [];
 const historyTabProps: HistoryTabProperties[] = [];
 const settingsTabProps: SettingsTabProperties[] = [];
 
-vi.mock("../../../components/SiteDetails/SiteDetailsHeader", () => ({
+vi.mock(import('../../../components/SiteDetails/SiteDetailsHeader'), () => ({
     SiteDetailsHeader: ({ children }: { readonly children?: ReactNode }) => (
         <header data-testid="site-details-header">{children}</header>
     ),
 }));
 
-vi.mock("../../../components/SiteDetails/SiteDetailsNavigation", () => ({
+vi.mock(import('../../../components/SiteDetails/SiteDetailsNavigation'), () => ({
     SiteDetailsNavigation: () => (
         <nav data-testid="site-details-navigation">navigation</nav>
     ),
 }));
 
-vi.mock("../../../components/shared/SurfaceContainer", () => ({
+vi.mock(import('../../../components/shared/SurfaceContainer'), () => ({
     SurfaceContainer: ({ children }: { readonly children?: ReactNode }) => (
         <section data-testid="surface-container">{children}</section>
     ),
 }));
 
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({
         children,
         ...props
@@ -93,35 +96,35 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
     ),
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/SiteOverviewTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/SiteOverviewTab'), () => ({
     SiteOverviewTab: (props: SiteOverviewTabProperties) => {
         siteOverviewTabProps.push(props);
         return <div data-testid="site-overview-tab">site overview</div>;
     },
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/OverviewTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/OverviewTab'), () => ({
     OverviewTab: (props: OverviewTabProperties) => {
         overviewTabProps.push(props);
         return <div data-testid="monitor-overview-tab">overview</div>;
     },
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/AnalyticsTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/AnalyticsTab'), () => ({
     AnalyticsTab: (props: AnalyticsTabProperties) => {
         analyticsTabProps.push(props);
         return <div data-testid="analytics-tab">analytics</div>;
     },
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/HistoryTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/HistoryTab'), () => ({
     HistoryTab: (props: HistoryTabProperties) => {
         historyTabProps.push(props);
         return <div data-testid="history-tab">history</div>;
     },
 }));
 
-vi.mock("../../../components/SiteDetails/tabs/SettingsTab", () => ({
+vi.mock(import('../../../components/SiteDetails/tabs/SettingsTab'), () => ({
     SettingsTab: (props: SettingsTabProperties) => {
         settingsTabProps.push(props);
         return <div data-testid="settings-tab">settings</div>;
@@ -150,12 +153,12 @@ const baseMonitor = {
 };
 
 const createHookState = (
-    overrides: Record<string, unknown> = {}
+    overrides: UnknownRecord = {}
 ): ReturnType<typeof useSiteDetails> => {
     const { analytics: analyticsOverride, ...restOverrides } = overrides;
     const analyticsOverrides = analyticsOverride as
-        | Record<string, unknown>
-        | undefined;
+        | undefined
+        | UnknownRecord;
 
     const analyticsBase = {
         avgResponseTime: 200,
@@ -185,22 +188,22 @@ const createHookState = (
         uptime: "95.5%",
     };
 
-    const mergedAnalytics = {
-        ...analyticsBase,
-        ...analyticsOverrides,
-    } as Record<string, unknown> & {
+    const mergedAnalytics = safeCastTo<UnknownRecord & {
         p50?: number;
         p95?: number;
         p99?: number;
-    };
+    }>({
+        ...analyticsBase,
+        ...analyticsOverrides,
+    });
 
     const overridePercentiles = analyticsOverrides?.["percentileMetrics"] as
+        | undefined
         | {
               p50: number;
               p95: number;
               p99: number;
-          }
-        | undefined;
+          };
 
     const percentileMetrics = overridePercentiles ?? {
         p50: Number(mergedAnalytics.p50 ?? 0),
@@ -254,7 +257,7 @@ const createHookState = (
     } as unknown as ReturnType<typeof useSiteDetails>;
 };
 
-const renderSiteDetails = (hookOverrides?: Record<string, unknown>) => {
+const renderSiteDetails = (hookOverrides?: UnknownRecord) => {
     mockUseSiteDetails.mockReturnValue(createHookState(hookOverrides));
     return render(<SiteDetails onClose={vi.fn()} site={baseSite} />);
 };
@@ -275,7 +278,7 @@ describe(SiteDetails, () => {
 
         expect(screen.getByTestId("site-overview-tab")).toBeInTheDocument();
         expect(siteOverviewTabProps).toHaveLength(1);
-        expect(siteOverviewTabProps[0]?.uptime).toBe(95.5);
+        expect(arrayFirst(siteOverviewTabProps)?.uptime).toBe(95.5);
     });
 
     it("closes when the overlay backdrop is clicked", async () => {
@@ -290,8 +293,8 @@ describe(SiteDetails, () => {
         const user = userEvent.setup();
         await user.click(overlay);
 
-        expect(waitForAnimationMock).toHaveBeenCalled();
-        await waitFor(() => expect(onClose).toHaveBeenCalled());
+        expect(waitForAnimationMock).toHaveBeenCalledWith();
+        await waitFor(() => { expect(onClose).toHaveBeenCalledWith(); });
     });
 
     it("closes when the overlay receives keyboard dismissal", async () => {
@@ -305,8 +308,8 @@ describe(SiteDetails, () => {
         });
         fireEvent.keyDown(overlay, { key: "Escape" });
 
-        expect(waitForAnimationMock).toHaveBeenCalled();
-        await waitFor(() => expect(onClose).toHaveBeenCalled());
+        expect(waitForAnimationMock).toHaveBeenCalledWith();
+        await waitFor(() => { expect(onClose).toHaveBeenCalledWith(); });
     });
 
     it("does not close when clicking inside the modal content", async () => {
@@ -330,7 +333,7 @@ describe(SiteDetails, () => {
         render(<SiteDetails onClose={vi.fn()} site={baseSite} />);
 
         expect(screen.getByTestId("monitor-overview-tab")).toBeInTheDocument();
-        expect(overviewTabProps.at(-1)?.selectedMonitor?.id).toBe(
+        expect(arrayAt(overviewTabProps, -1)?.selectedMonitor?.id).toBe(
             baseMonitor.id
         );
     });
@@ -365,12 +368,12 @@ describe(SiteDetails, () => {
 
         expect(screen.getByTestId("analytics-tab")).toBeInTheDocument();
         expect(analyticsTabProps).toHaveLength(1);
-        const props = analyticsTabProps[0];
+        const props = arrayFirst(analyticsTabProps);
         if (!props) {
             throw new Error("Expected AnalyticsTab to have been rendered");
         }
-        expect(props.lineChartData.datasets[0]?.data).toEqual([
-            filteredHistory[0]?.responseTime,
+        expect(arrayFirst(props.lineChartData.datasets)?.data).toEqual([
+            arrayFirst(filteredHistory)?.responseTime,
         ]);
         const firstLabel = props.lineChartData.labels?.[0];
         if (!firstLabel) {
@@ -378,7 +381,7 @@ describe(SiteDetails, () => {
         }
 
         expect(firstLabel).toEqual(
-            new Date(filteredHistory[0]?.timestamp ?? 0)
+            new Date(arrayFirst(filteredHistory)?.timestamp ?? 0)
         );
     });
 
@@ -386,7 +389,7 @@ describe(SiteDetails, () => {
         renderSiteDetails({ activeSiteDetailsTab: "history" });
 
         expect(screen.getByTestId("history-tab")).toBeInTheDocument();
-        expect(historyTabProps.at(-1)?.selectedMonitor?.id).toBe(
+        expect(arrayAt(historyTabProps, -1)?.selectedMonitor?.id).toBe(
             baseMonitor.id
         );
     });
@@ -400,7 +403,7 @@ describe(SiteDetails, () => {
         });
 
         expect(screen.getByTestId("settings-tab")).toBeInTheDocument();
-        const props = settingsTabProps.at(-1);
+        const props = arrayAt(settingsTabProps, -1);
         if (!props) {
             throw new Error("Expected SettingsTab to have been rendered");
         }
@@ -409,7 +412,7 @@ describe(SiteDetails, () => {
 
         props.handleSaveInterval();
         await waitFor(() =>
-            expect(handleSaveInterval).toHaveBeenCalledTimes(1)
+            { expect(handleSaveInterval).toHaveBeenCalledTimes(1); }
         );
     });
 });

@@ -3,7 +3,7 @@
  * the module without causing circular dependency timeouts
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("Hooks Index Barrel Exports", () => {
     it("should have a valid barrel export file structure", async ({

@@ -1,17 +1,16 @@
-import { describe, expect, it, vi } from "vitest";
-
 import type { Monitor } from "@shared/types";
 
-import { createServicesByTypeAndStrategyRegistry } from "../../services/monitoring/enhancedMonitorChecker/createServicesByTypeAndStrategyRegistry";
-import { performManualCheckOperation } from "../../services/monitoring/enhancedMonitorChecker/performManualCheck";
-import { performScheduledCheckOperation } from "../../services/monitoring/enhancedMonitorChecker/performScheduledCheck";
+import { describe, expect, it, vi } from "vitest";
 
+import type { MonitorCheckContext } from "../../services/monitoring/checkContext";
 import type {
     IMonitorService,
     MonitorCheckResult,
 } from "../../services/monitoring/types";
-import type { MonitorCheckContext } from "../../services/monitoring/checkContext";
 
+import { createServicesByTypeAndStrategyRegistry } from "../../services/monitoring/enhancedMonitorChecker/createServicesByTypeAndStrategyRegistry";
+import { performManualCheckOperation } from "../../services/monitoring/enhancedMonitorChecker/performManualCheck";
+import { performScheduledCheckOperation } from "../../services/monitoring/enhancedMonitorChecker/performScheduledCheck";
 import {
     createTestMonitor,
     createTestSite,

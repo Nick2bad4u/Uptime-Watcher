@@ -3,12 +3,12 @@
  * lines Focus on testing the warning logic without full component rendering
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { logger } from "../services/logger";
 
 // Mock logger
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -112,19 +112,19 @@ describe("Settings Component - Coverage Tests", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const allowedKeys = [
-            "systemNotificationsEnabled",
-            "systemNotificationsSoundEnabled",
+        const allowedKeys = new Set([
+            "autoStart",
+            "historyLimit",
             "inAppAlertsEnabled",
             "inAppAlertsSoundEnabled",
-            "autoStart",
             "minimizeToTray",
+            "systemNotificationsEnabled",
+            "systemNotificationsSoundEnabled",
             "theme",
-            "historyLimit",
-        ];
+        ]);
 
         for (const key of allowedKeys) {
-            if (!allowedKeys.includes(key)) {
+            if (!allowedKeys.has(key)) {
                 logger.warn("Attempted to update invalid settings key", key);
             }
         }

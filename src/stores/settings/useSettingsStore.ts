@@ -1,9 +1,9 @@
 /**
- * Settings store for managing application preferences and configuration.
+ * Settings store for managing app preferences and configuration.
  * Handles user settings, theme preferences, and backend synchronization.
  *
  * @remarks
- * This store manages all application settings with automatic persistence and
+ * This store manages all app settings with automatic persistence and
  * backend synchronization. It provides:
  *
  * - Persistent storage using Zustand persist middleware
@@ -61,7 +61,7 @@ const SETTINGS_PERSIST_CONFIG = createPersistConfig<
 }));
 
 /**
- * Zustand store for managing application settings with persistence.
+ * Zustand store for managing app settings with persistence.
  *
  * @remarks
  * This store composes modular slices for state and operations, mirroring the

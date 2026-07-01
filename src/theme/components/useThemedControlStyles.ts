@@ -10,6 +10,8 @@ import { TRANSITION_ALL } from "../../constants";
  */
 export type ThemedControlTone = "default" | "transparent";
 
+type ThemeClassGetter = (tone?: "primary") => CSSProperties;
+
 interface ThemeTokens {
     readonly borderRadius: {
         readonly md: string;
@@ -24,8 +26,6 @@ interface ThemeTokens {
         };
     };
 }
-
-type ThemeClassGetter = (tone?: "primary") => CSSProperties;
 
 /**
  * Shared styling hook for theme-aware form controls (inputs/selects).
@@ -55,7 +55,7 @@ export function useThemedControlStyles(args: {
     } = args;
 
     return useMemo((): CSSProperties => {
-        let nextCursor: CSSProperties["cursor"] | undefined = undefined;
+        let nextCursor: CSSProperties["cursor"] | undefined;
         if (isDefined(cursor)) {
             nextCursor = disabled ? "not-allowed" : cursor;
         }
@@ -71,10 +71,10 @@ export function useThemedControlStyles(args: {
             borderWidth: "1px",
             fontSize: currentTheme.typography.fontSize.sm,
             outline: "none",
-            ...(tone === "transparent" ? {} : { padding: basePadding }),
+            ...(tone !== "transparent" && { padding: basePadding }),
             transition: TRANSITION_ALL,
-            ...(fluid ? { width: "100%" } : {}),
-            ...(nextCursor ? { cursor: nextCursor } : {}),
+            ...(fluid && { width: "100%" }),
+            ...(nextCursor && { cursor: nextCursor }),
         };
 
         if (tone === "transparent") {

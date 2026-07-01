@@ -3,12 +3,14 @@
  * Tests monitor type utilities, type guards, and base type functionality.
  */
 
-import { describe, it, expect } from "vitest";
+import type { MonitorType } from "@shared/types";
+
+import { describe, expect, it } from "vitest";
+
 import {
     getBaseMonitorTypes,
     isBaseMonitorType,
 } from "../../../services/monitoring/monitorTypes";
-import type { MonitorType } from "@shared/types";
 
 const EXPECTED_BASE_TYPES: MonitorType[] = [
     "http",
@@ -247,7 +249,7 @@ describe("Monitor Types Utility", () => {
 
             if (isBaseMonitorType(unknownType)) {
                 // TypeScript should narrow the type here
-                const monitorType: MonitorType = unknownType as MonitorType;
+                const monitorType: MonitorType = unknownType;
                 expect(monitorType).toBe("http");
             }
         });
@@ -277,7 +279,7 @@ describe("Monitor Types Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const types: MonitorType[] = ["http", "port"];
-            const config: { type: MonitorType; enabled: boolean } = {
+            const config: { enabled: boolean; type: MonitorType; } = {
                 type: "http",
                 enabled: true,
             };
@@ -475,8 +477,8 @@ describe("Monitor Types Utility", () => {
             ];
 
             for (const type of testTypes) {
-                const result = isBaseMonitorType(type as string);
-                expect(typeof result).toBe("boolean");
+                const isResult = isBaseMonitorType(type as string);
+                expect(typeof isResult).toBe("boolean");
             }
         });
     });
@@ -492,7 +494,7 @@ describe("Monitor Types Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             // Example from JSDoc
-            const baseTypes = getBaseMonitorTypes(); // Includes http, http-keyword, http-status, port, ping, dns, ssl
+            const baseTypes = getBaseMonitorTypes(); // Includes HTTP, http-keyword, http-status, port, ping, DNS, SSL
             expect(baseTypes).toEqual(
                 expect.arrayContaining([
                     "http",

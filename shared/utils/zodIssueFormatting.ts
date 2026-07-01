@@ -14,23 +14,6 @@
  */
 import { arrayJoin } from "ts-extras";
 
-export type ZodIssuePathPart = number | string | symbol;
-
-/**
- * Minimal shape of a Zod issue used for formatting.
- */
-export interface ZodIssueLike {
-    message: string;
-    /**
-     * Path segments pointing to the offending value.
-     *
-     * @remarks
-     * This is optional to allow callers to reuse the formatter with "Zod-like"
-     * issue objects that only provide a message.
-     */
-    path?: readonly ZodIssuePathPart[];
-}
-
 /**
  * Options for {@link formatZodIssues}.
  */
@@ -50,6 +33,23 @@ export interface FormatZodIssuesOptions {
      */
     pathSeparator?: string;
 }
+
+/**
+ * Minimal shape of a Zod issue used for formatting.
+ */
+export interface ZodIssueLike {
+    message: string;
+    /**
+     * Path segments pointing to the offending value.
+     *
+     * @remarks
+     * This is optional to allow callers to reuse the formatter with "Zod-like"
+     * issue objects that only provide a message.
+     */
+    path?: readonly ZodIssuePathPart[];
+}
+
+export type ZodIssuePathPart = number | string | symbol;
 
 /**
  * Formats Zod issues into user-facing strings.

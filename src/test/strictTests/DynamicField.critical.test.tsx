@@ -13,19 +13,20 @@
  * - Disabled state handling across all field types
  */
 
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import React from "react";
-
 import type { MonitorFieldDefinition } from "@shared/types";
 
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import * as React from "react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DynamicField } from "../../components/AddSiteForm/DynamicField";
 import { logger } from "../../services/logger";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
-import { DynamicField } from "../../components/AddSiteForm/DynamicField";
 
 // Mock the logger
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -69,10 +70,10 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             renderWithTheme(
                 <DynamicField
+                    disabled={false}
                     field={mockField}
                     onChange={mockOnChange}
                     value={8080}
-                    disabled={false}
                 />
             );
 
@@ -152,7 +153,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             const input = screen.getByLabelText(
                 "Port (required)"
-            ) as HTMLInputElement;
+            );
 
             // Directly test the onChange handler by dispatching an event with invalid value
             // This simulates what would happen if invalid text somehow reached the handler
@@ -573,10 +574,10 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             renderWithTheme(
                 <DynamicField
+                    disabled
                     field={mockField}
                     onChange={mockOnChange}
                     value={8080}
-                    disabled
                 />
             );
 
@@ -605,10 +606,10 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             renderWithTheme(
                 <DynamicField
+                    disabled
                     field={mockField}
                     onChange={mockOnChange}
                     value="GET"
-                    disabled
                 />
             );
 
@@ -633,10 +634,10 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             renderWithTheme(
                 <DynamicField
+                    disabled
                     field={mockField}
                     onChange={mockOnChange}
                     value="example.com"
-                    disabled
                 />
             );
 
@@ -661,10 +662,10 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             renderWithTheme(
                 <DynamicField
+                    disabled
                     field={mockField}
                     onChange={mockOnChange}
                     value="https://example.com"
-                    disabled
                 />
             );
 
@@ -706,14 +707,14 @@ describe("DynamicField - Comprehensive Coverage", () => {
             await user.type(input, "test");
 
             // Should call onChange for each character - verify multiple calls were made
-            expect(mockOnChange).toHaveBeenCalled();
+            expect(mockOnChange).toHaveBeenCalledWith();
             expect(mockOnChange.mock.calls.length).toBeGreaterThan(0);
 
             // Check that calls contain individual characters as expected from userEvent.type()
             const calls = mockOnChange.mock.calls;
-            expect(calls.some((call) => call[0] === "t")).toBeTruthy(); // Contains 't'
-            expect(calls.some((call) => call[0] === "e")).toBeTruthy(); // Contains 'e'
-            expect(calls.some((call) => call[0] === "s")).toBeTruthy(); // Contains 's'
+            expect(calls.some((call) => arrayFirst(call) === "t")).toBeTruthy(); // Contains 't'
+            expect(calls.some((call) => arrayFirst(call) === "e")).toBeTruthy(); // Contains 'e'
+            expect(calls.some((call) => arrayFirst(call) === "s")).toBeTruthy(); // Contains 's'
         });
 
         it("should trigger onChange for select field change", async ({
@@ -788,21 +789,21 @@ describe("DynamicField - Comprehensive Coverage", () => {
             await user.type(input, "8080");
 
             // Should call onChange - verify it was called and with numeric values
-            expect(mockOnChange).toHaveBeenCalled();
+            expect(mockOnChange).toHaveBeenCalledWith();
             expect(mockOnChange.mock.calls.length).toBeGreaterThan(0);
 
             // Verify that calls contain numeric values and eventually the complete number
             const calls = mockOnChange.mock.calls;
             expect(
-                calls.some((call) => typeof call[0] === "number")
+                calls.some((call) => typeof arrayFirst(call) === "number")
             ).toBeTruthy(); // Contains numeric values
             expect(
                 calls.some(
                     (call) =>
-                        call[0] === 8080 ||
-                        call[0] === 808 ||
-                        call[0] === 80 ||
-                        call[0] === 8
+                        arrayFirst(call) === 8080 ||
+                        arrayFirst(call) === 808 ||
+                        arrayFirst(call) === 80 ||
+                        arrayFirst(call) === 8
                 )
             ).toBeTruthy(); // Contains progression
         });
@@ -866,9 +867,7 @@ describe("DynamicField - Comprehensive Coverage", () => {
                     label: `Field ${index}`,
                     type: fieldData.type,
                     required: false,
-                    ...("options" in fieldData
-                        ? { options: fieldData.options }
-                        : {}),
+                    ...(("options" in fieldData) && { options: fieldData.options }),
                 };
 
                 const mockOnChange = vi.fn();

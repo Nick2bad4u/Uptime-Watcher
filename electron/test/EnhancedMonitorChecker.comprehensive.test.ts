@@ -1,5 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import type { Site, Monitor } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
 
 function createTestMonitor(overrides: Partial<Monitor> = {}): Monitor {
@@ -200,12 +202,12 @@ describe(EnhancedMonitorChecker, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        const result = await checker.startMonitoring(
+        const isResult = await checker.startMonitoring(
             "test-site-1",
             "monitor-1"
         );
 
-        expect(typeof result).toBe("boolean");
+        expect(typeof isResult).toBe("boolean");
         expect(mockConfig.monitorRepository.update).toHaveBeenCalled();
     });
 
@@ -215,9 +217,9 @@ describe(EnhancedMonitorChecker, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        const result = await checker.stopMonitoring("test-site-1", "monitor-1");
+        const isResult = await checker.stopMonitoring("test-site-1", "monitor-1");
 
-        expect(typeof result).toBe("boolean");
+        expect(typeof isResult).toBe("boolean");
         expect(mockConfig.monitorRepository.update).toHaveBeenCalled();
     });
 

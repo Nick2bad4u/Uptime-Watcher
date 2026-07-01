@@ -73,7 +73,7 @@ export const syncSettingsAfterRehydration = (
         state.updateSettings(normalizedSettings);
     }
 
-    const matchesDefaults =
+    const isMatchesDefaults =
         normalizedSettings.autoStart === defaultSettings.autoStart &&
         normalizedSettings.historyLimit === defaultSettings.historyLimit &&
         normalizedSettings.inAppAlertsEnabled ===
@@ -88,10 +88,10 @@ export const syncSettingsAfterRehydration = (
         normalizedSettings.theme === defaultSettings.theme;
 
     logger.debug("[SettingsHydration] post-normalization status", {
-        matchesDefaults,
+        matchesDefaults: isMatchesDefaults,
     });
 
-    if (matchesDefaults) {
+    if (isMatchesDefaults) {
         return;
     }
 

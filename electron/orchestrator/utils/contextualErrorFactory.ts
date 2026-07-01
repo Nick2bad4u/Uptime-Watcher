@@ -51,9 +51,7 @@ export function createContextualErrorFactory(
         createContextualApplicationError({
             ...input,
             diagnosticsLogger: options.diagnosticsLogger,
-            ...(isDefined(options.diagnosticsPrefix)
-                ? { diagnosticsPrefix: options.diagnosticsPrefix }
-                : {}),
+            ...(isDefined(options.diagnosticsPrefix) && { diagnosticsPrefix: options.diagnosticsPrefix }),
             logger: options.logger,
         });
 }

@@ -1,22 +1,10 @@
 import * as path from "node:path";
 
 /**
- * Normalize a path string for consistent comparisons across platforms.
- *
- * @remarks
- * -
- *
- * Converts to absolute paths before comparison
- *
- * - Normalizes path separators
- * - On Windows, comparisons are case-insensitive
+ * Resolve the production distribution directory used for file:// navigation.
  */
-export function normalizePathForComparison(
-    value: string,
-    platform: NodeJS.Platform = process.platform
-): string {
-    const normalized = path.resolve(value);
-    return platform === "win32" ? normalized.toLowerCase() : normalized;
+export function getProductionDistDirectory(currentDirectory: string): string {
+    return path.resolve(path.join(currentDirectory, "../dist"));
 }
 
 /**
@@ -42,8 +30,20 @@ export function isPathWithinDirectory(
 }
 
 /**
- * Resolve the production distribution directory used for file:// navigation.
+ * Normalize a path string for consistent comparisons across platforms.
+ *
+ * @remarks
+ * -
+ *
+ * Converts to absolute paths before comparison
+ *
+ * - Normalizes path separators
+ * - On Windows, comparisons are case-insensitive
  */
-export function getProductionDistDirectory(currentDirectory: string): string {
-    return path.resolve(path.join(currentDirectory, "../dist"));
+export function normalizePathForComparison(
+    value: string,
+    platform: NodeJS.Platform = process.platform
+): string {
+    const normalized = path.resolve(value);
+    return platform === "win32" ? normalized.toLowerCase() : normalized;
 }

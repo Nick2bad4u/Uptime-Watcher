@@ -4,7 +4,7 @@
  *
  * @remarks
  * This module provides reusable TypeScript interfaces for common component prop
- * patterns used throughout the Uptime Watcher application. These types ensure
+ * patterns used throughout the Uptime Watcher app. These types ensure
  * consistency, improve developer experience, and enable better composition of
  * component interfaces.
  *
@@ -121,7 +121,7 @@ export type ComponentVariant =
  *
  * @remarks
  * These props control the visual appearance and behavior of components,
- * providing consistent theming across the application.
+ * providing consistent theming across the app.
  *
  * @public
  */
@@ -247,7 +247,7 @@ export type ChangeWithEventHandler<
  *
  * @remarks
  * This namespace provides convenient access to all event handler types used
- * throughout the application. It promotes consistency and makes it easier to
+ * throughout the app. It promotes consistency and makes it easier to
  * discover available handler types.
  */
 // eslint-disable-next-line @typescript-eslint/no-namespace -- Namespace provides organized access to event handler types for better developer experience and API consistency

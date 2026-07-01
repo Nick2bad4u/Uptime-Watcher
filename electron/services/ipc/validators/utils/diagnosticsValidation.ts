@@ -70,7 +70,7 @@ export function validateDiagnosticsMetadata(
 
     const paramName = options.paramName ?? "metadata";
     const recordResult = requireRecordParamValue(value, paramName);
-    if (recordResult.ok === false) {
+    if (!recordResult.ok) {
         return [...recordResult.error];
     }
 

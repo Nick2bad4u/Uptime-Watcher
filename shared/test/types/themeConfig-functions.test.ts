@@ -5,9 +5,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    type ColorPalette,
     isColorPalette,
     isThemeConfig,
-    type ColorPalette,
 } from "../../types/themeConfig";
 
 describe("shared/types/themeConfig function coverage", () => {

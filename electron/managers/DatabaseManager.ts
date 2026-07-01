@@ -120,7 +120,7 @@ export interface DatabaseManagerDependencies {
 }
 
 /**
- * Database operations manager for the Uptime Watcher application.
+ * Database operations manager for the Uptime Watcher app.
  *
  * @remarks
  * The DatabaseManager serves as the central coordination point for all
@@ -307,10 +307,10 @@ export class DatabaseManager {
     }
 
     /**
-     * Exports all application data to a JSON string.
+     * Exports all app data to a JSON string.
      *
      * @remarks
-     * Uses the command pattern to serialize all application data for backup or
+     * Uses the command pattern to serialize all app data for backup or
      * migration.
      *
      * @example
@@ -554,7 +554,7 @@ export class DatabaseManager {
     }
 
     /**
-     * Resets all application settings to their default values.
+     * Resets all app settings to their default values.
      *
      * @remarks
      * Resets the history limit and (in the future) other persisted settings to
@@ -567,8 +567,7 @@ export class DatabaseManager {
         // Reset history limit to default using the existing validated method
         await this.setHistoryLimit(DEFAULT_HISTORY_LIMIT);
 
-        // Future enhancement: Add reset for other settings here
-        // Example:
+        // Future enhancement: Add reset for other settings here Example:
         // await this.dependencies.repositories.settings.resetAllSettings();
 
         monitorLogger.info("[DatabaseManager] All settings reset to defaults", {
@@ -728,7 +727,7 @@ export class DatabaseManager {
                 `[DatabaseManager] Failed to emit ${args.kind} monitoring requested event:`,
                 error
             );
-            throw error instanceof Error
+            throw Error.isError(error)
                 ? error
                 : new Error(getUserFacingErrorDetail(error));
         }

@@ -2,8 +2,10 @@
  * Tests for monitorFormData types
  */
 
-import { describe, expect, it } from "vitest";
 import type { UnknownRecord } from "type-fest";
+
+import { objectKeys, objectValues  } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 describe("Monitor Form Data Types Coverage Tests", () => {
     describe("BaseFormData Interface", () => {
@@ -46,7 +48,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 monitoring: true,
             };
 
-            expect(Object.keys(minimalFormData)).toHaveLength(0);
+            expect(objectKeys(minimalFormData)).toHaveLength(0);
             expect(partialFormData.type).toBe("http");
             expect(partialFormData.monitoring).toBeTruthy();
         });
@@ -63,7 +65,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
                 timeout: 10_000,
             };
 
-            for (const value of Object.values(numericFields)) {
+            for (const value of objectValues(numericFields)) {
                 expect(typeof value).toBe("number");
                 expect(value).toBeGreaterThan(0);
             }
@@ -433,7 +435,7 @@ describe("Monitor Form Data Types Coverage Tests", () => {
 
             const testValue = (
                 value: number,
-                range: { min: number; max: number }
+                range: { max: number; min: number; }
             ) => value >= range.min && value <= range.max;
 
             expect(testValue(30_000, fieldRanges.checkInterval)).toBeTruthy();
@@ -534,10 +536,10 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             interface BaseData {
-                type: string;
-                url: string;
                 checkInterval?: number;
                 monitoring?: boolean;
+                type: string;
+                url: string;
             }
 
             interface ExtendedHttpFormData extends BaseData {
@@ -574,8 +576,8 @@ describe("Monitor Form Data Types Coverage Tests", () => {
             }
 
             interface BaseData {
-                type?: string;
                 checkInterval?: number;
+                type?: string;
             }
 
             interface ExtendedFormData extends BaseData, TimestampedFormData {

@@ -140,17 +140,17 @@ export const electronNoAppGetpathAtModuleScopeRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow app.getPath/app.getAppPath/app.getName at module scope in Electron sources",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-app-getpath-at-module-scope.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "app.{{methodName}} must not be called at module scope. Move it inside a function that runs after app.whenReady().",
         },
+        schema: [],
+        type: "problem",
     },
 };

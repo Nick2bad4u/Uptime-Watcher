@@ -18,25 +18,6 @@ import type {
 } from "./SiteRepository";
 
 /**
- * Creates transaction-scoped site + monitor repository adapters.
- */
-export function createSiteMonitorTransactionAdapters(
-    db: Database,
-    repositories: {
-        monitor: MonitorRepository;
-        site: SiteRepository;
-    }
-): {
-    monitorTx: MonitorRepositoryTransactionAdapter;
-    siteTx: SiteRepositoryTransactionAdapter;
-} {
-    return {
-        monitorTx: repositories.monitor.createTransactionAdapter(db),
-        siteTx: repositories.site.createTransactionAdapter(db),
-    };
-}
-
-/**
  * Creates transaction-scoped history + settings repository adapters.
  */
 export function createHistorySettingsTransactionAdapters(
@@ -76,6 +57,25 @@ export function createImportTransactionAdapters(
         historyTx: repositories.history.createTransactionAdapter(db),
         monitorTx: repositories.monitor.createTransactionAdapter(db),
         settingsTx: repositories.settings.createTransactionAdapter(db),
+        siteTx: repositories.site.createTransactionAdapter(db),
+    };
+}
+
+/**
+ * Creates transaction-scoped site + monitor repository adapters.
+ */
+export function createSiteMonitorTransactionAdapters(
+    db: Database,
+    repositories: {
+        monitor: MonitorRepository;
+        site: SiteRepository;
+    }
+): {
+    monitorTx: MonitorRepositoryTransactionAdapter;
+    siteTx: SiteRepositoryTransactionAdapter;
+} {
+    return {
+        monitorTx: repositories.monitor.createTransactionAdapter(db),
         siteTx: repositories.site.createTransactionAdapter(db),
     };
 }

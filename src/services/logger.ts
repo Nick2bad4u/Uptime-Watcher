@@ -43,13 +43,13 @@ import { arrayFirst, safeCastTo } from "ts-extras";
  */
 interface LoggerInterface extends UnifiedLogger {
     // Specialized logging methods for common scenarios
-    // Log application lifecycle events
+    // Log app lifecycle events
     app: AppLogger;
     /**
      * Raw access to the underlying electron-log instance.
      *
      * @remarks
-     * Use with caution! Direct access bypasses the application's logging
+     * Use with caution! Direct access bypasses the app's logging
      * conventions and structured format. Only use for advanced scenarios where
      * the standard logger methods are insufficient.
      *
@@ -138,8 +138,7 @@ function getLogTransport<K extends keyof LogTransports>(
     return candidate;
 }
 
-// Configure electron-log for renderer process
-// The /renderer import is specifically chosen because:
+// Configure electron-log for renderer process The /renderer import is specifically chosen because:
 // 1. It handles IPC communication with main process automatically
 // 2. Provides console logging in renderer while forwarding to main for file
 // logging 3. Avoids direct file access conflicts that would occur with main
@@ -166,7 +165,7 @@ const safeInvoke = (
     try {
         invoke(...args);
     } catch {
-        // Silently ignore logging errors to prevent application crashes
+        // Silently ignore logging errors to prevent app crashes
     }
 };
 
@@ -180,7 +179,7 @@ const buildFinalArgs = (
               context,
               ...logArgs.slice(1),
           ]
-        : Array.from(logArgs);
+        : [...logArgs];
 
 type LogMethodName = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
 
@@ -257,7 +256,7 @@ const baseLoggerMethods = {
 
 // Create logger with app context
 const loggerInstance: LoggerInterface = {
-    // Log application lifecycle events
+    // Log app lifecycle events
     app: {
         error: (context: string, error: Error): void => {
             baseLoggerMethods.error(`Application error in ${context}`, error);

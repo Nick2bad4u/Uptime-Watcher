@@ -13,14 +13,6 @@ import type {
 } from "@shared/types/cloudSync";
 
 /**
- * Field-level value along with last-write metadata.
- */
-export interface CloudSyncFieldValue {
-    readonly value: JsonValue;
-    readonly write: CloudSyncWriteKey;
-}
-
-/**
  * Derived entity state materialized from a stream of operations.
  */
 export interface CloudSyncEntityState {
@@ -35,6 +27,14 @@ export interface CloudSyncEntityState {
     readonly entityId: string;
     readonly entityType: CloudSyncEntityType;
     readonly fields: Readonly<Record<string, CloudSyncFieldValue>>;
+}
+
+/**
+ * Field-level value along with last-write metadata.
+ */
+export interface CloudSyncFieldValue {
+    readonly value: JsonValue;
+    readonly write: CloudSyncWriteKey;
 }
 
 /**

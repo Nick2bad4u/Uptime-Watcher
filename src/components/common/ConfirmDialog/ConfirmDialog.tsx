@@ -1,5 +1,5 @@
 /**
- * Central confirmation dialog overlay rendered at the application root.
+ * Central confirmation dialog overlay rendered at the app root.
  *
  * @remarks
  * Listens to the global confirmation dialog store and renders a themed modal

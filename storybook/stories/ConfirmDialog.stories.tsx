@@ -19,7 +19,7 @@ type Story = StoryObj;
 const withDialogState: Decorator = (StoryComponent, context) => {
     const args = context.args as Partial<ConfirmDialogStoryArgs> | undefined;
     const tone = args?.tone ?? "default";
-    const withDetails = args?.withDetails ?? false;
+    const isWithDetails = args?.withDetails ?? false;
 
     useEffect(
         function openConfirmDialog(): () => void {
@@ -32,12 +32,10 @@ const withDialogState: Decorator = (StoryComponent, context) => {
                         : "Do you want to enable response time analytics for all monitors?",
                 title: tone === "danger" ? "Delete Site" : "Enable Analytics",
                 tone,
-                ...(withDetails
-                    ? {
+                ...(isWithDetails && {
                           details:
                               "This action cannot be undone and will remove all monitoring history.",
-                      }
-                    : {}),
+                      }),
             } satisfies ReturnType<
                 typeof useConfirmDialogStore.getState
             >["request"];
@@ -56,7 +54,7 @@ const withDialogState: Decorator = (StoryComponent, context) => {
                 });
             };
         },
-        [tone, withDetails]
+        [isWithDetails, tone]
     );
 
     return <StoryComponent />;

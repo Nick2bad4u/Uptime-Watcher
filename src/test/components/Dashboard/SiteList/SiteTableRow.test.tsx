@@ -1,15 +1,20 @@
 import "@testing-library/jest-dom";
 
+import type { Monitor, MonitorStatus, Site } from "@shared/types";
+import type { ReactNode } from "react";
+import type { UnknownRecord } from "type-fest";
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Monitor, MonitorStatus, Site } from "@shared/types";
-import type { SiteTableRowProperties } from "../../../../components/Dashboard/SiteList/SiteTableRow";
-import { SiteTableRow } from "../../../../components/Dashboard/SiteList/SiteTableRow";
-import { useSite } from "../../../../hooks/site/useSite";
-import type { ReactNode } from "react";
+import { arrayAt, arrayFirst  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../../hooks/site/useSite", () => ({
+import type { SiteTableRowProperties } from "../../../../components/Dashboard/SiteList/SiteTableRow";
+
+import { SiteTableRow } from "../../../../components/Dashboard/SiteList/SiteTableRow";
+import { useSite } from "../../../../hooks/site/useSite";
+
+vi.mock(import('../../../../hooks/site/useSite'), () => ({
     useSite: vi.fn(),
 }));
 
@@ -30,7 +35,7 @@ interface MockActionButtonGroupProps {
 let actionButtonProps: MockActionButtonGroupProps | undefined;
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: ({
             className,
@@ -46,7 +51,7 @@ vi.mock(
                 <button
                     className={className}
                     data-testid="monitor-selector"
-                    onClick={() => onChange({ target: { value: "monitor-2" } })}
+                    onClick={() => { onChange({ target: { value: "monitor-2" } }); }}
                     type="button"
                 >
                     selector:{selectedMonitorId}
@@ -57,7 +62,7 @@ vi.mock(
 );
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => ({
         ActionButtonGroup: (props: MockActionButtonGroupProps) => {
             actionButtonProps = props;
@@ -75,14 +80,14 @@ vi.mock(
     })
 );
 
-vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
+vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => ({
     MarqueeText: ({ text }: { readonly text: string }) => {
         marqueeTextCalls.push(text);
         return <span data-testid="marquee-text">{text}</span>;
     },
 }));
 
-vi.mock("../../../../components/common/StatusBadge", () => ({
+vi.mock(import('../../../../components/common/StatusBadge'), () => ({
     StatusBadge: ({
         formatter,
         label,
@@ -94,15 +99,15 @@ vi.mock("../../../../components/common/StatusBadge", () => ({
     }) => <span data-testid="status-badge">{formatter(label, status)}</span>,
 }));
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         children,
         className,
         ...rest
-    }: {
+    }: UnknownRecord & {
         readonly children?: ReactNode;
         readonly className?: string;
-    } & Record<string, unknown>) => {
+    }) => {
         const {
             size: _size,
             variant: _variant,
@@ -175,7 +180,7 @@ const createHookState = (
     latestSite: overrides.latestSite ?? baseSite,
     monitor: Object.hasOwn(overrides, "monitor")
         ? overrides.monitor!
-        : baseSite.monitors[0],
+        : arrayFirst(baseSite.monitors),
     responseTime: Object.hasOwn(overrides, "responseTime")
         ? overrides.responseTime!
         : 88,
@@ -234,8 +239,8 @@ describe(SiteTableRow, () => {
         expect(screen.getByText("99.9%")).toBeInTheDocument();
         expect(screen.getByText("88 ms")).toBeInTheDocument();
         expect(screen.getByText("2/2")).toBeInTheDocument();
-        expect(marqueeTextCalls.at(-1)).toBe(baseSite.name);
-        expect(monitorSelectorCalls.at(-1)?.selectedMonitorId).toBe(
+        expect(arrayAt(marqueeTextCalls, -1)).toBe(baseSite.name);
+        expect(arrayAt(monitorSelectorCalls, -1)?.selectedMonitorId).toBe(
             "monitor-1"
         );
         expect(actionButtonProps).toMatchObject({
@@ -339,7 +344,7 @@ describe(SiteTableRow, () => {
                 latestSite,
                 monitor: undefined,
                 responseTime: undefined,
-                uptime: Number.NaN,
+                uptime: NaN,
             },
             { site: latestSite }
         );

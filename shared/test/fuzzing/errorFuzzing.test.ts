@@ -2,12 +2,12 @@
  * @file Fast-Check fuzzing tests for errorHandling targeting line 141
  */
 
-import { describe, expect, it, vi } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import {
-    withErrorHandling,
     type ErrorHandlingBackendContext,
+    withErrorHandling,
 } from "@shared/utils/errorHandling";
+import { describe, expect, it, vi } from "vitest";
 
 describe("ErrorHandling Fuzzing - Line 141", () => {
     it("should use console.error when logger is invalid - line 141", async () => {

@@ -182,8 +182,7 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
         }
     }
 
-    // IMPORTANT: Use a null-prototype object and defineProperty to avoid
-    // prototype-pollution edge cases such as "__proto__".
+    // IMPORTANT: Use a null-prototype object and defineProperty to avoid prototype-pollution edge cases such as "__proto__".
     //
     // - Assigning `result["__proto__"] = value` on a normal object can mutate
     //   the prototype instead of defining an own property.
@@ -290,8 +289,8 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
  */
 export function typedObjectEntries<T extends UnknownRecord>(
     obj: T
-): Array<[keyof T, ValueOf<T>]> {
-    return castUnchecked<Array<[keyof T, ValueOf<T>]>>(objectEntries(obj));
+): [keyof T, ValueOf<T>][] {
+    return castUnchecked<[keyof T, ValueOf<T>][]>(objectEntries(obj));
 }
 
 /**
@@ -318,8 +317,8 @@ export function typedObjectEntries<T extends UnknownRecord>(
  */
 export function typedObjectKeys<T extends UnknownRecord>(
     obj: T
-): Array<keyof T> {
-    return safeCastTo<Array<keyof T>>(objectKeys(obj));
+): (keyof T)[] {
+    return safeCastTo<(keyof T)[]>(objectKeys(obj));
 }
 
 /**
@@ -346,6 +345,6 @@ export function typedObjectKeys<T extends UnknownRecord>(
  */
 export function typedObjectValues<T extends UnknownRecord>(
     obj: T
-): Array<ValueOf<T>> {
-    return castUnchecked<Array<ValueOf<T>>>(objectValues(obj));
+): ValueOf<T>[] {
+    return castUnchecked<ValueOf<T>[]>(objectValues(obj));
 }

@@ -1,8 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
-
-import { DropboxCloudStorageProvider } from "@electron/services/cloud/providers/dropbox/DropboxCloudStorageProvider";
 import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
+import { DropboxCloudStorageProvider } from "@electron/services/cloud/providers/dropbox/DropboxCloudStorageProvider";
 import { DropboxResponseError } from "dropbox";
+import { describe, expect, it, vi } from "vitest";
 
 describe(DropboxCloudStorageProvider, () => {
     it("ignores folder entries returned by list_folder without warning", async () => {
@@ -39,7 +38,7 @@ describe(DropboxCloudStorageProvider, () => {
                     filesDeleteV2: vi.fn(),
                     usersGetCurrentAccount: vi.fn(),
                     authTokenRevoke: vi.fn(),
-                }) as never,
+                }),
             tokenManager: tokenManager as never,
         });
 
@@ -104,7 +103,7 @@ describe(DropboxCloudStorageProvider, () => {
                     filesDeleteV2: vi.fn(),
                     usersGetCurrentAccount: vi.fn(),
                     authTokenRevoke: vi.fn(),
-                }) as never,
+                }),
             tokenManager: tokenManager as never,
         });
 
@@ -138,7 +137,7 @@ describe(DropboxCloudStorageProvider, () => {
                     filesDeleteV2: vi.fn(),
                     usersGetCurrentAccount: vi.fn(),
                     authTokenRevoke: vi.fn(),
-                }) as never,
+                }),
             tokenManager: tokenManager as never,
         });
 
@@ -188,7 +187,7 @@ describe(DropboxCloudStorageProvider, () => {
                     filesDeleteV2: vi.fn(),
                     usersGetCurrentAccount: vi.fn(),
                     authTokenRevoke: vi.fn(),
-                }) as never,
+                }),
             tokenManager: tokenManager as never,
         });
 

@@ -1,10 +1,10 @@
-import { describe, expect, test } from "vitest";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { validateMonitorField } from "@shared/validation/monitorSchemas";
+import { describe, expect, it, test } from "vitest";
 
 describe("Final Coverage - Targeting Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89 (undefined/default switch cases)", () => {
-        test("should handle undefined value through switch statement", ({
+        it("should handle undefined value through switch statement", ({
             task,
             annotate,
         }) => {
@@ -23,7 +23,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             expect(result).toBe("");
         });
 
-        test("should handle unknown type through default case", ({
+        it("should handle unknown type through default case", ({
             task,
             annotate,
         }) => {
@@ -37,10 +37,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // Create a value that would trigger the default case on line 91
-            // We need to bypass the early return, so we'll mock/patch the function
-            // Since the function has an early return for null/undefined,
-            // we need to test a different path that reaches the switch default
+            // Create a value that would trigger the default case on line 91 We need to bypass the early return, so we'll mock/patch the function Since the function has an early return for null/undefined, we need to test a different path that reaches the switch default
 
             // Let's test with a symbol that's not handled explicitly
             const symbolValue = Symbol("test");
@@ -48,7 +45,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             expect(result).toContain("Symbol(test)"); // Symbol.toString()
         });
 
-        test("should reach default case with unknown primitive type", ({
+        it("should reach default case with unknown primitive type", ({
             task,
             annotate,
         }) => {
@@ -62,9 +59,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // We need to create a scenario where typeof returns something unexpected
-            // This is difficult as TypeScript/JavaScript has limited primitive types
-            // But we can test edge cases that might hit the default branch
+            // We need to create a scenario where typeof returns something unexpected This is difficult as TypeScript/JavaScript has limited primitive types But we can test edge cases that might hit the default branch
 
             // Test with a primitive wrapper object that might behave unexpectedly
             const weirdValue = new Object(Symbol("test"));
@@ -75,7 +70,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
     });
 
     describe("schemas.ts - Line 399 (throw error for unknown field)", () => {
-        test("should trigger unknown field error for invalid field name", ({
+        it("should trigger unknown field error for invalid field name", ({
             task,
             annotate,
         }) => {
@@ -99,7 +94,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             }).toThrow("Unknown field: completelyInvalidFieldName");
         });
 
-        test("should trigger unknown field error for field not in any schema", ({
+        it("should trigger unknown field error for field not in any schema", ({
             task,
             annotate,
         }) => {
@@ -121,7 +116,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
     });
 
     describe("schemas.ts - Line 482 (error vs warning categorization)", () => {
-        test("should categorize validation issues correctly", ({
+        it("should categorize validation issues correctly", ({
             task,
             annotate,
         }) => {
@@ -135,8 +130,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             annotate("Category: Core", "category");
             annotate("Type: Validation", "type");
 
-            // We need to trigger validation that creates both errors and warnings
-            // to hit the categorization logic on line 482
+            // We need to trigger validation that creates both errors and warnings to hit the categorization logic on line 482
 
             // Try to validate with a field that has the wrong type
             const result = validateMonitorField(
@@ -148,7 +142,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             expect(result.errors.length).toBeGreaterThan(0);
         });
 
-        test("should handle optional field validation warnings", ({
+        it("should handle optional field validation warnings", ({
             task,
             annotate,
         }) => {
@@ -162,8 +156,7 @@ describe("Final Coverage - Targeting Remaining Lines", () => {
             annotate("Category: Core", "category");
             annotate("Type: Validation", "type");
 
-            // Try to test the warning path vs error path
-            // This is tricky as we need to trigger the specific condition on line 481-482
+            // Try to test the warning path vs error path This is tricky as we need to trigger the specific condition on line 481-482
 
             // Test with undefined value which might trigger the warning path
             const result = validateMonitorField(

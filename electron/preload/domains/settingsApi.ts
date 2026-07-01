@@ -39,7 +39,7 @@ export interface SettingsApiInterface extends SettingsDomainBridge {
     getHistoryLimit: SettingsDomainBridge["getHistoryLimit"];
 
     /**
-     * Resets all persisted application settings to their defaults
+     * Resets all persisted app settings to their defaults
      *
      * @returns Promise that resolves when the reset completes
      */
@@ -76,7 +76,7 @@ function createSettingsApi(): SettingsApiInterface {
             ),
 
             /**
-             * Resets all persisted application settings to their defaults
+             * Resets all persisted app settings to their defaults
              *
              * @returns Promise that resolves when the reset completes
              */

@@ -88,9 +88,9 @@ function initializeMagneticButtons(): CleanupFunction {
     });
 
     return function cleanup(): void {
-        cleanupFunctions.forEach((fn) => {
+        for (const fn of cleanupFunctions) {
             fn();
-        });
+        }
     };
 }
 
@@ -106,13 +106,13 @@ function initializeScrollAnimations(): CleanupFunction {
         };
 
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
+            for (const entry of entries) {
                 const { isIntersecting, target } = entry;
                 if (isIntersecting && isHTMLElement(target)) {
                     target.style.opacity = "1";
                     target.style.transform = "translateY(0)";
                 }
-            });
+            }
         }, observerOptions);
 
         // Observe elements for animation
@@ -184,9 +184,9 @@ function applyGlassmorphismEffects(): CleanupFunction {
     });
 
     return function cleanup(): void {
-        cleanupFunctions.forEach((fn) => {
+        for (const fn of cleanupFunctions) {
             fn();
-        });
+        }
     };
 }
 
@@ -203,23 +203,25 @@ function applyThemeToggleAnimation(): CleanupFunction {
 
         function handleClick(): void {
             // Add a spinning animation
-            if (isHTMLElement(themeToggle)) {
-                themeToggle.style.transform = "scale(0.8) rotate(180deg)";
-                themeToggle.style.transition =
-                    "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)";
-
-                // Clear any existing animation timer
-                if (animationTimer) {
-                    clearTimeout(animationTimer);
-                }
-
-                animationTimer = setTimeout(() => {
-                    if (isHTMLElement(themeToggle)) {
-                        themeToggle.style.transform = "scale(1) rotate(0deg)";
-                    }
-                    animationTimer = null;
-                }, 150);
+            if (!isHTMLElement(themeToggle)) {
+                return;
             }
+
+            themeToggle.style.transform = "scale(0.8) rotate(180deg)";
+            themeToggle.style.transition =
+                "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)";
+
+            // Clear any existing animation timer
+            if (animationTimer) {
+                clearTimeout(animationTimer);
+            }
+
+            animationTimer = setTimeout(() => {
+                if (isHTMLElement(themeToggle)) {
+                    themeToggle.style.transform = "scale(1) rotate(0deg)";
+                }
+                animationTimer = null;
+            }, 150);
         }
 
         themeToggle.addEventListener("click", handleClick);
@@ -288,9 +290,9 @@ function applyThreeDimensionalTiltEffects(): CleanupFunction {
     });
 
     return function cleanup(): void {
-        cleanupFunctions.forEach((fn) => {
+        for (const fn of cleanupFunctions) {
             fn();
-        });
+        }
     };
 }
 
@@ -325,9 +327,9 @@ function addDynamicColorAccents(): CleanupFunction {
     });
 
     return function cleanup(): void {
-        cleanupFunctions.forEach((fn) => {
+        for (const fn of cleanupFunctions) {
             fn();
-        });
+        }
     };
 }
 
@@ -412,9 +414,9 @@ function configurePerformanceFeatures(): CleanupFunction {
     });
 
     return function cleanup(): void {
-        cleanupFunctions.forEach((fn) => {
+        for (const fn of cleanupFunctions) {
             fn();
-        });
+        }
     };
 }
 
@@ -423,13 +425,13 @@ function configurePerformanceFeatures(): CleanupFunction {
  */
 function initializeAdvancedFeatures(): CleanupFunction {
     // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia(
+    const isPrefersReducedMotion = globalThis.matchMedia(
         "(prefers-reduced-motion: reduce)"
     ).matches;
 
     const cleanupFunctions: CleanupFunction[] = [];
 
-    if (!prefersReducedMotion) {
+    if (!isPrefersReducedMotion) {
         cleanupFunctions.push(
             createScrollIndicator(),
             initializeMagneticButtons(),
@@ -448,9 +450,9 @@ function initializeAdvancedFeatures(): CleanupFunction {
     );
 
     return function cleanup(): void {
-        cleanupFunctions.forEach((fn) => {
+        for (const fn of cleanupFunctions) {
             fn();
-        });
+        }
     };
 }
 
@@ -490,22 +492,22 @@ function initializeEnhancements(): CleanupFunction {
     let routeChangeTimer: null | ReturnType<typeof setTimeout> = null;
 
     const observer = new MutationObserver(() => {
-        if (
-            typeof location !== "undefined" &&
-            location.pathname !== lastPathname
-        ) {
-            lastPathname = location.pathname;
-
-            // Clear any existing route change timer
-            if (routeChangeTimer) {
-                clearTimeout(routeChangeTimer);
-            }
-
-            routeChangeTimer = setTimeout(() => {
-                setupEnhancements();
-                routeChangeTimer = null;
-            }, 100); // Small delay for DOM updates
+        if (typeof location === "undefined" ||
+            location.pathname === lastPathname) {
+            return;
         }
+
+        lastPathname = location.pathname;
+
+        // Clear any existing route change timer
+        if (routeChangeTimer) {
+            clearTimeout(routeChangeTimer);
+        }
+
+        routeChangeTimer = setTimeout(() => {
+            setupEnhancements();
+            routeChangeTimer = null;
+        }, 100); // Small delay for DOM updates
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
@@ -537,7 +539,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 
 // Export for manual initialization if needed
 if (typeof window !== "undefined") {
-    window.initializeAdvancedFeatures = initializeAdvancedFeatures;
+    globalThis.initializeAdvancedFeatures = initializeAdvancedFeatures;
 }
 
 // ES Module export

@@ -6,18 +6,20 @@
  * database interaction scenarios.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { fc, test } from "@fast-check/vitest";
-import type { Database } from "node-sqlite3-wasm";
 import type { StatusHistory } from "@shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
+import type { Database } from "node-sqlite3-wasm";
+
+import { fc, test } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { rowToHistoryEntry } from "../../../../services/database/utils/mappers/historyMapper";
 import {
     findHistoryByMonitorId,
     getHistoryCount,
     getLatestHistoryEntry,
 } from "../../../../services/database/utils/queries/historyQuery";
 import { logger } from "../../../../utils/logger";
-import { rowToHistoryEntry } from "../../../../services/database/utils/mappers/historyMapper";
 
 // Mock dependencies
 vi.mock("../../../../utils/logger", () => ({
@@ -764,7 +766,7 @@ describe("historyQuery utilities", () => {
                 fc.oneof(
                     fc.constant(""),
                     fc.string({ maxLength: 0 }),
-                    fc.constant("   "),
+                    fc.constant(' '.repeat(3)),
                     fc
                         .string({ minLength: 1, maxLength: 5 })
                         .map((s) => s.trim())
@@ -1151,7 +1153,7 @@ describe("historyQuery utilities", () => {
                     for (const entry of monitorEntries) {
                         const mockRow: DatabaseHistoryRow = {
                             ...entry,
-                        } as DatabaseHistoryRow;
+                        };
 
                         const expectedMappedEntry: StatusHistory = {
                             timestamp: entry.timestamp,
@@ -1211,7 +1213,7 @@ describe("historyQuery utilities", () => {
                     const mockRow: DatabaseHistoryRow = {
                         ...edgeData,
                         monitorId,
-                    } as DatabaseHistoryRow;
+                    };
 
                     const expectedMappedEntry: StatusHistory = {
                         timestamp: edgeData.timestamp,

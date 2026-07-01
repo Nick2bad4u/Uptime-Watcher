@@ -133,6 +133,21 @@ export class HistoryRepository {
     private readonly databaseService: DatabaseService;
 
     /**
+     * Constructs a new {@link HistoryRepository} instance.
+     *
+     * @example
+     *
+     * ```typescript
+     * const repo = new HistoryRepository({ databaseService });
+     * ```
+     *
+     * @param dependencies - The required dependencies for history operations.
+     */
+    public constructor(dependencies: HistoryRepositoryDependencies) {
+        this.databaseService = dependencies.databaseService;
+    }
+
+    /**
      * Adds a new history entry for a monitor.
      *
      * @example
@@ -165,6 +180,29 @@ export class HistoryRepository {
             undefined,
             { monitorId }
         );
+    }
+
+    /**
+     * Adds a new history entry for a monitor within an existing transaction
+     * context.
+     *
+     * @remarks
+     * Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param monitorId - The unique identifier of the monitor to add history
+     *   for.
+     * @param entry - The status history entry to add.
+     * @param details - Optional details string for the entry.
+     */
+    public addEntryInternal(
+        db: Database,
+        monitorId: string,
+        entry: StatusHistory,
+        details?: string
+    ): void {
+        addHistoryEntry(db, monitorId, entry, details);
     }
 
     /**
@@ -228,6 +266,49 @@ export class HistoryRepository {
     }
 
     /**
+     * Creates a transaction-scoped adapter for batched history operations.
+     *
+     * @param db - Active database connection bound to the transaction.
+     *
+     * @returns Adapter exposing write operations within the active transaction
+     *   scope.
+     */
+    public createTransactionAdapter(
+        db: Database
+    ): HistoryRepositoryTransactionAdapter {
+        const addEntryAdapter: HistoryRepositoryTransactionAdapter["addEntry"] =
+            (monitorId, entry, details) => {
+                this.addEntryInternal(db, monitorId, entry, details);
+            };
+
+        const deleteAllAdapter: HistoryRepositoryTransactionAdapter["deleteAll"] =
+            () => {
+                this.deleteAllInternal(db);
+            };
+
+        const deleteByMonitorIdAdapter: HistoryRepositoryTransactionAdapter["deleteByMonitorId"] =
+            (monitorId) => {
+                this.deleteByMonitorIdInternal(db, monitorId);
+            };
+
+        const getHistoryCountAdapter: HistoryRepositoryTransactionAdapter["getHistoryCount"] =
+            (monitorId) => this.getHistoryCountInternal(db, monitorId);
+
+        const pruneAllHistoryAdapter: HistoryRepositoryTransactionAdapter["pruneAllHistory"] =
+            (limit) => {
+                this.pruneAllHistoryInternal(db, limit);
+            };
+
+        return {
+            addEntry: addEntryAdapter,
+            deleteAll: deleteAllAdapter,
+            deleteByMonitorId: deleteByMonitorIdAdapter,
+            getHistoryCount: getHistoryCountAdapter,
+            pruneAllHistory: pruneAllHistoryAdapter,
+        } satisfies HistoryRepositoryTransactionAdapter;
+    }
+
+    /**
      * Clears all history from the database.
      *
      * @remarks
@@ -257,6 +338,22 @@ export class HistoryRepository {
     }
 
     /**
+     * Clears all history from the database within an existing transaction
+     * context.
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction
+     * context. The operation is destructive and irreversible. Proper error
+     * handling is delegated to the calling transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     */
+    public deleteAllInternal(db: Database): void {
+        deleteAllHistory(db);
+    }
+
+    /**
      * Deletes all history entries for a specific monitor.
      *
      * @example
@@ -283,6 +380,22 @@ export class HistoryRepository {
             undefined,
             { monitorId }
         );
+    }
+
+    /**
+     * Deletes all history entries for a specific monitor within an existing
+     * transaction context.
+     *
+     * @remarks
+     * Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param monitorId - The unique identifier of the monitor to delete history
+     *   for.
+     */
+    public deleteByMonitorIdInternal(db: Database, monitorId: string): void {
+        deleteHistoryByMonitorId(db, monitorId);
     }
 
     /**
@@ -337,6 +450,25 @@ export class HistoryRepository {
             undefined,
             { monitorId }
         );
+    }
+
+    /**
+     * Gets the count of history entries for a monitor within an existing
+     * transaction context.
+     *
+     * @remarks
+     * **IMPORTANT**: This method must be called within an existing transaction
+     * context. Provides synchronous access for use in transaction-wrapped
+     * operations.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param monitorId - The unique identifier of the monitor.
+     *
+     * @returns The number of history entries for the monitor.
+     */
+    public getHistoryCountInternal(db: Database, monitorId: string): number {
+        return getHistoryCount(db, monitorId);
     }
 
     /**
@@ -406,6 +538,43 @@ export class HistoryRepository {
     }
 
     /**
+     * Prunes old history entries for all monitors within an existing
+     * transaction context, keeping only the most recent entries per monitor.
+     *
+     * @remarks
+     * Use this method only when already within a transaction context.
+     *
+     * @param db - The database connection (must be within an active
+     *   transaction).
+     * @param limit - The maximum number of entries to keep per monitor. Must be
+     *   greater than 0.
+     */
+    public pruneAllHistoryInternal(db: Database, limit: number): void {
+        const normalizedLimit = normalizeHistoryPruneLimit(limit);
+        if (!normalizedLimit) {
+            return;
+        }
+
+        // Get all monitor IDs
+        const monitorRows = queryForIds(db, HISTORY_QUERIES.SELECT_MONITOR_IDS);
+
+        // Prune history for each monitor
+        for (const row of monitorRows) {
+            const monitorId =
+                typeof row.id === "string" ? row.id : String(row.id);
+
+            // `queryForIds` already enforces non-empty strings and finite numbers.
+            pruneHistoryForMonitor(db, monitorId, normalizedLimit);
+        }
+
+        if (isDev()) {
+            logger.debug(
+                `[HistoryRepository] Pruned history for all monitors (limit: ${normalizedLimit}) (internal)`
+            );
+        }
+    }
+
+    /**
      * Prunes old history entries for a specific monitor, keeping only the most
      * recent entries.
      *
@@ -443,175 +612,6 @@ export class HistoryRepository {
             undefined,
             { limit: normalizedLimit, monitorId }
         );
-    }
-
-    /**
-     * Constructs a new {@link HistoryRepository} instance.
-     *
-     * @example
-     *
-     * ```typescript
-     * const repo = new HistoryRepository({ databaseService });
-     * ```
-     *
-     * @param dependencies - The required dependencies for history operations.
-     */
-    public constructor(dependencies: HistoryRepositoryDependencies) {
-        this.databaseService = dependencies.databaseService;
-    }
-
-    /**
-     * Creates a transaction-scoped adapter for batched history operations.
-     *
-     * @param db - Active database connection bound to the transaction.
-     *
-     * @returns Adapter exposing write operations within the active transaction
-     *   scope.
-     */
-    public createTransactionAdapter(
-        db: Database
-    ): HistoryRepositoryTransactionAdapter {
-        const addEntryAdapter: HistoryRepositoryTransactionAdapter["addEntry"] =
-            (monitorId, entry, details) => {
-                this.addEntryInternal(db, monitorId, entry, details);
-            };
-
-        const deleteAllAdapter: HistoryRepositoryTransactionAdapter["deleteAll"] =
-            () => {
-                this.deleteAllInternal(db);
-            };
-
-        const deleteByMonitorIdAdapter: HistoryRepositoryTransactionAdapter["deleteByMonitorId"] =
-            (monitorId) => {
-                this.deleteByMonitorIdInternal(db, monitorId);
-            };
-
-        const getHistoryCountAdapter: HistoryRepositoryTransactionAdapter["getHistoryCount"] =
-            (monitorId) => this.getHistoryCountInternal(db, monitorId);
-
-        const pruneAllHistoryAdapter: HistoryRepositoryTransactionAdapter["pruneAllHistory"] =
-            (limit) => {
-                this.pruneAllHistoryInternal(db, limit);
-            };
-
-        return {
-            addEntry: addEntryAdapter,
-            deleteAll: deleteAllAdapter,
-            deleteByMonitorId: deleteByMonitorIdAdapter,
-            getHistoryCount: getHistoryCountAdapter,
-            pruneAllHistory: pruneAllHistoryAdapter,
-        } satisfies HistoryRepositoryTransactionAdapter;
-    }
-
-    /**
-     * Adds a new history entry for a monitor within an existing transaction
-     * context.
-     *
-     * @remarks
-     * Use this method only when already within a transaction context.
-     *
-     * @param db - The database connection (must be within an active
-     *   transaction).
-     * @param monitorId - The unique identifier of the monitor to add history
-     *   for.
-     * @param entry - The status history entry to add.
-     * @param details - Optional details string for the entry.
-     */
-    public addEntryInternal(
-        db: Database,
-        monitorId: string,
-        entry: StatusHistory,
-        details?: string
-    ): void {
-        addHistoryEntry(db, monitorId, entry, details);
-    }
-
-    /**
-     * Clears all history from the database within an existing transaction
-     * context.
-     *
-     * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction
-     * context. The operation is destructive and irreversible. Proper error
-     * handling is delegated to the calling transaction context.
-     *
-     * @param db - The database connection (must be within an active
-     *   transaction).
-     */
-    public deleteAllInternal(db: Database): void {
-        deleteAllHistory(db);
-    }
-
-    /**
-     * Deletes all history entries for a specific monitor within an existing
-     * transaction context.
-     *
-     * @remarks
-     * Use this method only when already within a transaction context.
-     *
-     * @param db - The database connection (must be within an active
-     *   transaction).
-     * @param monitorId - The unique identifier of the monitor to delete history
-     *   for.
-     */
-    public deleteByMonitorIdInternal(db: Database, monitorId: string): void {
-        deleteHistoryByMonitorId(db, monitorId);
-    }
-
-    /**
-     * Gets the count of history entries for a monitor within an existing
-     * transaction context.
-     *
-     * @remarks
-     * **IMPORTANT**: This method must be called within an existing transaction
-     * context. Provides synchronous access for use in transaction-wrapped
-     * operations.
-     *
-     * @param db - The database connection (must be within an active
-     *   transaction).
-     * @param monitorId - The unique identifier of the monitor.
-     *
-     * @returns The number of history entries for the monitor.
-     */
-    public getHistoryCountInternal(db: Database, monitorId: string): number {
-        return getHistoryCount(db, monitorId);
-    }
-
-    /**
-     * Prunes old history entries for all monitors within an existing
-     * transaction context, keeping only the most recent entries per monitor.
-     *
-     * @remarks
-     * Use this method only when already within a transaction context.
-     *
-     * @param db - The database connection (must be within an active
-     *   transaction).
-     * @param limit - The maximum number of entries to keep per monitor. Must be
-     *   greater than 0.
-     */
-    public pruneAllHistoryInternal(db: Database, limit: number): void {
-        const normalizedLimit = normalizeHistoryPruneLimit(limit);
-        if (!normalizedLimit) {
-            return;
-        }
-
-        // Get all monitor IDs
-        const monitorRows = queryForIds(db, HISTORY_QUERIES.SELECT_MONITOR_IDS);
-
-        // Prune history for each monitor
-        for (const row of monitorRows) {
-            const monitorId =
-                typeof row.id === "string" ? row.id : String(row.id);
-
-            // `queryForIds` already enforces non-empty strings and finite numbers.
-            pruneHistoryForMonitor(db, monitorId, normalizedLimit);
-        }
-
-        if (isDev()) {
-            logger.debug(
-                `[HistoryRepository] Pruned history for all monitors (limit: ${normalizedLimit}) (internal)`
-            );
-        }
     }
 
     /**

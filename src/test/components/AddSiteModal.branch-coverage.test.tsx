@@ -12,19 +12,20 @@
  * - Theme state branches
  */
 
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
-import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
 
 // Mock the dependencies
-vi.mock("../../stores/ui/useUiStore");
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../stores/ui/useUiStore'));
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        (await importOriginal());
     return {
         ...actual,
         useTheme: vi.fn(),
@@ -44,10 +45,10 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
         })),
     };
 });
-vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
+vi.mock(import('../../components/AddSiteForm/AddSiteForm'), () => ({
     AddSiteForm: ({ onSuccess }: { onSuccess: () => void }) => (
         <div data-testid="add-site-form">
-            <button onClick={onSuccess} data-testid="mock-success-button">
+            <button data-testid="mock-success-button" onClick={onSuccess}>
                 Mock Success
             </button>
         </div>
@@ -55,15 +56,15 @@ vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
 }));
 
 // Mock themed components with unique test-ids
-vi.mock("../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({ children, className, ...props }: any) => (
         <div
+            className={className}
             data-testid={
                 className?.includes("max-w-2xl")
                     ? "modal-outer-box"
                     : "modal-inner-box"
             }
-            className={className}
             {...props}
         >
             {children}
@@ -71,7 +72,7 @@ vi.mock("../../theme/components/ThemedBox", () => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({ children, onClick, ...props }: any) => (
         <button data-testid="themed-button" onClick={onClick} {...props}>
             {children}
@@ -79,7 +80,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children, ...props }: any) => (
         <span data-testid="themed-text" {...props}>
             {children}
@@ -496,7 +497,7 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             const modalContent = document.querySelector(".modal-shell");
             expect(modalContent).not.toBeNull();
-            fireEvent.click(modalContent as Element);
+            fireEvent.click(modalContent!);
 
             expect(mockOnClose).not.toHaveBeenCalled();
         });

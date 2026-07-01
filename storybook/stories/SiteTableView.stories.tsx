@@ -36,6 +36,7 @@ const siteB = createMockSite({
 
 const siteC = createMockSite({
     identifier: "worker-cluster",
+    monitoring: false,
     monitors: [
         createMockMonitor({
             id: "worker-http",
@@ -52,7 +53,6 @@ const siteC = createMockSite({
             type: "port",
         }),
     ],
-    monitoring: false,
     name: "Worker Cluster",
 });
 

@@ -5,18 +5,19 @@
  * the coverage report as having branch coverage below 90%.
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { createValidMonitor } from "@shared/test/testHelpers";
 import { render, screen } from "@testing-library/react";
-import React from "react";
+import * as React from "react";
+import { arrayFirst } from "ts-extras";
+import { describe, expect, it, vi } from "vitest";
 
 // Import components with low branch coverage
 import { StatusBadge } from "../components/common/StatusBadge";
 import { SiteCardHistory } from "../components/Dashboard/SiteCard/SiteCardHistory";
 import { ThemeProvider } from "../theme/components/ThemeProvider";
-import { createValidMonitor } from "@shared/test/testHelpers";
 
 // Mock dependencies
-vi.mock("../hooks/useMonitorTypes", () => ({
+vi.mock(import('../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: () => ({
         options: [
             { value: "http", label: "HTTP" },
@@ -25,7 +26,7 @@ vi.mock("../hooks/useMonitorTypes", () => ({
     }),
 }));
 
-vi.mock("../utils/monitorTitleFormatters", () => ({
+vi.mock(import('../utils/monitorTitleFormatters'), () => ({
     formatTitleSuffix: (monitor: any) => {
         if (monitor.type === "http" && monitor.url) {
             return ` - ${monitor.url}`;
@@ -37,7 +38,7 @@ vi.mock("../utils/monitorTitleFormatters", () => ({
     },
 }));
 
-vi.mock("../components/common/HistoryChart", () => ({
+vi.mock(import('../components/common/HistoryChart'), () => ({
     HistoryChart: ({ title, history, maxItems }: any) => (
         <div data-testid="history-chart">
             <div data-testid="chart-title">{title}</div>
@@ -66,60 +67,60 @@ describe("Branch Coverage Optimization Tests", () => {
             // Test 2xl size (should map to "lg")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="2xl" />
+                    <StatusBadge label="Test" size="2xl" status="up" />
                 </ThemeProvider>
             );
 
             // Test 3xl size (should map to "lg")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="3xl" />
+                    <StatusBadge label="Test" size="3xl" status="up" />
                 </ThemeProvider>
             );
 
             // Test 4xl size (should map to "lg")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="4xl" />
+                    <StatusBadge label="Test" size="4xl" status="up" />
                 </ThemeProvider>
             );
 
             // Test xl size (should map to "lg")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="xl" />
+                    <StatusBadge label="Test" size="xl" status="up" />
                 </ThemeProvider>
             );
 
             // Test base size (should map to "md")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="base" />
+                    <StatusBadge label="Test" size="base" status="up" />
                 </ThemeProvider>
             );
 
             // Test lg size (should map to "md")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="lg" />
+                    <StatusBadge label="Test" size="lg" status="up" />
                 </ThemeProvider>
             );
 
             // Test sm size (should map to "sm")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="sm" />
+                    <StatusBadge label="Test" size="sm" status="up" />
                 </ThemeProvider>
             );
 
             // Test xs size (should map to "sm")
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Test" status="up" size="xs" />
+                    <StatusBadge label="Test" size="xs" status="up" />
                 </ThemeProvider>
             );
 
-            expect(screen.getAllByText(/Test/).length).toBeGreaterThan(0);
+            expect(screen.getAllByText(/Test/v).length).toBeGreaterThan(0);
         });
 
         it("should handle custom formatter function", ({ task, annotate }) => {
@@ -139,9 +140,9 @@ describe("Branch Coverage Optimization Tests", () => {
             render(
                 <ThemeProvider>
                     <StatusBadge
+                        formatter={customFormatter}
                         label="Status"
                         status="up"
-                        formatter={customFormatter}
                     />
                 </ThemeProvider>
             );
@@ -185,7 +186,7 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Status" status="up" showIcon={false} />
+                    <StatusBadge label="Status" showIcon={false} status="up" />
                 </ThemeProvider>
             );
 
@@ -208,7 +209,7 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <ThemeProvider>
-                    <StatusBadge label="Status" status="up" showIcon={true} />
+                    <StatusBadge label="Status" showIcon={true} status="up" />
                 </ThemeProvider>
             );
 
@@ -239,8 +240,8 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <SiteCardHistory
-                    monitor={undefined}
                     filteredHistory={mockHistory}
+                    monitor={undefined}
                 />
             );
 
@@ -277,8 +278,8 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <SiteCardHistory
-                    monitor={monitor}
                     filteredHistory={mockHistory}
+                    monitor={monitor}
                 />
             );
 
@@ -313,8 +314,8 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <SiteCardHistory
-                    monitor={monitor}
                     filteredHistory={mockHistory}
+                    monitor={monitor}
                 />
             );
 
@@ -353,8 +354,8 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <SiteCardHistory
-                    monitor={monitor}
                     filteredHistory={mockHistory}
+                    monitor={monitor}
                 />
             );
 
@@ -392,8 +393,8 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <SiteCardHistory
-                    monitor={monitor}
                     filteredHistory={mockHistory}
+                    monitor={monitor}
                 />
             );
 
@@ -418,8 +419,8 @@ describe("Branch Coverage Optimization Tests", () => {
                 }
 
                 // Compare first history item timestamp
-                const prevTimestamp = prev.filteredHistory[0]?.timestamp;
-                const nextTimestamp = next.filteredHistory[0]?.timestamp;
+                const prevTimestamp = arrayFirst(prev.filteredHistory)?.timestamp;
+                const nextTimestamp = arrayFirst(next.filteredHistory)?.timestamp;
                 if (prevTimestamp !== nextTimestamp) {
                     return false;
                 }
@@ -447,11 +448,9 @@ describe("Branch Coverage Optimization Tests", () => {
                 }
 
                 // Compare optional properties
-                return !(
-                    prevMonitor.url !== nextMonitor.url ||
-                    prevMonitor.port !== nextMonitor.port ||
-                    prevMonitor.host !== nextMonitor.host
-                );
+                return prevMonitor.url === nextMonitor.url &&
+                    prevMonitor.port === nextMonitor.port &&
+                    prevMonitor.host === nextMonitor.host;
             }
         );
 
@@ -468,14 +467,13 @@ describe("Branch Coverage Optimization Tests", () => {
 
             const { rerender } = render(
                 <SiteCardHistoryWrapped
-                    monitor={undefined}
                     filteredHistory={[]}
+                    monitor={undefined}
                 />
             );
 
             rerender(
                 <SiteCardHistoryWrapped
-                    monitor={undefined}
                     filteredHistory={[
                         {
                             timestamp: Date.now(),
@@ -483,6 +481,7 @@ describe("Branch Coverage Optimization Tests", () => {
                             responseTime: 100,
                         },
                     ]}
+                    monitor={undefined}
                 />
             );
 
@@ -504,8 +503,8 @@ describe("Branch Coverage Optimization Tests", () => {
 
             render(
                 <SiteCardHistoryWrapped
-                    monitor={undefined}
                     filteredHistory={[]}
+                    monitor={undefined}
                 />
             );
 
@@ -543,15 +542,15 @@ describe("Branch Coverage Optimization Tests", () => {
 
             const { rerender } = render(
                 <SiteCardHistoryWrapped
-                    monitor={undefined}
                     filteredHistory={[]}
+                    monitor={undefined}
                 />
             );
 
             rerender(
                 <SiteCardHistoryWrapped
-                    monitor={monitor}
                     filteredHistory={[]}
+                    monitor={monitor}
                 />
             );
 
@@ -594,15 +593,15 @@ describe("Branch Coverage Optimization Tests", () => {
 
             const { rerender } = render(
                 <SiteCardHistoryWrapped
-                    monitor={monitor1}
                     filteredHistory={[]}
+                    monitor={monitor1}
                 />
             );
 
             rerender(
                 <SiteCardHistoryWrapped
-                    monitor={monitor2}
                     filteredHistory={[]}
+                    monitor={monitor2}
                 />
             );
 
@@ -651,15 +650,15 @@ describe("Branch Coverage Optimization Tests", () => {
 
             const { rerender } = render(
                 <SiteCardHistoryWrapped
-                    monitor={httpMonitor}
                     filteredHistory={[]}
+                    monitor={httpMonitor}
                 />
             );
 
             rerender(
                 <SiteCardHistoryWrapped
-                    monitor={portMonitor}
                     filteredHistory={[]}
+                    monitor={portMonitor}
                 />
             );
 
@@ -699,15 +698,15 @@ describe("Branch Coverage Optimization Tests", () => {
 
             const { rerender } = render(
                 <SiteCardHistoryWrapped
-                    monitor={monitor1}
                     filteredHistory={[]}
+                    monitor={monitor1}
                 />
             );
 
             rerender(
                 <SiteCardHistoryWrapped
-                    monitor={monitor2}
                     filteredHistory={[]}
+                    monitor={monitor2}
                 />
             );
 
@@ -744,7 +743,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 history: [],
             };
 
-            render(<SiteCardHistory monitor={monitor} filteredHistory={[]} />);
+            render(<SiteCardHistory filteredHistory={[]} monitor={monitor} />);
 
             expect(screen.getByTestId("chart-title")).toHaveTextContent(
                 "unknown History"
@@ -768,7 +767,7 @@ describe("Branch Coverage Optimization Tests", () => {
             const monitor = {
                 id: "test-1",
                 type: "http" as const,
-                // Url is missing
+                // URL is missing
                 checkInterval: 60_000,
                 timeout: 5000,
                 retryAttempts: 3,
@@ -778,7 +777,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 history: [],
             };
 
-            render(<SiteCardHistory monitor={monitor} filteredHistory={[]} />);
+            render(<SiteCardHistory filteredHistory={[]} monitor={monitor} />);
 
             expect(screen.getByTestId("chart-title")).toHaveTextContent(
                 "HTTP History"
@@ -800,7 +799,7 @@ describe("Branch Coverage Optimization Tests", () => {
             annotate("Type: Business Logic", "type");
 
             render(
-                <SiteCardHistory monitor={undefined} filteredHistory={[]} />
+                <SiteCardHistory filteredHistory={[]} monitor={undefined} />
             );
 
             expect(screen.getByTestId("chart-max-items")).toHaveTextContent(
@@ -832,7 +831,7 @@ describe("Branch Coverage Optimization Tests", () => {
                 history: [],
             };
 
-            render(<SiteCardHistory monitor={monitor} filteredHistory={[]} />);
+            render(<SiteCardHistory filteredHistory={[]} monitor={monitor} />);
 
             expect(screen.getByTestId("chart-title")).toHaveTextContent(
                 "HTTP History"

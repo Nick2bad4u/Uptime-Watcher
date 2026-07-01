@@ -6,11 +6,11 @@
  * field inclusion work correctly and prevent future regressions.
  */
 
-import { describe, expect, it } from "vitest";
-
 import type { Monitor } from "@shared/types";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+import { describe, expect, it } from "vitest";
+
 import { TypedCache } from "../utils/cache";
 
 describe("Architectural Fixes Regression Tests", () => {

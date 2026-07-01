@@ -18,9 +18,9 @@ import { prepareMonitorTypesStore } from "../helpers/monitorTypeStoryHelpers";
 
 prepareMonitorTypesStore();
 
-type FieldValue = number | string;
-type FieldConfig = MonitorTypeConfig["fields"][number];
 type FieldChangeHandlers = Record<string, (value: FieldValue) => void>;
+type FieldConfig = MonitorTypeConfig["fields"][number];
+type FieldValue = number | string;
 
 const getFieldDefaults = (
     monitorType: MonitorType

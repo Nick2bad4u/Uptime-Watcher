@@ -104,16 +104,16 @@ export const electronNoDialogSyncRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description: "disallow sync Electron dialog APIs",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-dialog-sync.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "dialog.{{methodName}} is not allowed because sync dialogs block the main thread. Prefer the async dialog APIs.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -3,8 +3,10 @@
  * Tests the store creation and composition pattern.
  */
 
-import { describe, it, expect, vi } from "vitest";
 import type { Site } from "@shared/types";
+
+import { arrayFirst } from "ts-extras";
+import { describe, expect, it, vi } from "vitest";
 // The global electronAPI bootstrap block has been removed as it references a non-existent mockElectronAPI.
 
 describe("useSitesStore - Complete Function Coverage", () => {
@@ -251,7 +253,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
                 addSite: (site: Site) => site,
                 removeSite: (identifier: string) => identifier,
                 setLoading: (loading: boolean) => loading,
-                setError: (error: string | null) => error,
+                setError: (error: null | string) => error,
             };
 
             // Test function signatures
@@ -325,7 +327,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
             ];
 
             expect(sites).toHaveLength(2);
-            expect(sites[0]?.monitoring).toBeFalsy();
+            expect(arrayFirst(sites)?.monitoring).toBeFalsy();
             expect(sites[1]?.monitoring).toBeTruthy();
         });
     });

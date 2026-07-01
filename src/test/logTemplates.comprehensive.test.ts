@@ -6,20 +6,22 @@
  * @author GitHub Copilot
  */
 
-import { describe, expect, it, vi, type Mock } from "vitest";
+import type { UnknownRecord } from "type-fest";
 
 import {
+    createTemplateLogger,
     DEBUG_LOGS,
     ERROR_LOGS,
-    LOG_TEMPLATES,
-    SERVICE_LOGS,
-    WARNING_LOGS,
-    createTemplateLogger,
     interpolateLogTemplate,
+    LOG_TEMPLATES,
     type LogTemplate,
     type LogTemplatesInterface,
+    SERVICE_LOGS,
     type TemplateVariables,
+    WARNING_LOGS,
 } from "@shared/utils/logTemplates";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+
 import { createMockFunction } from "./utils/mockFactories";
 
 describe("logTemplates.ts - Comprehensive Coverage", () => {
@@ -619,7 +621,7 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
     describe(createTemplateLogger, () => {
         type LoggerMethod = (
             message: string,
-            context?: Record<string, unknown>
+            context?: UnknownRecord
         ) => void;
 
         let mockLogger: {

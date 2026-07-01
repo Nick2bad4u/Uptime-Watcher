@@ -8,7 +8,7 @@
 
 import "@testing-library/jest-dom";
 import { act, render } from "@testing-library/react";
-import { describe, it, beforeEach, afterEach, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ConfirmDialog } from "../../../components/common/ConfirmDialog/ConfirmDialog";
 import {

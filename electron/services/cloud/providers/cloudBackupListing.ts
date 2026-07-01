@@ -40,8 +40,7 @@ export async function listBackupsFromMetadataObjects(args: {
                         -".metadata.json".length
                     );
 
-                    // If the underlying backup blob is missing, the metadata is
-                    // effectively orphaned and the backup cannot be restored.
+                    // If the underlying backup blob is missing, the metadata is effectively orphaned and the backup cannot be restored.
                     // Hide it from the UI to avoid offering broken restore paths.
                     if (!setHas(objectKeys, backupKey)) {
                         logger.warn(

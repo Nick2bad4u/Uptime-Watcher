@@ -136,9 +136,9 @@ function getHttpErrorDetailIcon(details: string): IconType | null {
     const hasResponseCodeLabel = /\bresponse\s*code\b/iu.test(
         normalizedDetails
     );
-    const containsErrorLabel = /\berror\b/iu.test(normalizedDetails);
+    const isContainsErrorLabel = /\berror\b/iu.test(normalizedDetails);
 
-    if (hasResponseCodeLabel && containsErrorLabel) {
+    if (hasResponseCodeLabel && isContainsErrorLabel) {
         return AppIcons.status.downFilled;
     }
 
@@ -224,10 +224,10 @@ const FILTER_LABELS: Record<HistoryFilter, string> = {
     up: "Up",
 };
 
-const FILTER_OPTIONS: ReadonlyArray<{
+const FILTER_OPTIONS: readonly {
     readonly status?: SiteStatus;
     readonly value: HistoryFilter;
-}> = [
+}[] = [
     { value: "all" },
     { status: "up", value: "up" },
     { status: "down", value: "down" },

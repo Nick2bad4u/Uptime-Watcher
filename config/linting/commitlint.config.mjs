@@ -3,7 +3,7 @@
  *
  * Enforces conventional commit format with emoji and bracketed type, e.g., "✨
  * [feat] Add dark mode toggle". Each commit bullet point should start with one
- * of the following: 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️
+ * of the following: 🔧 [build], 🧹 [chore], 👷 [CI], 📝 [docs], ✨ [feat], 🛠️
  * [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test] Example: "✨
  * [feat] Add dark mode toggle" Indent any lines that refer to the statement
  * above with a " - ".
@@ -57,7 +57,7 @@ export default /** @type {CommitlintConfig} */ {
          *
          * @param commit
          */
-        (commit) => /^chore\(release\)/v.test(commit),
+        (commit) => commit.startsWith("chore(release)"),
 
         /**
          * Ignore dependency updates with automated format.

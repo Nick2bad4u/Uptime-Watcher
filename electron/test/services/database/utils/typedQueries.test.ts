@@ -3,25 +3,27 @@
  *   database query helpers with 100% coverage including error paths
  */
 
-import {
-    describe,
-    it,
-    expect,
-    beforeEach,
-    vi,
-    type MockedFunction,
-} from "vitest";
-import { fc, test } from "@fast-check/vitest";
-
-import type { Database } from "node-sqlite3-wasm";
 import type { HistoryRow, MonitorRow } from "@shared/types/database";
+import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
+
+import { fc, test } from "@fast-check/vitest";
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockedFunction,
+    vi,
+} from "vitest";
 
 import {
+    type CountResult,
+    type IdOnlyResult,
     insertWithReturning,
     queryForCount,
     queryForIds,
@@ -29,8 +31,6 @@ import {
     queryForSingleRecord,
     queryHistoryRow,
     queryMonitorRows,
-    type CountResult,
-    type IdOnlyResult,
 } from "../../../../services/database/utils/queries/typedQueries";
 
 /**
@@ -222,7 +222,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         ): _row is UnknownRecord => false,
                     }
                 )
-            ).toThrow(/ValidatedRow/);
+            ).toThrow(/ValidatedRow/v);
         });
         it("should handle empty array parameters", async ({
             task,
@@ -826,7 +826,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                         expect(Array.isArray(result)).toBeTruthy();
                         expect(result).toHaveLength(expectedIds.length);
 
-                        for (const item of result!) {
+                        for (const item of result) {
                             expect(item).toHaveProperty("id");
                             expect(typeof item.id).toBe("number");
                         }
@@ -941,7 +941,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             _row: UnknownRecord
                         ): _row is UnknownRecord => false,
                     })
-                ).toThrow(/TestRow/);
+                ).toThrow(/TestRow/v);
             });
             it("should return empty array for no records", async ({
                 task,
@@ -980,10 +980,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     string | symbol,
                     unknown
                 > {
-                    id: number;
-                    url: string;
-                    status: string;
                     checkInterval: number;
+                    id: number;
+                    status: string;
+                    url: string;
                 }
                 const mockResults: MonitorRecord[] = [
                     {
@@ -1046,10 +1046,10 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     string | symbol,
                     unknown
                 > {
-                    site_id: number;
-                    site_name: string;
                     monitor_id: number;
                     monitor_url: string;
+                    site_id: number;
+                    site_name: string;
                 }
                 const siteName = sampleOne(siteNameArbitrary);
                 const mockResults: JoinedRecord[] = [
@@ -1278,7 +1278,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                             ): _row is UnknownRecord => false,
                         }
                     )
-                ).toThrow(/SingleRow/);
+                ).toThrow(/SingleRow/v);
             });
             it("should handle query without parameters", async ({
                 task,
@@ -1606,7 +1606,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
 
                 expect(() =>
                     queryMonitorRows(mockDb, "SELECT * FROM monitors")
-                ).toThrow(/MonitorRow/);
+                ).toThrow(/MonitorRow/v);
             });
 
             it("should validate single history rows", () => {

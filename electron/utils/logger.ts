@@ -63,7 +63,7 @@ function createLogger(prefix: string): Logger {
                       context,
                       ...logArguments.slice(1),
                   ]
-                : Array.from(logArguments);
+                : [...logArguments];
             log.debug(...finalArgs);
         },
         error: (message: string, error?: unknown, ...args: unknown[]): void => {
@@ -80,7 +80,7 @@ function createLogger(prefix: string): Logger {
                       context,
                       ...logArguments.slice(1),
                   ]
-                : Array.from(logArguments);
+                : [...logArguments];
             log.error(...finalArgs);
         },
         info: (message: string, ...args: unknown[]): void => {
@@ -92,7 +92,7 @@ function createLogger(prefix: string): Logger {
                       context,
                       ...logArguments.slice(1),
                   ]
-                : Array.from(logArguments);
+                : [...logArguments];
             log.info(...finalArgs);
         },
         warn: (message: string, ...args: unknown[]): void => {
@@ -104,18 +104,18 @@ function createLogger(prefix: string): Logger {
                       context,
                       ...logArguments.slice(1),
                   ]
-                : Array.from(logArguments);
+                : [...logArguments];
             log.warn(...finalArgs);
         },
     };
 }
 
 /**
- * Main backend logger for general application operations.
+ * Main backend logger for general app operations.
  *
  * @remarks
  * Uses "BACKEND" prefix to distinguish from specialized loggers. This is the
- * primary logger for general application events, startup/shutdown,
+ * primary logger for general app events, startup/shutdown,
  * configuration changes, and other non-specific operations.
  *
  * @example

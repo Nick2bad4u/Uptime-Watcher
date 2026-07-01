@@ -14,7 +14,8 @@
  * @public
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import type { IpcResponse } from "../../../services/ipc/types";
 
 describe("IPC Standardization Concepts", () => {
@@ -67,7 +68,7 @@ describe("IPC Standardization Concepts", () => {
      */
     function createMockStandardizedHandler<T>(
         handler: (...args: any[]) => Promise<T>,
-        validator?: (params: unknown[]) => string[] | null
+        validator?: (params: unknown[]) => null | string[]
     ) {
         return async (...args: unknown[]): Promise<IpcResponse<T>> => {
             const startTime = performance.now();
@@ -104,7 +105,7 @@ describe("IPC Standardization Concepts", () => {
                 return {
                     success: false,
                     error:
-                        error instanceof Error ? error.message : String(error),
+                        Error.isError(error) ? error.message : String(error),
                     metadata: {
                         handler: "mock-handler",
                         duration: performance.now() - startTime,
@@ -204,7 +205,7 @@ describe("IPC Standardization Concepts", () => {
             const validateString = (
                 value: unknown,
                 paramName: string
-            ): string | null => {
+            ): null | string => {
                 if (typeof value !== "string") {
                     return `${paramName} must be a string`;
                 }
@@ -232,7 +233,7 @@ describe("IPC Standardization Concepts", () => {
             const validateNumber = (
                 value: unknown,
                 paramName: string
-            ): string | null => {
+            ): null | string => {
                 if (typeof value !== "number") {
                     return `${paramName} must be a number`;
                 }
@@ -250,7 +251,7 @@ describe("IPC Standardization Concepts", () => {
             expect(validateNumber("42", "param")).toBe(
                 "param must be a number"
             );
-            expect(validateNumber(Number.NaN, "param")).toBe(
+            expect(validateNumber(NaN, "param")).toBe(
                 "param must be a valid number"
             );
             expect(validateNumber(-1, "param")).toBe(
@@ -270,7 +271,7 @@ describe("IPC Standardization Concepts", () => {
             const validateObject = (
                 value: unknown,
                 paramName: string
-            ): string | null => {
+            ): null | string => {
                 if (typeof value !== "object" || value === null) {
                     return `${paramName} must be an object`;
                 }

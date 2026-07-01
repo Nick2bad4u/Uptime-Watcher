@@ -2,11 +2,9 @@
  * Tests for the in-app alert store implementation.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { test } from "@fast-check/vitest";
-import fc from "fast-check";
 import type { StatusUpdate } from "@shared/types";
-import { STATUS_KIND } from "@shared/types";
+
+import { test } from "@fast-check/vitest";
 import {
     monitorIdArbitrary,
     monitorNameArbitrary,
@@ -15,6 +13,10 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { STATUS_KIND } from "@shared/types";
+import fc from "fast-check";
+import { arrayAt, arrayFirst  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     MAX_ALERT_QUEUE_LENGTH,
@@ -96,7 +98,7 @@ describe(useAlertStore, () => {
 
         expect(alert.id).toBeDefined();
         expect(alert.timestamp).toBeGreaterThan(0);
-        expect(useAlertStore.getState().alerts[0]).toEqual(alert);
+        expect(arrayFirst(useAlertStore.getState().alerts)).toEqual(alert);
     });
 
     it("respects provided identifiers and timestamps", () => {
@@ -148,7 +150,7 @@ describe(useAlertStore, () => {
 
         expect(queuedAlerts).toHaveLength(MAX_ALERT_QUEUE_LENGTH);
         const expectedOldestIndex = overflowCount;
-        expect(queuedAlerts.at(-1)?.monitorId).toBe(
+        expect(arrayAt(queuedAlerts, -1)?.monitorId).toBe(
             `monitor-${expectedOldestIndex}`
         );
     });
@@ -228,7 +230,7 @@ describe(useAlertStore, () => {
                 identifier: "  site-slug   ",
                 monitoring: true,
                 monitors: [],
-                name: "   ",
+                name: ' '.repeat(3),
             },
             siteIdentifier: "   outer-id   ",
         });
@@ -242,10 +244,10 @@ describe(useAlertStore, () => {
     it("derives site name from the event identifier when site name and identifier are blank", () => {
         const update = createStatusUpdate({
             site: {
-                identifier: "   ",
+                identifier: ' '.repeat(3),
                 monitoring: true,
                 monitors: [],
-                name: "   ",
+                name: ' '.repeat(3),
             },
             siteIdentifier: "   event-id   ",
         });
@@ -259,12 +261,12 @@ describe(useAlertStore, () => {
     it("falls back to unknown-site when no site identifiers are available", () => {
         const base = createStatusUpdate({
             site: {
-                identifier: "   ",
+                identifier: ' '.repeat(3),
                 monitoring: true,
                 monitors: [],
-                name: "   ",
+                name: ' '.repeat(3),
             },
-            siteIdentifier: "   ",
+            siteIdentifier: ' '.repeat(3),
         });
 
         const alert = mapStatusUpdateToAlert(base);
@@ -334,7 +336,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
     });
 
     it("uses crypto.getRandomValues when randomUUID is not available", () => {
-        const originalCrypto = globalThis.crypto;
+        const originalCrypto = crypto;
 
         const mockGetRandomValues = vi.fn((buffer: Uint32Array) => {
             // Use deterministic values so the generated ID is predictable
@@ -358,14 +360,14 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/);
+            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
         } finally {
             globalThis.crypto = originalCrypto;
         }
     });
 
     it("falls back to Date.now-based identifiers when crypto is unavailable", () => {
-        const originalCrypto = globalThis.crypto;
+        const originalCrypto = crypto;
         const fixedNow = 1_730_000_000_000;
         const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
 
@@ -380,7 +382,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
                 status: STATUS_KIND.DOWN,
             });
 
-            expect(alert.id).toMatch(/^alert-1730{10}-\d+$/);
+            expect(alert.id).toMatch(/^alert-1730{10}-\d+$/v);
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;

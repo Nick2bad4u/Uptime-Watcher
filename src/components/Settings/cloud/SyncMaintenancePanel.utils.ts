@@ -210,7 +210,7 @@ export function buildDiagnosticsPayload(args: {
         },
         context: {
             provider: args.status?.provider ?? null,
-            ...(providerDetails ? { providerDetails } : {}),
+            ...(providerDetails && { providerDetails }),
             configured: args.status?.configured ?? false,
             connected: args.status?.connected ?? false,
             encryptionLocked: args.encryptionLocked,
@@ -218,9 +218,7 @@ export function buildDiagnosticsPayload(args: {
             lastBackupAt: args.status?.lastBackupAt ?? null,
             lastSyncAt: args.status?.lastSyncAt ?? null,
             syncEnabled: args.syncEnabled,
-            ...(args.status?.lastError
-                ? { lastError: args.status.lastError }
-                : {}),
+            ...(args.status?.lastError && { lastError: args.status.lastError }),
         },
         generatedAtEpochMs: args.generatedAtEpochMs,
         lastResetResult: args.lastResult,

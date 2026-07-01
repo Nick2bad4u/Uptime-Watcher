@@ -2,7 +2,7 @@
  * Shared IPC response envelope helpers.
  *
  * @remarks
- * The application standardizes all request/response style IPC handlers on the
+ * The app standardizes all request/response style IPC handlers on the
  * {@link IpcResponse} envelope. Historically, both preload and renderer code
  * carried their own small helpers for validating/unwrapping that envelope.
  *

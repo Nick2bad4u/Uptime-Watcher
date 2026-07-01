@@ -3,11 +3,11 @@
  * test files
  */
 
-import { beforeAll, afterAll } from "vitest";
-import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
-
+import fc from "fast-check";
 import { EventEmitter } from "node:events";
+import { safeCastTo } from "ts-extras";
+import { afterAll, beforeAll } from "vitest";
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment
@@ -20,7 +20,7 @@ process.setMaxListeners(MAX_LISTENERS);
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
+const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -56,9 +56,7 @@ fc.configureGlobal({
     // examples: [],          // add any concrete inputs you want always tested
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
-    // RNG / reproducibility
-    // seed: undefined,    // set a specific number to reproduce runs
-    // randomType: 'xorshift128plus', // default; change if you need a different generator
+    // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,

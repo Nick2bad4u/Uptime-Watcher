@@ -57,12 +57,12 @@ export const AppToastToast = (props: AppToastToastProperties): JSX.Element => {
 
     useEffect(
         function autoDismissToast(): () => void {
-            const timeout = window.setTimeout(() => {
+            const timeout = globalThis.setTimeout(() => {
                 onDismiss(toast.id);
             }, toast.ttlMs);
 
             return function cleanupAutoDismiss(): void {
-                window.clearTimeout(timeout);
+                globalThis.clearTimeout(timeout);
             };
         },
         [

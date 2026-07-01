@@ -3,23 +3,24 @@
  *   site state across store boundaries
  */
 
-import { renderHook } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-
-import { useSelectedSite } from "../../hooks/useSelectedSite";
 import type { Site } from "@shared/types";
 
+import { renderHook } from "@testing-library/react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useSelectedSite } from "../../hooks/useSelectedSite";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { useUIStore } from "../../stores/ui/useUiStore";
+
 // Mock the store hooks
-vi.mock("../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../stores/ui/useUiStore'), () => ({
     useUIStore: vi.fn(),
 }));
 
-vi.mock("../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn(),
 }));
-
-import { useUIStore } from "../../stores/ui/useUiStore";
-import { useSitesStore } from "../../stores/sites/useSitesStore";
 
 describe(useSelectedSite, () => {
     const mockUseUIStore = useUIStore as any;
@@ -196,7 +197,7 @@ describe(useSelectedSite, () => {
 
             const { result } = renderHook(() => useSelectedSite());
 
-            expect(result.current).toEqual(mockSites[0]);
+            expect(result.current).toEqual(arrayFirst(mockSites));
         });
 
         it("should handle selecting the last site", async ({
@@ -225,13 +226,13 @@ describe(useSelectedSite, () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            const singleSite = [mockSites[0]];
+            const singleSite = [arrayFirst(mockSites)];
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(singleSite);
 
             const { result } = renderHook(() => useSelectedSite());
 
-            expect(result.current).toEqual(singleSite[0]);
+            expect(result.current).toEqual(arrayFirst(singleSite));
         });
 
         it("should return undefined with empty sites array", async ({

@@ -92,7 +92,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
         if (status === 429) {
             return {
                 status,
-                ...(isDefined(retryAfterMs) ? { retryAfterMs } : {}),
+                ...(isDefined(retryAfterMs) && { retryAfterMs }),
             };
         }
 
@@ -104,7 +104,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
         ) {
             return {
                 status,
-                ...(isDefined(retryAfterMs) ? { retryAfterMs } : {}),
+                ...(isDefined(retryAfterMs) && { retryAfterMs }),
             };
         }
 
@@ -113,7 +113,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
 
     if (!axios.isAxiosError(error)) {
         // node-fetch / undici-style network errors.
-        if (error instanceof Error) {
+        if (Error.isError(error)) {
             if (
                 typeof error.name === "string" &&
                 error.name.toLowerCase().includes("fetch")
@@ -149,7 +149,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
     ) {
         return {
             status,
-            ...(isDefined(retryAfterMs) ? { retryAfterMs } : {}),
+            ...(isDefined(retryAfterMs) && { retryAfterMs }),
         };
     }
 

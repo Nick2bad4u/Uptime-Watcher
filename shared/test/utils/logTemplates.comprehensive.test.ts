@@ -4,9 +4,9 @@ import {
     DEBUG_LOGS,
     ERROR_LOGS,
     LOG_TEMPLATES,
+    type LogTemplatesInterface,
     SERVICE_LOGS,
     WARNING_LOGS,
-    type LogTemplatesInterface,
 } from "../../utils/logTemplates";
 
 describe("Log Templates", () => {
@@ -387,11 +387,11 @@ describe("Log Templates", () => {
 
             for (const key of allKeys) {
                 // Should be uppercase with underscores
-                expect(key).toMatch(/^[A-Z][\dA-Z_]*$/);
+                expect(key).toMatch(/^[A-Z][\dA-Z_]*$/v);
 
                 // Should not start or end with underscore
-                expect(key).not.toMatch(/^_/);
-                expect(key).not.toMatch(/_$/);
+                expect(key).not.toMatch(/^_/v);
+                expect(key).not.toMatch(/_$/v);
             }
         });
 

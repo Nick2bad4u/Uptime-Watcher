@@ -1,13 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import the component after mocks
+import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 import {
-    createMockSite,
     createMockMonitor,
+    createMockSite,
 } from "../../../utils/mockFactories";
 
 // Mock theme components
-vi.mock("../../../../theme/components", async (importOriginal) => {
-    const actual = (await importOriginal()) as any;
+vi.mock(import('../../../../theme/components'), async (importOriginal) => {
+    const actual = (await importOriginal());
     return {
         ...actual,
         ThemedBox: ({ children, ...props }: any) => (
@@ -24,7 +28,7 @@ vi.mock("../../../../theme/components", async (importOriginal) => {
 });
 
 // Mock the SiteCard components
-vi.mock("../SiteCardHeader", () => ({
+vi.mock(import('../SiteCardHeader'), () => ({
     SiteCardHeader: () => (
         <div data-testid="site-card-header">
             Site Header <div data-testid="site-card-footer">Site Footer</div>
@@ -32,24 +36,24 @@ vi.mock("../SiteCardHeader", () => ({
     ),
 }));
 
-vi.mock("../SiteCardStatus", () => ({
+vi.mock(import('../SiteCardStatus'), () => ({
     SiteCardStatus: () => <div data-testid="site-card-status">Site Status</div>,
 }));
 
-vi.mock("../SiteCardHistory", () => ({
+vi.mock(import('../SiteCardHistory'), () => ({
     SiteCardHistory: () => (
         <div data-testid="site-card-history">Site History</div>
     ),
 }));
 
-vi.mock("../SiteCardMetrics", () => ({
+vi.mock(import('../SiteCardMetrics'), () => ({
     SiteCardMetrics: () => (
         <div data-testid="site-card-metrics-content">Site Metrics</div>
     ),
 }));
 
 // Mock the hooks
-vi.mock("../../../../hooks/site/useSite", () => ({
+vi.mock(import('../../../../hooks/site/useSite'), () => ({
     useSite: vi.fn(() => {
         const mockSite = createMockSite({
             identifier: "test-site-1",
@@ -110,9 +114,6 @@ vi.mock("../../../../hooks/site/useSite", () => ({
         };
     }),
 }));
-
-// Import the component after mocks
-import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 
 describe("SiteCard Component", () => {
     const mockSite = createMockSite({
@@ -197,7 +198,7 @@ describe("SiteCard Component", () => {
         const siteWithMultipleMonitors = createMockSite({
             ...mockSite,
             monitors: [
-                mockSite.monitors![0]!,
+                arrayFirst(mockSite.monitors)!,
                 createMockMonitor({
                     id: "monitor-2",
                     type: "http" as const,

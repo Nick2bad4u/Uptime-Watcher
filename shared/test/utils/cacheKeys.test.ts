@@ -6,16 +6,16 @@
  * patterns.
  */
 
+// Import all exports for function coverage validation
+import * as cacheKeysModule from "@shared/utils/cacheKeys";
 import { describe, expect, it } from "vitest";
+
 import {
     CacheKeys,
     isStandardizedCacheKey,
     parseCacheKey,
     type StandardizedCacheKey,
 } from "../../utils/cacheKeys.js";
-
-// Import all exports for function coverage validation
-import * as cacheKeysModule from "@shared/utils/cacheKeys";
 
 describe("cacheKeys", () => {
     describe("Function Coverage Validation", () => {
@@ -716,7 +716,7 @@ describe("cacheKeys", () => {
             await annotate("Type: Caching", "type");
 
             const result1 = parseCacheKey(
-                "config:history-limit" as StandardizedCacheKey
+                "config:history-limit"
             );
             expect(result1).toEqual({
                 prefix: "config",
@@ -724,7 +724,7 @@ describe("cacheKeys", () => {
             });
 
             const result2 = parseCacheKey(
-                "site:site-123" as StandardizedCacheKey
+                "site:site-123"
             );
             expect(result2).toEqual({
                 prefix: "site",
@@ -732,7 +732,7 @@ describe("cacheKeys", () => {
             });
 
             const result3 = parseCacheKey(
-                "monitor:monitor-456" as StandardizedCacheKey
+                "monitor:monitor-456"
             );
             expect(result3).toEqual({
                 prefix: "monitor",
@@ -750,7 +750,7 @@ describe("cacheKeys", () => {
             await annotate("Type: Caching", "type");
 
             const result1 = parseCacheKey(
-                "config:validation:monitor-config" as StandardizedCacheKey
+                "config:validation:monitor-config"
             );
             expect(result1).toEqual({
                 prefix: "config",
@@ -759,7 +759,7 @@ describe("cacheKeys", () => {
             });
 
             const result2 = parseCacheKey(
-                "monitor:site:site-456" as StandardizedCacheKey
+                "monitor:site:site-456"
             );
             expect(result2).toEqual({
                 prefix: "monitor",
@@ -768,7 +768,7 @@ describe("cacheKeys", () => {
             });
 
             const result3 = parseCacheKey(
-                "validation:monitor-type:http" as StandardizedCacheKey
+                "validation:monitor-type:http"
             );
             expect(result3).toEqual({
                 prefix: "validation",
@@ -787,11 +787,11 @@ describe("cacheKeys", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(() =>
-                parseCacheKey("config:" as StandardizedCacheKey)
+                parseCacheKey("config:")
             ).toThrow("Invalid cache key format: config:");
 
             expect(() =>
-                parseCacheKey("monitor:operation:" as StandardizedCacheKey)
+                parseCacheKey("monitor:operation:")
             ).toThrow("Invalid cache key format: monitor:operation:");
         });
 
@@ -805,7 +805,7 @@ describe("cacheKeys", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                parseCacheKey(":identifier" as StandardizedCacheKey)
+                parseCacheKey(":identifier")
             ).toThrow("Invalid cache key format: :identifier");
             // Note: 'prefix:' with empty identifier is now valid
         });
@@ -820,13 +820,13 @@ describe("cacheKeys", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                parseCacheKey(":operation:identifier" as StandardizedCacheKey)
+                parseCacheKey(":operation:identifier")
             ).toThrow("Invalid cache key format: :operation:identifier");
             expect(() =>
-                parseCacheKey("prefix::identifier" as StandardizedCacheKey)
+                parseCacheKey("prefix::identifier")
             ).toThrow("Invalid cache key format: prefix::identifier");
             expect(() =>
-                parseCacheKey("prefix:operation:" as StandardizedCacheKey)
+                parseCacheKey("prefix:operation:")
             ).toThrow("Invalid cache key format: prefix:operation:");
         });
 
@@ -837,7 +837,7 @@ describe("cacheKeys", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = parseCacheKey(
-                "site:loading:complex-site-123_with_underscores-and-dashes" as StandardizedCacheKey
+                "site:loading:complex-site-123_with_underscores-and-dashes"
             );
             expect(result).toEqual({
                 prefix: "site",
@@ -860,7 +860,7 @@ describe("cacheKeys", () => {
             // Test round-trip: generate -> parse
             const configKey = CacheKeys.config.byName("test-config");
             const parsedConfig = parseCacheKey(
-                configKey as StandardizedCacheKey
+                configKey
             );
             expect(parsedConfig).toEqual({
                 prefix: "config",
@@ -869,7 +869,7 @@ describe("cacheKeys", () => {
 
             const monitorKey = CacheKeys.monitor.bySite("test-site");
             const parsedMonitor = parseCacheKey(
-                monitorKey as StandardizedCacheKey
+                monitorKey
             );
             expect(parsedMonitor).toEqual({
                 prefix: "monitor",
@@ -935,7 +935,7 @@ describe("cacheKeys", () => {
             expect(unicodeKey).toBe("config:测试-config-🔧");
             expect(isStandardizedCacheKey(unicodeKey)).toBeTruthy();
 
-            const parsed = parseCacheKey(unicodeKey as StandardizedCacheKey);
+            const parsed = parseCacheKey(unicodeKey);
             expect(parsed.identifier).toBe("测试-config-🔧");
         });
     });

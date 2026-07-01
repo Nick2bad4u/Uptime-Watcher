@@ -109,8 +109,8 @@ export class SslMonitor implements IMonitorService {
                     initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                     maxRetries: totalAttempts,
                     operationName: `SSL check for ${host}:${port}`,
-                    ...(signal ? { signal } : {}),
-                    ...(onRetryHandler ? { onRetry: onRetryHandler } : {}),
+                    ...(signal && { signal }),
+                    ...(onRetryHandler && { onRetry: onRetryHandler }),
                 }
             );
         } catch (error) {
@@ -166,7 +166,7 @@ export class SslMonitor implements IMonitorService {
                 servername: host,
             });
 
-            let completed = false;
+            let isCompleted = false;
 
             const cleanup = (listener?: () => void): void => {
                 socket.removeAllListeners("secureConnect");
@@ -184,10 +184,10 @@ export class SslMonitor implements IMonitorService {
                 action: () => void,
                 listener?: () => void
             ): void => {
-                if (completed) {
+                if (isCompleted) {
                     return;
                 }
-                completed = true;
+                isCompleted = true;
                 cleanup(listener);
                 action();
             };
@@ -217,8 +217,8 @@ export class SslMonitor implements IMonitorService {
             const onSecureConnect = (): void => {
                 if (!socket.authorized) {
                     const { authorizationError } = socket;
-                    let details: string | undefined = undefined;
-                    if (authorizationError instanceof Error) {
+                    let details: string | undefined;
+                    if (Error.isError(authorizationError)) {
                         details = authorizationError.message;
                     } else if (typeof authorizationError === "string") {
                         details = authorizationError;
@@ -229,7 +229,7 @@ export class SslMonitor implements IMonitorService {
                         : "TLS authorization failed";
 
                     const error =
-                        authorizationError instanceof Error
+                        Error.isError(authorizationError)
                             ? new Error(errorMessage, {
                                   cause: authorizationError,
                               })
@@ -356,9 +356,9 @@ export class SslMonitor implements IMonitorService {
         }
 
         const candidates: unknown[] = [
-            subject["CN"],
-            subject["O"],
-            subject["OU"],
+            subject.CN,
+            subject.O,
+            subject.OU,
         ];
         const name = candidates.find(
             (value): value is string =>

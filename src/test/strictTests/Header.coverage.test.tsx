@@ -5,7 +5,13 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { Header } from "../../components/Header/Header";
+import { HeaderControls } from "../../components/Header/HeaderControls";
+import { HealthIndicator } from "../../components/Header/HealthIndicator";
+import { StatusSummary } from "../../components/Header/StatusSummary";
 
 const tooltipModuleMock = vi.hoisted(() => ({
     Tooltip: ({
@@ -22,7 +28,7 @@ const tooltipModuleMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../components/common/Tooltip/Tooltip", () => tooltipModuleMock);
+vi.mock(import('../../components/common/Tooltip/Tooltip'), () => tooltipModuleMock);
 
 const themedTextModuleMock = vi.hoisted(() => ({
     ThemedText: ({
@@ -45,7 +51,7 @@ const themedTextModuleMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => themedTextModuleMock);
+vi.mock(import('../../theme/components/ThemedText'), () => themedTextModuleMock);
 
 const themedBoxModuleMock = vi.hoisted(() => ({
     ThemedBox: ({
@@ -70,7 +76,7 @@ const themedBoxModuleMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedBox", () => themedBoxModuleMock);
+vi.mock(import('../../theme/components/ThemedBox'), () => themedBoxModuleMock);
 
 const statusIndicatorRenderSpy = vi.hoisted(() => ({
     render: vi.fn(({ status }: { status: string }) => (
@@ -78,7 +84,7 @@ const statusIndicatorRenderSpy = vi.hoisted(() => ({
     )),
 }));
 
-vi.mock("../../theme/components/StatusIndicator", () => ({
+vi.mock(import('../../theme/components/StatusIndicator'), () => ({
     StatusIndicator: statusIndicatorRenderSpy.render,
 }));
 
@@ -88,17 +94,17 @@ const statusSubscriptionIndicatorSpy = vi.hoisted(() => ({
     )),
 }));
 
-vi.mock("../../components/Header/StatusSubscriptionIndicator", () => ({
+vi.mock(import('../../components/Header/StatusSubscriptionIndicator'), () => ({
     StatusSubscriptionIndicator: statusSubscriptionIndicatorSpy.component,
 }));
 
 const uiStoreState = vi.hoisted(() => ({
-    layout: "table" as "table" | "card-large",
+    layout: safeCastTo<"card-large" | "table">("table"),
     setShowAddSiteModal: vi.fn(),
     setShowSettings: vi.fn(),
 }));
 
-vi.mock("../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../stores/ui/useUiStore'), () => ({
     useUIStore: (selector?: unknown) => {
         const state = {
             setShowAddSiteModal: uiStoreState.setShowAddSiteModal,
@@ -117,9 +123,9 @@ const themeState = vi.hoisted(() => ({
     toggleTheme: vi.fn(),
 }));
 
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        (await importOriginal());
     return {
         ...actual,
         useTheme: () => ({
@@ -150,7 +156,7 @@ const metricsState = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../../hooks/useGlobalMonitoringMetrics", () => ({
+vi.mock(import('../../hooks/useGlobalMonitoringMetrics'), () => ({
     useGlobalMonitoringMetrics: () => metricsState.metrics,
 }));
 
@@ -168,11 +174,6 @@ interface ThemedBoxProperties extends HTMLAttributes<HTMLDivElement> {
     readonly shadow?: string;
     readonly surface?: string;
 }
-
-import { HealthIndicator } from "../../components/Header/HealthIndicator";
-import { StatusSummary } from "../../components/Header/StatusSummary";
-import { HeaderControls } from "../../components/Header/HeaderControls";
-import { Header } from "../../components/Header/Header";
 
 beforeEach(() => {
     uiStoreState.layout = "table";
@@ -270,7 +271,7 @@ describe(StatusSummary, () => {
         );
 
         expect(
-            screen.getAllByTestId("mock-tooltip-content")[0]
+            arrayFirst(screen.getAllByTestId("mock-tooltip-content"))
         ).toHaveTextContent("1 monitor");
     });
 });
@@ -341,7 +342,7 @@ describe("Header component", () => {
 
         expect(uiStoreState.setShowAddSiteModal).toHaveBeenCalledWith(true);
         expect(uiStoreState.setShowSettings).toHaveBeenCalledWith(true);
-        expect(statusSubscriptionIndicatorSpy.component).toHaveBeenCalled();
+        expect(statusSubscriptionIndicatorSpy.component).toHaveBeenCalledWith();
     });
 
     it("suppresses summary when layout is card-large", () => {

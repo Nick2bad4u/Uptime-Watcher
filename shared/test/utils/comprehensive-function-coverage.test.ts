@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 describe("Shared Module - 100% Function Coverage", () => {
     describe("chartConfig functions", () => {
         it("should ensure all chartConfig functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -39,8 +39,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("environment functions", () => {
         it("should ensure all environment functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -73,8 +73,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("validation functions", () => {
         it("should ensure all validation functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -106,8 +106,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("themeConfig functions", () => {
         it("should ensure all themeConfig functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -122,12 +122,12 @@ describe("Shared Module - 100% Function Coverage", () => {
 
             // Call type guard functions
             const validColorPalette = {
+                error: "#ff0000",
+                info: "#0066cc",
                 primary: "#000000",
                 secondary: "#ffffff",
-                error: "#ff0000",
-                warning: "#ffcc00",
-                info: "#0066cc",
                 success: "#00cc66",
+                warning: "#ffcc00",
             };
 
             expect(
@@ -166,19 +166,19 @@ describe("Shared Module - 100% Function Coverage", () => {
                 animation: {
                     duration: { fast: "150ms", normal: "300ms", slow: "500ms" },
                     easing: {
-                        linear: "linear",
                         easeIn: "ease-in",
-                        easeOut: "ease-out",
                         easeInOut: "ease-in-out",
+                        easeOut: "ease-out",
+                        linear: "linear",
                     },
                 },
                 borderRadius: {
+                    full: "9999px",
+                    lg: "12px",
+                    md: "8px",
                     none: "0px",
                     sm: "4px",
-                    md: "8px",
-                    lg: "12px",
                     xl: "16px",
-                    full: "9999px",
                 },
                 colors: validThemeColors,
                 components: {
@@ -200,39 +200,39 @@ describe("Shared Module - 100% Function Coverage", () => {
                     },
                 },
                 shadows: {
+                    md: "0 2px 4px rgba(0,0,0,0.1)",
                     none: "none",
                     sm: "0 1px 2px rgba(0,0,0,0.1)",
-                    md: "0 2px 4px rgba(0,0,0,0.1)",
                 },
                 spacing: {
-                    none: "0px",
-                    xs: "4px",
-                    sm: "8px",
-                    md: "16px",
                     lg: "24px",
+                    md: "16px",
+                    none: "0px",
+                    sm: "8px",
                     xl: "32px",
+                    xs: "4px",
                 },
                 typography: {
                     fontFamily: {
+                        monospace: "Monaco, monospace",
                         primary: "Arial, sans-serif",
                         secondary: "Georgia, serif",
-                        monospace: "Monaco, monospace",
                     },
                     fontSize: {
-                        xs: "12px",
-                        sm: "14px",
-                        md: "16px",
                         lg: "18px",
+                        md: "16px",
+                        sm: "14px",
                         xl: "20px",
+                        xs: "12px",
                     },
                     fontWeight: {
-                        light: 300,
-                        normal: 400,
-                        medium: 500,
-                        semibold: 600,
                         bold: 700,
+                        light: 300,
+                        medium: 500,
+                        normal: 400,
+                        semibold: 600,
                     },
-                    lineHeight: { tight: 1.25, normal: 1.5, relaxed: 1.75 },
+                    lineHeight: { normal: 1.5, relaxed: 1.75, tight: 1.25 },
                 },
             };
 
@@ -245,8 +245,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("objectSafety functions", () => {
         it("should ensure all objectSafety functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -300,8 +300,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("safeConversions functions", () => {
         it("should ensure all safeConversions functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -345,8 +345,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("typeGuards functions", () => {
         it("should ensure all typeGuards functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -390,8 +390,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("typeHelpers functions", () => {
         it("should ensure all typeHelpers functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -426,8 +426,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("stringConversion functions", () => {
         it("should ensure all stringConversion functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -450,8 +450,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("siteStatus functions", () => {
         it("should ensure all siteStatus functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -466,9 +466,9 @@ describe("Shared Module - 100% Function Coverage", () => {
             // Create mock site data
             const mockSite = {
                 identifier: "test",
-                name: "Test Site",
                 monitoring: true,
                 monitors: [],
+                name: "Test Site",
             };
 
             // Call all exported functions that may not be covered
@@ -492,8 +492,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("jsonSafety functions", () => {
         it("should ensure all jsonSafety functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -541,8 +541,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("errorCatalog functions", () => {
         it("should ensure all errorCatalog functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -583,8 +583,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("errorHandling functions", () => {
         it("should ensure all errorHandling functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -599,9 +599,9 @@ describe("Shared Module - 100% Function Coverage", () => {
 
             // Create mock store for testing
             const mockStore = {
-                setLoading: () => {},
                 clearError: () => {},
                 setError: () => {},
+                setLoading: () => {},
             };
 
             // Test withErrorHandling function
@@ -615,8 +615,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("logTemplates constants", () => {
         it("should ensure all logTemplates are accessed", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -644,8 +644,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("cacheKeys functions", () => {
         it("should ensure all cacheKeys functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -693,17 +693,17 @@ describe("Shared Module - 100% Function Coverage", () => {
                 cacheKeysModule.isStandardizedCacheKey("config:test")
             ).toBeTruthy();
             expect(cacheKeysModule.parseCacheKey("config:test")).toEqual({
-                prefix: "config",
                 identifier: "test",
                 operation: undefined,
+                prefix: "config",
             });
         });
     });
 
     describe("validation utility functions", () => {
         it("should ensure all validation utility functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -742,8 +742,8 @@ describe("Shared Module - 100% Function Coverage", () => {
 
     describe("validation schemas functions", () => {
         it("should ensure all validation schemas functions are covered", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -770,16 +770,16 @@ describe("Shared Module - 100% Function Coverage", () => {
 
             // Test validation functions
             const httpMonitor = {
+                checkInterval: 30_000,
+                history: [],
                 id: "test",
+                monitoring: true,
+                responseTime: 200,
+                retryAttempts: 3,
+                status: "up" as const,
+                timeout: 5000,
                 type: "http" as const,
                 url: "https://example.com",
-                status: "up" as const,
-                checkInterval: 30_000,
-                retryAttempts: 3,
-                timeout: 5000,
-                responseTime: 200,
-                history: [],
-                monitoring: true,
             };
 
             const result = schemasModule.validateMonitorData(
@@ -797,9 +797,9 @@ describe("Shared Module - 100% Function Coverage", () => {
 
             const siteData = {
                 identifier: "test-site",
-                name: "Test Site",
                 monitoring: true,
                 monitors: [httpMonitor],
+                name: "Test Site",
             };
 
             const siteResult = schemasModule.validateSiteData(siteData);

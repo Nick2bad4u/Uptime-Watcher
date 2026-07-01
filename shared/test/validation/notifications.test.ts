@@ -2,12 +2,11 @@
  * Tests for shared notification preference schemas.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     parseNotificationPreferenceUpdate,
     validateNotificationPreferenceUpdate,
 } from "@shared/validation/notifications";
+import { describe, expect, it } from "vitest";
 
 describe("notification preference validation", () => {
     it("accepts a valid update payload", () => {

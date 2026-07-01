@@ -172,7 +172,7 @@ export function createHttpMonitorService<
                 context: validation.context,
                 maxRetries: retryAttempts,
                 monitor: typedMonitor,
-                ...(signal ? { signal } : {}),
+                ...(signal && { signal }),
                 timeout,
                 url,
             } satisfies {
@@ -221,7 +221,7 @@ export function createHttpMonitorService<
                 const singleCheckParams = {
                     context,
                     monitor,
-                    ...(signal ? { signal } : {}),
+                    ...(signal && { signal }),
                     timeout,
                     url,
                 } satisfies {
@@ -242,7 +242,7 @@ export function createHttpMonitorService<
                         initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
                         maxRetries: totalAttempts,
                         operationName,
-                        ...(signal ? { signal } : {}),
+                        ...(signal && { signal }),
                         ...(isDev() && {
                             onRetry: (attempt: number, error: Error): void => {
                                 const errorMessage =
@@ -318,7 +318,7 @@ export function createHttpMonitorService<
                 Reflect.get(monitor, "followRedirects") !== false;
 
             const response = await this.axiosInstance.get(url, {
-                ...(signal ? { signal } : {}),
+                ...(signal && { signal }),
                 responseType: "stream",
                 timeout,
                 ...(!shouldFollowRedirects && { maxRedirects: 0 }),

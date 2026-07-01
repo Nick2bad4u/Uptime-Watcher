@@ -3,8 +3,11 @@
  *   styles with SSR support and theme change reactivity
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { act, renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 
@@ -57,7 +60,7 @@ describe("useThemeStyles Hook", () => {
     describe("Light Mode Styles", () => {
         beforeEach(() => {
             mockMediaQuery = createMockMediaQuery(false);
-            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (matchMedia as any).mockReturnValue(mockMediaQuery);
         });
 
         it("should return light mode styles when collapsed=false", async ({
@@ -154,7 +157,7 @@ describe("useThemeStyles Hook", () => {
     describe("Dark Mode Styles", () => {
         beforeEach(() => {
             mockMediaQuery = createMockMediaQuery(true);
-            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (matchMedia as any).mockReturnValue(mockMediaQuery);
         });
 
         it("should return dark mode styles when collapsed=false", async ({
@@ -258,7 +261,7 @@ describe("useThemeStyles Hook", () => {
 
             // Start with light mode
             mockMediaQuery = createMockMediaQuery(false);
-            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (matchMedia as any).mockReturnValue(mockMediaQuery);
 
             const { result } = renderHook(() => useThemeStyles());
 
@@ -267,15 +270,15 @@ describe("useThemeStyles Hook", () => {
 
             // Simulate theme change to dark mode
             Reflect.set(
-                mockMediaQuery as unknown as Record<string, unknown>,
+                mockMediaQuery as unknown as UnknownRecord,
                 "matches",
                 true
             );
-            const listener = (
+            const listener = arrayFirst((
                 mockMediaQuery.addEventListener as unknown as ReturnType<
                     typeof vi.fn
                 >
-            ).mock.calls[0]?.[1];
+            ).mock.calls)?.[1];
 
             act(() => {
                 if (listener) {
@@ -298,7 +301,7 @@ describe("useThemeStyles Hook", () => {
 
             // Start with dark mode
             mockMediaQuery = createMockMediaQuery(true);
-            (globalThis.matchMedia as any).mockReturnValue(mockMediaQuery);
+            (matchMedia as any).mockReturnValue(mockMediaQuery);
 
             const { result } = renderHook(() => useThemeStyles());
 
@@ -307,15 +310,15 @@ describe("useThemeStyles Hook", () => {
 
             // Simulate theme change to light mode
             Reflect.set(
-                mockMediaQuery as unknown as Record<string, unknown>,
+                mockMediaQuery as unknown as UnknownRecord,
                 "matches",
                 false
             );
-            const listener = (
+            const listener = arrayFirst((
                 mockMediaQuery.addEventListener as unknown as ReturnType<
                     typeof vi.fn
                 >
-            ).mock.calls[0]?.[1];
+            ).mock.calls)?.[1];
 
             act(() => {
                 if (listener) {
@@ -488,26 +491,25 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles());
 
-            // Check that transition properties are consistent
-            // This test validates the theme animation timing
+            // Check that transition properties are consistent This test validates the theme animation timing
 
             expect(result.current.collapseButtonStyle.transition).toMatch(
-                /all.*0\.3s cubic-bezier/
+                /all.*0\.3s cubic-bezier/v
             );
             expect(result.current.contentStyle.transition).toMatch(
-                /padding.*0\.3s cubic-bezier/
+                /padding.*0\.3s cubic-bezier/v
             );
             expect(result.current.headerStyle.transition).toMatch(
-                /all.*0\.3s cubic-bezier/
+                /all.*0\.3s cubic-bezier/v
             );
             expect(result.current.overlayStyle.transition).toMatch(
-                /background.*0\.3s cubic-bezier/
+                /background.*0\.3s cubic-bezier/v
             );
             expect(result.current.titleStyle.transition).toMatch(
-                /all.*0\.3s cubic-bezier/
+                /all.*0\.3s cubic-bezier/v
             );
             expect(result.current.urlStyle.transition).toMatch(
-                /color.*0\.3s cubic-bezier/
+                /color.*0\.3s cubic-bezier/v
             );
         });
 

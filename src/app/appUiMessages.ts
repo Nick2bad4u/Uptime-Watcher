@@ -1,5 +1,5 @@
 /**
- * UI message constants for the root application shell.
+ * UI message constants for the root app shell.
  *
  * @remarks
  * Centralizing strings here keeps `App.tsx` focused on orchestration and makes

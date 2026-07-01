@@ -235,7 +235,7 @@ describe("Monitoring Service Constants", () => {
                     `Constant ${name} should be a finite number`
                 ).toBeTruthy();
                 expect(value, `Constant ${name} should not be NaN`).not.toBe(
-                    Number.NaN
+                    NaN
                 );
             }
         });

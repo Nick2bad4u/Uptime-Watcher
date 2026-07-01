@@ -242,14 +242,14 @@ export const AnalyticsTab = ({
     );
 
     const handleAdvancedMetricsToggle = useCallback(() => {
-        const previousValue = showAdvancedMetrics;
-        const newValue = !showAdvancedMetrics;
+        const isPreviousValue = showAdvancedMetrics;
+        const isNewValue = !showAdvancedMetrics;
         logger.user.action("Advanced metrics toggle", {
             monitorType,
-            newValue,
-            previousValue,
+            newValue: isNewValue,
+            previousValue: isPreviousValue,
         });
-        setShowAdvancedMetrics(newValue);
+        setShowAdvancedMetrics(isNewValue);
     }, [
         monitorType,
         setShowAdvancedMetrics,

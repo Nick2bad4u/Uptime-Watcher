@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -223,8 +223,7 @@ describe("Validator Composition Utilities", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Old approach would have had many nested conditions
-            // New approach uses composition of simple validators
+            // Old approach would have had many nested conditions New approach uses composition of simple validators
 
             const countValidator = createParameterCountValidator(2);
             const stringValidator1 = createMockStringValidator("param1");

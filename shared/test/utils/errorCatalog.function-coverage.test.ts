@@ -6,17 +6,18 @@
  */
 
 import { describe, expect, test } from "vitest";
+
 import {
-    formatErrorMessage,
-    isKnownErrorMessage,
-    ERROR_CATALOG,
-    SITE_ERRORS,
-    MONITOR_ERRORS,
-    VALIDATION_ERRORS,
-    SYSTEM_ERRORS,
-    NETWORK_ERRORS,
     DATABASE_ERRORS,
+    ERROR_CATALOG,
+    formatErrorMessage,
     IPC_ERRORS,
+    isKnownErrorMessage,
+    MONITOR_ERRORS,
+    NETWORK_ERRORS,
+    SITE_ERRORS,
+    SYSTEM_ERRORS,
+    VALIDATION_ERRORS,
 } from "../../utils/errorCatalog.js";
 
 describe("ErrorCatalog Function Coverage Tests", () => {
@@ -196,7 +197,7 @@ describe("ErrorCatalog Function Coverage Tests", () => {
 
         test("should return false for empty or whitespace strings", () => {
             expect(isKnownErrorMessage("")).toBeFalsy();
-            expect(isKnownErrorMessage("   ")).toBeFalsy();
+            expect(isKnownErrorMessage(' '.repeat(3))).toBeFalsy();
             expect(isKnownErrorMessage("\n\t")).toBeFalsy();
         });
     });

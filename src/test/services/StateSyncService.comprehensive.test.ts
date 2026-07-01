@@ -3,9 +3,9 @@
  */
 
 import { fc, test as fcTest } from "@fast-check/vitest";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { StateSyncService } from "../../services/StateSyncService";
 
@@ -39,17 +39,17 @@ const mockElectronAPI = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
 vi.mock(
-    "../../services/utils/createIpcServiceHelpers",
+    import('../../services/utils/createIpcServiceHelpers'),
     async (importOriginal) => {
         const actual =
             await importOriginal<
@@ -141,7 +141,7 @@ describe("StateSyncService", () => {
         });
 
         expect(callback).toHaveBeenCalledTimes(1);
-        expect(callback.mock.calls[0]?.[0]).toMatchObject({
+        expect(arrayFirst(callback.mock.calls)?.[0]).toMatchObject({
             action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
             revision: fullSyncPayload.revision,
@@ -244,7 +244,7 @@ describe("StateSyncService", () => {
         });
 
         expect(callback).toHaveBeenCalledTimes(1);
-        expect(callback.mock.calls[0]?.[0]).toMatchObject({
+        expect(arrayFirst(callback.mock.calls)?.[0]).toMatchObject({
             action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
             source: fullSyncPayload.source,
@@ -278,7 +278,7 @@ describe("StateSyncService", () => {
 
         mockElectronAPI.stateSync.requestFullSync.mockReturnValue(
             new Promise((resolve) => {
-                resolveFullSync = () => resolve(fullSyncPayload);
+                resolveFullSync = () => { resolve(fullSyncPayload); };
             })
         );
 
@@ -393,7 +393,7 @@ describe("StateSyncService", () => {
         let resolveFullSync: (() => void) | undefined;
         mockElectronAPI.stateSync.requestFullSync.mockReturnValueOnce(
             new Promise((resolve) => {
-                resolveFullSync = () => resolve(fullSyncPayload);
+                resolveFullSync = () => { resolve(fullSyncPayload); };
             })
         );
 
@@ -506,7 +506,7 @@ describe("StateSyncService", () => {
             const initialErrorCount = mockLogger.error.mock.calls.length;
             const cleanup = await StateSyncService.onStateSyncEvent(callback);
 
-            expect(() => cleanup()).not.toThrow();
+            expect(() => { cleanup(); }).not.toThrow();
 
             const cleanupErrorCall =
                 mockLogger.error.mock.calls[initialErrorCount];

@@ -491,7 +491,7 @@ export const createSiteSyncActions = (
             // subscription setup is still pending. If a new subscriber attaches
             // before setup completes, we must not auto-cleanup on completion.
             syncEventSubscription.shouldCleanupOnReady = false;
-            let released = false;
+            let isReleased = false;
 
             const shouldAttachSubscription =
                 !isDefined(syncEventSubscription.cleanup) &&
@@ -506,9 +506,7 @@ export const createSiteSyncActions = (
                         warn: logger.warn,
                     },
                     logStoreAction,
-                    ...(deps.onSiteDelta
-                        ? { onSiteDelta: deps.onSiteDelta }
-                        : {}),
+                    ...(deps.onSiteDelta && { onSiteDelta: deps.onSiteDelta }),
                     setSites: deps.setSites,
                 });
 
@@ -567,11 +565,11 @@ export const createSiteSyncActions = (
             }
 
             return (): void => {
-                if (released) {
+                if (isReleased) {
                     return;
                 }
 
-                released = true;
+                isReleased = true;
                 syncEventSubscription.refCount = Math.max(
                     0,
                     syncEventSubscription.refCount - 1
@@ -653,9 +651,7 @@ export const createSiteSyncActions = (
                             source,
                             status: synchronized ? "success" : "failure",
                             success: synchronized,
-                            ...(synchronized
-                                ? {}
-                                : {
+                            ...(!synchronized && {
                                       failureReason: "backend-not-synchronized",
                                   }),
                         } satisfies SitesTelemetryPayload;

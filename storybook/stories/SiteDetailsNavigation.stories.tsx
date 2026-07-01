@@ -56,12 +56,12 @@ const createNavigationSite = (): NavigationScenario => {
 
     const site = createMockSite({
         identifier: "storybook-site-navigation",
+        monitoring: true,
         monitors: [
             httpMonitor,
             portMonitor,
             heartbeatMonitor,
         ],
-        monitoring: true,
         name: "Navigation Coverage Site",
     });
 
@@ -182,8 +182,8 @@ const noMonitorScenario = {
     primaryMonitorId: "",
     site: createMockSite({
         identifier: "storybook-site-navigation-empty",
-        monitors: [],
         monitoring: false,
+        monitors: [],
         name: "Navigation No Monitors",
     }),
 } as const;

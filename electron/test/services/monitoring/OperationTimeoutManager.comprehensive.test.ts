@@ -8,12 +8,13 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { OperationTimeoutManager } from "../../../services/monitoring/OperationTimeoutManager";
+import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type {
     MonitorCheckOperation,
     MonitorOperationRegistry,
 } from "../../../services/monitoring/MonitorOperationRegistry";
-import type { MonitorRepository } from "../../../services/database/MonitorRepository";
+
+import { OperationTimeoutManager } from "../../../services/monitoring/OperationTimeoutManager";
 
 // Mock the logger
 vi.mock("../../../utils/logger", () => {
@@ -35,7 +36,7 @@ vi.mock("../../../utils/logger", () => {
 vi.mock("@shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn((template: string, params: any) =>
         template.replaceAll(
-            /{(?<key>\w+)}/g,
+            /\{(?<key>\w+)\}/gv,
             (match, key) => params[key] || match
         )
     ),

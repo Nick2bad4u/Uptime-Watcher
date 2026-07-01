@@ -50,7 +50,33 @@ import { logger } from "../services/logger";
 const inFlightFetches = new WeakMap<object, Map<string, Promise<unknown>>>();
 
 /**
- * Predefined application cache collection interface.
+ * Configuration options for creating a {@link TypedCache} instance.
+ *
+ * @remarks
+ * Both properties are optional. When omitted, the cache uses a sensible default
+ * for `maxSize` and no default TTL (entries will not expire unless a TTL is
+ * provided at `set` time).
+ *
+ * @public
+ */
+export interface CacheOptions {
+    /**
+     * Maximum number of entries the cache will retain before evicting the
+     * least-recently-used entries.
+     *
+     * @defaultValue 100
+     */
+    maxSize?: number;
+
+    /**
+     * Default time-to-live in milliseconds applied to entries when no per-entry
+     * TTL is provided.
+     */
+    ttl?: number;
+}
+
+/**
+ * Predefined app cache collection interface.
  *
  * @remarks
  * Internal helper used to describe the structure of {@link AppCaches}.
@@ -60,7 +86,7 @@ const inFlightFetches = new WeakMap<object, Map<string, Promise<unknown>>>();
 interface AppCachesInterface {
     /**
      * General-purpose cache used for miscellaneous computed values and small
-     * application artifacts.
+     * app artifacts.
      */
     readonly general: TypedCache<string, CacheValue>;
 
@@ -99,32 +125,6 @@ interface CacheEntry<T> {
 }
 
 /**
- * Configuration options for creating a {@link TypedCache} instance.
- *
- * @remarks
- * Both properties are optional. When omitted, the cache uses a sensible default
- * for `maxSize` and no default TTL (entries will not expire unless a TTL is
- * provided at `set` time).
- *
- * @public
- */
-export interface CacheOptions {
-    /**
-     * Maximum number of entries the cache will retain before evicting the
-     * least-recently-used entries.
-     *
-     * @defaultValue 100
-     */
-    maxSize?: number;
-
-    /**
-     * Default time-to-live in milliseconds applied to entries when no per-entry
-     * TTL is provided.
-     */
-    ttl?: number;
-}
-
-/**
  * Generic in-memory cache with optional TTL and LRU eviction.
  *
  * @remarks
@@ -140,6 +140,17 @@ export interface CacheOptions {
  */
 export class TypedCache<K, V> {
     /**
+     * Current number of entries in the cache.
+     *
+     * @returns Number of stored entries.
+     *
+     * @public
+     */
+    public get size(): number {
+        return this.cache.size;
+    }
+
+    /**
      * Internal Map storing cache entries with metadata.
      *
      * @remarks
@@ -149,16 +160,6 @@ export class TypedCache<K, V> {
      * @internal
      */
     private readonly cache = new Map<K, CacheEntry<V>>();
-
-    /**
-     * Cache generation counter.
-     *
-     * @remarks
-     * Incremented whenever the cache is cleared. Used by higher-level helpers
-     * (for example {@link getCachedOrFetch}) to avoid caching values fetched
-     * before an invalidation/clear event.
-     */
-    private generation = 0;
 
     /**
      * Default time-to-live for cache entries in milliseconds.
@@ -171,6 +172,16 @@ export class TypedCache<K, V> {
      * @internal
      */
     private readonly defaultTtl: number | undefined;
+
+    /**
+     * Cache generation counter.
+     *
+     * @remarks
+     * Incremented whenever the cache is cleared. Used by higher-level helpers
+     * (for example {@link getCachedOrFetch}) to avoid caching values fetched
+     * before an invalidation/clear event.
+     */
+    private generation = 0;
 
     /**
      * Maximum number of entries allowed in the cache.
@@ -210,17 +221,6 @@ export class TypedCache<K, V> {
     }
 
     /**
-     * Current number of entries in the cache.
-     *
-     * @returns Number of stored entries.
-     *
-     * @public
-     */
-    public get size(): number {
-        return this.cache.size;
-    }
-
-    /**
      * Remove entries that have exceeded their TTL from this cache instance.
      *
      * @remarks
@@ -233,7 +233,7 @@ export class TypedCache<K, V> {
      */
     public cleanup(): void {
         const now = Date.now();
-        for (const [key, entry] of this.cache.entries()) {
+        for (const [key, entry] of this.cache) {
             const ttl = entry.ttl ?? this.defaultTtl;
             if (ttl && now - entry.timestamp > ttl) {
                 this.cache.delete(key);
@@ -252,17 +252,6 @@ export class TypedCache<K, V> {
     public clear(): void {
         this.generation += 1;
         this.cache.clear();
-    }
-
-    /**
-     * Returns the current cache generation.
-     *
-     * @remarks
-     * Consumers can capture this value before starting a long-running fetch and
-     * ensure the cache has not been invalidated before storing results.
-     */
-    public getGeneration(): number {
-        return this.generation;
     }
 
     /**
@@ -309,6 +298,17 @@ export class TypedCache<K, V> {
     }
 
     /**
+     * Returns the current cache generation.
+     *
+     * @remarks
+     * Consumers can capture this value before starting a long-running fetch and
+     * ensure the cache has not been invalidated before storing results.
+     */
+    public getGeneration(): number {
+        return this.generation;
+    }
+
+    /**
      * Check whether a non-expired entry exists for the given key.
      *
      * @param key - The cache key to test.
@@ -341,15 +341,17 @@ export class TypedCache<K, V> {
     public set(key: K, value: V, ttl?: number): void {
         // Enforce max size by removing least recently used entries
         if (this.cache.size >= this.maxSize) {
-            let lruKey: K | undefined = undefined;
-            let oldestAccessTime = Number.POSITIVE_INFINITY;
+            let lruKey: K | undefined;
+            let oldestAccessTime = Infinity;
 
             // Find the least recently used entry (O(n) operation)
-            for (const [entryKey, entry] of this.cache.entries()) {
-                if (entry.lastAccessed < oldestAccessTime) {
-                    oldestAccessTime = entry.lastAccessed;
-                    lruKey = entryKey;
+            for (const [entryKey, entry] of this.cache) {
+                if (!(entry.lastAccessed < oldestAccessTime)) {
+                    continue;
                 }
+
+                oldestAccessTime = entry.lastAccessed;
+                lruKey = entryKey;
             }
 
             if (isDefined(lruKey)) {
@@ -390,7 +392,7 @@ export const AppCaches: AppCachesInterface = {
 } as const;
 
 /**
- * Remove expired entries from all predefined application caches.
+ * Remove expired entries from all predefined app caches.
  *
  * @remarks
  * Iterates the caches in {@link AppCaches} and calls {@link TypedCache.cleanup}
@@ -399,7 +401,7 @@ export const AppCaches: AppCachesInterface = {
  * @public
  */
 export function cleanupAllCaches(): void {
-    const caches: Array<TypedCache<string, CacheValue>> = [
+    const caches: TypedCache<string, CacheValue>[] = [
         AppCaches.general,
         AppCaches.monitorTypes,
         AppCaches.uiHelpers,
@@ -411,7 +413,7 @@ export function cleanupAllCaches(): void {
 }
 
 /**
- * Clear all entries from the predefined application caches.
+ * Clear all entries from the predefined app caches.
  *
  * @remarks
  * This removes all data from the {@link AppCaches} instances. Use sparingly as
@@ -420,7 +422,7 @@ export function cleanupAllCaches(): void {
  * @public
  */
 export function clearAllCaches(): void {
-    const caches: Array<TypedCache<string, CacheValue>> = [
+    const caches: TypedCache<string, CacheValue>[] = [
         AppCaches.general,
         AppCaches.monitorTypes,
         AppCaches.uiHelpers,

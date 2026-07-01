@@ -6,7 +6,7 @@
  * `window.electronAPI` bridge to become available before renderer services
  * attempt to invoke IPC contracts. Consumers can declare the domains and
  * methods they rely on, enabling early diagnostics when preload wiring drifts
- * or when the application is executed outside an Electron environment.
+ * or when the app is executed outside an Electron environment.
  */
 
 import type { UnknownArray, UnknownRecord } from "type-fest";
@@ -25,8 +25,8 @@ const BASE_ERROR_MESSAGE =
 class BridgeNotReadyYetError extends Error {
     public readonly diagnostics: BridgeReadinessDiagnostics;
 
-    public constructor(diagnostics: BridgeReadinessDiagnostics) {
-        super("Electron bridge not ready yet");
+    public constructor(diagnostics: BridgeReadinessDiagnostics, options: ErrorOptions) {
+        super("Electron bridge not ready yet", options);
         this.name = "BridgeNotReadyYetError";
         this.diagnostics = diagnostics;
     }
@@ -80,10 +80,10 @@ export interface BridgeReadinessDiagnostics {
     /**
      * Methods that were missing or not callable on otherwise present domains.
      */
-    readonly missingMethods: ReadonlyArray<{
+    readonly missingMethods: readonly {
         readonly domain: ElectronBridgeDomain;
         readonly method: string;
-    }>;
+    }[];
 }
 
 /**
@@ -107,7 +107,7 @@ type BridgeRoot = typeof window extends { electronAPI: infer T } ? T : unknown;
 
 const getGlobalWindow = (): unknown => {
     if (typeof window !== "undefined") {
-        return window;
+        return globalThis;
     }
 
     const globalObject = safeCastTo<{ window?: unknown }>(globalThis);
@@ -158,17 +158,17 @@ const evaluateContracts = (
     bridge: BridgeRoot | undefined,
     contracts: readonly ElectronBridgeContract[]
 ): BridgeReadinessDiagnostics & { readonly isReady: boolean } => {
-    const bridgeAvailable = isBridgeRootCandidate(bridge);
+    const isBridgeAvailable = isBridgeRootCandidate(bridge);
 
     const missingDomains: ElectronBridgeDomain[] = [];
-    const missingMethods: Array<{
+    const missingMethods: {
         readonly domain: ElectronBridgeDomain;
         readonly method: string;
-    }> = [];
+    }[] = [];
 
-    if (!bridgeAvailable) {
+    if (!isBridgeAvailable) {
         return {
-            bridgeAvailable,
+            bridgeAvailable: isBridgeAvailable,
             isReady: false,
             missingDomains: contracts.map((contract) => contract.domain),
             missingMethods,
@@ -177,14 +177,14 @@ const evaluateContracts = (
 
     for (const contract of contracts) {
         const domainValue = safeGetProperty(bridge, contract.domain);
-        const domainAvailable = isObjectLike(domainValue);
+        const isDomainAvailable = isObjectLike(domainValue);
 
-        if (!domainAvailable) {
+        if (!isDomainAvailable) {
             missingDomains.push(contract.domain);
         }
 
         const expectedMethods = contract.methods ?? [];
-        if (domainAvailable && expectedMethods.length > 0) {
+        if (isDomainAvailable && expectedMethods.length > 0) {
             for (const methodName of expectedMethods) {
                 const candidate = safeGetProperty(domainValue, methodName);
                 if (typeof candidate !== "function") {
@@ -198,10 +198,10 @@ const evaluateContracts = (
     }
 
     const isReady =
-        isEmpty(missingDomains) && isEmpty(missingMethods) && bridgeAvailable;
+        isEmpty(missingDomains) && isEmpty(missingMethods) && isBridgeAvailable;
 
     return {
-        bridgeAvailable,
+        bridgeAvailable: isBridgeAvailable,
         isReady,
         missingDomains,
         missingMethods,

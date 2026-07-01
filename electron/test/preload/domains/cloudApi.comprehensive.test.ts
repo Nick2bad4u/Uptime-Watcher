@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { CLOUD_CHANNELS } from "@shared/types/preload";
 import { ipcRenderer } from "electron";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { cloudApi } from "../../../preload/domains/cloudApi";
-import { CLOUD_CHANNELS } from "@shared/types/preload";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),

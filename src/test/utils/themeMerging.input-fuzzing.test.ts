@@ -18,20 +18,22 @@
 
 /* Property-based tests require magic numbers and flexible object validation */
 
-import { describe, it, expect } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { arrayFirst, objectKeys, objectValues, safeCastTo    } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
-import { deepMergeTheme } from "../../theme/utils/themeMerging";
 import type { Theme } from "../../theme/types";
+
 import { themes } from "../../theme/themes";
+import { deepMergeTheme } from "../../theme/utils/themeMerging";
 
 // Arbitraries for theme generation (reuse from ThemeManager tests but simplified)
 const colorArbitrary = fc
     .tuple(
-        fc.integer({ min: 0, max: 255 }),
-        fc.integer({ min: 0, max: 255 }),
-        fc.integer({ min: 0, max: 255 })
+        fc.integer({ max: 255, min: 0 }),
+        fc.integer({ max: 255, min: 0 }),
+        fc.integer({ max: 255, min: 0 })
     )
     .map(
         ([
@@ -124,21 +126,21 @@ const themeColorsArbitrary = fc.record({
 
 const fontFamilyArbitrary = fc.record({
     mono: fc
-        .array(fc.string({ minLength: 3, maxLength: 20 }), {
-            minLength: 1,
+        .array(fc.string({ maxLength: 20, minLength: 3 }), {
             maxLength: 3,
-        })
-        .map((arr) => arr as readonly string[]),
-    sans: fc
-        .array(fc.string({ minLength: 3, maxLength: 20 }), {
             minLength: 1,
-            maxLength: 5,
         })
-        .map((arr) => arr as readonly string[]),
+        .map((arr) => safeCastTo<readonly string[]>(arr)),
+    sans: fc
+        .array(fc.string({ maxLength: 20, minLength: 3 }), {
+            maxLength: 5,
+            minLength: 1,
+        })
+        .map((arr) => safeCastTo<readonly string[]>(arr)),
 });
 
 const fontSizeArbitrary = fc
-    .integer({ min: 8, max: 48 })
+    .integer({ max: 48, min: 8 })
     .map((n) => `${n / 4}rem`);
 
 const fontSizesArbitrary = fc.record({
@@ -168,7 +170,7 @@ const fontWeightsArbitrary = fc.record({
     semibold: fontWeightArbitrary,
 });
 
-const lineHeightArbitrary = fc.double({ min: 1, max: 2.5 }).map(String);
+const lineHeightArbitrary = fc.double({ max: 2.5, min: 1 }).map(String);
 const lineHeightsArbitrary = fc.record({
     normal: lineHeightArbitrary,
     relaxed: lineHeightArbitrary,
@@ -183,7 +185,7 @@ const themeTypographyArbitrary = fc.record({
 });
 
 const spacingValueArbitrary = fc
-    .integer({ min: 1, max: 100 })
+    .integer({ max: 100, min: 1 })
     .map((n) => `${n}rem`);
 
 const themeSpacingArbitrary = fc.record({
@@ -196,7 +198,7 @@ const themeSpacingArbitrary = fc.record({
     xs: spacingValueArbitrary,
 });
 
-const shadowArbitrary = fc.string({ minLength: 10, maxLength: 50 });
+const shadowArbitrary = fc.string({ maxLength: 50, minLength: 10 });
 const themeShadowsArbitrary = fc.record({
     inner: shadowArbitrary,
     lg: shadowArbitrary,
@@ -208,7 +210,7 @@ const themeShadowsArbitrary = fc.record({
 const borderRadiusValueArbitrary = fc.oneof(
     fc.constant("0"),
     fc.constant("9999px"),
-    fc.integer({ min: 1, max: 50 }).map((n) => `${n}px`)
+    fc.integer({ max: 50, min: 1 }).map((n) => `${n}px`)
 );
 
 const themeBorderRadiusArbitrary = fc.record({
@@ -221,13 +223,13 @@ const themeBorderRadiusArbitrary = fc.record({
 });
 
 const completeThemeArbitrary = fc.record({
-    name: fc.string({ minLength: 2, maxLength: 30 }),
-    isDark: fc.boolean(),
-    colors: themeColorsArbitrary,
-    typography: themeTypographyArbitrary,
-    spacing: themeSpacingArbitrary,
-    shadows: themeShadowsArbitrary,
     borderRadius: themeBorderRadiusArbitrary,
+    colors: themeColorsArbitrary,
+    isDark: fc.boolean(),
+    name: fc.string({ maxLength: 30, minLength: 2 }),
+    shadows: themeShadowsArbitrary,
+    spacing: themeSpacingArbitrary,
+    typography: themeTypographyArbitrary,
 });
 
 // Partial theme arbitraries for override testing
@@ -277,12 +279,11 @@ const partialTypographyArbitrary = fc.record(
 
 const partialThemeArbitrary = fc.record(
     {
-        name: fc.option(fc.string({ minLength: 2, maxLength: 30 }), {
+        colors: fc.option(partialColorsArbitrary, { nil: undefined }),
+        isDark: fc.option(fc.boolean(), { nil: undefined }),
+        name: fc.option(fc.string({ maxLength: 30, minLength: 2 }), {
             nil: undefined,
         }),
-        isDark: fc.option(fc.boolean(), { nil: undefined }),
-        colors: fc.option(partialColorsArbitrary, { nil: undefined }),
-        typography: fc.option(partialTypographyArbitrary, { nil: undefined }),
         spacing: fc.option(
             fc.record({
                 lg: fc.option(spacingValueArbitrary, { nil: undefined }),
@@ -290,11 +291,12 @@ const partialThemeArbitrary = fc.record(
             }),
             { nil: undefined }
         ),
+        typography: fc.option(partialTypographyArbitrary, { nil: undefined }),
     },
     { requiredKeys: [] }
 );
 
-describe("Theme Merging Property-Based Tests", () => {
+describe("theme Merging Property-Based Tests", () => {
     fcTest.prop([completeThemeArbitrary, partialThemeArbitrary])(
         "should merge themes while preserving base theme structure",
         (baseTheme, overrideTheme) => {
@@ -483,7 +485,7 @@ describe("Theme Merging Property-Based Tests", () => {
     );
 
     fcTest.prop([
-        fc.constantFrom(...Object.values(themes)),
+        fc.constantFrom(...objectValues(themes)),
         partialThemeArbitrary,
     ])(
         "should work with predefined themes from themes.ts",
@@ -506,7 +508,7 @@ describe("Theme Merging Property-Based Tests", () => {
                 expect(result.isDark).toBe(overrideTheme.isDark);
             } else {
                 // When override doesn't have isDark, preserve base theme value
-                expect(typeof result.isDark).toBe("boolean");
+                expect(result.isDark).toBeTypeOf("boolean");
             }
 
             // Colors should be properly merged based on override presence
@@ -519,8 +521,8 @@ describe("Theme Merging Property-Based Tests", () => {
             }
 
             // Should preserve predefined theme quality
-            expect(Object.keys(result.colors.primary)).toHaveLength(10); // 50-900 shades
-            expect(Object.keys(result.colors.status)).toHaveLength(7); // All status colors
+            expect(objectKeys(result.colors.primary)).toHaveLength(10); // 50-900 shades
+            expect(objectKeys(result.colors.status)).toHaveLength(7); // All status colors
         }
     );
 
@@ -539,13 +541,13 @@ describe("Theme Merging Property-Based Tests", () => {
     );
 
     fcTest.prop([
-        fc.array(completeThemeArbitrary, { minLength: 2, maxLength: 5 }),
-        fc.array(partialThemeArbitrary, { minLength: 1, maxLength: 3 }),
+        fc.array(completeThemeArbitrary, { maxLength: 5, minLength: 2 }),
+        fc.array(partialThemeArbitrary, { maxLength: 3, minLength: 1 }),
     ])(
         "should handle multiple theme merging operations",
         (baseThemes, overrideThemes) => {
             // Start with first base theme
-            let result = baseThemes[0];
+            let result = arrayFirst(baseThemes);
 
             // Apply each override sequentially
             for (const override of overrideThemes) {
@@ -561,8 +563,8 @@ describe("Theme Merging Property-Based Tests", () => {
             expect(result!.colors).toHaveProperty("primary");
 
             // Should maintain structural integrity after multiple merges
-            expect(Object.keys(result!.colors.primary)).toHaveLength(10);
-            expect(Object.keys(result!.colors.status)).toHaveLength(7);
+            expect(objectKeys(result!.colors.primary)).toHaveLength(10);
+            expect(objectKeys(result!.colors.status)).toHaveLength(7);
         }
     );
 
@@ -571,7 +573,9 @@ describe("Theme Merging Property-Based Tests", () => {
 
         // Should handle empty override
         expect(() => deepMergeTheme(baseTheme, {})).not.toThrow();
+
         const result = deepMergeTheme(baseTheme, {});
+
         expect(result).toEqual(baseTheme);
     });
 
@@ -594,14 +598,15 @@ describe("Theme Merging Property-Based Tests", () => {
         expect(() =>
             deepMergeTheme(baseTheme, overrideWithNulls)
         ).not.toThrow();
+
         const result = deepMergeTheme(baseTheme, overrideWithNulls);
 
         // Null values should override (explicit null is intentional)
-        expect(result.colors.background.modal).toBe(null);
+        expect(result.colors.background.modal).toBeNull();
         // Undefined values DO override to undefined (JavaScript spread behavior)
-        expect(result.colors.background.primary).toBe(undefined);
+        expect(result.colors.background.primary).toBeUndefined();
         // Nested null should override
-        expect(result.typography.fontSize.base).toBe(null);
+        expect(result.typography.fontSize.base).toBeNull();
         // Other non-overridden values should remain
         expect(result.typography.fontSize.lg).toBe(
             baseTheme.typography.fontSize.lg

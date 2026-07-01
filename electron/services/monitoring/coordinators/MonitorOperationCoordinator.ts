@@ -64,9 +64,7 @@ export class MonitorOperationCoordinator {
             monitor.id,
             {
                 timeoutMs,
-                ...(options?.additionalSignals
-                    ? { additionalSignals: options.additionalSignals }
-                    : {}),
+                ...(options?.additionalSignals && { additionalSignals: options.additionalSignals }),
             }
         );
 

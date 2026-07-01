@@ -2,18 +2,18 @@
  * Exhaustive coverage for monitor status event validation guards.
  */
 
-import { STATUS_KIND, type Monitor, type Site } from "@shared/types";
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
-import { describe, expect, it } from "vitest";
+
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
-
+import { type Monitor, type Site, STATUS_KIND } from "@shared/types";
 import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
+import { describe, expect, it } from "vitest";
 
 const createMonitorSnapshot = (): Monitor => ({
     checkInterval: 60_000,

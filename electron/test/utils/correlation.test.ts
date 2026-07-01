@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,9 +15,9 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect } from "vitest";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ValidationError } from "@shared/utils/validationError";
+import { describe, expect, it } from "vitest";
 
 describe("Correlation Utility", () => {
     describe(generateCorrelationId, () => {
@@ -66,7 +66,7 @@ describe("Correlation Utility", () => {
             const id = generateCorrelationId();
 
             // Should only contain hex characters (0-9, a-f)
-            expect(id).toMatch(/^[\da-f]+$/);
+            expect(id).toMatch(/^[\da-f]+$/v);
         });
         it("should generate multiple unique IDs", async ({
             task,
@@ -113,14 +113,14 @@ describe("Correlation Utility", () => {
             for (let pos = 0; pos < 16; pos++) {
                 const chars = ids.map((id) => id[pos]);
                 // eslint-disable-next-line unicorn/no-array-reduce
-                const charCounts = chars.reduce(
+                const charCounts = chars.reduce<Record<string, number>>(
                     (acc, char) => {
                         if (char) {
                             acc[char] = (acc[char] || 0) + 1;
                         }
                         return acc;
                     },
-                    {} as Record<string, number>
+                    {}
                 );
 
                 // No single character should appear more than 80% of the time

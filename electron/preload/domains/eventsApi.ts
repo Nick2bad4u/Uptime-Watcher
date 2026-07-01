@@ -145,11 +145,7 @@ const isCacheInvalidatedEventDataPayload = (
         return false;
     }
 
-    if (!isCacheInvalidationType(type)) {
-        return false;
-    }
-
-    return true;
+    return isCacheInvalidationType(type);
 };
 
 const isMonitoringControlEventDataPayload = (
@@ -258,11 +254,7 @@ const isUpdateStatusEventDataPayload = (
         return false;
     }
 
-    if (isDefined(error) && typeof error !== "string") {
-        return false;
-    }
-
-    return true;
+    return !isDefined(error) || typeof error === "string";
 };
 
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
@@ -293,11 +285,7 @@ const isMonitorCheckCompletedEventDataPayload = (
         return false;
     }
 
-    if (!isMonitorStatusChangedEventData(result)) {
-        return false;
-    }
-
-    return true;
+    return isMonitorStatusChangedEventData(result);
 };
 
 const isHistoryLimitUpdatedEventDataPayload = (
@@ -324,16 +312,10 @@ const isHistoryLimitUpdatedEventDataPayload = (
         return false;
     }
 
-    if (
-        isDefined(previousLimit) &&
+    return !(isDefined(previousLimit) &&
         (typeof previousLimit !== "number" ||
             !isFiniteNumber(previousLimit) ||
-            previousLimit < 0)
-    ) {
-        return false;
-    }
-
-    return true;
+            previousLimit < 0));
 };
 
 const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);
@@ -383,11 +365,7 @@ const isSiteRemovedEventDataPayload = (
         return false;
     }
 
-    if (!hasFiniteTimestamp(timestamp)) {
-        return false;
-    }
-
-    return true;
+    return hasFiniteTimestamp(timestamp);
 };
 
 const isSiteUpdatedEventDataPayload = (
@@ -414,7 +392,7 @@ const isSiteUpdatedEventDataPayload = (
         return false;
     }
 
-    if (!updatedFields.every((field) => typeof field === "string")) {
+    if (updatedFields.some((field) => typeof field !== "string")) {
         return false;
     }
 
@@ -468,7 +446,7 @@ const subscribeWithGuard = <TPayload>(
                     payloadType,
                 },
                 reason: "payload-validation",
-                ...(payloadPreview ? { payloadPreview } : {}),
+                ...(payloadPreview && { payloadPreview }),
             };
 
             void reportPreloadGuardFailure(guardFailureContext);

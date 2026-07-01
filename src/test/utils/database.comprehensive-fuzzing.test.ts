@@ -17,14 +17,16 @@
  * @packageDocumentation
  */
 
-import { describe, expect, beforeEach, afterEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
 import type { MonitorType } from "@shared/types";
+
+import { fc, test as fcTest } from "@fast-check/vitest";
 import {
     secureRandomBoolean,
     secureRandomFloat,
     secureRandomInt,
 } from "@shared/test/testHelpers";
+import { arrayJoin, isEmpty, isInteger, safeCastTo    } from "ts-extras";
+import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Database Operations
@@ -85,36 +87,36 @@ const sqlInjectionStrings = fc.oneof(
  * Generates monitor data for database operations
  */
 const monitorDbData = fc.record({
-    id: fc.oneof(fc.integer({ min: 1, max: 1_000_000 }), fc.constant(null)),
+    created_at: fc.date({ max: new Date(), min: new Date(2020, 0, 1) }),
+    enabled: fc.boolean(),
+    id: fc.oneof(fc.integer({ max: 1_000_000, min: 1 }), fc.constant(null)),
+    interval: fc.integer({ max: 300_000, min: 1000 }),
     name: fc.oneof(
-        fc.string({ minLength: 1, maxLength: 255 }),
+        fc.string({ maxLength: 255, minLength: 1 }),
         sqlInjectionStrings
     ),
-    url: fc.oneof(fc.webUrl(), fc.string()),
-    type: fc.oneof(
+    timeout: fc.integer({ max: 30_000, min: 1000 }),
+    type: safeCastTo<fc.Arbitrary<MonitorType | string>>(fc.oneof(
         fc.constantFrom("http", "ping", "dns", "port"),
         fc.string()
-    ) as fc.Arbitrary<MonitorType | string>,
-    interval: fc.integer({ min: 1000, max: 300_000 }),
-    timeout: fc.integer({ min: 1000, max: 30_000 }),
-    enabled: fc.boolean(),
-    created_at: fc.date({ min: new Date(2020, 0, 1), max: new Date() }),
-    updated_at: fc.date({ min: new Date(2020, 0, 1), max: new Date() }),
+    )),
+    updated_at: fc.date({ max: new Date(), min: new Date(2020, 0, 1) }),
+    url: fc.oneof(fc.webUrl(), fc.string()),
 });
 
 /**
  * Generates status update data for database operations
  */
 const statusUpdateData = fc.record({
-    monitor_id: fc.integer({ min: 1, max: 1000 }),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    checked_at: fc.date(),
+    error_message: fc.oneof(fc.string(), fc.constant(null)),
+    monitor_id: fc.integer({ max: 1000, min: 1 }),
     response_time: fc.oneof(
-        fc.integer({ min: 0, max: 30_000 }),
+        fc.integer({ max: 30_000, min: 0 }),
         fc.constant(null)
     ),
-    uptime_percentage: fc.double({ min: 0, max: 100 }),
-    error_message: fc.oneof(fc.string(), fc.constant(null)),
-    checked_at: fc.date(),
+    status: fc.constantFrom("up", "down", "pending", "paused"),
+    uptime_percentage: fc.double({ max: 100, min: 0 }),
 });
 
 /**
@@ -122,56 +124,56 @@ const statusUpdateData = fc.record({
  */
 const transactionOperations = fc.array(
     fc.oneof(
-        fc.record({ operation: fc.constant("INSERT"), data: monitorDbData }),
-        fc.record({ operation: fc.constant("UPDATE"), data: monitorDbData }),
+        fc.record({ data: monitorDbData, operation: fc.constant("INSERT") }),
+        fc.record({ data: monitorDbData, operation: fc.constant("UPDATE") }),
         fc.record({
+            id: fc.integer({ max: 1000, min: 1 }),
             operation: fc.constant("DELETE"),
-            id: fc.integer({ min: 1, max: 1000 }),
         }),
         fc.record({ operation: fc.constant("SELECT"), query: fc.string() })
     ),
-    { minLength: 1, maxLength: 10 }
+    { maxLength: 10, minLength: 1 }
 );
 
 /**
  * Generates connection pool configuration scenarios
  */
 const connectionPoolConfig = fc.record({
-    minConnections: fc.integer({ min: 1, max: 5 }),
-    maxConnections: fc.integer({ min: 10, max: 100 }),
-    connectionTimeout: fc.integer({ min: 1000, max: 30_000 }),
-    idleTimeout: fc.integer({ min: 30_000, max: 300_000 }),
-    acquireTimeout: fc.integer({ min: 1000, max: 10_000 }),
-    retryAttempts: fc.integer({ min: 1, max: 5 }),
-    poolName: fc.string({ minLength: 1, maxLength: 50 }),
+    acquireTimeout: fc.integer({ max: 10_000, min: 1000 }),
+    connectionTimeout: fc.integer({ max: 30_000, min: 1000 }),
+    idleTimeout: fc.integer({ max: 300_000, min: 30_000 }),
+    maxConnections: fc.integer({ max: 100, min: 10 }),
+    minConnections: fc.integer({ max: 5, min: 1 }),
+    poolName: fc.string({ maxLength: 50, minLength: 1 }),
+    retryAttempts: fc.integer({ max: 5, min: 1 }),
 });
 
 /**
  * Generates concurrency scenarios for testing
  */
 const concurrencyScenarios = fc.record({
+    concurrentUsers: fc.integer({ max: 20, min: 2 }),
+    deadlockDetection: fc.boolean(),
     isolationLevel: fc.constantFrom(
         "READ_UNCOMMITTED",
         "READ_COMMITTED",
         "REPEATABLE_READ",
         "SERIALIZABLE"
     ),
+    lockTimeout: fc.integer({ max: 5000, min: 100 }),
     lockType: fc.constantFrom("SHARED", "EXCLUSIVE", "UPDATE", "INTENT"),
-    lockTimeout: fc.integer({ min: 100, max: 5000 }),
-    deadlockDetection: fc.boolean(),
-    transactionDepth: fc.integer({ min: 1, max: 5 }),
-    concurrentUsers: fc.integer({ min: 2, max: 20 }),
+    transactionDepth: fc.integer({ max: 5, min: 1 }),
 });
 
 /**
  * Generates foreign key relationship data
  */
 const relationshipData = fc.record({
-    parentTable: fc.constantFrom("sites", "monitors", "users"),
-    childTable: fc.constantFrom("monitors", "status_updates", "api_keys"),
     cascadeDelete: fc.boolean(),
     cascadeUpdate: fc.boolean(),
-    foreignKeyConstraint: fc.string({ minLength: 1, maxLength: 100 }),
+    childTable: fc.constantFrom("monitors", "status_updates", "api_keys"),
+    foreignKeyConstraint: fc.string({ maxLength: 100, minLength: 1 }),
+    parentTable: fc.constantFrom("sites", "monitors", "users"),
     referentialIntegrity: fc.boolean(),
 });
 
@@ -179,8 +181,8 @@ const relationshipData = fc.record({
  * Generates migration scenarios
  */
 const migrationScenarios = fc.record({
-    fromVersion: fc.integer({ min: 1, max: 10 }),
-    toVersion: fc.integer({ min: 1, max: 10 }),
+    dataPreservation: fc.boolean(),
+    fromVersion: fc.integer({ max: 10, min: 1 }),
     migrationSteps: fc.array(
         fc.oneof(
             fc.constant("ADD_COLUMN"),
@@ -191,10 +193,10 @@ const migrationScenarios = fc.record({
             fc.constant("ADD_CONSTRAINT"),
             fc.constant("DROP_CONSTRAINT")
         ),
-        { minLength: 1, maxLength: 5 }
+        { maxLength: 5, minLength: 1 }
     ),
     rollbackSupported: fc.boolean(),
-    dataPreservation: fc.boolean(),
+    toVersion: fc.integer({ max: 10, min: 1 }),
 });
 
 /**
@@ -213,8 +215,10 @@ const migrationScenarios = fc.record({
  * Generates security context data
  */
 const securityContexts = fc.record({
-    userId: fc.integer({ min: 1, max: 10_000 }),
-    userRole: fc.constantFrom("admin", "user", "readonly", "monitor", "guest"),
+    authenticationMethod: fc.constantFrom("JWT", "SESSION", "API_KEY", "BASIC"),
+    encrypted: fc.boolean(),
+    encryptionEnabled: fc.boolean(),
+    ipAddress: fc.ipV4(),
     permissions: fc.array(
         fc.constantFrom(
             "SELECT",
@@ -227,20 +231,22 @@ const securityContexts = fc.record({
             "WRITE",
             "ADMIN"
         ),
-        { minLength: 1, maxLength: 9 }
+        { maxLength: 9, minLength: 1 }
     ),
-    sessionId: fc.uuid(),
-    ipAddress: fc.ipV4(),
-    encrypted: fc.boolean(),
     requiresAuthentication: fc.boolean(),
-    authenticationMethod: fc.constantFrom("JWT", "SESSION", "API_KEY", "BASIC"),
-    encryptionEnabled: fc.boolean(),
+    sessionId: fc.uuid(),
+    userId: fc.integer({ max: 10_000, min: 1 }),
+    userRole: fc.constantFrom("admin", "user", "readonly", "monitor", "guest"),
 });
 
 /**
  * Generates recovery scenario data
  */
 const recoveryScenarios = fc.record({
+    automaticRecovery: fc.boolean(),
+    backupAge: fc.integer({ max: 72, min: 0 }), // Hours
+    backupAvailable: fc.boolean(),
+    dataLoss: fc.boolean(),
     failureType: fc.constantFrom(
         "DISK_FULL",
         "POWER_FAILURE",
@@ -251,54 +257,54 @@ const recoveryScenarios = fc.record({
         "TRANSACTION_ROLLBACK"
     ),
     recoveryMethod: fc.constantFrom("ROLLBACK", "RESTORE", "REPAIR", "REBUILD"),
-    backupAge: fc.integer({ min: 0, max: 72 }), // Hours
-    dataLoss: fc.boolean(),
-    automaticRecovery: fc.boolean(),
-    backupAvailable: fc.boolean(),
-    recoveryPointObjective: fc.integer({ min: 300, max: 7200 }), // Seconds (5 min to 2 hours)
+    recoveryPointObjective: fc.integer({ max: 7200, min: 300 }), // Seconds (5 min to 2 hours)
 });
 
 /**
  * Generates complex data type scenarios
  */
 const complexDataTypes = fc.record({
+    arrayData: fc.array(fc.anything(), { maxLength: 100, minLength: 0 }),
+    binaryData: fc.uint8Array({ maxLength: 1024, minLength: 0 }),
     dataType: fc.constantFrom("JSON", "BLOB", "ARRAY", "XML"),
-    size: fc.integer({ min: 100, max: 50_000 }),
     indexed: fc.boolean(),
-    binaryData: fc.uint8Array({ minLength: 0, maxLength: 1024 }),
     jsonData: fc.object({ maxDepth: 3 }),
-    largeText: fc.string({ minLength: 1000, maxLength: 10_000 }),
-    arrayData: fc.array(fc.anything(), { minLength: 0, maxLength: 100 }),
+    largeText: fc.string({ maxLength: 10_000, minLength: 1000 }),
+    nullableFields: fc.array(fc.boolean(), { maxLength: 10, minLength: 1 }),
+    size: fc.integer({ max: 50_000, min: 100 }),
     timestampData: fc.date(),
     uuidData: fc.uuid(),
-    nullableFields: fc.array(fc.boolean(), { minLength: 1, maxLength: 10 }),
 });
 
 /**
  * Generates query pattern scenarios
  */
 const queryPatterns = fc.record({
-    queryType: fc.constantFrom("SELECT", "JOIN", "AGGREGATE", "SUBQUERY"),
-    estimatedRows: fc.integer({ min: 10, max: 100_000 }),
     complexity: fc.constantFrom("LOW", "MEDIUM", "HIGH"),
-    indexesAvailable: fc.array(fc.string(), { minLength: 0, maxLength: 5 }),
-    joinType: fc.constantFrom("INNER", "LEFT", "RIGHT", "FULL", "CROSS"),
+    estimatedRows: fc.integer({ max: 100_000, min: 10 }),
+    groupBy: fc.array(fc.string(), { maxLength: 3, minLength: 0 }),
+    having: fc.oneof(fc.string(), fc.constant(null)),
+    indexesAvailable: fc.array(fc.string(), { maxLength: 5, minLength: 0 }),
     joinTables: fc.array(
         fc.constantFrom("monitors", "sites", "status_updates"),
-        { minLength: 2, maxLength: 4 }
+        { maxLength: 4, minLength: 2 }
     ),
-    whereConditions: fc.array(fc.string(), { minLength: 0, maxLength: 5 }),
-    orderBy: fc.array(fc.string(), { minLength: 0, maxLength: 3 }),
-    groupBy: fc.array(fc.string(), { minLength: 0, maxLength: 3 }),
-    having: fc.oneof(fc.string(), fc.constant(null)),
-    limit: fc.oneof(fc.integer({ min: 1, max: 1000 }), fc.constant(null)),
-    offset: fc.oneof(fc.integer({ min: 0, max: 1000 }), fc.constant(null)),
+    joinType: fc.constantFrom("INNER", "LEFT", "RIGHT", "FULL", "CROSS"),
+    limit: fc.oneof(fc.integer({ max: 1000, min: 1 }), fc.constant(null)),
+    offset: fc.oneof(fc.integer({ max: 1000, min: 0 }), fc.constant(null)),
+    orderBy: fc.array(fc.string(), { maxLength: 3, minLength: 0 }),
+    queryType: fc.constantFrom("SELECT", "JOIN", "AGGREGATE", "SUBQUERY"),
+    whereConditions: fc.array(fc.string(), { maxLength: 5, minLength: 0 }),
 });
 
 /**
  * Generates maintenance operation scenarios
  */
 const maintenanceOperations = fc.record({
+    batchSize: fc.integer({ max: 10_000, min: 100 }),
+    compressionLevel: fc.integer({ max: 9, min: 0 }),
+    estimatedDuration: fc.integer({ max: 7200, min: 60 }), // Seconds (1 min to 2 hours)
+    maintenanceWindow: fc.integer({ max: 14_400, min: 3600 }), // Seconds (1 to 4 hours)
     operationType: fc.constantFrom(
         "VACUUM",
         "ANALYZE",
@@ -309,32 +315,16 @@ const maintenanceOperations = fc.record({
         "BACKUP",
         "STATISTICS_UPDATE"
     ),
-    targetTable: tableNames,
-    batchSize: fc.integer({ min: 100, max: 10_000 }),
     preserveData: fc.boolean(),
-    compressionLevel: fc.integer({ min: 0, max: 9 }),
-    scheduledMaintenance: fc.boolean(),
-    estimatedDuration: fc.integer({ min: 60, max: 7200 }), // Seconds (1 min to 2 hours)
     requiresDowntime: fc.boolean(),
-    maintenanceWindow: fc.integer({ min: 3600, max: 14_400 }), // Seconds (1 to 4 hours)
+    scheduledMaintenance: fc.boolean(),
+    targetTable: tableNames,
 });
 
 /**
  * Generates comprehensive index management operation scenarios
  */
 const indexOperationScenarios = fc.record({
-    operationType: fc.constantFrom(
-        "CREATE_INDEX",
-        "DROP_INDEX",
-        "REBUILD_INDEX",
-        "ANALYZE_INDEX",
-        "REINDEX_TABLE",
-        "CREATE_UNIQUE_INDEX",
-        "CREATE_PARTIAL_INDEX",
-        "CREATE_COMPOSITE_INDEX"
-    ),
-    indexName: fc.string({ minLength: 1, maxLength: 63 }),
-    targetTable: tableNames,
     columns: fc.array(
         fc.constantFrom(
             "id",
@@ -345,43 +335,55 @@ const indexOperationScenarios = fc.record({
             "updated_at",
             "status"
         ),
-        { minLength: 1, maxLength: 4 }
+        { maxLength: 4, minLength: 1 }
     ),
-    indexType: fc.constantFrom("BTREE", "HASH", "GIN", "GIST"),
-    isUnique: fc.boolean(),
-    isPartial: fc.boolean(),
-    whereClause: fc.oneof(fc.string(), fc.constant(null)),
-    fillFactor: fc.integer({ min: 10, max: 100 }),
     concurrent: fc.boolean(),
-    expectedRows: fc.integer({ min: 1000, max: 1_000_000 }),
-    storageSize: fc.integer({ min: 1024, max: 100_000_000 }), // Bytes
+    expectedRows: fc.integer({ max: 1_000_000, min: 1000 }),
+    fillFactor: fc.integer({ max: 100, min: 10 }),
+    indexName: fc.string({ maxLength: 63, minLength: 1 }),
+    indexType: fc.constantFrom("BTREE", "HASH", "GIN", "GIST"),
+    isPartial: fc.boolean(),
+    isUnique: fc.boolean(),
+    operationType: fc.constantFrom(
+        "CREATE_INDEX",
+        "DROP_INDEX",
+        "REBUILD_INDEX",
+        "ANALYZE_INDEX",
+        "REINDEX_TABLE",
+        "CREATE_UNIQUE_INDEX",
+        "CREATE_PARTIAL_INDEX",
+        "CREATE_COMPOSITE_INDEX"
+    ),
+    storageSize: fc.integer({ max: 100_000_000, min: 1024 }), // Bytes
+    targetTable: tableNames,
+    whereClause: fc.oneof(fc.string(), fc.constant(null)),
 });
 
 /**
  * Generates advanced batch processing scenarios with failure injection
  */
 const batchOperationScenarios = fc.record({
-    operationType: fc.constantFrom("INSERT", "UPDATE", "DELETE", "UPSERT"),
-    batchSize: fc.integer({ min: 100, max: 50_000 }),
-    totalRecords: fc.integer({ min: 1000, max: 1_000_000 }),
-    chunkSize: fc.integer({ min: 50, max: 1000 }),
-    failureRate: fc.double({ max: 0.1, min: 0, noNaN: true }), // 0-10% failure rate
+    batchSize: fc.integer({ max: 50_000, min: 100 }),
+    chunkSize: fc.integer({ max: 1000, min: 50 }),
+    createLogTable: fc.boolean(),
     failurePoint: fc.oneof(
         fc.constantFrom("START", "MIDDLE", "END", "RANDOM"),
         fc.constant(null)
     ),
+    failureRate: fc.double({ max: 0.1, min: 0, noNaN: true }), // 0-10% failure rate
+    maxWorkers: fc.integer({ max: 8, min: 1 }),
+    memoryLimit: fc.integer({ max: 1024, min: 10 }), // MB
+    operationType: fc.constantFrom("INSERT", "UPDATE", "DELETE", "UPSERT"),
+    parallelProcessing: fc.boolean(),
     recoveryStrategy: fc.constantFrom(
         "ROLLBACK_ALL",
         "ROLLBACK_CHUNK",
         "CONTINUE",
         "RETRY"
     ),
-    memoryLimit: fc.integer({ min: 10, max: 1024 }), // MB
-    timeoutSeconds: fc.integer({ min: 30, max: 3600 }),
+    timeoutSeconds: fc.integer({ max: 3600, min: 30 }),
+    totalRecords: fc.integer({ max: 1_000_000, min: 1000 }),
     validateData: fc.boolean(),
-    createLogTable: fc.boolean(),
-    parallelProcessing: fc.boolean(),
-    maxWorkers: fc.integer({ min: 1, max: 8 }),
 });
 
 /**
@@ -419,6 +421,13 @@ const batchOperationScenarios = fc.record({
  * Generates cross-operation interaction scenarios for comprehensive testing
  */
 const crossOperationScenarios = fc.record({
+    expectedInterference: fc.constantFrom("NONE", "LOW", "MEDIUM", "HIGH"),
+    isolationRequired: fc.boolean(),
+    lockContention: fc.boolean(),
+    memoryContention: fc.boolean(),
+    operationOverlap: fc
+        .double({ max: 0.9, min: 0.1 })
+        .filter((n) => Number.isFinite(n) && n >= 0.1 && n <= 0.9), // 10-90% overlap
     primaryOperation: fc.constantFrom(
         "INSERT",
         "UPDATE",
@@ -426,6 +435,8 @@ const crossOperationScenarios = fc.record({
         "SELECT",
         "MAINTENANCE"
     ),
+    primaryOperationSize: fc.integer({ max: 10_000, min: 100 }),
+    resourceContention: fc.boolean(),
     secondaryOperation: fc.constantFrom(
         "BACKUP",
         "INDEX_CREATE",
@@ -433,23 +444,18 @@ const crossOperationScenarios = fc.record({
         "VACUUM",
         "ANALYZE"
     ),
-    simultaneousUsers: fc.integer({ min: 2, max: 20 }),
-    operationOverlap: fc
-        .double({ min: 0.1, max: 0.9 })
-        .filter((n) => Number.isFinite(n) && n >= 0.1 && n <= 0.9), // 10-90% overlap
-    primaryOperationSize: fc.integer({ min: 100, max: 10_000 }),
-    secondaryOperationSize: fc.integer({ min: 50, max: 5000 }),
-    resourceContention: fc.boolean(),
-    lockContention: fc.boolean(),
-    memoryContention: fc.boolean(),
-    expectedInterference: fc.constantFrom("NONE", "LOW", "MEDIUM", "HIGH"),
-    isolationRequired: fc.boolean(),
+    secondaryOperationSize: fc.integer({ max: 5000, min: 50 }),
+    simultaneousUsers: fc.integer({ max: 20, min: 2 }),
 });
 
 /**
  * Generates resource constraint scenarios for stress testing
  */
 const resourceConstraintScenarios = fc.record({
+    alertingEnabled: fc.boolean(),
+    automaticRecovery: fc.boolean(),
+    availableDiskSpaceMB: fc.integer({ max: 10_000, min: 100 }),
+    availableMemoryMB: fc.integer({ max: 2048, min: 64 }),
     constraintType: fc.constantFrom(
         "MEMORY_LIMIT",
         "DISK_SPACE_LIMIT",
@@ -458,16 +464,12 @@ const resourceConstraintScenarios = fc.record({
         "NETWORK_BANDWIDTH",
         "IO_THROTTLING"
     ),
-    severityLevel: fc.constantFrom("LOW", "MEDIUM", "HIGH", "CRITICAL"),
-    availableMemoryMB: fc.integer({ min: 64, max: 2048 }),
-    availableDiskSpaceMB: fc.integer({ min: 100, max: 10_000 }),
-    maxConnections: fc.integer({ min: 5, max: 100 }),
-    cpuUsagePercent: fc.integer({ min: 50, max: 95 }),
-    ioOperationsPerSecond: fc.integer({ min: 100, max: 10_000 }),
+    cpuUsagePercent: fc.integer({ max: 95, min: 50 }),
     gracefulDegradation: fc.boolean(),
-    automaticRecovery: fc.boolean(),
-    alertingEnabled: fc.boolean(),
+    ioOperationsPerSecond: fc.integer({ max: 10_000, min: 100 }),
+    maxConnections: fc.integer({ max: 100, min: 5 }),
     resourceRecycling: fc.boolean(),
+    severityLevel: fc.constantFrom("LOW", "MEDIUM", "HIGH", "CRITICAL"),
 });
 
 // =============================================================================
@@ -475,9 +477,9 @@ const resourceConstraintScenarios = fc.record({
 // =============================================================================
 
 interface PerformanceMetric {
+    data: unknown;
     operation: string;
     time: number;
-    data: unknown;
 }
 
 let performanceMetrics: PerformanceMetric[] = [];
@@ -499,10 +501,10 @@ const registerPerformanceMetricHooks = (): void => {
  * Helper to measure database operation performance.
  */
 function measureDbOperation<T extends unknown[], R>(
-    func: (...args: T) => R | Promise<R>,
+    func: (...args: T) => Promise<R> | R,
     operationName: string,
     ...args: T
-): R | Promise<R> {
+): Promise<R> | R {
     const startTime = performance.now();
     const result = func(...args);
 
@@ -510,26 +512,26 @@ function measureDbOperation<T extends unknown[], R>(
         return result.finally(() => {
             const endTime = performance.now();
             performanceMetrics.push({
+                data: args,
                 operation: operationName,
                 time: endTime - startTime,
-                data: args,
             });
         });
     }
 
     const endTime = performance.now();
     performanceMetrics.push({
+        data: args,
         operation: operationName,
         time: endTime - startTime,
-        data: args,
     });
     return result;
 }
 
-describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
+describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
     registerPerformanceMetricHooks();
 
-    describe("Transaction Safety Testing", () => {
+    describe("transaction Safety Testing", () => {
         fcTest.prop([transactionOperations])(
             "Transaction operations should maintain ACID properties",
             async (operations) => {
@@ -539,7 +541,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     for (const op of ops) {
                         // Validate operation structure
                         expect(op).toHaveProperty("operation");
-                        expect(typeof op.operation).toBe("string");
+                        expect(op.operation).toBeTypeOf("string");
 
                         // Each operation should be properly structured
                         if (
@@ -552,7 +554,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             expect(op).toHaveProperty("id");
                         }
                     }
-                    return { success: true, affectedRows: ops.length };
+                    return { affectedRows: ops.length, success: true };
                 };
 
                 // Property: Transaction function should never throw with valid structure
@@ -570,30 +572,30 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
 
         fcTest.prop([
-            fc.array(sqlInjectionStrings, { minLength: 1, maxLength: 5 }),
+            fc.array(sqlInjectionStrings, { maxLength: 5, minLength: 1 }),
         ])(
             "SQL injection attempts should be safely rejected",
             (injectionAttempts) => {
                 const mockSafeQueryValidator = (userInput: string) => {
                     // Simulate a safe query function that validates input
                     const hasSqlInjection =
-                        /drop\s+table/i.test(userInput) ||
-                        /delete\s+from.*where.*or.*1.*=.*1/i.test(userInput) ||
+                        /drop\s+table/iv.test(userInput) ||
+                        /delete\s+from.*where.*or[^\n\r1\u{2028}\u{2029}]*1[^\n\r=\u{2028}\u{2029}]*=.*1/iv.test(userInput) ||
                         /union\s+select/i.test(userInput) ||
-                        /waitfor\s+delay/i.test(userInput) ||
-                        /admin\s*'?\s*--/i.test(userInput) ||
-                        /'--/i.test(userInput) ||
-                        /;\s*--/i.test(userInput) ||
-                        /\/\*.*\*\//i.test(userInput) ||
-                        /'\s*or\s*'1'\s*=\s*'1/i.test(userInput) ||
-                        /'\s*or\s*1\s*=\s*1/i.test(userInput);
+                        /waitfor\s+delay/iv.test(userInput) ||
+                        /admin\s*(?:'\s*)?--/iv.test(userInput) ||
+                        userInput.includes('\'--') ||
+                        /;\s*--/v.test(userInput) ||
+                        /\/\*.*\*\//v.test(userInput) ||
+                        /'\s*or\s*'1'\s*=\s*'1/iv.test(userInput) ||
+                        /'\s*or\s*1\s*=\s*1/iv.test(userInput);
 
                     if (hasSqlInjection) {
                         throw new Error("SQL injection detected");
                     }
 
                     // Safe query - return sanitized result
-                    return { rows: [], rowCount: 0, sanitized: true };
+                    return { rowCount: 0, rows: [], sanitized: true };
                 };
 
                 for (const injection of injectionAttempts) {
@@ -610,7 +612,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
     });
 
-    describe("Data Integrity Testing", () => {
+    describe("data Integrity Testing", () => {
         fcTest.prop([monitorDbData])(
             "Monitor data validation should enforce constraints",
             (monitorData) => {
@@ -620,7 +622,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     // ID validation
                     if (
                         data.id !== null &&
-                        (!Number.isInteger(data.id) || data.id <= 0)
+                        (!isInteger(data.id) || data.id <= 0)
                     ) {
                         errors.push(
                             "Invalid ID: must be positive integer or null"
@@ -641,12 +643,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     // SQL injection detection in name
                     if (typeof data.name === "string") {
                         const sqlInjectionPatterns = [
-                            /drop\s+table/i,
-                            /delete\s+from/i,
+                            /drop\s+table/iv,
+                            /delete\s+from/iv,
                             /union\s+select/i,
                             /insert\s+into/i,
-                            /update\s+.*set/i,
-                            /exec\s*\(/i,
+                            /update\s+(?:\S.*)?set/i,
+                            /exec\s*\(/iv,
                             /script\s*>/i,
                         ];
 
@@ -671,7 +673,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
                     // Interval validation
                     if (
-                        !Number.isInteger(data.interval) ||
+                        !isInteger(data.interval) ||
                         data.interval < 1000 ||
                         data.interval > 300_000
                     ) {
@@ -680,40 +682,40 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
                     // Timeout validation
                     if (
-                        !Number.isInteger(data.timeout) ||
+                        !isInteger(data.timeout) ||
                         data.timeout < 1000 ||
                         data.timeout > 30_000
                     ) {
                         errors.push("Invalid timeout: must be 1000-30000ms");
                     }
 
-                    return { valid: errors.length === 0, errors };
+                    return { errors, valid: isEmpty(errors) };
                 };
 
                 const result = measureDbOperation(
                     validateMonitorData,
                     "validateMonitorData",
                     monitorData
-                ) as { valid: boolean; errors: string[] };
+                ) as { errors: string[]; valid: boolean; };
 
                 // Property: Validation should never throw
                 expect(result).toHaveProperty("valid");
                 expect(result).toHaveProperty("errors");
-                expect(Array.isArray(result.errors)).toBeTruthy();
+                expect(Array.isArray(result.errors)).toBe(true);
 
                 // Property: Invalid data should be caught
                 if (
                     monitorData.name &&
                     typeof monitorData.name === "string" &&
-                    (/drop\s+table/i.test(monitorData.name) ||
-                        /delete\s+from/i.test(monitorData.name) ||
+                    (/drop\s+table/iv.test(monitorData.name) ||
+                        /delete\s+from/iv.test(monitorData.name) ||
                         /union\s+select/i.test(monitorData.name) ||
                         /insert\s+into/i.test(monitorData.name) ||
-                        /update\s+.*set/i.test(monitorData.name) ||
-                        /exec\s*\(/i.test(monitorData.name) ||
+                        /update\s+(?:\S.*)?set/i.test(monitorData.name) ||
+                        /exec\s*\(/iv.test(monitorData.name) ||
                         /script\s*>/i.test(monitorData.name))
                 ) {
-                    expect(result.valid).toBeFalsy();
+                    expect(result.valid).toBe(false);
                     expect(result.errors.length).toBeGreaterThan(0);
                 }
             }
@@ -727,7 +729,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
                     // Monitor ID reference
                     if (
-                        !Number.isInteger(data.monitor_id) ||
+                        !isInteger(data.monitor_id) ||
                         data.monitor_id <= 0
                     ) {
                         errors.push("Invalid monitor_id reference");
@@ -747,7 +749,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     // Response time validation
                     if (
                         data.response_time !== null &&
-                        (!Number.isInteger(data.response_time) ||
+                        (!isInteger(data.response_time) ||
                             data.response_time < 0)
                     ) {
                         errors.push(
@@ -772,28 +774,28 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         errors.push("Invalid checked_at date");
                     }
 
-                    return { valid: errors.length === 0, errors };
+                    return { errors, valid: isEmpty(errors) };
                 };
 
                 const result = measureDbOperation(
                     validateStatusUpdate,
                     "validateStatusUpdate",
                     statusData
-                ) as { valid: boolean; errors: string[] };
+                ) as { errors: string[]; valid: boolean; };
 
                 // Property: Validation result should be properly structured
                 expect(result).toHaveProperty("valid");
                 expect(result).toHaveProperty("errors");
-                expect(typeof result.valid).toBe("boolean");
-                expect(Array.isArray(result.errors)).toBeTruthy();
+                expect(result.valid).toBeTypeOf("boolean");
+                expect(Array.isArray(result.errors)).toBe(true);
             }
         );
     });
 
-    describe("Concurrent Operations Simulation", () => {
+    describe("concurrent Operations Simulation", () => {
         fcTest.prop([
-            fc.array(monitorDbData, { minLength: 2, maxLength: 10 }),
-            fc.integer({ min: 2, max: 5 }),
+            fc.array(monitorDbData, { maxLength: 10, minLength: 2 }),
+            fc.integer({ max: 5, min: 2 }),
         ])(
             "Concurrent inserts should handle conflicts gracefully",
             (monitorDataArray, concurrentCount) => {
@@ -808,9 +810,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                 setTimeout(() => {
                                     resolve({
                                         id: index + 1,
+                                        insertTime: performance.now(),
                                         name: data.name,
                                         success: true,
-                                        insertTime: performance.now(),
                                     });
                                 }, secureRandomFloat() * 10);
                             })
@@ -827,9 +829,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 ) as Promise<
                     {
                         id: number;
+                        insertTime: number;
                         name: string;
                         success: boolean;
-                        insertTime: number;
                     }[]
                 >;
 
@@ -837,23 +839,23 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 expect(resultPromise).toBeInstanceOf(Promise);
 
                 return resultPromise.then((results) => {
-                    expect(Array.isArray(results)).toBeTruthy();
+                    expect(Array.isArray(results)).toBe(true);
                     expect(results).toHaveLength(
                         Math.min(monitorDataArray.length, concurrentCount)
                     );
 
                     for (const result of results) {
                         expect(result).toHaveProperty("success");
-                        expect(result.success).toBeTruthy();
+                        expect(result.success).toBe(true);
                     }
                 });
             }
         );
 
         fcTest.prop([
-            fc.array(fc.integer({ min: 1, max: 1000 }), {
-                minLength: 1,
+            fc.array(fc.integer({ max: 1000, min: 1 }), {
                 maxLength: 10,
+                minLength: 1,
             }),
         ])("Concurrent reads should return consistent data", (monitorIds) => {
             const simulateConcurrentReads = async (ids: number[]) => {
@@ -865,9 +867,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                 resolve({
                                     id,
                                     name: `Monitor ${id}`,
+                                    readTime: performance.now(),
                                     type: "http",
                                     url: `https://example-${id}.com`,
-                                    readTime: performance.now(),
                                 });
                             }, secureRandomFloat() * 5);
                         })
@@ -884,14 +886,14 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 {
                     id: number;
                     name: string;
+                    readTime: number;
                     type: string;
                     url: string;
-                    readTime: number;
                 }[]
             >;
 
             return resultPromise.then((results) => {
-                expect(Array.isArray(results)).toBeTruthy();
+                expect(Array.isArray(results)).toBe(true);
                 expect(results).toHaveLength(monitorIds.length);
 
                 // Property: Each read should return data for correct ID
@@ -904,8 +906,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         });
     });
 
-    describe("Error Handling and Recovery", () => {
-        fcTest.prop([fc.array(fc.string(), { minLength: 1, maxLength: 5 })])(
+    describe("error Handling and Recovery", () => {
+        fcTest.prop([fc.array(fc.string(), { maxLength: 5, minLength: 1 })])(
             "Database errors should be handled gracefully",
             (errorMessages) => {
                 const simulateDbError = (errorMsg: string) => {
@@ -921,15 +923,15 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             throw new Error("Foreign key constraint violation");
                         }
 
-                        return { success: true, data: "Operation completed" };
+                        return { data: "Operation completed", success: true };
                     } catch (error) {
                         return {
-                            success: false,
                             error:
-                                error instanceof Error
+                                Error.isError(error)
                                     ? error.message
                                     : "Unknown error",
                             recovered: true,
+                            success: false,
                         };
                     }
                 };
@@ -940,20 +942,20 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         "errorHandling",
                         errorMsg
                     ) as {
-                        success: boolean;
                         data?: string;
                         error?: string;
                         recovered?: boolean;
+                        success: boolean;
                     };
 
                     // Property: Error handling should never throw
                     expect(result).toHaveProperty("success");
-                    expect(typeof result.success).toBe("boolean");
+                    expect(result.success).toBeTypeOf("boolean");
 
                     // Property: Failed operations should provide error info
                     if (!result.success) {
                         expect(result).toHaveProperty("error");
-                        expect(typeof result.error).toBe("string");
+                        expect(result.error).toBeTypeOf("string");
                         expect(result).toHaveProperty("recovered");
                     }
                 }
@@ -962,7 +964,6 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
         fcTest.prop([
             fc.record({
-                tableName: tableNames,
                 operation: fc.constantFrom(
                     "SELECT",
                     "INSERT",
@@ -972,6 +973,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 params: fc.array(
                     fc.oneof(fc.string(), fc.integer(), fc.boolean())
                 ),
+                tableName: tableNames,
             }),
         ])(
             "Database operations should validate table access",
@@ -1023,7 +1025,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     }
 
                     return {
-                        allowed: errors.length === 0,
+                        allowed: isEmpty(errors),
                         errors,
                         operation: operation.operation,
                         table: operation.tableName,
@@ -1044,23 +1046,23 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 // Property: Access control should never throw
                 expect(result).toHaveProperty("allowed");
                 expect(result).toHaveProperty("errors");
-                expect(typeof result.allowed).toBe("boolean");
+                expect(result.allowed).toBeTypeOf("boolean");
 
                 // Property: Dangerous operations should be blocked
                 if (
                     dbOperation.tableName === "users" ||
                     dbOperation.tableName === "admin"
                 ) {
-                    expect(result.allowed).toBeFalsy();
+                    expect(result.allowed).toBe(false);
                     expect(result.errors.length).toBeGreaterThan(0);
                 }
             }
         );
     });
 
-    describe("Performance and Resource Management", () => {
+    describe("performance and Resource Management", () => {
         fcTest.prop(
-            [fc.array(monitorDbData, { minLength: 100, maxLength: 500 })],
+            [fc.array(monitorDbData, { maxLength: 500, minLength: 100 })],
             {
                 numRuns: 3, // Reduce runs for performance test
             }
@@ -1078,8 +1080,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 const endTime = performance.now();
 
                 return {
-                    processed: processedData.length,
                     duration: endTime - startTime,
+                    processed: processedData.length,
                     success: true,
                 };
             };
@@ -1089,22 +1091,23 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 "bulkInsert",
                 bulkData
             ) as {
-                processed: number;
                 duration: number;
+                processed: number;
                 success: boolean;
             };
 
             // Property: Bulk operation should complete successfully
-            expect(result.success).toBeTruthy();
+            expect(result.success).toBe(true);
             expect(result.processed).toBe(bulkData.length);
 
             // Property: Performance should be reasonable (< 10ms per item)
             const avgTimePerItem = result.duration / bulkData.length;
+
             expect(avgTimePerItem).toBeLessThan(10);
         }); // Reduced runs for performance tests
     });
 
-    describe("Advanced Connection Management", () => {
+    describe("advanced Connection Management", () => {
         fcTest.prop([connectionPoolConfig])(
             "Connection pool should handle various configurations safely",
             (poolConfig) => {
@@ -1141,12 +1144,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     );
 
                     return {
-                        valid: errors.length === 0,
-                        errors,
-                        warnings,
                         activeConnections,
+                        errors,
                         poolEfficiency:
                             activeConnections / config.maxConnections,
+                        valid: isEmpty(errors),
+                        warnings,
                     };
                 };
 
@@ -1155,11 +1158,11 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     "connectionPool",
                     poolConfig
                 ) as {
-                    valid: boolean;
-                    errors: string[];
-                    warnings: string[];
                     activeConnections: number;
+                    errors: string[];
                     poolEfficiency: number;
+                    valid: boolean;
+                    warnings: string[];
                 };
 
                 // Property: Pool validation should never throw
@@ -1172,9 +1175,9 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
 
         fcTest.prop([
-            fc.array(fc.integer({ min: 100, max: 5000 }), {
-                minLength: 1,
+            fc.array(fc.integer({ max: 5000, min: 100 }), {
                 maxLength: 20,
+                minLength: 1,
             }),
         ])(
             "Connection timeouts should be handled gracefully",
@@ -1184,26 +1187,26 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         // Const startTime = performance.now();
 
                         // Simulate connection attempt
-                        const connectionSuccess = timeout > 1000; // Arbitrary threshold
+                        const isConnectionSuccess = timeout > 1000; // Arbitrary threshold
                         const actualTime = Math.min(timeout, 2000); // Max 2s simulation
 
                         return {
-                            requestedTimeout: timeout,
                             actualTime,
-                            success: connectionSuccess,
-                            retryNeeded: !connectionSuccess,
+                            requestedTimeout: timeout,
+                            retryNeeded: !isConnectionSuccess,
+                            success: isConnectionSuccess,
                         };
                     });
 
                     return {
-                        totalAttempts: results.length,
-                        successfulConnections: results.filter((r) => r.success)
-                            .length,
-                        failedConnections: results.filter((r) => !r.success)
-                            .length,
                         avgConnectionTime:
                             results.reduce((sum, r) => sum + r.actualTime, 0) /
                             results.length,
+                        failedConnections: results.filter((r) => !r.success)
+                            .length,
+                        successfulConnections: results.filter((r) => r.success)
+                            .length,
+                        totalAttempts: results.length,
                     };
                 };
 
@@ -1223,7 +1226,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
     });
 
-    describe("Advanced Concurrency Control", () => {
+    describe("advanced Concurrency Control", () => {
         fcTest.prop([concurrencyScenarios])(
             "Isolation levels should maintain data consistency",
             async (scenario) => {
@@ -1235,10 +1238,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
                     // Simulate isolation level behavior
                     switch (config.isolationLevel) {
-                        case "READ_UNCOMMITTED": {
-                            dirtyReads = secureRandomInt(
-                                config.concurrentUsers
-                            );
+                        case "READ_COMMITTED": {
                             phantomReads = secureRandomInt(
                                 config.concurrentUsers
                             );
@@ -1247,7 +1247,10 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             );
                             break;
                         }
-                        case "READ_COMMITTED": {
+                        case "READ_UNCOMMITTED": {
+                            dirtyReads = secureRandomInt(
+                                config.concurrentUsers
+                            );
                             phantomReads = secureRandomInt(
                                 config.concurrentUsers
                             );
@@ -1278,14 +1281,14 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         );
 
                     return {
-                        isolationLevel: config.isolationLevel,
                         consistencyIssues,
                         deadlockDetected:
                             config.deadlockDetection &&
                             secureRandomBoolean(0.1),
+                        isolationLevel: config.isolationLevel,
                         lockWaitTime: config.lockTimeout * secureRandomFloat(),
                         transactionSuccess:
-                            consistencyIssues.length === 0 ||
+                            isEmpty(consistencyIssues) ||
                             config.isolationLevel !== "SERIALIZABLE",
                     };
                 };
@@ -1299,7 +1302,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 // Property: Higher isolation levels should have fewer consistency issues
                 expect(result).toHaveProperty("isolationLevel");
                 expect(result).toHaveProperty("consistencyIssues");
-                expect(Array.isArray(result.consistencyIssues)).toBeTruthy();
+                expect(Array.isArray(result.consistencyIssues)).toBe(true);
                 expect(result.lockWaitTime).toBeGreaterThanOrEqual(0);
                 expect(result.lockWaitTime).toBeLessThanOrEqual(
                     scenario.lockTimeout
@@ -1313,7 +1316,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
 
         fcTest.prop([
-            fc.array(concurrencyScenarios, { minLength: 2, maxLength: 5 }),
+            fc.array(concurrencyScenarios, { maxLength: 5, minLength: 2 }),
         ])(
             "Deadlock detection should prevent infinite waits",
             async (scenarios) => {
@@ -1321,12 +1324,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     configs: typeof scenarios
                 ) => {
                     const transactions = configs.map((config, index) => ({
+                        completed: false,
+                        deadlocked: false,
                         id: index + 1,
                         isolationLevel: config.isolationLevel,
                         lockType: config.lockType,
                         startTime: performance.now(),
-                        completed: false,
-                        deadlocked: false,
                     }));
 
                     // Simulate potential deadlock detection
@@ -1351,17 +1354,17 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     }
 
                     return {
-                        totalTransactions: transactions.length,
                         completedTransactions: transactions.filter(
                             (t) => t.completed
                         ).length,
+                        deadlockDetected: hasDeadlock,
                         deadlockedTransactions: transactions.filter(
                             (t) => t.deadlocked
                         ).length,
-                        deadlockDetected: hasDeadlock,
                         resolutionTime: hasDeadlock
                             ? secureRandomFloat() * 1000
                             : 0,
+                        totalTransactions: transactions.length,
                     };
                 };
 
@@ -1385,7 +1388,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
     });
 
-    describe("Foreign Key and Relationship Integrity", () => {
+    describe("foreign Key and Relationship Integrity", () => {
         fcTest.prop([relationshipData])(
             "Foreign key constraints should maintain referential integrity",
             async (relationship) => {
@@ -1395,14 +1398,14 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     const violations: string[] = [];
 
                     // Simulate foreign key validation
-                    const parentExists = secureRandomBoolean(0.9); // 90% parent records exist
-                    const childHasParent = secureRandomBoolean(0.95); // 95% children have valid parents
+                    const isParentExists = secureRandomBoolean(0.9); // 90% parent records exist
+                    const isChildHasParent = secureRandomBoolean(0.95); // 95% children have valid parents
 
-                    if (!parentExists && rel.referentialIntegrity) {
+                    if (!isParentExists && rel.referentialIntegrity) {
                         violations.push("Parent record does not exist");
                     }
 
-                    if (!childHasParent && rel.referentialIntegrity) {
+                    if (!isChildHasParent && rel.referentialIntegrity) {
                         violations.push(
                             "Child record references non-existent parent"
                         );
@@ -1410,21 +1413,21 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
                     // Test cascade operations
                     const cascadeResults = {
-                        deleteCascaded: rel.cascadeDelete && parentExists,
-                        updateCascaded: rel.cascadeUpdate && parentExists,
+                        deleteCascaded: rel.cascadeDelete && isParentExists,
                         orphanedRecords:
-                            !rel.cascadeDelete && !parentExists
+                            !rel.cascadeDelete && !isParentExists
                                 ? secureRandomInt(10)
                                 : 0,
+                        updateCascaded: rel.cascadeUpdate && isParentExists,
                     };
 
                     return {
-                        constraintName: rel.foreignKeyConstraint,
-                        violations,
                         cascadeResults,
-                        integrityMaintained: violations.length === 0,
-                        parentTable: rel.parentTable,
                         childTable: rel.childTable,
+                        constraintName: rel.foreignKeyConstraint,
+                        integrityMaintained: isEmpty(violations),
+                        parentTable: rel.parentTable,
+                        violations,
                     };
                 };
 
@@ -1437,7 +1440,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 // Property: Referential integrity should be enforced
                 expect(result).toHaveProperty("integrityMaintained");
                 expect(result).toHaveProperty("violations");
-                expect(Array.isArray(result.violations)).toBeTruthy();
+                expect(Array.isArray(result.violations)).toBe(true);
                 expect(result).toHaveProperty("cascadeResults");
 
                 // Property: Cascade operations should work when configured
@@ -1448,7 +1451,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
 
         fcTest.prop([
-            fc.array(relationshipData, { minLength: 2, maxLength: 5 }),
+            fc.array(relationshipData, { maxLength: 5, minLength: 2 }),
         ])(
             "Circular references should be detected and handled",
             async (relationships) => {
@@ -1500,10 +1503,10 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     }
 
                     return {
-                        totalRelationships: rels.length,
                         circularReferences: cycles,
                         cycleDetected: cycles.length > 0,
-                        graphValid: cycles.length === 0,
+                        graphValid: isEmpty(cycles),
+                        totalRelationships: rels.length,
                     };
                 };
 
@@ -1516,20 +1519,20 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 // Property: Circular reference detection should work
                 expect(result).toHaveProperty("cycleDetected");
                 expect(result).toHaveProperty("circularReferences");
-                expect(Array.isArray(result.circularReferences)).toBeTruthy();
+                expect(Array.isArray(result.circularReferences)).toBe(true);
                 expect(result.totalRelationships).toBe(relationships.length);
             }
         );
     });
 
-    describe("Migration and Schema Evolution", () => {
+    describe("migration and Schema Evolution", () => {
         fcTest.prop([migrationScenarios])(
             "Database migrations should preserve data integrity",
             async (migration) => {
                 const simulateMigration = (scenario: typeof migration) => {
                     const migrationLog: string[] = [];
                     const errors: string[] = [];
-                    let dataLoss = false;
+                    let isDataLoss = false;
 
                     // Validate migration scenario
                     if (scenario.fromVersion === scenario.toVersion) {
@@ -1552,7 +1555,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                     `${step} executed with data preservation`
                                 );
                             } else {
-                                dataLoss = true;
+                                isDataLoss = true;
                                 migrationLog.push(
                                     `Warning: ${step} may cause data loss`
                                 );
@@ -1573,14 +1576,14 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                         !scenario.migrationSteps.includes("DROP_CONSTRAINT");
 
                     return {
-                        migrationSuccess: errors.length === 0,
-                        migrationLog,
+                        dataLoss: isDataLoss,
                         errors,
-                        dataLoss,
-                        rollbackAvailable: canRollback,
                         fromVersion: scenario.fromVersion,
-                        toVersion: scenario.toVersion,
+                        migrationLog,
+                        migrationSuccess: isEmpty(errors),
+                        rollbackAvailable: canRollback,
                         stepsExecuted: scenario.migrationSteps.length,
+                        toVersion: scenario.toVersion,
                     };
                 };
 
@@ -1593,7 +1596,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 // Property: Migration should provide clear feedback
                 expect(result).toHaveProperty("migrationSuccess");
                 expect(result).toHaveProperty("migrationLog");
-                expect(Array.isArray(result.migrationLog)).toBeTruthy();
+                expect(Array.isArray(result.migrationLog)).toBe(true);
                 expect(result.stepsExecuted).toBe(
                     migration.migrationSteps.length
                 );
@@ -1604,13 +1607,13 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     (migration.migrationSteps.includes("DROP_COLUMN") ||
                         migration.migrationSteps.includes("DROP_CONSTRAINT"))
                 ) {
-                    expect(result.dataLoss).toBeTruthy();
+                    expect(result.dataLoss).toBe(true);
                 }
             }
         );
 
         fcTest.prop([
-            fc.array(migrationScenarios, { minLength: 2, maxLength: 5 }),
+            fc.array(migrationScenarios, { maxLength: 5, minLength: 2 }),
         ])(
             "Sequential migrations should maintain version consistency",
             async (migrations) => {
@@ -1632,10 +1635,10 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             // Execute migration
                             const migrationResult = {
                                 fromVersion: migration.fromVersion,
-                                toVersion: migration.toVersion,
                                 steps: migration.migrationSteps.length,
                                 success: true,
                                 timestamp: new Date().toISOString(),
+                                toVersion: migration.toVersion,
                             };
 
                             migrationHistory.push(migrationResult);
@@ -1648,12 +1651,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     }
 
                     return {
+                        errors,
                         finalVersion: currentVersion,
                         migrationHistory,
-                        errors,
-                        totalMigrations: scenarios.length,
                         successfulMigrations: migrationHistory.length,
-                        versionConsistency: errors.length === 0,
+                        totalMigrations: scenarios.length,
+                        versionConsistency: isEmpty(errors),
                     };
                 };
 
@@ -1674,71 +1677,71 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
         );
     });
 
-    describe("Security and Access Control", () => {
+    describe("security and Access Control", () => {
         fcTest.prop([securityContexts])(
             "Authentication and authorization should be enforced",
             async (security) => {
                 const validateSecurityContext = (ctx: typeof security) => {
                     const securityEvents: string[] = [];
-                    let accessGranted = false;
-                    let sessionValid = false;
+                    let isAccessGranted = false;
+                    let isSessionValid = false;
 
                     // Simulate authentication
                     if (ctx.requiresAuthentication) {
-                        const authSuccess =
+                        const isAuthSuccess =
                             ctx.authenticationMethod === "JWT"
                                 ? secureRandomBoolean(0.95) // 95% success for JWT
                                 : secureRandomBoolean(0.9); // 90% success for other methods
 
-                        if (authSuccess) {
+                        if (isAuthSuccess) {
                             securityEvents.push(
                                 `Authentication successful via ${ctx.authenticationMethod}`
                             );
-                            sessionValid = true;
+                            isSessionValid = true;
                         } else {
                             securityEvents.push(
                                 `Authentication failed for ${ctx.authenticationMethod}`
                             );
                             return {
                                 accessGranted: false,
-                                sessionValid: false,
-                                securityEvents,
-                                encryptionActive: ctx.encryptionEnabled, // Encryption is independent of authentication
                                 auditTrail: [
                                     `Failed authentication attempt at ${new Date().toISOString()}`,
                                 ],
+                                encryptionActive: ctx.encryptionEnabled, // Encryption is independent of authentication
+                                securityEvents,
+                                sessionValid: false,
                             };
                         }
                     } else {
-                        sessionValid = true;
+                        isSessionValid = true;
                     }
 
                     // Simulate authorization
-                    if (sessionValid && ctx.permissions.length > 0) {
+                    if (isSessionValid && ctx.permissions.length > 0) {
                         const hasRequiredPermission =
                             ctx.permissions.includes("READ") ||
                             ctx.permissions.includes("ADMIN");
-                        accessGranted = hasRequiredPermission;
+                        isAccessGranted = hasRequiredPermission;
 
-                        if (accessGranted) {
+                        if (isAccessGranted) {
                             securityEvents.push(
-                                `Access granted with permissions: ${ctx.permissions.join(", ")}`
+                                `Access granted with permissions: ${arrayJoin(ctx.permissions, ", ")}`
                             );
                         } else {
                             securityEvents.push(
-                                `Access denied - insufficient permissions`
+                                "Access denied - insufficient permissions"
                             );
                         }
                     }
 
                     return {
-                        accessGranted,
-                        sessionValid,
-                        securityEvents,
-                        encryptionActive: ctx.encryptionEnabled && sessionValid,
+                        accessGranted: isAccessGranted,
                         auditTrail: securityEvents.map(
                             (event, idx) => `${idx + 1}. ${event}`
                         ),
+                        encryptionActive: ctx.encryptionEnabled && isSessionValid,
+                        securityEvents,
+                        sessionValid: isSessionValid,
                     };
                 };
 
@@ -1751,8 +1754,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 // Property: Security constraints should be enforced
                 expect(result).toHaveProperty("accessGranted");
                 expect(result).toHaveProperty("sessionValid");
-                expect(Array.isArray(result.securityEvents)).toBeTruthy();
-                expect(Array.isArray(result.auditTrail)).toBeTruthy();
+                expect(Array.isArray(result.securityEvents)).toBe(true);
+                expect(Array.isArray(result.auditTrail)).toBe(true);
 
                 // Property: Authentication requirement should be respected
                 if (security.requiresAuthentication) {
@@ -1761,13 +1764,13 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
 
                 // Property: Encryption should be active when configured
                 if (security.encryptionEnabled) {
-                    expect(result.encryptionActive).toBeTruthy();
+                    expect(result.encryptionActive).toBe(true);
                 }
             }
         );
 
         fcTest.prop([
-            fc.array(securityContexts, { minLength: 1, maxLength: 3 }),
+            fc.array(securityContexts, { maxLength: 3, minLength: 1 }),
         ])(
             "Role-based access control should work correctly",
             async (securityRoles) => {
@@ -1782,7 +1785,6 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             role.permissions.includes("WRITE");
 
                         return {
-                            role: role.authenticationMethod,
                             adminOperations: hasAdminAccess
                                 ? [
                                       "CREATE_USER",
@@ -1791,6 +1793,11 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                   ]
                                 : [],
                             dataOperations: hasReadAccess ? ["SELECT"] : [],
+                            role: role.authenticationMethod,
+                            securityViolations:
+                                !hasReadAccess && isEmpty(role.permissions)
+                                    ? 1
+                                    : 0,
                             writeOperations: hasWriteAccess
                                 ? [
                                       "INSERT",
@@ -1798,28 +1805,24 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                       "DELETE",
                                   ]
                                 : [],
-                            securityViolations:
-                                !hasReadAccess && role.permissions.length === 0
-                                    ? 1
-                                    : 0,
                         };
                     });
 
                     return {
-                        totalRoles: roles.length,
+                        accessMatrix: accessResults,
                         adminRoles: accessResults.filter(
                             (r) => r.adminOperations.length > 0
                         ).length,
                         readOnlyRoles: accessResults.filter(
                             (r) =>
                                 r.dataOperations.length > 0 &&
-                                r.writeOperations.length === 0
+                                isEmpty(r.writeOperations)
                         ).length,
                         securityViolations: accessResults.reduce(
                             (sum, r) => sum + r.securityViolations,
                             0
                         ),
-                        accessMatrix: accessResults,
+                        totalRoles: roles.length,
                     };
                 };
 
@@ -1835,12 +1838,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     result.totalRoles
                 );
                 expect(result.securityViolations).toBe(0); // No violations expected in valid config
-                expect(Array.isArray(result.accessMatrix)).toBeTruthy();
+                expect(Array.isArray(result.accessMatrix)).toBe(true);
             }
         );
     });
 
-    describe("Recovery and Fault Tolerance", () => {
+    describe("recovery and Fault Tolerance", () => {
         fcTest.prop([recoveryScenarios])(
             "Database recovery should restore to consistent state",
             async (recovery) => {
@@ -1848,8 +1851,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                     scenario: typeof recovery
                 ) => {
                     const recoveryLog: string[] = [];
-                    let dataIntegrityMaintained = true;
-                    let recoverySuccessful = false;
+                    let isDataIntegrityMaintained = true;
+                    let isRecoverySuccessful = false;
 
                     recoveryLog.push(
                         `Starting recovery from ${scenario.failureType}`
@@ -1863,20 +1866,20 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                 recoveryLog.push(
                                     "Minor corruption detected - auto-repair successful"
                                 );
-                                recoverySuccessful = true;
+                                isRecoverySuccessful = true;
                             } else if (corruptionLevel < 0.7) {
                                 recoveryLog.push(
                                     "Moderate corruption - backup restoration required"
                                 );
-                                recoverySuccessful = scenario.backupAvailable;
-                                dataIntegrityMaintained =
+                                isRecoverySuccessful = scenario.backupAvailable;
+                                isDataIntegrityMaintained =
                                     scenario.backupAvailable;
                             } else {
                                 recoveryLog.push(
                                     "Severe corruption - data loss possible"
                                 );
-                                recoverySuccessful = false;
-                                dataIntegrityMaintained = false;
+                                isRecoverySuccessful = false;
+                                isDataIntegrityMaintained = false;
                             }
                             break;
                         }
@@ -1885,14 +1888,14 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                                 recoveryLog.push(
                                     "Hardware failure - restoring from backup"
                                 );
-                                recoverySuccessful = true;
-                                dataIntegrityMaintained =
+                                isRecoverySuccessful = true;
+                                isDataIntegrityMaintained =
                                     scenario.recoveryPointObjective <= 3600; // 1 hour RPO
                             } else {
                                 recoveryLog.push(
                                     "Hardware failure - no backup available"
                                 );
-                                recoverySuccessful = false;
+                                isRecoverySuccessful = false;
                             }
                             break;
                         }
@@ -1900,31 +1903,31 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                             recoveryLog.push(
                                 "Network partition detected - attempting reconnection"
                             );
-                            recoverySuccessful = secureRandomBoolean(0.8); // 80% success rate
-                            dataIntegrityMaintained = true; // Network issues don't corrupt data
+                            isRecoverySuccessful = secureRandomBoolean(0.8); // 80% success rate
+                            isDataIntegrityMaintained = true; // Network issues don't corrupt data
                             break;
                         }
                         case "TRANSACTION_ROLLBACK": {
                             recoveryLog.push("Transaction rollback initiated");
-                            recoverySuccessful = true; // Rollbacks should always succeed
-                            dataIntegrityMaintained = true;
+                            isRecoverySuccessful = true; // Rollbacks should always succeed
+                            isDataIntegrityMaintained = true;
                             break;
                         }
                     }
 
                     return {
-                        failureType: scenario.failureType,
-                        recoverySuccessful,
-                        dataIntegrityMaintained,
-                        recoveryTimeActual:
-                            scenario.recoveryPointObjective *
-                            (0.5 + secureRandomFloat()),
-                        recoveryLog,
                         backupUsed:
                             scenario.backupAvailable &&
                             ["CORRUPTION", "HARDWARE_FAILURE"].includes(
                                 scenario.failureType
                             ),
+                        dataIntegrityMaintained: isDataIntegrityMaintained,
+                        failureType: scenario.failureType,
+                        recoveryLog,
+                        recoverySuccessful: isRecoverySuccessful,
+                        recoveryTimeActual:
+                            scenario.recoveryPointObjective *
+                            (0.5 + secureRandomFloat()),
                     };
                 };
 
@@ -1938,24 +1941,24 @@ describe("Comprehensive Database Operations Fuzzing (Part 1)", () => {
                 expect(result).toHaveProperty("recoverySuccessful");
                 expect(result).toHaveProperty("dataIntegrityMaintained");
                 expect(result.recoveryTimeActual).toBeGreaterThan(0);
-                expect(Array.isArray(result.recoveryLog)).toBeTruthy();
+                expect(Array.isArray(result.recoveryLog)).toBe(true);
 
                 // Property: Backup availability should affect recovery success
                 if (
                     recovery.backupAvailable &&
                     recovery.failureType === "HARDWARE_FAILURE"
                 ) {
-                    expect(result.recoverySuccessful).toBeTruthy();
+                    expect(result.recoverySuccessful).toBe(true);
                 }
             }
         );
     });
 });
 
-describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
+describe("comprehensive Database Operations Fuzzing (Part 2)", () => {
     registerPerformanceMetricHooks();
 
-    describe("Complex Data Types and Query Optimization", () => {
+    describe("complex Data Types and Query Optimization", () => {
         fcTest.prop([complexDataTypes])(
             "Complex data types should be handled efficiently",
             async (dataType) => {
@@ -1966,13 +1969,13 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Simulate processing different data types
                     switch (type.dataType) {
-                        case "JSON": {
-                            const complexity = type.size / 1000; // Size in KB
+                        case "ARRAY": {
+                            const arrayComplexity = Math.log10(type.size);
                             processingTime =
-                                complexity * 10 + secureRandomFloat() * 50;
-                            memoryUsage = type.size * 1.5; // JSON overhead
+                                arrayComplexity * 20 + secureRandomFloat() * 30;
+                            memoryUsage = type.size * 8; // Pointer overhead
                             processingMetrics.push(
-                                `JSON parsing completed in ${processingTime.toFixed(2)}ms`
+                                `Array processing: ${type.size} elements`
                             );
                             break;
                         }
@@ -1985,13 +1988,13 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             );
                             break;
                         }
-                        case "ARRAY": {
-                            const arrayComplexity = Math.log10(type.size);
+                        case "JSON": {
+                            const complexity = type.size / 1000; // Size in KB
                             processingTime =
-                                arrayComplexity * 20 + secureRandomFloat() * 30;
-                            memoryUsage = type.size * 8; // Pointer overhead
+                                complexity * 10 + secureRandomFloat() * 50;
+                            memoryUsage = type.size * 1.5; // JSON overhead
                             processingMetrics.push(
-                                `Array processing: ${type.size} elements`
+                                `JSON parsing completed in ${processingTime.toFixed(2)}ms`
                             );
                             break;
                         }
@@ -2001,7 +2004,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                                 xmlComplexity * 25 + secureRandomFloat() * 75;
                             memoryUsage = type.size * 3; // DOM overhead
                             processingMetrics.push(
-                                `XML parsing and validation completed`
+                                "XML parsing and validation completed"
                             );
                             break;
                         }
@@ -2015,11 +2018,11 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     return {
                         dataType: type.dataType,
-                        processingTimeMs: processingTime,
-                        memoryUsageBytes: memoryUsage,
-                        indexed: type.indexed,
-                        processingMetrics,
                         efficiency: type.size / processingTime, // Bytes per ms
+                        indexed: type.indexed,
+                        memoryUsageBytes: memoryUsage,
+                        processingMetrics,
+                        processingTimeMs: processingTime,
                     };
                 };
 
@@ -2033,7 +2036,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                 expect(result.processingTimeMs).toBeGreaterThan(0);
                 expect(result.memoryUsageBytes).toBeGreaterThan(0);
                 expect(result.efficiency).toBeGreaterThan(0);
-                expect(Array.isArray(result.processingMetrics)).toBeTruthy();
+                expect(Array.isArray(result.processingMetrics)).toBe(true);
 
                 // Property: Indexing should improve performance
                 if (dataType.indexed) {
@@ -2057,23 +2060,17 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Apply query-specific optimizations
                     switch (pattern.queryType) {
-                        case "SELECT": {
+                        case "AGGREGATE": {
+                            executionTime *= 0.8; // Aggregates are optimized internally
+                            optimizationSteps.push(
+                                "Aggregate function optimization applied"
+                            );
                             if (pattern.indexesAvailable.length > 0) {
-                                indexUsage = pattern.indexesAvailable.length;
-                                executionTime *= 1 - indexUsage * 0.3; // Each index reduces time by 30%
-                                optimizationSteps.push(
-                                    `Using ${indexUsage} indexes for optimization`
-                                );
-                            }
-
-                            if (pattern.complexity === "HIGH") {
-                                // High complexity penalty, but reduce it if we have good indexes
-                                const complexityMultiplier =
-                                    indexUsage > 0 ? 1.2 : 1.5;
-                                executionTime *= complexityMultiplier;
-                                optimizationSteps.push(
-                                    "High complexity query - additional optimization applied"
-                                );
+                                indexUsage = Math.min(
+                                    pattern.indexesAvailable.length,
+                                    2
+                                ); // Aggregates use fewer indexes
+                                executionTime *= 0.9; // Additional optimization with indexes
                             }
                             break;
                         }
@@ -2104,17 +2101,23 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             }
                             break;
                         }
-                        case "AGGREGATE": {
-                            executionTime *= 0.8; // Aggregates are optimized internally
-                            optimizationSteps.push(
-                                "Aggregate function optimization applied"
-                            );
+                        case "SELECT": {
                             if (pattern.indexesAvailable.length > 0) {
-                                indexUsage = Math.min(
-                                    pattern.indexesAvailable.length,
-                                    2
-                                ); // Aggregates use fewer indexes
-                                executionTime *= 0.9; // Additional optimization with indexes
+                                indexUsage = pattern.indexesAvailable.length;
+                                executionTime *= 1 - indexUsage * 0.3; // Each index reduces time by 30%
+                                optimizationSteps.push(
+                                    `Using ${indexUsage} indexes for optimization`
+                                );
+                            }
+
+                            if (pattern.complexity === "HIGH") {
+                                // High complexity penalty, but reduce it if we have good indexes
+                                const complexityMultiplier =
+                                    indexUsage > 0 ? 1.2 : 1.5;
+                                executionTime *= complexityMultiplier;
+                                optimizationSteps.push(
+                                    "High complexity query - additional optimization applied"
+                                );
                             }
                             break;
                         }
@@ -2154,12 +2157,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     );
 
                     return {
-                        originalEstimate: pattern.estimatedRows * 0.1,
-                        optimizedTime: finalExecutionTime,
+                        indexesUsed: indexUsage,
                         optimizationRatio:
                             (pattern.estimatedRows * 0.1) / finalExecutionTime,
-                        indexesUsed: indexUsage,
                         optimizationSteps,
+                        optimizedTime: finalExecutionTime,
+                        originalEstimate: pattern.estimatedRows * 0.1,
                         queryComplexity: pattern.complexity,
                     };
                 };
@@ -2173,7 +2176,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                 // Property: Optimization should provide measurable benefits
                 expect(result.optimizedTime).toBeGreaterThan(0);
                 expect(result.optimizationRatio).toBeGreaterThan(0); // Just ensure it's positive
-                expect(Array.isArray(result.optimizationSteps)).toBeTruthy();
+                expect(Array.isArray(result.optimizationSteps)).toBe(true);
 
                 // Property: Indexes should improve performance for most query types
                 if (
@@ -2195,7 +2198,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
     });
 
-    describe("Operational and Maintenance Scenarios", () => {
+    describe("operational and Maintenance Scenarios", () => {
         fcTest.prop([maintenanceOperations])(
             "Maintenance operations should preserve system integrity",
             async (maintenance) => {
@@ -2203,8 +2206,8 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     operation: typeof maintenance
                 ) => {
                     const maintenanceLog: string[] = [];
-                    let systemAvailable = true;
-                    let dataIntegrityPreserved = true;
+                    let isSystemAvailable = true;
+                    let isDataIntegrityPreserved = true;
                     let performanceImprovement = 0;
 
                     maintenanceLog.push(
@@ -2213,6 +2216,34 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Simulate different maintenance operations
                     switch (operation.operationType) {
+                        case "BACKUP": {
+                            const backupSize =
+                                secureRandomFloat() * 10_000 + 1000; // MB
+                            maintenanceLog.push(
+                                `Backup completed - ${backupSize.toFixed(2)}MB backed up`
+                            );
+                            isSystemAvailable = true; // Backups don't affect availability
+                            isDataIntegrityPreserved = true;
+                            break;
+                        }
+                        case "REINDEX": {
+                            performanceImprovement =
+                                secureRandomFloat() * 25 + 10; // 10-35% improvement
+                            maintenanceLog.push(
+                                `REINDEX completed - ${performanceImprovement.toFixed(1)}% performance improvement`
+                            );
+                            isSystemAvailable = !operation.requiresDowntime;
+                            break;
+                        }
+                        case "STATISTICS_UPDATE": {
+                            performanceImprovement =
+                                secureRandomFloat() * 15 + 5; // 5-20% improvement
+                            maintenanceLog.push(
+                                "Statistics updated for query optimization"
+                            );
+                            isSystemAvailable = true;
+                            break;
+                        }
                         case "VACUUM": {
                             const spaceReclaimed =
                                 secureRandomFloat() *
@@ -2222,59 +2253,31 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             maintenanceLog.push(
                                 `VACUUM completed - reclaimed ${spaceReclaimed.toFixed(2)}MB`
                             );
-                            systemAvailable = !operation.requiresDowntime;
-                            break;
-                        }
-                        case "REINDEX": {
-                            performanceImprovement =
-                                secureRandomFloat() * 25 + 10; // 10-35% improvement
-                            maintenanceLog.push(
-                                `REINDEX completed - ${performanceImprovement.toFixed(1)}% performance improvement`
-                            );
-                            systemAvailable = !operation.requiresDowntime;
-                            break;
-                        }
-                        case "BACKUP": {
-                            const backupSize =
-                                secureRandomFloat() * 10_000 + 1000; // MB
-                            maintenanceLog.push(
-                                `Backup completed - ${backupSize.toFixed(2)}MB backed up`
-                            );
-                            systemAvailable = true; // Backups don't affect availability
-                            dataIntegrityPreserved = true;
-                            break;
-                        }
-                        case "STATISTICS_UPDATE": {
-                            performanceImprovement =
-                                secureRandomFloat() * 15 + 5; // 5-20% improvement
-                            maintenanceLog.push(
-                                `Statistics updated for query optimization`
-                            );
-                            systemAvailable = true;
+                            isSystemAvailable = !operation.requiresDowntime;
                             break;
                         }
                     }
 
                     // Account for scheduling constraints
-                    const schedulingSuccess =
+                    const isSchedulingSuccess =
                         operation.maintenanceWindow >
                         operation.estimatedDuration;
-                    if (!schedulingSuccess) {
+                    if (!isSchedulingSuccess) {
                         maintenanceLog.push(
                             "Warning: Operation exceeded maintenance window"
                         );
                     }
 
                     return {
-                        operationType: operation.operationType,
-                        executionSuccess: schedulingSuccess,
-                        systemAvailable,
-                        dataIntegrityPreserved,
-                        performanceImprovement,
                         actualDuration:
                             operation.estimatedDuration *
                             (0.8 + secureRandomFloat() * 0.4),
+                        dataIntegrityPreserved: isDataIntegrityPreserved,
+                        executionSuccess: isSchedulingSuccess,
                         maintenanceLog,
+                        operationType: operation.operationType,
+                        performanceImprovement,
+                        systemAvailable: isSystemAvailable,
                     };
                 };
 
@@ -2289,17 +2292,17 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                 expect(result).toHaveProperty("systemAvailable");
                 expect(result).toHaveProperty("dataIntegrityPreserved");
                 expect(result.actualDuration).toBeGreaterThan(0);
-                expect(Array.isArray(result.maintenanceLog)).toBeTruthy();
+                expect(Array.isArray(result.maintenanceLog)).toBe(true);
 
                 // Property: Data integrity should always be preserved
-                expect(result.dataIntegrityPreserved).toBeTruthy();
+                expect(result.dataIntegrityPreserved).toBe(true);
 
                 // Property: Performance operations should show improvement
                 if (
                     [
-                        "VACUUM",
                         "REINDEX",
                         "STATISTICS_UPDATE",
+                        "VACUUM",
                     ].includes(maintenance.operationType)
                 ) {
                     expect(
@@ -2310,7 +2313,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
 
         fcTest.prop([
-            fc.array(maintenanceOperations, { minLength: 2, maxLength: 4 }),
+            fc.array(maintenanceOperations, { maxLength: 4, minLength: 2 }),
         ])(
             "Maintenance scheduling should prevent conflicts",
             async (operations) => {
@@ -2342,11 +2345,11 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         }
 
                         schedule.push({
-                            operation: op.operationType,
-                            startTime,
-                            endTime,
                             duration: op.estimatedDuration,
+                            endTime,
+                            operation: op.operationType,
                             requiresDowntime: op.requiresDowntime,
+                            startTime,
                         });
 
                         if (op.requiresDowntime) {
@@ -2357,12 +2360,12 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     }
 
                     return {
-                        totalOperations: ops.length,
+                        conflictDetails: conflicts,
+                        conflicts: conflicts.length,
+                        schedule,
                         scheduledOperations: schedule.length,
                         totalDowntime,
-                        conflicts: conflicts.length,
-                        conflictDetails: conflicts,
-                        schedule,
+                        totalOperations: ops.length,
                     };
                 };
 
@@ -2375,19 +2378,19 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                 // Property: All operations should be schedulable
                 expect(result.totalOperations).toBe(operations.length);
                 expect(result.scheduledOperations).toBe(operations.length);
-                expect(Array.isArray(result.schedule)).toBeTruthy();
+                expect(Array.isArray(result.schedule)).toBe(true);
 
                 // Property: Downtime should be minimized
                 expect(result.totalDowntime).toBeGreaterThanOrEqual(0);
 
                 // Property: Conflicts should be identified
                 expect(result.conflicts).toBeGreaterThanOrEqual(0);
-                expect(Array.isArray(result.conflictDetails)).toBeTruthy();
+                expect(Array.isArray(result.conflictDetails)).toBe(true);
             }
         );
     });
 
-    describe("Advanced Index Management and Performance", () => {
+    describe("advanced Index Management and Performance", () => {
         fcTest.prop([indexOperationScenarios])(
             "Index operations should optimize query performance",
             async (indexOp) => {
@@ -2398,7 +2401,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         1
                     );
 
-                    const operationSuccess =
+                    const isOperationSuccess =
                         operation.operationType !== "DROP_INDEX" ||
                         secureRandomBoolean(0.9); // 90% success rate for drops
 
@@ -2406,22 +2409,22 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         baselinePerformance / indexedPerformance;
                     const storageOverhead = operation.storageSize;
 
-                    const maintenanceRequired = [
+                    const isMaintenanceRequired = [
                         "REBUILD_INDEX",
                         "REINDEX_TABLE",
                     ].includes(operation.operationType);
 
                     return {
-                        operationType: operation.operationType,
-                        executionSuccess: operationSuccess,
-                        performanceImprovement,
                         baselineQueryTime: baselinePerformance,
-                        optimizedQueryTime: indexedPerformance,
-                        storageUsed: storageOverhead,
-                        maintenanceRequired,
-                        indexHealthy: operationSuccess && !maintenanceRequired,
                         cardinality: operation.expectedRows,
+                        executionSuccess: isOperationSuccess,
+                        indexHealthy: isOperationSuccess && !isMaintenanceRequired,
+                        maintenanceRequired: isMaintenanceRequired,
+                        operationType: operation.operationType,
+                        optimizedQueryTime: indexedPerformance,
+                        performanceImprovement,
                         selectivity: secureRandomFloat(),
+                        storageUsed: storageOverhead,
                     };
                 };
 
@@ -2433,7 +2436,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                 // Property: Index operations should complete successfully most of the time
                 if (indexOp.operationType !== "DROP_INDEX") {
-                    expect(result.executionSuccess).toBeTruthy();
+                    expect(result.executionSuccess).toBe(true);
                 }
 
                 // Property: Performance metrics should be positive
@@ -2453,7 +2456,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
 
         fcTest.prop([
-            fc.array(indexOperationScenarios, { minLength: 2, maxLength: 5 }),
+            fc.array(indexOperationScenarios, { maxLength: 5, minLength: 2 }),
         ])(
             "Concurrent index operations should not interfere",
             async (operations) => {
@@ -2476,7 +2479,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     }
 
                     // Detect conflicts
-                    for (const [table, opTypes] of tableOperations.entries()) {
+                    for (const [table, opTypes] of tableOperations) {
                         const hasCreate = opTypes.some((t) =>
                             t.includes("CREATE")
                         );
@@ -2498,42 +2501,42 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     // Simulate execution
                     for (const [index, op] of ops.entries()) {
                         const executionTime = secureRandomFloat() * 1000 + 100; // 100-1100ms
-                        const lockRequired = [
+                        const isLockRequired = [
                             "CREATE_INDEX",
                             "DROP_INDEX",
                             "REBUILD_INDEX",
                         ].includes(op.operationType);
 
-                        if (lockRequired) {
+                        if (isLockRequired) {
                             totalLockTime += executionTime;
                         }
 
                         completedOperations.push({
-                            id: index,
-                            operation: op.operationType,
-                            table: op.targetTable,
                             executionTime,
-                            lockRequired,
+                            id: index,
+                            lockRequired: isLockRequired,
+                            operation: op.operationType,
                             success:
-                                conflicts.length === 0 ||
+                                isEmpty(conflicts) ||
                                 secureRandomBoolean(0.7),
+                            table: op.targetTable,
                         });
                     }
 
                     return {
-                        totalOperations: ops.length,
-                        completedOperations: completedOperations.length,
-                        conflicts: conflicts.length,
-                        conflictDetails: conflicts,
-                        totalLockTime,
                         averageExecutionTime:
                             completedOperations.reduce(
                                 (sum, op) => sum + op.executionTime,
                                 0
                             ) / completedOperations.length,
+                        completedOperations: completedOperations.length,
+                        conflictDetails: conflicts,
+                        conflicts: conflicts.length,
                         successRate:
                             completedOperations.filter((op) => op.success)
                                 .length / completedOperations.length,
+                        totalLockTime,
+                        totalOperations: ops.length,
                     };
                 };
 
@@ -2557,43 +2560,43 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                 // Property: Conflicts should be properly detected
                 expect(result.conflicts).toBeGreaterThanOrEqual(0);
-                expect(Array.isArray(result.conflictDetails)).toBeTruthy();
+                expect(Array.isArray(result.conflictDetails)).toBe(true);
             }
         );
 
         fcTest.prop([
             fc.record({
+                concurrentQueries: fc.integer({ max: 50, min: 1 }),
                 indexOp: indexOperationScenarios,
-                queryLoad: fc.integer({ min: 1, max: 1000 }),
-                concurrentQueries: fc.integer({ min: 1, max: 50 }),
+                queryLoad: fc.integer({ max: 1000, min: 1 }),
             }),
         ])(
             "Index maintenance should not severely impact query performance",
-            async ({ indexOp, queryLoad, concurrentQueries }) => {
+            async ({ concurrentQueries, indexOp, queryLoad }) => {
                 const measureIndexMaintenanceImpact = (params: {
+                    concurrentQueries: number;
                     indexOp: typeof indexOp;
                     queryLoad: number;
-                    concurrentQueries: number;
                 }) => {
                     const baselineQueryTime = params.queryLoad * 0.5; // Ms
 
                     // Simulate performance impact during index operation
                     const impactMultiplier =
                         {
-                            CREATE_INDEX: params.indexOp.concurrent ? 1.2 : 2,
-                            DROP_INDEX: 1.1,
-                            REBUILD_INDEX: params.indexOp.concurrent ? 1.5 : 3,
                             ANALYZE_INDEX: 1.05,
-                            REINDEX_TABLE: params.indexOp.concurrent ? 1.8 : 4,
-                            CREATE_UNIQUE_INDEX: params.indexOp.concurrent
-                                ? 1.3
-                                : 2.5,
-                            CREATE_PARTIAL_INDEX: params.indexOp.concurrent
-                                ? 1.15
-                                : 1.8,
                             CREATE_COMPOSITE_INDEX: params.indexOp.concurrent
                                 ? 1.4
                                 : 2.8,
+                            CREATE_INDEX: params.indexOp.concurrent ? 1.2 : 2,
+                            CREATE_PARTIAL_INDEX: params.indexOp.concurrent
+                                ? 1.15
+                                : 1.8,
+                            CREATE_UNIQUE_INDEX: params.indexOp.concurrent
+                                ? 1.3
+                                : 2.5,
+                            DROP_INDEX: 1.1,
+                            REBUILD_INDEX: params.indexOp.concurrent ? 1.5 : 3,
+                            REINDEX_TABLE: params.indexOp.concurrent ? 1.8 : 4,
                         }[params.indexOp.operationType] || 1.5;
 
                     const impactedQueryTime =
@@ -2608,27 +2611,27 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     const finalQueryTime = impactedQueryTime * contentionFactor;
 
                     return {
-                        indexOperation: params.indexOp.operationType,
-                        concurrentIndexCreation: params.indexOp.concurrent,
+                        acceptableImpact: performanceDegradation < 0.5, // Less than 50% degradation
                         baselinePerformance: baselineQueryTime,
-                        impactedPerformance: finalQueryTime,
-                        performanceDegradation,
+                        concurrentIndexCreation: params.indexOp.concurrent,
                         concurrentQueryLoad: params.concurrentQueries,
+                        impactedPerformance: finalQueryTime,
+                        indexOperation: params.indexOp.operationType,
+                        maintenanceCompleted: true,
+                        performanceDegradation,
                         queryThroughput:
                             (params.concurrentQueries / finalQueryTime) * 1000,
-                        maintenanceCompleted: true,
-                        acceptableImpact: performanceDegradation < 0.5, // Less than 50% degradation
                     };
                 };
 
                 const result = await measureDbOperation(
                     measureIndexMaintenanceImpact,
                     "indexMaintenanceImpact",
-                    { indexOp, queryLoad, concurrentQueries }
+                    { concurrentQueries, indexOp, queryLoad }
                 );
 
                 // Property: Index maintenance should complete
-                expect(result.maintenanceCompleted).toBeTruthy();
+                expect(result.maintenanceCompleted).toBe(true);
 
                 // Property: Performance metrics should be positive
                 expect(result.baselinePerformance).toBeGreaterThan(0);
@@ -2646,7 +2649,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
     });
 
-    describe("Comprehensive Batch Processing", () => {
+    describe("comprehensive Batch Processing", () => {
         fcTest.prop([batchOperationScenarios])(
             "Batch operations should handle large datasets efficiently",
             async (batchOp) => {
@@ -2660,35 +2663,18 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     );
 
                     // Simulate failure injection
-                    const failureOccurred = secureRandomBoolean(
+                    const isFailureOccurred = secureRandomBoolean(
                         operation.failureRate
                     );
-                    const failureBatch = failureOccurred
+                    const failureBatch = isFailureOccurred
                         ? secureRandomInt(totalBatches)
                         : -1;
 
                     let successfulRecords = processedRecords;
-                    let recoveryRequired = false;
+                    let isRecoveryRequired = false;
 
-                    if (failureOccurred) {
+                    if (isFailureOccurred) {
                         switch (operation.recoveryStrategy) {
-                            case "ROLLBACK_ALL": {
-                                successfulRecords = 0;
-                                recoveryRequired = true;
-                                break;
-                            }
-                            case "ROLLBACK_CHUNK": {
-                                successfulRecords = Math.max(
-                                    0,
-                                    failureBatch *
-                                        Math.min(
-                                            operation.batchSize,
-                                            operation.totalRecords
-                                        )
-                                );
-                                recoveryRequired = true;
-                                break;
-                            }
                             case "CONTINUE": {
                                 successfulRecords = Math.max(
                                     0,
@@ -2714,6 +2700,23 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                                       );
                                 break;
                             }
+                            case "ROLLBACK_ALL": {
+                                successfulRecords = 0;
+                                isRecoveryRequired = true;
+                                break;
+                            }
+                            case "ROLLBACK_CHUNK": {
+                                successfulRecords = Math.max(
+                                    0,
+                                    failureBatch *
+                                        Math.min(
+                                            operation.batchSize,
+                                            operation.totalRecords
+                                        )
+                                );
+                                isRecoveryRequired = true;
+                                break;
+                            }
                         }
                     }
 
@@ -2727,21 +2730,21 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     );
 
                     return {
-                        operationType: operation.operationType,
-                        totalRecords: operation.totalRecords,
-                        processedRecords,
-                        successfulRecords,
+                        dataValidated: operation.validateData,
                         failedRecords: processedRecords - successfulRecords,
-                        totalBatches,
-                        failureOccurred,
-                        recoveryRequired,
-                        recoveryStrategy: operation.recoveryStrategy,
-                        processingTimeMs: processingTime,
-                        throughputRecordsPerSecond: throughput,
+                        failureOccurred: isFailureOccurred,
                         memoryUsageMB: memoryUsage,
+                        operationType: operation.operationType,
+                        processedRecords,
+                        processingTimeMs: processingTime,
+                        recoveryRequired: isRecoveryRequired,
+                        recoveryStrategy: operation.recoveryStrategy,
+                        successfulRecords,
+                        throughputRecordsPerSecond: throughput,
                         timedOut:
                             processingTime > operation.timeoutSeconds * 1000,
-                        dataValidated: operation.validateData,
+                        totalBatches,
+                        totalRecords: operation.totalRecords,
                     };
                 };
 
@@ -2799,7 +2802,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
 
         fcTest.prop([
-            fc.array(batchOperationScenarios, { minLength: 2, maxLength: 4 }),
+            fc.array(batchOperationScenarios, { maxLength: 4, minLength: 2 }),
         ])(
             "Concurrent batch operations should coordinate resource usage",
             async (operations) => {
@@ -2842,37 +2845,37 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                             actualProcessingTime
                         );
 
-                        const success =
-                            resourceConflicts.length === 0 &&
+                        const isSuccess =
+                            isEmpty(resourceConflicts) &&
                             actualProcessingTime < op.timeoutSeconds * 1000;
 
                         completedOperations.push({
                             id: index,
-                            operationType: op.operationType,
                             memoryUsage,
+                            operationType: op.operationType,
                             processingTime: actualProcessingTime,
-                            success,
-                            recordsProcessed: success ? op.totalRecords : 0,
+                            recordsProcessed: isSuccess ? op.totalRecords : 0,
+                            success: isSuccess,
                         });
                     }
 
                     return {
-                        totalOperations: ops.length,
                         completedOperations: completedOperations.length,
-                        totalMemoryUsedMB: totalMemoryUsed,
-                        totalProcessingTimeMs: totalProcessingTime,
-                        resourceConflicts: resourceConflicts.length,
+                        concurrencyEfficiency:
+                            (completedOperations.length / totalProcessingTime) *
+                            1000,
                         conflictDetails: resourceConflicts,
+                        resourceConflicts: resourceConflicts.length,
                         successfulOperations: completedOperations.filter(
                             (op) => op.success
                         ).length,
+                        totalMemoryUsedMB: totalMemoryUsed,
+                        totalOperations: ops.length,
+                        totalProcessingTimeMs: totalProcessingTime,
                         totalRecordsProcessed: completedOperations.reduce(
                             (sum, op) => sum + op.recordsProcessed,
                             0
                         ),
-                        concurrencyEfficiency:
-                            (completedOperations.length / totalProcessingTime) *
-                            1000,
                     };
                 };
 
@@ -2893,6 +2896,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                 // Property: Success rate should be reasonable
                 const successRate =
                     result.successfulOperations / result.totalOperations;
+
                 expect(successRate).toBeGreaterThanOrEqual(0);
                 expect(successRate).toBeLessThanOrEqual(1);
 
@@ -2905,7 +2909,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
     });
 
-    describe("Cross-Operation Interference and Integration", () => {
+    describe("cross-Operation Interference and Integration", () => {
         fcTest.prop([crossOperationScenarios])(
             "Simultaneous operations should handle resource contention gracefully",
             async (crossOp) => {
@@ -2936,10 +2940,10 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Determine interference level
                     const interferenceMap = {
-                        NONE: 0,
+                        HIGH: 0.6,
                         LOW: 0.1,
                         MEDIUM: 0.3,
-                        HIGH: 0.6,
+                        NONE: 0,
                     };
                     const expectedInterference =
                         interferenceMap[scenario.expectedInterference];
@@ -2950,27 +2954,27 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     // Check if isolation was maintained
                     // For isolation required scenarios, we should have better contention management
-                    const isolationMaintained = scenario.isolationRequired
+                    const isIsolationMaintained = scenario.isolationRequired
                         ? actualInterference < expectedInterference + 0.3
                         : true;
 
                     return {
+                        actualInterferenceLevel: actualInterference,
+                        expectedInterferenceLevel: expectedInterference,
+                        isolationMaintained: isIsolationMaintained,
+                        operationsCompleted: true,
+                        overlapDuration,
+                        performanceImpact: contentionMultiplier - 1,
+                        primaryExecutionTime: actualPrimaryTime,
                         primaryOperation: scenario.primaryOperation,
+                        resourceContention: scenario.resourceContention,
+                        secondaryExecutionTime: actualSecondaryTime,
                         secondaryOperation: scenario.secondaryOperation,
                         simultaneousUsers: scenario.simultaneousUsers,
-                        overlapDuration,
-                        primaryExecutionTime: actualPrimaryTime,
-                        secondaryExecutionTime: actualSecondaryTime,
                         totalExecutionTime: Math.max(
                             actualPrimaryTime,
                             actualSecondaryTime
                         ),
-                        resourceContention: scenario.resourceContention,
-                        actualInterferenceLevel: actualInterference,
-                        expectedInterferenceLevel: expectedInterference,
-                        isolationMaintained,
-                        operationsCompleted: true,
-                        performanceImpact: contentionMultiplier - 1,
                     };
                 };
 
@@ -2981,7 +2985,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                 );
 
                 // Property: Operations should complete
-                expect(result.operationsCompleted).toBeTruthy();
+                expect(result.operationsCompleted).toBe(true);
 
                 // Property: Execution times should be positive
                 expect(result.primaryExecutionTime).toBeGreaterThan(0);
@@ -2996,7 +3000,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                 // Property: Isolation requirements should be respected
                 if (crossOp.isolationRequired) {
-                    expect(result.isolationMaintained).toBeTruthy();
+                    expect(result.isolationMaintained).toBe(true);
                 }
 
                 // Property: Overlap duration should be reasonable
@@ -3011,7 +3015,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
 
         fcTest.prop([
-            fc.array(crossOperationScenarios, { minLength: 3, maxLength: 6 }),
+            fc.array(crossOperationScenarios, { maxLength: 6, minLength: 3 }),
         ])(
             "Complex multi-operation scenarios should maintain system stability",
             async (scenarios) => {
@@ -3033,11 +3037,11 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     );
 
                     const resourcePressure = {
-                        memory:
-                            ops.filter((op) => op.memoryContention).length /
-                            ops.length,
                         locks:
                             ops.filter((op) => op.lockContention).length /
+                            ops.length,
+                        memory:
+                            ops.filter((op) => op.memoryContention).length /
                             ops.length,
                         resources:
                             ops.filter((op) => op.resourceContention).length /
@@ -3059,7 +3063,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         0,
                         1 - Math.max(loadFactor, userFactor, pressureFactor)
                     );
-                    const systemOverloaded = systemStability < 0.3;
+                    const isSystemOverloaded = systemStability < 0.3;
 
                     // Performance degradation
                     const normalizedPressureFactor = Math.min(
@@ -3076,28 +3080,28 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                     const overallDegradation = Math.min(degradationEstimate, 2);
 
-                    const completedOperations = systemOverloaded
+                    const completedOperations = isSystemOverloaded
                         ? Math.floor(ops.length * 0.7)
                         : ops.length;
 
                     return {
-                        totalOperations: ops.length,
                         completedOperations,
-                        totalSystemLoad: systemLoad,
-                        totalConcurrentUsers: totalUsers,
-                        memoryContentionRatio: resourcePressure.memory,
-                        lockContentionRatio: resourcePressure.locks,
-                        resourceContentionRatio: resourcePressure.resources,
-                        systemStability,
-                        systemOverloaded,
-                        overallPerformanceDegradation: overallDegradation,
                         gracefulDegradation:
-                            !systemOverloaded || completedOperations > 0,
+                            !isSystemOverloaded || completedOperations > 0,
                         isolationBreaches: ops.filter(
                             (op) =>
                                 op.isolationRequired &&
                                 resourcePressure.locks > 0.5
                         ).length,
+                        lockContentionRatio: resourcePressure.locks,
+                        memoryContentionRatio: resourcePressure.memory,
+                        overallPerformanceDegradation: overallDegradation,
+                        resourceContentionRatio: resourcePressure.resources,
+                        systemOverloaded: isSystemOverloaded,
+                        systemStability,
+                        totalConcurrentUsers: totalUsers,
+                        totalOperations: ops.length,
+                        totalSystemLoad: systemLoad,
                     };
                 };
 
@@ -3130,7 +3134,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                 // Property: System should fail gracefully under overload
                 if (result.systemOverloaded) {
-                    expect(result.gracefulDegradation).toBeTruthy();
+                    expect(result.gracefulDegradation).toBe(true);
                 }
 
                 // Property: Isolation breaches should be minimal
@@ -3142,7 +3146,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
         );
     });
 
-    describe("Resource Constraint and Pressure Testing", () => {
+    describe("resource Constraint and Pressure Testing", () => {
         fcTest.prop([resourceConstraintScenarios])(
             "Database operations should handle resource constraints gracefully",
             async (constraint) => {
@@ -3152,27 +3156,27 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     // Simulate resource availability
                     const resourceAvailable =
                         {
-                            MEMORY_LIMIT: resourceConstraint.availableMemoryMB,
-                            DISK_SPACE_LIMIT:
-                                resourceConstraint.availableDiskSpaceMB,
                             CONNECTION_LIMIT: resourceConstraint.maxConnections,
                             CPU_THROTTLING:
                                 100 - resourceConstraint.cpuUsagePercent,
-                            NETWORK_BANDWIDTH: 1000, // Mbps
+                            DISK_SPACE_LIMIT:
+                                resourceConstraint.availableDiskSpaceMB,
                             IO_THROTTLING:
                                 resourceConstraint.ioOperationsPerSecond,
+                            MEMORY_LIMIT: resourceConstraint.availableMemoryMB,
+                            NETWORK_BANDWIDTH: 1000, // Mbps
                         }[resourceConstraint.constraintType] || 100;
 
                     // Determine severity impact
                     const severityMultiplier = {
+                        CRITICAL: 0.9,
+                        HIGH: 0.6,
                         LOW: 0.1,
                         MEDIUM: 0.3,
-                        HIGH: 0.6,
-                        CRITICAL: 0.9,
                     }[resourceConstraint.severityLevel];
 
                     const resourcePressure = severityMultiplier;
-                    const operationSuccess =
+                    const isOperationSuccess =
                         resourcePressure < 0.8 ||
                         resourceConstraint.gracefulDegradation;
 
@@ -3185,33 +3189,33 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         basePerformance;
 
                     // Recovery simulation
-                    const automaticRecoveryTriggered =
+                    const isAutomaticRecoveryTriggered =
                         resourceConstraint.automaticRecovery &&
                         resourcePressure > 0.5;
-                    const alertGenerated =
+                    const isAlertGenerated =
                         resourceConstraint.alertingEnabled &&
                         resourcePressure > 0.3;
 
-                    const recoveryTime = automaticRecoveryTriggered
+                    const recoveryTime = isAutomaticRecoveryTriggered
                         ? secureRandomFloat() * 5000 + 1000
                         : 0; // 1-6 seconds
 
                     return {
-                        constraintType: resourceConstraint.constraintType,
-                        severityLevel: resourceConstraint.severityLevel,
-                        resourceAvailable,
-                        resourcePressure,
-                        operationSuccess,
+                        alertGenerated: isAlertGenerated,
+                        automaticRecoveryTriggered: isAutomaticRecoveryTriggered,
                         basePerformanceMs: basePerformance,
                         constrainedPerformanceMs: constrainedPerformance,
-                        performanceDegradation: degradationPercent,
-                        automaticRecoveryTriggered,
-                        recoveryTimeMs: recoveryTime,
-                        alertGenerated,
+                        constraintType: resourceConstraint.constraintType,
                         gracefulDegradation:
                             resourceConstraint.gracefulDegradation,
+                        operationSuccess: isOperationSuccess,
+                        performanceDegradation: degradationPercent,
+                        recoveryTimeMs: recoveryTime,
+                        resourceAvailable,
+                        resourcePressure,
+                        severityLevel: resourceConstraint.severityLevel,
                         systemStable:
-                            operationSuccess && degradationPercent < 2,
+                            isOperationSuccess && degradationPercent < 2,
                     };
                 };
 
@@ -3239,7 +3243,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     constraint.severityLevel === "CRITICAL" &&
                     constraint.automaticRecovery
                 ) {
-                    expect(result.automaticRecoveryTriggered).toBeTruthy();
+                    expect(result.automaticRecoveryTriggered).toBe(true);
                     expect(result.recoveryTimeMs).toBeGreaterThan(0);
                 }
 
@@ -3248,20 +3252,20 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     constraint.alertingEnabled &&
                     result.resourcePressure > 0.3
                 ) {
-                    expect(result.alertGenerated).toBeTruthy();
+                    expect(result.alertGenerated).toBe(true);
                 }
 
                 // Property: Graceful degradation should maintain operation
                 if (constraint.gracefulDegradation) {
-                    expect(result.operationSuccess).toBeTruthy();
+                    expect(result.operationSuccess).toBe(true);
                 }
             }
         );
 
         fcTest.prop([
             fc.array(resourceConstraintScenarios, {
-                minLength: 2,
                 maxLength: 4,
+                minLength: 2,
             }),
         ])(
             "Multiple simultaneous resource constraints should not cause system failure",
@@ -3277,10 +3281,10 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                     // Calculate cumulative resource pressure
                     for (const constraint of resourceConstraints) {
                         const severityWeight = {
+                            CRITICAL: 0.9,
+                            HIGH: 0.6,
                             LOW: 0.1,
                             MEDIUM: 0.3,
-                            HIGH: 0.6,
-                            CRITICAL: 0.9,
                         }[constraint.severityLevel];
 
                         overallResourcePressure += severityWeight;
@@ -3309,34 +3313,34 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
                         0,
                         1 - overallResourcePressure
                     );
-                    const systemFailure =
+                    const isSystemFailure =
                         systemStability < 0.1 && criticalConstraintsActive > 1;
-                    const gracefulDegradation =
-                        !systemFailure && overallResourcePressure > 0.7;
+                    const isGracefulDegradation =
+                        !isSystemFailure && overallResourcePressure > 0.7;
 
                     // Performance impact
                     const compoundedImpact =
                         overallResourcePressure *
                         (1 + criticalConstraintsActive * 0.3);
 
-                    const operationsStillPossible =
-                        !systemFailure &&
-                        (overallResourcePressure < 0.9 || gracefulDegradation);
+                    const isOperationsStillPossible =
+                        !isSystemFailure &&
+                        (overallResourcePressure < 0.9 || isGracefulDegradation);
 
                     return {
-                        totalConstraints: resourceConstraints.length,
                         activeConstraints,
-                        overallResourcePressure,
-                        criticalConstraintsActive,
-                        recoveryActionsTriggered,
-                        systemStability,
-                        systemFailure,
-                        gracefulDegradation,
                         compoundedPerformanceImpact: compoundedImpact,
-                        operationsStillPossible,
+                        criticalConstraintsActive,
                         emergencyModeActivated:
                             criticalConstraintsActive > 1 &&
                             systemStability < 0.3,
+                        gracefulDegradation: isGracefulDegradation,
+                        operationsStillPossible: isOperationsStillPossible,
+                        overallResourcePressure,
+                        recoveryActionsTriggered,
+                        systemFailure: isSystemFailure,
+                        systemStability,
+                        totalConstraints: resourceConstraints.length,
                     };
                 };
 
@@ -3370,7 +3374,7 @@ describe("Comprehensive Database Operations Fuzzing (Part 2)", () => {
 
                 // Property: System should not fail unless extremely constrained
                 if (!result.systemFailure) {
-                    expect(result.operationsStillPossible).toBeTruthy();
+                    expect(result.operationsStillPossible).toBe(true);
                 }
 
                 // Property: Performance impact should be measurable

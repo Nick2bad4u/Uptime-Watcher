@@ -10,16 +10,18 @@
  * - Always reset busy flags (even on failure)
  */
 
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { CloudBackupEntry, CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
-import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
+import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
+
+import { arrayFirst } from "ts-extras";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { CloudStoreState } from "../../../stores/cloud/useCloudStore";
 
 import { useAlertStore } from "../../../stores/alerts/useAlertStore";
+import { useCloudStore } from "../../../stores/cloud/useCloudStore";
 
 const cloudServiceMock = vi.hoisted(() => ({
     CloudService: {
@@ -56,9 +58,9 @@ const cloudServiceMock = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../../../services/CloudService", () => cloudServiceMock);
+vi.mock(import('../../../services/CloudService'), () => cloudServiceMock);
 
-vi.mock("../../../stores/utils/storeErrorHandling", () => ({
+vi.mock(import('../../../stores/utils/storeErrorHandling'), () => ({
     createStoreErrorHandler: () => ({
         clearError: () => {},
         setError: () => {},
@@ -66,12 +68,10 @@ vi.mock("../../../stores/utils/storeErrorHandling", () => ({
     }),
 }));
 
-import { useCloudStore } from "../../../stores/cloud/useCloudStore";
-
 function createDeferred<T>(): {
     promise: Promise<T>;
-    resolve: (value: T) => void;
     reject: (error: unknown) => void;
+    resolve: (value: T) => void;
 } {
     let resolve: (value: T) => void = () => {};
     let reject: (error: unknown) => void = () => {};
@@ -407,7 +407,7 @@ describe(useCloudStore, () => {
         ).toHaveBeenCalledTimes(1);
         expect(useCloudStore.getState().status?.lastBackupAt).toBe(999);
         // Fallback path: retain previous backups.
-        expect(useCloudStore.getState().backups[0]?.fileName).toBe(
+        expect(arrayFirst(useCloudStore.getState().backups)?.fileName).toBe(
             "existing.sqlite"
         );
         expect(useCloudStore.getState().isUploadingBackup).toBeFalsy();
@@ -444,7 +444,7 @@ describe(useCloudStore, () => {
         expect(
             cloudServiceMock.CloudService.restoreBackup
         ).toHaveBeenCalledWith("backups/1.sqlite");
-        expect(cloudServiceMock.CloudService.getStatus).toHaveBeenCalled();
+        expect(cloudServiceMock.CloudService.getStatus).toHaveBeenCalledWith();
 
         const [toast] = useAlertStore.getState().toasts;
         expect(toast?.variant).toBe("success");

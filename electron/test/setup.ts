@@ -3,9 +3,10 @@
  * utilities for consistent testing environment.
  */
 
-import { vi } from "vitest";
-import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
+import fc from "fast-check";
+import { vi } from "vitest";
+
 import { createCorrelationAwareInvokeMock } from "./utils/ipcCorrelationTestUtils";
 
 // Increase Node.js process listener limits for tests to prevent MaxListenersExceededWarning
@@ -49,9 +50,7 @@ fc.configureGlobal({
     // examples: [],          // add any concrete inputs you want always tested
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
-    // RNG / reproducibility
-    // seed: undefined,    // set a specific number to reproduce runs
-    // randomType: 'xorshift128plus', // default; change if you need a different generator
+    // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,
@@ -244,11 +243,9 @@ globalThis.console = {
     info: vi.fn(),
 };
 
-// Note: Logger module is NOT mocked globally to allow individual test files
-// to test the actual logger implementation with mocked electron-log
+// Note: Logger module is NOT mocked globally to allow individual test files to test the actual logger implementation with mocked electron-log
 
-// Note: Repository classes are NOT mocked globally to allow individual test files
-// to provide their own mocks for better test isolation and control
+// Note: Repository classes are NOT mocked globally to allow individual test files to provide their own mocks for better test isolation and control
 
 // Mock MonitorScheduler
 vi.mock("../services/monitoring/MonitorScheduler", () => {
@@ -272,7 +269,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
         );
 
         public readonly startMonitor = vi.fn(
-            (siteIdentifier: string, monitor: { id?: string | null }) => {
+            (siteIdentifier: string, monitor: { id?: null | string }) => {
                 if (!monitor?.id) {
                     return false;
                 }
@@ -293,10 +290,10 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
 
         public readonly startSite = vi.fn(
             (site: {
-                identifier?: string;
                 id?: string;
+                identifier?: string;
                 monitors?: {
-                    id?: string | null;
+                    id?: null | string;
                     monitoring?: boolean | null;
                 }[];
             }) => {
@@ -314,7 +311,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
         );
 
         public readonly stopSite = vi.fn(
-            (siteIdentifier: string, monitors?: { id?: string | null }[]) => {
+            (siteIdentifier: string, monitors?: { id?: null | string }[]) => {
                 if (monitors?.length) {
                     for (const monitor of monitors) {
                         if (monitor?.id) {
@@ -337,7 +334,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
         });
 
         public readonly restartMonitor = vi.fn(
-            (siteIdentifier: string, monitor: { id?: string | null }) => {
+            (siteIdentifier: string, monitor: { id?: null | string }) => {
                 if (!monitor?.id) {
                     return false;
                 }
@@ -415,8 +412,7 @@ vi.mock("../services/application", () => ({
     })),
 }));
 
-// Remove global logger mock to allow test-specific mocking
-// Individual tests can mock these as needed
+// Remove global logger mock to allow test-specific mocking Individual tests can mock these as needed
 
 // Mock electron-log
 vi.mock("electron-log/main", () => ({
@@ -430,7 +426,7 @@ vi.mock("electron-log/main", () => ({
             file: {
                 level: "info",
                 fileName: "uptime-watcher-main.log",
-                maxSize: 1024 * 1024 * 5,
+                maxSize: 1024 ** 2 * 5,
                 format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}",
             },
             console: {
@@ -451,7 +447,7 @@ vi.mock("electron-log/renderer", () => ({
             file: {
                 level: "info",
                 fileName: "uptime-watcher-renderer.log",
-                maxSize: 1024 * 1024 * 5,
+                maxSize: 1024 ** 2 * 5,
                 format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}",
             },
             console: {

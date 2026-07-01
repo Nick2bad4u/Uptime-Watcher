@@ -1,13 +1,14 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { UI_DELAYS } from "../../constants";
 import {
-    useTheme,
     useAvailabilityColors,
     useStatusColors,
+    useTheme,
     useThemeClasses,
     useThemeValue,
 } from "../../theme/useTheme";
-import { UI_DELAYS } from "../../constants";
 
 // Unmock the theme hooks for this test file to test actual implementations
 vi.unmock("../../theme/useTheme");
@@ -41,7 +42,7 @@ describe("useTheme - Complete Coverage", () => {
                         media: query,
                         onchange: null,
                         removeEventListener: vi.fn(),
-                    }) as unknown as MediaQueryList
+                    })
             ),
         });
     });

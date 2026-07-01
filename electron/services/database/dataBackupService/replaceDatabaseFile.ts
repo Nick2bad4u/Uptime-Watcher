@@ -46,8 +46,8 @@ export async function replaceDatabaseFile(args: {
     const shmPath = `${targetPath}-shm`;
     const journalPath = `${targetPath}-journal`;
 
-    let hadExistingTarget = false;
-    let copyError: Error | undefined = undefined;
+    let isHadExistingTarget = false;
+    let copyError: Error | undefined;
 
     try {
         // Stage the incoming DB first to reduce the time window where
@@ -69,7 +69,7 @@ export async function replaceDatabaseFile(args: {
 
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath is derived from the trusted DB path with a controlled suffix.
             await fs.rename(targetPath, rollbackPath);
-            hadExistingTarget = true;
+            isHadExistingTarget = true;
             await syncDirectorySafely(targetDir);
         } catch (error) {
             if (tryGetErrorCode(error) === "ENOENT") {
@@ -89,7 +89,7 @@ export async function replaceDatabaseFile(args: {
     // If we failed to copy the restored DB into place but we moved the
     // original DB out of the way, restore the original before we
     // re-initialize.
-    if (copyError && hadExistingTarget) {
+    if (copyError && isHadExistingTarget) {
         try {
             await fs.rm(targetPath, { force: true });
             // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
@@ -99,7 +99,7 @@ export async function replaceDatabaseFile(args: {
             await renameIfExists(rollbackWalPath, walPath);
             await renameIfExists(rollbackShmPath, shmPath);
             await renameIfExists(rollbackJournalPath, journalPath);
-            hadExistingTarget = false;
+            isHadExistingTarget = false;
         } catch {
             // Best effort. We still surface the original copy error below.
         }
@@ -111,7 +111,7 @@ export async function replaceDatabaseFile(args: {
         const initError = ensureError(error);
 
         // Attempt rollback if we replaced the file.
-        if (hadExistingTarget) {
+        if (isHadExistingTarget) {
             try {
                 await fs.rm(targetPath, { force: true });
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.

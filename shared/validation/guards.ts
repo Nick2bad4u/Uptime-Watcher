@@ -14,6 +14,10 @@ import type { Site } from "../types";
 import { siteSchema } from "./siteSchemas";
 import { typedStatusUpdateSchema as statusUpdateSchema } from "./statusUpdateSchemas";
 
+type SiteUpdate = {
+    readonly [Key in keyof SiteUpdateBase]?: SiteUpdateBase[Key] | undefined;
+};
+
 /**
  * Canonical schema for site update payloads.
  *
@@ -22,10 +26,6 @@ import { typedStatusUpdateSchema as statusUpdateSchema } from "./statusUpdateSch
  * modify the remaining fields, and unknown keys are rejected.
  */
 type SiteUpdateBase = Except<Site, "identifier">;
-
-type SiteUpdate = {
-    readonly [Key in keyof SiteUpdateBase]?: SiteUpdateBase[Key] | undefined;
-};
 
 const siteUpdateSchema: z.ZodType<SiteUpdate> = siteSchema
     .omit({ identifier: true })

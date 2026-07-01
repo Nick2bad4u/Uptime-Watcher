@@ -4,7 +4,7 @@
  * @module DatabaseServiceFactory
  *
  * @file Comprehensive tests for the DatabaseServiceFactory class in the Uptime
- *   Watcher application.
+ *   Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,14 +15,8 @@
  * @tags ["test", "factory", "database", "services"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-    DatabaseServiceFactory,
-    type DatabaseServiceFactoryDependencies,
-    type IDataBackupService,
-    type IDataImportExportService,
-    type ISiteRepositoryService,
-} from "../../../services/factories/DatabaseServiceFactory";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { UptimeEvents } from "../../../events/eventTypes.js";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
@@ -30,6 +24,14 @@ import type { HistoryRepository } from "../../../services/database/HistoryReposi
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../../services/database/SiteRepository";
+
+import {
+    DatabaseServiceFactory,
+    type DatabaseServiceFactoryDependencies,
+    type IDataBackupService,
+    type IDataImportExportService,
+    type ISiteRepositoryService,
+} from "../../../services/factories/DatabaseServiceFactory";
 
 // Mock all the dependencies
 vi.mock("../../../services/database/DataBackupService");

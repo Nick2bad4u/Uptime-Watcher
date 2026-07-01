@@ -5,6 +5,8 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ThemeManager } from "../../theme/ThemeManager";
+
 // Mock window.matchMedia
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
@@ -17,7 +19,7 @@ Object.defineProperty(globalThis, "matchMedia", {
                 media: query,
                 onchange: null,
                 removeEventListener: vi.fn(),
-            }) as unknown as MediaQueryList
+            })
     ),
 });
 
@@ -54,8 +56,6 @@ Object.defineProperty(globalThis, "document", {
     },
     writable: true,
 });
-
-import { ThemeManager } from "../../theme/ThemeManager";
 
 describe(ThemeManager, () => {
     let themeManager: ThemeManager;
@@ -160,7 +160,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue({
+            vi.mocked(matchMedia).mockReturnValue({
                 addEventListener: vi.fn(),
                 dispatchEvent: vi.fn(),
                 matches: true,
@@ -182,7 +182,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(globalThis.matchMedia).mockReturnValue({
+            vi.mocked(matchMedia).mockReturnValue({
                 addEventListener: vi.fn(),
                 dispatchEvent: vi.fn(),
                 matches: false,
@@ -201,7 +201,7 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalMatchMedia = globalThis.matchMedia;
+            const originalMatchMedia = matchMedia;
             // Testing missing matchMedia for fallback behavior
             (globalThis as any).matchMedia = undefined;
 
@@ -264,7 +264,7 @@ describe(ThemeManager, () => {
             themeManager.applyTheme(lightTheme);
 
             const documentElement = document.documentElement as any;
-            expect(documentElement.style.setProperty).toHaveBeenCalled();
+            expect(documentElement.style.setProperty).toHaveBeenCalledWith();
         });
 
         it("should handle missing document gracefully", async ({
@@ -276,11 +276,11 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalDocument = globalThis.document;
+            const originalDocument = document;
             delete (globalThis as any).document;
 
             const lightTheme = themeManager.getTheme("light");
-            expect(() => themeManager.applyTheme(lightTheme)).not.toThrow();
+            expect(() => { themeManager.applyTheme(lightTheme); }).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;
@@ -300,7 +300,7 @@ describe(ThemeManager, () => {
             const lightTheme = themeManager.getTheme("light");
 
             // Apply theme and verify it doesn't throw
-            expect(() => themeManager.applyTheme(lightTheme)).not.toThrow();
+            expect(() => { themeManager.applyTheme(lightTheme); }).not.toThrow();
 
             // Verify basic functionality (the actual calls may vary based on internal implementation)
             // We just verify that the applyTheme method executes without errors
@@ -319,7 +319,7 @@ describe(ThemeManager, () => {
 
             for (const themeName of availableThemes) {
                 const theme = themeManager.getTheme(themeName);
-                expect(() => themeManager.applyTheme(theme)).not.toThrow();
+                expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
             }
         });
     });
@@ -433,15 +433,15 @@ describe(ThemeManager, () => {
             const cssVariables = themeManager.generateCSSVariables(theme);
 
             // Should include color variables
-            expect(cssVariables).toMatch(/--color-\w+-\w+:/);
+            expect(cssVariables).toMatch(/--color-\w+-\w+:/v);
 
             // Should include typography variables
-            expect(cssVariables).toMatch(/--font-size-\w+:/);
-            expect(cssVariables).toMatch(/--font-weight-\w+:/);
-            expect(cssVariables).toMatch(/--line-height-\w+:/);
+            expect(cssVariables).toMatch(/--font-size-\w+:/v);
+            expect(cssVariables).toMatch(/--font-weight-\w+:/v);
+            expect(cssVariables).toMatch(/--line-height-\w+:/v);
 
             // Should include spacing variables
-            expect(cssVariables).toMatch(/--spacing-\w+:/);
+            expect(cssVariables).toMatch(/--spacing-\w+:/v);
         });
 
         it("should generate valid CSS syntax", async ({ task, annotate }) => {
@@ -454,7 +454,7 @@ describe(ThemeManager, () => {
             const cssVariables = themeManager.generateCSSVariables(theme);
 
             // Basic CSS syntax validation
-            expect(cssVariables).toMatch(/--[\w-]+:\s*[^;]+;/);
+            expect(cssVariables).toMatch(/--[\w-]+:[^;]+;/u);
             expect(cssVariables).not.toContain("undefined");
             expect(cssVariables).not.toContain("null");
         });
@@ -480,7 +480,7 @@ describe(ThemeManager, () => {
             } as any;
 
             expect(() =>
-                themeManager.applyTheme(incompleteTheme)
+                { themeManager.applyTheme(incompleteTheme); }
             ).not.toThrow();
             expect(() =>
                 themeManager.generateCSSVariables(incompleteTheme)
@@ -505,7 +505,7 @@ describe(ThemeManager, () => {
                 borderRadius: {},
             } as any;
 
-            expect(() => themeManager.applyTheme(themeWithNulls)).not.toThrow();
+            expect(() => { themeManager.applyTheme(themeWithNulls); }).not.toThrow();
         });
 
         it("should work without DOM environment", async ({
@@ -517,11 +517,11 @@ describe(ThemeManager, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalDocument = globalThis.document;
+            const originalDocument = document;
             delete (globalThis as any).document;
 
             const theme = themeManager.getTheme("light");
-            expect(() => themeManager.applyTheme(theme)).not.toThrow();
+            expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
 
             // Restore document
             globalThis.document = originalDocument;

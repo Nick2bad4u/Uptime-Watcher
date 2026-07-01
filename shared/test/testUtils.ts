@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type React from "react";
+import type * as React from "react";
 
 /**
  * Standard test annotation helper for consistent test metadata.

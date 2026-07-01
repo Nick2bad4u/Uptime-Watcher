@@ -251,9 +251,9 @@ export class SiteWriterService {
                 );
 
                 // Only remove from cache if database deletion was successful
-                let removed = false;
+                let isRemoved = false;
                 if (deletionResult.siteDeleted && sitesCache.has(identifier)) {
-                    removed = sitesCache.delete(identifier);
+                    isRemoved = sitesCache.delete(identifier);
                 }
 
                 if (deletionResult.siteDeleted) {
@@ -269,7 +269,7 @@ export class SiteWriterService {
                     );
                 }
 
-                if (removed) {
+                if (isRemoved) {
                     this.logger.debug(`Site removed from cache: ${identifier}`);
                 }
 
@@ -361,10 +361,10 @@ export class SiteWriterService {
                     (m) => m.id === newMonitor.id
                 );
 
-                const intervalChanged =
+                const isIntervalChanged =
                     originalMonitor?.checkInterval !== newMonitor.checkInterval;
 
-                if (intervalChanged && newMonitor.id) {
+                if (isIntervalChanged && newMonitor.id) {
                     this.logger.debug(
                         `Monitor ${newMonitor.id} interval changed from ${originalMonitor?.checkInterval} to ${newMonitor.checkInterval}`
                     );

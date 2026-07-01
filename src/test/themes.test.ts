@@ -2,9 +2,9 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { lightTheme, darkTheme } from "../theme/themes";
+import { darkTheme, lightTheme } from "../theme/themes";
 
 describe("Theme Definitions", () => {
     describe("lightTheme", () => {

@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
 
 import { EmptyState } from "../../../../components/Dashboard/SiteList/EmptyState";
 
-describe("EmptyState Component", () => {
+describe("emptyState Component", () => {
     it("renders the empty state content", () => {
         render(<EmptyState />);
 
@@ -32,6 +32,7 @@ describe("EmptyState Component", () => {
         render(<EmptyState />);
 
         const monitorIcon = screen.getByTestId("empty-state-monitor-icon");
+
         expect(monitorIcon).toBeInTheDocument();
         expect(monitorIcon).toHaveAttribute("aria-hidden", "true");
     });

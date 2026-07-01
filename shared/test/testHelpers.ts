@@ -6,14 +6,14 @@
  *   all test files in the project.
  */
 
+import { webcrypto } from "node:crypto";
+
 import type {
     Monitor,
     MonitorStatus,
     MonitorType,
     StatusHistory,
 } from "../types";
-
-import { webcrypto } from "node:crypto";
 
 import { castUnchecked } from "../utils/typeHelpers";
 
@@ -24,7 +24,7 @@ import { castUnchecked } from "../utils/typeHelpers";
  */
 const getCryptoForTests = (): Crypto => {
     if (typeof globalThis.crypto?.getRandomValues === "function") {
-        return globalThis.crypto;
+        return crypto;
     }
 
     if (typeof webcrypto.getRandomValues === "function") {
@@ -142,9 +142,9 @@ export const createValidMonitor = (
     port: 80,
     responseTime: 100,
     retryAttempts: 3,
-    status: "up" as MonitorStatus,
+    status: "up",
     timeout: 5000,
-    type: "http" as MonitorType,
+    type: "http",
     url: "https://example.com",
     ...partial,
 });

@@ -59,7 +59,7 @@ function safeSerializeErrorInternal(
     depth: number
 ): SerializedError {
     const safeSerializeCause = (cause: unknown): unknown => {
-        if (cause instanceof Error && depth < 3) {
+        if (Error.isError(cause) && depth < 3) {
             return safeNormalizeLogValue(
                 safeSerializeErrorInternal(cause, depth + 1)
             );
@@ -71,14 +71,12 @@ function safeSerializeErrorInternal(
     return {
         message: safeNormalizeLogString(error.message),
         name: safeNormalizeLogString(error.name),
-        ...(error.stack ? { stack: safeNormalizeLogString(error.stack) } : {}),
-        ...(objectHasIn(castUnchecked<UnknownRecord>(error), "cause")
-            ? {
+        ...(error.stack && { stack: safeNormalizeLogString(error.stack) }),
+        ...(objectHasIn(castUnchecked<UnknownRecord>(error), "cause") && {
                   cause: safeSerializeCause(
                       safeCastTo<{ cause?: unknown }>(error).cause
                   ),
-              }
-            : {}),
+              }),
     } satisfies SerializedError;
 }
 
@@ -103,7 +101,7 @@ export const formatLogMessage = (prefix: string, message: string): string =>
  *   original value.
  */
 export const serializeError = (error: unknown): null | SerializedError => {
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         return safeSerializeErrorInternal(error, 0) satisfies SerializedError;
     }
 

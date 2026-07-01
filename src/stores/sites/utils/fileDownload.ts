@@ -141,7 +141,7 @@ function handleDownloadError(
     fileName: string,
     mimeType: string
 ): void {
-    if (!(error instanceof Error)) {
+    if (!(Error.isError(error))) {
         logger.error("File download failed", ensureError(error));
         throw new Error("File download failed");
     }
@@ -285,7 +285,7 @@ export async function handleSQLiteBackupDownload(
         });
     } catch (clickError) {
         const normalizedClickError =
-            clickError instanceof Error
+            Error.isError(clickError)
                 ? clickError
                 : new Error(getUserFacingErrorDetail(clickError));
 

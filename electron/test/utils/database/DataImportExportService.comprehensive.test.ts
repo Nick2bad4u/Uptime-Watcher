@@ -12,21 +12,23 @@
  * Target: 90%+ coverage through systematic isolated testing.
  */
 
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    type MockedFunction,
-} from "vitest";
-import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import type { Site } from "@shared/types";
+import type { ImportSite } from "@shared/validation/importExportSchemas";
 import type { Database } from "node-sqlite3-wasm";
 
-import { DataImportExportService } from "../../../services/database/DataImportExportService";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import {
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockedFunction,
+    vi,
+} from "vitest";
+
 import type { DataImportExportConfig } from "../../../services/database/DataImportExportService";
-import type { ImportSite } from "@shared/validation/importExportSchemas";
+
+import { DataImportExportService } from "../../../services/database/DataImportExportService";
 import { DataImportExportError } from "../../../services/database/interfaces";
 
 // Mock all dependencies
@@ -143,20 +145,20 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
         attachTransactionAdapter(mockRepositories.site, {
             bulkInsert: (db: unknown, rows: unknown) =>
-                mockRepositories.site["bulkInsertInternal"](db, rows),
+                mockRepositories.site.bulkInsertInternal(db, rows),
             deleteAll: (db: unknown) =>
-                mockRepositories.site["deleteAllInternal"](db),
+                mockRepositories.site.deleteAllInternal(db),
         });
 
         attachTransactionAdapter(mockRepositories.monitor, {
             deleteAll: (db: unknown) =>
-                mockRepositories.monitor["deleteAllInternal"](db),
+                mockRepositories.monitor.deleteAllInternal(db),
             create: (
                 db: unknown,
                 siteIdentifier: string,
                 monitor: Site["monitors"][0]
             ) =>
-                mockRepositories.monitor["createInternal"](
+                mockRepositories.monitor.createInternal(
                     db,
                     siteIdentifier,
                     monitor
@@ -165,14 +167,14 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
         attachTransactionAdapter(mockRepositories.history, {
             deleteAll: (db: unknown) =>
-                mockRepositories.history["deleteAllInternal"]?.(db),
+                mockRepositories.history.deleteAllInternal?.(db),
             addEntry: (
                 db: unknown,
                 monitorId: unknown,
                 entry: unknown,
                 details: unknown
             ) =>
-                mockRepositories.history["addEntryInternal"](
+                mockRepositories.history.addEntryInternal(
                     db,
                     monitorId,
                     entry,
@@ -182,9 +184,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
         attachTransactionAdapter(mockRepositories.settings, {
             deleteAll: (db: unknown) =>
-                mockRepositories.settings["deleteAllInternal"](db),
+                mockRepositories.settings.deleteAllInternal(db),
             bulkInsert: (db: unknown, values: unknown) =>
-                mockRepositories.settings["bulkInsertInternal"](db, values),
+                mockRepositories.settings.bulkInsertInternal(db, values),
         });
 
         mockDatabaseService = {
@@ -449,7 +451,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const exportPromise = service.exportAllData();
             await expect(exportPromise).rejects.toThrow(DataImportExportError);
             await expect(exportPromise).rejects.toThrow(
-                /Failed to export data: Export payload is too large/u
+                /Failed to export data: Export payload is too large/v
             );
 
             expect(getUtfByteLength).toHaveBeenCalledWith('{"exported":true}');
@@ -992,7 +994,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await expect(
                 service.persistImportedData(mockSites, {})
-            ).rejects.toThrow(/Monitor import failed for site 'site1'/u);
+            ).rejects.toThrow(/Monitor import failed for site 'site1'/v);
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[DataImportExportService] Failed to import monitors for site site1:",
@@ -1110,7 +1112,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             // Simulate a repository bug returning a falsy ID so that the
             // history import path skips adding entries.
             mockRepositories.monitor.createInternal.mockReturnValueOnce(
-                "" as unknown as string
+                ""
             );
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(

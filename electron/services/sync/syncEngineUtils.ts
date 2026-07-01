@@ -84,10 +84,10 @@ export function isValidPersistedDeviceId(candidate: string): boolean {
 }
 
 function assertNoUndefined<T>(
-    values: Array<T | undefined>,
+    values: (T | undefined)[],
     message: string
 ): asserts values is T[] {
-    const undefinedValue: undefined = undefined;
+    const undefinedValue = undefined;
     const undefinedEntries = values.filter(
         (value): value is undefined => value === undefined
     );
@@ -107,7 +107,7 @@ export async function mapWithConcurrency<T, R>(args: {
     const { concurrency, items, task } = args;
     const workerCount = Math.max(1, Math.min(concurrency, items.length));
 
-    const results: Array<R | undefined> = Array.from(
+    const results: (R | undefined)[] = Array.from(
         { length: items.length },
         (): R | undefined => undefined
     );

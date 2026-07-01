@@ -20,7 +20,7 @@ export type TimeoutMilliseconds = number & {
     readonly [timeoutMillisecondsBrand]: true;
 };
 
-/** Inclusive TCP/UDP port range supported by the application. */
+/** Inclusive TCP/UDP port range supported by the app. */
 export const PORT_NUMBER_RANGE: Readonly<{
     readonly MAX: number;
     readonly MIN: number;
@@ -30,7 +30,7 @@ export const PORT_NUMBER_RANGE: Readonly<{
 });
 
 /** Minimum permissible timeout duration for shared utilities. */
-export const MIN_TIMEOUT_MILLISECONDS: number = 0;
+export const MIN_TIMEOUT_MILLISECONDS = 0;
 
 /** Upper bound used when branding timeout durations. */
 export const MAX_TIMEOUT_MILLISECONDS: number = Number.MAX_SAFE_INTEGER;

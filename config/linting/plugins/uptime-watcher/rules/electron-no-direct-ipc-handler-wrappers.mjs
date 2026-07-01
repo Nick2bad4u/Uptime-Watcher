@@ -135,17 +135,17 @@ export const electronNoDirectIpcHandlerWrappersRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow calling withIpcHandler/withIpcHandlerValidation outside the IPC utilities module.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-direct-ipc-handler-wrappers.md",
         },
-        schema: [],
         messages: {
             preferStandardRegistration:
                 "Do not call {{wrapper}} directly. Use registerStandardizedIpcHandler so IPC handling stays centralized and consistent.",
         },
+        schema: [],
+        type: "problem",
     },
 };

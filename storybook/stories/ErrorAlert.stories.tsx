@@ -30,8 +30,8 @@ const meta: Meta<typeof ErrorAlert> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
 type ErrorAlertProps = ComponentProps<typeof ErrorAlert>;
+type Story = StoryObj<typeof meta>;
 
 const DismissibleStory = (args: ErrorAlertProps): ReactElement => {
     const { onDismiss, ...rest } = args;

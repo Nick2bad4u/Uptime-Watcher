@@ -110,10 +110,9 @@ export class SiteManagerStateSync {
             hasChanges = true;
         }
 
-        // Always emit for bulk-sync and update actions so consumers relying on
-        // a monotonic revision/event stream are not starved by empty deltas.
-        // Delete actions still require a meaningful delta, which we normalize
-        // above when a siteIdentifier is available.
+        // Always emit for bulk-sync and update actions so consumers relying on a monotonic revision/event stream are
+        // not starved by empty deltas. Delete actions still require a meaningful delta,
+        // which we normalize above when a siteIdentifier is available.
         const shouldEmit =
             args.action === STATE_SYNC_ACTION.BULK_SYNC ||
             args.action === STATE_SYNC_ACTION.UPDATE ||

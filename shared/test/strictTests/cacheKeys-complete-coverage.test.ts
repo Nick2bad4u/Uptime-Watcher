@@ -4,14 +4,13 @@
  * paths.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     CacheKeys,
     isStandardizedCacheKey,
     parseCacheKey,
     type StandardizedCacheKey,
 } from "@shared/utils/cacheKeys";
+import { describe, expect, it } from "vitest";
 
 describe("CacheKeys - Complete Function Coverage", () => {
     describe("Config cache keys", () => {
@@ -474,7 +473,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = parseCacheKey(
-                "config:setting-name" as StandardizedCacheKey
+                "config:setting-name"
             );
             expect(result).toEqual({
                 prefix: "config",
@@ -492,7 +491,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = parseCacheKey(
-                "monitor:operation:monitor-123" as StandardizedCacheKey
+                "monitor:operation:monitor-123"
             );
             expect(result).toEqual({
                 prefix: "monitor",
@@ -514,7 +513,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() => {
-                parseCacheKey(":identifier" as StandardizedCacheKey);
+                parseCacheKey(":identifier");
             }).toThrow("Invalid cache key format: :identifier");
         });
 
@@ -531,7 +530,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(() =>
-                parseCacheKey("config:" as StandardizedCacheKey)
+                parseCacheKey("config:")
             ).toThrow("Invalid cache key format: config:");
         });
 
@@ -548,7 +547,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() => {
-                parseCacheKey(":operation:identifier" as StandardizedCacheKey);
+                parseCacheKey(":operation:identifier");
             }).toThrow("Invalid cache key format: :operation:identifier");
         });
 
@@ -565,7 +564,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() => {
-                parseCacheKey("prefix::identifier" as StandardizedCacheKey);
+                parseCacheKey("prefix::identifier");
             }).toThrow("Invalid cache key format: prefix::identifier");
         });
 
@@ -582,7 +581,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() => {
-                parseCacheKey("prefix:operation:" as StandardizedCacheKey);
+                parseCacheKey("prefix:operation:");
             }).toThrow("Invalid cache key format: prefix:operation:");
         });
 
@@ -596,7 +595,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = parseCacheKey(
-                "site:loading:site-123_test.domain.com" as StandardizedCacheKey
+                "site:loading:site-123_test.domain.com"
             );
             expect(result).toEqual({
                 prefix: "site",
@@ -686,7 +685,7 @@ describe("CacheKeys - Complete Function Coverage", () => {
             // Validate all keys
             for (const key of keys) {
                 expect(isStandardizedCacheKey(key)).toBeTruthy();
-                const parsed = parseCacheKey(key as StandardizedCacheKey);
+                const parsed = parseCacheKey(key);
                 expect(parsed).toBeDefined();
             }
         });

@@ -51,7 +51,7 @@ export const preferAppAliasRule = {
                     return;
                 }
 
-                const importPath = String(node.source.value);
+                const importPath = node.source.value;
                 if (!importPath.startsWith(".")) {
                     return;
                 }
@@ -101,12 +101,10 @@ export const preferAppAliasRule = {
                      *     replaceText: (arg0: any, arg1: string) => any;
                      * }} fixer
                      */
-                    fix(fixer) {
-                        return fixer.replaceText(
+                    fix: (fixer) => fixer.replaceText(
                             node.source,
                             `${quote}${aliasPath}${quote}`
-                        );
-                    },
+                        ),
                     messageId: "useAlias",
                     node: node.source,
                 });
@@ -115,7 +113,6 @@ export const preferAppAliasRule = {
     },
 
     meta: {
-        type: "suggestion",
         docs: {
             description:
                 "require using the @app alias instead of relative paths into src from external packages.",
@@ -123,10 +120,11 @@ export const preferAppAliasRule = {
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-app-alias.md",
         },
         fixable: "code",
-        schema: [],
         messages: {
             useAlias:
                 "Import from src via the @app alias instead of relative paths.",
         },
+        schema: [],
+        type: "suggestion",
     },
 };

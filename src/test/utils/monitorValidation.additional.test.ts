@@ -3,7 +3,7 @@
  * complete function coverage
  */
 import { describe, expect, it } from "vitest";
-import { validateMonitorFormData } from "../../utils/monitorValidation";
+
 import type {
     DnsFormData,
     HttpFormData,
@@ -11,11 +11,13 @@ import type {
     PortFormData,
 } from "../../types/monitorFormData";
 
+import { validateMonitorFormData } from "../../utils/monitorValidation";
+
 describe("monitorValidation functions - Additional Coverage", () => {
     describe("validateMonitorFormData - DNS validation", () => {
         it("should validate valid DNS form data", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -26,22 +28,23 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const data: Partial<DnsFormData> = {
-                type: "dns",
+                checkInterval: 60_000,
                 host: "example.com",
                 recordType: "A",
-                checkInterval: 60_000,
-                timeout: 5000,
                 retryAttempts: 3,
+                timeout: 5000,
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
         });
 
         it("should validate DNS form data with expectedValue", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -52,23 +55,24 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const data: Partial<DnsFormData> = {
-                type: "dns",
+                checkInterval: 60_000,
+                expectedValue: "192.168.1.1",
                 host: "example.com",
                 recordType: "A",
-                expectedValue: "192.168.1.1",
-                checkInterval: 60_000,
-                timeout: 5000,
                 retryAttempts: 3,
+                timeout: 5000,
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
         });
 
         it("should reject DNS form data with missing host", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -79,22 +83,23 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<DnsFormData> = {
-                type: "dns",
                 recordType: "A",
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject DNS form data with invalid host type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -105,23 +110,24 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data = {
-                type: "dns",
                 host: 123, // Invalid type
                 recordType: "A",
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject DNS form data with missing recordType", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -132,22 +138,23 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<DnsFormData> = {
-                type: "dns",
                 host: "example.com",
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Record type is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject DNS form data with invalid recordType type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -158,23 +165,24 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data = {
-                type: "dns",
                 host: "example.com",
                 recordType: 123, // Invalid type
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Record type is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should handle DNS form data with empty expectedValue", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -185,19 +193,20 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<DnsFormData> = {
-                type: "dns",
+                expectedValue: "", // Empty string should be ignored
                 host: "example.com",
                 recordType: "A",
-                expectedValue: "", // Empty string should be ignored
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
         });
 
         it("should handle DNS form data with whitespace-only expectedValue", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -208,21 +217,22 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<DnsFormData> = {
-                type: "dns",
+                expectedValue: ' '.repeat(3), // Whitespace only should be ignored
                 host: "example.com",
                 recordType: "A",
-                expectedValue: "   ", // Whitespace only should be ignored
+                type: "dns",
             };
 
             const result = await validateMonitorFormData("dns", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
         });
     });
 
     describe("validateMonitorFormData - Port validation", () => {
         it("should validate valid port form data", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -233,22 +243,23 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const data: Partial<PortFormData> = {
-                type: "port",
+                checkInterval: 60_000,
                 host: "example.com",
                 port: 80,
-                checkInterval: 60_000,
-                timeout: 5000,
                 retryAttempts: 3,
+                timeout: 5000,
+                type: "port",
             };
 
             const result = await validateMonitorFormData("port", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
         });
 
         it("should reject port form data with missing host", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -259,22 +270,23 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<PortFormData> = {
-                type: "port",
                 port: 80,
+                type: "port",
             };
 
             const result = await validateMonitorFormData("port", data);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject port form data with invalid host type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -285,23 +297,24 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data = {
-                type: "port",
                 host: 123, // Invalid type
                 port: 80,
+                type: "port",
             };
 
             const result = await validateMonitorFormData("port", data as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject port form data with missing port", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -312,22 +325,23 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data: Partial<PortFormData> = {
-                type: "port",
                 host: "example.com",
+                type: "port",
             };
 
             const result = await validateMonitorFormData("port", data);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Port is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject port form data with invalid port type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -338,25 +352,26 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data = {
-                type: "port",
                 host: "example.com",
                 port: "80", // Invalid type
+                type: "port",
             };
 
             const result = await validateMonitorFormData("port", data as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Port is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
     });
 
     describe("validateMonitorFormData - Ping validation", () => {
         it("should validate valid ping form data", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -367,21 +382,22 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const data: Partial<PingFormData> = {
-                type: "ping",
-                host: "example.com",
                 checkInterval: 60_000,
-                timeout: 5000,
+                host: "example.com",
                 retryAttempts: 3,
+                timeout: 5000,
+                type: "ping",
             };
 
             const result = await validateMonitorFormData("ping", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
         });
 
         it("should reject ping form data with missing host", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -396,17 +412,18 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("ping", data);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject ping form data with invalid host type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -417,24 +434,25 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const data = {
-                type: "ping",
                 host: 123, // Invalid type
+                type: "ping",
             };
 
             const result = await validateMonitorFormData("ping", data as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) =>
                     error.includes("Host is required")
                 )
-            ).toBeTruthy();
+            ).toBe(true);
         });
     });
 
     describe("validateMonitorFormData - HTTP validation", () => {
         it("should validate valid HTTP form data", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -445,21 +463,22 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const data: Partial<HttpFormData> = {
+                checkInterval: 60_000,
+                retryAttempts: 3,
+                timeout: 5000,
                 type: "http",
                 url: "https://example.com",
-                checkInterval: 60_000,
-                timeout: 5000,
-                retryAttempts: 3,
             };
 
             const result = await validateMonitorFormData("http", data);
-            expect(result.success).toBeTruthy();
+
+            expect(result.success).toBe(true);
             expect(result.errors).toHaveLength(0);
         });
 
         it("should reject HTTP form data with missing url", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -474,15 +493,16 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("http", data);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) => error.includes("URL is required"))
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         it("should reject HTTP form data with invalid url type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -498,17 +518,18 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("http", data as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(
                 result.errors.some((error) => error.includes("URL is required"))
-            ).toBeTruthy();
+            ).toBe(true);
         });
     });
 
     describe("validateMonitorFormData - Edge cases", () => {
         it("should handle unknown monitor types", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -523,14 +544,15 @@ describe("monitorValidation functions - Additional Coverage", () => {
             };
 
             const result = await validateMonitorFormData("http", data as any);
+
             // Should handle gracefully, likely returning base validation errors
             expect(result).toHaveProperty("success");
             expect(result).toHaveProperty("errors");
         });
 
         it("should handle invalid data structure", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -541,22 +563,25 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result1 = await validateMonitorFormData("http", null as any);
-            expect(result1.success).toBeFalsy();
+
+            expect(result1.success).toBe(false);
 
             const result2 = await validateMonitorFormData(
                 "http",
                 undefined as any
             );
-            expect(result2.success).toBeFalsy();
+
+            expect(result2.success).toBe(false);
 
             const result3 = await validateMonitorFormData(
                 "http",
                 "not an object" as any
             );
-            expect(result3.success).toBeFalsy();
+
+            expect(result3.success).toBe(false);
         });
 
-        it("should handle empty object", async ({ task, annotate }) => {
+        it("should handle empty object", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
                 "Component: monitorValidation.additional",
@@ -566,7 +591,8 @@ describe("monitorValidation functions - Additional Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = await validateMonitorFormData("http", {} as any);
-            expect(result.success).toBeFalsy();
+
+            expect(result.success).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
         });
     });

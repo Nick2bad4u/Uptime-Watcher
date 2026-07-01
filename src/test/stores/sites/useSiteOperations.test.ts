@@ -3,6 +3,9 @@
  * and monitor management
  */
 
+import { type Monitor, type Site } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 import {
     beforeEach,
     describe,
@@ -12,16 +15,13 @@ import {
     type MockInstance,
 } from "vitest";
 
-import { type Monitor, type Site } from "@shared/types";
-import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
+import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
-import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 import * as siteOperationHelpers from "../../../stores/sites/utils/operationHelpers";
 
 // Mock external dependencies
-vi.mock("../../../services/logger");
+vi.mock(import('../../../services/logger'));
 
 const mockErrorStore = {
     clearStoreError: vi.fn(),
@@ -29,13 +29,13 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
 }));
 
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
@@ -51,7 +51,7 @@ vi.mock("../../../stores/utils", () => ({
     }),
 }));
 
-vi.mock("../../../stores/sites/utils/fileDownload", () => ({
+vi.mock(import('../../../stores/sites/utils/fileDownload'), () => ({
     handleSQLiteBackupDownload: vi.fn(
         async (callback) =>
             // Actually call the callback to trigger the electron API call
@@ -59,7 +59,7 @@ vi.mock("../../../stores/sites/utils/fileDownload", () => ({
     ),
 }));
 
-vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
+vi.mock(import('../../../stores/sites/utils/monitorOperations'), () => ({
     normalizeMonitor: vi.fn((monitor) => monitor),
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
@@ -74,10 +74,12 @@ const mockElectronAPI = (
     globalThis as typeof globalThis & { electronAPI: unknown }
 ).electronAPI as any;
 const getRestoreMock = (): MockInstance =>
-    mockElectronAPI.data.restoreSqliteBackup as unknown as MockInstance;
+    mockElectronAPI.data.restoreSqliteBackup;
 if (!mockElectronAPI.data.restoreSqliteBackup) {
-    (mockElectronAPI.data as Record<string, unknown>)["restoreSqliteBackup"] =
-        vi.fn(async () => ({
+    vi.spyOn(
+        mockElectronAPI.data as Record<string, unknown>,
+        "restoreSqliteBackup"
+    ).mockImplementation(async () => ({
             metadata: {
                 appVersion: "0.0.0-test",
                 checksum: "restore-checksum",
@@ -217,7 +219,7 @@ describe(createSiteOperationsActions, () => {
                 mockElectronAPI.sites.updateSite.mock.calls.at(-1);
             const updatedMonitors = updateCall?.[1]?.monitors ?? [];
             expect(updatedMonitors).toHaveLength(2);
-            expect(mockDeps.setSites).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith();
             const reconciledSites =
                 vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = reconciledSites.find(
@@ -631,7 +633,7 @@ describe(createSiteOperationsActions, () => {
                 ...mockSite,
                 monitors: [mockMonitor, secondMonitor],
             };
-            mockDeps.getSites = vi.fn(() => [siteWithMultipleMonitors]);
+            vi.spyOn(mockDeps, 'getSites').mockImplementation(() => [siteWithMultipleMonitors]);
 
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 
@@ -643,7 +645,7 @@ describe(createSiteOperationsActions, () => {
                 "monitor-1"
             );
             expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
-            expect(mockDeps.setSites).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith();
             const reconciledSites =
                 vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = reconciledSites.find(
@@ -786,7 +788,7 @@ describe(createSiteOperationsActions, () => {
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
             expect(mockDeps.setLastBackupMetadata).toHaveBeenCalledWith(
                 result.metadata
             );
@@ -822,7 +824,7 @@ describe(createSiteOperationsActions, () => {
             expect(mockDeps.setLastBackupMetadata).toHaveBeenCalledWith(
                 summary.metadata
             );
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            expect(mockDeps.syncSites).toHaveBeenCalledWith();
             expect(result).toEqual(summary);
         });
 

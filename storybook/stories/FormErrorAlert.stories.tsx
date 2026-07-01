@@ -21,8 +21,8 @@ const meta: Meta<typeof FormErrorAlert> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
 type FormErrorAlertProps = ComponentProps<typeof FormErrorAlert>;
+type Story = StoryObj<typeof meta>;
 
 const InteractiveStory = (args: FormErrorAlertProps): ReactElement => {
     const { error, onClearError, ...rest } = args;
@@ -42,7 +42,7 @@ const InteractiveStory = (args: FormErrorAlertProps): ReactElement => {
             />
             <ThemedButton
                 onClick={() =>
-                    setMessage("Validation failed: URL is required.")
+                    { setMessage("Validation failed: URL is required."); }
                 }
                 size="sm"
                 variant="secondary"

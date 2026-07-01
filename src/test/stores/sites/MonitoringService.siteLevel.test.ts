@@ -2,7 +2,7 @@
  * Test file for site-level monitoring functionality in MonitoringService
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MonitoringService } from "../../../services/MonitoringService";
 import { installElectronApiMock } from "../../utils/electronApiMock";
@@ -21,13 +21,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock store utilities
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 

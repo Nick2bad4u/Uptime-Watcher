@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import {
-    TypedEventBus,
     type EventPayloadValue,
+    TypedEventBus,
 } from "../../events/TypedEventBus";
 
 interface ScopedEvents extends Record<string, EventPayloadValue> {

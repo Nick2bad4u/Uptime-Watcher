@@ -1,7 +1,7 @@
+import { SETTINGS_KEY_SYNC_ENABLED } from "@electron/services/cloud/internal/cloudServiceSettings";
+import { assertCloudSyncEnabled } from "@electron/services/cloud/internal/cloudSyncOperationGuard";
 import { describe, expect, it } from "vitest";
 
-import { assertCloudSyncEnabled } from "@electron/services/cloud/internal/cloudSyncOperationGuard";
-import { SETTINGS_KEY_SYNC_ENABLED } from "@electron/services/cloud/internal/cloudServiceSettings";
 import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
 
 describe(assertCloudSyncEnabled, () => {

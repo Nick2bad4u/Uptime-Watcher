@@ -52,14 +52,14 @@ export const CloudProviderSetupPanel = ({
     onRefreshStatus,
     status,
 }: CloudProviderSetupPanelProperties): JSX.Element => {
-    const configured = status?.configured ?? false;
-    const connected = status?.connected ?? false;
+    const isConfigured = status?.configured ?? false;
+    const isConnected = status?.connected ?? false;
 
     const providerLabel = resolveProviderLabel(status);
     const connectionSiteStatus = resolveConnectionSiteStatus(status);
 
     const activeProviderTab = resolveActiveProviderTab(status);
-    const lockedProviderTab = configured ? activeProviderTab : null;
+    const lockedProviderTab = isConfigured ? activeProviderTab : null;
 
     const [userSelectedProviderTab, setUserSelectedProviderTab] =
         useState<CloudProviderSetupPanelTabKey | null>(null);
@@ -170,8 +170,8 @@ export const CloudProviderSetupPanel = ({
                     </ThemedButton>
 
                     <CloudProviderSetupPanelDisconnectControl
-                        configured={configured}
-                        connected={connected}
+                        configured={isConfigured}
+                        connected={isConnected}
                         isDisconnecting={isDisconnecting}
                         onDisconnect={onDisconnect}
                     />
@@ -231,8 +231,8 @@ export const CloudProviderSetupPanel = ({
 
                 <CloudProviderSetupPanelProviderPanel
                     activeProviderTab={activeProviderTab}
-                    configured={configured}
-                    connected={connected}
+                    configured={isConfigured}
+                    connected={isConnected}
                     filesystemBaseDirectory={filesystemBaseDirectory}
                     filesystemConfiguredBaseDirectory={
                         filesystemConfiguredBaseDirectory

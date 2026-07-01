@@ -3,45 +3,6 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
 /**
- * Tone used for the maintenance status callout.
- */
-export type MaintenanceTone = "info" | "warning";
-
-/**
- * Aggregated counts shown in the preview metrics grid.
- */
-export interface PreviewStats {
-    readonly changes: number;
-    readonly devices: number;
-    readonly other: number;
-    readonly snapshots: number;
-    readonly total: number;
-}
-
-/**
- * Derived view model based on the sync reset preview.
- */
-export interface PreviewViewModel {
-    readonly mismatchText: null | string;
-    readonly otherObjectsText: null | string;
-    readonly perDevice: CloudSyncResetPreview["perDevice"];
-    readonly previewText: string;
-}
-
-/**
- * Copy outcome used by the tools card.
- */
-export type SyncMaintenanceCopyResult =
-    | null
-    | {
-          readonly kind: "error";
-          readonly message: string;
-      }
-    | {
-          readonly kind: "success";
-      };
-
-/**
  * Structured diagnostic payload copied by the Sync Maintenance tools.
  */
 export interface DiagnosticsPayload {
@@ -80,3 +41,42 @@ export interface DiagnosticsText {
     readonly json: string;
     readonly text: string;
 }
+
+/**
+ * Tone used for the maintenance status callout.
+ */
+export type MaintenanceTone = "info" | "warning";
+
+/**
+ * Aggregated counts shown in the preview metrics grid.
+ */
+export interface PreviewStats {
+    readonly changes: number;
+    readonly devices: number;
+    readonly other: number;
+    readonly snapshots: number;
+    readonly total: number;
+}
+
+/**
+ * Derived view model based on the sync reset preview.
+ */
+export interface PreviewViewModel {
+    readonly mismatchText: null | string;
+    readonly otherObjectsText: null | string;
+    readonly perDevice: CloudSyncResetPreview["perDevice"];
+    readonly previewText: string;
+}
+
+/**
+ * Copy outcome used by the tools card.
+ */
+export type SyncMaintenanceCopyResult =
+    | null
+    | {
+          readonly kind: "error";
+          readonly message: string;
+      }
+    | {
+          readonly kind: "success";
+      };

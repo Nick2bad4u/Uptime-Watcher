@@ -1,11 +1,11 @@
 /**
- * @file Simple tests for main.tsx application entry point focusing on coverage
+ * @file Simple tests for main.tsx app entry point focusing on coverage
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock structured renderer logger so we can assert initialization errors are logged consistently
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockAppLogger = {
         error: vi.fn(),
         performance: vi.fn(),
@@ -47,18 +47,18 @@ vi.mock("../services/logger", () => {
 });
 
 // Simple mocks without complex implementations
-vi.mock("react-dom/client", () => ({
+vi.mock(import('react-dom/client'), () => ({
     createRoot: vi.fn(() => ({
         render: vi.fn(),
         unmount: vi.fn(),
     })),
 }));
 
-vi.mock("../App", () => ({
+vi.mock(import('../App'), () => ({
     default: () => "App Component",
 }));
 
-vi.mock("../index.css", () => ({}));
+vi.mock(import('../index.css'), () => ({}));
 
 describe("main.tsx - Application Entry Point", () => {
     let originalConsoleError: typeof console.error;
@@ -72,7 +72,7 @@ describe("main.tsx - Application Entry Point", () => {
 
         // Spy on console.error
         originalConsoleError = console.error;
-        console.error = vi.fn();
+        vi.spyOn(console, 'error').mockImplementation();
     });
 
     afterEach(() => {
@@ -110,7 +110,7 @@ describe("main.tsx - Application Entry Point", () => {
             annotate("Type: Business Logic", "type");
 
             // Remove root element
-            document.body.innerHTML = "";
+            document.body.replaceChildren();
 
             // Import main.tsx
             await import("../main");
@@ -134,7 +134,7 @@ describe("main.tsx - Application Entry Point", () => {
             annotate("Type: Initialization", "type");
 
             // Remove root element to trigger error
-            document.body.innerHTML = "";
+            document.body.replaceChildren();
 
             // Import main.tsx
             await import("../main");
@@ -192,7 +192,7 @@ describe("main.tsx - Application Entry Point", () => {
             annotate("Type: Error Handling", "type");
 
             // Remove root to trigger error path
-            document.body.innerHTML = "";
+            document.body.replaceChildren();
 
             // Import main.tsx - should catch error and log it
             await import("../main");

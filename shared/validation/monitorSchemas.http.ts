@@ -21,11 +21,6 @@ import * as z from "zod";
 
 import { VALIDATION_CONSTRAINTS } from "./monitorSchemas.common";
 
-interface HttpMonitorSchemaBaseArgs {
-    readonly baseMonitorSchema: BaseMonitorSchemaType;
-    readonly httpUrlSchema: z.ZodString;
-}
-
 interface HttpHeaderMonitorSchemaArgs extends HttpMonitorSchemaBaseArgs {
     readonly httpHeaderNameSchema: z.ZodString;
     readonly httpHeaderValueSchema: z.ZodString;
@@ -35,17 +30,9 @@ interface HttpJsonMonitorSchemaArgs extends HttpMonitorSchemaBaseArgs {
     readonly jsonPathSchema: z.ZodString;
 }
 
-/** Creates the HTTP monitor schema. */
-export function createHttpMonitorSchema(
-    args: HttpMonitorSchemaBaseArgs
-): HttpMonitorSchemaType {
-    return args.baseMonitorSchema
-        .extend({
-            followRedirects: z.boolean().optional(),
-            type: z.literal("http"),
-            url: args.httpUrlSchema,
-        })
-        .strict();
+interface HttpMonitorSchemaBaseArgs {
+    readonly baseMonitorSchema: BaseMonitorSchemaType;
+    readonly httpUrlSchema: z.ZodString;
 }
 
 /** Creates the HTTP header monitor schema. */
@@ -58,27 +45,6 @@ export function createHttpHeaderMonitorSchema(
             followRedirects: z.boolean().optional(),
             headerName: args.httpHeaderNameSchema,
             type: z.literal("http-header"),
-            url: args.httpUrlSchema,
-        })
-        .strict();
-}
-
-/** Creates the HTTP keyword monitor schema. */
-export function createHttpKeywordMonitorSchema(
-    args: HttpMonitorSchemaBaseArgs
-): HttpKeywordMonitorSchemaType {
-    return args.baseMonitorSchema
-        .extend({
-            bodyKeyword: z
-                .string()
-                .trim()
-                .min(1, "Keyword is required")
-                .max(1024, "Keyword must be 1024 characters or fewer")
-                .refine((keyword) => keyword.trim().length > 0, {
-                    error: "Keyword is required",
-                }),
-            followRedirects: z.boolean().optional(),
-            type: z.literal("http-keyword"),
             url: args.httpUrlSchema,
         })
         .strict();
@@ -109,18 +75,22 @@ export function createHttpJsonMonitorSchema(
         .strict();
 }
 
-/** Creates the HTTP status monitor schema. */
-export function createHttpStatusMonitorSchema(
+/** Creates the HTTP keyword monitor schema. */
+export function createHttpKeywordMonitorSchema(
     args: HttpMonitorSchemaBaseArgs
-): HttpStatusMonitorSchemaType {
+): HttpKeywordMonitorSchemaType {
     return args.baseMonitorSchema
         .extend({
-            expectedStatusCode: z
-                .int("Status code must be an integer")
-                .min(100, "Status code must be between 100 and 599")
-                .max(599, "Status code must be between 100 and 599"),
+            bodyKeyword: z
+                .string()
+                .trim()
+                .min(1, "Keyword is required")
+                .max(1024, "Keyword must be 1024 characters or fewer")
+                .refine((keyword) => keyword.trim().length > 0, {
+                    error: "Keyword is required",
+                }),
             followRedirects: z.boolean().optional(),
-            type: z.literal("http-status"),
+            type: z.literal("http-keyword"),
             url: args.httpUrlSchema,
         })
         .strict();
@@ -141,6 +111,36 @@ export function createHttpLatencyMonitorSchema(
                     "Maximum response time cannot exceed 300 seconds"
                 ),
             type: z.literal("http-latency"),
+            url: args.httpUrlSchema,
+        })
+        .strict();
+}
+
+/** Creates the HTTP monitor schema. */
+export function createHttpMonitorSchema(
+    args: HttpMonitorSchemaBaseArgs
+): HttpMonitorSchemaType {
+    return args.baseMonitorSchema
+        .extend({
+            followRedirects: z.boolean().optional(),
+            type: z.literal("http"),
+            url: args.httpUrlSchema,
+        })
+        .strict();
+}
+
+/** Creates the HTTP status monitor schema. */
+export function createHttpStatusMonitorSchema(
+    args: HttpMonitorSchemaBaseArgs
+): HttpStatusMonitorSchemaType {
+    return args.baseMonitorSchema
+        .extend({
+            expectedStatusCode: z
+                .int("Status code must be an integer")
+                .min(100, "Status code must be between 100 and 599")
+                .max(599, "Status code must be between 100 and 599"),
+            followRedirects: z.boolean().optional(),
+            type: z.literal("http-status"),
             url: args.httpUrlSchema,
         })
         .strict();

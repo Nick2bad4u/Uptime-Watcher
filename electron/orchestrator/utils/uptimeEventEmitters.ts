@@ -16,11 +16,6 @@ import type {
     TypedEventBus,
 } from "../../events/TypedEventBus";
 
-/**
- * Narrow shape required to emit uptime events.
- */
-export type UptimeEventEmitter = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
-
 /** Strongly-typed `emitTyped` function signature for uptime events. */
 export type EmitUptimeEvent = <TEventName extends EventKey<UptimeEvents>>(
     eventName: TEventName,
@@ -28,13 +23,9 @@ export type EmitUptimeEvent = <TEventName extends EventKey<UptimeEvents>>(
 ) => Promise<void>;
 
 /**
- * Creates a strongly-typed `emitTyped` adapter.
+ * Narrow shape required to emit uptime events.
  */
-export function createEmitUptimeEvent(
-    bus: UptimeEventEmitter
-): EmitUptimeEvent {
-    return async (eventName, payload) => bus.emitTyped(eventName, payload);
-}
+export type UptimeEventEmitter = Pick<TypedEventBus<UptimeEvents>, "emitTyped">;
 
 /**
  * Creates an emitter for the `system:error` event.
@@ -44,4 +35,13 @@ export function createEmitSystemError(
 ): (payload: EventPayload<UptimeEvents, "system:error">) => Promise<void> {
     return (payload: EventPayload<UptimeEvents, "system:error">) =>
         bus.emitTyped("system:error", payload);
+}
+
+/**
+ * Creates a strongly-typed `emitTyped` adapter.
+ */
+export function createEmitUptimeEvent(
+    bus: UptimeEventEmitter
+): EmitUptimeEvent {
+    return async (eventName, payload) => bus.emitTyped(eventName, payload);
 }

@@ -2,14 +2,8 @@
  * Comprehensive tests for SiteDetailsNavigation component
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import React from "react";
-import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
-import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
-import type { Site, Monitor } from "@shared/types";
-import { getMonitorTypeDisplayLabel } from "../../../utils/fallbacks";
+import type { Monitor, Site } from "@shared/types";
+
 import {
     monitorIdArbitrary,
     sampleOne,
@@ -17,6 +11,16 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import "@testing-library/jest-dom";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import * as React from "react";
+import { arrayFirst, isEmpty  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
+
+import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
+import { getMonitorTypeDisplayLabel } from "../../../utils/fallbacks";
 
 const sampledSiteName = sampleOne(siteNameArbitrary);
 const sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
@@ -37,7 +41,7 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 );
 
 // Mock the logger
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         user: {
             action: vi.fn(),
@@ -46,7 +50,7 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 // Mock the theme components
-vi.mock("../../../theme/components", () => ({
+vi.mock(import('../../../theme/components'), () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div data-testid="themed-box" {...props}>
             {children}
@@ -55,10 +59,10 @@ vi.mock("../../../theme/components", () => ({
     ThemedButton: vi.fn(
         ({ children, onClick, variant, size, className, ...props }) => (
             <button
-                onClick={onClick}
-                data-variant={variant}
-                data-size={size}
                 className={className}
+                data-size={size}
+                data-variant={variant}
+                onClick={onClick}
                 {...props}
             >
                 {children}
@@ -73,7 +77,7 @@ vi.mock("../../../theme/components", () => ({
 }));
 
 vi.mock(
-    "../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: ({
             className,
@@ -89,12 +93,12 @@ vi.mock(
             <select
                 className={`monitor-selector-mock ${className ?? ""}`.trim()}
                 data-testid="monitor-selector"
-                disabled={monitors.length === 0}
+                disabled={isEmpty(monitors)}
                 onChange={onChange}
                 value={selectedMonitorId}
             >
-                {monitors.length === 0 ? (
-                    <option value="" disabled>
+                {isEmpty(monitors) ? (
+                    <option disabled value="">
                         No monitors available
                     </option>
                 ) : null}
@@ -110,22 +114,22 @@ vi.mock(
 
 // Mock the SiteMonitoringButton
 vi.mock(
-    "../../../components/common/SiteMonitoringButton/SiteMonitoringButton",
+    import('../../../components/common/SiteMonitoringButton/SiteMonitoringButton'),
     () => ({
         SiteMonitoringButton: vi.fn(
             ({ isLoading, onStartSiteMonitoring, onStopSiteMonitoring }) => (
                 <div data-testid="site-monitoring-button">
                     <button
                         data-testid="start-site-monitoring"
-                        onClick={onStartSiteMonitoring}
                         disabled={isLoading}
+                        onClick={onStartSiteMonitoring}
                     >
                         Start Site
                     </button>
                     <button
                         data-testid="stop-site-monitoring"
-                        onClick={onStopSiteMonitoring}
                         disabled={isLoading}
+                        onClick={onStopSiteMonitoring}
                     >
                         Stop Site
                     </button>
@@ -232,7 +236,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText(/Site Overview/)).toBeInTheDocument();
+            expect(screen.getByText(/Site Overview/v)).toBeInTheDocument();
         });
 
         it("should render monitor overview tab", ({ task, annotate }) => {
@@ -248,7 +252,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText(/Monitor Overview/)).toBeInTheDocument();
+            expect(screen.getByText(/Monitor Overview/v)).toBeInTheDocument();
         });
 
         it("should render settings tab", ({ task, annotate }) => {
@@ -264,7 +268,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText(/Settings/)).toBeInTheDocument();
+            expect(screen.getByText(/Settings/v)).toBeInTheDocument();
         });
 
         it("should render history tab", ({ task, annotate }) => {
@@ -280,7 +284,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText(/History/)).toBeInTheDocument();
+            expect(screen.getByText(/History/v)).toBeInTheDocument();
         });
 
         it("should render analytics tab", ({ task, annotate }) => {
@@ -297,7 +301,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             renderSiteDetailsNavigation();
 
             expect(
-                screen.getByText(/Website URL Analytics/)
+                screen.getByText(/Website URL Analytics/v)
             ).toBeInTheDocument();
         });
     });
@@ -334,7 +338,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             const selector = screen.getByTestId(
                 "monitor-selector"
-            ) as HTMLSelectElement;
+            );
             expect(selector).toHaveValue(httpMonitorId);
         });
 
@@ -382,10 +386,10 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             const selector = screen.getByTestId(
                 "monitor-selector"
-            ) as HTMLSelectElement;
+            );
             fireEvent.change(selector, { target: { value: portMonitorId } });
 
-            expect(handleMonitorIdChange).toHaveBeenCalled();
+            expect(handleMonitorIdChange).toHaveBeenCalledWith();
         });
     });
 
@@ -409,7 +413,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 setActiveSiteDetailsTab,
             });
 
-            fireEvent.click(screen.getByText(/Site Overview/));
+            fireEvent.click(screen.getByText(/Site Overview/v));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
                 "site-overview"
@@ -435,7 +439,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 setActiveSiteDetailsTab,
             });
 
-            fireEvent.click(screen.getByText(/Monitor Overview/));
+            fireEvent.click(screen.getByText(/Monitor Overview/v));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
                 "monitor-overview"
@@ -461,7 +465,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 setActiveSiteDetailsTab,
             });
 
-            fireEvent.click(screen.getByText(/Settings/));
+            fireEvent.click(screen.getByText(/Settings/v));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("settings");
         });
@@ -485,7 +489,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 setActiveSiteDetailsTab,
             });
 
-            fireEvent.click(screen.getByText(/History/));
+            fireEvent.click(screen.getByText(/History/v));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith("history");
         });
@@ -509,7 +513,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 setActiveSiteDetailsTab,
             });
 
-            fireEvent.click(screen.getByText(/Website URL Analytics/));
+            fireEvent.click(screen.getByText(/Website URL Analytics/v));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
                 `${httpMonitorId}-analytics`
@@ -647,7 +651,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             expect(
-                screen.getByLabelText(/Stop Monitoring/)
+                screen.getByLabelText(/Stop Monitoring/v)
             ).toBeInTheDocument();
         });
 
@@ -670,7 +674,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             expect(
-                screen.getByLabelText(/Start Monitoring/)
+                screen.getByLabelText(/Start Monitoring/v)
             ).toBeInTheDocument();
         });
 
@@ -691,9 +695,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 isMonitoring: false,
             });
 
-            fireEvent.click(screen.getByLabelText(/Start Monitoring/));
+            fireEvent.click(screen.getByLabelText(/Start Monitoring/v));
 
-            expect(handleStartMonitoring).toHaveBeenCalled();
+            expect(handleStartMonitoring).toHaveBeenCalledWith();
         });
 
         it("should handle stop monitoring click", ({ task, annotate }) => {
@@ -713,9 +717,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 isMonitoring: true,
             });
 
-            fireEvent.click(screen.getByLabelText(/Stop Monitoring/));
+            fireEvent.click(screen.getByLabelText(/Stop Monitoring/v));
 
-            expect(handleStopMonitoring).toHaveBeenCalled();
+            expect(handleStopMonitoring).toHaveBeenCalledWith();
         });
     });
 
@@ -742,9 +746,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             // Should still render basic tabs
-            expect(screen.getByText(/Site Overview/)).toBeInTheDocument();
-            expect(screen.getByText(/Settings/)).toBeInTheDocument();
-            expect(screen.getByText(/History/)).toBeInTheDocument();
+            expect(screen.getByText(/Site Overview/v)).toBeInTheDocument();
+            expect(screen.getByText(/Settings/v)).toBeInTheDocument();
+            expect(screen.getByText(/History/v)).toBeInTheDocument();
         });
 
         it("should handle loading state", ({ task, annotate }) => {
@@ -777,7 +781,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            const baseMonitor = mockSite.monitors[0];
+            const baseMonitor = arrayFirst(mockSite.monitors);
             if (!baseMonitor) {
                 throw new Error(
                     "Mock site must include at least one monitor for testing"
@@ -807,7 +811,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             expect(
-                screen.getByText(/Ping Monitor Analytics/)
+                screen.getByText(/Ping Monitor Analytics/v)
             ).toBeInTheDocument();
         });
 
@@ -827,7 +831,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             // Should still render navigation with fallback label
-            expect(screen.getByText(/Monitor Analytics/)).toBeInTheDocument();
+            expect(screen.getByText(/Monitor Analytics/v)).toBeInTheDocument();
         });
     });
 
@@ -883,7 +887,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             fireEvent.click(screen.getByTestId("start-site-monitoring"));
 
-            expect(handleStartSiteMonitoring).toHaveBeenCalled();
+            expect(handleStartSiteMonitoring).toHaveBeenCalledWith();
         });
 
         it("should handle site monitoring stop", ({ task, annotate }) => {
@@ -906,7 +910,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             fireEvent.click(screen.getByTestId("stop-site-monitoring"));
 
-            expect(handleStopSiteMonitoring).toHaveBeenCalled();
+            expect(handleStopSiteMonitoring).toHaveBeenCalledWith();
         });
     });
 });

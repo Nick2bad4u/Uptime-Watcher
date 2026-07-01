@@ -6,7 +6,10 @@
  * entirely
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import ServiceContainer after mocks are set up
+import { ServiceContainer } from "../../services/ServiceContainer";
 
 // Create hoisted mock factory for TypedEventBus using constructor pattern
 const mockTypedEventBus = vi.hoisted(() => {
@@ -150,9 +153,6 @@ vi.mock("../../managers/SiteManager", () => ({
         };
     },
 }));
-
-// Import ServiceContainer after mocks are set up
-import { ServiceContainer } from "../../services/ServiceContainer";
 
 describe("ServiceContainer - Factory Bypass Test", () => {
     let container: ServiceContainer;

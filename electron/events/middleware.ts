@@ -264,7 +264,7 @@ type ValidatorMap<EventMap extends TypedEventMap> = Partial<{
 /** Middleware stack helpers exposed to consumers. */
 export interface MiddlewareStacks {
     custom: <EventMap extends TypedEventMap>(
-        middlewares: Array<EventMiddleware<EventMap>>
+        middlewares: EventMiddleware<EventMap>[]
     ) => EventMiddleware<EventMap>;
     development: <
         EventMap extends TypedEventMap = TypedEventMap,
@@ -282,7 +282,7 @@ export interface MiddlewareStacks {
  */
 export function composeMiddleware<
     EventMap extends TypedEventMap = TypedEventMap,
->(...middlewares: Array<EventMiddleware<EventMap>>): EventMiddleware<EventMap> {
+>(...middlewares: EventMiddleware<EventMap>[]): EventMiddleware<EventMap> {
     return (event, data, next) => {
         let index = 0;
 
@@ -325,12 +325,10 @@ export function createDebugMiddleware<
 
         const processingContext = {
             event: typedEvent,
-            ...(verbose
-                ? {
+            ...(verbose && {
                       data: formatLoggableData(data),
                       serializedData: safeSerialize(data),
-                  }
-                : undefined),
+                  }),
             timestamp: startTime,
         };
 
@@ -412,8 +410,8 @@ export function createFilterMiddleware<
     EventMap extends TypedEventMap = TypedEventMap,
 >(
     options: {
-        allowList?: Array<EventKey<EventMap>>;
-        blockList?: Array<EventKey<EventMap>>;
+        allowList?: EventKey<EventMap>[];
+        blockList?: EventKey<EventMap>[];
         condition?: <K extends EventKey<EventMap>>(
             event: K,
             data: EventMap[K]
@@ -427,7 +425,7 @@ export function createFilterMiddleware<
 
         if (isPresent(allowList) && !arrayIncludes(allowList, typedEvent)) {
             baseLogger.debug(
-                `[EventBus] Event '${String(typedEvent)}' blocked by allow list`
+                `[EventBus] Event '${typedEvent}' blocked by allow list`
             );
             return Promise.resolve();
         }
@@ -660,7 +658,7 @@ export function createValidationMiddleware<
  * Preconfigured middleware stacks for common environments.
  */
 const createCustomStack = <EventMap extends TypedEventMap>(
-    middlewares: Array<EventMiddleware<EventMap>>
+    middlewares: EventMiddleware<EventMap>[]
 ): EventMiddleware<EventMap> => composeMiddleware<EventMap>(...middlewares);
 
 function createDevelopmentStack<

@@ -17,10 +17,12 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import fc from "fast-check";
-import { DataImportExportService } from "../../services/database/DataImportExportService";
 import type { Site } from "@shared/types";
+
+import fc from "fast-check";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DataImportExportService } from "../../services/database/DataImportExportService";
 
 describe("Data Import/Export Service Fuzzing Tests", () => {
     let service: DataImportExportService;
@@ -89,36 +91,36 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
         attachAdapter(mockConfig.repositories.site, {
             bulkInsert: (db: unknown, rows: unknown) =>
-                mockConfig.repositories.site["bulkInsertInternal"](db, rows),
+                mockConfig.repositories.site.bulkInsertInternal(db, rows),
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.site["deleteAllInternal"](db),
+                mockConfig.repositories.site.deleteAllInternal(db),
         });
 
         attachAdapter(mockConfig.repositories.settings, {
             bulkInsert: (db: unknown, values: unknown) =>
-                mockConfig.repositories.settings["bulkInsertInternal"](
+                mockConfig.repositories.settings.bulkInsertInternal(
                     db,
                     values
                 ),
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.settings["deleteAllInternal"](db),
+                mockConfig.repositories.settings.deleteAllInternal(db),
         });
 
         attachAdapter(mockConfig.repositories.monitor, {
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.monitor["deleteAllInternal"](db),
+                mockConfig.repositories.monitor.deleteAllInternal(db),
         });
 
         attachAdapter(mockConfig.repositories.history, {
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.history["deleteAllInternal"](db),
+                mockConfig.repositories.history.deleteAllInternal(db),
             addEntry: (
                 db: unknown,
                 monitorId: unknown,
                 entry: unknown,
                 details: unknown
             ) =>
-                mockConfig.repositories.history["addEntryInternal"](
+                mockConfig.repositories.history.addEntryInternal(
                     db,
                     monitorId,
                     entry,

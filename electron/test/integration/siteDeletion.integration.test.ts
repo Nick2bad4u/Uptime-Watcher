@@ -3,23 +3,24 @@
  * transactional surface without triggering nested transactions.
  */
 
-import { describe, expect, it, vi, afterEach } from "vitest";
-
 import type { Site } from "@shared/types";
 
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type {
     MonitorRepository,
     MonitorRepositoryTransactionAdapter,
 } from "../../services/database/MonitorRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type {
     SiteRepository,
     SiteRepositoryTransactionAdapter,
 } from "../../services/database/SiteRepository";
-import type { HistoryRepository } from "../../services/database/HistoryRepository";
-import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import { StandardizedCache } from "../../utils/cache/StandardizedCache";
+
 import { SiteWriterService } from "../../services/database/SiteWriterService";
+import { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 class FakeDatabaseService {
     public nestedTransactions = 0;
@@ -47,11 +48,11 @@ class FakeDatabaseService {
 
 interface RepositoryBundle {
     historyRepository: HistoryRepository;
-    monitorRepository: MonitorRepository;
     monitorAdapters: MonitorRepositoryTransactionAdapter[];
+    monitorRepository: MonitorRepository;
     settingsRepository: SettingsRepository;
-    siteRepository: SiteRepository;
     siteAdapters: SiteRepositoryTransactionAdapter[];
+    siteRepository: SiteRepository;
 }
 
 const createRepositoryBundle = (
@@ -194,9 +195,9 @@ describe("Site deletion orchestration", () => {
             },
         });
 
-        const result = await writer.deleteSite(sitesCache, siteIdentifier);
+        const isResult = await writer.deleteSite(sitesCache, siteIdentifier);
 
-        expect(result).toBeTruthy();
+        expect(isResult).toBeTruthy();
         expect(fakeDatabaseService.nestedTransactions).toBe(0);
         expect(sitesCache.has(siteIdentifier)).toBeFalsy();
         expect(sites.has(siteIdentifier)).toBeFalsy();

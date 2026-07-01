@@ -53,25 +53,7 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         site,
     }: SiteTableRowProperties) {
         const siteState = useSite(site);
-        const {
-            isLoading,
-            isMonitoring,
-            latestSite,
-            monitor,
-            responseTime,
-            selectedMonitorId,
-            status,
-            uptime,
-        } = siteState;
-        const {
-            handleCardClick,
-            handleCheckNow,
-            handleMonitorIdChange,
-            handleStartMonitoring,
-            handleStartSiteMonitoring,
-            handleStopMonitoring,
-            handleStopSiteMonitoring,
-        } = siteState;
+        const {isLoading, isMonitoring, latestSite, monitor, responseTime, selectedMonitorId, status, uptime, handleCardClick, handleCheckNow, handleMonitorIdChange, handleStartMonitoring, handleStartSiteMonitoring, handleStopMonitoring, handleStopSiteMonitoring} = siteState;
 
         const marqueeTextProps = useMemo<
             NonNullable<MarqueeTextProperties["textProps"]>

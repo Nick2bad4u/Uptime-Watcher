@@ -1,5 +1,6 @@
+import { afterEach, describe, expect, test, vi } from "vitest";
+
 import { createTemplateLogger } from "../../utils/logTemplates";
-import { describe, test, expect, vi, afterEach } from "vitest";
 
 describe("LogTemplates - Missing Coverage", () => {
     describe("createTemplateLogger branch coverage", () => {

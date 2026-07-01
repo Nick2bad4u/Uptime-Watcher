@@ -1,16 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-
 import type { CloudStatusSummary } from "@shared/types/cloud";
 
-import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
-
-import {
-    SETTINGS_KEY_DROPBOX_TOKENS,
-    SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
-    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
-    SETTINGS_KEY_PROVIDER,
-} from "../../../services/cloud/internal/cloudServiceSettings";
+import { describe, expect, it, vi } from "vitest";
 
 import type { CloudServiceOperationContext } from "../../../services/cloud/CloudService.operationContext";
 
@@ -18,6 +8,14 @@ import {
     connectDropbox,
     connectGoogleDrive,
 } from "../../../services/cloud/CloudService.providerOperations";
+import {
+    SETTINGS_KEY_DROPBOX_TOKENS,
+    SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+    SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+    SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
+    SETTINGS_KEY_PROVIDER,
+} from "../../../services/cloud/internal/cloudServiceSettings";
+import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 
 function createBaseStatus(): CloudStatusSummary {
     return {
@@ -44,7 +42,7 @@ function createSettingsAdapter(seed?: Record<string, string>): {
         set: async (key, value) => {
             data.set(key, value);
         },
-        snapshot: () => Object.fromEntries(data.entries()),
+        snapshot: () => Object.fromEntries(data),
     };
 }
 

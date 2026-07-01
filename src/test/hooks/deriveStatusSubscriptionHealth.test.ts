@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { deriveStatusSubscriptionHealth } from "../../hooks/useStatusSubscriptionHealth";
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
+
+import { deriveStatusSubscriptionHealth } from "../../hooks/useStatusSubscriptionHealth";
 
 describe(deriveStatusSubscriptionHealth, () => {
     it("flags unknown health when summary is absent", () => {

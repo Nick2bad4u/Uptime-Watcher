@@ -1,23 +1,28 @@
+import type { Site } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import {
+    createSiteSyncActions,
+    type SiteSyncDependencies,
+} from "../../../stores/sites/useSiteSync";
 
 const ensureErrorMock = vi.hoisted(() =>
     vi.fn((error: unknown) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     )
 );
 const withErrorHandlingMock = vi.hoisted(() =>
     vi.fn(async <T>(operation: () => Promise<T>) => await operation())
 );
 
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     ensureError: ensureErrorMock,
     withErrorHandling: withErrorHandlingMock,
 }));
 
 const logStoreActionMock = vi.hoisted(() => vi.fn());
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: logStoreActionMock,
 }));
 
@@ -26,7 +31,7 @@ const createStoreErrorHandlerMock = vi.hoisted(() =>
         setError: vi.fn(),
     }))
 );
-vi.mock("../../../stores/utils/storeErrorHandling", () => ({
+vi.mock(import('../../../stores/utils/storeErrorHandling'), () => ({
     createStoreErrorHandler: createStoreErrorHandlerMock,
 }));
 
@@ -36,7 +41,7 @@ const loggerMock = vi.hoisted(() => ({
     info: vi.fn(),
     warn: vi.fn(),
 }));
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: loggerMock,
 }));
 
@@ -45,7 +50,7 @@ const stateSyncServiceMock = vi.hoisted(() => ({
     onStateSyncEvent: vi.fn(),
     requestFullSync: vi.fn(),
 }));
-vi.mock("../../../services/StateSyncService", () => ({
+vi.mock(import('../../../services/StateSyncService'), () => ({
     StateSyncService: stateSyncServiceMock,
 }));
 
@@ -64,14 +69,9 @@ const statusUpdateManagerConstructor = vi.hoisted(() =>
         };
     })
 );
-vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
+vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
     StatusUpdateManager: statusUpdateManagerConstructor,
 }));
-
-import {
-    createSiteSyncActions,
-    type SiteSyncDependencies,
-} from "../../../stores/sites/useSiteSync";
 
 const buildSite = (identifier: string): Site => ({
     identifier,

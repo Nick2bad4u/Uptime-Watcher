@@ -2,15 +2,6 @@
  * Complete coverage for shared logging helpers and contract interfaces.
  */
 
-import { describe, expect, it } from "vitest";
-
-import {
-    buildErrorLogArguments,
-    buildLogArguments,
-    formatLogMessage,
-    serializeError,
-} from "@shared/utils/logger/common";
-
 import type {
     AppLogger,
     BaseLogger,
@@ -18,6 +9,14 @@ import type {
     SiteLogger,
     SystemLogger,
 } from "@shared/utils/logger/interfaces";
+
+import {
+    buildErrorLogArguments,
+    buildLogArguments,
+    formatLogMessage,
+    serializeError,
+} from "@shared/utils/logger/common";
+import { describe, expect, it } from "vitest";
 
 describe(formatLogMessage, () => {
     it("applies standard prefix formatting", () => {

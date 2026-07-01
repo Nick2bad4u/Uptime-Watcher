@@ -165,7 +165,7 @@ export class PortMonitor implements IMonitorService {
      * @remarks
      * Returns the string identifier used to route monitoring requests to this
      * service implementation. Uses the {@link MonitorType} union type for type
-     * safety and consistency across the application.
+     * safety and consistency across the app.
      *
      * @returns The monitor type identifier
      */
@@ -202,9 +202,7 @@ export class PortMonitor implements IMonitorService {
             throw new Error("Invalid timeout: must be a positive number");
         }
 
-        // Note: userAgent is not relevant for port monitoring, so we don't
-        // validate it This fixes the configuration validation inconsistency
-        // identified in the review
+        // Note: userAgent is not relevant for port monitoring, so we don't validate it This fixes the configuration validation inconsistency identified in the review
 
         this.config = {
             ...this.config,

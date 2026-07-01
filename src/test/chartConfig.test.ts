@@ -2,14 +2,16 @@
  * @vitest-environment jsdom
  */
 
-import { describe, expect, it } from "vitest";
+import { arrayJoin } from "ts-extras";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import type { Theme } from "../theme/types";
 
 import {
     ChartConfigService,
     createChartConfigs,
 } from "../services/chartConfig";
-import type { Theme } from "../theme/types";
-import { getScaleProperty, getNestedScaleProperty } from "../utils/chartUtils";
+import { getNestedScaleProperty, getScaleProperty } from "../utils/chartUtils";
 
 // Mock theme object for testing
 const mockTheme: Theme = {
@@ -302,12 +304,12 @@ describe(ChartConfigService, () => {
 
             // TypeScript has overly strict Chart.js types, so we use assertions for deep nested properties
             expect((config.plugins?.title?.font as any)?.family).toBe(
-                mockTheme.typography.fontFamily.sans.join(", ")
+                arrayJoin(mockTheme.typography.fontFamily.sans, ", ")
             );
             expect((config.plugins?.title?.font as any)?.size).toBe(16);
             expect((config.plugins?.title?.font as any)?.weight).toBe("bold");
             expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(
-                mockTheme.typography.fontFamily.sans.join(", ")
+                arrayJoin(mockTheme.typography.fontFamily.sans, ", ")
             );
             expect((config.plugins?.legend?.labels?.font as any)?.size).toBe(
                 12
@@ -402,11 +404,11 @@ describe(ChartConfigService, () => {
             const config = chartService.getBarChartConfig();
 
             expect((config.plugins?.title?.font as any)?.family).toBe(
-                mockTheme.typography.fontFamily.sans.join(", ")
+                arrayJoin(mockTheme.typography.fontFamily.sans, ", ")
             );
             expect(
                 getNestedScaleProperty(config, "y", "title.font.family")
-            ).toBe(mockTheme.typography.fontFamily.sans.join(", "));
+            ).toBe(arrayJoin(mockTheme.typography.fontFamily.sans, ", "));
         });
     });
 
@@ -542,10 +544,10 @@ describe(ChartConfigService, () => {
             const config = chartService.getDoughnutChartConfig(100);
 
             expect((config.plugins?.title?.font as any)?.family).toBe(
-                mockTheme.typography.fontFamily.sans.join(", ")
+                arrayJoin(mockTheme.typography.fontFamily.sans, ", ")
             );
             expect((config.plugins?.legend?.labels?.font as any)?.family).toBe(
-                mockTheme.typography.fontFamily.sans.join(", ")
+                arrayJoin(mockTheme.typography.fontFamily.sans, ", ")
             );
         });
     });

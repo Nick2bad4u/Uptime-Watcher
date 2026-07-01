@@ -7,15 +7,10 @@
 import type { PluginOption, UserConfig } from "vite";
 
 import viteReact from "@vitejs/plugin-react";
-// eslint-disable-next-line import-x/no-nodejs-modules -- Node filesystem access is required to ensure coverage output directories exist.
 import { mkdir } from "node:fs/promises";
-// eslint-disable-next-line import-x/no-nodejs-modules -- Node module utilities are required for optional dependency resolution.
 import { createRequire } from "node:module";
-// eslint-disable-next-line import-x/no-nodejs-modules -- Path resolution executes within the Node.js runtime for build tooling.
 import * as path from "node:path";
-// eslint-disable-next-line import-x/no-nodejs-modules -- URL helpers are required to compute project-relative paths.
 import { fileURLToPath } from "node:url";
-// eslint-disable-next-line import-x/no-nodejs-modules -- Utility inspection assists with rich error diagnostics during build-time operations.
 import { inspect } from "node:util";
 
 /**
@@ -80,7 +75,7 @@ const formatUnknownError = (error: unknown): string => {
         return error;
     }
 
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         return error.message;
     }
 
@@ -277,10 +272,7 @@ export const createStorybookPlugins = (
 export const createStorybookBaseViteConfig = (
     options?: StorybookBaseConfigOptions
 ): StorybookBaseConfig => {
-    const optimizeDepsInclude = new Set<string>([
-        ...(options?.additionalOptimizeDeps ?? []),
-        ...storybookOptimizeDepsInclude,
-    ]);
+    const optimizeDepsInclude = new Set<string>(Iterator.concat((options?.additionalOptimizeDeps ?? []), storybookOptimizeDepsInclude));
     const optimizeDepsExclude = new Set<string>([
         "@shared/constants",
         "@shared/types",
@@ -314,8 +306,8 @@ export const createStorybookBaseViteConfig = (
             },
         },
         optimizeDeps: {
-            exclude: Array.from(optimizeDepsExclude),
-            include: Array.from(optimizeDepsInclude),
+            exclude: [...optimizeDepsExclude],
+            include: [...optimizeDepsInclude],
             rolldownOptions: {
                 resolve: {
                     conditionNames: [
@@ -328,7 +320,7 @@ export const createStorybookBaseViteConfig = (
         },
         resolve: {
             alias,
-            extensions: Array.from(extensions),
+            extensions: [...extensions],
             tsconfigPaths: true,
         },
     };

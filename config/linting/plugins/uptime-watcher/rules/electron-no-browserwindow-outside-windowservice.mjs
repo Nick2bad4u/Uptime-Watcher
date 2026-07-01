@@ -59,17 +59,17 @@ export const electronNoBrowserwindowOutsideWindowserviceRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow BrowserWindow creation outside electron/services/window/WindowService.ts",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-browserwindow-outside-windowservice.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "Do not create BrowserWindow outside WindowService. Create windows via WindowService so security and lifecycle policies stay centralized.",
         },
+        schema: [],
+        type: "problem",
     },
 };

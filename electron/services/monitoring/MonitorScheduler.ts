@@ -181,14 +181,14 @@ export class MonitorScheduler {
 
                     if (timeoutState.timedOut) {
                         currentJob.isRunning = false;
-                        const startedQueuedManual =
+                        const isStartedQueuedManual =
                             this.startQueuedManualCheckIfAny(
                                 intervalKey,
                                 currentJob
                             );
 
                         if (
-                            !startedQueuedManual &&
+                            !isStartedQueuedManual &&
                             currentJob.needsReschedule
                         ) {
                             currentJob.needsReschedule = false;
@@ -264,12 +264,12 @@ export class MonitorScheduler {
             // If we timed out, rescheduling is deferred until the underlying
             // check settles (see checkPromise.finally) to avoid timer churn.
             if (currentJob === job && !timeoutState.timedOut) {
-                const startedQueuedManual = this.startQueuedManualCheckIfAny(
+                const isStartedQueuedManual = this.startQueuedManualCheckIfAny(
                     intervalKey,
                     currentJob
                 );
 
-                if (!startedQueuedManual) {
+                if (!isStartedQueuedManual) {
                     this.scheduleNextRun(intervalKey);
                 }
             }
@@ -432,7 +432,7 @@ export class MonitorScheduler {
      * @public
      */
     public getActiveMonitors(): string[] {
-        return Array.from(this.jobs.keys());
+        return [...this.jobs.keys()];
     }
 
     /**
@@ -446,7 +446,7 @@ export class MonitorScheduler {
      */
     public getJobsForTesting(): ReadonlyMap<string, MonitorJobSnapshot> {
         return new Map(
-            Array.from(this.jobs.entries(), ([key, job]) => [
+            Array.from(this.jobs, ([key, job]) => [
                 key,
                 {
                     backoffAttempt: job.backoffAttempt,
@@ -748,7 +748,7 @@ export class MonitorScheduler {
             }
         } else {
             // Stop all monitors for this site
-            const siteIntervals = Array.from(this.jobs.keys()).filter((key) =>
+            const siteIntervals = [...this.jobs.keys()].filter((key) =>
                 key.startsWith(`${siteIdentifier}|`)
             );
             for (const intervalKey of siteIntervals) {
@@ -872,10 +872,12 @@ export class MonitorScheduler {
     }
 
     private clearJobTimer(job: MonitorJob): void {
-        if (job.timer) {
-            clearTimeout(job.timer);
-            job.timer = undefined;
+        if (!job.timer) {
+            return;
         }
+
+        clearTimeout(job.timer);
+        job.timer = undefined;
     }
 
     private scheduleNextRun(intervalKey: string): void {

@@ -1,6 +1,5 @@
-import { describe, expect, test } from "vitest";
-import { getSiteStatusDescription } from "@shared/utils/siteStatus";
 import type { Monitor, Site } from "@shared/types";
+
 import {
     monitorIdArbitrary,
     sampleOne,
@@ -8,6 +7,8 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { getSiteStatusDescription } from "@shared/utils/siteStatus";
+import { describe, expect, test } from "vitest";
 
 const createHttpMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
     checkInterval: 300_000,

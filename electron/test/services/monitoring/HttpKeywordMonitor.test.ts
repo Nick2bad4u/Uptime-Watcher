@@ -2,9 +2,10 @@
  * Test suite for HttpKeywordMonitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpKeywordMonitor } from "../../../services/monitoring/HttpKeywordMonitor";
@@ -142,7 +143,7 @@ describe(HttpKeywordMonitor, () => {
             timeout: 5000,
             type: "http-keyword",
             url: "https://example.com/health",
-        } as Site["monitors"][0];
+        };
     });
 
     afterEach(() => {
@@ -183,7 +184,7 @@ describe(HttpKeywordMonitor, () => {
     });
 
     it("returns error result when keyword configuration is invalid", async () => {
-        const invalidMonitor = { ...monitor } as Site["monitors"][0];
+        const invalidMonitor = { ...monitor };
         Reflect.deleteProperty(invalidMonitor, "bodyKeyword");
 
         const result = await monitorService.check(invalidMonitor);

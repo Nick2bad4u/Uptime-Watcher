@@ -27,46 +27,6 @@ import {
 
 const safeParseSiteSnapshot = createSafeParseAdapter(validateSiteSnapshot);
 
-function safeParseSiteArray(
-    candidate: unknown
-): SafeParseLike<
-    SitesDomainBridge["getSites"] extends () => Promise<infer TResult>
-        ? TResult
-        : never
-> {
-    if (!Array.isArray(candidate)) {
-        return {
-            error: new Error(
-                `Expected array response payload, received ${typeof candidate}`
-            ),
-            success: false,
-        };
-    }
-
-    const parsed = validateSiteSnapshots(candidate);
-    if (parsed.success) {
-        return { data: parsed.data, success: true };
-    }
-
-    const firstIssue = arrayFirst(parsed.error.issues);
-    const firstPathSegment = firstIssue ? arrayFirst(firstIssue.path) : undefined;
-    const firstIndex = typeof firstPathSegment === "number" ? firstPathSegment : undefined;
-    const indexSuffix =
-        typeof firstIndex === "number"
-            ? ` (first failure at index ${firstIndex})`
-            : "";
-
-    return {
-        error: new Error(
-            `Invalid site snapshots returned from main process${indexSuffix}`,
-            {
-                cause: parsed.error,
-            }
-        ),
-        success: false,
-    };
-}
-
 /**
  * Interface defining the sites domain API operations.
  *
@@ -115,6 +75,46 @@ export interface SitesApiInterface extends SitesDomainBridge {
      * @returns Promise resolving to the updated site
      */
     updateSite: SitesDomainBridge["updateSite"];
+}
+
+function safeParseSiteArray(
+    candidate: unknown
+): SafeParseLike<
+    SitesDomainBridge["getSites"] extends () => Promise<infer TResult>
+        ? TResult
+        : never
+> {
+    if (!Array.isArray(candidate)) {
+        return {
+            error: new Error(
+                `Expected array response payload, received ${typeof candidate}`
+            ),
+            success: false,
+        };
+    }
+
+    const parsed = validateSiteSnapshots(candidate);
+    if (parsed.success) {
+        return { data: parsed.data, success: true };
+    }
+
+    const firstIssue = arrayFirst(parsed.error.issues);
+    const firstPathSegment = firstIssue ? arrayFirst(firstIssue.path) : undefined;
+    const firstIndex = typeof firstPathSegment === "number" ? firstPathSegment : undefined;
+    const indexSuffix =
+        typeof firstIndex === "number"
+            ? ` (first failure at index ${firstIndex})`
+            : "";
+
+    return {
+        error: new Error(
+            `Invalid site snapshots returned from main process${indexSuffix}`,
+            {
+                cause: parsed.error,
+            }
+        ),
+        success: false,
+    };
 }
 
 /**

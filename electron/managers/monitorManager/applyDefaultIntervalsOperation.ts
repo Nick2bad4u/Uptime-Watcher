@@ -120,7 +120,7 @@ export async function applyDefaultIntervalsOperation(args: {
 
     const updatedSite: Site = {
         ...site,
-        monitors: Array.from(site.monitors),
+        monitors: [...site.monitors],
     };
 
     site.monitors = updatedSite.monitors;

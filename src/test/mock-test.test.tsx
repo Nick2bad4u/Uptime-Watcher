@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 // Test mock
 const mockHook = vi.fn(() => ({ value: "mocked" }));
 
-vi.mock("../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../components/SiteDetails/useAddSiteForm'), () => ({
     useAddSiteForm: mockHook,
 }));
 
@@ -17,6 +17,6 @@ function TestComponent() {
 describe("Mock Test", () => {
     it("should use mocked version", () => {
         render(<TestComponent />);
-        expect(mockHook).toHaveBeenCalled();
+        expect(mockHook).toHaveBeenCalledWith();
     });
 });

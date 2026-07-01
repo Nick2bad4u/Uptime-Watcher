@@ -30,23 +30,19 @@ import { StateSyncStatusTracker } from "./internal/stateSyncStatusTracker";
 export class IpcService {
     private readonly autoUpdaterService: AutoUpdaterService;
 
+    private readonly cloudService: CloudService;
+
+    private readonly notificationService: NotificationService;
+
     private readonly registeredIpcHandlers = new Set<IpcInvokeChannel>();
 
     private readonly scopedSubscriptions = new ScopedSubscriptionManager();
 
-    private readonly uptimeOrchestrator: UptimeOrchestrator;
+    private stateSyncListenerRegistered = false;
 
     private readonly stateSyncStatusTracker: StateSyncStatusTracker;
 
-    private stateSyncListenerRegistered = false;
-
-    private readonly notificationService: NotificationService;
-
-    private readonly cloudService: CloudService;
-
-    private readonly handleStateSyncStatusUpdate = (data: unknown): void => {
-        this.stateSyncStatusTracker.handleStatusEvent(data);
-    };
+    private readonly uptimeOrchestrator: UptimeOrchestrator;
 
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
@@ -155,4 +151,8 @@ export class IpcService {
         );
         this.stateSyncListenerRegistered = true;
     }
+
+    private readonly handleStateSyncStatusUpdate = (data: unknown): void => {
+        this.stateSyncStatusTracker.handleStatusEvent(data);
+    };
 }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    type BaseValidationResult,
     createFailureResult,
     createSuccessResult,
     isValidationResult,
-    type BaseValidationResult,
     type ValidationMetadata,
     type ValidationResult,
 } from "../../types/validation";

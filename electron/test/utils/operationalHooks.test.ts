@@ -2,16 +2,18 @@
  * Test file to verify operational hooks implementation.
  */
 
+import { createAbortError } from "@shared/utils/abortError";
 import { describe, expect, it, vi } from "vitest";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
+
+import { logger } from "../../utils/logger";
 import {
     createOperationalHookContext,
-    withOperationalHooks,
     withDatabaseOperation,
+    withOperationalHooks,
 } from "../../utils/operationalHooks";
-import { logger } from "../../utils/logger";
-import { createAbortError } from "@shared/utils/abortError";
 
 describe(createOperationalHookContext, () => {
     it("should freeze and brand plain context objects", () => {

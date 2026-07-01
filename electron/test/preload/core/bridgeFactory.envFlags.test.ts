@@ -7,14 +7,13 @@
  * truthy, preventing accidental skips of handler verification.
  */
 
-import { describe, beforeEach, afterEach, expect, it, vi } from "vitest";
-
 import type {
     IpcHandlerVerificationResult,
     IpcResponse,
 } from "@shared/types/ipc";
 
 import { DIAGNOSTICS_CHANNELS, SETTINGS_CHANNELS } from "@shared/types/preload";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -32,8 +31,8 @@ interface GlobalProcessSnapshot {
 
 describe("bridgeFactory env flags", () => {
     const globalTarget = globalThis as Record<string, unknown> & {
-        process?: unknown;
         __UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__?: unknown;
+        process?: unknown;
     };
 
     const channelUnderTest = SETTINGS_CHANNELS.resetSettings;

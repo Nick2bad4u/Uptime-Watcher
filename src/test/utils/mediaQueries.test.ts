@@ -8,9 +8,9 @@ import {
 describe("mediaQueries utilities", () => {
     describe(tryGetMediaQueryList, () => {
         it("returns null when matchMedia is unavailable", () => {
-            const original = window.matchMedia;
+            const original = matchMedia;
 
-            Object.defineProperty(window, "matchMedia", {
+            Object.defineProperty(globalThis, "matchMedia", {
                 configurable: true,
                 value: undefined,
             });
@@ -20,7 +20,7 @@ describe("mediaQueries utilities", () => {
                     tryGetMediaQueryList("(prefers-reduced-motion: reduce)")
                 ).toBeNull();
             } finally {
-                Object.defineProperty(window, "matchMedia", {
+                Object.defineProperty(globalThis, "matchMedia", {
                     configurable: true,
                     value: original,
                 });
@@ -47,6 +47,7 @@ describe("mediaQueries utilities", () => {
             expect(addEventListener).toHaveBeenCalledWith("change", handler);
 
             cleanup();
+
             expect(removeEventListener).toHaveBeenCalledWith("change", handler);
         });
 
@@ -68,6 +69,7 @@ describe("mediaQueries utilities", () => {
             expect(addListener).toHaveBeenCalledWith(handler);
 
             cleanup();
+
             expect(removeListener).toHaveBeenCalledWith(handler);
         });
     });

@@ -11,15 +11,16 @@
  * @packageDocumentation
  */
 
-import { describe, expect, vi, beforeEach, afterEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
+
 import {
-    createCombinedAbortSignal,
     createAbortableOperation,
-    retryWithAbort,
-    raceWithAbort,
-    sleep,
+    createCombinedAbortSignal,
     isAbortError,
+    raceWithAbort,
+    retryWithAbort,
+    sleep,
 } from "../../utils/abortUtils";
 
 // =============================================================================
@@ -164,20 +165,20 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
                 fc.object()
             ),
         ])("should correctly identify abort errors", (error) => {
-            const result = isAbortError(error);
+            const isResult = isAbortError(error);
 
-            expect(typeof result).toBe("boolean");
+            expect(typeof isResult).toBe("boolean");
 
             if (
-                error instanceof Error &&
+                Error.isError(error) &&
                 (error.message.includes("abort") || error.name === "AbortError")
             ) {
-                expect(result).toBeTruthy();
+                expect(isResult).toBeTruthy();
             } else if (
                 error instanceof DOMException &&
                 error.name === "AbortError"
             ) {
-                expect(result).toBeTruthy();
+                expect(isResult).toBeTruthy();
             }
         });
     });
@@ -232,7 +233,7 @@ describeFn("AbortUtils Comprehensive Fuzzing Tests", () => {
             } catch (error) {
                 if (abortController.signal.aborted) {
                     expect(
-                        isAbortError(error) || error instanceof Error
+                        isAbortError(error) || Error.isError(error)
                     ).toBeTruthy();
                 }
             }

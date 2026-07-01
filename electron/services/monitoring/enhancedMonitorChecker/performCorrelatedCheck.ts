@@ -58,7 +58,7 @@ export async function performCorrelatedCheck(args: {
     } = args;
 
     const operationResult = await setupOperationCorrelation(monitor, {
-        ...(externalSignal ? { additionalSignals: [externalSignal] } : {}),
+        ...(externalSignal && { additionalSignals: [externalSignal] }),
     });
     if (!operationResult) {
         return undefined;
@@ -88,8 +88,8 @@ export async function performCorrelatedCheck(args: {
         const checkResult = await executeMonitorCheck(context);
         await saveHistoryEntry(monitor, checkResult);
 
-        const updated = await updateMonitorStatus(checkResult);
-        if (updated) {
+        const isUpdated = await updateMonitorStatus(checkResult);
+        if (isUpdated) {
             return await handleSuccessfulCheck(site, monitor, checkResult);
         }
     } catch (error) {

@@ -2,7 +2,10 @@
  * Debug test to understand TypedEventBus mocking differences
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import after mocks
+import { ServiceContainer } from "../../services/ServiceContainer";
 
 function createConstructableMock<T extends object>(
     instance: T,
@@ -165,9 +168,6 @@ vi.mock("../../managers/SiteManager", () => ({
 vi.mock("../../UptimeOrchestrator", () => ({
     UptimeOrchestrator: managerMocks.MockUptimeOrchestrator,
 }));
-
-// Import after mocks
-import { ServiceContainer } from "../../services/ServiceContainer";
 
 describe("ServiceContainer - Debug Mock Test", () => {
     let serviceContainer: ServiceContainer;

@@ -4,10 +4,10 @@ import { ThemedButton } from "@app/theme/components/ThemedButton";
 import { ThemedTooltip } from "@app/theme/components/ThemedTooltip";
 
 const meta: Meta<typeof ThemedTooltip> = {
-    component: ThemedTooltip,
     args: {
         content: "Opens the monitor configuration dialog",
     },
+    component: ThemedTooltip,
     parameters: {
         layout: "centered",
     },

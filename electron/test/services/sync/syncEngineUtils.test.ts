@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-
 import {
     getPersistedDeviceIdValidationError,
     isValidPersistedDeviceId,
 } from "@electron/services/sync/syncEngineUtils";
+import { describe, expect, it } from "vitest";
 
 describe("syncEngineUtils", () => {
     describe("getPersistedDeviceIdValidationError()", () => {
@@ -13,34 +12,34 @@ describe("syncEngineUtils", () => {
 
         it("rejects empty or whitespace-only ids", () => {
             expect(getPersistedDeviceIdValidationError("")).toMatch(
-                /non-empty/iu
+                /non-empty/iv
             );
-            expect(getPersistedDeviceIdValidationError("   ")).toMatch(
-                /non-empty/iu
+            expect(getPersistedDeviceIdValidationError(' '.repeat(3))).toMatch(
+                /non-empty/iv
             );
         });
 
         it("rejects leading/trailing whitespace", () => {
             expect(getPersistedDeviceIdValidationError(" device")).toMatch(
-                /leading or trailing whitespace/iu
+                /leading or trailing whitespace/iv
             );
         });
 
         it("rejects path separators and ':' tokens", () => {
             expect(getPersistedDeviceIdValidationError("a/b")).toMatch(
-                /path separators/iu
+                /path separators/iv
             );
             expect(getPersistedDeviceIdValidationError("a:bad")).toMatch(
-                /must not contain ':'/iu
+                /must not contain ':'/iv
             );
         });
 
         it("rejects traversal segments", () => {
             expect(getPersistedDeviceIdValidationError(".")).toMatch(
-                /traversal/iu
+                /traversal/iv
             );
             expect(getPersistedDeviceIdValidationError("..")).toMatch(
-                /traversal/iu
+                /traversal/iv
             );
         });
     });
@@ -50,7 +49,7 @@ describe("syncEngineUtils", () => {
             const candidates = [
                 "device-1",
                 "",
-                "   ",
+                ' '.repeat(3),
                 " device",
                 "a/b",
                 "a:bad",

@@ -20,22 +20,22 @@ interface ColumnDefinition {
 }
 
 const COLUMN_DEFINITIONS: readonly ColumnDefinition[] = [
-    { className: "site-table__col-site", key: "site", label: "Site" },
-    { className: "site-table__col-monitor", key: "monitor", label: "Monitor" },
-    { className: "site-table__col-status", key: "status", label: "Status" },
-    { className: "site-table__col-uptime", key: "uptime", label: "Uptime" },
-    {
-        className: "site-table__col-response",
-        key: "response",
-        label: "Response",
-    },
-    { className: "site-table__col-running", key: "running", label: "Running" },
     {
         align: "end",
         className: "site-table__col-controls",
         key: "controls",
         label: "Controls",
     },
+    { className: "site-table__col-monitor", key: "monitor", label: "Monitor" },
+    {
+        className: "site-table__col-response",
+        key: "response",
+        label: "Response",
+    },
+    { className: "site-table__col-running", key: "running", label: "Running" },
+    { className: "site-table__col-site", key: "site", label: "Site" },
+    { className: "site-table__col-status", key: "status", label: "Status" },
+    { className: "site-table__col-uptime", key: "uptime", label: "Uptime" },
 ] as const;
 
 const DENSITY_CLASS_MAP: Record<InterfaceDensity, string> = {

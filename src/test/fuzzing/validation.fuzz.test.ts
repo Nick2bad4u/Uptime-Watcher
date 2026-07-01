@@ -13,13 +13,14 @@
  * - Input sanitization and error handling
  */
 
-import fc from "fast-check";
-import { describe, expect, it } from "vitest";
 import {
-    isValidUrl,
     isValidHost,
     isValidPort,
+    isValidUrl,
 } from "@shared/validation/validatorUtils";
+import fc from "fast-check";
+import { arrayJoin } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 describe("Validation Fuzzing Tests", () => {
     describe("URL Validation Fuzzing", () => {
@@ -30,8 +31,8 @@ describe("Validation Fuzzing Tests", () => {
                     expect(() => isValidUrl(input)).not.toThrow();
 
                     // Property: result should always be boolean
-                    const result = isValidUrl(input);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidUrl(input);
+                    expect(typeof isResult).toBe("boolean");
                 })
             );
         });
@@ -56,13 +57,13 @@ describe("Validation Fuzzing Tests", () => {
                         path: string
                     ) => {
                         const url = `${protocol}${domain}:${port}${path}`;
-                        const result = isValidUrl(url);
+                        const isResult = isValidUrl(url);
 
                         // Always make an assertion to satisfy Vitest
-                        expect(typeof result).toBe("boolean");
+                        expect(typeof isResult).toBe("boolean");
 
                         // If the result is true, it should be a proper HTTPS URL
-                        if (result) {
+                        if (isResult) {
                             expect(
                                 url.startsWith("https://") ||
                                     url.startsWith("ftp://")
@@ -82,8 +83,8 @@ describe("Validation Fuzzing Tests", () => {
                         const url = `https://${domain}/${path}`;
 
                         expect(() => isValidUrl(url)).not.toThrow();
-                        const result = isValidUrl(url);
-                        expect(typeof result).toBe("boolean");
+                        const isResult = isValidUrl(url);
+                        expect(typeof isResult).toBe("boolean");
                     }
                 )
             );
@@ -91,9 +92,9 @@ describe("Validation Fuzzing Tests", () => {
 
         it("should reject URLs with dangerous schemes", () => {
             const dangerousSchemes = new Set([
+                "data:",
                 // eslint-disable-next-line no-script-url -- Testing dangerous URL schemes for security validation
                 "javascript:",
-                "data:",
                 "vbscript:",
             ]);
 
@@ -111,11 +112,11 @@ describe("Validation Fuzzing Tests", () => {
                     fc.string({ maxLength: 100 }),
                     (scheme: string, rest: string) => {
                         const url = `${scheme}${rest}`;
-                        const result = isValidUrl(url);
+                        const isResult = isValidUrl(url);
 
                         // These schemes should generally be rejected for security
                         if (dangerousSchemes.has(scheme)) {
-                            expect(result).toBeFalsy();
+                            expect(isResult).toBeFalsy();
                         }
                     }
                 )
@@ -128,8 +129,8 @@ describe("Validation Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.anything(), (input: unknown) => {
                     expect(() => isValidHost(input)).not.toThrow();
-                    const result = isValidHost(input);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidHost(input);
+                    expect(typeof isResult).toBe("boolean");
                 })
             );
         });
@@ -143,10 +144,10 @@ describe("Validation Fuzzing Tests", () => {
                     fc.integer({ min: 0, max: 255 }),
                     (a: number, b: number, c: number, d: number) => {
                         const ip = `${a}.${b}.${c}.${d}`;
-                        const result = isValidHost(ip);
+                        const isResult = isValidHost(ip);
 
                         // Valid IPv4 addresses should be accepted
-                        expect(result).toBeTruthy();
+                        expect(isResult).toBeTruthy();
                     }
                 )
             );
@@ -166,11 +167,11 @@ describe("Validation Fuzzing Tests", () => {
                         fc.string({ maxLength: 5 })
                     ),
                     (numbers: number[], separator: string) => {
-                        const malformedIp = numbers.join(separator);
+                        const malformedIp = arrayJoin(numbers, separator);
 
                         expect(() => isValidHost(malformedIp)).not.toThrow();
-                        const result = isValidHost(malformedIp);
-                        expect(typeof result).toBe("boolean");
+                        const isResult = isValidHost(malformedIp);
+                        expect(typeof isResult).toBe("boolean");
                     }
                 )
             );
@@ -195,8 +196,8 @@ describe("Validation Fuzzing Tests", () => {
                         const host = `${domain}${tld}`;
 
                         expect(() => isValidHost(host)).not.toThrow();
-                        const result = isValidHost(host);
-                        expect(typeof result).toBe("boolean");
+                        const isResult = isValidHost(host);
+                        expect(typeof isResult).toBe("boolean");
                     }
                 )
             );
@@ -208,8 +209,8 @@ describe("Validation Fuzzing Tests", () => {
                     fc.string({ maxLength: 50 }).filter((s) => s.length > 0),
                     (host: string) => {
                         expect(() => isValidHost(host)).not.toThrow();
-                        const result = isValidHost(host);
-                        expect(typeof result).toBe("boolean");
+                        const isResult = isValidHost(host);
+                        expect(typeof isResult).toBe("boolean");
 
                         // Hosts with invalid characters should be rejected
                         if (
@@ -217,7 +218,7 @@ describe("Validation Fuzzing Tests", () => {
                             host.includes("#") ||
                             host.includes("$")
                         ) {
-                            expect(result).toBeFalsy();
+                            expect(isResult).toBeFalsy();
                         }
                     }
                 )
@@ -230,8 +231,8 @@ describe("Validation Fuzzing Tests", () => {
             fc.assert(
                 fc.property(fc.anything(), (input: unknown) => {
                     expect(() => isValidPort(input)).not.toThrow();
-                    const result = isValidPort(input);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isValidPort(input);
+                    expect(typeof isResult).toBe("boolean");
                 })
             );
         });
@@ -241,8 +242,8 @@ describe("Validation Fuzzing Tests", () => {
                 fc.property(
                     fc.integer({ min: 1, max: 65_535 }),
                     (port: number) => {
-                        const result = isValidPort(port);
-                        expect(result).toBeTruthy();
+                        const isResult = isValidPort(port);
+                        expect(isResult).toBeTruthy();
                     }
                 )
             );
@@ -257,8 +258,8 @@ describe("Validation Fuzzing Tests", () => {
                         fc.integer({ max: -1 })
                     ),
                     (port: number) => {
-                        const result = isValidPort(port);
-                        expect(result).toBeFalsy();
+                        const isResult = isValidPort(port);
+                        expect(isResult).toBeFalsy();
                     }
                 )
             );
@@ -276,12 +277,12 @@ describe("Validation Fuzzing Tests", () => {
                     ),
                     (portStr: string) => {
                         expect(() => isValidPort(portStr)).not.toThrow();
-                        const result = isValidPort(portStr);
-                        expect(typeof result).toBe("boolean");
+                        const isResult = isValidPort(portStr);
+                        expect(typeof isResult).toBe("boolean");
 
                         // String "0" should be rejected
                         if (portStr === "0") {
-                            expect(result).toBeFalsy();
+                            expect(isResult).toBeFalsy();
                         }
                     }
                 )
@@ -299,12 +300,12 @@ describe("Validation Fuzzing Tests", () => {
                         fc.constant("99999")
                     ),
                     (portStr: string) => {
-                        const result = isValidPort(portStr);
+                        const isResult = isValidPort(portStr);
 
                         if (portStr === "1" || portStr === "65535") {
-                            expect(result).toBeTruthy();
+                            expect(isResult).toBeTruthy();
                         } else {
-                            expect(result).toBeFalsy();
+                            expect(isResult).toBeFalsy();
                         }
                     }
                 )
@@ -339,9 +340,9 @@ describe("Validation Fuzzing Tests", () => {
                         ),
                     }),
                     (config: {
-                        url: string | null | undefined;
                         host: string;
-                        port: number | string | null | undefined;
+                        port: null | number | string | undefined;
+                        url: null | string | undefined;
                     }) => {
                         // None of these validation functions should throw
                         expect(() => {

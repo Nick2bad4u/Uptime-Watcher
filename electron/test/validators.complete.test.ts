@@ -13,13 +13,13 @@
  * @author Uptime-Watcher
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Import all exported validator groups (domain modules)
 import { CloudHandlerValidators } from "../services/ipc/validators/cloud";
 import { DataHandlerValidators } from "../services/ipc/validators/data";
-import { MonitorTypeHandlerValidators } from "../services/ipc/validators/monitorTypes";
 import { MonitoringHandlerValidators } from "../services/ipc/validators/monitoring";
+import { MonitorTypeHandlerValidators } from "../services/ipc/validators/monitorTypes";
 import { SettingsHandlerValidators } from "../services/ipc/validators/settings";
 import { SiteHandlerValidators } from "../services/ipc/validators/sites";
 import { StateSyncHandlerValidators } from "../services/ipc/validators/stateSync";
@@ -1847,7 +1847,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
 
             const objWithFunction = {
                 ...createValidSite(),
-                callback: () => console.log("test"),
+                callback: () => { console.log("test"); },
             };
             const result = SiteHandlerValidators.addSite([objWithFunction]);
             expect(isValidationFailure(result)).toBeTruthy();

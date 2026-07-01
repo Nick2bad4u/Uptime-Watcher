@@ -2,12 +2,20 @@
  * Working ServiceContainer test - copied from simple test that works
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { EventEmitter } from "node:events";
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
 } from "@shared/types";
+
+import { EventEmitter } from "node:events";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import after mocks
+import { ServiceContainer } from "../../services/ServiceContainer";
+import {
+    FORWARDED_METADATA_PROPERTY_KEY,
+    ORIGINAL_METADATA_PROPERTY_KEY,
+} from "../../utils/eventMetadataForwarding";
 
 // Create comprehensive mocks using vi.hoisted to ensure they're available before imports
 const mockSiteManager = vi.hoisted(() => {
@@ -218,13 +226,6 @@ vi.mock("../../services/configuration/ConfigurationManager", () => ({
         };
     }),
 }));
-
-// Import after mocks
-import { ServiceContainer } from "../../services/ServiceContainer";
-import {
-    FORWARDED_METADATA_PROPERTY_KEY,
-    ORIGINAL_METADATA_PROPERTY_KEY,
-} from "../../utils/eventMetadataForwarding";
 
 describe("ServiceContainer - Working Tests", () => {
     let container: ServiceContainer;
@@ -528,7 +529,7 @@ describe("ServiceContainer - Working Tests", () => {
             const sanitized = invokeStripEventMetadata(
                 "site:added",
                 payload
-            ) as unknown[] & Record<string | symbol, unknown>;
+            ) as Record<string | symbol, unknown> & unknown[];
 
             expect(Array.isArray(sanitized)).toBeTruthy();
             expect(sanitized).not.toBe(payload);

@@ -3,8 +3,6 @@
  * runtime type checking for critical interfaces.
  */
 
-import { describe, expect, it } from "vitest";
-
 import type {
     Monitor,
     MonitorType,
@@ -12,6 +10,8 @@ import type {
     StatusHistory,
     StatusUpdate,
 } from "@shared/types";
+
+import { describe, expect, it } from "vitest";
 
 describe("Electron Types", () => {
     describe("MonitorType", () => {

@@ -1,3 +1,8 @@
+import { createMockConstructor } from "@shared/test/helpers/vitestConstructors";
+// Import the mocked modules to get access to the mock functions
+import * as dns from "node:dns/promises";
+import * as net from "node:net";
+import { performance } from "node:perf_hooks";
 /**
  * Unit tests for native connectivity checking with degraded state support.
  *
@@ -18,9 +23,11 @@
  * @since 2024
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { performance } from "node:perf_hooks";
 
-import { createMockConstructor } from "@shared/test/helpers/vitestConstructors";
+import {
+    checkConnectivity,
+    checkHttpConnectivity,
+} from "../../../services/monitoring/utils/nativeConnectivity";
 
 // Mock Node.js modules with inline functions to avoid hoisting issues
 vi.mock("node:dns/promises", () => ({
@@ -43,13 +50,6 @@ vi.mock("node:perf_hooks", () => ({
         now: vi.fn().mockReturnValue(100),
     },
 }));
-import {
-    checkConnectivity,
-    checkHttpConnectivity,
-} from "../../../services/monitoring/utils/nativeConnectivity";
-// Import the mocked modules to get access to the mock functions
-import * as dns from "node:dns/promises";
-import * as net from "node:net";
 // Mock objects must be declared after vi import and imports of actual modules
 const mockDnsResolve4 = vi.mocked(dns.resolve4);
 const mockSocketClass = vi.mocked(net.Socket);
@@ -62,7 +62,7 @@ const mockNet = {
     Socket: mockSocketClass,
 };
 // Mock fetch globally
-global.fetch = mockFetch;
+globalThis.fetch = mockFetch;
 describe("Native Connectivity with Degraded State", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -219,7 +219,7 @@ describe("Native Connectivity with Degraded State", () => {
             // Arrange
             mockDns.resolve4.mockReturnValue(
                 new Promise((resolve) =>
-                    setTimeout(() => resolve(["192.168.1.1"]), 2000)
+                    setTimeout(() => { resolve(["192.168.1.1"]); }, 2000)
                 )
             );
             // Act

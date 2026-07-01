@@ -6,17 +6,17 @@ import type {
 } from "./contextualErrorFactory";
 
 /**
- * Options for a contextual run wrapper (excludes the thrown cause).
- */
-export type RunWithContextOptions = Except<ContextualErrorInput, "cause">;
-
-/**
  * Signature for executing an async operation with contextual error wrapping.
  */
 export type RunWithContext = <T>(
     operation: () => Promise<T>,
     options: RunWithContextOptions
 ) => Promise<T>;
+
+/**
+ * Options for a contextual run wrapper (excludes the thrown cause).
+ */
+export type RunWithContextOptions = Except<ContextualErrorInput, "cause">;
 
 /**
  * Creates a helper that wraps async operations and normalizes errors using the

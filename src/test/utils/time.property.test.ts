@@ -19,8 +19,9 @@
  * @file
  */
 
-import { describe, test, expect, beforeEach, vi, afterEach } from "vitest";
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
+
 import {
     formatDuration,
     formatFullTimestamp,
@@ -28,27 +29,27 @@ import {
     formatRelativeTimestamp,
     formatResponseDuration,
     formatResponseTime,
-    getIntervalLabel,
     formatRetryAttemptsText,
+    getIntervalLabel,
     TIME_PERIOD_LABELS,
     type TimePeriod,
 } from "../../utils/time";
 
 // Mock UiDefaults for consistent testing
-vi.mock("../fallbacks", () => ({
+vi.mock(import('../fallbacks'), () => ({
     UiDefaults: {
         notAvailableLabel: "N/A",
     },
 }));
 
-describe("Time Utils Property-Based Tests", () => {
+describe("time Utils Property-Based Tests", () => {
     let originalDateNow: typeof Date.now;
     let mockTime: number;
 
     beforeEach(() => {
         originalDateNow = Date.now;
         mockTime = 1_640_995_200_000; // Fixed timestamp: 2021-12-31 16:00:00 UTC
-        Date.now = vi.fn(() => mockTime);
+        vi.spyOn(Date, 'now').mockImplementation(() => mockTime);
     });
 
     afterEach(() => {
@@ -57,20 +58,20 @@ describe("Time Utils Property-Based Tests", () => {
     });
 
     describe("formatDuration function", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 59 })])(
+        fcTest.prop([fc.integer({ max: 59, min: 0 })])(
             "should format seconds correctly for durations under 1 minute",
             (seconds) => {
                 const ms = seconds * 1000;
                 const result = formatDuration(ms);
 
                 expect(result).toBe(`${seconds}s`);
-                expect(result).toMatch(/^\d+s$/);
+                expect(result).toMatch(/^\d+s$/v);
             }
         );
 
         fcTest.prop([
-            fc.integer({ min: 1, max: 59 }),
-            fc.integer({ min: 0, max: 59 }),
+            fc.integer({ max: 59, min: 1 }),
+            fc.integer({ max: 59, min: 0 }),
         ])(
             "should format minutes and seconds correctly for durations under 1 hour",
             (minutes, seconds) => {
@@ -78,13 +79,13 @@ describe("Time Utils Property-Based Tests", () => {
                 const result = formatDuration(ms);
 
                 expect(result).toBe(`${minutes}m ${seconds}s`);
-                expect(result).toMatch(/^\d+m \d+s$/);
+                expect(result).toMatch(/^\d+m \d+s$/v);
             }
         );
 
         fcTest.prop([
-            fc.integer({ min: 1, max: 23 }),
-            fc.integer({ min: 0, max: 59 }),
+            fc.integer({ max: 23, min: 1 }),
+            fc.integer({ max: 59, min: 0 }),
         ])(
             "should format hours and minutes correctly for durations over 1 hour",
             (hours, minutes) => {
@@ -92,49 +93,51 @@ describe("Time Utils Property-Based Tests", () => {
                 const result = formatDuration(ms);
 
                 expect(result).toBe(`${hours}h ${minutes}m`);
-                expect(result).toMatch(/^\d+h \d+m$/);
+                expect(result).toMatch(/^\d+h \d+m$/v);
             }
         );
 
-        fcTest.prop([fc.double({ min: 0, max: 59.999, noNaN: true })])(
+        fcTest.prop([fc.double({ max: 59.999, min: 0, noNaN: true })])(
             "should handle fractional milliseconds by rounding down",
             (fractionalSeconds) => {
                 const ms = fractionalSeconds * 1000;
                 const result = formatDuration(ms);
 
                 const expectedSeconds = Math.floor(fractionalSeconds);
+
                 expect(result).toBe(`${expectedSeconds}s`);
             }
         );
 
-        test("should handle zero duration", () => {
+        it("should handle zero duration", () => {
             expect(formatDuration(0)).toBe("0s");
         });
 
         fcTest.prop([
-            fc.integer({ min: 86_400_000, max: 86_400_000 * 7 }), // 1-7 days
+            fc.integer({ max: 86_400_000 * 7, min: 86_400_000 }), // 1-7 days
         ])("should format very long durations correctly", (ms) => {
             const result = formatDuration(ms);
             const hours = Math.floor(ms / 3_600_000);
             const minutes = Math.floor((ms % 3_600_000) / 60_000);
 
             expect(result).toBe(`${hours}h ${minutes}m`);
-            expect(result).toMatch(/^\d+h \d+m$/);
+            expect(result).toMatch(/^\d+h \d+m$/v);
         });
     });
 
     describe("formatFullTimestamp function", () => {
-        fcTest.prop([fc.integer({ min: 0, max: Date.now() })])(
+        fcTest.prop([fc.integer({ max: Date.now(), min: 0 })])(
             "should return a valid date string for any valid timestamp",
             (timestamp) => {
                 const result = formatFullTimestamp(timestamp);
 
                 // Should be a non-empty string
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(0);
 
                 // Should be parseable back to a date
                 const parsedDate = new Date(result);
+
                 expect(parsedDate).toBeInstanceOf(Date);
             }
         );
@@ -145,47 +148,47 @@ describe("Time Utils Property-Based Tests", () => {
                 const timestamp = date.getTime();
                 const result = formatFullTimestamp(timestamp);
 
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(0);
             }
         );
     });
 
     describe("formatIntervalDuration function", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 59_999 })])(
+        fcTest.prop([fc.integer({ max: 59_999, min: 0 })])(
             "should format milliseconds to seconds for intervals under 1 minute",
             (ms) => {
                 const result = formatIntervalDuration(ms);
                 const expectedSeconds = Math.round(ms / 1000);
 
                 expect(result).toBe(`${expectedSeconds}s`);
-                expect(result).toMatch(/^\d+s$/);
+                expect(result).toMatch(/^\d+s$/v);
             }
         );
 
-        fcTest.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+        fcTest.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
             "should format milliseconds to minutes for intervals under 1 hour",
             (ms) => {
                 const result = formatIntervalDuration(ms);
                 const expectedMinutes = Math.round(ms / 60_000);
 
                 expect(result).toBe(`${expectedMinutes}m`);
-                expect(result).toMatch(/^\d+m$/);
+                expect(result).toMatch(/^\d+m$/v);
             }
         );
 
-        fcTest.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+        fcTest.prop([fc.integer({ max: 86_400_000, min: 3_600_000 })])(
             "should format milliseconds to hours for intervals over 1 hour",
             (ms) => {
                 const result = formatIntervalDuration(ms);
                 const expectedHours = Math.round(ms / 3_600_000);
 
                 expect(result).toBe(`${expectedHours}h`);
-                expect(result).toMatch(/^\d+h$/);
+                expect(result).toMatch(/^\d+h$/v);
             }
         );
 
-        test("should handle boundary values correctly", () => {
+        it("should handle boundary values correctly", () => {
             expect(formatIntervalDuration(59_999)).toBe("60s");
             expect(formatIntervalDuration(60_000)).toBe("1m");
             expect(formatIntervalDuration(3_599_999)).toBe("60m");
@@ -194,7 +197,7 @@ describe("Time Utils Property-Based Tests", () => {
     });
 
     describe("formatRelativeTimestamp function", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 30 })])(
+        fcTest.prop([fc.integer({ max: 30, min: 0 })])(
             'should return "Just now" for very recent timestamps',
             (secondsAgo) => {
                 const timestamp = mockTime - secondsAgo * 1000;
@@ -204,7 +207,7 @@ describe("Time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 31, max: 59 })])(
+        fcTest.prop([fc.integer({ max: 59, min: 31 })])(
             "should format seconds correctly",
             (secondsAgo) => {
                 const timestamp = mockTime - secondsAgo * 1000;
@@ -214,7 +217,7 @@ describe("Time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1, max: 59 })])(
+        fcTest.prop([fc.integer({ max: 59, min: 1 })])(
             "should format minutes correctly with proper pluralization",
             (minutesAgo) => {
                 const timestamp = mockTime - minutesAgo * 60 * 1000;
@@ -224,11 +227,12 @@ describe("Time Utils Property-Based Tests", () => {
                     minutesAgo === 1
                         ? "1 minute ago"
                         : `${minutesAgo} minutes ago`;
+
                 expect(result).toBe(expectedText);
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1, max: 23 })])(
+        fcTest.prop([fc.integer({ max: 23, min: 1 })])(
             "should format hours correctly with proper pluralization",
             (hoursAgo) => {
                 const timestamp = mockTime - hoursAgo * 60 * 60 * 1000;
@@ -236,11 +240,12 @@ describe("Time Utils Property-Based Tests", () => {
 
                 const expectedText =
                     hoursAgo === 1 ? "1 hour ago" : `${hoursAgo} hours ago`;
+
                 expect(result).toBe(expectedText);
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1, max: 7 })])(
+        fcTest.prop([fc.integer({ max: 7, min: 1 })])(
             "should format days correctly with proper pluralization",
             (daysAgo) => {
                 const timestamp = mockTime - daysAgo * 24 * 60 * 60 * 1000;
@@ -248,47 +253,48 @@ describe("Time Utils Property-Based Tests", () => {
 
                 const expectedText =
                     daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`;
+
                 expect(result).toBe(expectedText);
             }
         );
     });
 
     describe("formatResponseDuration function", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 999 })])(
+        fcTest.prop([fc.integer({ max: 999, min: 0 })])(
             "should format milliseconds for durations under 1 second",
             (ms) => {
                 const result = formatResponseDuration(ms);
 
                 expect(result).toBe(`${ms}ms`);
-                expect(result).toMatch(/^\d+ms$/);
+                expect(result).toMatch(/^\d+ms$/v);
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1000, max: 59_999 })])(
+        fcTest.prop([fc.integer({ max: 59_999, min: 1000 })])(
             "should format to seconds for durations under 1 minute",
             (ms) => {
                 const result = formatResponseDuration(ms);
                 const expectedSeconds = Math.round(ms / 1000);
 
                 expect(result).toBe(`${expectedSeconds}s`);
-                expect(result).toMatch(/^\d+s$/);
+                expect(result).toMatch(/^\d+s$/v);
             }
         );
 
-        fcTest.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+        fcTest.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
             "should format to minutes for durations under 1 hour",
             (ms) => {
                 const result = formatResponseDuration(ms);
                 const expectedMinutes = Math.round(ms / 60_000);
 
                 expect(result).toBe(`${expectedMinutes}m`);
-                expect(result).toMatch(/^\d+m$/);
+                expect(result).toMatch(/^\d+m$/v);
             }
         );
     });
 
     describe("formatResponseTime function", () => {
-        fcTest.prop([fc.integer({ min: 0, max: 999 })])(
+        fcTest.prop([fc.integer({ max: 999, min: 0 })])(
             "should format milliseconds for fast response times",
             (time) => {
                 const result = formatResponseTime(time);
@@ -297,14 +303,14 @@ describe("Time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1000, max: 10_000 })])(
+        fcTest.prop([fc.integer({ max: 10_000, min: 1000 })])(
             "should format seconds with decimal precision for slower responses",
             (time) => {
                 const result = formatResponseTime(time);
                 const expectedSeconds = (time / 1000).toFixed(2);
 
                 expect(result).toBe(`${expectedSeconds}s`);
-                expect(result).toMatch(/^\d+\.\d{2}s$/);
+                expect(result).toMatch(/^\d+\.\d{2}s$/v);
             }
         );
 
@@ -317,13 +323,13 @@ describe("Time Utils Property-Based Tests", () => {
             }
         );
 
-        test("should handle zero correctly", () => {
+        it("should handle zero correctly", () => {
             expect(formatResponseTime(0)).toBe("0ms");
         });
     });
 
     describe("getIntervalLabel function", () => {
-        fcTest.prop([fc.integer({ min: 1000, max: 3_600_000 })])(
+        fcTest.prop([fc.integer({ max: 3_600_000, min: 1000 })])(
             "should format numeric intervals using formatIntervalDuration",
             (interval) => {
                 const result = getIntervalLabel(interval);
@@ -334,8 +340,8 @@ describe("Time Utils Property-Based Tests", () => {
         );
 
         fcTest.prop([
-            fc.string({ minLength: 1, maxLength: 20 }),
-            fc.integer({ min: 1000, max: 60_000 }),
+            fc.string({ maxLength: 20, minLength: 1 }),
+            fc.integer({ max: 60_000, min: 1000 }),
         ])(
             "should use custom label when provided in interval object",
             (label, value) => {
@@ -346,7 +352,7 @@ describe("Time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: 1000, max: 60_000 })])(
+        fcTest.prop([fc.integer({ max: 60_000, min: 1000 })])(
             "should fallback to formatted duration when no label in object",
             (value) => {
                 const intervalObj = { value };
@@ -359,19 +365,21 @@ describe("Time Utils Property-Based Tests", () => {
     });
 
     describe("formatRetryAttemptsText function", () => {
-        test("should format zero attempts correctly", () => {
+        it("should format zero attempts correctly", () => {
             const result = formatRetryAttemptsText(0);
+
             expect(result).toBe(
                 "(Retry disabled - immediate failure detection)"
             );
         });
 
-        test("should format single attempt correctly", () => {
+        it("should format single attempt correctly", () => {
             const result = formatRetryAttemptsText(1);
+
             expect(result).toBe("(Retry 1 time before marking down)");
         });
 
-        fcTest.prop([fc.integer({ min: 2, max: 10 })])(
+        fcTest.prop([fc.integer({ max: 10, min: 2 })])(
             "should format multiple attempts correctly with plural",
             (attempts) => {
                 const result = formatRetryAttemptsText(attempts);
@@ -382,19 +390,19 @@ describe("Time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([fc.integer({ min: -5, max: -1 })])(
+        fcTest.prop([fc.integer({ max: -1, min: -5 })])(
             "should handle negative values gracefully",
             (attempts) => {
                 const result = formatRetryAttemptsText(attempts);
 
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
                 expect(result).toContain(attempts.toString());
             }
         );
     });
 
-    describe("TIME_PERIOD_LABELS constants", () => {
-        test("should have all expected time period labels", () => {
+    describe("tIME_PERIOD_LABELS constants", () => {
+        it("should have all expected time period labels", () => {
             const expectedLabels: Record<TimePeriod, string> = {
                 "1h": "Last Hour",
                 "7d": "Last 7 Days",
@@ -409,16 +417,16 @@ describe("Time Utils Property-Based Tests", () => {
         fcTest.prop([fc.constantFrom("1h", "7d", "12h", "24h", "30d")])(
             "should have string values for all period keys",
             (period) => {
-                const label = TIME_PERIOD_LABELS[period as TimePeriod];
+                const label = TIME_PERIOD_LABELS[period];
 
-                expect(typeof label).toBe("string");
+                expect(label).toBeTypeOf("string");
                 expect(label.length).toBeGreaterThan(0);
             }
         );
     });
 
-    describe("Edge cases and robustness", () => {
-        fcTest.prop([fc.double({ min: -1000, max: 1000, noNaN: true })])(
+    describe("edge cases and robustness", () => {
+        fcTest.prop([fc.double({ max: 1000, min: -1000, noNaN: true })])(
             "should handle negative durations gracefully",
             (ms) => {
                 // Functions should not throw for negative inputs
@@ -434,20 +442,22 @@ describe("Time Utils Property-Based Tests", () => {
 
         fcTest.prop([
             fc.oneof(
-                fc.constant(5e-324), // Smallest positive double
+                fc.constant(Number.MIN_VALUE), // Smallest positive double
                 fc.constant(Number.MIN_VALUE), // Same as 5e-324
-                fc.double({ min: 0, max: 1e-10, noNaN: true })
+                fc.double({ max: 1e-10, min: 0, noNaN: true })
             ),
         ])("should handle very small durations", (ms) => {
             const result = formatDuration(ms);
+
             expect(result).toBe("0s"); // Should round down to 0 seconds
 
             const responseResult = formatResponseDuration(ms);
+
             expect(responseResult).toBe("0ms"); // Should round to 0 milliseconds
         });
 
         fcTest.prop([
-            fc.integer({ min: 0, max: 1_000_000_000 }), // 1 billion
+            fc.integer({ max: 1_000_000_000, min: 0 }), // 1 billion
         ])(
             "should handle very large timestamps without throwing",
             (timestamp) => {
@@ -458,28 +468,29 @@ describe("Time Utils Property-Based Tests", () => {
 
         fcTest.prop([
             fc.record({
-                value: fc.integer({ min: 1000, max: 60_000 }),
-                label: fc.constant(""), // Empty string label
                 extraProp: fc.string(),
+                label: fc.constant(""), // Empty string label
+                value: fc.integer({ max: 60_000, min: 1000 }),
             }),
         ])(
             "should handle interval objects with empty labels",
             (intervalObj) => {
                 const result = getIntervalLabel(intervalObj);
+
                 // Should fallback to formatted duration for empty label
                 expect(result).toBe(formatIntervalDuration(intervalObj.value));
             }
         );
     });
 
-    describe("Performance and determinism", () => {
+    describe("performance and determinism", () => {
         const baseTimestamp = 1_640_995_200_000; // 2021-12-31 16:00:00 UTC
         const dayInMs = 86_400_000; // 24 * 60 * 60 * 1000
 
         fcTest.prop([
-            fc.array(fc.integer({ min: 0, max: dayInMs }), {
-                minLength: 1,
+            fc.array(fc.integer({ max: dayInMs, min: 0 }), {
                 maxLength: 20,
+                minLength: 1,
             }),
         ])("should be deterministic for same inputs", (durations) => {
             for (const duration of durations) {
@@ -493,10 +504,10 @@ describe("Time Utils Property-Based Tests", () => {
         fcTest.prop([
             fc.array(
                 fc.integer({
-                    min: baseTimestamp - dayInMs,
                     max: baseTimestamp,
+                    min: baseTimestamp - dayInMs,
                 }),
-                { minLength: 1, maxLength: 10 }
+                { maxLength: 10, minLength: 1 }
             ),
         ])(
             "should be consistent for relative timestamp formatting",
@@ -511,9 +522,9 @@ describe("Time Utils Property-Based Tests", () => {
         );
 
         fcTest.prop([
-            fc.array(fc.integer({ min: 0, max: 10_000 }), {
-                minLength: 1,
+            fc.array(fc.integer({ max: 10_000, min: 0 }), {
                 maxLength: 20,
+                minLength: 1,
             }),
         ])("should handle batch processing efficiently", (responseTimes) => {
             // Should be able to process many values without issues
@@ -522,8 +533,9 @@ describe("Time Utils Property-Based Tests", () => {
             );
 
             expect(results).toHaveLength(responseTimes.length);
+
             for (const result of results) {
-                expect(typeof result).toBe("string");
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(0);
             }
         });

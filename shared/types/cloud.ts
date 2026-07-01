@@ -34,6 +34,59 @@ export const CLOUD_PROVIDER_KIND = {
     WEBDAV: "webdav",
 } as const;
 
+/**
+ * Entry representing a remote backup artifact stored in a cloud provider.
+ */
+export interface CloudBackupEntry {
+    /** Indicates whether the stored backup is encrypted client-side. */
+    encrypted: boolean;
+    /** File name presented to the user when downloading/restoring. */
+    fileName: string;
+    /** Provider key that uniquely identifies the backup object. */
+    key: string;
+    /** Metadata describing the backup contents. */
+    metadata: SerializedDatabaseBackupMetadata;
+}
+
+/**
+ * Payload used to enable or disable multi-device cloud sync.
+ */
+export interface CloudEnableSyncConfig {
+    /** True when sync should be enabled. */
+    enabled: boolean;
+}
+
+/**
+ * Payload used to configure the filesystem provider.
+ */
+export interface CloudFilesystemProviderConfig {
+    /** Absolute path to a directory the app can read/write. */
+    baseDirectory: string;
+}
+
+/**
+ * Provider-specific details safe to expose to the renderer.
+ */
+export type CloudProviderDetails =
+    | {
+          /**
+           * Human-readable account identifier (email, display name, etc.).
+           *
+           * @remarks
+           * Optional because providers may not supply one.
+           */
+          accountLabel?: string | undefined;
+          kind:
+              | typeof CLOUD_PROVIDER_KIND.DROPBOX
+              | typeof CLOUD_PROVIDER_KIND.GOOGLE_DRIVE
+              | typeof CLOUD_PROVIDER_KIND.WEBDAV;
+      }
+    | {
+          /** Base directory configured by the user. */
+          baseDirectory: string;
+          kind: typeof CLOUD_PROVIDER_KIND.FILESYSTEM;
+      };
+
 /** Union of supported cloud provider identifiers. */
 export type CloudProviderKind = ValueOf<typeof CLOUD_PROVIDER_KIND>;
 
@@ -67,57 +120,4 @@ export interface CloudStatusSummary {
     providerDetails?: CloudProviderDetails | undefined;
     /** True when multi-device sync is enabled. */
     syncEnabled: boolean;
-}
-
-/**
- * Provider-specific details safe to expose to the renderer.
- */
-export type CloudProviderDetails =
-    | {
-          /**
-           * Human-readable account identifier (email, display name, etc.).
-           *
-           * @remarks
-           * Optional because providers may not supply one.
-           */
-          accountLabel?: string | undefined;
-          kind:
-              | typeof CLOUD_PROVIDER_KIND.DROPBOX
-              | typeof CLOUD_PROVIDER_KIND.GOOGLE_DRIVE
-              | typeof CLOUD_PROVIDER_KIND.WEBDAV;
-      }
-    | {
-          /** Base directory configured by the user. */
-          baseDirectory: string;
-          kind: typeof CLOUD_PROVIDER_KIND.FILESYSTEM;
-      };
-
-/**
- * Entry representing a remote backup artifact stored in a cloud provider.
- */
-export interface CloudBackupEntry {
-    /** Indicates whether the stored backup is encrypted client-side. */
-    encrypted: boolean;
-    /** File name presented to the user when downloading/restoring. */
-    fileName: string;
-    /** Provider key that uniquely identifies the backup object. */
-    key: string;
-    /** Metadata describing the backup contents. */
-    metadata: SerializedDatabaseBackupMetadata;
-}
-
-/**
- * Payload used to configure the filesystem provider.
- */
-export interface CloudFilesystemProviderConfig {
-    /** Absolute path to a directory the app can read/write. */
-    baseDirectory: string;
-}
-
-/**
- * Payload used to enable or disable multi-device cloud sync.
- */
-export interface CloudEnableSyncConfig {
-    /** True when sync should be enabled. */
-    enabled: boolean;
 }

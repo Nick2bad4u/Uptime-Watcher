@@ -1,11 +1,13 @@
 /**
- * Change application helpers for
+ * Change app helpers for
  * {@link src/components/Settings/Settings#Settings}.
  *
  * @remarks
  * Extracted from `Settings.tsx` to keep the component focused on rendering and
  * high-level orchestration.
  */
+
+import type { ArrayValues } from "type-fest";
 
 import { useCallback } from "react";
 import { isDefined, objectHasIn, objectKeys, safeCastTo, setHas } from "ts-extras";
@@ -14,7 +16,7 @@ import type { AppSettings } from "../../stores/types";
 
 import { logger } from "../../services/logger";
 
-type AllowedSettingsKey = (typeof ALLOWED_SETTINGS_KEY_LIST)[number];
+type AllowedSettingsKey = ArrayValues<typeof ALLOWED_SETTINGS_KEY_LIST>;
 
 const ALLOWED_SETTINGS_KEY_LIST = [
     "autoStart",
@@ -26,14 +28,14 @@ const ALLOWED_SETTINGS_KEY_LIST = [
     "systemNotificationsEnabled",
     "systemNotificationsSoundEnabled",
     "theme",
-] as const satisfies ReadonlyArray<keyof AppSettings>;
+] as const satisfies readonly (keyof AppSettings)[];
 
 const ALLOWED_SETTINGS_KEYS: ReadonlySet<AllowedSettingsKey> = new Set(
     ALLOWED_SETTINGS_KEY_LIST
 );
 
 interface ApplySettingChangesOptions {
-    readonly forceKeys?: ReadonlyArray<keyof AppSettings>;
+    readonly forceKeys?: readonly (keyof AppSettings)[];
 }
 
 /**
@@ -74,23 +76,25 @@ export function useSettingsChangeHandlers(args: {
 
             // Log and apply changes for allowed keys
             for (const allowedKey of ALLOWED_SETTINGS_KEY_LIST) {
-                if (objectHasIn(changes, allowedKey)) {
-                    const oldValue = settings[allowedKey];
-                    const newValue = changes[allowedKey];
-                    const isForced = setHas(forceSettingsKeys, allowedKey);
+                if (!objectHasIn(changes, allowedKey)) {
+                    continue;
+                }
 
-                    if (
-                        isDefined(newValue) &&
-                        (oldValue !== newValue || isForced)
-                    ) {
-                        Reflect.set(nextSettings, allowedKey, newValue);
+                const oldValue = settings[allowedKey];
+                const newValue = changes[allowedKey];
+                const isForced = setHas(forceSettingsKeys, allowedKey);
 
-                        logger.user.settingsChange(
-                            allowedKey,
-                            oldValue,
-                            newValue
-                        );
-                    }
+                if (
+                    isDefined(newValue) &&
+                    (oldValue !== newValue || isForced)
+                ) {
+                    Reflect.set(nextSettings, allowedKey, newValue);
+
+                    logger.user.settingsChange(
+                        allowedKey,
+                        oldValue,
+                        newValue
+                    );
                 }
             }
 

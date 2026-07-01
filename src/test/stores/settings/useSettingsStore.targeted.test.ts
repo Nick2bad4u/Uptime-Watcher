@@ -1,3 +1,5 @@
+// Import mocked modules
+import { withErrorHandling } from "@shared/utils/errorHandling";
 /**
  * Targeted tests for useSettingsStore uncovered lines (75, 207-228). Focuses
  * specifically on error scenarios and edge cases.
@@ -9,10 +11,15 @@
  * - Data extraction failures
  * - Concurrency behavior
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { AppSettings } from "../../../stores/types";
+
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock the entire constants module
-vi.mock("../../../constants", () => ({
+vi.mock(import('../../../constants'), () => ({
     DEFAULT_HISTORY_LIMIT: 100,
 }));
 
@@ -23,14 +30,14 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
 // Mock store utils (partial) so required exports like createPersistConfig remain available.
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
 
@@ -47,7 +54,7 @@ vi.mock("../../../stores/utils", async (importOriginal) => {
 });
 
 // Mock withErrorHandling from shared utils (partial) to retain ApplicationError, etc.
-vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('../../../../shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../../shared/utils/errorHandling")
@@ -56,17 +63,11 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
     return {
         ...actual,
         ensureError: vi.fn((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         ),
         withErrorHandling: vi.fn(),
     };
 });
-
-// Import mocked modules
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import type { AppSettings } from "../../../stores/types";
-import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(
@@ -82,7 +83,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -177,7 +178,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             expect(state.settings.historyLimit).toBe(250);
 
             // Verify API calls
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
         });
 
         it("should handle backend errors in syncFromBackend", async ({

@@ -33,22 +33,6 @@ import {
 
 const safeParseStatusUpdate = createSafeParseAdapter(validateStatusUpdate);
 
-function safeParseOptionalStatusUpdate(
-    candidate: unknown
-): SafeParseLike<StatusUpdate | undefined> {
-    if (!isDefined(candidate)) {
-        return { data: undefined, success: true };
-    }
-
-    const parsed = safeParseStatusUpdate(candidate);
-
-    if (parsed.success) {
-        return { data: parsed.data, success: true };
-    }
-
-    return { error: parsed.error, success: false };
-}
-
 /**
  * Interface defining the monitoring domain API operations.
  *
@@ -106,6 +90,22 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
      * @returns Promise resolving to true if monitoring stopped successfully
      */
     stopMonitoringForSite: MonitoringDomainBridge["stopMonitoringForSite"];
+}
+
+function safeParseOptionalStatusUpdate(
+    candidate: unknown
+): SafeParseLike<StatusUpdate | undefined> {
+    if (!isDefined(candidate)) {
+        return { data: undefined, success: true };
+    }
+
+    const parsed = safeParseStatusUpdate(candidate);
+
+    if (parsed.success) {
+        return { data: parsed.data, success: true };
+    }
+
+    return { error: parsed.error, success: false };
 }
 
 /**

@@ -4,7 +4,7 @@
  * @module Utilities
  *
  * @file Comprehensive tests for Electron utility functions and main process
- *   interactions in the Uptime Watcher application.
+ *   interactions in the Uptime Watcher app.
  *
  * @author GitHub Copilot
  *

@@ -8,10 +8,10 @@
  * user interactions remain deterministic under arbitrary store configurations.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-
+import { arrayAt, safeCastTo  } from "ts-extras";
 import "@testing-library/jest-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AppSettings } from "../../../stores/types";
 import type { ThemeName } from "../../../theme/types";
@@ -21,7 +21,7 @@ import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 
 interface ErrorStoreSnapshot {
     /** Last recorded error message, if any. */
-    error: string | null;
+    error: null | string;
     /** Loading flag representing in-flight operations. */
     isLoading: boolean;
     /** Cached message for display, allowing null when none. */
@@ -50,13 +50,13 @@ const {
     const state = {
         settings: { ...baseSettings },
         error: {
-            error: null as ErrorStoreSnapshot["error"],
+            error: safeCastTo<ErrorStoreSnapshot["error"]>(null),
             isLoading: false,
-            lastError: undefined as ErrorStoreSnapshot["lastError"],
+            lastError: safeCastTo<ErrorStoreSnapshot["lastError"]>(undefined),
         },
     } satisfies {
-        settings: AppSettings;
         error: ErrorStoreSnapshot;
+        settings: AppSettings;
     };
 
     const mocks = {
@@ -81,7 +81,7 @@ const {
         resetSettings: vi.fn(async () => {
             state.settings = { ...baseSettings };
         }),
-        setError: vi.fn((error: string | null) => {
+        setError: vi.fn((error: null | string) => {
             state.error.error = error;
             state.error.lastError = error ?? undefined;
         }),
@@ -150,16 +150,16 @@ const applySettingsOverrides = (overrides: Partial<AppSettings> = {}): void => {
  *
  * @returns The last update payload or {@code null} if no update occurred.
  */
-const getLastSettingsUpdate = (): Partial<AppSettings> | null => {
-    const lastCall = mocks.updateSettings.mock.calls.at(-1);
-    return (lastCall?.[0] as Partial<AppSettings> | undefined) ?? null;
+const getLastSettingsUpdate = (): null | Partial<AppSettings> => {
+    const lastCall = arrayAt(mocks.updateSettings.mock.calls, -1);
+    return (lastCall?.[0]) ?? null;
 };
 
-vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
     useConfirmDialog: () => mocks.confirm,
 }));
 
-vi.mock("../../../stores/settings/useSettingsStore", () => ({
+vi.mock(import('../../../stores/settings/useSettingsStore'), () => ({
     useSettingsStore: (selector?: (state: unknown) => unknown) => {
         const store = {
             persistHistoryLimit: mocks.persistHistoryLimit,
@@ -177,7 +177,7 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
     },
 }));
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: (selector?: unknown) => {
         const state = {
             clearError: mocks.clearError,
@@ -192,7 +192,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: (selector?: (state: unknown) => unknown) => {
         const state = {
             saveSqliteBackup: mocks.saveSqliteBackup,
@@ -202,7 +202,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
     },
 }));
 
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useTheme: () => ({
         availableThemes: [
             "light",
@@ -235,18 +235,18 @@ vi.mock("../../../theme/useTheme", () => ({
         }),
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: mocks.logger,
 }));
 
-vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: () => ({
         delayedLoading: false,
         isLoading: storeState.error.isLoading,
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: vi.fn(({ children, className, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -257,7 +257,7 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../theme/components/ThemedText'), () => ({
     ThemedText: vi.fn(({ children, className, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -272,14 +272,14 @@ vi.mock("../../../theme/components/ThemedText", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: vi.fn(({ children, disabled, onClick, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
             <button
-                type="button"
                 disabled={disabled}
                 onClick={onClick}
+                type="button"
                 {...safeProps}
             >
                 {children}
@@ -288,7 +288,7 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedSelect", () => ({
+vi.mock(import('../../../theme/components/ThemedSelect'), () => ({
     ThemedSelect: vi.fn(({ children, disabled, onChange, value, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -305,39 +305,39 @@ vi.mock("../../../theme/components/ThemedSelect", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedCheckbox", () => ({
+vi.mock(import('../../../theme/components/ThemedCheckbox'), () => ({
     ThemedCheckbox: vi.fn(({ checked, disabled, onChange, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
             <input
-                type="checkbox"
-                data-testid="themed-checkbox"
                 checked={checked}
+                data-testid="themed-checkbox"
                 disabled={disabled}
                 onChange={onChange}
+                type="checkbox"
                 {...safeProps}
             />
         );
     }),
 }));
 
-vi.mock("../../../theme/components/StatusIndicator", () => ({
+vi.mock(import('../../../theme/components/StatusIndicator'), () => ({
     StatusIndicator: vi.fn(({ status }) => (
-        <div data-testid="status-indicator" data-status={status} />
+        <div data-status={status} data-testid="status-indicator" />
     )),
 }));
 
-vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
+vi.mock(import('../../../components/common/ErrorAlert/ErrorAlert'), () => ({
     ErrorAlert: vi.fn(({ message }) => (
         <div data-testid="error-alert">{message}</div>
     )),
 }));
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock(import('../../../components/common/Tooltip/Tooltip'), () => ({
     Tooltip: vi.fn(({ children }) => <>{children}</>),
 }));
 
-vi.mock("../../../components/shared/SettingItem", () => ({
+vi.mock(import('../../../components/shared/SettingItem'), () => ({
     SettingItem: vi.fn(({ control, description, title }) => (
         <div data-testid="setting-item">
             <div>{title}</div>
@@ -348,11 +348,11 @@ vi.mock("../../../components/shared/SettingItem", () => ({
 }));
 
 // Cloud sync is tested separately; exclude it from notification fuzz scenarios.
-vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
+vi.mock(import('../../../components/Settings/CloudSettingsSection'), () => ({
     CloudSettingsSection: (): null => null,
 }));
 
-vi.mock("../../../utils/icons", () => {
+vi.mock(import('../../../utils/icons'), () => {
     const Icon = () => <span data-testid="app-icon" />;
     const IconSizes = {
         lg: 24,
@@ -402,7 +402,7 @@ vi.mock("../../../utils/icons", () => {
     };
 });
 
-vi.mock("../../../constants", () => ({
+vi.mock(import('../../../constants'), () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 1000,
     HISTORY_LIMIT_OPTIONS: [
@@ -419,7 +419,7 @@ vi.mock("../../../constants", () => ({
 
 type TestingRenderResult = ReturnType<typeof render>;
 
-let activeRender: TestingRenderResult | null = null;
+let activeRender: null | TestingRenderResult = null;
 
 /**
  * Renders the Settings component against a pristine DOM container.
@@ -432,7 +432,7 @@ const renderSettingsComponent = (): TestingRenderResult => {
         activeRender = null;
     }
 
-    document.body.innerHTML = "";
+    document.body.replaceChildren();
     const container = document.createElement("div");
     container.id = "vitest-test-root";
     document.body.append(container);
@@ -456,15 +456,15 @@ afterEach(() => {
         activeRender.unmount();
         activeRender = null;
     }
-    document.body.innerHTML = "";
+    document.body.replaceChildren();
 });
 
 describe("Settings Component - Notification preference scenarios", () => {
     const inAppToggleScenarios = [
-        { alertsEnabled: true, soundEnabled: true },
-        { alertsEnabled: true, soundEnabled: false },
-        { alertsEnabled: false, soundEnabled: true },
         { alertsEnabled: false, soundEnabled: false },
+        { alertsEnabled: false, soundEnabled: true },
+        { alertsEnabled: true, soundEnabled: false },
+        { alertsEnabled: true, soundEnabled: true },
     ] as const;
 
     for (const { alertsEnabled, soundEnabled } of inAppToggleScenarios) {
@@ -499,10 +499,10 @@ describe("Settings Component - Notification preference scenarios", () => {
     }
 
     const systemToggleScenarios = [
-        { notificationsEnabled: true, soundEnabled: true },
-        { notificationsEnabled: true, soundEnabled: false },
-        { notificationsEnabled: false, soundEnabled: true },
         { notificationsEnabled: false, soundEnabled: false },
+        { notificationsEnabled: false, soundEnabled: true },
+        { notificationsEnabled: true, soundEnabled: false },
+        { notificationsEnabled: true, soundEnabled: true },
     ] as const;
 
     for (const {
@@ -541,14 +541,14 @@ describe("Settings Component - Notification preference scenarios", () => {
         });
     }
 
-    const soundToggleCases = [true, false] as const;
+    const soundToggleCases = [false, true] as const;
 
-    for (const soundEnabled of soundToggleCases) {
-        it(`toggles in-app alert sound when enabled (initialSound=${soundEnabled})`, () => {
+    for (const isSoundEnabled of soundToggleCases) {
+        it(`toggles in-app alert sound when enabled (initialSound=${isSoundEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 inAppAlertsEnabled: true,
-                inAppAlertsSoundEnabled: soundEnabled,
+                inAppAlertsSoundEnabled: isSoundEnabled,
             });
 
             renderSettingsComponent();
@@ -561,17 +561,17 @@ describe("Settings Component - Notification preference scenarios", () => {
             const lastUpdate = getLastSettingsUpdate();
             expect(lastUpdate).not.toBeNull();
             expect(lastUpdate).toMatchObject({
-                inAppAlertsSoundEnabled: !soundEnabled,
+                inAppAlertsSoundEnabled: !isSoundEnabled,
             });
         });
     }
 
-    for (const soundEnabled of soundToggleCases) {
-        it(`toggles system notification sound when notifications are enabled (initialSound=${soundEnabled})`, () => {
+    for (const isSoundEnabled of soundToggleCases) {
+        it(`toggles system notification sound when notifications are enabled (initialSound=${isSoundEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 systemNotificationsEnabled: true,
-                systemNotificationsSoundEnabled: soundEnabled,
+                systemNotificationsSoundEnabled: isSoundEnabled,
             });
 
             renderSettingsComponent();
@@ -584,16 +584,16 @@ describe("Settings Component - Notification preference scenarios", () => {
             const lastUpdate = getLastSettingsUpdate();
             expect(lastUpdate).not.toBeNull();
             expect(lastUpdate).toMatchObject({
-                systemNotificationsSoundEnabled: !soundEnabled,
+                systemNotificationsSoundEnabled: !isSoundEnabled,
             });
         });
     }
 
     const dependentToggleScenarios = [
-        { inAppEnabled: true, systemEnabled: true },
-        { inAppEnabled: true, systemEnabled: false },
-        { inAppEnabled: false, systemEnabled: true },
         { inAppEnabled: false, systemEnabled: false },
+        { inAppEnabled: false, systemEnabled: true },
+        { inAppEnabled: true, systemEnabled: false },
+        { inAppEnabled: true, systemEnabled: true },
     ] as const;
 
     for (const { inAppEnabled, systemEnabled } of dependentToggleScenarios) {

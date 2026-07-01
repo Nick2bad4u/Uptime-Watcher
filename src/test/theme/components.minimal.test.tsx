@@ -2,6 +2,8 @@
  * Minimal theme components test to ensure basic functionality works
  */
 
+import type { ClickHandler, EventHandlers } from "@shared/types/componentProps";
+
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
     afterEach,
@@ -9,11 +11,10 @@ import {
     describe,
     expect,
     it,
-    vi,
     type Mock,
+    vi,
 } from "vitest";
 
-import type { ClickHandler, EventHandlers } from "@shared/types/componentProps";
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBadge } from "../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../theme/components/ThemedBox";
@@ -71,7 +72,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             render(<ThemedBox onClick={mockOnClick}>Clickable</ThemedBox>);
             fireEvent.click(screen.getByRole("button"));
-            expect(mockOnClick).toHaveBeenCalled();
+            expect(mockOnClick).toHaveBeenCalledWith();
         });
     });
 
@@ -106,7 +107,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             render(<ThemedButton onClick={mockOnClick}>Click Me</ThemedButton>);
             fireEvent.click(screen.getByRole("button"));
-            expect(mockOnClick).toHaveBeenCalled();
+            expect(mockOnClick).toHaveBeenCalledWith();
         });
     });
 
@@ -141,7 +142,7 @@ describe("Theme Components - Basic Functionality", () => {
             fireEvent.change(screen.getByRole("textbox"), {
                 target: { value: "test" },
             });
-            expect(mockOnChange).toHaveBeenCalled();
+            expect(mockOnChange).toHaveBeenCalledWith();
         });
     });
 
@@ -191,7 +192,7 @@ describe("Theme Components - Basic Functionality", () => {
 
             render(<ThemedCheckbox onChange={mockOnChange} />);
             fireEvent.click(screen.getByRole("checkbox"));
-            expect(mockOnChange).toHaveBeenCalled();
+            expect(mockOnChange).toHaveBeenCalledWith();
         });
     });
 
@@ -250,7 +251,7 @@ describe("Theme Components - Basic Functionality", () => {
                 </ThemedCard>
             );
             fireEvent.click(screen.getByRole("button"));
-            expect(mockOnClick).toHaveBeenCalled();
+            expect(mockOnClick).toHaveBeenCalledWith();
         });
     });
 
@@ -297,7 +298,7 @@ describe("Theme Components - Basic Functionality", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<StatusIndicator status="up" showText />);
+            render(<StatusIndicator showText status="up" />);
             expect(screen.getByText("Up")).toBeInTheDocument();
         });
     });

@@ -7,7 +7,7 @@
  * maintain user preferences across sessions while keeping transient state (like
  * modal visibility) in memory only.
  *
- * The store follows the application's modular architecture by separating UI
+ * The store follows the app's modular architecture by separating UI
  * concerns from business logic, allowing components to focus on presentation
  * while delegating state management to this centralized store.
  *
@@ -68,13 +68,13 @@ interface UIPersistedState {
 }
 
 const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
-    "site",
+    "controls",
     "monitor",
-    "status",
-    "uptime",
     "response",
     "running",
-    "controls",
+    "site",
+    "status",
+    "uptime",
 ] as const;
 
 /**
@@ -173,9 +173,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     logger.user.action("External URL failed", {
                         error: underlyingError.message,
                         url: urlForMessage,
-                        ...(context?.siteName
-                            ? { siteName: context.siteName }
-                            : {}),
+                        ...(context?.siteName && { siteName: context.siteName }),
                     });
 
                     logStoreAction("UIStore", "openExternalFailed", {
@@ -212,9 +210,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             }
                             logger.user.action("External URL opened", {
                                 url: urlForMessage,
-                                ...(context?.siteName
-                                    ? { siteName: context.siteName }
-                                    : {}),
+                                ...(context?.siteName && { siteName: context.siteName }),
                             });
                         }, errorHandler);
                     } catch (error: unknown) {
@@ -381,13 +377,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     siteIdentifier,
                 });
                 set((state) => {
-                    const current =
+                    const isCurrent =
                         state.siteDetailsHeaderCollapsedState[siteIdentifier] ??
                         false;
                     return {
                         siteDetailsHeaderCollapsedState: {
                             ...state.siteDetailsHeaderCollapsedState,
-                            [siteIdentifier]: !current,
+                            [siteIdentifier]: !isCurrent,
                         },
                     };
                 });

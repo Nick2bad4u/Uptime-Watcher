@@ -3,18 +3,19 @@
  * Part 2: Targeting more complex error paths and edge cases
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Monitor, Site } from "@shared/types";
 
-import type { Site, Monitor } from "@shared/types";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock all dependencies
-vi.mock("../stores", () => ({
+vi.mock(import('../stores'), () => ({
     useErrorStore: vi.fn(),
     useSitesStore: vi.fn(),
     useUIStore: vi.fn(),
 }));
 
-vi.mock("../hooks/site/useSiteAnalytics", () => ({
+vi.mock(import('../hooks/site/useSiteAnalytics'), () => ({
     useSiteAnalytics: vi.fn(() => ({
         data: null,
         error: null,
@@ -22,7 +23,7 @@ vi.mock("../hooks/site/useSiteAnalytics", () => ({
     })),
 }));
 
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         error: vi.fn(),
         site: { error: vi.fn() },
@@ -43,11 +44,11 @@ describe("Additional Uncovered Lines Tests", () => {
         vi.useFakeTimers();
 
         // Reset DOM state
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         // Mock global URL methods
-        globalThis.URL.createObjectURL = vi.fn(() => "blob:test");
-        globalThis.URL.revokeObjectURL = vi.fn();
+        vi.spyOn(URL, 'createObjectURL').mockReturnValue("blob:test");
+        vi.spyOn(URL, 'revokeObjectURL').mockImplementation();
     });
 
     afterEach(() => {
@@ -85,7 +86,7 @@ describe("Additional Uncovered Lines Tests", () => {
             };
 
             // This test verifies the edge case where timeout is undefined
-            expect(mockSite.monitors[0]?.timeout).toBeUndefined();
+            expect(arrayFirst(mockSite.monitors)?.timeout).toBeUndefined();
             // The code should handle this by using DEFAULT_REQUEST_TIMEOUT_SECONDS
         });
     });
@@ -106,7 +107,7 @@ describe("Additional Uncovered Lines Tests", () => {
             const mockCreateObjectURL = vi.fn(() => {
                 throw new Error("Failed to create object URL");
             });
-            Object.defineProperty(globalThis.URL, "createObjectURL", {
+            Object.defineProperty(URL, "createObjectURL", {
                 value: mockCreateObjectURL,
                 writable: true,
             });
@@ -154,7 +155,7 @@ describe("Additional Uncovered Lines Tests", () => {
                 await import("../stores/sites/utils/fileDownload");
             downloadFile({ buffer, fileName });
 
-            expect(mockClick).toHaveBeenCalled();
+            expect(mockClick).toHaveBeenCalledWith();
         });
 
         it("should handle non-DOM related errors", async ({
@@ -172,7 +173,7 @@ describe("Additional Uncovered Lines Tests", () => {
             const mockCreateObjectURL = vi.fn(() => {
                 throw new Error("Network error");
             });
-            Object.defineProperty(globalThis.URL, "createObjectURL", {
+            Object.defineProperty(URL, "createObjectURL", {
                 value: mockCreateObjectURL,
                 writable: true,
             });

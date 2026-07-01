@@ -22,13 +22,6 @@
  */
 import { objectHasIn, safeCastTo } from "ts-extras";
 
-export interface CleanupValidationContext {
-    /** Type reported by the `typeof` operator for the cleanup candidate. */
-    readonly actualType: string;
-    /** Raw value returned by the preload bridge. */
-    readonly cleanupCandidate: unknown;
-}
-
 /**
  * Callback contract used when validating cleanup handlers returned from the
  * preload bridge.
@@ -54,6 +47,13 @@ export interface CleanupResolutionHandlers {
     readonly handleInvalidCleanup: (
         context: CleanupValidationContext
     ) => () => void;
+}
+
+export interface CleanupValidationContext {
+    /** Type reported by the `typeof` operator for the cleanup candidate. */
+    readonly actualType: string;
+    /** Raw value returned by the preload bridge. */
+    readonly cleanupCandidate: unknown;
 }
 
 /**

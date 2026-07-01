@@ -24,25 +24,6 @@ export interface SettingRow {
 }
 
 /**
- * Validate that a SettingRow object is properly formed.
- *
- * @remarks
- * Validates SettingRow objects that have already been mapped from database
- * rows. Only checks key validity since value field is always processed
- * appropriately. Uses simplified validation since SettingRow interface already
- * enforces string types.
- *
- * @param setting - SettingRow object to validate
- *
- * @returns True if setting is valid
- *
- * @internal
- */
-function isValidSettingObject(setting: SettingRow): boolean {
-    return isNonEmptyString(setting.key);
-}
-
-/**
  * Validate that a row contains the minimum required fields for a setting.
  *
  * @param row - Database row to validate
@@ -53,6 +34,25 @@ function isValidSettingObject(setting: SettingRow): boolean {
  */
 export function isValidSettingRow(row: DatabaseSettingsRow): boolean {
     return isNonEmptyString(row.key);
+}
+
+/**
+ * Convert multiple database rows to SettingRow objects.
+ *
+ * @remarks
+ * Filters out invalid rows using isValidSettingRow before mapping to prevent
+ * creation of settings with empty keys or invalid data.
+ *
+ * @param rows - Array of raw database rows
+ *
+ * @returns Array of mapped SettingRow objects
+ *
+ * @public
+ */
+export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
+    return rows
+        .filter((row) => isValidSettingRow(row))
+        .map((row) => rowToSetting(row));
 }
 
 /**
@@ -101,42 +101,6 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
 }
 
 /**
- * Convert multiple database rows to SettingRow objects.
- *
- * @remarks
- * Filters out invalid rows using isValidSettingRow before mapping to prevent
- * creation of settings with empty keys or invalid data.
- *
- * @param rows - Array of raw database rows
- *
- * @returns Array of mapped SettingRow objects
- *
- * @public
- */
-export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
-    return rows
-        .filter((row) => isValidSettingRow(row))
-        .map((row) => rowToSetting(row));
-}
-
-/**
- * Convert a database row to a SettingRow object.
- *
- * @remarks
- * Handles type conversion and ensures consistent data transformation across all
- * settings-related database operations. Uses precise type checking instead of
- * loose falsy checks for better type safety.
- *
- * @param row - Raw database row
- *
- * @returns Mapped SettingRow object
- *
- * @throws {@link Error} When row has invalid key
- *
- * @public
- */
-
-/**
  * Convert a single database row to a setting value.
  *
  * @remarks
@@ -171,6 +135,23 @@ export function rowToSettingValue(
 
     return safeStringify(row.value);
 }
+
+/**
+ * Convert a database row to a SettingRow object.
+ *
+ * @remarks
+ * Handles type conversion and ensures consistent data transformation across all
+ * settings-related database operations. Uses precise type checking instead of
+ * loose falsy checks for better type safety.
+ *
+ * @param row - Raw database row
+ *
+ * @returns Mapped SettingRow object
+ *
+ * @throws {@link Error} When row has invalid key
+ *
+ * @public
+ */
 
 /**
  * Convert SettingRow array to a Record object mapping keys to values.
@@ -210,4 +191,23 @@ export function settingsToRecord(
     }
 
     return result;
+}
+
+/**
+ * Validate that a SettingRow object is properly formed.
+ *
+ * @remarks
+ * Validates SettingRow objects that have already been mapped from database
+ * rows. Only checks key validity since value field is always processed
+ * appropriately. Uses simplified validation since SettingRow interface already
+ * enforces string types.
+ *
+ * @param setting - SettingRow object to validate
+ *
+ * @returns True if setting is valid
+ *
+ * @internal
+ */
+function isValidSettingObject(setting: SettingRow): boolean {
+    return isNonEmptyString(setting.key);
 }

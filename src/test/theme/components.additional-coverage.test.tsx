@@ -6,8 +6,9 @@
 
 import { render } from "@testing-library/react";
 import { createElement } from "react";
-import { vi, it, expect, describe } from "vitest";
+import { safeCastTo } from "ts-extras";
 import "@testing-library/jest-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBadge } from "../../theme/components/ThemedBadge";
@@ -16,9 +17,9 @@ import { ThemedProgress } from "../../theme/components/ThemedProgress";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 
 // Mock theme hooks with factory function to avoid hoisting issues
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
     return {
         ...actual,
         useTheme: vi.fn(() => ({
@@ -125,7 +126,7 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
 });
 
 // Mock status utilities
-vi.mock("../../utils/status", () => {
+vi.mock(import('../../utils/status'), () => {
     const formatStatusLabel = vi.fn(
         (status: string) => status.charAt(0).toUpperCase() + status.slice(1)
     );
@@ -153,13 +154,13 @@ vi.mock("../../utils/status", () => {
 });
 
 // Mock time utilities
-vi.mock("../../utils/time", () => ({
+vi.mock(import('../../utils/time'), () => ({
     formatResponseTime: vi.fn((time?: number) => (time ? `${time}ms` : "0ms")),
 }));
 
 // Mock constants (partial to preserve other exports used by stores/settings)
-vi.mock("../../constants", async (importOriginal) => {
-    const actual = (await importOriginal()) as typeof import("../../constants");
+vi.mock(import('../../constants'), async (importOriginal) => {
+    const actual = (await importOriginal());
     return {
         ...actual,
         ARIA_LABEL: "aria-label",
@@ -203,7 +204,7 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<StatusIndicator status="down" className="custom-class" />);
+            render(<StatusIndicator className="custom-class" status="down" />);
 
             const indicator = document.querySelector(
                 ".themed-status-indicator"
@@ -244,7 +245,7 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<StatusIndicator status="up" showText />);
+            render(<StatusIndicator showText status="up" />);
 
             const text = document.querySelector(
                 ".themed-status-indicator__text"
@@ -268,15 +269,15 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const statuses = [
-                "up",
                 "down",
-                "pending",
                 "paused",
+                "pending",
+                "up",
             ] as const;
 
             for (const status of statuses) {
                 const { unmount } = render(
-                    <StatusIndicator status={status} showText />
+                    <StatusIndicator showText status={status} />
                 );
                 const text = document.querySelector(
                     ".themed-status-indicator__text"
@@ -299,7 +300,7 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Retrieval", "type");
 
-            render(<StatusIndicator status="pending" showText />);
+            render(<StatusIndicator showText status="pending" />);
 
             const indicator = document.querySelector(
                 ".themed-status-indicator"
@@ -328,14 +329,14 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
             ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
-                    <StatusIndicator status="up" size={size} />
+                    <StatusIndicator size={size} status="up" />
                 );
                 const indicator = document.querySelector(
                     ".themed-status-indicator"
@@ -358,7 +359,7 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<StatusIndicator status="up" className="" />);
+            render(<StatusIndicator className="" status="up" />);
 
             const indicator = document.querySelector(
                 ".themed-status-indicator"
@@ -380,10 +381,10 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "xs",
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
+                "xs",
             ] as const;
 
             for (const size of sizes) {
@@ -408,12 +409,12 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const variants = [
+                "error",
+                "info",
                 "primary",
                 "secondary",
                 "success",
                 "warning",
-                "error",
-                "info",
             ] as const;
 
             for (const variant of variants) {
@@ -440,10 +441,10 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const types = [
-                "text",
                 "email",
-                "password",
                 "number",
+                "password",
+                "text",
             ] as const;
 
             for (const type of types) {
@@ -549,7 +550,7 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedProgress value={75} className="custom-progress" />);
+            render(<ThemedProgress className="custom-progress" value={75} />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toHaveClass("custom-progress");
@@ -583,7 +584,7 @@ describe("Theme Components - Missing Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedProgress value={100} max={100} />);
+            render(<ThemedProgress max={100} value={100} />);
 
             const progress = document.querySelector(".themed-progress");
             expect(progress).toBeInTheDocument();

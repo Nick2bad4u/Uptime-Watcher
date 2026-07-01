@@ -19,6 +19,59 @@ const KEY_LENGTH_BYTES = 32;
 const KEY_CHECK_PLAINTEXT = "uptime-watcher-passphrase-check-v1";
 
 /**
+ * Encrypts a sentinel plaintext to allow validating a passphrase-derived key.
+ */
+export function createKeyCheckBase64(key: Buffer): string {
+    const encrypted = encryptBuffer({
+        key,
+        plaintext: Buffer.from(KEY_CHECK_PLAINTEXT, "utf8"),
+    });
+
+    return encrypted.toString("base64");
+}
+
+/**
+ * Decrypts a buffer previously encrypted by {@link encryptBuffer}.
+ */
+export function decryptBuffer(args: {
+    ciphertext: Buffer;
+    key: Buffer;
+}): Buffer {
+    if (args.key.length !== KEY_LENGTH_BYTES) {
+        throw new Error("Invalid encryption key length");
+    }
+
+    const payload = args.ciphertext;
+    if (!isEncryptedPayload(payload)) {
+        throw new Error("Payload is not encrypted");
+    }
+
+    const minimumLength =
+        MAGIC.length + 1 + IV_LENGTH_BYTES + TAG_LENGTH_BYTES + 1;
+    if (payload.length < minimumLength) {
+        throw new Error("Encrypted payload is truncated");
+    }
+
+    const version = payload.readUInt8(MAGIC.length);
+    if (version !== VERSION) {
+        throw new Error(`Unsupported encrypted payload version: ${version}`);
+    }
+
+    const ivStart = MAGIC.length + 1;
+    const tagStart = ivStart + IV_LENGTH_BYTES;
+    const dataStart = tagStart + TAG_LENGTH_BYTES;
+
+    const iv = payload.subarray(ivStart, tagStart);
+    const tag = payload.subarray(tagStart, dataStart);
+    const data = payload.subarray(dataStart);
+
+    const decipher = createDecipheriv("aes-256-gcm", args.key, iv);
+    decipher.setAuthTag(tag);
+
+    return Buffer.concat([decipher.update(data), decipher.final()]);
+}
+
+/**
  * Derives a 32-byte encryption key from a user passphrase.
  *
  * @remarks
@@ -67,23 +120,6 @@ export async function derivePassphraseKey(args: {
     return derived;
 }
 
-/** Creates a new random salt suitable for scrypt. */
-export function generateEncryptionSalt(): Buffer {
-    return randomBytes(16);
-}
-
-/**
- * Returns true when the buffer begins with the Uptime Watcher encryption
- * header.
- */
-export function isEncryptedPayload(buffer: Buffer): boolean {
-    if (buffer.length < MAGIC.length + 1) {
-        return false;
-    }
-
-    return buffer.subarray(0, MAGIC.length).equals(MAGIC);
-}
-
 /**
  * Encrypts a buffer using AES-256-GCM.
  *
@@ -120,57 +156,21 @@ export function encryptBuffer(args: {
     ]);
 }
 
-/**
- * Decrypts a buffer previously encrypted by {@link encryptBuffer}.
- */
-export function decryptBuffer(args: {
-    ciphertext: Buffer;
-    key: Buffer;
-}): Buffer {
-    if (args.key.length !== KEY_LENGTH_BYTES) {
-        throw new Error("Invalid encryption key length");
-    }
-
-    const payload = args.ciphertext;
-    if (!isEncryptedPayload(payload)) {
-        throw new Error("Payload is not encrypted");
-    }
-
-    const minimumLength =
-        MAGIC.length + 1 + IV_LENGTH_BYTES + TAG_LENGTH_BYTES + 1;
-    if (payload.length < minimumLength) {
-        throw new Error("Encrypted payload is truncated");
-    }
-
-    const version = payload.readUInt8(MAGIC.length);
-    if (version !== VERSION) {
-        throw new Error(`Unsupported encrypted payload version: ${version}`);
-    }
-
-    const ivStart = MAGIC.length + 1;
-    const tagStart = ivStart + IV_LENGTH_BYTES;
-    const dataStart = tagStart + TAG_LENGTH_BYTES;
-
-    const iv = payload.subarray(ivStart, tagStart);
-    const tag = payload.subarray(tagStart, dataStart);
-    const data = payload.subarray(dataStart);
-
-    const decipher = createDecipheriv("aes-256-gcm", args.key, iv);
-    decipher.setAuthTag(tag);
-
-    return Buffer.concat([decipher.update(data), decipher.final()]);
+/** Creates a new random salt suitable for scrypt. */
+export function generateEncryptionSalt(): Buffer {
+    return randomBytes(16);
 }
 
 /**
- * Encrypts a sentinel plaintext to allow validating a passphrase-derived key.
+ * Returns true when the buffer begins with the Uptime Watcher encryption
+ * header.
  */
-export function createKeyCheckBase64(key: Buffer): string {
-    const encrypted = encryptBuffer({
-        key,
-        plaintext: Buffer.from(KEY_CHECK_PLAINTEXT, "utf8"),
-    });
+export function isEncryptedPayload(buffer: Buffer): boolean {
+    if (buffer.length < MAGIC.length + 1) {
+        return false;
+    }
 
-    return encrypted.toString("base64");
+    return buffer.subarray(0, MAGIC.length).equals(MAGIC);
 }
 
 /**

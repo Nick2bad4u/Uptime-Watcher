@@ -19,7 +19,7 @@ const validateSiteIdentifierCandidate = (
     paramName: string
 ): ParameterValueValidationResult => {
     const requiredString = requireStringParamValue(value, paramName);
-    if (requiredString.ok === false) {
+    if (!requiredString.ok) {
         return requiredString.error;
     }
 
@@ -36,7 +36,7 @@ const validateMonitorIdCandidate = (
     paramName: string
 ): ParameterValueValidationResult => {
     const requiredString = requireStringParamValue(value, paramName);
-    if (requiredString.ok === false) {
+    if (!requiredString.ok) {
         return requiredString.error;
     }
 
@@ -122,7 +122,7 @@ export function createSiteUpdatePayloadValidator(): IpcParameterValidator {
                 updatesCandidate,
                 "updates"
             );
-            if (recordResult.ok === false) {
+            if (!recordResult.ok) {
                 return recordResult.error;
             }
 

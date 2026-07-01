@@ -74,7 +74,7 @@ export interface ModalProperties {
     readonly headerIcon?: ReactNode;
 
     /**
-     * If true, the application root (#root) is set to inert/aria-hidden while
+     * If true, the app root (#root) is set to inert/aria-hidden while
      * this modal is open.
      *
      * @defaultValue true
@@ -211,7 +211,7 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     const selector =
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-    return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+    return [...container.querySelectorAll<HTMLElement>(selector)].filter(
         (el) => !el.hasAttribute("aria-hidden")
     );
 }
@@ -463,7 +463,7 @@ export const Modal = ({
                 }
             };
 
-            document.addEventListener("keydown", handleKeyDownCapture, true);
+            document.addEventListener("keydown", handleKeyDownCapture, {capture: true});
 
             return () => {
                 document.removeEventListener(

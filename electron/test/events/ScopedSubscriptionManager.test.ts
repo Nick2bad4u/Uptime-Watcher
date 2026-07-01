@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import {
-    TypedEventBus,
     type EventPayloadValue,
+    TypedEventBus,
 } from "../../events/TypedEventBus";
 
 interface TestEvents extends Record<string, EventPayloadValue> {
@@ -52,7 +52,7 @@ describe(ScopedSubscriptionManager, () => {
             throw secondError;
         });
 
-        expect(() => manager.clearAll()).toThrow(AggregateError);
+        expect(() => { manager.clearAll(); }).toThrow(AggregateError);
     });
 
     it("invokes error callback when suppression is enabled", () => {

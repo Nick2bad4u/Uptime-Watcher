@@ -48,11 +48,11 @@ export async function executeIpcHandler<T>(
     options?: IpcHandlerExecutionOptions
 ): Promise<HandlerExecutionResult<T>> {
     const startTime = Date.now();
-    const logStart = shouldLogHandler(channelName);
+    const isLogStart = shouldLogHandler(channelName);
     const correlationId = options?.correlationId ?? generateCorrelationId();
     const startMetadata = options?.metadata;
 
-    if (logStart) {
+    if (isLogStart) {
         const metadata =
             startMetadata && objectKeys(startMetadata).length > 0
                 ? { handler: channelName, ...startMetadata }
@@ -74,7 +74,7 @@ export async function executeIpcHandler<T>(
         const value = await handler();
         const duration = Date.now() - startTime;
 
-        if (logStart) {
+        if (isLogStart) {
             logger.debug(
                 `[IpcHandler] Completed ${channelName}`,
                 withLogContext({

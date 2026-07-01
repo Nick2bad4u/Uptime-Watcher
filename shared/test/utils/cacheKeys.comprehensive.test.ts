@@ -2,7 +2,8 @@
  * Comprehensive backend tests for cacheKeys utilities Ensures backend-specific
  * usage patterns are covered
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 // Import ALL functions from cacheKeys to ensure coverage
 import * as cacheKeys from "../../utils/cacheKeys";
 import {
@@ -425,7 +426,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "site:backend-site-123" as StandardizedCacheKey
+                "site:backend-site-123"
             );
             expect(result).toEqual({
                 prefix: "site",
@@ -443,7 +444,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "monitor:operation:backend-123" as StandardizedCacheKey
+                "monitor:operation:backend-123"
             );
             expect(result).toEqual({
                 prefix: "monitor",
@@ -462,7 +463,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "config:validation:backend-config" as StandardizedCacheKey
+                "config:validation:backend-config"
             );
             expect(result).toEqual({
                 prefix: "config",
@@ -481,7 +482,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "site:loading:backend-site-456" as StandardizedCacheKey
+                "site:loading:backend-site-456"
             );
             expect(result).toEqual({
                 prefix: "site",
@@ -500,7 +501,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "validation:monitor-type:http" as StandardizedCacheKey
+                "validation:monitor-type:http"
             );
             expect(result).toEqual({
                 prefix: "validation",
@@ -519,7 +520,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "config:backend-setting_001" as StandardizedCacheKey
+                "config:backend-setting_001"
             );
             expect(result).toEqual({
                 prefix: "config",
@@ -537,7 +538,7 @@ describe("cacheKeys utilities - Backend Coverage", () => {
             );
 
             const result = parseCacheKey(
-                "monitor:backend.monitor.complex_123" as StandardizedCacheKey
+                "monitor:backend.monitor.complex_123"
             );
             expect(result).toEqual({
                 prefix: "monitor",

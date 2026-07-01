@@ -1,6 +1,6 @@
 /**
  * Centralized error message catalog for consistent error handling across the
- * application.
+ * app.
  *
  * @remarks
  * This module provides a comprehensive collection of standardized error
@@ -323,7 +323,7 @@ export interface ErrorCatalogInterface {
  *
  * @remarks
  * This catalog provides all error messages organized by functional domain for
- * easy access and consistent usage across the application. Each domain contains
+ * easy access and consistent usage across the app. Each domain contains
  * related error messages that can be used throughout the codebase.
  *
  * @public
@@ -457,5 +457,5 @@ export function getUnknownErrorMessage(
     error: unknown,
     fallback: string = ERROR_CATALOG.system.UNKNOWN_ERROR
 ): string {
-    return error instanceof Error ? error.message : fallback;
+    return Error.isError(error) ? error.message : fallback;
 }

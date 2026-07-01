@@ -1,15 +1,17 @@
 import type { Site } from "@shared/types";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
 import type { UnknownRecord } from "type-fest";
+
+import { render, screen } from "@testing-library/react";
+import { objectAssign } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
 import { createSelectorHookMock } from "../utils/createSelectorHookMock";
-import { createMockSite } from "../utils/mockFactories";
 import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../utils/createSitesStoreMock";
+import { createMockSite } from "../utils/mockFactories";
 
 const createDefaultSites = (): Site[] => [
     createMockSite({ identifier: "site-1", name: "Test Site 1" }),
@@ -35,7 +37,7 @@ const globalWithSitesStoreMock =
     globalThis as unknown as GlobalWithSitesStoreMock;
 globalWithSitesStoreMock.__useSitesStoreMock__ = useSitesStoreMock;
 
-vi.mock("../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../stores/sites/useSitesStore'), () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -45,7 +47,7 @@ vi.mock("../../stores/sites/useSitesStore", () => ({
             throw new Error("useSitesStore mock was not initialized");
         }
 
-        return hook(selector, equality) as Result | typeof sitesStoreState;
+        return hook(selector, equality);
     },
 }));
 
@@ -57,7 +59,7 @@ const resetSitesStoreState = (): void => {
     });
 };
 
-vi.mock("../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../stores/error/useErrorStore'), () => ({
     useErrorStore: (() => {
         const state = {
             clearAllErrors: vi.fn(),
@@ -88,7 +90,7 @@ vi.mock("../../stores/error/useErrorStore", () => ({
 
         store.getState = () => state;
         store.setState = (partial) => {
-            Object.assign(state, partial);
+            objectAssign(state, partial);
         };
         store.subscribe = () => () => {
             // no-op
@@ -99,7 +101,7 @@ vi.mock("../../stores/error/useErrorStore", () => ({
 }));
 
 // Mock the hooks
-vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
     useAddSiteForm: () => ({
         addMode: "existing",
         checkIntervalMs: 30,
@@ -124,7 +126,7 @@ vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     }),
 }));
 
-vi.mock("../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: () => ({
         options: [
             { label: "HTTP", value: "http" },
@@ -136,7 +138,7 @@ vi.mock("../../hooks/useMonitorTypes", () => ({
     }),
 }));
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
     useMonitorTypesStore: (selector?: unknown) => {
         const state = {
             isLoaded: true,
@@ -172,11 +174,11 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
     },
 }));
 
-vi.mock("../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: () => false,
 }));
 
-vi.mock("../../hooks/useDynamicHelpText", () => ({
+vi.mock(import('../../hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: () => ({}),
 }));
 
@@ -201,8 +203,8 @@ describe("AddSiteForm Component", () => {
         render(<AddSiteForm />);
 
         // Check for the presence of key elements
-        expect(screen.getByText(/add mode/i)).toBeInTheDocument();
-        expect(screen.getByText(/monitor type/i)).toBeInTheDocument();
+        expect(screen.getByText(/add mode/iv)).toBeInTheDocument();
+        expect(screen.getByText(/monitor type/iv)).toBeInTheDocument();
     });
 
     it("should display different mode options", ({ task, annotate }) => {
@@ -237,6 +239,6 @@ describe("AddSiteForm Component", () => {
         render(<AddSiteForm />);
 
         // Check for monitor type dropdown/selection
-        expect(screen.getByText(/monitor type/i)).toBeInTheDocument();
+        expect(screen.getByText(/monitor type/iv)).toBeInTheDocument();
     });
 });

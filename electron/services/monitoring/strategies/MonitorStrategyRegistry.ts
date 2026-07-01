@@ -12,9 +12,14 @@ import type {
 import { monitorLogger as logger } from "../../../utils/logger";
 
 /**
- * Execution context forwarded to monitor strategy services.
+ * Contract for executing monitor strategies based on monitor type.
  */
-export type StrategyExecutionContext = MonitorCheckContext;
+export interface MonitorStrategyRegistry {
+    execute: (
+        monitor: Monitor,
+        context?: StrategyExecutionContext
+    ) => Promise<ServiceMonitorCheckResult>;
+}
 
 /**
  * Registry entry describing how to execute a monitor strategy.
@@ -25,14 +30,9 @@ export interface StrategyEntry {
 }
 
 /**
- * Contract for executing monitor strategies based on monitor type.
+ * Execution context forwarded to monitor strategy services.
  */
-export interface MonitorStrategyRegistry {
-    execute: (
-        monitor: Monitor,
-        context?: StrategyExecutionContext
-    ) => Promise<ServiceMonitorCheckResult>;
-}
+export type StrategyExecutionContext = MonitorCheckContext;
 
 /**
  * Builds a monitor strategy registry backed by the provided entries.

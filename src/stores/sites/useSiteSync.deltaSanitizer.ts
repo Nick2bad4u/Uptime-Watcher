@@ -18,10 +18,12 @@ const getUniqueStringsPreservingOrder = (
     const result: string[] = [];
 
     for (const value of values) {
-        if (!setHas(seen, value)) {
-            seen.add(value);
-            result.push(value);
+        if (setHas(seen, value)) {
+            continue;
         }
+
+        seen.add(value);
+        result.push(value);
     }
 
     return result;

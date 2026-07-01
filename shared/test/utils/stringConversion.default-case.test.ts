@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Default Case Coverage", () => {
@@ -61,9 +62,7 @@ describe("String Conversion - Default Case Coverage", () => {
                 {},
                 {
                     // Proxy object
-                    get() {
-                        return undefined;
-                    },
+                    get: () => undefined,
                 }
             ),
         ];

@@ -1,5 +1,5 @@
 /**
- * Unified validation result types for the Uptime Watcher application.
+ * Unified validation result types for the Uptime Watcher app.
  *
  * @remarks
  * This module provides a single source of truth for validation result
@@ -18,7 +18,7 @@ import { isRecord } from "../utils/typeHelpers";
  * Base validation result interface.
  *
  * @remarks
- * Provides the core structure for validation results across the application.
+ * Provides the core structure for validation results across the app.
  * Other validation interfaces can extend this for domain-specific needs.
  *
  * @public
@@ -213,14 +213,8 @@ export function isValidationResult(
         return false;
     }
 
-    if (
-        isDefined(metadata) &&
-        (typeof metadata !== "object" ||
-            metadata === null ||
-            Array.isArray(metadata))
-    ) {
-        return false;
-    }
-
-    return true;
+    return !isDefined(metadata) ||
+        typeof metadata === "object" &&
+            metadata !== null &&
+            !Array.isArray(metadata);
 }

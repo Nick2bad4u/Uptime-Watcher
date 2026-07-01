@@ -1,5 +1,3 @@
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- We want to disable this rule for the whole file
-/* eslint-disable n/no-process-env -- Needed for Github Action builds */
 import type * as Preset from "@docusaurus/preset-classic";
 import type { Config } from "@docusaurus/types";
 
@@ -21,16 +19,14 @@ const removeHeadAttrFlagKey = [
 ].join("");
 
 const futureConfig = {
-    ...(enableExperimentalFaster
-        ? {
+    ...(enableExperimentalFaster && {
               experimental_faster: {
                   mdxCrossCompilerCache: true,
                   rspackBundler: true,
                   rspackPersistentCache: true,
                   ssgWorkerThreads: true,
               },
-          }
-        : {}),
+          }),
     v4: {
         [removeHeadAttrFlagKey]: true,
         // NOTE: Enabling cascade layers currently breaks our production CSS output
@@ -44,7 +40,7 @@ const futureConfig = {
 const socialCardImage = new URL(
     "img/uptime-watcher-social-card.jpg",
     `${siteUrl}${baseUrl}`
-).toString();
+).href;
 
 const modernEnhancementsClientModule = fileURLToPath(
     new URL("src/js/modernEnhancements.ts", import.meta.url)
@@ -61,7 +57,7 @@ const pwaMaskIconColor = "#71B041";
  * Controls the docs, blog, pages, theming, plugins, and deployment settings
  * used when building the documentation site hosted on GitHub Pages.
  */
-const config: Config = {
+const config = {
     // Set the /<baseUrl>/ pathname under which your site is served
     baseUrl,
     baseUrlIssueBanner: true,
@@ -531,10 +527,6 @@ const config: Config = {
                 property: "og:type",
             },
             {
-                content: socialCardImage,
-                property: "og:image",
-            },
-            {
                 content: `${siteUrl}${baseUrl}`,
                 property: "og:url",
             },
@@ -657,8 +649,8 @@ const config: Config = {
 
     trailingSlash: false,
 
-    // Set the production url of your site here
+    // Set the production URL of your site here
     url: siteUrl,
-};
+} satisfies Config;
 
 export default config;

@@ -1,18 +1,20 @@
+import type {
+    BulkStateSyncEventData,
+    DeltaStateSyncEventData,
+    StateSyncEventData,
+} from "@shared/types/events";
+
 import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
     type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
 import { STATUS_KIND } from "@shared/types";
-import type {
-    BulkStateSyncEventData,
-    DeltaStateSyncEventData,
-    StateSyncEventData,
-} from "@shared/types/events";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { RendererEventBridge } from "../../../services/events/RendererEventBridge";
 import type { WindowService } from "../../../services/window/WindowService";
+
+import { RendererEventBridge } from "../../../services/events/RendererEventBridge";
 import { logger } from "../../../utils/logger";
 
 interface WindowStub {

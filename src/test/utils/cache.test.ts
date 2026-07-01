@@ -8,22 +8,24 @@
  *   operations, and edge cases with different data types and sizes.
  */
 
+import { fc, test } from "@fast-check/vitest";
+import { arrayFirst, isDefined  } from "ts-extras";
 import {
-    describe,
-    it,
-    expect,
-    beforeEach,
     afterEach,
-    vi,
+    beforeEach,
+    describe,
+    expect,
+    it,
     type Mock,
+    vi,
 } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
 import {
-    TypedCache,
     AppCaches,
     cleanupAllCaches,
     clearAllCaches,
     getCachedOrFetch,
+    TypedCache,
 } from "../../utils/cache";
 import { createMockFunction } from "./mockFactories";
 
@@ -541,7 +543,7 @@ describe("Cache Utilities", () => {
 
                 const cache = new TypedCache<
                     string,
-                    string | null | undefined
+                    null | string | undefined
                 >();
                 cache.set("null", null);
                 cache.set("undefined", undefined);
@@ -612,7 +614,7 @@ describe("Cache Utilities", () => {
                 await annotate("Type: Caching", "type");
 
                 const cache = new TypedCache<string, string>({ ttl: 1000 });
-                expect(() => cache.cleanup()).not.toThrow();
+                expect(() => { cache.cleanup(); }).not.toThrow();
                 expect(cache.size).toBe(0);
             });
 
@@ -725,11 +727,11 @@ describe("Cache Utilities", () => {
 
     describe("getCachedOrFetch helper", () => {
         let cache: TypedCache<string, string>;
-        let mockFetcher: Mock<() => Promise<string | null>>;
+        let mockFetcher: Mock<() => Promise<null | string>>;
 
         beforeEach(() => {
             cache = new TypedCache<string, string>();
-            mockFetcher = createMockFunction<() => Promise<string | null>>();
+            mockFetcher = createMockFunction<() => Promise<null | string>>();
         });
 
         it("should return cached value if available", async ({
@@ -1131,7 +1133,7 @@ describe("Cache Utilities", () => {
                                 k,
                                 v,
                                 t,
-                            ]) => [k, [v, t] as const]
+                            ]) => [k, [t, v] as const]
                         )
                     ),
                 ];
@@ -1210,25 +1212,25 @@ describe("Cache Utilities", () => {
 
                     // Fill cache to capacity (2 entries) with controlled timing
                     mockNow.mockReturnValue(1000);
-                    cache.set(keys[0]!, "value0");
+                    cache.set(arrayFirst(keys)!, "value0");
 
                     mockNow.mockReturnValue(1100);
                     cache.set(keys[1]!, "value1");
 
                     expect(cache.size).toBe(2);
-                    expect(cache.has(keys[0]!)).toBeTruthy();
+                    expect(cache.has(arrayFirst(keys)!)).toBeTruthy();
                     expect(cache.has(keys[1]!)).toBeTruthy();
 
                     // Access first key to make it recently used
                     mockNow.mockReturnValue(1200);
-                    cache.get(keys[0]!);
+                    cache.get(arrayFirst(keys)!);
 
                     // Add third entry - should evict keys[1] (least recently used)
                     mockNow.mockReturnValue(1300);
                     cache.set(keys[2]!, "value2");
 
                     // Property: Recently accessed key should remain
-                    expect(cache.has(keys[0]!)).toBeTruthy();
+                    expect(cache.has(arrayFirst(keys)!)).toBeTruthy();
 
                     // Property: New key should exist
                     expect(cache.has(keys[2]!)).toBeTruthy();
@@ -1316,7 +1318,7 @@ describe("Cache Utilities", () => {
                     // Property: Explicitly stored undefined has same return as missing key
                     // Note: This is a limitation of the current cache implementation
                     cache.set(key, undefined);
-                    expect(cache.get(key)).toBe(undefined);
+                    expect(cache.get(key)).toBeUndefined();
                     // The has() method cannot distinguish between missing and undefined values
                     expect(cache.has(key)).toBeFalsy(); // This is the actual behavior
                 }
@@ -1514,11 +1516,11 @@ describe("Cache Utilities", () => {
                     let expectedSize = 0;
 
                     for (const [key, value] of entries) {
-                        const hadKey = cache.has(key);
+                        const isHadKey = cache.has(key);
                         cache.set(key, value);
 
                         // Property: Size should increment only for new keys
-                        if (!hadKey) {
+                        if (!isHadKey) {
                             expectedSize++;
                         }
                         expect(cache.size).toBe(expectedSize);
@@ -1548,7 +1550,7 @@ describe("Cache Utilities", () => {
 
                         // Property: has() and get() should be consistent
                         expect(cache.has(key)).toBe(
-                            cache.get(key) !== undefined
+                            isDefined(cache.get(key))
                         );
 
                         if (cache.has(key)) {

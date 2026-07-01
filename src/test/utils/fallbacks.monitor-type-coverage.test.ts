@@ -13,12 +13,12 @@
  * stable across all URL-based monitor types.
  */
 
-import { describe, expect, it } from "vitest";
 import { test } from "@fast-check/vitest";
+import { type Monitor, MONITOR_STATUS } from "@shared/types";
 import * as fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 import { getMonitorDisplayIdentifier } from "../../utils/fallbacks";
-import { MONITOR_STATUS, type Monitor } from "@shared/types";
 
 /**
  * Build a complete {@link Monitor} object with sane defaults for tests.
@@ -70,7 +70,7 @@ function createMonitorFixture(
         type,
         url: undefined,
         ...overrides,
-    } as Monitor;
+    };
 }
 
 describe("getMonitorDisplayIdentifier monitor type coverage", () => {
@@ -85,49 +85,50 @@ describe("getMonitorDisplayIdentifier monitor type coverage", () => {
     const monitorTypeCases = [
         {
             description: "http-header monitors reuse the request URL",
+            expected: "https://headers.example.com/inspect",
             monitor: createMonitorFixture("http-header", {
-                headerName: "x-cache",
                 expectedHeaderValue: "MISS",
+                headerName: "x-cache",
                 url: "https://headers.example.com/inspect",
             }),
-            expected: "https://headers.example.com/inspect",
         },
         {
             description: "http-json monitors expose the JSON endpoint URL",
+            expected: "https://json.example.com/health",
             monitor: createMonitorFixture("http-json", {
-                jsonPath: "$.status",
                 expectedJsonValue: "ok",
+                jsonPath: "$.status",
                 url: "https://json.example.com/health",
             }),
-            expected: "https://json.example.com/health",
         },
         {
             description: "http-keyword monitors surface their target URL",
+            expected: "https://keyword.example.com/check",
             monitor: createMonitorFixture("http-keyword", {
                 bodyKeyword: "success",
                 url: "https://keyword.example.com/check",
             }),
-            expected: "https://keyword.example.com/check",
         },
         {
             description: "http-latency monitors keep the observed URL",
+            expected: "https://latency.example.com/api",
             monitor: createMonitorFixture("http-latency", {
                 maxResponseTime: 1500,
                 url: "https://latency.example.com/api",
             }),
-            expected: "https://latency.example.com/api",
         },
         {
             description: "http-status monitors return their status URL",
+            expected: "https://status.example.com/ready",
             monitor: createMonitorFixture("http-status", {
                 expectedStatusCode: 204,
                 url: "https://status.example.com/ready",
             }),
-            expected: "https://status.example.com/ready",
         },
         {
             description:
                 "server-heartbeat monitors rely on their heartbeat URL",
+            expected: "https://heartbeat.example.com/metrics",
             monitor: createMonitorFixture("server-heartbeat", {
                 heartbeatExpectedStatus: "running",
                 heartbeatMaxDriftSeconds: 30,
@@ -135,27 +136,26 @@ describe("getMonitorDisplayIdentifier monitor type coverage", () => {
                 heartbeatTimestampField: "data.timestamp",
                 url: "https://heartbeat.example.com/metrics",
             }),
-            expected: "https://heartbeat.example.com/metrics",
         },
         {
             description: "SSL monitors stitch together host and port",
+            expected: "secure.example.com:443",
             monitor: createMonitorFixture("ssl", {
                 host: "secure.example.com",
                 port: 443,
             }),
-            expected: "secure.example.com:443",
         },
         {
             description: "WebSocket keepalive monitors emit their endpoint URL",
+            expected: "wss://socket.example.com/keepalive",
             monitor: createMonitorFixture("websocket-keepalive", {
                 maxPongDelayMs: 5000,
                 url: "wss://socket.example.com/keepalive",
             }),
-            expected: "wss://socket.example.com/keepalive",
         },
     ] as const satisfies readonly MonitorTypeCase[];
 
-    it.each(monitorTypeCases)("$description", ({ monitor, expected }) => {
+    it.each(monitorTypeCases)("$description", ({ expected, monitor }) => {
         expect(getMonitorDisplayIdentifier(monitor, fallbackLabel)).toBe(
             expected
         );
@@ -174,7 +174,7 @@ describe("getMonitorDisplayIdentifier monitor type coverage", () => {
     test.prop([
         fc.constantFrom(...urlBasedMonitorTypes),
         fc
-            .string({ minLength: 3, maxLength: 40 })
+            .string({ maxLength: 40, minLength: 3 })
             .filter((label) => label.trim().length > 0),
     ])(
         "returns fallback label when URL data is unavailable",

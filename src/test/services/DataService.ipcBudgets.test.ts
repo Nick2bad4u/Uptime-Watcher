@@ -4,11 +4,13 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DataService } from "../../services/DataService";
+
 const mockWaitForElectronBridge = vi.hoisted(() =>
     vi.fn(async () => undefined)
 );
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: class ElectronBridgeNotReadyError extends Error {
         public readonly diagnostics: unknown;
 
@@ -20,7 +22,7 @@ vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -29,7 +31,7 @@ vi.mock("../../services/logger", () => ({
     },
 }));
 
-vi.mock("electron-log/renderer", () => ({
+vi.mock(import('electron-log/renderer'), () => ({
     default: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -39,7 +41,7 @@ vi.mock("electron-log/renderer", () => ({
 }));
 
 // Override budgets so we can test without allocating huge buffers/strings.
-vi.mock("@shared/constants/backup", async () => {
+vi.mock(import('@shared/constants/backup'), async () => {
     const actual = await vi.importActual<
         typeof import("@shared/constants/backup")
     >("@shared/constants/backup");
@@ -51,8 +53,6 @@ vi.mock("@shared/constants/backup", async () => {
     } satisfies typeof import("@shared/constants/backup");
 });
 
-import { DataService } from "../../services/DataService";
-
 describe("DataService IPC payload budgets", () => {
     const restoreSqliteBackupMock = vi.fn();
     const importDataMock = vi.fn();
@@ -63,7 +63,7 @@ describe("DataService IPC payload budgets", () => {
 
         // Minimal subset of the preload bridge used by the service.
 
-        (window as unknown as { electronAPI: any }).electronAPI = {
+        (globalThis as unknown as { electronAPI: any }).electronAPI = {
             data: {
                 downloadSqliteBackup: vi.fn(),
                 exportData: vi.fn(),
@@ -80,7 +80,7 @@ describe("DataService IPC payload budgets", () => {
                 buffer: new ArrayBuffer(11),
                 fileName: "restore.sqlite",
             })
-        ).rejects.toThrow(/too large/u);
+        ).rejects.toThrow(/too large/v);
 
         expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
     });
@@ -91,14 +91,14 @@ describe("DataService IPC payload budgets", () => {
                 buffer: {} as unknown as ArrayBuffer,
                 fileName: "restore.sqlite",
             })
-        ).rejects.toThrow(/ArrayBuffer/u);
+        ).rejects.toThrow(/ArrayBuffer/v);
 
         expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
     });
 
     it("rejects JSON imports larger than MAX_IPC_JSON_IMPORT_BYTES", async () => {
         await expect(DataService.importData("abcd")).rejects.toThrow(
-            /too large/u
+            /too large/v
         );
 
         expect(importDataMock).not.toHaveBeenCalled();

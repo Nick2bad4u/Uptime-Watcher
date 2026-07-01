@@ -3,9 +3,11 @@
  * query, hash).
  */
 
+import type { Monitor } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Monitor } from "@shared/types";
+import { HttpMonitor } from "../../../../services/monitoring/HttpMonitor";
 
 const mockAxiosInstance = vi.hoisted(() => ({
     get: vi.fn(),
@@ -43,8 +45,6 @@ vi.mock("../../../../electronUtils", () => ({
 vi.mock("../../../../utils/logger", () => ({
     logger: loggerMock,
 }));
-
-import { HttpMonitor } from "../../../../services/monitoring/HttpMonitor";
 
 describe("httpMonitorCore safe URL logging", () => {
     beforeEach(() => {

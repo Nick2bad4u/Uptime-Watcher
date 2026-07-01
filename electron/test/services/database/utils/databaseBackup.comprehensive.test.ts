@@ -1,9 +1,19 @@
+import { fc } from "@fast-check/vitest";
+import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
+import { promises as fs } from "node:fs";
 /**
  * Comprehensive tests for databaseBackup.ts Testing database backup
  * functionality with all edge cases and error scenarios
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { fc } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { BACKUP_DB_FILE_NAME } from "../../../../constants";
+// Import after mocking
+import {
+    createDatabaseBackup,
+    type DatabaseBackupResult,
+} from "../../../../services/database/utils/backup/databaseBackup";
+import { logger } from "../../../../utils/logger";
 
 // Mock the logger with a factory function to avoid hoisting issues
 vi.mock("../../../../../electron/utils/logger", () => ({
@@ -12,16 +22,6 @@ vi.mock("../../../../../electron/utils/logger", () => ({
         error: vi.fn(),
     },
 }));
-
-// Import after mocking
-import {
-    createDatabaseBackup,
-    type DatabaseBackupResult,
-} from "../../../../../electron/services/database/utils/backup/databaseBackup";
-import { BACKUP_DB_FILE_NAME } from "../../../../../electron/constants";
-import { logger } from "../../../../../electron/utils/logger";
-import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
-import { promises as fs } from "node:fs";
 
 let mockReadFile: ReturnType<typeof vi.spyOn>;
 let mockStat: ReturnType<typeof vi.spyOn>;
@@ -39,7 +39,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
         mockStat = vi.spyOn(fs, "stat");
         mockStat.mockResolvedValue({
             size: testBuffer.byteLength,
-        } as unknown as Awaited<ReturnType<typeof fs.stat>>);
+        });
     });
 
     afterEach(() => {
@@ -139,7 +139,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const largeBuffer = Buffer.alloc(1024 * 1024 * 10); // 10MB
+            const largeBuffer = Buffer.alloc(1024 ** 2 * 10); // 10MB
             largeBuffer.fill(42); // Fill with test data
             mockReadFile.mockResolvedValue(largeBuffer);
 
@@ -215,7 +215,7 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 mockStat.mockResolvedValue({
                     size: DEFAULT_MAX_BACKUP_SIZE_BYTES + 1,
-                } as unknown as Awaited<ReturnType<typeof fs.stat>>);
+                });
 
                 await expect(createDatabaseBackup(testDbPath)).rejects.toThrow(
                     /exceeds maximum allowed size/i
@@ -580,10 +580,10 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 await fc.assert(
                     fc.asyncProperty(
                         fc.string({ minLength: 1, maxLength: 100 }).map(
-                            (s) => s.replaceAll(/["*:<>?|]/g, "_") // Remove invalid path characters
+                            (s) => s.replaceAll(/["*:<>?|]/gu, "_") // Remove invalid path characters
                         ),
                         fc.string({ minLength: 1, maxLength: 50 }).map(
-                            (s) => s.replaceAll(/["*/:<>?\\|]/g, "_") // Remove invalid filename characters
+                            (s) => s.replaceAll(/["*/:<>?\\|]/gu, "_") // Remove invalid filename characters
                         ),
                         async (directory, filename) => {
                             const testPath = `/${directory}/${filename}.sqlite`;

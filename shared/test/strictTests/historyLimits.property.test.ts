@@ -9,13 +9,12 @@
  * rules used across renderer and Electron layers.
  */
 
-import { describe, expect, it } from "vitest";
-import fc from "fast-check";
-
 import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 describe("normalizeHistoryLimit (property-based invariants)", () => {
     const nonNegativeCandidateArb: fc.Arbitrary<number> = fc.integer({

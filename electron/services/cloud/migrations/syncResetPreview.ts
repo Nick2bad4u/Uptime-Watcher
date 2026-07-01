@@ -84,12 +84,9 @@ export function buildCloudSyncResetPreview(args: {
         }
     }
 
-    const perDevice: PreviewDevice[] = [];
-    for (const value of safeCastTo<Iterable<PreviewDevice>>(
+    const perDevice: PreviewDevice[] = [...safeCastTo<Iterable<PreviewDevice>>(
         perDeviceMap.values()
-    )) {
-        perDevice.push(value);
-    }
+    )];
     perDevice.sort((a, b) => a.deviceId.localeCompare(b.deviceId));
 
     const deviceIds = objectKeys(args.manifest.devices);

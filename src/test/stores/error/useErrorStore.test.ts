@@ -4,12 +4,13 @@
  */
 
 import { act, renderHook } from "@testing-library/react";
+import { objectKeys, objectValues  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock the shared utils
-vi.mock("../../../stores/shared/utils", () => ({
+vi.mock(import('../../../stores/shared/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
@@ -23,7 +24,7 @@ describe(useErrorStore, () => {
             store.setLoading(false);
 
             // Clear all operation loading states by setting them to false
-            const currentOperations = Object.keys(store.operationLoading);
+            const currentOperations = objectKeys(store.operationLoading);
             for (const operation of currentOperations) {
                 store.setOperationLoading(operation, false);
             }
@@ -32,9 +33,9 @@ describe(useErrorStore, () => {
             const finalState = useErrorStore.getState();
             if (
                 finalState.lastError !== undefined ||
-                finalState.isLoading !== false ||
-                Object.keys(finalState.storeErrors).length > 0 ||
-                Object.values(finalState.operationLoading).includes(true)
+                finalState.isLoading ||
+                objectKeys(finalState.storeErrors).length > 0 ||
+                objectValues(finalState.operationLoading).includes(true)
             ) {
                 // Force a complete reset if the standard clear didn't work
                 useErrorStore.setState({
@@ -508,10 +509,10 @@ describe(useErrorStore, () => {
             const { result } = renderHook(() => useErrorStore());
 
             act(() => {
-                result.current.setError("   ");
+                result.current.setError(' '.repeat(3));
             });
 
-            expect(result.current.lastError).toBe("   ");
+            expect(result.current.lastError).toBe(' '.repeat(3));
         });
 
         it("should handle overwriting store errors", async ({
@@ -726,16 +727,16 @@ describe(useErrorStore, () => {
             });
 
             // Debug: Verify the operation loading is preserved
-            const operationLoading =
+            const isOperationLoading =
                 result.current.getOperationLoading("fetchSites");
             console.log(
                 "Operation loading after clearAllErrors:",
-                operationLoading
+                isOperationLoading
             );
 
             expect(result.current.lastError).toBeUndefined();
             expect(result.current.storeErrors).toEqual({});
-            expect(operationLoading).toBeTruthy();
+            expect(isOperationLoading).toBeTruthy();
         });
 
         it("should handle complex state transitions", async ({

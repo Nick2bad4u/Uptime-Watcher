@@ -9,23 +9,6 @@ import {
 } from "../utils/backup/databaseBackup";
 
 /**
- * Normalizes the backup metadata so `metadata.originalPath` always matches the
- * safe file name we actually wrote.
- */
-export function normalizeBackupResultMetadata(
-    backup: DatabaseBackupResult
-): DatabaseBackupResult {
-    const safeOriginalPath = backup.fileName;
-    return {
-        ...backup,
-        metadata: {
-            ...backup.metadata,
-            originalPath: safeOriginalPath,
-        },
-    };
-}
-
-/**
  * Builds metadata for a restored backup.
  */
 export function buildRestoreMetadata(args: {
@@ -45,4 +28,21 @@ export function buildRestoreMetadata(args: {
         schemaVersion,
         sizeBytes: args.buffer.length,
     } satisfies DatabaseBackupMetadata;
+}
+
+/**
+ * Normalizes the backup metadata so `metadata.originalPath` always matches the
+ * safe file name we actually wrote.
+ */
+export function normalizeBackupResultMetadata(
+    backup: DatabaseBackupResult
+): DatabaseBackupResult {
+    const safeOriginalPath = backup.fileName;
+    return {
+        ...backup,
+        metadata: {
+            ...backup.metadata,
+            originalPath: safeOriginalPath,
+        },
+    };
 }

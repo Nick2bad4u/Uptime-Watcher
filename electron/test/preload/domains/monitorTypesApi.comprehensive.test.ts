@@ -8,15 +8,18 @@
  * - Malformed payloads from the main process are rejected
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import fc from "fast-check";
-
-import type { Monitor } from "@shared/types";
-import type { MonitorFieldDefinition } from "@shared/types";
+import type { BASE_MONITOR_TYPES, Monitor , MonitorFieldDefinition, type MonitorType  } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
+import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    monitorTypesApi,
+    type MonitorTypesApiInterface,
+} from "../../../preload/domains/monitorTypesApi";
 
 const mockIpcRenderer = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -29,12 +32,6 @@ vi.mock("electron", () => ({
 const ipcContext = expect.objectContaining({
     __uptimeWatcherIpcContext: true,
 });
-
-import {
-    monitorTypesApi,
-    type MonitorTypesApiInterface,
-} from "../../../preload/domains/monitorTypesApi";
-import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 
 const createIpcResponse = <T>(data: T) => ({ success: true, data });
 
@@ -177,7 +174,7 @@ describe("monitorTypesApi", () => {
             );
 
             await expect(api.getMonitorTypes()).rejects.toThrow(
-                /failed validation/i
+                /failed validation/iv
             );
         });
 
@@ -204,7 +201,7 @@ describe("monitorTypesApi", () => {
             );
 
             await expect(api.getMonitorTypes()).rejects.toThrow(
-                /failed validation/i
+                /failed validation/iv
             );
         });
 

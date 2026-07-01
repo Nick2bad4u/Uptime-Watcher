@@ -17,6 +17,13 @@ import {
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
+/**
+ * Runtime configuration contract for HTTP latency monitor instances.
+ *
+ * @internal
+ */
+type HttpLatencyMonitorConfig = Monitor & { type: "http-latency" };
+
 function getThreshold(value: unknown): null | number {
     if (typeof value !== "number") {
         return null;
@@ -28,13 +35,6 @@ function getThreshold(value: unknown): null | number {
 
     return value;
 }
-
-/**
- * Runtime configuration contract for HTTP latency monitor instances.
- *
- * @internal
- */
-type HttpLatencyMonitorConfig = Monitor & { type: "http-latency" };
 
 const behavior: HttpMonitorBehavior<"http-latency", { threshold: number }> = {
     evaluateResponse: ({ context, responseTime }) => {

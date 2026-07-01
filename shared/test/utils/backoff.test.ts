@@ -71,8 +71,8 @@ describe(calculateBackoffDelayMs, () => {
 
         expect(
             calculateBackoffDelayMs({
-                attemptIndex: Number.NaN,
-                initialDelayMs: Number.POSITIVE_INFINITY,
+                attemptIndex: NaN,
+                initialDelayMs: Infinity,
                 strategy: "exponential",
             })
         ).toBe(0);

@@ -22,29 +22,18 @@ import type {
 } from "../events/TypedEventBus";
 
 /**
- * Represents a service that optionally exposes an
- * {@link PossiblyInitializableService.initialize | initialize} method.
+ * Event payload shape accepted by the event-forwarding layer.
+ *
+ * @remarks
+ * This is the normalized form that may (or may not) include `_meta` and
+ * `_originalMeta` properties attached by
+ * {@link electron/events/TypedEventBus#TypedEventBus}.
  */
-export interface PossiblyInitializableService {
-    /** Optional initializer invoked during container bootstrap. */
-    initialize?: (() => Promise<void>) | (() => unknown);
-}
-
-/**
- * Type guard that determines if a service exposes an
- * {@link PossiblyInitializableService.initialize | initialize} method.
- */
-export function hasInitializeMethod(
-    value: unknown
-): value is PossiblyInitializableService & {
-    initialize: () => unknown;
-} {
-    if (!isRecord(value)) {
-        return false;
-    }
-
-    return typeof value["initialize"] === "function";
-}
+export type ForwardableEventPayload<EventName extends EventKey<UptimeEvents>> =
+    ForwardablePayloadBase<EventName> & {
+        _meta?: EventMetadata;
+        _originalMeta?: EventMetadata;
+    };
 
 /**
  * Supported payload formats for manager events forwarded to the orchestrator.
@@ -68,20 +57,6 @@ export type ForwardablePayloadBase<EventName extends EventKey<UptimeEvents>> =
         : EventPayload<UptimeEvents, EventName>;
 
 /**
- * Event payload shape accepted by the event-forwarding layer.
- *
- * @remarks
- * This is the normalized form that may (or may not) include `_meta` and
- * `_originalMeta` properties attached by
- * {@link electron/events/TypedEventBus#TypedEventBus}.
- */
-export type ForwardableEventPayload<EventName extends EventKey<UptimeEvents>> =
-    ForwardablePayloadBase<EventName> & {
-        _meta?: EventMetadata;
-        _originalMeta?: EventMetadata;
-    };
-
-/**
  * Forwardable payload that is guaranteed to include `_meta`.
  */
 export type ForwardablePayloadWithMeta<
@@ -90,6 +65,31 @@ export type ForwardablePayloadWithMeta<
     _meta: EventMetadata;
     _originalMeta?: EventMetadata;
 };
+
+/**
+ * Represents a service that optionally exposes an
+ * {@link PossiblyInitializableService.initialize | initialize} method.
+ */
+export interface PossiblyInitializableService {
+    /** Optional initializer invoked during container bootstrap. */
+    initialize?: (() => Promise<void>) | (() => unknown);
+}
+
+/**
+ * Type guard that determines if a service exposes an
+ * {@link PossiblyInitializableService.initialize | initialize} method.
+ */
+export function hasInitializeMethod(
+    value: unknown
+): value is PossiblyInitializableService & {
+    initialize: () => unknown;
+} {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    return typeof value["initialize"] === "function";
+}
 
 /**
  * Cast {@link EnhancedEventPayload} into its forwardable representation.

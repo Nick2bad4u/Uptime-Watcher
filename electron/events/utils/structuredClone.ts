@@ -3,7 +3,7 @@
  *
  * @remarks
  * We intentionally keep this in the Electron tree (instead of shared) because
- * eslint's type-aware project setup treats some cross-project generic helpers
+ * ESLint's type-aware project setup treats some cross-project generic helpers
  * as "error typed" values.
  */
 
@@ -14,8 +14,8 @@ export type StructuredCloneFn = <T>(value: T) => T;
  * Returns a bound `structuredClone` function when available.
  */
 export const structuredCloneFn: StructuredCloneFn | undefined =
-    typeof globalThis.structuredClone === "function"
-        ? globalThis.structuredClone.bind(globalThis)
+    typeof structuredClone === "function"
+        ? structuredClone.bind(globalThis)
         : undefined;
 
 /**

@@ -5,10 +5,12 @@
  * SQLite backup download payload handling.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+
 import {
     downloadFile,
     generateBackupFileName,
@@ -16,18 +18,18 @@ import {
 } from "../../stores/sites/utils/fileDownload";
 
 // Mock the logger service
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
-        warn: vi.fn(),
         error: vi.fn(),
+        warn: vi.fn(),
     },
 }));
 
-const originalBlob = globalThis.Blob;
-const originalDocument = globalThis.document;
-const originalUrl = globalThis.URL;
+const originalBlob = Blob;
+const originalDocument = document;
+const originalUrl = URL;
 
-describe("File Download Utility", () => {
+describe("file Download Utility", () => {
     let mockAnchor: any;
 
     beforeEach(() => {
@@ -42,21 +44,21 @@ describe("File Download Utility", () => {
 
         // Mock anchor element
         mockAnchor = {
-            href: "",
-            download: "",
-            style: { display: "" },
             click: vi.fn(),
+            download: "",
+            href: "",
             remove: vi.fn(),
+            style: { display: "" },
         };
 
         // Mock document
         globalThis.document = {
-            createElement: vi.fn(() => mockAnchor),
             body: {
                 append: vi.fn(),
                 appendChild: vi.fn(),
                 removeChild: vi.fn(),
             },
+            createElement: vi.fn(() => mockAnchor),
         } as any;
 
         // Mock Blob constructor with a newable factory to satisfy `new Blob()` usage
@@ -65,15 +67,15 @@ describe("File Download Utility", () => {
             options?: BlobPropertyBag
         ) {
             return {
-                parts,
                 options,
-                type: options?.type ?? "",
+                parts,
                 size: 100,
+                type: options?.type ?? "",
             } satisfies {
-                parts: unknown[];
                 options: BlobPropertyBag | undefined;
-                type: string;
+                parts: unknown[];
                 size: number;
+                type: string;
             };
         }) as unknown as typeof Blob;
     });
@@ -101,8 +103,8 @@ describe("File Download Utility", () => {
 
     describe("downloadFile Function", () => {
         it("should successfully download file with all parameters", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -115,26 +117,26 @@ describe("File Download Utility", () => {
 
             downloadFile({ buffer, fileName, mimeType });
 
-            expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+            expect(Blob).toHaveBeenCalledWith([buffer], {
                 type: mimeType,
             });
-            expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
-            expect(globalThis.document.createElement).toHaveBeenCalledWith("a");
+            expect(URL.createObjectURL).toHaveBeenCalledWith();
+            expect(document.createElement).toHaveBeenCalledWith("a");
             expect(mockAnchor.href).toBe("mock-object-url");
             expect(mockAnchor.download).toBe(fileName);
-            expect(globalThis.document.body.append).toHaveBeenCalledWith(
+            expect(document.body.append).toHaveBeenCalledWith(
                 mockAnchor
             );
-            expect(mockAnchor.click).toHaveBeenCalled();
-            expect(mockAnchor.remove).toHaveBeenCalled();
-            expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
+            expect(mockAnchor.click).toHaveBeenCalledWith();
+            expect(mockAnchor.remove).toHaveBeenCalledWith();
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith(
                 "mock-object-url"
             );
         });
 
         it("should use default mimeType when not provided", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -146,14 +148,14 @@ describe("File Download Utility", () => {
 
             downloadFile({ buffer, fileName });
 
-            expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+            expect(Blob).toHaveBeenCalledWith([buffer], {
                 type: "application/octet-stream",
             });
         });
 
         it("should handle DOM manipulation errors with fallback", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -164,19 +166,19 @@ describe("File Download Utility", () => {
             const fileName = "test.txt";
 
             // Mock append to throw an error
-            globalThis.document.body.append = vi.fn().mockImplementation(() => {
+            document.body.append = vi.fn().mockImplementation(() => {
                 throw new Error("DOM error");
             });
 
             downloadFile({ buffer, fileName });
 
             // Should still attempt click as fallback
-            expect(mockAnchor.click).toHaveBeenCalled();
+            expect(mockAnchor.click).toHaveBeenCalledWith();
         });
 
         it("should handle createObjectURL errors", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -186,14 +188,14 @@ describe("File Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            globalThis.URL.createObjectURL = vi.fn().mockImplementation(() => {
+            URL.createObjectURL = vi.fn().mockImplementation(() => {
                 throw new Error("createObjectURL failed");
             });
 
-            expect(() => downloadFile({ buffer, fileName })).toThrow();
+            expect(() => { downloadFile({ buffer, fileName }); }).toThrow();
         });
 
-        it("should handle createElement errors", async ({ task, annotate }) => {
+        it("should handle createElement errors", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
@@ -202,18 +204,18 @@ describe("File Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            globalThis.document.createElement = vi
+            document.createElement = vi
                 .fn()
                 .mockImplementation(() => {
                     throw new Error("createElement failed");
                 });
 
-            expect(() => downloadFile({ buffer, fileName })).toThrow();
+            expect(() => { downloadFile({ buffer, fileName }); }).toThrow();
         });
 
         it("should handle appendChild errors with fallback attempt", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -224,22 +226,22 @@ describe("File Download Utility", () => {
             const fileName = "test.txt";
 
             // Mock append to throw appendChild specific error
-            globalThis.document.body.append = vi.fn().mockImplementation(() => {
+            document.body.append = vi.fn().mockImplementation(() => {
                 throw new Error("appendChild failed");
             });
 
             // The fallback will try the same createAndTriggerDownload again, so append will fail again
             // This means the fallback also fails and should throw "File download failed"
             // Fallback retry uses a direct click without DOM attachment.
-            expect(() => downloadFile({ buffer, fileName })).not.toThrow();
+            expect(() => { downloadFile({ buffer, fileName }); }).not.toThrow();
 
             // Verify that append was called (indicating both primary and fallback attempts)
-            expect(globalThis.document.body.append).toHaveBeenCalled();
+            expect(document.body.append).toHaveBeenCalledWith();
         });
 
         it("should clean up object URL even when errors occur", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -249,7 +251,7 @@ describe("File Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            mockAnchor.click = vi.fn().mockImplementation(() => {
+            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
@@ -259,14 +261,14 @@ describe("File Download Utility", () => {
                 // Expected to fail
             }
 
-            expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith(
                 "mock-object-url"
             );
         });
 
         it("should handle non-Error objects in catch blocks", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -276,22 +278,23 @@ describe("File Download Utility", () => {
             const buffer = new ArrayBuffer(10);
             const fileName = "test.txt";
 
-            globalThis.document.body.append = vi.fn().mockImplementation(() => {
+            document.body.append = vi.fn().mockImplementation(() => {
                 throw "String error";
             });
 
             downloadFile({ buffer, fileName });
-            expect(mockAnchor.click).toHaveBeenCalled();
+
+            expect(mockAnchor.click).toHaveBeenCalledWith();
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([
-                fc.uint8Array({ minLength: 0, maxLength: 1000 }),
+                fc.uint8Array({ maxLength: 1000, minLength: 0 }),
                 fc
-                    .string({ minLength: 1, maxLength: 100 })
+                    .string({ maxLength: 100, minLength: 1 })
                     .filter((s) => s.trim().length > 0),
                 fc
-                    .string({ minLength: 1, maxLength: 50 })
+                    .string({ maxLength: 50, minLength: 1 })
                     .filter((s) => s.includes("/")),
             ])(
                 "should handle various buffer, filename, and MIME type combinations",
@@ -300,19 +303,19 @@ describe("File Download Utility", () => {
 
                     downloadFile({ buffer, fileName, mimeType });
 
-                    expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+                    expect(Blob).toHaveBeenCalledWith([buffer], {
                         type: mimeType,
                     });
                     expect(mockAnchor.download).toBe(fileName);
-                    expect(mockAnchor.click).toHaveBeenCalled();
-                    expect(mockAnchor.remove).toHaveBeenCalled();
+                    expect(mockAnchor.click).toHaveBeenCalledWith();
+                    expect(mockAnchor.remove).toHaveBeenCalledWith();
                 }
             );
 
             test.prop([
-                fc.uint8Array({ minLength: 0, maxLength: 500 }),
+                fc.uint8Array({ maxLength: 500, minLength: 0 }),
                 fc
-                    .string({ minLength: 1, maxLength: 50 })
+                    .string({ maxLength: 50, minLength: 1 })
                     .filter((s) => s.trim().length > 0)
                     .filter((s) => !s.includes("/") && !s.includes("\\")),
             ])(
@@ -322,15 +325,15 @@ describe("File Download Utility", () => {
 
                     downloadFile({ buffer, fileName });
 
-                    expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+                    expect(Blob).toHaveBeenCalledWith([buffer], {
                         type: "application/octet-stream",
                     });
                     expect(mockAnchor.download).toBe(fileName);
-                    expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
+                    expect(URL.createObjectURL).toHaveBeenCalledWith();
                 }
             );
 
-            test.prop([fc.uint8Array({ minLength: 1, maxLength: 100 })])(
+            test.prop([fc.uint8Array({ maxLength: 100, minLength: 1 })])(
                 "should handle various buffer sizes and always create blob URL",
                 (uint8Array) => {
                     const buffer = uint8Array.buffer;
@@ -338,8 +341,8 @@ describe("File Download Utility", () => {
 
                     downloadFile({ buffer, fileName });
 
-                    expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
-                    expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
+                    expect(URL.createObjectURL).toHaveBeenCalledWith();
+                    expect(URL.revokeObjectURL).toHaveBeenCalledWith(
                         "mock-object-url"
                     );
                     expect(mockAnchor.href).toBe("mock-object-url");
@@ -348,7 +351,7 @@ describe("File Download Utility", () => {
 
             test.prop([
                 fc
-                    .string({ minLength: 1, maxLength: 200 })
+                    .string({ maxLength: 200, minLength: 1 })
                     .filter((s) => s.trim().length > 0),
             ])(
                 "should handle various filename lengths and formats",
@@ -359,9 +362,9 @@ describe("File Download Utility", () => {
 
                     expect(mockAnchor.download).toBe(fileName);
                     expect(
-                        globalThis.document.body.append
+                        document.body.append
                     ).toHaveBeenCalledWith(mockAnchor);
-                    expect(mockAnchor.click).toHaveBeenCalled();
+                    expect(mockAnchor.click).toHaveBeenCalledWith();
                 }
             );
         });
@@ -369,8 +372,8 @@ describe("File Download Utility", () => {
 
     describe("generateBackupFileName Function", () => {
         it("should generate filename with default parameters", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -378,12 +381,13 @@ describe("File Download Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateBackupFileName();
-            expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/);
+
+            expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/u);
         });
 
         it("should generate filename with custom prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -391,12 +395,13 @@ describe("File Download Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateBackupFileName("custom");
-            expect(result).toMatch(/^custom-\d{4}-\d{2}-\d{2}\.sqlite$/);
+
+            expect(result).toMatch(/^custom-\d{4}-\d{2}-\d{2}\.sqlite$/u);
         });
 
         it("should generate filename with custom extension", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -404,12 +409,13 @@ describe("File Download Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateBackupFileName("backup", "db");
-            expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.db$/);
+
+            expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.db$/u);
         });
 
         it("should generate filename with both custom parameters", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -417,12 +423,13 @@ describe("File Download Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateBackupFileName("myapp", "sqlite3");
-            expect(result).toMatch(/^myapp-\d{4}-\d{2}-\d{2}\.sqlite3$/);
+
+            expect(result).toMatch(/^myapp-\d{4}-\d{2}-\d{2}\.sqlite3$/u);
         });
 
         it("should handle empty string parameters", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -430,12 +437,13 @@ describe("File Download Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateBackupFileName("", "");
-            expect(result).toMatch(/^-\d{4}-\d{2}-\d{2}\.$/);
+
+            expect(result).toMatch(/^-\d{4}-\d{2}-\d{2}\.$/u);
         });
 
         it("should handle special characters in parameters", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -443,10 +451,11 @@ describe("File Download Utility", () => {
             await annotate("Type: Business Logic", "type");
 
             const result = generateBackupFileName("test-app", "db.sqlite");
-            expect(result).toMatch(/^test-app-\d{4}-\d{2}-\d{2}\.db\.sqlite$/);
+
+            expect(result).toMatch(/^test-app-\d{4}-\d{2}-\d{2}\.db\.sqlite$/u);
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([
                 fc.string({ maxLength: 50 }).filter((s) => !s.includes("-")),
                 fc
@@ -457,16 +466,17 @@ describe("File Download Utility", () => {
                 (prefix, extension) => {
                     const result = generateBackupFileName(prefix, extension);
                     const escapedPrefix = prefix.replaceAll(
-                        /[$()*+.?[\\\]^{|}]/g,
-                        String.raw`\$&`
+                        /[$()*+.?[\\\]^{|}]/gu,
+                        "$&"
                     );
                     const escapedExtension = extension.replaceAll(
-                        /[$()*+.?[\\\]^{|}]/g,
-                        String.raw`\$&`
+                        /[$()*+.?[\\\]^{|}]/gu,
+                        "$&"
                     );
                     const expectedPattern = new RegExp(
                         String.raw`^${escapedPrefix}-\d{4}-\d{2}-\d{2}\.${escapedExtension}$`
                     );
+
                     expect(result).toMatch(expectedPattern);
                 }
             );
@@ -477,9 +487,8 @@ describe("File Download Utility", () => {
                     const result = generateBackupFileName(prefix);
 
                     // Extract the timestamp part
-                    const timestampMatch = result.match(
-                        /-(?<timestamp>\d{4}-\d{2}-\d{2})\./
-                    );
+                    const timestampMatch = /-(?<timestamp>\d{4}-\d{2}-\d{2})\./.exec(result);
+
                     expect(timestampMatch).not.toBeNull();
 
                     if (timestampMatch?.groups) {
@@ -508,9 +517,9 @@ describe("File Download Utility", () => {
                 (prefix) => {
                     const result = generateBackupFileName(prefix);
 
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
-                    expect(result).toMatch(/-\d{4}-\d{2}-\d{2}\./);
+                    expect(result).toMatch(/-\d{4}-\d{2}-\d{2}\./u);
                 }
             );
 
@@ -522,15 +531,17 @@ describe("File Download Utility", () => {
                 (prefix, extension) => {
                     const result = generateBackupFileName(prefix, extension);
 
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
 
                     // Should contain exactly one timestamp
                     const timestampMatches =
-                        result.match(/-\d{4}-\d{2}-\d{2}\./g);
+                        result.match(/-\d{4}-\d{2}-\d{2}\./gu);
+
                     expect(timestampMatches).toHaveLength(1);
 
                     // Should start with prefix (or empty) and end with extension (or default)
                     const parts = result.split("-");
+
                     expect(parts.length).toBeGreaterThanOrEqual(4); // Prefix, year, month, day+extension
                 }
             );
@@ -564,20 +575,25 @@ describe("File Download Utility", () => {
         };
 
         const expectLatestBlobCall = (expectedLength: number): void => {
-            const lastCall = vi.mocked(globalThis.Blob).mock.calls.at(-1);
+            const lastCall = vi.mocked(Blob).mock.calls.at(-1);
+
             expect(lastCall).toBeDefined();
+
             const [parts, options] = lastCall!;
-            expect(Array.isArray(parts)).toBeTruthy();
+
+            expect(Array.isArray(parts)).toBe(true);
             expect(parts).toHaveLength(1);
+
             const [firstPart] = parts as unknown[];
+
             expect(firstPart).toBeInstanceOf(Uint8Array);
             expect(firstPart as Uint8Array).toHaveLength(expectedLength);
             expect(options).toEqual({ type: "application/x-sqlite3" });
         };
 
         it("should handle successful backup download", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -595,15 +611,17 @@ describe("File Download Utility", () => {
 
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
-            expect(mockDownloadFunction).toHaveBeenCalled();
+            expect(mockDownloadFunction).toHaveBeenCalledWith();
+
             expectLatestBlobCall(payload.length);
+
             expect(mockAnchor.download).toBe(backup.fileName);
-            expect(mockAnchor.click).toHaveBeenCalled();
+            expect(mockAnchor.click).toHaveBeenCalledWith();
         });
 
         it("should throw TypeError for invalid backup data type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -623,8 +641,8 @@ describe("File Download Utility", () => {
         });
 
         it("should throw TypeError for null backup data", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -639,8 +657,8 @@ describe("File Download Utility", () => {
         });
 
         it("should throw TypeError when required fields are missing", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -665,7 +683,7 @@ describe("File Download Utility", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should handle empty backup buffers", async ({ task, annotate }) => {
+        it("should handle empty backup buffers", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
@@ -678,12 +696,13 @@ describe("File Download Utility", () => {
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expectLatestBlobCall(payload.length);
-            expect(mockAnchor.click).toHaveBeenCalled();
+
+            expect(mockAnchor.click).toHaveBeenCalledWith();
         });
 
         it("should fall back to generated filename when provided name is blank", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -697,13 +716,13 @@ describe("File Download Utility", () => {
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expect(mockAnchor.download).toMatch(
-                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
+                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/u
             );
         });
 
         it("should handle click errors with proper error message", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -713,7 +732,7 @@ describe("File Download Utility", () => {
             const backup = buildBackupResult(new Uint8Array([1]));
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            mockAnchor.click = vi.fn().mockImplementation(() => {
+            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
@@ -723,8 +742,8 @@ describe("File Download Utility", () => {
         });
 
         it("should handle non-Error click failures", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -734,7 +753,7 @@ describe("File Download Utility", () => {
             const backup = buildBackupResult(new Uint8Array([1]));
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            mockAnchor.click = vi.fn().mockImplementation(() => {
+            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
                 throw "String error";
             });
 
@@ -744,8 +763,8 @@ describe("File Download Utility", () => {
         });
 
         it("should clean up object URL even when click fails", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -755,7 +774,7 @@ describe("File Download Utility", () => {
             const backup = buildBackupResult(new Uint8Array([1]));
             const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
-            mockAnchor.click = vi.fn().mockImplementation(() => {
+            vi.spyOn(mockAnchor, 'click').mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
@@ -763,14 +782,14 @@ describe("File Download Utility", () => {
                 handleSQLiteBackupDownload(mockDownloadFunction)
             ).rejects.toThrow();
 
-            expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
+            expect(URL.revokeObjectURL).toHaveBeenCalledWith(
                 "mock-object-url"
             );
         });
 
         it("should handle download function rejection", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -786,7 +805,7 @@ describe("File Download Utility", () => {
             ).rejects.toThrow("Download failed");
         });
 
-        it("should handle large backup data", async ({ task, annotate }) => {
+        it("should handle large backup data", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
@@ -799,11 +818,12 @@ describe("File Download Utility", () => {
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expectLatestBlobCall(payload.length);
-            expect(mockAnchor.click).toHaveBeenCalled();
+
+            expect(mockAnchor.click).toHaveBeenCalledWith();
         });
 
-        describe("Property-based Tests", () => {
-            test.prop([fc.uint8Array({ minLength: 1, maxLength: 10_000 })])(
+        describe("property-based Tests", () => {
+            test.prop([fc.uint8Array({ maxLength: 10_000, minLength: 1 })])(
                 "should handle various backup data sizes",
                 async (mockDataArray) => {
                     const backup = buildBackupResult(mockDataArray);
@@ -814,13 +834,15 @@ describe("File Download Utility", () => {
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
                     expect(mockDownloadFunction).toHaveBeenCalledTimes(1);
+
                     expectLatestBlobCall(mockDataArray.length);
+
                     expect(mockAnchor.download).toBe(backup.fileName);
-                    expect(mockAnchor.click).toHaveBeenCalled();
+                    expect(mockAnchor.click).toHaveBeenCalledWith();
                 }
             );
 
-            test.prop([fc.string({ minLength: 1, maxLength: 100 })])(
+            test.prop([fc.string({ maxLength: 100, minLength: 1 })])(
                 "should handle download function rejections with various error messages",
                 async (errorMessage) => {
                     const mockDownloadFunction = vi
@@ -835,7 +857,7 @@ describe("File Download Utility", () => {
                 }
             );
 
-            test.prop([fc.uint8Array({ minLength: 0, maxLength: 1000 })])(
+            test.prop([fc.uint8Array({ maxLength: 1000, minLength: 0 })])(
                 "should always use SQLite MIME type and cleanup resources",
                 async (backupData) => {
                     const backup = buildBackupResult(backupData);
@@ -846,16 +868,17 @@ describe("File Download Utility", () => {
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
                     expectLatestBlobCall(backupData.length);
-                    expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
+
+                    expect(URL.revokeObjectURL).toHaveBeenCalledWith(
                         "mock-object-url"
                     );
                 }
             );
 
             test.prop([
-                fc.array(fc.integer({ min: 0, max: 255 }), {
-                    minLength: 10,
+                fc.array(fc.integer({ max: 255, min: 0 }), {
                     maxLength: 500,
+                    minLength: 10,
                 }),
             ])(
                 "should reflect metadata byte size in the backup result",
@@ -869,6 +892,7 @@ describe("File Download Utility", () => {
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
                     expectLatestBlobCall(uint8Data.length);
+
                     expect(mockAnchor.href).toBe("mock-object-url");
                     expect(backup.metadata).toBeDefined();
                     expect(backup.metadata?.sizeBytes).toBe(uint8Data.length);
@@ -877,10 +901,10 @@ describe("File Download Utility", () => {
         });
     });
 
-    describe("Edge Cases and Integration Tests", () => {
+    describe("edge Cases and Integration Tests", () => {
         it("should handle multiple sequential downloads", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -893,14 +917,14 @@ describe("File Download Utility", () => {
             downloadFile({ buffer: buffer1, fileName: "file1.txt" });
             downloadFile({ buffer: buffer2, fileName: "file2.txt" });
 
-            expect(globalThis.URL.createObjectURL).toHaveBeenCalledTimes(2);
+            expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
             expect(mockAnchor.click).toHaveBeenCalledTimes(2);
-            expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledTimes(2);
+            expect(URL.revokeObjectURL).toHaveBeenCalledTimes(2);
         });
 
         it("should handle Blob creation with different data types", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
@@ -917,14 +941,14 @@ describe("File Download Utility", () => {
                 mimeType: "application/octet-stream",
             });
 
-            expect(globalThis.Blob).toHaveBeenCalledWith([buffer], {
+            expect(Blob).toHaveBeenCalledWith([buffer], {
                 type: "application/octet-stream",
             });
         });
 
         it("should properly set anchor properties", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");

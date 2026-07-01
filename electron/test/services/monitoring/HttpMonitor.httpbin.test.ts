@@ -10,9 +10,11 @@
  * @since 2025-09-16
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
-import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
 import type { Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
 
 const createHttpMonitor = (
     url: string,
@@ -37,16 +39,16 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
     // Some runs against httpbin.org can be impacted by upstream/CDN outages.
     // Treat common transient 5xx as acceptable skips to avoid flakiness.
     const transientNetworkErrors = new Set<string>([
-        "ECONNRESET",
-        "ECONNABORTED",
-        "ETIMEDOUT",
-        "EAI_AGAIN",
-        "ENOTFOUND",
-        "ERR_NETWORK",
-        "TimeoutError",
         // Cloudflare/edge proxies sometimes surface 522/524
         "522",
         "524",
+        "EAI_AGAIN",
+        "ECONNABORTED",
+        "ECONNRESET",
+        "ENOTFOUND",
+        "ERR_NETWORK",
+        "ETIMEDOUT",
+        "TimeoutError",
     ]);
 
     const isTransientOutage = (code?: string): boolean =>
@@ -59,8 +61,8 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
     const handleTransientOutage = (
         label: string,
         result: {
-            status: string;
             details?: string;
+            status: string;
         }
     ): boolean => {
         if (isTransientOutage(result.details)) {
@@ -98,7 +100,7 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             }
         }
         // If still transient after retries, return last result
-        return last as Awaited<ReturnType<typeof httpMonitor.check>>;
+        return last!;
     };
 
     beforeEach(() => {

@@ -2,9 +2,10 @@
  * Test suite for HttpHeaderMonitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpHeaderMonitor } from "../../../services/monitoring/HttpHeaderMonitor";
@@ -143,7 +144,7 @@ describe(HttpHeaderMonitor, () => {
             timeout: 5000,
             type: "http-header",
             url: "https://example.com/health",
-        } as Site["monitors"][0];
+        };
     });
 
     afterEach(() => {
@@ -203,7 +204,7 @@ describe(HttpHeaderMonitor, () => {
     });
 
     it("returns error result when header configuration is invalid", async () => {
-        const invalidMonitor = { ...monitor } as Site["monitors"][0];
+        const invalidMonitor = { ...monitor };
         Reflect.deleteProperty(invalidMonitor, "headerName");
 
         const result = await monitorService.check(invalidMonitor);

@@ -118,7 +118,7 @@ export function createStringWithBudgetedObjectValidator(
                 value,
                 objectParamName
             );
-            if (recordResult.ok === false) {
+            if (!recordResult.ok) {
                 return recordResult.error;
             }
 

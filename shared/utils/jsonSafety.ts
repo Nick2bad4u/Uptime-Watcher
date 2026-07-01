@@ -28,8 +28,8 @@ export interface SafeJsonResult<T> {
 }
 
 class JsonValidationError extends TypeError {
-    public constructor(message: string) {
-        super(message);
+    public constructor(message: string, options: ErrorOptions) {
+        super(message, options);
         this.name = "JsonValidationError";
     }
 }
@@ -221,7 +221,7 @@ const hasUnsupportedJsonValue = (
  *
  * @typeParam T - Validated shape returned on success.
  *
- * @param json - Raw JSON string to parse.
+ * @param JSON - Raw JSON string to parse.
  * @param validator - Custom type guard ensuring the parsed value satisfies `T`.
  *
  * @returns Structured result containing either the parsed value or a message.
@@ -268,7 +268,7 @@ export function safeJsonParse<T extends JsonValue>(
  *
  * @typeParam T - Element type expected inside the array.
  *
- * @param json - Raw JSON string to parse.
+ * @param JSON - Raw JSON string to parse.
  * @param elementValidator - Type guard applied to each array element.
  *
  * @returns Structured result containing a typed array or an error message.
@@ -288,7 +288,7 @@ export function safeJsonParseArray<T extends JsonValue>(
 
         const typedArray: T[] = [];
 
-        parsedValue.forEach((element, index) => {
+        for (const [index, element] of parsedValue.entries()) {
             if (!elementValidator(element)) {
                 throw new JsonValidationError(
                     `Array element at index ${index} does not match expected type`
@@ -296,7 +296,7 @@ export function safeJsonParseArray<T extends JsonValue>(
             }
 
             typedArray.push(element);
-        });
+        }
 
         return typedArray;
     }, "JSON parsing failed");
@@ -321,7 +321,7 @@ export function safeJsonParseArray<T extends JsonValue>(
  *
  * @typeParam T - Validated shape returned on success or fallback.
  *
- * @param json - Raw JSON string to parse.
+ * @param JSON - Raw JSON string to parse.
  * @param validator - Type guard ensuring the parsed value satisfies `T`.
  * @param fallback - Value returned when parsing or validation fails.
  *

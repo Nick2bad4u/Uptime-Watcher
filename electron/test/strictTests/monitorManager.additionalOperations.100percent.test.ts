@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from "vitest";
-
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
+
+import { describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -11,7 +11,6 @@ import { checkSiteManuallyOperation } from "../../managers/monitorManager/checkS
 import { setupIndividualNewMonitorsOperation } from "../../managers/monitorManager/setupIndividualNewMonitorsOperation";
 import { setupNewMonitorsOperation } from "../../managers/monitorManager/setupNewMonitorsOperation";
 import { logger } from "../../utils/logger";
-
 import {
     createMockEventBus,
     createMockStandardizedCache,

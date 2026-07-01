@@ -61,7 +61,7 @@ export async function disconnect(
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,
-                ...(clientSecret ? { clientSecret } : {}),
+                ...(clientSecret && { clientSecret }),
                 secretStore: ctx.secretStore,
                 storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
             });
@@ -310,7 +310,7 @@ export async function connectGoogleDrive(
 
         const authFlow = new GoogleDriveAuthFlow({
             clientId,
-            ...(clientSecret ? { clientSecret } : {}),
+            ...(clientSecret && { clientSecret }),
         });
         const auth = await authFlow.run();
 
@@ -320,7 +320,7 @@ export async function connectGoogleDrive(
 
         const tokenManager = new GoogleDriveTokenManager({
             clientId,
-            ...(clientSecret ? { clientSecret } : {}),
+            ...(clientSecret && { clientSecret }),
             secretStore: ctx.secretStore,
             storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
         });

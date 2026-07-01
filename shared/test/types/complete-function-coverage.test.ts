@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import * as chartConfig from "../../types/chartConfig";
-import * as themeConfig from "../../types/themeConfig";
 import * as database from "../../types/database";
+import * as themeConfig from "../../types/themeConfig";
 import * as validation from "../../types/validation";
 
 describe("Types Complete Function Coverage", () => {
@@ -15,13 +16,13 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = chartConfig.hasPlugins({ plugins: {} });
-            const result2 = chartConfig.hasPlugins(null);
-            const result3 = chartConfig.hasPlugins({ notPlugins: true });
+            const isResult1 = chartConfig.hasPlugins({ plugins: {} });
+            const isResult2 = chartConfig.hasPlugins(null);
+            const isResult3 = chartConfig.hasPlugins({ notPlugins: true });
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
 
         it("should call hasScales function", async ({ task, annotate }) => {
@@ -33,13 +34,13 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = chartConfig.hasScales({ scales: {} });
-            const result2 = chartConfig.hasScales(null);
-            const result3 = chartConfig.hasScales({ notScales: true });
+            const isResult1 = chartConfig.hasScales({ scales: {} });
+            const isResult2 = chartConfig.hasScales(null);
+            const isResult3 = chartConfig.hasScales({ notScales: true });
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
     });
 
@@ -64,13 +65,13 @@ describe("Types Complete Function Coverage", () => {
                 success: "#0f0",
                 warning: "#ff0",
             };
-            const result1 = themeConfig.isColorPalette(validPalette);
-            const result2 = themeConfig.isColorPalette({});
-            const result3 = themeConfig.isColorPalette(null);
+            const isResult1 = themeConfig.isColorPalette(validPalette);
+            const isResult2 = themeConfig.isColorPalette({});
+            const isResult3 = themeConfig.isColorPalette(null);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
 
         it("should call isThemeConfig function", async ({ task, annotate }) => {
@@ -91,13 +92,13 @@ describe("Types Complete Function Coverage", () => {
                 shadows: {},
                 typography: {},
             };
-            const result1 = themeConfig.isThemeConfig(validTheme);
-            const result2 = themeConfig.isThemeConfig({});
-            const result3 = themeConfig.isThemeConfig(null);
+            const isResult1 = themeConfig.isThemeConfig(validTheme);
+            const isResult2 = themeConfig.isThemeConfig({});
+            const isResult3 = themeConfig.isThemeConfig(null);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
     });
 
@@ -119,13 +120,13 @@ describe("Types Complete Function Coverage", () => {
                 status: "up",
                 timestamp: 123_456,
             };
-            const result1 = database.isValidHistoryRow(validRow);
-            const result2 = database.isValidHistoryRow({});
-            const result3 = database.isValidHistoryRow(null);
+            const isResult1 = database.isValidHistoryRow(validRow);
+            const isResult2 = database.isValidHistoryRow({});
+            const isResult3 = database.isValidHistoryRow(null);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
 
         it("should call isValidMonitorRow function", async ({
@@ -141,11 +142,11 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const validRow = { id: 1, site_identifier: "site1", type: "http" };
-            const result1 = database.isValidMonitorRow(validRow);
-            const result2 = database.isValidMonitorRow({});
+            const isResult1 = database.isValidMonitorRow(validRow);
+            const isResult2 = database.isValidMonitorRow({});
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isValidSettingsRow function", async ({
@@ -161,11 +162,11 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const validRow = { key: "setting1", value: "value1" };
-            const result1 = database.isValidSettingsRow(validRow);
-            const result2 = database.isValidSettingsRow({});
+            const isResult1 = database.isValidSettingsRow(validRow);
+            const isResult2 = database.isValidSettingsRow({});
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isValidSiteRow function", async ({
@@ -181,11 +182,11 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const validRow = { identifier: "site1", name: "Test Site" };
-            const result1 = database.isValidSiteRow(validRow);
-            const result2 = database.isValidSiteRow({});
+            const isResult1 = database.isValidSiteRow(validRow);
+            const isResult2 = database.isValidSiteRow({});
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call safeGetRowProperty function", async ({
@@ -264,13 +265,13 @@ describe("Types Complete Function Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const validResult = { success: true, errors: [] };
-            const result1 = validation.isValidationResult(validResult);
-            const result2 = validation.isValidationResult({});
-            const result3 = validation.isValidationResult(null);
+            const isResult1 = validation.isValidationResult(validResult);
+            const isResult2 = validation.isValidationResult({});
+            const isResult3 = validation.isValidationResult(null);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
     });
 });

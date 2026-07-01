@@ -1,9 +1,15 @@
-import { fc, test as fcTest } from "@fast-check/vitest";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
+import { fc, test as fcTest } from "@fast-check/vitest";
+import {
+    validateMonitorData as sharedValidateMonitorData,
+    validateMonitorField as sharedValidateMonitorField,
+} from "@shared/validation/monitorSchemas";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import {
     createMonitorObject,
     isMonitorFormData,
@@ -14,7 +20,7 @@ import {
     validateMonitorFieldEnhanced,
 } from "../../utils/monitorValidation";
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => {
+vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => {
     const getState = vi.fn();
     return {
         useMonitorTypesStore: {
@@ -24,10 +30,10 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => {
 });
 
 vi.mock(
-    "@shared/validation/monitorSchemas",
+    import('@shared/validation/monitorSchemas'),
     async (importOriginal): Promise<unknown> => {
         const actual =
-            (await importOriginal()) as typeof import("@shared/validation/monitorSchemas");
+            safeCastTo<typeof import("@shared/validation/monitorSchemas")>(await importOriginal());
 
         return {
             ...actual,
@@ -36,12 +42,6 @@ vi.mock(
         };
     }
 );
-
-import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
-import {
-    validateMonitorData as sharedValidateMonitorData,
-    validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/monitorSchemas";
 
 type MonitorTypesStoreState = ReturnType<typeof useMonitorTypesStore.getState>;
 
@@ -64,15 +64,15 @@ const resolveValidationResult = (
 const createMockMonitorTypesStoreState = (
     overrides: Partial<MonitorTypesStoreState> = {}
 ): MonitorTypesStoreState => ({
+    fieldConfigs: {},
     formatMonitorDetail: vi.fn(async () => ""),
     formatMonitorTitleSuffix: vi.fn(async () => ""),
     getFieldConfig: vi.fn(),
+    isLoaded: true,
     loadMonitorTypes: vi.fn(async () => undefined),
+    monitorTypes: [],
     refreshMonitorTypes: vi.fn(async () => undefined),
     validateMonitorData: vi.fn().mockResolvedValue(resolveValidationResult()),
-    fieldConfigs: {},
-    isLoaded: true,
-    monitorTypes: [],
     ...overrides,
 });
 
@@ -94,9 +94,9 @@ describe("monitorValidation error handling", () => {
             history: fc.array(fc.anything()),
             monitoring: fc.boolean(),
             responseTime: fc.integer(),
-            retryAttempts: fc.integer({ min: 0, max: 5 }),
+            retryAttempts: fc.integer({ max: 5, min: 0 }),
             status: fc.constantFrom("up", "down", "degraded", "pending"),
-            timeout: fc.integer({ min: 1, max: 60_000 }),
+            timeout: fc.integer({ max: 60_000, min: 1 }),
         }),
     ])(
         "createMonitorObject preserves provided fields and applies defaults",
@@ -116,8 +116,9 @@ describe("monitorValidation error handling", () => {
         );
 
         const result = await validateMonitorData("http", {});
-        expect(result.success).toBeFalsy();
-        expect(result.errors[0]).toContain(
+
+        expect(result.success).toBe(false);
+        expect(arrayFirst(result.errors)).toContain(
             "Validation failed - unable to connect to backend"
         );
     });
@@ -132,6 +133,7 @@ describe("monitorValidation error handling", () => {
         );
 
         const result = await validateMonitorData("ping", { host: "host" });
+
         expect(validateSpy).toHaveBeenCalledWith("ping", {
             host: "host",
             type: "ping",
@@ -143,13 +145,14 @@ describe("monitorValidation error handling", () => {
         mockedSharedSchemas.validateMonitorData.mockReturnValueOnce(
             resolveValidationResult({
                 errors: ["client error"],
-                warnings: ["warn"],
                 success: false,
+                warnings: ["warn"],
             })
         );
 
         const result = await validateMonitorDataClientSide("http", {});
-        expect(result.success).toBeFalsy();
+
+        expect(result.success).toBe(false);
         expect(result.errors).toContain("client error");
         expect(result.warnings).toContain("warn");
     });
@@ -160,8 +163,9 @@ describe("monitorValidation error handling", () => {
         });
 
         const result = await validateMonitorDataClientSide("http", {});
-        expect(result.success).toBeFalsy();
-        expect(result.errors[0]).toContain("Client-side validation failed");
+
+        expect(result.success).toBe(false);
+        expect(arrayFirst(result.errors)).toContain("Client-side validation failed");
     });
 
     it("filters errors per field when enhancing validation", async () => {
@@ -224,6 +228,7 @@ describe("monitorValidation error handling", () => {
         );
 
         const errors = await validateMonitorField("ping", "host", "");
+
         expect(errors).toEqual(["host missing"]);
     });
 
@@ -241,6 +246,7 @@ describe("monitorValidation error handling", () => {
             "url",
             "value"
         );
+
         expect(result.metadata).toEqual({ field: "url" });
         expect(result.errors).toEqual(["bad"]);
     });
@@ -250,6 +256,6 @@ describe("monitorValidation error handling", () => {
             resolveValidationResult({ success: false })
         );
 
-        expect(isMonitorFormData({})).toBeFalsy();
+        expect(isMonitorFormData({})).toBe(false);
     });
 });

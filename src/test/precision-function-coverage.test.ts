@@ -1,3 +1,4 @@
+import { arrayFirst, arrayJoin, stringSplit   } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -65,13 +66,15 @@ describe("Precision Function Coverage - Targeted Functions", () => {
             func: T,
             limit: number
         ): ((...args: Parameters<T>) => void) => {
-            let inThrottle: boolean;
+            let isInThrottle: boolean;
             return (...args: Parameters<T>) => {
-                if (!inThrottle) {
-                    func(...args);
-                    inThrottle = true;
-                    setTimeout(() => (inThrottle = false), limit);
+                if (isInThrottle) {
+                    return;
                 }
+
+                func(...args);
+                isInThrottle = true;
+                setTimeout(() => (isInThrottle = false), limit);
             };
         };
 
@@ -122,8 +125,7 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         // Test configuration validator
         const validateConfig = (config: any): boolean => {
             if (!config || typeof config !== "object") return false;
-            if (Array.isArray(config)) return false;
-            return true;
+            return !Array.isArray(config);
         };
 
         expect(validateConfig({})).toBeTruthy();
@@ -292,10 +294,10 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         await annotate("Type: Business Logic", "type");
 
         // Test date formatting utility
-        const formatDate = (date: Date | string | number): string => {
+        const formatDate = (date: Date | number | string): string => {
             const d = new Date(date);
             if (Number.isNaN(d.getTime())) return "Invalid Date";
-            return d.toISOString().split("T")[0] || "Invalid Date";
+            return arrayFirst(stringSplit(d.toISOString(), "T")) || "Invalid Date";
         };
 
         const now = new Date("2023-12-01T10:30:00Z");
@@ -367,7 +369,7 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         let callCount = 0;
         const expensiveFunction = (n: number): number => {
             callCount++;
-            return n * n;
+            return n ** 2;
         };
 
         const memoizedFn = memoize(expensiveFunction);
@@ -383,14 +385,13 @@ describe("Precision Function Coverage - Targeted Functions", () => {
 
         // Test cache key generation
         const generateCacheKey = (...args: any[]): string =>
-            args
+            arrayJoin(args
                 .map((arg) => {
                     if (typeof arg === "object") {
                         return JSON.stringify(arg);
                     }
                     return String(arg);
-                })
-                .join("|");
+                }), "|");
 
         expect(generateCacheKey("a", 1, true)).toBe("a|1|true");
         expect(generateCacheKey({ key: "value" }, [1, 2])).toBe(
@@ -408,8 +409,8 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         // Test async retry utility
         const retry = async <T>(
             fn: () => Promise<T>,
-            maxAttempts: number = 3,
-            delay: number = 1000
+            maxAttempts = 3,
+            delay = 1000
         ): Promise<T> => {
             let lastError: Error;
 
@@ -452,7 +453,7 @@ describe("Precision Function Coverage - Targeted Functions", () => {
 
         // Test error wrapper utility
         const wrapError = (error: unknown, context: string): Error => {
-            if (error instanceof Error) {
+            if (Error.isError(error)) {
                 const wrappedError = new Error(`${context}: ${error.message}`);
                 if (error.stack) {
                     wrappedError.stack = error.stack;

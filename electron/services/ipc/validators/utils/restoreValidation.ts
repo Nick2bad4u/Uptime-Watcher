@@ -79,7 +79,7 @@ export function validateRestoreFileNameCandidate(
     const paramName = options.paramName ?? "fileName";
 
     const requiredString = requireStringParamValue(candidate, paramName);
-    if (requiredString.ok === false) {
+    if (!requiredString.ok) {
         return [...requiredString.error];
     }
 

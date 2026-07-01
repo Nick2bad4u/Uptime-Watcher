@@ -1,5 +1,7 @@
-import { expect, _electron as electron } from "@playwright/test";
 import type { ElectronApplication, Page } from "@playwright/test";
+
+import { _electron as electron, expect } from "@playwright/test";
+
 import type { MonitorType } from "../../../shared/types";
 
 function buildPlaywrightEnv(
@@ -38,11 +40,11 @@ export async function launchAppForMonitorTesting(): Promise<{
     const window = await electronApp.firstWindow();
     await window.waitForLoadState("domcontentloaded");
 
-    await expect(window.getByTestId("app-root")).toBeVisible({
-        timeout: 15000,
+    await expect.soft(window.getByTestId("app-root")).toBeVisible({
+        timeout: 15_000,
     });
-    await expect(window.getByRole("main")).toBeVisible({
-        timeout: 15000,
+    await expect.soft(window.getByRole("main")).toBeVisible({
+        timeout: 15_000,
     });
 
     return { electronApp, window };
@@ -50,17 +52,17 @@ export async function launchAppForMonitorTesting(): Promise<{
 
 export async function openAddSiteModal(window: Page): Promise<void> {
     await window.getByRole("button", { name: /add new site/i }).click();
-    await expect(window.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await expect.soft(window.getByRole("dialog")).toBeVisible({ timeout: 5000 });
 }
 
 export async function selectMonitorType(
     window: Page,
     monitorType: MonitorType
 ): Promise<void> {
-    const monitorTypeSelect = window.getByLabel(/monitor type/i);
-    await expect(monitorTypeSelect).toBeEnabled();
+    const monitorTypeSelect = window.getByLabel(/monitor type/iv);
+    await expect.soft(monitorTypeSelect).toBeEnabled();
     await monitorTypeSelect.selectOption(monitorType);
-    await expect(monitorTypeSelect).toHaveValue(monitorType);
+    await expect.soft(monitorTypeSelect).toHaveValue(monitorType);
 }
 
 export async function submitMonitorForm(window: Page): Promise<void> {
@@ -74,5 +76,5 @@ export async function verifySiteCreated(
     window: Page,
     siteName: string
 ): Promise<void> {
-    await expect(window.getByText(siteName)).toBeVisible({ timeout: 7000 });
+    await expect.soft(window.getByText(siteName)).toBeVisible({ timeout: 7000 });
 }

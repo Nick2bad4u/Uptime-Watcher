@@ -19,7 +19,7 @@ import {
  * @remarks
  * Provides functions for creating database tables, indexes, and setting up
  * validation frameworks. All table creation operations are idempotent using "IF
- * NOT EXISTS" clauses. Used during application startup and migrations.
+ * NOT EXISTS" clauses. Used during app startup and migrations.
  *
  * @public
  */
@@ -86,7 +86,7 @@ const SCHEMA_QUERIES = {
 export const DATABASE_SCHEMA_VERSION = 3;
 
 function assertSafeSqlIdentifier(identifier: string): void {
-    const isSafe = /^[A-Za-z_]\w*$/u.test(identifier);
+    const isSafe = /^[A-Z_a-z]\w*$/u.test(identifier);
     if (!isSafe) {
         throw new Error(
             `Unsafe SQL identifier rejected while migrating schema: '${identifier}'`
@@ -136,20 +136,22 @@ function ensureMonitorDynamicColumns(database: Database): void {
 
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const def of fieldDefs) {
-        if (!setHas(existingColumns, def.columnName)) {
-            const column = escapeSqlIdentifier(def.columnName);
-            const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
-
-            database.run(
-                `ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`
-            );
-            existingColumns.add(def.columnName);
+        if (setHas(existingColumns, def.columnName)) {
+            continue;
         }
+
+        const column = escapeSqlIdentifier(def.columnName);
+        const sqlType = def.sqlType === "INTEGER" ? "INTEGER" : "TEXT";
+
+        database.run(
+            `ALTER TABLE monitors ADD COLUMN ${column} ${sqlType}`
+        );
+        existingColumns.add(def.columnName);
     }
 }
 
 /**
- * Ensures the SQLite user_version matches the application schema version.
+ * Ensures the SQLite user_version matches the app schema version.
  */
 const hasUserVersionProperty = (
     value: unknown
@@ -321,8 +323,7 @@ export function setupMonitorTypeValidation(): void {
             );
         }
 
-        // Future enhancement: Create database CHECK constraint or trigger
-        // Example SQL for future implementation:
+        // Future enhancement: Create database CHECK constraint or trigger Example SQL for future implementation:
         // CREATE TRIGGER validate_monitor_type
         // BEFORE INSERT ON monitors
         // FOR EACH ROW
@@ -338,7 +339,7 @@ export function setupMonitorTypeValidation(): void {
             error
         );
         // Don't throw here - this is a non-critical enhancement
-        // The application should still work without validation
+        // The app should still work without validation
         logger.warn(
             LOG_TEMPLATES.warnings.DATABASE_MONITOR_VALIDATION_CONTINUE
         );

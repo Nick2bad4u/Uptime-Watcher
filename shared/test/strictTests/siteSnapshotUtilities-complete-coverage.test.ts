@@ -2,8 +2,6 @@
  * Exhaustive coverage for site snapshot sanitation and synchronization helpers.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     deriveSiteSnapshot,
     hasSiteSyncChanges,
@@ -11,6 +9,7 @@ import {
 } from "@shared/utils/siteSnapshots";
 import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
+import { describe, expect, it } from "vitest";
 
 import { createSiteSnapshot } from "../fixtures/siteFactories";
 

@@ -8,14 +8,14 @@ import type { StoreApi } from "zustand";
 import type { MonitorTypesStore } from "./types";
 
 /**
- * Setter helper type for composing monitor types store slices.
- */
-export type MonitorTypesStoreSetter = StoreApi<MonitorTypesStore>["setState"];
-
-/**
  * Getter helper type for composing monitor types store slices.
  */
 export type MonitorTypesStoreGetter = StoreApi<MonitorTypesStore>["getState"];
+
+/**
+ * Setter helper type for composing monitor types store slices.
+ */
+export type MonitorTypesStoreSetter = StoreApi<MonitorTypesStore>["setState"];
 
 /**
  * Initial state for monitor types management.

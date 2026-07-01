@@ -17,22 +17,25 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import fc from "fast-check";
-import { z } from "zod";
-import { BASE_MONITOR_TYPES } from "@shared/types";
 import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
-import type { IMonitorService } from "../../services/monitoring/types";
+
+import { BASE_MONITOR_TYPES } from "@shared/types";
+import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
+
 import type { BaseMonitorConfig } from "../../services/monitoring/MonitorTypeRegistry.types";
+import type { IMonitorService } from "../../services/monitoring/types";
+
 import {
+    createMonitorWithTypeGuards,
+    getAllMonitorTypeConfigs,
+    getMonitorServiceFactory,
     getMonitorTypeConfig,
     getRegisteredMonitorTypes,
     isValidMonitorType,
-    getAllMonitorTypeConfigs,
-    getMonitorServiceFactory,
-    registerMonitorType,
-    createMonitorWithTypeGuards,
     isValidMonitorTypeGuard,
+    registerMonitorType,
 } from "../../services/monitoring/MonitorTypeRegistry";
 
 describe("MonitorTypeRegistry Fuzzing Tests", () => {
@@ -69,7 +72,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
         it("should handle edge case strings", () => {
             const edgeCases = [
                 "",
-                "   ",
+                ' '.repeat(3),
                 "\n\t",
                 "🚀",
                 "test123",
@@ -93,9 +96,9 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     // Property: validation should never throw
                     expect(() => isValidMonitorType(input)).not.toThrow();
 
-                    const result = isValidMonitorType(input);
+                    const isResult = isValidMonitorType(input);
                     // Property: result must be a boolean
-                    expect(typeof result).toBe("boolean");
+                    expect(typeof isResult).toBe("boolean");
                 })
             );
         });
@@ -188,14 +191,14 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                         }),
                         getType: vi.fn().mockReturnValue("http"),
                         updateConfig: vi.fn(),
-                    }) as IMonitorService,
+                    }),
                 validationSchema: z.object({
                     type: z.string(),
                     url: z.string().url(),
                 }),
             };
 
-            expect(() => registerMonitorType(validConfig)).not.toThrow();
+            expect(() => { registerMonitorType(validConfig); }).not.toThrow();
             expect(isValidMonitorType(validConfig.type)).toBeTruthy();
             expect(getMonitorTypeConfig(validConfig.type)).toBeDefined();
         });
@@ -272,12 +275,12 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                                     }),
                                     getType: vi.fn().mockReturnValue("http"),
                                     updateConfig: vi.fn(),
-                                }) as IMonitorService,
+                                }),
                             validationSchema: z.object({ type: z.string() }),
                         };
 
                         // Property: registration with valid field should not throw
-                        expect(() => registerMonitorType(config)).not.toThrow();
+                        expect(() => { registerMonitorType(config); }).not.toThrow();
                     }
                 )
             );
@@ -291,9 +294,9 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                     // Property: type guard should never throw
                     expect(() => isValidMonitorTypeGuard(input)).not.toThrow();
 
-                    const result = isValidMonitorTypeGuard(input);
+                    const isResult = isValidMonitorTypeGuard(input);
                     // Property: result must be boolean
-                    expect(typeof result).toBe("boolean");
+                    expect(typeof isResult).toBe("boolean");
                 })
             );
         });
@@ -315,7 +318,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                             .mockResolvedValue({ status: "up" as const }),
                         getType: vi.fn().mockReturnValue("http"),
                         updateConfig: vi.fn(),
-                    }) as IMonitorService,
+                    }),
                 validationSchema: z.object({ type: z.string() }),
             };
 
@@ -390,7 +393,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                 "测试类型",
                 "тип мониторинга",
                 "نوع المراقبة",
-                "\u0000\u0001\u0002",
+                "\u{0}\u{1}\u{2}",
                 "type\nwith\nnewlines",
                 "type\twith\ttabs",
                 `${String.fromCodePoint(0xfe_ff)}bom-type`,
@@ -455,7 +458,7 @@ describe("MonitorTypeRegistry Fuzzing Tests", () => {
                                 .mockResolvedValue({ status: "up" as const }),
                             getType: vi.fn().mockReturnValue(monitorType),
                             updateConfig: vi.fn(),
-                        }) as IMonitorService,
+                        }),
                     validationSchema: z.object({ type: z.string() }),
                 };
 

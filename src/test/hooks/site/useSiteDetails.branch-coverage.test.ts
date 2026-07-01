@@ -1,21 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import React from "react";
-import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { useUIStore } from "../../../stores/ui/useUiStore";
+import type * as React from "react";
+
+import { act, renderHook } from "@testing-library/react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
-import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
+import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
 import { logger } from "../../../services/logger";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
+import { validateMonitorFieldClientSide } from "../../../utils/monitorValidation";
 
 // Mock all dependencies
-vi.mock("../../../stores/sites/useSitesStore");
-vi.mock("../../../stores/error/useErrorStore");
-vi.mock("../../../stores/ui/useUiStore");
-vi.mock("../../../hooks/site/useSiteAnalytics");
-vi.mock("../../../utils/monitorValidation");
-vi.mock("../../../services/logger");
+vi.mock(import('../../../stores/sites/useSitesStore'));
+vi.mock(import('../../../stores/error/useErrorStore'));
+vi.mock(import('../../../stores/ui/useUiStore'));
+vi.mock(import('../../../hooks/site/useSiteAnalytics'));
+vi.mock(import('../../../utils/monitorValidation'));
+vi.mock(import('../../../services/logger'));
 
 const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseErrorStore = vi.mocked(useErrorStore);
@@ -50,7 +53,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
     const mockSitesStore = {
         sites: [mockSite],
         selectedMonitorIds: {
-            [mockSite.identifier]: mockSite.monitors[0]!.id,
+            [mockSite.identifier]: arrayFirst(mockSite.monitors)!.id,
         },
         getSelectedMonitorId: vi.fn(() => "monitor-1"),
         setSelectedMonitorId: vi.fn(),
@@ -172,7 +175,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 })
             ).rejects.toThrow();
 
-            expect(mockLogger.site.error).toHaveBeenCalled();
+            expect(mockLogger.site.error).toHaveBeenCalledWith();
         });
 
         it("should handle validation failure for timeout", async ({
@@ -213,7 +216,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 })
             ).rejects.toThrow();
 
-            expect(mockLogger.site.error).toHaveBeenCalled();
+            expect(mockLogger.site.error).toHaveBeenCalledWith();
         });
 
         it("should handle validation failure for retry attempts", async ({
@@ -254,7 +257,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 })
             ).rejects.toThrow();
 
-            expect(mockLogger.site.error).toHaveBeenCalled();
+            expect(mockLogger.site.error).toHaveBeenCalledWith();
         });
     });
 

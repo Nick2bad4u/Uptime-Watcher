@@ -5,12 +5,15 @@
  * exercising all store functions to improve coverage metrics.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
+
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MonitoringService } from "../../services/MonitoringService";
+import { SiteService } from "../../services/SiteService";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
-import { SiteService } from "../../services/SiteService";
-import { MonitoringService } from "../../services/MonitoringService";
 
 const mockStateSyncService = vi.hoisted(() => ({
     getSyncStatus: vi.fn(),
@@ -43,12 +46,12 @@ const createValidSite = (
     ],
 });
 
-vi.mock("../../services/StateSyncService", () => ({
+vi.mock(import('../../services/StateSyncService'), () => ({
     StateSyncService: mockStateSyncService,
 }));
 
 // Mock SiteService that the store operations use
-vi.mock("../../services/SiteService", () => ({
+vi.mock(import('../../services/SiteService'), () => ({
     SiteService: {
         addSite: vi.fn(),
         getSites: vi.fn(),
@@ -59,7 +62,7 @@ vi.mock("../../services/SiteService", () => ({
 }));
 
 // Mock MonitoringService that monitoring operations use
-vi.mock("../../services/MonitoringService", () => ({
+vi.mock(import('../../services/MonitoringService'), () => ({
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
@@ -221,7 +224,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             // Test addSite (local state function)
             store.addSite(testSite);
             expect(useSitesStore.getState().sites).toHaveLength(1);
-            expect(useSitesStore.getState().sites[0]).toEqual(testSite);
+            expect(arrayFirst(useSitesStore.getState().sites)).toEqual(testSite);
 
             // Test selectSite
             store.selectSite(testSite);
@@ -273,7 +276,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             });
 
             // Verify SiteService was called instead of electronAPI directly
-            expect(SiteService.addSite).toHaveBeenCalled();
+            expect(SiteService.addSite).toHaveBeenCalledWith();
         });
 
         it("should exercise sync status functions", async () => {
@@ -299,7 +302,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                     typeof syncStatus.lastSyncAt === "number"
             ).toBeTruthy();
             expect(typeof syncStatus.source).toBe("string");
-            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalledWith();
         });
 
         it("should exercise initialization functions", async () => {
@@ -312,7 +315,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof result.success).toBe("boolean");
             expect(typeof result.sitesLoaded).toBe("number");
             expect(typeof result.message).toBe("string");
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
             expect(SiteService.getSites).not.toHaveBeenCalled();
         });
 
@@ -401,7 +404,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test syncSites
             await store.syncSites();
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
 
             // Test fullResyncSites
             await store.fullResyncSites();

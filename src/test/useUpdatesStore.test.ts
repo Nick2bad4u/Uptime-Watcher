@@ -3,17 +3,18 @@
  * functionality.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { UnknownRecord } from "type-fest";
 
 import type { UpdateStatus } from "../stores/types";
 
-import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 import { EventsService } from "../services/EventsService";
+import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 
 // Mock the logger (partial) so createPersistConfig remains available.
-vi.mock("../stores/utils", async (importOriginal) => {
+vi.mock(import('../stores/utils'), async (importOriginal) => {
     const actual = await importOriginal<typeof import("../stores/utils")>();
     return {
         ...actual,
@@ -46,6 +47,7 @@ describe(useUpdatesStore, () => {
     afterEach(() => {
         vi.restoreAllMocks();
     });
+
     beforeEach(() => {
         // Reset the store before each test
         useUpdatesStore.setState({

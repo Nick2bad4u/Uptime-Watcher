@@ -1,7 +1,6 @@
-import fc, { type Arbitrary } from "fast-check";
-
 import { STATUS_KIND, type StatusKind } from "@shared/types";
 import { isValidUrl } from "@shared/validation/validatorUtils";
+import fc, { type Arbitrary } from "fast-check";
 
 const readableCharacters = [
     ..."abcdefghijklmnopqrstuvwxyz",
@@ -23,7 +22,7 @@ const readableCharacters = [
 const slugCharacters = [..."abcdefghijklmnopqrstuvwxyz", ..."0123456789"];
 
 const collapseWhitespace = (value: string): string =>
-    value.replaceAll(/\s+/gu, " ").trim();
+    value.replaceAll(/\s+/gv, " ").trim();
 
 const hasVisibleCharacters = (value: string): boolean => value.length > 0;
 
@@ -71,7 +70,7 @@ export const siteIdentifierArbitrary: Arbitrary<string> = fc
     .map(([left, right]) => `${left}-${right}`.toLowerCase());
 
 /**
- * Arbitrary generating unique monitor identifiers using uuid v4 strings.
+ * Arbitrary generating unique monitor identifiers using UUID v4 strings.
  */
 export const monitorIdArbitrary: Arbitrary<string> = fc.uuid();
 

@@ -3,8 +3,13 @@
  * backend tests exercise shared code for coverage reporting
  */
 
-import { describe, expect, it, test } from "vitest";
 import { fc } from "@fast-check/vitest";
+import { describe, expect, it, test } from "vitest";
+
+import {
+    MAX_TIMEOUT_MILLISECONDS,
+    MIN_TIMEOUT_MILLISECONDS,
+} from "../../types/units";
 // Import ALL functions from safeConversions to ensure coverage
 import * as safeConversions from "../../utils/safeConversions";
 import {
@@ -19,10 +24,6 @@ import {
     safeParseTimeout,
     safeParseTimestamp,
 } from "../../utils/safeConversions";
-import {
-    MAX_TIMEOUT_MILLISECONDS,
-    MIN_TIMEOUT_MILLISECONDS,
-} from "../../types/units";
 
 describe("Shared Safe Conversions - Backend Coverage", () => {
     // COVERAGE CRITICAL: Call every function to ensure 100% coverage
@@ -134,7 +135,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                 "component"
             );
 
-            const fallback = Number.NaN;
+            const fallback = NaN;
             expect(safeNumberConversion("invalid", fallback)).toBe(0);
             expect(safeNumberConversion(undefined, fallback)).toBe(0);
         });
@@ -785,7 +786,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                 ? Math.floor(input)
                                 : typeof input === "string"
                                   ? Number.parseInt(input, 10)
-                                  : Number.NaN;
+                                  : NaN;
 
                         if (
                             !Number.isNaN(intValue) &&
@@ -818,7 +819,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                 ? Math.floor(input)
                                 : typeof input === "string"
                                   ? Number.parseInt(input, 10)
-                                  : Number.NaN;
+                                  : NaN;
 
                         if (
                             !Number.isNaN(intValue) &&
@@ -855,7 +856,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                 ? Math.floor(input)
                                 : typeof input === "string"
                                   ? Number.parseInt(input, 10)
-                                  : Number.NaN;
+                                  : NaN;
 
                         if (
                             !Number.isNaN(intValue) &&
@@ -892,7 +893,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                                 ? input
                                 : typeof input === "string"
                                   ? Number(input)
-                                  : Number.NaN;
+                                  : NaN;
 
                         if (
                             !Number.isNaN(numValue) &&

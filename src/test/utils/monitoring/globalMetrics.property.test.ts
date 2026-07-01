@@ -10,22 +10,21 @@
  * status and latency combinations.
  */
 
-import { describe, expect } from "vitest";
 import { test } from "@fast-check/vitest";
-import fc from "fast-check";
-
 import { MONITOR_STATUS_VALUES, type MonitorStatus } from "@shared/types";
+import fc from "fast-check";
+import { describe, expect, it, test } from "vitest";
 
 import {
     calculateGlobalMonitoringMetrics,
     type GlobalMonitoringMetrics,
 } from "../../../utils/monitoring/globalMetrics";
 import {
-    createMockMonitor,
-    createMockSite,
     type CompleteMonitor,
     type CompleteSite,
-} from "../../utils/mockFactories";
+    createMockMonitor,
+    createMockSite,
+} from "../mockFactories";
 
 /**
  * Arbitrary for monitor status values based on the canonical shared constants.
@@ -40,7 +39,7 @@ const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
 const monitorOverridesArbitrary = fc.record({
     monitoring: fc.boolean(),
     // Use simple expressions to avoid triggering numeric separator style rules
-    responseTime: fc.integer({ min: -5 * 100, max: 5 * 100 }),
+    responseTime: fc.integer({ max: 5 * 100, min: -5 * 100 }),
     status: monitorStatusArbitrary,
 });
 
@@ -187,7 +186,7 @@ describe("calculateGlobalMonitoringMetrics (property-based)", () => {
         }
     );
 
-    test("returns zeroed metrics when no sites are provided", () => {
+    it("returns zeroed metrics when no sites are provided", () => {
         const metrics = calculateGlobalMonitoringMetrics([]);
 
         expect(metrics.totalSites).toBe(0);
@@ -206,12 +205,12 @@ describe("calculateGlobalMonitoringMetrics (property-based)", () => {
         expect(metrics.averageResponseTime).toBeUndefined();
     });
 
-    test("computes average response time only from finite positive samples", () => {
+    it("computes average response time only from finite positive samples", () => {
         const monitors: CompleteMonitor[] = [
-            createMockMonitor({ status: "up", responseTime: 200 }),
-            createMockMonitor({ status: "up", responseTime: 400 }),
-            createMockMonitor({ status: "down", responseTime: 0 }),
-            createMockMonitor({ status: "degraded", responseTime: -50 }),
+            createMockMonitor({ responseTime: 200, status: "up" }),
+            createMockMonitor({ responseTime: 400, status: "up" }),
+            createMockMonitor({ responseTime: 0, status: "down" }),
+            createMockMonitor({ responseTime: -50, status: "degraded" }),
         ];
 
         const site = createMockSite({ monitors });

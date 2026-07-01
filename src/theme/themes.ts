@@ -1,5 +1,5 @@
 /**
- * Theme definitions for the application.
+ * Theme definitions for the app.
  *
  * @remarks
  * Contains predefined light and dark theme configurations with complete styling
@@ -409,11 +409,11 @@ export interface Themes {
 }
 
 /**
- * Collection of all available themes in the application.
+ * Collection of all available themes in the app.
  *
  * @remarks
  * Provides a centralized registry of all theme configurations available for use
- * throughout the application. Used by the ThemeManager to resolve theme names
+ * throughout the app. Used by the ThemeManager to resolve theme names
  * to actual theme objects.
  *
  * @example

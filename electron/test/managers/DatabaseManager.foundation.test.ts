@@ -3,10 +3,12 @@
  * test serves as a template for proper mocking architecture
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
-import { DatabaseManager } from "../../managers/DatabaseManager";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
+
+import { DatabaseManager } from "../../managers/DatabaseManager";
 import {
     DownloadBackupCommand,
     ExportDataCommand,
@@ -182,7 +184,7 @@ describe("DatabaseManager Foundation Tests", () => {
 
         // Replace the command executor after construction
         // @ts-expect-error - overriding private property for testing
-        databaseManager["commandExecutor"] = smartCommandExecutor;
+        databaseManager.commandExecutor = smartCommandExecutor;
 
         // Create smart site loading orchestrator mock
         const mockSiteLoadingOrchestrator = {
@@ -194,11 +196,11 @@ describe("DatabaseManager Foundation Tests", () => {
         };
 
         // @ts-expect-error - overriding private property for testing
-        databaseManager["siteLoadingOrchestrator"] =
+        databaseManager.siteLoadingOrchestrator =
             mockSiteLoadingOrchestrator;
 
         // Ensure the site cache has all required methods
-        const siteCache = databaseManager["siteCache"];
+        const siteCache = databaseManager.siteCache;
         if (siteCache) {
             siteCache.clear = vi.fn();
             siteCache.set = vi.fn();
@@ -280,9 +282,9 @@ describe("DatabaseManager Foundation Tests", () => {
             await annotate("Type: Import Operation", "type");
 
             const testData = '{"sites": [], "settings": []}';
-            const result = await databaseManager.importData(testData);
+            const isResult = await databaseManager.importData(testData);
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
 
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",

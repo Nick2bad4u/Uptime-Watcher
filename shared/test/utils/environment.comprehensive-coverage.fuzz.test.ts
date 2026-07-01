@@ -23,11 +23,11 @@
  */
 
 import { fc, test } from "@fast-check/vitest";
-import { describe, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
 import {
-    getEnvVar,
     getEnvironment,
+    getEnvVar,
     getNodeEnv,
     isBrowserEnvironment,
     isDevelopment,
@@ -41,15 +41,15 @@ describe("environment comprehensive fuzzing tests", () => {
     // in the various fuzzed scenarios do not fight with Node's evolving
     // Process type surface. The tests only care about a handful of fields
     // (env, version, versions, etc.), not the full EventEmitter interface.
-    let originalProcess: any = globalThis.process;
-    let originalWindow: typeof globalThis.window = globalThis.window;
-    let originalDocument: typeof globalThis.document = globalThis.document;
+    let originalProcess: any = process;
+    let originalWindow: typeof globalThis.window = globalThis;
+    let originalDocument: typeof globalThis.document = document;
 
     beforeEach(() => {
         // Store original globals
-        originalProcess = globalThis.process;
-        originalWindow = globalThis.window;
-        originalDocument = globalThis.document;
+        originalProcess = process;
+        originalWindow = globalThis;
+        originalDocument = document;
     });
 
     afterEach(() => {
@@ -199,7 +199,7 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: customEnv as any,
+                        NODE_ENV: customEnv,
                     },
                 };
 
@@ -262,7 +262,7 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: customEnv as any,
+                        NODE_ENV: customEnv,
                     },
                 };
 
@@ -287,28 +287,28 @@ describe("environment comprehensive fuzzing tests", () => {
     describe(isBrowserEnvironment, () => {
         test("returns true when both window and document are available", () => {
             // Ensure both globals are available (they should be in test environment)
-            globalThis.window = { ...originalWindow } as any;
-            globalThis.document = { ...originalDocument } as any;
+            globalThis.window = { ...originalWindow };
+            globalThis.document = { ...originalDocument };
 
-            const result = isBrowserEnvironment();
-            expect(result).toBeTruthy();
+            const isResult = isBrowserEnvironment();
+            expect(isResult).toBeTruthy();
         });
 
         test("returns false when window is undefined", () => {
             globalThis.window = undefined as any;
-            globalThis.document = { ...originalDocument } as any;
+            globalThis.document = { ...originalDocument };
 
-            const result = isBrowserEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isBrowserEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when document is undefined", () => {
-            globalThis.window = { ...originalWindow } as any;
+            globalThis.window = { ...originalWindow };
 
             globalThis.document = undefined as any;
 
-            const result = isBrowserEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isBrowserEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when both window and document are undefined", () => {
@@ -316,8 +316,8 @@ describe("environment comprehensive fuzzing tests", () => {
 
             globalThis.document = undefined as any;
 
-            const result = isBrowserEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isBrowserEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test.prop([fc.anything(), fc.anything()])(
@@ -327,10 +327,10 @@ describe("environment comprehensive fuzzing tests", () => {
 
                 globalThis.document = documentValue as any;
 
-                const result = isBrowserEnvironment();
-                const expected =
+                const isResult = isBrowserEnvironment();
+                const isExpected =
                     windowValue !== undefined && documentValue !== undefined;
-                expect(result).toBe(expected);
+                expect(isResult).toBe(isExpected);
             }
         );
     });
@@ -344,8 +344,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 },
             };
 
-            const result = isDevelopment();
-            expect(result).toBeTruthy();
+            const isResult = isDevelopment();
+            expect(isResult).toBeTruthy();
         });
 
         test.prop([
@@ -356,12 +356,12 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: nodeEnvValue as any,
+                        NODE_ENV: nodeEnvValue,
                     },
                 };
 
-                const result = isDevelopment();
-                expect(result).toBeFalsy();
+                const isResult = isDevelopment();
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -371,27 +371,27 @@ describe("environment comprehensive fuzzing tests", () => {
                 env: {},
             };
 
-            const result = isDevelopment();
-            expect(result).toBeFalsy();
+            const isResult = isDevelopment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process is undefined", () => {
             globalThis.process = undefined as any;
 
-            const result = isDevelopment();
-            expect(result).toBeFalsy();
+            const isResult = isDevelopment();
+            expect(isResult).toBeFalsy();
         });
 
         test('is case-sensitive for "development"', () => {
             globalThis.process = {
                 ...originalProcess,
                 env: {
-                    NODE_ENV: "Development" as any, // Wrong case
+                    NODE_ENV: "Development", // Wrong case
                 },
             };
 
-            const result = isDevelopment();
-            expect(result).toBeFalsy();
+            const isResult = isDevelopment();
+            expect(isResult).toBeFalsy();
         });
 
         test("does not recognize development variants", () => {
@@ -406,12 +406,12 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: variant as any,
+                        NODE_ENV: variant,
                     },
                 };
 
-                const result = isDevelopment();
-                expect(result).toBeFalsy();
+                const isResult = isDevelopment();
+                expect(isResult).toBeFalsy();
             }
         });
     });
@@ -426,15 +426,15 @@ describe("environment comprehensive fuzzing tests", () => {
                 },
             };
 
-            const result = isNodeEnvironment();
-            expect(result).toBeTruthy();
+            const isResult = isNodeEnvironment();
+            expect(isResult).toBeTruthy();
         });
 
         test("returns false when process is undefined", () => {
             globalThis.process = undefined as any;
 
-            const result = isNodeEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isNodeEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process.versions is undefined", () => {
@@ -444,8 +444,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 versions: undefined as any,
             };
 
-            const result = isNodeEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isNodeEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process.versions is not an object", () => {
@@ -455,8 +455,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 versions: "not-an-object" as any,
             };
 
-            const result = isNodeEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isNodeEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process.versions.node is undefined", () => {
@@ -469,8 +469,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 },
             };
 
-            const result = isNodeEnvironment();
-            expect(result).toBeFalsy();
+            const isResult = isNodeEnvironment();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process.versions.node is falsy", () => {
@@ -491,8 +491,8 @@ describe("environment comprehensive fuzzing tests", () => {
                     },
                 };
 
-                const result = isNodeEnvironment();
-                expect(result).toBeFalsy();
+                const isResult = isNodeEnvironment();
+                expect(isResult).toBeFalsy();
             }
         });
 
@@ -507,8 +507,8 @@ describe("environment comprehensive fuzzing tests", () => {
                     },
                 };
 
-                const result = isNodeEnvironment();
-                expect(result).toBeTruthy();
+                const isResult = isNodeEnvironment();
+                expect(isResult).toBeTruthy();
             }
         );
     });
@@ -522,8 +522,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 },
             };
 
-            const result = isProduction();
-            expect(result).toBeTruthy();
+            const isResult = isProduction();
+            expect(isResult).toBeTruthy();
         });
 
         test.prop([
@@ -534,12 +534,12 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: nodeEnvValue as any,
+                        NODE_ENV: nodeEnvValue,
                     },
                 };
 
-                const result = isProduction();
-                expect(result).toBeFalsy();
+                const isResult = isProduction();
+                expect(isResult).toBeFalsy();
             }
         );
 
@@ -549,27 +549,27 @@ describe("environment comprehensive fuzzing tests", () => {
                 env: {},
             };
 
-            const result = isProduction();
-            expect(result).toBeFalsy();
+            const isResult = isProduction();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process is undefined", () => {
             globalThis.process = undefined as any;
 
-            const result = isProduction();
-            expect(result).toBeFalsy();
+            const isResult = isProduction();
+            expect(isResult).toBeFalsy();
         });
 
         test('is case-sensitive for "production"', () => {
             globalThis.process = {
                 ...originalProcess,
                 env: {
-                    NODE_ENV: "Production" as any, // Wrong case
+                    NODE_ENV: "Production", // Wrong case
                 },
             };
 
-            const result = isProduction();
-            expect(result).toBeFalsy();
+            const isResult = isProduction();
+            expect(isResult).toBeFalsy();
         });
 
         test("does not recognize production variants", () => {
@@ -583,12 +583,12 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: variant as any,
+                        NODE_ENV: variant,
                     },
                 };
 
-                const result = isProduction();
-                expect(result).toBeFalsy();
+                const isResult = isProduction();
+                expect(isResult).toBeFalsy();
             }
         });
     });
@@ -602,8 +602,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 },
             };
 
-            const result = isTest();
-            expect(result).toBeTruthy();
+            const isResult = isTest();
+            expect(isResult).toBeTruthy();
         });
 
         test.prop([
@@ -612,12 +612,12 @@ describe("environment comprehensive fuzzing tests", () => {
             globalThis.process = {
                 ...originalProcess,
                 env: {
-                    NODE_ENV: nodeEnvValue as any,
+                    NODE_ENV: nodeEnvValue,
                 },
             };
 
-            const result = isTest();
-            expect(result).toBeFalsy();
+            const isResult = isTest();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when NODE_ENV is not set", () => {
@@ -626,27 +626,27 @@ describe("environment comprehensive fuzzing tests", () => {
                 env: {},
             };
 
-            const result = isTest();
-            expect(result).toBeFalsy();
+            const isResult = isTest();
+            expect(isResult).toBeFalsy();
         });
 
         test("returns false when process is undefined", () => {
             globalThis.process = undefined as any;
 
-            const result = isTest();
-            expect(result).toBeFalsy();
+            const isResult = isTest();
+            expect(isResult).toBeFalsy();
         });
 
         test('is case-sensitive for "test"', () => {
             globalThis.process = {
                 ...originalProcess,
                 env: {
-                    NODE_ENV: "Test" as any, // Wrong case
+                    NODE_ENV: "Test", // Wrong case
                 },
             };
 
-            const result = isTest();
-            expect(result).toBeFalsy();
+            const isResult = isTest();
+            expect(isResult).toBeFalsy();
         });
 
         test("does not recognize test variants", () => {
@@ -660,12 +660,12 @@ describe("environment comprehensive fuzzing tests", () => {
                 globalThis.process = {
                     ...originalProcess,
                     env: {
-                        NODE_ENV: variant as any,
+                        NODE_ENV: variant,
                     },
                 };
 
-                const result = isTest();
-                expect(result).toBeFalsy();
+                const isResult = isTest();
+                expect(isResult).toBeFalsy();
             }
         });
     });
@@ -781,8 +781,8 @@ describe("environment comprehensive fuzzing tests", () => {
                     };
 
                     if (hasBrowser) {
-                        globalThis.window = { ...originalWindow } as any;
-                        globalThis.document = { ...originalDocument } as any;
+                        globalThis.window = { ...originalWindow };
+                        globalThis.document = { ...originalDocument };
                     } else {
                         globalThis.window = undefined as any;
 
@@ -839,8 +839,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 },
             };
 
-            globalThis.window = { ...originalWindow } as any;
-            globalThis.document = { ...originalDocument } as any;
+            globalThis.window = { ...originalWindow };
+            globalThis.document = { ...originalDocument };
 
             const startTime = performance.now();
 

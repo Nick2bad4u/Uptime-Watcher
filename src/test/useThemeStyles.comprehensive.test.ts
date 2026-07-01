@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useThemeStyles } from "../hooks/useThemeStyles";
 
@@ -95,7 +95,7 @@ describe(useThemeStyles, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        vi.mocked(globalThis.matchMedia).mockImplementation(
+        vi.mocked(matchMedia).mockImplementation(
             (query) =>
                 ({
                     addEventListener: vi.fn(),
@@ -121,7 +121,7 @@ describe(useThemeStyles, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        vi.mocked(globalThis.matchMedia).mockImplementation(
+        vi.mocked(matchMedia).mockImplementation(
             (query) =>
                 ({
                     addEventListener: vi.fn(),
@@ -269,7 +269,7 @@ describe(useThemeStyles, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        const originalMatchMedia = globalThis.matchMedia;
+        const originalMatchMedia = matchMedia;
         // Remove matchMedia to test defensive programming
 
         delete (globalThis as any).matchMedia;
@@ -302,7 +302,7 @@ describe(useThemeStyles, () => {
         await annotate("Type: Business Logic", "type");
 
         // Test light mode
-        vi.mocked(globalThis.matchMedia).mockReturnValue({
+        vi.mocked(matchMedia).mockReturnValue({
             addEventListener: vi.fn(),
             dispatchEvent: vi.fn(),
             matches: false,
@@ -314,7 +314,7 @@ describe(useThemeStyles, () => {
         const { result: lightResult } = renderHook(() => useThemeStyles());
 
         // Test dark mode
-        vi.mocked(globalThis.matchMedia).mockImplementation(
+        vi.mocked(matchMedia).mockImplementation(
             (query) =>
                 ({
                     addEventListener: vi.fn(),

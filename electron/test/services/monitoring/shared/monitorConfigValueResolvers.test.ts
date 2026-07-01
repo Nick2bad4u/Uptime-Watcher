@@ -35,7 +35,7 @@ describe("monitorConfigValueResolvers", () => {
 
             expect(
                 resolveRequiredMonitorStringField(
-                    { field: "   " },
+                    { field: ' '.repeat(3) },
                     "field",
                     "field is required"
                 )

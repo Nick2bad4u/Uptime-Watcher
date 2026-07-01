@@ -173,13 +173,11 @@ export const SiteService: SiteServiceContract = {
         }
 
         const { issues } = validationResult.error;
-        const invalidIndices = Array.from(
-            new Set(
+        const invalidIndices = [...new Set(
                 issues
                     .map((issue) => arrayFirst(issue.path))
                     .filter((value): value is number => typeof value === "number")
-            )
-        ).toSorted((a, b) => a - b);
+            )].toSorted((a, b) => a - b);
 
         if (isEmpty(issues)) {
             throw new ApplicationError({
@@ -290,9 +288,9 @@ export const SiteService: SiteServiceContract = {
      *   fails.
      */
     removeSite: wrap("removeSite", async (api, identifier: string) => {
-        const removed = await api.sites.removeSite(identifier);
+        const isRemoved = await api.sites.removeSite(identifier);
 
-        if (!removed) {
+        if (!isRemoved) {
             throw new ApplicationError({
                 code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                 details: {

@@ -1,6 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import type { MockInstance } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
+import { fc, test } from "@fast-check/vitest";
+import { objectValues } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     formatDuration,
     formatFullTimestamp,
@@ -8,15 +11,15 @@ import {
     formatRelativeTimestamp,
     formatResponseDuration,
     formatResponseTime,
-    getIntervalLabel,
     formatRetryAttemptsText,
+    getIntervalLabel,
     TIME_PERIOD_LABELS,
     type TimePeriod,
 } from "../../utils/time";
 
-describe("Time Utilities", () => {
+describe("time Utilities", () => {
     describe(formatDuration, () => {
-        it("should format seconds only", async ({ task, annotate }) => {
+        it("should format seconds only", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -27,7 +30,7 @@ describe("Time Utilities", () => {
             expect(formatDuration(59_000)).toBe("59s");
         });
 
-        it("should format minutes and seconds", async ({ task, annotate }) => {
+        it("should format minutes and seconds", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -39,7 +42,7 @@ describe("Time Utilities", () => {
             expect(formatDuration(3_540_000)).toBe("59m 0s");
         });
 
-        it("should format hours and minutes", async ({ task, annotate }) => {
+        it("should format hours and minutes", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -53,8 +56,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle zero and very small values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -66,7 +69,7 @@ describe("Time Utilities", () => {
             expect(formatDuration(999)).toBe("0s");
         });
 
-        it("should handle very large values", async ({ task, annotate }) => {
+        it("should handle very large values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -77,8 +80,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle edge cases with rounding", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -92,8 +95,8 @@ describe("Time Utilities", () => {
 
     describe(formatFullTimestamp, () => {
         it("should format timestamp as locale string", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -104,13 +107,13 @@ describe("Time Utilities", () => {
             const result = formatFullTimestamp(timestamp);
 
             // The exact format depends on locale and timezone, but should contain date/time info
-            expect(result).toMatch(/2021|2022|21|22/); // Should contain year (timezone dependent)
-            expect(result).toMatch(/Jan|Dec|1|31|01|12/); // Should contain month or day (timezone dependent)
-            expect(typeof result).toBe("string");
+            expect(result).toMatch(/21|22|2021|2022/v); // Should contain year (timezone dependent)
+            expect(result).toMatch(/Jan|Dec|1|31|01|12/v); // Should contain month or day (timezone dependent)
+            expect(result).toBeTypeOf("string");
             expect(result.length).toBeGreaterThan(5);
         });
 
-        it("should handle different timestamps", async ({ task, annotate }) => {
+        it("should handle different timestamps", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -124,27 +127,29 @@ describe("Time Utilities", () => {
 
             for (const timestamp of timestamps) {
                 const result = formatFullTimestamp(timestamp);
-                expect(typeof result).toBe("string");
+
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(5);
             }
         });
 
-        it("should handle zero timestamp", async ({ task, annotate }) => {
+        it("should handle zero timestamp", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const result = formatFullTimestamp(0);
-            expect(typeof result).toBe("string");
-            expect(result).toMatch(/1969|1970|69|70/); // Unix epoch (timezone dependent)
+
+            expect(result).toBeTypeOf("string");
+            expect(result).toMatch(/69|70|1969|1970/v); // Unix epoch (timezone dependent)
         });
     });
 
     describe(formatIntervalDuration, () => {
         it("should format seconds for values under 1 minute", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -157,8 +162,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format minutes for values under 1 hour", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -172,8 +177,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format hours for values 1 hour and above", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -187,8 +192,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle edge cases and rounding", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -201,7 +206,7 @@ describe("Time Utilities", () => {
             expect(formatIntervalDuration(119_500)).toBe("2m"); // 1.99 minutes rounds up
         });
 
-        it("should handle very large values", async ({ task, annotate }) => {
+        it("should handle very large values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -217,9 +222,7 @@ describe("Time Utilities", () => {
 
         beforeEach(() => {
             // Mock Date.now to return a fixed timestamp
-            mockNow = vi.spyOn(Date, "now") as unknown as MockInstance<
-                () => number
-            >;
+            mockNow = vi.spyOn(Date, "now");
             mockNow.mockReturnValue(1_640_995_200_000); // Jan 1, 2022 00:00:00 UTC
         });
 
@@ -228,8 +231,8 @@ describe("Time Utilities", () => {
         });
 
         it("should return 'Just now' for recent timestamps", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -237,17 +240,19 @@ describe("Time Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const recentTimestamp = 1_640_995_200_000 - 30_000; // 30 seconds ago
+
             expect(formatRelativeTimestamp(recentTimestamp)).toBe("Just now");
 
             const veryRecentTimestamp = 1_640_995_200_000 - 5000; // 5 seconds ago
+
             expect(formatRelativeTimestamp(veryRecentTimestamp)).toBe(
                 "Just now"
             );
         });
 
         it("should format seconds ago for timestamps 31+ seconds old", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -255,61 +260,72 @@ describe("Time Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const timestamp = 1_640_995_200_000 - 45_000; // 45 seconds ago
+
             expect(formatRelativeTimestamp(timestamp)).toBe("45 seconds ago");
 
             const timestamp2 = 1_640_995_200_000 - 59_000; // 59 seconds ago
+
             expect(formatRelativeTimestamp(timestamp2)).toBe("59 seconds ago");
         });
 
-        it("should format minutes ago", async ({ task, annotate }) => {
+        it("should format minutes ago", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const timestamp1 = 1_640_995_200_000 - 60_000; // 1 minute ago
+
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 minute ago");
 
             const timestamp2 = 1_640_995_200_000 - 120_000; // 2 minutes ago
+
             expect(formatRelativeTimestamp(timestamp2)).toBe("2 minutes ago");
 
             const timestamp3 = 1_640_995_200_000 - 1_800_000; // 30 minutes ago
+
             expect(formatRelativeTimestamp(timestamp3)).toBe("30 minutes ago");
         });
 
-        it("should format hours ago", async ({ task, annotate }) => {
+        it("should format hours ago", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const timestamp1 = 1_640_995_200_000 - 3_600_000; // 1 hour ago
+
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 hour ago");
 
             const timestamp2 = 1_640_995_200_000 - 7_200_000; // 2 hours ago
+
             expect(formatRelativeTimestamp(timestamp2)).toBe("2 hours ago");
 
             const timestamp3 = 1_640_995_200_000 - 21_600_000; // 6 hours ago
+
             expect(formatRelativeTimestamp(timestamp3)).toBe("6 hours ago");
         });
 
-        it("should format days ago", async ({ task, annotate }) => {
+        it("should format days ago", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             const timestamp1 = 1_640_995_200_000 - 86_400_000; // 1 day ago
+
             expect(formatRelativeTimestamp(timestamp1)).toBe("1 day ago");
 
             const timestamp2 = 1_640_995_200_000 - 172_800_000; // 2 days ago
+
             expect(formatRelativeTimestamp(timestamp2)).toBe("2 days ago");
 
             const timestamp3 = 1_640_995_200_000 - 604_800_000; // 7 days ago
+
             expect(formatRelativeTimestamp(timestamp3)).toBe("7 days ago");
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -317,10 +333,12 @@ describe("Time Utilities", () => {
 
             // Exactly 30 seconds
             const thirtySecondsAgo = 1_640_995_200_000 - 30_000;
+
             expect(formatRelativeTimestamp(thirtySecondsAgo)).toBe("Just now");
 
             // Exactly 31 seconds
             const thirtyOneSecondsAgo = 1_640_995_200_000 - 31_000;
+
             expect(formatRelativeTimestamp(thirtyOneSecondsAgo)).toBe(
                 "31 seconds ago"
             );
@@ -330,8 +348,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle future timestamps gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -341,14 +359,15 @@ describe("Time Utilities", () => {
             const futureTimestamp = 1_640_995_200_000 + 60_000; // 1 minute in future
             // Should handle negative differences gracefully (implementation dependent)
             const result = formatRelativeTimestamp(futureTimestamp);
-            expect(typeof result).toBe("string");
+
+            expect(result).toBeTypeOf("string");
         });
     });
 
     describe(formatResponseDuration, () => {
         it("should format milliseconds for values under 1 second", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -362,8 +381,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format seconds for values under 1 minute", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -377,8 +396,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format minutes for values under 1 hour", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -392,8 +411,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format hours for values 1 hour and above", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -405,7 +424,7 @@ describe("Time Utilities", () => {
             expect(formatResponseDuration(7_200_000)).toBe("2h");
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -418,8 +437,8 @@ describe("Time Utilities", () => {
 
     describe(formatResponseTime, () => {
         it("should return 'N/A' for undefined, null, or missing values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -431,7 +450,7 @@ describe("Time Utilities", () => {
             expect(formatResponseTime(null as any)).toBe("N/A");
         });
 
-        it("should format zero as milliseconds", async ({ task, annotate }) => {
+        it("should format zero as milliseconds", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -441,8 +460,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format values under 1000ms as milliseconds", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -456,8 +475,8 @@ describe("Time Utilities", () => {
         });
 
         it("should format values 1000ms and above as seconds with decimal", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -471,8 +490,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle edge cases with rounding", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -485,7 +504,7 @@ describe("Time Utilities", () => {
             expect(formatResponseTime(1234.999)).toBe("1.23s"); // Rounds down
         });
 
-        it("should handle very large values", async ({ task, annotate }) => {
+        it("should handle very large values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -498,8 +517,8 @@ describe("Time Utilities", () => {
 
     describe(getIntervalLabel, () => {
         it("should format numeric intervals using formatIntervalDuration", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -512,8 +531,8 @@ describe("Time Utilities", () => {
         });
 
         it("should use custom label when provided", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -521,38 +540,38 @@ describe("Time Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(
-                getIntervalLabel({ value: 5000, label: "Every 5 seconds" })
+                getIntervalLabel({ label: "Every 5 seconds", value: 5000 })
             ).toBe("Every 5 seconds");
             expect(
-                getIntervalLabel({ value: 60_000, label: "Custom minute" })
+                getIntervalLabel({ label: "Custom minute", value: 60_000 })
             ).toBe("Custom minute");
             expect(
-                getIntervalLabel({ value: 3_600_000, label: "Hourly Check" })
+                getIntervalLabel({ label: "Hourly Check", value: 3_600_000 })
             ).toBe("Hourly Check");
         });
 
         it("should fall back to formatIntervalDuration when label is empty", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(getIntervalLabel({ value: 5000, label: "" })).toBe("5s");
+            expect(getIntervalLabel({ label: "", value: 5000 })).toBe("5s");
             expect(getIntervalLabel({ value: 60_000 })).toBe("1m");
             expect(getIntervalLabel({ value: 3_600_000 })).toBe("1h");
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             expect(getIntervalLabel(0)).toBe("0s");
-            expect(getIntervalLabel({ value: 0, label: "Instant" })).toBe(
+            expect(getIntervalLabel({ label: "Instant", value: 0 })).toBe(
                 "Instant"
             );
             expect(getIntervalLabel({ value: 1000 })).toBe("1s");
@@ -561,8 +580,8 @@ describe("Time Utilities", () => {
 
     describe(formatRetryAttemptsText, () => {
         it("should return special message for 0 attempts", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -575,8 +594,8 @@ describe("Time Utilities", () => {
         });
 
         it("should use singular 'time' for 1 attempt", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -589,8 +608,8 @@ describe("Time Utilities", () => {
         });
 
         it("should use plural 'times' for multiple attempts", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -611,7 +630,7 @@ describe("Time Utilities", () => {
             );
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
@@ -629,8 +648,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle decimal values (though not expected in normal use)", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -646,10 +665,10 @@ describe("Time Utilities", () => {
         });
     });
 
-    describe("TIME_PERIOD_LABELS", () => {
+    describe("tIME_PERIOD_LABELS", () => {
         it("should contain all expected time period labels", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -666,8 +685,8 @@ describe("Time Utilities", () => {
         });
 
         it("should have correct types for all keys", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -684,27 +703,27 @@ describe("Time Utilities", () => {
 
             for (const period of periods) {
                 expect(TIME_PERIOD_LABELS[period]).toBeDefined();
-                expect(typeof TIME_PERIOD_LABELS[period]).toBe("string");
+                expect(TIME_PERIOD_LABELS[period]).toBeTypeOf("string");
             }
         });
 
-        it("should provide meaningful labels", async ({ task, annotate }) => {
+        it("should provide meaningful labels", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            for (const label of Object.values(TIME_PERIOD_LABELS)) {
-                expect(label).toMatch(/^Last/); // All labels start with "Last"
+            for (const label of objectValues(TIME_PERIOD_LABELS)) {
+                expect(label).toMatch(/^Last/v); // All labels start with "Last"
                 expect(label.length).toBeGreaterThan(5); // Meaningful length
             }
         });
     });
 
-    describe("Edge cases and robustness", () => {
+    describe("edge cases and robustness", () => {
         it("should handle very large numbers gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -721,8 +740,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle negative numbers gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -737,8 +756,8 @@ describe("Time Utilities", () => {
         });
 
         it("should handle floating point precision issues", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
@@ -747,9 +766,11 @@ describe("Time Utilities", () => {
 
             // Test common floating point edge cases
             const result1 = formatResponseTime(0.1 + 0.2); // Often equals 0.30000000000000004
+
             expect(result1).toBe("0.30000000000000004ms");
 
             const result2 = formatDuration(999.9999); // Should floor to 999ms = 0s
+
             expect(result2).toBe("0s");
         });
     });
@@ -760,53 +781,59 @@ describe("Time Utilities", () => {
      * explore edge cases and validate invariants across all time formatting
      * functions.
      */
-    describe("Property-Based Fuzzing Tests", () => {
+    describe("property-Based Fuzzing Tests", () => {
         describe("formatDuration property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 1_000_000_000 })])(
+            test.prop([fc.integer({ max: 1_000_000_000, min: 0 })])(
                 "should always return a valid time format string",
                 (ms) => {
                     const result = formatDuration(ms);
 
                     // Property: Result should be a non-empty string
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
 
                     // Property: Should match expected format patterns
                     const patterns = [
-                        /^\d+s$/, // Seconds only
-                        /^\d+m \d+s$/, // Minutes and seconds
-                        /^\d+h \d+m$/, // Hours and minutes
+                        /^\d+s$/v, // Seconds only
+                        /^\d+m \d+s$/v, // Minutes and seconds
+                        /^\d+h \d+m$/v, // Hours and minutes
                     ];
+
                     expect(
                         patterns.some((pattern) => pattern.test(result))
-                    ).toBeTruthy();
+                    ).toBe(true);
 
                     // Property: No negative values should appear in output
-                    expect(result).not.toMatch(/-\d/);
+                    expect(result).not.toMatch(/-\d/v);
                 }
             );
 
-            test.prop([fc.integer({ min: 0, max: 59_999 })])(
+            test.prop([fc.integer({ max: 59_999, min: 0 })])(
                 "should format seconds only for durations under 1 minute",
                 (ms) => {
                     const result = formatDuration(ms);
-                    expect(result).toMatch(/^\d+s$/);
+
+                    expect(result).toMatch(/^\d+s$/v);
 
                     // Property: Seconds value should match floor division
                     const expectedSeconds = Math.floor(ms / 1000);
+
                     expect(result).toBe(`${expectedSeconds}s`);
                 }
             );
 
-            test.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+            test.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
                 "should format minutes and seconds for durations 1min-1hr",
                 (ms) => {
                     const result = formatDuration(ms);
-                    expect(result).toMatch(/^\d+m \d+s$/);
+
+                    expect(result).toMatch(/^\d+m \d+s$/v);
 
                     // Property: Minutes should be between 1-59
-                    const minutesMatch = result.match(/^(?<minutes>\d+)m/);
-                    expect(minutesMatch).toBeTruthy();
+                    const minutesMatch = /^(?<minutes>\d+)m/v.exec(result);
+
+                    expect(minutesMatch).toBe(true);
+
                     const minutesCapture = minutesMatch![1];
                     if (!minutesCapture) {
                         throw new Error(
@@ -814,12 +841,15 @@ describe("Time Utilities", () => {
                         );
                     }
                     const minutes = Number.parseInt(minutesCapture, 10);
+
                     expect(minutes).toBeGreaterThanOrEqual(1);
                     expect(minutes).toBeLessThanOrEqual(59);
 
                     // Property: Seconds should be between 0-59
-                    const secondsMatch = result.match(/(?<seconds>\d+)s$/);
-                    expect(secondsMatch).toBeTruthy();
+                    const secondsMatch = /(?<seconds>\d+)s$/v.exec(result);
+
+                    expect(secondsMatch).toBe(true);
+
                     const secondsCapture = secondsMatch![1];
                     if (!secondsCapture) {
                         throw new Error(
@@ -827,20 +857,24 @@ describe("Time Utilities", () => {
                         );
                     }
                     const seconds = Number.parseInt(secondsCapture, 10);
+
                     expect(seconds).toBeGreaterThanOrEqual(0);
                     expect(seconds).toBeLessThanOrEqual(59);
                 }
             );
 
-            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+            test.prop([fc.integer({ max: 86_400_000, min: 3_600_000 })])(
                 "should format hours and minutes for durations >= 1 hour",
                 (ms) => {
                     const result = formatDuration(ms);
-                    expect(result).toMatch(/^\d+h \d+m$/);
+
+                    expect(result).toMatch(/^\d+h \d+m$/v);
 
                     // Property: Hours should be at least 1
-                    const hoursMatch = result.match(/^(?<hours>\d+)h/);
-                    expect(hoursMatch).toBeTruthy();
+                    const hoursMatch = /^(?<hours>\d+)h/v.exec(result);
+
+                    expect(hoursMatch).toBe(true);
+
                     const hoursCapture = hoursMatch![1];
                     if (!hoursCapture) {
                         throw new Error(
@@ -848,11 +882,14 @@ describe("Time Utilities", () => {
                         );
                     }
                     const hours = Number.parseInt(hoursCapture, 10);
+
                     expect(hours).toBeGreaterThanOrEqual(1);
 
                     // Property: Minutes should be between 0-59
-                    const minutesMatch = result.match(/(?<minutes>\d+)m$/);
-                    expect(minutesMatch).toBeTruthy();
+                    const minutesMatch = /(?<minutes>\d+)m$/v.exec(result);
+
+                    expect(minutesMatch).toBe(true);
+
                     const minutesCapture = minutesMatch![1];
                     if (!minutesCapture) {
                         throw new Error(
@@ -860,6 +897,7 @@ describe("Time Utilities", () => {
                         );
                     }
                     const minutes = Number.parseInt(minutesCapture, 10);
+
                     expect(minutes).toBeGreaterThanOrEqual(0);
                     expect(minutes).toBeLessThanOrEqual(59);
                 }
@@ -867,13 +905,13 @@ describe("Time Utilities", () => {
         });
 
         describe("formatFullTimestamp property tests", () => {
-            test.prop([fc.integer({ min: 0, max: Date.now() + 86_400_000 })])(
+            test.prop([fc.integer({ max: Date.now() + 86_400_000, min: 0 })])(
                 "should return valid locale string for valid timestamps",
                 (timestamp) => {
                     const result = formatFullTimestamp(timestamp);
 
                     // Property: Result should be a non-empty string
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
 
                     // Property: Should not throw and produce valid date string
@@ -886,7 +924,7 @@ describe("Time Utilities", () => {
 
             test.prop([
                 fc.oneof(
-                    fc.constant(Number.NaN),
+                    fc.constant(NaN),
                     fc.constant(Infinity),
                     fc.constant(-Infinity)
                 ),
@@ -896,49 +934,55 @@ describe("Time Utilities", () => {
                     const result = formatFullTimestamp(timestamp);
 
                     // Property: Should not throw with special values
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
                 }
             );
         });
 
         describe("formatIntervalDuration property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 59_999 })])(
+            test.prop([fc.integer({ max: 59_999, min: 0 })])(
                 "should format seconds for intervals < 1 minute",
                 (ms) => {
                     const result = formatIntervalDuration(ms);
 
-                    expect(result).toMatch(/^\d+s$/);
+                    expect(result).toMatch(/^\d+s$/v);
+
                     const expectedSeconds = Math.round(ms / 1000);
+
                     expect(result).toBe(`${expectedSeconds}s`);
                 }
             );
 
-            test.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+            test.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
                 "should format minutes for intervals 1min-1hr",
                 (ms) => {
                     const result = formatIntervalDuration(ms);
 
-                    expect(result).toMatch(/^\d+m$/);
+                    expect(result).toMatch(/^\d+m$/v);
+
                     const expectedMinutes = Math.round(ms / 60_000);
+
                     expect(result).toBe(`${expectedMinutes}m`);
                 }
             );
 
-            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+            test.prop([fc.integer({ max: 86_400_000, min: 3_600_000 })])(
                 "should format hours for intervals >= 1 hour",
                 (ms) => {
                     const result = formatIntervalDuration(ms);
 
-                    expect(result).toMatch(/^\d+h$/);
+                    expect(result).toMatch(/^\d+h$/v);
+
                     const expectedHours = Math.round(ms / 3_600_000);
+
                     expect(result).toBe(`${expectedHours}h`);
                 }
             );
         });
 
         describe("formatRelativeTimestamp property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 30_000 })])(
+            test.prop([fc.integer({ max: 30_000, min: 0 })])(
                 "should return 'Just now' for recent timestamps (< 30s ago)",
                 (offset) => {
                     vi.useFakeTimers();
@@ -956,7 +1000,7 @@ describe("Time Utilities", () => {
                 }
             );
 
-            test.prop([fc.integer({ min: 31_000, max: 3_599_000 })])(
+            test.prop([fc.integer({ max: 3_599_000, min: 31_000 })])(
                 "should format seconds or minutes for recent timestamps",
                 (offset) => {
                     vi.useFakeTimers();
@@ -967,16 +1011,16 @@ describe("Time Utilities", () => {
                     const result = formatRelativeTimestamp(timestamp);
 
                     // Property: Should contain time units
-                    expect(result).toMatch(/(?:second|minute)s? ago$/);
+                    expect(result).toMatch(/(?:minute|second)s? ago$/v);
 
                     // Property: Should not be negative
-                    expect(result).not.toMatch(/-\d/);
+                    expect(result).not.toMatch(/-\d/v);
 
                     vi.useRealTimers();
                 }
             );
 
-            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 - 1 })])(
+            test.prop([fc.integer({ max: 86_400_000 - 1, min: 3_600_000 })])(
                 "should format hours for timestamps 1-24 hours ago",
                 (offset) => {
                     vi.useFakeTimers();
@@ -986,13 +1030,13 @@ describe("Time Utilities", () => {
                     const timestamp = now - offset;
                     const result = formatRelativeTimestamp(timestamp);
 
-                    expect(result).toMatch(/^\d+ hours? ago$/);
+                    expect(result).toMatch(/^\d+ hours? ago$/v);
 
                     vi.useRealTimers();
                 }
             );
 
-            test.prop([fc.integer({ min: 86_400_000, max: 2_592_000_000 })])(
+            test.prop([fc.integer({ max: 2_592_000_000, min: 86_400_000 })])(
                 "should format days for timestamps > 24 hours ago",
                 (offset) => {
                     vi.useFakeTimers();
@@ -1002,7 +1046,7 @@ describe("Time Utilities", () => {
                     const timestamp = now - offset;
                     const result = formatRelativeTimestamp(timestamp);
 
-                    expect(result).toMatch(/^\d+ days? ago$/);
+                    expect(result).toMatch(/^\d+ days? ago$/v);
 
                     vi.useRealTimers();
                 }
@@ -1010,52 +1054,58 @@ describe("Time Utilities", () => {
         });
 
         describe("formatResponseDuration property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 999 })])(
+            test.prop([fc.integer({ max: 999, min: 0 })])(
                 "should format milliseconds for values < 1000ms",
                 (ms) => {
                     const result = formatResponseDuration(ms);
 
-                    expect(result).toMatch(/^\d+ms$/);
+                    expect(result).toMatch(/^\d+ms$/v);
                     expect(result).toBe(`${ms}ms`);
                 }
             );
 
-            test.prop([fc.integer({ min: 1000, max: 59_999 })])(
+            test.prop([fc.integer({ max: 59_999, min: 1000 })])(
                 "should format seconds for values 1s-59s",
                 (ms) => {
                     const result = formatResponseDuration(ms);
 
-                    expect(result).toMatch(/^\d+s$/);
+                    expect(result).toMatch(/^\d+s$/v);
+
                     const expectedSeconds = Math.round(ms / 1000);
+
                     expect(result).toBe(`${expectedSeconds}s`);
                 }
             );
 
-            test.prop([fc.integer({ min: 60_000, max: 3_599_999 })])(
+            test.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
                 "should format minutes for values 1m-59m",
                 (ms) => {
                     const result = formatResponseDuration(ms);
 
-                    expect(result).toMatch(/^\d+m$/);
+                    expect(result).toMatch(/^\d+m$/v);
+
                     const expectedMinutes = Math.round(ms / 60_000);
+
                     expect(result).toBe(`${expectedMinutes}m`);
                 }
             );
 
-            test.prop([fc.integer({ min: 3_600_000, max: 86_400_000 })])(
+            test.prop([fc.integer({ max: 86_400_000, min: 3_600_000 })])(
                 "should format hours for values >= 1h",
                 (ms) => {
                     const result = formatResponseDuration(ms);
 
-                    expect(result).toMatch(/^\d+h$/);
+                    expect(result).toMatch(/^\d+h$/v);
+
                     const expectedHours = Math.round(ms / 3_600_000);
+
                     expect(result).toBe(`${expectedHours}h`);
                 }
             );
         });
 
         describe("formatResponseTime property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 999 })])(
+            test.prop([fc.integer({ max: 999, min: 0 })])(
                 "should format milliseconds for times < 1000ms",
                 (time) => {
                     const result = formatResponseTime(time);
@@ -1064,13 +1114,15 @@ describe("Time Utilities", () => {
                 }
             );
 
-            test.prop([fc.integer({ min: 1000, max: 60_000 })])(
+            test.prop([fc.integer({ max: 60_000, min: 1000 })])(
                 "should format seconds with decimals for times >= 1000ms",
                 (time) => {
                     const result = formatResponseTime(time);
 
-                    expect(result).toMatch(/^\d+\.\d{2}s$/);
+                    expect(result).toMatch(/^\d+\.\d{2}s$/v);
+
                     const expectedValue = (time / 1000).toFixed(2);
+
                     expect(result).toBe(`${expectedValue}s`);
                 }
             );
@@ -1117,7 +1169,7 @@ describe("Time Utilities", () => {
                 }
             );
 
-            test.prop([fc.integer({ min: 2, max: 20 })])(
+            test.prop([fc.integer({ max: 20, min: 2 })])(
                 "should use plural 'times' for multiple attempts",
                 (attempts) => {
                     const result = formatRetryAttemptsText(attempts);
@@ -1128,7 +1180,7 @@ describe("Time Utilities", () => {
                 }
             );
 
-            test.prop([fc.integer({ min: -10, max: -1 })])(
+            test.prop([fc.integer({ max: -1, min: -10 })])(
                 "should handle negative attempts gracefully",
                 (attempts) => {
                     const result = formatRetryAttemptsText(attempts);
@@ -1142,7 +1194,7 @@ describe("Time Utilities", () => {
         });
 
         describe("getIntervalLabel property tests", () => {
-            test.prop([fc.integer({ min: 1000, max: 3_600_000 })])(
+            test.prop([fc.integer({ max: 3_600_000, min: 1000 })])(
                 "should format numeric intervals using formatIntervalDuration",
                 (interval) => {
                     const result = getIntervalLabel(interval);
@@ -1154,8 +1206,8 @@ describe("Time Utilities", () => {
 
             test.prop([
                 fc.record({
-                    value: fc.integer({ min: 1000, max: 3_600_000 }),
-                    label: fc.string({ minLength: 1, maxLength: 20 }),
+                    label: fc.string({ maxLength: 20, minLength: 1 }),
+                    value: fc.integer({ max: 3_600_000, min: 1000 }),
                 }),
             ])("should return custom label when provided", (interval) => {
                 const result = getIntervalLabel(interval);
@@ -1165,7 +1217,7 @@ describe("Time Utilities", () => {
 
             test.prop([
                 fc.record({
-                    value: fc.integer({ min: 1000, max: 3_600_000 }),
+                    value: fc.integer({ max: 3_600_000, min: 1000 }),
                 }),
             ])(
                 "should format value when no label provided in object",
@@ -1178,8 +1230,8 @@ describe("Time Utilities", () => {
             );
         });
 
-        describe("Cross-function property tests", () => {
-            test.prop([fc.integer({ min: 0, max: 86_400_000 })])(
+        describe("cross-function property tests", () => {
+            test.prop([fc.integer({ max: 86_400_000, min: 0 })])(
                 "formatDuration and formatResponseDuration should handle same inputs consistently",
                 (ms) => {
                     const duration = formatDuration(ms);
@@ -1190,19 +1242,19 @@ describe("Time Utilities", () => {
                     expect(response.length).toBeGreaterThan(0);
 
                     // Property: Both should not contain negative values
-                    expect(duration).not.toMatch(/-\d/);
-                    expect(response).not.toMatch(/-\d/);
+                    expect(duration).not.toMatch(/-\d/v);
+                    expect(response).not.toMatch(/-\d/v);
                 }
             );
 
-            test.prop([fc.integer({ min: 0, max: 1000 })])(
+            test.prop([fc.integer({ max: 1000, min: 0 })])(
                 "TIME_PERIOD_LABELS should have consistent structure",
                 () => {
                     const labels = TIME_PERIOD_LABELS;
 
                     // Property: All values should be non-empty strings
-                    for (const label of Object.values(labels)) {
-                        expect(typeof label).toBe("string");
+                    for (const label of objectValues(labels)) {
+                        expect(label).toBeTypeOf("string");
                         expect(label.length).toBeGreaterThan(0);
                     }
 

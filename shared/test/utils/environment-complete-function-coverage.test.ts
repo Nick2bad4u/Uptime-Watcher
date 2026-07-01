@@ -38,7 +38,8 @@
  *   systematic function calls.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import * as environmentModule from "../../utils/environment.js";
 
 describe("Environment - Complete Function Coverage", () => {
@@ -247,9 +248,7 @@ describe("Environment - Complete Function Coverage", () => {
             // In Node.js environment, window and document don't exist
             expect(environmentModule.isBrowserEnvironment()).toBeFalsy();
 
-            // We can't easily mock window/document in Node.js vitest environment
-            // because the function checks for typeof window/document which can't be mocked
-            // The function is working correctly - it detects we're not in a browser
+            // We can't easily mock window/document in Node.js vitest environment because the function checks for typeof window/document which can't be mocked The function is working correctly - it detects we're not in a browser
 
             // Test edge case where process might be undefined
             expect(environmentModule.isNodeEnvironment()).toBeTruthy(); // Should be true in test environment

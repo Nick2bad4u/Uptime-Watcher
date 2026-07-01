@@ -15,14 +15,15 @@
  * @tags ["events", "categorization", "priority", "utilities"]
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
-    isEventOfCategory,
     getEventPriority,
+    isEventOfCategory,
     type UptimeEventName,
 } from "../events/eventTypes.js";
 
-const uptimeEventNameAllowsAnyString =
+const isUptimeEventNameAllowsAnyString =
     false satisfies string extends UptimeEventName ? true : false;
 
 describe(isEventOfCategory, () => {
@@ -40,7 +41,7 @@ describe(isEventOfCategory, () => {
             "compile-time"
         );
 
-        expect(uptimeEventNameAllowsAnyString).toBeFalsy();
+        expect(isUptimeEventNameAllowsAnyString).toBeFalsy();
     });
 
     it("returns true for event in category", async ({ task, annotate }) => {

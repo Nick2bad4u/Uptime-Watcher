@@ -1,7 +1,7 @@
 import type { Simplify, TaggedUnion, UnknownRecord, ValueOf } from "type-fest";
 /**
  * Standardized log message templates for consistent logging across the
- * application.
+ * app.
  *
  * @remarks
  * This module provides templates for common log messages to ensure consistency
@@ -532,7 +532,7 @@ export function interpolateLogTemplate(
     };
 
     return template.replaceAll(
-        /\{(?<variableName>[$_a-z][\w$]*)\}/giu,
+        /\{(?<variableName>[$a-z_][\w$]*)\}/giu,
         (
             match: string,
             key: string,

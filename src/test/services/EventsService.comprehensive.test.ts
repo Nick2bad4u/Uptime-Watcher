@@ -7,21 +7,24 @@
  * to achieve 95%+ code coverage.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
+
 import {
-    MONITORING_CONTROL_REASON,
-    type MonitoringControlEventData,
-    type MonitoringStartedEventData as SharedMonitoringStartedEventData,
-    type MonitoringStoppedEventData as SharedMonitoringStoppedEventData,
     type CacheInvalidatedEventData,
     type MonitorDownEventData,
+    MONITORING_CONTROL_REASON,
+    type MonitoringControlEventData,
     type MonitorStatusChangedEventData,
     type MonitorUpEventData,
+    type MonitoringStartedEventData as SharedMonitoringStartedEventData,
+    type MonitoringStoppedEventData as SharedMonitoringStoppedEventData,
     type TestEventData,
     type UpdateStatusEventData,
 } from "@shared/types/events";
+import { arrayAt, safeCastTo  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { EventsService } from "../../services/EventsService";
 import { createMockFunction } from "../utils/mockFactories";
 
 type MonitoringStartedEventData = SharedMonitoringStartedEventData;
@@ -34,8 +37,6 @@ type MonitoringStartedEventHandler = (
 type MonitoringStoppedEventHandler = (
     payload: MonitoringStoppedEventData
 ) => void;
-
-import { EventsService } from "../../services/EventsService";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -73,7 +74,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -85,13 +86,13 @@ const mockLogger = vi.hoisted(() => ({
     warn: vi.fn(),
     debug: vi.fn(),
 }));
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
 // Mock ensureError from shared utils
 const mockEnsureError = vi.hoisted(() => vi.fn((error) => error));
-vi.mock("../../../shared/utils/errorHandling", () => ({
+vi.mock(import('../../../shared/utils/errorHandling'), () => ({
     ensureError: mockEnsureError,
 }));
 
@@ -192,9 +193,9 @@ describe("EventsService", () => {
             const expectedMethods = [
                 "initialize",
                 "onCacheInvalidated",
-                "onMonitorDown",
-                "onMonitorCheckCompleted",
                 "onHistoryLimitUpdated",
+                "onMonitorCheckCompleted",
+                "onMonitorDown",
                 "onMonitoringStarted",
                 "onMonitoringStopped",
                 "onMonitorStatusChanged",
@@ -217,7 +218,7 @@ describe("EventsService", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(EventsService.initialize()).resolves.toBeUndefined();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
@@ -229,7 +230,7 @@ describe("EventsService", () => {
                 "Electron API not available"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[EventsService] Failed to initialize:",
@@ -244,7 +245,7 @@ describe("EventsService", () => {
             await expect(EventsService.initialize()).rejects.toBe(stringError);
 
             expect(mockEnsureError).toHaveBeenCalledWith(stringError);
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
         });
     });
 
@@ -254,7 +255,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onCacheInvalidated(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.events.onCacheInvalidated
             ).toHaveBeenCalledWith(callback);
@@ -333,7 +334,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onMonitorDown(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onMonitorDown).toHaveBeenCalledWith(
                 callback
             );
@@ -360,7 +361,7 @@ describe("EventsService", () => {
             const cleanup =
                 await EventsService.onMonitorCheckCompleted(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.events.onMonitorCheckCompleted
             ).toHaveBeenCalledWith(callback);
@@ -390,7 +391,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onHistoryLimitUpdated(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.events.onHistoryLimitUpdated
             ).toHaveBeenCalledWith(callback);
@@ -420,15 +421,14 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onMonitoringStarted(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.events.onMonitoringStarted
             ).toHaveBeenCalledTimes(1);
 
             const call =
-                mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0) as
-                    | [MonitoringStartedEventHandler]
-                    | undefined;
+                safeCastTo<| [MonitoringStartedEventHandler]
+                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStarted.mock.calls, 0));
             expect(call).toBeDefined();
             if (!call) {
                 throw new Error(
@@ -464,7 +464,7 @@ describe("EventsService", () => {
             await EventsService.onMonitoringStarted(callback);
 
             const call =
-                mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0);
+                arrayAt(mockElectronAPI.events.onMonitoringStarted.mock.calls, 0);
             expect(call).toBeDefined();
             const [registeredHandler] = call as [MonitoringStartedEventHandler];
 
@@ -488,15 +488,14 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onMonitoringStopped(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.events.onMonitoringStopped
             ).toHaveBeenCalledTimes(1);
 
             const call =
-                mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0) as
-                    | [MonitoringStoppedEventHandler]
-                    | undefined;
+                safeCastTo<| [MonitoringStoppedEventHandler]
+                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStopped.mock.calls, 0));
             expect(call).toBeDefined();
             if (!call) {
                 throw new Error(
@@ -532,7 +531,7 @@ describe("EventsService", () => {
             await EventsService.onMonitoringStopped(callback);
 
             const call =
-                mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0);
+                arrayAt(mockElectronAPI.events.onMonitoringStopped.mock.calls, 0);
             expect(call).toBeDefined();
             const [registeredHandler] = call as [MonitoringStoppedEventHandler];
 
@@ -557,7 +556,7 @@ describe("EventsService", () => {
             const cleanup =
                 await EventsService.onMonitorStatusChanged(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.events.onMonitorStatusChanged
             ).toHaveBeenCalledWith(callback);
@@ -585,7 +584,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onMonitorUp(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onMonitorUp).toHaveBeenCalledWith(
                 callback
             );
@@ -611,7 +610,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onSiteAdded(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onSiteAdded).toHaveBeenCalledWith(
                 callback
             );
@@ -637,7 +636,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onSiteRemoved(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onSiteRemoved).toHaveBeenCalledWith(
                 callback
             );
@@ -663,7 +662,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onSiteUpdated(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onSiteUpdated).toHaveBeenCalledWith(
                 callback
             );
@@ -689,7 +688,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onTestEvent(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onTestEvent).toHaveBeenCalledWith(
                 callback
             );
@@ -715,7 +714,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onUpdateStatus(callback);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.events.onUpdateStatus).toHaveBeenCalledWith(
                 callback
             );
@@ -771,7 +770,7 @@ describe("EventsService", () => {
             );
 
             expect(mockEnsureError).toHaveBeenCalledWith(complexError);
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
         });
 
         it("should handle all event methods consistently", async () => {
@@ -811,10 +810,10 @@ describe("EventsService", () => {
                     callbacks.monitorCheckCompleted
                 ),
                 EventsService.onMonitoringStarted(
-                    callbacks.monitoringStarted as MonitoringStartedEventHandler
+                    safeCastTo<MonitoringStartedEventHandler>(callbacks.monitoringStarted)
                 ),
                 EventsService.onMonitoringStopped(
-                    callbacks.monitoringStopped as MonitoringStoppedEventHandler
+                    safeCastTo<MonitoringStoppedEventHandler>(callbacks.monitoringStopped)
                 ),
                 EventsService.onMonitorStatusChanged(
                     callbacks.monitorStatusChanged
@@ -860,13 +859,11 @@ describe("EventsService", () => {
             );
 
             const startedCall =
-                mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0) as
-                    | [MonitoringStartedEventHandler]
-                    | undefined;
+                safeCastTo<| [MonitoringStartedEventHandler]
+                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStarted.mock.calls, 0));
             const stoppedCall =
-                mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0) as
-                    | [MonitoringStoppedEventHandler]
-                    | undefined;
+                safeCastTo<| [MonitoringStoppedEventHandler]
+                    | undefined>(arrayAt(mockElectronAPI.events.onMonitoringStopped.mock.calls, 0));
 
             expect(startedCall).toBeDefined();
             expect(stoppedCall).toBeDefined();
@@ -923,7 +920,7 @@ describe("EventsService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             // Remove the electronAPI
-            delete (globalThis as any).window.electronAPI;
+            delete globalThis.electronAPI;
 
             const callback = vi.fn();
 

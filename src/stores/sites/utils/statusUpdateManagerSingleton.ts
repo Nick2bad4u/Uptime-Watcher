@@ -34,36 +34,6 @@ export function dispatchStatusUpdate(update: StatusUpdate): void {
     statusUpdateManagerSingleton.callback?.(update);
 }
 
-/** Returns the currently registered status update callback. */
-export function getStatusUpdateCallback(): StatusUpdateCallback | undefined {
-    return statusUpdateManagerSingleton.callback;
-}
-
-/**
- * Registers (or replaces) the status update callback used by the singleton
- * dispatcher.
- */
-export function setStatusUpdateCallback(callback: StatusUpdateCallback): void {
-    statusUpdateManagerSingleton.callback = callback;
-}
-
-/**
- * Returns the active
- * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
- * instance (if initialized).
- */
-export function getStatusUpdateManagerInstance():
-    | StatusUpdateManager
-    | undefined {
-    return statusUpdateManagerSingleton.instance;
-}
-
-/** Unsubscribes the active manager (if any) and clears the instance slot. */
-export function unsubscribeStatusUpdateManager(): void {
-    statusUpdateManagerSingleton.instance?.unsubscribe();
-    statusUpdateManagerSingleton.instance = undefined;
-}
-
 /**
  * Ensures the singleton
  * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager} exists
@@ -84,6 +54,22 @@ export function ensureStatusUpdateManager(options: {
     return statusUpdateManagerSingleton.instance;
 }
 
+/** Returns the currently registered status update callback. */
+export function getStatusUpdateCallback(): StatusUpdateCallback | undefined {
+    return statusUpdateManagerSingleton.callback;
+}
+
+/**
+ * Returns the active
+ * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
+ * instance (if initialized).
+ */
+export function getStatusUpdateManagerInstance():
+    | StatusUpdateManager
+    | undefined {
+    return statusUpdateManagerSingleton.instance;
+}
+
 /**
  * Resets the singleton for deterministic testing and dev hot-reload safety.
  */
@@ -97,4 +83,18 @@ export function resetStatusUpdateManagerSingleton(): void {
  */
 export function resolveFallbackExpectedListenerCount(): number {
     return resolveExpectedListenerCount(StatusUpdateManager);
+}
+
+/**
+ * Registers (or replaces) the status update callback used by the singleton
+ * dispatcher.
+ */
+export function setStatusUpdateCallback(callback: StatusUpdateCallback): void {
+    statusUpdateManagerSingleton.callback = callback;
+}
+
+/** Unsubscribes the active manager (if any) and clears the instance slot. */
+export function unsubscribeStatusUpdateManager(): void {
+    statusUpdateManagerSingleton.instance?.unsubscribe();
+    statusUpdateManagerSingleton.instance = undefined;
 }

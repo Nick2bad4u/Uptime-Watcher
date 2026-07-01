@@ -92,16 +92,16 @@ export const electronNoAdHocErrorCodeSuffixRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow ad-hoc error code suffix formatting in electron/services; use getElectronErrorCodeSuffix instead",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-ad-hoc-error-code-suffix.md",
         },
-        schema: [],
         messages: {
             banned: "Use getElectronErrorCodeSuffix from electron/services/shell/openExternalUtils.ts instead of ad-hoc error code suffix formatting.",
         },
+        schema: [],
+        type: "problem",
     },
 };

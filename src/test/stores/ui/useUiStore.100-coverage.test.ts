@@ -3,12 +3,13 @@
  *   the selectSite function when site is undefined
  */
 
-import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
+
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
 // Mock the logger
-vi.mock("@/stores/utils", () => ({
+vi.mock(import('@/stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
@@ -24,7 +25,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
     });
 
     describe("Targeting Lines 130-131 (selectSite with undefined)", () => {
-        test("should handle selectSite with undefined site", async ({
+        it("should handle selectSite with undefined site", async ({
             task,
             annotate,
         }) => {
@@ -67,7 +68,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
             expect(result.current.selectedSiteIdentifier).toBeUndefined();
         });
 
-        test("should handle selectSite with valid site", async ({
+        it("should handle selectSite with valid site", async ({
             task,
             annotate,
         }) => {
@@ -103,7 +104,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
             expect(result.current.selectedSiteIdentifier).toBe("test-site-2");
         });
 
-        test("should handle all UI store actions for coverage", async ({
+        it("should handle all UI store actions for coverage", async ({
             task,
             annotate,
         }) => {

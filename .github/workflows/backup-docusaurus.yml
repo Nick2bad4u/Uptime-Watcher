@@ -1,6 +1,6 @@
 # Build and backup Docusaurus documentation to backup repository
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Build And Backup Docusaurus Documentation
+name: Build and Backup Docusaurus Documentation
 run-name: Build And Backup Docusaurus Documentation
 
 on:

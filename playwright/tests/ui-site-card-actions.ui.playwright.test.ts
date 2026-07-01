@@ -3,15 +3,18 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Locator,
     type Page,
+    test,
 } from "@playwright/test";
+
+import type { CreatedSiteResult } from "../utils/ui-helpers";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     createSiteViaModal,
     getSiteCardLocator,
@@ -19,14 +22,11 @@ import {
     resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
-
-import type { CreatedSiteResult } from "../utils/ui-helpers";
 
 function resolveMetricsSummaryLocator(page: Page, site: CreatedSiteResult) {
     return site.identifier
         ? page.getByTestId(`site-card-metrics-summary-${site.identifier}`)
-        : page.getByText(/^Status:/).first();
+        : page.getByText(/^Status:/v).first();
 }
 
 test.describe(
@@ -59,7 +59,7 @@ test.describe(
                 monitorType: "http",
             });
             siteCardLocator = getSiteCardLocator(page, siteName);
-            await expect(siteCardLocator).toBeVisible({
+            await expect.soft(siteCardLocator).toBeVisible({
                 timeout: WAIT_TIMEOUTS.LONG,
             });
         });
@@ -91,7 +91,7 @@ test.describe(
                 const checkNow = siteCardLocator.getByRole("button", {
                     name: "Check Now",
                 });
-                await expect(checkNow).toBeEnabled({
+                await expect.soft(checkNow).toBeEnabled({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
                 await checkNow.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
@@ -107,23 +107,23 @@ test.describe(
                 const monitorSelector = siteCardLocator.getByRole("combobox", {
                     name: "Select monitor",
                 });
-                await expect(monitorSelector).toBeVisible({
+                await expect.soft(monitorSelector).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 const optionCount = await monitorSelector.evaluate(
                     (element) => element.querySelectorAll("option").length
                 );
-                expect(optionCount).toBeGreaterThan(0);
+                expect.soft(optionCount).toBeGreaterThan(0);
 
                 const metricsSummary = resolveMetricsSummaryLocator(
                     page,
                     createdSite
                 );
 
-                await expect(metricsSummary).toBeVisible();
+                await expect.soft(metricsSummary).toBeVisible();
                 const summaryText = await metricsSummary.textContent();
-                expect((summaryText ?? "").trim().length).toBeGreaterThan(0);
+                expect.soft((summaryText ?? "").trim().length).toBeGreaterThan(0);
             }
         );
 
@@ -154,7 +154,7 @@ test.describe(
                 });
 
                 const sslCard = getSiteCardLocator(page, sslSiteName);
-                await expect(sslCard).toBeVisible({
+                await expect.soft(sslCard).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
@@ -165,8 +165,8 @@ test.describe(
                     selected: true,
                 });
 
-                await expect(selectedOption).toHaveText(
-                    /SSL Certificate:\s*secure\.example\.com:443/i,
+                await expect.soft(selectedOption).toHaveText(
+                    /ssl certificate:\s*secure\.example\.com:443/i,
                     {
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     }
@@ -174,7 +174,7 @@ test.describe(
 
                 // Also ensure the selector itself is visible so the identifier
                 // is actually surfaced in the site card UI.
-                await expect(monitorSelector).toBeVisible({
+                await expect.soft(monitorSelector).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
             }
@@ -196,15 +196,15 @@ test.describe(
                 // status-alert toasts, then verify its live-region semantics.
                 const toaster = page
                     .getByRole("complementary")
-                    .filter({ has: page.getByTestId(/status-alert-/) });
+                    .filter({ has: page.getByTestId(/status-alert-/v) });
 
-                await expect(toaster).toHaveAttribute("aria-live", "polite");
+                await expect.soft(toaster).toHaveAttribute("aria-live", "polite");
 
-                const alertEntries = page.getByTestId(/status-alert-/);
+                const alertEntries = page.getByTestId(/status-alert-/v);
                 const pausedToastEntry = alertEntries.filter({
-                    hasText: /Monitoring paused/i,
+                    hasText: /monitoring paused/i,
                 });
-                await expect(pausedToastEntry.first()).toBeVisible({
+                await expect.soft(pausedToastEntry.first()).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
                 const toastCountAfterPause = await alertEntries.count();
@@ -223,13 +223,13 @@ test.describe(
                     .toBeGreaterThanOrEqual(toastCountAfterPause + 1);
 
                 const latestToastEntry = alertEntries.first();
-                await expect(latestToastEntry).toBeVisible({
+                await expect.soft(latestToastEntry).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 const recoveredAlertId = latestToastEntry;
 
-                await expect(recoveredAlertId).toHaveAttribute("data-alert-id");
+                await expect.soft(recoveredAlertId).toHaveAttribute("data-alert-id");
 
                 await latestToastEntry.click();
 
@@ -237,7 +237,7 @@ test.describe(
                 // dismissal. We cannot assert that *all* recovered toasts are
                 // gone, because multiple recovered alerts can be emitted in
                 // quick succession (flaky timing).
-                await expect(
+                await expect.soft(
                     page.getByTestId(`status-alert-${recoveredAlertId}`)
                 ).toHaveCount(0, {
                     timeout: WAIT_TIMEOUTS.LONG,

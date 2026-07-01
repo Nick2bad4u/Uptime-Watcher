@@ -13,7 +13,7 @@ export function buildStartMonitoringResponse(args: {
         operation: "start-monitoring-response",
         success: args.success,
         timestamp: Date.now(),
-        ...(args.monitorId ? { monitorId: args.monitorId } : {}),
+        ...(args.monitorId && { monitorId: args.monitorId }),
     };
 }
 
@@ -30,7 +30,7 @@ export function buildStopMonitoringResponse(args: {
         operation: "stop-monitoring-response",
         success: args.success,
         timestamp: Date.now(),
-        ...(args.monitorId ? { monitorId: args.monitorId } : {}),
+        ...(args.monitorId && { monitorId: args.monitorId }),
     };
 }
 

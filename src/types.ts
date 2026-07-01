@@ -12,8 +12,6 @@ import type {
     SystemDomainBridge,
 } from "@shared/types/preload";
 
-type RendererSystemApi = SystemDomainBridge;
-
 /**
  * Strongly typed renderer-side view of the Electron preload bridge API.
  */
@@ -21,6 +19,8 @@ export type ElectronAPI = ElectronBridgeApi<
     EventsDomainBridge,
     RendererSystemApi
 >;
+
+type RendererSystemApi = SystemDomainBridge;
 
 declare global {
     interface Window {

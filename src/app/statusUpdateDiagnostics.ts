@@ -16,12 +16,40 @@ import type { StatusUpdateSubscriptionSummary } from "../stores/sites/baseTypes"
 import { logger } from "../services/logger";
 
 /**
- * Log a warning only in development builds.
+ * Emit a debug log for a status update (dev-only).
  */
-export function warnMissingImplementation(message: string): void {
-    if (isDevelopment()) {
-        logger.warn(message);
+export function logStatusUpdateDebugInfo(update: StatusUpdate): void {
+    if (!isDevelopment()) {
+        return;
     }
+
+    const timestamp = new Date().toLocaleTimeString();
+    const resolvedIdentifier = resolveStatusUpdateSiteIdentifier(update);
+
+    logger.debug(
+        `[${timestamp}] Status update received for site: ${resolvedIdentifier}`
+    );
+}
+
+/**
+ * Report diagnostics returned by the status update subscription.
+ */
+export function reportSubscriptionDiagnostics(
+    summary: StatusUpdateSubscriptionSummary | undefined
+): void {
+    if (!summary) {
+        logger.warn("Status update subscription resolved without diagnostics");
+        return;
+    }
+
+    if (summary.success) {
+        return;
+    }
+
+    logger.warn("Status update subscription encountered issues", {
+        errors: summary.errors,
+        listenersAttached: summary.listenersAttached,
+    });
 }
 
 /**
@@ -59,38 +87,10 @@ export function resolveStatusUpdateSiteIdentifier(
 }
 
 /**
- * Emit a debug log for a status update (dev-only).
+ * Log a warning only in development builds.
  */
-export function logStatusUpdateDebugInfo(update: StatusUpdate): void {
-    if (!isDevelopment()) {
-        return;
+export function warnMissingImplementation(message: string): void {
+    if (isDevelopment()) {
+        logger.warn(message);
     }
-
-    const timestamp = new Date().toLocaleTimeString();
-    const resolvedIdentifier = resolveStatusUpdateSiteIdentifier(update);
-
-    logger.debug(
-        `[${timestamp}] Status update received for site: ${resolvedIdentifier}`
-    );
-}
-
-/**
- * Report diagnostics returned by the status update subscription.
- */
-export function reportSubscriptionDiagnostics(
-    summary: StatusUpdateSubscriptionSummary | undefined
-): void {
-    if (!summary) {
-        logger.warn("Status update subscription resolved without diagnostics");
-        return;
-    }
-
-    if (summary.success) {
-        return;
-    }
-
-    logger.warn("Status update subscription encountered issues", {
-        errors: summary.errors,
-        listenersAttached: summary.listenersAttached,
-    });
 }

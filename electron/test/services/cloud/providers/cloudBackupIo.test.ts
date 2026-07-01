@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-
 import type { CloudBackupEntry } from "@shared/types/cloud";
+
+import { describe, expect, it, vi } from "vitest";
 
 import {
     downloadBackupWithMetadata,
@@ -69,7 +69,7 @@ describe(downloadBackupWithMetadata, () => {
 
         await expect(
             downloadBackupWithMetadata({ downloadObject, key })
-        ).rejects.toThrow(/filename/i);
+        ).rejects.toThrow(/filename/iv);
     });
 });
 
@@ -102,7 +102,7 @@ describe(uploadBackupWithMetadata, () => {
                 },
                 uploadObject,
             })
-        ).rejects.toThrow(/metadata upload failed/i);
+        ).rejects.toThrow(/metadata upload failed/iv);
 
         expect(deleteObject).toHaveBeenCalledWith("backups/backup.sqlite");
     });

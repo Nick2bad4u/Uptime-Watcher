@@ -32,9 +32,9 @@ export const rendererNoDirectNetworkingRule = {
      *     getFilename: () => any;
      *     report: (arg0: {
      *         data:
-     *             | { api: string }
-     *             | { api: string }
-     *             | { api: string }
+     *             | { API: string }
+     *             | { API: string }
+     *             | { API: string }
      *             | {
      *                   api: string;
      *               };
@@ -174,17 +174,17 @@ export const rendererNoDirectNetworkingRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow direct fetch/axios usage outside the renderer service layer.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-direct-networking.md",
         },
-        schema: [],
         messages: {
             noDirectNetworking:
                 "Do not perform direct networking ({{api}}) here. Centralize networking in src/services/* (or Electron) to avoid duplicated codepaths.",
         },
+        schema: [],
+        type: "problem",
     },
 };

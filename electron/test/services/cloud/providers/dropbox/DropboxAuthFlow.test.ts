@@ -6,9 +6,12 @@
  * avoid collisions in CI and parallel test workers.
  */
 
+import {
+    DEFAULT_DROPBOX_LOOPBACK_PORT,
+    DropboxAuthFlow,
+} from "@electron/services/cloud/providers/dropbox/DropboxAuthFlow";
 import * as http from "node:http";
 import * as https from "node:https";
-
 import { describe, expect, it, vi } from "vitest";
 
 const openExternalMock = vi.hoisted(() => vi.fn(async (_url: string) => true));
@@ -19,12 +22,7 @@ vi.mock("electron", () => ({
     },
 }));
 
-import {
-    DEFAULT_DROPBOX_LOOPBACK_PORT,
-    DropboxAuthFlow,
-} from "@electron/services/cloud/providers/dropbox/DropboxAuthFlow";
-
-function httpGet(url: string): Promise<{ statusCode: number; body: string }> {
+async function httpGet(url: string): Promise<{ body: string; statusCode: number; }> {
     return new Promise((resolve, reject) => {
         const client = new URL(url).protocol === "https:" ? https : http;
         const request = client.get(url, (response) => {
@@ -60,10 +58,10 @@ describe(DropboxAuthFlow, () => {
                     (
                         redirectUri: string,
                         state?: string,
-                        authType?: "token" | "code",
-                        tokenAccessType?: null | "offline" | "online",
+                        authType?: "code" | "token",
+                        tokenAccessType?: "offline" | "online" | null,
                         scope?: string[],
-                        includeGrantedScopes?: "none" | "user" | "team",
+                        includeGrantedScopes?: "none" | "team" | "user",
                         usePKCE?: boolean
                     ) => Promise<string>
                 >()
@@ -130,7 +128,7 @@ describe(DropboxAuthFlow, () => {
 
             expect(capturedState).toBeTruthy();
             expect(capturedRedirectUri).toMatch(
-                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/u
+                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
             );
 
             if (capturedRedirectUri === undefined) {
@@ -200,7 +198,7 @@ describe(DropboxAuthFlow, () => {
 
         const flow = new DropboxAuthFlow({
             appKey: "app-key",
-            authFactory: () => auth as never,
+            authFactory: () => auth,
             loopbackPort: 0,
         });
 
@@ -242,7 +240,7 @@ describe(DropboxAuthFlow, () => {
 
         const flow = new DropboxAuthFlow({
             appKey: "app-key",
-            authFactory: () => auth as never,
+            authFactory: () => auth,
             loopbackPort: 0,
         });
 

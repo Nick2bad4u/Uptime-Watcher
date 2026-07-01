@@ -61,12 +61,12 @@ export interface UseMonitorTypesResult {
     /** Whether monitor types are currently loading */
     isLoading: boolean;
     /** Monitor type options for form select fields */
-    options: Array<{
+    options: {
         /** Human-readable display text for the monitor type */
         label: string;
         /** Unique identifier value for the monitor type */
         value: MonitorType;
-    }>;
+    }[];
     /** Refresh monitor types from backend */
     refresh: () => Promise<void>;
 }
@@ -82,7 +82,7 @@ export interface UseMonitorTypesResult {
  */
 export function useMonitorTypes(): UseMonitorTypesResult {
     const [options, setOptions] = useState<
-        Array<{ label: string; value: MonitorType }>
+        { label: string; value: MonitorType }[]
     >([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();
@@ -108,7 +108,7 @@ export function useMonitorTypes(): UseMonitorTypesResult {
                 normalizedError
             );
             // Use centralized fallback options to ensure consistency
-            setOptions(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));
+            setOptions([...FALLBACK_MONITOR_TYPE_OPTIONS]);
         } finally {
             setIsLoading(false);
         }

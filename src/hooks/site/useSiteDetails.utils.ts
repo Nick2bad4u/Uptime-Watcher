@@ -55,6 +55,44 @@ export type MonitorEditStateByIdSetter = (
 ) => void;
 
 /**
+ * Applies a per-monitor edit state update using the shared setter signature.
+ *
+ * @public
+ */
+export function applyMonitorEditStateUpdate(args: {
+    readonly monitorId: string;
+    readonly setMonitorEditStateById: MonitorEditStateByIdSetter;
+    readonly updater: (current: MonitorEditState) => MonitorEditState;
+}): void {
+    const { monitorId, setMonitorEditStateById, updater } = args;
+
+    setMonitorEditStateById((previous) =>
+        updateMonitorEditStateById({ monitorId, previous, updater })
+    );
+}
+
+/**
+ * Executes a site-details operation and logs failures without rethrowing.
+ *
+ * @remarks
+ * This helper prevents unhandled promise rejections for UI-driven operations
+ * while allowing underlying store-level error handling to manage user-facing
+ * error state.
+ *
+ * @public
+ */
+export async function runSiteDetailsOperation(
+    context: string,
+    operation: () => Promise<void>
+): Promise<void> {
+    try {
+        await operation();
+    } catch (error: unknown) {
+        logger.app.error(context, ensureError(error));
+    }
+}
+
+/**
  * Updates the monitor edit-state map for a specific monitor id.
  *
  * @public
@@ -70,23 +108,6 @@ export function updateMonitorEditStateById(args: {
         ...args.previous,
         [args.monitorId]: args.updater(current),
     };
-}
-
-/**
- * Applies a per-monitor edit state update using the shared setter signature.
- *
- * @public
- */
-export function applyMonitorEditStateUpdate(args: {
-    readonly monitorId: string;
-    readonly setMonitorEditStateById: MonitorEditStateByIdSetter;
-    readonly updater: (current: MonitorEditState) => MonitorEditState;
-}): void {
-    const { monitorId, setMonitorEditStateById, updater } = args;
-
-    setMonitorEditStateById((previous) =>
-        updateMonitorEditStateById({ monitorId, previous, updater })
-    );
 }
 
 /**
@@ -117,25 +138,4 @@ export async function validateMonitorFieldOrThrow(args: {
     );
     logger.site.error(siteIdentifier, validationError);
     throw validationError;
-}
-
-/**
- * Executes a site-details operation and logs failures without rethrowing.
- *
- * @remarks
- * This helper prevents unhandled promise rejections for UI-driven operations
- * while allowing underlying store-level error handling to manage user-facing
- * error state.
- *
- * @public
- */
-export async function runSiteDetailsOperation(
-    context: string,
-    operation: () => Promise<void>
-): Promise<void> {
-    try {
-        await operation();
-    } catch (error: unknown) {
-        logger.app.error(context, ensureError(error));
-    }
 }

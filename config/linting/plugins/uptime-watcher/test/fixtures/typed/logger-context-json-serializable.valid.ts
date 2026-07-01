@@ -1,6 +1,6 @@
 declare const logger: {
-    debug(message: string, context?: unknown): void;
-    error(message: string, error?: unknown, context?: unknown): void;
+    debug: (message: string, context?: unknown) => void;
+    error: (message: string, error?: unknown, context?: unknown) => void;
 };
 
 logger.debug("monitor update", {

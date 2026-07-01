@@ -3,13 +3,16 @@
  */
 
 import type { StatusUpdate } from "@shared/types";
-import { STATUS_KIND } from "@shared/types";
-import { act, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { STATUS_KIND } from "@shared/types";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { StatusAlert } from "../../../stores/alerts/useAlertStore";
 
 import {
     enqueueAlertFromStatusUpdate,
@@ -17,10 +20,9 @@ import {
 } from "../../../components/Alerts/alertCoordinator";
 import { StatusAlertToast } from "../../../components/Alerts/StatusAlertToast";
 import { StatusAlertToaster } from "../../../components/Alerts/StatusAlertToaster";
-import type { StatusAlert } from "../../../stores/alerts/useAlertStore";
 import { useAlertStore } from "../../../stores/alerts/useAlertStore";
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { defaultSettings } from "../../../stores/settings/state";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
     id: overrides.id ?? "alert-1",
@@ -30,9 +32,7 @@ const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
     siteName: overrides.siteName ?? sampleOne(siteNameArbitrary),
     status: overrides.status ?? "down",
     timestamp: overrides.timestamp ?? Date.now(),
-    ...(overrides.previousStatus === undefined
-        ? {}
-        : { previousStatus: overrides.previousStatus }),
+    ...(overrides.previousStatus !== undefined && { previousStatus: overrides.previousStatus }),
 });
 
 const createStatusUpdate = (
@@ -95,9 +95,9 @@ describe(StatusAlertToast, () => {
         render(<StatusAlertToast alert={alert} onDismiss={onDismiss} />);
 
         expect(
-            screen.getByRole("button", { name: /down for primary http/i })
+            screen.getByRole("button", { name: /down for primary http/iv })
         ).toBeInTheDocument();
-        expect(screen.getByText(/primary http/i)).toBeInTheDocument();
+        expect(screen.getByText(/primary http/iv)).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId("status-alert-alert-1"));
         expect(onDismiss).toHaveBeenCalledWith("alert-1");
@@ -154,7 +154,7 @@ describe(StatusAlertToaster, () => {
         });
 
         render(<StatusAlertToaster />);
-        expect(screen.getAllByTestId(/status-alert-/)).toHaveLength(2);
+        expect(screen.getAllByTestId(/status-alert-/v)).toHaveLength(2);
     });
 
     it("renders alerts produced from status updates when in-app alerts are enabled", () => {
@@ -167,7 +167,7 @@ describe(StatusAlertToaster, () => {
 
         expect(
             screen.getByRole("button", {
-                name: /down for http/i,
+                name: /down for http/iv,
             })
         ).toBeInTheDocument();
         expect(screen.getByText(statusUpdate.site.name)).toBeInTheDocument();

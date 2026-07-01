@@ -6,12 +6,11 @@
  * Any previous bespoke validation helpers have been removed.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { validateMonitorType } from "@shared/utils/validation";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { validateMonitorType } from "@shared/utils/validation";
+import { describe, expect, it } from "vitest";
 
 describe(validateMonitorType, () => {
     it("accepts known monitor types", () => {
@@ -47,7 +46,7 @@ describe("getMonitorValidationErrors (canonical Zod)", () => {
         expect(getMonitorValidationErrors({})).toEqual([
             "Monitor type is required",
         ]);
-        expect(getMonitorValidationErrors({ type: "   " })).toEqual([
+        expect(getMonitorValidationErrors({ type: ' '.repeat(3) })).toEqual([
             "Monitor type is required",
         ]);
     });
@@ -131,7 +130,7 @@ describe("validateSiteData (canonical Zod)", () => {
     it("rejects missing/invalid site fields", () => {
         const result = validateSiteData({
             identifier: "",
-            name: "   ",
+            name: ' '.repeat(3),
             monitoring: true,
             monitors: [],
         });

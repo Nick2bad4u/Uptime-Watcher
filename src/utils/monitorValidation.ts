@@ -36,18 +36,6 @@ const isKnownMonitorType = (value: string): value is MonitorType =>
     validateMonitorType(value);
 
 /**
- * Partial view of monitor form data for a specific monitor type.
- *
- * @typeParam TType - Monitor type discriminator.
- *
- * @public
- */
-export type PartialMonitorFormDataByType<TType extends MonitorType> =
-    PartialMonitorFormDataByTypeInternal<TType>;
-
-type EnhancedValidationResult = EnhancedValidationResultInternal;
-
-/**
  * Required fields for monitor creation, ensuring type safety. Prevents runtime
  * errors by guaranteeing essential properties are present.
  *
@@ -66,6 +54,18 @@ export interface MonitorCreationData
             | "type"
         >,
         UnknownRecord {}
+
+/**
+ * Partial view of monitor form data for a specific monitor type.
+ *
+ * @typeParam TType - Monitor type discriminator.
+ *
+ * @public
+ */
+export type PartialMonitorFormDataByType<TType extends MonitorType> =
+    PartialMonitorFormDataByTypeInternal<TType>;
+
+type EnhancedValidationResult = EnhancedValidationResultInternal;
 /**
  * Create monitor object with proper field mapping and type safety.
  *
@@ -107,6 +107,35 @@ export function createMonitorObject<TType extends MonitorType>(
  * @returns Result of the validation operation or the fallback when errors
  *   occur.
  */
+
+/**
+ * Type guard to check if form data is valid and complete.
+ *
+ * @param data - Form data to validate.
+ *
+ * @returns `true` if form data is valid and complete; otherwise `false`.
+ *
+ * @public
+ */
+export function isMonitorFormData(data: unknown): data is MonitorFormData {
+    if (!isRecord(data)) {
+        return false;
+    }
+
+    const candidateType = data["type"];
+
+    if (typeof candidateType !== "string") {
+        return false;
+    }
+
+    if (!isKnownMonitorType(candidateType)) {
+        return false;
+    }
+
+    const result = sharedValidateMonitorData(candidateType, data);
+
+    return result.success;
+}
 
 /**
  * Validate monitor data using backend registry.
@@ -190,66 +219,6 @@ export async function validateMonitorDataClientSide<TType extends MonitorType>(
 }
 
 /**
- * Enhanced field validation with type information and better error handling.
- *
- * @typeParam TType - Monitor type being validated.
- * @typeParam TField - Field identifier belonging to the monitor form.
- *
- * @param type - Monitor type.
- * @param fieldName - Field name to validate.
- * @param value - Field value.
- *
- * @returns Promise resolving to enhanced validation result.
- *
- * @public
- */
-export async function validateMonitorFieldEnhanced<
-    TType extends MonitorType,
-    TField extends MonitorFieldName<TType>,
->(
-    type: TType,
-    fieldName: TField,
-    value: OptionalMonitorFieldValue<TType, TField>
-): Promise<EnhancedValidationResult> {
-    return runMonitorValidationOperation(
-        "Enhanced field validation",
-        {
-            errors: [`Failed to validate field: ${fieldName}`],
-            fieldName,
-            success: false,
-            validationType: "field" as const,
-            warnings: [],
-        },
-        async () => {
-            const partialPayload = toPartialMonitorFormData(fieldName, value);
-            const result = await validateMonitorData(type, partialPayload);
-
-            const filteredErrors = result.errors.filter((error) =>
-                error.toLowerCase().includes(fieldName.toLowerCase())
-            );
-
-            const finalErrors =
-                result.errors.length > 0 &&
-                isEmpty(filteredErrors) &&
-                !result.success
-                    ? [`Failed to validate field: ${fieldName}`]
-                    : filteredErrors;
-
-            return {
-                errors: finalErrors,
-                fieldName,
-                success: result.success,
-                validationType: "field" as const,
-                warnings:
-                    result.warnings?.filter((warning) =>
-                        warning.toLowerCase().includes(fieldName.toLowerCase())
-                    ) ?? [],
-            };
-        }
-    );
-}
-
-/**
  * Validate individual monitor field with improved error filtering.
  *
  * @typeParam TType - Monitor type under validation.
@@ -321,6 +290,66 @@ export async function validateMonitorFieldClientSide<
 }
 
 /**
+ * Enhanced field validation with type information and better error handling.
+ *
+ * @typeParam TType - Monitor type being validated.
+ * @typeParam TField - Field identifier belonging to the monitor form.
+ *
+ * @param type - Monitor type.
+ * @param fieldName - Field name to validate.
+ * @param value - Field value.
+ *
+ * @returns Promise resolving to enhanced validation result.
+ *
+ * @public
+ */
+export async function validateMonitorFieldEnhanced<
+    TType extends MonitorType,
+    TField extends MonitorFieldName<TType>,
+>(
+    type: TType,
+    fieldName: TField,
+    value: OptionalMonitorFieldValue<TType, TField>
+): Promise<EnhancedValidationResult> {
+    return runMonitorValidationOperation(
+        "Enhanced field validation",
+        {
+            errors: [`Failed to validate field: ${fieldName}`],
+            fieldName,
+            success: false,
+            validationType: "field" as const,
+            warnings: [],
+        },
+        async () => {
+            const partialPayload = toPartialMonitorFormData(fieldName, value);
+            const result = await validateMonitorData(type, partialPayload);
+
+            const filteredErrors = result.errors.filter((error) =>
+                error.toLowerCase().includes(fieldName.toLowerCase())
+            );
+
+            const finalErrors =
+                result.errors.length > 0 &&
+                isEmpty(filteredErrors) &&
+                !result.success
+                    ? [`Failed to validate field: ${fieldName}`]
+                    : filteredErrors;
+
+            return {
+                errors: finalErrors,
+                fieldName,
+                success: result.success,
+                validationType: "field" as const,
+                warnings:
+                    result.warnings?.filter((warning) =>
+                        warning.toLowerCase().includes(fieldName.toLowerCase())
+                    ) ?? [],
+            };
+        }
+    );
+}
+
+/**
  * Validate monitor form data with only the fields that are provided. Used for
  * form validation where not all monitor fields are available yet.
  *
@@ -385,33 +414,4 @@ export async function validateMonitorFormData<TType extends MonitorType>(
             } satisfies ValidationResult;
         }
     );
-}
-
-/**
- * Type guard to check if form data is valid and complete.
- *
- * @param data - Form data to validate.
- *
- * @returns `true` if form data is valid and complete; otherwise `false`.
- *
- * @public
- */
-export function isMonitorFormData(data: unknown): data is MonitorFormData {
-    if (!isRecord(data)) {
-        return false;
-    }
-
-    const candidateType = data["type"];
-
-    if (typeof candidateType !== "string") {
-        return false;
-    }
-
-    if (!isKnownMonitorType(candidateType)) {
-        return false;
-    }
-
-    const result = sharedValidateMonitorData(candidateType, data);
-
-    return result.success;
 }

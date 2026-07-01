@@ -17,6 +17,15 @@ export type MonitorByType<TType extends Site["monitors"][number]["type"]> =
     Site["monitors"][number] & { type: TType };
 
 /**
+ * Base execution args shared by monitor core implementations.
+ */
+export type MonitorExecutionBaseArgs<TContext> = Readonly<{
+    context: TContext;
+    signal?: AbortSignal;
+    timeout: number;
+}>;
+
+/**
  * Asserts that the supplied monitor matches the expected type literal.
  */
 export function assertMonitorType<
@@ -30,54 +39,6 @@ export function assertMonitorType<
         throw new Error(`${scope} cannot handle monitor type: ${monitor.type}`);
     }
 }
-
-/**
- * Ensures the supplied monitor matches the expected type literal.
- *
- * @throws Error when the monitor type does not match the expected literal.
- */
-export function ensureMonitorType<
-    TType extends Site["monitors"][number]["type"],
->(
-    monitor: Site["monitors"][number],
-    expectedType: TType,
-    scope: string
-): MonitorByType<TType> {
-    assertMonitorType(monitor, expectedType, scope);
-    return monitor;
-}
-
-/**
- * Resolves retry attempts and timeout values for a monitor by merging monitor
- * overrides with the service configuration defaults.
- */
-export function deriveMonitorTiming<
-    TType extends Site["monitors"][number]["type"],
->(
-    monitor: MonitorByType<TType>,
-    serviceConfig: MonitorServiceConfig
-): {
-    retryAttempts: number;
-    timeout: number;
-} {
-    const normalized = createMonitorConfig(monitor, {
-        timeout: serviceConfig.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-    });
-
-    return {
-        retryAttempts: normalized.retryAttempts,
-        timeout: normalized.timeout,
-    };
-}
-
-/**
- * Base execution args shared by monitor core implementations.
- */
-export type MonitorExecutionBaseArgs<TContext> = Readonly<{
-    context: TContext;
-    signal?: AbortSignal;
-    timeout: number;
-}>;
 
 /**
  * Creates the base args object passed through monitor core layers.
@@ -116,4 +77,43 @@ export function buildMonitorExecutionBaseArgsWithOptionalSignal<
         timeout: args.timeout,
         ...withOptionalAbortSignal(args.signal),
     });
+}
+
+/**
+ * Resolves retry attempts and timeout values for a monitor by merging monitor
+ * overrides with the service configuration defaults.
+ */
+export function deriveMonitorTiming<
+    TType extends Site["monitors"][number]["type"],
+>(
+    monitor: MonitorByType<TType>,
+    serviceConfig: MonitorServiceConfig
+): {
+    retryAttempts: number;
+    timeout: number;
+} {
+    const normalized = createMonitorConfig(monitor, {
+        timeout: serviceConfig.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+    });
+
+    return {
+        retryAttempts: normalized.retryAttempts,
+        timeout: normalized.timeout,
+    };
+}
+
+/**
+ * Ensures the supplied monitor matches the expected type literal.
+ *
+ * @throws Error when the monitor type does not match the expected literal.
+ */
+export function ensureMonitorType<
+    TType extends Site["monitors"][number]["type"],
+>(
+    monitor: Site["monitors"][number],
+    expectedType: TType,
+    scope: string
+): MonitorByType<TType> {
+    assertMonitorType(monitor, expectedType, scope);
+    return monitor;
 }

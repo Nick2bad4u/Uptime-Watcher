@@ -4,23 +4,6 @@
  */
 
 import {
-    render,
-    screen,
-    fireEvent,
-    waitFor,
-    act,
-    createEvent,
-} from "@testing-library/react";
-import fc from "fast-check";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-
-import {
-    ScreenshotThumbnail,
-    type ScreenshotThumbnailProperties,
-} from "../components/SiteDetails/ScreenshotThumbnail";
-import { logger } from "../services/logger";
-import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
@@ -30,9 +13,26 @@ import {
     tryGetSafeThirdPartyHttpUrl,
 } from "@shared/utils/urlSafety";
 import { isValidUrl } from "@shared/validation/validatorUtils";
+import {
+    act,
+    createEvent,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    ScreenshotThumbnail,
+    type ScreenshotThumbnailProperties,
+} from "../components/SiteDetails/ScreenshotThumbnail";
+import { logger } from "../services/logger";
 
 // Mock the logger
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -55,12 +55,12 @@ const mockSystemService = vi.hoisted(() => ({
     quitAndInstall: vi.fn(),
 }));
 
-vi.mock("../services/SystemService", () => ({
+vi.mock(import('../services/SystemService'), () => ({
     SystemService: mockSystemService,
 }));
 
 // Mock the store utils (partial) so createPersistConfig remains available.
-vi.mock("../stores/utils", async (importOriginal) => {
+vi.mock(import('../stores/utils'), async (importOriginal) => {
     const actual = await importOriginal<typeof import("../stores/utils")>();
     return {
         ...actual,
@@ -69,14 +69,14 @@ vi.mock("../stores/utils", async (importOriginal) => {
 });
 
 // Mock the theme hook
-vi.mock("../theme/useTheme", () => ({
+vi.mock(import('../theme/useTheme'), () => ({
     useTheme: () => ({
         themeName: "dark" as const,
     }),
 }));
 
 // Prevent JSDOM navigation errors by mocking HTMLAnchorElement.prototype.click
-HTMLAnchorElement.prototype.click = vi.fn();
+vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation();
 
 // Mock the anchor element href setter to use hash URLs to prevent JSDOM navigation errors
 const originalSetAttribute = Element.prototype.setAttribute;
@@ -87,9 +87,9 @@ Element.prototype.setAttribute = function (name: string, value: string) {
         value.startsWith("http")
     ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
-        return originalSetAttribute.call(this, name, "#");
+        originalSetAttribute.call(this, name, "#"); return;
     }
-    return originalSetAttribute.call(this, name, value);
+    originalSetAttribute.call(this, name, value);
 };
 
 // Mock window properties
@@ -138,35 +138,32 @@ describe(ScreenshotThumbnail, () => {
         });
 
         // Mock ElementInternals for the anchor element
-        Element.prototype.getBoundingClientRect = vi
-            .fn()
+        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation()
             .mockReturnValue(createMockBoundingClientRect());
 
         // Mock location methods to prevent navigation errors in JSDOM
-        Object.defineProperty(globalThis, "location", {
-            configurable: true,
-            value: {
-                assign: vi.fn(),
-                href: "http://localhost/",
-                reload: vi.fn(),
-                replace: vi.fn(),
+        Object.defineProperties(globalThis, {
+            location: {
+                configurable: true,
+                value: {
+                    assign: vi.fn(),
+                    href: "http://localhost/",
+                    reload: vi.fn(),
+                    replace: vi.fn(),
+                },
+            },
+            innerWidth: {
+                value: 1920,
+                writable: true,
+            },
+            innerHeight: {
+                value: 1080,
+                writable: true,
             },
         });
 
-        Object.defineProperty(globalThis, "innerWidth", {
-            value: 1920,
-            writable: true,
-        });
-
-        Object.defineProperty(globalThis, "innerHeight", {
-            value: 1080,
-            writable: true,
-        });
-
         // Mock getBoundingClientRect
-        Element.prototype.getBoundingClientRect = vi.fn(() =>
-            createMockBoundingClientRect()
-        );
+        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(createMockBoundingClientRect());
     });
 
     afterEach(() => {
@@ -431,7 +428,7 @@ describe(ScreenshotThumbnail, () => {
             link.dispatchEvent(clickEvent);
 
             // Verify preventDefault was called
-            expect(preventDefaultSpy).toHaveBeenCalled();
+            expect(preventDefaultSpy).toHaveBeenCalledWith();
         });
 
         it("should not fall back to window.open when SystemService rejects", async ({
@@ -878,13 +875,15 @@ describe(ScreenshotThumbnail, () => {
             });
 
             // Simulate window resize
-            Object.defineProperty(globalThis, "innerWidth", {
-                value: 800,
-                writable: true,
-            });
-            Object.defineProperty(globalThis, "innerHeight", {
-                value: 600,
-                writable: true,
+            Object.defineProperties(globalThis, {
+                innerWidth: {
+                    value: 800,
+                    writable: true,
+                },
+                innerHeight: {
+                    value: 600,
+                    writable: true,
+                },
             });
             fireEvent(globalThis as any, new Event("resize"));
 
@@ -1036,7 +1035,7 @@ describe(ScreenshotThumbnail, () => {
             const image = screen.getByRole("img");
             expect(image).toHaveAttribute("alt", "Screenshot of ");
 
-            const caption = screen.getByText(/^Preview:\s*$/);
+            const caption = screen.getByText(/^Preview:\s*$/v);
             expect(caption).toBeInTheDocument();
         });
 
@@ -1282,7 +1281,7 @@ describe(ScreenshotThumbnail, () => {
 
             fireEvent.mouseEnter(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
         });
@@ -1322,7 +1321,7 @@ describe(ScreenshotThumbnail, () => {
             // Focus to trigger timeout clearing
             fireEvent.focus(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
         });
@@ -1362,7 +1361,7 @@ describe(ScreenshotThumbnail, () => {
             // Blur to trigger timeout clearing
             fireEvent.blur(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
         });
@@ -1404,7 +1403,7 @@ describe(ScreenshotThumbnail, () => {
             fireEvent.mouseLeave(image);
 
             // This should have called clearTimeout for the existing timeout before setting new one
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1488,7 +1487,7 @@ describe(ScreenshotThumbnail, () => {
 
             fireEvent.mouseEnter(image);
 
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1527,7 +1526,7 @@ describe(ScreenshotThumbnail, () => {
             // Focus should clear existing timeout
             fireEvent.focus(link);
 
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1566,7 +1565,7 @@ describe(ScreenshotThumbnail, () => {
             // Blur should clear existing timeout
             fireEvent.blur(link);
 
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1635,23 +1634,23 @@ describe(ScreenshotThumbnail, () => {
                 height: 50,
                 left: 10,
                 right: 60,
-                toJSON() {
-                    return {};
-                },
+                toJSON: () => ({}),
                 top: 10,
                 width: 50,
                 x: 10,
                 y: 10,
             };
-            Element.prototype.getBoundingClientRect = vi.fn(() => mockRect1);
+            vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(mockRect1);
 
-            Object.defineProperty(globalThis, "innerWidth", {
-                value: 1920,
-                writable: true,
-            });
-            Object.defineProperty(globalThis, "innerHeight", {
-                value: 1080,
-                writable: true,
+            Object.defineProperties(globalThis, {
+                innerWidth: {
+                    value: 1920,
+                    writable: true,
+                },
+                innerHeight: {
+                    value: 1080,
+                    writable: true,
+                },
             });
 
             const caseOneProps = createThumbnailProps();
@@ -1679,15 +1678,13 @@ describe(ScreenshotThumbnail, () => {
                 height: 50,
                 left: 1800,
                 right: 1850,
-                toJSON() {
-                    return {};
-                },
+                toJSON: () => ({}),
                 top: 1000,
                 width: 50,
                 x: 1800,
                 y: 1000,
             };
-            Element.prototype.getBoundingClientRect = vi.fn(() => mockRect2);
+            vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(mockRect2);
 
             const caseTwoProps = createThumbnailProps();
             const { unmount: unmount2 } = render(
@@ -1709,9 +1706,7 @@ describe(ScreenshotThumbnail, () => {
             unmount2();
 
             // Restore defaults
-            Element.prototype.getBoundingClientRect = vi.fn(() =>
-                createMockBoundingClientRect()
-            );
+            vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(createMockBoundingClientRect());
         });
 
         it("should handle all event combinations that can clear timeouts", ({
@@ -1743,7 +1738,7 @@ describe(ScreenshotThumbnail, () => {
             expect(vi.getTimerCount()).toBeGreaterThan(0);
 
             fireEvent.mouseEnter(link); // Should clear timeout
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockClear();
 
@@ -1752,7 +1747,7 @@ describe(ScreenshotThumbnail, () => {
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
             fireEvent.focus(link); // Should clear timeout
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockClear();
 
@@ -1761,7 +1756,7 @@ describe(ScreenshotThumbnail, () => {
             fireEvent.mouseLeave(link);
             expect(vi.getTimerCount()).toBeGreaterThan(0);
             fireEvent.blur(link); // Should clear timeout
-            expect(clearTimeoutSpy).toHaveBeenCalled();
+            expect(clearTimeoutSpy).toHaveBeenCalledWith();
 
             clearTimeoutSpy.mockRestore();
             vi.useRealTimers();
@@ -1783,8 +1778,8 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // This test demonstrates that the current useEffect implementation has a closure issue
-            // The cleanup function captures the initial undefined values of the refs,
+            // This test demonstrates that the current useEffect implementation has a closure issue The cleanup
+            // function captures the initial undefined values of the refs,
             // not their current values at cleanup time
 
             const props = createThumbnailProps();
@@ -1792,7 +1787,7 @@ describe(ScreenshotThumbnail, () => {
 
             // The component should still unmount cleanly even though the cleanup
             // doesn't actually clear the current timeout/portal refs due to closure
-            expect(() => unmount()).not.toThrow();
+            expect(() => { unmount(); }).not.toThrow();
 
             // This test documents the current behavior - the cleanup lines 59-60 and 65-66
             // are not actually reachable with the current implementation due to the

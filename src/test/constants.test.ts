@@ -1,33 +1,37 @@
 /**
- * Comprehensive tests for application constants. Validates all constants used
- * throughout the application.
+ * Comprehensive tests for app constants. Validates all constants used
+ * throughout the app.
  */
 
+import type { ArrayValues } from "type-fest";
+
+import { fc, test } from "@fast-check/vitest";
+import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { arrayAt, objectEntries, objectValues   } from "ts-extras";
 import { describe, expect, it } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
 import {
-    TRANSITION_ALL,
+    ARIA_LABEL,
+    CHART_TIME_PERIODS,
+    CHART_TIME_RANGES,
+    type ChartTimePeriods,
+    type ChartTimeRange,
+    CHECK_INTERVALS,
+    DEFAULT_CHECK_INTERVAL,
+    DEFAULT_HISTORY_LIMIT,
+    DEFAULT_REQUEST_TIMEOUT,
+    DEFAULT_REQUEST_TIMEOUT_SECONDS,
     FALLBACK_MONITOR_TYPE_OPTIONS,
     FONT_FAMILY_MONO,
     FONT_FAMILY_SANS,
-    CHECK_INTERVALS,
-    DEFAULT_CHECK_INTERVAL,
-    DEFAULT_REQUEST_TIMEOUT,
-    DEFAULT_REQUEST_TIMEOUT_SECONDS,
-    DEFAULT_HISTORY_LIMIT,
     HISTORY_LIMIT_OPTIONS,
+    type IntervalOption,
+    RETRY_CONSTRAINTS,
     TIMEOUT_CONSTRAINTS,
     TIMEOUT_CONSTRAINTS_MS,
-    RETRY_CONSTRAINTS,
+    TRANSITION_ALL,
     UI_DELAYS,
-    CHART_TIME_PERIODS,
-    CHART_TIME_RANGES,
-    ARIA_LABEL,
-    type ChartTimeRange,
-    type IntervalOption,
-    type ChartTimePeriods,
 } from "../constants";
-import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
 describe("Application Constants", () => {
     describe("UI Animation Constants", () => {
@@ -54,7 +58,7 @@ describe("Application Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             // Validate CSS transition syntax
-            expect(TRANSITION_ALL).toMatch(/^all\s+[\d.]+s\s+ease-in-out$/);
+            expect(TRANSITION_ALL).toMatch(/^all\s+[\d.]+s\s+ease-in-out$/v);
         });
     });
 
@@ -714,10 +718,10 @@ describe("Application Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             // Extract timing from TRANSITION_ALL
-            const timingMatch = TRANSITION_ALL.match(/(?<timing>[\d.]+)s/);
+            const timingMatch = /(?<timing>[\d.]+)s/v.exec(TRANSITION_ALL);
             expect(timingMatch).not.toBeNull();
 
-            if (timingMatch && timingMatch.groups?.["timing"]) {
+            if (timingMatch?.groups?.["timing"]) {
                 const seconds = Number.parseFloat(timingMatch.groups["timing"]);
                 expect(seconds).toBeGreaterThan(0);
                 expect(seconds).toBeLessThan(2); // Should be reasonable for UI animations
@@ -817,7 +821,7 @@ describe("Application Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(TRANSITION_ALL).toMatch(/^\w+\s+[\d.]+s\s+[\w-]+$/);
+            expect(TRANSITION_ALL).toMatch(/^\w+\s+[\d.]+s\s+[\w-]+$/u);
         });
 
         it("should have non-empty monitor type options", async ({
@@ -928,11 +932,11 @@ describe("Application Constants", () => {
 
                 for (const option of FALLBACK_MONITOR_TYPE_OPTIONS) {
                     expect(option).toHaveProperty(property);
-                    expect(typeof option[property as keyof typeof option]).toBe(
+                    expect(typeof option[property]).toBe(
                         "string"
                     );
                     expect(
-                        (option[property as keyof typeof option] as string)
+                        (option[property])
                             .length
                     ).toBeGreaterThan(0);
                 }
@@ -975,7 +979,7 @@ describe("Application Constants", () => {
                 expect(HISTORY_LIMIT_OPTIONS.length).toBeGreaterThan(0);
 
                 let unlimitedCount = 0;
-                const finiteOptions: (typeof HISTORY_LIMIT_OPTIONS)[number][] =
+                const finiteOptions: ArrayValues<typeof HISTORY_LIMIT_OPTIONS>[] =
                     [];
 
                 // All options should have valid structure
@@ -1007,7 +1011,7 @@ describe("Application Constants", () => {
                 expect(finiteOptions).toEqual(sortedFinite);
 
                 // Unlimited option should be the last entry for UX clarity
-                const lastOption = HISTORY_LIMIT_OPTIONS.at(-1);
+                const lastOption = arrayAt(HISTORY_LIMIT_OPTIONS, -1);
                 // Runtime guard to satisfy strict null checks while still
                 // asserting the structural invariant we care about.
                 expect(lastOption).toBeDefined();
@@ -1037,7 +1041,7 @@ describe("Application Constants", () => {
                 expect(ARIA_LABEL).toBe("aria-label");
 
                 // Verify it's a valid HTML attribute name
-                expect(ARIA_LABEL).toMatch(/^aria-[a-z]+$/);
+                expect(ARIA_LABEL).toMatch(/^aria-[a-z]+$/v);
             }
         );
 
@@ -1047,7 +1051,7 @@ describe("Application Constants", () => {
                 expect(RETRY_CONSTRAINTS).toBeDefined();
 
                 // All retry values should be numbers
-                for (const [_key, value] of Object.entries(RETRY_CONSTRAINTS)) {
+                for (const value of objectValues(RETRY_CONSTRAINTS)) {
                     expect(typeof value).toBe("number");
                     expect(value).toBeGreaterThanOrEqual(0); // MIN can be 0
                 }
@@ -1070,7 +1074,7 @@ describe("Application Constants", () => {
                 expect(UI_DELAYS).toBeDefined();
 
                 // All UI delays should be numbers and non-negative
-                for (const [_key, value] of Object.entries(UI_DELAYS)) {
+                for (const value of objectValues(UI_DELAYS)) {
                     expect(typeof value).toBe("number");
                     expect(value).toBeGreaterThanOrEqual(0); // STATE_UPDATE_DEFER can be 0
                     expect(value).toBeLessThan(10_000); // Should be reasonable for UI
@@ -1090,7 +1094,7 @@ describe("Application Constants", () => {
                 expect(CHART_TIME_RANGES).toBeDefined();
 
                 // Chart periods should be numbers (milliseconds)
-                for (const [key, period] of Object.entries(
+                for (const [key, period] of objectEntries(
                     CHART_TIME_PERIODS
                 )) {
                     expect(typeof key).toBe("string");

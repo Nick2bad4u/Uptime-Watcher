@@ -6,16 +6,16 @@
 import { describe, expect, it } from "vitest";
 
 import {
-    DEFAULT_THEME_CONFIG,
-    isColorPalette,
-    isThemeConfig,
     type AnimationConfig,
     type BackgroundColors,
     type BorderColors,
     type BorderRadiusConfig,
     type ColorPalette,
     type ComponentConfig,
+    DEFAULT_THEME_CONFIG,
     type HoverColors,
+    isColorPalette,
+    isThemeConfig,
     type ShadowConfig,
     type SpacingConfig,
     type StatusColors,

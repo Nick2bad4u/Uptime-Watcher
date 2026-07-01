@@ -1,6 +1,6 @@
 import {
-    validateMonitorField,
     validateMonitorData,
+    validateMonitorField,
 } from "../../validation/monitorSchemas";
 
 describe("Schemas - Missing Coverage", () => {
@@ -19,8 +19,7 @@ describe("Schemas - Missing Coverage", () => {
             annotate("Category: Validation", "category");
             annotate("Type: Validation", "type");
 
-            // Test a field that might trigger the fallback to base schema logic
-            // This should test the internal validateFieldWithSchema function
+            // Test a field that might trigger the fallback to base schema logic This should test the internal validateFieldWithSchema function
 
             expect(() => {
                 validateMonitorField("http", "unknown_field", "test-value");

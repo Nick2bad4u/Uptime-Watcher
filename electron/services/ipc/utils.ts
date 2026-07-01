@@ -206,7 +206,7 @@ function createResponseFromExecution<T>(
         ...metadata,
         duration: execution.duration,
         handler: channelName,
-        ...(correlationId ? { correlationId } : {}),
+        ...(correlationId && { correlationId }),
     };
 
     if (execution.outcome === "success") {
@@ -339,7 +339,7 @@ export async function withIpcHandlerValidation<
                 `[IpcHandler] Validation failed ${channelName}`,
                 withLogContext({
                     channel: channelName,
-                    ...(correlationId ? { correlationId } : {}),
+                    ...(correlationId && { correlationId }),
                     event: "ipc:validation:failure",
                     severity: "warn",
                 }),
@@ -355,7 +355,7 @@ export async function withIpcHandlerValidation<
         const responseMetadata = {
             ...metadata,
             handler: channelName,
-            ...(correlationId ? { correlationId } : {}),
+            ...(correlationId && { correlationId }),
             validationErrors,
         } satisfies IpcHandlerMetadata;
 
@@ -365,7 +365,7 @@ export async function withIpcHandlerValidation<
     const executionOptions: WithIpcHandlerOptions<T> = {
         metadata,
         validateResult: options?.validateResult ?? null,
-        ...(correlationId ? { correlationId } : {}),
+        ...(correlationId && { correlationId }),
     };
 
     const execution = await executeIpcHandler(
@@ -462,7 +462,7 @@ export function registerStandardizedIpcHandler<
             }),
             {
                 channel: channelName,
-                registeredHandlers: Array.from(registeredHandlers),
+                registeredHandlers: [...registeredHandlers],
             }
         );
 
@@ -584,7 +584,7 @@ export function registerStandardizedIpcHandler<
         registeredHandlers.delete(channelName);
 
         const error =
-            rawError instanceof Error
+            Error.isError(rawError)
                 ? rawError
                 : new Error(getUserFacingErrorDetail(rawError));
 

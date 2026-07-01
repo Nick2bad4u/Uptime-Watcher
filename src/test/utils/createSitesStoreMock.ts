@@ -10,10 +10,11 @@
  * overrides.
  */
 
-import { vi } from "vitest";
-
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
-import type { PartialDeep } from "type-fest";
+import type { PartialDeep, UnknownArray  } from "type-fest";
+
+import { objectAssign } from "ts-extras";
+import { vi } from "vitest";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -75,7 +76,7 @@ const createUnsubscribeResult = (): StatusUpdateUnsubscribeResult => ({
 export const createSitesStoreMock = (
     overrides: PartialDeep<SitesStore> = {}
 ): SitesStore => {
-    type AsyncVoidFn = (...args: readonly unknown[]) => Promise<void>;
+    type AsyncVoidFn = (...args: Readonly<UnknownArray>) => Promise<void>;
 
     const asyncVoid = <Fn extends AsyncVoidFn>(): Fn =>
         vi.fn(async () => undefined) as unknown as Fn;
@@ -158,7 +159,7 @@ export const createSitesStoreMock = (
         statusSubscriptionSummary: undefined,
     };
 
-    return Object.assign(store, overrides) as SitesStore;
+    return objectAssign(store, overrides);
 };
 
 /**
@@ -172,5 +173,5 @@ export const updateSitesStoreMock = (
     state: SitesStore,
     partial: PartialDeep<SitesStore>
 ): void => {
-    Object.assign(state, partial);
+    objectAssign(state, partial);
 };

@@ -2,9 +2,8 @@
  * Coverage test for the shared logger interfaces module.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { LOGGER_INTERFACES_MODULE_MARKER } from "@shared/utils/logger/interfaces";
+import { describe, expect, it } from "vitest";
 
 describe("logger interfaces module", () => {
     it("exports a runtime marker", () => {

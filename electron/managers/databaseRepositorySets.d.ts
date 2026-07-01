@@ -28,7 +28,7 @@ export interface DatabaseManagerRepositories {
     readonly history: HistoryRepository;
     /** Repository for monitor data. */
     readonly monitor: MonitorRepository;
-    /** Repository for application settings. */
+    /** Repository for app settings. */
     readonly settings: SettingsRepository;
     /** Repository for site data. */
     readonly site: SiteRepository;
@@ -44,7 +44,7 @@ export interface SiteManagerRepositories {
     readonly historyRepository: HistoryRepository;
     /** Repository for managing monitor configuration and data */
     readonly monitorRepository: MonitorRepository;
-    /** Repository for managing application settings */
+    /** Repository for managing app settings */
     readonly settingsRepository: SettingsRepository;
     /** Repository for managing site configuration and data */
     readonly siteRepository: SiteRepository;

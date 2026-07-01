@@ -8,18 +8,18 @@
  * handling, SQL injection prevention, and performance validation.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { fc } from "@fast-check/vitest";
 import type { Database } from "node-sqlite3-wasm";
+
+import { fc } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import all functions from databaseSchema
 import {
-    createDatabaseTables,
     createDatabaseIndexes,
-    setupMonitorTypeValidation,
     createDatabaseSchema,
+    createDatabaseTables,
+    setupMonitorTypeValidation,
 } from "../../services/database/utils/schema/databaseSchema";
-
 // Import the function that needs to be mocked
 import { getRegisteredMonitorTypes } from "../../services/monitoring/MonitorTypeRegistry";
 
@@ -115,8 +115,8 @@ const containsStandaloneSegment = (text: string, value: string): boolean => {
                 ? (text[searchIndex + value.length] ?? "")
                 : "";
 
-        const isLeadingAlphaNumeric = /[A-Za-z0-9_]/u.test(precedingCharacter);
-        const isTrailingAlphaNumeric = /[A-Za-z0-9_]/u.test(followingCharacter);
+        const isLeadingAlphaNumeric = /\w/v.test(precedingCharacter);
+        const isTrailingAlphaNumeric = /\w/v.test(followingCharacter);
 
         if (!isLeadingAlphaNumeric && !isTrailingAlphaNumeric) {
             return true;
@@ -163,7 +163,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
         vi.mocked(setupMonitorTypeValidation).mockImplementation(() => {
             try {
                 vi.mocked(getRegisteredMonitorTypes)();
-            } catch (error) {
+            } catch {
                 // Silently catch errors like the real implementation
                 // The real implementation logs but doesn't re-throw
             }
@@ -211,7 +211,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         if (shouldSucceed) {
                             expect(() =>
-                                createDatabaseTables(testDb)
+                                { createDatabaseTables(testDb); }
                             ).not.toThrow();
                             expect(runSpy).toHaveBeenCalled();
                             // Verify all required tables are created
@@ -246,7 +246,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                 )
                             );
                         } else {
-                            expect(() => createDatabaseTables(testDb)).toThrow(
+                            expect(() => { createDatabaseTables(testDb); }).toThrow(
                                 "SQL execution failed"
                             );
                         }
@@ -328,7 +328,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                         }
 
                         if (shouldFail) {
-                            expect(() => createDatabaseIndexes(testDb)).toThrow(
+                            expect(() => { createDatabaseIndexes(testDb); }).toThrow(
                                 errorType
                             );
                         } else {
@@ -432,7 +432,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Should not throw even if registry fails (graceful degradation)
                         expect(() =>
-                            setupMonitorTypeValidation()
+                            { setupMonitorTypeValidation(); }
                         ).not.toThrow();
 
                         if (!shouldThrow) {
@@ -465,7 +465,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Should handle any input gracefully
                         expect(() =>
-                            setupMonitorTypeValidation()
+                            { setupMonitorTypeValidation(); }
                         ).not.toThrow();
 
                         expect(getRegisteredMonitorTypes).toHaveBeenCalled();
@@ -553,7 +553,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                 ).mockImplementation(() => {
                                     try {
                                         vi.mocked(getRegisteredMonitorTypes)();
-                                    } catch (error) {
+                                    } catch {
                                         // Real implementation catches errors and just logs warnings
                                     }
                                 });
@@ -564,7 +564,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                     // Default implementation calls getRegisteredMonitorTypes with error handling
                                     try {
                                         vi.mocked(getRegisteredMonitorTypes)();
-                                    } catch (error) {
+                                    } catch {
                                         // Silently catch errors like the real implementation
                                     }
                                 });
@@ -572,20 +572,21 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                             if (failAt === "none") {
                                 expect(() =>
-                                    createDatabaseSchema(testDb)
+                                    { createDatabaseSchema(testDb); }
                                 ).not.toThrow();
                                 // Verify transaction was committed
                                 expect(runSpy).toHaveBeenCalledWith("COMMIT");
                             } else if (failAt === "validation") {
-                                // For validation case, the function should NOT throw since setupMonitorTypeValidation catches errors
+                                // For validation case, the function should NOT throw since setupMonitorTypeValidation
+                                // catches errors
                                 expect(() =>
-                                    createDatabaseSchema(testDb)
+                                    { createDatabaseSchema(testDb); }
                                 ).not.toThrow();
                                 // Verify transaction was committed (no rollback)
                                 expect(runSpy).toHaveBeenCalledWith("COMMIT");
                             } else {
                                 expect(() =>
-                                    createDatabaseSchema(testDb)
+                                    { createDatabaseSchema(testDb); }
                                 ).toThrow();
 
                                 // Only verify rollback was called if transaction was actually started
@@ -748,13 +749,16 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Mock different schema generation scenarios
                         switch (schemaVariant) {
-                            case "valid": {
-                                generateMonitorTableSchema.mockReturnValue(`
-                                    CREATE TABLE IF NOT EXISTS monitors (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        site_identifier TEXT NOT NULL
-                                    )
-                                `);
+                            case "contains_null": {
+                                generateMonitorTableSchema.mockReturnValue(
+                                    "CREATE TABLE null_value"
+                                );
+                                break;
+                            }
+                            case "contains_undefined": {
+                                generateMonitorTableSchema.mockReturnValue(
+                                    "CREATE TABLE undefined_value"
+                                );
                                 break;
                             }
                             case "empty": {
@@ -773,16 +777,13 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                 );
                                 break;
                             }
-                            case "contains_undefined": {
-                                generateMonitorTableSchema.mockReturnValue(
-                                    "CREATE TABLE undefined_value"
-                                );
-                                break;
-                            }
-                            case "contains_null": {
-                                generateMonitorTableSchema.mockReturnValue(
-                                    "CREATE TABLE null_value"
-                                );
+                            case "valid": {
+                                generateMonitorTableSchema.mockReturnValue(`
+                                    CREATE TABLE IF NOT EXISTS monitors (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        site_identifier TEXT NOT NULL
+                                    )
+                                `);
                                 break;
                             }
                         }
@@ -794,11 +795,11 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                             for (let i = 0; i < executionCount; i++) {
                                 if (schemaVariant === "valid") {
                                     expect(() =>
-                                        createDatabaseTables(testDb)
+                                        { createDatabaseTables(testDb); }
                                     ).not.toThrow();
                                 } else {
                                     expect(() =>
-                                        createDatabaseTables(testDb)
+                                        { createDatabaseTables(testDb); }
                                     ).toThrow();
                                 }
                             }
@@ -925,10 +926,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                     "\r",
                                     "_",
                                 ];
-                                if (sqlChars.some((char) => s.includes(char)))
-                                    return false;
-
-                                return true;
+                                return sqlChars.every((char) => !s.includes(char));
                             }),
                         emojiString: fc.oneof(
                             fc.constant("🔥💻🚀"),
@@ -950,7 +948,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
 
                         // Schema creation should work regardless of external Unicode data
                         expect(() =>
-                            createDatabaseSchema(testDb)
+                            { createDatabaseSchema(testDb); }
                         ).not.toThrow();
 
                         // Verify SQL commands don't contain external data
@@ -959,7 +957,7 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                             expect(typeof call).toBe("string");
                             // Verify standard ASCII SQL structure
                             expect(call.trim()).toMatch(
-                                /^(?:begin|create|commit|rollback)/i
+                                /^(?:begin|commit|create|rollback)/i
                             );
 
                             // External Unicode should not leak into schema

@@ -10,26 +10,28 @@
  *   121,142
  */
 
-import { describe, it, expect } from "vitest";
-import { getMonitorDisplayIdentifier } from "../../utils/fallbacks";
 import type { Monitor } from "@shared/types";
 
+import { describe, expect, it } from "vitest";
+
+import { getMonitorDisplayIdentifier } from "../../utils/fallbacks";
+
 describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
-    describe("Line 121: Ping Monitor Generator Coverage", (): void => {
+    describe("line 121: Ping Monitor Generator Coverage", (): void => {
         it("should execute ping monitor generator function with host value", (): void => {
             // This test specifically targets line 121: ping monitor generator
             // ["ping", (monitor): string | undefined => monitor.host ?? undefined],
             const pingMonitor: Monitor = {
-                id: "ping-test",
-                type: "ping",
-                host: "example.com",
-                monitoring: true,
                 checkInterval: 60_000,
                 history: [],
+                host: "example.com",
+                id: "ping-test",
+                monitoring: true,
                 responseTime: 0,
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
+                type: "ping",
             };
 
             const result = getMonitorDisplayIdentifier(
@@ -44,15 +46,15 @@ describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
         it("should execute ping monitor generator function without host value", (): void => {
             // This test ensures we test the `?? undefined` part of line 121
             const pingMonitorNoHost: Monitor = {
-                id: "ping-no-host",
-                type: "ping",
-                monitoring: true,
                 checkInterval: 60_000,
                 history: [],
+                id: "ping-no-host",
+                monitoring: true,
                 responseTime: 0,
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
+                type: "ping",
                 // No host property - will exercise the undefined fallback
             };
 
@@ -68,16 +70,16 @@ describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
         it("should execute ping monitor generator with null host", (): void => {
             // Test null host scenario for complete line 121 coverage
             const pingMonitorNullHost: Monitor = {
-                id: "ping-null-host",
-                type: "ping",
-                host: null as any, // Explicit null to test ?? undefined
-                monitoring: true,
                 checkInterval: 60_000,
                 history: [],
+                host: null as any, // Explicit null to test ?? undefined
+                id: "ping-null-host",
+                monitoring: true,
                 responseTime: 0,
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
+                type: "ping",
             };
 
             const result = getMonitorDisplayIdentifier(
@@ -90,22 +92,22 @@ describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
         });
     });
 
-    describe("Line 142: getGenericIdentifier monitor.url Return Coverage", (): void => {
+    describe("line 142: getGenericIdentifier monitor.url Return Coverage", (): void => {
         it("should execute line 142 - return monitor.url in getGenericIdentifier", (): void => {
             // This test specifically targets line 142: return monitor.url;
             // We need a monitor type that's NOT in MONITOR_IDENTIFIER_GENERATORS
             // so it falls back to getGenericIdentifier function
             const unknownMonitorWithUrl = {
-                id: "unknown-with-url",
-                type: "unknown-type", // Type not in MONITOR_IDENTIFIER_GENERATORS
-                url: "https://test-url.example.com",
-                monitoring: true,
                 checkInterval: 60_000,
                 history: [],
+                id: "unknown-with-url",
+                monitoring: true,
                 responseTime: 0,
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
+                type: "unknown-type", // Type not in MONITOR_IDENTIFIER_GENERATORS
+                url: "https://test-url.example.com",
             } as unknown as Monitor;
 
             const result = getMonitorDisplayIdentifier(
@@ -120,18 +122,18 @@ describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
         it("should prioritize monitor.url over host in getGenericIdentifier", (): void => {
             // Additional test to ensure line 142 is chosen over host logic
             const unknownMonitorWithBoth = {
-                id: "unknown-both",
-                type: "custom-type", // Type not in generators
-                url: "https://priority-url.com",
-                host: "secondary-host.com",
-                port: 8080,
-                monitoring: true,
                 checkInterval: 60_000,
                 history: [],
+                host: "secondary-host.com",
+                id: "unknown-both",
+                monitoring: true,
+                port: 8080,
                 responseTime: 0,
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
+                type: "custom-type", // Type not in generators
+                url: "https://priority-url.com",
             } as unknown as Monitor;
 
             const result = getMonitorDisplayIdentifier(
@@ -147,17 +149,17 @@ describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
             // Edge case: empty string URL should trigger fallback to host logic
             // since empty string is falsy in this context
             const unknownMonitorEmptyUrl = {
-                id: "unknown-empty-url",
-                type: "test-type",
-                url: "", // Empty string - should fallback to host
-                host: "backup-host.com",
-                monitoring: true,
                 checkInterval: 60_000,
                 history: [],
+                host: "backup-host.com",
+                id: "unknown-empty-url",
+                monitoring: true,
                 responseTime: 0,
                 retryAttempts: 3,
                 status: "pending",
                 timeout: 5000,
+                type: "test-type",
+                url: "", // Empty string - should fallback to host
             } as unknown as Monitor;
 
             const result = getMonitorDisplayIdentifier(
@@ -170,44 +172,46 @@ describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
         });
     });
 
-    describe("Combined Coverage Verification", (): void => {
+    describe("combined Coverage Verification", (): void => {
         it("should verify both targeted lines work in comprehensive scenario", (): void => {
             // Test both lines in sequence to ensure comprehensive coverage
 
             // First: Test line 121 (ping generator)
             const pingResult = getMonitorDisplayIdentifier(
                 {
-                    id: "ping",
-                    type: "ping",
-                    host: "ping-test.com",
-                    monitoring: true,
                     checkInterval: 60_000,
                     history: [],
+                    host: "ping-test.com",
+                    id: "ping",
+                    monitoring: true,
                     responseTime: 0,
                     retryAttempts: 3,
                     status: "pending",
                     timeout: 5000,
-                } as Monitor,
+                    type: "ping",
+                },
                 "Ping Fallback"
             );
+
             expect(pingResult).toBe("ping-test.com");
 
             // Second: Test line 142 (getGenericIdentifier URL return)
             const urlResult = getMonitorDisplayIdentifier(
                 {
-                    id: "custom",
-                    type: "custom",
-                    url: "https://generic-test.com",
-                    monitoring: true,
                     checkInterval: 60_000,
                     history: [],
+                    id: "custom",
+                    monitoring: true,
                     responseTime: 0,
                     retryAttempts: 3,
                     status: "pending",
                     timeout: 5000,
+                    type: "custom",
+                    url: "https://generic-test.com",
                 } as unknown as Monitor,
                 "URL Fallback"
             );
+
             expect(urlResult).toBe("https://generic-test.com");
         });
     });

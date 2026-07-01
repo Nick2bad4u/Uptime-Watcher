@@ -7,7 +7,6 @@
  * @file Tests for safe conversion utility functions
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -20,6 +19,7 @@ import {
     safeParseTimeout,
     safeParseTimestamp,
 } from "@shared/utils/safeConversions";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe(safeNumberConversion, () => {
     it("should return the number when given a valid number", async ({
@@ -34,7 +34,7 @@ describe(safeNumberConversion, () => {
         expect(safeNumberConversion(123)).toBe(123);
         expect(safeNumberConversion(0)).toBe(0);
         expect(safeNumberConversion(-456)).toBe(-456);
-        expect(safeNumberConversion(3.141_59)).toBe(3.141_59);
+        expect(safeNumberConversion(3.14159)).toBe(3.14159);
     });
 
     it("should convert valid numeric strings to numbers", async ({
@@ -49,10 +49,10 @@ describe(safeNumberConversion, () => {
         expect(safeNumberConversion("123")).toBe(123);
         expect(safeNumberConversion("0")).toBe(0);
         expect(safeNumberConversion("-456")).toBe(-456);
-        expect(safeNumberConversion("3.14159")).toBe(3.141_59);
+        expect(safeNumberConversion("3.14159")).toBe(3.14159);
         expect(safeNumberConversion("1e3")).toBe(1000);
         expect(safeNumberConversion("0xFF")).toBe(255);
-        expect(safeNumberConversion("1.23e-4")).toBe(0.000_123);
+        expect(safeNumberConversion("1.23e-4")).toBe(0.000123);
     });
 
     it("should return default value for invalid strings", async ({
@@ -110,7 +110,7 @@ describe(safeNumberConversion, () => {
 
         expect(safeNumberConversion(Infinity)).toBe(Infinity);
         expect(safeNumberConversion(-Infinity)).toBe(-Infinity);
-        expect(safeNumberConversion(Number.NaN)).toBe(0); // NaN is a number but should use default
+        expect(safeNumberConversion(NaN)).toBe(0); // NaN is a number but should use default
     });
 
     it("should handle edge cases with string representation of special values", async ({
@@ -208,7 +208,7 @@ describe(safeParseFloat, () => {
         expect(safeParseFloat("123.45")).toBe(123.45);
         expect(safeParseFloat("0")).toBe(0);
         expect(safeParseFloat("-456.789")).toBe(-456.789);
-        expect(safeParseFloat("3.14159")).toBe(3.141_59);
+        expect(safeParseFloat("3.14159")).toBe(3.14159);
         expect(safeParseFloat(".5")).toBe(0.5);
         expect(safeParseFloat("5.")).toBe(5);
     });
@@ -279,7 +279,7 @@ describe(safeParseFloat, () => {
 
         expect(safeParseFloat(Infinity)).toBe(Infinity);
         expect(safeParseFloat(-Infinity)).toBe(-Infinity);
-        expect(safeParseFloat(Number.NaN)).toBe(0); // NaN is a number but should use default
+        expect(safeParseFloat(NaN)).toBe(0); // NaN is a number but should use default
     });
 });
 
@@ -385,7 +385,7 @@ describe(safeParseInt, () => {
 
         expect(safeParseInt(Infinity)).toBe(0); // Infinity should use default value for safety
         expect(safeParseInt(-Infinity)).toBe(0); // -Infinity should use default value for safety
-        expect(safeParseInt(Number.NaN)).toBe(0); // NaN should use default
+        expect(safeParseInt(NaN)).toBe(0); // NaN should use default
     });
 });
 
@@ -847,7 +847,7 @@ describe(safeParseTimeout, () => {
 
         expect(safeParseTimeout(Infinity)).toBe(10_000); // Infinity is not finite, so use default
         expect(safeParseTimeout(-Infinity)).toBe(10_000); // negative, so use default
-        expect(safeParseTimeout(Number.NaN)).toBe(10_000); // NaN should use default
+        expect(safeParseTimeout(NaN)).toBe(10_000); // NaN should use default
     });
 
     it("should handle very small positive numbers", async ({
@@ -1011,7 +1011,7 @@ describe(safeParseTimestamp, () => {
 
         expect(safeParseTimestamp(Infinity)).toBe(CURRENT_TIME); // Too far in future
         expect(safeParseTimestamp(-Infinity)).toBe(CURRENT_TIME); // Negative
-        expect(safeParseTimestamp(Number.NaN)).toBe(CURRENT_TIME); // Invalid
+        expect(safeParseTimestamp(NaN)).toBe(CURRENT_TIME); // Invalid
     });
 
     it("should use current time as default when no defaultValue provided", async ({

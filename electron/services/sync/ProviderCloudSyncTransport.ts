@@ -103,9 +103,9 @@ class CloudSyncSizeLimitError extends Error {
         actualBytes: number;
         maxBytes: number;
         objectKind: "manifest" | "snapshot";
-    }) {
+    }, options: ErrorOptions) {
         super(
-            `Cloud sync ${args.objectKind} exceeds size limit of ${args.maxBytes} bytes. Actual: ${args.actualBytes} bytes.`
+            `Cloud sync ${args.objectKind} exceeds size limit of ${args.maxBytes} bytes. Actual: ${args.actualBytes} bytes.`, options
         );
         this.name = "CloudSyncSizeLimitError";
         this.actualBytes = args.actualBytes;
@@ -323,7 +323,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
         const createdAt = createdAtCandidate;
 
-        let minOpId = Number.POSITIVE_INFINITY;
+        let minOpId = Infinity;
         let maxOpId = Number.NEGATIVE_INFINITY;
         for (const op of operations) {
             if (op.deviceId !== deviceId) {
@@ -391,7 +391,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             }
         }
 
-        return Array.from(byKey.values()).toSorted((a, b) =>
+        return [...byKey.values()].toSorted((a, b) =>
             a.key.localeCompare(b.key)
         );
     }
@@ -513,7 +513,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             );
         }
 
-        let actualMinOpId = Number.POSITIVE_INFINITY;
+        let actualMinOpId = Infinity;
         let actualMaxOpId = Number.NEGATIVE_INFINITY;
         for (const op of operations) {
             if (op.deviceId !== expectations.deviceId) {

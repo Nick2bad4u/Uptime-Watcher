@@ -88,7 +88,7 @@ export const STATE_SYNC_SOURCE: StateSyncSourceConstants = Object.freeze({
  * @public
  */
 export const STATE_SYNC_SOURCES: readonly StateSyncSource[] = Object.freeze(
-    Array.from(STATE_SYNC_SOURCE_VALUES)
+    [...STATE_SYNC_SOURCE_VALUES]
 );
 
 const STATE_SYNC_ACTION_VALUES = [
@@ -137,7 +137,7 @@ export const STATE_SYNC_ACTION: StateSyncActionConstants = Object.freeze({
  * @public
  */
 export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] = Object.freeze(
-    Array.from(STATE_SYNC_ACTION_VALUES)
+    [...STATE_SYNC_ACTION_VALUES]
 );
 
 /**

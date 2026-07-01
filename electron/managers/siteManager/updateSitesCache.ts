@@ -11,27 +11,6 @@ import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { logger } from "../../utils/logger";
 
 /**
- * Optional configuration for {@link updateSitesCache}.
- */
-export interface UpdateSitesCacheOptions {
-    /** Action emitted with the optional state-sync payload. */
-    readonly action?: StateSyncAction;
-    /** Whether to emit a `sites:state-synchronized` event after updating cache. */
-    readonly emitSyncEvent?: boolean;
-    /** Identifier correlated with the emitted sync event. */
-    readonly siteIdentifier?: string;
-    /**
-     * Sites to use for the sync event payload (defaults to sanitized cache
-     * snapshot).
-     */
-    readonly sites?: Site[];
-    /** Source attributed to the emitted sync event. */
-    readonly source?: StateSyncSource;
-    /** Timestamp applied to the emitted sync event. */
-    readonly timestamp?: number;
-}
-
-/**
  * Dependencies required by {@link updateSitesCache}.
  */
 export interface UpdateSitesCacheDependencies {
@@ -54,6 +33,27 @@ export interface UpdateSitesCacheDependencies {
     }) => Promise<unknown>;
     /** Cache instance to update atomically. */
     readonly sitesCache: Pick<StandardizedCache<Site>, "replaceAll">;
+}
+
+/**
+ * Optional configuration for {@link updateSitesCache}.
+ */
+export interface UpdateSitesCacheOptions {
+    /** Action emitted with the optional state-sync payload. */
+    readonly action?: StateSyncAction;
+    /** Whether to emit a `sites:state-synchronized` event after updating cache. */
+    readonly emitSyncEvent?: boolean;
+    /** Identifier correlated with the emitted sync event. */
+    readonly siteIdentifier?: string;
+    /**
+     * Sites to use for the sync event payload (defaults to sanitized cache
+     * snapshot).
+     */
+    readonly sites?: Site[];
+    /** Source attributed to the emitted sync event. */
+    readonly source?: StateSyncSource;
+    /** Timestamp applied to the emitted sync event. */
+    readonly timestamp?: number;
 }
 
 /**

@@ -3,14 +3,15 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     closeSiteDetails,
     createSiteViaModal,
@@ -18,7 +19,6 @@ import {
     resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 function assertSiteName(value: string | undefined): asserts value is string {
     if (!value) {
@@ -89,21 +89,21 @@ test.describe(
                 const listButton = layoutToggleGroup.getByRole("button", {
                     name: "List",
                 });
-                await expect(page.getByText(/Tracking 2 sites/i)).toBeVisible({
+                await expect.soft(page.getByText(/tracking 2 sites/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await listButton.click();
 
                 const table = page.getByRole("table");
-                await expect(table).toBeVisible({
+                await expect.soft(table).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 const headers = await table.getByRole("columnheader").all();
-                expect(headers.length).toBeGreaterThanOrEqual(6);
+                expect.soft(headers.length).toBeGreaterThanOrEqual(6);
 
                 for (const siteName of createdSites) {
-                    await expect(
+                    await expect.soft(
                         table
                             .getByRole("row")
                             .filter({ hasText: siteName })
@@ -114,19 +114,19 @@ test.describe(
                 const monitorSelects = table.getByRole("combobox", {
                     name: "Select monitor",
                 });
-                await expect(monitorSelects.first()).toBeVisible({
+                await expect.soft(monitorSelects.first()).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(monitorSelects).toHaveCount(createdSites.length);
+                await expect.soft(monitorSelects).toHaveCount(createdSites.length);
 
-                await expect(
+                await expect.soft(
                     table.getByRole("button", { name: "Check Now" }).first()
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await expect(
+                await expect.soft(
                     table
                         .getByRole("button", {
-                            name: /All Monitoring$/,
+                            name: /All Monitoring$/v,
                         })
                         .first()
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
@@ -149,7 +149,7 @@ test.describe(
                 await listButton.click();
 
                 const table = page.getByRole("table");
-                await expect(table).toBeVisible({
+                await expect.soft(table).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
@@ -163,17 +163,17 @@ test.describe(
                 const rowTrigger = table.getByRole("row", {
                     name: `Open details for ${firstSiteName}`,
                 });
-                await expect(rowTrigger).toBeVisible({
+                await expect.soft(rowTrigger).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await rowTrigger.scrollIntoViewIfNeeded();
                 await rowTrigger.dispatchEvent("click");
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
-                await expect(siteDetailsModal).toBeVisible({
+                await expect.soft(siteDetailsModal).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
-                await expect(
+                await expect.soft(
                     siteDetailsModal
                         .getByText(firstSiteName, { exact: true })
                         .first()

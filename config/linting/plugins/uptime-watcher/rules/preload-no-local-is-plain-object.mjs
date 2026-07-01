@@ -54,16 +54,16 @@ export const preloadNoLocalIsPlainObjectRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow local isPlainObject definitions in electron/preload",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/preload-no-local-is-plain-object.md",
         },
-        schema: [],
         messages: {
             banned: "Use isObject from shared/utils/typeGuards.ts instead of defining local isPlainObject helpers.",
         },
+        schema: [],
+        type: "problem",
     },
 };

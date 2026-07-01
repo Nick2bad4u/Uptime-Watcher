@@ -2,9 +2,8 @@
  * Tests for runtime helpers in types/cloudBackupMigration.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { safeParseCloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
+import { describe, expect, it } from "vitest";
 
 describe("cloudBackupMigration", () => {
     it("safe parses CloudBackupMigrationResult", () => {

@@ -3,6 +3,7 @@
  * properly exported and have expected values.
  */
 
+import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -15,7 +16,6 @@ import {
     RETRY_BACKOFF,
     USER_AGENT,
 } from "../constants";
-import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {
@@ -108,7 +108,7 @@ describe("Electron Constants", () => {
             );
             await annotate(String.raw`Regex: /^[\w-]+\/[\d.]+$/`, "regex");
 
-            expect(USER_AGENT).toMatch(/^[\w-]+\/[\d.]+$/);
+            expect(USER_AGENT).toMatch(/^[\w-]+\/[\d.]+$/u);
         });
 
         it("should not be empty", async ({ annotate }) => {
@@ -279,7 +279,7 @@ describe("Electron Constants", () => {
             expect(DEFAULT_SITE_NAME.trim().length).toBeGreaterThan(0);
 
             // Should be human-readable (contains letter characters)
-            expect(DEFAULT_SITE_NAME).toMatch(/[A-Za-z]/);
+            expect(DEFAULT_SITE_NAME).toMatch(/[A-Za-z]/v);
         });
     });
 

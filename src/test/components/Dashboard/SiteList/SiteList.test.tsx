@@ -3,17 +3,22 @@
  *   hooks usage, and theme integration
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
 import type { Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
+
+import { render, screen } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { ThemeName } from "../../../../theme/types";
-import { createMockSite } from "../../../utils/mockFactories";
+
+import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
 import { createSelectorHookMock } from "../../../utils/createSelectorHookMock";
 import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../../../utils/createSitesStoreMock";
+import { createMockSite } from "../../../utils/mockFactories";
 
 // Mock the stores and theme
 // Standard creation bridged through global to avoid hoist-time import errors
@@ -25,7 +30,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 (globalThis as any).__useSitesStoreMock_siteList__ = useSitesStoreMock;
 
-vi.mock("../../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: (selector?: any, equality?: any) =>
         (globalThis as any).__useSitesStoreMock_siteList__?.(
             selector,
@@ -33,12 +38,12 @@ vi.mock("../../../../stores/sites/useSitesStore", () => ({
         ),
 }));
 
-vi.mock("../../../../theme/useTheme", () => ({
+vi.mock(import('../../../../theme/useTheme'), () => ({
     useTheme: vi.fn(),
 }));
 
 // Mock the components
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCard", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCard'), () => ({
     SiteCard: vi.fn(({ site }) => (
         <div data-testid={`site-card-${site.identifier}`}>
             Site Card for {site.identifier}
@@ -46,7 +51,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCard", () => ({
     )),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteList/EmptyState", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteList/EmptyState'), () => ({
     EmptyState: vi.fn(() => (
         <div data-testid="empty-state">No sites configured</div>
     )),
@@ -63,25 +68,25 @@ const resetSitesStoreState = (): void => {
 
 const setSitesSnapshot = (sites: Site[] | undefined): void => {
     updateSitesStoreMock(sitesStoreState, {
-        sites: (sites ?? []) as Site[],
+        sites: (sites ?? []),
     });
     if (sites === undefined) {
-        (sitesStoreState as Record<string, unknown>)["sites"] =
-            undefined as unknown as Site[];
+        (safeCastTo<UnknownRecord>(sitesStoreState))["sites"] =
+            undefined;
     }
 };
 
 // Helper to create mock theme return
 const createMockTheme = (isDark = false) => ({
     isDark,
-    availableThemes: ["light", "dark"] as ThemeName[],
+    availableThemes: safeCastTo<ThemeName[]>(["dark", "light"]),
     currentTheme: { colors: {}, spacing: {} } as any,
     getColor: vi.fn(),
     getStatusColor: vi.fn(),
     setTheme: vi.fn(),
     systemTheme: "light" as const,
     themeManager: {} as any,
-    themeName: (isDark ? "dark" : "light") as ThemeName,
+    themeName: safeCastTo<ThemeName>(isDark ? "dark" : "light"),
     themeVersion: 1,
     toggleTheme: vi.fn(),
 });
@@ -96,8 +101,8 @@ describe(SiteList, () => {
                 {
                     id: "monitor-1",
                     url: "https://example1.com",
-                    type: "http" as any,
-                    status: "up" as any,
+                    type: "http",
+                    status: "up",
                     monitoring: true,
                     checkInterval: 60_000,
                     timeout: 30_000,
@@ -115,8 +120,8 @@ describe(SiteList, () => {
                 {
                     id: "monitor-2",
                     url: "https://example2.com",
-                    type: "http" as any,
-                    status: "down" as any,
+                    type: "http",
+                    status: "down",
                     monitoring: true,
                     checkInterval: 60_000,
                     timeout: 30_000,
@@ -134,7 +139,7 @@ describe(SiteList, () => {
                 {
                     id: "monitor-3",
                     url: "https://example3.com",
-                    type: "http" as any,
+                    type: "http",
                     status: "unknown" as any,
                     monitoring: false,
                     checkInterval: 60_000,
@@ -169,7 +174,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot([] as Site[]);
+            setSitesSnapshot(safeCastTo<Site[]>([]));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -177,7 +182,7 @@ describe(SiteList, () => {
 
             // Assert
             expect(screen.getByTestId("empty-state")).toBeInTheDocument();
-            expect(screen.queryByTestId(/site-card-/)).not.toBeInTheDocument();
+            expect(screen.queryByTestId(/site-card-/v)).not.toBeInTheDocument();
         });
 
         it("should render EmptyState when sites array is empty - dark theme", ({
@@ -195,7 +200,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot([] as Site[]);
+            setSitesSnapshot(safeCastTo<Site[]>([]));
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             // Act
@@ -203,7 +208,7 @@ describe(SiteList, () => {
 
             // Assert
             expect(screen.getByTestId("empty-state")).toBeInTheDocument();
-            expect(screen.queryByTestId(/site-card-/)).not.toBeInTheDocument();
+            expect(screen.queryByTestId(/site-card-/v)).not.toBeInTheDocument();
         });
     });
 
@@ -306,7 +311,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            const singleSite: Site[] = [mockSites[0]!];
+            const singleSite: Site[] = [arrayFirst(mockSites)!];
             setSitesSnapshot(singleSite);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
@@ -335,7 +340,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot([] as Site[]);
+            setSitesSnapshot(safeCastTo<Site[]>([]));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -357,7 +362,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot([] as Site[]);
+            setSitesSnapshot(safeCastTo<Site[]>([]));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -387,7 +392,7 @@ describe(SiteList, () => {
                 otherProperty: "test",
             };
             setSitesSnapshot(mockStore.sites);
-            (sitesStoreState as Record<string, unknown>)["otherProperty"] =
+            (safeCastTo<UnknownRecord>(sitesStoreState))["otherProperty"] =
                 mockStore.otherProperty;
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
@@ -477,8 +482,8 @@ describe(SiteList, () => {
             const specialSites: Site[] = [
                 createMockSite({
                     identifier: "site-with-special-chars_123",
-                    name: mockSites[0]!.name,
-                    monitoring: mockSites[0]!.monitoring,
+                    name: arrayFirst(mockSites)!.name,
+                    monitoring: arrayFirst(mockSites)!.monitoring,
                 }),
                 createMockSite({
                     identifier: "site.with.dots",
@@ -568,7 +573,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            setSitesSnapshot([] as Site[]);
+            setSitesSnapshot(safeCastTo<Site[]>([]));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -660,7 +665,7 @@ describe(SiteList, () => {
 
             // Arrange
             const manySites = Array.from({ length: 100 }, (_, i) => ({
-                ...mockSites[0],
+                ...arrayFirst(mockSites),
                 identifier: `site-${i}`,
                 name: `Site ${i}`,
             })) as Site[];
@@ -723,7 +728,7 @@ describe(SiteList, () => {
             const { EmptyState: mockEmptyState } =
                 await import("../../../../components/Dashboard/SiteList/EmptyState");
             const mockEmptyStateMocked = vi.mocked(mockEmptyState);
-            setSitesSnapshot([] as Site[]);
+            setSitesSnapshot(safeCastTo<Site[]>([]));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act

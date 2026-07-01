@@ -145,17 +145,17 @@ export const electronNoInlineIpcChannelTypeArgumentRule = {
     },
 
     meta: {
-        type: "suggestion",
         docs: {
             description:
                 "disallow string-literal type arguments on registerStandardizedIpcHandler; rely on inference from shared channel constants.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-inline-ipc-channel-type-argument.md",
         },
-        schema: [],
         messages: {
             noInlineTypeChannel:
                 "Do not use a string-literal type argument for registerStandardizedIpcHandler. Use a shared channel constant and let TypeScript infer the channel type.",
         },
+        schema: [],
+        type: "suggestion",
     },
 };

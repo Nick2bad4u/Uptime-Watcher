@@ -4,7 +4,7 @@
  * @module DataBackupService
  *
  * @file Comprehensive tests for the DataBackupService class in the Uptime
- *   Watcher application.
+ *   Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,8 +15,22 @@
  * @tags ["test", "database", "backup", "service"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { app } from "electron";
 import * as path from "node:path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
+
+// Import after mocks are set up
+import { DataBackupService } from "../../../services/database/DataBackupService";
+import { createVacuumSnapshot } from "../../../services/database/dataBackupService/snapshot";
+import { SiteLoadingError } from "../../../services/database/interfaces";
+import {
+    assertSqliteDatabaseIntegrity,
+    createDatabaseBackup,
+    readDatabaseSchemaVersionFromFile,
+    validateDatabaseBackupPayload,
+} from "../../../services/database/utils/backup/databaseBackup";
 
 const mockFsPromises = vi.hoisted(() => ({
     copyFile: vi.fn(),
@@ -98,19 +112,6 @@ vi.mock("node-sqlite3-wasm", () => ({
     Database: mockDatabaseConstructor,
 }));
 
-// Import after mocks are set up
-import { DataBackupService } from "../../../services/database/DataBackupService";
-import { SiteLoadingError } from "../../../services/database/interfaces";
-import { app } from "electron";
-import {
-    assertSqliteDatabaseIntegrity,
-    createDatabaseBackup,
-    readDatabaseSchemaVersionFromFile,
-    validateDatabaseBackupPayload,
-} from "../../../services/database/utils/backup/databaseBackup";
-import { createVacuumSnapshot } from "../../../services/database/dataBackupService/snapshot";
-import type { DatabaseBackupResult } from "../../../services/database/utils/backup/databaseBackup";
-
 // Test utilities and mocks
 const createMockEventEmitter = () => ({
     emitTyped: vi.fn().mockResolvedValue(undefined),
@@ -178,10 +179,10 @@ describe(DataBackupService, () => {
         mockDatabaseGet.mockClear();
         mockDatabaseInstance.close.mockClear();
         mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-dir");
-        mockFsPromises.writeFile.mockResolvedValue(undefined as never);
-        mockFsPromises.copyFile.mockResolvedValue(undefined as never);
-        mockFsPromises.rename.mockResolvedValue(undefined as never);
-        mockFsPromises.rm.mockResolvedValue(undefined as never);
+        mockFsPromises.writeFile.mockResolvedValue(undefined);
+        mockFsPromises.copyFile.mockResolvedValue(undefined);
+        mockFsPromises.rename.mockResolvedValue(undefined);
+        mockFsPromises.rm.mockResolvedValue(undefined);
 
         // Reset app.getPath mock
         vi.mocked(app.getPath).mockReturnValue("/test/userdata");
@@ -370,7 +371,7 @@ describe(DataBackupService, () => {
                     shouldFailVacuum = false;
                     throw lockError;
                 }
-                return undefined as never;
+                return undefined;
             });
 
             await dataBackupService.downloadDatabaseBackup();
@@ -676,7 +677,7 @@ describe(DataBackupService, () => {
             await annotate("Type: Business Logic", "type");
 
             // Arrange
-            const largeBuffer = Buffer.alloc(1024 * 1024); // 1MB buffer
+            const largeBuffer = Buffer.alloc(1024 ** 2); // 1MB buffer
             vi.mocked(createDatabaseBackup).mockResolvedValue({
                 buffer: largeBuffer,
                 fileName: "large-backup.sqlite",
@@ -695,7 +696,7 @@ describe(DataBackupService, () => {
             const result = await dataBackupService.downloadDatabaseBackup();
 
             // Assert
-            expect(result.buffer).toHaveLength(1024 * 1024);
+            expect(result.buffer).toHaveLength(1024 ** 2);
             expect(result.fileName).toBe("large-backup.sqlite");
         });
 
@@ -791,13 +792,13 @@ describe(DataBackupService, () => {
             expect(mockFsPromises.rename).toHaveBeenCalledWith(
                 `${expectedDbPath}-wal`,
                 expect.stringMatching(
-                    /uptime-watcher\.sqlite\.rollback-\d+-wal$/u
+                    /uptime-watcher\.sqlite\.rollback-\d+-wal$/v
                 )
             );
             expect(mockFsPromises.rename).toHaveBeenCalledWith(
                 `${expectedDbPath}-shm`,
                 expect.stringMatching(
-                    /uptime-watcher\.sqlite\.rollback-\d+-shm$/u
+                    /uptime-watcher\.sqlite\.rollback-\d+-shm$/v
                 )
             );
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
@@ -834,7 +835,7 @@ describe(DataBackupService, () => {
                     buffer,
                     fileName: "restore.sqlite",
                 })
-            ).rejects.toThrow(/quick_check failed/u);
+            ).rejects.toThrow(/quick_check failed/v);
 
             // We wrote the incoming file, but never created a snapshot or
             // attempted to swap in the corrupted database.
@@ -852,7 +853,7 @@ describe(DataBackupService, () => {
                     buffer,
                     fileName: "not-sqlite.bin",
                 })
-            ).rejects.toThrow(/not a valid SQLite database file/u);
+            ).rejects.toThrow(/not a valid SQLite database file/v);
 
             expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
             expect(mockFsPromises.writeFile).not.toHaveBeenCalled();
@@ -936,7 +937,7 @@ describe(DataBackupService, () => {
 
             await expect(
                 dataBackupService.applyDatabaseBackupResult(backup)
-            ).rejects.toThrow(/not a valid SQLite database file/u);
+            ).rejects.toThrow(/not a valid SQLite database file/v);
 
             expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
             expect(mockFsPromises.writeFile).not.toHaveBeenCalled();

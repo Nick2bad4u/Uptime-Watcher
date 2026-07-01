@@ -95,7 +95,7 @@ export async function emitSiteUpdatedAndStateSynchronized(
         previousSite: structuredClone(args.previousSite),
         site: structuredClone(args.site),
         timestamp,
-        updatedFields: Array.from(args.updatedFields),
+        updatedFields: [...args.updatedFields],
     });
 
     await deps.emitSitesStateSynchronized({

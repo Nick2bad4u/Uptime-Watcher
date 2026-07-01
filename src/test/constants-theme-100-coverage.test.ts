@@ -6,22 +6,23 @@
  * that might have coverage gaps to ensure 100% code coverage.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { BASE_MONITOR_TYPES } from "@shared/types";
+import { arrayFirst, arrayJoin, objectHasOwn, objectValues    } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import constants and utility functions
 import {
-    TRANSITION_ALL,
-    FALLBACK_MONITOR_TYPE_OPTIONS,
     CHECK_INTERVALS,
+    FALLBACK_MONITOR_TYPE_OPTIONS,
     FONT_FAMILY_MONO,
     FONT_FAMILY_SANS,
-    type MonitorTypeOption,
     type IntervalOption,
+    type MonitorTypeOption,
+    TRANSITION_ALL,
 } from "../constants";
-import { BASE_MONITOR_TYPES } from "@shared/types";
 
 // Mock any external dependencies
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -58,7 +59,7 @@ describe("Constants and Configuration 100% Coverage", () => {
 
         it("should maintain consistent timing", () => {
             // Verify the transition follows expected format
-            expect(TRANSITION_ALL).toMatch(/^all \d+\.?\d*s ease-in-out$/);
+            expect(TRANSITION_ALL).toMatch(/^all \d+(?:\.\d*)?s ease-in-out$/v);
         });
     });
 
@@ -190,11 +191,11 @@ describe("Constants and Configuration 100% Coverage", () => {
 
         it("should be usable in CSS context", () => {
             const monoStyle = {
-                fontFamily: FONT_FAMILY_MONO.join(", "),
+                fontFamily: arrayJoin(FONT_FAMILY_MONO, ", "),
             };
 
             const sansStyle = {
-                fontFamily: FONT_FAMILY_SANS.join(", "),
+                fontFamily: arrayJoin(FONT_FAMILY_SANS, ", "),
             };
 
             expect(monoStyle.fontFamily).toContain("monospace");
@@ -211,7 +212,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             ];
 
             for (const animation of animations) {
-                for (const transition of Object.values(animation)) {
+                for (const transition of objectValues(animation)) {
                     expect(transition).toBe("all 0.2s ease-in-out");
                 }
             }
@@ -261,7 +262,7 @@ describe("Constants and Configuration 100% Coverage", () => {
             expect(Array.isArray(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeTruthy();
 
             // Should still behave like an array for reading
-            expect(FALLBACK_MONITOR_TYPE_OPTIONS[0]).toBeDefined();
+            expect(arrayFirst(FALLBACK_MONITOR_TYPE_OPTIONS)).toBeDefined();
         });
 
         it("should handle edge case values in monitor options", () => {
@@ -290,7 +291,7 @@ describe("Constants and Configuration 100% Coverage", () => {
 
     describe("Type Safety", () => {
         it("should maintain type safety for monitor options", () => {
-            const firstOption = FALLBACK_MONITOR_TYPE_OPTIONS[0];
+            const firstOption = arrayFirst(FALLBACK_MONITOR_TYPE_OPTIONS);
 
             if (firstOption) {
                 // TypeScript should infer correct types
@@ -305,7 +306,7 @@ describe("Constants and Configuration 100% Coverage", () => {
         });
 
         it("should maintain type safety for interval options", () => {
-            const firstInterval = CHECK_INTERVALS[0];
+            const firstInterval = arrayFirst(CHECK_INTERVALS);
 
             if (firstInterval) {
                 // TypeScript should infer correct types
@@ -358,7 +359,7 @@ describe("Constants and Configuration 100% Coverage", () => {
 
             const end = performance.now();
 
-            const isCoverageRun = Object.hasOwn(globalThis, "__coverage__");
+            const isCoverageRun = objectHasOwn(globalThis, "__coverage__");
 
             const thresholdMs = isCoverageRun ? 25 : 10;
 
@@ -436,12 +437,12 @@ describe("Constants and Configuration 100% Coverage", () => {
             expect(totalIntervalTime).toBeGreaterThan(0);
 
             // Test some/every operations
-            const allPositive = CHECK_INTERVALS.every((i) => i.value > 0);
+            const isAllPositive = CHECK_INTERVALS.every((i) => i.value > 0);
             const hasMinutes = CHECK_INTERVALS.some((i) =>
                 i.label.includes("minute")
             );
 
-            expect(allPositive).toBeTruthy();
+            expect(isAllPositive).toBeTruthy();
             expect(hasMinutes).toBeTruthy();
         });
     });

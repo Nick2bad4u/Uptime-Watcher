@@ -26,7 +26,7 @@ import type { Promisable, UnknownArray } from "type-fest";
 export function createSingleFlight<Args extends Readonly<UnknownArray>, Result>(
     fn: (...args: Args) => Promisable<Result>
 ): (...args: Args) => Promise<Result> {
-    let inFlight: Promise<Result> | undefined = undefined;
+    let inFlight: Promise<Result> | undefined;
 
     return async (...args: Args): Promise<Result> => {
         // Ensure synchronous throws become a rejected promise so we can:

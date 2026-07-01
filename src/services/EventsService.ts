@@ -484,7 +484,7 @@ export const EventsService: EventsServiceContract = {
     ),
 
     /**
-     * Register a callback for application update status events.
+     * Register a callback for app update status events.
      *
      * @example
      *

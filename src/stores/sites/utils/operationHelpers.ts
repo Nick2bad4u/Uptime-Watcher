@@ -200,24 +200,24 @@ const runSiteOperation = async <T>(
     const { syncAfter = true, telemetry: telemetryInput } = options ?? {};
     const telemetry = normalizeTelemetry(telemetryInput);
     const emitTelemetry = createTelemetryEmitter(operationName, telemetry);
-    let pendingEmitted = false;
-    let failureEmitted = false;
+    let isPendingEmitted = false;
+    let isFailureEmitted = false;
 
     const ensurePendingEmission = (): void => {
-        if (pendingEmitted) {
+        if (isPendingEmitted) {
             return;
         }
 
-        pendingEmitted = true;
+        isPendingEmitted = true;
         emitTelemetry("pending", { status: "pending" });
     };
 
     const emitFailure = (cause: unknown): void => {
-        if (failureEmitted) {
+        if (isFailureEmitted) {
             return;
         }
 
-        failureEmitted = true;
+        isFailureEmitted = true;
         const normalizedError = ensureError(cause);
         emitTelemetry("failure", {
             error: normalizedError.message,
@@ -272,7 +272,7 @@ export const getSiteByIdentifier = (
     siteIdentifier: string,
     deps: SiteOperationsDependencies
 ): Site => {
-    const sites = safeCastTo<Array<null | Site | undefined>>(deps.getSites());
+    const sites = safeCastTo<(null | Site | undefined)[]>(deps.getSites());
     const site = sites.find((s) => s?.identifier === siteIdentifier);
     if (!site) {
         throw new Error(safeCastTo(ERROR_CATALOG.sites.NOT_FOUND));

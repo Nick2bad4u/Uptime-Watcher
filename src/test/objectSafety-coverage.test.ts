@@ -4,7 +4,7 @@
  * @file Direct function call tests for objectSafety to ensure coverage
  */
 
-import { describe, expect, it } from "vitest";
+import { test } from "@fast-check/vitest";
 import {
     safeObjectAccess,
     safeObjectIteration,
@@ -14,8 +14,9 @@ import {
     typedObjectKeys,
     typedObjectValues,
 } from "@shared/utils/objectSafety";
-import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { arrayFirst, objectHasOwn, objectKeys   } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 /** Arbitrary for generating test objects with known values */
 const testObjectArbitrary = fc.record({
@@ -72,7 +73,7 @@ describe("objectSafety Direct Function Coverage", () => {
     it("should call typedObjectKeys function", () => {
         const keys = typedObjectKeys(sampleRecord);
         expect(Array.isArray(keys)).toBeTruthy();
-        expect(keys).toContain("username" as keyof typeof sampleRecord);
+        expect(keys).toContain("username");
     });
 
     it("should call typedObjectValues function", () => {
@@ -87,7 +88,7 @@ describe("objectSafety Direct Function Coverage", () => {
             (obj, fallbackValue) => {
                 const result = safeObjectAccess(
                     obj,
-                    "nonExistentKey" as keyof typeof obj,
+                    "nonExistentKey",
                     fallbackValue
                 );
                 expect(result).toBe(fallbackValue);
@@ -101,7 +102,7 @@ describe("objectSafety Direct Function Coverage", () => {
                 safeObjectIteration(obj, (key) => {
                     visitedKeys.push(key);
                 });
-                expect(visitedKeys).toHaveLength(Object.keys(obj).length);
+                expect(visitedKeys).toHaveLength(objectKeys(obj).length);
             }
         );
 
@@ -109,9 +110,9 @@ describe("objectSafety Direct Function Coverage", () => {
             "should return entries matching object structure",
             (obj) => {
                 const entries = typedObjectEntries(obj);
-                expect(entries).toHaveLength(Object.keys(obj).length);
+                expect(entries).toHaveLength(objectKeys(obj).length);
                 for (const [key, value] of entries) {
-                    expect(obj[key as keyof typeof obj]).toBe(value);
+                    expect(obj[key]).toBe(value);
                 }
             }
         );
@@ -120,7 +121,7 @@ describe("objectSafety Direct Function Coverage", () => {
             "should return all keys from any object",
             (obj) => {
                 const keys = typedObjectKeys(obj);
-                expect(keys).toHaveLength(Object.keys(obj).length);
+                expect(keys).toHaveLength(objectKeys(obj).length);
             }
         );
 
@@ -128,38 +129,38 @@ describe("objectSafety Direct Function Coverage", () => {
             "should return all values from any object",
             (obj) => {
                 const values = typedObjectValues(obj);
-                expect(values).toHaveLength(Object.keys(obj).length);
+                expect(values).toHaveLength(objectKeys(obj).length);
             }
         );
 
         test.prop([
             fc.object({ maxDepth: 1, maxKeys: 5 }).filter((o) => {
-                const keys = Object.keys(o);
+                const keys = objectKeys(o);
                 return keys.length >= 2;
             }),
         ])("should omit specified keys from any object", (obj) => {
-            const keys = Object.keys(obj);
+            const keys = objectKeys(obj);
             if (keys.length >= 2) {
-                const keyToOmit = keys[0]!;
+                const keyToOmit = arrayFirst(keys)!;
                 const result = safeObjectOmit(obj, [keyToOmit]);
-                expect(Object.hasOwn(result, keyToOmit)).toBeFalsy();
-                expect(Object.keys(result)).toHaveLength(keys.length - 1);
+                expect(objectHasOwn(result, keyToOmit)).toBeFalsy();
+                expect(objectKeys(result)).toHaveLength(keys.length - 1);
             }
         });
 
         test.prop([
             fc.object({ maxDepth: 1, maxKeys: 5 }).filter((o) => {
-                const keys = Object.keys(o);
+                const keys = objectKeys(o);
                 return keys.length >= 2;
             }),
         ])("should pick specified keys from any object", (obj) => {
-            const keys = Object.keys(obj);
+            const keys = objectKeys(obj);
             if (keys.length >= 2) {
                 const keysToPick = keys.slice(0, 2);
                 const result = safeObjectPick(obj, keysToPick);
-                expect(Object.keys(result)).toHaveLength(keysToPick.length);
+                expect(objectKeys(result)).toHaveLength(keysToPick.length);
                 for (const key of keysToPick) {
-                    expect(Object.hasOwn(result, key)).toBeTruthy();
+                    expect(objectHasOwn(result, key)).toBeTruthy();
                 }
             }
         });

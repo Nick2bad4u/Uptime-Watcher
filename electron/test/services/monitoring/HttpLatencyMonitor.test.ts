@@ -2,9 +2,10 @@
  * Test suite for HttpLatencyMonitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpLatencyMonitor } from "../../../services/monitoring/HttpLatencyMonitor";
@@ -142,7 +143,7 @@ describe(HttpLatencyMonitor, () => {
             timeout: 5000,
             type: "http-latency",
             url: "https://example.com/health",
-        } as Site["monitors"][0];
+        };
     });
 
     afterEach(() => {
@@ -179,8 +180,7 @@ describe(HttpLatencyMonitor, () => {
     });
 
     it("returns error result when latency configuration is invalid", async () => {
-        const invalidMonitor = { ...monitor } as Site["monitors"][0];
-        invalidMonitor.maxResponseTime = -5;
+        const invalidMonitor = { ...monitor , maxResponseTime: -5,};
 
         const result = await monitorService.check(invalidMonitor);
 

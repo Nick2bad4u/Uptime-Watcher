@@ -112,7 +112,7 @@ export const DataService: DataServiceContract = {
     }),
 
     /**
-     * Exports all application data as a serialized JSON string.
+     * Exports all app data as a serialized JSON string.
      *
      * @remarks
      * The returned string is intended to be stored or transported as a logical
@@ -157,14 +157,14 @@ export const DataService: DataServiceContract = {
     importData: wrap("importData", async (api, payload: string) => {
         assertJsonImportPayloadWithinIpcBudget(payload);
 
-        const result = await api.data.importData(payload);
-        if (typeof result !== "boolean") {
+        const isResult = await api.data.importData(payload);
+        if (typeof isResult !== "boolean") {
             throw new TypeError(
                 "Import data response must be a boolean indicating success"
             );
         }
 
-        return result;
+        return isResult;
     }),
     initialize: ensureInitialized,
 

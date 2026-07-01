@@ -90,22 +90,23 @@ export const electronNoRendererImportRule = {
              * @param {import("@typescript-eslint/utils").TSESTree.CallExpression} node
              */
             CallExpression(node) {
-                if (
-                    node.callee.type === "Identifier" &&
-                    node.callee.name === "require" &&
-                    node.arguments.length > 0
-                ) {
-                    const [firstArgument] = node.arguments;
-                    if (
-                        firstArgument?.type === "Literal" &&
-                        typeof firstArgument.value === "string"
-                    ) {
-                        handleModuleSpecifier(
-                            firstArgument,
-                            firstArgument.value
-                        );
-                    }
+                if (node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length === 0) {
+                    return;
                 }
+
+                const [firstArgument] = node.arguments;
+                if (
+                    firstArgument?.type === "Literal" &&
+                    typeof firstArgument.value === "string"
+                ) {
+                    handleModuleSpecifier(
+                        firstArgument,
+                        firstArgument.value
+                    );
+                }
+
             },
 
             /**
@@ -135,17 +136,17 @@ export const electronNoRendererImportRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow Electron runtime modules from importing renderer bundles",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-renderer-import.md",
         },
-        schema: [],
         messages: {
             noRendererImport:
                 'Electron runtime code must not import from "{{module}}". Use shared contracts or preload bridges instead.',
         },
+        schema: [],
+        type: "problem",
     },
 };

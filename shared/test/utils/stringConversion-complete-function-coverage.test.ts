@@ -6,8 +6,8 @@
  *   imports and systematic function calls.
  */
 
-import { describe, expect, it } from "vitest";
 import * as stringConversionModule from "@shared/utils/stringConversion";
+import { describe, expect, it } from "vitest";
 
 describe("StringConversion - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
@@ -50,7 +50,7 @@ describe("StringConversion - Complete Function Coverage", () => {
             expect(stringConversionModule.safeStringify(123)).toBe("123");
             expect(stringConversionModule.safeStringify(-456)).toBe("-456");
             expect(stringConversionModule.safeStringify(3.14)).toBe("3.14");
-            expect(stringConversionModule.safeStringify(Number.NaN)).toBe(
+            expect(stringConversionModule.safeStringify(NaN)).toBe(
                 "NaN"
             );
             expect(stringConversionModule.safeStringify(Infinity)).toBe(
@@ -240,7 +240,7 @@ describe("StringConversion - Complete Function Coverage", () => {
                     3,
                 ],
                 new Date(),
-                /regex/,
+                /regex/v,
                 () => {},
                 new Error("test error"),
             ];

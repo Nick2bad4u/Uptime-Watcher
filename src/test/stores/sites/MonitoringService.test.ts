@@ -1,17 +1,18 @@
-/**
- * @vitest-environment jsdom
- */
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { arrayFirst } from "ts-extras";
+/**
+ * @vitest-environment jsdom
+ */
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MonitoringService } from "../../../services/MonitoringService";
 import { installElectronApiMock } from "../../utils/electronApiMock";
@@ -33,13 +34,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock store utilities
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
@@ -697,7 +698,7 @@ describe("MonitoringService", () => {
                 ?.electronAPI;
             const originalGlobalBridge = (globalThis as any).electronAPI;
 
-            (globalThis as any).window.electronAPI = undefined;
+            globalThis.electronAPI = undefined;
             (globalThis as any).electronAPI = undefined;
 
             try {
@@ -708,7 +709,7 @@ describe("MonitoringService", () => {
                     MonitoringService.stopMonitoringForMonitor("test", "test")
                 ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
             } finally {
-                (globalThis as any).window.electronAPI = originalWindowBridge;
+                globalThis.electronAPI = originalWindowBridge;
                 (globalThis as any).electronAPI = originalGlobalBridge;
             }
         });
@@ -1011,7 +1012,7 @@ describe("MonitoringService", () => {
 
             const results = await Promise.allSettled(operations);
 
-            expect(results[0]?.status).toBe("fulfilled");
+            expect(arrayFirst(results)?.status).toBe("fulfilled");
             expect(results[1]?.status).toBe("rejected");
             expect(results[2]?.status).toBe("fulfilled");
         });

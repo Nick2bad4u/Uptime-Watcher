@@ -3,23 +3,25 @@
  * props and interaction wiring with child components.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import type { Monitor, Site } from "@shared/types";
+
 import "@testing-library/jest-dom";
 import type { ChangeEvent } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
-import type { Monitor, Site } from "@shared/types";
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
 
 const monitorSelectorPropsSpy = vi.fn();
 const actionButtonGroupPropsSpy = vi.fn();
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     async (importOriginal) => {
         const actual =
             await importOriginal<
@@ -36,9 +38,9 @@ vi.mock(
                     <button
                         data-testid="monitor-selector"
                         onClick={() =>
-                            props.onChange({
+                            { props.onChange({
                                 target: { value: "monitor-2" },
-                            } as ChangeEvent<HTMLSelectElement>)
+                            } as ChangeEvent<HTMLSelectElement>); }
                         }
                         type="button"
                     >
@@ -51,7 +53,7 @@ vi.mock(
 );
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     async (importOriginal) => {
         const actual =
             await importOriginal<
@@ -108,7 +110,7 @@ vi.mock(
     }
 );
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardFooter'), () => ({
     SiteCardFooter: () => <div data-testid="site-card-footer">mock-footer</div>,
 }));
 

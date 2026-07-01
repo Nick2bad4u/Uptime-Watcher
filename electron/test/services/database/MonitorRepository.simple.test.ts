@@ -3,6 +3,9 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Import after mocks so the repository picks up the mocked collaborators.
+import { MonitorRepository } from "../../../services/database/MonitorRepository";
+
 const withDatabaseOperationMock = vi.hoisted(() =>
     vi.fn(
         async <T>(
@@ -39,15 +42,12 @@ interface MockDatabaseService {
 }
 
 interface MockDb {
-    run: ReturnType<typeof vi.fn>;
     prepare: ReturnType<typeof vi.fn>;
+    run: ReturnType<typeof vi.fn>;
 }
 
 let mockDatabaseService: MockDatabaseService;
 let mockDb: MockDb;
-
-// Import after mocks so the repository picks up the mocked collaborators.
-import { MonitorRepository } from "../../../services/database/MonitorRepository";
 
 describe("MonitorRepository simple orchestration", () => {
     beforeEach(() => {
@@ -62,7 +62,7 @@ describe("MonitorRepository simple orchestration", () => {
         mockDatabaseService = {
             executeTransaction: vi.fn(
                 async (callback: (db: MockDb) => Promise<void> | void) =>
-                    await callback(mockDb)
+                    { await callback(mockDb); }
             ),
             getDatabase: vi.fn(() => mockDb),
         };

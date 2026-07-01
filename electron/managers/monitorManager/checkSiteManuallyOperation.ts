@@ -92,7 +92,7 @@ export async function checkSiteManuallyOperation(args: {
     }
 
     const firstMonitorId = site.monitors.find((monitor) =>
-        Boolean(monitor.id)
+        monitor.id
     )?.id;
     if (firstMonitorId) {
         return checkSiteManuallyOperation({

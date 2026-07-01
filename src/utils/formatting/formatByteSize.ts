@@ -21,9 +21,9 @@ export function formatByteSize(bytes: number): string {
 
     const units = [
         "B",
+        "GB",
         "KB",
         "MB",
-        "GB",
         "TB",
     ] as const;
 

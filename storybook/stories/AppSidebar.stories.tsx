@@ -44,7 +44,7 @@ const sampleSites = [
 
 const withSidebarLayout: Decorator = (StoryComponent, context) => {
     const args = context.args as Partial<AppSidebarStoryArgs> | undefined;
-    const requestedOpen = args?.isSidebarOpen ?? true;
+    const isRequestedOpen = args?.isSidebarOpen ?? true;
     const [sidebarOpen, dispatchSidebarOpen] = useReducer(
         (
             current: boolean,
@@ -56,14 +56,14 @@ const withSidebarLayout: Decorator = (StoryComponent, context) => {
 
             return action.open;
         },
-        requestedOpen
+        isRequestedOpen
     );
 
     useEffect(
         function syncSidebarOpen(): void {
-            dispatchSidebarOpen({ open: requestedOpen, type: "set" });
+            dispatchSidebarOpen({ open: isRequestedOpen, type: "set" });
         },
-        [requestedOpen]
+        [isRequestedOpen]
     );
 
     const toggleSidebar = useCallback(() => {
@@ -111,7 +111,7 @@ const SidebarPreview = (): JSX.Element => {
 };
 
 /**
- * Storybook metadata for the application sidebar layout stories.
+ * Storybook metadata for the app sidebar layout stories.
  */
 const meta: Meta<AppSidebarStoryArgs> = {
     args: {

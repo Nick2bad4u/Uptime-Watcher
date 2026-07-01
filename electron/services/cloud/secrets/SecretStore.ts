@@ -50,9 +50,14 @@ export class EphemeralSecretStore implements SecretStore {
  * {@link SecretStore} that falls back to a secondary store if the primary fails.
  */
 export class FallbackSecretStore implements SecretStore {
+    private readonly fallback: SecretStore;
+
     private readonly primary: SecretStore;
 
-    private readonly fallback: SecretStore;
+    public constructor(args: { fallback: SecretStore; primary: SecretStore }) {
+        this.primary = args.primary;
+        this.fallback = args.fallback;
+    }
 
     public async deleteSecret(key: string): Promise<void> {
         await this.primary.deleteSecret(key).catch(() => {});
@@ -82,11 +87,6 @@ export class FallbackSecretStore implements SecretStore {
 
         await this.fallback.setSecret(key, value);
     }
-
-    public constructor(args: { fallback: SecretStore; primary: SecretStore }) {
-        this.primary = args.primary;
-        this.fallback = args.fallback;
-    }
 }
 
 /**
@@ -103,6 +103,19 @@ export class SafeStorageSecretStore implements SecretStore {
         get: (key: string) => Promise<string | undefined>;
         set: (key: string, value: string) => Promise<void>;
     };
+
+    public constructor(args: {
+        settings: {
+            get: (key: string) => Promise<string | undefined>;
+            set: (key: string, value: string) => Promise<void>;
+        };
+    }) {
+        this.settings = args.settings;
+    }
+
+    public async deleteSecret(key: string): Promise<void> {
+        await this.settings.set(key, "");
+    }
 
     public async getSecret(key: string): Promise<string | undefined> {
         const stored = await this.settings.get(key);
@@ -134,18 +147,5 @@ export class SafeStorageSecretStore implements SecretStore {
 
         const encrypted = safeStorage.encryptString(value);
         await this.settings.set(key, encrypted.toString("base64"));
-    }
-
-    public async deleteSecret(key: string): Promise<void> {
-        await this.settings.set(key, "");
-    }
-
-    public constructor(args: {
-        settings: {
-            get: (key: string) => Promise<string | undefined>;
-            set: (key: string, value: string) => Promise<void>;
-        };
-    }) {
-        this.settings = args.settings;
     }
 }

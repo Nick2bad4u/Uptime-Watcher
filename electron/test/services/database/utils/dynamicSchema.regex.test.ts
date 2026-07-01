@@ -10,8 +10,9 @@
  * caught by the test suite.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { MonitorFieldDefinition } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock monitor type configurations that use camelCase field names
 const mockMonitorConfigs = [
@@ -20,9 +21,9 @@ const mockMonitorConfigs = [
         displayName: "HTTP Monitor",
         description: "HTTP endpoint monitoring",
         fields: [
-            { name: "url", type: "string", required: true },
             { name: "method", type: "string", required: false },
             { name: "timeout", type: "number", required: false },
+            { name: "url", type: "string", required: true },
         ] as MonitorFieldDefinition[],
         serviceFactory: () => ({}) as any,
     },
@@ -31,9 +32,9 @@ const mockMonitorConfigs = [
         displayName: "Test CamelCase Monitor",
         description: "Test monitor with camelCase properties",
         fields: [
-            { name: "someUrlEndpoint", type: "string", required: true },
-            { name: "maxRetryCount", type: "number", required: false },
             { name: "enableHttpLogging", type: "boolean", required: false },
+            { name: "maxRetryCount", type: "number", required: false },
+            { name: "someUrlEndpoint", type: "string", required: true },
         ] as MonitorFieldDefinition[],
         serviceFactory: () => ({}) as any,
     },
@@ -88,7 +89,7 @@ describe("DynamicSchema Regex Mutations", () => {
             // These assertions would fail if the first regex /^[A-Z]/u is mutated
             // Verify the conversion didn't leave any uppercase letters at the start
             for (const field of fieldDefinitions) {
-                expect(field.columnName).not.toMatch(/^[A-Z]/);
+                expect(field.columnName).not.toMatch(/^[A-Z]/v);
             }
         });
 
@@ -115,8 +116,8 @@ describe("DynamicSchema Regex Mutations", () => {
 
             // Verify no uppercase letters remain anywhere in the column names
             for (const field of fieldDefinitions) {
-                expect(field.columnName).not.toMatch(/[A-Z]/);
-                expect(field.columnName).toMatch(/^[\d_a-z]+$/); // Only lowercase, numbers, and underscores
+                expect(field.columnName).not.toMatch(/[A-Z]/v);
+                expect(field.columnName).toMatch(/^[\d_a-z]+$/v); // Only lowercase, numbers, and underscores
             }
         });
 
@@ -138,9 +139,9 @@ describe("DynamicSchema Regex Mutations", () => {
             // Verify all column names follow snake_case convention
             for (const field of fieldDefinitions) {
                 // Should not have any uppercase letters (both regex patterns working)
-                expect(field.columnName).not.toMatch(/[A-Z]/);
+                expect(field.columnName).not.toMatch(/[A-Z]/v);
                 // Should be properly formatted snake_case
-                expect(field.columnName).toMatch(/^[a-z][\d_a-z]*$/);
+                expect(field.columnName).toMatch(/^[a-z][\d_a-z]*$/v);
             }
         });
     });

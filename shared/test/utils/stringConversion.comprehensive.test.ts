@@ -3,8 +3,9 @@
  * coverage for all string conversion functions
  */
 
-import { describe, it, expect } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+import { fc, test } from "@fast-check/vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion Utilities - Comprehensive Coverage", () => {
@@ -54,7 +55,7 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(0)).toBe("0");
             expect(safeStringify(-123)).toBe("-123");
             expect(safeStringify(3.14)).toBe("3.14");
-            expect(safeStringify(Number.NaN)).toBe("NaN");
+            expect(safeStringify(NaN)).toBe("NaN");
             expect(safeStringify(Infinity)).toBe("Infinity");
             expect(safeStringify(-Infinity)).toBe("-Infinity");
         });
@@ -180,9 +181,8 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             // This test documents that undefined is properly handled
             expect(safeStringify(undefined)).toBe("");
 
-            // Note: The 'default' case is theoretically unreachable in JavaScript
-            // since typeof only returns known string values. This would require
-            // a future JavaScript version to add new types, or engine bugs.
+            // Note: The 'default' case is theoretically unreachable in JavaScript since typeof only returns known
+            // string values. This would require a future JavaScript version to add new types, or engine bugs.
             // We cannot easily test this path without mocking typeof behavior.
         });
 
@@ -467,13 +467,15 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                 const normalizeSignedZeros = (value: unknown): unknown => {
                     if (Array.isArray(value)) {
                         return value.map((item) => normalizeSignedZeros(item));
-                    } else if (value && typeof value === "object") {
+                    }
+                    if (value && typeof value === "object") {
                         const normalized: Record<string, unknown> = {};
                         for (const [key, val] of Object.entries(value)) {
                             normalized[key] = normalizeSignedZeros(val);
                         }
                         return normalized;
-                    } else if (Object.is(value, -0)) {
+                    }
+                    if (Object.is(value, -0)) {
                         return 0; // Normalize -0 to +0
                     }
                     return value;
@@ -501,13 +503,15 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
                             return value.map((item) =>
                                 normalizeSignedZeros(item)
                             );
-                        } else if (value && typeof value === "object") {
+                        }
+                        if (value && typeof value === "object") {
                             const normalized: Record<string, unknown> = {};
                             for (const [key, val] of Object.entries(value)) {
                                 normalized[key] = normalizeSignedZeros(val);
                             }
                             return normalized;
-                        } else if (Object.is(value, -0)) {
+                        }
+                        if (Object.is(value, -0)) {
                             return 0; // Normalize -0 to +0
                         }
                         return value;

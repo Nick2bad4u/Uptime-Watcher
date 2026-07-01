@@ -3,10 +3,18 @@
  * Comprehensive unit tests for the SSL monitor implementation.
  */
 
+import type { Site } from "@shared/types";
+import type { PeerCertificate } from "node:tls";
+
 import { EventEmitter } from "node:events";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import {
+    createMonitorConfig,
+    createMonitorErrorResult,
+    validateMonitorHostAndPort,
+} from "../../../services/monitoring/shared/monitorServiceHelpers";
+import { SslMonitor } from "../../../services/monitoring/SslMonitor";
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     createMonitorConfig: vi.fn(),
@@ -22,15 +30,6 @@ vi.mock("node:tls", () => ({
     },
     connect: (...args: unknown[]) => connectMock(...args),
 }));
-
-import type { PeerCertificate } from "node:tls";
-
-import { SslMonitor } from "../../../services/monitoring/SslMonitor";
-import {
-    createMonitorConfig,
-    createMonitorErrorResult,
-    validateMonitorHostAndPort,
-} from "../../../services/monitoring/shared/monitorServiceHelpers";
 
 class MockTlsSocket extends EventEmitter {
     public authorized: boolean;
@@ -54,8 +53,8 @@ class MockTlsSocket extends EventEmitter {
     public constructor(
         certificate: PeerCertificate,
         options: {
-            authorized?: boolean;
             authorizationError?: Error | string;
+            authorized?: boolean;
         } = {}
     ) {
         super();
@@ -93,8 +92,8 @@ function createCertificate(
 function mockSuccessfulHandshake(
     certificate: PeerCertificate,
     overrides: {
-        authorized?: boolean;
         authorizationError?: Error | string;
+        authorized?: boolean;
     } = {}
 ): void {
     connectMock.mockImplementation(() => {
@@ -139,7 +138,7 @@ describe("SslMonitor service", () => {
             status: "pending",
             responseTime: 0,
             history: [],
-        } as Site["monitors"][0];
+        };
 
         vi.mocked(validateMonitorHostAndPort).mockReturnValue(null);
         vi.mocked(createMonitorConfig).mockReturnValue({
@@ -240,7 +239,7 @@ describe("SslMonitor service", () => {
             .certificateWarningDays;
 
         const result = await sslMonitor.check(
-            monitorWithoutWarning as Site["monitors"][0]
+            monitorWithoutWarning
         );
 
         expect(result.status).toBe("degraded");

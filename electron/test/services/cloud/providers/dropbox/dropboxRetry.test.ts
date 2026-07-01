@@ -1,8 +1,7 @@
+import { withDropboxRetry } from "@electron/services/cloud/providers/dropbox/dropboxRetry";
 import { AxiosError, type AxiosResponse } from "axios";
 import { DropboxResponseError } from "dropbox";
 import { describe, expect, it, vi } from "vitest";
-
-import { withDropboxRetry } from "@electron/services/cloud/providers/dropbox/dropboxRetry";
 
 function createAxiosError(args: {
     headers?: Record<string, string>;

@@ -23,25 +23,27 @@
  * @author AI Assistant
  */
 
-import { beforeEach, describe, expect, vi, afterEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
+import type { Monitor, MonitorStatus, MonitorType, Site } from "@shared/types";
 import type { ReactNode } from "react";
-import type { Site, Monitor, MonitorStatus, MonitorType } from "@shared/types";
+
+import { fc, test as fcTest } from "@fast-check/vitest";
+import "@testing-library/jest-dom";
+import { secureRandomFloat } from "@shared/test/testHelpers";
+import { render, screen } from "@testing-library/react";
+import { arrayFirst, arrayJoin  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 import { getMonitorTypeDisplayLabel } from "../../../../utils/fallbacks";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock state for testing
-let mockSiteData: Site | null = null;
+let mockSiteData: null | Site = null;
 
 const normalizeStatusTestIdSegment = (segment: string): string =>
-    segment.replaceAll(/[^\dA-Za-z]/g, "_").toLowerCase();
+    segment.replaceAll(/[^\da-z]/gi, "_").toLowerCase();
 
 // Mock all SiteCard sub-components with testid patterns
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHeader'), () => ({
     SiteCardHeader: ({ site }: { site: { site: Site } }) => (
         <div data-testid={`site-card-header-${site.site.identifier}`}>
             Header: {site.site.name}{" "}
@@ -52,7 +54,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     ),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardStatus'), () => ({
     SiteCardStatus: ({
         monitorLabel,
         status,
@@ -68,14 +70,14 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
     ),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () => ({
     SiteCardMetrics: ({
         metrics,
     }: {
         metrics: readonly {
             readonly key: string;
             readonly label: string;
-            readonly value: string | number;
+            readonly value: number | string;
         }[];
     }) => {
         const siteIdentifier = mockSiteData?.identifier || "default";
@@ -83,9 +85,8 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
         const statusValue = String(
             statusMetric?.value ?? "unknown"
         ).toLowerCase();
-        const summary = metrics
-            .map((metric) => `${metric.label}: ${metric.value}`)
-            .join(" | ");
+        const summary = arrayJoin(metrics
+            .map((metric) => `${metric.label}: ${metric.value}`), " | ");
 
         return (
             <div
@@ -99,7 +100,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
     },
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHistory'), () => ({
     SiteCardHistory: ({
         filteredHistory,
         monitor,
@@ -114,7 +115,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
 }));
 
 // Mock the useSite hook with comprehensive return data
-vi.mock("../../../../hooks/site/useSite", () => ({
+vi.mock(import('../../../../hooks/site/useSite'), () => ({
     useSite: vi.fn((site: Site) => ({
         checkCount: 100,
         filteredHistory: [],
@@ -128,26 +129,26 @@ vi.mock("../../../../hooks/site/useSite", () => ({
         isLoading: false,
         isMonitoring: true,
         latestSite: site,
-        monitor: site.monitors[0],
+        monitor: arrayFirst(site.monitors),
         responseTime: 150,
-        selectedMonitorId: site.monitors[0]?.id || "default",
-        status: "up" as MonitorStatus,
+        selectedMonitorId: arrayFirst(site.monitors)?.id || "default",
+        status: "up",
         uptime: 99.5,
     })),
 }));
 
 // Mock ThemedBox
-vi.mock("../../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({
         children,
         className,
         onClick,
         "aria-label": ariaLabel,
     }: {
+        "aria-label"?: string;
         children: ReactNode;
         className?: string;
         onClick?: () => void;
-        "aria-label"?: string;
     }) => {
         // Get unique site identifier from mock data
         const siteIdentifier = mockSiteData?.identifier || "default";
@@ -157,14 +158,14 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
             /View details for (?<siteName>.*)/
         );
         const siteName = siteNameMatch?.groups?.["siteName"] ?? "unknown";
-        const testId = `themed-box-${siteIdentifier}-${siteName.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+        const testId = `themed-box-${siteIdentifier}-${siteName.replaceAll(/[^\da-z]/gi, "_")}`;
 
         return (
             <div
-                className={className}
-                onClick={onClick}
                 aria-label={ariaLabel}
+                className={className}
                 data-testid={testId}
+                onClick={onClick}
             >
                 {children}
             </div>
@@ -177,7 +178,7 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
  * break CSS selectors: [](){}#$%'",;:*&^!|~`
  */
 const cssSafeIdentifierArbitrary = (
-    options: { minLength?: number; maxLength?: number } = {}
+    options: { maxLength?: number; minLength?: number; } = {}
 ) =>
     fc
         .array(
@@ -253,9 +254,9 @@ const cssSafeIdentifierArbitrary = (
                 maxLength: options.maxLength || 50,
             }
         )
-        .map((arr) => arr.join(""))
-        .map((s) => s.trim().replace(/^[.-]/, "a"))
-        .filter((s) => s.length > 0 && /^[A-Za-z]/.test(s));
+        .map((arr) => arrayJoin(arr, ""))
+        .map((s) => s.trim().replace(/^[-.]/u, "a"))
+        .filter((s) => s.length > 0 && /^[A-Za-z]/v.test(s));
 
 /**
  * Arbitrary for generating valid Monitor objects with history
@@ -267,14 +268,14 @@ const validMonitorArbitrary = fc.record({
         "ping",
         "port",
         "dns"
-    ) as fc.Arbitrary<MonitorType>,
+    ),
     monitoring: fc.boolean(),
     status: fc.constantFrom(
         "up",
         "down",
         "pending",
         "paused"
-    ) as fc.Arbitrary<MonitorStatus>,
+    ),
     responseTime: fc.integer({ min: 0, max: 10_000 }),
     checkInterval: fc.integer({ min: 1000, max: 300_000 }),
     timeout: fc.integer({ min: 1000, max: 60_000 }),
@@ -391,7 +392,7 @@ const renderSiteCard = (site: any) => {
  */
 const verifySiteCardStructure = (site: any) => {
     // Use consistent testId pattern matching the mocked ThemedBox implementation
-    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\da-z]/gi, "_")}`;
     const themedBox = screen.getByTestId(testId);
     expect(themedBox).toBeInTheDocument();
     expect(themedBox).toHaveAttribute(
@@ -421,7 +422,7 @@ const verifySiteCardStructure = (site: any) => {
             screen.getByTestId("site-card-status-monitor")
         ).toBeInTheDocument();
         expect(
-            screen.getByTestId(`site-card-history-no-monitor`)
+            screen.getByTestId("site-card-history-no-monitor")
         ).toBeInTheDocument();
     }
     expect(
@@ -470,7 +471,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                 // Normalize whitespace for comparison - HTML normalizes consecutive spaces
                 // Split and join to normalize whitespace instead of using regex replace
                 const normalizeWhitespace = (text: string) =>
-                    text.split(/\s+/).join(" ").trim();
+                    text.replaceAll(/\s+/gv, ' ').trim();
                 const expectedHeaderText = normalizeWhitespace(
                     `Header: ${site.name} Click to view details`
                 );
@@ -485,7 +486,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                 // Use more specific selectors to avoid conflicts between multiple cards
                 if (site.monitors.length > 0) {
                     const expectedMonitorLabel = getMonitorTypeDisplayLabel(
-                        site.monitors[0]!.type
+                        arrayFirst(site.monitors)!.type
                     );
                     expect(
                         screen.getByTestId(
@@ -494,7 +495,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                     ).toHaveTextContent("Status: up");
                     expect(
                         screen.getByTestId(
-                            `site-card-history-${site.monitors[0]!.id}`
+                            `site-card-history-${arrayFirst(site.monitors)!.id}`
                         )
                     ).toHaveTextContent("History: 0 entries");
                 } else {
@@ -502,7 +503,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                         screen.getByTestId("site-card-status-monitor")
                     ).toHaveTextContent("Status: up");
                     expect(
-                        screen.getByTestId(`site-card-history-no-monitor`)
+                        screen.getByTestId("site-card-history-no-monitor")
                     ).toHaveTextContent("History: 0 entries");
                 }
 
@@ -514,12 +515,12 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                 const metricsSummary = screen.getByTestId(
                     `site-card-metrics-summary-${site.identifier}`
                 );
-                expect(metricsSummary).toHaveTextContent(/Uptime: 99\.5%/);
+                expect(metricsSummary).toHaveTextContent(/Uptime: 99\.5%/v);
 
                 const metricsContent = screen.getByTestId(
                     "site-card-metrics-content"
                 );
-                expect(metricsContent).toHaveTextContent(/Metrics:/);
+                expect(metricsContent).toHaveTextContent(/Metrics:/v);
                 expect(
                     screen.getByTestId(`site-card-footer-${site.identifier}`)
                 ).toHaveTextContent("Click to view details");
@@ -537,7 +538,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
             const { unmount } = renderSiteCard(site);
 
             try {
-                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\da-z]/gi, "_")}`;
                 const themedBox = screen.getByTestId(testId);
                 expect(themedBox).toHaveClass(
                     "group",
@@ -569,7 +570,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
 
             try {
                 // Should render without crashing - use consistent testId pattern
-                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+                const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\da-z]/gi, "_")}`;
                 const themedBox = screen.getByTestId(testId);
                 expect(themedBox).toBeInTheDocument();
 
@@ -588,14 +589,14 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
             [
                 validSiteArbitrary.map((site) => ({
                     ...site,
-                    monitors: fc.sample(
+                    monitors: arrayFirst(fc.sample(
                         fc.uniqueArray(validMonitorArbitrary, {
                             selector: (monitor) => monitor.id,
                             minLength: 3,
                             maxLength: 10,
                         }),
                         1
-                    )[0],
+                    )),
                 })),
             ],
             {
@@ -632,7 +633,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
 
             try {
                 // Should render basic structure - use consistent testId pattern
-                const testId = `themed-box-${siteWithNoMonitors.identifier}-${siteWithNoMonitors.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+                const testId = `themed-box-${siteWithNoMonitors.identifier}-${siteWithNoMonitors.name.replaceAll(/[^\da-z]/gi, "_")}`;
                 const themedBox = screen.getByTestId(testId);
                 expect(themedBox).toBeInTheDocument();
                 expect(
@@ -675,7 +676,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
 
                 try {
                     // Use consistent testId pattern
-                    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+                    const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\da-z]/gi, "_")}`;
                     const themedBox = screen.getByTestId(testId);
                     expect(themedBox).toHaveAttribute(
                         "aria-label",
@@ -697,7 +698,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
 
             // Verify structure before unmounting
             verifySiteCardStructure(site);
-            const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+            const testId = `themed-box-${site.identifier}-${site.name.replaceAll(/[^\da-z]/gi, "_")}`;
 
             // Unmount and verify cleanup
             unmount();

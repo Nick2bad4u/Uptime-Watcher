@@ -2,7 +2,8 @@
  * Backend tests for environment utilities Focus on backend-specific usage
  * patterns in electron environment
  */
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import {
     getEnvironment,
     getEnvVar,
@@ -202,7 +203,7 @@ describe("environment utilities - Backend Coverage", () => {
             );
 
             // In electron backend, window should be undefined
-            expect(typeof globalThis.window).toBe("undefined");
+            expect(typeof window).toBe("undefined");
             expect(isBrowserEnvironment()).toBeFalsy();
         });
         it("should handle backend environment correctly", async ({

@@ -1,17 +1,17 @@
+import type { MonitorFieldDefinition } from "@shared/types";
+
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useMonitorFields } from "../../hooks/useMonitorFields";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
     useMonitorTypesStore: vi.fn(),
 }));
 
-vi.mock("../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(),
 }));
 
@@ -41,8 +41,8 @@ describe(useMonitorFields, () => {
     }
 
     interface ErrorState {
-        monitorTypesError: string | undefined;
         getStoreError: (key: string) => string | undefined;
+        monitorTypesError: string | undefined;
     }
 
     let monitorTypesState: MonitorTypesState;

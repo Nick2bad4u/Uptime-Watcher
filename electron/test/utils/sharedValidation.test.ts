@@ -3,12 +3,13 @@
  * electron/test to ensure coverage tracking
  */
 
-import { describe, expect, it } from "vitest";
 import type { Monitor, Site } from "@shared/types";
+
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { validateMonitorType } from "@shared/utils/validation";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
-import { validateMonitorType } from "@shared/utils/validation";
-import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { describe, expect, it } from "vitest";
 
 describe("Shared Validation - Backend Coverage", () => {
     describe(getMonitorValidationErrors, () => {
@@ -162,13 +163,13 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(
-                validateSiteData(null as unknown as Partial<Site>).success
+                validateSiteData(null).success
             ).toBeFalsy();
             expect(
                 validateSiteData(undefined as unknown as Partial<Site>).success
             ).toBeFalsy();
             expect(
-                validateSiteData("string" as unknown as Partial<Site>).success
+                validateSiteData("string").success
             ).toBeFalsy();
         });
 

@@ -3,10 +3,11 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import {
+    DEFAULT_CHART_THEMES,
     hasPlugins,
     hasScales,
-    DEFAULT_CHART_THEMES,
 } from "../../types/chartConfig.js";
 
 describe("Chart Config Utilities", () => {
@@ -366,7 +367,7 @@ describe("Chart Config Utilities", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const colorRegex = /^rgba?\((?:\d+,\s*){2}\d+(?:,\s*[\d.]+)?\)$/;
+            const colorRegex = /^rgba?\((?:\d+,\s*){2}\d+(?:,\s*[\d.]+)?\)$/v;
 
             for (const color of DEFAULT_CHART_THEMES.dark.backgroundColors) {
                 expect(typeof color).toBe("string");

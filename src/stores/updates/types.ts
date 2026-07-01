@@ -1,5 +1,5 @@
 /**
- * Updates store types and interfaces. Manages application updates and update
+ * Updates store types and interfaces. Manages app updates and update
  * notifications.
  *
  * @packageDocumentation
@@ -8,7 +8,7 @@
 import type { UpdateStatus } from "../types";
 
 /**
- * Updates store interface. Manages application update status and operations.
+ * Updates store interface. Manages app update status and operations.
  *
  * @public
  */
@@ -38,7 +38,7 @@ export interface UpdatesStore {
      * Subscribes to backend update status events.
      *
      * @remarks
-     * This is intentionally store-owned so application bootstrap code can
+     * This is intentionally store-owned so app bootstrap code can
      * subscribe via the domain store (rather than wiring
      * {@link src/services/EventsService#EventsService} directly in the root
      * component).

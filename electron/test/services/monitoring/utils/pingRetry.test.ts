@@ -11,6 +11,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { MonitorCheckResult } from "../../../../services/monitoring/types";
 
+import {
+    checkConnectivity,
+    checkHttpConnectivity,
+} from "../../../../services/monitoring/utils/nativeConnectivity";
+import {
+    performPingCheckWithRetry,
+    performSinglePingCheck,
+} from "../../../../services/monitoring/utils/pingRetry";
+import { withOperationalHooks } from "../../../../utils/operationalHooks";
+
 // Mock dependencies before importing module under test
 vi.mock("../../../../electronUtils", () => ({
     isDev: vi.fn(),
@@ -44,16 +54,6 @@ vi.mock("../../../../constants", () => ({
         MAX_DELAY: 250,
     },
 }));
-
-import {
-    performPingCheckWithRetry,
-    performSinglePingCheck,
-} from "../../../../services/monitoring/utils/pingRetry";
-import {
-    checkConnectivity,
-    checkHttpConnectivity,
-} from "../../../../services/monitoring/utils/nativeConnectivity";
-import { withOperationalHooks } from "../../../../utils/operationalHooks";
 
 const upResult: MonitorCheckResult = {
     details: "OK",

@@ -2,7 +2,7 @@
  * Theme system type definitions.
  *
  * @remarks
- * Defines the structure and interfaces for the application's theming system
+ * Defines the structure and interfaces for the app's theming system
  * including colors, typography, spacing, and visual effects.
  */
 
@@ -199,6 +199,16 @@ export interface ThemeColors {
 }
 
 /**
+ * Available theme names in the app.
+ */
+export type ThemeName =
+    | "custom"
+    | "dark"
+    | "high-contrast"
+    | "light"
+    | "system";
+
+/**
  * Shadow system interface for elevation and depth. Defines consistent shadow
  * styles for UI components.
  */
@@ -217,7 +227,7 @@ export interface ThemeShadows {
 
 /**
  * Spacing scale interface for consistent layout spacing. Defines standard
- * spacing values used throughout the application.
+ * spacing values used throughout the app.
  */
 export interface ThemeSpacing {
     /** Double extra large spacing */
@@ -303,16 +313,6 @@ export interface ThemeTypography {
         tight: string;
     };
 }
-
-/**
- * Available theme names in the application.
- */
-export type ThemeName =
-    | "custom"
-    | "dark"
-    | "high-contrast"
-    | "light"
-    | "system";
 
 /**
  * List of all supported {@link ThemeName} values at runtime.

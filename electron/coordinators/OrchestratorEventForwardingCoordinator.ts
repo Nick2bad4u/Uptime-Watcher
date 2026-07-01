@@ -128,7 +128,7 @@ export class OrchestratorEventForwardingCoordinator {
                 const siteIdentifier =
                     data.identifier ?? data.site?.identifier ?? "unknown-site";
                 const siteName = data.site?.name ?? "Unknown";
-                const cascade = data.cascade === true;
+                const isCascade = data.cascade === true;
 
                 if (!data.site) {
                     logger.warn(
@@ -138,7 +138,7 @@ export class OrchestratorEventForwardingCoordinator {
                 }
 
                 const payload = {
-                    cascade,
+                    cascade: isCascade,
                     siteIdentifier,
                     siteName,
                     timestamp: data.timestamp,

@@ -59,54 +59,6 @@ import { DEFAULT_SITE_NAME } from "../../constants";
 import { SiteLoadingError } from "./interfaces";
 
 /**
- * Orchestrates the complete site loading process. Coordinates data loading with
- * side effects.
- */
-export class SiteLoadingOrchestrator {
-    private readonly siteRepositoryService: SiteRepositoryService;
-
-    /**
-     * Load sites from database and start monitoring. Coordinates all aspects of
-     * site loading process.
-     */
-    public async loadSitesFromDatabase(
-        siteCache: StandardizedCache<Site>,
-        monitoringConfig: MonitoringConfig
-    ): Promise<{ message: string; sitesLoaded: number; success: boolean }> {
-        try {
-            // Load sites data
-            await this.siteRepositoryService.loadSitesIntoCache(siteCache);
-
-            // Apply settings
-            await this.siteRepositoryService.applyHistoryLimitSetting(
-                monitoringConfig
-            );
-
-            // Note: Auto-start monitoring is now handled by
-            // MonitorManager.setupSiteForMonitoring() No need to explicitly
-            // start monitoring here as it's handled during site setup
-
-            const sitesLoaded = siteCache.size;
-            return {
-                message: `Successfully loaded ${sitesLoaded} sites`,
-                sitesLoaded,
-                success: true,
-            };
-        } catch (error) {
-            return {
-                message: `Failed to load sites: ${getUnknownErrorMessage(error)}`,
-                sitesLoaded: 0,
-                success: false,
-            };
-        }
-    }
-
-    public constructor(siteRepositoryService: SiteRepositoryService) {
-        this.siteRepositoryService = siteRepositoryService;
-    }
-}
-
-/**
  * Service for handling site repository operations.
  *
  * @remarks
@@ -130,6 +82,22 @@ export class SiteRepositoryService {
         settings: SettingsRepository;
         site: SiteRepository;
     };
+
+    /**
+     * Create a new SiteRepositoryService instance.
+     *
+     * @remarks
+     * Initializes the service with injected dependencies for repositories,
+     * logging, and event communication. All dependencies are required for
+     * proper operation and comprehensive functionality.
+     *
+     * @param config - Configuration with required dependencies
+     */
+    public constructor(config: SiteLoadingConfig) {
+        this.repositories = config.repositories;
+        this.logger = config.logger;
+        this.eventEmitter = config.eventEmitter;
+    }
 
     /**
      * Apply history limit setting. Side effect operation separated from data
@@ -197,40 +165,6 @@ export class SiteRepositoryService {
     }
 
     /**
-     * Get sites from database with their monitors and history.
-     *
-     * @remarks
-     * Performs a complete site loading operation including all associated
-     * monitors and their status history. This operation includes logging and
-     * error handling side effects for comprehensive error tracking.
-     *
-     * The operation builds complete site objects by fetching site metadata,
-     * associated monitors, and historical data in an efficient manner while
-     * maintaining proper error handling throughout the process.
-     *
-     * @returns Promise resolving to array of complete site objects
-     *
-     * @throws SiteLoadingError When database operation fails
-     */
-    public async getSitesFromDatabase(): Promise<Site[]> {
-        try {
-            const siteRows = await this.repositories.site.findAll();
-
-            // Build sites in parallel since each site operation is independent
-            const sitePromises = siteRows.map(async (siteRow) =>
-                this.buildSiteWithMonitorsAndHistory(siteRow)
-            );
-
-            return await Promise.all(sitePromises);
-        } catch (error) {
-            const normalizedError = ensureError(error);
-            const message = `Failed to fetch sites from database: ${getUnknownErrorMessage(normalizedError)}`;
-            this.logger.error(message, normalizedError);
-            throw new SiteLoadingError(message, { cause: normalizedError });
-        }
-    }
-
-    /**
      * Get a single site from the database with monitors and history.
      *
      * @remarks
@@ -263,6 +197,40 @@ export class SiteRepositoryService {
         } catch (error) {
             const normalizedError = ensureError(error);
             const message = `Failed to fetch site ${identifier} from database: ${getUnknownErrorMessage(normalizedError)}`;
+            this.logger.error(message, normalizedError);
+            throw new SiteLoadingError(message, { cause: normalizedError });
+        }
+    }
+
+    /**
+     * Get sites from database with their monitors and history.
+     *
+     * @remarks
+     * Performs a complete site loading operation including all associated
+     * monitors and their status history. This operation includes logging and
+     * error handling side effects for comprehensive error tracking.
+     *
+     * The operation builds complete site objects by fetching site metadata,
+     * associated monitors, and historical data in an efficient manner while
+     * maintaining proper error handling throughout the process.
+     *
+     * @returns Promise resolving to array of complete site objects
+     *
+     * @throws SiteLoadingError When database operation fails
+     */
+    public async getSitesFromDatabase(): Promise<Site[]> {
+        try {
+            const siteRows = await this.repositories.site.findAll();
+
+            // Build sites in parallel since each site operation is independent
+            const sitePromises = siteRows.map(async (siteRow) =>
+                this.buildSiteWithMonitorsAndHistory(siteRow)
+            );
+
+            return await Promise.all(sitePromises);
+        } catch (error) {
+            const normalizedError = ensureError(error);
+            const message = `Failed to fetch sites from database: ${getUnknownErrorMessage(normalizedError)}`;
             this.logger.error(message, normalizedError);
             throw new SiteLoadingError(message, { cause: normalizedError });
         }
@@ -343,20 +311,52 @@ export class SiteRepositoryService {
             name: siteRow.name ?? DEFAULT_SITE_NAME, // Use consistent default name
         };
     }
+}
+
+/**
+ * Orchestrates the complete site loading process. Coordinates data loading with
+ * side effects.
+ */
+export class SiteLoadingOrchestrator {
+    private readonly siteRepositoryService: SiteRepositoryService;
+
+    public constructor(siteRepositoryService: SiteRepositoryService) {
+        this.siteRepositoryService = siteRepositoryService;
+    }
 
     /**
-     * Create a new SiteRepositoryService instance.
-     *
-     * @remarks
-     * Initializes the service with injected dependencies for repositories,
-     * logging, and event communication. All dependencies are required for
-     * proper operation and comprehensive functionality.
-     *
-     * @param config - Configuration with required dependencies
+     * Load sites from database and start monitoring. Coordinates all aspects of
+     * site loading process.
      */
-    public constructor(config: SiteLoadingConfig) {
-        this.repositories = config.repositories;
-        this.logger = config.logger;
-        this.eventEmitter = config.eventEmitter;
+    public async loadSitesFromDatabase(
+        siteCache: StandardizedCache<Site>,
+        monitoringConfig: MonitoringConfig
+    ): Promise<{ message: string; sitesLoaded: number; success: boolean }> {
+        try {
+            // Load sites data
+            await this.siteRepositoryService.loadSitesIntoCache(siteCache);
+
+            // Apply settings
+            await this.siteRepositoryService.applyHistoryLimitSetting(
+                monitoringConfig
+            );
+
+            // Note: Auto-start monitoring is now handled by
+            // MonitorManager.setupSiteForMonitoring() No need to explicitly
+            // start monitoring here as it's handled during site setup
+
+            const sitesLoaded = siteCache.size;
+            return {
+                message: `Successfully loaded ${sitesLoaded} sites`,
+                sitesLoaded,
+                success: true,
+            };
+        } catch (error) {
+            return {
+                message: `Failed to load sites: ${getUnknownErrorMessage(error)}`,
+                sitesLoaded: 0,
+                success: false,
+            };
+        }
     }
 }

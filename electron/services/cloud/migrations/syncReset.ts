@@ -107,9 +107,7 @@ export async function resetProviderCloudSyncState(args: {
 
     const nextManifest = {
         ...ProviderCloudSyncTransport.createEmptyManifest(),
-        ...(remoteManifest.encryption
-            ? { encryption: remoteManifest.encryption }
-            : {}),
+        ...(remoteManifest.encryption && { encryption: remoteManifest.encryption }),
         resetAt,
     };
 
@@ -121,9 +119,7 @@ export async function resetProviderCloudSyncState(args: {
         deletedObjects: deletionResult.deleted,
         failedDeletions: deletionResult.failures,
         resetAt,
-        ...(seeded.snapshotKey
-            ? { seededSnapshotKey: seeded.snapshotKey }
-            : {}),
+        ...(seeded.snapshotKey && { seededSnapshotKey: seeded.snapshotKey }),
         startedAt,
     };
 }

@@ -7,17 +7,18 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test, vi, beforeEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
+import { generateCorrelationId } from "@shared/utils/correlation";
+import { beforeEach, describe, expect, it, test, vi } from "vitest";
 
-// Import event system modules
-import { TypedEventBus } from "../../../electron/events/TypedEventBus";
 import type {
     UptimeEventName,
     UptimeEvents,
 } from "../../../electron/events/eventTypes";
-import { generateCorrelationId } from "@shared/utils/correlation";
-import { secureRandomFloat } from "@shared/test/testHelpers";
+
+// Import event system modules
+import { TypedEventBus } from "../../../electron/events/TypedEventBus";
 
 // Custom arbitraries for event system testing
 const arbitraryEventType = fc.constantFrom(
@@ -298,7 +299,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        test("should generate valid correlation IDs", () => {
+        it("should generate valid correlation IDs", () => {
             const correlationId = generateCorrelationId();
             expect(typeof correlationId).toBe("string");
             expect(correlationId.length).toBeGreaterThan(0);
@@ -501,7 +502,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             "should handle complete event lifecycle",
             (eventType, payload, _metadata) => {
                 const listener = vi.fn();
-                eventBus.on(String(eventType), listener);
+                eventBus.on(eventType, listener);
 
                 // Create complete event (unused)
                 // const _completeEvent = {
@@ -511,11 +512,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // };
 
                 // Emit with metadata
-                eventBus.emit(String(eventType), payload);
+                eventBus.emit(eventType, payload);
 
                 expect(listener).toHaveBeenCalledTimes(1);
 
-                eventBus.off(String(eventType), listener);
+                eventBus.off(eventType, listener);
             }
         );
 
@@ -529,12 +530,12 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 for (const eventType of eventTypes) {
                     const listener = vi.fn();
                     listeners.set(eventType, listener);
-                    eventBus.on(String(eventType), listener);
+                    eventBus.on(eventType, listener);
                 }
 
                 // Emit all events
                 for (const event of events) {
-                    eventBus.emit(String(event.type), event.payload);
+                    eventBus.emit(event.type, event.payload);
                 }
 
                 // Verify correct distribution
@@ -549,7 +550,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Cleanup
                 for (const eventType of eventTypes) {
                     const listener = listeners.get(eventType);
-                    eventBus.off(String(eventType), listener);
+                    eventBus.off(eventType, listener);
                 }
             }
         );
@@ -582,7 +583,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             (eventType) => {
                 // Emit event with no listeners
                 expect(() => {
-                    eventBus.emit(String(eventType), {
+                    eventBus.emit(eventType, {
                         test: true,
                     });
                 }).not.toThrow();
@@ -594,14 +595,14 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             (eventType, payload) => {
                 const listener = vi.fn().mockImplementation(() => {
                     // Remove itself during execution
-                    eventBus.off(String(eventType), listener);
+                    eventBus.off(eventType, listener);
                 });
 
-                eventBus.on(String(eventType), listener);
+                eventBus.on(eventType, listener);
 
                 // Should not cause issues
                 expect(() => {
-                    eventBus.emit(String(eventType), payload);
+                    eventBus.emit(eventType, payload);
                 }).not.toThrow();
 
                 expect(listener).toHaveBeenCalledTimes(1);
@@ -617,19 +618,19 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 const recursiveListener = vi.fn().mockImplementation(() => {
                     callCount++;
                     if (callCount < maxCalls) {
-                        eventBus.emit(String(eventType), {
+                        eventBus.emit(eventType, {
                             nested: true,
                         });
                     }
                 });
 
-                eventBus.on(String(eventType), recursiveListener);
+                eventBus.on(eventType, recursiveListener);
 
-                eventBus.emit(String(eventType), payload);
+                eventBus.emit(eventType, payload);
 
                 expect(recursiveListener).toHaveBeenCalledTimes(maxCalls);
 
-                eventBus.off(String(eventType), recursiveListener);
+                eventBus.off(eventType, recursiveListener);
             }
         );
 
@@ -652,7 +653,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Event System Memory Management", () => {
-        test("should not leak memory with many listeners", () => {
+        it("should not leak memory with many listeners", () => {
             const listeners: (() => void)[] = [];
 
             // Create many listeners - store the actual listener functions for cleanup

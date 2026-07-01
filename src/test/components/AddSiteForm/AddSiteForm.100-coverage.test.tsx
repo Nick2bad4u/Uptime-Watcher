@@ -3,12 +3,13 @@
  *   Targeting the dynamic field change handlers
  */
 
-import { describe, expect, test, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, test, vi } from "vitest";
+
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 // Mock the hooks and dependencies
-vi.mock("@/hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('@/hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: () => ({
         loading: false,
         startLoading: vi.fn(),
@@ -16,20 +17,20 @@ vi.mock("@/hooks/useDelayedButtonLoading", () => ({
     }),
 }));
 
-vi.mock("@/hooks/useDynamicHelpText", () => ({
+vi.mock(import('@/hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: () => ({
         getHelpText: vi.fn(() => "Help text"),
     }),
 }));
 
-vi.mock("@/hooks/useMonitorFields", () => ({
+vi.mock(import('@/hooks/useMonitorFields'), () => ({
     useMonitorFields: () => ({
         getFieldsForType: vi.fn(() => []),
         getRequiredFieldsForType: vi.fn(() => []),
     }),
 }));
 
-vi.mock("@/hooks/useMonitorTypes", () => ({
+vi.mock(import('@/hooks/useMonitorTypes'), () => ({
     useMonitorTypes: () => ({
         types: [
             { value: "http", label: "HTTP" },
@@ -41,7 +42,7 @@ vi.mock("@/hooks/useMonitorTypes", () => ({
     }),
 }));
 
-vi.mock("@/stores/sites/useSiteSync", () => ({
+vi.mock(import('@/stores/sites/useSiteSync'), () => ({
     useSiteSync: () => ({
         addSite: vi.fn(),
     }),
@@ -52,11 +53,9 @@ const commitFieldChange = async (
     value: unknown
 ): Promise<void> => {
     if (
-        !(
-            element instanceof HTMLInputElement ||
-            element instanceof HTMLSelectElement ||
-            element instanceof HTMLTextAreaElement
-        )
+        !(element instanceof HTMLInputElement) &&
+            !(element instanceof HTMLSelectElement) &&
+            !(element instanceof HTMLTextAreaElement)
     ) {
         return;
     }
@@ -75,7 +74,7 @@ const commitFieldChange = async (
 
 describe("AddSiteForm - 100% Coverage Tests", () => {
     describe("Targeting Lines 187-196 (dynamic field change handlers)", () => {
-        test("should handle expectedValue field change", async ({
+        it("should handle expectedValue field change", async ({
             task,
             annotate,
         }) => {
@@ -95,13 +94,13 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
 
             // Change monitor type to DNS to get expectedValue field
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await commitFieldChange(monitorTypeSelect, "dns");
 
             // Look for the expectedValue field
             const expectedValueField =
-                screen.queryByLabelText(/expected value/i);
+                screen.queryByLabelText(/expected value/iv);
             if (
                 expectedValueField &&
                 expectedValueField instanceof HTMLInputElement
@@ -109,17 +108,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
                 await commitFieldChange(expectedValueField, "test-value");
                 // Just check that the form component exists - the dynamic handler is called internally
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             } else {
                 // If field doesn't exist, just ensure the component renders
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             }
         });
 
-        test("should handle host field change", async ({ task, annotate }) => {
+        it("should handle host field change", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.100-coverage", "component");
             annotate("Category: Component", "category");
@@ -136,7 +135,7 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
 
             // Change monitor type to ping to get host field
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await commitFieldChange(monitorTypeSelect, "ping");
 
@@ -146,17 +145,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
                 await commitFieldChange(hostField, "example.com");
                 // Just check that the form component exists - the dynamic handler is called internally
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             } else {
                 // If field doesn't exist, just ensure the component renders
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             }
         });
 
-        test("should handle port field change", async ({ task, annotate }) => {
+        it("should handle port field change", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.100-coverage", "component");
             annotate("Category: Component", "category");
@@ -173,27 +172,27 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
 
             // Change monitor type to port to get port field
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await commitFieldChange(monitorTypeSelect, "port");
 
             // Look for the port field
-            const portField = screen.queryByLabelText(/port/i);
+            const portField = screen.queryByLabelText(/port/iv);
             if (portField && portField instanceof HTMLInputElement) {
                 await commitFieldChange(portField, "8080");
                 // Just check that the form component exists - the dynamic handler is called internally
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             } else {
                 // If field doesn't exist, just ensure the component renders
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             }
         });
 
-        test("should handle recordType field change", async ({
+        it("should handle recordType field change", async ({
             task,
             annotate,
         }) => {
@@ -211,14 +210,14 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
-            // Change monitor type to dns to get recordType field
+            // Change monitor type to DNS to get recordType field
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await commitFieldChange(monitorTypeSelect, "dns");
 
             // Look for the recordType field
-            const recordTypeField = screen.queryByLabelText(/record type/i);
+            const recordTypeField = screen.queryByLabelText(/record type/iv);
             if (
                 recordTypeField &&
                 recordTypeField instanceof HTMLInputElement
@@ -226,17 +225,17 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
                 await commitFieldChange(recordTypeField, "A");
                 // Just check that the form component exists - the dynamic handler is called internally
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             } else {
                 // If field doesn't exist, just ensure the component renders
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             }
         });
 
-        test("should handle url field change", async ({ task, annotate }) => {
+        it("should handle url field change", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.100-coverage", "component");
             annotate("Category: Component", "category");
@@ -251,29 +250,29 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
 
             render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
-            // Change monitor type to http to get url field
+            // Change monitor type to HTTP to get URL field
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await commitFieldChange(monitorTypeSelect, "http");
 
-            // Look for the url field
-            const urlField = screen.queryByLabelText(/url/i);
+            // Look for the URL field
+            const urlField = screen.queryByLabelText(/url/iv);
             if (urlField && urlField instanceof HTMLInputElement) {
                 await commitFieldChange(urlField, "https://example.com");
                 // Just check that the form component exists - the dynamic handler is called internally
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             } else {
                 // If field doesn't exist, just ensure the component renders
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             }
         });
 
-        test("should convert numeric values to strings in field handlers", async ({
+        it("should convert numeric values to strings in field handlers", async ({
             task,
             annotate,
         }) => {
@@ -295,22 +294,22 @@ describe("AddSiteForm - 100% Coverage Tests", () => {
             // This targets the specific line where String(value) is called
 
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await commitFieldChange(monitorTypeSelect, "port");
 
-            const portField = screen.queryByLabelText(/port/i);
+            const portField = screen.queryByLabelText(/port/iv);
             if (portField && portField instanceof HTMLInputElement) {
                 // Simulate a numeric input that should be converted to string
                 await commitFieldChange(portField, 8080);
                 // Just check that the form component exists - the dynamic handler is called internally
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             } else {
                 // If field doesn't exist, just ensure the component renders
                 expect(
-                    screen.getByRole("combobox", { name: /monitor type/i })
+                    screen.getByRole("combobox", { name: /monitor type/iv })
                 ).toBeTruthy();
             }
         });

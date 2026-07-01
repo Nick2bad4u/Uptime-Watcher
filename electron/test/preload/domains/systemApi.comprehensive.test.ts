@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { SYSTEM_CHANNELS } from "@shared/types/preload";
 import { ipcRenderer } from "electron";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { systemApi } from "../../../preload/domains/systemApi";
-import { SYSTEM_CHANNELS } from "@shared/types/preload";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -30,9 +30,9 @@ describe("systemApi", () => {
             data: true,
         });
 
-        const result = await systemApi.openExternal("https://example.com");
+        const isResult = await systemApi.openExternal("https://example.com");
 
-        expect(result).toBeTruthy();
+        expect(isResult).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SYSTEM_CHANNELS.openExternal,
             "https://example.com",
@@ -45,7 +45,7 @@ describe("systemApi", () => {
 
         await expect(
             systemApi.openExternal("https://fail.example")
-        ).rejects.toThrow(/ipc operation failed/i);
+        ).rejects.toThrow(/ipc operation failed/iv);
     });
 
     it("invokes quit-and-install via invoke", async () => {
@@ -79,9 +79,9 @@ describe("systemApi", () => {
             }
         );
 
-        const result = await systemApi.quitAndInstall();
+        const isResult = await systemApi.quitAndInstall();
 
-        expect(result).toBeTruthy();
+        expect(isResult).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SYSTEM_CHANNELS.quitAndInstall,
             ipcContext
@@ -94,9 +94,9 @@ describe("systemApi", () => {
             data: true,
         });
 
-        const result = await systemApi.writeClipboardText("hello clipboard");
+        const isResult = await systemApi.writeClipboardText("hello clipboard");
 
-        expect(result).toBeTruthy();
+        expect(isResult).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SYSTEM_CHANNELS.writeClipboardText,
             "hello clipboard",

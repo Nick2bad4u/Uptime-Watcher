@@ -1,6 +1,6 @@
 /**
  * Tracks the temporary Electron userData directories allocated per Playwright
- * page/Electron application during UI tests.
+ * page/Electron app during UI tests.
  */
 
 import type { ElectronApplication, Page } from "@playwright/test";

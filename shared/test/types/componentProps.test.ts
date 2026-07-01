@@ -3,15 +3,16 @@
  * namespace and related types work correctly
  */
 
-import React from "react";
-import { describe, it, expect } from "vitest";
 import type {
-    ClickHandler,
-    ClickWithEventHandler,
-    ClickFlexibleHandler,
     ChangeHandler,
     ChangeWithEventHandler,
+    ClickFlexibleHandler,
+    ClickHandler,
+    ClickWithEventHandler,
 } from "@shared/types/componentProps";
+import type * as React from "react";
+
+import { describe, expect, it } from "vitest";
 
 describe("Component Props - EventHandlers Namespace", () => {
     describe("Click event handlers", () => {
@@ -100,7 +101,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Event Processing", "type");
 
-            const handler: ChangeWithEventHandler<HTMLInputElement> = (
+            const handler: ChangeWithEventHandler = (
                 event: React.ChangeEvent<HTMLInputElement>
             ) => {
                 expect(event.target).toBeDefined();
@@ -117,7 +118,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            const inputHandler: ChangeWithEventHandler<HTMLInputElement> = (
+            const inputHandler: ChangeWithEventHandler = (
                 event: React.ChangeEvent<HTMLInputElement>
             ) => {
                 expect(event.target.value).toBeDefined();
@@ -145,8 +146,8 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Business Logic", "type");
 
             interface MockButtonProperties {
-                onClick?: ClickWithEventHandler<HTMLButtonElement>;
                 children: React.ReactNode;
+                onClick?: ClickWithEventHandler<HTMLButtonElement>;
             }
 
             const props: MockButtonProperties = {
@@ -170,7 +171,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Business Logic", "type");
 
             interface MockInputProperties {
-                onChange?: ChangeWithEventHandler<HTMLInputElement>;
+                onChange?: ChangeWithEventHandler;
                 value: string;
             }
 
@@ -306,7 +307,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             }
 
             interface FormComponentProperties extends BaseComponentProperties {
-                onChange?: ChangeWithEventHandler<HTMLInputElement>;
+                onChange?: ChangeWithEventHandler;
                 onSubmit?: ClickHandler;
             }
 
@@ -342,8 +343,8 @@ describe("Component Props - EventHandlers Namespace", () => {
             await annotate("Type: Event Processing", "type");
 
             interface ConditionalComponentProperties {
-                onClick?: ClickWithEventHandler<HTMLButtonElement> | undefined;
                 disabled?: boolean;
+                onClick?: ClickWithEventHandler<HTMLButtonElement> | undefined;
             }
 
             const getHandler = (
@@ -393,9 +394,7 @@ describe("Component Props - EventHandlers Namespace", () => {
             const changeHandler: ChangeHandler = (value: string) => {
                 expect(typeof value).toBe("string");
             };
-            const changeWithEventHandler: ChangeWithEventHandler<
-                HTMLInputElement
-            > = () => {};
+            const changeWithEventHandler: ChangeWithEventHandler = () => {};
 
             expect(typeof clickHandler).toBe("function");
             expect(typeof clickWithEventHandler).toBe("function");

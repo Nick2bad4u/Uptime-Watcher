@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { safeStringify } from "../utils/stringConversion";
 import { validateMonitorField } from "@shared/validation/monitorSchemas";
+import { describe, expect, it } from "vitest";
+
+import { safeStringify } from "../utils/stringConversion";
 
 describe("Final 100% Coverage Tests", () => {
     describe("stringConversion - Lines 86-89", () => {
@@ -50,7 +51,7 @@ describe("Final 100% Coverage Tests", () => {
 
             // Test validateMonitorField with invalid monitor type to trigger error path
             const result = validateMonitorField(
-                "invalidType" as any,
+                "invalidType",
                 "someField",
                 "someValue"
             );
@@ -78,7 +79,7 @@ describe("Final 100% Coverage Tests", () => {
             expect(() => {
                 validateMonitorField(
                     "http",
-                    "nonExistentField" as any,
+                    "nonExistentField",
                     "someValue"
                 );
             }).toThrow("Unknown field: nonExistentField");

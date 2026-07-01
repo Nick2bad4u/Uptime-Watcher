@@ -14,6 +14,29 @@ import type { UnknownRecord } from "type-fest";
 import { objectHasIn } from "ts-extras";
 
 /**
+ * Safely casts IPC response to expected type with basic validation.
+ *
+ * @remarks
+ * Use this for IPC responses where we have a contract but can't guarantee
+ * types. The validator provides additional runtime safety if provided.
+ *
+ * @param response - IPC response of unknown type
+ * @param validator - Optional validation function
+ *
+ * @returns Response cast to expected type
+ */
+export function castIpcResponse<T>(
+    response: unknown,
+    validator?: (val: unknown) => val is T
+): T {
+    if (validator && !validator(response)) {
+        throw new Error("IPC response validation failed");
+    }
+
+    return castUnchecked<T>(response);
+}
+
+/**
  * Performs an unchecked cast of an unknown value to type {@link T}.
  *
  * @remarks
@@ -39,26 +62,15 @@ export function castUnchecked<T>(value: unknown): T {
 }
 
 /**
- * Safely casts IPC response to expected type with basic validation.
+ * Converts an unknown value into a record when it is record-like.
  *
  * @remarks
- * Use this for IPC responses where we have a contract but can't guarantee
- * types. The validator provides additional runtime safety if provided.
- *
- * @param response - IPC response of unknown type
- * @param validator - Optional validation function
- *
- * @returns Response cast to expected type
+ * Prefer this helper over ad-hoc local helpers like
+ * `isObjectRecord`/`toRecord`. This prevents AI-driven duplication of
+ * object-shape checks across the codebase.
  */
-export function castIpcResponse<T>(
-    response: unknown,
-    validator?: (val: unknown) => val is T
-): T {
-    if (validator && !validator(response)) {
-        throw new Error("IPC response validation failed");
-    }
-
-    return castUnchecked<T>(response);
+export function ensureRecordLike(value: unknown): undefined | UnknownRecord {
+    return isRecord(value) ? value : undefined;
 }
 
 /**
@@ -89,18 +101,6 @@ export function isArray(value: unknown): value is unknown[] {
  */
 export function isRecord(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/**
- * Converts an unknown value into a record when it is record-like.
- *
- * @remarks
- * Prefer this helper over ad-hoc local helpers like
- * `isObjectRecord`/`toRecord`. This prevents AI-driven duplication of
- * object-shape checks across the codebase.
- */
-export function ensureRecordLike(value: unknown): undefined | UnknownRecord {
-    return isRecord(value) ? value : undefined;
 }
 
 /**

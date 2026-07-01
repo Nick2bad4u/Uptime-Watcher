@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { calculateMaxDuration } from "../utils/duration";
 
@@ -84,7 +84,7 @@ describe("calculateMaxDuration utility function", () => {
         // totalAttempts = 3, timeoutTime = 90
         // backoffTime ≈ 1.5 (0.5 + 1.0), totalTime ≈ 92
         // Since 92 >= 60, should return minutes: Math.ceil(92/60) = 2m
-        expect(result).toMatch(/\d+m/);
+        expect(result).toMatch(/\d+m/v);
 
         // Test with a value that definitely exceeds 60s
         const result2 = calculateMaxDuration(60, 0);
@@ -104,9 +104,9 @@ describe("calculateMaxDuration utility function", () => {
 
         // Test multiple values to ensure both branches work
         expect(calculateMaxDuration(10, 0)).toBe("10s"); // RetryAttempts = 0, hits line 194
-        expect(calculateMaxDuration(10, 1)).toMatch(/\d+s/); // RetryAttempts > 0
-        expect(calculateMaxDuration(10, 2)).toMatch(/\d+s/); // RetryAttempts > 0
-        expect(calculateMaxDuration(10, 3)).toMatch(/\d+s/); // RetryAttempts > 0
+        expect(calculateMaxDuration(10, 1)).toMatch(/\d+s/v); // RetryAttempts > 0
+        expect(calculateMaxDuration(10, 2)).toMatch(/\d+s/v); // RetryAttempts > 0
+        expect(calculateMaxDuration(10, 3)).toMatch(/\d+s/v); // RetryAttempts > 0
     });
 
     it("should verify backoff calculation edge cases", ({ task, annotate }) => {

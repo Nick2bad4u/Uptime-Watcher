@@ -6,21 +6,21 @@ import { describe, expect, it } from "vitest";
 
 import { logger } from "../../services/logger";
 
-describe("Logger Service - Basic Tests", () => {
-    it("should have logger instance available", async ({ task, annotate }) => {
+describe("logger Service - Basic Tests", () => {
+    it("should have logger instance available", async ({ annotate, task }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: logger", "component");
         await annotate("Category: Service", "category");
         await annotate("Type: Business Logic", "type");
 
         expect(logger).toBeDefined();
-        expect(typeof logger.info).toBe("function");
-        expect(typeof logger.error).toBe("function");
-        expect(typeof logger.warn).toBe("function");
-        expect(typeof logger.debug).toBe("function");
+        expect(logger.info).toBeTypeOf("function");
+        expect(logger.error).toBeTypeOf("function");
+        expect(logger.warn).toBeTypeOf("function");
+        expect(logger.debug).toBeTypeOf("function");
     });
 
-    it("should log messages without throwing", async ({ task, annotate }) => {
+    it("should log messages without throwing", async ({ annotate, task }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: logger", "component");
         await annotate("Category: Service", "category");

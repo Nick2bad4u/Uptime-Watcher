@@ -43,19 +43,6 @@ interface ReplicationMonitorContext {
 
 type ReplicationMonitorInstance = Monitor & { type: "replication" };
 
-function resolveLagThreshold(
-    monitor: ReplicationMonitorInstance,
-    serviceConfig: MonitorServiceConfig
-): number {
-    return resolveMonitorNumericOverride({
-        fallbackValue: MINIMUM_LAG_THRESHOLD_SECONDS,
-        minimumValue: MINIMUM_LAG_THRESHOLD_SECONDS,
-        monitor,
-        monitorFieldName: "maxReplicationLagSeconds",
-        serviceConfig,
-    });
-}
-
 type TimestampEvaluation =
     | {
           readonly ok: false;
@@ -87,6 +74,19 @@ function evaluateTimestamp(
     }
 
     return { ok: true, timestamp };
+}
+
+function resolveLagThreshold(
+    monitor: ReplicationMonitorInstance,
+    serviceConfig: MonitorServiceConfig
+): number {
+    return resolveMonitorNumericOverride({
+        fallbackValue: MINIMUM_LAG_THRESHOLD_SECONDS,
+        minimumValue: MINIMUM_LAG_THRESHOLD_SECONDS,
+        monitor,
+        monitorFieldName: "maxReplicationLagSeconds",
+        serviceConfig,
+    });
 }
 
 const behavior: RemoteMonitorBehavior<

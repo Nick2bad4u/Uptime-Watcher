@@ -248,7 +248,7 @@ export function getNodeEnv(): string {
  * Detects whether browser globals are present.
  */
 export function isBrowserEnvironment(): boolean {
-    return isDefined(globalThis.window) && isDefined(globalThis.document);
+    return isDefined(globalThis) && isDefined(document);
 }
 
 /**

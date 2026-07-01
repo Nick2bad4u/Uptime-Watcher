@@ -1,9 +1,11 @@
 import type { Monitor } from "@shared/types";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { MonitorOperationRegistry } from "../../../services/monitoring/MonitorOperationRegistry";
 import type { OperationTimeoutManager } from "../../../services/monitoring/OperationTimeoutManager";
+
 import { MonitorOperationCoordinator } from "../../../services/monitoring/coordinators/MonitorOperationCoordinator";
 
 const createMonitor = (): Monitor => ({

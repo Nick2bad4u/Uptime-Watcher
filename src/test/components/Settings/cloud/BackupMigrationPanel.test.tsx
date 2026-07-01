@@ -2,12 +2,11 @@
  * Tests for the BackupMigrationPanel (Cloud Sync / Backup maintenance UI).
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
-
-import "@testing-library/jest-dom";
-
 import type { CloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { describe, expect, it, vi } from "vitest";
 
 import { BackupMigrationPanel } from "../../../../components/Settings/cloud/BackupMigrationPanel";
 

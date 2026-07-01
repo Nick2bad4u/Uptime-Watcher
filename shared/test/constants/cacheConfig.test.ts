@@ -3,7 +3,7 @@
  *
  * @remarks
  * Validates the structure, values, and consistency of cache configuration
- * constants used throughout the application for consistent caching behavior.
+ * constants used throughout the app for consistent caching behavior.
  */
 
 import { describe, expect, it } from "vitest";

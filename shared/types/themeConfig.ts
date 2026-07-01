@@ -2,7 +2,7 @@
  * Theme configuration type definitions for Uptime Watcher.
  *
  * @remarks
- * These interfaces provide type-safe configuration structures for application
+ * These interfaces provide type-safe configuration structures for app
  * theming. They ensure proper typing for colors, spacing, typography, and
  * component styling.
  *
@@ -390,7 +390,7 @@ export interface TextColors {
  * Complete theme color configuration interface.
  *
  * @remarks
- * Comprehensive color configuration for the entire application theme.
+ * Comprehensive color configuration for the entire app theme.
  *
  * @public
  */

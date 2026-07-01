@@ -33,6 +33,12 @@ export interface IsMonitoringActiveRequestData {
 }
 
 /**
+ * Combined event interface for the orchestrator, spanning internal and public
+ * event channels.
+ */
+export type OrchestratorEvents = UptimeEvents;
+
+/**
  * Payload describing a request to restart monitoring for a specific monitor.
  */
 export interface RestartMonitoringRequestData {
@@ -100,11 +106,5 @@ export interface UptimeOrchestratorDependencies {
     /** Site manager for site management operations. */
     siteManager: SiteManager;
 }
-
-/**
- * Combined event interface for the orchestrator, spanning internal and public
- * event channels.
- */
-export type OrchestratorEvents = UptimeEvents;
 
 /* V8 ignore end */

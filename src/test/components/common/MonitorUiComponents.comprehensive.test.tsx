@@ -3,28 +3,29 @@
  * untested (0% coverage)
  */
 
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import type { MonitorType } from "@shared/types";
+
 import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import { safeCastTo } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MonitorType } from "@shared/types";
 import {
     ConditionalResponseTime,
     DetailLabel,
 } from "../../../components/common/MonitorUiComponents";
+import { logger } from "../../../services/logger";
+import {
+    formatMonitorDetail,
+    supportsResponseTime,
+} from "../../../utils/monitorUiHelpers";
 
 // Mock the dependencies
-vi.mock("../../../services/logger");
-vi.mock("../../../utils/monitorUiHelpers", () => ({
+vi.mock(import('../../../services/logger'));
+vi.mock(import('../../../utils/monitorUiHelpers'), () => ({
     supportsResponseTime: vi.fn(),
     formatMonitorDetail: vi.fn(),
 }));
-
-import { logger } from "../../../services/logger";
-import {
-    supportsResponseTime,
-    formatMonitorDetail,
-} from "../../../utils/monitorUiHelpers";
 
 describe("MonitorUiComponents", () => {
     beforeEach(() => {
@@ -37,7 +38,7 @@ describe("MonitorUiComponents", () => {
 
     describe(ConditionalResponseTime, () => {
         const defaultProps = {
-            monitorType: "http" as MonitorType,
+            monitorType: safeCastTo<MonitorType>("http"),
             children: <div data-testid="children">Response time content</div>,
             fallback: <div data-testid="fallback">No response time</div>,
         };
@@ -210,7 +211,7 @@ describe("MonitorUiComponents", () => {
             await promise;
 
             // Verify that the component was properly unmounted without errors
-            expect(supportsResponseTime).toHaveBeenCalled();
+            expect(supportsResponseTime).toHaveBeenCalledWith();
         });
 
         it("should handle fallback prop being undefined", async ({
@@ -231,8 +232,8 @@ describe("MonitorUiComponents", () => {
 
             render(
                 <ConditionalResponseTime
-                    monitorType="http"
                     children={<div data-testid="children">Content</div>}
+                    monitorType="http"
                 />
             );
 
@@ -292,7 +293,7 @@ describe("MonitorUiComponents", () => {
 
     describe(DetailLabel, () => {
         const defaultProps = {
-            monitorType: "http" as MonitorType,
+            monitorType: safeCastTo<MonitorType>("http"),
             details: "example.com",
             fallback: "Unknown host",
         };
@@ -348,7 +349,7 @@ describe("MonitorUiComponents", () => {
                 "formatted result"
             );
 
-            render(<DetailLabel monitorType="http" details="example.com" />);
+            render(<DetailLabel details="example.com" monitorType="http" />);
 
             // Should show details as initial fallback
             expect(screen.getByText("example.com")).toBeInTheDocument();
@@ -448,7 +449,7 @@ describe("MonitorUiComponents", () => {
             await promise;
 
             // Verify that the component was properly unmounted without errors
-            expect(formatMonitorDetail).toHaveBeenCalled();
+            expect(formatMonitorDetail).toHaveBeenCalledWith();
         });
 
         it("should handle prop changes", async ({ task, annotate }) => {
@@ -497,7 +498,7 @@ describe("MonitorUiComponents", () => {
             vi.mocked(formatMonitorDetail).mockResolvedValue("");
 
             render(
-                <DetailLabel monitorType="http" details="" fallback="Empty" />
+                <DetailLabel details="" fallback="Empty" monitorType="http" />
             );
 
             await waitFor(() => {
@@ -565,9 +566,9 @@ describe("MonitorUiComponents", () => {
 
             render(
                 <DetailLabel
-                    monitorType="http"
                     details={longDetails}
                     fallback="Loading..."
+                    monitorType="http"
                 />
             );
 

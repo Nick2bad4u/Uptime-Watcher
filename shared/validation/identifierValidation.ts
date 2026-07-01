@@ -17,21 +17,22 @@ import {
 } from "@shared/validation/siteFieldConstants";
 
 /**
- * Returns whether a site identifier is acceptable for repository operations.
+ * Throws if the supplied monitor identifier is empty/whitespace or contains
+ * ASCII control characters.
+ *
+ * @param monitorId - Monitor identifier candidate.
+ * @param context - Human-readable context included in thrown errors.
  */
-export function isValidSiteIdentifier(identifier: string): boolean {
-    return (
-        identifier.trim().length > 0 &&
-        identifier.length <= SITE_IDENTIFIER_MAX_LENGTH &&
-        !hasAsciiControlCharacters(identifier)
-    );
-}
+export function assertValidMonitorId(monitorId: string, context: string): void {
+    if (monitorId.trim().length === 0) {
+        throw new TypeError(`[${context}] ${MONITOR_ID_REQUIRED_MESSAGE}`);
+    }
 
-/**
- * Returns whether a monitor identifier is acceptable for repository operations.
- */
-export function isValidMonitorId(monitorId: string): boolean {
-    return monitorId.trim().length > 0 && !hasAsciiControlCharacters(monitorId);
+    if (hasAsciiControlCharacters(monitorId)) {
+        throw new TypeError(
+            `[${context}] Monitor ID contains invalid control characters`
+        );
+    }
 }
 
 /**
@@ -63,20 +64,19 @@ export function assertValidSiteIdentifier(
 }
 
 /**
- * Throws if the supplied monitor identifier is empty/whitespace or contains
- * ASCII control characters.
- *
- * @param monitorId - Monitor identifier candidate.
- * @param context - Human-readable context included in thrown errors.
+ * Returns whether a monitor identifier is acceptable for repository operations.
  */
-export function assertValidMonitorId(monitorId: string, context: string): void {
-    if (monitorId.trim().length === 0) {
-        throw new TypeError(`[${context}] ${MONITOR_ID_REQUIRED_MESSAGE}`);
-    }
+export function isValidMonitorId(monitorId: string): boolean {
+    return monitorId.trim().length > 0 && !hasAsciiControlCharacters(monitorId);
+}
 
-    if (hasAsciiControlCharacters(monitorId)) {
-        throw new TypeError(
-            `[${context}] Monitor ID contains invalid control characters`
-        );
-    }
+/**
+ * Returns whether a site identifier is acceptable for repository operations.
+ */
+export function isValidSiteIdentifier(identifier: string): boolean {
+    return (
+        identifier.trim().length > 0 &&
+        identifier.length <= SITE_IDENTIFIER_MAX_LENGTH &&
+        !hasAsciiControlCharacters(identifier)
+    );
 }

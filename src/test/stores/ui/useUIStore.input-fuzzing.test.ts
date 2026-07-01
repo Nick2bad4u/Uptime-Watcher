@@ -24,13 +24,20 @@
  * @ts-expect-error Complex fuzzing tests with Site object type compatibility - exact type safety deferred for test coverage
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
-import * as fc from "fast-check";
 import {
     getSafeUrlForLogging,
     validateExternalOpenUrlCandidate,
 } from "@shared/utils/urlSafety";
+import * as fc from "fast-check";
+import { arrayAt, objectEntries, safeCastTo   } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Removed unused Site type import
+import type { ChartTimeRange } from "../../../stores/types";
+
+import { SystemService } from "../../../services/SystemService";
+import { useUIStore } from "../../../stores/ui/useUiStore";
 
 const mockErrorStore = vi.hoisted(() => ({
     clearStoreError: vi.fn(),
@@ -52,13 +59,13 @@ const createStoreErrorHandlerMock = vi.hoisted(() =>
     }))
 );
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
 }));
 
-vi.mock("../../../stores/utils/storeErrorHandling", () => ({
+vi.mock(import('../../../stores/utils/storeErrorHandling'), () => ({
     createStoreErrorHandler: createStoreErrorHandlerMock,
 }));
 
@@ -72,21 +79,16 @@ const mockLogger = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
 // Mock SystemService for openExternal functionality
-vi.mock("../../../services/SystemService", () => ({
+vi.mock(import('../../../services/SystemService'), () => ({
     SystemService: {
         openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
-
-import { SystemService } from "../../../services/SystemService";
-import { useUIStore } from "../../../stores/ui/useUiStore";
-// Removed unused Site type import
-import type { ChartTimeRange } from "../../../stores/types";
 
 // Get the mocked SystemService function
 const mockOpenExternal = vi.mocked(SystemService.openExternal);
@@ -119,10 +121,10 @@ const arbitraries = {
 
     /** Generate chart time range */
     chartTimeRange: fc.constantFrom(
-        "1h" as ChartTimeRange,
-        "24h" as ChartTimeRange,
-        "7d" as ChartTimeRange,
-        "30d" as ChartTimeRange
+        safeCastTo<ChartTimeRange>("1h"),
+        safeCastTo<ChartTimeRange>("24h"),
+        safeCastTo<ChartTimeRange>("7d"),
+        safeCastTo<ChartTimeRange>("30d")
     ),
 
     /** Generate valid URL */
@@ -302,7 +304,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         // Mock window.electronAPI if needed
         if (!(globalThis.window as any)?.electronAPI) {
             (globalThis.window as any) = {
-                ...globalThis.window,
+                ...globalThis,
                 electronAPI: {
                     system: {
                         openExternal: vi.fn().mockResolvedValue(true),
@@ -487,7 +489,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             for (const site of sites) useUIStore.getState().selectSite(site);
 
             // Assert - last selection should win
-            const lastSite = sites.at(-1);
+            const lastSite = arrayAt(sites, -1);
             expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                 lastSite!.identifier
             );
@@ -514,7 +516,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 useUIStore.getState().setActiveSiteDetailsTab(tabId);
 
             // Assert - last tab should be active
-            const lastTabId = tabIds.at(-1);
+            const lastTabId = arrayAt(tabIds, -1);
             expect(useUIStore.getState().activeSiteDetailsTab).toBe(lastTabId);
         });
 
@@ -557,7 +559,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 useUIStore.getState().setSiteDetailsChartTimeRange(timeRange);
 
             // Assert - last time range should be selected
-            const lastTimeRange = timeRanges.at(-1);
+            const lastTimeRange = arrayAt(timeRanges, -1);
             expect(useUIStore.getState().siteDetailsChartTimeRange).toBe(
                 lastTimeRange
             );
@@ -592,7 +594,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
                 const validation = validateExternalOpenUrlCandidate(url);
 
-                if (validation.ok === true) {
+                if (validation.ok) {
                     expect(mockOpenExternal).toHaveBeenCalledWith(
                         validation.normalizedUrl
                     );
@@ -619,7 +621,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
                 const validation = validateExternalOpenUrlCandidate(url);
 
-                if (validation.ok === true) {
+                if (validation.ok) {
                     expect(mockOpenExternal).toHaveBeenCalledWith(
                         validation.normalizedUrl
                     );
@@ -832,8 +834,8 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 }
 
                 // Assert - final state should be consistent
-                const lastSite = sites.at(-1);
-                const lastTabId = tabIds.at(-1);
+                const lastSite = arrayAt(sites, -1);
+                const lastTabId = arrayAt(tabIds, -1);
 
                 expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     lastSite!.identifier
@@ -906,7 +908,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             }
 
             // Assert - final time range should be set
-            const finalTimeRange = timeRanges.at(-1);
+            const finalTimeRange = arrayAt(timeRanges, -1);
             expect(useUIStore.getState().siteDetailsChartTimeRange).toBe(
                 finalTimeRange
             );
@@ -932,7 +934,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             }
 
             // Assert - final state should be consistent
-            const finalStates = modalStatesList.at(-1)!;
+            const finalStates = arrayAt(modalStatesList, -1)!;
             expect(useUIStore.getState().showSettings).toBe(
                 finalStates.showSettings
             );
@@ -968,7 +970,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 }
 
                 // Assert - final site should be selected
-                const finalSite = sites.at(-1);
+                const finalSite = arrayAt(sites, -1);
                 expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     finalSite!.identifier
                 );
@@ -1052,13 +1054,13 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
     });
 
     describe("Edge Cases and Error Scenarios", () => {
-        test("should handle operations with undefined site", () => {
+        it("should handle operations with undefined site", () => {
             // Arrange
             resetUIStore();
 
             // Act & Assert - setting undefined site should not crash
             expect(() =>
-                useUIStore.getState().selectSite(undefined)
+                { useUIStore.getState().selectSite(undefined); }
             ).not.toThrow();
             expect(
                 useUIStore.getState().selectedSiteIdentifier
@@ -1071,18 +1073,18 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 // Arrange - temporarily remove electronAPI
                 const originalAPI = (globalThis.window as any)?.electronAPI;
                 if (globalThis.window) {
-                    (globalThis.window as any).electronAPI = undefined;
+                    (globalThis as any).electronAPI = undefined;
                 }
 
                 try {
                     // Act & Assert - should not crash
                     expect(() =>
-                        useUIStore.getState().openExternal(url)
+                        { useUIStore.getState().openExternal(url); }
                     ).not.toThrow();
                 } finally {
                     // Restore electronAPI
                     if (globalThis.window && originalAPI) {
-                        (globalThis.window as any).electronAPI = originalAPI;
+                        (globalThis as any).electronAPI = originalAPI;
                     }
                 }
             }
@@ -1166,11 +1168,11 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 // Verify valid values
                 const activeTab = useUIStore.getState().activeSiteDetailsTab;
                 const allowedStaticTabs = new Set([
-                    "site-overview",
-                    "monitor-overview",
                     "analytics",
                     "history",
+                    "monitor-overview",
                     "settings",
+                    "site-overview",
                 ]);
 
                 expect(
@@ -1211,22 +1213,22 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             "should maintain boolean state consistency",
             (modalStates) => {
                 // Act
-                for (const [key, value] of Object.entries(modalStates)) {
+                for (const [key, value] of objectEntries(modalStates)) {
                     switch (key) {
-                        case "showSettings": {
-                            useUIStore.getState().setShowSettings(value);
-                            break;
-                        }
-                        case "showSiteDetails": {
-                            useUIStore.getState().setShowSiteDetails(value);
-                            break;
-                        }
                         case "showAddSiteModal": {
                             useUIStore.getState().setShowAddSiteModal(value);
                             break;
                         }
                         case "showAdvancedMetrics": {
                             useUIStore.getState().setShowAdvancedMetrics(value);
+                            break;
+                        }
+                        case "showSettings": {
+                            useUIStore.getState().setShowSettings(value);
+                            break;
+                        }
+                        case "showSiteDetails": {
+                            useUIStore.getState().setShowSiteDetails(value);
                             break;
                         }
                     }

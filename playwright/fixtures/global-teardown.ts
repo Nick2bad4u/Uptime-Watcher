@@ -24,7 +24,7 @@ async function globalTeardown(): Promise<void> {
                 stdio: "ignore",
             });
         } else {
-            // macOS/Linux
+            // MacOS/Linux
             execSync("pkill -f electron", {
                 stdio: "ignore",
             });

@@ -236,7 +236,7 @@ export class PingMonitor implements IMonitorService {
      * @remarks
      * Returns the string identifier used to route monitoring requests to this
      * service implementation. Uses the {@link MonitorType} union type for type
-     * safety and consistency across the application.
+     * safety and consistency across the app.
      *
      * @returns The monitor type identifier
      */

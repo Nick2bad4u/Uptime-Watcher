@@ -1,10 +1,10 @@
+import { toString } from "mdast-util-to-string";
+import { statSync } from "node:fs";
 /**
  * Custom validation for Uptime Watcher documentation patterns.
  */
 import * as path from "node:path";
-import { statSync } from "node:fs";
 import { visit } from "unist-util-visit";
-import { toString } from "mdast-util-to-string";
 
 /**
  * @typedef {import("mdast").Root} Root
@@ -37,7 +37,7 @@ import { toString } from "mdast-util-to-string";
  *
  * @type {RegExp}
  */
-const EMOJI_CODEPOINT_REGEX = /^(?:\p{Extended_Pictographic})$/u;
+const EMOJI_CODEPOINT_REGEX = /^\p{Extended_Pictographic}$/v;
 
 /**
  * Check if a single Unicode symbol is an emoji.
@@ -65,12 +65,12 @@ function startsWithCapitalOrEmoji(text) {
     if (!text || text.length === 0) return false;
 
     // Remove any markdown formatting first
-    const cleanText = text.replace(/^\*\*([^*]+)\*\*/, "$1").trim();
+    const cleanText = text.replace(/^\*\*([^*]+)\*\*/v, "$1").trim();
 
     if (cleanText.length === 0) return false;
 
     // Use full Unicode symbols so surrogate pairs (e.g. emoji) are handled
-    const [firstSymbol = ""] = Array.from(cleanText);
+    const [firstSymbol = ""] = [...cleanText];
 
     // Check if first symbol is emoji
     if (isEmoji(firstSymbol)) {
@@ -78,7 +78,7 @@ function startsWithCapitalOrEmoji(text) {
     }
 
     // Check if starts with capital letter
-    return /^[A-Z]/.test(cleanText);
+    return /^[A-Z]/v.test(cleanText);
 }
 
 /**
@@ -96,7 +96,7 @@ function startsWithCapitalOrEmoji(text) {
  * @param {string} ruleId - Rule identifier.
  */
 function createMessage(file, message, location, ruleId) {
-    // vfile.message has multiple overloads; cast location to the broader
+    // Vfile.message has multiple overloads; cast location to the broader
     // allowed type to keep JSDoc consumers happy while preserving runtime
     // behaviour.
     const msg = /** @type {any} */ (file).message(
@@ -118,32 +118,32 @@ function createMessage(file, message, location, ruleId) {
  */
 function isIgnoredFile(filePath, patterns) {
     if (!filePath) return false;
-    const normalizedPath = filePath.replace(/\\/g, "/");
+    const normalizedPath = filePath.replaceAll('\\', "/");
     return patterns.some((pattern) => normalizedPath.includes(pattern));
 }
 
 const INTERNAL_LINK_CODE_EXTENSIONS = new Set([
+    ".bash",
+    ".cjs",
+    ".css",
+    ".cts",
+    ".js",
+    ".json",
+    ".jsx",
+    ".less",
+    ".mjs",
+    ".mts",
+    ".ps1",
+    ".psd1",
+    ".psm1",
+    ".sass",
+    ".scss",
+    ".sh",
+    ".sql",
     ".ts",
     ".tsx",
-    ".cts",
-    ".mts",
-    ".js",
-    ".jsx",
-    ".mjs",
-    ".cjs",
-    ".json",
     ".yaml",
     ".yml",
-    ".sql",
-    ".css",
-    ".scss",
-    ".sass",
-    ".less",
-    ".ps1",
-    ".psm1",
-    ".psd1",
-    ".sh",
-    ".bash",
     ".zsh",
 ]);
 
@@ -157,7 +157,7 @@ const INTERNAL_LINK_CODE_EXTENSIONS = new Set([
  * @returns {boolean} True when the link resolves to a directory.
  */
 function isDirectoryReference(relativeUrl, sourceFilePath) {
-    const sanitizedUrl = relativeUrl.split("#")[0];
+    const sanitizedUrl = relativeUrl.split("#", 1)[0];
 
     if (!sanitizedUrl || sanitizedUrl.startsWith("#")) {
         return false;
@@ -195,7 +195,7 @@ function resolvesToFileTarget(relativeUrl, sourceFilePath) {
         return false;
     }
 
-    const sanitizedUrl = relativeUrl.split("#")[0];
+    const sanitizedUrl = relativeUrl.split("#", 1)[0];
     if (!sanitizedUrl || sanitizedUrl.endsWith("/")) {
         return false;
     }
@@ -276,9 +276,9 @@ function shouldPreferRelativeGitHubLink(urlString) {
 
         const convertibleResources = new Set([
             "blob",
-            "tree",
             "edit",
             "raw",
+            "tree",
         ]);
         return convertibleResources.has(resource.toLowerCase());
     } catch {
@@ -291,8 +291,7 @@ function shouldPreferRelativeGitHubLink(urlString) {
  *
  * @type {import("unified").Plugin<[], Root>}
  */
-const validateUptimeWatcherDocs = () => {
-    return (tree, file) => {
+const validateUptimeWatcherDocs = () => (tree, file) => {
         const filePath = file.path || "";
 
         // Front-matter normalization and validation
@@ -301,16 +300,16 @@ const validateUptimeWatcherDocs = () => {
             if (!rawYaml) return;
 
             // Auto-fix blank lines between array-typed keys and their first item
-            const fixedYaml = rawYaml.replace(
-                /((?:^|\n)(?:tags|topics|audience):[^\n]*\n)[ \t]*\n([ \t]*- )/gu,
-                "$1$2"
+            const fixedYaml = rawYaml.replaceAll(
+                /((?:^|\n)(?:audience|tags|topics):[^\n]*\n)[\t ]*\n(?=[\t ]*- )/gv,
+                "$1"
             );
 
             if (fixedYaml !== rawYaml) {
                 node.value = fixedYaml;
             }
 
-            const normalizedPath = filePath.replace(/\\/g, "/");
+            const normalizedPath = filePath.replaceAll('\\', "/");
             const isDocFile =
                 normalizedPath.includes("docs/Guides/") ||
                 normalizedPath.includes("docs/Architecture/") ||
@@ -322,13 +321,13 @@ const validateUptimeWatcherDocs = () => {
 
             /** @type {Set<string>} */
             const keys = new Set();
-            const lines = fixedYaml.split(/\r?\n/);
+            const lines = fixedYaml.split(/\r?\n/v);
 
             for (const line of lines) {
                 const trimmed = line.trim();
                 if (!trimmed || trimmed.startsWith("#")) continue;
 
-                const keyMatch = /^(?<key>[\w$]+):\s*/u.exec(trimmed);
+                const keyMatch = /^(?<key>[\w$]+):\s*/v.exec(trimmed);
                 const key = keyMatch?.groups?.["key"];
                 if (key) {
                     keys.add(key);
@@ -338,18 +337,18 @@ const validateUptimeWatcherDocs = () => {
             /** @type {Set<string>} */
             const allowedKeys = new Set([
                 "$schema",
-                "schema",
+                "audience",
                 "author",
                 "created",
                 "doc_category",
                 "doc_group",
                 "doc_title",
                 "last_reviewed",
+                "schema",
+                "status",
                 "summary",
                 "tags",
                 "topics",
-                "audience",
-                "status",
             ]);
 
             /** @type {string[]} */
@@ -372,7 +371,7 @@ const validateUptimeWatcherDocs = () => {
             }
 
             const schemaMatch =
-                /\b(?:schema|\$schema):\s*["']?(?<ref>[^"'\n]+)["']?/u.exec(
+                /\b(?:schema|\$schema):\s*["']?(?<ref>[^\n"']+)["']?/v.exec(
                     fixedYaml
                 );
             const schemaRef = schemaMatch?.groups?.["ref"];
@@ -482,13 +481,13 @@ const validateUptimeWatcherDocs = () => {
                 "TECHNOLOGY_EVOLUTION.md",
             ]);
 
-            Object.entries(incorrectTerms).forEach(([wrong, correct]) => {
-                if (skipTerminologyChecks) return;
+            for (const [wrong, correct] of Object.entries(incorrectTerms)) {
+                if (skipTerminologyChecks) continue;
                 const lowerText = text.toLowerCase();
                 if (lowerText.includes(wrong) && !text.includes(correct)) {
                     // Only flag if the wrong term appears as a whole word
                     const wordBoundaryRegex = new RegExp(
-                        `\\b${wrong.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+                        String.raw`\b${RegExp.escape(wrong)}\b`,
                         "i"
                     );
                     if (wordBoundaryRegex.test(text)) {
@@ -500,7 +499,7 @@ const validateUptimeWatcherDocs = () => {
                         );
                     }
                 }
-            });
+            }
 
             // Check for overly long headings (keep this strict globally)
             if (text.length > 80) {
@@ -524,7 +523,7 @@ const validateUptimeWatcherDocs = () => {
             // Only check substantial code blocks for language specification
             if (node.lang === null && node.value && node.value.length > 20) {
                 const hasCodePatterns =
-                    /[{}();]|function|class|import|export|const|let|var|if|for|while/.test(
+                    /[();{}]|class|const|export|for|function|if|import|let|var|while/u.test(
                         node.value
                     );
                 if (hasCodePatterns) {
@@ -562,7 +561,7 @@ const validateUptimeWatcherDocs = () => {
                 (node.lang === "typescript" || node.lang === "ts") &&
                 node.value
             ) {
-                const anyCount = (node.value.match(/\bany\b/g) || []).length;
+                const anyCount = (node.value.match(/\bany\b/gv) || []).length;
                 const hasDisableComment =
                     node.value.includes("// eslint-disable") ||
                     node.value.includes("// @ts-ignore") ||
@@ -584,33 +583,33 @@ const validateUptimeWatcherDocs = () => {
             if (node.value) {
                 const securityPatterns = [
                     {
-                        pattern: /password\s*=\s*['"]\w+['"]/,
+                        pattern: /password\s*=\s*["']\w+["']/v,
                         message: "Avoid hardcoded passwords in examples",
                     },
                     {
-                        pattern: /api[_-]?key\s*=\s*['"]\w+['"]/,
+                        pattern: /api[-_]?key\s*=\s*["']\w+["']/u,
                         message: "Avoid hardcoded API keys in examples",
                     },
                     {
-                        pattern: /secret\s*=\s*['"]\w+['"]/,
+                        pattern: /secret\s*=\s*["']\w+["']/v,
                         message: "Avoid hardcoded secrets in examples",
                     },
                     {
-                        pattern: /eval\s*\(/,
+                        pattern: /eval\s*\(/v,
                         message: "Avoid using eval() in examples",
                     },
                     {
-                        pattern: /innerHTML\s*=/,
+                        pattern: /innerHTML\s*=/v,
                         message:
                             "Consider safer alternatives to innerHTML for XSS prevention",
                     },
                 ];
 
-                securityPatterns.forEach(({ pattern, message }) => {
+                for (const { pattern, message } of securityPatterns) {
                     if (pattern.test(node.value)) {
                         createMessage(file, message, node, "security-pattern");
                     }
-                });
+                }
             }
         });
 
@@ -619,7 +618,7 @@ const validateUptimeWatcherDocs = () => {
 
             // Check for proper internal link formatting
             if (node.url.startsWith("./") || node.url.startsWith("../")) {
-                const urlWithoutHash = node.url.split("#")[0];
+                const urlWithoutHash = node.url.split("#", 1)[0];
                 if (
                     urlWithoutHash &&
                     !node.url.includes("#") &&
@@ -719,19 +718,20 @@ const validateUptimeWatcherDocs = () => {
 
         visit(tree, "table", (node) => {
             // Check for tables without headers
-            if (node.children && node.children.length > 0) {
-                const firstRow = node.children[0];
-                if (
-                    firstRow &&
-                    !firstRow.children.some((cell) => cell.type === "tableCell")
-                ) {
-                    createMessage(
-                        file,
-                        "Tables should have header rows for accessibility",
-                        node,
-                        "table-header-required"
-                    );
-                }
+            if (!node.children || node.children.length === 0) {
+                return;
+            }
+
+            const firstRow = node.children[0];
+            if (
+                firstRow?.children.every((cell) => cell.type !== "tableCell")
+            ) {
+                createMessage(
+                    file,
+                    "Tables should have header rows for accessibility",
+                    node,
+                    "table-header-required"
+                );
             }
         });
 
@@ -742,7 +742,7 @@ const validateUptimeWatcherDocs = () => {
             // Ensure architecture docs mention design patterns (more flexible)
             if (filePath.includes("Architecture") && content.length > 500) {
                 const hasDesignContent =
-                    /\b(pattern|design|architecture|structure|approach|principle)\b/i.test(
+                    /\b(approach|architecture|design|pattern|principle|structure)\b/i.test(
                         content
                     );
                 if (!hasDesignContent) {
@@ -767,9 +767,9 @@ const validateUptimeWatcherDocs = () => {
                 const hasCodeBlocks = tree.children.some(
                     (child) => child.type === "code"
                 );
-                const hasCodeInline = /`[^`]+`/.test(content);
+                const hasCodeInline = /`[^`]+`/v.test(content);
                 const hasExamples =
-                    /\b(example|demo|sample|usage|how to|tutorial|walkthrough)\b/i.test(
+                    /\b(demo|example|how to|sample|tutorial|usage|walkthrough)\b/i.test(
                         content
                     );
 
@@ -796,7 +796,7 @@ const validateUptimeWatcherDocs = () => {
 
             if (
                 !isIgnoredFile(filePath, todoIgnorePatterns) &&
-                /\b(TODO|FIXME|HACK|XXX)\b/i.test(content)
+                /\b(fixme|hack|todo|x{3})\b/i.test(content)
             ) {
                 createMessage(
                     file,
@@ -820,7 +820,7 @@ const validateUptimeWatcherDocs = () => {
             ) {
                 const hasInstallation =
                     /\b(install|installation|setup)\b/i.test(content);
-                const hasUsage = /\b(usage|how to use|getting started)\b/i.test(
+                const hasUsage = /\b(getting started|how to use|usage)\b/i.test(
                     content
                 );
 
@@ -848,6 +848,5 @@ const validateUptimeWatcherDocs = () => {
             }
         });
     };
-};
 
 export default validateUptimeWatcherDocs;

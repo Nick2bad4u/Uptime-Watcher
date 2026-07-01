@@ -3,18 +3,20 @@
  * specific error handling paths and edge cases
  */
 
+import type { Site } from "@shared/types";
+
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { arrayAt, arrayFirst  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type Site } from "@shared/types";
-import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 
+import { logger } from "../../../services/logger";
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import { applySavedSiteToStore } from "../../../stores/sites/utils/operationHelpers";
-import type { SiteOperationsDependencies } from "../../../stores/sites/types";
-import { logger } from "../../../services/logger";
 
 // Mock logger to control development mode checks
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -29,13 +31,13 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => mockErrorStore),
     },
 }));
 
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
@@ -51,11 +53,11 @@ vi.mock("../../../stores/utils", () => ({
     }),
 }));
 
-vi.mock("../../../stores/sites/utils/fileDownload", () => ({
+vi.mock(import('../../../stores/sites/utils/fileDownload'), () => ({
     handleSQLiteBackupDownload: vi.fn(async (callback) => await callback()),
 }));
 
-vi.mock("../../../utils/safeExtractIpcData", () => ({
+vi.mock(import('../../../utils/safeExtractIpcData'), () => ({
     safeExtractIpcData: vi.fn((response, _defaultValue) => {
         if (response.success) {
             return response.data;
@@ -109,7 +111,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
     const mockSiteWithSingleMonitor: Site = {
         ...mockSiteWithMultipleMonitors,
         identifier: "test-site-single",
-        monitors: [mockSiteWithMultipleMonitors.monitors[0]!],
+        monitors: [arrayFirst(mockSiteWithMultipleMonitors.monitors)!],
     };
 
     beforeEach(() => {
@@ -153,7 +155,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         // Mock global electronAPI
         globalThis.window = {
-            ...globalThis.window,
+            ...globalThis,
             electronAPI: mockElectronAPI,
         } as any;
 
@@ -303,7 +305,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
         });
     });
 
@@ -321,7 +323,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await expect(
                 actions.removeMonitorFromSite(
                     mockSiteWithSingleMonitor.identifier,
-                    mockSiteWithSingleMonitor.monitors[0]!.id
+                    arrayFirst(mockSiteWithSingleMonitor.monitors)!.id
                 )
             ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
@@ -347,20 +349,20 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0]!.id
+                arrayFirst(mockSiteWithMultipleMonitors.monitors)!.id
             );
 
             expect(siteService.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0]!.id
+                arrayFirst(mockSiteWithMultipleMonitors.monitors)!.id
             );
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
 
-            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
             const updatedSites =
-                vi.mocked(mockSiteDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
+                arrayAt(vi.mocked(mockSiteDeps.setSites).mock.calls, -1)?.[0] ?? [];
             const reconciledSite = updatedSites.find(
                 (site: Site) =>
                     site.identifier === mockSiteWithMultipleMonitors.identifier
@@ -384,7 +386,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await expect(
                 actions.removeMonitorFromSite(
                     mockSiteWithMultipleMonitors.identifier,
-                    mockSiteWithMultipleMonitors.monitors[0]!.id
+                    arrayFirst(mockSiteWithMultipleMonitors.monitors)!.id
                 )
             ).rejects.toThrow("Monitor removal failed");
 
@@ -444,16 +446,16 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             await statefulActions.removeMonitorFromSite(
                 baseSite.identifier,
-                baseSite.monitors[0]!.id
+                arrayFirst(baseSite.monitors)!.id
             );
 
             expect(
                 statefulDeps.services.site.removeMonitor
             ).toHaveBeenCalledWith(
                 baseSite.identifier,
-                baseSite.monitors[0]!.id
+                arrayFirst(baseSite.monitors)!.id
             );
-            expect(sitesState[0]?.monitors).toHaveLength(
+            expect(arrayFirst(sitesState)?.monitors).toHaveLength(
                 mockSiteWithMultipleMonitors.monitors.length - 1
             );
 
@@ -467,7 +469,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             applySavedSiteToStore(syncSnapshot, statefulDeps);
 
-            expect(sitesState[0]?.monitors).toEqual(syncSnapshot.monitors);
+            expect(arrayFirst(sitesState)?.monitors).toEqual(syncSnapshot.monitors);
             expect(statefulDeps.syncSites).not.toHaveBeenCalled();
         });
     });
@@ -484,17 +486,17 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0]!.id
+                arrayFirst(mockSiteWithMultipleMonitors.monitors)!.id
             );
 
             expect(siteService.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0]!.id
+                arrayFirst(mockSiteWithMultipleMonitors.monitors)!.id
             );
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
 
@@ -520,7 +522,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.setSites).toHaveBeenCalledWith();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
     });

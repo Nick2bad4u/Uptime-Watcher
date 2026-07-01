@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
 interface Site {
-    identifier: string;
     [key: string]: unknown;
+    identifier: string;
 }
 
 const mockSites: Site[] = [];
@@ -11,7 +11,7 @@ describe("useSitesStore (module coverage)", () => {
     it("should load and expose a zustand store", async () => {
         // Avoid impacting unrelated tests: only mock these service modules for
         // the duration of this test's dynamic import.
-        vi.doMock("../../../services/SiteService", () => ({
+        vi.doMock(import('../../../services/SiteService'), () => ({
             SiteService: {
                 addSite: vi.fn(async (site: Site) => site),
                 getSites: vi.fn(async () => mockSites),
@@ -25,12 +25,12 @@ describe("useSitesStore (module coverage)", () => {
                             // Minimal shape for this test; callers in these tests do
                             // not depend on fields beyond identifier.
                             identifier: updates.identifier ?? "mock-site",
-                        }) as unknown as Site
+                        })
                 ),
             },
         }));
 
-        vi.doMock("../../../services/MonitoringService", () => ({
+        vi.doMock(import('../../../services/MonitoringService'), () => ({
             MonitoringService: {
                 startMonitoring: vi.fn(async () => ({
                     attempted: 0,
@@ -55,7 +55,7 @@ describe("useSitesStore (module coverage)", () => {
             },
         }));
 
-        vi.doMock("../../../services/DataService", () => ({
+        vi.doMock(import('../../../services/DataService'), () => ({
             DataService: {
                 downloadSqliteBackup: vi.fn(async () => ({
                     success: true,

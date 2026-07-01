@@ -5,6 +5,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { MonitorStatus, Site } from "@shared/types";
 
+// Import after mocking
+import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdateHandler";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { isDevelopment } from "@shared/utils/environment";
+import { EventsService } from "../../../../services/EventsService";
+import { logger } from "../../../../services/logger";
+
 // Mock basic dependencies first
 vi.mock("../../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) => error),
@@ -59,13 +66,6 @@ vi.mock("../../../../services/EventsService", () => ({
         onMonitoringStopped: vi.fn(),
     },
 }));
-
-// Import after mocking
-import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdateHandler";
-import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { isDevelopment } from "@shared/utils/environment";
-import { EventsService } from "../../../../services/EventsService";
-import { logger } from "../../../../services/logger";
 
 const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
 const mockIsDevelopment = vi.mocked(isDevelopment);
@@ -145,7 +145,7 @@ describe("StatusUpdateHandler", () => {
                     if (fallbackValue === undefined) {
                         throw new Error(
                             `${operationName} failed and no fallback value provided. ` +
-                                `When shouldThrow is false, you must provide a fallbackValue parameter.`,
+                                "When shouldThrow is false, you must provide a fallbackValue parameter.",
                             { cause: error }
                         );
                     }
@@ -270,9 +270,9 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            expect(mockEventsService.onMonitorStatusChanged).toHaveBeenCalled();
-            expect(mockEventsService.onMonitoringStarted).toHaveBeenCalled();
-            expect(mockEventsService.onMonitoringStopped).toHaveBeenCalled();
+            expect(mockEventsService.onMonitorStatusChanged).toHaveBeenCalledWith();
+            expect(mockEventsService.onMonitoringStarted).toHaveBeenCalledWith();
+            expect(mockEventsService.onMonitoringStopped).toHaveBeenCalledWith();
         });
 
         it("should cleanup existing subscriptions before subscribing again", async ({
@@ -294,7 +294,7 @@ describe("StatusUpdateHandler", () => {
             await manager.subscribe();
             await manager.subscribe(); // Subscribe again
 
-            expect(cleanupFn).toHaveBeenCalled();
+            expect(cleanupFn).toHaveBeenCalledWith();
         });
 
         it("should unsubscribe and remove all listeners", async ({
@@ -333,7 +333,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(manager.isSubscribed()).toBeFalsy();
-            expect(() => manager.unsubscribe()).not.toThrow();
+            expect(() => { manager.unsubscribe(); }).not.toThrow();
             expect(manager.isSubscribed()).toBeFalsy();
         });
     });
@@ -385,9 +385,9 @@ describe("StatusUpdateHandler", () => {
             // Trigger the callback and wait for async execution
             await statusChangedCallback(monitorStatusEvent);
 
-            expect(mockSetSites).toHaveBeenCalled();
+            expect(mockSetSites).toHaveBeenCalledWith();
             // The actual onUpdate gets called with the full StatusUpdate including the site
-            expect(mockOnUpdate).toHaveBeenCalled();
+            expect(mockOnUpdate).toHaveBeenCalledWith();
             const actualUpdate = mockOnUpdate.mock.calls[0][0];
             expect(actualUpdate.siteIdentifier).toBe("site1"); // Converted to siteIdentifier in StatusUpdate
             expect(actualUpdate.monitorId).toBe("monitor1");
@@ -525,7 +525,7 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
 
-            expect(mockSetSites).toHaveBeenCalled();
+            expect(mockSetSites).toHaveBeenCalledWith();
             const newSites = mockSetSites.mock.calls[0][0];
             expect(newSites).toBeDefined();
             expect(Array.isArray(newSites)).toBeTruthy();
@@ -553,7 +553,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should fall back to full sync when monitor not found", async ({
@@ -577,7 +577,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should handle invalid data format and fall back to full sync", async ({
@@ -598,7 +598,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(invalidData);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should handle when updated site is not found after update", async ({
@@ -619,9 +619,10 @@ describe("StatusUpdateHandler", () => {
             // Mock applyMonitorStatusUpdate to return empty array (simulate site removal)
             const originalApplyMethod = (manager as any)
                 .applyMonitorStatusUpdate;
-            (manager as any).applyMonitorStatusUpdate = vi
-                .fn()
-                .mockReturnValue([]);
+            vi.spyOn(
+                manager as any,
+                "applyMonitorStatusUpdate"
+            ).mockReturnValue([]);
 
             const monitorStatusEvent = {
                 siteIdentifier: "site1",
@@ -675,7 +676,7 @@ describe("StatusUpdateHandler", () => {
             );
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockSetSites).toHaveBeenCalled();
+            expect(mockSetSites).toHaveBeenCalledWith();
 
             managerWithoutCallback.unsubscribe();
         });
@@ -745,7 +746,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should handle errors in onUpdate callback gracefully", async ({
@@ -978,7 +979,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should handle sites with no monitors", async ({
@@ -1006,7 +1007,7 @@ describe("StatusUpdateHandler", () => {
             };
 
             await statusChangedCallback(monitorStatusEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should handle null/undefined status updates", async ({
@@ -1182,7 +1183,7 @@ describe("StatusUpdateHandler", () => {
             await monitoringStartedCallback();
 
             // Should have triggered full sync
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should trigger full sync when monitoring stops", async ({
@@ -1199,7 +1200,7 @@ describe("StatusUpdateHandler", () => {
             await monitoringStoppedCallback();
 
             // Should have triggered full sync
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should handle invalid event data and log warning in development mode", async ({
@@ -1230,7 +1231,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidEvent);
 
             // Should have triggered full sync as fallback
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
 
             // Should have logged warning in development mode
             expect(logger.logger.warn).toHaveBeenCalledWith(
@@ -1262,7 +1263,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(invalidEvent);
 
             // Should still trigger full sync but without warning
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
             expect(logger.logger.warn).not.toHaveBeenCalled();
         });
 
@@ -1312,7 +1313,7 @@ describe("StatusUpdateHandler", () => {
             let storedSites: any[] = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
             mockSetSites.mockImplementation(
-                (siteSetter: any[] | ((arg0: any[]) => any[])) => {
+                (siteSetter: ((arg0: any[]) => any[]) | any[]) => {
                     storedSites =
                         typeof siteSetter === "function"
                             ? siteSetter(storedSites)
@@ -1358,7 +1359,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(event);
 
             // Should have updated the sites with the new monitor status
-            expect(mockSetSites).toHaveBeenCalled();
+            expect(mockSetSites).toHaveBeenCalledWith();
             const updatedSitesArray = mockSetSites.mock.calls[0][0];
 
             // Find the updated site and verify the monitor status was changed
@@ -1397,7 +1398,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(event);
 
             // Should trigger full sync but not log debug messages
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).toHaveBeenCalledWith();
             expect(logger.logger.debug).not.toHaveBeenCalled();
         });
 
@@ -1416,7 +1417,7 @@ describe("StatusUpdateHandler", () => {
             let storedSites = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
             mockSetSites.mockImplementation(
-                (siteSetter: Site[] | ((arg0: Site[]) => Site[])) => {
+                (siteSetter: ((arg0: Site[]) => Site[]) | Site[]) => {
                     storedSites =
                         typeof siteSetter === "function"
                             ? siteSetter(storedSites)
@@ -1522,7 +1523,7 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(eventWithEmptyHistory);
 
             // Verify that setSites was called
-            expect(mockSetSites).toHaveBeenCalled();
+            expect(mockSetSites).toHaveBeenCalledWith();
             const updatedSitesArray = mockSetSites.mock.calls[0][0];
 
             // Find the updated site and verify the history was preserved

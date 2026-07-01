@@ -1,5 +1,5 @@
+import { fc, test } from "@fast-check/vitest";
 import { describe, expect, it } from "vitest";
-import { test, fc } from "@fast-check/vitest";
 
 import {
     clampNormalizedVolume,
@@ -8,7 +8,7 @@ import {
 } from "../components/Settings/utils/volumeNormalization";
 
 describe("volumeNormalization", () => {
-    it("clamps normalized volumes into [0, 1]", async ({ task, annotate }) => {
+    it("clamps normalized volumes into [0, 1]", async ({ annotate, task }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: volumeNormalization", "component");
         await annotate("Category: Settings", "category");
@@ -21,16 +21,17 @@ describe("volumeNormalization", () => {
         expect(clampNormalizedVolume(2)).toBe(1);
     });
 
-    test.prop([fc.double({ noNaN: true, noDefaultInfinity: true })])(
+    test.prop([fc.double({ noDefaultInfinity: true, noNaN: true })])(
         "always returns a clamped value",
         (value) => {
             const clamped = clampNormalizedVolume(value);
+
             expect(clamped).toBeGreaterThanOrEqual(0);
             expect(clamped).toBeLessThanOrEqual(1);
         }
     );
 
-    test.prop([fc.integer({ min: 0, max: 100 })])(
+    test.prop([fc.integer({ max: 100, min: 0 })])(
         "slider percent round-trips via normalized conversion",
         (percent) => {
             const normalized = convertSliderPercentToNormalizedVolume(percent);

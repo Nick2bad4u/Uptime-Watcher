@@ -33,39 +33,6 @@ const googleApiErrorEnvelopeSchema = z
 
 type GoogleApiErrorEnvelope = z.infer<typeof googleApiErrorEnvelopeSchema>;
 
-function tryParseGoogleApiErrorEnvelope(
-    value: unknown
-): GoogleApiErrorEnvelope | null {
-    const parsed = googleApiErrorEnvelopeSchema.safeParse(value);
-    if (parsed.success) {
-        return parsed.data;
-    }
-
-    formatZodIssues(parsed.error.issues);
-    return null;
-}
-
-function normalizeGoogleApiErrorCandidate(value: unknown): unknown {
-    if (typeof value === "string") {
-        const parsed = tryParseJsonRecord(value);
-        return parsed ?? value;
-    }
-
-    if (value instanceof ArrayBuffer) {
-        const text = Buffer.from(new Uint8Array(value)).toString("utf8");
-        const parsed = tryParseJsonRecord(text);
-        return parsed ?? text;
-    }
-
-    if (Buffer.isBuffer(value)) {
-        const text = value.toString("utf8");
-        const parsed = tryParseJsonRecord(text);
-        return parsed ?? text;
-    }
-
-    return value;
-}
-
 /**
  * Best-effort extraction of a concise Google Drive API error detail string.
  */
@@ -121,4 +88,37 @@ export function tryDescribeGoogleDriveApiError(
     return fallbackMessage.length > 0
         ? `${prefix}${fallbackMessage}`
         : undefined;
+}
+
+function normalizeGoogleApiErrorCandidate(value: unknown): unknown {
+    if (typeof value === "string") {
+        const parsed = tryParseJsonRecord(value);
+        return parsed ?? value;
+    }
+
+    if (value instanceof ArrayBuffer) {
+        const text = Buffer.from(new Uint8Array(value)).toString("utf8");
+        const parsed = tryParseJsonRecord(text);
+        return parsed ?? text;
+    }
+
+    if (Buffer.isBuffer(value)) {
+        const text = value.toString("utf8");
+        const parsed = tryParseJsonRecord(text);
+        return parsed ?? text;
+    }
+
+    return value;
+}
+
+function tryParseGoogleApiErrorEnvelope(
+    value: unknown
+): GoogleApiErrorEnvelope | null {
+    const parsed = googleApiErrorEnvelopeSchema.safeParse(value);
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    formatZodIssues(parsed.error.issues);
+    return null;
 }

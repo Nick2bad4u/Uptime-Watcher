@@ -4,7 +4,6 @@
  * Tests every exported function to ensure 100% function coverage
  */
 
-import { describe, it, expect } from "vitest";
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -17,6 +16,7 @@ import {
     safeParseTimeout,
     safeParseTimestamp,
 } from "@shared/utils/safeConversions";
+import { describe, expect, it } from "vitest";
 
 describe("safeConversions - Complete Function Coverage", () => {
     describe(safeNumberConversion, () => {

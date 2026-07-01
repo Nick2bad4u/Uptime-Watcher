@@ -7,40 +7,6 @@ import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons, getIconSize } from "../../../utils/icons";
 
-function resolveBackupMigrationStatusText(args: {
-    encryptionLocked: boolean;
-    encryptionMode: "none" | "passphrase";
-    plaintextBackupCount: number;
-}): string {
-    if (args.plaintextBackupCount === 0) {
-        return "No plaintext backups to migrate.";
-    }
-
-    if (args.encryptionMode !== "passphrase") {
-        return "Enable passphrase encryption to migrate backups.";
-    }
-
-    if (args.encryptionLocked) {
-        return "Unlock encryption to migrate backups on this device.";
-    }
-
-    return `Ready to migrate ${args.plaintextBackupCount} plaintext backup(s).`;
-}
-
-function resolveBackupMigrationLastSummary(
-    lastResult: CloudBackupMigrationResult | null
-): null | string {
-    if (!lastResult) {
-        return null;
-    }
-
-    if (lastResult.target !== "encrypted") {
-        return null;
-    }
-
-    return `Last migration: ${lastResult.migrated} migrated, ${lastResult.failures.length} failed.`;
-}
-
 /**
  * Props for {@link BackupMigrationPanel}.
  */
@@ -61,6 +27,40 @@ export interface BackupMigrationPanelProperties {
     readonly onEncryptBackupsKeepOriginals: () => void;
     /** Number of plaintext backups currently present. */
     readonly plaintextBackupCount: number;
+}
+
+function resolveBackupMigrationLastSummary(
+    lastResult: CloudBackupMigrationResult | null
+): null | string {
+    if (!lastResult) {
+        return null;
+    }
+
+    if (lastResult.target !== "encrypted") {
+        return null;
+    }
+
+    return `Last migration: ${lastResult.migrated} migrated, ${lastResult.failures.length} failed.`;
+}
+
+function resolveBackupMigrationStatusText(args: {
+    encryptionLocked: boolean;
+    encryptionMode: "none" | "passphrase";
+    plaintextBackupCount: number;
+}): string {
+    if (args.plaintextBackupCount === 0) {
+        return "No plaintext backups to migrate.";
+    }
+
+    if (args.encryptionMode !== "passphrase") {
+        return "Enable passphrase encryption to migrate backups.";
+    }
+
+    if (args.encryptionLocked) {
+        return "Unlock encryption to migrate backups on this device.";
+    }
+
+    return `Ready to migrate ${args.plaintextBackupCount} plaintext backup(s).`;
 }
 
 /**

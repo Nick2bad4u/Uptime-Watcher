@@ -151,7 +151,7 @@ export function getSafeUrlForLogging(rawUrl: string): string {
  * @remarks
  * Unlike {@link validateExternalOpenUrlCandidate}, this helper rejects all
  * non-HTTP(S) schemes (including `mailto:`) and is tuned for places where the
- * application expects to fetch or monitor a web endpoint.
+ * app expects to fetch or monitor a web endpoint.
  *
  * This is primarily used at IPC trust boundaries to ensure consistent
  * enforcement of:
@@ -183,8 +183,8 @@ export function validateHttpUrlCandidate(
         toSafeUrlForLogging: getSafeUrlForLogging,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-    if (primitiveValidation.ok === false) {
+
+    if (!primitiveValidation.ok) {
         return primitiveValidation;
     }
 
@@ -248,7 +248,7 @@ function isValidHttpUrlWithValidator(url: string): boolean {
 
 function tryNormalizeHttpUrlViaWhatwg(url: string): null | string {
     try {
-        return new URL(url).toString();
+        return new URL(url).href;
     } catch {
         return null;
     }
@@ -277,9 +277,8 @@ function normalizeHttpUrlForExternalOpen(args: {
         };
     }
 
-    // Keep a strict stance on path whitespace: if spaces appear before the
-    // query/hash delimiter, treat it as invalid rather than "fixing" it.
-    // This preserves our existing security posture and UX.
+    // Keep a strict stance on path whitespace: if spaces appear before the query/hash delimiter,
+    // treat it as invalid rather than "fixing" it. This preserves our existing security posture and UX.
     if (hasSpaceBeforeQueryOrHash(args.url)) {
         return {
             ok: false,
@@ -400,11 +399,7 @@ function isPrivateIpvFourOctets(
     }
 
     // 100.64.0.0/10 (CGNAT)
-    if (a === 100 && b >= 64 && b <= 127) {
-        return true;
-    }
-
-    return false;
+    return a === 100 && b >= 64 && b <= 127;
 }
 
 /**
@@ -487,8 +482,8 @@ export function validateExternalOpenUrlCandidate(
         toSafeUrlForLogging: getSafeUrlForLogging,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-    if (primitiveValidation.ok === false) {
+
+    if (!primitiveValidation.ok) {
         return primitiveValidation;
     }
 

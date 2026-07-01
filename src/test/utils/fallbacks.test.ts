@@ -2,12 +2,15 @@
  * Tests for fallback and default value utilities
  *
  * @file Comprehensive tests covering all branches and edge cases for fallback
- *   utilities used throughout the application.
+ *   utilities used throughout the app.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Monitor } from "@shared/types";
+
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import {
     isNullOrUndefined,
     withAsyncErrorHandling,
@@ -20,17 +23,16 @@ import {
     MonitorDefaults,
     SiteDefaults,
 } from "../../utils/fallbacks";
-import type { Monitor } from "@shared/types";
 
 const monitorIdArbitrary = fc.uuid();
 const fallbackIdentifierArbitrary = fc
-    .string({ minLength: 1, maxLength: 48 })
+    .string({ maxLength: 48, minLength: 1 })
     .filter((value) => value.trim().length > 0);
 const httpUrlArbitrary = fc
     .webUrl()
     .filter((url) => url.startsWith("https://") || url.startsWith("https://"));
 const hostIdentifierArbitrary = fc.oneof(fc.domain(), fc.constant("localhost"));
-const portArbitrary = fc.integer({ min: 1, max: 65_535 });
+const portArbitrary = fc.integer({ max: 65_535, min: 1 });
 const dnsRecordTypeArbitrary = fc.constantFrom(
     "A",
     "AAAA",
@@ -55,158 +57,158 @@ const buildMinimalMonitor = (overrides: Partial<Monitor>): Monitor =>
     }) as Monitor;
 
 // Mock the logger module
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
     },
 }));
 
 // Mock the error handling utilities
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
     withUtilityErrorHandling: vi.fn((operation) => operation()),
 }));
 
-describe("Fallback Utilities", () => {
+describe("fallback Utilities", () => {
     beforeEach(() => {
         // Clear all mocks before each test
         vi.clearAllMocks();
     });
 
     describe(isNullOrUndefined, () => {
-        describe("Null values", () => {
-            it("should return true for null", async ({ task, annotate }) => {
+        describe("null values", () => {
+            it("should return true for null", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(null)).toBeTruthy();
+                expect(isNullOrUndefined(null)).toBe(true);
             });
 
             it("should return true for undefined", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(undefined)).toBeTruthy();
+                expect(isNullOrUndefined(undefined)).toBe(true);
             });
         });
 
-        describe("Falsy but not null/undefined values", () => {
+        describe("falsy but not null/undefined values", () => {
             it("should return false for empty string", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined("http")).toBeFalsy();
+                expect(isNullOrUndefined("http")).toBe(false);
             });
 
-            it("should return false for zero", async ({ task, annotate }) => {
+            it("should return false for zero", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(0)).toBeFalsy();
+                expect(isNullOrUndefined(0)).toBe(false);
             });
 
-            it("should return false for false", async ({ task, annotate }) => {
+            it("should return false for false", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(false)).toBeFalsy();
+                expect(isNullOrUndefined(false)).toBe(false);
             });
 
-            it("should return false for NaN", async ({ task, annotate }) => {
+            it("should return false for NaN", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(Number.NaN)).toBeFalsy();
+                expect(isNullOrUndefined(NaN)).toBe(false);
             });
         });
 
-        describe("Truthy values", () => {
-            it("should return false for string", async ({ task, annotate }) => {
+        describe("truthy values", () => {
+            it("should return false for string", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined("http")).toBeFalsy();
+                expect(isNullOrUndefined("http")).toBe(false);
             });
 
-            it("should return false for number", async ({ task, annotate }) => {
+            it("should return false for number", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(42)).toBeFalsy();
+                expect(isNullOrUndefined(42)).toBe(false);
             });
 
             it("should return false for boolean true", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(true)).toBeFalsy();
+                expect(isNullOrUndefined(true)).toBe(false);
             });
 
-            it("should return false for object", async ({ task, annotate }) => {
+            it("should return false for object", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined({})).toBeFalsy();
+                expect(isNullOrUndefined({})).toBe(false);
             });
 
-            it("should return false for array", async ({ task, annotate }) => {
+            it("should return false for array", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined([])).toBeFalsy();
+                expect(isNullOrUndefined([])).toBe(false);
             });
 
             it("should return false for function", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(isNullOrUndefined(() => {})).toBeFalsy();
+                expect(isNullOrUndefined(() => {})).toBe(false);
             });
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([fc.oneof(fc.constant(null), fc.constant(undefined))])(
                 "should always return true for null or undefined values",
                 (nullOrUndef) => {
-                    expect(isNullOrUndefined(nullOrUndef)).toBeTruthy();
+                    expect(isNullOrUndefined(nullOrUndef)).toBe(true);
                 }
             );
 
@@ -215,8 +217,8 @@ describe("Fallback Utilities", () => {
                     fc.string(),
                     fc.integer(),
                     fc.float({
-                        min: Math.fround(-1000),
                         max: Math.fround(1000),
+                        min: Math.fround(-1000),
                     }),
                     fc.boolean(),
                     fc.array(fc.anything()),
@@ -231,22 +233,22 @@ describe("Fallback Utilities", () => {
             ])(
                 "should always return false for non-null/undefined values including falsy ones",
                 (value) => {
-                    expect(isNullOrUndefined(value)).toBeFalsy();
+                    expect(isNullOrUndefined(value)).toBe(false);
                 }
             );
 
             test.prop([
                 fc.anything().filter((v) => v !== null && v !== undefined),
             ])("should return false for any defined value", (value) => {
-                expect(isNullOrUndefined(value)).toBeFalsy();
+                expect(isNullOrUndefined(value)).toBe(false);
             });
         });
     });
 
     describe(withAsyncErrorHandling, () => {
         it("should return a sync function that handles async operations", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fallbacks", "component");
@@ -259,13 +261,13 @@ describe("Fallback Utilities", () => {
                 "test operation"
             );
 
-            expect(typeof handler).toBe("function");
+            expect(handler).toBeTypeOf("function");
             expect(handler()).toBeUndefined(); // Returns void
         });
 
         it("should execute the async operation when handler is called", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fallbacks", "component");
@@ -284,8 +286,8 @@ describe("Fallback Utilities", () => {
         });
 
         it("should handle async operations that throw errors", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fallbacks", "component");
@@ -301,12 +303,12 @@ describe("Fallback Utilities", () => {
             );
 
             // Should not throw when called
-            expect(() => handler()).not.toThrow();
+            expect(() => { handler(); }).not.toThrow();
         });
 
         it("should work with different operation names", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fallbacks", "component");
@@ -323,12 +325,12 @@ describe("Fallback Utilities", () => {
                 "operation 2"
             );
 
-            expect(typeof handler1).toBe("function");
-            expect(typeof handler2).toBe("function");
+            expect(handler1).toBeTypeOf("function");
+            expect(handler2).toBeTypeOf("function");
             expect(handler1).not.toBe(handler2); // Different instances
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should create handler function for any valid operation name",
                 (operationName) => {
@@ -338,7 +340,7 @@ describe("Fallback Utilities", () => {
                         operationName
                     );
 
-                    expect(typeof handler).toBe("function");
+                    expect(handler).toBeTypeOf("function");
                     expect(handler()).toBeUndefined(); // Returns void
                 }
             );
@@ -350,10 +352,11 @@ describe("Fallback Utilities", () => {
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called
-                    expect(() => handler()).not.toThrow();
+                    expect(() => { handler(); }).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
                     await new Promise((resolve) => setTimeout(resolve, 0));
+
                     expect(mockAsyncOp).toHaveBeenCalledTimes(1);
                 }
             );
@@ -367,10 +370,11 @@ describe("Fallback Utilities", () => {
                     const handler = withAsyncErrorHandling(mockAsyncOp, "test");
 
                     // Should not throw when handler is called, even if async op fails
-                    expect(() => handler()).not.toThrow();
+                    expect(() => { handler(); }).not.toThrow();
 
                     // Wait a bit to allow async operation to complete
                     await new Promise((resolve) => setTimeout(resolve, 0));
+
                     expect(mockAsyncOp).toHaveBeenCalledTimes(1);
                 }
             );
@@ -382,10 +386,10 @@ describe("Fallback Utilities", () => {
             vi.clearAllMocks();
         });
 
-        describe("Successful operations", () => {
+        describe("successful operations", () => {
             it("should return operation result when operation succeeds", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -406,8 +410,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle complex return types", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -443,8 +447,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle operations returning falsy values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -452,22 +456,22 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const operation = vi.fn().mockReturnValue(false);
-                const fallback = true;
+                const isFallback = true;
 
                 const result = withSyncErrorHandling(
                     operation,
                     "boolean operation",
-                    fallback
+                    isFallback
                 );
 
-                expect(result).toBeFalsy();
+                expect(result).toBe(false);
             });
         });
 
-        describe("Error handling", () => {
+        describe("error handling", () => {
             it("should return fallback value when operation throws", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -488,12 +492,12 @@ describe("Fallback Utilities", () => {
 
                 expect(result).toBe(fallback);
                 expect(operation).toHaveBeenCalledTimes(1);
-                expect(logger.logger.error).toHaveBeenCalled();
+                expect(logger.logger.error).toHaveBeenCalledWith();
             });
 
             it("should handle different error types", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -513,12 +517,12 @@ describe("Fallback Utilities", () => {
                 );
 
                 expect(result).toBe(fallback);
-                expect(logger.logger.error).toHaveBeenCalled();
+                expect(logger.logger.error).toHaveBeenCalledWith();
             });
 
             it("should log the error with operation name", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -544,7 +548,7 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([fc.anything(), fc.anything()])(
                 "should return operation result when operation succeeds",
                 (mockResult, fallbackValue) => {
@@ -580,7 +584,7 @@ describe("Fallback Utilities", () => {
 
                     expect(result).toBe(fallbackValue);
                     expect(operation).toHaveBeenCalledTimes(1);
-                    expect(logger.logger.error).toHaveBeenCalled();
+                    expect(logger.logger.error).toHaveBeenCalledWith();
                 }
             );
 
@@ -607,17 +611,17 @@ describe("Fallback Utilities", () => {
                     );
 
                     expect(result).toBe(fallbackValue);
-                    expect(logger.logger.error).toHaveBeenCalled();
+                    expect(logger.logger.error).toHaveBeenCalledWith();
                 }
             );
         });
     });
 
     describe(withFallback, () => {
-        describe("Null/undefined handling", () => {
+        describe("null/undefined handling", () => {
             it("should return fallback for null value", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -628,8 +632,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should return fallback for undefined value", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -640,10 +644,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Valid value handling", () => {
+        describe("valid value handling", () => {
             it("should return original value when not null/undefined", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -654,8 +658,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should return falsy values that are not null/undefined", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -664,10 +668,10 @@ describe("Fallback Utilities", () => {
 
                 expect(withFallback("http", "fallback")).toBe("http");
                 expect(withFallback(0, 42)).toBe(0);
-                expect(withFallback(false, true)).toBeFalsy();
+                expect(withFallback(false, true)).toBe(false);
             });
 
-            it("should handle complex types", async ({ task, annotate }) => {
+            it("should handle complex types", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -681,7 +685,7 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([
                 fc.oneof(fc.constant(null), fc.constant(undefined)),
                 fc.anything(),
@@ -719,6 +723,7 @@ describe("Fallback Utilities", () => {
                 (falsyValue, fallback) => {
                     // Skip null/undefined as they should use fallback
                     fc.pre(falsyValue !== null && falsyValue !== undefined);
+
                     expect(withFallback(falsyValue, fallback)).toBe(falsyValue);
                 }
             );
@@ -726,10 +731,10 @@ describe("Fallback Utilities", () => {
     });
 
     describe(getMonitorDisplayIdentifier, () => {
-        describe("HTTP monitors", () => {
+        describe("hTTP monitors", () => {
             it("should return URL for HTTP monitor", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -757,8 +762,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle HTTP monitor with undefined URL", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -771,10 +776,10 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, fallback) => {
                             const monitor = buildMinimalMonitor({
+                                host: undefined,
                                 id,
                                 type: "http",
                                 url: undefined,
-                                host: undefined,
                             });
 
                             expect(
@@ -786,10 +791,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Port monitors", () => {
+        describe("port monitors", () => {
             it("should return host:port for port monitor with both values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -804,10 +809,10 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, host, port, fallback) => {
                             const monitor = buildMinimalMonitor({
-                                id,
-                                type: "port",
                                 host,
+                                id,
                                 port,
+                                type: "port",
                                 url: undefined,
                             });
 
@@ -820,8 +825,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should return host only for port monitor without port", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -835,10 +840,10 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, host, fallback) => {
                             const monitor = buildMinimalMonitor({
-                                id,
-                                type: "port",
                                 host,
+                                id,
                                 port: undefined,
+                                type: "port",
                                 url: undefined,
                             });
 
@@ -851,8 +856,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should use fallback for port monitor with no host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -866,10 +871,10 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, port, fallback) => {
                             const monitor = buildMinimalMonitor({
-                                id,
-                                type: "port",
                                 host: undefined,
+                                id,
                                 port,
+                                type: "port",
                             });
 
                             expect(
@@ -881,10 +886,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Specialized monitor types", () => {
+        describe("specialized monitor types", () => {
             it("should use baseline URL for CDN edge consistency monitors", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -898,9 +903,9 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, baselineUrl, fallback) => {
                             const monitor = buildMinimalMonitor({
+                                baselineUrl,
                                 id,
                                 type: "cdn-edge-consistency",
-                                baselineUrl,
                             });
 
                             expect(
@@ -912,8 +917,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should append DNS record type when available", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -928,10 +933,10 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, host, recordType, fallback) => {
                             const monitor = buildMinimalMonitor({
-                                id,
-                                type: "dns",
                                 host,
+                                id,
                                 recordType,
+                                type: "dns",
                             });
 
                             expect(
@@ -943,8 +948,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should prefer primary status URL for replication monitors", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -960,9 +965,9 @@ describe("Fallback Utilities", () => {
                         (id, primaryUrl, replicaUrl, fallback) => {
                             const monitor = buildMinimalMonitor({
                                 id,
-                                type: "replication",
                                 primaryStatusUrl: primaryUrl,
                                 replicaStatusUrl: replicaUrl,
+                                type: "replication",
                             });
 
                             expect(
@@ -974,8 +979,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should fall back to replica status URL when primary is missing", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -990,9 +995,9 @@ describe("Fallback Utilities", () => {
                         (id, replicaUrl, fallback) => {
                             const monitor = buildMinimalMonitor({
                                 id,
-                                type: "replication",
                                 primaryStatusUrl: undefined,
                                 replicaStatusUrl: replicaUrl,
+                                type: "replication",
                             });
 
                             expect(
@@ -1004,10 +1009,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Generic identifier fallback", () => {
+        describe("generic identifier fallback", () => {
             it("should use URL from generic identifier when type generator fails", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1021,17 +1026,18 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, url, fallback) => {
                             const monitor = buildMinimalMonitor({
+                                host: undefined,
                                 id,
+                                port: undefined,
                                 type: "port",
                                 url,
-                                host: undefined,
-                                port: undefined,
                             });
 
                             const result = getMonitorDisplayIdentifier(
                                 monitor,
                                 fallback
                             );
+
                             expect(result).toBe(url);
                         }
                     )
@@ -1039,8 +1045,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should use host from generic identifier", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1054,9 +1060,9 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, host, fallback) => {
                             const monitor = buildMinimalMonitor({
+                                host,
                                 id,
                                 type: "http",
-                                host,
                                 url: undefined,
                             });
 
@@ -1064,6 +1070,7 @@ describe("Fallback Utilities", () => {
                                 monitor,
                                 fallback
                             );
+
                             expect(result).toBe(host);
                         }
                     )
@@ -1071,8 +1078,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should use host:port from generic identifier", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1087,10 +1094,10 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, host, port, fallback) => {
                             const monitor = buildMinimalMonitor({
-                                id,
-                                type: "http",
                                 host,
+                                id,
                                 port,
+                                type: "http",
                                 url: undefined,
                             });
 
@@ -1098,6 +1105,7 @@ describe("Fallback Utilities", () => {
                                 monitor,
                                 fallback
                             );
+
                             expect(result).toBe(`${host}:${port}`);
                         }
                     )
@@ -1105,10 +1113,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Fallback behavior", () => {
+        describe("fallback behavior", () => {
             it("should return site fallback for unknown monitor type with no identifiers", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1121,11 +1129,11 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, fallback) => {
                             const monitor = buildMinimalMonitor({
+                                host: undefined,
                                 id,
+                                port: undefined,
                                 type: "http",
                                 url: undefined,
-                                host: undefined,
-                                port: undefined,
                             });
 
                             expect(
@@ -1137,8 +1145,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle different fallback values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1152,11 +1160,11 @@ describe("Fallback Utilities", () => {
                         fallbackIdentifierArbitrary,
                         (id, fallbackA, fallbackB) => {
                             const monitor = buildMinimalMonitor({
+                                host: undefined,
                                 id,
+                                port: undefined,
                                 type: "http",
                                 url: undefined,
-                                host: undefined,
-                                port: undefined,
                             });
 
                             expect(
@@ -1171,36 +1179,37 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle monitor with no identifying properties (line 169 coverage)", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
 
-                // Create a monitor with no url, host, or port to hit the return undefined line
+                // Create a monitor with no URL, host, or port to hit the return undefined line
                 const monitor = {
-                    id: "1",
-                    type: "custom",
                     checkInterval: 30_000,
-                    timeout: 5000,
+                    id: "1",
                     retryAttempts: 3,
-                    // No url, host, or port properties
+                    timeout: 5000,
+                    type: "custom",
+                    // No URL, host, or port properties
                 } as unknown as Monitor;
 
                 const result = getMonitorDisplayIdentifier(
                     monitor,
                     "Site Fallback"
                 );
+
                 expect(result).toBe("Site Fallback");
             });
         });
 
-        describe("Error handling", () => {
+        describe("error handling", () => {
             it("should handle monitor with malformed properties", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1208,36 +1217,37 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = {
-                    type: "http",
                     // Malformed properties that might cause errors
                     // url: undefined, // Remove undefined properties
                     // host: undefined, // Remove undefined properties
                     port: "invalid",
+                    type: "http",
                 } as any;
 
                 const result = getMonitorDisplayIdentifier(
                     monitor,
                     "Error Fallback"
                 );
+
                 expect(result).toBe("Error Fallback");
             });
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             const createMonitorArbitrary = (type: string) =>
                 fc.record({
-                    id: fc.string().filter((s) => s.trim().length > 0),
-                    type: fc.constant(type),
-                    host: fc.option(fc.domain()),
-                    url: fc.option(fc.webUrl()),
-                    port: fc.option(fc.integer({ min: 1, max: 65_535 })),
                     checkInterval: fc.integer({ min: 1000, max: 3_600_000 }),
+                    history: fc.constant([]),
+                    host: fc.option(fc.domain()),
+                    id: fc.string().filter((s) => s.trim().length > 0),
                     monitoring: fc.boolean(),
+                    port: fc.option(fc.integer({ min: 1, max: 65_535 })),
                     responseTime: fc.integer({ min: -1, max: 10_000 }),
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
                     timeout: fc.integer({ min: 1000, max: 60_000 }),
-                    history: fc.constant([]),
+                    type: fc.constant(type),
+                    url: fc.option(fc.webUrl()),
                 }) as fc.Arbitrary<Monitor>;
 
             test.prop([
@@ -1251,6 +1261,7 @@ describe("Fallback Utilities", () => {
                         monitor,
                         fallback
                     );
+
                     expect(result).toBe(monitor.url);
                 }
             );
@@ -1266,6 +1277,7 @@ describe("Fallback Utilities", () => {
                         monitor,
                         fallback
                     );
+
                     expect(result).toBe(`${monitor.host}:${monitor.port}`);
                 }
             );
@@ -1281,21 +1293,22 @@ describe("Fallback Utilities", () => {
                         monitor,
                         fallback
                     );
+
                     expect(result).toBe(monitor.host);
                 }
             );
 
             test.prop([
                 fc.record({
-                    id: fc.string().filter((s) => s.trim().length > 0),
-                    type: fc.constantFrom("http", "port", "ping", "dns"),
                     checkInterval: fc.integer({ min: 1000, max: 3_600_000 }),
+                    history: fc.constant([]),
+                    id: fc.string().filter((s) => s.trim().length > 0),
                     monitoring: fc.boolean(),
                     responseTime: fc.integer({ min: -1, max: 10_000 }),
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
                     timeout: fc.integer({ min: 1000, max: 60_000 }),
-                    history: fc.constant([]),
+                    type: fc.constantFrom("http", "port", "ping", "dns"),
                 }) as fc.Arbitrary<Monitor>,
                 fc.string().filter((s) => s.trim().length > 0),
             ])(
@@ -1311,6 +1324,7 @@ describe("Fallback Utilities", () => {
                         cleanMonitor,
                         fallback
                     );
+
                     expect(result).toBe(fallback);
                 }
             );
@@ -1318,10 +1332,10 @@ describe("Fallback Utilities", () => {
     });
 
     describe(getMonitorTypeDisplayLabel, () => {
-        describe("Configured monitor types", () => {
+        describe("configured monitor types", () => {
             it("should return configured label for HTTP", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1332,8 +1346,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should return configured label for port", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1344,10 +1358,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Unknown monitor types with formatting", () => {
+        describe("unknown monitor types with formatting", () => {
             it("should generate title case for camelCase", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1359,7 +1373,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle snake_case", async ({ task, annotate }) => {
+            it("should handle snake_case", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1370,7 +1384,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle kebab-case", async ({ task, annotate }) => {
+            it("should handle kebab-case", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1381,7 +1395,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle mixed cases", async ({ task, annotate }) => {
+            it("should handle mixed cases", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1392,7 +1406,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle single words", async ({ task, annotate }) => {
+            it("should handle single words", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1401,7 +1415,7 @@ describe("Fallback Utilities", () => {
                 expect(getMonitorTypeDisplayLabel("ping")).toBe("Ping Monitor");
             });
 
-            it("should handle uppercase", async ({ task, annotate }) => {
+            it("should handle uppercase", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1410,7 +1424,7 @@ describe("Fallback Utilities", () => {
                 expect(getMonitorTypeDisplayLabel("API")).toBe("API Monitor");
             });
 
-            it("should handle lowercase", async ({ task, annotate }) => {
+            it("should handle lowercase", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1422,8 +1436,8 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Edge cases and error handling", () => {
-            it("should handle empty string", async ({ task, annotate }) => {
+        describe("edge cases and error handling", () => {
+            it("should handle empty string", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1434,7 +1448,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle null input", async ({ task, annotate }) => {
+            it("should handle null input", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1445,7 +1459,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle undefined input", async ({ task, annotate }) => {
+            it("should handle undefined input", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1456,7 +1470,7 @@ describe("Fallback Utilities", () => {
                 );
             });
 
-            it("should handle non-string input", async ({ task, annotate }) => {
+            it("should handle non-string input", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1468,8 +1482,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle special characters", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1482,8 +1496,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle very long monitor types", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1492,19 +1506,20 @@ describe("Fallback Utilities", () => {
 
                 const longType = "a".repeat(100);
                 const result = getMonitorTypeDisplayLabel(longType);
+
                 expect(result).toBe(
                     `${longType.charAt(0).toUpperCase()}${longType.slice(1)} Monitor`
                 );
             });
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([fc.constantFrom("http", "port", "ping", "dns")])(
                 "should return consistent labels for known monitor types",
                 (monitorType) => {
                     const result = getMonitorTypeDisplayLabel(monitorType);
 
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
 
                     // Should not return the fallback "Monitor Configuration"
@@ -1514,14 +1529,14 @@ describe("Fallback Utilities", () => {
 
             test.prop([
                 fc
-                    .string({ minLength: 1, maxLength: 50 })
+                    .string({ maxLength: 50, minLength: 1 })
                     .filter(
                         (s) =>
                             ![
-                                "http",
-                                "port",
-                                "ping",
                                 "dns",
+                                "http",
+                                "ping",
+                                "port",
                             ].includes(s)
                     )
                     .filter((s) => s.trim().length > 0),
@@ -1530,9 +1545,9 @@ describe("Fallback Utilities", () => {
                 (unknownType) => {
                     const result = getMonitorTypeDisplayLabel(unknownType);
 
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
-                    expect(result.endsWith(" Monitor")).toBeTruthy();
+                    expect(result.endsWith(" Monitor")).toBe(true);
 
                     // First character should be uppercase
                     expect(result.charAt(0)).toBe(
@@ -1553,6 +1568,7 @@ describe("Fallback Utilities", () => {
                     const result = getMonitorTypeDisplayLabel(
                         invalidInput as any
                     );
+
                     expect(result).toBe("Monitor Configuration");
                 }
             );
@@ -1564,7 +1580,7 @@ describe("Fallback Utilities", () => {
                         (s) =>
                             s.includes("_") ||
                             s.includes("-") ||
-                            /[A-Z]/.test(s)
+                            /[A-Z]/u.test(s)
                     )
                     .filter((s) => s.trim().length > 0),
             ])(
@@ -1572,22 +1588,22 @@ describe("Fallback Utilities", () => {
                 (formattedString) => {
                     const result = getMonitorTypeDisplayLabel(formattedString);
 
-                    expect(typeof result).toBe("string");
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeGreaterThan(0);
-                    expect(result.endsWith(" Monitor")).toBeTruthy();
+                    expect(result.endsWith(" Monitor")).toBe(true);
 
                     // Should contain some capitalization
-                    expect(/[A-Z]/.test(result)).toBeTruthy();
+                    expect(/[A-Z]/u.test(result)).toBe(true);
                 }
             );
         });
     });
 
     describe(truncateForLogging, () => {
-        describe("Basic truncation", () => {
+        describe("basic truncation", () => {
             it("should return original string if shorter than maxLength", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1598,8 +1614,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should return original string if equal to maxLength", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1607,12 +1623,13 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const text = "a".repeat(50);
+
                 expect(truncateForLogging(text, 50)).toBe(text);
             });
 
             it("should truncate string if longer than maxLength", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1621,15 +1638,16 @@ describe("Fallback Utilities", () => {
 
                 const text = "a".repeat(60);
                 const result = truncateForLogging(text, 50);
+
                 expect(result).toBe("a".repeat(50));
                 expect(result).toHaveLength(50);
             });
         });
 
-        describe("Default maxLength behavior", () => {
+        describe("default maxLength behavior", () => {
             it("should use default maxLength of 50", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1638,12 +1656,13 @@ describe("Fallback Utilities", () => {
 
                 const text = "a".repeat(60);
                 const result = truncateForLogging(text);
+
                 expect(result).toHaveLength(50);
             });
 
             it("should handle text exactly at default length", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1651,14 +1670,15 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const text = "a".repeat(50);
+
                 expect(truncateForLogging(text)).toBe(text);
             });
         });
 
-        describe("Custom maxLength", () => {
+        describe("custom maxLength", () => {
             it("should respect custom maxLength", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1666,10 +1686,11 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const text = "hello world";
+
                 expect(truncateForLogging(text, 5)).toBe("hello");
             });
 
-            it("should handle zero maxLength", async ({ task, annotate }) => {
+            it("should handle zero maxLength", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1679,22 +1700,23 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle negative maxLength", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                // With negative maxLength, the condition value.length <= maxLength would be false for any non-empty string
-                // So it will still try to slice, but slice(0, -1) returns first n-1 characters
+                // With negative maxLength, the condition value.length <= maxLength would be false for any non-empty
+                // string So it will still try to slice, but slice(0,
+                // -1) returns first n-1 characters
                 expect(truncateForLogging("test", -1)).toBe("tes");
             });
         });
 
-        describe("Edge cases", () => {
-            it("should handle empty string", async ({ task, annotate }) => {
+        describe("edge cases", () => {
+            it("should handle empty string", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1703,7 +1725,7 @@ describe("Fallback Utilities", () => {
                 expect(truncateForLogging("", 10)).toBe("");
             });
 
-            it("should handle single character", async ({ task, annotate }) => {
+            it("should handle single character", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1714,8 +1736,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should handle Unicode characters", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1725,13 +1747,14 @@ describe("Fallback Utilities", () => {
                 const unicode = "🎉🎊🎈🎁🎂";
                 // Unicode characters may take multiple bytes, so slice(0, 3) might not work as expected
                 const result = truncateForLogging(unicode, 3);
+
                 expect(result.length).toBeLessThanOrEqual(3);
-                expect(result.startsWith("🎉")).toBeTruthy();
+                expect(result.startsWith("🎉")).toBe(true);
             });
 
             it("should handle newlines and special characters", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1739,16 +1762,17 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const text = String.raw`line1\nline2\ttab`;
+
                 expect(truncateForLogging(text, 10)).toBe(
                     String.raw`line1\nlin`
                 );
             });
         });
 
-        describe("Real-world scenarios", () => {
+        describe("real-world scenarios", () => {
             it("should truncate URLs appropriately", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1758,11 +1782,12 @@ describe("Fallback Utilities", () => {
                 const url =
                     "https://very-long-domain-name.example.com/very/long/path/with/many/segments";
                 const result = truncateForLogging(url, 30);
+
                 expect(result).toHaveLength(30);
                 expect(result).toBe("https://very-long-domain-name.");
             });
 
-            it("should truncate error messages", async ({ task, annotate }) => {
+            it("should truncate error messages", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
@@ -1771,6 +1796,7 @@ describe("Fallback Utilities", () => {
                 const error =
                     "Connection failed: Unable to connect to server at example.com:8080 after 30 seconds timeout";
                 const result = truncateForLogging(error, 50);
+
                 expect(result).toHaveLength(50);
                 expect(result).toBe(
                     "Connection failed: Unable to connect to server at "
@@ -1778,19 +1804,20 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("Property-based Tests", () => {
-            test.prop([fc.string(), fc.integer({ min: 0, max: 1000 })])(
+        describe("property-based Tests", () => {
+            test.prop([fc.string(), fc.integer({ max: 1000, min: 0 })])(
                 "should always return string with length <= maxLength",
                 (text, maxLength) => {
                     const result = truncateForLogging(text, maxLength);
-                    expect(typeof result).toBe("string");
+
+                    expect(result).toBeTypeOf("string");
                     expect(result.length).toBeLessThanOrEqual(maxLength);
                 }
             );
 
             test.prop([
                 fc.string().filter((s) => s.length > 0),
-                fc.integer({ min: 1, max: 20 }),
+                fc.integer({ max: 20, min: 1 }),
             ])(
                 "should preserve start of string when truncating",
                 (text, maxLength) => {
@@ -1812,28 +1839,32 @@ describe("Fallback Utilities", () => {
                         // Assuming default max is >= 100
                         expect(result).toBe(text);
                     }
+
                     expect(result.length).toBeLessThanOrEqual(text.length);
                 }
             );
 
             test.prop([
                 fc.string({ minLength: 100 }),
-                fc.integer({ min: 10, max: 50 }),
+                fc.integer({ max: 50, min: 10 }),
             ])(
                 "should truncate long strings to specified length",
                 (longText, maxLength) => {
                     const result = truncateForLogging(longText, maxLength);
+
                     expect(result).toHaveLength(maxLength);
                     expect(result).toBe(longText.slice(0, maxLength));
                 }
             );
 
-            test.prop([fc.integer({ min: 0, max: 10 })])(
+            test.prop([fc.integer({ max: 10, min: 0 })])(
                 "should handle zero and small maxLength values",
                 (maxLength) => {
                     const text = "sample text";
                     const result = truncateForLogging(text, maxLength);
+
                     expect(result).toHaveLength(maxLength);
+
                     if (maxLength === 0) {
                         expect(result).toBe("");
                     } else {
@@ -1844,11 +1875,11 @@ describe("Fallback Utilities", () => {
         });
     });
 
-    describe("Default values", () => {
-        describe("UiDefaults", () => {
+    describe("default values", () => {
+        describe("uiDefaults", () => {
             it("should have correct chart defaults", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1860,8 +1891,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should have correct label defaults", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1875,8 +1906,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should have correct timing defaults", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1888,8 +1919,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should be deeply frozen (readonly)", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1900,6 +1931,7 @@ describe("Fallback Utilities", () => {
                 // The objects can still be modified at runtime, but should be treated as readonly
                 expect(UiDefaults.chartPeriod).toBe("24h");
                 expect(UiDefaults.chartPoints).toBe(24);
+
                 // Test that we can't modify (this will silently fail in non-strict mode)
                 (UiDefaults as any).chartPeriod = "48h";
                 // The value may or may not actually change depending on JavaScript mode
@@ -1907,10 +1939,10 @@ describe("Fallback Utilities", () => {
             });
         });
 
-        describe("MonitorDefaults", () => {
+        describe("monitorDefaults", () => {
             it("should have correct monitoring defaults", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1925,8 +1957,8 @@ describe("Fallback Utilities", () => {
             });
 
             it("should be deeply frozen (readonly)", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1936,28 +1968,29 @@ describe("Fallback Utilities", () => {
                 // Note: 'as const' provides type-level readonly but not runtime immutability
                 expect(MonitorDefaults.checkInterval).toBe(300_000);
                 expect(MonitorDefaults.timeout).toBe(10_000);
+
                 // Test that values are accessible and correct
                 (MonitorDefaults as any).timeout = 5000;
                 // The object should be treated as readonly in TypeScript
             });
         });
 
-        describe("SiteDefaults", () => {
+        describe("siteDefaults", () => {
             it("should have correct site defaults", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                expect(SiteDefaults.monitoring).toBeTruthy();
+                expect(SiteDefaults.monitoring).toBe(true);
             });
 
             it("should be deeply frozen (readonly)", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: fallbacks", "component");
@@ -1965,20 +1998,21 @@ describe("Fallback Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 // Note: 'as const' provides type-level readonly but not runtime immutability
-                expect(SiteDefaults.monitoring).toBeTruthy();
+                expect(SiteDefaults.monitoring).toBe(true);
+
                 // Test that values are accessible and correct
                 (SiteDefaults as any).monitoring = false;
                 // The object should be treated as readonly in TypeScript
             });
         });
 
-        describe("Property-based Tests", () => {
+        describe("property-based Tests", () => {
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should validate UiDefaults properties maintain consistent types",
                 (_propertyName) => {
                     // Test that UiDefaults is a consistent object
                     expect(UiDefaults).toEqual(expect.any(Object));
-                    expect(typeof UiDefaults).toBe("object");
+                    expect(UiDefaults).toBeTypeOf("object");
                     expect(UiDefaults).not.toBeNull();
                 }
             );
@@ -1987,11 +2021,11 @@ describe("Fallback Utilities", () => {
                 "should validate MonitorDefaults maintains correct type structure",
                 (_propertyName) => {
                     // Test that MonitorDefaults has expected numeric properties
-                    expect(typeof MonitorDefaults.checkInterval).toBe("number");
-                    expect(typeof MonitorDefaults.responseTime).toBe("number");
-                    expect(typeof MonitorDefaults.retryAttempts).toBe("number");
-                    expect(typeof MonitorDefaults.timeout).toBe("number");
-                    expect(typeof MonitorDefaults.status).toBe("string");
+                    expect(MonitorDefaults.checkInterval).toBeTypeOf("number");
+                    expect(MonitorDefaults.responseTime).toBeTypeOf("number");
+                    expect(MonitorDefaults.retryAttempts).toBeTypeOf("number");
+                    expect(MonitorDefaults.timeout).toBeTypeOf("number");
+                    expect(MonitorDefaults.status).toBeTypeOf("string");
 
                     // Verify reasonable ranges
                     expect(MonitorDefaults.checkInterval).toBeGreaterThan(0);
@@ -2005,7 +2039,7 @@ describe("Fallback Utilities", () => {
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should validate SiteDefaults has consistent boolean monitoring property",
                 (_propertyName) => {
-                    expect(typeof SiteDefaults.monitoring).toBe("boolean");
+                    expect(SiteDefaults.monitoring).toBeTypeOf("boolean");
                     expect(SiteDefaults).toEqual(expect.any(Object));
                     expect(SiteDefaults).not.toBeNull();
                 }

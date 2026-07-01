@@ -3,11 +3,12 @@
  * lines 201-218 in App.tsx
  */
 
-import { render, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import "@testing-library/jest-dom";
-
 import { isDevelopment, isProduction } from "@shared/utils/environment";
+import { render, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { App } from "../App";
 import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
@@ -19,8 +20,8 @@ import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 import { useTheme } from "../theme/useTheme";
 
 // Mock environment functions
-vi.mock("@shared/utils/environment");
-vi.mock("../services/logger", () => {
+vi.mock(import('@shared/utils/environment'));
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         app: {
             started: vi.fn(),
@@ -38,15 +39,15 @@ vi.mock("../services/logger", () => {
 });
 
 // Mock hooks and utilities
-vi.mock("../hooks/useBackendFocusSync", () => ({
+vi.mock(import('../hooks/useBackendFocusSync'), () => ({
     useBackendFocusSync: vi.fn(),
 }));
 
-vi.mock("../hooks/useSelectedSite", () => ({
+vi.mock(import('../hooks/useSelectedSite'), () => ({
     useSelectedSite: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock("../hooks/useMount", () => ({
+vi.mock(import('../hooks/useMount'), () => ({
     useMount: vi.fn((initCallback) => {
         setTimeout(() => {
             initCallback();
@@ -54,20 +55,20 @@ vi.mock("../hooks/useMount", () => ({
     }),
 }));
 
-vi.mock("../utils/cacheSync", () => ({
+vi.mock(import('../utils/cacheSync'), () => ({
     setupCacheSync: vi.fn(() => vi.fn()),
 }));
 
 // Mock components
-vi.mock("../components/Header/Header", () => ({
+vi.mock(import('../components/Header/Header'), () => ({
     Header: () => <header data-testid="header">Header</header>,
 }));
 
-vi.mock("../components/Dashboard/SiteList/SiteList", () => ({
+vi.mock(import('../components/Dashboard/SiteList/SiteList'), () => ({
     SiteList: () => <div data-testid="site-list">Site List</div>,
 }));
 
-vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
+vi.mock(import('../components/AddSiteForm/AddSiteModal'), () => ({
     AddSiteModal: ({ onClose }: { onClose: () => void }) => (
         <div data-testid="add-site-modal" onClick={onClose}>
             Add Site Modal
@@ -75,11 +76,11 @@ vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
     ),
 }));
 
-vi.mock("../components/common/ErrorAlert/ErrorAlert", () => ({
+vi.mock(import('../components/common/ErrorAlert/ErrorAlert'), () => ({
     ErrorAlert: () => <div data-testid="error-alert">Error Alert</div>,
 }));
 
-vi.mock("../services/NotificationPreferenceService", () => ({
+vi.mock(import('../services/NotificationPreferenceService'), () => ({
     NotificationPreferenceService: {
         initialize: vi.fn().mockResolvedValue(undefined),
         updatePreferences: vi.fn().mockResolvedValue(undefined),
@@ -87,14 +88,14 @@ vi.mock("../services/NotificationPreferenceService", () => ({
 }));
 
 // Mock stores
-vi.mock("../stores/error/useErrorStore");
-vi.mock("../stores/settings/useSettingsStore");
-vi.mock("../stores/sites/useSitesStore");
-vi.mock("../stores/ui/useUiStore");
-vi.mock("../stores/updates/useUpdatesStore");
-vi.mock("../theme/useTheme");
+vi.mock(import('../stores/error/useErrorStore'));
+vi.mock(import('../stores/settings/useSettingsStore'));
+vi.mock(import('../stores/sites/useSitesStore'));
+vi.mock(import('../stores/ui/useUiStore'));
+vi.mock(import('../stores/updates/useUpdatesStore'));
+vi.mock(import('../theme/useTheme'));
 
-const originalMatchMedia = globalThis.matchMedia;
+const originalMatchMedia = matchMedia;
 
 describe("App Development Logging Coverage", () => {
     let mockSettingsStoreState: {
@@ -106,9 +107,9 @@ describe("App Development Logging Coverage", () => {
     };
     let mockSitesStoreState: {
         initializeSites: ReturnType<typeof vi.fn>;
+        sites: never[];
         subscribeToStatusUpdates: ReturnType<typeof vi.fn>;
         unsubscribeFromStatusUpdates: ReturnType<typeof vi.fn>;
-        sites: never[];
     };
 
     beforeEach(() => {
@@ -119,7 +120,7 @@ describe("App Development Logging Coverage", () => {
         vi.mocked(isProduction).mockReturnValue(false);
 
         // Mock logger
-        vi.mocked(logger).debug = vi.fn();
+        vi.spyOn(vi.mocked(logger), 'debug').mockImplementation();
 
         // Setup store mocks
         vi.mocked(useErrorStore).mockReturnValue({
@@ -179,8 +180,7 @@ describe("App Development Logging Coverage", () => {
             selector
                 ? selector(mockSettingsStoreState)
                 : mockSettingsStoreState) as any);
-        vi.mocked(useSettingsStore).getState = vi
-            .fn()
+        vi.spyOn(vi.mocked(useSettingsStore), 'getState').mockImplementation()
             .mockReturnValue(mockSettingsStoreState as any);
 
         mockSitesStoreState = {
@@ -196,11 +196,10 @@ describe("App Development Logging Coverage", () => {
             selector
                 ? selector(mockSitesStoreState)
                 : mockSitesStoreState) as any);
-        vi.mocked(useSitesStore).getState = vi
-            .fn()
+        vi.spyOn(vi.mocked(useSitesStore), 'getState').mockImplementation()
             .mockReturnValue(mockSitesStoreState as any);
 
-        globalThis.matchMedia = vi.fn().mockReturnValue({
+        globalThis.matchMedia = safeCastTo<typeof globalThis.matchMedia>(vi.fn().mockReturnValue({
             matches: false,
             media: "(max-width: 1280px)",
             addEventListener: vi.fn(),
@@ -208,7 +207,7 @@ describe("App Development Logging Coverage", () => {
             addListener: vi.fn(),
             removeListener: vi.fn(),
             dispatchEvent: vi.fn(),
-        }) as typeof globalThis.matchMedia;
+        }));
     });
 
     afterEach(() => {
@@ -234,11 +233,9 @@ describe("App Development Logging Coverage", () => {
         // Update sites store mock to capture callback
         mockSitesStoreState.subscribeToStatusUpdates =
             subscribeToStatusUpdatesMock;
-        mockSitesStoreState.initializeSites = vi
-            .fn()
+        vi.spyOn(mockSitesStoreState, 'initializeSites').mockImplementation()
             .mockResolvedValue(undefined);
-        vi.mocked(useSitesStore).getState = vi
-            .fn()
+        vi.spyOn(vi.mocked(useSitesStore), 'getState').mockImplementation()
             .mockReturnValue(mockSitesStoreState as any);
 
         render(<App />);
@@ -246,14 +243,14 @@ describe("App Development Logging Coverage", () => {
         // Wait for initialization to complete
         await waitFor(
             () => {
-                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalledWith();
             },
             { timeout: 1000 }
         );
 
         // Get the callback function passed to subscribeToStatusUpdates
         const statusUpdateCallback =
-            subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
+            arrayFirst(subscribeToStatusUpdatesMock.mock.calls)?.[0];
 
         if (statusUpdateCallback) {
             // Create a mock status update
@@ -269,7 +266,7 @@ describe("App Development Logging Coverage", () => {
         // Verify that logger.debug was called
         expect(logger.debug).toHaveBeenCalledWith(
             expect.stringMatching(
-                /\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: test-site-id/
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: test-site-id/v
             )
         );
     });
@@ -291,7 +288,7 @@ describe("App Development Logging Coverage", () => {
         const subscribeToStatusUpdatesMock = vi.fn();
 
         // Update sites store mock to capture callback
-        vi.mocked(useSitesStore).getState = vi.fn().mockReturnValue({
+        vi.spyOn(vi.mocked(useSitesStore), 'getState').mockImplementation().mockReturnValue({
             initializeSites: vi.fn().mockResolvedValue(undefined),
             subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
             unsubscribeFromStatusUpdates: vi.fn(),
@@ -302,14 +299,14 @@ describe("App Development Logging Coverage", () => {
         // Wait for initialization to complete
         await waitFor(
             () => {
-                expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+                expect(subscribeToStatusUpdatesMock).toHaveBeenCalledWith();
             },
             { timeout: 1000 }
         );
 
         // Get the callback function passed to subscribeToStatusUpdates
         const statusUpdateCallback =
-            subscribeToStatusUpdatesMock.mock.calls[0]?.[0];
+            arrayFirst(subscribeToStatusUpdatesMock.mock.calls)?.[0];
 
         if (statusUpdateCallback) {
             // Create a mock status update with undefined site.identifier
@@ -325,7 +322,7 @@ describe("App Development Logging Coverage", () => {
         // Verify that logger.debug was called with fallback identifier
         expect(logger.debug).toHaveBeenCalledWith(
             expect.stringMatching(
-                /\[\d{1,2}:\d{2}:\d{2} [AP]M] Status update received for site: fallback-site-id/
+                /\[\d{1,2}:\d{2}:\d{2} [AP]M\] Status update received for site: fallback-site-id/v
             )
         );
     });

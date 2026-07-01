@@ -15,7 +15,7 @@ import * as path from "node:path";
  *
  * @returns {string} Normalized POSIX-style path.
  */
-const normalizePath = (filePath) => filePath.replace(/\\/gu, "/");
+const normalizePath = (filePath) => filePath.replaceAll('\\', "/");
 
 /**
  * @typedef {object} RequiredSnippetEntry
@@ -35,13 +35,13 @@ const remarkRequireSnippets = (options = {}) => {
     const entries = Array.isArray(options.entries) ? options.entries : [];
 
     return (_tree, file) => {
-        if (!entries.length) {
+        if (entries.length === 0) {
             return;
         }
 
         const originalPath =
             (Array.isArray(file.history) &&
-                file.history[file.history.length - 1]) ||
+                file.history.at(-1)) ||
             file.path ||
             "";
         const normalized = normalizePath(
@@ -59,14 +59,16 @@ const remarkRequireSnippets = (options = {}) => {
         const contents = String(file);
 
         for (const snippet of entry.snippets) {
-            if (!contents.includes(snippet)) {
-                const message = file.message(
-                    `Document must reference "${snippet}" to keep IPC contract docs synchronized.`,
-                    undefined,
-                    "remark-require-snippets:missing-snippet"
-                );
-                message.fatal = true;
+            if (contents.includes(snippet)) {
+                continue;
             }
+
+            const message = file.message(
+                `Document must reference "${snippet}" to keep IPC contract docs synchronized.`,
+                undefined,
+                "remark-require-snippets:missing-snippet"
+            );
+            message.fatal = true;
         }
     };
 };

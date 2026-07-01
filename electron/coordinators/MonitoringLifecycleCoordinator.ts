@@ -157,7 +157,7 @@ export class MonitoringLifecycleCoordinator {
         const { identifier, kind, monitorId } = args;
 
         try {
-            const success =
+            const isSuccess =
                 kind === "start"
                     ? await this.monitorManager.startMonitoringForSite(
                           identifier,
@@ -173,8 +173,8 @@ export class MonitoringLifecycleCoordinator {
                     "internal:site:start-monitoring-response",
                     buildStartMonitoringResponse(
                         monitorId
-                            ? { identifier, monitorId, success }
-                            : { identifier, success }
+                            ? { identifier, monitorId, success: isSuccess }
+                            : { identifier, success: isSuccess }
                     )
                 );
             } else {
@@ -182,8 +182,8 @@ export class MonitoringLifecycleCoordinator {
                     "internal:site:stop-monitoring-response",
                     buildStopMonitoringResponse(
                         monitorId
-                            ? { identifier, monitorId, success }
-                            : { identifier, success }
+                            ? { identifier, monitorId, success: isSuccess }
+                            : { identifier, success: isSuccess }
                     )
                 );
             }
@@ -233,7 +233,7 @@ export class MonitoringLifecycleCoordinator {
                 await this.handleSiteMonitoringToggleRequested({
                     identifier: data.identifier,
                     kind: "start",
-                    ...(data.monitorId ? { monitorId: data.monitorId } : {}),
+                    ...(data.monitorId && { monitorId: data.monitorId }),
                 });
             },
             {
@@ -256,7 +256,7 @@ export class MonitoringLifecycleCoordinator {
                 await this.handleSiteMonitoringToggleRequested({
                     identifier: data.identifier,
                     kind: "stop",
-                    ...(data.monitorId ? { monitorId: data.monitorId } : {}),
+                    ...(data.monitorId && { monitorId: data.monitorId }),
                 });
             },
             {
@@ -326,7 +326,7 @@ export class MonitoringLifecycleCoordinator {
                     // Note: restartMonitorWithNewConfig is intentionally
                     // synchronous as it only updates scheduler configuration
                     // without async I/O
-                    const success =
+                    const isSuccess =
                         this.monitorManager.restartMonitorWithNewConfig(
                             data.identifier,
                             data.monitor
@@ -336,7 +336,7 @@ export class MonitoringLifecycleCoordinator {
                         buildRestartMonitoringResponse({
                             identifier: data.identifier,
                             monitorId: data.monitor.id,
-                            success,
+                            success: isSuccess,
                         })
                     );
                 } catch (error) {

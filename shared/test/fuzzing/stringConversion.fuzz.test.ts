@@ -7,9 +7,9 @@
  * @file Comprehensive Fast-Check fuzzing tests for stringConversion utilities
  */
 
-import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { safeStringify } from "@shared/utils/stringConversion";
+import { describe, expect, it } from "vitest";
 
 describe("StringConversion - Fast-Check Fuzzing Tests", () => {
     describe("safeStringify comprehensive fuzzing", () => {
@@ -195,14 +195,6 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
             const valueType = typeof value;
 
             switch (valueType) {
-                case "string": {
-                    expect(result).toBe(value);
-                    break;
-                }
-                case "number": {
-                    expect(result).toBe((value as number).toString());
-                    break;
-                }
                 case "boolean": {
                     expect(result).toBe((value as boolean).toString());
                     break;
@@ -211,8 +203,8 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
                     expect(result).toContain("[Function");
                     break;
                 }
-                case "undefined": {
-                    expect(result).toBe("");
+                case "number": {
+                    expect(result).toBe((value as number).toString());
                     break;
                 }
                 case "object": {
@@ -223,6 +215,14 @@ describe("StringConversion - Fast-Check Fuzzing Tests", () => {
                     } else {
                         expect(typeof result).toBe("string");
                     }
+                    break;
+                }
+                case "string": {
+                    expect(result).toBe(value);
+                    break;
+                }
+                case "undefined": {
+                    expect(result).toBe("");
                     break;
                 }
                 default: {

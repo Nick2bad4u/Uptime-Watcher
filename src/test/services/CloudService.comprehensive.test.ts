@@ -2,12 +2,12 @@
  * Comprehensive test suite for CloudService.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
-import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
+import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CloudService } from "../../services/CloudService";
 
@@ -53,12 +53,12 @@ const mockElectronAPI = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
@@ -281,7 +281,7 @@ describe("CloudService", () => {
         expect(mockElectronAPI.cloud.restoreBackup).toHaveBeenCalledWith(
             "backups/1.sqlite"
         );
-        expect(mockLogger.info).toHaveBeenCalled();
+        expect(mockLogger.info).toHaveBeenCalledWith();
     });
 
     it("rejects empty restore key", async () => {
@@ -308,7 +308,7 @@ describe("CloudService", () => {
         expect(
             mockElectronAPI.cloud.setEncryptionPassphrase
         ).toHaveBeenCalledWith("pass");
-        expect(mockLogger.info).toHaveBeenCalled();
+        expect(mockLogger.info).toHaveBeenCalledWith();
     });
 
     it("rejects empty encryption passphrase", async () => {

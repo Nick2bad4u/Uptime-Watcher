@@ -75,5 +75,4 @@ export const MONITOR_TIMEOUT_BUFFER_MS = 5000;
  */
 export const SECONDS_TO_MS_MULTIPLIER = 1000;
 
-// Note: migration-related constants were intentionally removed. Development
-// builds do not support migration chains; state is reset instead.
+// Note: migration-related constants were intentionally removed. Development builds do not support migration chains; state is reset instead.

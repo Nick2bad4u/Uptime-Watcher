@@ -14,7 +14,7 @@
  * @tags ["mutation-testing", "array-declaration", "stryker", "specific-mutations"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock database service and related imports
 vi.mock("../services/database/DatabaseService", () => ({

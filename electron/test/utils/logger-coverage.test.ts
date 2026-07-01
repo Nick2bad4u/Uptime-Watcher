@@ -24,8 +24,8 @@ describe("Logger Implementation Coverage", () => {
 
     describe("Main Logger (logger)", () => {
         it("should call debug method with correct prefix and arguments", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -41,8 +41,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call info method with correct prefix and arguments", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -58,8 +58,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call warn method with correct prefix and arguments", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -76,8 +76,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method with Error object", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -101,15 +101,15 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method with non-Error object", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const nonError = { type: "custom error", code: 500 };
+            const nonError = { code: 500, type: "custom error" };
 
             logger.error("Test error message", nonError, "additional");
 
@@ -121,8 +121,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method without error object", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -139,8 +139,8 @@ describe("Logger Implementation Coverage", () => {
 
     describe("Database Logger (dbLogger)", () => {
         it("should call debug method with DB prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -158,8 +158,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call info method with DB prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -174,8 +174,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call warn method with DB prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -193,8 +193,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method with Error object and DB prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -217,8 +217,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method with non-Error object and DB prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -238,8 +238,8 @@ describe("Logger Implementation Coverage", () => {
 
     describe("Monitor Logger (monitorLogger)", () => {
         it("should call debug method with MONITOR prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -257,8 +257,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call info method with MONITOR prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -273,8 +273,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call warn method with MONITOR prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -290,8 +290,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method with Error object and MONITOR prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -317,8 +317,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should call error method with string error and MONITOR prefix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -336,8 +336,8 @@ describe("Logger Implementation Coverage", () => {
 
     describe("Error Handling Edge Cases", () => {
         it("should handle Error object without stack trace", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -358,7 +358,7 @@ describe("Logger Implementation Coverage", () => {
             );
         });
 
-        it("should handle null error object", async ({ task, annotate }) => {
+        it("should handle null error object", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
             await annotate("Category: Utility", "category");
@@ -373,8 +373,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should handle undefined error object explicitly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -390,8 +390,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should handle multiple additional arguments", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -416,8 +416,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should handle empty string messages", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -438,8 +438,8 @@ describe("Logger Implementation Coverage", () => {
 
     describe("Logger Method Signatures", () => {
         it("should maintain correct method signatures for all loggers", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");
@@ -464,8 +464,8 @@ describe("Logger Implementation Coverage", () => {
         });
 
         it("should handle method calls without additional arguments", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: logger-coverage", "component");

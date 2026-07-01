@@ -3,12 +3,13 @@
  * and edge cases to achieve 100% coverage.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
     createValidBaseMonitor,
     createValidHttpMonitor,
-    createValidPortMonitor,
     createValidPingMonitor,
+    createValidPortMonitor,
     createValidSite,
     createValidStatusHistory,
 } from "./testHelpers";
@@ -237,7 +238,7 @@ describe("Test Helpers - Comprehensive Coverage", () => {
 
             const monitor = createValidHttpMonitor({ type: "port" as any });
 
-            expect(monitor.type).toBe("http"); // Should be overridden back to http
+            expect(monitor.type).toBe("http"); // Should be overridden back to HTTP
         });
     });
 

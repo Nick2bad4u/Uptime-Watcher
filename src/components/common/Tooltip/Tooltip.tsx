@@ -157,9 +157,9 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             const commitVisible = (): void => {
                 if (
                     typeof window !== "undefined" &&
-                    typeof window.requestAnimationFrame === "function"
+                    typeof requestAnimationFrame === "function"
                 ) {
-                    window.requestAnimationFrame(() => {
+                    globalThis.requestAnimationFrame(() => {
                         setIsVisible(true);
                     });
                 } else {
@@ -450,7 +450,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 // RequestAnimationFrame batches DOM reads/writes into a single
                 // frame, preventing scroll/resize from triggering multiple
                 // layout recalculations per frame.
-                rafId = window.requestAnimationFrame(() => {
+                rafId = globalThis.requestAnimationFrame(() => {
                     rafId = null;
                     applyTooltipPosition();
                 });
@@ -492,7 +492,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             return (): void => {
                 if (rafId !== null) {
-                    window.cancelAnimationFrame(rafId);
+                    globalThis.cancelAnimationFrame(rafId);
                 }
 
                 window.removeEventListener("resize", handleReposition);

@@ -120,13 +120,13 @@ export class MonitorOperationRegistry {
     public cancelOperations(monitorId: string): void {
         let cancelledCount = 0;
         for (const [, operation] of this.activeOperations) {
-            if (
-                operation.monitorId === monitorId &&
-                !operation.signal.aborted
-            ) {
-                operation.abortController.abort("Monitor cancelled");
-                cancelledCount++;
+            if (operation.monitorId !== monitorId ||
+                operation.signal.aborted) {
+                continue;
             }
+
+            operation.abortController.abort("Monitor cancelled");
+            cancelledCount++;
         }
 
         if (cancelledCount > 0) {
@@ -208,7 +208,7 @@ export class MonitorOperationRegistry {
             timeoutMs?: number;
         }
     ): { operationId: string; signal: AbortSignal } {
-        let operationId: string | undefined = undefined;
+        let operationId: string | undefined;
         for (let attempt = 0; attempt < 5; attempt++) {
             const candidate = crypto.randomUUID();
             if (!this.activeOperations.has(candidate)) {
@@ -228,12 +228,8 @@ export class MonitorOperationRegistry {
 
         const signal = mergeAbortSignals({
             baseSignal,
-            ...(options?.additionalSignals
-                ? { additionalSignals: options.additionalSignals }
-                : {}),
-            ...(typeof options?.timeoutMs === "number"
-                ? { timeoutMs: options.timeoutMs }
-                : {}),
+            ...(options?.additionalSignals && { additionalSignals: options.additionalSignals }),
+            ...((typeof options?.timeoutMs === "number") && { timeoutMs: options.timeoutMs }),
         });
 
         const operation: MonitorCheckOperation = {

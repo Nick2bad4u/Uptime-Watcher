@@ -2,24 +2,32 @@
  * Comprehensive tests for useSettingsStore providing maximum coverage.
  */
 
+import { fc, test } from "@fast-check/vitest";
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import { act, renderHook } from "@testing-library/react";
+import { arrayAt, isInteger, objectEntries   } from "ts-extras";
 import {
     afterAll,
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
     afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
 } from "vitest";
-import { act, renderHook } from "@testing-library/react";
-import { test, fc } from "@fast-check/vitest";
-import type { ElectronAPI } from "../../../types";
+
 import type { AppSettings } from "../../../stores/types";
-import { installElectronApiMock } from "../../utils/electronApiMock";
+import type { ElectronAPI } from "../../../types";
+
+import { resetHistoryLimitSubscriptionForTesting } from "../../../stores/settings/operations";
 import {
     defaultSettings,
     normalizeAppSettings,
 } from "../../../stores/settings/state";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+// Import mocked modules to get references
+import { logStoreAction } from "../../../stores/utils";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock the bridge readiness helper to avoid polling delays in tests
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -36,7 +44,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -48,14 +56,14 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
 // Mock store utils (partial) so new exports (e.g. createPersistConfig) remain available.
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -65,7 +73,7 @@ vi.mock("../../../stores/utils", async (importOriginal) => {
 });
 
 // Mock withErrorHandling from shared utils (partial) to retain ApplicationError, etc.
-vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('../../../../shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../../shared/utils/errorHandling")
@@ -74,17 +82,11 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
     return {
         ...actual,
         ensureError: vi.fn((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         ),
         withErrorHandling: vi.fn(),
     };
 });
-
-// Import mocked modules to get references
-import { logStoreAction } from "../../../stores/utils";
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import { resetHistoryLimitSubscriptionForTesting } from "../../../stores/settings/operations";
 const mockLogStoreAction = vi.mocked(logStoreAction);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
@@ -183,7 +185,7 @@ describe(useSettingsStore, () => {
             } catch (error: unknown) {
                 // Match the real withErrorHandling behavior: extract error message
                 const errorMessage =
-                    error instanceof Error ? error.message : String(error);
+                    Error.isError(error) ? error.message : String(error);
                 (handlers as any).setError?.(errorMessage);
                 throw error;
             } finally {
@@ -315,7 +317,7 @@ describe(useSettingsStore, () => {
                 await result.current.initializeSettings();
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
             expect(result.current.settings.historyLimit).toBe(500);
         });
 
@@ -1039,7 +1041,7 @@ describe(useSettingsStore, () => {
                 }
 
                 // Check that the final state contains all the updates
-                for (const [setting, expectedValue] of Object.entries(
+                for (const [setting, expectedValue] of objectEntries(
                     finalExpectedState
                 )) {
                     expect((result.current.settings as any)[setting]).toBe(
@@ -1118,7 +1120,7 @@ describe(useSettingsStore, () => {
                 // Verify history limit properties
                 expect(historyLimit).toBeGreaterThanOrEqual(0);
                 expect(historyLimit).toBeLessThanOrEqual(50_000);
-                expect(Number.isInteger(historyLimit)).toBeTruthy();
+                expect(isInteger(historyLimit)).toBeTruthy();
             }
         );
 
@@ -1154,12 +1156,12 @@ describe(useSettingsStore, () => {
                 });
 
                 // Check that updated fields have new values
-                for (const [key, value] of Object.entries(partialSettings)) {
+                for (const [key, value] of objectEntries(partialSettings)) {
                     expect((result.current.settings as any)[key]).toBe(value);
                 }
 
                 // Check that non-updated fields remain unchanged
-                for (const [key, initialValue] of Object.entries(
+                for (const [key, initialValue] of objectEntries(
                     initialSettings
                 )) {
                     if (!(key in partialSettings)) {
@@ -1182,18 +1184,18 @@ describe(useSettingsStore, () => {
                 const updates: boolean[] = [];
 
                 for (let i = 0; i < updateCount; i++) {
-                    const newValue = i % 2 === 0;
-                    updates.push(newValue);
+                    const isNewValue = i % 2 === 0;
+                    updates.push(isNewValue);
 
                     act(() => {
                         result.current.updateSettings({
-                            systemNotificationsEnabled: newValue,
+                            systemNotificationsEnabled: isNewValue,
                         });
                     });
                 }
 
                 // Final state should match the last update
-                const expectedFinalValue = updates.at(-1);
+                const expectedFinalValue = arrayAt(updates, -1);
                 expect(result.current.settings.systemNotificationsEnabled).toBe(
                     expectedFinalValue
                 );
@@ -1262,7 +1264,7 @@ describe(useSettingsStore, () => {
                             result.current.updateSettings({
                                 [invalidAttempt.invalidKey]:
                                     invalidAttempt.invalidValue,
-                            } as any);
+                            });
                         });
                     }).not.toThrow();
                 }

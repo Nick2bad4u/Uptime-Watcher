@@ -1,7 +1,7 @@
 /**
  * Service for data import/export operations.
  *
- * Provides a testable, dependency-injected service for application data
+ * Provides a testable, dependency-injected service for app data
  * management. Handles importing and exporting sites, monitors, history, and
  * settings data.
  */
@@ -176,7 +176,7 @@ export class DataImportExportService {
     };
 
     /**
-     * Export all application data as JSON string. Pure data operation without
+     * Export all app data as JSON string. Pure data operation without
      * side effects.
      */
     public async exportAllData(): Promise<string> {
@@ -320,7 +320,7 @@ export class DataImportExportService {
 
                         // Import sites using bulk insert
                         const siteRows = normalizedSites.map((site) => {
-                            const monitoring = site.monitoring ?? true;
+                            const isMonitoring = site.monitoring ?? true;
 
                             const row: {
                                 identifier: string;
@@ -328,7 +328,7 @@ export class DataImportExportService {
                                 name?: string;
                             } = {
                                 identifier: site.identifier,
-                                monitoring,
+                                monitoring: isMonitoring,
                             };
 
                             if (site.name) {
@@ -372,7 +372,7 @@ export class DataImportExportService {
         context: string
     ): Promise<never> {
         const normalizedError =
-            error instanceof Error
+            Error.isError(error)
                 ? error
                 : new Error(getUserFacingErrorDetail(error));
         const message = `${context}: ${normalizedError.message}`;

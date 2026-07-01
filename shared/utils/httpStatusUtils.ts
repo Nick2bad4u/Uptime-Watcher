@@ -14,23 +14,6 @@
 import { arrayIncludes, isInteger } from "ts-extras";
 
 /**
- * Validates that a value is a valid HTTP status code (100–599).
- *
- * @remarks
- * Used internally to ensure only valid HTTP status codes are evaluated for
- * monitor status. Returns true for integer values in the 100–599 range.
- *
- * @param httpStatus - The HTTP status code to validate.
- *
- * @returns True if the code is a valid HTTP status code, false otherwise.
- *
- * @internal
- */
-function isValidHttpStatus(httpStatus: number): boolean {
-    return isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599;
-}
-
-/**
  * Determines monitor status ("up", "degraded", or "down") from an HTTP status
  * code.
  *
@@ -101,4 +84,21 @@ export function determineMonitorStatus(
 
     // 1xx-4xx = responding normally (up)
     return "up";
+}
+
+/**
+ * Validates that a value is a valid HTTP status code (100–599).
+ *
+ * @remarks
+ * Used internally to ensure only valid HTTP status codes are evaluated for
+ * monitor status. Returns true for integer values in the 100–599 range.
+ *
+ * @param httpStatus - The HTTP status code to validate.
+ *
+ * @returns True if the code is a valid HTTP status code, false otherwise.
+ *
+ * @internal
+ */
+function isValidHttpStatus(httpStatus: number): boolean {
+    return isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599;
 }

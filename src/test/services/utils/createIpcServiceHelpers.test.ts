@@ -3,7 +3,9 @@
  * initialization semantics and error handling across renderer services.
  */
 
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import type { UnknownRecord } from "type-fest";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ElectronBridgeContract } from "../../../services/utils/electronBridgeReadiness";
 
@@ -12,12 +14,12 @@ interface SetupOverrides {
         readonly debug: ReturnType<typeof vi.fn>;
         readonly error: ReturnType<typeof vi.fn>;
     };
-    readonly loggerModule?: Record<string, unknown>;
+    readonly loggerModule?: UnknownRecord;
 }
 
 const createEnsureErrorMock = () =>
     vi.fn((error: unknown) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     );
 
 const setupModule = async (overrides: SetupOverrides = {}) => {
@@ -43,18 +45,18 @@ const setupModule = async (overrides: SetupOverrides = {}) => {
         }
     }
 
-    vi.doMock("@shared/utils/errorHandling", () => ({ ensureError }));
-    vi.doMock("electron-log/renderer", () => ({ default: electronLog }));
+    vi.doMock(import('@shared/utils/errorHandling'), () => ({ ensureError }));
+    vi.doMock(import('electron-log/renderer'), () => ({ default: electronLog }));
 
     const loggerModule =
         overrides.loggerModule ??
         ({
             Logger: { error: loggerError, debug: loggerDebug },
             logger: { error: loggerError, debug: loggerDebug },
-        } satisfies Record<string, unknown>);
-    vi.doMock("../../../services/logger", () => loggerModule);
+        } satisfies UnknownRecord);
+    vi.doMock(import('../../../services/logger'), () => loggerModule);
 
-    vi.doMock("../../../services/utils/electronBridgeReadiness", () => ({
+    vi.doMock(import('../../../services/utils/electronBridgeReadiness'), () => ({
         ElectronBridgeNotReadyError: TestElectronBridgeNotReadyError,
         waitForElectronBridge,
     }));
@@ -207,7 +209,7 @@ describe("createIpcServiceHelpers", () => {
         await expect(wrapped("site-123")).rejects.toBe(handlerError);
 
         expect(waitForElectronBridge).toHaveBeenCalledTimes(1);
-        expect(handler).toHaveBeenCalledWith(window.electronAPI, "site-123");
+        expect(handler).toHaveBeenCalledWith(globalThis.electronAPI, "site-123");
         expect(ensureError).toHaveBeenCalledWith(handlerError);
         expect(loggerError).toHaveBeenCalledWith(
             "[HistoryService] fetchHistory failed:",
@@ -223,7 +225,7 @@ describe("createIpcServiceHelpers", () => {
             get logger(): never {
                 throw new Error("logger getter should not be invoked");
             },
-        } satisfies Record<string, unknown>;
+        } satisfies UnknownRecord;
         const electronLog = {
             debug: vi.fn(),
             error: vi.fn(),

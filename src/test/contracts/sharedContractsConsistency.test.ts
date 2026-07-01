@@ -1,8 +1,10 @@
-import { describe, expect, it, expectTypeOf } from "vitest";
+import type { MonitorTypeOption as SharedMonitorTypeOption } from "@shared/types/monitorTypes";
+import type { AsyncReturnType } from "type-fest";
+
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import type { MonitorTypeOption as ConstantsMonitorTypeOption } from "../../constants";
-import type { MonitorTypeOption as SharedMonitorTypeOption } from "@shared/types/monitorTypes";
-import { getMonitorTypeOptions } from "../../utils/monitorTypeHelper";
+import type { getMonitorTypeOptions } from "../../utils/monitorTypeHelper";
 
 /**
  * Ensures renderer imports stay aligned with shared DTO definitions.
@@ -14,7 +16,7 @@ describe("Shared contract consistency", () => {
     });
 
     it("returns canonical MonitorTypeOption entries from helper", () => {
-        type HelperReturn = Awaited<ReturnType<typeof getMonitorTypeOptions>>;
+        type HelperReturn = AsyncReturnType<typeof getMonitorTypeOptions>;
         expectTypeOf<HelperReturn>().toEqualTypeOf<SharedMonitorTypeOption[]>();
         expect(true).toBeTruthy();
     });

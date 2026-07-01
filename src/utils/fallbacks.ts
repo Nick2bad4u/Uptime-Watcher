@@ -2,9 +2,9 @@
  * Centralized fallback and default value utilities for robust error handling.
  *
  * @remarks
- * Provides type-safe fallback handling across the application with consistent
+ * Provides type-safe fallback handling across the app with consistent
  * error handling, default value management, and UI state recovery patterns.
- * This module ensures the application remains functional even when expected
+ * This module ensures the app remains functional even when expected
  * data is missing or invalid.
  *
  * @example
@@ -117,7 +117,7 @@ export function withSyncErrorHandling<T>(
  * immutability.
  *
  * @remarks
- * Centralized defaults that ensure consistent behavior across the application
+ * Centralized defaults that ensure consistent behavior across the app
  * when data is missing or components need fallback values. Uses
  * {@link ReadonlyDeep} to guarantee immutability of the configuration object.
  *
@@ -311,25 +311,6 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
 ]);
 
 /**
- * Generate identifier from common monitor fields.
- *
- * @remarks
- * Extracted helper to reduce complexity of {@link getMonitorDisplayIdentifier}.
- *
- * @internal
- */
-function getGenericIdentifier(monitor: Monitor): string | undefined {
-    // Check common identifier fields in order of preference
-    if (monitor.url) {
-        return monitor.url;
-    }
-    if (monitor.host) {
-        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
-    }
-    return undefined;
-}
-
-/**
  * Generate display identifier for a monitor dynamically. Replaces hardcoded
  * backward compatibility patterns.
  *
@@ -393,6 +374,25 @@ export function getMonitorDisplayIdentifier(
 }
 
 /**
+ * Generate identifier from common monitor fields.
+ *
+ * @remarks
+ * Extracted helper to reduce complexity of {@link getMonitorDisplayIdentifier}.
+ *
+ * @internal
+ */
+function getGenericIdentifier(monitor: Monitor): string | undefined {
+    // Check common identifier fields in order of preference
+    if (monitor.url) {
+        return monitor.url;
+    }
+    if (monitor.host) {
+        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
+    }
+    return undefined;
+}
+
+/**
  * Configuration for monitor type display labels.
  *
  * @remarks
@@ -430,54 +430,6 @@ const MONITOR_TYPE_ACRONYMS = new Set([
     "dns",
     "http",
 ]);
-
-/**
- * Inserts spaces between camelCase boundaries.
- *
- * @remarks
- * Avoid regex lookarounds: the codebase forbids lookahead/lookbehind, and
- * regexp auto-fixers may attempt to introduce them.
- */
-function splitCamelCase(value: string): string {
-    if (value.length === 0) {
-        return value;
-    }
-
-    let result = "";
-    let previous = "";
-
-    for (const character of value) {
-        const previousIsLowerAscii = previous >= "a" && previous <= "z";
-        const isUpperAscii = character >= "A" && character <= "Z";
-
-        if (previousIsLowerAscii && isUpperAscii) {
-            result += " ";
-        }
-
-        result += character;
-        previous = character;
-    }
-
-    return result;
-}
-
-function formatMonitorTypeSegment(segment: string): string {
-    if (!segment) {
-        return "";
-    }
-
-    // Preserve already-uppercase segments (e.g. `HTTP`).
-    if (/^[A-Z0-9]+$/u.test(segment)) {
-        return segment;
-    }
-
-    const lower = segment.toLowerCase();
-    if (setHas(MONITOR_TYPE_ACRONYMS, lower)) {
-        return lower.toUpperCase();
-    }
-
-    return `${segment.charAt(0).toUpperCase()}${segment.slice(1).toLowerCase()}`;
-}
 
 /**
  * Generate display label for monitor type dynamically. Replaces hardcoded
@@ -520,7 +472,7 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
                     stringSplit(
                         arrayJoin(
                             stringSplit(
-                                monitorType.replaceAll(/[_-]/gu, " "),
+                                monitorType.replaceAll(/[-_]/gu, " "),
                                 " "
                             ).map((segment) => splitCamelCase(segment)),
                             " "
@@ -557,6 +509,54 @@ export function truncateForLogging(value: string, maxLength = 50): string {
         return value;
     }
     return value.slice(0, maxLength);
+}
+
+function formatMonitorTypeSegment(segment: string): string {
+    if (!segment) {
+        return "";
+    }
+
+    // Preserve already-uppercase segments (e.g. `HTTP`).
+    if (/^[0-9A-Z]+$/u.test(segment)) {
+        return segment;
+    }
+
+    const lower = segment.toLowerCase();
+    if (setHas(MONITOR_TYPE_ACRONYMS, lower)) {
+        return lower.toUpperCase();
+    }
+
+    return `${segment.charAt(0).toUpperCase()}${segment.slice(1).toLowerCase()}`;
+}
+
+/**
+ * Inserts spaces between camelCase boundaries.
+ *
+ * @remarks
+ * Avoid regex lookarounds: the codebase forbids lookahead/lookbehind, and
+ * regexp auto-fixers may attempt to introduce them.
+ */
+function splitCamelCase(value: string): string {
+    if (value.length === 0) {
+        return value;
+    }
+
+    let result = "";
+    let previous = "";
+
+    for (const character of value) {
+        const isPreviousIsLowerAscii = previous >= "a" && previous <= "z";
+        const isUpperAscii = character >= "A" && character <= "Z";
+
+        if (isPreviousIsLowerAscii && isUpperAscii) {
+            result += " ";
+        }
+
+        result += character;
+        previous = character;
+    }
+
+    return result;
 }
 
 /**

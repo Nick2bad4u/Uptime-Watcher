@@ -54,7 +54,7 @@ export function createContextualApplicationError(
         code,
         message,
         operation,
-        ...(details ? { details } : {}),
+        ...(details && { details }),
     };
 
     const appError = new ApplicationError(errorOptions);

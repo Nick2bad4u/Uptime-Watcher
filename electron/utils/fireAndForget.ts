@@ -18,6 +18,17 @@ export interface BackgroundTaskLogger {
 }
 
 /**
+ * Arguments for {@link fireAndForgetLogged}.
+ */
+export interface FireAndForgetLoggedArgs {
+    logger: BackgroundTaskLogger;
+    /** Optional extra logger args (structured context, etc.). */
+    loggerArgs?: Readonly<UnknownArray>;
+    message: string;
+    task: () => Promise<void>;
+}
+
+/**
  * Options for {@link fireAndForget}.
  */
 export interface FireAndForgetOptions {
@@ -44,17 +55,6 @@ export function fireAndForget(
             options.onError(error);
         }
     })();
-}
-
-/**
- * Arguments for {@link fireAndForgetLogged}.
- */
-export interface FireAndForgetLoggedArgs {
-    logger: BackgroundTaskLogger;
-    /** Optional extra logger args (structured context, etc.). */
-    loggerArgs?: Readonly<UnknownArray>;
-    message: string;
-    task: () => Promise<void>;
 }
 
 /**

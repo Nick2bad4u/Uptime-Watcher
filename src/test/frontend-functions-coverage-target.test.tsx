@@ -9,30 +9,27 @@
  * @file Frontend Functions Coverage Test
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
-    render,
-    screen,
     act,
     fireEvent,
-    waitFor,
+    render,
+    renderHook,
+    screen, waitFor
 } from "@testing-library/react";
-import { renderHook } from "@testing-library/react";
-import { Component, useState, useEffect } from "react";
-
-import { installElectronApiMock } from "./utils/electronApiMock";
+import { Component, useEffect, useState } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import components that may have uncovered functions
 import { DefaultErrorFallback } from "../components/error/DefaultErrorFallback";
-import { withErrorBoundary } from "../stores/error/withErrorBoundary";
-
 // Import stores
 import { useErrorStore } from "../stores/error/useErrorStore";
+import { withErrorBoundary } from "../stores/error/withErrorBoundary";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useUIStore } from "../stores/ui/useUiStore";
+import { installElectronApiMock } from "./utils/electronApiMock";
 
 // Simple mock for testing
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -103,10 +100,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
 
             // Test retry function
             const retryButton = screen.getByRole("button", {
-                name: /try again/i,
+                name: /try again/iv,
             });
             fireEvent.click(retryButton);
-            expect(onRetry).toHaveBeenCalled();
+            expect(onRetry).toHaveBeenCalledWith();
         });
 
         it("should exercise withErrorBoundary HOC functions", ({
@@ -291,10 +288,10 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 />
             );
 
-            expect(mountEffect).toHaveBeenCalled();
+            expect(mountEffect).toHaveBeenCalledWith();
 
             unmount();
-            expect(unmountEffect).toHaveBeenCalled();
+            expect(unmountEffect).toHaveBeenCalledWith();
         });
 
         it("should exercise useState functions", ({ task, annotate }) => {
@@ -320,13 +317,13 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
 
                 return (
                     <div>
-                        <button onClick={() => setCount(count + 1)}>
+                        <button onClick={() => { setCount(count + 1); }}>
                             Count: {count}
                         </button>
                         <input
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
+                            onChange={(e) => { setText(e.target.value); }}
                             placeholder="Type here"
+                            value={text}
                         />
                     </div>
                 );
@@ -373,9 +370,9 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 <div>
                     <button onClick={clickHandler}>Click me</button>
                     <input
+                        onBlur={blurHandler}
                         onChange={changeHandler}
                         onFocus={focusHandler}
-                        onBlur={blurHandler}
                         onKeyDown={keyHandler}
                     />
                 </div>
@@ -387,19 +384,19 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const input = screen.getByRole("textbox");
 
             fireEvent.click(button);
-            expect(clickHandler).toHaveBeenCalled();
+            expect(clickHandler).toHaveBeenCalledWith();
 
             fireEvent.change(input, { target: { value: "test" } });
-            expect(changeHandler).toHaveBeenCalled();
+            expect(changeHandler).toHaveBeenCalledWith();
 
             fireEvent.focus(input);
-            expect(focusHandler).toHaveBeenCalled();
+            expect(focusHandler).toHaveBeenCalledWith();
 
             fireEvent.blur(input);
-            expect(blurHandler).toHaveBeenCalled();
+            expect(blurHandler).toHaveBeenCalledWith();
 
             fireEvent.keyDown(input, { key: "Enter" });
-            expect(keyHandler).toHaveBeenCalled();
+            expect(keyHandler).toHaveBeenCalledWith();
         });
     });
 
@@ -427,14 +424,14 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const asyncEffect = vi.fn().mockResolvedValue("success");
 
             const AsyncComponent = () => {
-                const [data, setData] = useState<string | null>(null);
+                const [data, setData] = useState<null | string>(null);
 
                 useEffect(() => {
                     const fetchData = async () => {
                         try {
                             const result = await asyncEffect();
                             setData(result);
-                        } catch (error: unknown) {
+                        } catch {
                             setData("error");
                         }
                     };
@@ -453,7 +450,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 expect(screen.getByText("success")).toBeInTheDocument();
             });
 
-            expect(asyncEffect).toHaveBeenCalled();
+            expect(asyncEffect).toHaveBeenCalledWith();
         });
 
         it("should exercise error handling in async functions", async ({
@@ -481,7 +478,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 .mockRejectedValue(new Error("Async error"));
 
             const AsyncErrorComponent = () => {
-                const [error, setError] = useState<string | null>(null);
+                const [error, setError] = useState<null | string>(null);
 
                 useEffect(() => {
                     const fetchData = async () => {
@@ -489,7 +486,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                             await failingAsyncEffect();
                         } catch (error_) {
                             setError(
-                                error_ instanceof Error
+                                Error.isError(error_)
                                     ? error_.message
                                     : "Unknown error"
                             );
@@ -508,7 +505,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
                 expect(screen.getByText("Async error")).toBeInTheDocument();
             });
 
-            expect(failingAsyncEffect).toHaveBeenCalled();
+            expect(failingAsyncEffect).toHaveBeenCalledWith();
         });
     });
 
@@ -608,9 +605,9 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             const useCounter = (initialValue = 0) => {
                 const [count, setCount] = useState(initialValue);
 
-                const increment = () => setCount((c) => c + 1);
-                const decrement = () => setCount((c) => c - 1);
-                const reset = () => setCount(initialValue);
+                const increment = () => { setCount((c) => c + 1); };
+                const decrement = () => { setCount((c) => c - 1); };
+                const reset = () => { setCount(initialValue); };
 
                 return { count, increment, decrement, reset };
             };
@@ -689,14 +686,14 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
 
             const { unmount } = render(<TestClassComponent />);
 
-            expect(componentDidMount).toHaveBeenCalled();
+            expect(componentDidMount).toHaveBeenCalledWith();
 
             const button = screen.getByRole("button");
             fireEvent.click(button);
             expect(screen.getByText("Value: 1")).toBeInTheDocument();
 
             unmount();
-            expect(componentWillUnmount).toHaveBeenCalled();
+            expect(componentWillUnmount).toHaveBeenCalledWith();
         });
     });
 
@@ -721,8 +718,7 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // This test ensures we've exercised various function patterns
-            // that commonly contribute to function coverage metrics
+            // This test ensures we've exercised various function patterns that commonly contribute to function coverage metrics
 
             const utilityFunctions = {
                 add: (a: number, b: number) => a + b,

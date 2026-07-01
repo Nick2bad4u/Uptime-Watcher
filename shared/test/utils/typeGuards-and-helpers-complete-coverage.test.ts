@@ -5,12 +5,10 @@
  * Tests all exported functions to achieve 100% function coverage
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // TypeGuards imports
 import {
-    isObject,
-    isNumber,
     hasProperties,
     hasProperty,
     isArray,
@@ -21,12 +19,13 @@ import {
     isFunction,
     isNonNegativeNumber,
     isNonNullObject,
+    isNumber,
+    isObject,
     isPositiveNumber,
     isString,
     isValidPort,
     isValidTimestamp,
 } from "../../utils/typeGuards";
-
 // TypeHelpers imports
 import {
     castIpcResponse,
@@ -107,7 +106,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isNumber(Number.NaN)).toBeFalsy();
+            expect(isNumber(NaN)).toBeFalsy();
             expect(isNumber("123")).toBeFalsy();
             expect(isNumber(null)).toBeFalsy();
             expect(isNumber(undefined)).toBeFalsy();
@@ -426,7 +425,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
 
             expect(isFiniteNumber(Infinity)).toBeFalsy();
             expect(isFiniteNumber(-Infinity)).toBeFalsy();
-            expect(isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(isFiniteNumber(NaN)).toBeFalsy();
             expect(isFiniteNumber("123")).toBeFalsy();
             expect(isFiniteNumber(null)).toBeFalsy();
         });
@@ -500,7 +499,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             expect(isNonNegativeNumber(-1)).toBeFalsy();
             expect(isNonNegativeNumber(-123)).toBeFalsy();
             expect(isNonNegativeNumber("42")).toBeFalsy();
-            expect(isNonNegativeNumber(Number.NaN)).toBeFalsy();
+            expect(isNonNegativeNumber(NaN)).toBeFalsy();
         });
     });
 
@@ -575,7 +574,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             expect(isPositiveNumber(0)).toBeFalsy();
             expect(isPositiveNumber(-1)).toBeFalsy();
             expect(isPositiveNumber("42")).toBeFalsy();
-            expect(isPositiveNumber(Number.NaN)).toBeFalsy();
+            expect(isPositiveNumber(NaN)).toBeFalsy();
         });
     });
 
@@ -649,7 +648,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
             expect(isValidPort(65_536)).toBeFalsy();
             expect(isValidPort(3.14)).toBeFalsy();
             expect(isValidPort("80")).toBeFalsy();
-            expect(isValidPort(Number.NaN)).toBeFalsy();
+            expect(isValidPort(NaN)).toBeFalsy();
         });
     });
 
@@ -685,7 +684,7 @@ describe("shared/utils/typeGuards.ts - Complete Function Coverage", () => {
 
             expect(isValidTimestamp(0)).toBeFalsy(); // Must be > 0
             expect(isValidTimestamp(-1)).toBeFalsy();
-            expect(isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(isValidTimestamp(NaN)).toBeFalsy();
             expect(isValidTimestamp(Infinity)).toBeFalsy();
             expect(isValidTimestamp("1640995200000")).toBeFalsy();
             expect(isValidTimestamp(null)).toBeFalsy();
@@ -711,7 +710,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
             const response = { success: true, data: "test" };
             const validator = (
                 value: unknown
-            ): value is { success: boolean; data: string } =>
+            ): value is { data: string; success: boolean; } =>
                 typeof value === "object" &&
                 value !== null &&
                 "success" in value &&
@@ -981,7 +980,7 @@ describe("shared/utils/typeHelpers.ts - Complete Function Coverage", () => {
 
             const validator = (
                 value: unknown
-            ): value is { name: string; age: number } =>
+            ): value is { age: number; name: string; } =>
                 typeof value === "object" &&
                 value !== null &&
                 "name" in value &&

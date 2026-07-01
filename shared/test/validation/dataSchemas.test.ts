@@ -2,10 +2,7 @@
  * Tests for shared Zod schemas in validation/dataSchemas.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
-
 import {
     validateMonitorTypeConfigArray,
     validateSerializedDatabaseBackupResult,
@@ -13,6 +10,7 @@ import {
     validateSerializedDatabaseRestoreResult,
     validateValidationResult,
 } from "@shared/validation/dataSchemas";
+import { describe, expect, it } from "vitest";
 
 describe("dataSchemas", () => {
     it("validates a serialized backup result payload", () => {
@@ -62,7 +60,7 @@ describe("dataSchemas", () => {
 
         const parsed = validateSerializedDatabaseBackupResult({
             buffer,
-            fileName: "   ",
+            fileName: ' '.repeat(3),
             metadata: {
                 appVersion: "1.0.0",
                 checksum: "abc",

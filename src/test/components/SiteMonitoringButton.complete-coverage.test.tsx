@@ -3,14 +3,16 @@
  * 100% coverage with focus on state handling, interactions, and accessibility.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import type {
     ButtonHTMLAttributes,
     PropsWithChildren,
     ReactElement,
 } from "react";
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { SiteMonitoringButton } from "../../components/common/SiteMonitoringButton/SiteMonitoringButton";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
@@ -22,7 +24,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock("../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         onClick,
@@ -34,13 +36,13 @@ vi.mock("../../theme/components/ThemedButton", () => ({
         ...props
     }: ThemedButtonMockProperties) => (
         <button
-            onClick={onClick}
-            disabled={disabled}
             aria-label={ariaLabel}
             className={className}
-            data-testid="themed-button"
             data-size={size}
+            data-testid="themed-button"
             data-variant={variant}
+            disabled={disabled}
+            onClick={onClick}
             {...props}
         >
             {children}
@@ -48,7 +50,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("../../utils/icons", () => {
+vi.mock(import('../../utils/icons'), () => {
     const createIcon = (name: string) => {
         const Icon = ({
             className,
@@ -101,7 +103,7 @@ vi.mock("../../utils/icons", () => {
 const renderWithTheme = (ui: ReactElement) =>
     render(<ThemeProvider>{ui}</ThemeProvider>);
 const expectButtonIcon = (button: HTMLElement, iconName: string): void => {
-    const icon = button.querySelector(`svg[data-icon="${iconName}"]`);
+    const icon = button.querySelector(`svg[data-icon="${CSS.escape(iconName)}"]`);
     expect(icon).not.toBeNull();
 };
 
@@ -1026,7 +1028,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             ).type?.name;
             const displayName =
                 SiteMonitoringButton.displayName || memoTypeName;
-            expect(displayName).toMatch(/^SiteMonitoringButton\d*$/);
+            expect(displayName).toMatch(/^SiteMonitoringButton\d*$/v);
         });
 
         it("should maintain stable callback references", ({
@@ -1107,9 +1109,9 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const { rerender } = renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
+                    allMonitorsRunning={false}
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
-                    allMonitorsRunning={false}
                 />
             );
 
@@ -1119,9 +1121,9 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             rerender(
                 <SiteMonitoringButton
                     {...defaultProps}
+                    allMonitorsRunning
                     onStartSiteMonitoring={mockStart}
                     onStopSiteMonitoring={mockStop}
-                    allMonitorsRunning
                 />
             );
 
@@ -1157,8 +1159,8 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             const { rerender } = renderWithTheme(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    onStartSiteMonitoring={mockStart1}
                     allMonitorsRunning={false}
+                    onStartSiteMonitoring={mockStart1}
                 />
             );
 
@@ -1169,8 +1171,8 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             rerender(
                 <SiteMonitoringButton
                     {...defaultProps}
-                    onStartSiteMonitoring={mockStart2}
                     allMonitorsRunning={false}
+                    onStartSiteMonitoring={mockStart2}
                 />
             );
 

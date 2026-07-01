@@ -7,18 +7,21 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
-import { renderHook, act } from "@testing-library/react";
+import type { UnknownRecord } from "type-fest";
 
-// Import available stores for testing
-import { useSettingsStore } from "../../stores/settings/useSettingsStore";
-import { useErrorStore } from "../../stores/error/useErrorStore";
-import { useUpdatesStore } from "../../stores/updates/useUpdatesStore";
-import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { act, renderHook } from "@testing-library/react";
+import { objectEntries, objectFromEntries, safeCastTo   } from "ts-extras";
+import { describe, expect, it, test } from "vitest";
 
 // Types
 import type { AppSettings } from "../../stores/types";
+
+import { useErrorStore } from "../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
+// Import available stores for testing
+import { useSettingsStore } from "../../stores/settings/useSettingsStore";
+import { useUpdatesStore } from "../../stores/updates/useUpdatesStore";
 
 // Custom arbitraries for store testing
 const arbitraryTheme = fc.constantFrom("light", "dark", "system");
@@ -36,7 +39,7 @@ const arbitraryPartialSettings = fc.record({
 
 describe("Stores Comprehensive Fuzzing", () => {
     describe("Settings Store", () => {
-        test("should have store available", () => {
+        it("should have store available", () => {
             const { result, unmount } = renderHook(() => useSettingsStore());
             try {
                 expect(result.current).toBeDefined();
@@ -58,8 +61,8 @@ describe("Stores Comprehensive Fuzzing", () => {
                         "function"
                     );
 
-                    const cleanSettings = Object.fromEntries(
-                        Object.entries(partialSettings).map(([key, value]) => [
+                    const cleanSettings = objectFromEntries(
+                        objectEntries(partialSettings).map(([key, value]) => [
                             key,
                             value === null ? undefined : value,
                         ])
@@ -78,7 +81,7 @@ describe("Stores Comprehensive Fuzzing", () => {
     });
 
     describe("Error Store", () => {
-        test("should have error store available", () => {
+        it("should have error store available", () => {
             const { result, unmount } = renderHook(() => useErrorStore());
             try {
                 expect(result.current).toBeDefined();
@@ -104,7 +107,7 @@ describe("Stores Comprehensive Fuzzing", () => {
             }
         );
 
-        test("should handle error clearing", () => {
+        it("should handle error clearing", () => {
             const { result, unmount } = renderHook(() => useErrorStore());
             try {
                 expect(typeof result.current.clearError).toBe("function");
@@ -120,7 +123,7 @@ describe("Stores Comprehensive Fuzzing", () => {
     });
 
     describe("Updates Store", () => {
-        test("should have updates store available", () => {
+        it("should have updates store available", () => {
             const { result, unmount } = renderHook(() => useUpdatesStore());
             try {
                 expect(result.current).toBeDefined();
@@ -129,7 +132,7 @@ describe("Stores Comprehensive Fuzzing", () => {
             }
         });
 
-        test("should handle update status and progress", () => {
+        it("should handle update status and progress", () => {
             const { result, unmount } = renderHook(() => useUpdatesStore());
             try {
                 expect(typeof result.current.applyUpdateStatus).toBe(
@@ -152,7 +155,7 @@ describe("Stores Comprehensive Fuzzing", () => {
     });
 
     describe("Monitor Types Store", () => {
-        test("should have monitor types store available", () => {
+        it("should have monitor types store available", () => {
             const { result, unmount } = renderHook(() =>
                 useMonitorTypesStore()
             );
@@ -164,20 +167,20 @@ describe("Stores Comprehensive Fuzzing", () => {
             }
         });
 
-        test("should not expose store-owned error actions", () => {
+        it("should not expose store-owned error actions", () => {
             const { result, unmount } = renderHook(() =>
                 useMonitorTypesStore()
             );
             try {
                 expect(
-                    (result.current as Record<string, unknown>)["setError"]
-                ).toBe(undefined);
+                    (safeCastTo<UnknownRecord>(result.current))["setError"]
+                ).toBeUndefined();
                 expect(
-                    (result.current as Record<string, unknown>)["clearError"]
-                ).toBe(undefined);
+                    (safeCastTo<UnknownRecord>(result.current))["clearError"]
+                ).toBeUndefined();
                 expect(
-                    (result.current as Record<string, unknown>)["setLoading"]
-                ).toBe(undefined);
+                    (safeCastTo<UnknownRecord>(result.current))["setLoading"]
+                ).toBeUndefined();
             } finally {
                 unmount();
             }

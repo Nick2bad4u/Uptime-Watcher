@@ -2,9 +2,8 @@
  * Tests for shared runtime assertions.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { assertNever } from "@shared/utils/assertions";
+import { describe, expect, it } from "vitest";
 
 describe(assertNever, () => {
     it("throws with context and includes string value", () => {
@@ -45,7 +44,7 @@ describe(assertNever, () => {
 
         expect(() =>
             assertNever(Symbol("x") as unknown as never, "sym")
-        ).toThrow(/\[sym\] Reached unreachable code with value: Symbol\(x\)/u);
+        ).toThrow(/\[sym\] Reached unreachable code with value: Symbol\(x\)/v);
     });
 
     it("stringifies plain objects", () => {

@@ -74,15 +74,15 @@ export function createParamValidator(
             }
         }
 
-        validators.forEach((validate, index) => {
+        for (const [index, validate] of validators.entries()) {
             const [paramValue] = params.slice(index, index + 1);
             const error = validate(paramValue);
             if (!error) {
-                return;
+                continue;
             }
 
             errors.push(...error);
-        });
+        }
 
         return errors.length > 0 ? errors : null;
     };

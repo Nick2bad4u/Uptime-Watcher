@@ -1,8 +1,10 @@
+import type { PartialDeep, UnknownRecord  } from "type-fest";
+
+import { objectEntries, objectHasIn, safeCastTo   } from "ts-extras";
+
 import type { ElectronAPI } from "../../types";
 
-import type { PartialDeep } from "type-fest";
-
-type PlainObject = Record<string, unknown>;
+type PlainObject = UnknownRecord;
 
 const isPlainObject = (value: unknown): value is PlainObject => {
     if (value === null || typeof value !== "object") {
@@ -19,7 +21,7 @@ const isPlainObject = (value: unknown): value is PlainObject => {
 const shallowCloneApi = (api: ElectronAPI): ElectronAPI => {
     const clone: PlainObject = { ...api };
 
-    for (const [key, value] of Object.entries(clone)) {
+    for (const [key, value] of objectEntries(clone)) {
         if (isPlainObject(value)) {
             clone[key] = { ...value };
         }
@@ -29,15 +31,17 @@ const shallowCloneApi = (api: ElectronAPI): ElectronAPI => {
 };
 
 const mergeInto = (target: PlainObject, source: PlainObject): void => {
-    for (const [key, value] of Object.entries(source)) {
-        if (value !== undefined) {
-            const current = target[key];
+    for (const [key, value] of objectEntries(source)) {
+        if (value === undefined) {
+            continue;
+        }
 
-            if (isPlainObject(current) && isPlainObject(value)) {
-                mergeInto(current, value);
-            } else {
-                target[key] = value;
-            }
+        const current = target[key];
+
+        if (isPlainObject(current) && isPlainObject(value)) {
+            mergeInto(current, value);
+        } else {
+            target[key] = value;
         }
     }
 };
@@ -70,9 +74,8 @@ export const installElectronApiMock = (
         ensureWindow?: boolean;
     } = {}
 ): { mock: ElectronAPI; restore: () => void } => {
-    const original = Reflect.get(globalThis, "electronAPI") as
-        | ElectronAPI
-        | undefined;
+    const original = safeCastTo<| ElectronAPI
+        | undefined>(Reflect.get(globalThis, "electronAPI"));
 
     if (!original) {
         throw new Error(
@@ -83,17 +86,17 @@ export const installElectronApiMock = (
     const mock = shallowCloneApi(original);
     mergeInto(
         mock as unknown as PlainObject,
-        overrides as unknown as PlainObject
+        overrides
     );
 
-    const hadWindow = Reflect.has(globalThis, "window");
-    const createdWindow = options.ensureWindow === true && !hadWindow;
+    const isHadWindow = objectHasIn(globalThis, "window");
+    const isCreatedWindow = options.ensureWindow === true && !isHadWindow;
 
-    if (createdWindow) {
+    if (isCreatedWindow) {
         Object.defineProperty(globalThis, "window", {
             configurable: true,
-            writable: true,
             value: {},
+            writable: true,
         });
     }
 
@@ -101,23 +104,23 @@ export const installElectronApiMock = (
 
     Object.defineProperty(globalThis, "electronAPI", {
         configurable: true,
-        writable: true,
         value: mock,
+        writable: true,
     });
 
     if (windowRef !== undefined && typeof windowRef === "object") {
-        Object.defineProperty(windowRef as object, "electronAPI", {
+        Object.defineProperty(windowRef, "electronAPI", {
             configurable: true,
-            writable: true,
             value: mock,
+            writable: true,
         });
     }
 
     const restore = (): void => {
         Object.defineProperty(globalThis, "electronAPI", {
             configurable: true,
-            writable: true,
             value: original,
+            writable: true,
         });
 
         const currentWindowRef = Reflect.get(globalThis, "window");
@@ -125,15 +128,15 @@ export const installElectronApiMock = (
             currentWindowRef !== undefined &&
             typeof currentWindowRef === "object"
         ) {
-            Object.defineProperty(currentWindowRef as object, "electronAPI", {
+            Object.defineProperty(currentWindowRef, "electronAPI", {
                 configurable: true,
-                writable: true,
                 value: original,
+                writable: true,
             });
         }
 
-        if (createdWindow) {
-            delete (globalThis as Record<string, unknown>)["window"];
+        if (isCreatedWindow) {
+            delete (safeCastTo<UnknownRecord>(globalThis))["window"];
         }
     };
 

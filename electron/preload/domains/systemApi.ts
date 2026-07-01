@@ -3,7 +3,7 @@
  *
  * @remarks
  * This module provides type-safe IPC communication for system-level operations
- * such as external application launching. As a thin wrapper over the bridge
+ * such as external app launching. As a thin wrapper over the bridge
  * factory, exceptions are intentionally propagated to the frontend for handling
  * at the UI level.
  *
@@ -43,7 +43,7 @@ function createSystemApi(): SystemApiInterface {
             /**
              * Opens an external URL in the default browser
              *
-             * @param url - URL to open externally
+             * @param URL - URL to open externally
              *
              * @returns Promise resolving to true if URL was opened successfully
              */
@@ -57,7 +57,7 @@ function createSystemApi(): SystemApiInterface {
             ),
 
             /**
-             * Quits the application and installs a pending update
+             * Quits the app and installs a pending update
              *
              * @remarks
              * This method triggers the app to quit and automatically install a

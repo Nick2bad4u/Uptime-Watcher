@@ -2,8 +2,8 @@
  * Simple tests to improve SettingsRepository coverage
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fc } from "@fast-check/vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock external dependencies
 vi.mock("../../../utils/logger", () => {
@@ -439,7 +439,7 @@ describe("SettingsRepository Coverage Tests", () => {
                                 .map((s) => `system.${s}`),
                             fc
                                 .string({ minLength: 1, maxLength: 50 })
-                                .map((s) => s.replaceAll(/[^\w.-]/g, "_"))
+                                .map((s) => s.replaceAll(/[^\w\-.]/g, "_"))
                         ),
                         { minLength: 1, maxLength: 15 }
                     ),
@@ -474,9 +474,9 @@ describe("SettingsRepository Coverage Tests", () => {
                                 expect(repository).toBeDefined();
                                 expect(key.length).toBeGreaterThan(0);
                                 expect(typeof key).toBe("string");
-                                expect(key).not.toMatch(/^\./);
-                                expect(key).not.toMatch(/\.$/);
-                                expect(key).not.toMatch(/\.\./);
+                                expect(key).not.toMatch(/^\./v);
+                                expect(key).not.toMatch(/\.$/v);
+                                expect(key).not.toMatch(/\.\./v);
                             }
                         } catch (error) {
                             expect(error).toBeInstanceOf(Error);

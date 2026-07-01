@@ -19,18 +19,18 @@
  * For error handling functions.
  */
 
-import { describe, expect, it, vi } from "vitest";
 import {
     convertError,
     ensureError,
     withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
+import { describe, expect, it, vi } from "vitest";
 
-describe("Error Handling Utilities - Comprehensive Coverage", () => {
+describe("error Handling Utilities - Comprehensive Coverage", () => {
     describe(convertError, () => {
         it("should return same Error instance when passed an Error", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -43,13 +43,13 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBe(originalError);
             expect(result.error).toBeInstanceOf(Error);
             expect(result.error.message).toBe("test error");
-            expect(result.wasError).toBeTruthy();
+            expect(result.wasError).toBe(true);
             expect(result.originalType).toBe("Error");
         });
 
         it("should convert string to Error instance", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -61,12 +61,12 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeInstanceOf(Error);
             expect(result.error.message).toBe("string error");
             expect(result.originalType).toBe("string");
-            expect(result.wasError).toBeFalsy();
+            expect(result.wasError).toBe(false);
         });
 
         it("should convert number to Error instance", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -78,12 +78,12 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeInstanceOf(Error);
             expect(result.error.message).toBe("404");
             expect(result.originalType).toBe("number");
-            expect(result.wasError).toBeFalsy();
+            expect(result.wasError).toBe(false);
         });
 
         it("should convert undefined to Error instance", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -95,12 +95,12 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeInstanceOf(Error);
             expect(result.error.message).toBe("undefined");
             expect(result.originalType).toBe("undefined");
-            expect(result.wasError).toBeFalsy();
+            expect(result.wasError).toBe(false);
         });
 
         it("should convert null to Error instance", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -112,32 +112,32 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeInstanceOf(Error);
             expect(result.error.message).toBe("null");
             expect(result.originalType).toBe("object");
-            expect(result.wasError).toBeFalsy();
+            expect(result.wasError).toBe(false);
         });
 
         it("should convert object to Error instance", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const objectError = { message: "custom error", code: 500 };
+            const objectError = { code: 500, message: "custom error" };
             const result = convertError(objectError);
 
             expect(result.error).toBeInstanceOf(Error);
             expect(result.error.message).toBe("[object Object]");
             expect(result.originalType).toBe("object");
-            expect(result.wasError).toBeFalsy();
+            expect(result.wasError).toBe(false);
         });
     });
 
     describe(ensureError, () => {
         it("should return Error instance for Error input", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -152,8 +152,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should convert non-Error to Error instance", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -169,8 +169,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
 
     describe(withUtilityErrorHandling, () => {
         it("should return operation result when operation succeeds", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -188,8 +188,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should return fallback value when operation fails", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -221,8 +221,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should throw error when shouldThrow is true", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -256,8 +256,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should throw error when no fallback value provided", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -288,8 +288,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle non-Error thrown values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -321,8 +321,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should handle complex fallback values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -356,8 +356,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
         });
 
         it("should preserve original error in cause when throwing with no fallback", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: errorHandling", "component");
@@ -379,6 +379,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                     failingOperation,
                     "test operation"
                 );
+
                 // Should not reach here
                 expect.fail("Expected function to throw");
             } catch (error) {

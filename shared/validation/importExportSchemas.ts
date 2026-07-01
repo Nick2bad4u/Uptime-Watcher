@@ -30,7 +30,7 @@ export interface ImportSite {
  *
  * @remarks
  * Import is intentionally more permissive than {@link siteSchema} to allow users
- * to bring partial data into the application and let the database layer apply
+ * to bring partial data into the app and let the database layer apply
  * defaults where appropriate.
  */
 export const importSiteSchema: z.ZodType<ImportSite> = z

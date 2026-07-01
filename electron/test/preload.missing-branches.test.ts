@@ -3,7 +3,7 @@
  * error handling and edge cases
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock electron dependencies
 const mockContextBridge = {
@@ -266,7 +266,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 /failed validation for channel 'update-history-limit'/i
             );
             await expect(
-                exposedAPI.settings.updateHistoryLimit(Number.NaN)
+                exposedAPI.settings.updateHistoryLimit(NaN)
             ).rejects.toThrow(
                 /failed validation for channel 'update-history-limit'/i
             );

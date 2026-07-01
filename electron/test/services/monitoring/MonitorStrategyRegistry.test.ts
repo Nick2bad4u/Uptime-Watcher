@@ -1,5 +1,6 @@
 import type { Monitor } from "@shared/types";
-import { describe, it, expect, vi } from "vitest";
+
+import { describe, expect, it, vi } from "vitest";
 
 import { createMonitorStrategyRegistry } from "../../../services/monitoring/strategies/MonitorStrategyRegistry";
 

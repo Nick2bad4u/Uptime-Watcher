@@ -1,16 +1,16 @@
-import { describe, expect, it, vi } from "vitest";
-
 import type { Monitor, Site } from "@shared/types";
 import type { BaseLogger, Logger } from "@shared/utils/logger/interfaces";
 
+import { describe, expect, it, vi } from "vitest";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { EnhancedLifecycleConfig } from "../../managers/MonitorManagerEnhancedLifecycle";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { EnhancedMonitoringServices } from "../../services/monitoring/EnhancedMonitoringServiceFactory";
 import type { MonitorScheduler } from "../../services/monitoring/MonitorScheduler";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
-import type { EnhancedLifecycleConfig } from "../../managers/MonitorManagerEnhancedLifecycle";
 
 import {
     createEnhancedLifecycleConfigOperation,
@@ -24,7 +24,6 @@ import {
 } from "../../managers/monitorManager/toggleMonitoringAllOperation";
 import { toggleMonitoringForSiteOperation } from "../../managers/monitorManager/toggleMonitoringForSiteOperation";
 import { monitorLogger } from "../../utils/logger";
-
 import {
     createMockEventBus,
     createMockStandardizedCache,
@@ -107,7 +106,7 @@ describe("monitorManager helper operations", () => {
         const delegate = createMonitorActionDelegate({
             action,
             identifier: "s1",
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             monitorId: "m1",
         });
 
@@ -135,7 +134,7 @@ describe("monitorManager helper operations", () => {
         const delegate = createMonitorActionDelegate({
             action,
             identifier: "s1",
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             monitorId: undefined,
         });
 
@@ -160,7 +159,7 @@ describe("monitorManager helper operations", () => {
 
         await handleScheduledCheckOperation({
             checker,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             monitorId: "m1",
             signal: new AbortController().signal,
             siteIdentifier: "missing",
@@ -197,7 +196,7 @@ describe("monitorManager helper operations", () => {
 
         await handleScheduledCheckOperation({
             checker,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             monitorId: "missing",
             signal,
             siteIdentifier: "s1",
@@ -238,7 +237,7 @@ describe("monitorManager helper operations", () => {
 
         await handleScheduledCheckOperation({
             checker,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             monitorId: "m1",
             signal,
             siteIdentifier: "s1",
@@ -385,7 +384,7 @@ describe("monitorManager helper operations", () => {
             config: {} as unknown as EnhancedLifecycleConfig,
             eventEmitter,
             isMonitoring: true,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             startAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                 alreadyActive: false,
                 attempted: 2,
@@ -409,7 +408,7 @@ describe("monitorManager helper operations", () => {
             config: {} as unknown as EnhancedLifecycleConfig,
             eventEmitter,
             isMonitoring: true,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             startAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                 alreadyActive: true,
                 attempted: 0,
@@ -433,7 +432,7 @@ describe("monitorManager helper operations", () => {
             config: {} as unknown as EnhancedLifecycleConfig,
             eventEmitter,
             isMonitoring: true,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             startAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                 alreadyActive: false,
                 attempted: 0,
@@ -459,7 +458,7 @@ describe("monitorManager helper operations", () => {
                 config: {} as unknown as EnhancedLifecycleConfig,
                 eventEmitter,
                 isMonitoring: true,
-                logger: monitorLogger as unknown as BaseLogger,
+                logger: monitorLogger,
                 startAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                     alreadyActive: false,
                     attempted: 2,
@@ -480,7 +479,7 @@ describe("monitorManager helper operations", () => {
                 eventEmitter:
                     createMockEventBus() as unknown as TypedEventBus<UptimeEvents>,
                 isMonitoring: false,
-                logger: monitorLogger as unknown as BaseLogger,
+                logger: monitorLogger,
                 startAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                     alreadyActive: false,
                     attempted: 1,
@@ -497,7 +496,7 @@ describe("monitorManager helper operations", () => {
                 config: {} as unknown as EnhancedLifecycleConfig,
                 eventEmitter:
                     createMockEventBus() as unknown as TypedEventBus<UptimeEvents>,
-                logger: monitorLogger as unknown as BaseLogger,
+                logger: monitorLogger,
                 stopAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                     alreadyInactive: false,
                     attempted: 1,
@@ -515,7 +514,7 @@ describe("monitorManager helper operations", () => {
         const summary = await stopMonitoringAllOperation({
             config: {} as unknown as EnhancedLifecycleConfig,
             eventEmitter,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             stopAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                 alreadyInactive: false,
                 attempted: 2,
@@ -538,7 +537,7 @@ describe("monitorManager helper operations", () => {
         const summary = await stopMonitoringAllOperation({
             config: {} as unknown as EnhancedLifecycleConfig,
             eventEmitter,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             stopAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                 alreadyInactive: true,
                 attempted: 0,
@@ -565,7 +564,7 @@ describe("monitorManager helper operations", () => {
         await stopMonitoringAllOperation({
             config: {} as unknown as EnhancedLifecycleConfig,
             eventEmitter,
-            logger: monitorLogger as unknown as BaseLogger,
+            logger: monitorLogger,
             stopAllMonitoringEnhanced: vi.fn().mockResolvedValue({
                 alreadyInactive: false,
                 attempted: 2,

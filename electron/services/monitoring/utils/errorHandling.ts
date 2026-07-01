@@ -105,12 +105,10 @@ function buildSafeErrorLogData(args: {
     const base: UnknownRecord = {
         errorMessage: args.error.message,
         errorName: args.error.name,
-        ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+        ...(normalizedCode && { errorCode: normalizedCode }),
         isAxiosError: args.isAxiosError,
         url: args.safeUrlForLogging,
-        ...(typeof args.httpStatus === "number"
-            ? { httpStatus: args.httpStatus }
-            : {}),
+        ...((typeof args.httpStatus === "number") && { httpStatus: args.httpStatus }),
     };
 
     return args.correlationId
@@ -124,7 +122,7 @@ function buildSafeErrorLogData(args: {
 export function isCancellationError(
     error: unknown
 ): error is Error & { code?: string } {
-    if (!(error instanceof Error)) {
+    if (!(Error.isError(error))) {
         return false;
     }
 
@@ -163,7 +161,7 @@ export function isCancellationError(
  *
  * @param error - The {@link AxiosError} instance containing request/response
  *   details.
- * @param url - The URL that was being monitored when the error occurred.
+ * @param URL - The URL that was being monitored when the error occurred.
  * @param responseTime - The response time in milliseconds at the point of
  *   failure.
  * @param correlationId - Optional correlation ID for event tracking and
@@ -223,9 +221,9 @@ export function handleAxiosError(
     if (isDev()) {
         const httpStatus = error.response?.status;
         const logData = buildSafeErrorLogData({
-            ...(correlationId ? { correlationId } : {}),
+            ...(correlationId && { correlationId }),
             error,
-            ...(typeof httpStatus === "number" ? { httpStatus } : {}),
+            ...((typeof httpStatus === "number") && { httpStatus }),
             isAxiosError: true,
             safeUrlForLogging,
         });
@@ -259,7 +257,7 @@ export function handleAxiosError(
  * ```
  *
  * @param error - The unknown error thrown during monitoring (can be any type).
- * @param url - The URL being monitored when the error occurred.
+ * @param URL - The URL being monitored when the error occurred.
  * @param correlationId - Optional correlation ID for event tracking and
  *   logging.
  *
@@ -275,7 +273,7 @@ export function handleCheckError(
     correlationId?: string
 ): MonitorCheckResult {
     const safeUrlForLogging = getSafeUrlForLogging(url);
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         const normalizedCode = normalizeErrorCode(error);
         if (
             normalizedCode === "UW_UNSUPPORTED_REDIRECT_PROTOCOL" ||
@@ -295,7 +293,7 @@ export function handleCheckError(
     if (isCancellationError(error)) {
         if (isDev()) {
             const logContext = buildSafeErrorLogData({
-                ...(correlationId ? { correlationId } : {}),
+                ...(correlationId && { correlationId }),
                 error: ensureError(error),
                 isAxiosError: axios.isAxiosError(error),
                 safeUrlForLogging,
@@ -329,12 +327,12 @@ export function handleCheckError(
               correlationId,
               errorMessage: normalizedError.message,
               errorName: normalizedError.name,
-              ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+              ...(normalizedCode && { errorCode: normalizedCode }),
           }
         : {
               errorMessage: normalizedError.message,
               errorName: normalizedError.name,
-              ...(normalizedCode ? { errorCode: normalizedCode } : {}),
+              ...(normalizedCode && { errorCode: normalizedCode }),
           };
     logger.error(
         `[HttpMonitor] Unexpected error checking ${safeUrlForLogging}`,

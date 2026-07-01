@@ -33,7 +33,7 @@ export interface DebugStoreCountRefs {
 
 /** Ref container storing active debug-store unsubscribe callbacks. */
 export interface DebugStoreSubscriptionRefs {
-    subscriptionsRef: MutableRef<Array<() => void>>;
+    subscriptionsRef: MutableRef<(() => void)[]>;
 }
 
 const isCleanupFunction = (candidate: unknown): candidate is () => void =>
@@ -51,7 +51,7 @@ const isUnsubscribeContainer = (
 };
 
 const registerSubscription = (args: {
-    nextSubscriptions: Array<() => void>;
+    nextSubscriptions: (() => void)[];
     storeIdentifier: string;
     unsubscribeCandidate: unknown;
 }): void => {
@@ -84,7 +84,7 @@ export function subscribeToDebugStores(args: {
     countRefs: DebugStoreCountRefs;
     refs: DebugStoreSubscriptionRefs;
 }): void {
-    const nextSubscriptions: Array<() => void> = [];
+    const nextSubscriptions: (() => void)[] = [];
 
     const sitesUnsubscribe = useSitesStore.subscribe((state) => {
         if (!isDevelopment()) {
@@ -184,13 +184,13 @@ export function subscribeToDebugStores(args: {
 export function cleanupDebugStoreSubscriptions(args: {
     refs: DebugStoreSubscriptionRefs;
 }): void {
-    args.refs.subscriptionsRef.current.forEach((unsubscribe, index) => {
+    for (const [index, unsubscribe] of args.refs.subscriptionsRef.current.entries()) {
         if (typeof unsubscribe !== "function") {
             logger.warn(
                 "[App:debug] encountered a non-function during debug subscription cleanup",
                 { index, type: typeof unsubscribe }
             );
-            return;
+            continue;
         }
 
         try {
@@ -201,7 +201,7 @@ export function cleanupDebugStoreSubscriptions(args: {
                 ensureError(error)
             );
         }
-    });
+    }
 
     args.refs.subscriptionsRef.current = [];
 }

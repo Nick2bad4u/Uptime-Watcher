@@ -50,16 +50,16 @@ export class CloudSyncScheduler {
 
         this.isRunning = true;
 
-        let success = false;
+        let isSuccess = false;
         try {
             const status = await this.cloudService.getStatus();
             if (!status.syncEnabled || !status.connected) {
-                success = true;
+                isSuccess = true;
                 return;
             }
 
             await this.cloudService.requestSyncNow();
-            success = true;
+            isSuccess = true;
         } catch (error) {
             const resolved = ensureError(error);
 
@@ -78,11 +78,11 @@ export class CloudSyncScheduler {
             logger.warn("[CloudSyncScheduler] Sync cycle failed", {
                 message: resolved.message,
                 name: resolved.name,
-                ...(providerDetails ? { providerDetails } : {}),
+                ...(providerDetails && { providerDetails }),
             });
         } finally {
             this.isRunning = false;
-            this.scheduleNextRun(this.computeDelayMs(success));
+            this.scheduleNextRun(this.computeDelayMs(isSuccess));
         }
     }
 

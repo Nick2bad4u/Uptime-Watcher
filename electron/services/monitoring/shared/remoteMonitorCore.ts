@@ -171,9 +171,7 @@ export function createRemoteMonitorService<
                         failureLogLevel: behavior.failureLogLevel ?? "warn",
                         maxRetries: totalAttempts,
                         operationName,
-                        ...(executionArgs.signal
-                            ? { signal: executionArgs.signal }
-                            : {}),
+                        ...(executionArgs.signal && { signal: executionArgs.signal }),
                     }
                 );
             } catch (error) {

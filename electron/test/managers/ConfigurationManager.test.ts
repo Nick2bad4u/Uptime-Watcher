@@ -2,13 +2,16 @@
  * @file Comprehensive tests for ConfigurationManager with 100% branch coverage
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { Monitor, Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { ValidationResult } from "../../managers/validators/interfaces";
+
+import * as electronUtils from "../../electronUtils";
 import { ConfigurationManager } from "../../managers/ConfigurationManager";
-import type { Site, Monitor } from "@shared/types";
 import { MonitorValidator } from "../../managers/validators/MonitorValidator";
 import { SiteValidator } from "../../managers/validators/SiteValidator";
-import type { ValidationResult } from "../../managers/validators/interfaces";
-import * as electronUtils from "../../electronUtils";
 
 // Mock the electron utils
 vi.mock("../../electronUtils", () => ({
@@ -56,7 +59,7 @@ function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
         history: [],
         url: "https://example.com",
         ...overrides,
-    } as Monitor;
+    };
 }
 
 /**
@@ -69,7 +72,7 @@ function createMockSite(overrides: Partial<Site> = {}): Site {
         monitoring: true,
         monitors: [createMockMonitor()],
         ...overrides,
-    } as Site;
+    };
 }
 
 describe(ConfigurationManager, () => {
@@ -129,7 +132,7 @@ describe(ConfigurationManager, () => {
             await annotate("Type: Validation", "type");
 
             // The cache is private, so we just test that the method executes without error
-            expect(() => configManager.clearValidationCache()).not.toThrow();
+            expect(() => { configManager.clearValidationCache(); }).not.toThrow();
         });
     });
 
@@ -249,12 +252,12 @@ describe(ConfigurationManager, () => {
                 true
             );
 
-            const result = configManager.shouldApplyDefaultInterval(monitor);
+            const isResult = configManager.shouldApplyDefaultInterval(monitor);
 
             expect(
                 mockMonitorValidator.shouldApplyDefaultInterval
             ).toHaveBeenCalledWith(monitor);
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should return false when monitor validator returns false", async ({
@@ -271,9 +274,9 @@ describe(ConfigurationManager, () => {
                 false
             );
 
-            const result = configManager.shouldApplyDefaultInterval(monitor);
+            const isResult = configManager.shouldApplyDefaultInterval(monitor);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
 
@@ -295,9 +298,9 @@ describe(ConfigurationManager, () => {
             vi.mocked(electronUtils.isDev).mockReturnValue(true);
             const site = createMockSite({ monitoring: true });
 
-            const result = configManager.shouldAutoStartMonitoring(site);
+            const isResult = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should return false for sites without monitors", async ({
@@ -311,9 +314,9 @@ describe(ConfigurationManager, () => {
 
             const site = createMockSite({ monitors: [], monitoring: true });
 
-            const result = configManager.shouldAutoStartMonitoring(site);
+            const isResult = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should return false when site monitoring is disabled", async ({
@@ -327,9 +330,9 @@ describe(ConfigurationManager, () => {
 
             const site = createMockSite({ monitoring: false });
 
-            const result = configManager.shouldAutoStartMonitoring(site);
+            const isResult = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should return true when conditions are met", async ({
@@ -343,9 +346,9 @@ describe(ConfigurationManager, () => {
 
             const site = createMockSite({ monitoring: true });
 
-            const result = configManager.shouldAutoStartMonitoring(site);
+            const isResult = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should handle site with multiple monitors", async ({
@@ -365,9 +368,9 @@ describe(ConfigurationManager, () => {
                 ],
             });
 
-            const result = configManager.shouldAutoStartMonitoring(site);
+            const isResult = configManager.shouldAutoStartMonitoring(site);
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
     });
 
@@ -381,12 +384,12 @@ describe(ConfigurationManager, () => {
             const site = createMockSite();
             mockSiteValidator.shouldIncludeInExport.mockReturnValue(true);
 
-            const result = configManager.shouldIncludeInExport(site);
+            const isResult = configManager.shouldIncludeInExport(site);
 
             expect(
                 mockSiteValidator.shouldIncludeInExport
             ).toHaveBeenCalledWith(site);
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should return false when site validator returns false", async ({
@@ -401,9 +404,9 @@ describe(ConfigurationManager, () => {
             const site = createMockSite();
             mockSiteValidator.shouldIncludeInExport.mockReturnValue(false);
 
-            const result = configManager.shouldIncludeInExport(site);
+            const isResult = configManager.shouldIncludeInExport(site);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
 
@@ -594,7 +597,7 @@ describe(ConfigurationManager, () => {
                 type: "port",
                 host: "example.com",
                 port: 80,
-                // Url is omitted since it's not needed for port monitors
+                // URL is omitted since it's not needed for port monitors
             });
             const expectedResult: ValidationResult = {
                 success: true,

@@ -85,7 +85,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     failureLogLevel: "warn",
                     maxRetries: totalAttempts,
                     operationName: `WebSocket keepalive for ${urlCandidate}`,
-                    ...(signal ? { signal } : {}),
+                    ...(signal && { signal }),
                 }
             );
         } catch (error) {
@@ -128,22 +128,26 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
             let handshakeTimer: NodeJS.Timeout | null = null;
             let pongTimer: NodeJS.Timeout | null = null;
-            let settled = false;
+            let isSettled = false;
 
-            const cleanupCallbacks: Array<() => void> = [];
+            const cleanupCallbacks: (() => void)[] = [];
 
             const clearHandshakeTimer = (): void => {
-                if (handshakeTimer !== null) {
-                    clearTimeout(handshakeTimer);
-                    handshakeTimer = null;
+                if (handshakeTimer === null) {
+                    return;
                 }
+
+                clearTimeout(handshakeTimer);
+                handshakeTimer = null;
             };
 
             const clearPongTimer = (): void => {
-                if (pongTimer !== null) {
-                    clearTimeout(pongTimer);
-                    pongTimer = null;
+                if (pongTimer === null) {
+                    return;
                 }
+
+                clearTimeout(pongTimer);
+                pongTimer = null;
             };
 
             const cleanup = (): void => {
@@ -160,19 +164,23 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             };
 
             const resolveOnce = (result: MonitorCheckResult): void => {
-                if (!settled) {
-                    settled = true;
-                    cleanup();
-                    resolve(result);
+                if (isSettled) {
+                    return;
                 }
+
+                isSettled = true;
+                cleanup();
+                resolve(result);
             };
 
             const rejectOnce = (error: Error): void => {
-                if (!settled) {
-                    settled = true;
-                    cleanup();
-                    reject(error);
+                if (isSettled) {
+                    return;
                 }
+
+                isSettled = true;
+                cleanup();
+                reject(error);
             };
 
             const resolveSuccess = (details: string): void => {

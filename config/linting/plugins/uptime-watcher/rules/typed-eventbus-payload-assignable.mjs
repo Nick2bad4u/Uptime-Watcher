@@ -149,20 +149,20 @@ const typedEventbusPayloadAssignableRule = createTypedRule({
     },
     defaultOptions: [],
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require TypedEventBus emit payloads and listeners to be assignable to event-map contract types.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/typed-eventbus-payload-assignable.md",
         },
-        schema: [],
         messages: {
             emitPayloadNotAssignable:
                 "Typed event payload is not assignable to the event contract payload type.",
             listenerNotAssignable:
                 "Typed event listener callback is not assignable to the event contract listener type.",
         },
+        schema: [],
+        type: "problem",
     },
     name: "typed-eventbus-payload-assignable",
 });

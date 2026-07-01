@@ -58,9 +58,9 @@ const jsonValueInternalSchema: z.ZodType<JsonValue> = z.lazy(() =>
 export const jsonValueSchema: z.ZodType<JsonValue> = jsonValueInternalSchema;
 
 const entityTypeValues = [
-    "site",
     "monitor",
     "settings",
+    "site",
 ] as const;
 
 /**

@@ -80,20 +80,23 @@ export class MonitorStatusUpdateService {
      */
     private readonly timeoutManager: OperationTimeoutManager;
 
-    private async pruneOperationFromMonitor(
-        monitor: Monitor,
-        operationId: string
-    ): Promise<void> {
-        const current = monitor.activeOperations ?? [];
-        const updated = current.filter((op) => op !== operationId);
-
-        if (updated.length === current.length) {
-            return;
-        }
-
-        await this.monitorRepository.update(monitor.id, {
-            activeOperations: updated,
-        });
+    /**
+     * Creates a new MonitorStatusUpdateService.
+     *
+     * @param operationRegistry - Registry for validating operations
+     * @param monitorRepository - Repository for monitor operations
+     * @param sites - Site cache for updating cached monitor states
+     */
+    public constructor(
+        operationRegistry: MonitorOperationRegistry,
+        monitorRepository: MonitorRepository,
+        sites: StandardizedCache<Site>,
+        timeoutManager: OperationTimeoutManager
+    ) {
+        this.operationRegistry = operationRegistry;
+        this.monitorRepository = monitorRepository;
+        this.sites = sites;
+        this.timeoutManager = timeoutManager;
     }
 
     /**
@@ -195,6 +198,28 @@ export class MonitorStatusUpdateService {
         }
     }
 
+    private cleanupOperationResources(operationId: string): void {
+        // Clear timer first so the process doesn't retain a pending timeout.
+        this.timeoutManager.clearTimeout(operationId);
+        this.operationRegistry.completeOperation(operationId);
+    }
+
+    private async pruneOperationFromMonitor(
+        monitor: Monitor,
+        operationId: string
+    ): Promise<void> {
+        const current = monitor.activeOperations ?? [];
+        const updated = current.filter((op) => op !== operationId);
+
+        if (updated.length === current.length) {
+            return;
+        }
+
+        await this.monitorRepository.update(monitor.id, {
+            activeOperations: updated,
+        });
+    }
+
     /**
      * Refreshes the site cache for the site containing the given monitor.
      *
@@ -248,30 +273,5 @@ export class MonitorStatusUpdateService {
             // Don't throw - cache refresh failure shouldn't break monitor
             // updates
         }
-    }
-
-    private cleanupOperationResources(operationId: string): void {
-        // Clear timer first so the process doesn't retain a pending timeout.
-        this.timeoutManager.clearTimeout(operationId);
-        this.operationRegistry.completeOperation(operationId);
-    }
-
-    /**
-     * Creates a new MonitorStatusUpdateService.
-     *
-     * @param operationRegistry - Registry for validating operations
-     * @param monitorRepository - Repository for monitor operations
-     * @param sites - Site cache for updating cached monitor states
-     */
-    public constructor(
-        operationRegistry: MonitorOperationRegistry,
-        monitorRepository: MonitorRepository,
-        sites: StandardizedCache<Site>,
-        timeoutManager: OperationTimeoutManager
-    ) {
-        this.operationRegistry = operationRegistry;
-        this.monitorRepository = monitorRepository;
-        this.sites = sites;
-        this.timeoutManager = timeoutManager;
     }
 }

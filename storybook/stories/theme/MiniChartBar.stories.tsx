@@ -5,12 +5,12 @@ import type { JSX } from "react";
 import { MiniChartBar } from "@app/theme/components/MiniChartBar";
 
 const meta: Meta<typeof MiniChartBar> = {
-    component: MiniChartBar,
     args: {
+        responseTime: 120,
         status: "up",
         timestamp: new Date().toISOString(),
-        responseTime: 120,
     },
+    component: MiniChartBar,
     parameters: {
         layout: "centered",
     },
@@ -26,28 +26,28 @@ export const Default: Story = {};
 export const Timeline: Story = {
     render: (): JSX.Element => {
         const baseTimestamp = Date.now();
-        const timeline: ReadonlyArray<{
+        const timeline: readonly {
             readonly responseTime?: number;
             readonly status: MiniChartBarProperties["status"];
-        }> = [
-            { status: "up", responseTime: 95 },
-            { status: "up", responseTime: 110 },
-            { status: "degraded", responseTime: 220 },
+        }[] = [
+            { responseTime: 95, status: "up" },
+            { responseTime: 110, status: "up" },
+            { responseTime: 220, status: "degraded" },
             { status: "down" },
             { status: "pending" },
-            { status: "up", responseTime: 105 },
-            { status: "up", responseTime: 92 },
-            { status: "up", responseTime: 88 },
-            { status: "degraded", responseTime: 215 },
-            { status: "up", responseTime: 100 },
+            { responseTime: 105, status: "up" },
+            { responseTime: 92, status: "up" },
+            { responseTime: 88, status: "up" },
+            { responseTime: 215, status: "degraded" },
+            { responseTime: 100, status: "up" },
         ];
 
         return (
             <div
                 style={{
+                    alignItems: "flex-end",
                     display: "flex",
                     gap: "0.5rem",
-                    alignItems: "flex-end",
                 }}
             >
                 {timeline.map((entry, index) => {

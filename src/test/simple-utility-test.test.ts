@@ -4,8 +4,8 @@
 
 import { describe, expect, it } from "vitest";
 
-describe("Simple Utility Coverage Test", () => {
-    it("should pass basic test", ({ task, annotate }) => {
+describe("simple Utility Coverage Test", () => {
+    it("should pass basic test", ({ annotate, task }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: simple-utility-test", "component");
         annotate("Category: Core", "category");
@@ -16,6 +16,6 @@ describe("Simple Utility Coverage Test", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        expect(true).toBeTruthy();
+        expect(true).toBe(true);
     });
 });

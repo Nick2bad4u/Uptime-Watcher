@@ -3,12 +3,13 @@
  * all event categories, priorities, and utility functions
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
-    isEventOfCategory,
-    getEventPriority,
     EVENT_CATEGORIES,
     EVENT_PRIORITIES,
+    getEventPriority,
+    isEventOfCategory,
     type UptimeEventName,
 } from "../../events/eventTypes.js";
 
@@ -637,16 +638,16 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 );
 
                 // Test with valid event names that might not be in categories
-                const result1 = isEventOfCategory(
+                const isResult1 = isEventOfCategory(
                     "cache:invalidated",
                     "MONITOR"
                 );
-                const result2 = isEventOfCategory(
+                const isResult2 = isEventOfCategory(
                     "config:changed",
                     "PERFORMANCE"
                 );
-                expect(result1).toBeFalsy();
-                expect(result2).toBeFalsy();
+                expect(isResult1).toBeFalsy();
+                expect(isResult2).toBeFalsy();
             });
             it("should handle all category combinations", async ({
                 task,
@@ -665,11 +666,11 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 const testEvent = "site:added" as UptimeEventName;
 
                 for (const category of categories) {
-                    const result = isEventOfCategory(testEvent, category);
+                    const isResult = isEventOfCategory(testEvent, category);
                     if (category === "SITE") {
-                        expect(result).toBeTruthy();
+                        expect(isResult).toBeTruthy();
                     } else {
-                        expect(result).toBeFalsy();
+                        expect(isResult).toBeFalsy();
                     }
                 }
             });
@@ -789,7 +790,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 // Test each event returns its correct priority
                 for (const eventName of uniqueEvents) {
                     const priority = getEventPriority(
-                        eventName as UptimeEventName
+                        eventName
                     );
                     expect([
                         "CRITICAL",

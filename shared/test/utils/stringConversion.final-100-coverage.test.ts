@@ -3,7 +3,8 @@
  * Specifically targeting lines 86-89 (undefined case and default case)
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Final 100% Coverage", () => {

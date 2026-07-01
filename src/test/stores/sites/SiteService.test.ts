@@ -1,9 +1,10 @@
+import type { Site } from "@shared/types";
+import type { ArrayElement } from "type-fest";
+
 /**
  * @vitest-environment jsdom
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { Site } from "@shared/types";
 
 import { SiteService } from "../../../services/SiteService";
 import { installElectronApiMock } from "../../utils/electronApiMock";
@@ -25,13 +26,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock store utilities
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
@@ -68,8 +69,8 @@ let restoreElectronApi: (() => void) | undefined;
 
 const createValidHttpMonitor = (
     id: string,
-    overrides: Partial<Site["monitors"][number]> = {}
-): Site["monitors"][number] => ({
+    overrides: Partial<ArrayElement<Site["monitors"]>> = {}
+): ArrayElement<Site["monitors"]> => ({
     checkInterval: 60_000,
     history: [],
     id,
@@ -86,8 +87,8 @@ const createValidHttpMonitor = (
 
 const createValidPortMonitor = (
     id: string,
-    overrides: Partial<Site["monitors"][number]> = {}
-): Site["monitors"][number] => ({
+    overrides: Partial<ArrayElement<Site["monitors"]>> = {}
+): ArrayElement<Site["monitors"]> => ({
     checkInterval: 60_000,
     history: [],
     host: "example.com",
@@ -426,12 +427,12 @@ describe("SiteService", () => {
             const identifier = "site-to-remove";
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
 
-            const result = await SiteService.removeSite(identifier);
+            const isResult = await SiteService.removeSite(identifier);
 
             expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
                 identifier
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should throw when backend returns false", async ({
@@ -533,7 +534,7 @@ describe("SiteService", () => {
                 ?.electronAPI;
             const originalGlobalBridge = (globalThis as any).electronAPI;
 
-            (globalThis as any).window.electronAPI = undefined;
+            globalThis.electronAPI = undefined;
             (globalThis as any).electronAPI = undefined;
 
             try {
@@ -550,7 +551,7 @@ describe("SiteService", () => {
                     MOCK_BRIDGE_ERROR_MESSAGE
                 );
             } finally {
-                (globalThis as any).window.electronAPI = originalWindowBridge;
+                globalThis.electronAPI = originalWindowBridge;
                 (globalThis as any).electronAPI = originalGlobalBridge;
             }
         });
@@ -570,7 +571,7 @@ describe("SiteService", () => {
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                validSite as Site
+                validSite
             );
 
             await SiteService.addSite(validSite);
@@ -603,7 +604,7 @@ describe("SiteService", () => {
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                siteWithMonitors as Site
+                siteWithMonitors
             );
 
             const result = await SiteService.addSite(siteWithMonitors);
@@ -635,7 +636,7 @@ describe("SiteService", () => {
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                siteWithSpecialChars as Site
+                siteWithSpecialChars
             );
 
             const result = await SiteService.addSite(siteWithSpecialChars);
@@ -665,7 +666,7 @@ describe("SiteService", () => {
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
-                siteWithUnicode as Site
+                siteWithUnicode
             );
 
             const result = await SiteService.addSite(siteWithUnicode);

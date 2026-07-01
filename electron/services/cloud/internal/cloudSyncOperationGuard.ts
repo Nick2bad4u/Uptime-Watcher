@@ -12,11 +12,11 @@ export async function assertCloudSyncEnabled(args: {
     readonly disabledMessage: string;
     readonly settings: CloudSettingsAdapter;
 }): Promise<void> {
-    const syncEnabled = parseBooleanSetting(
+    const isSyncEnabled = parseBooleanSetting(
         await args.settings.get(SETTINGS_KEY_SYNC_ENABLED)
     );
 
-    if (!syncEnabled) {
+    if (!isSyncEnabled) {
         throw new Error(args.disabledMessage);
     }
 }

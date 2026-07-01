@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS_HISTORY_LIMIT = DEFAULT_HISTORY_LIMIT;
 const DEFAULT_IN_APP_ALERT_VOLUME = 1;
 
 /**
- * Default application settings applied during initialization.
+ * Default app settings applied during initialization.
  */
 export const defaultSettings: AppSettings = {
     autoStart: false,

@@ -1,7 +1,9 @@
+import { safeCastTo } from "ts-extras";
 /**
  * Comprehensive tests for monitor form data types
  */
 import { describe, expect, it } from "vitest";
+
 import type {
     BaseFormData,
     DynamicFormData,
@@ -10,6 +12,7 @@ import type {
     PingFormData,
     PortFormData,
 } from "../../types/monitorFormData";
+
 import {
     createDefaultFormData,
     isHttpFormData,
@@ -251,7 +254,7 @@ describe("Monitor Form Data Types", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     "custom"
                 );
-            }).toThrow(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/iv);
         });
     });
 
@@ -289,7 +292,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isHttpFormData(wrongType as Partial<MonitorFormData>)
+                    isHttpFormData(safeCastTo<Partial<MonitorFormData>>(wrongType))
                 ).toBeFalsy();
             });
 
@@ -307,7 +310,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isHttpFormData(missingUrl as Partial<MonitorFormData>)
+                    isHttpFormData(safeCastTo<Partial<MonitorFormData>>(missingUrl))
                 ).toBeFalsy();
             });
 
@@ -362,7 +365,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isPingFormData(wrongType as Partial<MonitorFormData>)
+                    isPingFormData(safeCastTo<Partial<MonitorFormData>>(wrongType))
                 ).toBeFalsy();
             });
 
@@ -380,7 +383,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isPingFormData(missingHost as Partial<MonitorFormData>)
+                    isPingFormData(safeCastTo<Partial<MonitorFormData>>(missingHost))
                 ).toBeFalsy();
             });
 
@@ -437,7 +440,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isPortFormData(wrongType as Partial<MonitorFormData>)
+                    isPortFormData(safeCastTo<Partial<MonitorFormData>>(wrongType))
                 ).toBeFalsy();
             });
 
@@ -456,7 +459,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isPortFormData(missingHost as Partial<MonitorFormData>)
+                    isPortFormData(safeCastTo<Partial<MonitorFormData>>(missingHost))
                 ).toBeFalsy();
             });
 
@@ -475,7 +478,7 @@ describe("Monitor Form Data Types", () => {
                 };
 
                 expect(
-                    isPortFormData(missingPort as Partial<MonitorFormData>)
+                    isPortFormData(safeCastTo<Partial<MonitorFormData>>(missingPort))
                 ).toBeFalsy();
             });
 

@@ -3,10 +3,11 @@
  * service initialization paths, error handling, and lifecycle management.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { ServiceContainerConfig } from "../../services/ServiceContainer";
 
 import { ServiceContainer } from "../../services/ServiceContainer";
-import type { ServiceContainerConfig } from "../../services/ServiceContainer";
 
 describe(ServiceContainer, () => {
     let container: ServiceContainer;

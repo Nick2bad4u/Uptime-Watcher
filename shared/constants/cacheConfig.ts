@@ -69,7 +69,7 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
     }),
 
     /**
-     * Configuration for application settings caching.
+     * Configuration for app settings caching.
      *
      * @remarks
      * Used by ConfigurationManager for caching configuration values with longer

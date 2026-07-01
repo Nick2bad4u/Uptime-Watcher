@@ -4,10 +4,10 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
@@ -18,8 +18,8 @@ import {
     removeAllSites,
     resetApplicationState,
     resolveConfirmDialog,
-    waitForConfirmDialogRequest,
     WAIT_TIMEOUTS,
+    waitForConfirmDialogRequest,
 } from "../utils/ui-helpers";
 
 test.describe(
@@ -75,16 +75,16 @@ test.describe(
 
                 await exportButton.click();
 
-                await expect(exportButton).not.toHaveClass(
-                    /themed-button--loading/,
+                await expect.soft(exportButton).not.toHaveClass(
+                    /themed-button--loading/v,
                     { timeout: WAIT_TIMEOUTS.LONG }
                 );
 
-                await expect(
+                await expect.soft(
                     page.getByText("Failed to download SQLite backup")
                 ).toHaveCount(0);
 
-                await expect(
+                await expect.soft(
                     page.getByText(
                         "Manage data exports and advanced utilities."
                     )
@@ -105,15 +105,15 @@ test.describe(
                 await resetButton.click();
 
                 const confirmRequest = await waitForConfirmDialogRequest(page);
-                expect(confirmRequest).not.toBeNull();
-                expect(confirmRequest?.title).toBe("Reset Settings");
+                expect.soft(confirmRequest).not.toBeNull();
+                expect.soft(confirmRequest?.title).toBe("Reset Settings");
 
                 const dialog = page.getByRole("alertdialog", {
                     name: "Reset Settings",
                 });
 
                 try {
-                    await expect(dialog).toBeVisible({
+                    await expect.soft(dialog).toBeVisible({
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     });
                     await dialog.getByRole("button", { name: "Reset" }).click();
@@ -121,11 +121,11 @@ test.describe(
                     await resolveConfirmDialog(page, "confirm");
                 }
 
-                await expect(dialog).not.toBeVisible({
+                await expect.soft(dialog).not.toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect(
+                await expect.soft(
                     page.getByText("Failed to download SQLite backup")
                 ).toHaveCount(0);
             }
@@ -143,12 +143,12 @@ test.describe(
 
                 await refreshButton.click();
 
-                await expect(refreshButton).not.toHaveClass(
-                    /themed-button--loading/,
+                await expect.soft(refreshButton).not.toHaveClass(
+                    /themed-button--loading/v,
                     { timeout: WAIT_TIMEOUTS.LONG }
                 );
 
-                await expect(page.getByText("Sync complete")).toBeVisible({
+                await expect.soft(page.getByText("Sync complete")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
             }

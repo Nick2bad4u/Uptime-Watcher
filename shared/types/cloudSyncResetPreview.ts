@@ -1,20 +1,6 @@
 /**
  * Preview information shown before executing a destructive remote sync reset.
  */
-export interface CloudSyncResetPreviewDevice {
-    /** Device identifier from the object key path. */
-    deviceId: string;
-    /** Newest createdAtEpochMs observed in op object keys for this device. */
-    newestCreatedAtEpochMs?: number | undefined;
-    /** Oldest createdAtEpochMs observed in op object keys for this device. */
-    oldestCreatedAtEpochMs?: number | undefined;
-    /** Count of operation log objects for this device. */
-    operationObjectCount: number;
-}
-
-/**
- * Preview information shown before executing a destructive remote sync reset.
- */
 export interface CloudSyncResetPreview {
     /** Known device IDs present in the remote manifest. */
     deviceIds: string[];
@@ -36,4 +22,18 @@ export interface CloudSyncResetPreview {
     snapshotObjectCount: number;
     /** Total number of remote objects under `sync/`. */
     syncObjectCount: number;
+}
+
+/**
+ * Preview information shown before executing a destructive remote sync reset.
+ */
+export interface CloudSyncResetPreviewDevice {
+    /** Device identifier from the object key path. */
+    deviceId: string;
+    /** Newest createdAtEpochMs observed in op object keys for this device. */
+    newestCreatedAtEpochMs?: number | undefined;
+    /** Oldest createdAtEpochMs observed in op object keys for this device. */
+    oldestCreatedAtEpochMs?: number | undefined;
+    /** Count of operation log objects for this device. */
+    operationObjectCount: number;
 }

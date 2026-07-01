@@ -9,6 +9,7 @@
 
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+
 import {
     type EscapeKeyModalConfig,
     type StateSetter,
@@ -111,7 +112,7 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
                 },
             ];
 
-            renderHook(() => useEscapeKeyModalHandler(modalConfigs));
+            renderHook(() => { useEscapeKeyModalHandler(modalConfigs); });
 
             expect(document.addEventListener).toHaveBeenCalledWith(
                 "keydown",
@@ -136,7 +137,7 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             ];
 
             const { unmount } = renderHook(() =>
-                useEscapeKeyModalHandler(modalConfigs)
+                { useEscapeKeyModalHandler(modalConfigs); }
             );
 
             unmount();
@@ -178,10 +179,10 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
                 },
             ];
 
-            renderHook(() => useEscapeKeyModalHandler(modalConfigs));
+            renderHook(() => { useEscapeKeyModalHandler(modalConfigs); });
 
             // Get the keydown handler that was registered
-            // eslint-disable-next-line prefer-destructuring
+
             const keydownHandler = (document.addEventListener as any).mock
                 .calls[0][1];
 
@@ -225,9 +226,9 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
                 },
             ];
 
-            renderHook(() => useEscapeKeyModalHandler(modalConfigs));
+            renderHook(() => { useEscapeKeyModalHandler(modalConfigs); });
 
-            // eslint-disable-next-line prefer-destructuring
+
             const keydownHandler = (document.addEventListener as any).mock
                 .calls[0][1];
 
@@ -266,9 +267,9 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
                 },
             ];
 
-            renderHook(() => useEscapeKeyModalHandler(modalConfigs));
+            renderHook(() => { useEscapeKeyModalHandler(modalConfigs); });
 
-            // eslint-disable-next-line prefer-destructuring
+
             const keydownHandler = (document.addEventListener as any).mock
                 .calls[0][1];
 
@@ -302,9 +303,9 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
                 },
             ];
 
-            renderHook(() => useEscapeKeyModalHandler(modalConfigs));
+            renderHook(() => { useEscapeKeyModalHandler(modalConfigs); });
 
-            // eslint-disable-next-line prefer-destructuring
+
             const keydownHandler = (document.addEventListener as any).mock
                 .calls[0][1];
 
@@ -328,9 +329,9 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
 
             const modalConfigs: EscapeKeyModalConfig[] = [];
 
-            renderHook(() => useEscapeKeyModalHandler(modalConfigs));
+            renderHook(() => { useEscapeKeyModalHandler(modalConfigs); });
 
-            // eslint-disable-next-line prefer-destructuring
+
             const keydownHandler = (document.addEventListener as any).mock
                 .calls[0][1];
 

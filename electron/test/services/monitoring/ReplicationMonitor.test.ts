@@ -2,9 +2,11 @@
  * Unit tests for the replication monitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import { ReplicationMonitor } from "../../../services/monitoring/ReplicationMonitor";
 
 const httpGetMock = vi.fn();
 
@@ -19,8 +21,6 @@ vi.mock("../../../services/monitoring/utils/httpClient", () => ({
         get: httpGetMock,
     })),
 }));
-
-import { ReplicationMonitor } from "../../../services/monitoring/ReplicationMonitor";
 
 function createMonitor(
     overrides: Partial<Site["monitors"][0]> = {}
@@ -41,7 +41,7 @@ function createMonitor(
         timeout: 5000,
         type: "replication",
         ...overrides,
-    } as Site["monitors"][0];
+    };
 }
 
 describe("ReplicationMonitor service", () => {

@@ -44,7 +44,7 @@ export interface MonitorServiceResult {
      */
     configurationApplied: boolean;
     /**
-     * Configuration error message if application failed (only present when
+     * Configuration error message if app failed (only present when
      * there's an error)
      */
     configurationError?: string;
@@ -155,11 +155,11 @@ export function getAvailableMonitorTypes(): readonly string[] {
 }
 
 /**
- * Retrieves the monitor service instance with configuration application status.
+ * Retrieves the monitor service instance with configuration app status.
  *
  * @remarks
  * Same as {@link getMonitor} but returns detailed result including configuration
- * application status. Use this method when you need to know if configuration
+ * app status. Use this method when you need to know if configuration
  * was successfully applied.
  *
  * @example
@@ -221,9 +221,9 @@ export function getMonitorWithResult(
         didCreateInstance = true;
     }
 
-    // Track configuration application status
-    let configurationApplied = true;
-    let configurationError: string | undefined = undefined;
+    // Track configuration app status
+    let isConfigurationApplied = true;
+    let configurationError: string | undefined;
 
     // Apply configuration if provided and either forcing update or instance is
     // new
@@ -251,13 +251,13 @@ export function getMonitorWithResult(
         }
     } else if (config) {
         // Config was provided but not applied (existing instance, no force)
-        configurationApplied = false;
+        isConfigurationApplied = false;
         configurationError =
             "Configuration not applied to cached instance (use forceConfigUpdate=true)";
     }
 
     return {
-        configurationApplied,
+        configurationApplied: isConfigurationApplied,
         ...(isDefined(configurationError) && { configurationError }),
         instance,
     };
@@ -294,7 +294,7 @@ export function getMonitorWithResult(
  *
  * @throws {@link Error} If the monitor type is not supported or no service
  *   factory is registered for the type.
- * @throws {@link MonitorConfigurationError} If configuration application fails.
+ * @throws {@link MonitorConfigurationError} If configuration app fails.
  *
  * @public
  *

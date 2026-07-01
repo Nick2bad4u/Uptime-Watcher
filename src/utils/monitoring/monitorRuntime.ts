@@ -43,7 +43,7 @@ export interface MonitorRuntimeSummary {
  * @public
  */
 export function getMonitorRuntimeSummary(
-    monitors: ReadonlyArray<{ readonly monitoring: boolean }>
+    monitors: readonly { readonly monitoring: boolean }[]
 ): MonitorRuntimeSummary {
     const totalCount = monitors.length;
 

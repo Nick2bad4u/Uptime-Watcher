@@ -26,7 +26,7 @@ const baseMonitorTypeSet: ReadonlySet<string> = new Set(BASE_MONITOR_TYPES);
  * Get all base monitor types as an array.
  *
  * @remarks
- * This function returns only the core base types (http, port) that are built
+ * This function returns only the core base types (HTTP, port) that are built
  * into the system. It does NOT include dynamically registered monitor types
  * from the registry.
  *
@@ -41,14 +41,14 @@ const baseMonitorTypeSet: ReadonlySet<string> = new Set(BASE_MONITOR_TYPES);
  * @see {@link electron/services/monitoring/MonitorTypeRegistry#getRegisteredMonitorTypes | getRegisteredMonitorTypes} for complete type list including dynamic types
  */
 export function getBaseMonitorTypes(): MonitorType[] {
-    return Array.from(BASE_MONITOR_TYPES);
+    return [...BASE_MONITOR_TYPES];
 }
 
 /**
  * Type guard to check if a string is a valid base monitor type.
  *
  * @remarks
- * This function only validates against BASE monitor types (http, port). It does
+ * This function only validates against BASE monitor types (HTTP, port). It does
  * NOT check against dynamically registered types in the registry. For full type
  * checking including dynamic types, use the registry.
  *

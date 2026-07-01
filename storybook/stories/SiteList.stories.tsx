@@ -32,6 +32,24 @@ interface SiteListStoryArgs {
 
 const defaultSites: readonly Site[] = [
     createMockSite({
+        identifier: "site-atlas",
+        monitors: [
+            createMockMonitor({
+                id: "atlas-port",
+                monitoring: false,
+                status: "paused",
+                type: "port",
+            }),
+            createMockMonitor({
+                id: "atlas-ping",
+                responseTime: 180,
+                status: "up",
+                type: "ping",
+            }),
+        ],
+        name: "Atlas Edge Gateway",
+    }),
+    createMockSite({
         identifier: "site-aurora",
         name: "Aurora CDN",
     }),
@@ -52,24 +70,6 @@ const defaultSites: readonly Site[] = [
             }),
         ],
         name: "Orion API Cluster",
-    }),
-    createMockSite({
-        identifier: "site-atlas",
-        monitors: [
-            createMockMonitor({
-                id: "atlas-port",
-                monitoring: false,
-                status: "paused",
-                type: "port",
-            }),
-            createMockMonitor({
-                id: "atlas-ping",
-                responseTime: 180,
-                status: "up",
-                type: "ping",
-            }),
-        ],
-        name: "Atlas Edge Gateway",
     }),
 ] as const;
 
@@ -185,6 +185,22 @@ const meta: Meta<typeof SiteList> = {
         sites: defaultSites,
     },
     argTypes: {
+        density: {
+            control: {
+                labels: {
+                    comfortable: "Comfortable",
+                    compact: "Compact",
+                    cozy: "Cozy",
+                },
+                type: "radio",
+            },
+            description: "Row density used when layout is set to list (table)",
+            options: [
+                "comfortable",
+                "cozy",
+                "compact",
+            ],
+        },
         layout: {
             control: {
                 labels: {
@@ -199,22 +215,6 @@ const meta: Meta<typeof SiteList> = {
                 "card-large",
                 "card-compact",
                 "list",
-            ],
-        },
-        density: {
-            control: {
-                labels: {
-                    comfortable: "Comfortable",
-                    cozy: "Cozy",
-                    compact: "Compact",
-                },
-                type: "radio",
-            },
-            description: "Row density used when layout is set to list (table)",
-            options: [
-                "comfortable",
-                "cozy",
-                "compact",
             ],
         },
         presentation: {

@@ -58,6 +58,21 @@ export type ButtonVariant =
     | "tertiary"
     | "warning";
 
+/** Size variants for progress components */
+export type ProgressSize = "lg" | "md" | "sm" | "xl" | "xs";
+
+/** Visual style variants for progress components */
+export type ProgressVariant =
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning";
+
+/** System theme preference options */
+export type SystemThemePreference = "dark" | "light";
+
 /** Text alignment options for text components */
 export type TextAlign = "center" | "justify" | "left" | "right";
 
@@ -87,21 +102,6 @@ export type TextVariant =
 
 /** Font weight variants for text components */
 export type TextWeight = "bold" | "medium" | "normal" | "semibold";
-
-/** Size variants for progress components */
-export type ProgressSize = "lg" | "md" | "sm" | "xl" | "xs";
-
-/** Visual style variants for progress components */
-export type ProgressVariant =
-    | "error"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "success"
-    | "warning";
-
-/** System theme preference options */
-export type SystemThemePreference = "dark" | "light";
 
 /**
  * CSS class name constants for themed components.

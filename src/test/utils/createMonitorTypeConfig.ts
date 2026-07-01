@@ -25,6 +25,6 @@ export const createMonitorTypeConfig = (
         fields: overrides.fields ?? defaultFields,
         type: overrides.type ?? "http",
         version: overrides.version ?? "1.0.0",
-        ...(uiConfig ? { uiConfig } : {}),
+        ...(uiConfig && { uiConfig }),
     } satisfies MonitorTypeConfig;
 };

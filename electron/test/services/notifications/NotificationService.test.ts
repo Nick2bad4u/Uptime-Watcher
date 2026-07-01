@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { type Site } from "@shared/types";
+import type { Site } from "@shared/types";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-    NotificationService,
     DEFAULT_DOWN_ALERT_COOLDOWN_MS,
     type NotificationConfig,
+    NotificationService,
 } from "../../../services/notifications/NotificationService";
 import { logger } from "../../../utils/logger";
 

@@ -3,14 +3,27 @@
  * testing for robust coverage
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import fc from "fast-check";
-
 import type { Monitor, Site, StatusHistory } from "@shared/types";
+import type {
+    CacheInvalidatedEventData,
+    HistoryLimitUpdatedEventData,
+    MonitorCheckCompletedEventData,
+    MonitorDownEventData,
+    MonitoringControlEventData,
+    MonitorStatusChangedEventData,
+    MonitorUpEventData,
+    TestEventData,
+    UpdateStatusEventData,
+} from "@shared/types/events";
+
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createEventsApi } from "../../../preload/domains/eventsApi";
 
 // Mock electron using vi.hoisted() to ensure proper initialization order
 const mockIpcRenderer = vi.hoisted(() => ({
@@ -53,19 +66,6 @@ vi.mock("../../../preload/utils/preloadLogger", () => ({
     },
     reportPreloadGuardFailure: guardFailureSpy,
 }));
-
-import { createEventsApi } from "../../../preload/domains/eventsApi";
-import type {
-    CacheInvalidatedEventData,
-    HistoryLimitUpdatedEventData,
-    MonitorCheckCompletedEventData,
-    MonitorDownEventData,
-    MonitorStatusChangedEventData,
-    MonitoringControlEventData,
-    MonitorUpEventData,
-    TestEventData,
-    UpdateStatusEventData,
-} from "@shared/types/events";
 
 const createMonitorFixture = (overrides: Partial<Monitor> = {}): Monitor => ({
     activeOperations: [],
@@ -395,7 +395,7 @@ describe("Events Domain API", () => {
             const callback = vi.fn();
             const canonicalPayload: MonitorStatusChangedEventData & {
                 monitor: Monitor & Record<string, unknown>;
-                site: Site & Record<string, unknown>;
+                site: Record<string, unknown> & Site;
             } = {
                 details: "Recovered",
                 monitor: createMonitorFixture() as Monitor &
@@ -403,7 +403,7 @@ describe("Events Domain API", () => {
                 monitorId: "monitor-123",
                 previousStatus: "down",
                 responseTime: 1200,
-                site: createSiteFixture() as Site & Record<string, unknown>,
+                site: createSiteFixture() as Record<string, unknown> & Site,
                 siteIdentifier: "site-abc",
                 status: "up",
                 timestamp: new Date().toISOString(),
@@ -849,7 +849,7 @@ describe("Events Domain API", () => {
         it("should work even when no listeners are registered", () => {
             const freshApi = createEventsApi();
 
-            expect(() => freshApi.removeAllListeners()).not.toThrow();
+            expect(() => { freshApi.removeAllListeners(); }).not.toThrow();
             expect(mockIpcRenderer.removeListener).not.toHaveBeenCalled();
         });
     });
@@ -879,7 +879,7 @@ describe("Events Domain API", () => {
                             maxLength,
                             minLength,
                         })
-                        .filter((value) => /\S/u.test(value));
+                        .filter((value) => /\S/v.test(value));
                 })();
 
             const monitorFixtureArbitrary = fc
@@ -950,9 +950,7 @@ describe("Events Domain API", () => {
                         const site = createSiteFixture({
                             identifier: siteOverrides.identifier,
                             monitoring: siteOverrides.monitoring,
-                            ...(siteOverrides.name === undefined
-                                ? {}
-                                : { name: siteOverrides.name }),
+                            ...(siteOverrides.name !== undefined && { name: siteOverrides.name }),
                             monitors: [monitor],
                         });
 

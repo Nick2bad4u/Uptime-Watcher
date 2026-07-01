@@ -7,16 +7,18 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test, vi, beforeEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { generateCorrelationId } from "@shared/utils/correlation";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it, test, vi } from "vitest";
 
-// Import event system modules
-import { TypedEventBus } from "../../../electron/events/TypedEventBus";
 import type {
     UptimeEventName,
     UptimeEvents,
 } from "../../../electron/events/eventTypes";
-import { generateCorrelationId } from "@shared/utils/correlation";
+
+// Import event system modules
+import { TypedEventBus } from "../../../electron/events/TypedEventBus";
 
 // Custom arbitraries for event system testing
 const arbitraryValidEventType = fc.constantFrom(
@@ -67,13 +69,13 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Register listener
                 const result = eventBus.onTyped(
-                    eventType as UptimeEventName,
+                    eventType,
                     listener
                 );
                 expect(result).toBe(eventBus); // Should return this for chaining
 
                 // Emit event
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await eventBus.emitTyped(eventType, payload);
 
                 // Verify listener was called
                 expect(listener).toHaveBeenCalledTimes(1);
@@ -88,7 +90,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 );
 
                 // Cleanup
-                eventBus.offTyped(eventType as UptimeEventName, listener);
+                eventBus.offTyped(eventType, listener);
             }
         );
 
@@ -97,18 +99,18 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             fc.array(arbitraryEventPayload, { maxLength: 5 }),
         ])("should handle multiple events", async (eventType, payloads) => {
             const listener = vi.fn();
-            eventBus.onTyped(eventType as UptimeEventName, listener);
+            eventBus.onTyped(eventType, listener);
 
             // Emit multiple events
             for (const payload of payloads) {
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await eventBus.emitTyped(eventType, payload);
             }
 
             // Verify listener call count
             expect(listener).toHaveBeenCalledTimes(payloads.length);
 
             // Cleanup
-            eventBus.offTyped(eventType as UptimeEventName, listener);
+            eventBus.offTyped(eventType, listener);
         });
 
         fcTest.prop([
@@ -124,11 +126,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 for (let i = 0; i < listenerCount; i++) {
                     const listener = vi.fn();
                     listeners.push(listener);
-                    eventBus.onTyped(eventType as UptimeEventName, listener);
+                    eventBus.onTyped(eventType, listener);
                 }
 
                 // Emit event
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await eventBus.emitTyped(eventType, payload);
 
                 // Verify all listeners were called
                 for (const listener of listeners) {
@@ -137,12 +139,12 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Cleanup
                 for (const listener of listeners) {
-                    eventBus.offTyped(eventType as UptimeEventName, listener);
+                    eventBus.offTyped(eventType, listener);
                 }
             }
         );
 
-        test("should support once listeners", async () => {
+        it("should support once listeners", async () => {
             const listener = vi.fn();
 
             eventBus.onceTyped("cache:invalidated", listener);
@@ -178,7 +180,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        test("should generate valid correlation IDs", () => {
+        it("should generate valid correlation IDs", () => {
             const correlationId = generateCorrelationId();
             expect(typeof correlationId).toBe("string");
             expect(correlationId.length).toBeGreaterThan(0);
@@ -195,9 +197,9 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             "should include metadata in events",
             async (eventType, payload) => {
                 const listener = vi.fn();
-                eventBus.onTyped(eventType as UptimeEventName, listener);
+                eventBus.onTyped(eventType, listener);
 
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                await eventBus.emitTyped(eventType, payload);
 
                 expect(listener).toHaveBeenCalledWith(
                     expect.objectContaining({
@@ -209,7 +211,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                     })
                 );
 
-                eventBus.offTyped(eventType as UptimeEventName, listener);
+                eventBus.offTyped(eventType, listener);
             }
         );
     });
@@ -228,8 +230,8 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
                 // Add middleware
                 eventBus.registerMiddleware(middleware);
 
-                eventBus.onTyped(eventType as UptimeEventName, listener);
-                await eventBus.emitTyped(eventType as UptimeEventName, payload);
+                eventBus.onTyped(eventType, listener);
+                await eventBus.emitTyped(eventType, payload);
 
                 // Verify middleware and listener were called
                 expect(middleware).toHaveBeenCalledTimes(1);
@@ -242,7 +244,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Cleanup
                 eventBus.removeMiddleware(middleware);
-                eventBus.offTyped(eventType as UptimeEventName, listener);
+                eventBus.offTyped(eventType, listener);
             }
         );
 
@@ -256,11 +258,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Add error middleware
                 eventBus.registerMiddleware(errorMiddleware);
-                eventBus.onTyped(eventType as UptimeEventName, listener);
+                eventBus.onTyped(eventType, listener);
 
                 // Event emission should throw due to middleware error
                 await expect(
-                    eventBus.emitTyped(eventType as UptimeEventName, payload)
+                    eventBus.emitTyped(safeCastTo<UptimeEventName>(eventType), payload)
                 ).rejects.toThrow("Middleware error");
 
                 // Listener should not be called due to middleware error
@@ -268,11 +270,11 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
 
                 // Cleanup
                 eventBus.removeMiddleware(errorMiddleware);
-                eventBus.offTyped(eventType as UptimeEventName, listener);
+                eventBus.offTyped(eventType, listener);
             }
         );
 
-        test("should support middleware removal", () => {
+        it("should support middleware removal", () => {
             const middleware1 = vi
                 .fn()
                 .mockImplementation(
@@ -297,7 +299,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             eventBus.clearMiddleware();
 
             // Verify basic functionality still works
-            expect(() => eventBus.clearMiddleware()).not.toThrow();
+            expect(() => { eventBus.clearMiddleware(); }).not.toThrow();
         });
     });
 
@@ -352,7 +354,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        test("should provide diagnostics", () => {
+        it("should provide diagnostics", () => {
             const listener = vi.fn();
             eventBus.onTyped("cache:invalidated", listener);
 
@@ -377,7 +379,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             async (eventType) => {
                 // Emit event with no listeners - should not throw
                 await expect(
-                    eventBus.emitTyped(eventType as UptimeEventName, {
+                    eventBus.emitTyped(safeCastTo<UptimeEventName>(eventType), {
                         test: true,
                     })
                 ).resolves.not.toThrow();
@@ -406,7 +408,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             }
         );
 
-        test("should handle middleware limit", () => {
+        it("should handle middleware limit", () => {
             const limitedBus = new TypedEventBus<UptimeEvents>("limited", {
                 maxMiddleware: 2,
             });
@@ -427,7 +429,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             }).toThrow("Maximum middleware limit");
         });
 
-        test("should handle invalid constructor options", () => {
+        it("should handle invalid constructor options", () => {
             expect(() => {
                 new TypedEventBus<UptimeEvents>("invalid", {
                     maxMiddleware: 0,
@@ -443,7 +445,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
     });
 
     describe("Event System Data Transformation", () => {
-        test("should handle object payloads", async () => {
+        it("should handle object payloads", async () => {
             const listener = vi.fn();
             eventBus.onTyped("config:changed", listener);
 
@@ -466,7 +468,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             eventBus.offTyped("config:changed", listener);
         });
 
-        test("should handle arrays", async () => {
+        it("should handle arrays", async () => {
             const listener = vi.fn();
             eventBus.onTyped("config:changed", listener);
 
@@ -493,7 +495,7 @@ describe("Event System - 100% Fast-Check Fuzzing Coverage", () => {
             eventBus.offTyped("config:changed", listener);
         });
 
-        test("should handle primitive values", async () => {
+        it("should handle primitive values", async () => {
             const listener = vi.fn();
             eventBus.onTyped("config:changed", listener);
 

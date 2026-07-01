@@ -38,7 +38,7 @@ const REDACTED_PLACEHOLDER = "[REDACTED]";
 const CIRCULAR_PLACEHOLDER = "[Circular]";
 
 const SENSITIVE_KEY_PATTERN =
-    /api[_-]?key|authorization|passphrase|password|refresh|secret|token/iu;
+    /api[-_]?key|authorization|passphrase|password|refresh|secret|token/iu;
 
 function isSensitiveKeyName(candidate: string): boolean {
     return SENSITIVE_KEY_PATTERN.test(candidate);
@@ -117,7 +117,7 @@ const serializeValue = (value: unknown): unknown => {
 
     if (value instanceof Map) {
         return {
-            entries: Array.from(value.entries()).slice(0, 5),
+            entries: [...value].slice(0, 5),
             size: value.size,
             type: "Map",
         };
@@ -125,7 +125,7 @@ const serializeValue = (value: unknown): unknown => {
 
     if (value instanceof Set) {
         return {
-            sample: Array.from(value.values()).slice(0, 5),
+            sample: [...value].slice(0, 5),
             size: value.size,
             type: "Set",
         };
@@ -154,7 +154,7 @@ const serializeValue = (value: unknown): unknown => {
         };
     }
 
-    if (value instanceof Error) {
+    if (Error.isError(value)) {
         const { cause: errorCause, message, name, stack } = value;
         return {
             cause: isDefined(errorCause)
@@ -284,9 +284,9 @@ export const reportPreloadGuardFailure = async (
     const payload: PreloadGuardDiagnosticsReport = {
         channel,
         guard,
-        ...(metadata ? { metadata } : {}),
-        ...(payloadPreview ? { payloadPreview } : {}),
-        ...(reason ? { reason } : {}),
+        ...(metadata && { metadata }),
+        ...(payloadPreview && { payloadPreview }),
+        ...(reason && { reason }),
         timestamp: timestamp ?? Date.now(),
     };
 

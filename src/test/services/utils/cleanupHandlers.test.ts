@@ -5,9 +5,9 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+    type CleanupResolutionHandlers,
     resolveCleanupHandler,
     subscribeWithValidatedCleanup,
-    type CleanupResolutionHandlers,
 } from "../../../services/utils/cleanupHandlers";
 
 describe(resolveCleanupHandler, () => {

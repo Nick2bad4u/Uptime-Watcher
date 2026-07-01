@@ -3,18 +3,21 @@
  * accessibility labels.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import type { ReactNode } from "react";
+
+import "@testing-library/jest-dom";
+import type { UnknownRecord } from "type-fest";
+
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HeaderControls } from "../../../components/Header/HeaderControls";
 
-vi.mock("../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock(import('../../../components/common/Tooltip/Tooltip'), () => ({
     Tooltip: ({
         children,
     }: {
-        children: (props: Record<string, unknown>) => ReactNode;
+        children: (props: UnknownRecord) => ReactNode;
     }) => <>{children({})}</>,
 }));
 

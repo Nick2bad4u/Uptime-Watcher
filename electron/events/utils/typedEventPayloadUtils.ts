@@ -121,7 +121,7 @@ export function cloneArrayPayload<TPayload extends ArrayPayload>(
 
     // Fall back to manual cloning for non-cloneable payload entries (e.g.
     // functions).
-    return castUnchecked<TPayload>(Array.from(payload));
+    return castUnchecked<TPayload>([...payload]);
 }
 
 /**

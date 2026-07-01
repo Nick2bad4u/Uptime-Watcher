@@ -8,12 +8,14 @@
  * @file Property-based fuzzing tests for Sites Store using fast-check
  */
 
-import { afterEach, beforeEach, describe, expect, vi } from "vitest";
+import type { Monitor, MonitorStatus, Site } from "@shared/types";
+
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
-import type { Site, Monitor, MonitorStatus } from "@shared/types";
+import { arrayFirst, isEmpty, safeCastTo   } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock window.electronAPI for testing
@@ -66,14 +68,14 @@ const createTestSitesStore = () => {
 
 // Property-based test arbitraries for sites store
 const arbitraries = {
-    monitorStatus: fc.constantFrom(
+    monitorStatus: safeCastTo<fc.Arbitrary<MonitorStatus>>(fc.constantFrom(
         "up" as const,
         "down" as const,
         "pending" as const,
         "paused" as const
-    ) as fc.Arbitrary<MonitorStatus>,
+    )),
 
-    monitor: fc.record({
+    monitor: safeCastTo<fc.Arbitrary<Monitor>>(fc.record({
         id: fc.string({ minLength: 1, maxLength: 50 }),
         type: fc.constantFrom(
             "http" as const,
@@ -99,7 +101,7 @@ const arbitraries = {
             "down" as const,
             "pending" as const,
             "paused" as const
-        ) as fc.Arbitrary<MonitorStatus>,
+        ),
         timeout: fc.integer({ min: 1000, max: 30_000 }), // 1-30 seconds
         // Optional fields
         activeOperations: fc.option(fc.array(fc.string())),
@@ -109,10 +111,10 @@ const arbitraries = {
         port: fc.option(fc.integer({ min: 1, max: 65_535 })),
         recordType: fc.option(fc.string()),
         url: fc.option(fc.webUrl()),
-    }) as fc.Arbitrary<Monitor>,
+    })),
 
     get site() {
-        return fc.record({
+        return safeCastTo<fc.Arbitrary<Site>>(fc.record({
             identifier: fc.string({ minLength: 1, maxLength: 50 }),
             name: fc.string({ minLength: 1, maxLength: 100 }),
             monitoring: fc.boolean(),
@@ -121,7 +123,7 @@ const arbitraries = {
                 minLength: 0,
                 maxLength: 5,
             }),
-        }) as fc.Arbitrary<Site>;
+        }));
     },
 
     get multipleSites() {
@@ -148,7 +150,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 // Assert
                 const state = useSitesStore.getState();
                 expect(state.sites).toHaveLength(1);
-                expect(state.sites[0]).toEqual(site);
+                expect(arrayFirst(state.sites)).toEqual(site);
             }
         );
 
@@ -256,11 +258,11 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
             "should handle removing monitors from sites",
             (site) => {
                 // Skip sites with no monitors
-                if (site.monitors.length === 0) {
+                if (isEmpty(site.monitors)) {
                     return;
                 }
 
-                const monitorToRemove = site.monitors[0]!;
+                const monitorToRemove = arrayFirst(site.monitors)!;
 
                 // Test the pure utility function
                 const updatedSite = {
@@ -338,7 +340,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert - all monitor statuses should be valid
                 const state = useSitesStore.getState();
-                const addedSite = state.sites[0]!;
+                const addedSite = arrayFirst(state.sites)!;
                 for (const monitor of addedSite.monitors) {
                     expect([
                         "up",
@@ -360,12 +362,12 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // Act & Assert - operations on non-existent sites should not crash
                 expect(() =>
-                    useSitesStore
+                    { useSitesStore
                         .getState()
-                        .removeSite("non-existent-identifier")
+                        .removeSite("non-existent-identifier"); }
                 ).not.toThrow();
                 expect(() =>
-                    useSitesStore.getState().selectSite(site)
+                    { useSitesStore.getState().selectSite(site); }
                 ).not.toThrow();
 
                 const state = useSitesStore.getState();
@@ -381,7 +383,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // Act & Assert - malformed operations should not crash
                 expect(() =>
-                    useSitesStore.getState().removeSite(malformedId)
+                    { useSitesStore.getState().removeSite(malformedId); }
                 ).not.toThrow();
 
                 const state = useSitesStore.getState();

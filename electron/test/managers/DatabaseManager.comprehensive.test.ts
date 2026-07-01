@@ -3,9 +3,20 @@
  * Focuses on error paths and edge cases not covered by existing tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Site } from "@shared/types";
+
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { UptimeEvents } from "../../events/eventTypes.js";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { DatabaseManagerDependencies, DatabaseManager as DatabaseManagerType  } from "../../managers/DatabaseManager";
+
+import { DatabaseManager } from "../../managers/DatabaseManager";
+import { DataImportExportService } from "../../services/database/DataImportExportService";
+// Import the mocked classes for use in tests
+import { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
 
 // Mock database commands FIRST using vi.hoisted
 const { DatabaseCommandExecutor } = vi.hoisted(() => {
@@ -14,12 +25,14 @@ const { DatabaseCommandExecutor } = vi.hoisted(() => {
             // Return appropriate values based on command type
             if (command && command.constructor.name === "ImportDataCommand") {
                 return Promise.resolve(true);
-            } else if (
+            }
+            if (
                 command &&
                 command.constructor.name === "DownloadBackupCommand"
             ) {
                 return Promise.resolve("/path/to/backup.json");
-            } else if (
+            }
+            if (
                 command &&
                 command.constructor.name === "ExportDataCommand"
             ) {
@@ -123,13 +136,6 @@ vi.mock("../../services/database/SiteRepositoryService", () => ({
     }),
 }));
 
-import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
-import { DatabaseManager } from "../../managers/DatabaseManager";
-import type { DatabaseManager as DatabaseManagerType } from "../../managers/DatabaseManager";
-import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import type { UptimeEvents } from "../../events/eventTypes.js";
-
 // Mock DataImportExportService
 vi.mock("../../services/database/DataImportExportService", () => ({
     DataImportExportService: vi.fn(function DataImportExportServiceMock() {
@@ -142,10 +148,6 @@ vi.mock("../../services/database/DataImportExportService", () => ({
         };
     }),
 }));
-
-// Import the mocked classes for use in tests
-import { SiteLoadingOrchestrator } from "../../services/database/SiteRepositoryService";
-import { DataImportExportService } from "../../services/database/DataImportExportService";
 
 // Mock serviceFactory
 vi.mock("../../services/database/serviceFactory", () => ({
@@ -162,7 +164,7 @@ vi.mock("../../services/database/serviceFactory", () => ({
             clear: vi.fn(() => {
                 store.clear();
             }),
-            replaceAll: vi.fn((items: { key: string; data: Site }[]) => {
+            replaceAll: vi.fn((items: { data: Site; key: string; }[]) => {
                 store.clear();
                 for (const { key, data } of items) {
                     store.set(key, data);
@@ -276,25 +278,25 @@ const attachTransactionAdapter = (
 const initializeTransactionAdapters = (): void => {
     attachTransactionAdapter(mockSettingsRepository, {
         set: (db: unknown, key: unknown, value: unknown) =>
-            mockSettingsRepository["setInternal"](db, key, value),
+            mockSettingsRepository.setInternal(db, key, value),
     });
 
     attachTransactionAdapter(mockHistoryRepository, {
         pruneAllHistory: (db: unknown, limit: unknown) =>
-            mockHistoryRepository["pruneAllHistoryInternal"](db, limit),
+            mockHistoryRepository.pruneAllHistoryInternal(db, limit),
         deleteAll: (db: unknown) =>
-            mockHistoryRepository["deleteAllInternal"](db),
+            mockHistoryRepository.deleteAllInternal(db),
     });
 
     attachTransactionAdapter(mockMonitorRepository, {
         deleteAll: (db: unknown) =>
-            mockMonitorRepository["deleteAllInternal"](db),
+            mockMonitorRepository.deleteAllInternal(db),
     });
 
     attachTransactionAdapter(mockSiteRepository, {
         bulkInsert: (db: unknown, rows: unknown) =>
-            mockSiteRepository["bulkInsertInternal"](db, rows),
-        deleteAll: (db: unknown) => mockSiteRepository["deleteAllInternal"](db),
+            mockSiteRepository.bulkInsertInternal(db, rows),
+        deleteAll: (db: unknown) => mockSiteRepository.deleteAllInternal(db),
     });
 };
 
@@ -746,8 +748,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 .mockResolvedValueOnce(undefined)
                 .mockRejectedValueOnce(new Error("Event emission failed"));
 
-            const result = await databaseManager.importData('{"sites": []}');
-            expect(result).toBeFalsy();
+            const isResult = await databaseManager.importData('{"sites": []}');
+            expect(isResult).toBeFalsy();
         });
 
         it("should handle successful importData flow", async ({
@@ -779,11 +781,11 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 rollbackAll: vi.fn(),
             };
 
-            const result = await databaseManager.importData(
+            const isResult = await databaseManager.importData(
                 '{"sites": [{"identifier": "site1"}], "settings": []}'
             );
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockExecute).toHaveBeenCalled();
         });
     });
@@ -1468,14 +1470,16 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             let totalSetInvocations = 0;
             for (const invocation of settingsAdapterMock.mock.results) {
-                if (invocation.type === "return") {
-                    const adapter = invocation.value as {
-                        set?: ReturnType<typeof vi.fn>;
-                    };
+                if (invocation.type !== "return") {
+                    continue;
+                }
 
-                    if (adapter?.set) {
-                        totalSetInvocations += adapter.set.mock.calls.length;
-                    }
+                const adapter = invocation.value as {
+                    set?: ReturnType<typeof vi.fn>;
+                };
+
+                if (adapter?.set) {
+                    totalSetInvocations += adapter.set.mock.calls.length;
                 }
             }
 

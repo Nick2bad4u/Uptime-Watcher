@@ -4,10 +4,11 @@
  */
 
 import "@testing-library/jest-dom";
-import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
-import { afterAll, beforeAll, vi } from "vitest";
+import fc from "fast-check";
 import { EventEmitter } from "node:events";
+import { objectAssign, safeCastTo  } from "ts-extras";
+import { afterAll, afterEach, beforeAll, vi } from "vitest";
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment
@@ -27,7 +28,7 @@ process.setMaxListeners(MAX_LISTENERS);
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
+const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -63,9 +64,7 @@ fc.configureGlobal({
     // examples: [],          // add any concrete inputs you want always tested
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
-    // RNG / reproducibility
-    // seed: undefined,    // set a specific number to reproduce runs
-    // randomType: 'xorshift128plus', // default; change if you need a different generator
+    // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,
@@ -92,7 +91,7 @@ beforeAll(() => {
         class MockIntersectionObserver implements IntersectionObserver {
             private readonly callback: IntersectionObserverCallback;
 
-            public readonly root: Element | Document | null;
+            public readonly root: Document | Element | null;
 
             public readonly rootMargin: string;
 
@@ -146,7 +145,7 @@ beforeAll(() => {
             public unobserve(_target: Element): void {
                 // no-op
             }
-        } as unknown as typeof IntersectionObserver;
+        };
 
     // Mock ResizeObserver for responsive component testing
     globalThis.ResizeObserver =
@@ -184,7 +183,7 @@ beforeAll(() => {
             public unobserve(_target: Element): void {
                 // no-op
             }
-        } as unknown as typeof ResizeObserver;
+        };
 
     // Mock requestIdleCallback for performance testing
     globalThis.requestIdleCallback = (
@@ -212,15 +211,15 @@ beforeAll(() => {
     };
 
     // Mock getComputedStyle for CSS-dependent tests
-    globalThis.getComputedStyle = vi.fn().mockReturnValue({
+    vi.spyOn(globalThis, 'getComputedStyle').mockImplementation().mockReturnValue({
         getPropertyValue: vi.fn().mockReturnValue(""),
     });
 
     // Mock Element.prototype.scrollIntoView
-    Element.prototype.scrollIntoView = vi.fn();
+    vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation();
 
     // Mock Element.prototype.getBoundingClientRect
-    Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation().mockReturnValue({
         width: 0,
         height: 0,
         top: 0,
@@ -242,8 +241,8 @@ beforeAll(() => {
     });
 
     // Mock URL.createObjectURL
-    globalThis.URL.createObjectURL = vi.fn().mockReturnValue("blob:mock-url");
-    globalThis.URL.revokeObjectURL = vi.fn();
+    vi.spyOn(URL, 'createObjectURL').mockImplementation().mockReturnValue("blob:mock-url");
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation();
 
     // Mock File and FileReader for file upload testing
     globalThis.File = class MockFile extends Blob implements File {
@@ -276,7 +275,7 @@ beforeAll(() => {
                 type: contentType ?? this.type,
             });
         }
-    } as unknown as typeof File;
+    };
 
     globalThis.FileReader = class MockFileReader
         extends EventTarget
@@ -306,7 +305,7 @@ beforeAll(() => {
 
         public readyState: FileReader["readyState"] = MockFileReader.EMPTY;
 
-        public result: string | ArrayBuffer | null = null;
+        public result: ArrayBuffer | null | string = null;
 
         public abort: FileReader["abort"] = vi.fn(() => {
             this.readyState = MockFileReader.DONE;
@@ -389,10 +388,10 @@ beforeAll(() => {
             }
             this.dispatchEvent(event);
         }
-    } as unknown as typeof FileReader;
+    };
 
     // Mock performance.now for timing tests
-    globalThis.performance.now = vi.fn(() => Date.now());
+    vi.spyOn(performance, 'now').mockReturnValue(Date.now());
 
     // Mock console methods to reduce test noise (optional)
     const originalConsole = { ...console };
@@ -416,12 +415,12 @@ afterEach(() => {
     vi.clearAllMocks();
 
     // Reset DOM state
-    document.body.innerHTML = "";
-    document.head.innerHTML = "";
+    document.body.replaceChildren();
+    document.head.replaceChildren();
 });
 
 // Global cleanup
 afterAll(() => {
     // Restore original console
-    Object.assign(console, console);
+    objectAssign(console, console);
 });

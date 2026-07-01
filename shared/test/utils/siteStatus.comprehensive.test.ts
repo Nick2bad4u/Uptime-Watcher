@@ -641,7 +641,7 @@ describe("Edge Cases and Complex Scenarios", () => {
                 ? "up"
                 : i % 3 === 1
                   ? "down"
-                  : "pending") as MonitorStatus,
+                  : "pending"),
         }));
 
         const site = createTestSite(monitors);

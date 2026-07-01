@@ -4,10 +4,9 @@
  * @file Direct function call tests for environment to ensure coverage
  */
 
-import { describe, expect, it } from "vitest";
 import {
-    getEnvVar,
     getEnvironment,
+    getEnvVar,
     getNodeEnv,
     isBrowserEnvironment,
     isDevelopment,
@@ -15,6 +14,7 @@ import {
     isProduction,
     isTest,
 } from "@shared/utils/environment";
+import { describe, expect, it } from "vitest";
 
 describe("environment Direct Function Coverage", () => {
     it("should call getEnvVar function", () => {

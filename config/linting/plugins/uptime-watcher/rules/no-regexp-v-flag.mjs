@@ -39,17 +39,17 @@ export const noRegexpVFlagRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow RegExp literals using the experimental 'v' flag",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-regexp-v-flag.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "RegExp flag 'v' is not allowed. Use 'u'/'gu' or rewrite the regex.",
         },
+        schema: [],
+        type: "problem",
     },
 };

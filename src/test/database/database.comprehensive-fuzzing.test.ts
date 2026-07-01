@@ -9,9 +9,10 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import { objectKeys } from "ts-extras";
+import { describe, expect, it, test } from "vitest";
 
 // Custom arbitraries for database testing
 const arbitraryString = fc.string({ minLength: 1, maxLength: 100 });
@@ -69,13 +70,13 @@ const arbitrarySettings = fc.record({
 
 describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
     describe("Database Module Imports", () => {
-        test("should import database initializer", async () => {
+        it("should import database initializer", async () => {
             const { initDatabase } =
                 await import("../../../electron/services/database/databaseInitializer");
             expect(typeof initDatabase).toBe("function");
         });
 
-        test("should import repository classes", async () => {
+        it("should import repository classes", async () => {
             const { SiteRepository } =
                 await import("../../../electron/services/database/SiteRepository");
             const { MonitorRepository } =
@@ -91,7 +92,7 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             expect(SettingsRepository).toBeDefined();
         }, 30_000);
 
-        test("should import data services", async () => {
+        it("should import data services", async () => {
             const { DataBackupService } =
                 await import("../../../electron/services/database/DataBackupService");
             const { DataImportExportService } =
@@ -136,7 +137,7 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(identifier.length).toBeGreaterThan(0);
 
                 // Validate UUID format (basic check)
-                const uuidRegex = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i;
+                const uuidRegex = /^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iv;
                 expect(uuidRegex.test(identifier)).toBeTruthy();
             }
         );
@@ -323,15 +324,15 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 // Value can be any type - settings should handle serialization
 
                 // Test JSON serialization safety
-                let serializable = true;
+                let isSerializable = true;
                 try {
                     JSON.stringify(value);
                 } catch {
-                    serializable = false;
+                    isSerializable = false;
                 }
 
                 // Even non-serializable values should be handled gracefully
-                expect(typeof serializable).toBe("boolean");
+                expect(typeof isSerializable).toBe("boolean");
             }
         );
 
@@ -341,9 +342,9 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(typeof settingsMap).toBe("object");
                 expect(settingsMap).not.toBeNull();
 
-                for (const [key, _value] of Object.entries(settingsMap)) {
+                for (const key of objectKeys(settingsMap)) {
                     expect(typeof key).toBe("string");
-                    // Value type validation happens at the application layer
+                    // Value type validation happens at the app layer
                 }
             }
         );
@@ -357,8 +358,8 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(operations.length).toBeLessThanOrEqual(5);
 
                 // Simulate transaction pattern validation
-                const transactionValid = operations.every(() => true); // Always valid for testing
-                expect(transactionValid).toBeTruthy();
+                const isTransactionValid = operations.every(() => true); // Always valid for testing
+                expect(isTransactionValid).toBeTruthy();
             }
         );
 
@@ -562,7 +563,7 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
             "should handle corrupted data simulation",
             (corruptedInput) => {
                 // Test error handling for various input types
-                let handledGracefully = true;
+                let isHandledGracefully = true;
 
                 try {
                     // Simulate data validation
@@ -570,16 +571,16 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                         corruptedInput === null ||
                         corruptedInput === undefined
                     ) {
-                        handledGracefully = false;
+                        isHandledGracefully = false;
                     }
 
                     JSON.stringify(corruptedInput);
                 } catch {
                     // Serialization errors should be handled
-                    handledGracefully = true;
+                    isHandledGracefully = true;
                 }
 
-                expect(typeof handledGracefully).toBe("boolean");
+                expect(typeof isHandledGracefully).toBe("boolean");
             }
         );
 

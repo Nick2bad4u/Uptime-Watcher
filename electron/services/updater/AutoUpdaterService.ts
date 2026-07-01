@@ -1,6 +1,6 @@
 /**
- * Auto-updater service for the Uptime Watcher application. Handles automatic
- * application updates using electron-updater.
+ * Auto-updater service for the Uptime Watcher app. Handles automatic
+ * app updates using electron-updater.
  */
 
 import {
@@ -14,7 +14,7 @@ import { autoUpdater } from "electron-updater";
 import { logger } from "../../utils/logger";
 
 /**
- * Service responsible for handling application auto-updates. Manages update
+ * Service responsible for handling app auto-updates. Manages update
  * checking, downloading, and installation.
  *
  * @remarks
@@ -153,7 +153,7 @@ export class AutoUpdaterService {
      *
      * @remarks
      * Sets up all necessary event listeners for the update lifecycle. This
-     * method should be called once during application startup.
+     * method should be called once during app startup.
      *
      * Side effects:
      *
@@ -170,7 +170,7 @@ export class AutoUpdaterService {
      * - Update-downloaded: Download completed
      * - Error: Update process errors
      *
-     * Call this method only once per application instance to avoid duplicate
+     * Call this method only once per app instance to avoid duplicate
      * event listeners.
      *
      * @returns Void
@@ -200,7 +200,7 @@ export class AutoUpdaterService {
      *
      * @remarks
      * Removes all event listeners registered during initialization. Should be
-     * called before application shutdown.
+     * called before app shutdown.
      *
      * @returns Void
      */
@@ -235,15 +235,15 @@ export class AutoUpdaterService {
     }
 
     /**
-     * Quit the application and install the update.
+     * Quit the app and install the update.
      *
      * @remarks
-     * **WARNING: This method will terminate the application immediately.**
+     * **WARNING: This method will terminate the app immediately.**
      *
      * Preconditions:
      *
      * - An update must be downloaded and ready (status: "downloaded")
-     * - All critical application state should be saved before calling
+     * - All critical app state should be saved before calling
      * - User should be prompted to confirm the action
      *
      * Process:
@@ -253,7 +253,7 @@ export class AutoUpdaterService {
      * 3. New version starts after installation
      *
      * This method should only be called when the user has explicitly confirmed
-     * they want to install the update and restart the application.
+     * they want to install the update and restart the app.
      *
      * @example
      *
@@ -268,7 +268,7 @@ export class AutoUpdaterService {
      * }
      * ```
      *
-     * @returns Void - Method does not return as application terminates
+     * @returns Void - Method does not return as app terminates
      */
     public quitAndInstall(): void {
         logger.info("[AutoUpdaterService] Quitting and installing update");

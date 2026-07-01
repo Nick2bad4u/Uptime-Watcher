@@ -312,18 +312,20 @@ function buildStateSyncPayloadDiagnostics(
 
             // Also scan monitor config string fields for obvious offenders.
             for (const [key, value] of objectEntries(monitor)) {
-                if (typeof value === "string" && value.length > 0) {
-                    const bytes = getUtfByteLength(value);
-                    recordTopN(
-                        topDetailsStrings,
-                        {
-                            bytes,
-                            path: `${pathPrefix}.monitors[${monitorIndex}].${key}`,
-                            preview: toStringPreview(value),
-                        },
-                        (left, right) => right.bytes - left.bytes
-                    );
+                if (typeof value !== "string" || value.length === 0) {
+                    continue;
                 }
+
+                const bytes = getUtfByteLength(value);
+                recordTopN(
+                    topDetailsStrings,
+                    {
+                        bytes,
+                        path: `${pathPrefix}.monitors[${monitorIndex}].${key}`,
+                        preview: toStringPreview(value),
+                    },
+                    (left, right) => right.bytes - left.bytes
+                );
             }
         }
     };
@@ -366,7 +368,7 @@ function buildStateSyncPayloadDiagnostics(
         siteSnapshots: deltaSiteSnapshots,
     } = deltaTotals;
 
-    let deltaCounts: StateSyncPayloadDiagnostics["deltaCounts"] = undefined;
+    let deltaCounts: StateSyncPayloadDiagnostics["deltaCounts"];
     if (delta) {
         const { addedSites, removedSiteIdentifiers, updatedSites } = delta;
         deltaCounts = {
@@ -467,12 +469,12 @@ export class RendererEventBridge {
             return;
         }
 
-        windows.forEach((window, index) => {
+        for (const [index, window] of windows.entries()) {
             if (window.isDestroyed()) {
                 logger.debug(
                     `[RendererEventBridge] Skipping destroyed window for channel ${channel}`
                 );
-                return;
+                continue;
             }
 
             try {
@@ -495,7 +497,7 @@ export class RendererEventBridge {
                     error
                 );
             }
-        });
+        }
     }
 
     /**
@@ -509,10 +511,10 @@ export class RendererEventBridge {
         const maxBytes = getMaxStateSyncEventBytes();
         const estimatedBytes = getJsonByteLengthUpTo(payload, maxBytes + 1);
 
-        const diagnosticsEnabled =
+        const isDiagnosticsEnabled =
             shouldLogStateSyncPayloadDiagnostics(estimatedBytes);
         logStateSyncPayloadDiagnostics(
-            diagnosticsEnabled,
+            isDiagnosticsEnabled,
             "[RendererEventBridge] State-sync payload diagnostics",
             payload,
             maxBytes,
@@ -526,18 +528,18 @@ export class RendererEventBridge {
                     maxHistoryEntriesPerMonitor
                 );
 
-                const exceedsBudget = isJsonByteBudgetExceeded(
+                const isExceedsBudget = isJsonByteBudgetExceeded(
                     compacted,
                     maxBytes
                 );
 
-                if (!exceedsBudget) {
+                if (!isExceedsBudget) {
                     const compactedBytes = getJsonByteLengthUpTo(
                         compacted,
                         maxBytes + 1
                     );
                     logStateSyncPayloadDiagnostics(
-                        diagnosticsEnabled,
+                        isDiagnosticsEnabled,
                         "[RendererEventBridge] State-sync payload diagnostics (compacted)",
                         compacted,
                         maxBytes,

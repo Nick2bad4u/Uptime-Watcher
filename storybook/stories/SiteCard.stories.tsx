@@ -42,6 +42,7 @@ const primarySite = createMockSite({
 
 const stressedSite = createMockSite({
     identifier: "storybook-site-card-down",
+    monitoring: false,
     monitors: [
         createMockMonitor({
             id: "down-http",
@@ -56,7 +57,6 @@ const stressedSite = createMockSite({
             type: "ping",
         }),
     ],
-    monitoring: false,
     name: "Critical Outage",
 });
 

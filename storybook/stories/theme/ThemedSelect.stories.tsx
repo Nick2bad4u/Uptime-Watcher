@@ -6,13 +6,13 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 
 const meta: Meta<typeof ThemedSelect> = {
-    component: ThemedSelect,
     args: {
         "aria-label": "Select monitor type",
     },
     argTypes: {
         onChange: { action: "change" },
     },
+    component: ThemedSelect,
     parameters: {
         layout: "padded",
     },
@@ -22,16 +22,16 @@ const meta: Meta<typeof ThemedSelect> = {
 export default meta;
 
 type Story = StoryObj;
-type ThemedSelectProps = ComponentProps<typeof ThemedSelect>;
-
 type StoryArgsWithKey<TProps> = TProps & { key?: Key };
+
+type ThemedSelectProps = ComponentProps<typeof ThemedSelect>;
 
 const MonitorTypeSelectStory = (args: ThemedSelectProps): ReactElement => {
     const {
-        value = "http",
-        onChange,
         id = "monitor-type",
         key: ignoredKey,
+        onChange,
+        value = "http",
         ...rest
     } = args as StoryArgsWithKey<ThemedSelectProps>;
     void ignoredKey;
@@ -78,6 +78,10 @@ export const MonitorTypes: Story = {
 };
 
 export const Disabled: Story = {
+    args: {
+        "aria-label": "Environment",
+        disabled: true,
+    },
     render: (args) => {
         const { key: ignoredKey, ...safeArgs } =
             args as StoryArgsWithKey<ThemedSelectProps>;
@@ -107,9 +111,5 @@ export const Disabled: Story = {
                 </ThemedSelect>
             </div>
         );
-    },
-    args: {
-        disabled: true,
-        "aria-label": "Environment",
     },
 };

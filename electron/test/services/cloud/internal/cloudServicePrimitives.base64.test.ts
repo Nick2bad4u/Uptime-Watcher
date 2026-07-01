@@ -1,10 +1,9 @@
-import { describe, expect, it } from "vitest";
-
 import {
     decodeCanonicalBase64,
     decodeStrictBase64,
     encodeBase64,
 } from "@electron/services/cloud/internal/cloudServicePrimitives";
+import { describe, expect, it } from "vitest";
 
 describe("cloudServicePrimitives base64", () => {
     it("decodes canonical base64", () => {
@@ -40,7 +39,7 @@ describe("cloudServicePrimitives base64", () => {
                 label: "example",
                 value: "aGVsbG8", // Missing padding
             })
-        ).toThrow(/multiple of 4/i);
+        ).toThrow(/multiple of 4/iv);
     });
 
     it("decodeStrictBase64 enforces byte length", () => {

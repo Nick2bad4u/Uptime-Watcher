@@ -2,8 +2,9 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createSelectorHookMock } from "./utils/createSelectorHookMock";
 import {
     createSitesStoreMock,
@@ -19,15 +20,15 @@ const mockMonitoringService = {
 };
 
 // Mock the stores and services
-vi.mock("../stores/utils", () => ({
+vi.mock(import('../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock("../stores/error/withErrorHandling", () => ({
+vi.mock(import('../stores/error/withErrorHandling'), () => ({
     withErrorHandling: vi.fn((fn) => fn),
 }));
 
-vi.mock("../services/monitoring", () => ({
+vi.mock(import('../services/monitoring'), () => ({
     MonitoringService: mockMonitoringService,
 }));
 
@@ -46,7 +47,7 @@ const mockSitesStore = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(mockSitesStore);
 
-vi.mock("../stores/sites/useSitesStore", () => ({
+vi.mock(import('../stores/sites/useSitesStore'), () => ({
     useSitesStore: useSitesStoreMock,
 }));
 

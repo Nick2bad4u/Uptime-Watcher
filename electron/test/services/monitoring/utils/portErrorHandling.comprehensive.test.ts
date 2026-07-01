@@ -4,7 +4,7 @@
  * @module PortErrorHandling
  *
  * @file Comprehensive tests for port error handling utilities in the Uptime
- *   Watcher application, including error constants, result interfaces, custom
+ *   Watcher app, including error constants, result interfaces, custom
  *   error classes, and error handling functions.
  *
  * @author GitHub Copilot
@@ -16,7 +16,18 @@
  * @tags ["test", "monitoring", "port", "error-handling"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { PortCheckErrorResult } from "../../../../services/monitoring/utils/portErrorHandling";
+
+import { isDev } from "../../../../electronUtils";
+// Import after mocks are set up
+import {
+    handlePortCheckError,
+    PORT_NOT_REACHABLE,
+    PortCheckError,
+} from "../../../../services/monitoring/utils/portErrorHandling";
+import { logger } from "../../../../utils/logger";
 
 // Mock dependencies before importing the module under test
 vi.mock("../../../../electronUtils", () => ({
@@ -31,16 +42,6 @@ vi.mock("../../../../utils/logger", () => ({
         error: vi.fn(),
     },
 }));
-
-// Import after mocks are set up
-import {
-    PORT_NOT_REACHABLE,
-    PortCheckError,
-    handlePortCheckError,
-} from "../../../../services/monitoring/utils/portErrorHandling";
-import type { PortCheckErrorResult } from "../../../../services/monitoring/utils/portErrorHandling";
-import { isDev } from "../../../../electronUtils";
-import { logger } from "../../../../utils/logger";
 
 describe("Port Error Handling", () => {
     beforeEach(() => {
@@ -258,7 +259,7 @@ describe("Port Error Handling", () => {
 
             const error = new PortCheckError("Test", 100);
 
-            expect(error instanceof Error).toBeTruthy();
+            expect(Error.isError(error)).toBeTruthy();
             expect(error instanceof PortCheckError).toBeTruthy();
             expect(Object.getPrototypeOf(error)).toBe(PortCheckError.prototype);
         });
@@ -276,10 +277,7 @@ describe("Port Error Handling", () => {
 
             expect(error.responseTime).toBe(100);
 
-            // In JavaScript, properties are not truly readonly at runtime
-            // This test validates that TypeScript declares it as readonly,
-            // but at runtime the property can still be modified
-            // The key is that TypeScript should prevent this at compile time
+            // In JavaScript, properties are not truly readonly at runtime This test validates that TypeScript declares it as readonly, but at runtime the property can still be modified The key is that TypeScript should prevent this at compile time
 
             // The property exists and has the expected value
             expect(error.responseTime).toBe(100);

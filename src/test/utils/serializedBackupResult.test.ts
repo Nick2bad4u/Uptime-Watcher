@@ -4,7 +4,6 @@ import {
     INVALID_SERIALIZED_BACKUP_DATA_MESSAGE,
     parseSerializedDatabaseBackupResult,
 } from "../../utils/downloads/serializedBackupResult";
-
 import { createSerializedBackupResult } from "./createSerializedBackupResult";
 
 describe(parseSerializedDatabaseBackupResult, () => {

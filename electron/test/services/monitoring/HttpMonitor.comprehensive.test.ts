@@ -6,10 +6,11 @@
  * configuration management, Axios integration, and retry logic.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Site } from "@shared/types";
 import type { AxiosResponse } from "axios";
 
-import type { Site } from "@shared/types";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type {
     MonitorCheckResult,
     MonitorServiceConfig,
@@ -111,7 +112,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             monitor,
             timeout,
             url: overrides.url ?? monitor.url,
-            ...(overrides.signal ? { signal: overrides.signal } : {}),
+            ...(overrides.signal && { signal: overrides.signal }),
         } as const;
     };
 
@@ -287,16 +288,16 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => httpMonitor.updateConfig({ timeout: -1000 })).toThrow(
+            expect(() => { httpMonitor.updateConfig({ timeout: -1000 }); }).toThrow(
                 "Invalid timeout: must be a positive number"
             );
-            expect(() => httpMonitor.updateConfig({ timeout: 0 })).toThrow(
+            expect(() => { httpMonitor.updateConfig({ timeout: 0 }); }).toThrow(
                 "Invalid timeout: must be a positive number"
             );
             expect(() =>
-                httpMonitor.updateConfig({
+                { httpMonitor.updateConfig({
                     timeout: "invalid" as any,
-                })
+                }); }
             ).toThrow("Invalid timeout: must be a positive number");
         });
 
@@ -310,9 +311,9 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             expect(() =>
-                httpMonitor.updateConfig({
+                { httpMonitor.updateConfig({
                     userAgent: 123 as any,
-                })
+                }); }
             ).toThrow("Invalid userAgent: must be a string");
         });
     });

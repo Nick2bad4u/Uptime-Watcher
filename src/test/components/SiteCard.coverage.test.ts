@@ -2,6 +2,7 @@
  * Tests for SiteCard component and related components
  */
 
+import { objectValues } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 describe("SiteCard Component Coverage Tests", () => {
@@ -94,7 +95,7 @@ describe("SiteCard Component Coverage Tests", () => {
                 onStopSiteMonitoring: vi.fn(),
             };
 
-            for (const prop of Object.values(interactionProps)) {
+            for (const prop of objectValues(interactionProps)) {
                 expect(typeof prop).toBe("function");
             }
 
@@ -106,14 +107,14 @@ describe("SiteCard Component Coverage Tests", () => {
             interactionProps.onStopMonitoring();
             interactionProps.onStopSiteMonitoring();
 
-            expect(interactionProps.onCheckNow).toHaveBeenCalled();
+            expect(interactionProps.onCheckNow).toHaveBeenCalledWith();
             expect(interactionProps.onMonitorIdChange).toHaveBeenCalledWith(
                 "monitor-1"
             );
-            expect(interactionProps.onStartMonitoring).toHaveBeenCalled();
-            expect(interactionProps.onStartSiteMonitoring).toHaveBeenCalled();
-            expect(interactionProps.onStopMonitoring).toHaveBeenCalled();
-            expect(interactionProps.onStopSiteMonitoring).toHaveBeenCalled();
+            expect(interactionProps.onStartMonitoring).toHaveBeenCalledWith();
+            expect(interactionProps.onStartSiteMonitoring).toHaveBeenCalledWith();
+            expect(interactionProps.onStopMonitoring).toHaveBeenCalledWith();
+            expect(interactionProps.onStopSiteMonitoring).toHaveBeenCalledWith();
         });
 
         describe("SiteCard Hook Integration", () => {
@@ -221,31 +222,31 @@ describe("SiteCard Component Coverage Tests", () => {
                     monitors: [],
                 };
 
-                const allRunning1 =
+                const isAllRunning1 =
                     siteWithAllRunning.monitors.length > 0 &&
                     siteWithAllRunning.monitors.every(
                         (m: any) => m.monitoring === true
                     );
-                const allRunning2 =
+                const isAllRunning2 =
                     siteWithSomeRunning.monitors.length > 0 &&
                     siteWithSomeRunning.monitors.every(
                         (m: any) => m.monitoring === true
                     );
-                const allRunning3 =
+                const isAllRunning3 =
                     siteWithNoneRunning.monitors.length > 0 &&
                     siteWithNoneRunning.monitors.every(
                         (m: any) => m.monitoring === true
                     );
-                const allRunning4 =
+                const isAllRunning4 =
                     emptyMonitors.monitors.length > 0 &&
                     emptyMonitors.monitors.every(
                         (m: any) => m.monitoring === true
                     );
 
-                expect(allRunning1).toBeTruthy();
-                expect(allRunning2).toBeFalsy();
-                expect(allRunning3).toBeFalsy();
-                expect(allRunning4).toBeFalsy();
+                expect(isAllRunning1).toBeTruthy();
+                expect(isAllRunning2).toBeFalsy();
+                expect(isAllRunning3).toBeFalsy();
+                expect(isAllRunning4).toBeFalsy();
             });
         });
 
@@ -491,7 +492,7 @@ describe("SiteCard Component Coverage Tests", () => {
                 }
 
                 const avgResponseTime =
-                    responseTimes.reduce((a, b) => a + b, 0) /
+                    Math.sumPrecise(responseTimes) /
                     responseTimes.length;
                 expect(avgResponseTime).toBeGreaterThan(0);
             });
@@ -536,7 +537,7 @@ describe("SiteCard Component Coverage Tests", () => {
                     handleMonitorIdChange: vi.fn(),
                 };
 
-                for (const handler of Object.values(clickHandlers)) {
+                for (const handler of objectValues(clickHandlers)) {
                     expect(typeof handler).toBe("function");
                 }
 
@@ -544,8 +545,8 @@ describe("SiteCard Component Coverage Tests", () => {
                 clickHandlers.handleCheckNow();
                 clickHandlers.handleMonitorIdChange("new-monitor");
 
-                expect(clickHandlers.handleCardClick).toHaveBeenCalled();
-                expect(clickHandlers.handleCheckNow).toHaveBeenCalled();
+                expect(clickHandlers.handleCardClick).toHaveBeenCalledWith();
+                expect(clickHandlers.handleCheckNow).toHaveBeenCalledWith();
                 expect(
                     clickHandlers.handleMonitorIdChange
                 ).toHaveBeenCalledWith("new-monitor");

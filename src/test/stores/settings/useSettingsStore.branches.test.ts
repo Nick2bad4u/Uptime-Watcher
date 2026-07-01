@@ -3,10 +3,14 @@
  *   and error handling paths to achieve 90%+ branch coverage
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+// Import mocked modules to get references
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
-import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { logger } from "../../../services/logger";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock the bridge readiness helper to avoid real polling during tests
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -23,13 +27,13 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
 // Mock logger
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         info: vi.fn(),
@@ -45,14 +49,14 @@ const mockErrorStore = {
     setOperationLoading: vi.fn(),
 };
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: () => mockErrorStore,
     },
 }));
 
 // Mock store utils (partial) so createPersistConfig remains available.
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -62,7 +66,7 @@ vi.mock("../../../stores/utils", async (importOriginal) => {
 });
 
 // Mock withErrorHandling from shared utils (partial) to preserve ApplicationError, etc.
-vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('../../../../shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<
             typeof import("../../../../shared/utils/errorHandling")
@@ -71,15 +75,11 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
     return {
         ...actual,
         ensureError: vi.fn((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         ),
         withErrorHandling: vi.fn(),
     };
 });
-
-// Import mocked modules to get references
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { installElectronApiMock } from "../../utils/electronApiMock";
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock the entire electronAPI
@@ -143,8 +143,8 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // This is testing the syncSettingsAfterRehydration function that is called during persist rehydration
-            // We need to test it via the rehydration mechanism since it's not a public method
+            // This is testing the syncSettingsAfterRehydration function that is called during persist rehydration We
+            // need to test it via the rehydration mechanism since it's not a public method
 
             // Clear any persisted state first
             useSettingsStore.persist.clearStorage();
@@ -190,7 +190,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
             expect(result.current.settings.historyLimit).toBe(2000);
         });
 
@@ -222,7 +222,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await new Promise((resolve) => setTimeout(resolve, 150));
             });
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
             expect(logger.warn).toHaveBeenCalledWith(
                 "Failed to sync settings after rehydration:",
                 expect.any(Error)
@@ -306,7 +306,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
-                "invalid" as unknown as number
+                "invalid"
             );
 
             await act(async () => {
@@ -331,7 +331,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             const { result } = renderHook(() => useSettingsStore());
 
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
-                "not-a-number" as unknown as number
+                "not-a-number"
             );
 
             await act(async () => {

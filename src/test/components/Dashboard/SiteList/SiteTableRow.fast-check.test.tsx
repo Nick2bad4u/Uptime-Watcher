@@ -10,17 +10,20 @@ import type {
     StatusHistory,
 } from "@shared/types";
 import type { ChangeEvent } from "react";
+import type { UnknownArray } from "type-fest";
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, vi } from "vitest";
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
+import { describe, expect, vi } from "vitest";
+
+import type { UseSiteResult } from "../../../../hooks/site/useSite";
 
 import { getMonitorRuntimeSummary } from "../../../../utils/monitoring/monitorRuntime";
 import { toSentenceCase } from "../../../../utils/text/toSentenceCase";
-import type { UseSiteResult } from "../../../../hooks/site/useSite";
 
 interface MarqueeStubProps {
-    readonly dependencies: readonly unknown[];
+    readonly dependencies: Readonly<UnknownArray>;
     readonly text: string;
 }
 
@@ -53,7 +56,7 @@ const monitorSelectorCalls: MonitorSelectorStubProps[] = [];
 const statusBadgeCalls: StatusBadgeStubProps[] = [];
 const actionGroupCalls: ActionButtonGroupStubProps[] = [];
 
-vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => {
+vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => {
     const component = vi.fn((props: MarqueeStubProps) => {
         marqueeCalls.push(props);
         return <div data-testid="marquee-text-stub">{props.text}</div>;
@@ -62,7 +65,7 @@ vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => {
 });
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => {
         const component = vi.fn((props: MonitorSelectorStubProps) => {
             monitorSelectorCalls.push(props);
@@ -72,13 +75,13 @@ vi.mock(
                         data-prevent-row-activation
                         data-testid="monitor-selector-trigger"
                         onClick={() =>
-                            props.onChange({
+                            { props.onChange({
                                 target: {
                                     value:
-                                        props.monitors[0]?.id ??
+                                        arrayFirst(props.monitors)?.id ??
                                         "unknown-monitor",
                                 },
-                            } as ChangeEvent<HTMLSelectElement>)
+                            } as ChangeEvent<HTMLSelectElement>); }
                         }
                         type="button"
                     >
@@ -91,7 +94,7 @@ vi.mock(
     }
 );
 
-vi.mock("../../../../components/common/StatusBadge", () => {
+vi.mock(import('../../../../components/common/StatusBadge'), () => {
     const component = vi.fn((props: StatusBadgeStubProps) => {
         statusBadgeCalls.push(props);
         return (
@@ -104,7 +107,7 @@ vi.mock("../../../../components/common/StatusBadge", () => {
 });
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => {
         const component = vi.fn((props: ActionButtonGroupStubProps) => {
             actionGroupCalls.push(props);
@@ -125,7 +128,7 @@ vi.mock(
     }
 );
 
-vi.mock("../../../../hooks/site/useSite", async () => {
+vi.mock(import('../../../../hooks/site/useSite'), async () => {
     const actual = await vi.importActual<
         typeof import("../../../../hooks/site/useSite")
     >("../../../../hooks/site/useSite");
@@ -143,7 +146,7 @@ const { SiteTableRow } =
 
 const identifierArbitrary = fc
     .string({ maxLength: 24, minLength: 1 })
-    .filter((value) => /^[\w-]+$/.test(value));
+    .filter((value) => /^[\w-]+$/u.test(value));
 
 const nameArbitrary = fc
     .string({ maxLength: 32, minLength: 1 })
@@ -180,7 +183,7 @@ const historyArbitrary = fc.array(
             max: 1_900_000_000_000,
             min: 1_600_000_000_000,
         }),
-    }) as fc.Arbitrary<StatusHistory>,
+    }),
     { maxLength: 3, minLength: 1 }
 );
 
@@ -197,7 +200,7 @@ const monitorArbitrary = fc
         type: fc.constant("http" as const),
         url: fc.constant("https://example.com"),
     })
-    .map((raw) => raw as Monitor);
+    .map((raw) => safeCastTo<Monitor>(raw));
 
 const siteScenarioArbitrary = fc.record({
     includeMonitor: fc.boolean(),
@@ -243,8 +246,8 @@ describe("SiteTableRow fast-check coverage", () => {
             const handleStopMonitoring = vi.fn();
             const handleStopSiteMonitoring = vi.fn();
 
-            const selectedMonitor = includeMonitor ? monitors[0] : undefined;
-            const selectedMonitorId = selectedMonitor?.id ?? monitors[0]!.id;
+            const selectedMonitor = includeMonitor ? arrayFirst(monitors) : undefined;
+            const selectedMonitorId = selectedMonitor?.id ?? arrayFirst(monitors)!.id;
             const filteredHistory = selectedMonitor?.history ?? [];
 
             const baseSite: Site = {
@@ -295,7 +298,7 @@ describe("SiteTableRow fast-check coverage", () => {
 
             expect(mockUseSite).toHaveBeenCalledWith(baseSite);
 
-            const marqueeCall = marqueeCalls.at(-1);
+            const marqueeCall = arrayAt(marqueeCalls, -1);
             expect(marqueeCall).toBeDefined();
             expect(marqueeCall?.text).toBe(latestSite.name);
             expect(marqueeCall?.dependencies).toEqual([
@@ -303,14 +306,14 @@ describe("SiteTableRow fast-check coverage", () => {
                 baseSite.identifier,
             ]);
 
-            const statusBadgeCall = statusBadgeCalls.at(-1);
+            const statusBadgeCall = arrayAt(statusBadgeCalls, -1);
             expect(statusBadgeCall).toBeDefined();
             const customLabel = "Runtime";
             expect(statusBadgeCall?.formatter(customLabel, status)).toBe(
                 `${customLabel}: ${toSentenceCase(status)}`
             );
 
-            const monitorSelectorCall = monitorSelectorCalls.at(-1);
+            const monitorSelectorCall = arrayAt(monitorSelectorCalls, -1);
             expect(monitorSelectorCall).toBeDefined();
             expect(monitorSelectorCall?.monitors).toEqual(latestSite.monitors);
             expect(monitorSelectorCall?.selectedMonitorId).toBe(
@@ -318,11 +321,11 @@ describe("SiteTableRow fast-check coverage", () => {
             );
 
             monitorSelectorCall?.onChange({
-                target: { value: monitors[0]!.id },
+                target: { value: arrayFirst(monitors)!.id },
             } as ChangeEvent<HTMLSelectElement>);
             expect(handleMonitorIdChange).toHaveBeenCalledTimes(1);
 
-            const actionGroupCall = actionGroupCalls.at(-1);
+            const actionGroupCall = arrayAt(actionGroupCalls, -1);
             expect(actionGroupCall).toBeDefined();
 
             const runtimeSummary = getMonitorRuntimeSummary(
@@ -370,7 +373,7 @@ describe("SiteTableRow fast-check coverage", () => {
             handleCardClick.mockClear();
             const expectedRowAccessibleName =
                 `Open details for ${latestSite.name}`
-                    .replaceAll(/\s+/gu, " ")
+                    .replaceAll(/\s+/gv, " ")
                     .trim();
             const rowElement = screen.getByRole("row", {
                 name: expectedRowAccessibleName,

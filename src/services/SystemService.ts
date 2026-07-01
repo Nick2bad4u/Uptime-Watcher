@@ -56,7 +56,7 @@ interface SystemServiceContract {
  *
  * @remarks
  * Provides a comprehensive interface for system-level operations including
- * external browser navigation and application update management with automatic
+ * external browser navigation and app update management with automatic
  * service initialization and type-safe IPC communication.
  *
  * @public
@@ -83,7 +83,7 @@ export const SystemService: SystemServiceContract = {
      * await SystemService.openExternal("https://example.com");
      * ```
      *
-     * @param url - The URL to open in the external browser.
+     * @param URL - The URL to open in the external browser.
      *
      * @returns `true` when Electron successfully delegates the request.
      *
@@ -113,28 +113,28 @@ export const SystemService: SystemServiceContract = {
                 throw error;
             }
 
-            const opened = await api.system.openExternal(
+            const isOpened = await api.system.openExternal(
                 validation.normalizedUrl
             );
 
-            if (typeof opened !== "boolean") {
+            if (typeof isOpened !== "boolean") {
                 throw new TypeError(
-                    `Electron declined to open external URL: ${urlForMessage} (received ${typeof opened})`
+                    `Electron declined to open external URL: ${urlForMessage} (received ${typeof isOpened})`
                 );
             }
 
-            if (!opened) {
+            if (!isOpened) {
                 throw new Error(
                     `Electron declined to open external URL: ${urlForMessage}`
                 );
             }
 
-            return opened;
+            return isOpened;
         }
     ),
 
     /**
-     * Quits the application and installs a pending update.
+     * Quits the app and installs a pending update.
      *
      * @remarks
      * Delegates to the preload system bridge which triggers the main-process
@@ -143,15 +143,15 @@ export const SystemService: SystemServiceContract = {
      * unavailable or the main-process handler reports failure.
      */
     quitAndInstall: wrap("quitAndInstall", async (api): Promise<void> => {
-        const result = await api.system.quitAndInstall();
+        const isResult = await api.system.quitAndInstall();
 
-        if (typeof result !== "boolean") {
+        if (typeof isResult !== "boolean") {
             throw new TypeError(
-                `Invalid response received from quitAndInstall: ${typeof result}`
+                `Invalid response received from quitAndInstall: ${typeof isResult}`
             );
         }
 
-        if (!result) {
+        if (!isResult) {
             throw new Error(
                 "Electron declined to execute quitAndInstall request"
             );
@@ -169,15 +169,15 @@ export const SystemService: SystemServiceContract = {
     writeClipboardText: wrap(
         "writeClipboardText",
         async (api: ElectronAPI, text: string): Promise<void> => {
-            const result = await api.system.writeClipboardText(text);
+            const isResult = await api.system.writeClipboardText(text);
 
-            if (typeof result !== "boolean") {
+            if (typeof isResult !== "boolean") {
                 throw new TypeError(
-                    `Invalid response received from writeClipboardText: ${typeof result}`
+                    `Invalid response received from writeClipboardText: ${typeof isResult}`
                 );
             }
 
-            if (!result) {
+            if (!isResult) {
                 throw new Error("Electron declined to write clipboard text");
             }
         }

@@ -2,9 +2,11 @@
  * Unit tests for the CDN edge consistency monitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import { CdnEdgeConsistencyMonitor } from "../../../services/monitoring/CdnEdgeConsistencyMonitor";
 
 const httpGetMock = vi.fn();
 
@@ -19,8 +21,6 @@ vi.mock("../../../services/monitoring/utils/httpClient", () => ({
         get: httpGetMock,
     })),
 }));
-
-import { CdnEdgeConsistencyMonitor } from "../../../services/monitoring/CdnEdgeConsistencyMonitor";
 
 // Convenience helper to build monitor objects with required defaults
 function createMonitor(
@@ -41,7 +41,7 @@ function createMonitor(
         timeout: 5000,
         type: "cdn-edge-consistency",
         ...overrides,
-    } as Site["monitors"][0];
+    };
 }
 
 describe("CdnEdgeConsistencyMonitor service", () => {

@@ -2,16 +2,17 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { UIStore } from "../../../stores/ui/types";
+
 import { Header } from "../../../components/Header/Header";
 import { useGlobalMonitoringMetrics } from "../../../hooks/useGlobalMonitoringMetrics";
 import {
     DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
     useUIStore,
 } from "../../../stores/ui/useUiStore";
-import type { UIStore } from "../../../stores/ui/types";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 
-vi.mock("../../../stores/ui/useUiStore", async () => {
+vi.mock(import('../../../stores/ui/useUiStore'), async () => {
     const actual = await vi.importActual<
         typeof import("../../../stores/ui/useUiStore")
     >("../../../stores/ui/useUiStore");
@@ -20,11 +21,11 @@ vi.mock("../../../stores/ui/useUiStore", async () => {
         useUIStore: vi.fn(),
     };
 });
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useAvailabilityColors: vi.fn(),
     useTheme: vi.fn(),
 }));
-vi.mock("../../../hooks/useGlobalMonitoringMetrics", () => ({
+vi.mock(import('../../../hooks/useGlobalMonitoringMetrics'), () => ({
     useGlobalMonitoringMetrics: vi.fn(),
 }));
 

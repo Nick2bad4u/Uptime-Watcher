@@ -8,9 +8,9 @@
  * are enforced at the trust boundary.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { Monitor } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HttpMonitor } from "../../../../services/monitoring/HttpMonitor";
 

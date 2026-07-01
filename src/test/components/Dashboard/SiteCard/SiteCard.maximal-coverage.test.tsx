@@ -1,11 +1,14 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import "@testing-library/jest-dom";
-import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 import type { Site } from "@shared/types";
 
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { arrayJoin } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
+
 // Mock all dependencies
-vi.mock("../../../../hooks/site/useSite", () => ({
+vi.mock(import('../../../../hooks/site/useSite'), () => ({
     useSite: vi.fn(() => ({
         checkCount: 1000,
         filteredHistory: [],
@@ -32,12 +35,12 @@ vi.mock("../../../../hooks/site/useSite", () => ({
     })),
 }));
 
-vi.mock("@shared/utils/siteStatus", () => ({
+vi.mock(import('@shared/utils/siteStatus'), () => ({
     getSiteDisplayStatus: vi.fn(() => "operational"),
     getSiteStatusVariant: vi.fn(() => "success"),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHeader'), () => ({
     SiteCardHeader: vi.fn(({ site, display, interactions, monitoring }) => (
         <div data-testid="site-card-header" onClick={interactions?.onCheckNow}>
             Header: {site?.site?.name || "Unknown"} | Loading:{" "}
@@ -48,7 +51,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     )),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardStatus'), () => ({
     SiteCardStatus: vi.fn(({ selectedMonitorId, status }) => (
         <div data-testid="site-card-status">
             Status: {status} (Monitor: {selectedMonitorId})
@@ -56,7 +59,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
     )),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardMetrics'), () => ({
     SiteCardMetrics: vi.fn(
         ({
             metrics,
@@ -64,20 +67,19 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
             metrics: readonly {
                 readonly key: string;
                 readonly label: string;
-                readonly value: string | number;
+                readonly value: number | string;
             }[];
         }) => (
             <div data-testid="site-card-metrics-content">
                 Metrics:{" "}
-                {metrics
-                    .map((metric) => `${metric.label}: ${metric.value}`)
-                    .join(" | ")}
+                {arrayJoin(metrics
+                    .map((metric) => `${metric.label}: ${metric.value}`), " | ")}
             </div>
         )
     ),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardHistory'), () => ({
     SiteCardHistory: vi.fn(({ filteredHistory, monitor }) => (
         <div data-testid="site-card-history">
             History: {filteredHistory?.length || 0} items | Monitor:{" "}
@@ -181,7 +183,7 @@ describe("SiteCard Component - Complete Coverage", () => {
         );
         expect(
             screen.getByTestId("site-card-metrics-content")
-        ).toHaveTextContent(/Uptime: 98\.0%/);
+        ).toHaveTextContent(/Uptime: 98\.0%/v);
         expect(screen.getByTestId("site-card-history")).toHaveTextContent(
             "History: 0 items"
         );

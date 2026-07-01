@@ -1,14 +1,21 @@
-import { render, screen, within } from "@testing-library/react";
-import { fc, test as fcTest } from "@fast-check/vitest";
-import type { ReactNode } from "react";
-import { beforeEach, afterAll, describe, expect, vi } from "vitest";
-
 import type {
     Monitor,
     MonitorStatus,
     Site,
     StatusHistory,
 } from "@shared/types";
+import type { ReactNode } from "react";
+
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
+import { render, screen, within } from "@testing-library/react";
+import { beforeEach, afterAll, describe, expect, vi } from "vitest";
+
+import type { MarqueeTextProperties } from "../../../../components/common/MarqueeText/MarqueeText";
+import type { ActionButtonGroupProperties } from "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup";
+import type { MonitorSelectorProperties } from "../../../../components/Dashboard/SiteCard/components/MonitorSelector";
+import type { UseSiteResult } from "../../../../hooks/site/useSite";
+import type { StatusIndicatorProperties } from "../../../../theme/components/StatusIndicator";
 
 import {
     getMonitorDisplayIdentifier,
@@ -16,12 +23,6 @@ import {
 } from "../../../../utils/fallbacks";
 import { getMonitorRuntimeSummary } from "../../../../utils/monitoring/monitorRuntime";
 import { toSentenceCase } from "../../../../utils/text/toSentenceCase";
-import type { MonitorSelectorProperties } from "../../../../components/Dashboard/SiteCard/components/MonitorSelector";
-import type { ActionButtonGroupProperties } from "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup";
-import type { StatusIndicatorProperties } from "../../../../theme/components/StatusIndicator";
-import type { MarqueeTextProperties } from "../../../../components/common/MarqueeText/MarqueeText";
-import type { UseSiteResult } from "../../../../hooks/site/useSite";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 const { ActionButtonGroupMock, MonitorSelectorMock, StatusIndicatorMock } =
     vi.hoisted(() => ({
@@ -30,7 +31,7 @@ const { ActionButtonGroupMock, MonitorSelectorMock, StatusIndicatorMock } =
         StatusIndicatorMock: vi.fn(),
     }));
 
-vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
+vi.mock(import('../../../../components/common/MarqueeText/MarqueeText'), () => ({
     MarqueeText: (props: MarqueeTextProperties) => (
         <div data-testid="marquee-text" data-text={props.text}>
             {props.text}
@@ -39,7 +40,7 @@ vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
 }));
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: (props: MonitorSelectorProperties) => {
             MonitorSelectorMock(props);
@@ -53,7 +54,7 @@ vi.mock(
 );
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => ({
         ActionButtonGroup: (props: ActionButtonGroupProperties) => {
             ActionButtonGroupMock(props);
@@ -68,19 +69,19 @@ vi.mock(
     })
 );
 
-vi.mock("../../../../theme/components/StatusIndicator", () => ({
+vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
     StatusIndicator: (props: StatusIndicatorProperties) => {
         StatusIndicatorMock(props);
         return (
             <div
-                data-testid={`status-indicator-${props.status}`}
                 data-status={props.status}
+                data-testid={`status-indicator-${props.status}`}
             />
         );
     },
 }));
 
-vi.mock("../../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({
         children,
         className,
@@ -88,9 +89,9 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
         onClick,
         ...rest
     }: {
+        readonly "aria-label"?: string;
         readonly children: ReactNode;
         readonly className?: string;
-        readonly "aria-label"?: string;
         readonly onClick?: () => void;
     }) => (
         <div
@@ -105,7 +106,7 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         children,
         className,
@@ -120,7 +121,7 @@ vi.mock("../../../../theme/components/ThemedText", () => ({
     ),
 }));
 
-vi.mock("../../../../hooks/site/useSite", () => ({
+vi.mock(import('../../../../hooks/site/useSite'), () => ({
     useSite: vi.fn(),
 }));
 
@@ -175,10 +176,6 @@ const createSite = (overrides: Partial<Site> = {}): Site => {
     };
 };
 interface UseSiteScenario {
-    readonly result: UseSiteResult;
-    readonly site: Site;
-    readonly latestSite: Site;
-    readonly monitor: Monitor | undefined;
     readonly handlers: {
         readonly handleCardClick: ReturnType<typeof vi.fn>;
         readonly handleCheckNow: ReturnType<typeof vi.fn>;
@@ -188,20 +185,24 @@ interface UseSiteScenario {
         readonly handleStopMonitoring: ReturnType<typeof vi.fn>;
         readonly handleStopSiteMonitoring: ReturnType<typeof vi.fn>;
     };
+    readonly latestSite: Site;
+    readonly monitor: Monitor | undefined;
+    readonly result: UseSiteResult;
+    readonly site: Site;
 }
 
 const createUseSiteScenario = (
     options: Partial<{
-        site: Site;
+        checkCount?: number;
+        isLoading?: boolean;
+        isMonitoring?: boolean;
         latestSite: Site;
         monitor: Monitor | null;
-        status: MonitorStatus;
         responseTime?: number | undefined;
-        uptime?: number;
-        checkCount?: number;
-        isMonitoring?: boolean;
-        isLoading?: boolean;
         selectedMonitorId?: string;
+        site: Site;
+        status: MonitorStatus;
+        uptime?: number;
     }> = {}
 ): UseSiteScenario => {
     const site = options.site ?? createSite();
@@ -314,8 +315,8 @@ describe("SiteCompactCard", () => {
                 screen.getByText(
                     new RegExp(
                         expectedSummary.replaceAll(
-                            /[$()*+.?[\\\]^{|}]/g,
-                            String.raw`\$&`
+                            /[$()*+.?[\\\]^{|}]/gu,
+                            "$&"
                         )
                     )
                 )
@@ -344,7 +345,7 @@ describe("SiteCompactCard", () => {
             ).toBeInTheDocument();
 
             const lastActionCall = ActionButtonGroupMock.mock.lastCall?.[0];
-            expect(lastActionCall).not.toBeUndefined();
+            expect(lastActionCall).toBeDefined();
             expect(lastActionCall?.isMonitoring).toBeTruthy();
             expect(lastActionCall?.isLoading).toBeFalsy();
             expect(lastActionCall?.allMonitorsRunning).toBeTruthy();
@@ -375,7 +376,7 @@ describe("SiteCompactCard", () => {
         const scenario = createUseSiteScenario({
             monitor: null,
             status: "up",
-            uptime: Number.NaN,
+            uptime: NaN,
             checkCount: 0,
             isMonitoring: false,
         });
@@ -385,7 +386,7 @@ describe("SiteCompactCard", () => {
         const view = render(<SiteCompactCard site={scenario.site} />);
 
         try {
-            expect(screen.getByText(/No Monitor Selected/)).toBeInTheDocument();
+            expect(screen.getByText(/No Monitor Selected/u)).toBeInTheDocument();
             const uptimeMetric = screen
                 .getByText("Uptime")
                 .closest(".site-card__compact-metric");

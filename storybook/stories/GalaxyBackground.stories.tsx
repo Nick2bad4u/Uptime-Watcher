@@ -3,7 +3,7 @@
  *
  * This story exists primarily to make it easy to debug visual regressions in
  * the animated background used by the header, settings modal, and add-site
- * flows. The component is intentionally rendered without application chrome so
+ * flows. The component is intentionally rendered without app chrome so
  * the CSS and SVG layers are fully visible.
  */
 

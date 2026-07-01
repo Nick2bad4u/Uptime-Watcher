@@ -55,31 +55,6 @@ export function isDatabaseCommandContext(
 }
 
 /**
- * Normalizes the supported constructor patterns into a context object.
- */
-export function resolveDatabaseCommandContext(
-    value: DatabaseCommandContext | DatabaseServiceFactory,
-    eventEmitter?: TypedEventBus<UptimeEvents>,
-    cache?: StandardizedCache<Site>
-): DatabaseCommandContext {
-    if (isDatabaseCommandContext(value)) {
-        return value;
-    }
-
-    if (!eventEmitter || !cache) {
-        throw new TypeError(
-            "DatabaseCommand requires eventEmitter and cache when a context object is not provided."
-        );
-    }
-
-    return {
-        cache,
-        eventEmitter,
-        serviceFactory: value,
-    };
-}
-
-/**
  * Narrows to an import context (context object plus `data`).
  */
 export function isImportContext(
@@ -109,4 +84,29 @@ export function isRestoreContext(
     }
 
     return Buffer.isBuffer(Reflect.get(payload, "buffer"));
+}
+
+/**
+ * Normalizes the supported constructor patterns into a context object.
+ */
+export function resolveDatabaseCommandContext(
+    value: DatabaseCommandContext | DatabaseServiceFactory,
+    eventEmitter?: TypedEventBus<UptimeEvents>,
+    cache?: StandardizedCache<Site>
+): DatabaseCommandContext {
+    if (isDatabaseCommandContext(value)) {
+        return value;
+    }
+
+    if (!eventEmitter || !cache) {
+        throw new TypeError(
+            "DatabaseCommand requires eventEmitter and cache when a context object is not provided."
+        );
+    }
+
+    return {
+        cache,
+        eventEmitter,
+        serviceFactory: value,
+    };
 }

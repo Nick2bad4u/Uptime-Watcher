@@ -3,9 +3,10 @@
  * coverage on key areas
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import React from "react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import * as React from "react";
+import { isDefined } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Final Coverage Enhancement Tests - Simplified", () => {
     beforeEach(() => {
@@ -412,7 +413,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             class Cache {
                 private readonly cache = new Map<
                     string,
-                    { value: any; expiry: number }
+                    { expiry: number; value: any; }
                 >();
 
                 set(key: string, value: any, ttl: number) {
@@ -435,7 +436,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 }
 
                 has(key: string): boolean {
-                    return this.get(key) !== undefined;
+                    return isDefined(this.get(key));
                 }
 
                 delete(key: string): boolean {
@@ -610,8 +611,8 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
             annotate("Type: Business Logic", "type");
 
             interface Props {
-                title?: string;
                 onClick?: () => void;
+                title?: string;
             }
 
             const OptionalPropsComponent = ({
@@ -748,7 +749,7 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 return (
                     <div>
                         <span data-testid="count">{count}</span>
-                        <button onClick={() => setCount(count + 1)}>
+                        <button onClick={() => { setCount(count + 1); }}>
                             Increment
                         </button>
                     </div>
@@ -785,10 +786,10 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
                 return (
                     <form>
                         <input
+                            data-testid="input"
+                            onChange={(e) => { setValue(e.target.value); }}
                             type="text"
                             value={value}
-                            onChange={(e) => setValue(e.target.value)}
-                            data-testid="input"
                         />
                         <span data-testid="value">{value}</span>
                     </form>
@@ -948,12 +949,12 @@ describe("Final Coverage Enhancement Tests - Simplified", () => {
 
             const lazy = (fn: () => any) => {
                 let value: any;
-                let computed = false;
+                let isComputed = false;
 
                 return () => {
-                    if (!computed) {
+                    if (!isComputed) {
                         value = fn();
-                        computed = true;
+                        isComputed = true;
                     }
                     return value;
                 };

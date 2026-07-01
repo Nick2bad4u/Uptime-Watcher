@@ -23,16 +23,19 @@
  * @file Test suite for historyLimitManager.ts
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Database } from "node-sqlite3-wasm";
+
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
-import {
-    setHistoryLimit,
-    getHistoryLimit,
-} from "../../../services/database/historyLimitManager";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
-import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { Database } from "node-sqlite3-wasm";
+
+import {
+    getHistoryLimit,
+    setHistoryLimit,
+} from "../../../services/database/historyLimitManager";
 
 // Mock repositories
 // Mock database

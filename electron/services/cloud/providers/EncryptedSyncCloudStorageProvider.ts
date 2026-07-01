@@ -19,25 +19,22 @@ import { CloudProviderOperationError } from "./cloudProviderErrors";
 const SYNC_PREFIX = "sync/" as const;
 const MANIFEST_KEY = "manifest.json" as const;
 
-function shouldEncryptSyncObject(key: string): boolean {
-    if (key === MANIFEST_KEY) {
-        return false;
-    }
-
-    return key.startsWith(SYNC_PREFIX);
-}
-
 /**
  * Decorator around a {@link CloudStorageProvider} that encrypts/decrypts sync
  * artifacts under `sync/`.
  */
 export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
+    public get kind(): CloudProviderKind {
+        return this.inner.kind;
+    }
+
     private readonly inner: CloudStorageProvider;
 
     private readonly key: Buffer;
 
-    public get kind(): CloudProviderKind {
-        return this.inner.kind;
+    public constructor(args: { inner: CloudStorageProvider; key: Buffer }) {
+        this.inner = args.inner;
+        this.key = args.key;
     }
 
     public async deleteObject(key: string): Promise<void> {
@@ -149,9 +146,12 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
             );
         }
     }
+}
 
-    public constructor(args: { inner: CloudStorageProvider; key: Buffer }) {
-        this.inner = args.inner;
-        this.key = args.key;
+function shouldEncryptSyncObject(key: string): boolean {
+    if (key === MANIFEST_KEY) {
+        return false;
     }
+
+    return key.startsWith(SYNC_PREFIX);
 }

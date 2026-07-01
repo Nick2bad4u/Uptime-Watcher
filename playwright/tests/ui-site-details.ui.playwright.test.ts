@@ -3,11 +3,12 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
+
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
 import {
@@ -19,11 +20,11 @@ import {
     openSiteDetailsSettingsTab,
     removeAllSites,
     resetApplicationState,
-    waitForAppInitialization,
     WAIT_TIMEOUTS,
+    waitForAppInitialization,
 } from "../utils/ui-helpers";
 
-const ANALYTICS_BUTTON_REGEX = /Analytics$/i;
+const ANALYTICS_BUTTON_REGEX = /analytics$/i;
 
 test.describe(
     "site details - modern ui",
@@ -87,21 +88,21 @@ test.describe(
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
 
-                await expect(
+                await expect.soft(
                     siteDetailsModal.getByTestId("site-overview-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
                     .getByRole("tab", { name: "Monitor Overview" })
                     .click();
-                await expect(
+                await expect.soft(
                     siteDetailsModal.getByTestId("overview-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await siteDetailsModal
                     .getByRole("tab", { name: ANALYTICS_BUTTON_REGEX })
                     .click();
-                await expect(
+                await expect.soft(
                     siteDetailsModal.getByTestId("analytics-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
@@ -114,7 +115,7 @@ test.describe(
                     state: "visible",
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(async () => {
+                await expect.soft(async () => {
                     await historyButton.click({
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                         trial: true,
@@ -124,7 +125,7 @@ test.describe(
 
                 const historyTab = siteDetailsModal.getByTestId("history-tab");
                 await historyTab.scrollIntoViewIfNeeded();
-                await expect(historyTab).toBeVisible({
+                await expect.soft(historyTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
@@ -163,10 +164,10 @@ test.describe(
                     const globalTarget = globalThis as typeof globalThis & {
                         electronAPI?: {
                             monitoring?: {
-                                stopMonitoringForSite?: (
+                                startMonitoringForSite?: (
                                     siteIdentifier: string
                                 ) => Promise<unknown>;
-                                startMonitoringForSite?: (
+                                stopMonitoringForSite?: (
                                     siteIdentifier: string
                                 ) => Promise<unknown>;
                             };
@@ -190,7 +191,7 @@ test.describe(
                             typeof candidate === "object" &&
                             "name" in candidate &&
                             (candidate as { name?: string }).name === targetName
-                    ) as { identifier?: string } | undefined;
+                    ) as undefined | { identifier?: string };
 
                     if (!targetSite?.identifier) {
                         return;
@@ -201,7 +202,7 @@ test.describe(
                     );
                 }, siteName);
 
-                await expect(startAllButton).toBeVisible({
+                await expect.soft(startAllButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
                 await startAllButton.scrollIntoViewIfNeeded();
@@ -235,7 +236,7 @@ test.describe(
                             typeof candidate === "object" &&
                             "name" in candidate &&
                             (candidate as { name?: string }).name === targetName
-                    ) as { identifier?: string } | undefined;
+                    ) as undefined | { identifier?: string };
 
                     if (!targetSite?.identifier) {
                         return;
@@ -246,7 +247,7 @@ test.describe(
                     );
                 }, siteName);
 
-                await expect(stopAllButton).toBeVisible({
+                await expect.soft(stopAllButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
@@ -263,14 +264,14 @@ test.describe(
                     { name: "Start Monitoring" }
                 );
 
-                await expect(startMonitoringButton).toBeVisible({
+                await expect.soft(startMonitoringButton).toBeVisible({
                     // Stop monitoring triggers backend work + renderer store updates.
                     // On slower CI / cold caches this can exceed the default 5s.
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
                 await startMonitoringButton.click();
 
-                await expect(stopMonitoringButton).toBeVisible({
+                await expect.soft(stopMonitoringButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
@@ -304,7 +305,7 @@ test.describe(
                             typeof candidate === "object" &&
                             "name" in candidate &&
                             (candidate as { name?: string }).name === targetName
-                    ) as { identifier?: string } | undefined;
+                    ) as undefined | { identifier?: string };
 
                     if (!targetSite?.identifier) {
                         return;
@@ -315,14 +316,14 @@ test.describe(
                     );
                 }, siteName);
 
-                await expect(stopAllButton).not.toBeVisible({
+                await expect.soft(stopAllButton).not.toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                await expect(startAllButton).toBeVisible({
+                await expect.soft(startAllButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
-                await expect(startMonitoringButton).toBeVisible({
+                await expect.soft(startMonitoringButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
             }
@@ -346,8 +347,8 @@ test.describe(
 
                 await ensureSiteDetailsHeaderCollapsed(siteDetailsModal);
 
-                await expect(header).toHaveAttribute("data-collapsed", "true");
-                await expect(
+                await expect.soft(header).toHaveAttribute("data-collapsed", "true");
+                await expect.soft(
                     siteDetailsModal.getByTestId(
                         "site-details-header-thumbnail"
                     )
@@ -358,19 +359,19 @@ test.describe(
                 const persistedState = await page.evaluate(() => {
                     try {
                         const raw =
-                            window.localStorage.getItem("uptime-watcher-ui");
+                            localStorage.getItem("uptime-watcher-ui");
                         return raw ? JSON.parse(raw) : null;
                     } catch {
                         return null;
                     }
                 });
 
-                const requiredSiteIdentifier = siteIdentifier as string;
+                const requiredSiteIdentifier = siteIdentifier!;
                 const collapsedPersisted =
                     persistedState?.state?.siteDetailsHeaderCollapsedState?.[
                         requiredSiteIdentifier
                     ];
-                expect(collapsedPersisted).toBe(true);
+                expect.soft(collapsedPersisted).toBe(true);
 
                 await page.reload({ waitUntil: "domcontentloaded" });
                 await waitForAppInitialization(page);
@@ -378,7 +379,7 @@ test.describe(
                 const persistedAfterReload = await page.evaluate(() => {
                     try {
                         const raw =
-                            window.localStorage.getItem("uptime-watcher-ui");
+                            localStorage.getItem("uptime-watcher-ui");
                         return raw ? JSON.parse(raw) : null;
                     } catch {
                         return null;
@@ -390,7 +391,7 @@ test.describe(
                         ?.siteDetailsHeaderCollapsedState?.[
                         requiredSiteIdentifier
                     ];
-                expect(collapsedAfterReload).toBe(true);
+                expect.soft(collapsedAfterReload).toBe(true);
             }
         );
     }

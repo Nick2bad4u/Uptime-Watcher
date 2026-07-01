@@ -3,17 +3,20 @@
  * uncovered lines and edge cases to achieve 100% coverage.
  */
 
+import type { Monitor, MonitorType } from "@shared/types";
+
+import { createValidMonitor } from "@shared/test/testHelpers";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { forwardRef } from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { arrayFirst, objectHasOwn  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
-import type { Monitor, MonitorType } from "@shared/types";
-import { createValidMonitor } from "@shared/test/testHelpers";
 
 // Mock ThemedSelect
-vi.mock("../../theme/components/ThemedSelect", () => ({
+vi.mock(import('../../theme/components/ThemedSelect'), () => ({
     ThemedSelect: forwardRef<HTMLSelectElement, any>(
         ({ children, className, fluid, tone, ...rest }, ref) => (
             <select
@@ -33,7 +36,7 @@ const createMockMonitor = (
     type: MonitorType,
     options: Partial<Monitor> = {}
 ): Monitor => {
-    const hasUrlOverride = Object.hasOwn(options, "url");
+    const hasUrlOverride = objectHasOwn(options, "url");
     const { url: overrideUrl, ...restOptions } = options;
     const monitor = createValidMonitor({
         id,
@@ -42,7 +45,7 @@ const createMockMonitor = (
         monitoring: false,
         responseTime: 0,
         ...restOptions,
-        ...(overrideUrl === undefined ? {} : { url: overrideUrl }),
+        ...(overrideUrl !== undefined && { url: overrideUrl }),
     });
 
     if (hasUrlOverride && overrideUrl === undefined) {
@@ -150,7 +153,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             const options = screen.getAllByRole("option");
             expect(options).toHaveLength(3);
 
-            expect(options[0]).toHaveValue("monitor-1");
+            expect(arrayFirst(options)).toHaveValue("monitor-1");
             expect(options[1]).toHaveValue("monitor-2");
             expect(options[2]).toHaveValue("monitor-3");
         });
@@ -195,7 +198,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             const select = screen.getByTestId("themed-select");
             const wrapper = select.closest(
                 ".monitor-selector__wrapper"
-            ) as HTMLElement;
+            )!;
 
             expect(select).toBeDisabled();
             expect(select).toHaveValue("");
@@ -224,7 +227,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             const select = screen.getByTestId("themed-select");
             const wrapper = select.closest(
                 ".monitor-selector__wrapper"
-            ) as HTMLElement;
+            )!;
 
             expect(select).not.toBeDisabled();
             expect(select).toHaveValue("");
@@ -272,18 +275,18 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const select = screen.getByTestId(
                 "themed-select"
-            ) as HTMLSelectElement;
+            );
             const focusSpy = vi
                 .spyOn(select, "focus")
                 .mockReturnValue(undefined);
             const wrapper = select.closest(
                 ".monitor-selector__wrapper"
-            ) as HTMLElement;
+            )!;
 
             await user.click(select);
             select.focus();
 
-            expect(focusSpy).toHaveBeenCalled();
+            expect(focusSpy).toHaveBeenCalledWith();
             expect(defaultProps.onChange).not.toHaveBeenCalled();
             expect(wrapper).not.toHaveAttribute("aria-expanded");
 
@@ -388,7 +391,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             annotate("Type: Monitoring", "type");
 
             const monitors = [
-                createMockMonitor("monitor-no-details", "http"), // No url or port
+                createMockMonitor("monitor-no-details", "http"), // No URL or port
             ];
 
             renderMonitorSelector({ monitors });
@@ -493,7 +496,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             const select = screen.getByTestId("themed-select");
             await user.selectOptions(select, "monitor-2");
 
-            expect(onChange).toHaveBeenCalled();
+            expect(onChange).toHaveBeenCalledWith();
         });
 
         it("should stop propagation on click events", ({ task, annotate }) => {
@@ -523,7 +526,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             fireEvent(select, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalledWith();
         });
 
         it("should stop propagation on mouseDown events", ({
@@ -556,7 +559,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             fireEvent(select, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalledWith();
         });
 
         it("should handle click without event object", ({ task, annotate }) => {
@@ -720,8 +723,8 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const newOptions = getSelectableOptions();
             expect(newOptions).toHaveLength(1);
-            expect(newOptions[0]).toHaveValue("new-monitor");
-            expect(newOptions[0]).toHaveTextContent(
+            expect(arrayFirst(newOptions)).toHaveValue("new-monitor");
+            expect(arrayFirst(newOptions)).toHaveTextContent(
                 "Website URL: https://new.com"
             );
         });
@@ -752,8 +755,8 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const options = screen.queryAllByRole("option");
             expect(options).toHaveLength(1);
-            expect(options[0]).toHaveTextContent("No monitors available");
-            expect(options[0]).toBeDisabled();
+            expect(arrayFirst(options)).toHaveTextContent("No monitors available");
+            expect(arrayFirst(options)).toBeDisabled();
         });
 
         it("should handle single monitor", ({ task, annotate }) => {
@@ -781,7 +784,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const options = getSelectableOptions();
             expect(options).toHaveLength(1);
-            expect(options[0]).toHaveTextContent("Ping Monitor");
+            expect(arrayFirst(options)).toHaveTextContent("Ping Monitor");
         });
 
         it("should handle monitors with special characters in URL", ({
@@ -1072,9 +1075,9 @@ describe("MonitorSelector - Complete Coverage", () => {
             const options = getSelectableOptions();
 
             // Check that each option has expected format
-            expect(options[0]).toHaveTextContent(/^Website URL:/);
-            expect(options[1]).toHaveTextContent(/^Host & Port:/);
-            expect(options[2]).toHaveTextContent(/^Ping Monitor:/);
+            expect(arrayFirst(options)).toHaveTextContent(/^Website URL:/v);
+            expect(options[1]).toHaveTextContent(/^Host & Port:/v);
+            expect(options[2]).toHaveTextContent(/^Ping Monitor:/v);
         });
     });
 

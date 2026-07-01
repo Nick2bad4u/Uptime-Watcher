@@ -177,18 +177,12 @@ export function createIpcServiceHelpers(
         defaultLogger ??
         createStructuredFallbackLogger(serviceName);
 
-    let initializationPromise: Promise<void> | undefined = undefined;
+    let initializationPromise: Promise<void> | undefined;
 
     const buildBridgeOptions = (): WaitForElectronBridgeOptions => ({
-        ...(isDefined(options.bridgeContracts)
-            ? { contracts: options.bridgeContracts }
-            : {}),
-        ...(isDefined(options.bridgeOptions?.baseDelay)
-            ? { baseDelay: options.bridgeOptions.baseDelay }
-            : {}),
-        ...(isDefined(options.bridgeOptions?.maxAttempts)
-            ? { maxAttempts: options.bridgeOptions.maxAttempts }
-            : {}),
+        ...(isDefined(options.bridgeContracts) && { contracts: options.bridgeContracts }),
+        ...(isDefined(options.bridgeOptions?.baseDelay) && { baseDelay: options.bridgeOptions.baseDelay }),
+        ...(isDefined(options.bridgeOptions?.maxAttempts) && { maxAttempts: options.bridgeOptions.maxAttempts }),
     });
 
     const ensureInitialized = (): Promise<void> => {
@@ -242,7 +236,7 @@ export function createIpcServiceHelpers(
             await ensureInitialized();
 
             try {
-                return await handler(window.electronAPI, ...args);
+                return await handler(globalThis.electronAPI, ...args);
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
                 logger.error(

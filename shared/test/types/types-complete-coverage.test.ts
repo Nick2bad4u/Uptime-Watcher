@@ -4,13 +4,14 @@
  * Tests all exported functions to achieve 100% function coverage
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
     isComputedSiteStatus,
     isMonitorStatus,
     isSiteStatus,
-    validateMonitor,
     type Monitor,
+    validateMonitor,
 } from "../../types";
 
 describe("shared/types.ts - Complete Function Coverage", () => {

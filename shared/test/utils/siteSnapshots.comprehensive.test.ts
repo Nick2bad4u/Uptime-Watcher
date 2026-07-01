@@ -2,8 +2,6 @@
  * Comprehensive tests for site snapshot and sync overlay utilities.
  */
 
-import { describe, expect, it } from "vitest";
-
 import type { Monitor, Site, StatusHistory } from "@shared/types";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 
@@ -21,6 +19,7 @@ import {
     toMonitorSnapshotOverlay,
     toSiteSnapshotOverlay,
 } from "@shared/utils/siteSnapshots";
+import { describe, expect, it } from "vitest";
 
 function createHistory(partial: Partial<StatusHistory> = {}): StatusHistory {
     return {

@@ -40,14 +40,6 @@ export const SETTINGS_KEY_ENCRYPTION_SALT = "cloud.encryption.salt" as const;
 export const SECRET_KEY_ENCRYPTION_DERIVED_KEY =
     "cloud.encryption.key.v1" as const;
 
-/** Persist a user-facing last error string in settings. */
-export async function setLastError(
-    settings: CloudSettingsAdapter,
-    message: string
-): Promise<void> {
-    await settings.set(SETTINGS_KEY_LAST_ERROR, message);
-}
-
 /** Clear the persisted last error string in settings. */
 export async function clearLastError(
     settings: CloudSettingsAdapter
@@ -68,4 +60,12 @@ export function parseNumberSetting(value: string | undefined): null | number {
 
     const parsed = Number(value);
     return isFiniteNumber(parsed) ? parsed : null;
+}
+
+/** Persist a user-facing last error string in settings. */
+export async function setLastError(
+    settings: CloudSettingsAdapter,
+    message: string
+): Promise<void> {
+    await settings.set(SETTINGS_KEY_LAST_ERROR, message);
 }

@@ -1,5 +1,5 @@
 /**
- * Window management service for Electron application windows.
+ * Window management service for Electron app windows.
  *
  * @remarks
  * Handles the creation, configuration, and lifecycle management of Electron
@@ -8,7 +8,7 @@
  *
  * Key responsibilities:
  *
- * - Create and configure the main application window
+ * - Create and configure the main app window
  * - Load appropriate content based on the current environment
  * - Handle window lifecycle events (ready-to-show, closed, etc.)
  * - Manage window state and provide convenience accessors
@@ -17,7 +17,7 @@
  * The service automatically handles environment-specific loading:
  *
  * - Development: Loads from the Vite dev server and opens DevTools
- * - Production: Loads from built static files in the application bundle
+ * - Production: Loads from built static files in the app bundle
  *
  * @example
  *
@@ -100,7 +100,7 @@ const getCallableProperty = (
  */
 const resolveCurrentDirectory = (): string => {
     try {
-        return path.dirname(fileURLToPath(import.meta.url));
+        return import.meta.dirname;
     } catch {
         const globalFilename = Reflect.get(globalThis, "__filename");
         if (typeof globalFilename === "string" && globalFilename.length > 0) {
@@ -119,7 +119,7 @@ const resolveCurrentDirectory = (): string => {
 const currentDirectory = resolveCurrentDirectory();
 
 /**
- * Attempts to resolve Electron's application path when the runtime exposes the
+ * Attempts to resolve Electron's app path when the runtime exposes the
  * required `app` lifecycle methods.
  *
  * @remarks
@@ -128,7 +128,7 @@ const currentDirectory = resolveCurrentDirectory();
  * helper keeps production behaviour unchanged while ensuring module evaluation
  * never crashes under partial mocks.
  *
- * @returns The resolved application path when available; otherwise `undefined`.
+ * @returns The resolved app path when available; otherwise `undefined`.
  */
 const tryResolveElectronAppPath = (): string | undefined => {
     try {
@@ -231,7 +231,7 @@ export class WindowService {
         SERVER_URL: "http://localhost:5173",
     } as const;
 
-    /** Reference to the main application window (null if not created) */
+    /** Reference to the main app window (null if not created) */
     private mainWindow: BrowserWindowInstance | null = null;
 
     /**
@@ -239,7 +239,7 @@ export class WindowService {
      *
      * @remarks
      * Electron rejects pending `loadURL` / `loadFile` promises when a window is
-     * closed before navigation completes. That is expected during application
+     * closed before navigation completes. That is expected during app
      * teardown and should not escalate into a fatal process shutdown.
      */
     private isMainWindowClosing = false;
@@ -388,9 +388,7 @@ export class WindowService {
             errorName: result.errorName,
             url: result.safeUrlForLogging,
             ...(typeof result.errorCode === "string" &&
-            result.errorCode.length > 0
-                ? { errorCode: result.errorCode }
-                : {}),
+            result.errorCode.length > 0 && { errorCode: result.errorCode }),
         });
     }
 
@@ -535,8 +533,8 @@ export class WindowService {
         class ViteDevServerNotReadyError extends Error {
             public override readonly name = "ViteDevServerNotReadyError";
 
-            public constructor(message: string) {
-                super(message);
+            public constructor(message: string, options: ErrorOptions) {
+                super(message, options);
             }
         }
 
@@ -719,14 +717,16 @@ export class WindowService {
      * Close the main window.
      */
     public closeMainWindow(): void {
-        if (this.hasMainWindow()) {
-            this.isMainWindowClosing = true;
-            this.mainWindow?.close();
+        if (!this.hasMainWindow()) {
+            return;
         }
+
+        this.isMainWindowClosing = true;
+        this.mainWindow?.close();
     }
 
     /**
-     * Create and configure the main application window.
+     * Create and configure the main app window.
      *
      * @remarks
      * Creates a new main window with secure defaults including:

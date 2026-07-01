@@ -2,9 +2,10 @@
  * Tests for alert coordinator helpers.
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { StatusUpdate } from "@shared/types";
+
 import { STATUS_KIND } from "@shared/types";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as alertCoordinator from "../../../components/Alerts/alertCoordinator";
 import { logger } from "../../../services/logger";
@@ -13,7 +14,8 @@ import {
     useAlertStore,
 } from "../../../stores/alerts/useAlertStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-vi.mock("../../../services/logger", () => ({
+
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -22,7 +24,7 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../services/NotificationPreferenceService", () => ({
+vi.mock(import('../../../services/NotificationPreferenceService'), () => ({
     NotificationPreferenceService: {
         initialize: vi.fn().mockResolvedValue(undefined),
         updatePreferences: vi.fn().mockResolvedValue(undefined),
@@ -192,8 +194,8 @@ describe("alertCoordinator", () => {
 
     it.each([
         ["greater than one", 1.25],
-        ["infinite", Number.POSITIVE_INFINITY],
-        ["not-a-number", Number.NaN],
+        ["infinite", Infinity],
+        ["not-a-number", NaN],
     ])("normalizes %s alert volume candidates", (_, volume) => {
         const toneSpy = vi.fn().mockResolvedValue(undefined);
         alertCoordinator.setAlertToneInvoker(toneSpy);
@@ -344,7 +346,7 @@ describe("playInAppAlertTone", () => {
         createOscillatorSpy = vi.fn(() => new MockOscillator());
         createGainSpy = vi.fn(() => new MockGain());
 
-        originalAudioContext = globalThis.AudioContext;
+        originalAudioContext = AudioContext;
         (
             globalThis as unknown as { AudioContext: typeof AudioContext }
         ).AudioContext = TestAudioContext as unknown as typeof AudioContext;

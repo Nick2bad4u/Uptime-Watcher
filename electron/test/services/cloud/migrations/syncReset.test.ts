@@ -1,18 +1,16 @@
-import type { CloudEncryptionConfigPassphrase } from "@shared/types/cloudEncryption";
-import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
-
-import { describe, expect, it, vi } from "vitest";
-
-import { CLOUD_ENCRYPTION_CONFIG_VERSION } from "@shared/types/cloudEncryption";
-import { CLOUD_SYNC_MANIFEST_VERSION } from "@shared/types/cloudSyncManifest";
-import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
-
-import { resetProviderCloudSyncState } from "@electron/services/cloud/migrations/syncReset";
 import type { CloudStorageProvider } from "@electron/services/cloud/providers/CloudStorageProvider.types";
 import type {
     CloudSyncEngine,
     SyncEngineResult,
 } from "@electron/services/sync/SyncEngine";
+import type { CloudEncryptionConfigPassphrase } from "@shared/types/cloudEncryption";
+import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
+
+import { resetProviderCloudSyncState } from "@electron/services/cloud/migrations/syncReset";
+import { CLOUD_ENCRYPTION_CONFIG_VERSION } from "@shared/types/cloudEncryption";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { CLOUD_SYNC_MANIFEST_VERSION } from "@shared/types/cloudSyncManifest";
+import { describe, expect, it, vi } from "vitest";
 
 class InMemoryProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;

@@ -7,15 +7,16 @@
  * edge cases to achieve 95%+ code coverage.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-
-import { DataService } from "../../services/DataService";
 import type {
     SerializedDatabaseBackupResult,
     SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestorePayload,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DataService } from "../../services/DataService";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -35,7 +36,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -47,7 +48,7 @@ const mockLogger = vi.hoisted(() => ({
     warn: vi.fn(),
     debug: vi.fn(),
 }));
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: mockLogger,
 }));
 
@@ -64,7 +65,7 @@ const mockWithUtilityErrorHandling = vi.hoisted(() =>
     )
 );
 
-vi.mock("../../../shared/utils/errorHandling", async () => {
+vi.mock(import('../../../shared/utils/errorHandling'), async () => {
     const actual = await vi.importActual<
         typeof import("../../../shared/utils/errorHandling")
     >("../../../shared/utils/errorHandling");
@@ -120,14 +121,14 @@ function createMockRestorePayload(): SerializedDatabaseRestorePayload {
 function createMockSaveResult(
     overrides: Partial<SerializedDatabaseBackupSaveResult> = {}
 ): SerializedDatabaseBackupSaveResult {
-    if ("canceled" in overrides && overrides.canceled === false) {
+    if ("canceled" in overrides && !overrides.canceled) {
         return {
             canceled: false,
             fileName: "backup.sqlite",
             filePath: "/tmp/backup.sqlite",
             metadata: createMockBackupResult().metadata,
             ...overrides,
-        } as SerializedDatabaseBackupSaveResult;
+        };
     }
 
     return {
@@ -193,11 +194,11 @@ describe("DataService", () => {
         it("should expose all required methods", () => {
             const expectedMethods = [
                 "downloadSqliteBackup",
-                "saveSqliteBackup",
                 "exportData",
                 "importData",
-                "restoreSqliteBackup",
                 "initialize",
+                "restoreSqliteBackup",
+                "saveSqliteBackup",
             ] as const;
 
             for (const method of expectedMethods) {
@@ -211,7 +212,7 @@ describe("DataService", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(DataService.initialize()).resolves.toBeUndefined();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
@@ -223,7 +224,7 @@ describe("DataService", () => {
                 "Electron API not available"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[DataService] Failed to initialize:",
@@ -238,7 +239,7 @@ describe("DataService", () => {
             await expect(DataService.initialize()).rejects.toBe(stringError);
 
             expect(mockEnsureError).toHaveBeenCalledWith(stringError);
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
         });
 
         it("should handle null/undefined initialization errors", async () => {
@@ -248,7 +249,7 @@ describe("DataService", () => {
             await expect(DataService.initialize()).rejects.toBe(nullError);
 
             expect(mockEnsureError).toHaveBeenCalledWith(nullError);
-            expect(mockLogger.error).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith();
         });
     });
 
@@ -261,10 +262,10 @@ describe("DataService", () => {
 
             const result = await DataService.downloadSqliteBackup();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
             expect(result).toEqual(mockBackup);
             expect(result.buffer).toBeInstanceOf(ArrayBuffer);
             expect(typeof result.fileName).toBe("string");
@@ -293,10 +294,10 @@ describe("DataService", () => {
                 "Backup failed"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
         });
 
         it("should handle different backup response formats", async () => {
@@ -330,7 +331,7 @@ describe("DataService", () => {
 
             const result = await DataService.restoreSqliteBackup(payload);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(
                 mockElectronAPI.data.restoreSqliteBackup
             ).toHaveBeenCalledWith(payload);
@@ -368,8 +369,8 @@ describe("DataService", () => {
 
             const result = await DataService.exportData();
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.data.exportData).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockElectronAPI.data.exportData).toHaveBeenCalledWith();
             expect(result).toBe(mockExportData);
             expect(typeof result).toBe("string");
         });
@@ -393,8 +394,8 @@ describe("DataService", () => {
                 "Export failed"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
-            expect(mockElectronAPI.data.exportData).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
+            expect(mockElectronAPI.data.exportData).toHaveBeenCalledWith();
         });
 
         it("should handle empty export data", async () => {
@@ -447,13 +448,13 @@ describe("DataService", () => {
                 '{"sites":[{"id":"1","name":"Imported Site"}],"monitors":[]}';
             mockElectronAPI.data.importData.mockResolvedValue(true);
 
-            const result = await DataService.importData(importData);
+            const isResult = await DataService.importData(importData);
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should fail if initialization fails", async () => {
@@ -477,7 +478,7 @@ describe("DataService", () => {
                 "Import failed"
             );
 
-            expect(mockWaitForElectronBridge).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalledWith();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
@@ -487,24 +488,24 @@ describe("DataService", () => {
             const emptyData = "";
             mockElectronAPI.data.importData.mockResolvedValue(false);
 
-            const result = await DataService.importData(emptyData);
+            const isResult = await DataService.importData(emptyData);
 
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 emptyData
             );
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should propagate backend failure for invalid JSON", async () => {
             const invalidJson = '{"sites": [invalid json}';
             mockElectronAPI.data.importData.mockResolvedValue(false);
 
-            const result = await DataService.importData(invalidJson);
+            const isResult = await DataService.importData(invalidJson);
 
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 invalidJson
             );
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should handle various import data formats", async () => {
@@ -537,12 +538,12 @@ describe("DataService", () => {
             });
             mockElectronAPI.data.importData.mockResolvedValue(true);
 
-            const result = await DataService.importData(complexData);
+            const isResult = await DataService.importData(complexData);
 
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 complexData
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("throws TypeError when backend returns non-boolean result", async () => {
@@ -559,22 +560,22 @@ describe("DataService", () => {
     describe("Integration Testing", () => {
         it("should handle multiple operations in sequence", async () => {
             const exportData = '{"sites":[],"monitors":[]}';
-            const importResult = true;
+            const isImportResult = true;
             const backupResult = createMockBackupResult();
 
             mockElectronAPI.data.exportData.mockResolvedValue(exportData);
-            mockElectronAPI.data.importData.mockResolvedValue(importResult);
+            mockElectronAPI.data.importData.mockResolvedValue(isImportResult);
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue(
                 backupResult
             );
 
             // Perform multiple operations
             const exported = await DataService.exportData();
-            const imported = await DataService.importData(exported);
+            const isImported = await DataService.importData(exported);
             const backup = await DataService.downloadSqliteBackup();
 
             expect(exported).toBe(exportData);
-            expect(imported).toBe(importResult);
+            expect(isImported).toBe(isImportResult);
             expect(backup).toEqual(backupResult);
 
             // Should only initialize once due to shared initialization
@@ -583,11 +584,11 @@ describe("DataService", () => {
 
         it("should handle concurrent operations", async () => {
             const exportData = '{"sites":[],"monitors":[]}';
-            const importResult = true;
+            const isImportResult = true;
             const backupResult = createMockBackupResult();
 
             mockElectronAPI.data.exportData.mockResolvedValue(exportData);
-            mockElectronAPI.data.importData.mockResolvedValue(importResult);
+            mockElectronAPI.data.importData.mockResolvedValue(isImportResult);
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue(
                 backupResult
             );
@@ -604,7 +605,7 @@ describe("DataService", () => {
             ]);
 
             expect(exported).toBe(exportData);
-            expect(imported).toBe(importResult);
+            expect(imported).toBe(isImportResult);
             expect(backup).toEqual(backupResult);
         });
 
@@ -634,14 +635,14 @@ describe("DataService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             // Remove the electronAPI
-            delete (globalThis as any).window.electronAPI;
+            delete globalThis.electronAPI;
 
             await expect(DataService.exportData()).rejects.toThrow();
         });
 
         it("should handle partial electron API gracefully", async () => {
             // Remove specific method
-            delete (globalThis as any).window.electronAPI.data.exportData;
+            delete globalThis.electronAPI.data.exportData;
 
             await expect(DataService.exportData()).rejects.toThrow();
         });
@@ -707,10 +708,10 @@ describe("DataService", () => {
             mockElectronAPI.data.importData.mockResolvedValue(true);
 
             const exported = await DataService.exportData();
-            const imported = await DataService.importData(unicodeData);
+            const isImported = await DataService.importData(unicodeData);
 
             expect(exported).toBe(unicodeData);
-            expect(imported).toBeTruthy();
+            expect(isImported).toBeTruthy();
         });
 
         it("should handle special filename characters in backup", async () => {

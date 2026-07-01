@@ -3,11 +3,12 @@
  * lines to achieve 100% coverage
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { safeStringify } from "../utils/stringConversion";
 import { validateMonitorField } from "@shared/validation/monitorSchemas";
-import { safeGetRowProperty, RowValidationUtils } from "../types/database";
+import { describe, expect, it, vi } from "vitest";
+
+import { RowValidationUtils, safeGetRowProperty } from "../types/database";
 import { withErrorHandling } from "../utils/errorHandling";
+import { safeStringify } from "../utils/stringConversion";
 
 describe("Complete 100% Coverage - Final Tests", () => {
     describe("stringConversion.ts - Uncovered Lines", () => {
@@ -68,7 +69,7 @@ describe("Complete 100% Coverage - Final Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             // Try to validate a field that doesn't exist in any schema
-            // Using a field name that's not in http schema or base schema
+            // Using a field name that's not in HTTP schema or base schema
             expect(() => {
                 validateMonitorField(
                     "http",
@@ -121,8 +122,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
                 expect(error).toBeDefined();
             }
 
-            const result = true; // Just to ensure test passes
-            expect(result).toBeDefined();
+            const isResult = true; // Just to ensure test passes
+            expect(isResult).toBeDefined();
         });
     });
 
@@ -138,9 +139,9 @@ describe("Complete 100% Coverage - Final Tests", () => {
 
             // Test the case where isValidTimestamp returns false
             const invalidTimestamp = "not-a-number";
-            const result =
+            const isResult =
                 RowValidationUtils.isValidTimestamp(invalidTimestamp);
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should handle property access edge cases (lines 372-373)", async ({
@@ -246,8 +247,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
             expect(result1).toBe("");
 
             // For database validation edge cases
-            const result2 = RowValidationUtils.isValidTimestamp("NaN");
-            expect(result2).toBeFalsy();
+            const isResult2 = RowValidationUtils.isValidTimestamp("NaN");
+            expect(isResult2).toBeFalsy();
 
             // Ensure all edge cases are covered
             expect(true).toBeTruthy();

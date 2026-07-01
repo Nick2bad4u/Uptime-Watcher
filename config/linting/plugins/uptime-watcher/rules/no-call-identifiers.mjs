@@ -78,12 +78,15 @@ export const noCallIdentifiersRule = {
     },
 
     meta: {
-        type: "problem",
+        defaultOptions: [{ banned: [] }],
         docs: {
             description:
                 "disallow calling specific identifiers by name to prevent drift away from shared utilities",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-call-identifiers.md",
+        },
+        messages: {
+            bannedCall: "Calling '{{name}}' is not allowed. {{details}}",
         },
         schema: [
             {
@@ -119,9 +122,6 @@ export const noCallIdentifiersRule = {
                 },
             },
         ],
-        defaultOptions: [{ banned: [] }],
-        messages: {
-            bannedCall: "Calling '{{name}}' is not allowed. {{details}}",
-        },
+        type: "problem",
     },
 };

@@ -1,16 +1,18 @@
+import type { UnknownRecord } from "type-fest";
+
 /**
  * @vitest-environment jsdom
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+    type ElectronBridgeContract,
     ElectronBridgeNotReadyError,
     waitForElectronBridge,
-    type ElectronBridgeContract,
 } from "../../../services/utils/electronBridgeReadiness";
 
 describe(waitForElectronBridge, () => {
-    const setBridge = (contracts?: Record<string, unknown>): void => {
+    const setBridge = (contracts?: UnknownRecord): void => {
         const electronAPI = contracts ?? {};
         vi.stubGlobal("window", {
             electronAPI,
@@ -59,7 +61,7 @@ describe(waitForElectronBridge, () => {
             baseDelay: 1,
             contracts: [{ domain: "sites" }],
             maxAttempts: 2,
-        }).catch((error) => error as ElectronBridgeNotReadyError);
+        }).catch((error: unknown) => error as ElectronBridgeNotReadyError);
 
         await vi.runAllTimersAsync();
 
@@ -88,7 +90,7 @@ describe(waitForElectronBridge, () => {
                 },
             ],
             maxAttempts: 2,
-        }).catch((error) => error as ElectronBridgeNotReadyError);
+        }).catch((error: unknown) => error as ElectronBridgeNotReadyError);
 
         await vi.runAllTimersAsync();
 

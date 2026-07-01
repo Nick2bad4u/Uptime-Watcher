@@ -1,11 +1,13 @@
 import type {
+    CloudObjectEntry,
+    CloudStorageProvider,
+} from "@electron/services/cloud/providers/CloudStorageProvider.types";
+import type { CloudBackupEntry } from "@shared/types/cloud";
+import type {
     CloudBackupMigrationRequest,
     CloudBackupMigrationResult,
 } from "@shared/types/cloudBackupMigration";
-import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
-
-import { describe, expect, it } from "vitest";
 
 import {
     decryptBuffer,
@@ -14,10 +16,7 @@ import {
     isEncryptedPayload,
 } from "@electron/services/cloud/crypto/cloudCrypto";
 import { migrateProviderBackups } from "@electron/services/cloud/migrations/backupMigration";
-import type {
-    CloudObjectEntry,
-    CloudStorageProvider,
-} from "@electron/services/cloud/providers/CloudStorageProvider.types";
+import { describe, expect, it } from "vitest";
 
 class InMemoryBackupProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;
@@ -129,11 +128,11 @@ class InMemoryBackupProvider implements CloudStorageProvider {
     }
 
     public seedBackup(entry: {
+        buffer: Buffer;
+        createdAt: number;
         encrypted: boolean;
         fileName: string;
         key: string;
-        buffer: Buffer;
-        createdAt: number;
     }): void {
         const metadata: SerializedDatabaseBackupMetadata = {
             appVersion: "test",
@@ -198,7 +197,7 @@ describe(migrateProviderBackups, () => {
         expect(result.failures).toHaveLength(0);
 
         const backups = await provider.listBackups();
-        expect(backups.some((b) => b.encrypted === false)).toBeTruthy();
+        expect(backups.some((b) => !b.encrypted)).toBeTruthy();
         expect(backups.filter((b) => b.encrypted).length).toBeGreaterThan(0);
 
         const migratedEntry = backups.find(
@@ -271,7 +270,7 @@ describe(migrateProviderBackups, () => {
 
         await expect(
             migrateProviderBackups({ provider, request })
-        ).rejects.toThrow(/Encryption key is required/u);
+        ).rejects.toThrow(/Encryption key is required/v);
     });
 
     it("returns failures when an entry cannot be downloaded", async () => {
@@ -442,7 +441,7 @@ describe(migrateProviderBackups, () => {
         expect(result.failures[0]?.key).toBe(
             "backups/legacy/uptime-watcher-backup-10.sqlite"
         );
-        expect(result.failures[0]?.message).toMatch(/already exists/u);
+        expect(result.failures[0]?.message).toMatch(/already exists/v);
 
         const existingCanonical = provider.readBlob(
             "backups/uptime-watcher-backup-10.sqlite.enc"

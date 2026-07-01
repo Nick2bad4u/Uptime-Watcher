@@ -1,7 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-
 import * as path from "node:path";
 import ts from "typescript";
+import { describe, expect, it, vi } from "vitest";
 
 const { readFileSync, readdirSync } =
     await vi.importActual<typeof import("node:fs")>("node:fs");
@@ -287,31 +286,31 @@ function collectInjectedChannels(
                 const [configArg] = node.arguments;
                 if (configArg && ts.isObjectLiteralExpression(configArg)) {
                     for (const property of configArg.properties) {
-                        if (
-                            ts.isPropertyAssignment(property) &&
-                            property.name &&
-                            ts.isIdentifier(property.name)
-                        ) {
-                            const propertyName = property.name.text;
+                        if (!ts.isPropertyAssignment(property) ||
+                            !property.name ||
+                            !ts.isIdentifier(property.name)) {
+                            continue;
+                        }
 
-                            if (propertyName === "updatePreferencesChannel") {
-                                const channelName = resolveChannelName(
-                                    property.initializer
-                                );
-                                channels.add(
-                                    channelName ??
-                                        "update-notification-preferences"
-                                );
-                            } else if (
-                                propertyName === "verifyChannel" ||
-                                propertyName === "reportChannel"
-                            ) {
-                                const channelName = resolveChannelName(
-                                    property.initializer
-                                );
-                                if (channelName) {
-                                    channels.add(channelName);
-                                }
+                        const propertyName = property.name.text;
+
+                        if (propertyName === "updatePreferencesChannel") {
+                            const channelName = resolveChannelName(
+                                property.initializer
+                            );
+                            channels.add(
+                                channelName ??
+                                    "update-notification-preferences"
+                            );
+                        } else if (
+                            propertyName === "verifyChannel" ||
+                            propertyName === "reportChannel"
+                        ) {
+                            const channelName = resolveChannelName(
+                                property.initializer
+                            );
+                            if (channelName) {
+                                channels.add(channelName);
                             }
                         }
                     }

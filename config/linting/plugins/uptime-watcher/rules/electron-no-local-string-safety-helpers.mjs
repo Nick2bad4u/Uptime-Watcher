@@ -69,16 +69,16 @@ export const electronNoLocalStringSafetyHelpersRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow local hasAsciiControlCharacters helpers in electron/services; use the shared implementation instead",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-local-string-safety-helpers.md",
         },
-        schema: [],
         messages: {
             banned: "Use the shared hasAsciiControlCharacters implementation instead of re-declaring it locally.",
         },
+        schema: [],
+        type: "problem",
     },
 };

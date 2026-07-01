@@ -1,6 +1,3 @@
-import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
-import { describe, expect, it } from "vitest";
-
 import {
     assertOpsObjectKey,
     assertSafeProviderKey,
@@ -8,6 +5,8 @@ import {
     assertValidSyncDeviceId,
     isValidOpsObjectKey,
 } from "@electron/services/sync/providerKeyValidation";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { describe, expect, it } from "vitest";
 
 describe("providerKeyValidation", () => {
     describe("assertValidSyncDeviceId behavior", () => {

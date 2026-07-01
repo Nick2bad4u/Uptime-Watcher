@@ -3,15 +3,14 @@
  * management, and persistence.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-
-import { installElectronApiMock } from "./utils/electronApiMock";
+import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AppSettings } from "../stores/types";
 
 import { normalizeAppSettings } from "../stores/settings/state";
-import fc from "fast-check";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
+import { installElectronApiMock } from "./utils/electronApiMock";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(
@@ -27,7 +26,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
         }
 );
 
-vi.mock("../services/utils/electronBridgeReadiness", () => ({
+vi.mock(import('../services/utils/electronBridgeReadiness'), () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
@@ -45,7 +44,7 @@ const mockElectronAPI = {
 let restoreElectronApi: (() => void) | undefined;
 
 // Mock utils (partial) so createPersistConfig remains available.
-vi.mock("../stores/utils", async (importOriginal) => {
+vi.mock(import('../stores/utils'), async (importOriginal) => {
     const actual = await importOriginal<typeof import("../stores/utils")>();
 
     return {
@@ -62,7 +61,7 @@ vi.mock("../stores/utils", async (importOriginal) => {
 });
 
 // Mock useErrorStore
-vi.mock("../stores/error/useErrorStore", () => ({
+vi.mock(import('../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -73,7 +72,7 @@ vi.mock("../stores/error/useErrorStore", () => ({
 }));
 
 // Mock constants
-vi.mock("../constants", () => ({
+vi.mock(import('../constants'), () => ({
     DEFAULT_HISTORY_LIMIT: 100,
 }));
 
@@ -212,7 +211,7 @@ describe(useSettingsStore, () => {
 
             await useSettingsStore.getState().initializeSettings();
 
-            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalledWith();
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(250);
@@ -502,7 +501,7 @@ describe(useSettingsStore, () => {
             fc.assert(
                 fc.property(fc.anything(), (rawValue) => {
                     const normalized = normalizeAppSettings({
-                        inAppAlertVolume: rawValue as unknown as number,
+                        inAppAlertVolume: rawValue as number,
                     });
 
                     expect(normalized.inAppAlertVolume).toBeGreaterThanOrEqual(
@@ -582,9 +581,9 @@ describe(useSettingsStore, () => {
             await annotate("Type: Business Logic", "type");
 
             const validThemes = [
-                "system",
-                "light",
                 "dark",
+                "light",
+                "system",
             ] as const;
 
             for (const theme of validThemes) {

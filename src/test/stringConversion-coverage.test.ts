@@ -4,8 +4,8 @@
  * @file Direct function call tests for stringConversion to ensure coverage
  */
 
-import { describe, expect, it } from "vitest";
 import { safeStringify } from "@shared/utils/stringConversion";
+import { describe, expect, it } from "vitest";
 
 describe("stringConversion Direct Function Coverage", () => {
     it("should call safeStringify function with various types", () => {

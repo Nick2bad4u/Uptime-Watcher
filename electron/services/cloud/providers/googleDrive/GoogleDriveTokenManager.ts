@@ -100,9 +100,7 @@ export class GoogleDriveTokenManager {
         try {
             return await requestGoogleOAuthToken({
                 clientId: this.clientId,
-                ...(this.clientSecret
-                    ? { clientSecret: this.clientSecret }
-                    : {}),
+                ...(this.clientSecret && { clientSecret: this.clientSecret }),
                 operationLabel: "refresh",
                 params: {
                     grant_type: "refresh_token",
@@ -169,8 +167,8 @@ export class GoogleDriveTokenManager {
                 accessToken: refreshed.access_token,
                 expiresAt: now + expiresInSeconds * 1000,
                 refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
-                ...(isDefined(nextScope) ? { scope: nextScope } : {}),
-                ...(isDefined(nextTokenType) ? { tokenType: nextTokenType } : {}),
+                ...(isDefined(nextScope) && { scope: nextScope }),
+                ...(isDefined(nextTokenType) && { tokenType: nextTokenType }),
             });
 
             return refreshed.access_token;

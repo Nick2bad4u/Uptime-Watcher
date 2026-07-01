@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import {
     createKeyCheckBase64,
     decryptBuffer,
@@ -9,6 +7,7 @@ import {
     isEncryptedPayload,
     verifyKeyCheckBase64,
 } from "@electron/services/cloud/crypto/cloudCrypto";
+import { describe, expect, it } from "vitest";
 
 describe("cloudCrypto", () => {
     it("derives deterministic keys for same passphrase and salt", async () => {

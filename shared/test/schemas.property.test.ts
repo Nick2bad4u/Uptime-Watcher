@@ -4,21 +4,21 @@
  * @packageDocumentation
  */
 
-import { test, fc } from "@fast-check/vitest";
-import { describe, expect } from "vitest";
+import { fc, test } from "@fast-check/vitest";
 import validator from "validator";
+import { describe, expect } from "vitest";
 
+import { BASE_MONITOR_TYPES } from "../types";
 import {
     baseMonitorSchema,
-    httpMonitorSchema,
-    portMonitorSchema,
-    pingMonitorSchema,
     dnsMonitorSchema,
+    httpMonitorSchema,
     monitorSchema,
+    pingMonitorSchema,
+    portMonitorSchema,
     validateMonitorData,
 } from "../validation/monitorSchemas";
 import { siteSchema, validateSiteData } from "../validation/siteSchemas";
-import { BASE_MONITOR_TYPES } from "../types";
 
 // Custom arbitraries for monitor data generation that match schema constraints
 const baseMonitorArbitrary = fc.record({
@@ -462,7 +462,7 @@ const monitorArbitrary = fc.oneof(
 const siteArbitrary = fc.record({
     identifier: fc
         .string({ minLength: 1, maxLength: 100 })
-        .filter((s) => /^[\w-]+$/.test(s) && s.trim().length > 0),
+        .filter((s) => /^[\w-]+$/u.test(s) && s.trim().length > 0),
     name: fc
         .string({ minLength: 1, maxLength: 200 })
         .filter((s) => s.trim().length > 0),
@@ -603,8 +603,8 @@ describe("Schema Property-Based Tests", () => {
                 -1,
                 65_536,
                 999_999,
-                Number.NaN,
-                Number.POSITIVE_INFINITY,
+                NaN,
+                Infinity,
             ];
 
             for (const invalidPort of invalidPorts) {
@@ -676,13 +676,18 @@ describe("Schema Property-Based Tests", () => {
 
                     // Type-specific validation
                     switch (result.data.type) {
-                        case "http": {
-                            expect(result.data).toHaveProperty("url");
+                        case "cdn-edge-consistency": {
+                            expect(result.data).toHaveProperty("baselineUrl");
+                            expect(result.data).toHaveProperty("edgeLocations");
                             break;
                         }
-                        case "http-keyword": {
+                        case "dns": {
+                            expect(result.data).toHaveProperty("host");
+                            expect(result.data).toHaveProperty("recordType");
+                            break;
+                        }
+                        case "http": {
                             expect(result.data).toHaveProperty("url");
-                            expect(result.data).toHaveProperty("bodyKeyword");
                             break;
                         }
                         case "http-header": {
@@ -701,6 +706,11 @@ describe("Schema Property-Based Tests", () => {
                             );
                             break;
                         }
+                        case "http-keyword": {
+                            expect(result.data).toHaveProperty("url");
+                            expect(result.data).toHaveProperty("bodyKeyword");
+                            break;
+                        }
                         case "http-latency": {
                             expect(result.data).toHaveProperty("url");
                             expect(result.data).toHaveProperty(
@@ -715,32 +725,14 @@ describe("Schema Property-Based Tests", () => {
                             );
                             break;
                         }
-                        case "port": {
-                            expect(result.data).toHaveProperty("host");
-                            expect(result.data).toHaveProperty("port");
-                            break;
-                        }
                         case "ping": {
                             expect(result.data).toHaveProperty("host");
                             expect(result.data).not.toHaveProperty("port");
                             break;
                         }
-                        case "dns": {
-                            expect(result.data).toHaveProperty("host");
-                            expect(result.data).toHaveProperty("recordType");
-                            break;
-                        }
-                        case "ssl": {
+                        case "port": {
                             expect(result.data).toHaveProperty("host");
                             expect(result.data).toHaveProperty("port");
-                            expect(result.data).toHaveProperty(
-                                "certificateWarningDays"
-                            );
-                            break;
-                        }
-                        case "cdn-edge-consistency": {
-                            expect(result.data).toHaveProperty("baselineUrl");
-                            expect(result.data).toHaveProperty("edgeLocations");
                             break;
                         }
                         case "replication": {
@@ -772,6 +764,14 @@ describe("Schema Property-Based Tests", () => {
                                 "heartbeatTimestampField"
                             );
                             expect(result.data).toHaveProperty("url");
+                            break;
+                        }
+                        case "ssl": {
+                            expect(result.data).toHaveProperty("host");
+                            expect(result.data).toHaveProperty("port");
+                            expect(result.data).toHaveProperty(
+                                "certificateWarningDays"
+                            );
                             break;
                         }
                         case "websocket-keepalive": {

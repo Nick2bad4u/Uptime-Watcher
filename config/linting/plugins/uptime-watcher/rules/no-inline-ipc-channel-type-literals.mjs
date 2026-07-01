@@ -232,17 +232,17 @@ export const noInlineIpcChannelTypeLiteralsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow IPC channel string literals in TS type positions; rely on shared channel constants and inference.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-inline-ipc-channel-type-literals.md",
         },
-        schema: [],
         messages: {
             noInlineChannelTypeLiteral:
                 "Do not encode IPC channel strings in TypeScript type positions. Use shared channel constants/mappings (from @shared/types/preload) and let types be inferred.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -15,18 +15,6 @@ const dropboxErrorSummarySchema: z.ZodType<DropboxErrorSummaryPayload> = z
     })
     .loose();
 
-function tryParseDropboxErrorSummaryFromObject(
-    value: unknown
-): string | undefined {
-    const parsed = dropboxErrorSummarySchema.safeParse(value);
-    if (parsed.success) {
-        return parsed.data.error_summary;
-    }
-
-    formatZodIssues(parsed.error.issues);
-    return undefined;
-}
-
 /**
  * Best-effort extraction of a Dropbox `error_summary` string.
  *
@@ -84,5 +72,17 @@ export function tryParseDropboxErrorSummary(
             : undefined;
     }
 
+    return undefined;
+}
+
+function tryParseDropboxErrorSummaryFromObject(
+    value: unknown
+): string | undefined {
+    const parsed = dropboxErrorSummarySchema.safeParse(value);
+    if (parsed.success) {
+        return parsed.data.error_summary;
+    }
+
+    formatZodIssues(parsed.error.issues);
     return undefined;
 }

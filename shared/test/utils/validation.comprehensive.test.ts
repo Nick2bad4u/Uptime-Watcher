@@ -6,11 +6,10 @@
  * monitor/site payloads and surface meaningful errors for invalid data.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
+import { describe, expect, it } from "vitest";
 
 describe("Canonical validation (Zod)", () => {
     it("accepts valid http monitor payload", () => {

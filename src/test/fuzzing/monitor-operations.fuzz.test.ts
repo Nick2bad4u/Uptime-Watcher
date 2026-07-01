@@ -10,22 +10,25 @@
  * @public
  */
 
-import { describe, expect, test } from "vitest";
-import fc from "fast-check";
+import type { Monitor, MonitorStatus, MonitorType, Site } from "@shared/types";
+import type { UnknownRecord } from "type-fest";
 
-import type { Monitor, MonitorType, MonitorStatus, Site } from "@shared/types";
+import { secureRandomFloat } from "@shared/test/testHelpers";
 import { BASE_MONITOR_TYPES } from "@shared/types";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
+import fc from "fast-check";
+import { objectKeys } from "ts-extras";
+import { describe, expect, it, test } from "vitest";
+
 import {
-    createDefaultMonitor,
-    normalizeMonitor,
-    monitorOperations,
     addMonitorToSite,
-    updateMonitorInSite,
+    createDefaultMonitor,
     findMonitorInSite,
+    monitorOperations,
+    normalizeMonitor,
+    updateMonitorInSite,
     validateMonitorExists,
 } from "../../stores/sites/utils/monitorOperations";
-import { isNonEmptyString } from "@shared/validation/validatorUtils";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Test data generators using fast-check
 const arbitraryMonitorType = (): fc.Arbitrary<MonitorType> =>
@@ -154,7 +157,7 @@ const arbitraryMixedValue = (): fc.Arbitrary<unknown> =>
             {},
             [],
             new Date(),
-            /regex/,
+            /regex/v,
             Symbol("test"),
             () => {},
             new Error("test")
@@ -212,7 +215,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
 
             // Create a partial by randomly selecting which properties to include
             const partial: Partial<Monitor> = {};
-            const keys = Object.keys(fullMonitorTyped) as (keyof Monitor)[];
+            const keys = objectKeys(fullMonitorTyped);
 
             const copyField = <K extends keyof Monitor>(key: K): void => {
                 partial[key] = fullMonitorTyped[key];
@@ -230,7 +233,7 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
 
 // Generate monitor with mixed type contamination
 const arbitraryContaminatedMonitor = (): fc.Arbitrary<
-    Record<string, unknown>
+    UnknownRecord
 > =>
     fc.record({
         id: arbitraryMixedValue(),
@@ -272,7 +275,7 @@ const arbitraryContaminatedMonitor = (): fc.Arbitrary<
 
 describe("Monitor Operations Fuzzing Tests", () => {
     describe(createDefaultMonitor, () => {
-        test("should create valid monitor with any partial override", () => {
+        it("should create valid monitor with any partial override", () => {
             fc.assert(
                 fc.property(arbitraryPartialMonitor(), (overrides) => {
                     const monitor = createDefaultMonitor(overrides);
@@ -315,11 +318,11 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("should handle contaminated input gracefully", () => {
+        it("should handle contaminated input gracefully", () => {
             fc.assert(
                 fc.property(arbitraryContaminatedMonitor(), (contaminated) => {
                     const monitor = createDefaultMonitor(
-                        contaminated as Partial<Monitor>
+                        contaminated
                     );
 
                     // Should still create a valid monitor despite contamination
@@ -332,7 +335,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
     });
 
     describe(normalizeMonitor, () => {
-        test("should normalize any partial monitor input", () => {
+        it("should normalize any partial monitor input", () => {
             fc.assert(
                 fc.property(arbitraryPartialMonitor(), (partial) => {
                     const normalized = normalizeMonitor(partial);
@@ -375,7 +378,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("should handle array input gracefully", () => {
+        it("should handle array input gracefully", () => {
             fc.assert(
                 fc.property(fc.array(fc.anything()), (arrayInput) => {
                     expect(() =>
@@ -387,7 +390,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("should filter fields by monitor type", () => {
+        it("should filter fields by monitor type", () => {
             fc.assert(
                 fc.property(
                     arbitraryMonitorType(),
@@ -400,6 +403,36 @@ describe("Monitor Operations Fuzzing Tests", () => {
 
                         // Check type-specific field filtering
                         switch (type) {
+                            case "dns": {
+                                // DNS monitors should have host, recordType, expectedValue if provided and valid
+                                if (
+                                    partial.host &&
+                                    typeof partial.host === "string" &&
+                                    partial.host.length > 0
+                                ) {
+                                    expect(normalized).toHaveProperty("host");
+                                }
+                                if (
+                                    partial.recordType &&
+                                    typeof partial.recordType === "string" &&
+                                    partial.recordType.length > 0
+                                ) {
+                                    expect(normalized).toHaveProperty(
+                                        "recordType"
+                                    );
+                                }
+                                if (
+                                    partial.expectedValue &&
+                                    typeof partial.expectedValue === "string" &&
+                                    isNonEmptyString(partial.expectedValue)
+                                ) {
+                                    expect(normalized).toHaveProperty(
+                                        "expectedValue"
+                                    );
+                                }
+
+                                break;
+                            }
                             case "http": {
                                 // HTTP monitors should have URL if provided and valid
                                 if (
@@ -433,36 +466,6 @@ describe("Monitor Operations Fuzzing Tests", () => {
 
                                 break;
                             }
-                            case "dns": {
-                                // DNS monitors should have host, recordType, expectedValue if provided and valid
-                                if (
-                                    partial.host &&
-                                    typeof partial.host === "string" &&
-                                    partial.host.length > 0
-                                ) {
-                                    expect(normalized).toHaveProperty("host");
-                                }
-                                if (
-                                    partial.recordType &&
-                                    typeof partial.recordType === "string" &&
-                                    partial.recordType.length > 0
-                                ) {
-                                    expect(normalized).toHaveProperty(
-                                        "recordType"
-                                    );
-                                }
-                                if (
-                                    partial.expectedValue &&
-                                    typeof partial.expectedValue === "string" &&
-                                    isNonEmptyString(partial.expectedValue)
-                                ) {
-                                    expect(normalized).toHaveProperty(
-                                        "expectedValue"
-                                    );
-                                }
-
-                                break;
-                            }
                             // No default
                         }
                     }
@@ -470,12 +473,12 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("should handle contaminated input with type coercion", () => {
+        it("should handle contaminated input with type coercion", () => {
             fc.assert(
                 fc.property(arbitraryContaminatedMonitor(), (contaminated) => {
                     try {
                         const normalized = normalizeMonitor(
-                            contaminated as Partial<Monitor>
+                            contaminated
                         );
 
                         // Should still produce valid monitor
@@ -499,7 +502,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
     });
 
     describe("monitorOperations", () => {
-        test("updateStatus should validate status values", () => {
+        it("updateStatus should validate status values", () => {
             fc.assert(
                 fc.property(
                     arbitraryPartialMonitor(),
@@ -509,10 +512,10 @@ describe("Monitor Operations Fuzzing Tests", () => {
 
                         if (
                             [
-                                "up",
                                 "down",
-                                "pending",
                                 "paused",
+                                "pending",
+                                "up",
                             ].includes(statusValue as string)
                         ) {
                             const updated = monitorOperations.updateStatus(
@@ -534,7 +537,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("updateTimeout should preserve monitor integrity", () => {
+        it("updateTimeout should preserve monitor integrity", () => {
             fc.assert(
                 fc.property(
                     arbitraryPartialMonitor(),
@@ -556,7 +559,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("updateCheckInterval should handle any numeric input", () => {
+        it("updateCheckInterval should handle any numeric input", () => {
             fc.assert(
                 fc.property(
                     arbitraryPartialMonitor(),
@@ -576,7 +579,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("updateRetryAttempts should handle any numeric input", () => {
+        it("updateRetryAttempts should handle any numeric input", () => {
             fc.assert(
                 fc.property(
                     arbitraryPartialMonitor(),
@@ -596,14 +599,14 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("toggleMonitoring should flip boolean state", () => {
+        it("toggleMonitoring should flip boolean state", () => {
             fc.assert(
                 fc.property(arbitraryPartialMonitor(), (monitorData) => {
                     const monitor = normalizeMonitor(monitorData);
-                    const originalState = monitor.monitoring;
+                    const isOriginalState = monitor.monitoring;
                     const toggled = monitorOperations.toggleMonitoring(monitor);
 
-                    expect(toggled.monitoring).toBe(!originalState);
+                    expect(toggled.monitoring).toBe(!isOriginalState);
                     expect(toggled.id).toBe(monitor.id);
                     // All other fields preserved
                 })
@@ -624,7 +627,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                 ),
             });
 
-        test("addMonitorToSite should preserve site structure", () => {
+        it("addMonitorToSite should preserve site structure", () => {
             fc.assert(
                 fc.property(
                     arbitrarySite(),
@@ -644,15 +647,15 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("findMonitorInSite should handle various monitor IDs", () => {
+        it("findMonitorInSite should handle various monitor IDs", () => {
             fc.assert(
                 fc.property(arbitrarySite(), fc.string(), (site, searchId) => {
                     const found = findMonitorInSite(site, searchId);
 
-                    const existsInSite = site.monitors.some(
+                    const isExistsInSite = site.monitors.some(
                         (m) => m.id === searchId
                     );
-                    if (existsInSite) {
+                    if (isExistsInSite) {
                         expect(found).toBeDefined();
                         expect(found!.id).toBe(searchId);
                     } else {
@@ -662,7 +665,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("updateMonitorInSite should handle update failures gracefully", () => {
+        it("updateMonitorInSite should handle update failures gracefully", () => {
             fc.assert(
                 fc.property(
                     arbitrarySite(),
@@ -683,7 +686,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         const updated = updateMonitorInSite(
                             siteWithMonitor,
                             actualMonitorId,
-                            updates as Partial<Monitor>
+                            updates
                         );
 
                         // Should always return a site
@@ -702,31 +705,31 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("validateMonitorExists should throw for missing monitor", () => {
+        it("validateMonitorExists should throw for missing monitor", () => {
             fc.assert(
                 fc.property(arbitrarySite(), fc.string(), (site, randomId) => {
-                    const monitorExists = site.monitors.some(
+                    const isMonitorExists = site.monitors.some(
                         (m) => m.id === randomId
                     );
 
-                    if (monitorExists) {
+                    if (isMonitorExists) {
                         expect(() =>
-                            validateMonitorExists(site, randomId)
+                            { validateMonitorExists(site, randomId); }
                         ).not.toThrow();
                     } else {
                         expect(() =>
-                            validateMonitorExists(site, randomId)
+                            { validateMonitorExists(site, randomId); }
                         ).toThrow();
                     }
                 })
             );
         });
 
-        test("validateMonitorExists should throw for undefined site", () => {
+        it("validateMonitorExists should throw for undefined site", () => {
             fc.assert(
                 fc.property(fc.string(), (monitorId) => {
                     expect(() =>
-                        validateMonitorExists(undefined, monitorId)
+                        { validateMonitorExists(undefined, monitorId); }
                     ).toThrow();
                 })
             );
@@ -734,7 +737,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
     });
 
     describe("edge cases and boundary conditions", () => {
-        test("should handle empty string inputs", () => {
+        it("should handle empty string inputs", () => {
             const emptyStringMonitor = normalizeMonitor({
                 id: "",
                 type: "" as unknown as MonitorType,
@@ -742,7 +745,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                 host: "",
                 recordType: "",
                 expectedValue: "",
-            } as Partial<Monitor>);
+            });
 
             // Should generate valid defaults
             expect(emptyStringMonitor.id).toBeTruthy();
@@ -750,7 +753,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             expect(BASE_MONITOR_TYPES).toContain(emptyStringMonitor.type);
         });
 
-        test("should handle numeric strings for validation", () => {
+        it("should handle numeric strings for validation", () => {
             const numericStringMonitor = normalizeMonitor({
                 timeout: "5000" as unknown as number,
                 checkInterval: "300000" as unknown as number,
@@ -763,7 +766,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             expect(numericStringMonitor.timeout).toBeGreaterThan(0);
         });
 
-        test("should handle extreme numeric values", () => {
+        it("should handle extreme numeric values", () => {
             fc.assert(
                 fc.property(
                     fc.integer({ min: -1_000_000, max: 1_000_000 }),
@@ -789,7 +792,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("should handle Unicode and special characters", () => {
+        it("should handle Unicode and special characters", () => {
             fc.assert(
                 fc.property(fc.string(), (unicodeStr) => {
                     const monitor = normalizeMonitor({
@@ -807,7 +810,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        test("should handle circular references safely", () => {
+        it("should handle circular references safely", () => {
             const circular: any = { type: "http" };
             circular.self = circular;
             circular.nested = { parent: circular };
@@ -818,8 +821,8 @@ describe("Monitor Operations Fuzzing Tests", () => {
             expect(monitor).toHaveProperty("type");
         });
 
-        test("should handle very large objects", () => {
-            const largeData: Record<string, unknown> = { type: "http" };
+        it("should handle very large objects", () => {
+            const largeData: UnknownRecord = { type: "http" };
             for (let i = 0; i < 1000; i++) {
                 largeData[`field${i}`] = `value${i}`;
             }
@@ -829,7 +832,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
             expect(monitor).toHaveProperty("type");
 
             // Should filter out extra fields
-            expect(Object.keys(monitor).length).toBeLessThan(100);
+            expect(objectKeys(monitor).length).toBeLessThan(100);
         });
     });
 });

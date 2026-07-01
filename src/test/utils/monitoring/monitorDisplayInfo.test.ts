@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { buildMonitorDisplayInfo } from "../../../utils/monitoring/monitorDisplayInfo";
-import { createMockMonitor } from "../../utils/mockFactories";
+import { createMockMonitor } from "../mockFactories";
 
 describe(buildMonitorDisplayInfo, () => {
     it("uses monitor suffix and strips wrapping parentheses", () => {

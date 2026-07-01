@@ -3,23 +3,14 @@
  */
 
 /**
- * Returns an object containing `signal` only when the signal is defined.
- *
- * @remarks
- * This helper exists primarily for code clarity and to avoid repeating the same
- * spread pattern:
- *
- * ```ts
- * { ...(signal ? { signal } : {}) }
- * ```
- *
- * It also plays nicely with `exactOptionalPropertyTypes` by omitting the key
- * entirely when undefined.
+ * Creates a timeout signal and optionally merges it with an external signal.
  */
-export function withOptionalAbortSignal(signal: AbortSignal | undefined): {
-    signal?: AbortSignal;
-} {
-    return signal ? { signal } : {};
+export function createTimeoutSignal(
+    timeoutMs: number,
+    signal?: AbortSignal
+): AbortSignal {
+    const timeoutSignal = AbortSignal.timeout(timeoutMs);
+    return signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal;
 }
 
 /**
@@ -62,12 +53,21 @@ export function mergeAbortSignals(args: {
 }
 
 /**
- * Creates a timeout signal and optionally merges it with an external signal.
+ * Returns an object containing `signal` only when the signal is defined.
+ *
+ * @remarks
+ * This helper exists primarily for code clarity and to avoid repeating the same
+ * spread pattern:
+ *
+ * ```ts
+ * { ...(signal ? { signal } : {}) }
+ * ```
+ *
+ * It also plays nicely with `exactOptionalPropertyTypes` by omitting the key
+ * entirely when undefined.
  */
-export function createTimeoutSignal(
-    timeoutMs: number,
-    signal?: AbortSignal
-): AbortSignal {
-    const timeoutSignal = AbortSignal.timeout(timeoutMs);
-    return signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal;
+export function withOptionalAbortSignal(signal: AbortSignal | undefined): {
+    signal?: AbortSignal;
+} {
+    return signal ? { signal } : {};
 }

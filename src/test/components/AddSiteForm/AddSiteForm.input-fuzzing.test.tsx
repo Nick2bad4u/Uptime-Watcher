@@ -5,11 +5,11 @@
  * These tests focus on the actual user input attack surface - the add site form
  * where users can input site names, URLs, host names, ports, and other
  * configuration. This is the primary entry point for external data into the
- * application.
+ * app.
  *
  * These tests use property-based testing to discover edge cases in user input
  * validation that could lead to security issues, data corruption, or
- * application crashes.
+ * app crashes.
  *
  * Focus areas:
  *
@@ -23,21 +23,26 @@
  * @ts-expect-error Complex fuzzing tests with dynamic DOM queries - exact type safety deferred for test coverage
  */
 
-import { describe, expect, vi, beforeEach, afterEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import type { MonitorType, Site } from "@shared/types";
+
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import type { MonitorType, Site } from "@shared/types";
+import { arrayFirst, isEmpty, safeCastTo   } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, vi } from "vitest";
+
+// Import the component under test
+import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 
 // Mock state for the form
 let mockState = {
-    addMode: "new" as "new" | "existing",
+    addMode: safeCastTo<"existing" | "new">("new"),
     checkIntervalMs: DEFAULT_CHECK_INTERVAL,
-    formError: undefined as string | undefined,
+    formError: safeCastTo<string | undefined>(undefined),
     host: "",
-    monitorType: "http" as MonitorType,
+    monitorType: safeCastTo<MonitorType>("http"),
     name: "",
     port: "",
     selectedExistingSite: "",
@@ -46,7 +51,7 @@ let mockState = {
 };
 
 // Mock setters that update the state
-const mockSetAddMode = vi.fn((value: "new" | "existing") => {
+const mockSetAddMode = vi.fn((value: "existing" | "new") => {
     mockState.addMode = value;
 });
 const mockSetName = vi.fn((value: string) => {
@@ -111,15 +116,15 @@ const mockUseAddSiteForm = vi.fn(() => ({
     setUrl: mockSetUrl,
 }));
 
-vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
     get useAddSiteForm() {
         return mockUseAddSiteForm;
     },
 }));
 
-vi.mock("../../../constants", async (importOriginal) => {
+vi.mock(import('../../../constants'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../../constants");
+        (await importOriginal());
     return {
         ...actual,
         ARIA_LABEL: "aria-label",
@@ -142,7 +147,7 @@ vi.mock("../../../constants", async (importOriginal) => {
     };
 });
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(() => ({
         clearError: vi.fn(),
         setError: vi.fn(),
@@ -150,7 +155,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     })),
 }));
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn(() => ({
         sites: [],
         addSite: vi.fn(),
@@ -160,7 +165,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: vi.fn(() => ({
         monitorTypes: [
             "http",
@@ -179,7 +184,7 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/useDynamicHelpText", () => ({
+vi.mock(import('../../../hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: vi.fn(() => ({
         helpText: "Enter the details for your new site monitor",
         error: null,
@@ -187,15 +192,15 @@ vi.mock("../../../hooks/useDynamicHelpText", () => ({
     })),
 }));
 
-vi.mock("../../../components/AddSiteForm/Submit", () => ({
+vi.mock(import('../../../components/AddSiteForm/Submit'), () => ({
     handleSubmit: vi.fn(),
 }));
 
-vi.mock("../../../utils/data/generateUuid", () => ({
+vi.mock(import('../../../utils/data/generateUuid'), () => ({
     generateUuid: vi.fn(() => "test-uuid-123"),
 }));
 
-vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: vi.fn(() => ({
         isLoading: false,
         delayedLoading: false,
@@ -203,7 +208,7 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
 }));
 
 // Mock the sub-components used by AddSiteForm
-vi.mock("../../../components/AddSiteForm/SelectField", () => ({
+vi.mock(import('../../../components/AddSiteForm/SelectField'), () => ({
     SelectField: vi.fn(({ label, options, onChange, value, id }) => {
         const handleChange = (e: any) => {
             const newValue = e.target.value;
@@ -223,13 +228,13 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
             <div>
                 <label htmlFor={id}>{label}</label>
                 <select
-                    id={id}
-                    value={value ?? ""}
-                    onChange={handleChange}
                     data-testid={`selectfield-${id}`}
+                    id={id}
+                    onChange={handleChange}
+                    value={value ?? ""}
                 >
                     {options?.map(
-                        (option: { value: string; label: string }) => (
+                        (option: { label: string; value: string; }) => (
                             <option key={option.value} value={option.value}>
                                 {option.label}
                             </option>
@@ -274,7 +279,7 @@ const commitInputValue = async (
     fireEvent.input(element, { target: { value } });
 };
 
-vi.mock("../../../components/AddSiteForm/TextField", () => ({
+vi.mock(import('../../../components/AddSiteForm/TextField'), () => ({
     TextField: vi.fn(({ label, onChange, value, id }) => {
         const handleChange = (e: any) => {
             if (onChange) {
@@ -282,20 +287,20 @@ vi.mock("../../../components/AddSiteForm/TextField", () => ({
             }
             // Also update mock state directly for the appropriate field
             switch (id) {
-                case "siteName": {
-                    mockSetName(e.target.value);
-                    break;
-                }
-                case "url": {
-                    mockSetUrl(e.target.value);
-                    break;
-                }
                 case "host": {
                     mockSetHost(e.target.value);
                     break;
                 }
                 case "port": {
                     mockSetPort(e.target.value);
+                    break;
+                }
+                case "siteName": {
+                    mockSetName(e.target.value);
+                    break;
+                }
+                case "url": {
+                    mockSetUrl(e.target.value);
                     break;
                 }
                 default: {
@@ -308,17 +313,17 @@ vi.mock("../../../components/AddSiteForm/TextField", () => ({
             <div>
                 <label htmlFor={id}>{label}</label>
                 <input
-                    id={id}
-                    defaultValue={value ?? ""}
-                    onChange={handleChange}
                     data-testid={`textfield-${id}`}
+                    defaultValue={value ?? ""}
+                    id={id}
+                    onChange={handleChange}
                 />
             </div>
         );
     }),
 }));
 
-vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
+vi.mock(import('../../../components/AddSiteForm/RadioGroup'), () => ({
     RadioGroup: vi.fn(({ label, options, onChange, value }) => {
         const handleChange = (e: any) => {
             if (onChange) {
@@ -330,14 +335,14 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
                 <fieldset>
                     <legend>{label}</legend>
                     {options?.map(
-                        (option: { value: string; label: string }) => (
+                        (option: { label: string; value: string; }) => (
                             <div key={option.value}>
                                 <input
+                                    checked={value === option.value}
+                                    data-testid={`radio-${option.value}`}
+                                    onChange={handleChange}
                                     type="radio"
                                     value={option.value}
-                                    checked={value === option.value}
-                                    onChange={handleChange}
-                                    data-testid={`radio-${option.value}`}
                                 />
                                 <label>{option.label}</label>
                             </div>
@@ -349,7 +354,7 @@ vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
     }),
 }));
 
-vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
+vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
     DynamicMonitorFields: vi.fn(({ monitorType }) => {
         // Determine which monitor type to use
         const currentType = monitorType || mockState.monitorType;
@@ -360,11 +365,11 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                     <div>
                         <label htmlFor="url">URL</label>
                         <input
-                            id="url"
-                            type="text"
-                            placeholder="https://example.com"
                             aria-label="URL"
                             defaultValue=""
+                            id="url"
+                            placeholder="https://example.com"
+                            type="text"
                         />
                     </div>
                 )}
@@ -372,19 +377,19 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                     <div>
                         <label htmlFor="host">Host</label>
                         <input
-                            id="host"
-                            type="text"
-                            placeholder="example.com"
                             aria-label="Host"
                             defaultValue=""
+                            id="host"
+                            placeholder="example.com"
+                            type="text"
                         />
                         <label htmlFor="port">Port</label>
                         <input
-                            id="port"
-                            type="number"
-                            placeholder="80"
                             aria-label="Port"
                             defaultValue=""
+                            id="port"
+                            placeholder="80"
+                            type="number"
                         />
                     </div>
                 )}
@@ -392,11 +397,11 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                     <div>
                         <label htmlFor="host">Host</label>
                         <input
-                            id="host"
-                            type="text"
-                            placeholder="example.com"
                             aria-label="Host"
                             defaultValue=""
+                            id="host"
+                            placeholder="example.com"
+                            type="text"
                         />
                     </div>
                 )}
@@ -404,11 +409,11 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                     <div>
                         <label htmlFor="host">Host</label>
                         <input
-                            id="host"
-                            type="text"
-                            placeholder="example.com"
                             aria-label="Host"
                             defaultValue=""
+                            id="host"
+                            placeholder="example.com"
+                            type="text"
                         />
                     </div>
                 )}
@@ -417,44 +422,41 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div {...props}>{children}</div>
     )),
 }));
 
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: vi.fn(({ children, ...props }) => (
         <button {...props}>{children}</button>
     )),
 }));
 
-vi.mock("../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../theme/components/ThemedText'), () => ({
     ThemedText: vi.fn(({ children, ...props }) => (
         <span {...props}>{children}</span>
     )),
 }));
 
-vi.mock("../../../components/common/ErrorAlert/ErrorAlert", () => ({
+vi.mock(import('../../../components/common/ErrorAlert/ErrorAlert'), () => ({
     ErrorAlert: vi.fn(({ message }) =>
         message ? <div data-testid="error-alert">{message}</div> : null
     ),
 }));
-
-// Import the component under test
-import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 describe("AddSiteForm User Input Fuzzing", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.clearAllTimers();
         // Force garbage collection and cleanup
-        if (global.gc) {
-            global.gc();
+        if (globalThis.gc) {
+            globalThis.gc();
         }
 
         // Clear any existing DOM - cleanup() is automatic in modern test runners
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         // Reset mock state to default
         mockState = {
@@ -479,14 +481,14 @@ describe("AddSiteForm User Input Fuzzing", () => {
         vi.clearAllTimers();
 
         // Clear DOM
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         // Remove all event listeners
         window.removeEventListener ||= () => {};
 
         // Force garbage collection
-        if (global.gc) {
-            global.gc();
+        if (globalThis.gc) {
+            globalThis.gc();
         }
     });
 
@@ -514,12 +516,12 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Switch to "new" mode to show site name field
                 const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0]!;
+                const newRadio = arrayFirst(newRadios)!;
                 await user.click(newRadio);
 
                 // Find and interact with site name input
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0]!;
+                const siteNameInput = arrayFirst(siteNameInputs)!;
                 expect(siteNameInput).toBeInTheDocument();
 
                 // Test input handling
@@ -552,12 +554,12 @@ describe("AddSiteForm User Input Fuzzing", () => {
             [
                 fc.constantFrom(
                     "", // Empty string
-                    "   ", // Spaces only
+                    ' '.repeat(3), // Spaces only
                     "\t\n", // Tab and newline
                     "  \t  \n  ", // Mixed whitespace
                     "\r\n", // Carriage return + newline
-                    "\t\t\t", // Multiple tabs
-                    "    " // Multiple spaces
+                    '\t'.repeat(3), // Multiple tabs
+                    ' '.repeat(4) // Multiple spaces
                 ),
             ],
             { numRuns: 2, timeout: 30_000 }
@@ -569,11 +571,11 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Switch to "new" mode
                 const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0]!;
+                const newRadio = arrayFirst(newRadios)!;
                 await user.click(newRadio);
 
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0]!;
+                const siteNameInput = arrayFirst(siteNameInputs)!;
 
                 // Clear and set value using act-aware helper for more control
                 await commitInputValue(siteNameInput, emptyName);
@@ -596,7 +598,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Submit button should still be present (validation is on submit)
                 const submitButtons = screen.getAllByRole("button", {
-                    name: /add/i,
+                    name: /add/iv,
                 });
                 expect(submitButtons.length).toBeGreaterThan(0);
             }
@@ -626,11 +628,11 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 await renderForm();
 
                 const newRadios = screen.getAllByDisplayValue("new");
-                const newRadio = newRadios[0]!;
+                const newRadio = arrayFirst(newRadios)!;
                 await user.click(newRadio);
 
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
-                const siteNameInput = siteNameInputs[0]!;
+                const siteNameInput = arrayFirst(siteNameInputs)!;
 
                 // Should not throw or crash when handling malicious input
                 expect(() => {
@@ -652,10 +654,10 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     );
                     // Allow for some whitespace normalization variations
                     // eslint-disable-next-line unicorn/prefer-string-replace-all
-                    const actualTrimmed = inputValue.replace(/\s+/g, " ");
+                    const actualTrimmed = inputValue.replace(/\s+/gv, " ");
                     // eslint-disable-next-line unicorn/prefer-string-replace-all
                     const expectedTrimmed = normalizedExpected.replace(
-                        /\s+/g,
+                        /\s+/gv,
                         " "
                     );
                     expect(actualTrimmed).toBe(expectedTrimmed);
@@ -704,8 +706,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
             await renderForm();
 
             // URL input should be available immediately with HTTP monitor type
-            const urlInputs = screen.getAllByLabelText(/url/i);
-            const urlInput = urlInputs[0]!; // Take the first one if multiple exist
+            const urlInputs = screen.getAllByLabelText(/url/iv);
+            const urlInput = arrayFirst(urlInputs)!; // Take the first one if multiple exist
             expect(urlInput).toBeInTheDocument();
 
             // Use direct DOM manipulation instead of userEvent for speed
@@ -715,7 +717,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             expect(urlInput).toHaveValue(validUrl);
 
             // Verify URL format (webUrl generates valid URLs)
-            expect(validUrl).toMatch(/^https?:\/\//);
+            expect(validUrl).toMatch(/^https?:\/\//v);
         });
 
         fcTest.prop(
@@ -744,8 +746,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
             // Use faster query method with timeout
             const urlInput = await waitFor(
                 () => {
-                    const inputs = screen.queryAllByLabelText(/url/i);
-                    if (inputs.length === 0) {
+                    const inputs = screen.queryAllByLabelText(/url/iv);
+                    if (isEmpty(inputs)) {
                         throw new Error("URL input not found");
                     }
                     return inputs[0]!;
@@ -794,7 +796,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Verify host input is available
                 const hostInputs = screen.getAllByLabelText(/host/i);
-                const hostInput = hostInputs[0]!; // Take the first one if multiple exist
+                const hostInput = arrayFirst(hostInputs)!; // Take the first one if multiple exist
                 expect(hostInput).toBeInTheDocument();
 
                 // Use direct DOM manipulation instead of userEvent for speed
@@ -831,7 +833,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 const hostInput = await waitFor(
                     () => {
                         const inputs = screen.queryAllByLabelText(/host/i);
-                        if (inputs.length === 0) {
+                        if (isEmpty(inputs)) {
                             throw new Error("Host input not found");
                         }
                         return inputs[0]!;
@@ -860,8 +862,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
             await renderForm();
 
             // Port input should be available immediately
-            const portInputs = screen.getAllByLabelText(/port/i);
-            const portInput = portInputs[0]!; // Take the first one if multiple exist
+            const portInputs = screen.getAllByLabelText(/port/iv);
+            const portInput = arrayFirst(portInputs)!; // Take the first one if multiple exist
             expect(portInput).toBeInTheDocument();
 
             // Use direct DOM manipulation instead of userEvent for speed
@@ -896,8 +898,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 await renderForm();
 
                 // Port input should be available immediately
-                const portInputs = screen.getAllByLabelText(/port/i);
-                const portInput = portInputs[0]!; // Take the first one if multiple exist
+                const portInputs = screen.getAllByLabelText(/port/iv);
+                const portInput = arrayFirst(portInputs)!; // Take the first one if multiple exist
                 expect(portInput).toBeInTheDocument();
 
                 // Should not crash on invalid input while simulating user entry
@@ -939,14 +941,14 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     const modeRadios = screen.queryAllByDisplayValue(
                         formData.mode
                     );
-                    const modeRadio = modeRadios[0];
+                    const modeRadio = arrayFirst(modeRadios);
                     if (modeRadio) {
                         await user.click(modeRadio);
                     }
 
                     // Set monitor type - use query to handle missing elements
                     const monitorTypeSelect =
-                        screen.queryByLabelText(/monitor type/i);
+                        screen.queryByLabelText(/monitor type/iv);
                     if (monitorTypeSelect) {
                         await user.selectOptions(
                             monitorTypeSelect,
@@ -975,8 +977,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     // Fill type-specific fields
                     if (formData.monitorType === "http") {
                         const urlInput =
-                            screen.queryByLabelText(/url/i) ||
-                            screen.queryByPlaceholderText(/url/i);
+                            screen.queryByLabelText(/url/iv) ||
+                            screen.queryByPlaceholderText(/url/iv);
                         if (urlInput) {
                             await user.clear(urlInput);
                             // Use faster direct assignment
@@ -1002,9 +1004,9 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                         if (formData.monitorType === "port") {
                             const portInput =
-                                screen.queryByLabelText(/port/i) ||
+                                screen.queryByLabelText(/port/iv) ||
                                 screen.queryByRole("spinbutton", {
-                                    name: /port/i,
+                                    name: /port/iv,
                                 });
                             if (portInput) {
                                 await user.clear(portInput);
@@ -1020,12 +1022,12 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Form should still be functional
                 const submitButtons = screen.getAllByRole("button", {
-                    name: /add/i,
+                    name: /add/iv,
                 });
                 const submitButton =
                     submitButtons.length > 0
-                        ? submitButtons[0]
-                        : screen.getAllByRole("button", { name: /submit/i })[0];
+                        ? arrayFirst(submitButtons)
+                        : arrayFirst(screen.getAllByRole("button", { name: /submit/i }));
                 expect(submitButton).toBeInTheDocument();
             }
         );
@@ -1047,7 +1049,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                         "port",
                         "ping",
                         "dns"
-                    ) as fc.Arbitrary<MonitorType>,
+                    ),
                     url: fc.constantFrom(
                         "https://example.com",
                         "http://localhost:3000",

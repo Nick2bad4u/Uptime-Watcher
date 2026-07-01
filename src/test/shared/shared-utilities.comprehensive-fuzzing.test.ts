@@ -7,31 +7,30 @@
  * @packageDocumentation
  */
 
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { describe, expect } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
 
+import * as jsonSafety from "../../../shared/utils/jsonSafety";
 // Import existing shared utilities for testing
 import * as guards from "../../../shared/utils/typeGuards";
-import * as jsonSafety from "../../../shared/utils/jsonSafety";
-
 // Import specific validation functions that exist
 import {
-    isValidUrl,
     isValidPort,
+    isValidUrl,
 } from "../../../shared/validation/validatorUtils";
 
 describe("Shared Utilities Comprehensive Fuzzing", () => {
     describe("validatorUtils", () => {
         fcTest.prop([fc.webUrl()])("should handle URL validation", (url) => {
-            const result = isValidUrl(url);
-            expect(typeof result).toBe("boolean");
+            const isResult = isValidUrl(url);
+            expect(typeof isResult).toBe("boolean");
         });
 
         fcTest.prop([fc.integer({ min: 1, max: 65_535 })])(
             "should handle port validation",
             (port) => {
-                const result = isValidPort(port);
-                expect(typeof result).toBe("boolean");
+                const isResult = isValidPort(port);
+                expect(typeof isResult).toBe("boolean");
             }
         );
     });

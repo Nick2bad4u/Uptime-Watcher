@@ -10,43 +10,6 @@ import { createSanitizedFileName } from "./sanitizeBackupFileName";
 
 const SNAPSHOT_BUSY_TIMEOUT_MS = 10_000;
 
-function escapeSqlStringLiteral(value: string): string {
-    // Defensive hardening: NUL bytes can behave unexpectedly across native
-    // boundaries (SQLite bindings ultimately cross into C/C++). While Windows
-    // paths cannot contain NUL bytes, JS strings can, and we never want such
-    // values to reach SQLite.
-    if (value.includes("\0")) {
-        throw new Error("SQLite string literal cannot contain NUL bytes");
-    }
-
-    return `'${value.replaceAll("'", "''")}'`;
-}
-
-/**
- * Creates a database snapshot via `VACUUM INTO`.
- */
-export function createVacuumSnapshot(args: {
-    readonly dbPath: string;
-    readonly snapshotPath: string;
-}): void {
-    const { dbPath, snapshotPath } = args;
-
-    const tempDb = new sqlite3.Database(dbPath, {
-        fileMustExist: true,
-    });
-    try {
-        try {
-            tempDb.exec(`PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`);
-        } catch {
-            // Best-effort; snapshot still works without it.
-        }
-
-        tempDb.exec(`VACUUM INTO ${escapeSqlStringLiteral(snapshotPath)}`);
-    } finally {
-        tempDb.close();
-    }
-}
-
 /**
  * Creates a consistent snapshot in `snapshotDir`, retrying once after closing
  * the primary connection on SQLITE_BUSY/LOCKED.
@@ -85,4 +48,41 @@ export function createConsistentSnapshot(args: {
             databaseService.initialize();
         }
     }
+}
+
+/**
+ * Creates a database snapshot via `VACUUM INTO`.
+ */
+export function createVacuumSnapshot(args: {
+    readonly dbPath: string;
+    readonly snapshotPath: string;
+}): void {
+    const { dbPath, snapshotPath } = args;
+
+    const tempDb = new sqlite3.Database(dbPath, {
+        fileMustExist: true,
+    });
+    try {
+        try {
+            tempDb.exec(`PRAGMA busy_timeout = ${SNAPSHOT_BUSY_TIMEOUT_MS}`);
+        } catch {
+            // Best-effort; snapshot still works without it.
+        }
+
+        tempDb.exec(`VACUUM INTO ${escapeSqlStringLiteral(snapshotPath)}`);
+    } finally {
+        tempDb.close();
+    }
+}
+
+function escapeSqlStringLiteral(value: string): string {
+    // Defensive hardening: NUL bytes can behave unexpectedly across native
+    // boundaries (SQLite bindings ultimately cross into C/C++). While Windows
+    // paths cannot contain NUL bytes, JS strings can, and we never want such
+    // values to reach SQLite.
+    if (value.includes("\0")) {
+        throw new Error("SQLite string literal cannot contain NUL bytes");
+    }
+
+    return `'${value.replaceAll("'", "''")}'`;
 }

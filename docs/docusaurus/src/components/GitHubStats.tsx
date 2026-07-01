@@ -1,11 +1,12 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This file contains multiple unrelated eslint rules that cannot be properly paired */
 
 import type { ReactNode } from "react";
+
 import Link from "@docusaurus/Link";
 import GitHubButton from "react-github-btn";
 
-import styles from "../pages/index.module.css";
 import { useGitHubStats, usePackageVersion } from "../hooks/useGitHubStats";
+import styles from "../pages/index.module.css";
 
 /**
  * Renders the GitHub statistics panel on the documentation home page.
@@ -35,8 +36,8 @@ export default function GitHubStatsComponent(): ReactNode {
             <div className={styles.statGroup}>
                 <span className={styles.stat}>⭐ {starText}</span>
                 <Link
-                    href={`https://github.com/Nick2bad4u/Uptime-Watcher/releases/tag/v${version}`}
                     className={styles.stat || ""}
+                    href={`https://github.com/Nick2bad4u/Uptime-Watcher/releases/tag/v${version}`}
                     style={{ color: "inherit", textDecoration: "none" }}
                 >
                     🔧 v{version}
@@ -44,12 +45,12 @@ export default function GitHubStatsComponent(): ReactNode {
             </div>
             <div className={styles.starButtonContainer}>
                 <GitHubButton
-                    href="https://github.com/nick2bad4u/uptime-watcher"
+                    aria-label="Star nick2bad4u/uptime-watcher on GitHub"
                     data-color-scheme="no-preference: dark; light: light; dark: dark;"
                     data-icon="octicon-star"
-                    data-size="large"
                     data-show-count="true"
-                    aria-label="Star nick2bad4u/uptime-watcher on GitHub"
+                    data-size="large"
+                    href="https://github.com/nick2bad4u/uptime-watcher"
                 >
                     Star
                 </GitHubButton>

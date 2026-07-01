@@ -4,15 +4,17 @@
 /* eslint-disable sonarjs/deprecation -- SonarJS deprecation warnings are acceptable in documentation context */
 /* eslint-disable @typescript-eslint/no-deprecated -- TypeScript deprecated APIs are still required here */
 
-import Heading from "@theme/Heading";
-import HomepageFeatures from "@site/src/components/HomepageFeatures";
-import Layout from "@theme/Layout";
-import Link from "@docusaurus/Link";
 import type { JSX } from "react";
-import clsx from "clsx";
-import styles from "./index.module.css";
+
+import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import GitHubStatsComponent from "@site/src/components/GitHubStats";
+import HomepageFeatures from "@site/src/components/HomepageFeatures";
+import Heading from "@theme/Heading";
+import Layout from "@theme/Layout";
+import clsx from "clsx";
+
+import styles from "./index.module.css";
 
 /**
  * Copies code to clipboard with fallback support.
@@ -44,12 +46,12 @@ const handleCopyCode = (() => {
         // Try modern clipboard API first (browser environment only)
         if (
             typeof window !== "undefined" &&
-            "navigator" in window &&
+            "navigator" in globalThis &&
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
-            window.navigator.clipboard
+            navigator.clipboard
         ) {
             try {
-                await window.navigator.clipboard.writeText(code);
+                await navigator.clipboard.writeText(code);
                 // Simple feedback
                 const button = document.activeElement;
                 if (button && button instanceof HTMLButtonElement) {
@@ -151,10 +153,10 @@ const UIDemo = (): JSX.Element => {
             <div className={styles.appBody}>
                 <div className={styles.appToolbar}>
                     <button
-                        type="button"
                         className={styles.addButton}
                         onClick={handleDemoButtonClick}
                         title="Demo button - not functional"
+                        type="button"
                     >
                         + Add Site (Demo)
                     </button>
@@ -166,7 +168,7 @@ const UIDemo = (): JSX.Element => {
 
                 <div className={styles.siteList}>
                     {sites.map((site) => (
-                        <div key={site.url} className={styles.siteItem}>
+                        <div className={styles.siteItem} key={site.url}>
                             <div className={styles.siteStatus}>
                                 <span
                                     className={styles.statusDot}
@@ -394,19 +396,19 @@ const HomepageHeader = (): JSX.Element => (
 
                                 <div className={styles.codeActions}>
                                     <button
-                                        type="button"
                                         className={styles.copyButton}
                                         onClick={handleCopyCodeClick}
+                                        type="button"
                                     >
                                         📋 Copy
                                     </button>
 
                                     {/* eslint-disable-next-line @docusaurus/no-html-links -- External GitHub link requires standard HTML anchor */}
                                     <a
-                                        href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/package.json"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
                                         className={styles.viewButton}
+                                        href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/package.json"
+                                        rel="noopener noreferrer"
+                                        target="_blank"
                                     >
                                         🔗 View Full
                                     </a>
@@ -452,8 +454,8 @@ export default function Home(): JSX.Element {
     const { siteConfig } = useDocusaurusContext();
     return (
         <Layout
-            title={`${siteConfig.title} - No-BS Website Monitoring`}
             description="Open-source desktop app for monitoring website uptime. No cloud, no monthly fees, no drama."
+            title={`${siteConfig.title} - No-BS Website Monitoring`}
         >
             <HomepageHeader />
 

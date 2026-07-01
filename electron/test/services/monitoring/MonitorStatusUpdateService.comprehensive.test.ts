@@ -3,8 +3,10 @@
  * coverage from 6.66% to 95%+
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Monitor, Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     MonitorStatusUpdateService,
     type StatusUpdateMonitorCheckResult,
@@ -173,10 +175,10 @@ describe(MonitorStatusUpdateService, () => {
                 .mockResolvedValueOnce(testMonitor); // Second call for cache refresh
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(
                 mockOperationRegistry.validateOperation
             ).toHaveBeenCalledWith("op-123");
@@ -216,10 +218,10 @@ describe(MonitorStatusUpdateService, () => {
             );
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(
                 mockOperationRegistry.validateOperation
             ).toHaveBeenCalledWith("op-123");
@@ -255,10 +257,10 @@ describe(MonitorStatusUpdateService, () => {
             mockMonitorRepository.findByIdentifier.mockResolvedValue(undefined);
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
@@ -288,10 +290,10 @@ describe(MonitorStatusUpdateService, () => {
             );
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
@@ -336,10 +338,10 @@ describe(MonitorStatusUpdateService, () => {
             mockSitesCache.getAll.mockReturnValue([createTestSite()]);
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockMonitorRepository.update).toHaveBeenCalledWith(
                 "test-monitor-1",
                 expectedUpdates
@@ -378,10 +380,10 @@ describe(MonitorStatusUpdateService, () => {
             mockSitesCache.getAll.mockReturnValue([createTestSite()]);
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockMonitorRepository.update).toHaveBeenCalledWith(
                 "test-monitor-1",
                 expectedUpdates
@@ -412,10 +414,10 @@ describe(MonitorStatusUpdateService, () => {
             mockMonitorRepository.update.mockRejectedValue(dbError);
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(
                 mockOperationRegistry.completeOperation
             ).toHaveBeenCalledWith("op-123");
@@ -448,10 +450,10 @@ describe(MonitorStatusUpdateService, () => {
             mockSitesCache.getAll.mockReturnValue([]); // No sites in cache
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeTruthy(); // Should still complete successfully
+            expect(isResult).toBeTruthy(); // Should still complete successfully
             expect(mockSitesCache.set).not.toHaveBeenCalled();
         });
 
@@ -484,10 +486,10 @@ describe(MonitorStatusUpdateService, () => {
             });
 
             // Act
-            const result = await service.updateMonitorStatus(testResult);
+            const isResult = await service.updateMonitorStatus(testResult);
 
             // Assert
-            expect(result).toBeTruthy(); // Should still complete successfully despite cache error
+            expect(isResult).toBeTruthy(); // Should still complete successfully despite cache error
         });
     });
 

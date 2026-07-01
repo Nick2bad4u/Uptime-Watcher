@@ -2,6 +2,7 @@
  * Tests for useSiteActions hook
  */
 
+import { objectValues } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 describe("useSiteActions Hook Coverage Tests", () => {
@@ -90,7 +91,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 stopSiteMonitorMonitoring: vi.fn(),
             };
 
-            for (const fn of Object.values(sitesStore)) {
+            for (const fn of objectValues(sitesStore)) {
                 expect(typeof fn).toBe("function");
             }
 
@@ -284,7 +285,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 site.identifier,
                 new Error("Attempted to start monitoring without valid monitor")
             );
-            expect(mockLogger.site.error).toHaveBeenCalled();
+            expect(mockLogger.site.error).toHaveBeenCalledWith();
         });
 
         it("should handle stop monitoring action", () => {
@@ -336,7 +337,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 site.identifier,
                 new Error("Attempted to stop monitoring without valid monitor")
             );
-            expect(mockLogger.site.error).toHaveBeenCalled();
+            expect(mockLogger.site.error).toHaveBeenCalledWith();
         });
 
         it("should handle start site monitoring action", () => {
@@ -407,7 +408,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
     describe("Error Handling", () => {
         it("should handle errors with ensureError utility", () => {
             const ensureError = (error: any) => {
-                if (error instanceof Error) {
+                if (Error.isError(error)) {
                     return error;
                 }
                 return new Error(String(error));
@@ -435,7 +436,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             };
 
             // Simulate error when monitor is undefined
-            const monitor = undefined;
+            const monitor;
 
             if (!monitor) {
                 mockLogger.site.error(
@@ -596,7 +597,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 monitoring: true,
             };
 
-            const undefinedMonitor = undefined;
+            const undefinedMonitor;
 
             expect(validMonitor).toHaveProperty("id");
             expect(validMonitor).toHaveProperty("type");

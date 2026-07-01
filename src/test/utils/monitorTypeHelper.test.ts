@@ -2,46 +2,48 @@
  * @file Tests for monitorTypeHelper utility functions
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { test } from "@fast-check/vitest";
-import * as fc from "fast-check";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
-import { AppCaches } from "../../utils/cache";
-import * as errorHandling from "@shared/utils/errorHandling";
+import { test } from "@fast-check/vitest";
 import {
     BASE_MONITOR_TYPES,
     type MonitorFieldDefinition,
     type MonitorType,
 } from "@shared/types";
+import * as errorHandling from "@shared/utils/errorHandling";
+import * as fc from "fast-check";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { AppCaches } from "../../utils/cache";
 import {
     clearMonitorTypeCache,
     getAvailableMonitorTypes,
     getMonitorTypeConfig,
     getMonitorTypeOptions,
 } from "../../utils/monitorTypeHelper";
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { installElectronApiMock } from "./electronApiMock";
 
 // Mock the monitor types store
 const mockMonitorTypesStore = {
-    monitorTypes: [] as MonitorTypeConfig[],
     isLoaded: false,
     loadMonitorTypes: vi.fn(),
+    monitorTypes: safeCastTo<MonitorTypeConfig[]>([]),
 };
 
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+vi.mock(import('../../stores/monitor/useMonitorTypesStore'), () => ({
     useMonitorTypesStore: {
         getState: vi.fn(() => mockMonitorTypesStore),
     },
 }));
 
 // Mock dependencies
-vi.mock("../../utils/cache", () => ({
+vi.mock(import('../../utils/cache'), () => ({
     AppCaches: {
         monitorTypes: {
+            clear: vi.fn(),
             get: vi.fn(),
             set: vi.fn(),
-            clear: vi.fn(),
         },
     },
     getCachedOrFetch: vi.fn(async (cache, key, fetcher) => {
@@ -56,9 +58,9 @@ vi.mock("../../utils/cache", () => ({
     }),
 }));
 
-vi.mock("@shared/utils/errorHandling", () => ({
-    ensureError: vi.fn(),
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     convertError: vi.fn(),
+    ensureError: vi.fn(),
     withErrorHandling: vi.fn(),
     withUtilityErrorHandling: vi.fn(),
 }));
@@ -84,82 +86,82 @@ describe("monitorTypeHelper", () => {
 
     const mockMonitorTypes: MonitorTypeConfig[] = [
         {
-            type: "http",
-            displayName: "HTTP Monitor",
             description: "Monitors HTTP endpoints",
-            version: "1.0.0",
+            displayName: "HTTP Monitor",
             fields: [
                 {
-                    name: "url",
-                    type: "text",
-                    required: true,
                     label: "URL",
+                    name: "url",
                     placeholder: "https://example.com",
+                    required: true,
+                    type: "text",
                 },
             ],
+            type: "http",
             uiConfig: {
-                display: {
-                    showUrl: true,
-                    showAdvancedMetrics: true,
+                detailFormats: {
+                    analyticsLabel: "HTTP: {url}",
                 },
-                supportsResponseTime: true,
-                supportsAdvancedAnalytics: true,
+                display: {
+                    showAdvancedMetrics: true,
+                    showUrl: true,
+                },
                 helpTexts: {
                     primary: "Enter the URL to monitor",
                     secondary: "Must be a valid HTTP/HTTPS URL",
                 },
-                detailFormats: {
-                    analyticsLabel: "HTTP: {url}",
-                },
+                supportsAdvancedAnalytics: true,
+                supportsResponseTime: true,
             },
+            version: "1.0.0",
         },
         {
-            type: "ping",
-            displayName: "Ping Monitor",
             description: "Monitors server connectivity via ping",
-            version: "1.0.0",
+            displayName: "Ping Monitor",
             fields: [
                 {
-                    name: "host",
-                    type: "text",
-                    required: true,
                     label: "Host",
+                    name: "host",
                     placeholder: "example.com",
+                    required: true,
+                    type: "text",
                 },
             ],
+            type: "ping",
             uiConfig: {
                 display: {
-                    showUrl: false,
                     showAdvancedMetrics: false,
+                    showUrl: false,
                 },
-                supportsResponseTime: true,
-                supportsAdvancedAnalytics: false,
                 helpTexts: {
                     primary: "Enter hostname or IP address",
                 },
+                supportsAdvancedAnalytics: false,
+                supportsResponseTime: true,
             },
+            version: "1.0.0",
         },
         {
-            type: "port",
-            displayName: "TCP Monitor",
             description: "Monitors TCP port connectivity",
-            version: "1.0.0",
+            displayName: "TCP Monitor",
             fields: [
                 {
-                    name: "host",
-                    type: "text",
-                    required: true,
                     label: "Host",
+                    name: "host",
                     placeholder: "example.com",
+                    required: true,
+                    type: "text",
                 },
                 {
-                    name: "port",
-                    type: "number",
-                    required: true,
                     label: "Port",
+                    name: "port",
                     placeholder: "80",
+                    required: true,
+                    type: "number",
                 },
             ],
+            type: "port",
+            version: "1.0.0",
         },
     ];
 
@@ -175,7 +177,7 @@ describe("monitorTypeHelper", () => {
     });
 
     describe(clearMonitorTypeCache, () => {
-        it("should call cache clear method", async ({ task, annotate }) => {
+        it("should call cache clear method", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
             await annotate("Category: Utility", "category");
@@ -187,8 +189,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should clear cache when called multiple times", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -205,8 +207,8 @@ describe("monitorTypeHelper", () => {
 
     describe(getAvailableMonitorTypes, () => {
         it("should return cached data when available", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -227,8 +229,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should fetch from backend when cache is empty", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -258,8 +260,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle backend fetch errors gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -283,8 +285,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should cache fetched data for subsequent calls", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -310,8 +312,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle empty response from backend", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -339,8 +341,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle invalid cache data gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -372,8 +374,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should return config for existing monitor type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -382,12 +384,12 @@ describe("monitorTypeHelper", () => {
 
             const result = await getMonitorTypeConfig("http");
 
-            expect(result).toEqual(mockMonitorTypes[0]);
+            expect(result).toEqual(arrayFirst(mockMonitorTypes));
         });
 
         it("should return config for different monitor types", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -402,8 +404,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should return undefined for non-existent monitor type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -416,8 +418,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should return undefined for empty string", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -430,8 +432,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle case-sensitive type matching", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -444,8 +446,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should work with whitespace in type names", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -458,8 +460,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle special characters in type names", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -472,8 +474,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should return undefined when monitor types list is empty", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -497,8 +499,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should return options array for all monitor types", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -515,8 +517,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should return empty array when no monitor types available", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -531,8 +533,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle monitor types with complex display names", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -541,18 +543,18 @@ describe("monitorTypeHelper", () => {
 
             const complexTypes: MonitorTypeConfig[] = [
                 {
-                    type: "http",
-                    displayName: "HTTP Monitor (Advanced)",
                     description: "Advanced HTTP monitoring",
+                    displayName: "HTTP Monitor (Advanced)",
+                    fields: arrayFirst(mockMonitorTypes)!.fields,
+                    type: "http",
                     version: "2.0.0",
-                    fields: mockMonitorTypes[0]!.fields,
                 },
                 {
-                    type: "ping",
-                    displayName: "Custom Ping Service",
                     description: "Custom ping implementation",
-                    version: "1.1.0",
+                    displayName: "Custom Ping Service",
                     fields: mockMonitorTypes[1]!.fields,
+                    type: "ping",
+                    version: "1.1.0",
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(complexTypes);
@@ -568,8 +570,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should preserve order of monitor types from backend", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -591,8 +593,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle monitor types with empty display names", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -605,18 +607,18 @@ describe("monitorTypeHelper", () => {
             // fall back to the monitor types store.
             const invalidCachedTypes: MonitorTypeConfig[] = [
                 {
-                    type: "http",
-                    displayName: "",
                     description: "Monitor with empty display name",
+                    displayName: "",
+                    fields: arrayFirst(mockMonitorTypes)!.fields,
+                    type: "http",
                     version: "1.0.0",
-                    fields: mockMonitorTypes[0]!.fields,
                 },
                 {
-                    type: "ping",
-                    displayName: "Normal Monitor",
                     description: "Normal monitor",
+                    displayName: "Normal Monitor",
+                    fields: arrayFirst(mockMonitorTypes)!.fields,
+                    type: "ping",
                     version: "1.0.0",
-                    fields: mockMonitorTypes[0]!.fields,
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
@@ -642,8 +644,8 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should handle monitor types with special characters in names", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -652,11 +654,11 @@ describe("monitorTypeHelper", () => {
 
             const specialTypes: MonitorTypeConfig[] = [
                 {
-                    type: "http",
-                    displayName: "Monitor (v2.0) - Advanced & Fast",
                     description: "Special monitor",
+                    displayName: "Monitor (v2.0) - Advanced & Fast",
+                    fields: arrayFirst(mockMonitorTypes)!.fields,
+                    type: "http",
                     version: "2.0.0",
-                    fields: mockMonitorTypes[0]!.fields,
                 },
             ];
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(specialTypes);
@@ -671,8 +673,8 @@ describe("monitorTypeHelper", () => {
 
     describe("error handling integration", () => {
         it("should pass correct parameters to withUtilityErrorHandling", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -694,15 +696,15 @@ describe("monitorTypeHelper", () => {
         });
 
         it("should use fallback value from error handler", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const fallbackValue = [mockMonitorTypes[0]];
+            const fallbackValue = [arrayFirst(mockMonitorTypes)];
 
             vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
             vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(
@@ -715,10 +717,10 @@ describe("monitorTypeHelper", () => {
         });
     });
 
-    describe("Store integration", () => {
+    describe("store integration", () => {
         it("should use monitor types store correctly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeHelper", "component");
@@ -749,14 +751,14 @@ describe("monitorTypeHelper", () => {
     });
 
     // Property-based Tests
-    describe("Property-based Tests", () => {
+    describe("property-based Tests", () => {
         const monitorTypeKeyArb = fc.constantFrom(
-            ...(BASE_MONITOR_TYPES as readonly MonitorType[])
+            ...(safeCastTo<readonly MonitorType[]>(BASE_MONITOR_TYPES))
         );
 
         const monitorFieldOptionArb = fc.record({
-            label: fc.string({ minLength: 1, maxLength: 20 }),
-            value: fc.string({ minLength: 1, maxLength: 20 }),
+            label: fc.string({ maxLength: 20, minLength: 1 }),
+            value: fc.string({ maxLength: 20, minLength: 1 }),
         });
 
         const monitorFieldOptionalPropsArb: fc.Arbitrary<
@@ -764,41 +766,41 @@ describe("monitorTypeHelper", () => {
         > = fc
             .record({
                 helpText: fc.option(
-                    fc.string({ minLength: 1, maxLength: 100 }),
+                    fc.string({ maxLength: 100, minLength: 1 }),
                     { nil: null }
                 ),
-                max: fc.option(fc.integer({ min: -10_000, max: 10_000 }), {
+                max: fc.option(fc.integer({ max: 10_000, min: -10_000 }), {
                     nil: null,
                 }),
-                min: fc.option(fc.integer({ min: -10_000, max: 10_000 }), {
+                min: fc.option(fc.integer({ max: 10_000, min: -10_000 }), {
                     nil: null,
                 }),
                 options: fc.option(
                     fc.array(monitorFieldOptionArb, {
-                        minLength: 1,
                         maxLength: 5,
+                        minLength: 1,
                     }),
                     { nil: null }
                 ),
                 placeholder: fc.option(
-                    fc.string({ minLength: 1, maxLength: 50 }),
+                    fc.string({ maxLength: 50, minLength: 1 }),
                     { nil: null }
                 ),
             })
             .map(({ helpText, max, min, options, placeholder }) => ({
-                ...(helpText === null ? {} : { helpText }),
-                ...(max === null ? {} : { max }),
-                ...(min === null ? {} : { min }),
-                ...(options === null ? {} : { options }),
-                ...(placeholder === null ? {} : { placeholder }),
+                ...(helpText !== null && { helpText }),
+                ...(max !== null && { max }),
+                ...(min !== null && { min }),
+                ...(options !== null && { options }),
+                ...(placeholder !== null && { placeholder }),
             }));
 
         const monitorFieldDefinitionArb: fc.Arbitrary<MonitorFieldDefinition> =
             fc
                 .tuple(
                     fc.record({
-                        label: fc.string({ minLength: 1, maxLength: 50 }),
-                        name: fc.string({ minLength: 1, maxLength: 30 }),
+                        label: fc.string({ maxLength: 50, minLength: 1 }),
+                        name: fc.string({ maxLength: 30, minLength: 1 }),
                         required: fc.boolean(),
                         type: fc.constantFrom(
                             "number",
@@ -816,14 +818,14 @@ describe("monitorTypeHelper", () => {
 
         const monitorTypeConfigArb: fc.Arbitrary<MonitorTypeConfig> = fc.record(
             {
-                description: fc.string({ minLength: 5, maxLength: 200 }),
-                displayName: fc.string({ minLength: 1, maxLength: 50 }),
+                description: fc.string({ maxLength: 200, minLength: 5 }),
+                displayName: fc.string({ maxLength: 50, minLength: 1 }),
                 fields: fc.array(monitorFieldDefinitionArb, {
-                    minLength: 1,
                     maxLength: 5,
+                    minLength: 1,
                 }),
                 type: monitorTypeKeyArb,
-                version: fc.string({ minLength: 1, maxLength: 20 }),
+                version: fc.string({ maxLength: 20, minLength: 1 }),
             }
         );
 
@@ -844,14 +846,14 @@ describe("monitorTypeHelper", () => {
                     clearMonitorTypeCache();
 
                     // Verify clear was called
-                    expect(AppCaches.monitorTypes.clear).toHaveBeenCalled();
+                    expect(AppCaches.monitorTypes.clear).toHaveBeenCalledWith();
                 }
             );
         });
 
         describe("getAvailableMonitorTypes property tests", () => {
             test.prop([
-                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
+                fc.array(monitorTypeConfigArb, { maxLength: 5, minLength: 1 }),
             ])(
                 "should return monitor type configurations from cache or store",
                 async (mockTypes) => {
@@ -872,18 +874,18 @@ describe("monitorTypeHelper", () => {
                     const result = await getAvailableMonitorTypes();
 
                     expect(result).toEqual(mockTypes);
-                    expect(AppCaches.monitorTypes.set).toHaveBeenCalled();
+                    expect(AppCaches.monitorTypes.set).toHaveBeenCalledWith();
                 }
             );
 
             test.prop([
-                fc.array(monitorTypeConfigArb, { minLength: 0, maxLength: 3 }),
+                fc.array(monitorTypeConfigArb, { maxLength: 3, minLength: 0 }),
             ])(
                 "should return cached monitor types when available",
                 async (cachedTypes) => {
                     // Setup cache to return data
                     vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                        cachedTypes as any
+                        cachedTypes
                     );
                     vi.mocked(AppCaches.monitorTypes.set).mockImplementation(
                         () => {}
@@ -900,8 +902,8 @@ describe("monitorTypeHelper", () => {
 
         describe("getMonitorTypeConfig property tests", () => {
             test.prop([
-                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
-                fc.integer({ min: 0, max: 4 }),
+                fc.array(monitorTypeConfigArb, { maxLength: 5, minLength: 1 }),
+                fc.integer({ max: 4, min: 0 }),
             ])(
                 "should find monitor type config when type exists",
                 async (mockTypes, targetIndex) => {
@@ -913,7 +915,7 @@ describe("monitorTypeHelper", () => {
 
                     // Setup mocks to return the mock types
                     vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                        mockTypes as any
+                        mockTypes
                     );
 
                     const result = await getMonitorTypeConfig(targetType.type);
@@ -926,9 +928,9 @@ describe("monitorTypeHelper", () => {
             );
 
             test.prop([
-                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
+                fc.array(monitorTypeConfigArb, { maxLength: 5, minLength: 1 }),
                 fc.constantFrom(
-                    ...(BASE_MONITOR_TYPES as readonly MonitorType[])
+                    ...(safeCastTo<readonly MonitorType[]>(BASE_MONITOR_TYPES))
                 ),
             ])(
                 "should return undefined when monitor type not found",
@@ -941,7 +943,7 @@ describe("monitorTypeHelper", () => {
 
                     // Setup mocks to return the mock types
                     vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                        mockTypes as any
+                        mockTypes
                     );
 
                     const result = await getMonitorTypeConfig(searchType);
@@ -953,18 +955,19 @@ describe("monitorTypeHelper", () => {
 
         describe("getMonitorTypeOptions property tests", () => {
             test.prop([
-                fc.array(monitorTypeConfigArb, { minLength: 1, maxLength: 5 }),
+                fc.array(monitorTypeConfigArb, { maxLength: 5, minLength: 1 }),
             ])(
                 "should transform monitor types to option format",
                 async (mockTypes) => {
                     // Setup mocks to return the mock types
                     vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                        mockTypes as any
+                        mockTypes
                     );
 
                     const result = await getMonitorTypeOptions();
 
                     expect(result).toHaveLength(mockTypes.length);
+
                     for (const [index, option] of result.entries()) {
                         const mockType = mockTypes[index];
                         if (!mockType) {
@@ -972,6 +975,7 @@ describe("monitorTypeHelper", () => {
                                 `Expected mockType at index ${index} to be defined`
                             );
                         }
+
                         expect(option.label).toBe(mockType.displayName);
                         expect(option.value).toBe(mockType.type);
                     }
@@ -989,7 +993,7 @@ describe("monitorTypeHelper", () => {
                         false,
                     ];
                     vi.mocked(AppCaches.monitorTypes.get).mockReturnValueOnce(
-                        emptyValues[emptyCase] as any
+                        emptyValues[emptyCase]
                     );
 
                     if (emptyCase > 0) {
@@ -1003,7 +1007,8 @@ describe("monitorTypeHelper", () => {
 
                     const result = await getMonitorTypeOptions();
 
-                    expect(Array.isArray(result)).toBeTruthy();
+                    expect(Array.isArray(result)).toBe(true);
+
                     if (emptyCase === 0) {
                         expect(result).toHaveLength(0);
                     }

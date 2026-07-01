@@ -58,17 +58,17 @@ export const electronPreferReadProcessEnvRule = {
     },
 
     meta: {
-        type: "suggestion",
         docs: {
             description:
                 "require using readProcessEnv() instead of direct process.env access",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-prefer-read-process-env.md",
         },
-        schema: [],
         messages: {
             preferReadProcessEnv:
                 "Prefer readProcessEnv() instead of direct process.env access.",
         },
+        schema: [],
+        type: "suggestion",
     },
 };

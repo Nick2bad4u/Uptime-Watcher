@@ -14,7 +14,7 @@
  * @tags ["mutation-testing", "array-declaration", "stryker"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("ArrayDeclaration Mutation Tests", () => {
     beforeEach(() => {
@@ -277,8 +277,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             await annotate("Category: Frontend", "category");
             await annotate("Type: Configuration Arrays", "type");
 
-            // This targets mutations in form field configurations
-            // Like className arrays, validation rule arrays, etc.
+            // This targets mutations in form field configurations Like className arrays, validation rule arrays, etc.
 
             function getFormFieldConfig(hasError: boolean) {
                 const baseClasses = ["form-field", "input"];
@@ -343,8 +342,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             await annotate("Category: Business Logic", "category");
             await annotate("Type: Configuration Arrays", "type");
 
-            // This targets mutations in monitor field configurations
-            // Fields that should start empty and be populated based on monitor type
+            // This targets mutations in monitor field configurations Fields that should start empty and be populated based on monitor type
 
             function getMonitorTypeFields(monitorType: string) {
                 const requiredFields: string[] = [];
@@ -574,8 +572,7 @@ describe("ArrayDeclaration Mutation Tests", () => {
             await annotate("Category: State Management", "category");
             await annotate("Type: Collection Initialization", "type");
 
-            // This targets mutations in cache initialization
-            // Like entries arrays, keys arrays, etc.
+            // This targets mutations in cache initialization Like entries arrays, keys arrays, etc.
 
             function initializeCache() {
                 const entries: { key: string; value: any }[] = [];

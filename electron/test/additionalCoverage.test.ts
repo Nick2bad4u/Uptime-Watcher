@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,9 +15,9 @@
  * @tags ["test"]
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock dependencies
 vi.mock("../utils/logger", () => ({
@@ -196,7 +196,7 @@ describe("Additional Coverage Tests", () => {
 
             const asyncFunction = async () =>
                 new Promise((resolve) => {
-                    setTimeout(() => resolve("success"), 1);
+                    setTimeout(() => { resolve("success"); }, 1);
                 });
 
             const result = await asyncFunction();

@@ -9,6 +9,10 @@
  * props that native elements can safely receive while still allowing event
  * handlers and accessibility attributes.
  */
+import type { UnknownRecord } from "type-fest";
+
+import { objectEntries, objectFromEntries  } from "ts-extras";
+
 const SAFE_PROPS = new Set<string>([
     "accept",
     "action",
@@ -64,9 +68,9 @@ const SAFE_PROPS = new Set<string>([
 ]);
 
 const SAFE_PREFIXES = ["data-", "aria-"];
-const EVENT_HANDLER_PATTERN = /^on[A-Z]/u;
+const EVENT_HANDLER_PATTERN = /^on[A-Z]/v;
 
-export type DomLikeProps = Record<string, unknown>;
+export type DomLikeProps = UnknownRecord;
 
 /**
  * Filters a props bag down to DOM-safe attributes.
@@ -82,11 +86,11 @@ export function sanitizeDomProps<Props extends DomLikeProps>(
     additionalAllowed: readonly string[] = []
 ): Partial<Props> {
     if (!props) {
-        return {} as Partial<Props>;
+        return {};
     }
 
-    const allowed = new Set([...SAFE_PROPS, ...additionalAllowed]);
-    const safeEntries = Object.entries(props).filter(([key, value]) => {
+    const allowed = new Set(Iterator.concat(SAFE_PROPS, additionalAllowed));
+    const safeEntries = objectEntries(props).filter(([key, value]) => {
         if (typeof key !== "string") {
             return false;
         }
@@ -106,5 +110,5 @@ export function sanitizeDomProps<Props extends DomLikeProps>(
         return SAFE_PREFIXES.some((prefix) => key.startsWith(prefix));
     });
 
-    return Object.fromEntries(safeEntries) as Partial<Props>;
+    return objectFromEntries(safeEntries) as Partial<Props>;
 }

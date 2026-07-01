@@ -327,25 +327,27 @@ export function buildDesiredSitesFromSyncState(
     const desiredSites: Record<string, CloudSyncSiteConfig> = {};
 
     for (const [siteId, entity] of objectEntries(siteState)) {
-        if (!isDefined(entity.deleted)) {
-            const nameValue = entity.fields["name"]?.value;
-            const monitoringValue = entity.fields["monitoring"]?.value;
+        if (isDefined(entity.deleted)) {
+            continue;
+        }
 
-            const parsed = cloudSyncSiteConfigSchema.safeParse({
-                identifier: siteId,
-                monitoring:
-                    typeof monitoringValue === "boolean"
-                        ? monitoringValue
-                        : true,
-                name:
-                    typeof nameValue === "string" && nameValue.trim().length > 0
-                        ? nameValue
-                        : siteId,
-            });
+        const nameValue = entity.fields["name"]?.value;
+        const monitoringValue = entity.fields["monitoring"]?.value;
 
-            if (parsed.success) {
-                desiredSites[siteId] = parsed.data;
-            }
+        const parsed = cloudSyncSiteConfigSchema.safeParse({
+            identifier: siteId,
+            monitoring:
+                typeof monitoringValue === "boolean"
+                    ? monitoringValue
+                    : true,
+            name:
+                typeof nameValue === "string" && nameValue.trim().length > 0
+                    ? nameValue
+                    : siteId,
+        });
+
+        if (parsed.success) {
+            desiredSites[siteId] = parsed.data;
         }
     }
 
@@ -367,33 +369,35 @@ export function buildDesiredMonitorsFromSyncState(
     const desiredMonitors: Record<string, CloudSyncMonitorConfig> = {};
 
     for (const [monitorId, entity] of objectEntries(monitorState)) {
-        if (!isDefined(entity.deleted)) {
-            const candidate: UnknownRecord = { id: monitorId };
-            for (const [field, fieldValue] of objectEntries(entity.fields)) {
-                if (field !== "id" && fieldValue.value !== null) {
-                    candidate[field] = fieldValue.value;
-                }
-            }
+        if (isDefined(entity.deleted)) {
+            continue;
+        }
 
-            // Stabilize required baseline fields that may not be present in
-            // remote operations.
-            if (!isBoolean(candidate["monitoring"])) {
-                candidate["monitoring"] = true;
+        const candidate: UnknownRecord = { id: monitorId };
+        for (const [field, fieldValue] of objectEntries(entity.fields)) {
+            if (field !== "id" && fieldValue.value !== null) {
+                candidate[field] = fieldValue.value;
             }
-            if (!isFiniteNumber(candidate["checkInterval"])) {
-                candidate["checkInterval"] = DEFAULT_CHECK_INTERVAL;
-            }
-            if (!isFiniteNumber(candidate["retryAttempts"])) {
-                candidate["retryAttempts"] = DEFAULT_RETRY_ATTEMPTS;
-            }
-            if (!isFiniteNumber(candidate["timeout"])) {
-                candidate["timeout"] = DEFAULT_REQUEST_TIMEOUT;
-            }
+        }
 
-            const parsed = cloudSyncMonitorConfigSchema.safeParse(candidate);
-            if (parsed.success) {
-                desiredMonitors[monitorId] = parsed.data;
-            }
+        // Stabilize required baseline fields that may not be present in
+        // remote operations.
+        if (!isBoolean(candidate["monitoring"])) {
+            candidate["monitoring"] = true;
+        }
+        if (!isFiniteNumber(candidate["checkInterval"])) {
+            candidate["checkInterval"] = DEFAULT_CHECK_INTERVAL;
+        }
+        if (!isFiniteNumber(candidate["retryAttempts"])) {
+            candidate["retryAttempts"] = DEFAULT_RETRY_ATTEMPTS;
+        }
+        if (!isFiniteNumber(candidate["timeout"])) {
+            candidate["timeout"] = DEFAULT_REQUEST_TIMEOUT;
+        }
+
+        const parsed = cloudSyncMonitorConfigSchema.safeParse(candidate);
+        if (parsed.success) {
+            desiredMonitors[monitorId] = parsed.data;
         }
     }
 
@@ -411,11 +415,13 @@ export function buildDesiredSettingsFromSyncState(
     const desiredSettings: CloudSyncSettingsConfig = {};
 
     for (const [key, entity] of objectEntries(settingsState)) {
-        if (shouldSyncSettingKey(key) && !isDefined(entity.deleted)) {
-            const value = entity.fields["value"]?.value;
-            if (typeof value === "string") {
-                desiredSettings[key] = value;
-            }
+        if (!shouldSyncSettingKey(key) || isDefined(entity.deleted)) {
+            continue;
+        }
+
+        const value = entity.fields["value"]?.value;
+        if (typeof value === "string") {
+            desiredSettings[key] = value;
         }
     }
 
@@ -509,9 +515,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     const operations: CloudSyncOperation[] = [];
     let opId = args.nextOpId;
 
-    const monitorFields: ReadonlyArray<
-        Exclude<keyof CloudSyncMonitorConfig, "id">
-    > = [
+    const monitorFields: readonly Exclude<keyof CloudSyncMonitorConfig, "id">[] = [
         "baselineUrl",
         "bodyKeyword",
         "certificateWarningDays",
@@ -628,10 +632,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
         }
     }
 
-    const settingsKeys = new Set<string>([
-        ...objectKeys(args.current.settings),
-        ...objectKeys(baselineSettings),
-    ]);
+    const settingsKeys = new Set<string>(Iterator.concat(objectKeys(args.current.settings), objectKeys(baselineSettings)));
 
     for (const key of settingsKeys) {
         const currentValue = args.current.settings[key];

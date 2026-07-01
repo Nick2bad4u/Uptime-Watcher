@@ -11,22 +11,34 @@
  * consistency, replication, and WebSocket keepalive monitors.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { test } from "@fast-check/vitest";
-import * as fc from "fast-check";
-
 import type { MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
+import type { UnknownRecord } from "type-fest";
 
-vi.mock("@shared/utils/errorHandling", () => ({
+import { test } from "@fast-check/vitest";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import {
+    validateMonitorData as sharedValidateMonitorData,
+    validateMonitorField as sharedValidateMonitorField,
+} from "@shared/validation/monitorSchemas";
+import * as fc from "fast-check";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    type PartialMonitorFormDataByType,
+    validateMonitorFormData,
+} from "../../utils/monitorValidation";
+
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     withUtilityErrorHandling: vi.fn(),
 }));
 
 vi.mock(
-    "@shared/validation/monitorSchemas",
+    import('@shared/validation/monitorSchemas'),
     async (importOriginal): Promise<unknown> => {
         const actual =
-            (await importOriginal()) as typeof import("@shared/validation/monitorSchemas");
+            (await importOriginal());
 
         return {
             ...actual,
@@ -35,16 +47,6 @@ vi.mock(
         };
     }
 );
-
-import {
-    validateMonitorFormData,
-    type PartialMonitorFormDataByType,
-} from "../../utils/monitorValidation";
-import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import {
-    validateMonitorData as sharedValidateMonitorData,
-    validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/monitorSchemas";
 
 /**
  * Base validation result reused across tests to keep mocks deterministic.
@@ -60,13 +62,13 @@ const baseValidationResult: ValidationResult = {
  * Definition of a monitor scenario for table-driven tests.
  */
 interface MonitorTypeScenario<TType extends MonitorType = MonitorType> {
-    readonly type: TType;
-    readonly validData: PartialMonitorFormDataByType<TType>;
     readonly requiredFields: readonly {
         readonly field: string;
-        readonly missingMessage: string;
         readonly invalidValue?: unknown;
+        readonly missingMessage: string;
     }[];
+    readonly type: TType;
+    readonly validData: PartialMonitorFormDataByType<TType>;
 }
 
 const advancedMonitorScenarios = [
@@ -322,10 +324,10 @@ const missingFieldCases = advancedMonitorScenarios.flatMap((scenario) =>
     scenario.requiredFields.map(
         (field) =>
             [
-                field.field,
-                scenario.type,
                 field,
+                field.field,
                 scenario,
+                scenario.type,
             ] as const
     )
 );
@@ -353,15 +355,16 @@ beforeEach(() => {
 describe("validateMonitorFormData advanced monitor coverage", () => {
     it.each(advancedMonitorScenarios)(
         "accepts valid $type payloads and delegates to shared schemas",
-        async ({ type, validData, requiredFields }) => {
+        async ({ requiredFields, type, validData }) => {
             const result = await validateMonitorFormData(type, validData);
 
             expect(result).toEqual({ errors: [], success: true, warnings: [] });
 
             for (const { field } of requiredFields) {
-                const fieldValue = (validData as Record<string, unknown>)[
+                const fieldValue = (safeCastTo<UnknownRecord>(validData))[
                     field
                 ];
+
                 expect(sharedValidateMonitorField).toHaveBeenCalledWith(
                     type,
                     field,
@@ -382,16 +385,14 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
 
             if (field.invalidValue === undefined) {
                 const { [field.field]: removedValue, ...remainingData } =
-                    invalidData as Record<string, unknown>;
+                    safeCastTo<UnknownRecord>(invalidData);
                 void removedValue;
-                invalidData = remainingData as PartialMonitorFormDataByType<
-                    typeof scenario.type
-                >;
+                invalidData = remainingData;
             } else {
                 invalidData = {
                     ...invalidData,
                     [field.field]: field.invalidValue,
-                } as PartialMonitorFormDataByType<typeof scenario.type>;
+                };
             }
 
             const result = await validateMonitorFormData(
@@ -409,7 +410,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
 
     it("validates DNS expectedValue only when it contains content", async () => {
         const whitespaceData = {
-            expectedValue: "   ",
+            expectedValue: ' '.repeat(3),
             host: "dns.example.com",
             recordType: "A",
         } satisfies PartialMonitorFormDataByType<"dns">;
@@ -420,6 +421,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
             .mock.calls.filter(
                 ([, fieldName]) => fieldName === "expectedValue"
             );
+
         expect(expectedValueCalls).toHaveLength(0);
 
         vi.mocked(sharedValidateMonitorField).mockClear();
@@ -436,6 +438,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
             .mock.calls.filter(
                 ([, fieldName]) => fieldName === "expectedValue"
             );
+
         expect(populatedCalls).toHaveLength(1);
     });
 
@@ -456,7 +459,7 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
 test.prop([
     fc.constantFrom(...scenarioFieldPairs),
     fc
-        .string({ minLength: 5, maxLength: 40 })
+        .string({ maxLength: 40, minLength: 5 })
         .filter((message) => /\S/.test(message)),
 ])(
     "propagates shared schema errors for advanced monitor fields",
@@ -483,7 +486,7 @@ test.prop([
         );
 
         expect(result.errors).toContain(schemaErrorMessage);
-        expect(result.success).toBeFalsy();
+        expect(result.success).toBe(false);
 
         vi.mocked(sharedValidateMonitorField).mockReturnValue(
             baseValidationResult

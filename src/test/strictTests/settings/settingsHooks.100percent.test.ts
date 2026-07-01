@@ -13,7 +13,7 @@ const mockedLogger = vi.hoisted(() => ({
     warn: vi.fn(),
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: mockedLogger,
 }));
 
@@ -250,7 +250,7 @@ describe(useSettingsChangeHandlers, () => {
             expect.objectContaining({ historyLimit: 2500, theme: "light" })
         );
         expect(mockedLogger.warn).toHaveBeenCalledTimes(1);
-        expect(mockedLogger.user.settingsChange).toHaveBeenCalled();
+        expect(mockedLogger.user.settingsChange).toHaveBeenCalledWith();
     });
 
     it("does not call updateSettings when there are no effective changes", async () => {

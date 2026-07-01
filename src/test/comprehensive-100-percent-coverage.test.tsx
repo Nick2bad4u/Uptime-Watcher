@@ -8,24 +8,25 @@
  */
 
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { ReactNode } from "react";
 
-// Import components and utilities to test
-import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";
-import { generateUuid } from "../utils/data/generateUuid";
 import {
     ensureError,
     withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
-import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import components and utilities to test
+import { AddSiteForm } from "../components/AddSiteForm/AddSiteForm";
+import { useAddSiteForm } from "../components/SiteDetails/useAddSiteForm";
+import { useDynamicHelpText } from "../hooks/useDynamicHelpText";
+import { useMonitorTypes } from "../hooks/useMonitorTypes";
 import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
-import { useMonitorTypes } from "../hooks/useMonitorTypes";
-import { useDynamicHelpText } from "../hooks/useDynamicHelpText";
-import { useAddSiteForm } from "../components/SiteDetails/useAddSiteForm";
+import { generateUuid } from "../utils/data/generateUuid";
+import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 const buildAddSiteFormState = (
     overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}
@@ -99,7 +100,7 @@ const buildAddSiteFormState = (
     }) as ReturnType<typeof useAddSiteForm>;
 
 // Mock all external dependencies
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -113,7 +114,7 @@ vi.mock("../services/logger", () => {
     };
 });
 
-vi.mock("../stores/error/useErrorStore", () => ({
+vi.mock(import('../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             clearError: vi.fn(),
@@ -125,7 +126,7 @@ vi.mock("../stores/error/useErrorStore", () => ({
     }),
 }));
 
-vi.mock("../stores/sites/useSitesStore", () => ({
+vi.mock(import('../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn((selector?: (state: unknown) => unknown) => {
         const state = {
             addMonitorToSite: vi.fn(),
@@ -136,7 +137,7 @@ vi.mock("../stores/sites/useSitesStore", () => ({
     }),
 }));
 
-vi.mock("../hooks/useMonitorTypes", () => ({
+vi.mock(import('../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: vi.fn(() => ({
         options: [
             { label: "HTTP/HTTPS", value: "http" },
@@ -146,18 +147,18 @@ vi.mock("../hooks/useMonitorTypes", () => ({
     })),
 }));
 
-vi.mock("../hooks/useDynamicHelpText", () => ({
+vi.mock(import('../hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: vi.fn(() => ({
         primary: "Test help text",
         secondary: "Secondary help text",
     })),
 }));
 
-vi.mock("../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
-vi.mock("../components/SiteDetails/useAddSiteForm", async () => {
+vi.mock(import('../components/SiteDetails/useAddSiteForm'), async () => {
     const actual = await vi.importActual<
         typeof import("../components/SiteDetails/useAddSiteForm")
     >("../components/SiteDetails/useAddSiteForm");
@@ -168,7 +169,7 @@ vi.mock("../components/SiteDetails/useAddSiteForm", async () => {
     };
 });
 
-vi.mock("../constants", () => ({
+vi.mock(import('../constants'), () => ({
     CHECK_INTERVALS: [
         { label: "1 minute", value: 60_000 },
         { label: "5 minutes", value: 300_000 },
@@ -176,28 +177,28 @@ vi.mock("../constants", () => ({
 }));
 
 // Mock all form components
-vi.mock("../components/AddSiteForm/RadioGroup", () => ({
+vi.mock(import('../components/AddSiteForm/RadioGroup'), () => ({
     RadioGroup: ({ onChange, value, options }: any) => (
         <div data-testid="radio-group">
             {options.map((option: any) => (
                 <input
-                    key={option.value}
-                    type="radio"
-                    data-testid={`radio-${option.value}`}
                     checked={value === option.value}
+                    data-testid={`radio-${option.value}`}
+                    key={option.value}
                     onChange={() => onChange(option.value)}
+                    type="radio"
                 />
             ))}
         </div>
     ),
 }));
 
-vi.mock("../components/AddSiteForm/SelectField", () => ({
+vi.mock(import('../components/AddSiteForm/SelectField'), () => ({
     SelectField: ({ onChange, value, options, id }: any) => (
         <select
             data-testid={id}
-            value={value}
             onChange={(e) => onChange(e.target.value)}
+            value={value}
         >
             {options.map((option: any) => (
                 <option key={option.value} value={option.value}>
@@ -208,21 +209,21 @@ vi.mock("../components/AddSiteForm/SelectField", () => ({
     ),
 }));
 
-vi.mock("../components/AddSiteForm/TextField", () => ({
+vi.mock(import('../components/AddSiteForm/TextField'), () => ({
     TextField: ({ onChange, value, id }: any) => (
         <input
             data-testid={id}
-            value={value}
             onChange={(e) => onChange(e.target.value)}
+            value={value}
         />
     ),
 }));
 
-vi.mock("../components/AddSiteForm/DynamicMonitorFields", () => ({
+vi.mock(import('../components/AddSiteForm/DynamicMonitorFields'), () => ({
     DynamicMonitorFields: () => <div data-testid="dynamic-fields" />,
 }));
 
-vi.mock("../components/common/ErrorAlert/ErrorAlert", () => ({
+vi.mock(import('../components/common/ErrorAlert/ErrorAlert'), () => ({
     ErrorAlert: ({ message, onDismiss }: any) => (
         <div data-testid="error-alert">
             {message}
@@ -233,11 +234,11 @@ vi.mock("../components/common/ErrorAlert/ErrorAlert", () => ({
     ),
 }));
 
-vi.mock("../theme/components/ThemedBox", () => ({
+vi.mock(import('../theme/components/ThemedBox'), () => ({
     ThemedBox: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-vi.mock("../theme/components/ThemedButton", () => ({
+vi.mock(import('../theme/components/ThemedButton'), () => ({
     ThemedButton: ({ children, onClick, disabled }: any) => (
         <button disabled={disabled} onClick={onClick}>
             {children}
@@ -245,13 +246,13 @@ vi.mock("../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("../theme/components/ThemedText", () => ({
+vi.mock(import('../theme/components/ThemedText'), () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
         <span>{children}</span>
     ),
 }));
 
-vi.mock("../components/AddSiteForm/Submit", () => ({
+vi.mock(import('../components/AddSiteForm/Submit'), () => ({
     handleSubmit: vi.fn(),
 }));
 
@@ -293,7 +294,7 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/);
+            expect(uuid).toMatch(/^site-\w+-\d+$/v);
         });
 
         it("should handle undefined crypto", () => {
@@ -304,7 +305,7 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/);
+            expect(uuid).toMatch(/^site-\w+-\d+$/v);
         });
 
         it("should handle crypto without randomUUID method", () => {
@@ -314,7 +315,7 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/);
+            expect(uuid).toMatch(/^site-\w+-\d+$/v);
         });
     });
 
@@ -381,7 +382,7 @@ describe("100% Coverage Edge Cases", () => {
                 false
             );
             expect(result).toBe("success");
-            expect(operation).toHaveBeenCalled();
+            expect(operation).toHaveBeenCalledWith();
         });
 
         it("should handle async operation failure with fallback", async () => {
@@ -450,7 +451,7 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(typeof wrapper).toBe("function");
             wrapper();
-            expect(asyncOp).toHaveBeenCalled();
+            expect(asyncOp).toHaveBeenCalledWith();
         });
     });
 
@@ -561,7 +562,7 @@ describe("100% Coverage Edge Cases", () => {
                 name: /dismiss error/i,
             });
             fireEvent.click(dismissButton);
-            expect(clearError).toHaveBeenCalled();
+            expect(clearError).toHaveBeenCalledWith();
         });
     });
 
@@ -592,7 +593,7 @@ describe("100% Coverage Edge Cases", () => {
                 options: [],
                 isLoading: true,
                 error: undefined,
-                refresh: function (): Promise<void> {
+                refresh: async function (): Promise<void> {
                     throw new Error("Function not implemented.");
                 },
             });
@@ -649,15 +650,15 @@ describe("100% Coverage Edge Cases", () => {
             // Test valid monitor type
             fireEvent.change(select, { target: { value: "http" } });
             await waitFor(() =>
-                expect(setMonitorType).toHaveBeenCalledWith("http")
+                { expect(setMonitorType).toHaveBeenCalledWith("http"); }
             );
 
             // Test invalid monitor type - check that logger.error was called with some message
             fireEvent.change(select, { target: { value: "invalid" } });
             await waitFor(() =>
-                expect(logger.error).toHaveBeenCalledWith(
+                { expect(logger.error).toHaveBeenCalledWith(
                     expect.stringContaining("Invalid monitor type value")
-                )
+                ); }
             );
         });
 

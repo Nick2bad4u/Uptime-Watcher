@@ -2,20 +2,32 @@
  * Working utility function coverage tests.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { standardTestAnnotation } from "@shared/test/testUtils";
-
 // Import utility functions from shared modules with low function coverage
 import {
     getEnvironment,
     getNodeEnv,
     isBrowserEnvironment,
+    isDevelopment,
     isNodeEnvironment,
     isProduction,
     isTest,
-    isDevelopment,
 } from "@shared/utils/environment";
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import {
+    safeJsonParse,
+    safeJsonParseArray,
+    safeJsonParseWithFallback,
+    safeJsonStringify,
+    safeJsonStringifyWithFallback,
+} from "@shared/utils/jsonSafety";
+import {
+    calculateSiteMonitoringStatus,
+    calculateSiteStatus,
+    getSiteDisplayStatus,
+    getSiteStatusDescription,
+} from "@shared/utils/siteStatus";
+import { safeStringify } from "@shared/utils/stringConversion";
 import {
     hasProperties,
     hasProperty,
@@ -31,28 +43,14 @@ import {
     isValidPort,
     isValidTimestamp,
 } from "@shared/utils/typeGuards";
-import {
-    safeJsonParse,
-    safeJsonParseArray,
-    safeJsonParseWithFallback,
-    safeJsonStringify,
-    safeJsonStringifyWithFallback,
-} from "@shared/utils/jsonSafety";
 import { validateMonitorType } from "@shared/utils/validation";
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { safeStringify } from "@shared/utils/stringConversion";
-import {
-    calculateSiteStatus,
-    calculateSiteMonitoringStatus,
-    getSiteDisplayStatus,
-    getSiteStatusDescription,
-} from "@shared/utils/siteStatus";
+import { describe, expect, it } from "vitest";
 
-describe("Working Utility Coverage Tests", () => {
-    describe("Environment Utilities", () => {
+describe("working Utility Coverage Tests", () => {
+    describe("environment Utilities", () => {
         it("should test all environment detection functions", ({
-            task,
             annotate,
+            task,
         }) => {
             standardTestAnnotation(
                 task,
@@ -64,23 +62,25 @@ describe("Working Utility Coverage Tests", () => {
 
             // Test getEnvironment
             const env = getEnvironment();
-            expect(typeof env).toBe("string");
+
+            expect(env).toBeTypeOf("string");
 
             // Test getNodeEnv
             const nodeEnv = getNodeEnv();
-            expect(typeof nodeEnv).toBe("string");
+
+            expect(nodeEnv).toBeTypeOf("string");
 
             // Test environment checks
-            expect(typeof isBrowserEnvironment()).toBe("boolean");
-            expect(typeof isNodeEnvironment()).toBe("boolean");
-            expect(typeof isProduction()).toBe("boolean");
-            expect(typeof isTest()).toBe("boolean");
-            expect(typeof isDevelopment()).toBe("boolean");
+            expect(isBrowserEnvironment()).toBeTypeOf("boolean");
+            expect(isNodeEnvironment()).toBeTypeOf("boolean");
+            expect(isProduction()).toBeTypeOf("boolean");
+            expect(isTest()).toBeTypeOf("boolean");
+            expect(isDevelopment()).toBeTypeOf("boolean");
         });
     });
 
-    describe("Type Guard Utilities", () => {
-        it("should test all type guard functions", ({ task, annotate }) => {
+    describe("type Guard Utilities", () => {
+        it("should test all type guard functions", ({ annotate, task }) => {
             standardTestAnnotation(
                 task,
                 annotate,
@@ -100,43 +100,43 @@ describe("Working Utility Coverage Tests", () => {
             const testFunc = () => {};
 
             // Test object property checks
-            expect(hasProperties(testObj, ["test"])).toBeTruthy();
-            expect(hasProperties(testObj, ["nonexistent"])).toBeFalsy();
-            expect(hasProperty(testObj, "test")).toBeTruthy();
-            expect(hasProperty(testObj, "nonexistent")).toBeFalsy();
+            expect(hasProperties(testObj, ["test"])).toBe(true);
+            expect(hasProperties(testObj, ["nonexistent"])).toBe(false);
+            expect(hasProperty(testObj, "test")).toBe(true);
+            expect(hasProperty(testObj, "nonexistent")).toBe(false);
 
             // Test type checks
-            expect(isArray(testArray)).toBeTruthy();
-            expect(isArray(testObj)).toBeFalsy();
-            expect(isBoolean(true)).toBeTruthy();
-            expect(isBoolean("true")).toBeFalsy();
-            expect(isDate(testDate)).toBeTruthy();
-            expect(isDate("2023-01-01")).toBeFalsy();
-            expect(isError(testError)).toBeTruthy();
-            expect(isError("error")).toBeFalsy();
-            expect(isFunction(testFunc)).toBeTruthy();
-            expect(isFunction(testObj)).toBeFalsy();
+            expect(isArray(testArray)).toBe(true);
+            expect(isArray(testObj)).toBe(false);
+            expect(isBoolean(true)).toBe(true);
+            expect(isBoolean("true")).toBe(false);
+            expect(isDate(testDate)).toBe(true);
+            expect(isDate("2023-01-01")).toBe(false);
+            expect(isError(testError)).toBe(true);
+            expect(isError("error")).toBe(false);
+            expect(isFunction(testFunc)).toBe(true);
+            expect(isFunction(testObj)).toBe(false);
 
             // Test number validations
-            expect(isFiniteNumber(42)).toBeTruthy();
-            expect(isFiniteNumber(Infinity)).toBeFalsy();
-            expect(isNonNegativeNumber(0)).toBeTruthy();
-            expect(isNonNegativeNumber(-1)).toBeFalsy();
-            expect(isPositiveNumber(1)).toBeTruthy();
-            expect(isPositiveNumber(0)).toBeFalsy();
-            expect(isValidPort(80)).toBeTruthy();
-            expect(isValidPort(70_000)).toBeFalsy();
-            expect(isValidTimestamp(Date.now())).toBeTruthy();
-            expect(isValidTimestamp(-1)).toBeFalsy();
+            expect(isFiniteNumber(42)).toBe(true);
+            expect(isFiniteNumber(Infinity)).toBe(false);
+            expect(isNonNegativeNumber(0)).toBe(true);
+            expect(isNonNegativeNumber(-1)).toBe(false);
+            expect(isPositiveNumber(1)).toBe(true);
+            expect(isPositiveNumber(0)).toBe(false);
+            expect(isValidPort(80)).toBe(true);
+            expect(isValidPort(70_000)).toBe(false);
+            expect(isValidTimestamp(Date.now())).toBe(true);
+            expect(isValidTimestamp(-1)).toBe(false);
 
             // Test object checks
-            expect(isNonNullObject(testObj)).toBeTruthy();
-            expect(isNonNullObject(null)).toBeFalsy();
+            expect(isNonNullObject(testObj)).toBe(true);
+            expect(isNonNullObject(null)).toBe(false);
         });
     });
 
     describe("JSON Safety Utilities", () => {
-        it("should test all JSON safety functions", ({ task, annotate }) => {
+        it("should test all JSON safety functions", ({ annotate, task }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: working-utility-coverage", "component");
             annotate("Category: Core", "category");
@@ -152,16 +152,19 @@ describe("Working Utility Coverage Tests", () => {
                 typeof data === "object" && data !== null && "test" in data;
 
             const parseResult = safeJsonParse('{"test":"value"}', validator);
-            expect(parseResult.success).toBeTruthy();
+
+            expect(parseResult.success).toBe(true);
 
             const badParseResult = safeJsonParse("invalid json", validator);
-            expect(badParseResult.success).toBeFalsy();
+
+            expect(badParseResult.success).toBe(false);
 
             // Test safeJsonParseArray
             const arrayValidator = (item: unknown): item is number =>
                 typeof item === "number";
             const arrayResult = safeJsonParseArray("[1,2,3]", arrayValidator);
-            expect(arrayResult.success).toBeTruthy();
+
+            expect(arrayResult.success).toBe(true);
 
             // Test safeJsonParseWithFallback
             const fallbackResult = safeJsonParseWithFallback(
@@ -169,23 +172,26 @@ describe("Working Utility Coverage Tests", () => {
                 validator,
                 { test: "fallback" }
             );
+
             expect(fallbackResult.test).toBe("fallback");
 
             // Test safeJsonStringify
             const stringifyResult = safeJsonStringify({ test: "value" });
-            expect(stringifyResult.success).toBeTruthy();
+
+            expect(stringifyResult.success).toBe(true);
 
             // Test safeJsonStringifyWithFallback
             const stringifyFallback = safeJsonStringifyWithFallback(
                 { test: "value" },
                 "{}"
             );
-            expect(typeof stringifyFallback).toBe("string");
+
+            expect(stringifyFallback).toBeTypeOf("string");
         });
     });
 
-    describe("Validation Utilities", () => {
-        it("should test validation functions", ({ task, annotate }) => {
+    describe("validation Utilities", () => {
+        it("should test validation functions", ({ annotate, task }) => {
             standardTestAnnotation(
                 task,
                 annotate,
@@ -195,16 +201,16 @@ describe("Working Utility Coverage Tests", () => {
             );
 
             // Test validateMonitorType
-            expect(validateMonitorType("http")).toBeTruthy();
-            expect(validateMonitorType("port")).toBeTruthy();
-            expect(validateMonitorType("ping")).toBeTruthy();
-            expect(validateMonitorType("dns")).toBeTruthy();
-            expect(validateMonitorType("invalid")).toBeFalsy();
+            expect(validateMonitorType("http")).toBe(true);
+            expect(validateMonitorType("port")).toBe(true);
+            expect(validateMonitorType("ping")).toBe(true);
+            expect(validateMonitorType("dns")).toBe(true);
+            expect(validateMonitorType("invalid")).toBe(false);
         });
     });
 
-    describe("Error Handling Utilities", () => {
-        it("should test error handling functions", ({ task, annotate }) => {
+    describe("error Handling Utilities", () => {
+        it("should test error handling functions", ({ annotate, task }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: working-utility-coverage", "component");
             annotate("Category: Core", "category");
@@ -227,12 +233,13 @@ describe("Working Utility Coverage Tests", () => {
                 async () => "success",
                 mockContext
             );
+
             expect(successResult).toBeInstanceOf(Promise);
         });
     });
 
-    describe("String Conversion Utilities", () => {
-        it("should test string conversion functions", ({ task, annotate }) => {
+    describe("string Conversion Utilities", () => {
+        it("should test string conversion functions", ({ annotate, task }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: working-utility-coverage", "component");
             annotate("Category: Core", "category");
@@ -244,17 +251,17 @@ describe("Working Utility Coverage Tests", () => {
             annotate("Type: Business Logic", "type");
 
             // Test safeStringify
-            expect(typeof safeStringify("test")).toBe("string");
-            expect(typeof safeStringify(42)).toBe("string");
-            expect(typeof safeStringify({})).toBe("string");
-            expect(typeof safeStringify([])).toBe("string");
-            expect(typeof safeStringify(null)).toBe("string");
-            expect(typeof safeStringify(undefined)).toBe("string");
+            expect(safeStringify("test")).toBeTypeOf("string");
+            expect(safeStringify(42)).toBeTypeOf("string");
+            expect(safeStringify({})).toBeTypeOf("string");
+            expect(safeStringify([])).toBeTypeOf("string");
+            expect(safeStringify(null)).toBeTypeOf("string");
+            expect(safeStringify(undefined)).toBeTypeOf("string");
         });
     });
 
-    describe("Site Status Utilities", () => {
-        it("should test site status functions", ({ task, annotate }) => {
+    describe("site Status Utilities", () => {
+        it("should test site status functions", ({ annotate, task }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: working-utility-coverage", "component");
             annotate("Category: Core", "category");
@@ -274,19 +281,23 @@ describe("Working Utility Coverage Tests", () => {
 
             // Test calculateSiteStatus
             const status = calculateSiteStatus(mockSite);
-            expect(typeof status).toBe("string");
+
+            expect(status).toBeTypeOf("string");
 
             // Test calculateSiteMonitoringStatus
             const monitoringStatus = calculateSiteMonitoringStatus(mockSite);
-            expect(typeof monitoringStatus).toBe("string");
+
+            expect(monitoringStatus).toBeTypeOf("string");
 
             // Test getSiteDisplayStatus
             const displayStatus = getSiteDisplayStatus(mockSite);
-            expect(typeof displayStatus).toBe("string");
+
+            expect(displayStatus).toBeTypeOf("string");
 
             // Test getSiteStatusDescription
             const statusDesc = getSiteStatusDescription(mockSite);
-            expect(typeof statusDesc).toBe("string");
+
+            expect(statusDesc).toBeTypeOf("string");
         });
     });
 });

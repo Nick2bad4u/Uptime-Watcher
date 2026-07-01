@@ -38,7 +38,8 @@ export function calculateMaxDuration(
     // Format duration with appropriate unit (seconds, minutes, or hours)
     if (totalTime < 60) {
         return `${totalTime}s`;
-    } else if (totalTime < 3600) {
+    }
+    if (totalTime < 3600) {
         return `${Math.ceil(totalTime / 60)}m`;
     }
     return `${Math.ceil(totalTime / 3600)}h`;

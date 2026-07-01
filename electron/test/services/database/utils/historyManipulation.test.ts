@@ -4,10 +4,11 @@
  *   property-based testing for robust data validation coverage
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { test, fc } from "@fast-check/vitest";
-import type { Database } from "node-sqlite3-wasm";
 import type { StatusHistory } from "@shared/types";
+import type { Database } from "node-sqlite3-wasm";
+
+import { fc, test } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import functions to test
 import {
@@ -33,7 +34,7 @@ vi.mock("../../../../utils/logger", () => ({
 
 vi.mock("../../../../../shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn((template, data) =>
-        template.replaceAll(/{(?<key>\w+)}/g, (match: string, key: string) =>
+        template.replaceAll(/\{(?<key>\w+)\}/gv, (match: string, key: string) =>
             String(data[key] ?? match)
         )
     ),
@@ -215,7 +216,7 @@ describe("History Manipulation Utilities", () => {
 
             // Act & Assert
             expect(() =>
-                addHistoryEntry(mockDb, monitorId, sampleStatusHistory)
+                { addHistoryEntry(mockDb, monitorId, sampleStatusHistory); }
             ).toThrow("Database connection failed");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -296,7 +297,7 @@ describe("History Manipulation Utilities", () => {
                     mockDb,
                     monitorId,
                     sampleStatusHistory,
-                    details as string
+                    details!
                 );
 
                 // Assert
@@ -469,7 +470,7 @@ describe("History Manipulation Utilities", () => {
 
             // Act & Assert
             expect(() =>
-                bulkInsertHistory(mockDb, monitorId, historyEntries)
+                { bulkInsertHistory(mockDb, monitorId, historyEntries); }
             ).toThrow("Statement execution failed");
 
             expect(mockStmt.finalize).toHaveBeenCalledTimes(1);
@@ -497,7 +498,7 @@ describe("History Manipulation Utilities", () => {
 
             // Act & Assert
             expect(() =>
-                bulkInsertHistory(mockDb, monitorId, historyEntries)
+                { bulkInsertHistory(mockDb, monitorId, historyEntries); }
             ).toThrow("Failed to prepare statement");
 
             expect(mockLogger.error).toHaveBeenCalledWith(
@@ -749,7 +750,7 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => deleteAllHistory(mockDb)).toThrow(
+            expect(() => { deleteAllHistory(mockDb); }).toThrow(
                 "Cannot delete from history table"
             );
 
@@ -822,7 +823,7 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => deleteHistoryByMonitorId(mockDb, monitorId)).toThrow(
+            expect(() => { deleteHistoryByMonitorId(mockDb, monitorId); }).toThrow(
                 "Monitor not found"
             );
 
@@ -896,7 +897,7 @@ describe("History Manipulation Utilities", () => {
 
                     // Act & Assert
                     expect(() =>
-                        deleteHistoryByMonitorId(mockDb, testMonitorId)
+                        { deleteHistoryByMonitorId(mockDb, testMonitorId); }
                     ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
@@ -1067,7 +1068,7 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => pruneHistoryForMonitor(mockDb, monitorId, 5)).toThrow(
+            expect(() => { pruneHistoryForMonitor(mockDb, monitorId, 5); }).toThrow(
                 "Cannot select from history table"
             );
 
@@ -1096,7 +1097,7 @@ describe("History Manipulation Utilities", () => {
             });
 
             // Act & Assert
-            expect(() => pruneHistoryForMonitor(mockDb, monitorId, 5)).toThrow(
+            expect(() => { pruneHistoryForMonitor(mockDb, monitorId, 5); }).toThrow(
                 "Cannot delete from history table"
             );
 
@@ -1148,9 +1149,9 @@ describe("History Manipulation Utilities", () => {
                             fc.constant(undefined),
                             fc.constant(0),
                             fc.integer({ min: -1000, max: -1 }),
-                            fc.constant(Number.POSITIVE_INFINITY),
+                            fc.constant(Infinity),
                             fc.constant(Number.NEGATIVE_INFINITY),
-                            fc.constant(Number.NaN)
+                            fc.constant(NaN)
                         ),
                     }),
                     { minLength: 1, maxLength: 20 }
@@ -1245,7 +1246,7 @@ describe("History Manipulation Utilities", () => {
 
                     // Act & Assert
                     expect(() =>
-                        pruneHistoryForMonitor(mockDb, testMonitorId, limit)
+                        { pruneHistoryForMonitor(mockDb, testMonitorId, limit); }
                     ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
@@ -1281,7 +1282,7 @@ describe("History Manipulation Utilities", () => {
 
                     // Act & Assert
                     expect(() =>
-                        pruneHistoryForMonitor(mockDb, testMonitorId, limit)
+                        { pruneHistoryForMonitor(mockDb, testMonitorId, limit); }
                     ).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(

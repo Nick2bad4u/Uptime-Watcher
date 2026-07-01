@@ -3,26 +3,32 @@
  *   which combines site monitoring, actions, statistics, and UI state
  */
 
+import type { Monitor, Site } from "@shared/types";
+
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useSite } from "../../../hooks/site/useSite";
-import type { Site, Monitor } from "@shared/types";
+import { useSiteActions } from "../../../hooks/site/useSiteActions";
+// Import the mocked modules
+import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
+import { useSiteStats } from "../../../hooks/site/useSiteStats";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Mock all the sub-hooks
-vi.mock("../../../hooks/site/useSiteMonitor", () => ({
+vi.mock(import('../../../hooks/site/useSiteMonitor'), () => ({
     useSiteMonitor: vi.fn(),
 }));
 
-vi.mock("../../../hooks/site/useSiteStats", () => ({
+vi.mock(import('../../../hooks/site/useSiteStats'), () => ({
     useSiteStats: vi.fn(),
 }));
 
-vi.mock("../../../hooks/site/useSiteActions", () => ({
+vi.mock(import('../../../hooks/site/useSiteActions'), () => ({
     useSiteActions: vi.fn(),
 }));
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(
         (selector?: (state: { isLoading: boolean }) => unknown) => {
             const state = {
@@ -33,12 +39,6 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
         }
     ),
 }));
-
-// Import the mocked modules
-import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
-import { useSiteStats } from "../../../hooks/site/useSiteStats";
-import { useSiteActions } from "../../../hooks/site/useSiteActions";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 // Create typed mock references
 const mockUseSiteMonitor = vi.mocked(useSiteMonitor);
@@ -137,7 +137,7 @@ describe("useSite Hook", () => {
                 mockSite,
                 undefined
             );
-            expect(mockUseErrorStore).toHaveBeenCalled();
+            expect(mockUseErrorStore).toHaveBeenCalledWith();
         });
 
         it("should pass filteredHistory from monitor to stats", async ({
@@ -523,8 +523,7 @@ describe("useSite Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            // According to docs: Actions → Monitor → Stats → Loading state
-            // isLoading should be added last and not overwritten
+            // According to docs: Actions → Monitor → Stats → Loading state isLoading should be added last and not overwritten
 
             mockUseSiteActions.mockReturnValueOnce({
                 handleCardClick: vi.fn(),

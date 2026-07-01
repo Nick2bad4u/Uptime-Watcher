@@ -26,12 +26,6 @@ import { OverviewTab } from "./tabs/OverviewTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
 
-type AnalyticsTabProperties = ComponentProps<typeof AnalyticsTab>;
-type HistoryTabProperties = ComponentProps<typeof HistoryTab>;
-type OverviewTabProperties = ComponentProps<typeof OverviewTab>;
-type SettingsTabProperties = ComponentProps<typeof SettingsTab>;
-type SiteOverviewTabProperties = ComponentProps<typeof SiteOverviewTab>;
-
 /**
  * Props for {@link SiteDetailsTabContent}.
  *
@@ -81,6 +75,12 @@ export interface SiteDetailsTabContentProperties {
     readonly siteDetailsChartTimeRange: AnalyticsTabProperties["siteDetailsChartTimeRange"];
     readonly timeoutChanged: SettingsTabProperties["timeoutChanged"];
 }
+type AnalyticsTabProperties = ComponentProps<typeof AnalyticsTab>;
+type HistoryTabProperties = ComponentProps<typeof HistoryTab>;
+type OverviewTabProperties = ComponentProps<typeof OverviewTab>;
+type SettingsTabProperties = ComponentProps<typeof SettingsTab>;
+
+type SiteOverviewTabProperties = ComponentProps<typeof SiteOverviewTab>;
 
 /**
  * Renders the content of the currently selected SiteDetails tab.

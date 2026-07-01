@@ -3,17 +3,18 @@
  * interfaces, and type compatibility.
  */
 
+import { arrayFirst } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 import type {
-    ThemeColors,
-    ThemeSpacing,
-    ThemeTypography,
-    ThemeShadows,
-    ThemeBorderRadius,
     Theme,
+    ThemeBorderRadius,
+    ThemeColors,
     ThemeName,
+    ThemeShadows,
+    ThemeSpacing,
     ThemeState,
+    ThemeTypography,
 } from "../theme/types";
 
 describe("Theme Types Module", () => {
@@ -201,7 +202,7 @@ describe("Theme Types Module", () => {
 
             // Test font families
             expect(Array.isArray(typography.fontFamily.sans)).toBeTruthy();
-            expect(typography.fontFamily.sans[0]).toBe("Inter");
+            expect(arrayFirst(typography.fontFamily.sans)).toBe("Inter");
             expect(Array.isArray(typography.fontFamily.mono)).toBeTruthy();
 
             // Test font sizes
@@ -718,9 +719,9 @@ describe("Theme Types Module", () => {
                 warning: "#f59e0b",
             };
 
-            expect(colors.success).toMatch(/^#[\da-f]{6}$/i);
-            expect(colors.error).toMatch(/^#[\da-f]{6}$/i);
-            expect(colors.warning).toMatch(/^#[\da-f]{6}$/i);
+            expect(colors.success).toMatch(/^#[\da-f]{6}$/iv);
+            expect(colors.error).toMatch(/^#[\da-f]{6}$/iv);
+            expect(colors.warning).toMatch(/^#[\da-f]{6}$/iv);
         });
 
         it("should handle rgba color values", ({ task, annotate }) => {

@@ -1,7 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-
 import { DropboxTokenManager } from "@electron/services/cloud/providers/dropbox/DropboxTokenManager";
 import { InMemorySecretStore } from "@electron/test/utils/InMemorySecretStore";
+import { describe, expect, it, vi } from "vitest";
 
 describe(DropboxTokenManager, () => {
     it("returns stored access token when not expired", async () => {
@@ -53,7 +52,7 @@ describe(DropboxTokenManager, () => {
                     setAccessTokenExpiresAt: () => {},
                     setClientId: () => {},
                     setRefreshToken: () => {},
-                }) as never,
+                }),
         });
 
         await manager.storeTokens({
@@ -99,7 +98,7 @@ describe(DropboxTokenManager, () => {
                     setAccessTokenExpiresAt: () => {},
                     setClientId: () => {},
                     setRefreshToken: () => {},
-                }) as never,
+                }),
         });
 
         await manager.storeTokens({
@@ -133,7 +132,7 @@ describe(DropboxTokenManager, () => {
 
         await expect(manager.getStoredTokens()).resolves.toBeUndefined();
         await expect(manager.getAccessToken()).rejects.toThrow(
-            /Dropbox is not connected/iu
+            /dropbox is not connected/iv
         );
     });
 

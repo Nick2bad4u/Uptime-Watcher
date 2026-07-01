@@ -3,11 +3,12 @@
  * achieve 100% coverage
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { safeStringify } from "../utils/stringConversion";
 import { validateMonitorField } from "@shared/validation/monitorSchemas";
+import { describe, expect, it, vi } from "vitest";
+
 import { isValidHistoryRow, safeGetRowProperty } from "../types/database";
 import { withErrorHandling } from "../utils/errorHandling";
+import { safeStringify } from "../utils/stringConversion";
 
 describe("Fixed Coverage Tests", () => {
     describe("stringConversion.ts - Lines 89-90, 92-93", () => {
@@ -79,8 +80,8 @@ describe("Fixed Coverage Tests", () => {
                 timestamp: "invalid-timestamp", // This will fail isValidTimestamp
             };
 
-            const result = isValidHistoryRow(invalidHistoryRow);
-            expect(result).toBeFalsy();
+            const isResult = isValidHistoryRow(invalidHistoryRow);
+            expect(isResult).toBeFalsy();
         });
     });
 

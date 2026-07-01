@@ -209,20 +209,20 @@ const ipcHandlerSignatureMatchesValidatorRule = createTypedRule({
     },
     defaultOptions: [],
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require standardized IPC handler signatures to stay assignable to validator output and channel contracts.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/ipc-handler-signature-matches-validator.md",
         },
-        schema: [],
         messages: {
             handlerChannelContractMismatch:
                 "IPC handler signature does not match the channel contract request/response types.",
             validatorOutputNotAssignableToHandlerInput:
                 "Validator output type must be assignable to the IPC handler input parameter type.",
         },
+        schema: [],
+        type: "problem",
     },
     name: "ipc-handler-signature-matches-validator",
 });

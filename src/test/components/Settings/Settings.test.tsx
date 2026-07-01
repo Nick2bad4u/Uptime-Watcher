@@ -4,6 +4,8 @@
  */
 
 import "@testing-library/jest-dom";
+import type { UnknownRecord } from "type-fest";
+
 import {
     act,
     fireEvent,
@@ -12,9 +14,15 @@ import {
     waitFor,
     within,
 } from "@testing-library/react";
+import { arrayJoin, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { UnknownRecord } from "type-fest";
 
+import type { ThemeName } from "../../../theme/types";
+
+import { playInAppAlertTone } from "../../../components/Alerts/alertCoordinator";
+// Import after mocks
+import { Settings } from "../../../components/Settings/Settings";
+import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
 import {
     createSerializedBackupResult,
@@ -24,12 +32,11 @@ import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../../utils/createSitesStoreMock";
-import type { ThemeName } from "../../../theme/types";
 
 const errorStoreState = {
     clearError: vi.fn(),
     isLoading: false,
-    lastError: null as null | string,
+    lastError: safeCastTo<null | string>(null),
     setError: vi.fn(),
 };
 
@@ -70,7 +77,7 @@ globalWithSettingsMocks.__useSettingsStoreMock_settings__ =
     useSettingsStoreMock;
 
 // Mock all dependencies
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: <Result = typeof errorStoreState,>(
         selector?: (state: typeof errorStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -80,11 +87,11 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
             throw new Error("useErrorStore mock was not initialized");
         }
 
-        return hook(selector, equality) as Result | typeof errorStoreState;
+        return hook(selector, equality);
     },
 }));
 
-vi.mock("../../../stores/settings/useSettingsStore", () => ({
+vi.mock(import('../../../stores/settings/useSettingsStore'), () => ({
     useSettingsStore: <Result = typeof settingsStoreState,>(
         selector?: (state: typeof settingsStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -94,14 +101,14 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
             throw new Error("useSettingsStore mock was not initialized");
         }
 
-        return hook(selector, equality) as Result | typeof settingsStoreState;
+        return hook(selector, equality);
     },
 }));
 
 // Cloud settings integration triggers side-effectful store operations and IPC
 // calls. This suite focuses on the baseline Settings UI; CloudSettingsSection
 // has its own dedicated tests.
-vi.mock("../../../components/Settings/CloudSettingsSection", () => ({
+vi.mock(import('../../../components/Settings/CloudSettingsSection'), () => ({
     CloudSettingsSection: (): null => null,
 }));
 
@@ -131,7 +138,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 globalWithSettingsMocks.__useSitesStoreMock_settings__ = useSitesStoreMock;
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -141,7 +148,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
             throw new Error("useSitesStore mock was not initialized");
         }
 
-        return hook(selector, equality) as Result | typeof sitesStoreState;
+        return hook(selector, equality);
     },
 }));
 
@@ -172,23 +179,20 @@ const themeState: { current: UnknownRecord } = {
     current: defaultThemeForSelectors,
 };
 
-vi.mock("../../../theme/useTheme", () => {
+vi.mock(import('../../../theme/useTheme'), () => {
     const useThemeMock = vi.fn(() => themeState.current);
     const useThemeClassesMock = vi.fn(() => ({
         join: vi.fn((...classes: readonly string[]) =>
-            classes.filter(Boolean).join(" ")
+            arrayJoin(classes.filter(Boolean), " ")
         ),
         cx: vi.fn((...classes: readonly string[]) =>
-            classes.filter(Boolean).join(" ")
+            arrayJoin(classes.filter(Boolean), " ")
         ),
     }));
     const useThemeValueMock = vi.fn(
-        (selector: (theme: Record<string, unknown>) => unknown) =>
+        (selector: (theme: UnknownRecord) => unknown) =>
             selector(
-                (themeState.current["currentTheme"] ?? {}) as Record<
-                    string,
-                    unknown
-                >
+                (themeState.current["currentTheme"] ?? {}) as UnknownRecord
             )
     );
 
@@ -199,7 +203,7 @@ vi.mock("../../../theme/useTheme", () => {
     };
 });
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -210,27 +214,22 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../utils/errorHandling", () => ({
+vi.mock(import('../../../utils/errorHandling'), () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
 }));
 
-vi.mock("../../../hooks/usePrefersReducedMotion", () => ({
+vi.mock(import('../../../hooks/usePrefersReducedMotion'), () => ({
     usePrefersReducedMotion: () => false,
 }));
-vi.mock("../../../components/Alerts/alertCoordinator", () => ({
+vi.mock(import('../../../components/Alerts/alertCoordinator'), () => ({
     playInAppAlertTone: vi.fn().mockResolvedValue(undefined),
 }));
 const confirmMock = vi.fn();
-vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
     useConfirmDialog: () => confirmMock,
 }));
-
-// Import after mocks
-import { Settings } from "../../../components/Settings/Settings";
-import { playInAppAlertTone } from "../../../components/Alerts/alertCoordinator";
-import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 
 // Get mocked functions
 const mockUseTheme = vi.mocked(useTheme);
@@ -269,7 +268,7 @@ describe("Settings Component", () => {
 
     const mockTheme = {
         currentTheme: {
-            name: "light" as ThemeName,
+            name: safeCastTo<ThemeName>("light"),
             isDark: false,
             colors: {
                 primary: {
@@ -326,12 +325,12 @@ describe("Settings Component", () => {
         },
         isDark: false,
         setTheme: vi.fn(),
-        availableThemes: ["light", "dark"] as ThemeName[],
+        availableThemes: safeCastTo<ThemeName[]>(["dark", "light"]),
         getColor: vi.fn((_path: string) => "#000"),
         getStatusColor: vi.fn(),
-        systemTheme: "light" as ThemeName,
+        systemTheme: safeCastTo<ThemeName>("light"),
         themeManager: {},
-        themeName: "light" as ThemeName,
+        themeName: safeCastTo<ThemeName>("light"),
         themeVersion: "1.0.0",
         toggleTheme: vi.fn(),
     };
@@ -354,7 +353,7 @@ describe("Settings Component", () => {
             ...mockSettingsStore,
             settings: mockSettingsStore.settings,
         });
-        themeState.current = mockTheme as UnknownRecord;
+        themeState.current = mockTheme;
         mockUseTheme.mockReturnValue(
             themeState.current as unknown as ReturnType<typeof useTheme>
         );
@@ -413,7 +412,7 @@ describe("Settings Component", () => {
         fireEvent.click(closeButton);
 
         await waitFor(() => {
-            expect(mockOnClose).toHaveBeenCalled();
+            expect(mockOnClose).toHaveBeenCalledWith();
         });
     });
 
@@ -494,7 +493,7 @@ describe("Settings Component", () => {
         fireEvent.click(resetButton);
 
         await waitFor(() =>
-            expect(mockSettingsStore.resetSettings).toHaveBeenCalled()
+            { expect(mockSettingsStore.resetSettings).toHaveBeenCalledWith(); }
         );
         expect(confirmMock).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -529,7 +528,7 @@ describe("Settings Component", () => {
         fireEvent.click(resetButton);
 
         await waitFor(() =>
-            expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled()
+            { expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled(); }
         );
     });
 
@@ -551,7 +550,7 @@ describe("Settings Component", () => {
         });
         fireEvent.click(syncButton);
 
-        expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
+        expect(mockSitesStore.fullResyncSites).toHaveBeenCalledWith();
     });
 
     it("should handle SQLite backup save", ({ task, annotate }) => {
@@ -568,11 +567,11 @@ describe("Settings Component", () => {
         render(<Settings onClose={mockOnClose} />);
 
         const downloadButton = screen.getByRole("button", {
-            name: /export monitoring data/i,
+            name: /export monitoring data/iv,
         });
         fireEvent.click(downloadButton);
 
-        expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalled();
+        expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalledWith();
     });
 
     it("should handle theme changes", ({ task, annotate }) => {
@@ -665,7 +664,7 @@ describe("Settings Component", () => {
                 isDark: true,
             },
         };
-        themeState.current = darkTheme as UnknownRecord;
+        themeState.current = darkTheme;
         mockUseTheme.mockReturnValue(
             themeState.current as unknown as ReturnType<typeof useTheme>
         );
@@ -723,7 +722,7 @@ describe("Settings Component", () => {
                 await vi.advanceTimersByTimeAsync(200);
             });
 
-            expect(mockPlayInAppAlertTone).toHaveBeenCalled();
+            expect(mockPlayInAppAlertTone).toHaveBeenCalledWith();
         } finally {
             vi.useRealTimers();
         }

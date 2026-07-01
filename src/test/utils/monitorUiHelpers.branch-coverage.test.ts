@@ -4,10 +4,11 @@
  * and advancedAnalytics branches are covered under varied inputs.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { MockInstance } from "vitest";
 
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /**
  * Creates a minimal {@link MonitorTypeConfig} suitable for branch-coverage
@@ -21,7 +22,7 @@ const createMonitorConfig = (
     const baseConfig: MonitorTypeConfig = {
         description: overrides.description ?? `${type.toUpperCase()} monitor`,
         displayName: overrides.displayName ?? type.toUpperCase(),
-        fields: overrides.fields ?? ([] as MonitorTypeConfig["fields"]),
+        fields: overrides.fields ?? (safeCastTo<MonitorTypeConfig["fields"]>([])),
         type,
         version: overrides.version ?? "1.0.0",
     };
@@ -35,7 +36,7 @@ const createMonitorConfig = (
 
 interface MonitorMockContext {
     getTypesWithFeature: (
-        feature: "responseTime" | "advancedAnalytics"
+        feature: "advancedAnalytics" | "responseTime"
     ) => Promise<string[]>;
     spy: MockInstance<() => Promise<MonitorTypeConfig[]>>;
 }
@@ -67,8 +68,8 @@ describe("monitorUiHelpers - Branch Coverage", () => {
 
     describe("getTypesWithFeature - Ternary Branch Coverage", () => {
         it("should hit responseTime branch in ternary operator", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -100,13 +101,13 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             const result = await getTypesWithFeature("responseTime");
 
             expect(spy).toHaveBeenCalledTimes(1);
-            expect(Array.isArray(result)).toBeTruthy();
+            expect(Array.isArray(result)).toBe(true);
             expect(result).toContain("http");
         });
 
         it("should hit advancedAnalytics branch in ternary operator", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -138,13 +139,13 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             const result = await getTypesWithFeature("advancedAnalytics");
 
             expect(spy).toHaveBeenCalledTimes(1);
-            expect(Array.isArray(result)).toBeTruthy();
+            expect(Array.isArray(result)).toBe(true);
             expect(result).toContain("http");
         });
 
         it("should handle both branches with mixed support", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -186,11 +187,12 @@ describe("monitorUiHelpers - Branch Coverage", () => {
 
             const responseTimeResult =
                 await getTypesWithFeature("responseTime");
-            expect(Array.isArray(responseTimeResult)).toBeTruthy();
+
+            expect(Array.isArray(responseTimeResult)).toBe(true);
             expect(responseTimeResult).toEqual(["http", "ping"]);
 
             vi.mocked(spy).mockResolvedValue([
-                baseConfigs[0]!,
+                arrayFirst(baseConfigs)!,
                 baseConfigs[1]!,
                 createMonitorConfig("ssl", {
                     description: "SSL monitor",
@@ -204,13 +206,14 @@ describe("monitorUiHelpers - Branch Coverage", () => {
 
             const analyticsResult =
                 await getTypesWithFeature("advancedAnalytics");
-            expect(Array.isArray(analyticsResult)).toBeTruthy();
+
+            expect(Array.isArray(analyticsResult)).toBe(true);
             expect(analyticsResult).toEqual(["http", "ssl"]);
         });
 
         it("should handle undefined uiConfig values in both branches", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -243,8 +246,8 @@ describe("monitorUiHelpers - Branch Coverage", () => {
                 await getTypesWithFeature("advancedAnalytics");
 
             expect(spy).toHaveBeenCalledTimes(2);
-            expect(Array.isArray(responseTimeResult)).toBeTruthy();
-            expect(Array.isArray(analyticsResult)).toBeTruthy();
+            expect(Array.isArray(responseTimeResult)).toBe(true);
+            expect(Array.isArray(analyticsResult)).toBe(true);
             expect(responseTimeResult).toHaveLength(0);
             expect(analyticsResult).toHaveLength(0);
         });

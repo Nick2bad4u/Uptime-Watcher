@@ -28,52 +28,18 @@ export type FilesystemBaseDirectoryValidationIssue =
     | { readonly code: "whitespace" }
     | { readonly code: "windows-device-namespace" };
 
-function isWindowsDeviceNamespacePath(value: string): boolean {
-    // Treat forward slashes as backslashes for this check.
-    const normalized = normalizePathSeparatorsToWindows(value);
-    return normalized.startsWith("\\\\?\\") || normalized.startsWith("\\\\.\\");
-}
-
-function isAbsoluteFilesystemPath(value: string): boolean {
-    if (isWindowsDeviceNamespacePath(value)) {
-        return true;
-    }
-
-    // POSIX absolute paths
-    if (value.startsWith("/")) {
-        return true;
-    }
-
-    // UNC paths (\\server\share or //server/share)
-    if (value.startsWith("\\\\") || value.startsWith("//")) {
-        return true;
-    }
-
-    // Windows drive paths (C:\ or C:/)
-    if (value.length >= 3) {
-        const [
-            firstChar,
-            secondChar,
-            thirdChar,
-        ] = value;
-        if (secondChar !== ":" || !isDefined(firstChar)) {
-            return false;
-        }
-
-        const codePoint = firstChar.codePointAt(0);
-        const isAsciiLetter =
-            isDefined(codePoint) &&
-            ((codePoint >= 65 && codePoint <= 90) ||
-                (codePoint >= 97 && codePoint <= 122));
-
-        if (!isAsciiLetter) {
-            return false;
-        }
-
-        return thirdChar === "\\" || thirdChar === "/";
-    }
-
-    return false;
+/**
+ * Returns true when a filesystem base directory candidate is valid.
+ */
+export function isFilesystemBaseDirectoryValid(
+    candidate: unknown,
+    options: {
+        readonly maxBytes?: number;
+    } = {}
+): boolean {
+    return isEmpty(
+        validateFilesystemBaseDirectoryCandidate(candidate, options)
+    );
 }
 
 /**
@@ -128,16 +94,50 @@ export function validateFilesystemBaseDirectoryCandidate(
     return issues;
 }
 
-/**
- * Returns true when a filesystem base directory candidate is valid.
- */
-export function isFilesystemBaseDirectoryValid(
-    candidate: unknown,
-    options: {
-        readonly maxBytes?: number;
-    } = {}
-): boolean {
-    return isEmpty(
-        validateFilesystemBaseDirectoryCandidate(candidate, options)
-    );
+function isAbsoluteFilesystemPath(value: string): boolean {
+    if (isWindowsDeviceNamespacePath(value)) {
+        return true;
+    }
+
+    // POSIX absolute paths
+    if (value.startsWith("/")) {
+        return true;
+    }
+
+    // UNC paths (\\server\share or //server/share)
+    if (value.startsWith("\\\\") || value.startsWith("//")) {
+        return true;
+    }
+
+    // Windows drive paths (C:\ or C:/)
+    if (value.length >= 3) {
+        const [
+            firstChar,
+            secondChar,
+            thirdChar,
+        ] = value;
+        if (secondChar !== ":" || !isDefined(firstChar)) {
+            return false;
+        }
+
+        const codePoint = firstChar.codePointAt(0);
+        const isAsciiLetter =
+            isDefined(codePoint) &&
+            ((codePoint >= 65 && codePoint <= 90) ||
+                (codePoint >= 97 && codePoint <= 122));
+
+        if (!isAsciiLetter) {
+            return false;
+        }
+
+        return thirdChar === "\\" || thirdChar === "/";
+    }
+
+    return false;
+}
+
+function isWindowsDeviceNamespacePath(value: string): boolean {
+    // Treat forward slashes as backslashes for this check.
+    const normalized = normalizePathSeparatorsToWindows(value);
+    return normalized.startsWith("\\\\?\\") || normalized.startsWith("\\\\.\\");
 }

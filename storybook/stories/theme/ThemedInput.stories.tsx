@@ -6,15 +6,15 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 
 const meta: Meta<typeof ThemedInput> = {
-    component: ThemedInput,
     args: {
-        type: "text",
-        placeholder: "https://status.example.com",
         "aria-label": "Site URL",
+        placeholder: "https://status.example.com",
+        type: "text",
     },
     argTypes: {
         onChange: { action: "change" },
     },
+    component: ThemedInput,
     parameters: {
         layout: "padded",
     },
@@ -23,14 +23,14 @@ const meta: Meta<typeof ThemedInput> = {
 
 export default meta;
 
-type Story = StoryObj;
-type ThemedInputProps = ComponentProps<typeof ThemedInput>;
-
 type ControlledInputProps = ThemedInputProps & {
     readonly containerWidth: string;
     readonly label: string;
     readonly labelId: string;
 };
+type Story = StoryObj;
+
+type ThemedInputProps = ComponentProps<typeof ThemedInput>;
 
 const ControlledInputStory = (props: ControlledInputProps): ReactElement => {
     const {
@@ -81,12 +81,12 @@ export const Default: Story = {
 
 export const NumberInput: Story = {
     args: {
-        type: "number",
-        min: 1,
-        max: 60,
-        step: 1,
-        placeholder: "15",
         "aria-label": "Interval",
+        max: 60,
+        min: 1,
+        placeholder: "15",
+        step: 1,
+        type: "number",
     },
     render: (args) => (
         <ControlledInputStory

@@ -1,10 +1,11 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useSiteActions } from "../../../hooks/site/useSiteActions";
-import { createMockSite, createMockMonitor } from "../../utils/mockFactories";
+import { createMockMonitor, createMockSite } from "../../utils/mockFactories";
 
 // Mock dependencies - define all mocks inline to avoid hoisting issues
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn(() => ({
         checkSiteNow: vi.fn(),
         setSelectedMonitorId: vi.fn(),
@@ -15,14 +16,14 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
     })),
 }));
 
-vi.mock("../../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../../stores/ui/useUiStore'), () => ({
     useUIStore: vi.fn(() => ({
         selectSite: vi.fn(),
         setShowSiteDetails: vi.fn(),
     })),
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         site: {
             error: vi.fn(),
@@ -384,8 +385,8 @@ describe("useSiteActions Hook", () => {
             expect(typeof secondRender.handleStartMonitoring).toBe("function");
 
             // Functions should work correctly (testing functional stability rather than reference equality)
-            expect(() => firstRender.handleCardClick()).not.toThrow();
-            expect(() => secondRender.handleCardClick()).not.toThrow();
+            expect(() => { firstRender.handleCardClick(); }).not.toThrow();
+            expect(() => { secondRender.handleCardClick(); }).not.toThrow();
         });
 
         it("should work with multiple hook instances", async ({
@@ -415,8 +416,8 @@ describe("useSiteActions Hook", () => {
             expect(typeof result2.current.handleCardClick).toBe("function");
 
             // Both instances should be callable
-            expect(() => result1.current.handleCardClick()).not.toThrow();
-            expect(() => result2.current.handleCardClick()).not.toThrow();
+            expect(() => { result1.current.handleCardClick(); }).not.toThrow();
+            expect(() => { result2.current.handleCardClick(); }).not.toThrow();
         });
     });
 

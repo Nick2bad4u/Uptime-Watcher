@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-
 import {
     isMonitorFieldDefinition,
     isMonitorTypeConfig,
 } from "@shared/types/monitorTypes";
+import { describe, expect, it } from "vitest";
 
 describe("monitor type runtime guards", () => {
     it("accepts valid field definitions", () => {

@@ -94,7 +94,7 @@ export const applyStatusUpdateSnapshot = (
     }
 
     const event: MonitorStatusChangedEvent = {
-        ...(isDefined(details) ? { details } : {}),
+        ...(isDefined(details) && { details }),
         monitor,
         monitorId,
         previousStatus: resolvedPreviousStatus,

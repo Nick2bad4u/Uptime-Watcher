@@ -1,4 +1,4 @@
 title = "Nick2bad4u shared Gitleaks configuration"
 
 [extend]
-path = "node_modules/gitleaks-config-nick2bad4u/gitleaks.toml"
+    path = "node_modules/gitleaks-config-nick2bad4u/gitleaks.toml"

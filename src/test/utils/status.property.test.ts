@@ -11,19 +11,20 @@
  * @since 2025-09-05
  */
 
-import { describe, expect } from "vitest";
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
+import { arrayFirst, arrayJoin, stringSplit   } from "ts-extras";
+import { describe, expect, it, test } from "vitest";
 
 import {
-    getStatusIcon,
-    formatStatusWithIcon,
     createStatusIdentifier,
+    formatStatusWithIcon,
+    getStatusIcon,
     type StatusIdentifier,
     type StatusWithIcon,
 } from "../../utils/status";
 
-describe("Status Utils Property-Based Tests", () => {
+describe("status Utils Property-Based Tests", () => {
     /**
      * Custom arbitraries for testing status values
      */
@@ -38,7 +39,7 @@ describe("Status Utils Property-Based Tests", () => {
 
     const statusVariations = fc.oneof(
         knownStatusValues,
-        fc.string({ minLength: 1, maxLength: 20 }), // Random strings
+        fc.string({ maxLength: 20, minLength: 1 }), // Random strings
         fc.oneof(
             fc.constant("DOWN"), // Uppercase variations
             fc.constant("Up"),
@@ -65,26 +66,32 @@ describe("Status Utils Property-Based Tests", () => {
                 switch (status) {
                     case "down": {
                         expect(icon).toBe("❌");
+
                         break;
                     }
                     case "mixed": {
                         expect(icon).toBe("🔄");
+
                         break;
                     }
                     case "paused": {
                         expect(icon).toBe("⏸️");
+
                         break;
                     }
                     case "pending": {
                         expect(icon).toBe("⏳");
+
                         break;
                     }
                     case "unknown": {
                         expect(icon).toBe("❓");
+
                         break;
                     }
                     case "up": {
                         expect(icon).toBe("✅");
+
                         break;
                     }
                 }
@@ -104,6 +111,7 @@ describe("Status Utils Property-Based Tests", () => {
                 const lowerCaseIcon = getStatusIcon(
                     caseVariation.toLowerCase()
                 );
+
                 expect(icon).toBe(lowerCaseIcon);
             }
         );
@@ -124,6 +132,7 @@ describe("Status Utils Property-Based Tests", () => {
             "should return default emoji for unknown status values",
             (unknownStatus) => {
                 const icon = getStatusIcon(unknownStatus);
+
                 expect(icon).toBe("⚪");
             }
         );
@@ -132,7 +141,8 @@ describe("Status Utils Property-Based Tests", () => {
             "should always return a non-empty string",
             (anyStatus) => {
                 const icon = getStatusIcon(anyStatus);
-                expect(typeof icon).toBe("string");
+
+                expect(icon).toBeTypeOf("string");
                 expect(icon.length).toBeGreaterThan(0);
             }
         );
@@ -150,16 +160,17 @@ describe("Status Utils Property-Based Tests", () => {
                     "✅",
                     "⚪",
                 ];
+
                 expect(validIcons).toContain(icon);
             }
         );
 
-        test("should handle empty string", () => {
+        it("should handle empty string", () => {
             expect(getStatusIcon("")).toBe("⚪");
         });
 
-        test("should handle whitespace-only strings", () => {
-            expect(getStatusIcon("   ")).toBe("⚪");
+        it("should handle whitespace-only strings", () => {
+            expect(getStatusIcon(' '.repeat(3))).toBe("⚪");
             expect(getStatusIcon("\t")).toBe("⚪");
             expect(getStatusIcon("\n")).toBe("⚪");
         });
@@ -174,6 +185,7 @@ describe("Status Utils Property-Based Tests", () => {
                 const expectedText =
                     status.charAt(0).toUpperCase() +
                     status.slice(1).toLowerCase();
+
                 expect(formatted).toBe(`${icon} ${expectedText}`);
             }
         );
@@ -182,14 +194,15 @@ describe("Status Utils Property-Based Tests", () => {
             "should always include icon and capitalized text",
             (status) => {
                 const formatted: StatusWithIcon = formatStatusWithIcon(status);
-                const parts = formatted.split(" ");
+                const parts = stringSplit(formatted, " ");
 
                 expect(parts.length).toBeGreaterThanOrEqual(2);
-                expect(parts[0]).toBe(getStatusIcon(status)); // First part should be icon
+                expect(arrayFirst(parts)).toBe(getStatusIcon(status)); // First part should be icon
 
                 // Remaining parts should form the capitalized text
-                const textPart = parts.slice(1).join(" ");
-                expect(textPart).toBeTruthy();
+                const textPart = arrayJoin(parts.slice(1), " ");
+
+                expect(textPart).toBe(true);
                 expect(textPart.charAt(0)).toBe(
                     textPart.charAt(0).toUpperCase()
                 );
@@ -200,7 +213,8 @@ describe("Status Utils Property-Based Tests", () => {
             "should preserve original status length in text part",
             (status) => {
                 const formatted: StatusWithIcon = formatStatusWithIcon(status);
-                const textPart = formatted.split(" ").slice(1).join(" ");
+                const textPart = arrayJoin(stringSplit(formatted, " ").slice(1), " ");
+
                 expect(textPart).toHaveLength(status.length);
             }
         );
@@ -210,30 +224,34 @@ describe("Status Utils Property-Based Tests", () => {
             (status) => {
                 const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const expectedIcon = getStatusIcon(status);
-                expect(formatted.startsWith(expectedIcon)).toBeTruthy();
+
+                expect(formatted.startsWith(expectedIcon)).toBe(true);
             }
         );
 
-        test("should handle single character status", () => {
+        it("should handle single character status", () => {
             const formatted: StatusWithIcon = formatStatusWithIcon("a");
-            expect(formatted).toMatch(/^.+ A$/);
+
+            expect(formatted).toMatch(/^.+ A$/v);
         });
 
-        test("should handle mixed case input", () => {
+        it("should handle mixed case input", () => {
             const formatted: StatusWithIcon = formatStatusWithIcon("tEsT");
-            expect(formatted).toMatch(/^.+ Test$/);
+
+            expect(formatted).toMatch(/^.+ Test$/v);
         });
     });
 
     describe(createStatusIdentifier, () => {
         test.prop([
             fc
-                .string({ minLength: 1, maxLength: 50 })
+                .string({ maxLength: 50, minLength: 1 })
                 .filter((s) => s.trim().length > 0),
         ])("should always return a string", (statusText) => {
             const identifier: StatusIdentifier =
                 createStatusIdentifier(statusText);
-            expect(typeof identifier).toBe("string");
+
+            expect(identifier).toBeTypeOf("string");
         });
 
         test.prop([multiWordStatuses])(
@@ -243,7 +261,7 @@ describe("Status Utils Property-Based Tests", () => {
                     createStatusIdentifier(statusText);
 
                 // Should not contain spaces, hyphens, or underscores
-                expect(identifier).not.toMatch(/[\s_-]/);
+                expect(identifier).not.toMatch(/[\s\-_]/v);
 
                 // Should start with lowercase letter
                 expect(identifier.charAt(0)).toBe(
@@ -255,7 +273,7 @@ describe("Status Utils Property-Based Tests", () => {
             }
         );
 
-        test("should handle known test cases correctly", () => {
+        it("should handle known test cases correctly", () => {
             expect(createStatusIdentifier("service down")).toBe("serviceDown");
             expect(createStatusIdentifier("network error")).toBe(
                 "networkError"
@@ -272,22 +290,23 @@ describe("Status Utils Property-Based Tests", () => {
         });
 
         test.prop([
-            fc.string({ minLength: 1 }).filter((s) => !/[\s_-]/.test(s)),
+            fc.string({ minLength: 1 }).filter((s) => !/[\s\-_]/v.test(s)),
         ])("should handle single word inputs correctly", (singleWord) => {
             const identifier: StatusIdentifier =
                 createStatusIdentifier(singleWord);
+
             expect(identifier).toBe(singleWord.toLowerCase());
         });
 
         test.prop([
             fc.array(
                 fc
-                    .string({ minLength: 1, maxLength: 10 })
-                    .filter((s) => /^[A-Za-z]+$/.test(s)),
-                { minLength: 2, maxLength: 5 }
+                    .string({ maxLength: 10, minLength: 1 })
+                    .filter((s) => /^[A-Za-z]+$/v.test(s)),
+                { maxLength: 5, minLength: 2 }
             ),
         ])("should create valid camelCase from word arrays", (words) => {
-            const statusText = words.join(" ");
+            const statusText = arrayJoin(words, " ");
             const identifier: StatusIdentifier =
                 createStatusIdentifier(statusText);
 
@@ -305,7 +324,7 @@ describe("Status Utils Property-Based Tests", () => {
             // Should have internal capital letters (camelCase pattern) for multiple alphabetic words
             if (words.length > 1) {
                 // At least one uppercase letter should exist beyond the first character
-                expect(identifier.slice(1)).toMatch(/[A-Z]/);
+                expect(identifier.slice(1)).toMatch(/[A-Z]/v);
             }
         });
 
@@ -320,22 +339,22 @@ describe("Status Utils Property-Based Tests", () => {
                 createStatusIdentifier(statusText);
 
             // Result should not contain original delimiters
-            expect(identifier).not.toMatch(/[\s_-]/);
+            expect(identifier).not.toMatch(/[\s\-_]/v);
 
             // Should be non-empty if original had non-whitespace content
-            if (statusText.replaceAll(/[\s_-]/g, "").length > 0) {
+            if (statusText.replaceAll(/[\s\-_]/gv, "").length > 0) {
                 expect(identifier.length).toBeGreaterThan(0);
             }
         });
 
-        test("should handle edge cases", () => {
+        it("should handle edge cases", () => {
             expect(createStatusIdentifier("a")).toBe("a");
             expect(createStatusIdentifier("A")).toBe("a");
             expect(createStatusIdentifier("a b")).toBe("aB");
             expect(createStatusIdentifier("A B")).toBe("aB");
         });
 
-        test("should handle multiple consecutive delimiters", () => {
+        it("should handle multiple consecutive delimiters", () => {
             expect(createStatusIdentifier("test   multiple    spaces")).toBe(
                 "testMultipleSpaces"
             );
@@ -348,12 +367,13 @@ describe("Status Utils Property-Based Tests", () => {
         });
     });
 
-    describe("Invariant properties", () => {
+    describe("invariant properties", () => {
         test.prop([fc.string()])(
             "getStatusIcon should be deterministic",
             (status) => {
                 const icon1 = getStatusIcon(status);
                 const icon2 = getStatusIcon(status);
+
                 expect(icon1).toBe(icon2);
             }
         );
@@ -363,7 +383,8 @@ describe("Status Utils Property-Based Tests", () => {
             (status) => {
                 const formatted: StatusWithIcon = formatStatusWithIcon(status);
                 const expectedIcon = getStatusIcon(status);
-                expect(formatted.startsWith(expectedIcon)).toBeTruthy();
+
+                expect(formatted.startsWith(expectedIcon)).toBe(true);
             }
         );
 
@@ -374,6 +395,7 @@ describe("Status Utils Property-Based Tests", () => {
                 // Format is "{icon} {text}" where text has same length as status
                 // So formatted length should be icon length + 1 (space) + status length
                 const iconLength = getStatusIcon(status).length;
+
                 expect(formatted).toHaveLength(iconLength + 1 + status.length);
             }
         );
@@ -382,12 +404,13 @@ describe("Status Utils Property-Based Tests", () => {
             "createStatusIdentifier should be idempotent for single words",
             (word) => {
                 // Skip multi-word inputs for this test
-                fc.pre(!/[\s_-]/.test(word));
+                fc.pre(!/[\s\-_]/v.test(word));
 
                 const identifier1: StatusIdentifier =
                     createStatusIdentifier(word);
                 const identifier2: StatusIdentifier =
                     createStatusIdentifier(identifier1);
+
                 expect(identifier1).toBe(identifier2);
             }
         );
@@ -411,7 +434,7 @@ describe("Status Utils Property-Based Tests", () => {
                 ]).toContain(icon);
 
                 // Formatted should start with the same icon
-                expect(formatted.startsWith(icon)).toBeTruthy();
+                expect(formatted.startsWith(icon)).toBe(true);
 
                 // Identifier should be the same as the original (since they're single words)
                 expect(identifier).toBe(status);
@@ -419,8 +442,8 @@ describe("Status Utils Property-Based Tests", () => {
         );
     });
 
-    describe("Integration and edge cases", () => {
-        test("should handle null-like inputs gracefully", () => {
+    describe("integration and edge cases", () => {
+        it("should handle null-like inputs gracefully", () => {
             // These test what happens with various falsy/edge case inputs
             expect(() => getStatusIcon("")).not.toThrow();
             expect(() => formatStatusWithIcon("a")).not.toThrow();
@@ -439,12 +462,13 @@ describe("Status Utils Property-Based Tests", () => {
                 }
 
                 const endTime = performance.now();
+
                 // Should complete in reasonable time (less than 10ms for property-based testing)
                 expect(endTime - startTime).toBeLessThan(10);
             }
         );
 
-        test("should handle unicode and special characters", () => {
+        it("should handle unicode and special characters", () => {
             expect(() => getStatusIcon("测试")).not.toThrow();
             expect(() => formatStatusWithIcon("🚀 status")).not.toThrow();
             expect(() =>
@@ -453,11 +477,12 @@ describe("Status Utils Property-Based Tests", () => {
 
             // Results should still be valid
             expect(getStatusIcon("测试")).toBe("⚪");
-            expect(formatStatusWithIcon("🚀").startsWith("⚪")).toBeTruthy();
+            expect(formatStatusWithIcon("🚀").startsWith("⚪")).toBe(true);
 
             const identifier: StatusIdentifier =
                 createStatusIdentifier("test-émoji_status");
-            expect(identifier).not.toMatch(/[\s_-]/);
+
+            expect(identifier).not.toMatch(/[\s\-_]/v);
         });
     });
 });

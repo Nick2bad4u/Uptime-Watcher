@@ -2,7 +2,7 @@
  * Base validation interface.
  *
  * @remarks
- * Used by validators throughout the application to return standardized results.
+ * Used by validators throughout the app to return standardized results.
  * Enables consistent error handling and user feedback by encapsulating both
  * error messages and overall validity.
  *

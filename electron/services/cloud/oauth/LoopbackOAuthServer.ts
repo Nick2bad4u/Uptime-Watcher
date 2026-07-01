@@ -166,7 +166,7 @@ function parseCallbackWithExpectedPath(
     readonly state: null | string;
 } {
     const url = new URL(request.url ?? "/", "http://localhost");
-    const pathOk = url.pathname === expectedPath;
+    const isPathOk = url.pathname === expectedPath;
 
     const code = url.searchParams.get("code");
     const state = url.searchParams.get("state");
@@ -177,7 +177,7 @@ function parseCallbackWithExpectedPath(
         code,
         error,
         errorDescription,
-        pathOk,
+        pathOk: isPathOk,
         state,
     };
 }
@@ -215,7 +215,7 @@ export async function startLoopbackOAuthServer(args?: {
     const expectedPath = normalizeRedirectPath(
         redirectPathRaw ?? DEFAULT_OAUTH_LOOPBACK_PATH
     );
-    const omitPath = isDefined(redirectPathRaw) && expectedPath === "/";
+    const isOmitPath = isDefined(redirectPathRaw) && expectedPath === "/";
 
     assertSafeRedirectHost(redirectHost);
 
@@ -240,7 +240,7 @@ export async function startLoopbackOAuthServer(args?: {
             ? ([requiresIpv6 ? "::1" : "127.0.0.1"] as const)
             : LOOPBACK_HOSTS;
 
-    let resolved = false;
+    let isResolved = false;
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
     let rejectPromise: ((error: unknown) => void) | null = null;
     let expectedStateValue: null | string = null;
@@ -284,8 +284,8 @@ export async function startLoopbackOAuthServer(args?: {
                     title: "Authorization failed",
                 });
 
-                if (!resolved && expectedStateValue !== null) {
-                    resolved = true;
+                if (!isResolved && expectedStateValue !== null) {
+                    isResolved = true;
                     rejectPromise?.(
                         new Error(`OAuth callback error: ${callbackError}`)
                     );
@@ -300,8 +300,8 @@ export async function startLoopbackOAuthServer(args?: {
                     title: "Authorization failed",
                 });
 
-                if (!resolved && expectedStateValue !== null) {
-                    resolved = true;
+                if (!isResolved && expectedStateValue !== null) {
+                    isResolved = true;
                     rejectPromise?.(
                         new Error("OAuth callback missing required parameters")
                     );
@@ -320,8 +320,8 @@ export async function startLoopbackOAuthServer(args?: {
                     title: "Authorization failed",
                 });
 
-                if (!resolved) {
-                    resolved = true;
+                if (!isResolved) {
+                    isResolved = true;
                     rejectPromise?.(new Error("OAuth state mismatch"));
                 }
                 return;
@@ -351,8 +351,8 @@ export async function startLoopbackOAuthServer(args?: {
                 title: "Connected",
             });
 
-            if (!resolved) {
-                resolved = true;
+            if (!isResolved) {
+                isResolved = true;
                 resolvePromise?.({ code: parsed.code, state: parsed.state });
             }
         });
@@ -398,10 +398,10 @@ export async function startLoopbackOAuthServer(args?: {
     }
 
     const port = resolvePortFromServer(primaryServer.server);
-    // Loopback callback listener is an HTTP server (createServer from node:http),
-    // so redirect URIs must use http:// to avoid browser TLS protocol errors.
-    const origin = `http://${redirectHost}:${port}`;
-    const redirectUri = omitPath ? origin : `${origin}${expectedPath}`;
+    // Loopback callback listener is an HTTP server (createServer from node:HTTP),
+    // so redirect URIs must use HTTP:// to avoid browser TLS protocol errors.
+    const origin = `https://${redirectHost}:${port}`;
+    const redirectUri = isOmitPath ? origin : `${origin}${expectedPath}`;
 
     return {
         close: async (): Promise<void> => {
@@ -422,8 +422,8 @@ export async function startLoopbackOAuthServer(args?: {
         }): Promise<LoopbackOAuthCallback> => {
             expectedStateValue = expectedState;
 
-            if (pendingCallback?.state === expectedStateValue && !resolved) {
-                resolved = true;
+            if (pendingCallback?.state === expectedStateValue && !isResolved) {
+                isResolved = true;
                 resolvePromise?.(pendingCallback);
                 pendingCallback = null;
             } else if (pendingCallback) {
@@ -431,10 +431,12 @@ export async function startLoopbackOAuthServer(args?: {
             }
 
             const timeoutHandle = setTimeout(() => {
-                if (!resolved) {
-                    resolved = true;
-                    rejectPromise?.(new Error("OAuth loopback timeout"));
+                if (isResolved) {
+                    return;
                 }
+
+                isResolved = true;
+                rejectPromise?.(new Error("OAuth loopback timeout"));
             }, timeoutMs);
 
             try {

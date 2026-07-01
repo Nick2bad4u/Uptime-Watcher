@@ -2,20 +2,24 @@
  * @file Coverage tests exercising interactive flows in the OverviewTab.
  */
 
-import type { ChangeEventHandler, ReactNode } from "react";
 import type { Monitor } from "@shared/types";
+import type { ChangeEventHandler, ReactNode } from "react";
+import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { OverviewTab } from "../../components/SiteDetails/tabs/OverviewTab";
 
 const availabilityMock = vi.hoisted(() => ({
     getAvailabilityColor: vi.fn(() => "#22c55e"),
     getAvailabilityVariant: vi.fn(() => "success" as const),
 }));
 
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
     return {
         ...actual,
         useAvailabilityColors: () => availabilityMock,
@@ -32,10 +36,10 @@ vi.mock("../../theme/useTheme", async (importOriginal) => {
     };
 });
 
-const statusIndicatorProps = vi.hoisted(() => [] as Record<string, unknown>[]);
+const statusIndicatorProps = vi.hoisted(() => safeCastTo<UnknownRecord[]>([]));
 
-vi.mock("../../theme/components/StatusIndicator", () => ({
-    StatusIndicator: (props: Record<string, unknown>) => {
+vi.mock(import('../../theme/components/StatusIndicator'), () => ({
+    StatusIndicator: (props: UnknownRecord) => {
         statusIndicatorProps.push(props);
         return <span data-testid="status-indicator" />;
     },
@@ -105,39 +109,37 @@ const ThemedSelectMock = vi.hoisted(() =>
 );
 const ThemedTextMock = vi.hoisted(() => createThemedComponent("themed-text"));
 
-vi.mock("../../theme/components/ThemedCard", () => ({
+vi.mock(import('../../theme/components/ThemedCard'), () => ({
     ThemedCard: ThemedCardMock,
 }));
-vi.mock("../../theme/components/ThemedBadge", () => ({
+vi.mock(import('../../theme/components/ThemedBadge'), () => ({
     ThemedBadge: ThemedBadgeMock,
 }));
-vi.mock("../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ThemedButton: ThemedButtonMock,
 }));
-vi.mock("../../theme/components/ThemedInput", () => ({
+vi.mock(import('../../theme/components/ThemedInput'), () => ({
     ThemedInput: ThemedInputMock,
 }));
-vi.mock("../../theme/components/ThemedProgress", () => ({
+vi.mock(import('../../theme/components/ThemedProgress'), () => ({
     ThemedProgress: ThemedProgressMock,
 }));
-vi.mock("../../theme/components/ThemedSelect", () => ({
+vi.mock(import('../../theme/components/ThemedSelect'), () => ({
     ThemedSelect: ThemedSelectMock,
 }));
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: ThemedTextMock,
 }));
 
 const loggerAction = vi.hoisted(() => vi.fn());
 
-vi.mock("../../services/logger", () => ({
+vi.mock(import('../../services/logger'), () => ({
     logger: {
         user: {
             action: loggerAction,
         },
     },
 }));
-
-import { OverviewTab } from "../../components/SiteDetails/tabs/OverviewTab";
 
 describe("OverviewTab coverage", () => {
     beforeEach(() => {
@@ -195,7 +197,7 @@ describe("OverviewTab coverage", () => {
         );
 
         expect(screen.getByTestId("overview-tab")).toBeInTheDocument();
-        expect(statusIndicatorProps[0]).toMatchObject({
+        expect(arrayFirst(statusIndicatorProps)).toMatchObject({
             showText: true,
             size: "lg",
             status: "up",
@@ -213,7 +215,7 @@ describe("OverviewTab coverage", () => {
 
         const saveButtons = screen.getAllByText("Save");
         expect(saveButtons).toHaveLength(2);
-        fireEvent.click(saveButtons[0]!);
+        fireEvent.click(arrayFirst(saveButtons)!);
         fireEvent.click(saveButtons[1]!);
         expect(handleSaveInterval).toHaveBeenCalledTimes(1);
         expect(handleSaveTimeout).toHaveBeenCalledTimes(1);
@@ -232,7 +234,7 @@ describe("OverviewTab coverage", () => {
             })
         );
 
-        expect(availabilityMock.getAvailabilityColor).toHaveBeenCalled();
-        expect(availabilityMock.getAvailabilityVariant).toHaveBeenCalled();
+        expect(availabilityMock.getAvailabilityColor).toHaveBeenCalledWith();
+        expect(availabilityMock.getAvailabilityVariant).toHaveBeenCalledWith();
     });
 });

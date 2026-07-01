@@ -103,11 +103,9 @@ const toSerializableErrorContext = (
     return {
         errorMessage: normalizedError.message,
         errorName: normalizedError.name,
-        ...(normalizedError.stack
-            ? {
+        ...(normalizedError.stack && {
                   errorStack: normalizedError.stack,
-              }
-            : {}),
+              }),
     };
 };
 
@@ -270,8 +268,8 @@ export class SiteManager {
             action,
             siteIdentifier,
             source,
-            ...(Array.isArray(sites) ? { sites } : {}),
-            ...(typeof timestamp === "number" ? { timestamp } : {}),
+            ...(Array.isArray(sites) && { sites }),
+            ...((typeof timestamp === "number") && { timestamp }),
         };
 
         return this.sitesStateSynchronizer.emitSitesStateSynchronized(emitArgs);
@@ -402,7 +400,7 @@ export class SiteManager {
      * Initializes the SiteManager by loading all sites into cache.
      *
      * @remarks
-     * This method should be called during application startup.
+     * This method should be called during app startup.
      *
      * @example
      *
@@ -445,12 +443,12 @@ export class SiteManager {
     public async removeSite(identifier: string): Promise<boolean> {
         const siteBeforeRemoval = this.sitesCache.get(identifier);
 
-        const removed = await this.siteWriterService.deleteSite(
+        const isRemoved = await this.siteWriterService.deleteSite(
             this.sitesCache,
             identifier
         );
 
-        if (!removed) {
+        if (!isRemoved) {
             return false;
         }
 
@@ -460,9 +458,7 @@ export class SiteManager {
             cascade: false,
             identifier,
             operation: "removed",
-            ...(siteBeforeRemoval
-                ? { site: structuredClone(siteBeforeRemoval) }
-                : {}),
+            ...(siteBeforeRemoval && { site: structuredClone(siteBeforeRemoval) }),
             timestamp,
         });
 
@@ -719,8 +715,8 @@ export class SiteManager {
             readonly sites: Site[];
         } = {
             sites,
-            ...(typeof context === "string" ? { context } : {}),
-            ...(options ? { options } : {}),
+            ...((typeof context === "string") && { context }),
+            ...(options && { options }),
         };
 
         await updateSitesCache(
@@ -740,7 +736,7 @@ export class SiteManager {
      *
      * @remarks
      * Performs silent background loading with error logging and event emission.
-     * This ensures background operations don't disrupt the main application
+     * This ensures background operations don't disrupt the main app
      * flow while still providing observability through logging and events.
      *
      * @param identifier - The site identifier to load.

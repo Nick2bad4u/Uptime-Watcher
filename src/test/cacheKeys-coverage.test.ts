@@ -4,13 +4,13 @@
  * @file Direct function call tests for cacheKeys to ensure coverage
  */
 
-import { describe, expect, it } from "vitest";
 import {
     CacheKeys,
     isStandardizedCacheKey,
     parseCacheKey,
     type StandardizedCacheKey,
 } from "@shared/utils/cacheKeys";
+import { describe, expect, it } from "vitest";
 
 describe("cacheKeys Direct Function Coverage", () => {
     it("should call all config functions", () => {
@@ -73,14 +73,14 @@ describe("cacheKeys Direct Function Coverage", () => {
 
     it("should test parseCacheKey function", () => {
         // Test 2-part keys
-        expect(parseCacheKey("config:test" as StandardizedCacheKey)).toEqual({
+        expect(parseCacheKey("config:test")).toEqual({
             prefix: "config",
             identifier: "test",
         });
 
         // Test 3-part keys
         expect(
-            parseCacheKey("monitor:operation:test" as StandardizedCacheKey)
+            parseCacheKey("monitor:operation:test")
         ).toEqual({
             prefix: "monitor",
             operation: "operation",
@@ -88,14 +88,14 @@ describe("cacheKeys Direct Function Coverage", () => {
         });
 
         // Test error cases
-        expect(() => parseCacheKey("invalid" as StandardizedCacheKey)).toThrow(
+        expect(() => parseCacheKey("invalid")).toThrow(
             "Invalid cache key format"
         );
-        expect(() => parseCacheKey(":missing" as StandardizedCacheKey)).toThrow(
+        expect(() => parseCacheKey(":missing")).toThrow(
             "Invalid cache key format"
         );
         expect(() =>
-            parseCacheKey("missing::" as StandardizedCacheKey)
+            parseCacheKey("missing::")
         ).toThrow("Invalid cache key format");
     });
 });

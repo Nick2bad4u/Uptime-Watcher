@@ -70,16 +70,16 @@ export const electronSyncNoLocalAsciiDigitsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow local isAsciiDigits implementations in electron/services/sync; import the shared helper instead",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-sync-no-local-ascii-digits.md",
         },
-        schema: [],
         messages: {
             banned: "Import isAsciiDigits from the shared helper instead of defining it locally.",
         },
+        schema: [],
+        type: "problem",
     },
 };

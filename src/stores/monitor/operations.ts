@@ -166,13 +166,13 @@ export const createMonitorTypesOperationsSlice = (
 
                 const normalizedResult: ValidationResult = {
                     data: validationResult.data,
-                    errors: Array.from(validationResult.errors),
+                    errors: [...validationResult.errors],
                     metadata: validationResult.metadata
                         ? { ...validationResult.metadata }
                         : {},
                     success: validationResult.success,
                     warnings: validationResult.warnings
-                        ? Array.from(validationResult.warnings)
+                        ? [...validationResult.warnings]
                         : [],
                 };
 

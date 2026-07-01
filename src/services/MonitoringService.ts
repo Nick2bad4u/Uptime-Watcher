@@ -282,7 +282,7 @@ export const MonitoringService: MonitoringServiceContract = {
      * Ensures the preload bridge is ready before invoking monitoring APIs.
      *
      * @remarks
-     * Call this during application startup to avoid paying the bridge
+     * Call this during app startup to avoid paying the bridge
      * initialization cost on the first monitoring operation.
      *
      * @returns A promise that resolves when the `monitoring` bridge is ready
@@ -364,12 +364,12 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const success = await api.monitoring.startMonitoringForMonitor(
+            const isSuccess = await api.monitoring.startMonitoringForMonitor(
                 siteIdentifier,
                 monitorId
             );
 
-            if (!success) {
+            if (!isSuccess) {
                 throw new ApplicationError({
                     code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                     details: {
@@ -396,10 +396,10 @@ export const MonitoringService: MonitoringServiceContract = {
     startMonitoringForSite: wrap(
         "startMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
-            const success =
+            const isSuccess =
                 await api.monitoring.startMonitoringForSite(siteIdentifier);
 
-            if (!success) {
+            if (!isSuccess) {
                 throw new ApplicationError({
                     code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                     details: {
@@ -484,12 +484,12 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const success = await api.monitoring.stopMonitoringForMonitor(
+            const isSuccess = await api.monitoring.stopMonitoringForMonitor(
                 siteIdentifier,
                 monitorId
             );
 
-            if (!success) {
+            if (!isSuccess) {
                 throw new ApplicationError({
                     code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                     details: {
@@ -516,10 +516,10 @@ export const MonitoringService: MonitoringServiceContract = {
     stopMonitoringForSite: wrap(
         "stopMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
-            const success =
+            const isSuccess =
                 await api.monitoring.stopMonitoringForSite(siteIdentifier);
 
-            if (!success) {
+            if (!isSuccess) {
                 throw new ApplicationError({
                     code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                     details: {

@@ -353,14 +353,12 @@ export const monitorFallbackConsistencyRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require FALLBACK_MONITOR_TYPE_OPTIONS to stay aligned with shared BASE_MONITOR_TYPES",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/monitor-fallback-consistency.md",
         },
-        schema: [],
         messages: {
             duplicateMonitorType:
                 'Monitor type "{{type}}" appears multiple times in FALLBACK_MONITOR_TYPE_OPTIONS.',
@@ -375,5 +373,7 @@ export const monitorFallbackConsistencyRule = {
             valueShouldBeLiteral:
                 'Fallback monitor option "value" must be a string literal for static analysis.',
         },
+        schema: [],
+        type: "problem",
     },
 };

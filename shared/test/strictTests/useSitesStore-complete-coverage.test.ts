@@ -29,7 +29,7 @@ const mockElectronAPI = {
 
 // Mock global window and electronAPI for Node.js test environment
 (globalThis as any).window = globalThis.window || {};
-Object.defineProperty(globalThis.window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
     configurable: true,
@@ -252,7 +252,7 @@ describe("useSitesStore - Complete Function Coverage", () => {
                 addSite: (site: Site) => site,
                 removeSite: (identifier: string) => identifier,
                 setLoading: (loading: boolean) => loading,
-                setError: (error: string | null) => error,
+                setError: (error: null | string) => error,
             };
 
             // Test function signatures

@@ -6,6 +6,17 @@ import { validateCloudBackupEntry } from "@shared/validation/cloudBackupSchemas"
 import { arrayJoin } from "ts-extras";
 
 /**
+ * Returns the canonical metadata sidecar key for a backup object key.
+ *
+ * @remarks
+ * Backups are stored as a binary object under `backups/<...>`. Their metadata
+ * is stored next to the binary object using the `.metadata.json` suffix.
+ */
+export function backupMetadataKeyForBackupKey(backupKey: string): string {
+    return `${backupKey}.metadata.json`;
+}
+
+/**
  * Parses a provider-stored backup metadata file.
  */
 export function parseCloudBackupMetadataFile(
@@ -38,6 +49,20 @@ export function parseCloudBackupMetadataFileBuffer(
 }
 
 /**
+ * Serializes a provider-stored backup metadata file.
+ */
+export function serializeCloudBackupMetadataFile(
+    entry: CloudBackupEntry
+): string {
+    return JSON.stringify({
+        encrypted: entry.encrypted,
+        fileName: entry.fileName,
+        key: entry.key,
+        metadata: entry.metadata,
+    });
+}
+
+/**
  * Best-effort parsing for provider-stored backup metadata buffers.
  *
  * @remarks
@@ -57,29 +82,4 @@ export function tryParseCloudBackupMetadataFileBuffer(
     } catch {
         return null;
     }
-}
-
-/**
- * Serializes a provider-stored backup metadata file.
- */
-export function serializeCloudBackupMetadataFile(
-    entry: CloudBackupEntry
-): string {
-    return JSON.stringify({
-        encrypted: entry.encrypted,
-        fileName: entry.fileName,
-        key: entry.key,
-        metadata: entry.metadata,
-    });
-}
-
-/**
- * Returns the canonical metadata sidecar key for a backup object key.
- *
- * @remarks
- * Backups are stored as a binary object under `backups/<...>`. Their metadata
- * is stored next to the binary object using the `.metadata.json` suffix.
- */
-export function backupMetadataKeyForBackupKey(backupKey: string): string {
-    return `${backupKey}.metadata.json`;
 }

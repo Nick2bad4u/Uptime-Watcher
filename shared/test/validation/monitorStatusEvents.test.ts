@@ -2,14 +2,13 @@
  * Tests for monitor status event validation helpers.
  */
 
-import { describe, expect, it } from "vitest";
-
 import type { Monitor, Site } from "@shared/types";
 
 import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
+import { describe, expect, it } from "vitest";
 
 function createValidHttpMonitor(partial: Partial<Monitor> = {}): Monitor {
     return {

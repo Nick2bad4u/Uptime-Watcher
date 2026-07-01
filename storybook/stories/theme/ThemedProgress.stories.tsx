@@ -3,13 +3,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ThemedProgress } from "@app/theme/components/ThemedProgress";
 
 const meta: Meta<typeof ThemedProgress> = {
-    component: ThemedProgress,
     args: {
-        value: 45,
+        label: "Monthly uptime goal",
         max: 100,
         showLabel: true,
-        label: "Monthly uptime goal",
+        value: 45,
     },
+    component: ThemedProgress,
     parameters: {
         layout: "padded",
     },
@@ -24,25 +24,25 @@ export const Default: Story = {};
 
 export const Success: Story = {
     args: {
-        variant: "success",
-        value: 92,
         label: "SLA met",
+        value: 92,
+        variant: "success",
     },
 };
 
 export const Warning: Story = {
     args: {
-        variant: "warning",
-        value: 72,
         label: "Alert threshold",
+        value: 72,
+        variant: "warning",
     },
 };
 
 export const Compact: Story = {
     args: {
-        size: "sm",
-        showLabel: false,
-        value: 30,
         className: "max-w-sm",
+        showLabel: false,
+        size: "sm",
+        value: 30,
     },
 };

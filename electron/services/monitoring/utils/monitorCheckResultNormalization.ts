@@ -10,7 +10,7 @@ import type { MonitorCheckResult } from "../types";
  */
 export function toFailure(details?: string): MonitorCheckResult {
     return {
-        ...(details ? { details } : {}),
+        ...(details && { details }),
         responseTime: 0,
         status: "down",
     };
@@ -32,11 +32,7 @@ export function isValidServiceResult(
         return false;
     }
 
-    if (typeof responseTime !== "number") {
-        return false;
-    }
-
-    return true;
+    return typeof responseTime === "number";
 }
 
 /**

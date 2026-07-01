@@ -15,17 +15,8 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import { validateSerializedDatabaseBackupResult } from "@shared/validation/dataSchemas";
 
 /** Canonical error message used when backup payload validation fails. */
-export const INVALID_SERIALIZED_BACKUP_DATA_MESSAGE: string =
+export const INVALID_SERIALIZED_BACKUP_DATA_MESSAGE =
     "Invalid backup data received";
-
-/**
- * Verifies that metadata byte size matches the actual binary payload length.
- */
-function hasConsistentBackupByteLength(
-    backupResult: SerializedDatabaseBackupResult
-): boolean {
-    return backupResult.metadata.sizeBytes === backupResult.buffer.byteLength;
-}
 
 /**
  * Parses and validates a serialized SQLite backup payload.
@@ -64,4 +55,13 @@ export function parseSerializedDatabaseBackupResult(
     }
 
     return backupResult;
+}
+
+/**
+ * Verifies that metadata byte size matches the actual binary payload length.
+ */
+function hasConsistentBackupByteLength(
+    backupResult: SerializedDatabaseBackupResult
+): boolean {
+    return backupResult.metadata.sizeBytes === backupResult.buffer.byteLength;
 }

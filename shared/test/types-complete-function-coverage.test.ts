@@ -7,6 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import * as typesModule from "../types";
 
 describe("Shared Types - Complete Function Coverage", () => {
@@ -265,7 +266,7 @@ describe("Shared Types - Complete Function Coverage", () => {
                     timeout: 5000,
                     retryAttempts: 3,
                     history: [],
-                    activeOperations: ["   ", "valid"], // Whitespace-only strings should be invalid
+                    activeOperations: [' '.repeat(3), "valid"], // Whitespace-only strings should be invalid
                 })
             ).toBeFalsy();
         });

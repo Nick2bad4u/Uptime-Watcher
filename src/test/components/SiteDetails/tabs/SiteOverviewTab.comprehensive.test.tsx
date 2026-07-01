@@ -18,21 +18,23 @@
  * @see {@link file://./src/components/SiteDetails/tabs/SiteOverviewTab.tsx} for implementation details
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import type { Site, Monitor } from "@shared/types";
-import { createValidMonitor } from "@shared/test/testHelpers";
+import type { Monitor, Site } from "@shared/types";
+
 import {
     sampleOne,
     siteIdentifierArbitrary,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { createValidMonitor } from "@shared/test/testHelpers";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SiteOverviewTab } from "../../../../components/SiteDetails/tabs/SiteOverviewTab";
 
 // Unmock the theme module to test the actual implementation
 vi.unmock("../../../../theme/useTheme");
-
-import { SiteOverviewTab } from "../../../../components/SiteDetails/tabs/SiteOverviewTab";
 
 const mockSiteName = sampleOne(siteNameArbitrary);
 const mockSiteIdentifier = sampleOne(siteIdentifierArbitrary);
@@ -214,9 +216,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Check monitor summary
-            expect(screen.getByText(/Total:\s*2/u)).toBeInTheDocument();
-            expect(screen.getByText(/Running:\s*1/u)).toBeInTheDocument();
-            expect(screen.getByText(/Stopped:\s*1/u)).toBeInTheDocument();
+            expect(screen.getByText(/Total:\s*2/v)).toBeInTheDocument();
+            expect(screen.getByText(/Running:\s*1/v)).toBeInTheDocument();
+            expect(screen.getByText(/Stopped:\s*1/v)).toBeInTheDocument();
 
             // Check individual monitor details
             expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
@@ -548,7 +550,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
 
             // Check if monitoring button is disabled (start or stop depending on state)
             const monitoringButton = screen.getByRole("button", {
-                name: /All Monitoring/u,
+                name: /All Monitoring/v,
             });
             expect(monitoringButton).toBeDisabled();
         });
@@ -588,7 +590,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                                     type: "ping",
                                     host: "example.com",
                                 });
-                            return pingMonitor as Monitor;
+                            return safeCastTo<Monitor>(pingMonitor);
                         })(),
                         // Port monitor with host and port
                         (() => {
@@ -605,7 +607,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                                 lastChecked: new Date("2023-01-01"),
                                 responseTime: 50,
                             });
-                            return portMonitor as Monitor;
+                            return safeCastTo<Monitor>(portMonitor);
                         })(),
                     ],
                 },
@@ -640,8 +642,8 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Should show formatted durations
-            expect(screen.getByText(/Every 30s/)).toBeInTheDocument();
-            expect(screen.getByText(/Every 1m/)).toBeInTheDocument();
+            expect(screen.getByText(/Every 30s/v)).toBeInTheDocument();
+            expect(screen.getByText(/Every 1m/v)).toBeInTheDocument();
         });
 
         it("should handle monitors without URL or host", ({
@@ -663,7 +665,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                 site: {
                     ...mockSite,
                     monitors: [
-                        {
+                        safeCastTo<Monitor>({
                             id: "monitor-no-url",
                             type: "http",
                             checkInterval: 30_000,
@@ -674,7 +676,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
                             lastChecked: new Date("2023-01-01"),
                             responseTime: 100,
                             history: [],
-                        } as Monitor,
+                        }),
                     ],
                 },
             };

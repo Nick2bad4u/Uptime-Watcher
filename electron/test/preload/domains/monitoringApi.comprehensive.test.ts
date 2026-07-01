@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
+
+import { MONITORING_CHANNELS } from "@shared/types/preload";
 import { ipcRenderer } from "electron";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { monitoringApi } from "../../../preload/domains/monitoringApi";
-import { MONITORING_CHANNELS } from "@shared/types/preload";
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -134,7 +135,7 @@ describe("monitoringApi", () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
         await expect(monitoringApi.startMonitoring()).rejects.toThrow(
-            /ipc operation failed/i
+            /ipc operation failed/iv
         );
     });
 });

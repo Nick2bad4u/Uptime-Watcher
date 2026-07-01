@@ -1,5 +1,5 @@
 /**
- * Tests for the React application entrypoint (main.tsx).
+ * Tests for the React app entrypoint (main.tsx).
  *
  * These tests intentionally validate observable behavior:
  *
@@ -19,28 +19,28 @@ const mockAppLogger = {
     error: vi.fn(),
 };
 
-vi.mock("../services/logger", () => ({
+vi.mock(import('../services/logger'), () => ({
     logger: {
         app: mockAppLogger,
     },
 }));
 
-vi.mock("react-dom/client", () => ({
+vi.mock(import('react-dom/client'), () => ({
     createRoot: mockCreateRoot,
 }));
 
-vi.mock("../App", () => ({
+vi.mock(import('../App'), () => ({
     App: () => "MockedApp",
 }));
 
-vi.mock("../index.css", () => ({}));
+vi.mock(import('../index.css'), () => ({}));
 
 describe("main.tsx - Application Entry Point", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
         // Fresh DOM for each test.
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         mockCreateRoot.mockClear();
         mockRender.mockClear();
@@ -80,7 +80,7 @@ describe("main.tsx - Application Entry Point", () => {
         annotate("Category: Core", "category");
         annotate("Type: Error Handling", "type");
 
-        document.body.innerHTML = "";
+        document.body.replaceChildren();
 
         await import("../main");
 

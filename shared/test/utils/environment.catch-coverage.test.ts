@@ -2,7 +2,7 @@
  * Test to cover line 41 in environment.ts - the catch block in getEnvVar
  */
 
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("Environment - Catch Block Coverage", () => {
     let originalProcessEnv: any = {};

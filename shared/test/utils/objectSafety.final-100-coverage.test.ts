@@ -3,7 +3,8 @@
  * targeting line 142 (symbol properties handling)
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeObjectOmit } from "../../utils/objectSafety";
 
 describe("Object Safety - Final 100% Coverage", () => {

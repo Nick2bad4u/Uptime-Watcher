@@ -3,9 +3,17 @@
  * uncovered lines: 194-195, 207-220, 239
  */
 
-import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
+
+// Import after mocking
+import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
+import { logStoreAction } from "../../../stores/utils";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 
 const LISTENER_NAMES = [
@@ -22,7 +30,7 @@ const buildListenerStates = (attachedCount: number) =>
     }));
 
 // Mock all dependencies
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -32,22 +40,22 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock("../../../../shared/utils/errorHandling", () => ({
+vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
     withErrorHandling: vi.fn(async (operation) => await operation()),
     withUtilityErrorHandling: vi.fn(),
     convertError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
 }));
 
-vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
+vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
     StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
         return {
             subscribe: vi.fn(async () => ({
@@ -69,7 +77,7 @@ const mockStateSyncService = vi.hoisted(() => ({
     requestFullSync: vi.fn(),
 }));
 
-vi.mock("../../../services/StateSyncService", () => ({
+vi.mock(import('../../../services/StateSyncService'), () => ({
     StateSyncService: mockStateSyncService,
 }));
 
@@ -82,12 +90,6 @@ const { restore: restoreElectronApi } = installElectronApiMock(
 afterAll(() => {
     restoreElectronApi();
 });
-
-// Import after mocking
-import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { logStoreAction } from "../../../stores/utils";
-import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 describe("useSiteSync - Final 100% Coverage", () => {
     let mockDeps: any;
@@ -192,7 +194,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             const result = await syncActions.getSyncStatus();
 
-            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalledWith();
             expect(logStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
                 "getSyncStatus",

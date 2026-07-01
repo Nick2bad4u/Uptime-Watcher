@@ -4,6 +4,13 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { sleep, sleepUnref } from "../../utils/abortUtils";
+import {
+    isRetryNonErrorThrownError,
+    type RetryOptions,
+    withRetry,
+} from "../../utils/retry";
+
 vi.mock("../../utils/abortUtils", async () => {
     const actual = await vi.importActual<
         typeof import("../../utils/abortUtils")
@@ -15,13 +22,6 @@ vi.mock("../../utils/abortUtils", async () => {
         sleepUnref: vi.fn().mockResolvedValue(undefined),
     };
 });
-
-import { sleep, sleepUnref } from "../../utils/abortUtils";
-import {
-    isRetryNonErrorThrownError,
-    withRetry,
-    type RetryOptions,
-} from "../../utils/retry";
 
 describe("shared/utils/retry", () => {
     beforeEach(() => {

@@ -83,7 +83,7 @@ const buildCloudStatusSummary = (
     common: CloudStatusCommonArgs,
     overrides: CloudStatusBuildOverrides
 ): CloudStatusSummary => {
-    const encryptionLocked =
+    const isEncryptionLocked =
         overrides.encryptionMode === "passphrase" &&
         !common.hasLocalEncryptionKey;
 
@@ -93,15 +93,13 @@ const buildCloudStatusSummary = (
         backupsEnabled: overrides.backupsEnabled,
         configured: overrides.configured,
         connected: overrides.connected,
-        encryptionLocked,
+        encryptionLocked: isEncryptionLocked,
         encryptionMode: overrides.encryptionMode,
         lastBackupAt: common.lastBackupAt,
         ...buildLastErrorSpread(lastError),
         lastSyncAt: common.lastSyncAt,
         provider: overrides.provider,
-        ...(overrides.providerDetails
-            ? { providerDetails: overrides.providerDetails }
-            : {}),
+        ...(overrides.providerDetails && { providerDetails: overrides.providerDetails }),
         syncEnabled: common.syncEnabled,
     };
 };
@@ -120,38 +118,38 @@ export async function buildDropboxStatus(args: {
     const { common, deps } = args;
 
     const provider = await deps.resolveProviderOrNull();
-    let connected = false;
-    let connectionError: string | undefined = undefined;
-    let accountLabel: string | undefined = undefined;
+    let isConnected = false;
+    let connectionError: string | undefined;
+    let accountLabel: string | undefined;
 
     if (provider?.kind === "dropbox" && hasAccountLabel(provider)) {
         try {
             accountLabel = await provider.getAccountLabel();
-            connected = true;
+            isConnected = true;
         } catch (error) {
-            connected = false;
+            isConnected = false;
             connectionError = ensureError(error).message;
         }
     } else if (provider) {
         // Fallback for unexpected provider implementation.
-        connected = await provider.isConnected().catch(() => false);
+        isConnected = await provider.isConnected().catch(() => false);
     }
 
     const encryptionMode =
-        connected && provider
+        isConnected && provider
             ? await deps.getEffectiveEncryptionMode(provider)
             : common.localEncryptionMode;
 
-    const encryptionLocked =
+    const isEncryptionLocked =
         encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     const lastError = common.lastError ?? connectionError;
 
     return {
-        backupsEnabled: connected,
+        backupsEnabled: isConnected,
         configured: true,
-        connected,
-        encryptionLocked,
+        connected: isConnected,
+        encryptionLocked: isEncryptionLocked,
         encryptionMode,
         lastBackupAt: common.lastBackupAt,
         ...buildLastErrorSpread(lastError),
@@ -159,7 +157,7 @@ export async function buildDropboxStatus(args: {
         provider: "dropbox",
         providerDetails: {
             kind: "dropbox",
-            ...(accountLabel ? { accountLabel } : {}),
+            ...(accountLabel && { accountLabel }),
         },
         syncEnabled: common.syncEnabled,
     };
@@ -180,23 +178,23 @@ export async function buildGoogleDriveStatus(args: {
     const { accountLabel, common, deps } = args;
 
     const provider = await deps.resolveProviderOrNull();
-    const connected = provider
+    const isConnected = provider
         ? await provider.isConnected().catch(() => false)
         : false;
 
     const encryptionMode =
-        connected && provider
+        isConnected && provider
             ? await deps.getEffectiveEncryptionMode(provider)
             : common.localEncryptionMode;
 
-    const encryptionLocked =
+    const isEncryptionLocked =
         encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
     return {
-        backupsEnabled: connected,
+        backupsEnabled: isConnected,
         configured: true,
-        connected,
-        encryptionLocked,
+        connected: isConnected,
+        encryptionLocked: isEncryptionLocked,
         encryptionMode,
         lastBackupAt: common.lastBackupAt,
         ...buildLastErrorSpread(common.lastError),
@@ -204,7 +202,7 @@ export async function buildGoogleDriveStatus(args: {
         provider: "google-drive",
         providerDetails: {
             kind: "google-drive",
-            ...(accountLabel ? { accountLabel } : {}),
+            ...(accountLabel && { accountLabel }),
         },
         syncEnabled: common.syncEnabled,
     };
@@ -261,19 +259,19 @@ export async function buildFilesystemStatus(args: {
         // Treat invalid constructor inputs as disconnected.
     }
 
-    const connected = provider
+    const isConnected = provider
         ? await provider.isConnected().catch(() => false)
         : false;
 
     const encryptionMode =
-        connected && provider
+        isConnected && provider
             ? await deps.getEffectiveEncryptionMode(provider)
             : common.localEncryptionMode;
 
     return buildCloudStatusSummary(common, {
-        backupsEnabled: connected,
+        backupsEnabled: isConnected,
         configured: true,
-        connected,
+        connected: isConnected,
         encryptionMode,
         provider: "filesystem",
         providerDetails: {

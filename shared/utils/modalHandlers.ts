@@ -5,7 +5,7 @@
  * @remarks
  * This module provides standardized utilities for modal state management,
  * including close handlers, keyboard event handling, and common modal patterns
- * found throughout the application.
+ * found throughout the app.
  *
  * @packageDocumentation
  */
@@ -63,19 +63,21 @@ export function useEscapeKeyModalHandler(
     useEffect(
         function setupEscapeKeyModalHandler(): () => void {
             const handleKeyDown = (event: KeyboardEvent): void => {
-                if (event.key === "Escape") {
-                    // Sort by priority (highest first) and find the first open modal
-                    const sortedConfigs = modalConfigs.toSorted(
-                        (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
-                    );
+                if (event.key !== "Escape") {
+                    return;
+                }
 
-                    const openModal = sortedConfigs.find(
-                        (config) => config.isOpen
-                    );
-                    if (openModal) {
-                        event.preventDefault();
-                        openModal.onClose();
-                    }
+                // Sort by priority (highest first) and find the first open modal
+                const sortedConfigs = modalConfigs.toSorted(
+                    (a, b) => (b.priority ?? 0) - (a.priority ?? 0)
+                );
+
+                const openModal = sortedConfigs.find(
+                    (config) => config.isOpen
+                );
+                if (openModal) {
+                    event.preventDefault();
+                    openModal.onClose();
                 }
             };
 

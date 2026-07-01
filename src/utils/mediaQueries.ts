@@ -9,29 +9,6 @@
 const noop = (): void => {};
 
 /**
- * Attempts to construct a {@link MediaQueryList} for the given query.
- *
- * @remarks
- * Returns `null` in non-browser environments (SSR/tests) or if the browser does
- * not support `matchMedia`.
- */
-export function tryGetMediaQueryList(query: string): MediaQueryList | null {
-    if (typeof window === "undefined") {
-        return null;
-    }
-
-    if (typeof window.matchMedia !== "function") {
-        return null;
-    }
-
-    try {
-        return window.matchMedia(query);
-    } catch {
-        return null;
-    }
-}
-
-/**
  * Returns the current `matches` value for a media query.
  */
 export function getMediaQueryMatches(query: string): boolean {
@@ -97,4 +74,27 @@ export function subscribeToMediaQueryMatches(
     };
 
     return subscribeToMediaQueryListChanges(mediaQueryList, handler);
+}
+
+/**
+ * Attempts to construct a {@link MediaQueryList} for the given query.
+ *
+ * @remarks
+ * Returns `null` in non-browser environments (SSR/tests) or if the browser does
+ * not support `matchMedia`.
+ */
+export function tryGetMediaQueryList(query: string): MediaQueryList | null {
+    if (typeof window === "undefined") {
+        return null;
+    }
+
+    if (typeof matchMedia !== "function") {
+        return null;
+    }
+
+    try {
+        return globalThis.matchMedia(query);
+    } catch {
+        return null;
+    }
 }

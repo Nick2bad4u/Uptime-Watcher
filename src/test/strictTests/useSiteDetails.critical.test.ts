@@ -5,31 +5,33 @@
  * @file UseSiteDetails.critical.test.ts
  */
 
-import { renderHook, act } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { useSiteDetails } from "../../hooks/site/useSiteDetails";
-import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { logger } from "../../services/logger";
-import { useUIStore } from "../../stores/ui/useUiStore";
 import type { Monitor, Site } from "@shared/types";
+
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useSiteDetails } from "../../hooks/site/useSiteDetails";
+import { logger } from "../../services/logger";
+import { useSitesStore } from "../../stores/sites/useSitesStore";
+import { useUIStore } from "../../stores/ui/useUiStore";
 // import type { ChangeEvent } from "react";
 
 // Mock modules
-vi.mock("../../stores/sites/useSitesStore");
-vi.mock("../../services/logger");
-vi.mock("../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../stores/sites/useSitesStore'));
+vi.mock(import('../../services/logger'));
+vi.mock(import('../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(() => ({
         clearError: vi.fn(),
         isLoading: false,
         error: null,
     })),
 }));
-vi.mock("../../stores/ui/useUiStore");
+vi.mock(import('../../stores/ui/useUiStore'));
 const confirmMock = vi.fn();
-vi.mock("../../hooks/ui/useConfirmDialog", () => ({
+vi.mock(import('../../hooks/ui/useConfirmDialog'), () => ({
     useConfirmDialog: () => confirmMock,
 }));
-vi.mock("@shared/utils/errorHandling", () => ({
+vi.mock(import('@shared/utils/errorHandling'), () => ({
     withUtilityErrorHandling: vi.fn(
         async (fn, _context, _defaultValue, _throwOnError) => await fn()
     ),
@@ -518,7 +520,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         await act(async () => {
             try {
                 await result.current.handleStartSiteMonitoring();
-            } catch (error) {
+            } catch {
                 // Expected to fail
             }
         });
@@ -526,7 +528,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         await act(async () => {
             try {
                 await result.current.handleStopSiteMonitoring();
-            } catch (error) {
+            } catch {
                 // Expected to fail
             }
         });

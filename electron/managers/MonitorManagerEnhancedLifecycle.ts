@@ -99,12 +99,12 @@ const toggleSingleMonitorEnhanced = async (args: {
         site,
     } = args;
 
-    const checkerResult =
+    const isCheckerResult =
         kind === "start"
             ? await services.checker.startMonitoring(identifier, monitorId)
             : await services.checker.stopMonitoring(identifier, monitorId);
 
-    if (!checkerResult) {
+    if (!isCheckerResult) {
         return false;
     }
 
@@ -169,10 +169,10 @@ const getMonitorOrWarn = (
 const getMonitorsWithIds = (
     site: Site,
     options?: { requireMonitoring?: boolean }
-): ReadonlyArray<Monitor & { id: string }> => {
+): readonly (Monitor & { id: string })[] => {
     const { requireMonitoring = false } = options ?? {};
 
-    const rawMonitors = safeCastTo<Array<Monitor | undefined>>(
+    const rawMonitors = safeCastTo<(Monitor | undefined)[]>(
         Array.isArray(site.monitors) ? site.monitors : []
     );
 
@@ -235,7 +235,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
     );
 
     await runSequentially(sites, async (site) => {
-        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(
+        const monitors = safeCastTo<(Site["monitors"][0] | undefined)[]>(
             Array.isArray(site.monitors) ? site.monitors : []
         );
         const siteStarted: { current: boolean } = { current: false };
@@ -285,12 +285,12 @@ export async function startAllMonitoringEnhancedFlow(params: {
             attempted += 1;
 
             try {
-                const started = await services.checker.startMonitoring(
+                const isStarted = await services.checker.startMonitoring(
                     site.identifier,
                     id
                 );
 
-                if (!started) {
+                if (!isStarted) {
                     failed += 1;
                     config.logger.warn(
                         "[MonitorManager] Checker declined to start monitor",
@@ -328,20 +328,20 @@ export async function startAllMonitoringEnhancedFlow(params: {
         }
     });
 
-    const partialFailures = failed > 0 && succeeded > 0;
+    const isPartialFailures = failed > 0 && succeeded > 0;
 
     const summary: MonitoringStartSummary = {
         alreadyActive: false,
         attempted,
         failed,
         isMonitoring: succeeded > 0,
-        partialFailures,
+        partialFailures: isPartialFailures,
         siteCount,
         skipped,
         succeeded,
     };
 
-    if (partialFailures) {
+    if (isPartialFailures) {
         config.logger.warn(
             "[MonitorManager] Global monitoring started with partial failures",
             summary
@@ -384,7 +384,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
     config.logger.info("Stopping all monitoring operations (enhanced system)");
 
     await runSequentially(sites, async (site) => {
-        const monitors = safeCastTo<Array<Site["monitors"][0] | undefined>>(
+        const monitors = safeCastTo<(Site["monitors"][0] | undefined)[]>(
             Array.isArray(site.monitors) ? site.monitors : []
         );
 
@@ -421,12 +421,12 @@ export async function stopAllMonitoringEnhancedFlow(params: {
             attempted += 1;
 
             try {
-                const stopped = await services.checker.stopMonitoring(
+                const isStopped = await services.checker.stopMonitoring(
                     site.identifier,
                     monitorId
                 );
 
-                if (!stopped) {
+                if (!isStopped) {
                     failed += 1;
                     config.logger.warn(
                         "[MonitorManager] Checker declined to stop monitor",
@@ -461,19 +461,19 @@ export async function stopAllMonitoringEnhancedFlow(params: {
 
     config.monitorScheduler.stopAll();
 
-    const partialFailures = failed > 0 && succeeded > 0;
+    const isPartialFailures = failed > 0 && succeeded > 0;
     const summary: MonitoringStopSummary = {
         alreadyInactive: attempted === 0,
         attempted,
         failed,
         isMonitoring: failed > 0,
-        partialFailures,
+        partialFailures: isPartialFailures,
         siteCount,
         skipped,
         succeeded,
     };
 
-    if (partialFailures) {
+    if (isPartialFailures) {
         config.logger.warn(
             "[MonitorManager] Global monitoring stopped with partial failures",
             summary
@@ -503,7 +503,7 @@ const runEnhancedLifecycleBatch = async <TAcc>(args: {
     readonly identifier: string;
     readonly initial: TAcc;
     readonly monitorAction: MonitorActionDelegate | undefined;
-    readonly monitors: ReadonlyArray<Monitor & { id: string }>;
+    readonly monitors: readonly (Monitor & { id: string })[];
 }): Promise<TAcc> => {
     const {
         actionLabel,
@@ -521,11 +521,11 @@ const runEnhancedLifecycleBatch = async <TAcc>(args: {
 
     await host.runSequentially(monitors, async (monitorWithId) => {
         try {
-            const result = monitorAction
+            const isResult = monitorAction
                 ? await monitorAction(identifier, monitorWithId.id)
                 : await fallback(monitorWithId.id);
 
-            acc = combine(acc, result);
+            acc = combine(acc, isResult);
         } catch (error) {
             config.logger.error(
                 `Enhanced ${actionLabel} failed for ${identifier}:${monitorWithId.id}`,

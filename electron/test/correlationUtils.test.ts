@@ -3,10 +3,9 @@
  * ValidationError.
  */
 
-import { describe, it, expect } from "vitest";
-
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ValidationError } from "@shared/utils/validationError";
+import { describe, expect, it } from "vitest";
 
 describe("correlationUtils", () => {
     describe(generateCorrelationId, () => {
@@ -39,7 +38,7 @@ describe("correlationUtils", () => {
             const id = generateCorrelationId();
 
             // Should be a 16-character hex string (8 bytes * 2 hex chars per byte)
-            expect(id).toMatch(/^[\da-f]{16}$/);
+            expect(id).toMatch(/^[\da-f]{16}$/v);
         });
 
         it("should generate different IDs on multiple calls", async ({

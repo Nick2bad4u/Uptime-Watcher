@@ -1,15 +1,15 @@
 import type { MonitorStatus } from "@shared/types/configTypes";
 
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-
-import { ThemeProvider } from "../../../../../theme/components/ThemeProvider";
 import { createValidMonitor } from "@shared/test/testHelpers";
+import { render, screen } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     MonitorSelector,
     type MonitorSelectorProperties,
 } from "../../../../../components/Dashboard/SiteCard/components/MonitorSelector";
+import { ThemeProvider } from "../../../../../theme/components/ThemeProvider";
 
 /**
  * MonitorSelector Additional Coverage Tests
@@ -115,7 +115,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                 // Note: NO port property here - only URL
                 responseTime: 100,
                 retryAttempts: 3,
-                status: "up" as MonitorStatus,
+                status: safeCastTo<MonitorStatus>("up"),
                 timeout: 5000,
                 type: "weird-type" as any, // Unknown type
                 url: "https://example.com",
@@ -200,7 +200,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            // Create a valid monitor with both port and url
+            // Create a valid monitor with both port and URL
             const unknownMonitorBoth = {
                 ...createValidMonitor({
                     id: "unknown-monitor-both",
@@ -257,7 +257,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                     // No URL property
                     responseTime: 100,
                     retryAttempts: 3,
-                    status: "up" as MonitorStatus,
+                    status: safeCastTo<MonitorStatus>("up"),
                     timeout: 5000,
                     type: "type-a" as any,
                 } as any,
@@ -273,7 +273,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                     // No port property
                     responseTime: 100,
                     retryAttempts: 3,
-                    status: "up" as MonitorStatus,
+                    status: safeCastTo<MonitorStatus>("up"),
                     timeout: 5000,
                     type: "type-b" as any,
                     url: "https://test.com",
@@ -290,7 +290,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
                     // No port or URL properties
                     responseTime: 100,
                     retryAttempts: 3,
-                    status: "up" as MonitorStatus,
+                    status: safeCastTo<MonitorStatus>("up"),
                     timeout: 5000,
                     type: "type-c" as any,
                 } as any,

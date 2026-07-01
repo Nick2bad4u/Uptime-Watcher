@@ -1,5 +1,5 @@
 /**
- * SaveButton component for consistent save actions across the application.
+ * SaveButton component for consistent save actions across the app.
  *
  * @remarks
  * Provides a standardized save button with loading states, theming, and

@@ -18,8 +18,8 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it } from "vitest";
 import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 describe("Shared Utilities Fuzzing Tests", () => {
     describe("String Validation", () => {
@@ -44,8 +44,8 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             ): value is string =>
                                 typeof value === "string" && value.length > 0;
 
-                            const result = isValidString(input);
-                            expect(typeof result).toBe("boolean");
+                            const isResult = isValidString(input);
+                            expect(typeof isResult).toBe("boolean");
                         }).not.toThrow();
                     }
                 )
@@ -80,7 +80,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                                 const cleaned = value.replaceAll(
                                     // eslint-disable-next-line no-control-regex
-                                    /[\0-\u001F\u007F]/gu,
+                                    /[\0-\x1F\u{7F}]/gv,
                                     ""
                                 );
 
@@ -95,7 +95,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
 
                             // Property: should not contain control characters
                             // eslint-disable-next-line no-control-regex
-                            expect(result).not.toMatch(/[\0-\u001F\u007F]/);
+                            expect(result).not.toMatch(/[\0-\x1f\u{7F}]/v);
 
                             // Property: should have reasonable length
                             expect(result.length).toBeLessThanOrEqual(1000);
@@ -146,8 +146,8 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                 }
                             };
 
-                            const result = isValidUrl(input);
-                            expect(typeof result).toBe("boolean");
+                            const isResult = isValidUrl(input);
+                            expect(typeof isResult).toBe("boolean");
                         }).not.toThrow();
                     }
                 )
@@ -183,9 +183,9 @@ describe("Shared Utilities Fuzzing Tests", () => {
                         fc.constant("not-an-object"),
                         fc.constant([]),
                         fc.record({
-                            timeout: fc.constant(Number.POSITIVE_INFINITY),
+                            timeout: fc.constant(Infinity),
                             retries: fc.constant(Number.NEGATIVE_INFINITY),
-                            interval: fc.constant(Number.NaN),
+                            interval: fc.constant(NaN),
                         })
                     ),
                     (config: any) => {
@@ -307,10 +307,10 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                     obj.name.length > 0
                                 );
 
-                            const result = hasIdAndName(input);
-                            expect(typeof result).toBe("boolean");
+                            const isResult = hasIdAndName(input);
+                            expect(typeof isResult).toBe("boolean");
 
-                            if (result) {
+                            if (isResult) {
                                 // If type guard passes, properties should be accessible
                                 expect(typeof input.id).toBe("string");
                                 expect(typeof input.name).toBe("string");
@@ -355,7 +355,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                 error: any
                             ): string => {
                                 const message =
-                                    error instanceof Error
+                                    Error.isError(error)
                                         ? error.message
                                         : typeof error === "string"
                                           ? error
@@ -373,10 +373,10 @@ describe("Shared Utilities Fuzzing Tests", () => {
                                     )
                                     .replaceAll(/bearer\s+\S+/gi, "bearer ***")
                                     .replaceAll(
-                                        /\/\S*\.(?:env|key|pem|crt)\S*/gi,
+                                        /\/\S*\.(?:crt|env|key|pem)\S*/gi,
                                         "***"
                                     )
-                                    .replaceAll(/\s+/g, " ") // Normalize whitespace
+                                    .replaceAll(/\s+/gv, " ") // Normalize whitespace
                                     .trim();
 
                                 // Limit length
@@ -403,7 +403,7 @@ describe("Shared Utilities Fuzzing Tests", () => {
                             expect(result.length).toBeLessThanOrEqual(500);
 
                             // Property: should not have excessive whitespace
-                            expect(result).not.toMatch(/\s{2,}/);
+                            expect(result).not.toMatch(/\s{2,}/v);
                         }).not.toThrow();
                     }
                 )

@@ -44,8 +44,8 @@ export function validateExternalOpenUrlCandidateWithPolicy(
 ): ExternalOpenUrlValidationResult {
     const validation = validateExternalOpenUrlCandidate(rawUrl);
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-    if (validation.ok === false) {
+
+    if (!validation.ok) {
         return validation;
     }
 
@@ -114,8 +114,8 @@ export async function tryOpenExternalValidated(args: {
         args.policy
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-    if (validation.ok === false) {
+
+    if (!validation.ok) {
         return {
             ok: false,
             outcome: "blocked",
@@ -147,9 +147,7 @@ export async function tryOpenExternalValidated(args: {
             errorName: resolved.name,
             ok: false,
             outcome: "open-failed",
-            ...(typeof code === "string" && code.length > 0
-                ? { errorCode: code }
-                : {}),
+            ...(typeof code === "string" && code.length > 0 && { errorCode: code }),
             safeUrlForLogging: validation.safeUrlForLogging,
         };
     }
@@ -186,8 +184,8 @@ export async function openExternalValidatedOrThrow(args: {
         args.policy
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-    if (validation.ok === false) {
+
+    if (!validation.ok) {
         throw createExternalOpenRejectionError({
             reason: validation.reason,
             safeUrlForLogging: validation.safeUrlForLogging,

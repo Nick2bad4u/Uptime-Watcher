@@ -4,15 +4,15 @@
  * Targeting remaining files with low branch coverage to achieve 90%+ threshold.
  */
 
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { render, fireEvent, screen } from "@testing-library/react";
 
 // Import components and utilities needing branch coverage
 import { RadioGroup } from "../components/AddSiteForm/RadioGroup";
 import { SettingItem } from "../components/shared/SettingItem";
+import { getIconColorClass } from "../theme/components/iconUtils";
 import { ThemedBox } from "../theme/components/ThemedBox";
 import { ThemedProgress } from "../theme/components/ThemedProgress";
-import { getIconColorClass } from "../theme/components/iconUtils";
 import { ThemeProvider } from "../theme/components/ThemeProvider";
 
 describe("Additional Branch Coverage Tests", () => {
@@ -38,11 +38,11 @@ describe("Additional Branch Coverage Tests", () => {
                 <ThemeProvider>
                     <RadioGroup
                         id="test-radio"
-                        name="test-radio"
                         label="Test Radio"
-                        value="option1"
-                        options={options}
+                        name="test-radio"
                         onChange={mockOnChange}
+                        options={options}
+                        value="option1"
                     />
                 </ThemeProvider>
             );
@@ -77,11 +77,11 @@ describe("Additional Branch Coverage Tests", () => {
                 <ThemeProvider>
                     <RadioGroup
                         id="site-type"
-                        name="site-type"
                         label="Site Type"
-                        value="new"
-                        options={options}
+                        name="site-type"
                         onChange={mockOnChange}
+                        options={options}
+                        value="new"
                     />
                 </ThemeProvider>
             );
@@ -117,11 +117,11 @@ describe("Additional Branch Coverage Tests", () => {
                 <ThemeProvider>
                     <RadioGroup
                         id="monitor-type"
-                        name="monitor-type"
                         label="Monitor Type"
-                        value="http"
-                        options={options}
+                        name="monitor-type"
                         onChange={() => {}}
+                        options={options}
+                        value="http"
                     />
                 </ThemeProvider>
             );
@@ -147,10 +147,10 @@ describe("Additional Branch Coverage Tests", () => {
             render(
                 <ThemeProvider>
                     <SettingItem
-                        title="Test Setting"
                         control={
                             <div data-testid="setting-control">Control</div>
                         }
+                        title="Test Setting"
                     />
                 </ThemeProvider>
             );
@@ -173,9 +173,9 @@ describe("Additional Branch Coverage Tests", () => {
             render(
                 <ThemeProvider>
                     <SettingItem
-                        title="Test Setting"
-                        description="This is a test setting description"
                         control={<div>Control</div>}
+                        description="This is a test setting description"
+                        title="Test Setting"
                     />
                 </ThemeProvider>
             );
@@ -199,9 +199,9 @@ describe("Additional Branch Coverage Tests", () => {
             render(
                 <ThemeProvider>
                     <SettingItem
-                        title="Disabled Setting"
-                        disabled={true}
                         control={<input data-testid="disabled-input" />}
+                        disabled={true}
+                        title="Disabled Setting"
                     />
                 </ThemeProvider>
             );
@@ -322,7 +322,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test 0% progress
             const { rerender } = render(
                 <ThemeProvider>
-                    <ThemedProgress value={0} max={100} />
+                    <ThemedProgress max={100} value={0} />
                 </ThemeProvider>
             );
 
@@ -331,7 +331,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test 50% progress
             rerender(
                 <ThemeProvider>
-                    <ThemedProgress value={50} max={100} />
+                    <ThemedProgress max={100} value={50} />
                 </ThemeProvider>
             );
 
@@ -340,7 +340,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test 100% progress
             rerender(
                 <ThemeProvider>
-                    <ThemedProgress value={100} max={100} />
+                    <ThemedProgress max={100} value={100} />
                 </ThemeProvider>
             );
 
@@ -361,7 +361,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test small size
             const { rerender } = render(
                 <ThemeProvider>
-                    <ThemedProgress value={50} size="sm" />
+                    <ThemedProgress size="sm" value={50} />
                 </ThemeProvider>
             );
 
@@ -370,7 +370,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test medium size
             rerender(
                 <ThemeProvider>
-                    <ThemedProgress value={50} size="md" />
+                    <ThemedProgress size="md" value={50} />
                 </ThemeProvider>
             );
 
@@ -379,7 +379,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test large size
             rerender(
                 <ThemeProvider>
-                    <ThemedProgress value={50} size="lg" />
+                    <ThemedProgress size="lg" value={50} />
                 </ThemeProvider>
             );
 
@@ -448,9 +448,9 @@ describe("Additional Branch Coverage Tests", () => {
             render(
                 <ThemeProvider>
                     <ThemedProgress
-                        value={75}
                         label="Loading..."
                         showLabel={true}
+                        value={75}
                     />
                 </ThemeProvider>
             );
@@ -472,7 +472,7 @@ describe("Additional Branch Coverage Tests", () => {
 
             render(
                 <ThemeProvider>
-                    <ThemedProgress value={25} size="xs" />
+                    <ThemedProgress size="xs" value={25} />
                 </ThemeProvider>
             );
 
@@ -587,11 +587,11 @@ describe("Additional Branch Coverage Tests", () => {
                 <ThemeProvider>
                     <RadioGroup
                         id="minimal"
-                        name="minimal"
                         label="Minimal"
-                        value=""
-                        options={[]}
+                        name="minimal"
                         onChange={() => {}}
+                        options={[]}
+                        value=""
                     />
                 </ThemeProvider>
             );
@@ -617,10 +617,10 @@ describe("Additional Branch Coverage Tests", () => {
             render(
                 <ThemeProvider>
                     <ThemedBox
-                        variant="primary"
                         className="test-class"
-                        style={{ padding: "20px" }}
                         onClick={() => {}}
+                        style={{ padding: "20px" }}
+                        variant="primary"
                     >
                         Full Box Content
                     </ThemedBox>
@@ -647,7 +647,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test with very high values
             render(
                 <ThemeProvider>
-                    <ThemedProgress value={999} max={100} />
+                    <ThemedProgress max={100} value={999} />
                 </ThemeProvider>
             );
 
@@ -671,7 +671,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test with negative values
             render(
                 <ThemeProvider>
-                    <ThemedProgress value={-10} max={100} />
+                    <ThemedProgress max={100} value={-10} />
                 </ThemeProvider>
             );
 
@@ -695,7 +695,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test with zero max
             render(
                 <ThemeProvider>
-                    <ThemedProgress value={50} max={0} />
+                    <ThemedProgress max={0} value={50} />
                 </ThemeProvider>
             );
 
@@ -719,7 +719,7 @@ describe("Additional Branch Coverage Tests", () => {
             // Test with negative max
             render(
                 <ThemeProvider>
-                    <ThemedProgress value={50} max={-10} />
+                    <ThemedProgress max={-10} value={50} />
                 </ThemeProvider>
             );
 
@@ -754,11 +754,11 @@ describe("Additional Branch Coverage Tests", () => {
                 <ThemeProvider>
                     <RadioGroup
                         id="state-radio"
-                        name="state-radio"
                         label="State Radio"
-                        value={currentValue}
-                        options={options}
+                        name="state-radio"
                         onChange={handleChange}
+                        options={options}
+                        value={currentValue}
                     />
                 </ThemeProvider>
             );
@@ -774,11 +774,11 @@ describe("Additional Branch Coverage Tests", () => {
                 <ThemeProvider>
                     <RadioGroup
                         id="state-radio"
-                        name="state-radio"
                         label="State Radio"
-                        value={currentValue}
-                        options={options}
+                        name="state-radio"
                         onChange={handleChange}
+                        options={options}
+                        value={currentValue}
                     />
                 </ThemeProvider>
             );

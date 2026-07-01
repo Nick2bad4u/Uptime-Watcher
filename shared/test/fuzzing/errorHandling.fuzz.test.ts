@@ -4,16 +4,16 @@
  * @file Fast-Check fuzzing tests for errorHandling targeting line 141
  */
 
-import { describe, expect, it, vi } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import {
     convertError,
     ensureError,
-    withErrorHandling,
-    withUtilityErrorHandling,
     type ErrorHandlingBackendContext,
     type ErrorHandlingFrontendStore,
+    withErrorHandling,
+    withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
+import { describe, expect, it, vi } from "vitest";
 
 describe("ErrorHandling fuzzing - line 141", () => {
     it("simple fuzz sanity check", () => {
@@ -309,7 +309,7 @@ describe("withErrorHandling backend fuzz coverage", () => {
     ])(
         "should fuzz-log failures with provided logger",
         async (operationName, errorMessage) => {
-            const logCalls: { message: string; error: unknown }[] = [];
+            const logCalls: { error: unknown; message: string; }[] = [];
             const logger = {
                 error: vi.fn((msg: string, err: unknown) => {
                     logCalls.push({ message: msg, error: err });
@@ -398,11 +398,11 @@ describe("withErrorHandling frontend fuzz integration", () => {
     const buildStore = (
         config: {
             clearThrows: boolean;
-            setLoadingTrueThrows: boolean;
-            setLoadingFalseThrows: boolean;
             setErrorThrows?: boolean;
+            setLoadingFalseThrows: boolean;
+            setLoadingTrueThrows: boolean;
         },
-        state: { loading: boolean; error: string | undefined }
+        state: { error: string | undefined; loading: boolean; }
     ): ErrorHandlingFrontendStore & {
         calls: { method: string; payload?: unknown }[];
     } => {
@@ -523,11 +523,11 @@ describe("withErrorHandling frontend fuzz integration", () => {
                         throw errorValue;
                     }, store)
                 ).rejects.toSatisfy((rejection: unknown) => {
-                    if (errorValue instanceof Error) {
+                    if (Error.isError(errorValue)) {
                         return rejection === errorValue;
                     }
 
-                    if (!(rejection instanceof Error)) {
+                    if (!(Error.isError(rejection))) {
                         return false;
                     }
 
@@ -543,7 +543,7 @@ describe("withErrorHandling frontend fuzz integration", () => {
                     (call) => call.method === "setError"
                 );
                 const expectedMessage =
-                    errorValue instanceof Error
+                    Error.isError(errorValue)
                         ? errorValue.message
                         : convertError(errorValue).error.message;
                 expect(setErrorCall?.payload).toBe(expectedMessage);
@@ -620,7 +620,7 @@ describe("convertError and ensureError fuzz coverage", () => {
             const result = convertError(value);
             expect(result.error).toBeInstanceOf(Error);
             expect(typeof result.originalType).toBe("string");
-            if (value instanceof Error) {
+            if (Error.isError(value)) {
                 expect(result.wasError).toBeTruthy();
             } else {
                 expect(result.wasError).toBeFalsy();

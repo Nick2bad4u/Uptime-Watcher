@@ -30,7 +30,7 @@ export const createMonitorCheckContext = (
 ): MonitorCheckContext => ({
     monitor: options.monitor,
     site: options.site,
-    ...(options.operationId ? { operationId: options.operationId } : {}),
-    ...(options.isManualCheck ? { isManualCheck: options.isManualCheck } : {}),
-    ...(options.signal ? { signal: options.signal } : {}),
+    ...(options.operationId && { operationId: options.operationId }),
+    ...(options.isManualCheck && { isManualCheck: options.isManualCheck }),
+    ...(options.signal && { signal: options.signal }),
 });

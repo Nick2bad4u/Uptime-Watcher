@@ -2,12 +2,11 @@
  * Tests for canonical JSON helpers used by cloud sync.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     createCanonicalJsonValue,
     stringifyJsonValueStable,
 } from "@shared/utils/canonicalJson";
+import { describe, expect, it } from "vitest";
 
 describe(createCanonicalJsonValue, () => {
     it("sorts object keys recursively and preserves array ordering", () => {

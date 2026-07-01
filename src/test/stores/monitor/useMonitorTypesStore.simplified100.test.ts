@@ -6,18 +6,21 @@
  * exercised.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { act, renderHook } from "@testing-library/react";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
+
 import {
     BASE_MONITOR_TYPES,
     type Monitor,
     type MonitorFieldDefinition,
     type MonitorType,
 } from "@shared/types";
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
-import type { ValidationResult } from "@shared/types/validation";
-import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import { act, renderHook } from "@testing-library/react";
+import { arrayFirst, objectKeys  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Hoisted mocks
 const mockWithErrorHandling = vi.hoisted(() => vi.fn());
@@ -32,20 +35,20 @@ const mockMonitorTypesApi = vi.hoisted(() => ({
 }));
 
 // Mock dependencies (partial mock to preserve exports like ApplicationError)
-vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
     return {
         ...actual,
         ensureError: vi.fn((error) =>
-            error instanceof Error ? error : new Error(String(error))
+            Error.isError(error) ? error : new Error(String(error))
         ),
         withErrorHandling: mockWithErrorHandling,
     };
 });
 
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -65,7 +68,7 @@ vi.stubGlobal("window", {
     electronAPI: mockElectronAPI,
 });
 
-vi.mock("../../../services/MonitorTypesService", () => ({
+vi.mock(import('../../../services/MonitorTypesService'), () => ({
     MonitorTypesService: {
         formatMonitorDetail: mockMonitorTypesApi.formatMonitorDetail,
         formatMonitorTitleSuffix: mockMonitorTypesApi.formatMonitorTitleSuffix,
@@ -94,9 +97,7 @@ const createMonitorTypeConfig = (
                 type: "url",
             },
         ] satisfies MonitorTypeConfig["fields"]),
-    ...(overrides.uiConfig === undefined
-        ? {}
-        : { uiConfig: overrides.uiConfig }),
+    ...(overrides.uiConfig !== undefined && { uiConfig: overrides.uiConfig }),
 });
 
 describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
@@ -118,7 +119,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 return await operation();
             } catch (error: unknown) {
                 const errorMessage =
-                    error instanceof Error ? error.message : String(error);
+                    Error.isError(error) ? error.message : String(error);
                 store.setError(errorMessage);
                 throw error;
             } finally {
@@ -148,7 +149,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             expect(result.current.isLoaded).toBeFalsy();
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
         });
 
         it("should handle successful monitor types loading", async () => {
@@ -181,8 +182,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toEqual(mockConfigs);
-            expect(result.current.fieldConfigs["http"]).toEqual(
-                mockConfigs[0]!.fields
+            expect(result.current.fieldConfigs.http).toEqual(
+                arrayFirst(mockConfigs)!.fields
             );
             expect(result.current.isLoaded).toBeTruthy();
             expect(
@@ -192,7 +193,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             ).toBeFalsy();
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
         });
     });
 
@@ -433,7 +434,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             useErrorStore.getState().clearStoreError("monitor-types");
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
         });
 
         it("should allow ErrorStore operation loading lifecycle", () => {
@@ -475,7 +476,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
             const { result } = renderHook(() => useMonitorTypesStore());
 
-            const config = result.current.getFieldConfig("http" as MonitorType);
+            const config = result.current.getFieldConfig("http");
             expect(config).toEqual(testFields);
 
             const nonExistent = result.current.getFieldConfig(
@@ -548,7 +549,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             // RefreshMonitorTypes should force a reload
             expect(
                 mockElectronAPI.monitorTypes.getMonitorTypes
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
         });
     });
 
@@ -654,7 +655,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 await result.current.loadMonitorTypes();
             });
 
-            expect(Object.keys(result.current.fieldConfigs)).toHaveLength(
+            expect(objectKeys(result.current.fieldConfigs)).toHaveLength(
                 BASE_MONITOR_TYPES.length
             );
             expect(result.current.isLoaded).toBeTruthy();
@@ -691,8 +692,8 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             });
 
             expect(result.current.monitorTypes).toHaveLength(1);
-            expect(result.current.monitorTypes[0]!.type).toBe("http");
-            expect(result.current.monitorTypes[0]!.fields[0]!.name).toBe(
+            expect(arrayFirst(result.current.monitorTypes)!.type).toBe("http");
+            expect(arrayFirst(arrayFirst(result.current.monitorTypes)!.fields)!.name).toBe(
                 "field-with-unicode-测试"
             );
         });

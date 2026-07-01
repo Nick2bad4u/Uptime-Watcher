@@ -9,13 +9,11 @@
  * @packageDocumentation
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { describe, expect } from "vitest";
 
 import {
-    isObject,
-    isNumber,
     hasProperties,
     hasProperty,
     isArray,
@@ -26,6 +24,8 @@ import {
     isFunction,
     isNonNegativeNumber,
     isNonNullObject,
+    isNumber,
+    isObject,
     isPositiveNumber,
     isString,
     isValidPort,
@@ -37,9 +37,9 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for plain objects (not null, arrays, or primitives)",
             (value) => {
-                const result = isObject(value);
+                const isResult = isObject(value);
 
-                if (result) {
+                if (isResult) {
                     // If isObject returns true, it must be an object
                     expect(typeof value).toBe("object");
                     expect(value).not.toBeNull();
@@ -81,9 +81,9 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for finite numbers (excluding NaN)",
             (value) => {
-                const result = isNumber(value);
+                const isResult = isNumber(value);
 
-                if (result) {
+                if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
                 } else {
@@ -102,14 +102,14 @@ describe("TypeGuards Fuzzing Tests", () => {
             }
         );
 
-        test.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
+        test.prop([fc.constantFrom(NaN, Infinity, -Infinity)])(
             "should handle special number values correctly",
             (specialNum) => {
-                const result = isNumber(specialNum);
+                const isResult = isNumber(specialNum);
                 if (Number.isNaN(specialNum)) {
-                    expect(result).toBeFalsy();
+                    expect(isResult).toBeFalsy();
                 } else {
-                    expect(result).toBeTruthy(); // Infinity is still a number
+                    expect(isResult).toBeTruthy(); // Infinity is still a number
                 }
             }
         );
@@ -122,12 +122,12 @@ describe("TypeGuards Fuzzing Tests", () => {
         ])(
             "should return true only when object has all specified properties",
             (value, properties) => {
-                const result = hasProperties(value, properties);
+                const isResult = hasProperties(value, properties);
 
                 // Always make at least one assertion
-                expect(typeof result).toBe("boolean");
+                expect(typeof isResult).toBe("boolean");
 
-                if (result) {
+                if (isResult) {
                     // If hasProperties returns true, value must be object with all props
                     expect(isObject(value)).toBeTruthy();
                     for (const prop of properties) {
@@ -138,13 +138,13 @@ describe("TypeGuards Fuzzing Tests", () => {
                 }
 
                 if (isObject(value)) {
-                    const allPropsExist = properties.every((prop) =>
+                    const isAllPropsExist = properties.every((prop) =>
                         Object.hasOwn(value, prop)
                     );
-                    expect(result).toBe(allPropsExist);
+                    expect(isResult).toBe(isAllPropsExist);
                 } else {
                     // If value is not an object, result should always be false
-                    expect(result).toBeFalsy();
+                    expect(isResult).toBeFalsy();
                 }
             }
         );
@@ -176,9 +176,9 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything(), fc.string()])(
             "should return true only when object has the specified property",
             (value, property) => {
-                const result = hasProperty(value, property);
+                const isResult = hasProperty(value, property);
 
-                if (result) {
+                if (isResult) {
                     expect(isObject(value)).toBeTruthy();
                     expect(
                         Object.hasOwn(value as object, property)
@@ -187,7 +187,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                     // If not has property, either not an object or property doesn't exist
                     const isValidFalse =
                         !isObject(value) ||
-                        !Object.hasOwn(value as object, property);
+                        !Object.hasOwn(value, property);
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -208,8 +208,8 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for arrays",
             (value) => {
-                const result = isArray(value);
-                expect(result).toBe(Array.isArray(value));
+                const isResult = isArray(value);
+                expect(isResult).toBe(Array.isArray(value));
             }
         );
 
@@ -244,8 +244,8 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for boolean values",
             (value) => {
-                const result = isBoolean(value);
-                expect(result).toBe(typeof value === "boolean");
+                const isResult = isBoolean(value);
+                expect(isResult).toBe(typeof value === "boolean");
             }
         );
 
@@ -261,16 +261,16 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for valid Date instances",
             (value) => {
-                const result = isDate(value);
+                const isResult = isDate(value);
 
-                if (result) {
+                if (isResult) {
                     expect(value instanceof Date).toBeTruthy();
-                    expect(Number.isNaN((value as Date).getTime())).toBeFalsy();
+                    expect(Number.isNaN((value).getTime())).toBeFalsy();
                 } else {
                     // If not a date, ensure it's either not a Date instance or invalid
                     const isValidFalse =
                         !(value instanceof Date) ||
-                        Number.isNaN((value as Date).getTime());
+                        Number.isNaN((value).getTime());
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -293,8 +293,8 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for Error instances",
             (value) => {
-                const result = isError(value);
-                expect(result).toBe(value instanceof Error);
+                const isResult = isError(value);
+                expect(isResult).toBe(Error.isError(value));
             }
         );
 
@@ -313,9 +313,9 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for finite numbers",
             (value) => {
-                const result = isFiniteNumber(value);
+                const isResult = isFiniteNumber(value);
 
-                if (result) {
+                if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
                     expect(Number.isFinite(value)).toBeTruthy();
@@ -337,7 +337,7 @@ describe("TypeGuards Fuzzing Tests", () => {
             expect(isFiniteNumber(finiteNum)).toBeTruthy();
         });
 
-        test.prop([fc.constantFrom(Infinity, -Infinity, Number.NaN)])(
+        test.prop([fc.constantFrom(Infinity, -Infinity, NaN)])(
             "should return false for infinite numbers and NaN",
             (infiniteOrNaN) => {
                 expect(isFiniteNumber(infiniteOrNaN)).toBeFalsy();
@@ -349,8 +349,8 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for functions",
             (value) => {
-                const result = isFunction(value);
-                expect(result).toBe(typeof value === "function");
+                const isResult = isFunction(value);
+                expect(isResult).toBe(typeof value === "function");
             }
         );
 
@@ -366,18 +366,18 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for non-negative numbers",
             (value) => {
-                const result = isNonNegativeNumber(value);
+                const isResult = isNonNegativeNumber(value);
 
-                if (result) {
+                if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
-                    expect(value as number).toBeGreaterThanOrEqual(0);
+                    expect(value).toBeGreaterThanOrEqual(0);
                 } else {
                     // If not non-negative, it's either not a number, NaN, or negative
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
-                        (value as number) < 0;
+                        (value) < 0;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -412,19 +412,19 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for positive numbers",
             (value) => {
-                const result = isPositiveNumber(value);
+                const isResult = isPositiveNumber(value);
 
-                if (result) {
+                if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
-                    expect(value as number).toBeGreaterThan(0);
+                    expect(value).toBeGreaterThan(0);
                 } else {
                     // If not positive, it's either not a number, NaN, or <= 0
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
                         !Number.isFinite(value) ||
-                        (value as number) <= 0;
+                        (value) <= 0;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -450,8 +450,8 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for strings",
             (value) => {
-                const result = isString(value);
-                expect(result).toBe(typeof value === "string");
+                const isResult = isString(value);
+                expect(isResult).toBe(typeof value === "string");
             }
         );
 
@@ -467,9 +467,9 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for valid port numbers (1-65535)",
             (value) => {
-                const result = isValidPort(value);
+                const isResult = isValidPort(value);
 
-                if (result) {
+                if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
                     expect(Number.isInteger(value)).toBeTruthy();
@@ -481,8 +481,8 @@ describe("TypeGuards Fuzzing Tests", () => {
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
                         !Number.isInteger(value) ||
-                        (value as number) < 1 ||
-                        (value as number) > 65_535;
+                        (value) < 1 ||
+                        (value) > 65_535;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -517,21 +517,21 @@ describe("TypeGuards Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should return true only for valid timestamps",
             (value) => {
-                const result = isValidTimestamp(value);
+                const isResult = isValidTimestamp(value);
                 const maxValidTime = Date.now() + 86_400_000; // 1 day from now
 
-                if (result) {
+                if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
-                    expect(value as number).toBeGreaterThan(0);
-                    expect(value as number).toBeLessThanOrEqual(maxValidTime);
+                    expect(value).toBeGreaterThan(0);
+                    expect(value).toBeLessThanOrEqual(maxValidTime);
                 } else {
                     // If not a valid timestamp, it's either not a number, NaN, <= 0, or too far in future
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
-                        (value as number) <= 0 ||
-                        (value as number) > maxValidTime;
+                        (value) <= 0 ||
+                        (value) > maxValidTime;
                     expect(isValidFalse).toBeTruthy();
                 }
             }
@@ -615,8 +615,8 @@ describe("TypeGuards Fuzzing Tests", () => {
                     isValidTimestamp(value),
                 ];
 
-                for (const result of results) {
-                    expect(typeof result).toBe("boolean");
+                for (const isResult of results) {
+                    expect(typeof isResult).toBe("boolean");
                 }
             }
         );
@@ -628,9 +628,9 @@ describe("TypeGuards Fuzzing Tests", () => {
                 expect(typeof hasProperties(value, props)).toBe("boolean");
 
                 if (props.length === 1) {
-                    const singlePropResult = hasProperty(value, props[0]!);
-                    const multiPropResult = hasProperties(value, props);
-                    expect(singlePropResult).toBe(multiPropResult);
+                    const isSinglePropResult = hasProperty(value, props[0]!);
+                    const isMultiPropResult = hasProperties(value, props);
+                    expect(isSinglePropResult).toBe(isMultiPropResult);
                 }
             }
         );
@@ -654,7 +654,7 @@ describe("TypeGuards Fuzzing Tests", () => {
                 if (
                     isNonNegativeNumber(value) &&
                     isFiniteNumber(value) &&
-                    (value as number) > 0
+                    (value) > 0
                 ) {
                     expect(isPositiveNumber(value)).toBeTruthy();
                 }

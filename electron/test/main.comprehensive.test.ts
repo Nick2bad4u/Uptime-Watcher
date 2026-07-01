@@ -1,12 +1,14 @@
 /**
  * Comprehensive tests for main.ts - Electron main process entry point These
- * tests cover application initialization, logging configuration, and cleanup
+ * tests cover app initialization, logging configuration, and cleanup
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { App } from "electron";
-import type { ApplicationService as ApplicationServiceType } from "../services/application/ApplicationService";
+
 import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { ApplicationService as ApplicationServiceType } from "../services/application/ApplicationService";
 
 // ========================================
 // MOCK ALL DEPENDENCIES BEFORE MAIN.TS IMPORT
@@ -19,7 +21,7 @@ const mockLog = {
         file: {
             level: "info",
             fileName: "uptime-watcher-main.log",
-            maxSize: 1024 * 1024 * 5,
+            maxSize: 1024 ** 2 * 5,
             format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}",
         },
         console: {
@@ -401,7 +403,7 @@ describe("main.ts - Electron Main Process", () => {
 
             if (beforeExitHandler) {
                 // The beforeExit handler doesn't throw synchronously - it logs and handles errors internally
-                expect(() => beforeExitHandler()).not.toThrow();
+                expect(() => { beforeExitHandler(); }).not.toThrow();
 
                 // Give some time for the async cleanup to run and error handling to complete
                 await new Promise((resolve) => setTimeout(resolve, 100));
@@ -657,7 +659,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.transports.file.fileName).toBe(
                 "uptime-watcher-main.log"
             );
-            expect(mockLog.transports.file.maxSize).toBe(1024 * 1024 * 5);
+            expect(mockLog.transports.file.maxSize).toBe(1024 ** 2 * 5);
             expect(mockLog.transports.file.format).toBe(
                 "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}"
             );

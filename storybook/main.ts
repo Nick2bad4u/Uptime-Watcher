@@ -1,4 +1,3 @@
-// eslint-disable-next-line import-x/no-unassigned-import, import-x/extensions -- ensure web storage shim registers before Storybook config executes
 import "./shims/nodeWebStorage.ts";
 
 import type { AddonOptionsVite } from "@storybook/addon-coverage";
@@ -29,14 +28,14 @@ import {
 
 const coverageOptions: AddonOptionsVite = {
     istanbul: {
-        exclude: Array.from(storybookCoverageExcludeGlobs),
+        exclude: [...storybookCoverageExcludeGlobs],
         extension: [
             ".ts",
             ".tsx",
             ".js",
             ".jsx",
         ],
-        include: Array.from(storybookCoverageIncludeGlobs),
+        include: [...storybookCoverageIncludeGlobs],
         requireEnv: true,
     },
 };
@@ -46,14 +45,11 @@ const coverageOptions: AddonOptionsVite = {
  * UI).
  */
 const isTestMode = (): boolean =>
-    /* eslint-disable n/no-process-env -- used to detect test mode */
     process.env["VITEST"] === "true" ||
     process.env["NODE_ENV"] === "test" ||
     process.argv.includes("--test");
 
 const isCoverageMode = (): boolean => process.env["VITE_COVERAGE"] === "true";
-
-/* eslint-enable n/no-process-env -- turn back on */
 
 /**
  * Primary Storybook configuration for the React/Vite renderer.
@@ -165,7 +161,7 @@ const config: StorybookConfig = {
         return mergeConfig(
             {
                 ...existingConfig,
-                ...(shouldUseRelativeBase ? { base: "./" } : {}),
+                ...(shouldUseRelativeBase && { base: "./" }),
                 plugins,
             },
             baseViteConfig

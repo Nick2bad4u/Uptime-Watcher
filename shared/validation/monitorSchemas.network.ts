@@ -23,35 +23,6 @@ interface NetworkMonitorSchemaBaseArgs {
     readonly hostValidationSchema: z.ZodString;
 }
 
-/** Creates the port monitor schema. */
-export function createPortMonitorSchema(
-    args: NetworkMonitorSchemaBaseArgs
-): PortMonitorSchemaType {
-    return args.baseMonitorSchema
-        .extend({
-            host: args.hostValidationSchema,
-            port: z
-                .number({
-                    error: "Port is required",
-                })
-                .refine(isValidPort, "Must be a valid port number (1-65535)"),
-            type: z.literal("port"),
-        })
-        .strict();
-}
-
-/** Creates the ping monitor schema. */
-export function createPingMonitorSchema(
-    args: NetworkMonitorSchemaBaseArgs
-): PingMonitorSchemaType {
-    return args.baseMonitorSchema
-        .extend({
-            host: args.hostValidationSchema,
-            type: z.literal("ping"),
-        })
-        .strict();
-}
-
 /** Creates the DNS monitor schema. */
 export function createDnsMonitorSchema(
     args: NetworkMonitorSchemaBaseArgs
@@ -81,6 +52,35 @@ export function createDnsMonitorSchema(
                 }
             ),
             type: z.literal("dns"),
+        })
+        .strict();
+}
+
+/** Creates the ping monitor schema. */
+export function createPingMonitorSchema(
+    args: NetworkMonitorSchemaBaseArgs
+): PingMonitorSchemaType {
+    return args.baseMonitorSchema
+        .extend({
+            host: args.hostValidationSchema,
+            type: z.literal("ping"),
+        })
+        .strict();
+}
+
+/** Creates the port monitor schema. */
+export function createPortMonitorSchema(
+    args: NetworkMonitorSchemaBaseArgs
+): PortMonitorSchemaType {
+    return args.baseMonitorSchema
+        .extend({
+            host: args.hostValidationSchema,
+            port: z
+                .number({
+                    error: "Port is required",
+                })
+                .refine(isValidPort, "Must be a valid port number (1-65535)"),
+            type: z.literal("port"),
         })
         .strict();
 }

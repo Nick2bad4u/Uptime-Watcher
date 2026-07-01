@@ -31,20 +31,22 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
     const normalized: ZodIssueLike[] = [];
 
     for (const issue of issues) {
-        if (isObject(issue)) {
-            const rawMessage = issue["message"];
+        if (!isObject(issue)) {
+            continue;
+        }
 
-            if (typeof rawMessage === "string") {
-                const rawPath = issue["path"];
-                const path = Array.isArray(rawPath)
-                    ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath)
-                    : undefined;
+        const rawMessage = issue["message"];
 
-                if (path) {
-                    normalized.push({ message: rawMessage, path });
-                } else {
-                    normalized.push({ message: rawMessage });
-                }
+        if (typeof rawMessage === "string") {
+            const rawPath = issue["path"];
+            const path = Array.isArray(rawPath)
+                ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath)
+                : undefined;
+
+            if (path) {
+                normalized.push({ message: rawMessage, path });
+            } else {
+                normalized.push({ message: rawMessage });
             }
         }
     }
@@ -101,7 +103,7 @@ const describeValidationFailureReason = (
         return trimmed.length > 0 ? trimmed : undefined;
     }
 
-    if (cause instanceof Error) {
+    if (Error.isError(cause)) {
         const trimmed = cause.message.trim();
         return trimmed.length > 0 ? trimmed : undefined;
     }
@@ -161,7 +163,7 @@ export function validateServicePayload<T>(
                 cause: error,
                 code: "RENDERER_SERVICE_VALIDATOR_THREW",
                 details: {
-                    ...(diagnostics ? { diagnostics } : {}),
+                    ...(diagnostics && { diagnostics }),
                     operation,
                     serviceName,
                 },
@@ -198,7 +200,7 @@ export function validateServicePayload<T>(
             cause: errorForEnsure,
             code: "RENDERER_SERVICE_INVALID_PAYLOAD",
             details: {
-                ...(diagnostics ? { diagnostics } : {}),
+                ...(diagnostics && { diagnostics }),
                 issues: messages,
                 operation,
                 serviceName,

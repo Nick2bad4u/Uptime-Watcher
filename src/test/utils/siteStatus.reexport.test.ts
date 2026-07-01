@@ -6,11 +6,11 @@ import { describe, expect, it } from "vitest";
  * @file Tests the shared site status utilities directly
  */
 
-describe("Shared SiteStatus Utilities", () => {
-    describe("Shared functions", () => {
+describe("shared SiteStatus Utilities", () => {
+    describe("shared functions", () => {
         it("should export calculateSiteMonitoringStatus function", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -19,12 +19,13 @@ describe("Shared SiteStatus Utilities", () => {
 
             const { calculateSiteMonitoringStatus } =
                 await import("@shared/utils/siteStatus");
-            expect(typeof calculateSiteMonitoringStatus).toBe("function");
+
+            expect(calculateSiteMonitoringStatus).toBeTypeOf("function");
         });
 
         it("should export calculateSiteStatus function", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -33,12 +34,13 @@ describe("Shared SiteStatus Utilities", () => {
 
             const { calculateSiteStatus } =
                 await import("@shared/utils/siteStatus");
-            expect(typeof calculateSiteStatus).toBe("function");
+
+            expect(calculateSiteStatus).toBeTypeOf("function");
         });
 
         it("should export getSiteDisplayStatus function", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -47,12 +49,13 @@ describe("Shared SiteStatus Utilities", () => {
 
             const { getSiteDisplayStatus } =
                 await import("@shared/utils/siteStatus");
-            expect(typeof getSiteDisplayStatus).toBe("function");
+
+            expect(getSiteDisplayStatus).toBeTypeOf("function");
         });
 
         it("should export getSiteStatusDescription function", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -61,12 +64,13 @@ describe("Shared SiteStatus Utilities", () => {
 
             const { getSiteStatusDescription } =
                 await import("@shared/utils/siteStatus");
-            expect(typeof getSiteStatusDescription).toBe("function");
+
+            expect(getSiteStatusDescription).toBeTypeOf("function");
         });
 
         it("should export getSiteStatusVariant function", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -75,12 +79,13 @@ describe("Shared SiteStatus Utilities", () => {
 
             const { getSiteStatusVariant } =
                 await import("@shared/utils/siteStatus");
-            expect(typeof getSiteStatusVariant).toBe("function");
+
+            expect(getSiteStatusVariant).toBeTypeOf("function");
         });
     });
 
-    describe("Re-exported types", () => {
-        it("should re-export SiteStatus type", async ({ task, annotate }) => {
+    describe("re-exported types", () => {
+        it("should re-export SiteStatus type", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
             await annotate("Category: Utility", "category");
@@ -98,10 +103,10 @@ describe("Shared SiteStatus Utilities", () => {
         });
     });
 
-    describe("Functional integration", () => {
+    describe("functional integration", () => {
         it("should call re-exported calculateSiteStatus with monitor data", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -114,27 +119,28 @@ describe("Shared SiteStatus Utilities", () => {
             const site = {
                 monitors: [
                     {
-                        id: "test-1",
-                        type: "http" as const,
-                        status: "up" as const,
-                        monitoring: true,
                         checkInterval: 30_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
+                        id: "test-1",
+                        monitoring: true,
                         responseTime: 200,
+                        retryAttempts: 3,
+                        status: "up" as const,
+                        timeout: 5000,
+                        type: "http" as const,
                         url: "https://example.com",
                     },
                 ],
             };
 
             const result = calculateSiteStatus(site);
+
             expect(result).toBeDefined();
-            expect(typeof result).toBe("string");
+            expect(result).toBeTypeOf("string");
         });
 
         it("should call re-exported getSiteDisplayStatus", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -148,21 +154,22 @@ describe("Shared SiteStatus Utilities", () => {
                 monitors: [
                     {
                         id: "test-1",
-                        type: "http" as const,
-                        status: "up" as const,
                         monitoring: true,
+                        status: "up" as const,
+                        type: "http" as const,
                     },
                 ],
             };
 
             const result = getSiteDisplayStatus(site);
+
             expect(result).toBeDefined();
-            expect(typeof result).toBe("string");
+            expect(result).toBeTypeOf("string");
         });
 
         it("should call re-exported getSiteStatusDescription", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -176,21 +183,22 @@ describe("Shared SiteStatus Utilities", () => {
                 monitors: [
                     {
                         id: "test-1",
-                        type: "http" as const,
-                        status: "up" as const,
                         monitoring: true,
+                        status: "up" as const,
+                        type: "http" as const,
                     },
                 ],
             };
 
             const result = getSiteStatusDescription(site);
+
             expect(result).toBeDefined();
-            expect(typeof result).toBe("string");
+            expect(result).toBeTypeOf("string");
         });
 
         it("should call re-exported getSiteStatusVariant", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -201,13 +209,14 @@ describe("Shared SiteStatus Utilities", () => {
                 await import("@shared/utils/siteStatus");
 
             const result = getSiteStatusVariant("up");
+
             expect(result).toBeDefined();
-            expect(typeof result).toBe("string");
+            expect(result).toBeTypeOf("string");
         });
 
         it("should call re-exported calculateSiteMonitoringStatus", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
@@ -220,27 +229,28 @@ describe("Shared SiteStatus Utilities", () => {
             const site = {
                 monitors: [
                     {
-                        id: "test-1",
-                        type: "http" as const,
-                        status: "up" as const,
-                        monitoring: true,
                         checkInterval: 30_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
+                        id: "test-1",
+                        monitoring: true,
                         responseTime: 200,
+                        retryAttempts: 3,
+                        status: "up" as const,
+                        timeout: 5000,
+                        type: "http" as const,
                         url: "https://example.com",
                     },
                 ],
             };
 
             const result = calculateSiteMonitoringStatus(site);
+
             expect(result).toBeDefined();
-            expect(typeof result).toBe("string");
+            expect(result).toBeTypeOf("string");
         });
     });
 
-    describe("Edge cases", () => {
-        it("should handle empty monitor arrays", async ({ task, annotate }) => {
+    describe("edge cases", () => {
+        it("should handle empty monitor arrays", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");
             await annotate("Category: Utility", "category");
@@ -251,12 +261,13 @@ describe("Shared SiteStatus Utilities", () => {
 
             const site = { monitors: [] };
             const result = calculateSiteStatus(site);
+
             expect(result).toBeDefined();
         });
 
         it("should handle invalid status strings gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: siteStatus.reexport", "component");

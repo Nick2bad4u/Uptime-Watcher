@@ -3,28 +3,32 @@
  * pagination, display limits, and history management.
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Monitor } from "@shared/types";
 import type {
     ButtonHTMLAttributes,
     HTMLAttributes,
     PropsWithChildren,
     SelectHTMLAttributes,
 } from "react";
+import type { ArrayElement } from "type-fest";
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
-import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import { useSettingsStore } from "../../../../stores/settings/useSettingsStore";
-import { useTheme } from "../../../../theme/useTheme";
 import { ThemeManager } from "../../../../theme/ThemeManager";
 import { themes } from "../../../../theme/themes";
-import type { Monitor } from "@shared/types";
+import { useTheme } from "../../../../theme/useTheme";
 
 // Mock dependencies
-vi.mock("../../../../stores/settings/useSettingsStore");
-vi.mock("../../../../services/logger");
-vi.mock("../../../../theme/useTheme", () => ({
+vi.mock(import('../../../../stores/settings/useSettingsStore'));
+vi.mock(import('../../../../services/logger'));
+vi.mock(import('../../../../theme/useTheme'), () => ({
     useTheme: vi.fn(),
     useThemeClasses: vi.fn(() => ({
         getBackgroundClass: vi.fn((variant: string) => ({
@@ -60,7 +64,7 @@ type ThemedTextMockProperties = PropsWithChildren<
     HTMLAttributes<HTMLSpanElement>
 >;
 
-vi.mock("../../../../theme/components", () => ({
+vi.mock(import('../../../../theme/components'), () => ({
     StatusIndicator: ({
         children,
         ...props
@@ -96,7 +100,7 @@ type DetailLabelMockProperties = PropsWithChildren<
     HTMLAttributes<HTMLDivElement>
 >;
 
-vi.mock("../../../../components/common/MonitorUiComponents", () => ({
+vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
     DetailLabel: ({ children, ...props }: DetailLabelMockProperties) => (
         <div data-testid="detail-label" {...props}>
             {children}
@@ -113,7 +117,7 @@ describe(HistoryTab, () => {
         new Date(timestamp).toISOString()
     );
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
-    const createMockMonitor = (historyLength: number = 5): Monitor => ({
+    const createMockMonitor = (historyLength = 5): Monitor => ({
         id: "test-monitor",
         type: "http",
         url: "https://example.com",
@@ -284,7 +288,7 @@ describe(HistoryTab, () => {
 
             const user = userEvent.setup();
 
-            const upButton = screen.getByRole("button", { name: /up/i });
+            const upButton = screen.getByRole("button", { name: /up/iv });
             await user.click(upButton);
 
             // Should show only up status records (every even index)
@@ -301,7 +305,7 @@ describe(HistoryTab, () => {
 
             // Get the filter button specifically (not any text containing "down")
             const downButton = screen.getByRole("button", {
-                name: /^down$/i,
+                name: /^down$/iv,
             });
             await user.click(downButton);
 
@@ -318,14 +322,14 @@ describe(HistoryTab, () => {
             const user = userEvent.setup();
 
             // First filter to up
-            const upButton = screen.getByRole("button", { name: /up/i });
+            const upButton = screen.getByRole("button", { name: /up/iv });
             await user.click(upButton);
             expect(
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(2);
 
             // Then switch back to all
-            const allButton = screen.getByRole("button", { name: /all/i });
+            const allButton = screen.getByRole("button", { name: /all/iv });
             await user.click(allButton);
             expect(
                 document.querySelectorAll(".themed-status-indicator")
@@ -460,8 +464,8 @@ describe(HistoryTab, () => {
             const monitor = createMockMonitor(2);
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(mockFormatFullTimestamp).toHaveBeenCalled();
-            expect(mockFormatResponseTime).toHaveBeenCalled();
+            expect(mockFormatFullTimestamp).toHaveBeenCalledWith();
+            expect(mockFormatResponseTime).toHaveBeenCalledWith();
         });
 
         it("should display formatted timestamps", ({ task, annotate }) => {
@@ -477,8 +481,8 @@ describe(HistoryTab, () => {
 
             const monitor = createMockMonitor(1);
             const timestamp = Date.now();
-            if (monitor.history[0]) {
-                monitor.history[0].timestamp = timestamp;
+            if (arrayFirst(monitor.history)) {
+                arrayFirst(monitor.history).timestamp = timestamp;
             }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -498,8 +502,8 @@ describe(HistoryTab, () => {
             annotate("Type: Business Logic", "type");
 
             const monitor = createMockMonitor(1);
-            if (monitor.history[0]) {
-                monitor.history[0].responseTime = 250;
+            if (arrayFirst(monitor.history)) {
+                arrayFirst(monitor.history).responseTime = 250;
             }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -522,8 +526,8 @@ describe(HistoryTab, () => {
             annotate("Type: Business Logic", "type");
 
             const monitor = createMockMonitor(1);
-            if (monitor.history[0]) {
-                monitor.history[0].status = "up";
+            if (arrayFirst(monitor.history)) {
+                arrayFirst(monitor.history).status = "up";
             }
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
@@ -536,7 +540,7 @@ describe(HistoryTab, () => {
                 .closest(".history-tab__row-status")
                 ?.querySelector(
                     ".history-tab__row-status-icon"
-                ) as SVGElement | null;
+                ) as null | SVGElement;
             expect(statusIcon).not.toBeNull();
         });
     });
@@ -555,7 +559,7 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
-            expect(vi.mocked(useTheme)).toHaveBeenCalled();
+            expect(vi.mocked(useTheme)).toHaveBeenCalledWith();
             // Theme colors should be applied to filter and history icons
         });
 
@@ -590,7 +594,7 @@ describe(HistoryTab, () => {
             rerender(<HistoryTab {...defaultProps} />);
 
             // Component should re-render with new theme
-            expect(vi.mocked(useTheme)).toHaveBeenCalled();
+            expect(vi.mocked(useTheme)).toHaveBeenCalledWith();
         });
     });
 
@@ -685,7 +689,7 @@ describe(HistoryTab, () => {
                 timestamp: Date.now(),
                 status: "up",
                 // Missing responseTime
-            } as unknown as Monitor["history"][number];
+            } as unknown as ArrayElement<Monitor["history"]>;
 
             expect(() =>
                 render(
@@ -714,9 +718,9 @@ describe(HistoryTab, () => {
 
             const user = userEvent.setup();
 
-            const upButton = screen.getByRole("button", { name: /up/i });
-            const downButton = screen.getByRole("button", { name: /down/i });
-            const allButton = screen.getByRole("button", { name: /all/i });
+            const upButton = screen.getByRole("button", { name: /up/iv });
+            const downButton = screen.getByRole("button", { name: /down/iv });
+            const allButton = screen.getByRole("button", { name: /all/iv });
 
             // Test filter state changes
             await user.click(upButton);
@@ -744,8 +748,8 @@ describe(HistoryTab, () => {
 
             const user = userEvent.setup();
 
-            const upButton = screen.getByRole("button", { name: /^up$/i });
-            const downButton = screen.getByRole("button", { name: /^down$/i });
+            const upButton = screen.getByRole("button", { name: /^up$/iv });
+            const downButton = screen.getByRole("button", { name: /^down$/iv });
 
             // Rapid clicks
             await user.click(upButton);

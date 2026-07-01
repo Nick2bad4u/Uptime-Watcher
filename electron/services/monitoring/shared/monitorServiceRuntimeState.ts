@@ -33,7 +33,7 @@ export function createMonitorServiceRuntimeState(args: {
 }): MonitorServiceRuntimeState {
     const config: MonitorServiceConfig = {
         timeout: args.defaultTimeoutMs,
-        ...(args.defaultUserAgent ? { userAgent: args.defaultUserAgent } : {}),
+        ...(args.defaultUserAgent && { userAgent: args.defaultUserAgent }),
         ...args.config,
     };
 
@@ -63,7 +63,7 @@ export function updateMonitorServiceRuntimeState(args: {
 
     const merged: MonitorServiceConfig = {
         timeout: args.defaultTimeoutMs,
-        ...(args.defaultUserAgent ? { userAgent: args.defaultUserAgent } : {}),
+        ...(args.defaultUserAgent && { userAgent: args.defaultUserAgent }),
         ...args.currentConfig,
         ...update,
     };

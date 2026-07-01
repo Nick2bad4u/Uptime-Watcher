@@ -2,7 +2,7 @@
  * Centralized utility functions for time and formatting.
  *
  * @remarks
- * Provides consistent time formatting throughout the application with support
+ * Provides consistent time formatting throughout the app with support
  * for various time scales: milliseconds for precise measurements,
  * seconds/minutes/hours for human-readable durations, and relative timestamps
  * for recent events. All functions handle edge cases gracefully and provide
@@ -24,6 +24,12 @@ import { UiDefaults } from "./fallbacks";
  * @public
  */
 export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
+
+interface DurationUnitDefinition {
+    readonly divisor: number;
+    readonly suffix: string;
+    readonly threshold: number;
+}
 
 /**
  * Formats duration in a human-readable format with appropriate time units.
@@ -61,12 +67,6 @@ export function formatDuration(ms: number): string {
     return `${seconds}s`;
 }
 
-interface DurationUnitDefinition {
-    readonly divisor: number;
-    readonly suffix: string;
-    readonly threshold: number;
-}
-
 function formatRoundedDuration(
     milliseconds: number,
     units: readonly DurationUnitDefinition[]
@@ -102,7 +102,7 @@ const SHORT_DURATION_UNITS: readonly DurationUnitDefinition[] = [
     {
         divisor: 3_600_000,
         suffix: "h",
-        threshold: Number.POSITIVE_INFINITY,
+        threshold: Infinity,
     },
 ] as const satisfies readonly DurationUnitDefinition[];
 

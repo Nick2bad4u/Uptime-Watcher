@@ -212,8 +212,7 @@ export async function migrateProviderBackups(args: {
         });
     }
 
-    // Preload existing backup keys so we can refuse to overwrite an existing
-    // target object.
+    // Preload existing backup keys so we can refuse to overwrite an existing target object.
     //
     // @remarks
     // Uploads use the provider's canonical backup layout (`backups/<fileName>`).
@@ -221,9 +220,9 @@ export async function migrateProviderBackups(args: {
     // collisions when legacy keys include nested folders.
     const existingBackupKeys = new Set(backups.map((entry) => entry.key));
 
-    const needsCryptoKey =
+    const isNeedsCryptoKey =
         targetEncrypted || selected.some((entry) => entry.encrypted);
-    if (needsCryptoKey && !isDefined(encryptionKey)) {
+    if (isNeedsCryptoKey && !isDefined(encryptionKey)) {
         throw new Error(ENCRYPTION_KEY_REQUIRED_MESSAGE);
     }
 
@@ -231,8 +230,8 @@ export async function migrateProviderBackups(args: {
     for (const entry of selected) {
         processed += 1;
 
-        const needsMigration = entry.encrypted !== targetEncrypted;
-        if (needsMigration) {
+        const isNeedsMigration = entry.encrypted !== targetEncrypted;
+        if (isNeedsMigration) {
             const result = await migrateSingleEntry({
                 deleteSource,
                 encryptionKey,

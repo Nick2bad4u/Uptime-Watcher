@@ -12,8 +12,10 @@ import * as z from "zod";
 
 export const CLOUD_ENCRYPTION_CONFIG_VERSION = 1 as const;
 
-/** Supported cloud encryption modes. */
-export type CloudEncryptionMode = "none" | "passphrase";
+/** Union of all supported cloud encryption configuration variants. */
+export type CloudEncryptionConfig =
+    | CloudEncryptionConfigNone
+    | CloudEncryptionConfigPassphrase;
 
 /** Base fields shared by all encryption configuration variants. */
 export interface CloudEncryptionConfigBase {
@@ -44,10 +46,8 @@ export interface CloudEncryptionConfigPassphrase extends CloudEncryptionConfigBa
     readonly saltBase64: string;
 }
 
-/** Union of all supported cloud encryption configuration variants. */
-export type CloudEncryptionConfig =
-    | CloudEncryptionConfigNone
-    | CloudEncryptionConfigPassphrase;
+/** Supported cloud encryption modes. */
+export type CloudEncryptionMode = "none" | "passphrase";
 
 const cloudEncryptionConfigInternalSchema = z.discriminatedUnion("mode", [
     z

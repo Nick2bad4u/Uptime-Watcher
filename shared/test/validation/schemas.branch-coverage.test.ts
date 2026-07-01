@@ -3,7 +3,8 @@
  * targets the remaining uncovered branches and edge cases
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
     validateMonitorData,
     validateMonitorField,
@@ -237,7 +238,7 @@ describe("Validation Schemas - Branch Coverage Completion", () => {
             expect(result.success).toBeTruthy();
             expect(result.metadata).toHaveProperty("monitorType", "http");
             expect(result.metadata).toHaveProperty("validatedDataSize");
-            expect(typeof result.metadata!["validatedDataSize"]).toBe("number");
+            expect(typeof result.metadata!.validatedDataSize).toBe("number");
         });
 
         it("should include metadata for site validation", async ({

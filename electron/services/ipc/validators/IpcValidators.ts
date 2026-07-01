@@ -111,7 +111,7 @@ export const IpcValidators = {
             maxBytes: MAX_IPC_URL_UTF_BYTES,
         });
 
-        if (validation.ok === false) {
+        if (!validation.ok) {
             if (validation.reason === "must be a non-empty string") {
                 return `${paramName} must be a valid http(s) URL`;
             }

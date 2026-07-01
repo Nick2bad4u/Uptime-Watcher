@@ -6,8 +6,9 @@
  * behavior across a wide range of inputs, ensuring robustness and consistency.
  */
 
+import { fc, test } from "@fast-check/vitest";
 import { describe, expect } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
 import { CacheKeys } from "../../utils/cacheKeys";
 
 describe("CacheKeys - Property-Based Tests", () => {
@@ -20,7 +21,7 @@ describe("CacheKeys - Property-Based Tests", () => {
                 const key = CacheKeys.site.byIdentifier(props.identifier);
 
                 // Should always start with site prefix
-                expect(key).toMatch(/^site:/);
+                expect(key).toMatch(/^site:/v);
 
                 // Should contain the identifier
                 expect(key).toContain(props.identifier);
@@ -49,7 +50,7 @@ describe("CacheKeys - Property-Based Tests", () => {
                 const key = CacheKeys.monitor.byId(props.monitorId);
 
                 // Should always start with monitor prefix
-                expect(key).toMatch(/^monitor:/);
+                expect(key).toMatch(/^monitor:/v);
 
                 // Should contain the monitor id
                 expect(key).toContain(props.monitorId);
@@ -65,7 +66,7 @@ describe("CacheKeys - Property-Based Tests", () => {
             const key = CacheKeys.monitor.bySite(props.siteIdentifier);
 
             // Should start with monitor prefix
-            expect(key).toMatch(/^monitor:site:/);
+            expect(key).toMatch(/^monitor:site:/v);
 
             // Should contain the site id
             expect(key).toContain(props.siteIdentifier);
@@ -86,13 +87,13 @@ describe("CacheKeys - Property-Based Tests", () => {
                 const key = CacheKeys.config.byName(props.configName);
 
                 // Should start with config prefix
-                expect(key).toMatch(/^config:/);
+                expect(key).toMatch(/^config:/v);
 
                 // Should contain the config name
                 expect(key).toContain(props.configName);
 
                 // Should have exactly one separator (between prefix and name)
-                const separatorCount = (key.match(/:/g) ?? []).length;
+                const separatorCount = (key.match(/:/gv) ?? []).length;
                 expect(separatorCount).toBe(1);
             }
         );
@@ -109,7 +110,7 @@ describe("CacheKeys - Property-Based Tests", () => {
             );
 
             // Should start with validation prefix
-            expect(key).toMatch(/^validation:/);
+            expect(key).toMatch(/^validation:/v);
 
             // Should contain both the type and identifier
             expect(key).toContain(props.validationType);
@@ -135,10 +136,10 @@ describe("CacheKeys - Property-Based Tests", () => {
 
                 const [key1, key2] = (() => {
                     switch (props.domain) {
-                        case "site": {
+                        case "config": {
                             return [
-                                CacheKeys.site.byIdentifier(props.identifier1),
-                                CacheKeys.site.byIdentifier(props.identifier2),
+                                CacheKeys.config.byName(props.identifier1),
+                                CacheKeys.config.byName(props.identifier2),
                             ];
                         }
                         case "monitor": {
@@ -147,10 +148,10 @@ describe("CacheKeys - Property-Based Tests", () => {
                                 CacheKeys.monitor.byId(props.identifier2),
                             ];
                         }
-                        case "config": {
+                        case "site": {
                             return [
-                                CacheKeys.config.byName(props.identifier1),
-                                CacheKeys.config.byName(props.identifier2),
+                                CacheKeys.site.byIdentifier(props.identifier1),
+                                CacheKeys.site.byIdentifier(props.identifier2),
                             ];
                         }
                         default: {
@@ -178,9 +179,9 @@ describe("CacheKeys - Property-Based Tests", () => {
                 expect(monitorKey).not.toBe(configKey);
 
                 // Each should have its proper prefix
-                expect(siteKey).toMatch(/^site:/);
-                expect(monitorKey).toMatch(/^monitor:/);
-                expect(configKey).toMatch(/^config:/);
+                expect(siteKey).toMatch(/^site:/v);
+                expect(monitorKey).toMatch(/^monitor:/v);
+                expect(configKey).toMatch(/^config:/v);
             }
         );
     });
@@ -188,7 +189,7 @@ describe("CacheKeys - Property-Based Tests", () => {
     describe("Special character handling", () => {
         test.prop({
             identifier: fc.string({ minLength: 1, maxLength: 20 }).map(
-                (s) => s.replaceAll(/[^\w-_.]/g, "_") // Replace special chars with underscores
+                (s) => s.replaceAll(/[^\w-.]/g, "_") // Replace special chars with underscores
             ),
         })("should handle sanitized identifiers safely", (props) => {
             const siteKey = CacheKeys.site.byIdentifier(props.identifier);

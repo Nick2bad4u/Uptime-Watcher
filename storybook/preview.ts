@@ -17,8 +17,8 @@ import { installElectronAPIMock } from "./setup/electron-api-mock";
 type AccessibilityTestMode = "error" | "warn";
 
 const storybookAccessibilityModeEnvKeys = [
-    "VITE_STORYBOOK_A11Y_ASSERT_MODE",
     "STORYBOOK_A11Y_ASSERT_MODE",
+    "VITE_STORYBOOK_A11Y_ASSERT_MODE",
 ] as const;
 
 const normalizeAccessibilityTestMode = (
@@ -56,11 +56,7 @@ const readEnvVariable = (
 };
 
 const getProcessEnvRecord = (): Record<string, unknown> | undefined => {
-    const processCandidate = (
-        globalThis as {
-            process?: undefined | { env?: unknown };
-        }
-    ).process;
+    const processCandidate = process;
 
     const processRecord = ensureRecordLike(processCandidate);
 
@@ -95,9 +91,9 @@ const resolveStorybookAccessibilityMode = (): AccessibilityTestMode => {
 
 const storybookAccessibilityTestMode = resolveStorybookAccessibilityMode();
 
-type StoryThemeName = Extract<ThemeName, "dark" | "high-contrast" | "light">;
-
 type StoryGlobals = Parameters<Decorator>[1]["globals"];
+
+type StoryThemeName = Extract<ThemeName, "dark" | "high-contrast" | "light">;
 
 const STORYBOOK_THEME_CLASS_MAP: Record<StoryThemeName, string> = {
     dark: "theme-dark dark",
@@ -147,7 +143,7 @@ const resolveMswServiceWorkerUrl = (): string => {
         return "mockServiceWorker.js";
     }
 
-    return new URL("mockServiceWorker.js", window.location.href).toString();
+    return new URL("mockServiceWorker.js", location.href).href;
 };
 
 const STORYBOOK_VIEWPORTS = {
@@ -264,9 +260,9 @@ const preview: Preview = {
         },
         controls: {
             matchers: {
-                color: /(?<property>background|color)$/iu,
+                color: /(?<property>background|color)$/iv,
 
-                date: /(?<date>date)$/iu,
+                date: /(?<date>date)$/iv,
             },
         },
         docs: {

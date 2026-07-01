@@ -107,15 +107,15 @@ export async function resolveCloudProviderOrNull(args: {
 
             const tokenManager = new GoogleDriveTokenManager({
                 clientId,
-                ...(clientSecret ? { clientSecret } : {}),
+                ...(clientSecret && { clientSecret }),
                 secretStore,
                 storageKey: keys.googleDriveTokens,
             });
 
-            const connected = await tokenManager
+            const isConnected = await tokenManager
                 .isConnected()
                 .catch(() => false);
-            if (!connected) {
+            if (!isConnected) {
                 return null;
             }
 

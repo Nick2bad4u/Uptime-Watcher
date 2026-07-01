@@ -35,4 +35,4 @@ export const createCorrelationAwareInvokeMock = (): ReturnType<typeof vi.fn> =>
                 }
             }
         },
-    }) as ReturnType<typeof vi.fn>;
+    });

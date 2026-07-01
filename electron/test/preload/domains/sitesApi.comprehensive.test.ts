@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { Monitor, Site } from "@shared/types";
+
+import { SITES_CHANNELS } from "@shared/types/preload";
 import { ipcRenderer } from "electron";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { sitesApi } from "../../../preload/domains/sitesApi";
-import { SITES_CHANNELS } from "@shared/types/preload";
-import type { Monitor, Site } from "@shared/types";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -85,9 +86,9 @@ describe("sitesApi", () => {
             data: true,
         });
 
-        const result = await sitesApi.removeSite(baseSite.identifier);
+        const isResult = await sitesApi.removeSite(baseSite.identifier);
 
-        expect(result).toBeTruthy();
+        expect(isResult).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             SITES_CHANNELS.removeSite,
             baseSite.identifier,
@@ -159,7 +160,7 @@ describe("sitesApi", () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
         await expect(sitesApi.getSites()).rejects.toThrow(
-            /ipc operation failed/i
+            /ipc operation failed/iv
         );
     });
 
@@ -170,7 +171,7 @@ describe("sitesApi", () => {
         });
 
         await expect(sitesApi.removeSite(baseSite.identifier)).rejects.toThrow(
-            /failed validation/i
+            /failed validation/iv
         );
     });
 });

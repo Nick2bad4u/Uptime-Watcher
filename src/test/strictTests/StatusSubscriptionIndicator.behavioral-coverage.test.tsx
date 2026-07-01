@@ -2,18 +2,23 @@
  * @file Coverage tests for the `StatusSubscriptionIndicator` component.
  */
 
-import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
 import type { ReactNode } from "react";
+import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { objectAssign, safeCastTo, arrayFirst   } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
+
+import { StatusSubscriptionIndicator } from "../../components/Header/StatusSubscriptionIndicator";
 
 const tooltipMock = vi.hoisted(() => ({
     Tooltip: ({
         children,
         content,
     }: {
-        children: (props: Record<string, unknown>) => ReactNode;
+        children: (props: UnknownRecord) => ReactNode;
         content: ReactNode;
     }) => (
         <div data-testid="subscription-tooltip">
@@ -23,7 +28,7 @@ const tooltipMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../components/common/Tooltip/Tooltip", () => tooltipMock);
+vi.mock(import('../../components/common/Tooltip/Tooltip'), () => tooltipMock);
 
 const themedTextMock = vi.hoisted(() => ({
     ThemedText: ({ children, ...props }: { children?: ReactNode }) => (
@@ -31,7 +36,7 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => themedTextMock);
+vi.mock(import('../../theme/components/ThemedText'), () => themedTextMock);
 
 interface ThemedButtonMockProps {
     "aria-label"?: string;
@@ -45,9 +50,9 @@ interface ThemedButtonMockProps {
     variant?: string;
 }
 
-const themedButtonInvocations = vi.hoisted(() => [] as ThemedButtonMockProps[]);
+const themedButtonInvocations = vi.hoisted(() => safeCastTo<ThemedButtonMockProps[]>([]));
 
-vi.mock("../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ThemedButton: (props: ThemedButtonMockProps) => {
         themedButtonInvocations.push(props);
         const {
@@ -59,7 +64,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
             type,
             ...rest
         } = props;
-        const resolvedType: "button" | "submit" | "reset" | undefined =
+        const resolvedType: "button" | "reset" | "submit" | undefined =
             type === "submit" || type === "reset" || type === "button"
                 ? type
                 : "button";
@@ -78,11 +83,11 @@ vi.mock("../../theme/components/ThemedButton", () => ({
     },
 }));
 
-vi.mock("../../utils/icons", () => ({
+vi.mock(import('../../utils/icons'), () => ({
     AppIcons: {
         actions: {
             refresh: ({ size }: { size: number }) => (
-                <span data-testid="refresh-icon" data-size={size} />
+                <span data-size={size} data-testid="refresh-icon" />
             ),
         },
     },
@@ -91,7 +96,7 @@ vi.mock("../../utils/icons", () => ({
 const healthState = vi.hoisted(() => ({
     value: {
         description: "All systems operational",
-        errors: [] as string[],
+        errors: safeCastTo<string[]>([]),
         label: "Healthy",
         needsAttention: false,
         status: "healthy",
@@ -106,7 +111,7 @@ const deriveStatusSubscriptionHealthMock = vi.hoisted(() =>
     >(() => healthState.value)
 );
 
-vi.mock("../../hooks/useStatusSubscriptionHealth", () => ({
+vi.mock(import('../../hooks/useStatusSubscriptionHealth'), () => ({
     deriveStatusSubscriptionHealth: (
         summary?: StatusUpdateSubscriptionSummary
     ) => deriveStatusSubscriptionHealthMock(summary),
@@ -129,7 +134,7 @@ const siteStoreState = vi.hoisted(() => ({
     retryStatusSubscription: vi.fn(async () =>
         createSummary({ expectedListeners: 3, listenersAttached: 2 })
     ),
-    summary: undefined as StatusUpdateSubscriptionSummary | undefined,
+    summary: safeCastTo<StatusUpdateSubscriptionSummary | undefined>(undefined),
 }));
 
 const createSiteStoreSnapshot = vi.hoisted(() => () => ({
@@ -137,14 +142,14 @@ const createSiteStoreSnapshot = vi.hoisted(() => () => ({
     statusSubscriptionSummary: siteStoreState.summary,
 }));
 
-vi.mock("../../stores/sites/useSitesStore", () => {
-    const useSitesStoreMock = Object.assign(
+vi.mock(import('../../stores/sites/useSitesStore'), () => {
+    const useSitesStoreMock = objectAssign(
         <Selection,>(
             selector?: (
                 state: ReturnType<typeof createSiteStoreSnapshot>
             ) => Selection,
             _equality?: (a: Selection, b: Selection) => boolean
-        ): Selection | ReturnType<typeof createSiteStoreSnapshot> => {
+        ): ReturnType<typeof createSiteStoreSnapshot> | Selection => {
             const snapshot = createSiteStoreSnapshot();
             return typeof selector === "function"
                 ? selector(snapshot)
@@ -157,8 +162,6 @@ vi.mock("../../stores/sites/useSitesStore", () => {
 
     return { useSitesStore: useSitesStoreMock };
 });
-
-import { StatusSubscriptionIndicator } from "../../components/Header/StatusSubscriptionIndicator";
 
 describe("StatusSubscriptionIndicator coverage", () => {
     beforeEach(() => {
@@ -275,10 +278,10 @@ describe("StatusSubscriptionIndicator coverage", () => {
             name: "Retry realtime listeners",
         });
         expect(retryButtonsCollection.length).toBeGreaterThan(0);
-        fireEvent.click(retryButtonsCollection[0]!);
+        fireEvent.click(arrayFirst(retryButtonsCollection)!);
 
         await waitFor(() =>
-            expect(siteStoreState.retryStatusSubscription).toHaveBeenCalled()
+            { expect(siteStoreState.retryStatusSubscription).toHaveBeenCalledWith(); }
         );
 
         expect(

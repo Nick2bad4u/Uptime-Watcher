@@ -1,18 +1,18 @@
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
+import { isDev } from "../../../electronUtils";
+import { MONITOR_TIMEOUT_BUFFER_MS } from "../../../services/monitoring/constants";
+import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
+import { logger } from "../../../utils/logger";
 
 vi.mock("node:crypto", () => ({
     randomInt: vi.fn().mockReturnValue(0),
 }));
 
 vi.unmock("../../../services/monitoring/MonitorScheduler");
-
-import type { Site } from "@shared/types";
-
-import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
-import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import { MONITOR_TIMEOUT_BUFFER_MS } from "../../../services/monitoring/constants";
-import { isDev } from "../../../electronUtils";
-import { logger } from "../../../utils/logger";
 
 vi.mock("../../../electronUtils");
 vi.mock("../../../utils/logger", () => {
@@ -112,14 +112,14 @@ describe("MonitorScheduler – comprehensive", () => {
         );
 
         const backoffPayload = backoffEvent?.[1] as
+            | undefined
             | {
                   backoffAttempt: number;
                   delayMs: number;
                   monitorId: string;
                   siteIdentifier: string;
                   timestamp: number;
-              }
-            | undefined;
+              };
         expect(backoffPayload).toMatchObject({
             backoffAttempt: 1,
             monitorId: "monitor-1",
@@ -166,12 +166,12 @@ describe("MonitorScheduler – comprehensive", () => {
             );
 
             const payload = latestBackoff?.[1] as
+                | undefined
                 | {
                       delayMs: number;
                       monitorId: string;
                       timestamp: number;
-                  }
-                | undefined;
+                  };
             expect(payload).toMatchObject({
                 monitorId: expect.any(String),
                 timestamp: FIXED_NOW,

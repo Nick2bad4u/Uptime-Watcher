@@ -56,16 +56,16 @@ export const sharedTypesNoLocalIsPlainObjectRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow local isPlainObject declarations in shared/types; use the shared typeGuards helper instead",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/shared-types-no-local-is-plain-object.md",
         },
-        schema: [],
         messages: {
             banned: "Do not define a local isPlainObject in shared/types. Import it from @shared/utils/typeGuards instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

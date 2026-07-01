@@ -25,7 +25,7 @@ export interface ToggleGroupProperties<TValue extends string> {
     readonly iconClassName: string;
     readonly labelClassName: string;
     readonly onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-    readonly options: ReadonlyArray<ToggleGroupOption<TValue>>;
+    readonly options: readonly ToggleGroupOption<TValue>[];
     readonly selectedValue: TValue;
 }
 

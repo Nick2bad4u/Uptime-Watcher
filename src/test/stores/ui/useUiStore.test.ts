@@ -3,10 +3,11 @@
  * management functionality.
  */
 
+import type { Site } from "@shared/types";
+
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
 import type {
     SiteDetailsTab,
     SiteListLayoutMode,
@@ -15,7 +16,7 @@ import type {
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
 // Mock the store utils (partial) so createPersistConfig remains available.
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -819,8 +820,8 @@ describe(useUIStore, () => {
 
             const timeRanges = [
                 "1h",
-                "24h",
                 "7d",
+                "24h",
                 "30d",
             ] as const;
 
@@ -1178,25 +1179,25 @@ describe(useUIStore, () => {
                 const getState = booleanStates[index]!;
 
                 // Should start false
-                expect(getState!()).toBeFalsy();
+                expect(getState()).toBeFalsy();
 
                 // Set true
                 act(() => {
                     action(true);
                 });
-                expect(getState!()).toBeTruthy();
+                expect(getState()).toBeTruthy();
 
                 // Set false
                 act(() => {
                     action(false);
                 });
-                expect(getState!()).toBeFalsy();
+                expect(getState()).toBeFalsy();
 
                 // Set true again
                 act(() => {
                     action(true);
                 });
-                expect(getState!()).toBeTruthy();
+                expect(getState()).toBeTruthy();
             }
         });
     });

@@ -1,7 +1,7 @@
 import type { Monitor, MonitorType } from "@shared/types";
 
 import { validateMonitorType } from "@shared/utils/validation";
-import { objectKeys } from "ts-extras";
+import { objectAssign, objectKeys  } from "ts-extras";
 
 /** Function that produces a human-readable suffix for monitor titles. */
 export type TitleSuffixFormatter = (monitor: Monitor) => string;
@@ -89,19 +89,6 @@ const customMonitorTitleSuffixFormatters = new Map<
 >();
 
 /**
- * Retrieves a suffix formatter for a given monitor type.
- */
-export function getTitleSuffixFormatter(
-    monitorType: string
-): TitleSuffixFormatter | undefined {
-    if (validateMonitorType(monitorType)) {
-        return monitorTitleSuffixFormatters[monitorType];
-    }
-
-    return customMonitorTitleSuffixFormatters.get(monitorType);
-}
-
-/**
  * Formats a title suffix for the provided monitor configuration.
  */
 export function formatTitleSuffix(monitor: Monitor): string {
@@ -116,6 +103,19 @@ export function formatTitleSuffix(monitor: Monitor): string {
     }
 
     return suffix;
+}
+
+/**
+ * Retrieves a suffix formatter for a given monitor type.
+ */
+export function getTitleSuffixFormatter(
+    monitorType: string
+): TitleSuffixFormatter | undefined {
+    if (validateMonitorType(monitorType)) {
+        return monitorTitleSuffixFormatters[monitorType];
+    }
+
+    return customMonitorTitleSuffixFormatters.get(monitorType);
 }
 
 /**
@@ -144,7 +144,7 @@ export function resetMonitorTitleSuffixFormatters(): void {
         }
     }
 
-    Object.assign(
+    objectAssign(
         monitorTitleSuffixFormatters,
         defaultMonitorTitleSuffixFormatters
     );

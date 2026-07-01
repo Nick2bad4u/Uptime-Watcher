@@ -1,9 +1,10 @@
+import type { Site } from "@shared/types";
+import type { ReactNode } from "react";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
+import { arrayAt, objectValues  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { Site } from "@shared/types";
 
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
 
@@ -14,14 +15,14 @@ const actionButtonCalls: {
     isMonitoring: boolean;
 }[] = [];
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
         <span data-testid="themed-text">{children}</span>
     ),
 }));
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: ({ selectedMonitorId, onChange }: any) => {
             monitorSelectorCalls.push({ selectedMonitorId });
@@ -40,7 +41,7 @@ vi.mock(
 );
 
 vi.mock(
-    "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => ({
         ActionButtonGroup: ({
             allMonitorsRunning,
@@ -100,7 +101,7 @@ vi.mock(
     })
 );
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
+vi.mock(import('../../../../components/Dashboard/SiteCard/SiteCardFooter'), () => ({
     SiteCardFooter: () => <div data-testid="site-card-footer" />,
 }));
 
@@ -137,7 +138,7 @@ describe(SiteCardHeader, () => {
     beforeEach(() => {
         monitorSelectorCalls.length = 0;
         actionButtonCalls.length = 0;
-        for (const fn of Object.values(baseProps.interactions)) fn.mockClear();
+        for (const fn of objectValues(baseProps.interactions)) fn.mockClear();
     });
 
     it("renders the site name in the title", () => {
@@ -155,7 +156,7 @@ describe(SiteCardHeader, () => {
         expect(baseProps.interactions.onMonitorIdChange).toHaveBeenCalledWith(
             expect.objectContaining({ target: { value: "monitor-2" } })
         );
-        expect(monitorSelectorCalls.at(-1)).toEqual({
+        expect(arrayAt(monitorSelectorCalls, -1)).toEqual({
             selectedMonitorId: "monitor-1",
         });
     });
@@ -168,7 +169,7 @@ describe(SiteCardHeader, () => {
             />
         );
 
-        expect(actionButtonCalls.at(-1)).toEqual({
+        expect(arrayAt(actionButtonCalls, -1)).toEqual({
             allMonitorsRunning: true,
             disabled: true,
             isMonitoring: true,

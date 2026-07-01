@@ -45,18 +45,16 @@ export function createHttpMonitorUiConfig(
     } = overrides;
 
     return {
-        ...(detailFormats ? { detailFormats } : {}),
+        ...(detailFormats && { detailFormats }),
         display: {
             showAdvancedMetrics: true,
             showUrl: true,
             ...display,
         },
-        ...(formatDetail ? { formatDetail } : {}),
+        ...(formatDetail && { formatDetail }),
         formatTitleSuffix: formatTitleSuffix ?? createUrlSuffixResolver(type),
-        ...(helpTexts ? { helpTexts } : {}),
-        ...(isDefined(supportsAdvancedAnalytics)
-            ? { supportsAdvancedAnalytics }
-            : {}),
-        ...(isDefined(supportsResponseTime) ? { supportsResponseTime } : {}),
+        ...(helpTexts && { helpTexts }),
+        ...(isDefined(supportsAdvancedAnalytics) && { supportsAdvancedAnalytics }),
+        ...(isDefined(supportsResponseTime) && { supportsResponseTime }),
     };
 }

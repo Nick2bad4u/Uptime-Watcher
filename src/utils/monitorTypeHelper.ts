@@ -19,18 +19,6 @@ import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
 
-function isMonitorTypeConfigArray(
-    value: unknown
-): value is MonitorTypeConfig[] {
-    return Array.isArray(value) && value.every(isMonitorTypeConfig);
-}
-
-/**
- * Frontend representation of monitor type configuration.
- */
-// MonitorTypeConfig moved to shared/types/monitorTypes to avoid circular
-// imports
-
 /**
  * Clear the monitor type cache.
  *
@@ -44,6 +32,12 @@ function isMonitorTypeConfigArray(
 export function clearMonitorTypeCache(): void {
     AppCaches.monitorTypes.clear();
 }
+
+/**
+ * Frontend representation of monitor type configuration.
+ */
+// MonitorTypeConfig moved to shared/types/monitorTypes to avoid circular
+// imports
 
 /**
  * Get all available monitor types from backend via IPC.
@@ -151,4 +145,10 @@ export async function getMonitorTypeOptions(): Promise<MonitorTypeOption[]> {
         label: config.displayName,
         value: config.type,
     }));
+}
+
+function isMonitorTypeConfigArray(
+    value: unknown
+): value is MonitorTypeConfig[] {
+    return Array.isArray(value) && value.every(isMonitorTypeConfig);
 }

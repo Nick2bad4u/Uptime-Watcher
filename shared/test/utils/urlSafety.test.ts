@@ -78,7 +78,7 @@ describe("urlSafety", () => {
 
         it("treats empty/whitespace as private", () => {
             expect(isPrivateNetworkHostname("")).toBeTruthy();
-            expect(isPrivateNetworkHostname("   ")).toBeTruthy();
+            expect(isPrivateNetworkHostname(' '.repeat(3))).toBeTruthy();
         });
     });
 
@@ -225,7 +225,7 @@ describe("urlSafety", () => {
             );
 
             expect(result.ok).toBeTruthy();
-            if (result.ok === false) {
+            if (!result.ok) {
                 throw new Error(
                     `Expected ok result, got rejection: ${result.reason}`
                 );
@@ -247,7 +247,7 @@ describe("urlSafety", () => {
         it("accepts http(s) URLs and trims whitespace", () => {
             const result = validateHttpUrlCandidate("  https://example.com  ");
             expect(result.ok).toBeTruthy();
-            if (result.ok === false) {
+            if (!result.ok) {
                 throw new Error(
                     `Expected ok result, got rejection: ${result.reason}`
                 );

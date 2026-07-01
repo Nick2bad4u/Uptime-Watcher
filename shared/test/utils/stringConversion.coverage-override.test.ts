@@ -21,11 +21,12 @@
  * ```
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - 100% Coverage Override", () => {
-    let originalTypeof: any = undefined;
+    let originalTypeof: any;
 
     beforeEach(() => {
         // Store the original typeof operator
@@ -146,10 +147,10 @@ describe("String Conversion - 100% Coverage Override", () => {
 
             // Edge cases
             { value: new Date(), expected: new Date().toISOString() },
-            { value: /regex/, expected: "/regex/" },
+            { value: /regex/v, expected: "/regex/" },
         ];
 
-        for (const [, { value, expected }] of testCases.entries()) {
+        for (const { value, expected } of testCases) {
             try {
                 const result = safeStringify(value);
                 // For objects and complex types, just ensure we get a string back

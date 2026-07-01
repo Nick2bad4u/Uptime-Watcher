@@ -848,6 +848,7 @@ storybook-static
 storybook/stories/__screenshots__/
 
 # Temp & Reports
+.tmp/
 assets/prettier-plugin-multiline-arrays/
 codeql-agent-results/
 gha-creds-*.json

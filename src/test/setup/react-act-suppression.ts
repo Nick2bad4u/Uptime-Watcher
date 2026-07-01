@@ -9,6 +9,8 @@
  */
 
 // Store original console.error
+import { arrayFirst } from "ts-extras";
+
 const originalConsoleError = console.error;
 
 /**
@@ -20,9 +22,9 @@ export function suppressReactActWarnings(): void {
         // Suppress act() warnings - these are false positives when mocks fail
         // but the real code uses proper useEffect patterns
         if (
-            typeof args[0] === "string" &&
-            args[0].includes("Warning: An update to") &&
-            args[0].includes("inside a test was not wrapped in act")
+            typeof arrayFirst(args) === "string" &&
+            arrayFirst(args).includes("Warning: An update to") &&
+            arrayFirst(args).includes("inside a test was not wrapped in act")
         ) {
             return;
         }

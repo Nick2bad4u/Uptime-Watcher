@@ -14,32 +14,34 @@
  * @file Comprehensive branch coverage tests for Settings component
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { objectAssign, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { UnknownRecord } from "type-fest";
 
 import { Settings } from "../../../components/Settings/Settings";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 import { ThemeManager } from "../../../theme/ThemeManager";
 import { themes } from "../../../theme/themes";
+import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
-import {
-    createSitesStoreMock,
-    updateSitesStoreMock,
-} from "../../utils/createSitesStoreMock";
 import {
     createSerializedBackupResult,
     createSerializedRestoreResult,
 } from "../../utils/createSerializedBackupResult";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../utils/createSitesStoreMock";
 
 type MutableSitesStore = ReturnType<typeof createSitesStoreMock>;
 
 // Mock all dependencies
-vi.mock("../../../stores/error/useErrorStore");
-vi.mock("../../../stores/settings/useSettingsStore");
+vi.mock(import('../../../stores/error/useErrorStore'));
+vi.mock(import('../../../stores/settings/useSettingsStore'));
 
 const createDefaultSaveBackup = () =>
     vi.fn(async () => ({
@@ -57,7 +59,7 @@ const sitesStoreState = createSitesStoreMock({
     restoreSqliteBackup: vi.fn(async () => createSerializedRestoreResult()),
     lastBackupMetadata: createSerializedBackupResult().metadata,
     setLastBackupMetadata: vi.fn(),
-}) as MutableSitesStore;
+});
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
@@ -80,7 +82,7 @@ const resetSitesStoreState = (): void => {
     });
 };
 
-vi.mock("../../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../../stores/sites/useSitesStore'), () => ({
     useSitesStore: <Result = typeof sitesStoreState,>(
         selector?: (state: typeof sitesStoreState) => Result,
         equality?: (a: Result, b: Result) => boolean
@@ -91,17 +93,17 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
             throw new Error("useSitesStore mock was not initialized");
         }
 
-        return hook(selector, equality) as Result | typeof sitesStoreState;
+        return hook(selector, equality);
     },
 }));
 
-vi.mock("../../../theme/useTheme");
+vi.mock(import('../../../theme/useTheme'));
 const confirmMock = vi.fn();
-vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         warn: vi.fn(),
         error: vi.fn(),
@@ -112,7 +114,7 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
@@ -120,13 +122,13 @@ describe("Settings - Branch Coverage Tests", () => {
     const setSitesStoreState = (
         overrides: Partial<typeof sitesStoreState>
     ): void => {
-        Object.assign(sitesStoreState, overrides);
+        objectAssign(sitesStoreState, overrides);
     };
 
     const mockErrorStore = {
         clearError: vi.fn(),
         isLoading: false,
-        lastError: null as null | string,
+        lastError: safeCastTo<null | string>(null),
         setError: vi.fn(),
         setLoading: vi.fn(),
     };
@@ -174,18 +176,17 @@ describe("Settings - Branch Coverage Tests", () => {
         resetSitesStoreState();
         useSitesStoreMock.mockClear();
 
-        mockErrorStore.clearError = vi.fn();
-        mockErrorStore.setError = vi.fn();
-        mockErrorStore.setLoading = vi.fn();
+        vi.spyOn(mockErrorStore, 'clearError').mockImplementation();
+        vi.spyOn(mockErrorStore, 'setError').mockImplementation();
+        vi.spyOn(mockErrorStore, 'setLoading').mockImplementation();
         mockErrorStore.isLoading = false;
         mockErrorStore.lastError = null;
 
-        mockSettingsStore.updateSettings = vi.fn();
-        mockSettingsStore.persistHistoryLimit = vi
-            .fn()
+        vi.spyOn(mockSettingsStore, 'updateSettings').mockImplementation();
+        vi.spyOn(mockSettingsStore, 'persistHistoryLimit').mockImplementation()
             .mockResolvedValue(undefined);
-        mockSettingsStore.resetSettings = vi.fn().mockResolvedValue(undefined);
-        mockSettingsStore.syncSettings = vi.fn();
+        vi.spyOn(mockSettingsStore, 'resetSettings').mockImplementation().mockResolvedValue(undefined);
+        vi.spyOn(mockSettingsStore, 'syncSettings').mockImplementation();
         mockSettingsStore.settings = {
             autoStart: false,
             historyLimit: 1000,
@@ -271,7 +272,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
+            expect(screen.queryByText(/error/iv)).not.toBeInTheDocument();
         });
     });
 
@@ -385,7 +386,7 @@ describe("Settings - Branch Coverage Tests", () => {
             fireEvent.click(soundAlertsCheckbox);
 
             // Should still call updateSettings for valid keys
-            expect(mockSettingsStore.updateSettings).toHaveBeenCalled();
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith();
         });
     });
 
@@ -506,7 +507,7 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             const backupButton = screen.getByRole("button", {
-                name: /export monitoring data/i,
+                name: /export monitoring data/iv,
             });
             fireEvent.click(backupButton);
 
@@ -587,10 +588,10 @@ describe("Settings - Branch Coverage Tests", () => {
             });
 
             await waitFor(() => {
-                expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
+                expect(mockSettingsStore.resetSettings).toHaveBeenCalledWith();
             });
 
-            expect(mockErrorStore.clearError).toHaveBeenCalled();
+            expect(mockErrorStore.clearError).toHaveBeenCalledWith();
         });
 
         it("should not reset settings when user cancels", ({
@@ -737,7 +738,7 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             const backupButton = screen.getByRole("button", {
-                name: /export monitoring data/i,
+                name: /export monitoring data/iv,
             });
             fireEvent.click(backupButton);
 
@@ -875,7 +876,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
             await user.click(closeButton);
             await waitFor(() => {
-                expect(mockOnClose).toHaveBeenCalled();
+                expect(mockOnClose).toHaveBeenCalledWith();
             });
         });
     });
@@ -910,7 +911,7 @@ describe("Settings - Branch Coverage Tests", () => {
             await user.click(syncButton);
 
             await waitFor(() => {
-                expect(mockFullSync).toHaveBeenCalled();
+                expect(mockFullSync).toHaveBeenCalledWith();
             });
         });
 
@@ -940,12 +941,12 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             const backupButton = screen.getByRole("button", {
-                name: /export monitoring data/i,
+                name: /export monitoring data/iv,
             });
             await user.click(backupButton);
 
             await waitFor(() => {
-                expect(mockSaveBackup).toHaveBeenCalled();
+                expect(mockSaveBackup).toHaveBeenCalledWith();
             });
         });
     });

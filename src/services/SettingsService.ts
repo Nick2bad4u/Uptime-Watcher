@@ -86,7 +86,7 @@ interface SettingsServiceContract {
 }
 
 /**
- * Service for managing application settings through Electron IPC.
+ * Service for managing app settings through Electron IPC.
  *
  * @remarks
  * Provides a comprehensive interface for settings operations including history
@@ -145,7 +145,7 @@ export const SettingsService: SettingsServiceContract = {
     initialize: ensureInitialized,
 
     /**
-     * Resets all application settings to their default values.
+     * Resets all app settings to their default values.
      *
      * @example
      *
@@ -212,8 +212,8 @@ export const SettingsService: SettingsServiceContract = {
         "updateHistoryLimit",
         async (api, limit: number): Promise<number> => {
             const historyRules = DEFAULT_HISTORY_LIMIT_RULES;
-            let sanitizedRequestLimit: number | undefined = undefined;
-            let requestNormalizationError: Error | undefined = undefined;
+            let sanitizedRequestLimit: number | undefined;
+            let requestNormalizationError: Error | undefined;
 
             try {
                 sanitizedRequestLimit = normalizeHistoryLimit(

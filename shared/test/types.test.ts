@@ -2,23 +2,24 @@
  * Comprehensive test suite for shared/types.ts
  *
  * Tests for validation functions and type guards that ensure type safety across
- * the application. These functions are critical for validating data integrity
+ * the app. These functions are critical for validating data integrity
  * between frontend and backend.
  *
  * @file Tests for shared type validation functions
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
+    BASE_MONITOR_TYPES,
     isComputedSiteStatus,
     isMonitorStatus,
     isSiteStatus,
-    validateMonitor,
     type Monitor,
     type MonitorStatus,
     type MonitorType,
     type SiteStatus,
-    BASE_MONITOR_TYPES,
+    validateMonitor,
 } from "../types";
 // Import namespace for function coverage validation
 import * as types from "../types";
@@ -735,7 +736,7 @@ describe(validateMonitor, () => {
             it(`should return false for missing ${field}`, () => {
                 const monitor = createValidMonitor();
                 // Use Reflect.deleteProperty to avoid dynamic delete lint error
-                Reflect.deleteProperty(monitor as any, field);
+                Reflect.deleteProperty(monitor, field);
                 expect(validateMonitor(monitor)).toBeFalsy();
             });
 
@@ -801,7 +802,7 @@ describe(validateMonitor, () => {
         monitor.responseTime = 150; // Reset
 
         // NaN is considered a number type in JavaScript, so it passes type check
-        monitor.timeout = Number.NaN;
+        monitor.timeout = NaN;
         expect(validateMonitor(monitor)).toBeTruthy();
 
         monitor.timeout = 5000; // Reset
@@ -837,8 +838,8 @@ describe("Function Coverage Validation", () => {
         // Create a valid monitor for testing validateMonitor
         const validMonitor: Partial<Monitor> = {
             id: "test",
-            type: "http" as MonitorType,
-            status: "up" as MonitorStatus,
+            type: "http",
+            status: "up",
             monitoring: true,
             responseTime: 100,
             checkInterval: 60_000,

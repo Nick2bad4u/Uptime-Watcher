@@ -63,16 +63,16 @@ export const rendererNoProcessEnvRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description: "disallow process.env access in the renderer",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-process-env.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "process.env must not be used in the renderer. Use import.meta.env (Vite) or preload/IPC for runtime config.",
         },
+        schema: [],
+        type: "problem",
     },
 };

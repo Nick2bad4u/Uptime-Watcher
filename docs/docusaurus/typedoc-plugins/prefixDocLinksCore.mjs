@@ -1,8 +1,8 @@
 // @ts-check
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- This file intentionally uses JSDoc types that trigger TSDoc warnings in this repo; disable the rule for the whole file.
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types -- This is runtime code used by a TypeDoc plugin; we use JSDoc for typing without introducing TSDoc parsing issues. */
 
-const SCHEME_RE = /^[a-zA-Z][a-zA-Z+.-]*:/u;
+
+
+const SCHEME_RE = /^[A-Za-z][+\-.A-Za-z]*:/v;
 
 /**
  * @typedef {{ marker: "`" | "~"; length: number }} FenceState
@@ -42,8 +42,8 @@ function findInlineLinkLabelOpenBracket(line, closeBracketIndex) {
         const ch = line.charAt(i);
 
         const isBracket = ch === "[" || ch === "]";
-        const escapedBracket = isBracket && isEscaped(line, i);
-        if (!escapedBracket) {
+        const isEscapedBracket = isBracket && isEscaped(line, i);
+        if (!isEscapedBracket) {
             if (ch === "]") {
                 depth += 1;
             } else if (ch === "[") {
@@ -63,7 +63,7 @@ function findInlineLinkLabelOpenBracket(line, closeBracketIndex) {
  * Prefixes bare relative Markdown file link destinations with `./` so
  * Docusaurus treats them as file paths.
  *
- * @param {string} url - The inline link destination (may contain whitespace).
+ * @param {string} URL - The inline link destination (may contain whitespace).
  */
 function prefixIfBareRelativeMarkdownFile(url) {
     const trimmedStart = url.trimStart();
@@ -85,7 +85,7 @@ function prefixIfBareRelativeMarkdownFile(url) {
         return url;
     }
 
-    // Ignore any explicit scheme (http:, https:, mailto:, vscode:, etc.).
+    // Ignore any explicit scheme (HTTP:, HTTPS:, mailto:, VS Code:, etc.).
     if (SCHEME_RE.test(trimmed)) {
         return url;
     }
@@ -98,7 +98,7 @@ function prefixIfBareRelativeMarkdownFile(url) {
         queryIndex === -1 ? beforeHash : beforeHash.slice(0, queryIndex);
 
     // Only touch markdown-file links.
-    if (!(pathname.endsWith(".md") || pathname.endsWith(".mdx"))) {
+    if (!pathname.endsWith(".md") && !pathname.endsWith(".mdx")) {
         return url;
     }
 
@@ -222,7 +222,7 @@ function splitInlineLinkDestination(payload) {
                 break;
             }
             default: {
-                if (depth === 0 && /\s/u.test(ch)) {
+                if (depth === 0 && /\s/v.test(ch)) {
                     return {
                         destination: core.slice(0, i),
                         remainder: core.slice(i),
@@ -365,14 +365,14 @@ function prefixInlineMarkdownLinksInLine(line) {
  */
 export function prefixBareMarkdownFileLinksInMarkdown(input) {
     const newline = input.includes("\r\n") ? "\r\n" : "\n";
-    const lines = input.split(/\r?\n/u);
+    const lines = input.split(/\r?\n/v);
 
     /** @type {null | FenceState} */
     let fenceState = null;
 
     const outLines = lines.map((line) => {
         // Only treat runs of a single marker character as fences.
-        const fenceMatch = /^\s*(?<marker>[`~])\k<marker>{2,}/u.exec(line);
+        const fenceMatch = /^\s*(?<marker>[`~])\k<marker>{2,}/v.exec(line);
         if (fenceMatch) {
             const [matchText] = fenceMatch;
             const run = matchText.trimStart();

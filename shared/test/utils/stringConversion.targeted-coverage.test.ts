@@ -3,7 +3,8 @@
  * targeting lines 86-89 (undefined case and default case)
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
@@ -46,8 +47,7 @@ describe("String Conversion - Targeted Coverage for Lines 86-89", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Constructor", "type");
 
-            // While we can't easily make typeof return unknown values,
-            // we can test objects that might behave unusually
+            // While we can't easily make typeof return unknown values, we can test objects that might behave unusually
 
             // Test object with unusual prototype chain
             const weirdObject = Object.create(null);

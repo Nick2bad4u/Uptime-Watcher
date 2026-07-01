@@ -2,10 +2,9 @@
  * Simple tests to improve DatabaseService coverage
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fc } from "@fast-check/vitest";
-
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock external dependencies
 vi.mock("electron", () => ({
@@ -129,11 +128,11 @@ describe("DatabaseService Coverage Tests", () => {
 
         const { Database } = await import("node-sqlite3-wasm");
         const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
             | {
                   get: ReturnType<typeof vi.fn>;
                   run: ReturnType<typeof vi.fn>;
-              }
-            | undefined;
+              };
 
         expect(dbInstance).toBeDefined();
         expect(dbInstance?.run).toHaveBeenCalledWith(
@@ -171,11 +170,11 @@ describe("DatabaseService Coverage Tests", () => {
 
         const { Database } = await import("node-sqlite3-wasm");
         const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
             | {
                   close: ReturnType<typeof vi.fn>;
                   get: ReturnType<typeof vi.fn>;
-              }
-            | undefined;
+              };
 
         service.close();
 
@@ -289,10 +288,10 @@ describe("DatabaseService Coverage Tests", () => {
             const { Database } = await import("node-sqlite3-wasm");
             const dbInstance = vi.mocked(Database).mock.results.at(-1)
                 ?.value as
+                | undefined
                 | {
                       run: ReturnType<typeof vi.fn>;
-                  }
-                | undefined;
+                  };
 
             expect(dbInstance).toBeDefined();
 
@@ -373,7 +372,7 @@ describe("DatabaseService Coverage Tests", () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.string({ minLength: 1, maxLength: 100 }).map(
-                        (s) => s.replaceAll(/["*:<>?|]/g, "_") // Remove invalid path characters
+                        (s) => s.replaceAll(/["*:<>?|]/gu, "_") // Remove invalid path characters
                     ),
                     async (mockPath) => {
                         // Mock the app.getPath to return our test path

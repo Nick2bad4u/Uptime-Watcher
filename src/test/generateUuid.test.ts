@@ -2,9 +2,10 @@
  * Tests for UUID generation utility.
  */
 
+import { fc, test } from "@fast-check/vitest";
 import { webcrypto } from "node:crypto";
+import { arrayFirst, stringSplit  } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { test, fc } from "@fast-check/vitest";
 
 import { generateUuid } from "../utils/data/generateUuid";
 
@@ -39,7 +40,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(crypto.randomUUID).toHaveBeenCalled();
+            expect(crypto.randomUUID).toHaveBeenCalledWith();
             expect(uuid).toBe("123e4567-e89b-12d3-a456-426614174000");
         });
 
@@ -52,7 +53,7 @@ describe("UUID Generation", () => {
             const uuid = generateUuid();
 
             // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-            expect(uuid).toMatch(/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/i);
+            expect(uuid).toMatch(/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/iv);
         });
     });
 
@@ -73,7 +74,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
         });
 
         it("should include timestamp in fallback", async ({
@@ -90,7 +91,7 @@ describe("UUID Generation", () => {
             const afterTime = Date.now();
 
             // Extract timestamp (before microseconds) from format: site-xxxxx-tttttttttttttmmm
-            const timestampMatch = /(?<full>\d+)$/.exec(uuid);
+            const timestampMatch = /(?<full>\d+)$/v.exec(uuid);
             expect(timestampMatch).toBeTruthy();
 
             if (timestampMatch?.groups) {
@@ -144,7 +145,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
         });
     });
 
@@ -170,8 +171,8 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(crypto.randomUUID).toHaveBeenCalled();
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+            expect(crypto.randomUUID).toHaveBeenCalledWith();
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
         });
 
         it("should handle multiple calls when randomUUID throws", async ({
@@ -187,8 +188,8 @@ describe("UUID Generation", () => {
             const uuid2 = generateUuid();
 
             expect(crypto.randomUUID).toHaveBeenCalledTimes(2);
-            expect(uuid1).toMatch(/^site-[\da-z]+-\d+$/);
-            expect(uuid2).toMatch(/^site-[\da-z]+-\d+$/);
+            expect(uuid1).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(uuid2).toMatch(/^site-[\da-z]+-\d+$/v);
             expect(uuid1).not.toBe(uuid2);
         });
 
@@ -220,7 +221,7 @@ describe("UUID Generation", () => {
                 });
 
                 const uuid = generateUuid();
-                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
             }
         });
     });
@@ -245,7 +246,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
         });
     });
 
@@ -297,11 +298,11 @@ describe("UUID Generation", () => {
 
             // All should be valid and different
             for (const id of ids) {
-                expect(id).toMatch(/^site-[\da-z]+-\d+$/);
+                expect(id).toMatch(/^site-[\da-z]+-\d+$/v);
             }
 
             // Should have different random parts (high probability)
-            const randomParts = ids.map((id) => id.split("-")[1]);
+            const randomParts = ids.map((id) => stringSplit(id, "-", 2)[1]);
             const uniqueRandomParts = new Set(randomParts);
             expect(uniqueRandomParts.size).toBeGreaterThan(1);
         });
@@ -348,7 +349,7 @@ describe("UUID Generation", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).not.toMatch(/\s/);
+            expect(uuid).not.toMatch(/\s/v);
         });
 
         it("should handle rapid successive calls with crypto", async ({
@@ -399,7 +400,7 @@ describe("UUID Generation", () => {
             // All should be valid fallback format
             for (const uuid of uuids) {
                 expect(typeof uuid).toBe("string");
-                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
             }
         });
 
@@ -416,13 +417,13 @@ describe("UUID Generation", () => {
             vi.stubGlobal("crypto", undefined);
 
             const uuid = generateUuid();
-            const parts = uuid.split("-");
+            const parts = stringSplit(uuid, "-");
 
             expect(parts).toHaveLength(3);
-            expect(parts[0]).toBe("site");
-            expect(parts[1]).toMatch(/^[\da-z]+$/);
+            expect(arrayFirst(parts)).toBe("site");
+            expect(parts[1]).toMatch(/^[\da-z]+$/v);
             expect(parts[1]?.length).toBe(12); // Two random parts of 6 chars each = 12 characters
-            expect(parts[2]).toMatch(/^\d+$/);
+            expect(parts[2]).toMatch(/^\d+$/v);
             expect(Number.parseInt(parts[2] ?? "0", 10)).toBeGreaterThan(0);
         });
     });
@@ -485,7 +486,7 @@ describe("UUID Generation", () => {
                     expect(uuid).toBe("test-uuid-123");
                 } else {
                     // Should use fallback format
-                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
                 }
             }
         );
@@ -504,7 +505,7 @@ describe("UUID Generation", () => {
                         { length: numRequests },
                         (_, i) =>
                             new Promise<string>((resolve) => {
-                                setTimeout(() => resolve(generateUuid()), i);
+                                setTimeout(() => { resolve(generateUuid()); }, i);
                             })
                     )
                 );
@@ -534,16 +535,16 @@ describe("UUID Generation", () => {
             "should handle various crypto states gracefully",
             (cryptoState) => {
                 switch (cryptoState) {
-                    case "undefined": {
-                        vi.stubGlobal("crypto", undefined);
-                        break;
-                    }
                     case "null": {
                         vi.stubGlobal("crypto", null);
                         break;
                     }
                     case "object": {
                         vi.stubGlobal("crypto", {});
+                        break;
+                    }
+                    case "undefined": {
+                        vi.stubGlobal("crypto", undefined);
                         break;
                     }
                 }
@@ -558,7 +559,7 @@ describe("UUID Generation", () => {
                     !crypto ||
                     typeof crypto.randomUUID !== "function"
                 ) {
-                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
                 }
             }
         );
@@ -570,10 +571,10 @@ describe("UUID Generation", () => {
                 vi.spyOn(Date, "now").mockReturnValue(mockNow);
 
                 const uuid = generateUuid();
-                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/);
+                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
 
                 // Extract all digits from the timestamp+microseconds part, then remove last 3 digits (microseconds)
-                const timestampMatch = /(?<full>\d+)$/.exec(uuid);
+                const timestampMatch = /(?<full>\d+)$/v.exec(uuid);
                 expect(timestampMatch).toBeTruthy();
 
                 if (timestampMatch?.groups) {

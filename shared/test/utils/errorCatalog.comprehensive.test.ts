@@ -1,7 +1,8 @@
 /**
  * Comprehensive tests for errorCatalog utilities
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
     formatErrorMessage,
     isKnownErrorMessage,
@@ -324,8 +325,8 @@ describe("errorCatalog utilities", () => {
             ];
 
             for (const message of unknownMessages) {
-                const result = isKnownErrorMessage(message);
-                expect(result).toBeFalsy();
+                const isResult = isKnownErrorMessage(message);
+                expect(isResult).toBeFalsy();
             }
         });
 
@@ -335,8 +336,8 @@ describe("errorCatalog utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = isKnownErrorMessage("");
-            expect(result).toBeFalsy();
+            const isResult = isKnownErrorMessage("");
+            expect(isResult).toBeFalsy();
         });
 
         it("should handle case sensitivity", async ({ task, annotate }) => {

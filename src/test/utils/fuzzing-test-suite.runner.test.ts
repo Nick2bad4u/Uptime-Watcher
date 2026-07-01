@@ -17,18 +17,19 @@
  * @packageDocumentation
  */
 
-import { describe, expect, beforeAll, afterAll } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import { isEmpty } from "ts-extras";
+import { afterAll, beforeAll, describe, expect } from "vitest";
 
-describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
+describe("comprehensive Fast-Check Fuzzing Test Suite", () => {
     let suiteStartTime: number;
     const coverageResults: {
-        suite: string;
-        testsRun: number;
-        propertiesChecked: number;
         edgeCasesFound: number;
         performance: { avg: number; max: number; min: number };
+        propertiesChecked: number;
+        suite: string;
+        testsRun: number;
     }[] = [];
 
     beforeAll(() => {
@@ -72,7 +73,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
         console.log("🎯 100% Fast-Check property-based test coverage achieved");
     });
 
-    describe("Fuzzing Test Suite Integration", () => {
+    describe("fuzzing Test Suite Integration", () => {
         fcTest.prop([
             fc.constantFrom(
                 "validation",
@@ -94,34 +95,10 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
 
                     // Simulate module execution based on type
                     switch (type) {
-                        case "validation": {
-                            testsRun = 45; // Number of validation fuzzing tests
-                            propertiesChecked = 200; // Properties validated
-                            edgeCasesFound = 15; // Edge cases discovered
-                            break;
-                        }
                         case "database": {
                             testsRun = 30; // Database operation tests
                             propertiesChecked = 150; // DB properties checked
                             edgeCasesFound = 8; // DB edge cases
-                            break;
-                        }
-                        case "ipc": {
-                            testsRun = 25; // IPC communication tests
-                            propertiesChecked = 120; // IPC properties
-                            edgeCasesFound = 6; // IPC edge cases
-                            break;
-                        }
-                        case "state-management": {
-                            testsRun = 35; // State management tests
-                            propertiesChecked = 180; // State properties
-                            edgeCasesFound = 12; // State edge cases
-                            break;
-                        }
-                        case "monitoring": {
-                            testsRun = 20; // Monitoring tests
-                            propertiesChecked = 100; // Monitoring properties
-                            edgeCasesFound = 5; // Monitoring edge cases
                             break;
                         }
                         case "error-handling": {
@@ -130,16 +107,40 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                             edgeCasesFound = 10; // Error edge cases (expected)
                             break;
                         }
-                        case "security": {
-                            testsRun = 25; // Security tests
-                            propertiesChecked = 130; // Security properties
-                            edgeCasesFound = 20; // Security vulnerabilities found
+                        case "ipc": {
+                            testsRun = 25; // IPC communication tests
+                            propertiesChecked = 120; // IPC properties
+                            edgeCasesFound = 6; // IPC edge cases
+                            break;
+                        }
+                        case "monitoring": {
+                            testsRun = 20; // Monitoring tests
+                            propertiesChecked = 100; // Monitoring properties
+                            edgeCasesFound = 5; // Monitoring edge cases
                             break;
                         }
                         case "performance": {
                             testsRun = 10; // Performance tests
                             propertiesChecked = 50; // Performance metrics
                             edgeCasesFound = 3; // Performance bottlenecks
+                            break;
+                        }
+                        case "security": {
+                            testsRun = 25; // Security tests
+                            propertiesChecked = 130; // Security properties
+                            edgeCasesFound = 20; // Security vulnerabilities found
+                            break;
+                        }
+                        case "state-management": {
+                            testsRun = 35; // State management tests
+                            propertiesChecked = 180; // State properties
+                            edgeCasesFound = 12; // State edge cases
+                            break;
+                        }
+                        case "validation": {
+                            testsRun = 45; // Number of validation fuzzing tests
+                            propertiesChecked = 200; // Properties validated
+                            edgeCasesFound = 15; // Edge cases discovered
                             break;
                         }
                         default: {
@@ -151,16 +152,16 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                     const executionTime = endTime - startTime;
 
                     return {
-                        success: true,
-                        module: type,
-                        testsRun,
-                        propertiesChecked,
-                        edgeCasesFound,
-                        executionTime,
                         coverage: Math.min(
                             100,
                             85 + propertiesChecked / testsRun / 10
                         ), // Simulated coverage
+                        edgeCasesFound,
+                        executionTime,
+                        module: type,
+                        propertiesChecked,
+                        success: true,
+                        testsRun,
                     };
                 },
             };
@@ -168,7 +169,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
             const result = moduleExecutor.execute(moduleType);
 
             // Property: All modules should execute successfully
-            expect(result.success).toBeTruthy();
+            expect(result.success).toBe(true);
             expect(result.module).toBe(moduleType);
 
             // Property: Execution should produce meaningful results
@@ -184,20 +185,27 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
 
             // Track results for final reporting
             coverageResults.push({
-                suite: result.module,
-                testsRun: result.testsRun,
-                propertiesChecked: result.propertiesChecked,
                 edgeCasesFound: result.edgeCasesFound,
                 performance: {
                     avg: result.executionTime,
                     max: result.executionTime * 1.2,
                     min: result.executionTime * 0.8,
                 },
+                propertiesChecked: result.propertiesChecked,
+                suite: result.module,
+                testsRun: result.testsRun,
             });
         });
 
         fcTest.prop([
             fc.record({
+                coverage: fc.double({ max: 100, min: 0 }),
+                edgeCases: fc.integer({ max: 100, min: 0 }),
+                performance: fc.record({
+                    avgTime: fc.double({ max: 1000, min: 0.1 }),
+                    maxTime: fc.double({ max: 5000, min: 1 }),
+                    memory: fc.integer({ max: 1_073_741_824, min: 1024 }), // 1KB to 1GB
+                }),
                 testType: fc.constantFrom(
                     "unit",
                     "integration",
@@ -205,13 +213,6 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                     "property",
                     "fuzzing"
                 ),
-                coverage: fc.double({ min: 0, max: 100 }),
-                performance: fc.record({
-                    avgTime: fc.double({ min: 0.1, max: 1000 }),
-                    maxTime: fc.double({ min: 1, max: 5000 }),
-                    memory: fc.integer({ min: 1024, max: 1_073_741_824 }), // 1KB to 1GB
-                }),
-                edgeCases: fc.integer({ min: 0, max: 100 }),
             }),
         ])(
             "Test quality metrics should meet fuzzing standards",
@@ -260,10 +261,10 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                         }
 
                         return {
-                            qualityScore,
                             issues,
+                            passed: isEmpty(issues),
+                            qualityScore,
                             recommendations,
-                            passed: issues.length === 0,
                         };
                     },
 
@@ -340,19 +341,19 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
         );
     });
 
-    describe("Coverage Analysis and Reporting", () => {
+    describe("coverage Analysis and Reporting", () => {
         fcTest.prop([
             fc.array(
                 fc.record({
-                    fileName: fc.string({ minLength: 1, maxLength: 100 }),
-                    linesCovered: fc.integer({ min: 0, max: 1000 }),
-                    totalLines: fc.integer({ min: 1, max: 1000 }),
-                    branchesCovered: fc.integer({ min: 0, max: 100 }),
-                    totalBranches: fc.integer({ min: 1, max: 100 }),
-                    functionsCovered: fc.integer({ min: 0, max: 50 }),
-                    totalFunctions: fc.integer({ min: 1, max: 50 }),
+                    branchesCovered: fc.integer({ max: 100, min: 0 }),
+                    fileName: fc.string({ maxLength: 100, minLength: 1 }),
+                    functionsCovered: fc.integer({ max: 50, min: 0 }),
+                    linesCovered: fc.integer({ max: 1000, min: 0 }),
+                    totalBranches: fc.integer({ max: 100, min: 1 }),
+                    totalFunctions: fc.integer({ max: 50, min: 1 }),
+                    totalLines: fc.integer({ max: 1000, min: 1 }),
                 }),
-                { minLength: 1, maxLength: 20 }
+                { maxLength: 20, minLength: 1 }
             ),
         ])(
             "Coverage reporting should provide comprehensive metrics",
@@ -360,12 +361,12 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                 const coverageReporter = {
                     generateReport: (data: typeof coverageData) => {
                         const overallMetrics = {
-                            totalLines: 0,
+                            coveredBranches: 0,
+                            coveredFunctions: 0,
                             coveredLines: 0,
                             totalBranches: 0,
-                            coveredBranches: 0,
                             totalFunctions: 0,
-                            coveredFunctions: 0,
+                            totalLines: 0,
                         };
 
                         const fileReports = data.map((file) => {
@@ -409,10 +410,10 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                             overallMetrics.coveredFunctions += functionsCovered;
 
                             return {
-                                fileName: file.fileName,
-                                lineCoverage,
                                 branchCoverage,
+                                fileName: file.fileName,
                                 functionCoverage,
+                                lineCoverage,
                                 overallCoverage:
                                     (lineCoverage +
                                         branchCoverage +
@@ -444,9 +445,9 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                         return {
                             fileReports,
                             overall: {
-                                lineCoverage: overallLineCoverage,
                                 branchCoverage: overallBranchCoverage,
                                 functionCoverage: overallFunctionCoverage,
+                                lineCoverage: overallLineCoverage,
                                 totalCoverage:
                                     (overallLineCoverage +
                                         overallBranchCoverage +
@@ -454,13 +455,13 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                                     3,
                             },
                             summary: {
-                                filesAnalyzed: data.length,
-                                totalLines: overallMetrics.totalLines,
                                 coveredLines: overallMetrics.coveredLines,
+                                filesAnalyzed: data.length,
                                 goalMet:
                                     overallLineCoverage >= 90 &&
                                     overallBranchCoverage >= 85 &&
                                     overallFunctionCoverage >= 95,
+                                totalLines: overallMetrics.totalLines,
                             },
                         };
                     },
@@ -494,6 +495,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                         report.overall.branchCoverage +
                         report.overall.functionCoverage) /
                     3;
+
                 expect(
                     Math.abs(report.overall.totalCoverage - expectedTotal)
                 ).toBeLessThan(0.01);
@@ -510,13 +512,13 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                     report.overall.branchCoverage >= 85 &&
                     report.overall.functionCoverage >= 95
                 ) {
-                    expect(report.summary.goalMet).toBeTruthy();
+                    expect(report.summary.goalMet).toBe(true);
                 }
             }
         );
     });
 
-    describe("Integration Testing", () => {
+    describe("integration Testing", () => {
         fcTest.prop([fc.constantFrom("complete-suite")])(
             "Complete fuzzing test suite should achieve target coverage",
             (_suiteType) => {
@@ -541,13 +543,13 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                                 Math.floor(secureRandomFloat() * 20) + 5; // 5-25 edge cases
 
                             return {
-                                module,
-                                testsRun: testCount,
                                 coverage,
                                 edgeCases,
-                                passed: coverage >= 85,
                                 executionTime:
                                     secureRandomFloat() * 5000 + 1000, // 1-6 seconds
+                                module,
+                                passed: coverage >= 85,
+                                testsRun: testCount,
                             };
                         });
 
@@ -562,19 +564,19 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                             (sum, r) => sum + r.edgeCases,
                             0
                         );
-                        const allPassed = results.every((r) => r.passed);
+                        const isAllPassed = results.every((r) => r.passed);
 
                         return {
                             modules: results,
                             summary: {
+                                allPassed: isAllPassed,
                                 overallCoverage,
-                                totalTests,
-                                totalEdgeCases,
-                                allPassed,
                                 targetMet:
                                     overallCoverage >= 90 &&
                                     totalEdgeCases >= 20 &&
-                                    allPassed,
+                                    isAllPassed,
+                                totalEdgeCases,
+                                totalTests,
                             },
                         };
                     },
@@ -604,7 +606,7 @@ describe("Comprehensive Fast-Check Fuzzing Test Suite", () => {
                     suiteResult.summary.totalEdgeCases >= 20 &&
                     suiteResult.summary.allPassed
                 ) {
-                    expect(suiteResult.summary.targetMet).toBeTruthy();
+                    expect(suiteResult.summary.targetMet).toBe(true);
                 }
             }
         );

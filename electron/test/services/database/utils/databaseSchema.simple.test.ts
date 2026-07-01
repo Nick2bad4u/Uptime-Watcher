@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,8 +15,9 @@
  * @tags ["test"]
  */
 
-import { describe, expect, it, vi, afterEach } from "vitest";
 import { fc } from "@fast-check/vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { createDatabaseTables } from "../../../../services/database/utils/schema/databaseSchema";
 
 describe("Database Schema", () => {
@@ -51,7 +52,7 @@ describe("Database Schema", () => {
         mockDatabase.run.mockImplementation(() => {
             throw new Error("Database error");
         });
-        expect(() => createDatabaseTables(mockDatabase as any)).toThrow(
+        expect(() => { createDatabaseTables(mockDatabase as any); }).toThrow(
             "Database error"
         );
     });
@@ -117,7 +118,7 @@ describe("Database Schema", () => {
 
                         // Act & Assert
                         expect(() =>
-                            createDatabaseTables(testDatabase as any)
+                            { createDatabaseTables(testDatabase as any); }
                         ).toThrow(errorMessage);
                     }
                 )
@@ -208,7 +209,7 @@ describe("Database Schema", () => {
                         // Act & Assert
                         if (shouldSucceed) {
                             expect(() =>
-                                createDatabaseTables(testDatabase as any)
+                                { createDatabaseTables(testDatabase as any); }
                             ).not.toThrow();
 
                             // Verify SQL commands are well-formed
@@ -218,7 +219,7 @@ describe("Database Schema", () => {
                             for (const call of allCalls) {
                                 const sqlCommand = call[0] as string;
                                 expect(sqlCommand).toMatch(
-                                    /CREATE TABLE IF NOT EXISTS/
+                                    /CREATE TABLE IF NOT EXISTS/v
                                 );
                                 expect(sqlCommand).toContain("(");
                                 expect(sqlCommand).toContain(")");
@@ -226,7 +227,7 @@ describe("Database Schema", () => {
                             }
                         } else {
                             expect(() =>
-                                createDatabaseTables(testDatabase as any)
+                                { createDatabaseTables(testDatabase as any); }
                             ).toThrow("Mock SQL error");
                         }
                     }

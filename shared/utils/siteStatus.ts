@@ -30,7 +30,7 @@ const normalizeMonitors = (
     }
 
     const nullableMonitors =
-        safeCastTo<Array<null | SiteForStatus["monitors"][number] | undefined>>(
+        safeCastTo<(null | SiteForStatus["monitors"][number] | undefined)[]>(
             monitors
         );
 
@@ -118,7 +118,7 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
     }
 
     // Get unique statuses and validate they exist
-    const statuses = Array.from(new Set(monitors.map((m) => m.status)));
+    const statuses = [...new Set(monitors.map((m) => m.status))];
 
     // Handle case where no valid statuses found
     if (isEmpty(statuses)) {

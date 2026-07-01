@@ -7,32 +7,34 @@
  * accumulated
  */
 
-import { render } from "@testing-library/react";
+import type { Site } from "@shared/types";
+
 import "@testing-library/jest-dom";
+import { render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Header } from "../../../components/Header/Header";
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
-import type { SitesStore } from "../../../stores/sites/types";
-import {
-    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
-    useUIStore,
-} from "../../../stores/ui/useUiStore";
-import type { UIStore } from "../../../stores/ui/types";
-import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
-import type { Site } from "@shared/types";
 import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "../../../stores/sites/baseTypes";
+import type { SitesStore } from "../../../stores/sites/types";
+import type { UIStore } from "../../../stores/ui/types";
+
+import { Header } from "../../../components/Header/Header";
+import { useSitesStore } from "../../../stores/sites/useSitesStore";
+import {
+    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+    useUIStore,
+} from "../../../stores/ui/useUiStore";
+import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import {
     createSerializedBackupResult,
     createSerializedRestoreResult,
 } from "../../utils/createSerializedBackupResult";
 
 // Mock all store hooks
-vi.mock("../../../stores/sites/useSitesStore");
-vi.mock("../../../stores/ui/useUiStore", async () => {
+vi.mock(import('../../../stores/sites/useSitesStore'));
+vi.mock(import('../../../stores/ui/useUiStore'), async () => {
     const actual = await vi.importActual<
         typeof import("../../../stores/ui/useUiStore")
     >("../../../stores/ui/useUiStore");
@@ -41,7 +43,7 @@ vi.mock("../../../stores/ui/useUiStore", async () => {
         useUIStore: vi.fn(),
     };
 });
-vi.mock("../../../theme/useTheme");
+vi.mock(import('../../../theme/useTheme'));
 
 const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseUIStore = vi.mocked(useUIStore);
@@ -195,7 +197,7 @@ describe("Header Assignment Operator Mutations", () => {
 
         // Mock theme hooks with proper types
         mockUseTheme.mockReturnValue({
-            availableThemes: ["light", "dark"] as any,
+            availableThemes: ["dark", "light"] as any,
             isDark: false,
             toggleTheme: vi.fn(),
             setTheme: vi.fn(),
@@ -335,7 +337,7 @@ describe("Header Assignment Operator Mutations", () => {
         expect(container).toBeInTheDocument();
 
         // We can test the aggregate function directly by checking the store calls
-        expect(mockUseSitesStore).toHaveBeenCalled();
+        expect(mockUseSitesStore).toHaveBeenCalledWith();
     });
 
     /**
@@ -442,7 +444,7 @@ describe("Header Assignment Operator Mutations", () => {
         // With mutation: site1 has 3 pending - site2 has 1 pending = 2 total pending (wrong)
 
         expect(container).toBeInTheDocument();
-        expect(mockUseSitesStore).toHaveBeenCalled();
+        expect(mockUseSitesStore).toHaveBeenCalledWith();
     });
 
     /**
@@ -559,6 +561,6 @@ describe("Header Assignment Operator Mutations", () => {
         // If paused mutation: site1(1) - site2(1) - site3(0) = 0 (wrong)
         // If pending mutation: site1(1) - site2(1) - site3(0) = 0 (wrong)
 
-        expect(mockUseSitesStore).toHaveBeenCalled();
+        expect(mockUseSitesStore).toHaveBeenCalledWith();
     });
 });

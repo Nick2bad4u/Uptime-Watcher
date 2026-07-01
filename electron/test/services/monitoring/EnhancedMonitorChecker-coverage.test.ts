@@ -6,9 +6,11 @@
  *   coverage.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EnhancedMonitorChecker } from "../../../services/monitoring/EnhancedMonitorChecker";
 import type { Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { EnhancedMonitorChecker } from "../../../services/monitoring/EnhancedMonitorChecker";
 
 describe("EnhancedMonitorChecker Coverage Tests", () => {
     let enhancedChecker: EnhancedMonitorChecker;
@@ -487,12 +489,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result = await enhancedChecker.startMonitoring(
+            const isResult = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-1"
             );
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockMonitorRepository.update).toHaveBeenCalledWith(
                 "monitor-1",
                 {
@@ -521,12 +523,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 new Error("Database error")
             );
 
-            const result = await enhancedChecker.startMonitoring(
+            const isResult = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-1"
             );
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should handle successful monitoring start with event emission", async ({
@@ -541,12 +543,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result = await enhancedChecker.startMonitoring(
+            const isResult = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-2"
             );
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:started",
                 expect.objectContaining({
@@ -573,12 +575,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 new Error("Event emission failed")
             );
 
-            const result = await enhancedChecker.startMonitoring(
+            const isResult = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-1"
             );
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
 
@@ -595,7 +597,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result = await enhancedChecker.stopMonitoring(
+            const isResult = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-1"
             );
@@ -610,7 +612,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                     monitoring: false,
                 }
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should handle successful stop with event emission", async ({
@@ -625,12 +627,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Event Processing", "type");
 
-            const result = await enhancedChecker.stopMonitoring(
+            const isResult = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-2"
             );
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockEventBus.emitTyped).toHaveBeenCalledWith(
                 "internal:monitor:stopped",
                 expect.objectContaining({
@@ -658,12 +660,12 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                 new Error("Database update failed")
             );
 
-            const result = await enhancedChecker.stopMonitoring(
+            const isResult = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-1"
             );
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
 
@@ -680,7 +682,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = await enhancedChecker.startMonitoring(
+            const isResult = await enhancedChecker.startMonitoring(
                 "test-site",
                 "monitor-3"
             );
@@ -688,7 +690,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             expect(mockOperationRegistry.cancelOperations).toHaveBeenCalledWith(
                 "monitor-3"
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should cover repository integration", async ({
@@ -703,7 +705,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = await enhancedChecker.stopMonitoring(
+            const isResult = await enhancedChecker.stopMonitoring(
                 "test-site",
                 "monitor-1"
             );
@@ -715,7 +717,7 @@ describe("EnhancedMonitorChecker Coverage Tests", () => {
                     monitoring: false,
                 }
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
     });
 

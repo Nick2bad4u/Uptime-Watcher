@@ -3,12 +3,13 @@
  * function coverage
  */
 import { describe, expect, it } from "vitest";
+
 import {
     isComputedSiteStatus,
     isMonitorStatus,
     isSiteStatus,
-    validateMonitor,
     type Monitor,
+    validateMonitor,
 } from "../types";
 
 describe("shared/types type guards and validators", () => {
@@ -423,7 +424,7 @@ describe("shared/types type guards and validators", () => {
                 activeOperations: [
                     "valid",
                     "",
-                    "   ",
+                    ' '.repeat(3),
                 ], // Contains empty/whitespace strings
             };
             expect(validateMonitor(invalidMonitor)).toBeFalsy();

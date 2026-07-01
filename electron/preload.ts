@@ -32,11 +32,11 @@ import {
     detectPlaywrightAutomation,
 } from "./preload/utils/preloadSecurity";
 
-const automationFlag = detectPlaywrightAutomation(
+const isAutomationFlag = detectPlaywrightAutomation(
     Reflect.get(globalThis, "process")
 );
 
-if (automationFlag) {
+if (isAutomationFlag) {
     Reflect.set(globalThis, "playwrightAutomation", true);
 
     contextBridge.exposeInMainWorld("playwrightAutomation", true);

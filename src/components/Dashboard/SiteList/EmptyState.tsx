@@ -3,7 +3,7 @@
  *
  * @remarks
  * This component serves as a friendly guide for users who have just installed
- * the application or cleared all their sites. It provides clear visual feedback
+ * the app or cleared all their sites. It provides clear visual feedback
  * about the empty state and implicitly suggests the next action.
  *
  * Features:

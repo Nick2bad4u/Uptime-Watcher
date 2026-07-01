@@ -1,3 +1,5 @@
+import type { UnknownRecord } from "type-fest";
+
 import { describe, expect, it } from "vitest";
 
 import { validateServicePayload } from "../../../services/utils/validation";
@@ -44,7 +46,7 @@ describe(validateServicePayload, () => {
     });
 
     it("formats invalid payload errors with issues and handles unserializable diagnostics", () => {
-        const diagnostics: Record<string, unknown> = {
+        const diagnostics: UnknownRecord = {
             siteIdentifier: "site-1",
         };
         diagnostics["self"] = diagnostics;
@@ -71,7 +73,7 @@ describe(validateServicePayload, () => {
                     diagnostics,
                 }
             )
-        ).toThrow(/returned invalid payload/);
+        ).toThrow(/returned invalid payload/v);
 
         try {
             validateServicePayload(
@@ -86,7 +88,7 @@ describe(validateServicePayload, () => {
         } catch (error: unknown) {
             expect(error).toBeInstanceOf(Error);
 
-            const message = String((error as Error).message);
+            const message = (error as Error).message;
             expect(message).toContain("missing");
             expect(message).toContain("diagnostics=[unserializable]");
         }

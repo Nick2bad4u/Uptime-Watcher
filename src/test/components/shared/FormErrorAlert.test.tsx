@@ -4,14 +4,17 @@
  * @file Comprehensive tests for FormErrorAlert component
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type {
     ButtonHTMLAttributes,
     HTMLAttributes,
     PropsWithChildren,
 } from "react";
+
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { stringSplit } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     FormErrorAlert,
     type FormErrorAlertProperties,
@@ -24,11 +27,11 @@ type ThemedBoxMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({ children, className, variant }: ThemedBoxMockProperties) => (
         <div
-            data-testid="themed-box"
             className={className}
+            data-testid="themed-box"
             data-variant={variant}
         >
             {children}
@@ -43,9 +46,9 @@ type ThemedTextMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock("../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children, size, variant }: ThemedTextMockProperties) => (
-        <span data-testid="themed-text" data-size={size} data-variant={variant}>
+        <span data-size={size} data-testid="themed-text" data-variant={variant}>
             {children}
         </span>
     ),
@@ -58,7 +61,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         className,
@@ -68,11 +71,11 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
         ...props
     }: ThemedButtonMockProperties) => (
         <button
-            data-testid="themed-button"
             className={className}
-            onClick={onClick}
             data-size={size}
+            data-testid="themed-button"
             data-variant={variant}
+            onClick={onClick}
             {...props}
         >
             {children}
@@ -370,7 +373,7 @@ describe(FormErrorAlert, () => {
             const themedBox = screen.getByTestId("themed-box");
             expect(themedBox).toHaveClass("error-alert");
             // Empty className should not add empty class, just the base class
-            expect(themedBox.className.split(" ")).toEqual(["error-alert"]);
+            expect(stringSplit(themedBox.className, " ")).toEqual(["error-alert"]);
         });
 
         it("should handle undefined className", ({ task, annotate }) => {
@@ -405,7 +408,7 @@ describe(FormErrorAlert, () => {
             );
 
             const themedBox = screen.getByTestId("themed-box");
-            expect(themedBox.className).not.toMatch(/^\s|\s$/); // No leading/trailing whitespace
+            expect(themedBox.className).not.toMatch(/^\s|\s$/v); // No leading/trailing whitespace
             expect(themedBox).toHaveClass("error-alert", "custom-error");
         });
     });
@@ -871,10 +874,10 @@ describe(FormErrorAlert, () => {
 
             render(
                 <FormErrorAlert
-                    error="Integration test error"
-                    onClearError={mockOnClearError}
-                    isDark={true}
                     className="integration-test"
+                    error="Integration test error"
+                    isDark={true}
+                    onClearError={mockOnClearError}
                 />
             );
 

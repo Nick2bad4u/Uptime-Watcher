@@ -3,7 +3,7 @@
  * resolve the "No test suite found" error
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("useSitesStore - Comprehensive Tests", () => {
     it("should be a placeholder test", async ({ task, annotate }) => {

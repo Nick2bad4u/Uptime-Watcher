@@ -3,7 +3,7 @@
  * integration works correctly
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("Final Coverage Analysis", () => {
     it("should verify new store integration", ({ task, annotate }) => {

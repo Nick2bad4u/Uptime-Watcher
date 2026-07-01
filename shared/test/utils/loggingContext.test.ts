@@ -20,7 +20,7 @@ describe("logging context helpers", () => {
 
         expect(context).toBeDefined();
         expect(context?.correlationId).toHaveLength(16);
-        expect(context?.siteHash).toMatch(/^[a-f0-9]{8}$/u);
+        expect(context?.siteHash).toMatch(/^[0-9a-f]{8}$/v);
         expect(remaining).toEqual([extraPayload]);
     });
 

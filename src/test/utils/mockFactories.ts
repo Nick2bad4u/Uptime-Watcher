@@ -3,7 +3,7 @@
  *
  * @remarks
  * This module provides factory functions for creating mock data objects used in
- * testing. The mock objects are designed to match the actual application type
+ * testing. The mock objects are designed to match the actual app type
  * definitions while providing sensible defaults that can be easily overridden
  * for specific test scenarios.
  *
@@ -38,10 +38,9 @@
  * @packageDocumentation
  */
 
-import { vi, type Mock } from "vitest";
+import type { MonitorStatus, MonitorType, StatusHistory } from "@shared/types";
 import type { PartialDeep, SetOptional } from "type-fest";
 
-import type { MonitorStatus, MonitorType, StatusHistory } from "@shared/types";
 import {
     monitorIdArbitrary,
     sampleOne,
@@ -49,46 +48,8 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
-
-/**
- * Create a strongly typed Vitest mock for a given function signature.
- *
- * @typeParam Fn - Function signature the mock should adhere to.
- *
- * @param implementation - Optional implementation executed by the mock.
- *
- * @returns A Vitest mock constrained to the supplied signature.
- */
-export function createMockFunction<Fn extends (...args: any[]) => any>(
-    implementation?: Fn
-): Mock<Fn> {
-    if (implementation !== undefined) {
-        return vi.fn<Fn>(implementation);
-    }
-
-    return vi.fn<Fn>();
-}
-
-/**
- * Complete site interface for testing purposes.
- *
- * @remarks
- * Represents a site with all required properties for comprehensive testing.
- * This interface includes the core site properties used throughout the
- * application.
- *
- * @public
- */
-export interface CompleteSite {
-    /** Unique identifier for the site */
-    identifier: string;
-    /** Whether the site is actively being monitored */
-    monitoring: boolean;
-    /** Array of monitors associated with this site */
-    monitors: CompleteMonitor[];
-    /** Human-readable name for the site */
-    name: string;
-}
+import { objectAssign } from "ts-extras";
+import { type Mock, vi } from "vitest";
 
 /**
  * Complete monitor interface for testing purposes.
@@ -132,6 +93,46 @@ export interface CompleteMonitor {
 }
 
 /**
+ * Complete site interface for testing purposes.
+ *
+ * @remarks
+ * Represents a site with all required properties for comprehensive testing.
+ * This interface includes the core site properties used throughout the
+ * app.
+ *
+ * @public
+ */
+export interface CompleteSite {
+    /** Unique identifier for the site */
+    identifier: string;
+    /** Whether the site is actively being monitored */
+    monitoring: boolean;
+    /** Array of monitors associated with this site */
+    monitors: CompleteMonitor[];
+    /** Human-readable name for the site */
+    name: string;
+}
+
+/**
+ * Create a strongly typed Vitest mock for a given function signature.
+ *
+ * @typeParam Fn - Function signature the mock should adhere to.
+ *
+ * @param implementation - Optional implementation executed by the mock.
+ *
+ * @returns A Vitest mock constrained to the supplied signature.
+ */
+export function createMockFunction<Fn extends (...args: any[]) => any>(
+    implementation?: Fn
+): Mock<Fn> {
+    if (implementation !== undefined) {
+        return vi.fn<Fn>(implementation);
+    }
+
+    return vi.fn<Fn>();
+}
+
+/**
  * Creates a mock monitor object with default values using deep partial type
  * safety.
  *
@@ -162,7 +163,7 @@ export const createMockMonitorDeep = (
     overrides: PartialDeep<CompleteMonitor> = {}
 ): CompleteMonitor => {
     const base = createMockMonitor();
-    return Object.assign(base, overrides) as CompleteMonitor;
+    return objectAssign(base, overrides);
 };
 
 /**
@@ -197,16 +198,16 @@ export const createMockMonitorOptional = (
 export const createMockMonitor = (
     overrides: Partial<CompleteMonitor> = {}
 ): CompleteMonitor => ({
+    checkInterval: 300_000,
+    history: [],
     id: sampleOne(monitorIdArbitrary),
+    monitoring: true,
+    responseTime: 150,
+    retryAttempts: 3,
+    status: "up",
+    timeout: 30_000,
     type: "http",
     url: sampleOne(siteUrlArbitrary),
-    checkInterval: 300_000,
-    timeout: 30_000,
-    retryAttempts: 3,
-    monitoring: true,
-    history: [],
-    status: "up",
-    responseTime: 150,
     ...overrides,
 });
 
@@ -244,8 +245,8 @@ export const createMockSite = (
     overrides: Partial<CompleteSite> = {}
 ): CompleteSite => ({
     identifier: sampleOne(siteIdentifierArbitrary),
-    name: sampleOne(siteNameArbitrary),
     monitoring: true,
     monitors: [createMockMonitor()],
+    name: sampleOne(siteNameArbitrary),
     ...overrides,
 });

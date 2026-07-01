@@ -4,7 +4,7 @@
  * @module IpcTypes
  *
  * @file Comprehensive tests for the IPC types and interfaces in the Uptime
- *   Watcher application.
+ *   Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,11 +15,12 @@
  * @tags ["test", "ipc", "types", "interfaces"]
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import type {
     IpcHandlerConfig,
-    IpcResponse,
     IpcParameterValidator,
+    IpcResponse,
 } from "../../../services/ipc/types.js";
 
 describe("IPC Types", () => {

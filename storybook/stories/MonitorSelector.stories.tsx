@@ -15,8 +15,8 @@ const baseMonitors: Monitor[] = [
         url: "https://status.example.com",
     }),
     createMockMonitor({
-        id: "monitor-port",
         host: "api.example.com",
+        id: "monitor-port",
         monitoring: true,
         port: 8443,
         responseTime: 130,

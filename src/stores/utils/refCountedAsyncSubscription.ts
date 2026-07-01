@@ -80,8 +80,8 @@ export function createRefCountedAsyncSubscription(
     const { onCleanupError, onReady, onSetupError, onStarted, start } = options;
 
     let refCount = 0;
-    let cleanup: (() => void) | undefined = undefined;
-    let pending: Promise<void> | undefined = undefined;
+    let cleanup: (() => void) | undefined;
+    let pending: Promise<void> | undefined;
 
     const safeCleanup = (): void => {
         if (!isDefined(cleanup)) {

@@ -15,7 +15,7 @@ import { isRecord } from "./typeHelpers";
  * - Everything else falls back to {@link ERROR_CATALOG.system.UNKNOWN_ERROR}.
  */
 export function getUserFacingErrorDetail(error: unknown): string {
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         const normalized = normalizeLogValue(error.message);
         return typeof normalized === "string" ? normalized : error.message;
     }

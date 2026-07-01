@@ -7,8 +7,9 @@
  * safe in environments without `matchMedia` support.
  */
 
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { safeCastTo } from "ts-extras";
 
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 
@@ -20,13 +21,13 @@ describe(usePrefersReducedMotion, () => {
     afterEach(() => {
         // Restore any overridden matchMedia implementation between tests.
         (
-            window as { matchMedia: typeof originalMatchMedia | undefined }
+            safeCastTo<{ matchMedia: typeof originalMatchMedia | undefined }>(window)
         ).matchMedia = originalMatchMedia;
         vi.restoreAllMocks();
     });
 
     it("returns false when matchMedia is unavailable", () => {
-        (window as { matchMedia?: unknown }).matchMedia = undefined;
+        (globalThis as { matchMedia?: unknown }).matchMedia = undefined;
 
         const { result } = renderHook(() => usePrefersReducedMotion());
 
@@ -36,8 +37,7 @@ describe(usePrefersReducedMotion, () => {
     it("subscribes to media query changes and updates state", async () => {
         let changeListener: ChangeListener;
 
-        (window as { matchMedia: unknown }).matchMedia = vi
-            .fn()
+        vi.spyOn(window as { matchMedia: typeof window.matchMedia }, "matchMedia")
             .mockImplementation((query: string): MediaQueryList => {
                 const mediaQueryList: MediaQueryList = {
                     matches: false,
@@ -51,9 +51,7 @@ describe(usePrefersReducedMotion, () => {
                             type === "change" &&
                             typeof listener === "function"
                         ) {
-                            changeListener = listener as (
-                                event: MediaQueryListEvent
-                            ) => void;
+                            changeListener = listener;
                         }
                     },
                     removeEventListener: () => {
@@ -90,8 +88,7 @@ describe(usePrefersReducedMotion, () => {
     });
 
     it("falls back gracefully when addEventListener is not available", () => {
-        (window as { matchMedia: unknown }).matchMedia = vi
-            .fn()
+        vi.spyOn(window as { matchMedia: typeof window.matchMedia }, "matchMedia")
             .mockImplementation(
                 (query: string): MediaQueryList =>
                     ({

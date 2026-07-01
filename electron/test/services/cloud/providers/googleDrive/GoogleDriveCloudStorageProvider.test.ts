@@ -1,7 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
-import { GoogleDriveCloudStorageProvider } from "@electron/services/cloud/providers/googleDrive/GoogleDriveCloudStorageProvider";
 import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
+import { GoogleDriveCloudStorageProvider } from "@electron/services/cloud/providers/googleDrive/GoogleDriveCloudStorageProvider";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const googleDriveClientMocks = vi.hoisted(() => {
     const driveStub = {

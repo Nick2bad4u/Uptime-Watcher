@@ -3,18 +3,18 @@
  * ensure coverage tracking
  */
 
-import { describe, expect, it } from "vitest";
 import {
+    type HistoryRow,
     isValidHistoryRow,
     isValidMonitorRow,
     isValidSettingsRow,
     isValidSiteRow,
-    safeGetRowProperty,
-    type HistoryRow,
     type MonitorRow,
+    safeGetRowProperty,
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
+import { describe, expect, it } from "vitest";
 
 describe("Shared Database Types - Backend Coverage", () => {
     describe(isValidHistoryRow, () => {
@@ -108,7 +108,7 @@ describe("Shared Database Types - Backend Coverage", () => {
             const invalidRow = {
                 monitorId: "test",
                 status: "up",
-                timestamp: Number.NaN,
+                timestamp: NaN,
             };
 
             expect(isValidHistoryRow(invalidRow)).toBeFalsy();
@@ -312,7 +312,7 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(isValidSiteRow({ identifier: null })).toBeFalsy();
             expect(isValidSiteRow({ identifier: 123 })).toBeFalsy();
             expect(isValidSiteRow({ identifier: "" })).toBeFalsy();
-            expect(isValidSiteRow({ identifier: "   " })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: ' '.repeat(3) })).toBeFalsy();
         });
     });
     describe(safeGetRowProperty, () => {

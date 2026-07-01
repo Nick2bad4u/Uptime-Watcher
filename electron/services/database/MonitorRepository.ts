@@ -179,8 +179,8 @@ export class MonitorRepository {
      */
     public async bulkCreate(
         siteIdentifier: string,
-        monitors: Array<Site["monitors"][0]>
-    ): Promise<Array<Site["monitors"][0]>> {
+        monitors: Site["monitors"][0][]
+    ): Promise<Site["monitors"][0][]> {
         assertValidSiteIdentifier(
             siteIdentifier,
             "MonitorRepository.bulkCreate"
@@ -189,7 +189,7 @@ export class MonitorRepository {
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic bulk create operation
-                const createdMonitors: Array<Site["monitors"][0]> = [];
+                const createdMonitors: Site["monitors"][0][] = [];
 
                 await this.databaseService.executeTransaction((db) => {
                     for (const monitor of monitors) {
@@ -347,9 +347,9 @@ export class MonitorRepository {
         return withDatabaseOperation(
             () =>
                 this.databaseService.executeTransaction((db) => {
-                    const result = this.deleteInternal(db, monitorId);
+                    const isResult = this.deleteInternal(db, monitorId);
 
-                    if (result) {
+                    if (isResult) {
                         if (isDev()) {
                             logger.debug(
                                 `[MonitorRepository] Deleted monitor with id: ${monitorId}`
@@ -361,7 +361,7 @@ export class MonitorRepository {
                         );
                     }
 
-                    return Promise.resolve(result);
+                    return Promise.resolve(isResult);
                 }),
             "monitor-delete",
             undefined,
@@ -538,7 +538,7 @@ export class MonitorRepository {
      *
      * @throws Error if the database operation fails.
      */
-    public async getAllMonitorIds(): Promise<Array<{ id: number | string }>> {
+    public async getAllMonitorIds(): Promise<{ id: number | string }[]> {
         return withDatabaseOperation(
             () =>
                 Promise.resolve(

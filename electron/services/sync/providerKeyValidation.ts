@@ -15,76 +15,6 @@ const OPS_PREFIX = "sync/devices" as const;
 const MAX_SYNC_KEY_BYTES = 2048;
 
 /**
- * Validates a persisted cloud sync device identifier.
- *
- * @remarks
- * Keeps historical error messages stable so existing tests and telemetry
- * comparisons do not regress.
- */
-export function assertValidSyncDeviceId(deviceId: string): void {
-    // Keep the historical TypeError for non-string values (even though call
-    // sites are typed as string).
-    if (typeof deviceId !== "string") {
-        throw new TypeError("deviceId must be a non-empty string");
-    }
-
-    const error = getPersistedDeviceIdValidationError(deviceId);
-    if (error !== null) {
-        throw new Error(error);
-    }
-}
-
-/**
- * Asserts that a provider object key is safe and canonical.
- *
- * @remarks
- * Provider keys are treated as logical identifiers, not file paths or URLs.
- * This rejects traversal segments, control characters, URL-like tokens, and
- * other malformed key patterns.
- */
-export function assertSafeProviderKey(key: string): void {
-    if (typeof key !== "string" || key.trim().length === 0) {
-        throw new Error("Key must be a non-empty string");
-    }
-
-    if (Buffer.byteLength(key, "utf8") > MAX_SYNC_KEY_BYTES) {
-        throw new Error(`Invalid key: exceeds ${MAX_SYNC_KEY_BYTES} bytes`);
-    }
-
-    // Provider keys are always POSIX-style.
-    if (key.includes("\\")) {
-        throw new Error("Invalid key: backslashes are not allowed");
-    }
-
-    if (hasAsciiControlCharacters(key)) {
-        throw new Error("Invalid key: control characters are not allowed");
-    }
-
-    if (key.startsWith("/")) {
-        throw new Error("Invalid key: absolute keys are not allowed");
-    }
-
-    // Treat provider keys as logical identifiers, not OS paths or URLs.
-    if (key.includes("://")) {
-        throw new Error("Invalid key: URL-like keys are not allowed");
-    }
-
-    if (key.includes(":")) {
-        throw new Error("Invalid key: ':' tokens are not allowed");
-    }
-
-    const segments = stringSplit(key, "/");
-    if (
-        segments.some(
-            (segment) =>
-                segment.length === 0 || segment === "." || segment === ".."
-        )
-    ) {
-        throw new Error("Invalid key: traversal segments are not allowed");
-    }
-}
-
-/**
  * Asserts that a cloud sync operation object key matches canonical format.
  *
  * @remarks
@@ -144,14 +74,52 @@ export function assertOpsObjectKey(key: string): void {
 }
 
 /**
- * Returns true when a cloud sync operation key is valid.
+ * Asserts that a provider object key is safe and canonical.
+ *
+ * @remarks
+ * Provider keys are treated as logical identifiers, not file paths or URLs.
+ * This rejects traversal segments, control characters, URL-like tokens, and
+ * other malformed key patterns.
  */
-export function isValidOpsObjectKey(key: string): boolean {
-    try {
-        assertOpsObjectKey(key);
-        return true;
-    } catch {
-        return false;
+export function assertSafeProviderKey(key: string): void {
+    if (typeof key !== "string" || key.trim().length === 0) {
+        throw new Error("Key must be a non-empty string");
+    }
+
+    if (Buffer.byteLength(key, "utf8") > MAX_SYNC_KEY_BYTES) {
+        throw new Error(`Invalid key: exceeds ${MAX_SYNC_KEY_BYTES} bytes`);
+    }
+
+    // Provider keys are always POSIX-style.
+    if (key.includes("\\")) {
+        throw new Error("Invalid key: backslashes are not allowed");
+    }
+
+    if (hasAsciiControlCharacters(key)) {
+        throw new Error("Invalid key: control characters are not allowed");
+    }
+
+    if (key.startsWith("/")) {
+        throw new Error("Invalid key: absolute keys are not allowed");
+    }
+
+    // Treat provider keys as logical identifiers, not OS paths or URLs.
+    if (key.includes("://")) {
+        throw new Error("Invalid key: URL-like keys are not allowed");
+    }
+
+    if (key.includes(":")) {
+        throw new Error("Invalid key: ':' tokens are not allowed");
+    }
+
+    const segments = stringSplit(key, "/");
+    if (
+        segments.some(
+            (segment) =>
+                segment.length === 0 || segment === "." || segment === ".."
+        )
+    ) {
+        throw new Error("Invalid key: traversal segments are not allowed");
     }
 }
 
@@ -190,5 +158,37 @@ export function assertSnapshotKey(key: string): void {
 
     if (!fileName || !isValidSnapshotFileName(fileName)) {
         throw new Error(`Invalid snapshot key: ${key}`);
+    }
+}
+
+/**
+ * Validates a persisted cloud sync device identifier.
+ *
+ * @remarks
+ * Keeps historical error messages stable so existing tests and telemetry
+ * comparisons do not regress.
+ */
+export function assertValidSyncDeviceId(deviceId: string): void {
+    // Keep the historical TypeError for non-string values (even though call
+    // sites are typed as string).
+    if (typeof deviceId !== "string") {
+        throw new TypeError("deviceId must be a non-empty string");
+    }
+
+    const error = getPersistedDeviceIdValidationError(deviceId);
+    if (error !== null) {
+        throw new Error(error);
+    }
+}
+
+/**
+ * Returns true when a cloud sync operation key is valid.
+ */
+export function isValidOpsObjectKey(key: string): boolean {
+    try {
+        assertOpsObjectKey(key);
+        return true;
+    } catch {
+        return false;
     }
 }

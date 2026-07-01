@@ -1,5 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Monitor } from "@shared/types";
+
+import { sleepUnref } from "@shared/utils/abortUtils";
+import { resolve4 } from "node:dns/promises";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import after mocking
+import { DnsMonitor } from "../services/monitoring/DnsMonitor";
 
 vi.mock("@shared/utils/abortUtils", async () => {
     const actual = await vi.importActual<
@@ -75,12 +81,6 @@ vi.mock("node:dns/promises", () => ({
         ])
     ),
 }));
-
-// Import after mocking
-import { DnsMonitor } from "../services/monitoring/DnsMonitor";
-
-import { sleepUnref } from "@shared/utils/abortUtils";
-import { resolve4 } from "node:dns/promises";
 
 function createTestMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {

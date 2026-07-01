@@ -6,14 +6,14 @@ import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 
 const meta: Meta<typeof ThemedCheckbox> = {
-    component: ThemedCheckbox,
     args: {
-        checked: false,
         "aria-label": "Enable alerts",
+        checked: false,
     },
     argTypes: {
         onChange: { action: "change" },
     },
+    component: ThemedCheckbox,
     parameters: {
         layout: "centered",
     },
@@ -30,7 +30,7 @@ const CheckboxWithState = (args: ThemedCheckboxProps): ReactElement => {
     const [isChecked, setIsChecked] = useState(checked);
 
     return (
-        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <label style={{ alignItems: "center", display: "flex", gap: "0.5rem" }}>
             <ThemedCheckbox
                 {...rest}
                 checked={isChecked}
@@ -50,12 +50,12 @@ export const Basic: Story = {
 
 export const Disabled: Story = {
     args: {
+        "aria-label": "Subscription locked",
         checked: true,
         disabled: true,
-        "aria-label": "Subscription locked",
     },
     render: (args) => (
-        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <label style={{ alignItems: "center", display: "flex", gap: "0.5rem" }}>
             <ThemedCheckbox {...args} />
             <ThemedText variant="secondary">Requires Pro plan</ThemedText>
         </label>

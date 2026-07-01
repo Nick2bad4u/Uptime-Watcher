@@ -3,13 +3,15 @@
  * types work correctly.
  */
 
+import type { Site } from "@shared/types";
+
 import { describe, expect, it } from "vitest";
+
 import type {
-    MonitorCheckResult,
     IMonitorService,
+    MonitorCheckResult,
     MonitorServiceConfig,
 } from "../services/monitoring/types";
-import type { Site } from "@shared/types";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult interface", () => {
@@ -85,17 +87,11 @@ describe("Monitoring Types", () => {
 
             // This is a type check to ensure the interface compiles correctly
             const mockService: IMonitorService = {
-                async check(
-                    monitor: Site["monitors"][0]
-                ): Promise<MonitorCheckResult> {
-                    return {
+                check: async (monitor: Site["monitors"][0]): Promise<MonitorCheckResult> => ({
                         status: monitor.monitoring ? "up" : "down",
                         responseTime: 100,
-                    };
-                },
-                getType(): Site["monitors"][0]["type"] {
-                    return "http";
-                },
+                    }),
+                getType: (): Site["monitors"][0]["type"] => "http",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>
                 ): void {
@@ -130,18 +126,12 @@ describe("Monitoring Types", () => {
             };
 
             const httpService: IMonitorService = {
-                async check(
-                    monitor: Site["monitors"][0]
-                ): Promise<MonitorCheckResult> {
-                    return {
+                check: async (monitor: Site["monitors"][0]): Promise<MonitorCheckResult> => ({
                         status: monitor.url ? "up" : "down",
                         responseTime: 150,
                         details: monitor.url ?? "No URL provided",
-                    };
-                },
-                getType(): Site["monitors"][0]["type"] {
-                    return "http";
-                },
+                    }),
+                getType: (): Site["monitors"][0]["type"] => "http",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>
                 ): void {
@@ -180,20 +170,14 @@ describe("Monitoring Types", () => {
             };
 
             const portService: IMonitorService = {
-                async check(
-                    monitor: Site["monitors"][0]
-                ): Promise<MonitorCheckResult> {
-                    return {
+                check: async (monitor: Site["monitors"][0]): Promise<MonitorCheckResult> => ({
                         status: monitor.host && monitor.port ? "up" : "down",
                         responseTime: 50,
                         details: monitor.port
                             ? String(monitor.port)
                             : "No port provided",
-                    };
-                },
-                getType(): Site["monitors"][0]["type"] {
-                    return "port";
-                },
+                    }),
+                getType: (): Site["monitors"][0]["type"] => "port",
                 updateConfig: function (
                     _config: Partial<MonitorServiceConfig>
                 ): void {

@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { SETTINGS_CHANNELS } from "@shared/types/preload";
 import { ipcRenderer } from "electron";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { settingsApi } from "../../../preload/domains/settingsApi";
-import { SETTINGS_CHANNELS } from "@shared/types/preload";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -68,7 +68,7 @@ describe("settingsApi", () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
         await expect(settingsApi.getHistoryLimit()).rejects.toThrow(
-            /ipc operation failed/i
+            /ipc operation failed/iv
         );
     });
 

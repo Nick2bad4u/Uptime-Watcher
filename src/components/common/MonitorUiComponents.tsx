@@ -71,10 +71,10 @@ export function ConditionalResponseTime({
 
             const checkSupport = async (): Promise<void> => {
                 try {
-                    const supports =
+                    const isSupports =
                         await checkSupportsResponseTime(monitorType);
                     if (!isCancelled) {
-                        setSupportsResponseTime(supports);
+                        setSupportsResponseTime(isSupports);
                         setIsLoading(false);
                     }
                 } catch (error) {

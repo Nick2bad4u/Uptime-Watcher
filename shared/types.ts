@@ -125,7 +125,7 @@ export type StatusHistoryStatus = StatusHistoryTuple[number];
 export type MonitorStatus = MonitorStatusTuple[number];
 
 /**
- * HTTP method types supported by the application.
+ * HTTP method types supported by the app.
  *
  * @remarks
  * Used for HTTP monitor configurations and requests.
@@ -143,20 +143,20 @@ export type HttpMethod = "DELETE" | "GET" | "HEAD" | "POST" | "PUT";
  * @public
  */
 export const BASE_MONITOR_TYPES = [
+    "cdn-edge-consistency",
+    "dns",
     "http",
-    "http-keyword",
-    "http-status",
     "http-header",
     "http-json",
+    "http-keyword",
     "http-latency",
-    "port",
+    "http-status",
     "ping",
-    "dns",
+    "port",
+    "replication",
+    "server-heartbeat",
     "ssl",
     "websocket-keepalive",
-    "server-heartbeat",
-    "replication",
-    "cdn-edge-consistency",
 ] as const;
 
 /**
@@ -333,7 +333,7 @@ export interface MonitorFieldDefinition {
     /** Field name (matches monitor property) */
     name: string;
     /** Options for select fields */
-    options?: Array<{ label: string; value: string }>;
+    options?: { label: string; value: string }[];
     /** Placeholder text */
     placeholder?: string;
     /** Whether field is required */
@@ -372,10 +372,10 @@ export interface Site {
  * @public
  */
 export interface SiteForStatus {
-    monitors: Array<{
+    monitors: {
         monitoring: boolean;
         status: MonitorStatus;
-    }>;
+    }[];
 }
 
 /**

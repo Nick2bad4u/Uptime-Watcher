@@ -2,18 +2,21 @@
  * @file Behavioral coverage tests for `SiteTableRow` interaction handlers.
  */
 
+import type { Site } from "@shared/types";
 import type { ReactNode } from "react";
+import type { UnknownRecord } from "type-fest";
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import { SiteTableRow } from "../../components/Dashboard/SiteList/SiteTableRow";
 
 const useSiteState = vi.hoisted(() => ({
     factory: vi.fn(),
 }));
 
-vi.mock("../../hooks/site/useSite", () => ({
+vi.mock(import('../../hooks/site/useSite'), () => ({
     useSite: (site: Site) => useSiteState.factory(site),
 }));
 
@@ -23,7 +26,7 @@ const marqueeTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../components/common/MarqueeText/MarqueeText", () => ({
+vi.mock(import('../../components/common/MarqueeText/MarqueeText'), () => ({
     MarqueeText: marqueeTextMock.component,
 }));
 
@@ -33,24 +36,24 @@ const themedTextMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/components/ThemedText", () => ({
+vi.mock(import('../../theme/components/ThemedText'), () => ({
     ThemedText: themedTextMock.component,
 }));
 
 const statusBadgeMock = vi.hoisted(() => ({
-    props: [] as Record<string, unknown>[],
-    component: (props: Record<string, unknown>) => {
+    props: safeCastTo<UnknownRecord[]>([]),
+    component: (props: UnknownRecord) => {
         statusBadgeMock.props.push(props);
         return <div data-testid="status-badge" />;
     },
 }));
 
-vi.mock("../../components/common/StatusBadge", () => ({
+vi.mock(import('../../components/common/StatusBadge'), () => ({
     StatusBadge: statusBadgeMock.component,
 }));
 
 const monitorSelectorMock = vi.hoisted(() => ({
-    props: [] as Record<string, unknown>[],
+    props: safeCastTo<UnknownRecord[]>([]),
     component: (props: {
         monitors: unknown;
         onChange: (event: { target: { value: string } }) => void;
@@ -61,7 +64,7 @@ const monitorSelectorMock = vi.hoisted(() => ({
             <button
                 data-testid="monitor-selector"
                 onClick={() =>
-                    props.onChange({ target: { value: "monitor-2" } })
+                    { props.onChange({ target: { value: "monitor-2" } }); }
                 }
                 type="button"
             >
@@ -72,21 +75,21 @@ const monitorSelectorMock = vi.hoisted(() => ({
 }));
 
 vi.mock(
-    "../../components/Dashboard/SiteCard/components/MonitorSelector",
+    import('../../components/Dashboard/SiteCard/components/MonitorSelector'),
     () => ({
         MonitorSelector: monitorSelectorMock.component,
     })
 );
 
 const actionButtonGroupMock = vi.hoisted(() => ({
-    props: [] as Record<string, unknown>[],
+    props: safeCastTo<UnknownRecord[]>([]),
     component: (props: {
+        isLoading: boolean;
         onCheckNow: () => void;
         onStartMonitoring: () => void;
-        onStopMonitoring: () => void;
         onStartSiteMonitoring: () => void;
+        onStopMonitoring: () => void;
         onStopSiteMonitoring: () => void;
-        isLoading: boolean;
     }) => {
         actionButtonGroupMock.props.push(props);
         return (
@@ -104,13 +107,14 @@ const actionButtonGroupMock = vi.hoisted(() => ({
 }));
 
 vi.mock(
-    "../../components/Dashboard/SiteCard/components/ActionButtonGroup",
+    import('../../components/Dashboard/SiteCard/components/ActionButtonGroup'),
     () => ({
         ActionButtonGroup: actionButtonGroupMock.component,
     })
 );
 
 interface UseSiteReturnValue {
+    allMonitorsRunning: boolean;
     handleCardClick: ReturnType<typeof vi.fn>;
     handleCheckNow: ReturnType<typeof vi.fn>;
     handleMonitorIdChange: ReturnType<typeof vi.fn>;
@@ -121,12 +125,11 @@ interface UseSiteReturnValue {
     isLoading: boolean;
     isMonitoring: boolean;
     latestSite: Site;
-    monitor: object | null;
-    responseTime: number | null;
+    monitor: null | object;
+    responseTime: null | number;
     selectedMonitorId: string;
     status: string;
     uptime: number;
-    allMonitorsRunning: boolean;
 }
 
 const createUseSiteReturn = (
@@ -176,7 +179,7 @@ const createUseSiteReturn = (
         isLoading: false,
         isMonitoring: true,
         latestSite: baseSite,
-        monitor: baseSite.monitors[0] ?? null,
+        monitor: arrayFirst(baseSite.monitors) ?? null,
         responseTime: 142,
         selectedMonitorId: "monitor-1",
         status: "up",
@@ -191,8 +194,6 @@ const sampleSite: Site = {
     monitors: [],
     name: "Alpha Site",
 };
-
-import { SiteTableRow } from "../../components/Dashboard/SiteList/SiteTableRow";
 
 const renderSiteTableRow = (site: Site = sampleSite): void => {
     render(
@@ -272,11 +273,11 @@ describe("SiteTableRow interaction coverage", () => {
 
         renderSiteTableRow();
 
-        expect(monitorSelectorMock.props[0]).toMatchObject({
+        expect(arrayFirst(monitorSelectorMock.props)).toMatchObject({
             monitors: useSiteResult.latestSite.monitors,
             selectedMonitorId: "monitor-1",
         });
-        expect(statusBadgeMock.props[0]).toMatchObject({
+        expect(arrayFirst(statusBadgeMock.props)).toMatchObject({
             label: "Status",
             status: "up",
         });
@@ -288,7 +289,7 @@ describe("SiteTableRow interaction coverage", () => {
 
         renderSiteTableRow();
 
-        expect(actionButtonGroupMock.props[0]).toMatchObject({
+        expect(arrayFirst(actionButtonGroupMock.props)).toMatchObject({
             disabled: true,
             isLoading: false,
         });
@@ -330,7 +331,7 @@ describe("SiteTableRow interaction coverage", () => {
         const useSiteResult = createUseSiteReturn({
             isMonitoring: false,
             latestSite: runningSite,
-            monitor: runningSite.monitors[0]!,
+            monitor: arrayFirst(runningSite.monitors)!,
             responseTime: 75,
             uptime: 100,
         });
@@ -341,7 +342,7 @@ describe("SiteTableRow interaction coverage", () => {
         expect(screen.getByText("100%")).toBeInTheDocument();
         expect(screen.getByText("75 ms")).toBeInTheDocument();
         expect(screen.getByText("2/2")).toBeInTheDocument();
-        expect(actionButtonGroupMock.props[0]).toMatchObject({
+        expect(arrayFirst(actionButtonGroupMock.props)).toMatchObject({
             allMonitorsRunning: true,
             isMonitoring: false,
         });

@@ -1,5 +1,5 @@
 /**
- * Helpers for resuming monitor sessions after application restart.
+ * Helpers for resuming monitor sessions after app restart.
  *
  * @remarks
  * This module is intentionally dependency-light and side-effect free. It is
@@ -59,12 +59,12 @@ export async function resumeMonitoringCandidates(args: {
 
     const resumePromises = candidates.map(async ({ monitor, site }) => {
         try {
-            const success = await startMonitoringForSite(
+            const isSuccess = await startMonitoringForSite(
                 site.identifier,
                 monitor.id
             );
 
-            if (success) {
+            if (isSuccess) {
                 logger.debug(
                     `[MonitoringLifecycleCoordinator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
                 );
@@ -74,7 +74,7 @@ export async function resumeMonitoringCandidates(args: {
                 );
             }
 
-            return success;
+            return isSuccess;
         } catch (error) {
             logger.error(
                 `[MonitoringLifecycleCoordinator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,

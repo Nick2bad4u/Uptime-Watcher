@@ -1,17 +1,16 @@
 /**
  * Provides complete coverage for shared monitoring interval constants.
  *
- * @file Ensures remediation heuristics remain in sync across application layers
+ * @file Ensures remediation heuristics remain in sync across app layers
  *   by validating the exported thresholds and helper logic.
  */
-
-import { describe, expect, it } from "vitest";
 
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
     shouldRemediateMonitorInterval,
 } from "@shared/constants/monitoring";
+import { describe, expect, it } from "vitest";
 
 describe("monitoring interval constants", () => {
     it("expose the documented millisecond thresholds", () => {
@@ -26,9 +25,9 @@ describe("monitoring interval constants", () => {
 describe(shouldRemediateMonitorInterval, () => {
     it("flags non-numeric or missing values for remediation", () => {
         expect(shouldRemediateMonitorInterval(undefined)).toBeTruthy();
-        expect(shouldRemediateMonitorInterval(Number.NaN)).toBeTruthy();
+        expect(shouldRemediateMonitorInterval(NaN)).toBeTruthy();
         expect(
-            shouldRemediateMonitorInterval("15" as unknown as number)
+            shouldRemediateMonitorInterval("15")
         ).toBeTruthy();
     });
 

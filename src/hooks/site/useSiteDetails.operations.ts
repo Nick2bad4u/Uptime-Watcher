@@ -72,7 +72,7 @@ export async function removeSiteWithConfirmation(args: {
 }): Promise<void> {
     const { clearError, currentSite, deleteSite, requestConfirmation } = args;
 
-    const confirmed = await requestConfirmation({
+    const isConfirmed = await requestConfirmation({
         cancelLabel: "Keep Site",
         confirmLabel: "Remove Site",
         details: "This action permanently removes the site and its monitors.",
@@ -82,7 +82,7 @@ export async function removeSiteWithConfirmation(args: {
         tone: "danger",
     });
 
-    if (!confirmed) {
+    if (!isConfirmed) {
         return;
     }
 
@@ -128,7 +128,7 @@ export async function removeMonitorWithConfirmation(args: {
     const monitorName =
         selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
 
-    const confirmed = await requestConfirmation({
+    const isConfirmed = await requestConfirmation({
         cancelLabel: "Keep Monitor",
         confirmLabel: "Remove Monitor",
         details: `${currentSite.name} will no longer be monitored by "${monitorName}".`,
@@ -138,7 +138,7 @@ export async function removeMonitorWithConfirmation(args: {
         tone: "danger",
     });
 
-    if (!confirmed) {
+    if (!isConfirmed) {
         return;
     }
 

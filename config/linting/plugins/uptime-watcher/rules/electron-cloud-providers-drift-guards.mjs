@@ -99,19 +99,19 @@ export const electronCloudProvidersDriftGuardsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow ad-hoc cloud provider drift helpers and calls in electron/services/cloud/providers",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-cloud-providers-drift-guards.md",
         },
-        schema: [],
         messages: {
             bannedLocal:
                 "Do not define local helper '{{name}}' here. Use the centralized allowlist/utility implementation.",
             bannedCall:
                 "Do not call isAllowedExternalOpenUrl here. Use the centralized provider allowlist utilities.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -64,7 +64,7 @@ function ensureTrimmedStringOrFallback(
 
 const DEFAULT_MONITOR_TIMEOUT_MS = 30_000;
 const DEFAULT_MONITOR_RETRY_ATTEMPTS = 3;
-const DEFAULT_MONITOR_MONITORING = true;
+const IS_DEFAULT_MONITOR_MONITORING = true;
 const DEFAULT_SSL_WARNING_DAYS = 30;
 
 const HTTP_DEFAULT_URL = "https://example.com";
@@ -117,7 +117,7 @@ function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
         case "ssl": {
             return {
                 checkInterval: DEFAULT_MONITOR_CHECK_INTERVAL_MS,
-                monitoring: DEFAULT_MONITOR_MONITORING,
+                monitoring: IS_DEFAULT_MONITOR_MONITORING,
                 retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
                 timeout: DEFAULT_MONITOR_TIMEOUT_MS,
             };
@@ -126,7 +126,7 @@ function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
         case "replication": {
             return {
                 checkInterval: 120_000,
-                monitoring: DEFAULT_MONITOR_MONITORING,
+                monitoring: IS_DEFAULT_MONITOR_MONITORING,
                 retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
                 timeout: DEFAULT_MONITOR_TIMEOUT_MS,
             };
@@ -136,7 +136,7 @@ function getMonitorTypeDefaults(type: MonitorType): MonitorTypeDefaults {
         case "websocket-keepalive": {
             return {
                 checkInterval: 60_000,
-                monitoring: DEFAULT_MONITOR_MONITORING,
+                monitoring: IS_DEFAULT_MONITOR_MONITORING,
                 retryAttempts: DEFAULT_MONITOR_RETRY_ATTEMPTS,
                 timeout: DEFAULT_MONITOR_TIMEOUT_MS,
             };
@@ -319,11 +319,7 @@ function applyHttpKeywordMonitorDefaults(
     applyHttpMonitorDefaults(monitor, filteredData);
 
     const keywordValue = filteredData.bodyKeyword;
-    if (typeof keywordValue === "string" && keywordValue.trim()) {
-        monitor.bodyKeyword = keywordValue.trim();
-    } else {
-        monitor.bodyKeyword = "status: ok";
-    }
+    monitor.bodyKeyword = typeof keywordValue === "string" && keywordValue.trim() ? keywordValue.trim() : "status: ok";
 }
 
 function applyHttpStatusMonitorDefaults(

@@ -146,7 +146,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         }, [handleStopSiteMonitoring]);
 
         // Site-level monitoring state calculation
-        const allMonitorsRunning = useMemo(
+        const isAllMonitorsRunning = useMemo(
             () =>
                 currentSite.monitors.length > 0 &&
                 currentSite.monitors.every((monitor) => monitor.monitoring),
@@ -243,11 +243,11 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         const tabKeys = useMemo(
             () =>
                 [
-                    "site-overview",
-                    "monitor-overview",
                     analyticsTabKey,
                     "history",
+                    "monitor-overview",
                     "settings",
+                    "site-overview",
                 ] as const,
             [analyticsTabKey]
         );
@@ -304,7 +304,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                 queueMicrotask(() => {
                     document
                         .querySelector<HTMLElement>(
-                            `[id="${resolveSiteDetailsTabId(nextKey)}"]`
+                            `[id="${CSS.escape(resolveSiteDetailsTabId(nextKey))}"]`
                         )
                         ?.focus();
                 });
@@ -455,7 +455,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                         {/* Site-level monitoring controls */}
                         <div className="site-details-navigation__control-group">
                             <SiteMonitoringButton
-                                allMonitorsRunning={allMonitorsRunning}
+                                allMonitorsRunning={isAllMonitorsRunning}
                                 isLoading={isLoading}
                                 onStartSiteMonitoring={
                                     handleStartSiteMonitoringMemoized

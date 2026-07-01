@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 # yamllint disable rule:line-length
-name: Build And Release Electron App
+name: Build and Release Electron App
 
 run-name: Build and Release Electron App
 

@@ -85,7 +85,7 @@ function formatUnknownErrorCause(cause: unknown): string {
  * @returns Normalized Error instance or undefined when no cause provided.
  */
 function normalizeErrorCause(cause: unknown): Error | undefined {
-    if (cause instanceof Error) {
+    if (Error.isError(cause)) {
         return cause;
     }
 
@@ -266,7 +266,7 @@ export interface ErrorConversionResult {
  * @returns Detailed error conversion result
  */
 export function convertError(error: unknown): ErrorConversionResult {
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
         return {
             error,
             originalType: "Error",

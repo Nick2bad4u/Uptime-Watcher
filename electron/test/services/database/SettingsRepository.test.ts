@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,12 +15,11 @@
  * @tags ["test"]
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { Database } from "node-sqlite3-wasm";
 
-import { SettingsRepository } from "../../../services/database/SettingsRepository";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { SettingsRepository } from "../../../services/database/SettingsRepository";
 // Import the actual module to spy on it
 import * as operationalHooks from "../../../utils/operationalHooks";
 
@@ -390,7 +389,7 @@ describe(SettingsRepository, () => {
                 mockDatabase.prepare = vi.fn().mockReturnValue(mockStatement);
 
                 expect(() =>
-                    repository.bulkInsertInternal(mockDatabase, settings)
+                    { repository.bulkInsertInternal(mockDatabase, settings); }
                 ).toThrow("Statement error");
                 expect(mockStatement.finalize).toHaveBeenCalled();
             });

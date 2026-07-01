@@ -2,9 +2,11 @@
  * Unit tests for the server heartbeat monitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import { ServerHeartbeatMonitor } from "../../../services/monitoring/ServerHeartbeatMonitor";
 
 const httpGetMock = vi.fn();
 
@@ -19,8 +21,6 @@ vi.mock("../../../services/monitoring/utils/httpClient", () => ({
         get: httpGetMock,
     })),
 }));
-
-import { ServerHeartbeatMonitor } from "../../../services/monitoring/ServerHeartbeatMonitor";
 
 function createMonitor(
     overrides: Partial<Site["monitors"][0]> = {}
@@ -42,7 +42,7 @@ function createMonitor(
         type: "server-heartbeat",
         url: "https://api.example.com/heartbeat",
         ...overrides,
-    } as Site["monitors"][0];
+    };
 }
 
 describe("ServerHeartbeatMonitor service", () => {

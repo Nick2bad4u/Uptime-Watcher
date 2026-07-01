@@ -3,20 +3,21 @@
  * theme component variants, props, and edge cases.
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MiniChartBar } from "../../theme/components/MiniChartBar";
+import { StatusIndicator } from "../../theme/components/StatusIndicator";
+import { ThemedBadge } from "../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
-import { ThemedInput } from "../../theme/components/ThemedInput";
-import { ThemedText } from "../../theme/components/ThemedText";
-import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
-import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedCard } from "../../theme/components/ThemedCard";
-import { ThemedBadge } from "../../theme/components/ThemedBadge";
-import { StatusIndicator } from "../../theme/components/StatusIndicator";
-import { MiniChartBar } from "../../theme/components/MiniChartBar";
+import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
+import { ThemedInput } from "../../theme/components/ThemedInput";
+import { ThemedSelect } from "../../theme/components/ThemedSelect";
+import { ThemedText } from "../../theme/components/ThemedText";
 
 // Mock functions for testing
 const mockOnClick = vi.fn();
@@ -88,11 +89,11 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const paddings = [
-                "xs",
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
                 "xl",
+                "xs",
             ] as const;
 
             for (const padding of paddings) {
@@ -138,10 +139,10 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const elements = [
-                "div",
-                "section",
                 "article",
                 "aside",
+                "div",
+                "section",
             ] as const;
 
             for (const as of elements) {
@@ -198,11 +199,11 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const roundedOptions = [
+                "full",
+                "lg",
+                "md",
                 "none",
                 "sm",
-                "md",
-                "lg",
-                "full",
             ] as const;
 
             for (const rounded of roundedOptions) {
@@ -229,11 +230,11 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const shadowOptions = [
-                "sm",
-                "md",
-                "lg",
-                "xl",
                 "inner",
+                "lg",
+                "md",
+                "sm",
+                "xl",
             ] as const;
 
             for (const shadow of shadowOptions) {
@@ -333,19 +334,19 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const variants = [
-                "primary",
-                "secondary",
                 "error",
                 "ghost",
                 "outline",
+                "primary",
+                "secondary",
                 "success",
-                "warning",
                 "tertiary",
+                "warning",
             ] as const;
 
             for (const variant of variants) {
                 const { unmount } = render(
-                    <ThemedButton variant={variant} onClick={mockOnClick}>
+                    <ThemedButton onClick={mockOnClick} variant={variant}>
                         {variant} Button
                     </ThemedButton>
                 );
@@ -371,16 +372,16 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "xs",
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
                 "xl",
+                "xs",
             ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
-                    <ThemedButton size={size} onClick={mockOnClick}>
+                    <ThemedButton onClick={mockOnClick} size={size}>
                         {size} Button
                     </ThemedButton>
                 );
@@ -554,13 +555,13 @@ describe("Theme Components - Complete Coverage", () => {
 
             const types = [
                 "button",
-                "submit",
                 "reset",
+                "submit",
             ] as const;
 
             for (const type of types) {
                 const { unmount } = render(
-                    <ThemedButton type={type} onClick={mockOnClick}>
+                    <ThemedButton onClick={mockOnClick} type={type}>
                         {type} Button
                     </ThemedButton>
                 );
@@ -606,15 +607,15 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const types = [
-                "text",
                 "email",
                 "password",
+                "text",
                 "url",
             ] as const;
 
             for (const type of types) {
                 const { unmount } = render(
-                    <ThemedInput type={type} placeholder={`${type} input`} />
+                    <ThemedInput placeholder={`${type} input`} type={type} />
                 );
 
                 const input = screen.getByPlaceholderText(`${type} input`);
@@ -635,7 +636,7 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedInput type="number" placeholder="number input" />);
+            render(<ThemedInput placeholder="number input" type="number" />);
 
             const input = screen.getByPlaceholderText("number input");
             expect(input).toHaveAttribute("type", "number");
@@ -671,15 +672,15 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <ThemedInput
-                    value="test value"
                     onChange={mockOnChange}
                     placeholder="controlled input"
+                    value="test value"
                 />
             );
 
-            const input = screen.getByPlaceholderText(
+            const input = safeCastTo<HTMLInputElement>(screen.getByPlaceholderText(
                 "controlled input"
-            ) as HTMLInputElement;
+            ));
             expect(input.value).toBe("test value");
 
             fireEvent.change(input, { target: { value: "new value" } });
@@ -717,11 +718,11 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <ThemedInput
-                    type="number"
-                    min={1}
                     max={100}
-                    step={0.1}
+                    min={1}
                     placeholder="number range"
+                    step={0.1}
+                    type="number"
                 />
             );
 
@@ -744,8 +745,8 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <ThemedInput
-                    aria-label="Search"
                     aria-describedby="search-help"
+                    aria-label="Search"
                 />
             );
 
@@ -785,15 +786,15 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "xs",
-                "sm",
-                "base",
-                "md",
-                "lg",
-                "xl",
                 "2xl",
                 "3xl",
                 "4xl",
+                "base",
+                "lg",
+                "md",
+                "sm",
+                "xl",
+                "xs",
             ] as const;
 
             for (const size of sizes) {
@@ -820,10 +821,10 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const weights = [
-                "normal",
-                "medium",
-                "semibold",
                 "bold",
+                "medium",
+                "normal",
+                "semibold",
             ] as const;
 
             for (const weight of weights) {
@@ -850,15 +851,15 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const variants = [
-                "primary",
-                "secondary",
                 "danger",
-                "success",
-                "warning",
                 "error",
                 "info",
                 "inverse",
+                "primary",
+                "secondary",
+                "success",
                 "tertiary",
+                "warning",
             ] as const;
 
             for (const variant of variants) {
@@ -885,10 +886,10 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const alignments = [
-                "left",
                 "center",
-                "right",
                 "justify",
+                "left",
+                "right",
             ] as const;
 
             for (const align of alignments) {
@@ -958,7 +959,7 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(<ThemedCheckbox checked onChange={mockOnChange} />);
 
-            const checkbox = screen.getByRole("checkbox") as HTMLInputElement;
+            const checkbox = screen.getByRole("checkbox");
             expect(checkbox.checked).toBeTruthy();
         });
 
@@ -990,7 +991,7 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedCheckbox required onChange={mockOnChange} />);
+            render(<ThemedCheckbox onChange={mockOnChange} required />);
 
             const checkbox = screen.getByRole("checkbox");
             expect(checkbox).toHaveAttribute("required");
@@ -1009,8 +1010,8 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <ThemedCheckbox
-                    onChange={mockOnChange}
                     aria-label="Accept terms"
+                    onChange={mockOnChange}
                 />
             );
 
@@ -1098,14 +1099,14 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             render(
-                <ThemedSelect value="option2" onChange={mockOnChange}>
+                <ThemedSelect onChange={mockOnChange} value="option2">
                     <option value="option1">Option 1</option>
                     <option value="option2">Option 2</option>
                     <option value="option3">Option 3</option>
                 </ThemedSelect>
             );
 
-            const select = screen.getByRole("combobox") as HTMLSelectElement;
+            const select = screen.getByRole("combobox");
             expect(select.value).toBe("option2");
 
             fireEvent.change(select, { target: { value: "option3" } });
@@ -1124,7 +1125,7 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             render(
-                <ThemedSelect required onChange={mockOnChange}>
+                <ThemedSelect onChange={mockOnChange} required>
                     <option value="test">Test</option>
                 </ThemedSelect>
             );
@@ -1149,9 +1150,9 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <ThemedSelect
+                    onChange={mockOnChange}
                     onClick={mockClick}
                     onMouseDown={mockMouseDown}
-                    onChange={mockOnChange}
                 >
                     <option value="test">Test</option>
                 </ThemedSelect>
@@ -1178,8 +1179,8 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <ThemedSelect
-                    aria-label="Choose option"
                     aria-describedby="select-help"
+                    aria-label="Choose option"
                     onChange={mockOnChange}
                 >
                     <option value="test">Test</option>
@@ -1223,7 +1224,7 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             render(
-                <ThemedCard title="Card Title" subtitle="Card Subtitle">
+                <ThemedCard subtitle="Card Subtitle" title="Card Title">
                     Card content
                 </ThemedCard>
             );
@@ -1386,12 +1387,12 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const variants = [
+                "error",
+                "info",
                 "primary",
                 "secondary",
                 "success",
                 "warning",
-                "error",
-                "info",
             ] as const;
 
             for (const variant of variants) {
@@ -1418,10 +1419,10 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "xs",
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
+                "xs",
             ] as const;
 
             for (const size of sizes) {
@@ -1492,14 +1493,14 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const sizes = [
-                "sm",
-                "md",
                 "lg",
+                "md",
+                "sm",
             ] as const;
 
             for (const size of sizes) {
                 const { unmount } = render(
-                    <StatusIndicator status="up" size={size} />
+                    <StatusIndicator size={size} status="up" />
                 );
 
                 const indicator = document.querySelector(
@@ -1522,7 +1523,7 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<StatusIndicator status="up" showText />);
+            render(<StatusIndicator showText status="up" />);
 
             const textElement = screen.getByText("Up");
             expect(textElement).toBeInTheDocument();
@@ -1540,9 +1541,9 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const statuses = [
-                "up",
                 "down",
                 "unknown",
+                "up",
             ] as const;
 
             for (const status of statuses) {
@@ -1590,9 +1591,9 @@ describe("Theme Components - Complete Coverage", () => {
 
             render(
                 <MiniChartBar
+                    responseTime={150}
                     status="up"
                     timestamp={new Date()}
-                    responseTime={150}
                 />
             );
 
@@ -1612,9 +1613,9 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const statuses = [
-                "up",
                 "down",
                 "unknown",
+                "up",
             ] as const;
 
             for (const status of statuses) {
@@ -1679,7 +1680,7 @@ describe("Theme Components - Complete Coverage", () => {
             annotate("Type: Data Retrieval", "type");
 
             render(
-                <ThemedBox surface="elevated" padding="lg">
+                <ThemedBox padding="lg" surface="elevated">
                     <ThemedText size="lg" weight="bold">
                         Form Components
                     </ThemedText>

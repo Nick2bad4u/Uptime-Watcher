@@ -43,7 +43,7 @@ const buildMonitorValidationCandidate = (
         typeof data["checkInterval"] === "number"
             ? data["checkInterval"]
             : 300_000;
-    const monitoring =
+    const isMonitoring =
         typeof data["monitoring"] === "boolean" ? data["monitoring"] : true;
     const retryAttempts =
         typeof data["retryAttempts"] === "number" ? data["retryAttempts"] : 3;
@@ -56,7 +56,7 @@ const buildMonitorValidationCandidate = (
         checkInterval,
         history: [],
         id: "temp-monitor",
-        monitoring,
+        monitoring: isMonitoring,
         responseTime: -1,
         retryAttempts,
         status: "pending",
@@ -267,7 +267,7 @@ const serializeMonitorTypeConfig = (
         fields: baseProperties.fields,
         type: monitorType,
         version: baseProperties.version,
-        ...(serializedUiConfig ? { uiConfig: serializedUiConfig } : {}),
+        ...(serializedUiConfig && { uiConfig: serializedUiConfig }),
     };
 
     if (!isMonitorTypeConfig(sanitizedConfig)) {

@@ -3,16 +3,20 @@
  * component behavior and interface structure
  */
 
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+import { fc, test } from "@fast-check/vitest";
 import {
     sampleOne,
     siteIdentifierArbitrary,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
+import { useAddSiteForm } from "../../../components/SiteDetails/useAddSiteForm";
 
 // Ensure the hook is mocked correctly instead of suppressing React warnings.
 
@@ -21,11 +25,9 @@ import {
 // Mock the useAddSiteForm hook using vi.hoisted - keeping as backup
 const mockUseAddSiteForm = vi.hoisted(() => vi.fn());
 
-vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../../../components/SiteDetails/useAddSiteForm'), () => ({
     useAddSiteForm: mockUseAddSiteForm,
 }));
-
-import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 /**
  * Render helper that ensures any asynchronous React updates triggered by
@@ -50,7 +52,7 @@ const renderForm = async (): Promise<void> => {
 // no beforeAll / afterAll hook - warnings should not be necessary with proper mocks
 
 // Mock stores
-vi.mock("../../../stores/useErrorStore", () => ({
+vi.mock(import('../../../stores/useErrorStore'), () => ({
     useErrorStore: vi.fn(() => ({
         clearError: vi.fn(),
         isLoading: false,
@@ -71,7 +73,7 @@ const mockSiteEntries = [
     },
 ];
 
-vi.mock("../../../stores/useSitesStore", () => ({
+vi.mock(import('../../../stores/useSitesStore'), () => ({
     useSitesStore: vi.fn(() => ({
         addMonitorToSite: vi.fn(),
         createSite: vi.fn(),
@@ -80,7 +82,7 @@ vi.mock("../../../stores/useSitesStore", () => ({
 }));
 
 // Mock hooks
-vi.mock("../../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: vi.fn(() => ({
         isLoading: false,
         options: [
@@ -90,14 +92,14 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
 // Mock constants (partial to preserve other exports)
-vi.mock("../../../constants", async (importOriginal) => {
+vi.mock(import('../../../constants'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../../constants");
+        (await importOriginal());
     return {
         ...actual,
         ARIA_LABEL: {
@@ -124,7 +126,7 @@ vi.mock("../../../constants", async (importOriginal) => {
 });
 
 // Mock other components
-vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
+vi.mock(import('../../../components/AddSiteForm/DynamicMonitorFields'), () => ({
     DynamicMonitorFields: ({ monitorType }: { monitorType: string }) => {
         if (monitorType === "http") {
             return (
@@ -135,9 +137,9 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                         </label>
                         <input
                             aria-label="URL (required)"
-                            type="url"
                             placeholder="https://example.com"
                             required
+                            type="url"
                         />
                     </div>
                     <div>
@@ -146,9 +148,9 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                         </label>
                         <input
                             aria-label="Port"
-                            type="number"
-                            min="1"
                             max="65535"
+                            min="1"
+                            type="number"
                         />
                     </div>
                 </div>
@@ -164,8 +166,8 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                         </label>
                         <input
                             aria-label="Host (required)"
-                            type="text"
                             required
+                            type="text"
                         />
                     </div>
                     <div>
@@ -174,10 +176,10 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
                         </label>
                         <input
                             aria-label="Port (required)"
-                            type="number"
-                            min="1"
                             max="65535"
+                            min="1"
                             required
+                            type="number"
                         />
                     </div>
                 </div>
@@ -188,18 +190,16 @@ vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     },
 }));
 
-vi.mock("../../../utils/data/generateUuid", () => ({
+vi.mock(import('../../../utils/data/generateUuid'), () => ({
     generateUuid: vi.fn(() => "test-uuid"),
 }));
 
-vi.mock("../../../utils/logger", () => ({
+vi.mock(import('../../../utils/logger'), () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
     },
 }));
-
-import { useAddSiteForm } from "../../../components/SiteDetails/useAddSiteForm";
 
 describe("AddSiteForm Comprehensive Tests", () => {
     let mockFormHook: any;
@@ -300,7 +300,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             // Monitor type selector
             expect(
-                screen.getByRole("combobox", { name: /monitor type/i })
+                screen.getByRole("combobox", { name: /monitor type/iv })
             ).toBeInTheDocument();
 
             // Check interval selector
@@ -351,10 +351,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             await renderForm();
 
             expect(
-                screen.getByRole("textbox", { name: /url/i })
+                screen.getByRole("textbox", { name: /url/iv })
             ).toBeInTheDocument();
             expect(
-                screen.getByRole("spinbutton", { name: /port/i })
+                screen.getByRole("spinbutton", { name: /port/iv })
             ).toBeInTheDocument();
         });
     });
@@ -412,7 +412,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             // Button text should change
             expect(
-                screen.getByRole("button", { name: /add monitor/i })
+                screen.getByRole("button", { name: /add monitor/iv })
             ).toBeInTheDocument();
         });
     });
@@ -468,7 +468,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             await renderForm();
 
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
             await user.selectOptions(monitorTypeSelect, "port");
 
@@ -522,10 +522,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             await renderForm();
 
             expect(
-                screen.getByRole("textbox", { name: /url/i })
+                screen.getByRole("textbox", { name: /url/iv })
             ).toBeInTheDocument();
             expect(
-                screen.getByRole("spinbutton", { name: /port/i })
+                screen.getByRole("spinbutton", { name: /port/iv })
             ).toBeInTheDocument();
         });
 
@@ -549,7 +549,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 screen.getByRole("textbox", { name: /host/i })
             ).toBeInTheDocument();
             expect(
-                screen.getByRole("spinbutton", { name: /port.*required/i })
+                screen.getByRole("spinbutton", { name: /port.*required/iv })
             ).toBeInTheDocument();
         });
     });
@@ -569,7 +569,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            mockFormHook.isFormValid = vi.fn(() => true);
+            vi.spyOn(mockFormHook, 'isFormValid').mockReturnValue(true);
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
             await renderForm();
@@ -675,7 +675,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 screen.getByRole("textbox", { name: /site name/i })
             ).toBeInTheDocument();
             expect(
-                screen.getByRole("combobox", { name: /monitor type/i })
+                screen.getByRole("combobox", { name: /monitor type/iv })
             ).toBeInTheDocument();
             expect(
                 screen.getByRole("combobox", { name: /check interval/i })
@@ -702,7 +702,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 name: /site name/i,
             });
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
+                name: /monitor type/iv,
             });
 
             // Focus on name input and verify
@@ -788,14 +788,14 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             // Verify realistic input characteristics
             expect(config.siteName.trim().length).toBeGreaterThan(0);
-            expect(config.url).toMatch(/^https?:\/\//);
+            expect(config.url).toMatch(/^https?:\/\//v);
             expect(["http", "port"]).toContain(config.monitorType);
 
             // Form should be interactive
             const forms = screen.getAllByRole("form", {
                 name: /add site form/i,
             });
-            const form = forms[0];
+            const form = arrayFirst(forms);
             expect(form).toBeInTheDocument();
         });
 
@@ -867,7 +867,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 ]).toContain(scenario.environment);
 
                 expect(siteName.length).toBeGreaterThan(10);
-                expect(url).toMatch(/^https:\/\//);
+                expect(url).toMatch(/^https:\/\//v);
             }
         );
 
@@ -903,7 +903,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(config.port).toBeGreaterThanOrEqual(80);
             expect(config.port).toBeLessThanOrEqual(9999);
             expect(["http", "https"]).toContain(config.protocol);
-            expect(regionalUrl).toMatch(/^https?:\/\/service-/);
+            expect(regionalUrl).toMatch(/^https?:\/\/service-/v);
         });
 
         test.prop(
@@ -1008,7 +1008,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 const forms = screen.getAllByRole("form", {
                     name: /add site form/i,
                 });
-                const form = forms[0];
+                const form = arrayFirst(forms);
                 expect(form).toBeInTheDocument();
             }
         );
@@ -1117,24 +1117,6 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 ]).toContain(website.type);
 
                 switch (website.type) {
-                    case "ecommerce": {
-                        expect([
-                            "cart",
-                            "checkout",
-                            "payment",
-                            "inventory",
-                        ]).toContain(website.features);
-                        break;
-                    }
-                    case "saas": {
-                        expect([
-                            "auth",
-                            "dashboard",
-                            "api",
-                            "billing",
-                        ]).toContain(website.features);
-                        break;
-                    }
                     case "blog": {
                         expect([
                             "posts",
@@ -1144,12 +1126,30 @@ describe("AddSiteForm Comprehensive Tests", () => {
                         ]).toContain(website.features);
                         break;
                     }
+                    case "ecommerce": {
+                        expect([
+                            "cart",
+                            "checkout",
+                            "payment",
+                            "inventory",
+                        ]).toContain(website.features);
+                        break;
+                    }
                     case "portfolio": {
                         expect([
                             "gallery",
                             "contact",
                             "resume",
                             "projects",
+                        ]).toContain(website.features);
+                        break;
+                    }
+                    case "saas": {
+                        expect([
+                            "auth",
+                            "dashboard",
+                            "api",
+                            "billing",
                         ]).toContain(website.features);
                         break;
                     }

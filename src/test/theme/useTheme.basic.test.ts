@@ -2,23 +2,23 @@
  * Simple tests for useTheme hooks to improve coverage.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../stores/settings/useSettingsStore", () => ({
+import {
+    useAvailabilityColors,
+    useStatusColors,
+    useTheme,
+    useThemeClasses,
+    useThemeValue,
+} from "../../theme/useTheme";
+
+vi.mock(import('../../stores/settings/useSettingsStore'), () => ({
     useSettingsStore: vi.fn(() => ({
         settings: { theme: "light" },
         updateSettings: vi.fn(),
     })),
 }));
-
-import {
-    useTheme,
-    useAvailabilityColors,
-    useStatusColors,
-    useThemeClasses,
-    useThemeValue,
-} from "../../theme/useTheme";
 
 describe("useTheme Basic Coverage", () => {
     beforeEach(() => {

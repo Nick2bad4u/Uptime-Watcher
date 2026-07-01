@@ -3,11 +3,12 @@
  * data.
  */
 
+import type { StatusHistory } from "@shared/types";
+
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { useSiteStats } from "../hooks/site/useSiteStats";
-import type { StatusHistory } from "@shared/types";
 
 describe(useSiteStats, () => {
     describe("Basic Functionality", () => {
@@ -557,7 +558,7 @@ describe(useSiteStats, () => {
                     status: i % 2 === 0 ? "up" : "down",
                     timestamp: 1_640_995_200_000 + i * 60_000,
                 })
-            ) as StatusHistory[];
+            );
 
             const { result } = renderHook(() => useSiteStats(history));
 

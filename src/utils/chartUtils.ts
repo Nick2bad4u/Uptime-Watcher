@@ -19,79 +19,6 @@ import { ensureRecordLike } from "@shared/utils/typeHelpers";
 import { objectHasOwn, safeCastTo, stringSplit } from "ts-extras";
 
 /**
- * Type-safe scale configuration result describing lookup outcomes.
- *
- * @public
- */
-export type ScaleConfigResult = Simplify<{
-    /** The scale configuration object */
-    config: UnknownRecord | ValueOf<ChartScalesConfig>;
-    /** Whether the scale exists */
-    exists: boolean;
-}>;
-
-/**
- * Enhanced scale configuration access with existence tracking.
- *
- * @param config - Chart configuration
- * @param axis - Axis name ("x" or "y")
- *
- * @returns Scale configuration result with existence information.
- *
- * @public
- */
-export function getScaleConfigSafe(
-    config: unknown,
-    axis: "x" | "y"
-): ScaleConfigResult {
-    if (!hasScalesInternal(config)) {
-        return {
-            config: {},
-            exists: false,
-        };
-    }
-
-    const { scales } = config;
-
-    if (objectHasOwn(scales, axis)) {
-        const scale: unknown = scales[axis];
-
-        // Validate that the scale is actually an object (handle runtime type safety)
-        if (typeof scale === "object" && scale !== null) {
-            return {
-                config: safeCastTo<ValueOf<ChartScalesConfig>>(scale),
-                exists: true,
-            };
-        }
-    }
-
-    return {
-        config: {},
-        exists: false,
-    };
-}
-
-// Make hasScales available for external use
-
-/**
- * Safely get scale configuration, returning `undefined` when absent.
- *
- * @param config - Chart configuration.
- * @param axis - Axis name ("x" or "y").
- *
- * @returns Scale configuration or `undefined` when the scale is missing.
- *
- * @public
- */
-export function getScaleConfig(
-    config: unknown,
-    axis: "x" | "y"
-): undefined | ValueOf<ChartScalesConfig> {
-    const result = getScaleConfigSafe(config, axis);
-    return result.exists ? result.config : undefined;
-}
-
-/**
  * Type-safe nested property access result.
  *
  * @public
@@ -104,6 +31,40 @@ export type PropertyAccessResult = Simplify<{
     /** The retrieved value */
     value: unknown;
 }>;
+
+/**
+ * Type-safe scale configuration result describing lookup outcomes.
+ *
+ * @public
+ */
+export type ScaleConfigResult = Simplify<{
+    /** The scale configuration object */
+    config: UnknownRecord | ValueOf<ChartScalesConfig>;
+    /** Whether the scale exists */
+    exists: boolean;
+}>;
+
+// Make hasScales available for external use
+
+/**
+ * Safely get nested property from scale configuration.
+ *
+ * @param config - Chart configuration.
+ * @param axis - Axis name ("x" or "y").
+ * @param path - Property path (e.g., "title.text").
+ *
+ * @returns Property value or `undefined` when unavailable.
+ *
+ * @public
+ */
+export function getNestedScaleProperty(
+    config: unknown,
+    axis: "x" | "y",
+    path: string
+): unknown {
+    const result = getNestedScalePropertySafe(config, axis, path);
+    return result.exists ? result.value : undefined;
+}
 
 /**
  * Enhanced nested property access with detailed path information.
@@ -156,23 +117,62 @@ export function getNestedScalePropertySafe(
 }
 
 /**
- * Safely get nested property from scale configuration.
+ * Safely get scale configuration, returning `undefined` when absent.
  *
  * @param config - Chart configuration.
  * @param axis - Axis name ("x" or "y").
- * @param path - Property path (e.g., "title.text").
  *
- * @returns Property value or `undefined` when unavailable.
+ * @returns Scale configuration or `undefined` when the scale is missing.
  *
  * @public
  */
-export function getNestedScaleProperty(
+export function getScaleConfig(
     config: unknown,
-    axis: "x" | "y",
-    path: string
-): unknown {
-    const result = getNestedScalePropertySafe(config, axis, path);
-    return result.exists ? result.value : undefined;
+    axis: "x" | "y"
+): undefined | ValueOf<ChartScalesConfig> {
+    const result = getScaleConfigSafe(config, axis);
+    return result.exists ? result.config : undefined;
+}
+
+/**
+ * Enhanced scale configuration access with existence tracking.
+ *
+ * @param config - Chart configuration
+ * @param axis - Axis name ("x" or "y")
+ *
+ * @returns Scale configuration result with existence information.
+ *
+ * @public
+ */
+export function getScaleConfigSafe(
+    config: unknown,
+    axis: "x" | "y"
+): ScaleConfigResult {
+    if (!hasScalesInternal(config)) {
+        return {
+            config: {},
+            exists: false,
+        };
+    }
+
+    const { scales } = config;
+
+    if (objectHasOwn(scales, axis)) {
+        const scale: unknown = scales[axis];
+
+        // Validate that the scale is actually an object (handle runtime type safety)
+        if (typeof scale === "object" && scale !== null) {
+            return {
+                config: safeCastTo<ValueOf<ChartScalesConfig>>(scale),
+                exists: true,
+            };
+        }
+    }
+
+    return {
+        config: {},
+        exists: false,
+    };
 }
 
 /**

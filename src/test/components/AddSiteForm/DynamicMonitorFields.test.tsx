@@ -1,7 +1,7 @@
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { DynamicMonitorFields } from "../../../components/AddSiteForm/DynamicMonitorFields";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
@@ -73,14 +73,14 @@ describe(DynamicMonitorFields, () => {
         render(
             <DynamicMonitorFields
                 monitorType="http"
-                values={{ url: "https://example.com" }}
                 onChange={{
                     url: vi.fn(),
                 }}
+                values={{ url: "https://example.com" }}
             />
         );
 
-        expect(screen.getByLabelText(/url/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/url/iv)).toBeInTheDocument();
         expect(screen.getByLabelText("Timeout")).toBeInTheDocument();
     });
 
@@ -96,8 +96,8 @@ describe(DynamicMonitorFields, () => {
         render(
             <DynamicMonitorFields
                 monitorType="http"
-                values={{}}
                 onChange={{}}
+                values={{}}
             />
         );
 
@@ -115,8 +115,8 @@ describe(DynamicMonitorFields, () => {
         render(
             <DynamicMonitorFields
                 monitorType="http"
-                values={{}}
                 onChange={{}}
+                values={{}}
             />
         );
 
@@ -131,8 +131,8 @@ describe(DynamicMonitorFields, () => {
         render(
             <DynamicMonitorFields
                 monitorType="ping"
-                values={{}}
                 onChange={{}}
+                values={{}}
             />
         );
 
@@ -145,10 +145,10 @@ describe(DynamicMonitorFields, () => {
         render(
             <DynamicMonitorFields
                 monitorType="http"
-                values={{ url: "https://example.com" }}
                 onChange={{
                     url: vi.fn(),
                 }}
+                values={{ url: "https://example.com" }}
             />
         );
 

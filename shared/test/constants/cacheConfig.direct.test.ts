@@ -6,7 +6,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { CACHE_NAMES } from "../../../shared/constants/cacheConfig";
+
+import { CACHE_NAMES } from "../../constants/cacheConfig";
 
 describe("cacheConfig - Direct Function Coverage", () => {
     it("should test monitors function without suffix", () => {

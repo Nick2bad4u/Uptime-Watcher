@@ -7,15 +7,15 @@
  * considerations.
  */
 
-import { describe, expect, it } from "vitest";
-import fc from "fast-check";
-import type { MonitorStatus, MonitorType } from "../types";
-import {
-    createValidMonitor,
-    createValidStatusHistory,
+import { createValidMonitor,
     createValidMonitors,
-} from "./testHelpers";
-import { secureRandomFloat } from "@shared/test/testHelpers";
+    createValidStatusHistory,
+    secureRandomFloat } from "@shared/test/testHelpers";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
+
+import type { MonitorStatus, MonitorType } from "../types";
+
 
 describe("testHelpers", () => {
     describe(createValidMonitor, () => {
@@ -31,7 +31,7 @@ describe("testHelpers", () => {
             const monitor = createValidMonitor();
 
             expect(monitor.id).toBeDefined();
-            expect(monitor.id).toMatch(/^test-monitor-[\da-z]{9}$/);
+            expect(monitor.id).toMatch(/^test-monitor-[\da-z]{9}$/v);
             expect(monitor.url).toBe("https://example.com");
             expect(monitor.host).toBe("example.com");
             expect(monitor.type).toBe("http");
@@ -60,8 +60,8 @@ describe("testHelpers", () => {
             const monitor2 = createValidMonitor();
 
             expect(monitor1.id).not.toBe(monitor2.id);
-            expect(monitor1.id).toMatch(/^test-monitor-[\da-z]{9}$/);
-            expect(monitor2.id).toMatch(/^test-monitor-[\da-z]{9}$/);
+            expect(monitor1.id).toMatch(/^test-monitor-[\da-z]{9}$/v);
+            expect(monitor2.id).toMatch(/^test-monitor-[\da-z]{9}$/v);
         });
 
         it("should override properties correctly", async ({
@@ -93,10 +93,10 @@ describe("testHelpers", () => {
             await annotate("Type: Monitoring", "type");
 
             for (const status of [
-                "up",
                 "down",
-                "pending",
                 "paused",
+                "pending",
+                "up",
             ] as MonitorStatus[]) {
                 const monitor = createValidMonitor({ status });
                 expect(monitor.status).toBe(status);
@@ -111,8 +111,8 @@ describe("testHelpers", () => {
 
             for (const type of [
                 "http",
-                "port",
                 "ping",
+                "port",
             ] as MonitorType[]) {
                 const monitor = createValidMonitor({ type });
                 expect(monitor.type).toBe(type);
@@ -255,7 +255,7 @@ describe("testHelpers", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            for (const status of ["up", "down"] as const) {
+            for (const status of ["down", "up"] as const) {
                 const statusHistory = createValidStatusHistory({ status });
                 expect(statusHistory.status).toBe(status);
             }

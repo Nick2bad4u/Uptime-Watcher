@@ -2,12 +2,11 @@
  * Comprehensive coverage for runtime validation guards.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     validateSiteSnapshot,
     validateSiteSnapshots,
 } from "@shared/validation/guards";
+import { describe, expect, it } from "vitest";
 
 import {
     createMonitorSnapshot,
@@ -93,10 +92,10 @@ describe(validateSiteSnapshots, () => {
         expect(hasIssueForIndex1).toBeTruthy();
         expect(hasIssueForIndex2).toBeTruthy();
 
-        const mentionsMonitors = issues.some((issue) =>
+        const isMentionsMonitors = issues.some((issue) =>
             issue.path.includes("monitors")
         );
-        expect(mentionsMonitors).toBeTruthy();
+        expect(isMentionsMonitors).toBeTruthy();
     });
 
     it("gracefully handles empty collections", () => {

@@ -5,8 +5,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { AppToastToast } from "../../../components/Alerts/AppToastToast";
 import type { AppToast } from "../../../stores/alerts/useAlertStore";
+
+import { AppToastToast } from "../../../components/Alerts/AppToastToast";
 
 const createToast = (overrides: Partial<AppToast> = {}): AppToast => {
     const base: AppToast = {
@@ -15,9 +16,7 @@ const createToast = (overrides: Partial<AppToast> = {}): AppToast => {
         title: overrides.title ?? "Hello",
         ttlMs: overrides.ttlMs ?? 5000,
         variant: overrides.variant ?? "info",
-        ...(overrides.message === undefined
-            ? {}
-            : { message: overrides.message }),
+        ...(overrides.message !== undefined && { message: overrides.message }),
     };
 
     return base;

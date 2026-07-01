@@ -19,29 +19,6 @@ import {
 } from "../../../utils/fallbacks";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 
-/** Format a seconds value and include a minutes breakdown for long durations. */
-export function formatSecondsWithMinutes(totalSeconds: number): string { const safeSeconds = isFiniteNumber(totalSeconds)
-        ? Math.max(0, Math.round(totalSeconds))
-        : 0;
-
-    if (safeSeconds < 60) {
-        return `${safeSeconds }s`;
-    }
-
-    const minutes = Math.floor(safeSeconds / 60);
-    const seconds = safeSeconds % 60;
-    return `${safeSeconds}s (${minutes}m ${seconds}s)`;
-}
-
-function calculateBackoffSeconds(retryAttempts: number): number {
-    if (retryAttempts <= 0) {
-        return 0;
-    }
-
-    // Sum of exponential backoff delays: 2^0 + 2^1 + ... + 2^(n-1) = 2^n - 1
-    return 2 ** retryAttempts - 1;
-}
-
 /**
  * Calculate the maximum potential duration of a monitor check including retries
  * and exponential backoff.
@@ -65,6 +42,20 @@ export function calculateMaxCheckDurationSeconds(args: {
     };
 }
 
+/** Format a seconds value and include a minutes breakdown for long durations. */
+export function formatSecondsWithMinutes(totalSeconds: number): string { const safeSeconds = isFiniteNumber(totalSeconds)
+        ? Math.max(0, Math.round(totalSeconds))
+        : 0;
+
+    if (safeSeconds < 60) {
+        return `${safeSeconds }s`;
+    }
+
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${safeSeconds}s (${minutes}m ${seconds}s)`;
+}
+
 /**
  * Generate a display identifier based on the monitor type.
  */
@@ -73,31 +64,6 @@ export function getDisplayIdentifier(
     selectedMonitor: Monitor
 ): string {
     return getMonitorDisplayIdentifier(selectedMonitor, currentSite.identifier);
-}
-
-async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getMonitorTypeConfig(selectedMonitor.type);
-            if (config?.fields) {
-                const primaryField = config.fields.find(
-                    (field) => field.required
-                );
-                if (primaryField) {
-                    return primaryField.label;
-                }
-
-                const firstField = arrayFirst(config.fields);
-                if (config.fields.length > 0 && firstField) {
-                    return firstField.label;
-                }
-            }
-
-            return getMonitorTypeDisplayLabel(selectedMonitor.type);
-        },
-        "Get identifier label for monitor type",
-        UiDefaults.unknownLabel
-    );
 }
 
 /**
@@ -128,4 +94,38 @@ export function useIdentifierLabel(selectedMonitor: Monitor): string {
     );
 
     return label;
+}
+
+function calculateBackoffSeconds(retryAttempts: number): number {
+    if (retryAttempts <= 0) {
+        return 0;
+    }
+
+    // Sum of exponential backoff delays: 2^0 + 2^1 + ... + 2^(n-1) = 2^n - 1
+    return 2 ** retryAttempts - 1;
+}
+
+async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
+    return withUtilityErrorHandling(
+        async () => {
+            const config = await getMonitorTypeConfig(selectedMonitor.type);
+            if (config?.fields) {
+                const primaryField = config.fields.find(
+                    (field) => field.required
+                );
+                if (primaryField) {
+                    return primaryField.label;
+                }
+
+                const firstField = arrayFirst(config.fields);
+                if (config.fields.length > 0 && firstField) {
+                    return firstField.label;
+                }
+            }
+
+            return getMonitorTypeDisplayLabel(selectedMonitor.type);
+        },
+        "Get identifier label for monitor type",
+        UiDefaults.unknownLabel
+    );
 }

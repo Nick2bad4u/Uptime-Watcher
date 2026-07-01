@@ -344,25 +344,25 @@ export class ServiceContainerEventForwarder {
 
         const resolvedOriginal = original ?? forwarded;
 
-        Object.defineProperty(target, FORWARDED_METADATA_PROPERTY_KEY, {
-            configurable: true,
-            enumerable: false,
-            value: forwarded,
-            writable: false,
-        });
-
-        Object.defineProperty(target, ORIGINAL_METADATA_PROPERTY_KEY, {
-            configurable: true,
-            enumerable: false,
-            value: resolvedOriginal,
-            writable: false,
-        });
-
-        Object.defineProperty(target, ORIGINAL_METADATA_SYMBOL, {
-            configurable: true,
-            enumerable: false,
-            value: resolvedOriginal,
-            writable: false,
+        Object.defineProperties(target, {
+            [FORWARDED_METADATA_PROPERTY_KEY]: {
+                configurable: true,
+                enumerable: false,
+                value: forwarded,
+                writable: false,
+            },
+            [ORIGINAL_METADATA_PROPERTY_KEY]: {
+                configurable: true,
+                enumerable: false,
+                value: resolvedOriginal,
+                writable: false,
+            },
+            [ORIGINAL_METADATA_SYMBOL]: {
+                configurable: true,
+                enumerable: false,
+                value: resolvedOriginal,
+                writable: false,
+            },
         });
     }
 }

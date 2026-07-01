@@ -1,9 +1,8 @@
-import { describe, expect, it } from "vitest";
-
 import {
     parseOpsObjectFileNameMetadata,
     parseOpsObjectKeyMetadata,
 } from "@electron/services/sync/syncEngineKeyUtils";
+import { describe, expect, it } from "vitest";
 
 describe("syncEngineKeyUtils", () => {
     describe(parseOpsObjectFileNameMetadata, () => {

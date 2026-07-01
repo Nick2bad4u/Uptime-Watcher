@@ -1,5 +1,3 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
 import type { ChartOptions } from "chart.js";
 import type {
     ButtonHTMLAttributes,
@@ -9,11 +7,9 @@ import type {
 } from "react";
 import type { UnknownRecord } from "type-fest";
 
-import {
-    AnalyticsTab,
-    type AnalyticsTabProperties,
-} from "../../../../components/SiteDetails/tabs/AnalyticsTab";
-import { logger } from "../../../../services/logger";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
 import type { DowntimePeriod } from "../../../../hooks/site/useSiteAnalytics";
 import type {
     ResponseTimeChartData,
@@ -21,8 +17,14 @@ import type {
     UptimeChartData,
 } from "../../../../services/chartConfig";
 
+import {
+    AnalyticsTab,
+    type AnalyticsTabProperties,
+} from "../../../../components/SiteDetails/tabs/AnalyticsTab";
+import { logger } from "../../../../services/logger";
+
 // Mock all external dependencies
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -46,7 +48,7 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../theme/components", () => ({
+vi.mock(import('../../../../theme/components'), () => ({
     ThemedBadge: ({
         children,
         variant,
@@ -140,8 +142,8 @@ vi.mock("../../../../theme/components", () => ({
         const { iconColor, hoverable, showLabel, ...cleanProps } = props;
         return (
             <span
-                data-testid="themed-text"
                 data-size={size}
+                data-testid="themed-text"
                 data-variant={variant}
                 {...cleanProps}
             >
@@ -151,15 +153,15 @@ vi.mock("../../../../theme/components", () => ({
     },
 }));
 
-vi.mock("../../../../components/common/MonitorUiComponents", () => ({
+vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
     ConditionalResponseTime: ({
         children,
         monitorType,
     }: PropsWithChildren<Readonly<{ monitorType: string }>>) => (
         // Always show children (assumes response time is supported for test simplicity)
         <div
-            data-testid="conditional-response-time"
             data-monitor-type={monitorType}
+            data-testid="conditional-response-time"
         >
             {children}
         </div>
@@ -167,30 +169,30 @@ vi.mock("../../../../components/common/MonitorUiComponents", () => ({
 }));
 
 // Mock the monitorUiHelpers to prevent async operations
-vi.mock("../../../../utils/monitorUiHelpers", () => ({
+vi.mock(import('../../../../utils/monitorUiHelpers'), () => ({
     supportsResponseTime: vi.fn(() => true), // Synchronous function
     formatMonitorDetail: vi.fn(() => "mocked detail"), // Synchronous function
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
+vi.mock(import('../../../../components/SiteDetails/charts/ResponseTimeChart'), () => ({
     ResponseTimeChart: () => (
-        <div data-testid="response-time-chart" data-chart-type="line">
+        <div data-chart-type="line" data-testid="response-time-chart">
             Line Chart
         </div>
     ),
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
+vi.mock(import('../../../../components/SiteDetails/charts/StatusChart'), () => ({
     StatusChart: () => (
-        <div data-testid="status-chart" data-chart-type="bar">
+        <div data-chart-type="bar" data-testid="status-chart">
             Bar Chart
         </div>
     ),
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
+vi.mock(import('../../../../components/SiteDetails/charts/UptimeChart'), () => ({
     UptimeChart: () => (
-        <div data-testid="uptime-chart" data-chart-type="doughnut">
+        <div data-chart-type="doughnut" data-testid="uptime-chart">
             Doughnut Chart
         </div>
     ),
@@ -1124,7 +1126,7 @@ describe(AnalyticsTab, () => {
 
             render(<AnalyticsTab {...props} />);
 
-            fireEvent.click(screen.getByRole("button", { name: /advanced/i }));
+            fireEvent.click(screen.getByRole("button", { name: /advanced/iv }));
 
             expect(setShowAdvancedMetrics).toHaveBeenCalledWith(true);
             expect(logger.user.action).toHaveBeenCalledWith(

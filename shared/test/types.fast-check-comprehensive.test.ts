@@ -26,24 +26,24 @@
  * );constructors.
  */
 
-import { describe, it, expect } from "vitest";
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 // Import all functions and types from shared/types.ts
 import {
+    BASE_MONITOR_TYPES,
+    DEFAULT_MONITOR_STATUS,
+    DEFAULT_SITE_STATUS,
     isComputedSiteStatus,
     isMonitorStatus,
     isSiteStatus,
-    validateMonitor,
     type Monitor,
+    MONITOR_STATUS,
     type MonitorStatus,
     type MonitorType,
     type SiteStatus,
-    BASE_MONITOR_TYPES,
-    MONITOR_STATUS,
-    DEFAULT_MONITOR_STATUS,
-    DEFAULT_SITE_STATUS,
+    validateMonitor,
 } from "../types";
 
 const createMonitorSample = (
@@ -59,7 +59,7 @@ const createMonitorSample = (
         status: "up",
         timeout: 5 * 1000,
         ...overrides,
-    }) as Monitor;
+    });
 
 const VALID_MONITOR_SAMPLES: readonly Monitor[] = [
     createMonitorSample({
@@ -159,12 +159,12 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
         test.prop([fc.string()])(
             "should return true only for 'mixed' and 'unknown' strings",
             (input: string) => {
-                const result = isComputedSiteStatus(input);
+                const isResult = isComputedSiteStatus(input);
 
                 if (input === "mixed" || input === "unknown") {
-                    expect(result).toBeTruthy();
+                    expect(isResult).toBeTruthy();
                 } else {
-                    expect(result).toBeFalsy();
+                    expect(isResult).toBeFalsy();
                 }
             }
         );
@@ -746,7 +746,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 retryAttempts: fc.nat(),
                 history: fc.array(fc.anything()),
                 activeOperations: fc.array(
-                    fc.constantFrom("   ", "  \t  ", " \n ", ""),
+                    fc.constantFrom(' '.repeat(3), "  \t  ", " \n ", ""),
                     { minLength: 1 }
                 ),
             }),

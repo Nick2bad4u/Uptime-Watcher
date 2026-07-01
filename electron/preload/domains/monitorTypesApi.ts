@@ -31,51 +31,6 @@ import {
     createPreloadDomain,
 } from "../utils/preloadDomainFactory";
 
-function safeParseValidationResult(
-    candidate: unknown
-): SafeParseLike<ValidationResult> {
-    if (!isValidationResult(candidate)) {
-        return {
-            error: new Error(
-                `Expected ValidationResult response payload, received ${
-                    Array.isArray(candidate) ? "array" : typeof candidate
-                }`
-            ),
-            success: false,
-        };
-    }
-
-    return { data: candidate, success: true };
-}
-
-function safeParseMonitorTypeConfigs(
-    candidate: unknown
-): SafeParseLike<MonitorTypeConfig[]> {
-    if (!Array.isArray(candidate)) {
-        return {
-            error: new Error(
-                `Expected monitor type configuration array, received ${typeof candidate}`
-            ),
-            success: false,
-        };
-    }
-
-    const typedConfigs = candidate.filter(isMonitorTypeConfig);
-    if (typedConfigs.length !== candidate.length) {
-        return {
-            error: new Error(
-                "Monitor type configuration array contained invalid entries"
-            ),
-            success: false,
-        };
-    }
-
-    return {
-        data: typedConfigs,
-        success: true,
-    };
-}
-
 /**
  * Interface defining the monitor types domain API operations.
  *
@@ -163,6 +118,51 @@ function createMonitorTypesApi(): MonitorTypesApiInterface {
     } catch (error) {
         throw ensureError(error);
     }
+}
+
+function safeParseMonitorTypeConfigs(
+    candidate: unknown
+): SafeParseLike<MonitorTypeConfig[]> {
+    if (!Array.isArray(candidate)) {
+        return {
+            error: new Error(
+                `Expected monitor type configuration array, received ${typeof candidate}`
+            ),
+            success: false,
+        };
+    }
+
+    const typedConfigs = candidate.filter(isMonitorTypeConfig);
+    if (typedConfigs.length !== candidate.length) {
+        return {
+            error: new Error(
+                "Monitor type configuration array contained invalid entries"
+            ),
+            success: false,
+        };
+    }
+
+    return {
+        data: typedConfigs,
+        success: true,
+    };
+}
+
+function safeParseValidationResult(
+    candidate: unknown
+): SafeParseLike<ValidationResult> {
+    if (!isValidationResult(candidate)) {
+        return {
+            error: new Error(
+                `Expected ValidationResult response payload, received ${
+                    Array.isArray(candidate) ? "array" : typeof candidate
+                }`
+            ),
+            success: false,
+        };
+    }
+
+    return { data: candidate, success: true };
 }
 
 const createMonitorTypesApiFallback = (

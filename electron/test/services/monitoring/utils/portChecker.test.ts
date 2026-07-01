@@ -4,7 +4,7 @@
  * @module portChecker
  *
  * @file Comprehensive tests for the performSinglePortCheck function in the
- *   Uptime Watcher application.
+ *   Uptime Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,7 +15,17 @@
  * @tags ["test", "monitoring", "port", "tcp", "connectivity"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+// Import after mocks are set up
+import isPortReachable from "is-port-reachable";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { isDev } from "../../../../electronUtils";
+import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";
+import {
+    PORT_NOT_REACHABLE,
+    PortCheckError,
+} from "../../../../services/monitoring/utils/portErrorHandling";
+import { logger } from "../../../../utils/logger";
 
 // Mock external dependencies before importing the module under test
 vi.mock("is-port-reachable", () => ({
@@ -46,16 +56,6 @@ vi.mock("../../../../services/monitoring/utils/portErrorHandling", () => ({
         }
     },
 }));
-
-// Import after mocks are set up
-import isPortReachable from "is-port-reachable";
-import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";
-import { isDev } from "../../../../electronUtils";
-import { logger } from "../../../../utils/logger";
-import {
-    PORT_NOT_REACHABLE,
-    PortCheckError,
-} from "../../../../services/monitoring/utils/portErrorHandling";
 
 // Mock performance.now() globally
 const mockPerformanceNow = vi.fn();

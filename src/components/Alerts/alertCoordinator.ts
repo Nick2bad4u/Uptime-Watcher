@@ -133,6 +133,8 @@ const ensureAudioContext = (): AudioContext | null => {
     return context;
 };
 
+type AlertToneInvoker = () => Promise<void>;
+
 /**
  * Plays a short audible tone for in-app alerts when enabled.
  */
@@ -204,8 +206,6 @@ export async function playInAppAlertTone(): Promise<void> {
 
     oscillator.addEventListener("ended", handleToneEnded, { once: true });
 }
-
-type AlertToneInvoker = () => Promise<void>;
 
 const alertToneInvokerRef: { current: AlertToneInvoker } = {
     current: playInAppAlertTone,

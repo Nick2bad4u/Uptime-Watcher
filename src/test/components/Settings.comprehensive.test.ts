@@ -2,6 +2,7 @@
  * Tests for Settings component to improve coverage
  */
 
+import { objectValues, setHas  } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 describe("Settings Component Coverage Tests", () => {
@@ -21,7 +22,7 @@ describe("Settings Component Coverage Tests", () => {
             expect(typeof props.onClose).toBe("function");
 
             props.onClose();
-            expect(props.onClose).toHaveBeenCalled();
+            expect(props.onClose).toHaveBeenCalledWith();
         });
     });
 
@@ -38,9 +39,9 @@ describe("Settings Component Coverage Tests", () => {
             const ALLOWED_SETTINGS_KEYS = new Set([
                 "autoStart",
                 "historyLimit",
-                "minimizeToTray",
                 "inAppAlertsEnabled",
                 "inAppAlertsSoundEnabled",
+                "minimizeToTray",
                 "systemNotificationsEnabled",
                 "systemNotificationsSoundEnabled",
                 "theme",
@@ -64,11 +65,11 @@ describe("Settings Component Coverage Tests", () => {
             ];
 
             for (const key of validKeys) {
-                expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBeTruthy();
+                expect(setHas(ALLOWED_SETTINGS_KEYS, key as any)).toBeTruthy();
             }
 
             for (const key of invalidKeys) {
-                expect(ALLOWED_SETTINGS_KEYS.has(key as any)).toBeFalsy();
+                expect(setHas(ALLOWED_SETTINGS_KEYS, key as any)).toBeFalsy();
             }
         });
     });
@@ -98,7 +99,7 @@ describe("Settings Component Coverage Tests", () => {
             errorStore.clearError();
             errorStore.setError(new Error("Test error"));
 
-            expect(errorStore.clearError).toHaveBeenCalled();
+            expect(errorStore.clearError).toHaveBeenCalledWith();
             expect(errorStore.setError).toHaveBeenCalledWith(expect.any(Error));
         });
 
@@ -159,8 +160,8 @@ describe("Settings Component Coverage Tests", () => {
             sitesStore.saveSqliteBackup();
             sitesStore.fullResyncSites();
 
-            expect(sitesStore.saveSqliteBackup).toHaveBeenCalled();
-            expect(sitesStore.fullResyncSites).toHaveBeenCalled();
+            expect(sitesStore.saveSqliteBackup).toHaveBeenCalledWith();
+            expect(sitesStore.fullResyncSites).toHaveBeenCalledWith();
         });
 
         it("should integrate with useTheme", async ({ task, annotate }) => {
@@ -276,16 +277,16 @@ describe("Settings Component Coverage Tests", () => {
             const ALLOWED_SETTINGS_KEYS = new Set([
                 "autoStart",
                 "historyLimit",
-                "minimizeToTray",
                 "inAppAlertsEnabled",
                 "inAppAlertsSoundEnabled",
+                "minimizeToTray",
                 "systemNotificationsEnabled",
                 "systemNotificationsSoundEnabled",
                 "theme",
             ]);
 
             const handleSettingChange = (key: string, _value: unknown) => {
-                if (!ALLOWED_SETTINGS_KEYS.has(key as any)) {
+                if (!ALLOWED_SETTINGS_KEYS.has(key)) {
                     return false; // Invalid key
                 }
                 return true; // Valid key
@@ -473,7 +474,7 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Type: Error Handling", "type");
 
             const ensureError = (error: unknown) => {
-                if (error instanceof Error) {
+                if (Error.isError(error)) {
                     return error;
                 }
                 return new Error(String(error));
@@ -500,7 +501,7 @@ describe("Settings Component Coverage Tests", () => {
             clearError();
             setError(new Error("Test error"));
 
-            expect(clearError).toHaveBeenCalled();
+            expect(clearError).toHaveBeenCalledWith();
             expect(setError).toHaveBeenCalledWith(expect.any(Error));
         });
     });
@@ -562,7 +563,7 @@ describe("Settings Component Coverage Tests", () => {
             const resetSettings = vi.fn();
 
             resetSettings();
-            expect(resetSettings).toHaveBeenCalled();
+            expect(resetSettings).toHaveBeenCalledWith();
         });
     });
 
@@ -755,7 +756,7 @@ describe("Settings Component Coverage Tests", () => {
             // Simulate close button click
             onClose();
 
-            expect(onClose).toHaveBeenCalled();
+            expect(onClose).toHaveBeenCalledWith();
         });
 
         it("should handle setting changes", async ({ task, annotate }) => {
@@ -821,8 +822,8 @@ describe("Settings Component Coverage Tests", () => {
                 validation: true,
             };
 
-            for (const element of Object.values(architectureElements)) {
-                expect(element).toBeTruthy();
+            for (const isElement of objectValues(architectureElements)) {
+                expect(isElement).toBeTruthy();
             }
         });
     });

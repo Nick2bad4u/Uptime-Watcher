@@ -1,11 +1,10 @@
-import { describe, expect, it } from "vitest";
-
 import {
     hasHttpAuthorityDelimiterIssue,
     hasMissingProtocolDelimiter,
     hasNestedHttpSchemeAfterFirstDelimiter,
     isSchemeOnlyUrl,
 } from "@shared/utils/urlSchemeValidation";
+import { describe, expect, it } from "vitest";
 
 describe("urlSchemeValidation", () => {
     describe(isSchemeOnlyUrl, () => {

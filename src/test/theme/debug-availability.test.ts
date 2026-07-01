@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 
 import { useAvailabilityColors } from "../../theme/useTheme";
 
-describe("Debug Availability Description", () => {
+describe("debug Availability Description", () => {
     it("should debug actual availability description values", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: debug-availability", "component");
@@ -25,6 +25,6 @@ describe("Debug Availability Description", () => {
         expect(result.current.getAvailabilityDescription(80)).toBeDefined();
 
         // Just to pass the test
-        expect(true).toBeTruthy();
+        expect(true).toBe(true);
     });
 });

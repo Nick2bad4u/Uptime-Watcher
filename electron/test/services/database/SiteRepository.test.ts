@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,8 +15,9 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { fc } from "@fast-check/vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { SiteRepository } from "../../../services/database/SiteRepository";
 
 describe(SiteRepository, () => {
@@ -229,9 +230,9 @@ describe(SiteRepository, () => {
                 }
             );
 
-            const result = await repository.delete("nonexistent");
+            const isResult = await repository.delete("nonexistent");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
         it("should handle deletion errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -302,9 +303,9 @@ describe(SiteRepository, () => {
                 prepare: mockPrepare,
                 get: mockGet,
             });
-            const result = await repository.exists("site1");
+            const isResult = await repository.exists("site1");
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
         it("should return false when site does not exist", async ({
             task,
@@ -324,9 +325,9 @@ describe(SiteRepository, () => {
                 prepare: mockPrepare,
                 get: mockGet,
             });
-            const result = await repository.exists("nonexistent");
+            const isResult = await repository.exists("nonexistent");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
     describe("bulkInsert", () => {
@@ -479,10 +480,10 @@ describe(SiteRepository, () => {
                         for (const siteIdentifier of siteIdentifiers) {
                             mockDatabase.run.mockReturnValue({ changes: 1 });
 
-                            const result =
+                            const isResult =
                                 await repository.delete(siteIdentifier);
 
-                            expect(result).toBeTruthy();
+                            expect(isResult).toBeTruthy();
                             expect(
                                 mockDatabaseService.executeTransaction
                             ).toHaveBeenCalled();

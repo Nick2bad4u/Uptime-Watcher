@@ -23,9 +23,9 @@
  * @file Arithmetic mutation tests for ScreenshotThumbnail component
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, waitFor, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     ScreenshotThumbnail,
@@ -33,7 +33,7 @@ import {
 } from "../../../components/SiteDetails/ScreenshotThumbnail";
 
 // Mock the logger (following existing pattern)
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         user: {
@@ -44,14 +44,14 @@ vi.mock("../../../services/logger", () => ({
 }));
 
 // Mock theme hook (following existing pattern)
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useTheme: () => ({
         themeName: "light",
     }),
 }));
 
 // Mock useUIStore (following existing pattern)
-vi.mock("../../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../../stores/ui/useUiStore'), () => ({
     useUIStore: (
         selector?: (state: { openExternal: () => void }) => unknown
     ) => {
@@ -64,7 +64,7 @@ vi.mock("../../../stores/ui/useUiStore", () => ({
 }));
 
 // Mock useMount hook (following existing pattern)
-vi.mock("../../../hooks/useMount", () => ({
+vi.mock(import('../../../hooks/useMount'), () => ({
     useMount: vi.fn((initCallback) => {
         setTimeout(() => {
             initCallback();
@@ -73,7 +73,7 @@ vi.mock("../../../hooks/useMount", () => ({
 }));
 
 // Mock navigation to prevent JSDOM errors
-HTMLAnchorElement.prototype.click = vi.fn();
+vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation();
 const originalSetAttribute = Element.prototype.setAttribute;
 Element.prototype.setAttribute = function (name: string, value: string) {
     if (
@@ -82,9 +82,9 @@ Element.prototype.setAttribute = function (name: string, value: string) {
         value.startsWith("http")
     ) {
         // Use a hash URL instead of the actual URL to prevent JSDOM navigation
-        return originalSetAttribute.call(this, name, "#");
+        originalSetAttribute.call(this, name, "#"); return;
     }
-    return originalSetAttribute.call(this, name, value);
+    originalSetAttribute.call(this, name, value);
 };
 
 describe("ScreenshotThumbnail Arithmetic Mutations", () => {
@@ -122,19 +122,21 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
         vi.clearAllMocks();
 
         // Mock window dimensions
-        Object.defineProperty(window, "innerWidth", {
-            writable: true,
-            configurable: true,
-            value: 1920,
-        });
-        Object.defineProperty(window, "innerHeight", {
-            writable: true,
-            configurable: true,
-            value: 1080,
+        Object.defineProperties(globalThis, {
+            innerWidth: {
+                writable: true,
+                configurable: true,
+                value: 1920,
+            },
+            innerHeight: {
+                writable: true,
+                configurable: true,
+                value: 1080,
+            },
         });
 
         // Mock getBoundingClientRect
-        Element.prototype.getBoundingClientRect = vi.fn(() => createMockRect());
+        vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(createMockRect());
 
         // Mock document.body for portal container
         if (!document.body) {

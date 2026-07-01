@@ -7,17 +7,20 @@
  * condition.
  */
 
-import { render, screen, within, act } from "@testing-library/react";
-import { createElement, type ReactNode } from "react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { UnknownRecord } from "type-fest";
+
+import { act, render, screen, within } from "@testing-library/react";
+import { createElement, type ReactNode } from "react";
+import { objectKeys, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { ThemeName } from "../theme/types";
 
 import { Settings } from "../components/Settings/Settings";
 import { logger } from "../services/logger";
-import type { ThemeName } from "../theme/types";
 
 // Mock constants
-vi.mock("../constants", () => ({
+vi.mock(import('../constants'), () => ({
     ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 100,
     HISTORY_LIMIT_OPTIONS: [
@@ -36,7 +39,7 @@ vi.mock("../constants", () => ({
 }));
 
 // Mock logger
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -73,7 +76,7 @@ const mockUseStore = {
         inAppAlertVolume: 1,
         systemNotificationsEnabled: true,
         systemNotificationsSoundEnabled: true,
-        theme: "dark" as ThemeName,
+        theme: safeCastTo<ThemeName>("dark"),
     },
     persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
     updateSettings: mockUpdateSettings,
@@ -85,17 +88,17 @@ const selectorAwareUseSitesStore = vi.fn(
         _equalityFn?: (a: unknown, b: unknown) => boolean
     ) =>
         (typeof selector === "function"
-            ? selector(mockUseStore as UnknownRecord)
-            : mockUseStore) as unknown
+            ? selector(safeCastTo<UnknownRecord>(mockUseStore))
+            : mockUseStore)
 );
 
 // Mock the theme hook
 const mockUseTheme = {
-    availableThemes: [
-        "light",
+    availableThemes: safeCastTo<ThemeName[]>([
         "dark",
+        "light",
         "system",
-    ] as ThemeName[],
+    ]),
     currentTheme: {
         colors: {
             background: {
@@ -209,13 +212,13 @@ const mockUseTheme = {
 };
 
 // Mock themed components
-vi.mock("../theme/components", () => ({
+vi.mock(import('../theme/components'), () => ({
     StatusIndicator: ({
         children,
         ...props
     }: {
-        children?: ReactNode;
         [key: string]: unknown;
+        children?: ReactNode;
     }) => createElement("div", props, children),
     ThemedBox: ({
         border,
@@ -223,10 +226,10 @@ vi.mock("../theme/components", () => ({
         loading,
         ...props
     }: {
-        children?: ReactNode;
-        border?: boolean;
-        loading?: boolean;
         [key: string]: unknown;
+        border?: boolean;
+        children?: ReactNode;
+        loading?: boolean;
     }) => {
         const filteredProps = { ...props };
         // Remove non-DOM props
@@ -243,9 +246,9 @@ vi.mock("../theme/components", () => ({
         loading,
         ...props
     }: {
+        [key: string]: unknown;
         children?: ReactNode;
         loading?: boolean;
-        [key: string]: unknown;
     }) => {
         const filteredProps = { ...props };
         // Remove non-DOM props
@@ -260,27 +263,27 @@ vi.mock("../theme/components", () => ({
         children,
         ...props
     }: {
-        children?: ReactNode;
         [key: string]: unknown;
+        children?: ReactNode;
     }) => createElement("select", props, children),
     ThemedText: ({
         children,
         ...props
     }: {
-        children?: ReactNode;
         [key: string]: unknown;
+        children?: ReactNode;
     }) => createElement("span", props, children),
 }));
 
 // Mock the stores
-vi.mock("../stores", () => ({
+vi.mock(import('../stores'), () => ({
     useErrorStore: () => mockUseStore,
     useSettingsStore: () => mockUseStore,
     useSitesStore: selectorAwareUseSitesStore,
 }));
 
 // Mock the theme hook
-vi.mock("../theme/useTheme", () => ({
+vi.mock(import('../theme/useTheme'), () => ({
     useTheme: () => mockUseTheme,
     useThemeClasses: () => ({
         getBackgroundClass: vi.fn(),
@@ -304,7 +307,7 @@ vi.mock("../theme/useTheme", () => ({
 }));
 
 const confirmMock = vi.fn();
-vi.mock("../hooks/ui/useConfirmDialog", () => ({
+vi.mock(import('../hooks/ui/useConfirmDialog'), () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
@@ -334,9 +337,9 @@ const getSettingsModal = (): HTMLElement => {
 const createAllowedSettingsKeySet = (): ReadonlySet<
     keyof typeof mockUseStore.settings
 > => {
-    const keys = Object.keys(
+    const keys = safeCastTo<(keyof typeof mockUseStore.settings)[]>(objectKeys(
         mockUseStore.settings
-    ) as (keyof typeof mockUseStore.settings)[];
+    ));
 
     return new Set<keyof typeof mockUseStore.settings>(keys);
 };
@@ -363,13 +366,11 @@ describe("Settings Component - Invalid Key Coverage", () => {
         // Ensure the modal structure matches expectations after recent UI updates
         getSettingsModal();
 
-        // We need to simulate the internal handleSettingChange call
-        // Since we can't directly access the method, we'll test it by creating a scenario
-        // where the method would be called with an invalid key
+        // We need to simulate the internal handleSettingChange call Since we can't directly access the method,
+        // we'll test it by creating a scenario where the method would be called with an invalid key
 
-        // The key insight is that the component's handleSettingChange method is called
-        // from the onChange handlers. We need to modify the component to allow testing
-        // of invalid keys, or use a different approach.
+        // The key insight is that the component's handleSettingChange method is called from the onChange handlers.
+        // We need to modify the component to allow testing of invalid keys, or use a different approach.
 
         // For now, let's test by directly calling the logic that would be in handleSettingChange
         await act(async () => {
@@ -425,7 +426,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
 
             // Simulate the logic from handleSettingChange with valid key
             if (
-                !allowedKeys.has(validKey as keyof typeof mockUseStore.settings)
+                !allowedKeys.has(validKey)
             ) {
                 logger.warn(
                     "Attempted to update invalid settings key",
@@ -437,7 +438,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
             // This should be reached for valid keys
             const oldValue =
                 mockUseStore.settings[
-                    validKey as keyof typeof mockUseStore.settings
+                    safeCastTo<keyof typeof mockUseStore.settings>(validKey)
                 ];
             mockUpdateSettings({ [validKey]: !oldValue });
             logger.user.settingsChange(validKey, oldValue, !oldValue);

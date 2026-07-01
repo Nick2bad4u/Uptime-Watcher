@@ -6,7 +6,7 @@
  * This module provides standardized form handling utilities, input change
  * handlers, validation patterns, and common form operations. It ensures
  * consistent behavior and reduces code duplication across form components in
- * the application.
+ * the app.
  *
  * Key features:
  *
@@ -37,7 +37,7 @@
  * @packageDocumentation
  */
 
-import type React from "react";
+import type * as React from "react";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { arrayIncludes } from "ts-extras";

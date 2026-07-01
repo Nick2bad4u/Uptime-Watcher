@@ -3,7 +3,7 @@
  * surfaces (e.g. the sidebar quick switcher).
  *
  * @remarks
- * The application uses `data-site-identifier` in multiple places (sidebar
+ * The app uses `data-site-identifier` in multiple places (sidebar
  * buttons, site cards, and table rows). A naive `document.querySelector` may
  * therefore match the sidebar element itself rather than the dashboard card.
  *
@@ -37,14 +37,14 @@ const DEFAULT_SCROLL_OPTIONS: Required<ScrollToSiteCardOptions> = {
 
 const escapeForAttributeSelector = (value: string): string => {
     try {
-        return globalThis.CSS.escape(value);
+        return CSS.escape(value);
     } catch {
         // Continue to fallback escaping.
     }
 
     // Minimal escaping for attribute selector string literals.
     // This is a fallback when CSS.escape is not available.
-    return value.replaceAll("\\", "\\\\").replaceAll('"', String.raw`\"`);
+    return value.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 };
 
 /**

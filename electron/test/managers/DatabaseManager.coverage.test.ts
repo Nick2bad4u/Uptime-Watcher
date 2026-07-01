@@ -3,21 +3,22 @@
  * achieve stable test coverage.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     DatabaseManager,
     type DatabaseManagerDependencies,
 } from "../../managers/DatabaseManager";
 import {
-    createMockStandardizedCache,
+    createMockConfigurationManager,
     createMockEventBus,
     createMockRepositories,
-    createMockConfigurationManager,
     createMockSiteLoadingOrchestrator,
+    createMockStandardizedCache,
     createTestSite,
 } from "../utils/enhanced-testUtilities";
 
@@ -88,13 +89,15 @@ describe("DatabaseManager - Coverage Tests", () => {
             await import("../../services/database/historyLimitManager");
         vi.mocked(historyLimitManager.setHistoryLimit).mockImplementation(
             async (params) => {
-                if (params?.setHistoryLimit) {
-                    const nextLimit = normalizeHistoryLimit(
-                        params.limit,
-                        params.rules ?? DEFAULT_HISTORY_LIMIT_RULES
-                    );
-                    await params.setHistoryLimit(nextLimit);
+                if (!params?.setHistoryLimit) {
+                    return;
                 }
+
+                const nextLimit = normalizeHistoryLimit(
+                    params.limit,
+                    params.rules ?? DEFAULT_HISTORY_LIMIT_RULES
+                );
+                await params.setHistoryLimit(nextLimit);
             }
         );
 
@@ -129,9 +132,9 @@ describe("DatabaseManager - Coverage Tests", () => {
         );
 
         mockDependencies = {
-            configurationManager: mockConfigurationManager as any,
+            configurationManager: mockConfigurationManager,
             eventEmitter: eventEmitter as any,
-            repositories: mockRepositories as any,
+            repositories: mockRepositories,
         };
 
         databaseManager = new DatabaseManager(mockDependencies);
@@ -384,9 +387,9 @@ describe("DatabaseManager - Coverage Tests", () => {
             const mockExecutor = (databaseManager as any).commandExecutor;
             vi.mocked(mockExecutor.execute).mockResolvedValue(true);
 
-            const result = await databaseManager.importData('{"test": "data"}');
+            const isResult = await databaseManager.importData('{"test": "data"}');
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockExecutor.execute).toHaveBeenCalled();
         });
 
@@ -421,9 +424,9 @@ describe("DatabaseManager - Coverage Tests", () => {
             };
             (databaseManager as any).commandExecutor = failureCommandExecutor;
 
-            const result = await databaseManager.importData("invalid-json");
+            const isResult = await databaseManager.importData("invalid-json");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(failureCommandExecutor.execute).toHaveBeenCalled();
         });
     });

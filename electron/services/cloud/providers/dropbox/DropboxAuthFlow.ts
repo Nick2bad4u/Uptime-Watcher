@@ -105,7 +105,7 @@ export class DropboxAuthFlow {
                     args.state,
                     "code",
                     "offline",
-                    Array.from(DROPBOX_SCOPES),
+                    [...DROPBOX_SCOPES],
                     "none",
                     true
                 )

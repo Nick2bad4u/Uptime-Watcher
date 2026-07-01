@@ -22,7 +22,7 @@ export const createPersistConfig = <TState, TPersisted = Partial<TState>>(
     partialize?: (state: TState) => TPersisted
 ): PersistOptions<TState, TPersisted> => ({
     name: `uptime-watcher-${storeName}`,
-    ...(partialize ? { partialize } : {}),
+    ...(partialize && { partialize }),
 });
 
 /**

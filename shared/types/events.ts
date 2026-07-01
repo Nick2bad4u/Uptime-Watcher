@@ -100,7 +100,6 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
  *
  * @public
  */
-/* eslint-disable perfectionist/sort-interfaces -- Maintain timestamp-first ordering to satisfy sort-class-members. */
 /**
  * Common base shape shared by all event payloads emitted through the typed
  * event bus.
@@ -113,8 +112,6 @@ export interface BaseEventData extends UnknownRecord {
     /** Preserves previously attached metadata when re-emitting events. */
     readonly _originalMeta?: EventMetadata | undefined;
 }
-/* eslint-enable perfectionist/sort-interfaces -- Restore interface sorting rules. */
-
 const baseEventDataSchema = z
     .object({
         _meta: eventMetadataSchema.optional(),
@@ -157,7 +154,7 @@ export const SITE_ADDED_SOURCE: Readonly<{
  * @public
  */
 export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze(
-    Array.from(SITE_ADDED_SOURCE_VALUES)
+    [...SITE_ADDED_SOURCE_VALUES]
 );
 
 /**
@@ -854,7 +851,7 @@ export const UPDATE_STATUS_VALUES: readonly UpdateStatus[] = Object.freeze(
  * Payload for update status change events.
  *
  * @remarks
- * Used to communicate the current status of application updates, including
+ * Used to communicate the current status of app updates, including
  * errors.
  *
  * - `status`: The current update status.

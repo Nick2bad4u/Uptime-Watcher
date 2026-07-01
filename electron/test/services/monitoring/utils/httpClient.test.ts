@@ -3,14 +3,17 @@
  * interceptors.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import axios from "axios";
 import type { AxiosInstance } from "axios";
+
+import axios from "axios";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { MonitorServiceConfig } from "../../../../services/monitoring/types";
+
 import {
     createHttpClient,
     setupTimingInterceptors,
 } from "../../../../services/monitoring/utils/httpClient";
-import type { MonitorServiceConfig } from "../../../../services/monitoring/types";
 
 // Mock axios
 vi.mock("axios", () => ({
@@ -19,7 +22,7 @@ vi.mock("axios", () => ({
     },
 }));
 
-// Mock http and https agents (node: specifiers match implementation)
+// Mock HTTP and HTTPS agents (node: specifiers match implementation)
 vi.mock("node:http", () => ({
     Agent: vi.fn(),
 }));

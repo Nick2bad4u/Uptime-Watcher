@@ -1,8 +1,8 @@
 /**
- * Main entry point for the Electron application.
+ * Main entry point for the Electron app.
  *
  * @remarks
- * Sets up logging, initializes the application service, and configures shutdown
+ * Sets up logging, initializes the app service, and configures shutdown
  * handlers for graceful cleanup. Uses context isolation and preload scripts for
  * secure logging.
  *
@@ -47,8 +47,8 @@ function isPlainRecord(value: unknown): value is UnknownRecord {
  * startup.
  */
 const USER_DATA_ENV_KEYS = [
-    "UPTIME_WATCHER_USER_DATA_DIR",
     "PLAYWRIGHT_USER_DATA_DIR",
+    "UPTIME_WATCHER_USER_DATA_DIR",
 ] as const;
 
 /**
@@ -88,7 +88,7 @@ const configureUserDataPath = (): void => {
 
         const resolvedPath = path.resolve(trimmedOverridePath);
 
-        mkdirSync(resolvedPath, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename, n/no-sync -- Dynamic but validated path is required during early startup and sync IO guarantees the directory exists before Electron proceeds
+        mkdirSync(resolvedPath, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path is required during early startup and sync IO guarantees the directory exists before Electron proceeds
         app.setPath("userData", resolvedPath);
         logger.info("[Main] Using custom userData path override", {
             path: resolvedPath,
@@ -184,19 +184,19 @@ const configureLogging = (): {
     // Check for log level flags in command line arguments
     const args = new Set(process.argv.slice(2));
 
-    const debugFlag = setHas(args, "--debug") || setHas(args, "--log-debug");
-    const productionFlag =
+    const isDebugFlag = setHas(args, "--debug") || setHas(args, "--log-debug");
+    const isProductionFlag =
         setHas(args, "--production") ||
         setHas(args, "--log-production") ||
         setHas(args, "--log-prod");
-    const infoFlag = setHas(args, "--info") || setHas(args, "--log-info");
+    const isInfoFlag = setHas(args, "--info") || setHas(args, "--log-info");
 
     // Determine log level based on flags and environment
     return ((): {
         consoleLevel: ElectronLogLevel;
         fileLevel: ElectronLogLevel;
     } => {
-        if (debugFlag) {
+        if (isDebugFlag) {
             const configuration = {
                 consoleLevel: safeCastTo<ElectronLogLevel>("debug"),
                 fileLevel: safeCastTo<ElectronLogLevel>("debug"),
@@ -206,7 +206,8 @@ const configureLogging = (): {
                 configuration
             );
             return configuration;
-        } else if (productionFlag) {
+        }
+        if (isProductionFlag) {
             const configuration = {
                 consoleLevel: safeCastTo<ElectronLogLevel>("info"),
                 fileLevel: safeCastTo<ElectronLogLevel>("warn"),
@@ -216,7 +217,8 @@ const configureLogging = (): {
                 configuration
             );
             return configuration;
-        } else if (infoFlag) {
+        }
+        if (isInfoFlag) {
             const configuration = {
                 consoleLevel: safeCastTo<ElectronLogLevel>("info"),
                 fileLevel: safeCastTo<ElectronLogLevel>("info"),
@@ -259,9 +261,9 @@ type ElectronLogLevel =
 
 const ELECTRON_LOG_FILE = "uptime-watcher-main.log" as const;
 const LOG_FILE_MAX_SIZE = 1024 ** 2 * 5; // 5MB max file size
-const LOG_FILE_FORMAT: string =
+const LOG_FILE_FORMAT =
     "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
-const LOG_CONSOLE_FORMAT: string = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
+const LOG_CONSOLE_FORMAT = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
 
 const { consoleLevel, fileLevel } = configureLogging();
 log.transports.file.level = fileLevel;
@@ -304,7 +306,7 @@ if (isDev()) {
     let lastHotReloadTime = 0;
     let reloadHistory: number[] = []; // Track recent reload timestamps
     let isReloadInProgress = false;
-    let circuitBreakerMode = false;
+    let isCircuitBreakerMode = false;
     let circuitBreakerUntil = 0;
     let circuitBreakerCount = 0;
     let reloadProgressTimer: NodeJS.Timeout | null = null;
@@ -339,7 +341,7 @@ if (isDev()) {
             PROGRESSIVE_BACKOFF_MULTIPLIER **
                 Math.min(circuitBreakerCount - 1, 3);
 
-        circuitBreakerMode = true;
+        isCircuitBreakerMode = true;
         circuitBreakerUntil = Date.now() + backoffTime;
 
         logger.warn(
@@ -352,12 +354,14 @@ if (isDev()) {
      * Checks and resets circuit breaker if timeout has passed.
      */
     const checkCircuitBreakerReset = (): void => {
-        if (circuitBreakerMode && Date.now() > circuitBreakerUntil) {
-            circuitBreakerMode = false;
-            logger.info(
-                "[Main] Hot reload circuit breaker reset - normal operation resumed"
-            );
+        if (!isCircuitBreakerMode || Date.now() <= circuitBreakerUntil) {
+            return;
         }
+
+        isCircuitBreakerMode = false;
+        logger.info(
+            "[Main] Hot reload circuit breaker reset - normal operation resumed"
+        );
     };
 
     /**
@@ -375,7 +379,7 @@ if (isDev()) {
 
         // Check if circuit breaker is active
         checkCircuitBreakerReset();
-        if (circuitBreakerMode) {
+        if (isCircuitBreakerMode) {
             logger.debug("[Main] Hot reload blocked - circuit breaker active");
             return;
         }
@@ -481,11 +485,11 @@ if (isDev()) {
 }
 
 /**
- * Main application class that initializes and manages the Electron app.
+ * Main app class that initializes and manages the Electron app.
  *
  * @remarks
  * Uses a modular {@link ApplicationService} for clean separation of concerns and
- * follows the single responsibility principle. Handles application lifecycle
+ * follows the single responsibility principle. Handles app lifecycle
  * management, including initialization, cleanup, and graceful shutdown.
  *
  * Ensures that cleanup is performed only once, even if multiple shutdown events
@@ -578,58 +582,62 @@ class Main {
      * Named event handler for safe cleanup on process exit.
      */
     private readonly handleProcessExit = (): void => {
-        if (!this.cleanedUp) {
-            this.cleanedUp = true;
-            // Handle cleanup asynchronously without blocking process exit
-            // Use setImmediate to avoid blocking the event loop
-            setImmediate((): void => {
-                fireAndForget(
-                    async () => {
-                        await this.performCleanup();
-                    },
-                    {
-                        onError: (error) => {
-                            logger.error(
-                                "[Main] Unexpected error during process exit cleanup",
-                                error
-                            );
-                            // Log the error but don't prevent process exit
-                        },
-                    }
-                );
-            });
+        if (this.cleanedUp) {
+            return;
         }
+
+        this.cleanedUp = true;
+        // Handle cleanup asynchronously without blocking process exit
+        // Use setImmediate to avoid blocking the event loop
+        setImmediate((): void => {
+            fireAndForget(
+                async () => {
+                    await this.performCleanup();
+                },
+                {
+                    onError: (error) => {
+                        logger.error(
+                            "[Main] Unexpected error during process exit cleanup",
+                            error
+                        );
+                        // Log the error but don't prevent process exit
+                    },
+                }
+            );
+        });
     };
 
     /**
      * Named event handler for safe cleanup on app quit.
      */
     private readonly handleAppQuit = (): void => {
-        if (!this.cleanedUp) {
-            this.cleanedUp = true;
-            // Handle cleanup asynchronously during app quit
-            setImmediate((): void => {
-                fireAndForget(
-                    async () => {
-                        await this.performCleanup();
-                    },
-                    {
-                        onError: (error) => {
-                            logger.error(
-                                "[Main] Unexpected error during app quit cleanup",
-                                error
-                            );
-                            // Don't throw - app is already quitting, just exit with error code
-                            app.exit(1);
-                        },
-                    }
-                );
-            });
+        if (this.cleanedUp) {
+            return;
         }
+
+        this.cleanedUp = true;
+        // Handle cleanup asynchronously during app quit
+        setImmediate((): void => {
+            fireAndForget(
+                async () => {
+                    await this.performCleanup();
+                },
+                {
+                    onError: (error) => {
+                        logger.error(
+                            "[Main] Unexpected error during app quit cleanup",
+                            error
+                        );
+                        // Don't throw - app is already quitting, just exit with error code
+                        app.exit(1);
+                    },
+                }
+            );
+        });
     };
 
     /**
-     * Starts the main application lifecycle.
+     * Starts the main app lifecycle.
      *
      * @remarks
      * The returned instance is stored on the class to ensure it remains
@@ -684,7 +692,7 @@ class Main {
             }
         };
 
-        let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
         const timeout = new Promise<void>((resolve) => {
             timeoutId = setTimeout(resolve, Main.FATAL_SHUTDOWN_TIMEOUT_MS);
         });
@@ -699,7 +707,7 @@ class Main {
     }
 
     /**
-     * Performs cleanup of application service.
+     * Performs cleanup of app service.
      *
      * @returns Promise that resolves when cleanup is complete
      */
@@ -717,10 +725,10 @@ class Main {
     }
 
     /**
-     * Constructs the main application and sets up shutdown handlers.
+     * Constructs the main app and sets up shutdown handlers.
      *
      * @remarks
-     * Sets up logging, creates the application service, and configures cleanup
+     * Sets up logging, creates the app service, and configures cleanup
      * handlers. Establishes event listeners for both Node.js process events and
      * Electron app events to ensure proper cleanup in all shutdown scenarios.
      *
@@ -762,7 +770,7 @@ class Main {
      * Removes event listeners to prevent memory leaks.
      *
      * @remarks
-     * Called during application shutdown to clean up event listeners and
+     * Called during app shutdown to clean up event listeners and
      * prevent memory leaks. Removes both Node.js process and Electron app event
      * listeners that were set up in the constructor.
      */
@@ -777,11 +785,11 @@ class Main {
     }
 }
 
-// Start the application
+// Start the app
 /**
  * @remarks
  * Intentionally not assigning the Main instance to a variable. This ensures the
- * instance persists for the application's lifetime, preventing premature
+ * instance persists for the app's lifetime, preventing premature
  * garbage collection and maintaining lifecycle handlers.
  */
 if (process.versions.electron) {

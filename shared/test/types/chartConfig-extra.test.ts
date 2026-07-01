@@ -7,8 +7,8 @@
  * @file Function coverage validation for chartConfig type guards
  */
 
-import { describe, it, expect } from "vitest";
 import * as chartConfig from "@shared/types/chartConfig";
+import { describe, expect, it } from "vitest";
 
 describe("Function Coverage Validation", () => {
     it("should call all exported functions to ensure 100% function coverage", async ({

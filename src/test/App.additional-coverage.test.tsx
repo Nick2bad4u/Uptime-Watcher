@@ -30,6 +30,14 @@ import { isDevelopment } from "@shared/utils/environment";
 import { App } from "../App";
 import { defaultSettings } from "../stores/settings/state";
 
+// Import the actual store modules to mock them
+import * as useUpdatesStore from "../stores/updates/useUpdatesStore";
+import * as useSitesStore from "../stores/sites/useSitesStore";
+import * as useErrorStore from "../stores/error/useErrorStore";
+import * as useUIStore from "../stores/ui/useUiStore";
+import * as useSettingsStore from "../stores/settings/useSettingsStore";
+import * as useTheme from "../theme/useTheme";
+
 // Mock all the stores
 vi.mock("../stores/updates/useUpdatesStore");
 vi.mock("../stores/sites/useSitesStore");
@@ -327,14 +335,6 @@ const mockThemeState = {
     toggleTheme: vi.fn(),
 };
 
-// Import the actual store modules to mock them
-import * as useUpdatesStore from "../stores/updates/useUpdatesStore";
-import * as useSitesStore from "../stores/sites/useSitesStore";
-import * as useErrorStore from "../stores/error/useErrorStore";
-import * as useUIStore from "../stores/ui/useUiStore";
-import * as useSettingsStore from "../stores/settings/useSettingsStore";
-import * as useTheme from "../theme/useTheme";
-
 // Set up mocks
 const mockUseUpdatesStore = vi.mocked(useUpdatesStore.useUpdatesStore);
 const mockUseSitesStore = vi.mocked(useSitesStore.useSitesStore);
@@ -529,24 +529,24 @@ describe("App Additional Coverage Tests", () => {
         mockUseErrorStore.mockReturnValue(mockErrorStoreState);
 
         // Mock the getState method for useErrorStore (needed by createStoreErrorHandler)
-        (mockUseErrorStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockErrorStoreState);
+        vi.spyOn(mockUseErrorStore as any, "getState").mockReturnValue(
+            mockErrorStoreState
+        );
 
         // Mock the getState method for useSitesStore (needed by App component cleanup)
-        (mockUseSitesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSitesStoreState);
+        vi.spyOn(mockUseSitesStore as any, "getState").mockReturnValue(
+            mockSitesStoreState
+        );
 
         // Mock the getState method for useUpdatesStore (needed by App component)
-        (mockUseUpdatesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockUpdatesStoreState);
+        vi.spyOn(mockUseUpdatesStore as any, "getState").mockReturnValue(
+            mockUpdatesStoreState
+        );
 
         // Mock the getState method for useSettingsStore (needed by App component initialization)
-        (mockUseSettingsStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSettingsStoreState);
+        vi.spyOn(mockUseSettingsStore as any, "getState").mockReturnValue(
+            mockSettingsStoreState
+        );
 
         mockUseUIStore.mockImplementation((selector: any) =>
             selector ? selector(mockUIStoreState) : mockUIStoreState
@@ -697,7 +697,7 @@ describe("App Additional Coverage Tests", () => {
         const closeButton = screen.getByLabelText("Dismiss error");
         await user.click(closeButton);
 
-        expect(clearErrorMock).toHaveBeenCalled();
+        expect(clearErrorMock).toHaveBeenCalledWith();
     });
 
     it("should display update error notification", async ({
@@ -861,7 +861,7 @@ describe("App Additional Coverage Tests", () => {
         // Test restart button click
         const restartButton = screen.getByText("Restart Now");
         await user.click(restartButton);
-        expect(applyUpdateMock).toHaveBeenCalled();
+        expect(applyUpdateMock).toHaveBeenCalledWith();
     });
 
     it("should show settings modal when showSettings is true", async ({
@@ -981,26 +981,26 @@ describe("App Additional Coverage Tests", () => {
         };
 
         // Mock getState to return our mock stores consistently
-        (mockUseSettingsStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSettingsStore);
-        (mockUseSitesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSitesStore);
+        vi.spyOn(mockUseSettingsStore as any, "getState").mockReturnValue(
+            mockSettingsStore
+        );
+        vi.spyOn(mockUseSitesStore as any, "getState").mockReturnValue(
+            mockSitesStore
+        );
 
         render(<App />);
 
         // Wait for initialization to complete including subscription
         await waitFor(
             () => {
-                expect(initializeSettingsMock).toHaveBeenCalled();
+                expect(initializeSettingsMock).toHaveBeenCalledWith();
             },
             { timeout: 2000 }
         );
 
         // Verify other initialization calls
-        expect(initializeSitesMock).toHaveBeenCalled();
-        expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+        expect(initializeSitesMock).toHaveBeenCalledWith();
+        expect(subscribeToStatusUpdatesMock).toHaveBeenCalledWith();
 
         // Simulate the callback being called by getting it from the mock call
         const statusUpdateCallback =
@@ -1065,23 +1065,23 @@ describe("App Additional Coverage Tests", () => {
         };
 
         // Mock getState to return our mock stores consistently
-        (mockUseSettingsStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSettingsStore);
-        (mockUseSitesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSitesStore);
+        vi.spyOn(mockUseSettingsStore as any, "getState").mockReturnValue(
+            mockSettingsStore
+        );
+        vi.spyOn(mockUseSitesStore as any, "getState").mockReturnValue(
+            mockSitesStore
+        );
 
         render(<App />);
 
         // Wait for initialization to complete including subscription
         await waitFor(() => {
-            expect(initializeSettingsMock).toHaveBeenCalled();
+            expect(initializeSettingsMock).toHaveBeenCalledWith();
         });
 
         // Verify other initialization calls
-        expect(initializeSitesMock).toHaveBeenCalled();
-        expect(subscribeToStatusUpdatesMock).toHaveBeenCalled();
+        expect(initializeSitesMock).toHaveBeenCalledWith();
+        expect(subscribeToStatusUpdatesMock).toHaveBeenCalledWith();
 
         // Simulate the callback being called with an update that has no site.identifier
         const statusUpdateCallback =
@@ -1123,7 +1123,7 @@ describe("App Additional Coverage Tests", () => {
             toggleThemeMock();
         });
 
-        expect(toggleThemeMock).toHaveBeenCalled();
+        expect(toggleThemeMock).toHaveBeenCalledWith();
     });
 
     it("should handle site loading on mount", async ({ task, annotate }) => {
@@ -1153,16 +1153,16 @@ describe("App Additional Coverage Tests", () => {
         });
 
         // Mock the stores to use our mock data
-        (useSitesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSitesStoreState);
+        vi.spyOn(useSitesStore as any, "getState").mockReturnValue(
+            mockSitesStoreState
+        );
         (useSettingsStore as any).getState = mockSettingsStoreGetState;
 
         render(<App />);
 
         // Wait for initialization to complete - this should call initializeSites
         await waitFor(() => {
-            expect(initializeSitesMock).toHaveBeenCalled();
+            expect(initializeSitesMock).toHaveBeenCalledWith();
         });
     });
 
@@ -1186,13 +1186,13 @@ describe("App Additional Coverage Tests", () => {
         const subscribeToStatusUpdatesMock = vi.fn();
 
         // Mock the stores to use our mock data WITH getState properly configured
-        (mockUseSitesStore as any).getState = vi.fn().mockReturnValue({
+        vi.spyOn(mockUseSitesStore as any, "getState").mockReturnValue({
             ...mockSitesStoreState,
             initializeSites: initializeSitesMock,
             subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
         });
 
-        (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue({
+        vi.spyOn(mockUseSettingsStore as any, "getState").mockReturnValue({
             initializeSettings: initializeSettingsMock,
             resetSettings: vi.fn(),
             settings: { ...defaultSettings },
@@ -1204,11 +1204,11 @@ describe("App Additional Coverage Tests", () => {
 
         // Wait for initialization to complete - this should call both initialization functions
         await waitFor(() => {
-            expect(initializeSettingsMock).toHaveBeenCalled();
+            expect(initializeSettingsMock).toHaveBeenCalledWith();
         });
 
         // Verify sites initialization was called
-        expect(initializeSitesMock).toHaveBeenCalled();
+        expect(initializeSitesMock).toHaveBeenCalledWith();
     });
 
     it("should properly clean up subscriptions on unmount", async ({
@@ -1244,9 +1244,9 @@ describe("App Additional Coverage Tests", () => {
         });
 
         // Mock the stores to use our mock data
-        (useSitesStore as any).getState = vi
-            .fn()
-            .mockReturnValue(mockSitesStoreState);
+        vi.spyOn(useSitesStore as any, "getState").mockReturnValue(
+            mockSitesStoreState
+        );
         (useSettingsStore as any).getState = mockSettingsStoreGetState;
 
         const { unmount } = render(<App />);

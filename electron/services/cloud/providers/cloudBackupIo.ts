@@ -23,6 +23,54 @@ import {
  */
 
 /**
+ * Downloads a backup object and its `.metadata.json` sidecar.
+ *
+ * @remarks
+ * This helper assumes the provider stores backup metadata as UTF-8 JSON at the
+ * canonical sidecar key returned by {@link backupMetadataKeyForBackupKey}.
+ *
+ * Providers are responsible for normalizing the backup key (POSIX separators,
+ * no leading slashes, etc.) before calling this function.
+ *
+ * @param args - Download parameters.
+ *
+ * @returns Both the backup buffer and the parsed {@link CloudBackupEntry}.
+ */
+export async function downloadBackupWithMetadata(args: {
+    /** Provider download primitive. Must accept POSIX-style keys. */
+    readonly downloadObject: (key: string) => Promise<Buffer>;
+    /** Backup key to download (must already be normalized by the provider). */
+    readonly key: string;
+}): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
+    const buffer = await args.downloadObject(args.key);
+    const metadataKey = backupMetadataKeyForBackupKey(args.key);
+    const metadataBuffer = await args.downloadObject(metadataKey);
+
+    const entry = parseCloudBackupMetadataFileBuffer(metadataBuffer);
+
+    // Safety: the metadata file is untrusted input. Ensure it describes the
+    // same object we asked for, otherwise consumers may restore a backup using
+    // the wrong metadata (checksum/schema), or display misleading names.
+    if (entry.key !== args.key) {
+        throw new Error(
+            `Backup metadata mismatch: expected key '${args.key}' but received '${entry.key}'`
+        );
+    }
+
+    const expectedFileName = stringSplit(args.key, "/").pop() ?? "";
+    if (expectedFileName && entry.fileName !== expectedFileName) {
+        throw new Error(
+            `Backup metadata mismatch: expected fileName '${expectedFileName}' but received '${entry.fileName}'`
+        );
+    }
+
+    return {
+        buffer,
+        entry,
+    };
+}
+
+/**
  * Uploads a backup blob and its `.metadata.json` sidecar.
  *
  * @remarks
@@ -98,52 +146,4 @@ export async function uploadBackupWithMetadata(args: {
     }
 
     return entry;
-}
-
-/**
- * Downloads a backup object and its `.metadata.json` sidecar.
- *
- * @remarks
- * This helper assumes the provider stores backup metadata as UTF-8 JSON at the
- * canonical sidecar key returned by {@link backupMetadataKeyForBackupKey}.
- *
- * Providers are responsible for normalizing the backup key (POSIX separators,
- * no leading slashes, etc.) before calling this function.
- *
- * @param args - Download parameters.
- *
- * @returns Both the backup buffer and the parsed {@link CloudBackupEntry}.
- */
-export async function downloadBackupWithMetadata(args: {
-    /** Provider download primitive. Must accept POSIX-style keys. */
-    readonly downloadObject: (key: string) => Promise<Buffer>;
-    /** Backup key to download (must already be normalized by the provider). */
-    readonly key: string;
-}): Promise<{ buffer: Buffer; entry: CloudBackupEntry }> {
-    const buffer = await args.downloadObject(args.key);
-    const metadataKey = backupMetadataKeyForBackupKey(args.key);
-    const metadataBuffer = await args.downloadObject(metadataKey);
-
-    const entry = parseCloudBackupMetadataFileBuffer(metadataBuffer);
-
-    // Safety: the metadata file is untrusted input. Ensure it describes the
-    // same object we asked for, otherwise consumers may restore a backup using
-    // the wrong metadata (checksum/schema), or display misleading names.
-    if (entry.key !== args.key) {
-        throw new Error(
-            `Backup metadata mismatch: expected key '${args.key}' but received '${entry.key}'`
-        );
-    }
-
-    const expectedFileName = stringSplit(args.key, "/").pop() ?? "";
-    if (expectedFileName && entry.fileName !== expectedFileName) {
-        throw new Error(
-            `Backup metadata mismatch: expected fileName '${expectedFileName}' but received '${entry.fileName}'`
-        );
-    }
-
-    return {
-        buffer,
-        entry,
-    };
 }

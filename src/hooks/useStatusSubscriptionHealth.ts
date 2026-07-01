@@ -11,15 +11,6 @@
 import type { StatusUpdateSubscriptionSummary } from "../stores/sites/baseTypes";
 
 /**
- * Discrete health states for the realtime status subscription.
- */
-export type StatusSubscriptionHealthState =
-    | "degraded"
-    | "failed"
-    | "healthy"
-    | "unknown";
-
-/**
  * Derived subscription health information consumed by UI components.
  */
 export interface StatusSubscriptionHealth {
@@ -40,6 +31,15 @@ export interface StatusSubscriptionHealth {
     /** Latest subscription diagnostics, if any. */
     readonly summary: StatusUpdateSubscriptionSummary | undefined;
 }
+
+/**
+ * Discrete health states for the realtime status subscription.
+ */
+export type StatusSubscriptionHealthState =
+    | "degraded"
+    | "failed"
+    | "healthy"
+    | "unknown";
 
 /**
  * Creates a normalized health snapshot from the latest subscription summary.

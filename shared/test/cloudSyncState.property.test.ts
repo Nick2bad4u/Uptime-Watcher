@@ -1,13 +1,11 @@
-import { describe, expect, it } from "vitest";
-
-import fc from "fast-check";
-
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
     type CloudSyncOperation,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
 import { applyCloudSyncOperations } from "@shared/utils/cloudSyncState";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 const hexCharArb = fc.constantFrom(
     ...([..."0123456789abcdef"] as readonly string[])

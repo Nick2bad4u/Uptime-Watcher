@@ -55,12 +55,12 @@ export function mergeMonitorStatusChange(
             return site;
         }
 
-        let monitorFound = false;
+        let isMonitorFound = false;
         const updatedMonitors: Monitor[] = [];
 
         for (const monitor of site.monitors) {
             if (monitor.id === event.monitorId) {
-                monitorFound = true;
+                isMonitorFound = true;
 
                 // The status update payload carries the fresh monitor snapshot on
                 // `event.monitor`. The embedded `event.site` can legitimately lag
@@ -74,7 +74,7 @@ export function mergeMonitorStatusChange(
             }
         }
 
-        if (!monitorFound && isDevelopment()) {
+        if (!isMonitorFound && isDevelopment()) {
             logger.debug(
                 `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
             );

@@ -5,7 +5,7 @@
  * Renders a responsive grid of status cards inspired by modern collaboration
  * tools. The cards surface high-level metrics such as total sites, active
  * monitors, uptime, and incident counts. Each card uses the themed primitives
- * to stay consistent with the application's visual language.
+ * to stay consistent with the app's visual language.
  */
 
 import type { NamedExoticComponent } from "react";

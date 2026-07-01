@@ -15,7 +15,7 @@
  * @tags ["mutation-testing", "arithmetic-operators", "frontend", "react"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
 describe("ArithmeticOperator Mutations - Frontend Components", () => {
@@ -192,24 +192,24 @@ describe("ArithmeticOperator Mutations - Frontend Components", () => {
                 const viewportW = 1000;
 
                 // Original: left + overlayW > viewportW - 8
-                const exceedsRight = left + overlayW > viewportW - 8;
-                expect(exceedsRight).toBeTruthy(); // 850 + 200 = 1050 > 992
+                const isExceedsRight = left + overlayW > viewportW - 8;
+                expect(isExceedsRight).toBeTruthy(); // 850 + 200 = 1050 > 992
 
                 // Test mutations:
                 // 1. left - overlayW (instead of +)
-                const mutation1 = left - overlayW > viewportW - 8;
-                expect(mutation1).toBeFalsy(); // 650 > 992 = false ≠ true
+                const isMutation1 = left - overlayW > viewportW - 8;
+                expect(isMutation1).toBeFalsy(); // 650 > 992 = false ≠ true
 
                 // 2. viewportW + 8 (instead of -)
-                const mutation2 = left + overlayW > viewportW + 8;
-                expect(mutation2).toBeTruthy(); // 1050 > 1008 = true (same result)
+                const isMutation2 = left + overlayW > viewportW + 8;
+                expect(isMutation2).toBeTruthy(); // 1050 > 1008 = true (same result)
 
                 // Test with different values where mutation2 matters
                 const smallLeft = 800;
-                const check1 = smallLeft + overlayW > viewportW - 8;
-                const check2 = smallLeft + overlayW > viewportW + 8;
-                expect(check1).toBeTruthy(); // 1000 > 992 = true
-                expect(check2).toBeFalsy(); // 1000 > 1008 = false ≠ true
+                const isCheck1 = smallLeft + overlayW > viewportW - 8;
+                const isCheck2 = smallLeft + overlayW > viewportW + 8;
+                expect(isCheck1).toBeTruthy(); // 1000 > 992 = true
+                expect(isCheck2).toBeFalsy(); // 1000 > 1008 = false ≠ true
             });
         });
 
@@ -220,15 +220,15 @@ describe("ArithmeticOperator Mutations - Frontend Components", () => {
                 const viewportH = 1000;
 
                 // Original: top + overlayH > viewportH - 8
-                const exceedsBottom = top + overlayH > viewportH - 8;
-                expect(exceedsBottom).toBeTruthy(); // 850 + 200 = 1050 > 992
+                const isExceedsBottom = top + overlayH > viewportH - 8;
+                expect(isExceedsBottom).toBeTruthy(); // 850 + 200 = 1050 > 992
 
                 // With mutations, similar logic to above test
-                const mutation1 = top - overlayH > viewportH - 8;
-                expect(mutation1).toBeFalsy(); // 650 > 992 = false ≠ true
+                const isMutation1 = top - overlayH > viewportH - 8;
+                expect(isMutation1).toBeFalsy(); // 650 > 992 = false ≠ true
 
-                const mutation2 = top + overlayH > viewportH + 8;
-                expect(mutation2).toBeTruthy(); // 1050 > 1008 = true
+                const isMutation2 = top + overlayH > viewportH + 8;
+                expect(isMutation2).toBeTruthy(); // 1050 > 1008 = true
             });
         });
     });

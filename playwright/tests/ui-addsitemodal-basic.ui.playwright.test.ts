@@ -3,23 +3,24 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
+
 import { launchElectronApp } from "../fixtures/electron-helpers";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     fillAddSiteForm,
     getSiteCardLocator,
     openAddSiteModal,
     removeAllSites,
     resetApplicationState,
-    waitForMonitorCount,
     submitAddSiteForm,
     WAIT_TIMEOUTS,
+    waitForMonitorCount,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 test.describe(
     "add site modal - modern ui",
@@ -65,18 +66,18 @@ test.describe(
                 const dialog = page.getByRole("dialog").filter({
                     has: page.getByTestId("add-site-form"),
                 });
-                await expect(dialog).toBeVisible();
-                await expect(dialog).toHaveClass(/modal-shell/);
+                await expect.soft(dialog).toBeVisible();
+                await expect.soft(dialog).toHaveClass(/modal-shell/v);
 
                 const dialogClassName = await dialog.evaluate(
                     (element) => element.className
                 );
-                expect(dialogClassName).toContain(
+                expect.soft(dialogClassName).toContain(
                     "modal-shell--accent-success"
                 );
 
                 const submitButton = dialog.getByRole("button", {
-                    name: /Add Site/i,
+                    name: /add site/i,
                 });
                 const nameInput = dialog.getByLabel("Site Name (required)", {
                     exact: false,
@@ -90,12 +91,12 @@ test.describe(
                 const validationMessage = page.getByText(
                     "Site name is required"
                 );
-                await expect(validationMessage).toBeVisible();
+                await expect.soft(validationMessage).toBeVisible();
 
                 await dialog
                     .getByRole("button", { name: "Close modal" })
                     .click();
-                await expect(dialog).toBeHidden();
+                await expect.soft(dialog).toBeHidden();
             }
         );
 
@@ -118,7 +119,7 @@ test.describe(
                 await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
 
                 const siteCardLocator = getSiteCardLocator(page, uniqueName);
-                await expect(siteCardLocator).toBeVisible({
+                await expect.soft(siteCardLocator).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
@@ -140,8 +141,8 @@ test.describe(
             async () => {
                 await openAddSiteModal(page);
 
-                const monitorTypeSelect = page.getByLabel(/Monitor Type/i);
-                await expect(monitorTypeSelect).toBeVisible();
+                const monitorTypeSelect = page.getByLabel(/monitor type/iv);
+                await expect.soft(monitorTypeSelect).toBeVisible();
 
                 const monitorTypeValues = await monitorTypeSelect.evaluate(
                     (element) =>
@@ -154,11 +155,11 @@ test.describe(
                         )
                 );
 
-                expect(monitorTypeValues.length).toBeGreaterThanOrEqual(5);
-                expect(
+                expect.soft(monitorTypeValues.length).toBeGreaterThanOrEqual(5);
+                expect.soft(
                     monitorTypeValues.some((option) => option.value === "http")
                 ).toBe(true);
-                expect(
+                expect.soft(
                     monitorTypeValues.every(
                         (option) => option.label.trim().length > 0
                     )
@@ -189,11 +190,11 @@ test.describe(
                     });
 
                     const heartbeatFieldLabels = [
-                        /Heartbeat URL/i,
-                        /Status Field/i,
-                        /Expected Status/i,
-                        /Timestamp Field/i,
-                        /Max Drift \(seconds\)/i,
+                        /heartbeat url/iv,
+                        /status field/i,
+                        /expected status/i,
+                        /timestamp field/i,
+                        /max drift \(seconds\)/i,
                     ];
 
                     for (const label of heartbeatFieldLabels) {
@@ -205,7 +206,7 @@ test.describe(
                             state: "visible",
                             timeout: WAIT_TIMEOUTS.MEDIUM,
                         });
-                        await expect(fieldInput).toBeEditable({
+                        await expect.soft(fieldInput).toBeEditable({
                             timeout: WAIT_TIMEOUTS.SHORT,
                         });
                         await fieldInput.fill("");
@@ -214,13 +215,13 @@ test.describe(
                     await page.getByTestId("add-site-submit").click();
 
                     // Invalid submissions should keep the modal open.
-                    await expect(
+                    await expect.soft(
                         page.getByTestId("add-site-modal")
                     ).toBeVisible({
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     });
 
-                    await expect(page.getByTestId("add-site-form")).toBeVisible(
+                    await expect.soft(page.getByTestId("add-site-form")).toBeVisible(
                         {
                             timeout: WAIT_TIMEOUTS.MEDIUM,
                         }
@@ -244,7 +245,7 @@ test.describe(
                                 : 0;
                         }
                     );
-                    expect(siteCountAfterInvalid).toBe(0);
+                    expect.soft(siteCountAfterInvalid).toBe(0);
                 });
 
                 await test.step("Fill heartbeat fields and create monitor", async () => {
@@ -270,7 +271,7 @@ test.describe(
                         page,
                         heartbeatSiteName
                     );
-                    await expect(heartbeatSiteCard).toBeVisible({
+                    await expect.soft(heartbeatSiteCard).toBeVisible({
                         timeout: WAIT_TIMEOUTS.LONG,
                     });
                 });

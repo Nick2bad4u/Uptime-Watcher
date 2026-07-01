@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { setHas } from "ts-extras";
 
-const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}._-]/gu;
+const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}\-._]/gu;
 
 const WINDOWS_RESERVED_BASENAMES = new Set([
     "aux",

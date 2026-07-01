@@ -5,8 +5,8 @@
  * @remarks
  * This component provides a flexible text element with full control over
  * typography including size, weight, alignment, and color variants. It
- * integrates with the application's theme system to ensure consistent text
- * styling across the application. The component supports various semantic
+ * integrates with the app's theme system to ensure consistent text
+ * styling across the app. The component supports various semantic
  * styling variants for different contexts (primary, secondary, error, etc.).
  *
  * @example Heading text with custom styling:

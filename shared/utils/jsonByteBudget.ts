@@ -14,17 +14,6 @@ import { isDefined, isFinite as isFiniteNumber, objectHasIn, objectKeys } from "
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
 
-interface LeaveMarker {
-    readonly [JSON_BYTE_BUDGET_LEAVE]: object;
-}
-
-function isLeaveMarker(value: unknown): value is LeaveMarker {
-    return (
-        isRecord(value) &&
-        objectHasIn(value, JSON_BYTE_BUDGET_LEAVE)
-    );
-}
-
 interface JsonByteBudgetState {
     bytes: number;
     readonly maxBytes: number;
@@ -33,25 +22,47 @@ interface JsonByteBudgetState {
     readonly stack: unknown[];
 }
 
+interface LeaveMarker {
+    readonly [JSON_BYTE_BUDGET_LEAVE]: object;
+}
+
+/**
+ * Returns a conservative estimate of JSON UTF-8 byte length, stopping early
+ * once the budget is exceeded.
+ */
+export function getJsonByteLengthUpTo(
+    value: unknown,
+    maxBytes: number
+): number {
+    if (!isFiniteNumber(maxBytes) || maxBytes <= 0) {
+        return 0;
+    }
+
+    const state: JsonByteBudgetState = {
+        bytes: 0,
+        maxBytes,
+        path: new WeakSet<object>(),
+        stack: [value],
+    };
+
+    while (state.stack.length > 0 && !isBudgetExceeded(state)) {
+        const next = state.stack.pop();
+        addJsonBytesForValue(state, next);
+    }
+
+    return state.bytes;
+}
+
+/** Returns true when {@link getJsonByteLengthUpTo} exceeds `maxBytes`. */
+export function isJsonByteBudgetExceeded(
+    value: unknown,
+    maxBytes: number
+): boolean {
+    return getJsonByteLengthUpTo(value, maxBytes) > maxBytes;
+}
+
 function addBytes(state: JsonByteBudgetState, increment: number): void {
     state.bytes += increment;
-}
-
-function isBudgetExceeded(state: JsonByteBudgetState): boolean {
-    return state.bytes > state.maxBytes;
-}
-
-function getJsonBytesForString(value: string): number {
-    // Quotes + bytes (rough; ignores escaping overhead).
-    return getUtfByteLength(value) + 2;
-}
-
-function getJsonBytesForNumber(value: number): number {
-    return getUtfByteLength(String(value));
-}
-
-function getJsonBytesForNull(): number {
-    return 4;
 }
 
 function addJsonBytesForObject(
@@ -181,37 +192,26 @@ function addJsonBytesForValue(
     addJsonBytesForObject(state, value);
 }
 
-/**
- * Returns a conservative estimate of JSON UTF-8 byte length, stopping early
- * once the budget is exceeded.
- */
-export function getJsonByteLengthUpTo(
-    value: unknown,
-    maxBytes: number
-): number {
-    if (!isFiniteNumber(maxBytes) || maxBytes <= 0) {
-        return 0;
-    }
-
-    const state: JsonByteBudgetState = {
-        bytes: 0,
-        maxBytes,
-        path: new WeakSet<object>(),
-        stack: [value],
-    };
-
-    while (state.stack.length > 0 && !isBudgetExceeded(state)) {
-        const next = state.stack.pop();
-        addJsonBytesForValue(state, next);
-    }
-
-    return state.bytes;
+function getJsonBytesForNull(): number {
+    return 4;
 }
 
-/** Returns true when {@link getJsonByteLengthUpTo} exceeds `maxBytes`. */
-export function isJsonByteBudgetExceeded(
-    value: unknown,
-    maxBytes: number
-): boolean {
-    return getJsonByteLengthUpTo(value, maxBytes) > maxBytes;
+function getJsonBytesForNumber(value: number): number {
+    return getUtfByteLength(String(value));
+}
+
+function getJsonBytesForString(value: string): number {
+    // Quotes + bytes (rough; ignores escaping overhead).
+    return getUtfByteLength(value) + 2;
+}
+
+function isBudgetExceeded(state: JsonByteBudgetState): boolean {
+    return state.bytes > state.maxBytes;
+}
+
+function isLeaveMarker(value: unknown): value is LeaveMarker {
+    return (
+        isRecord(value) &&
+        objectHasIn(value, JSON_BYTE_BUDGET_LEAVE)
+    );
 }

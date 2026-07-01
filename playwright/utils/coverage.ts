@@ -3,8 +3,9 @@
  */
 
 import type { ElectronApplication, Page } from "@playwright/test";
-import { createCoverageMap } from "istanbul-lib-coverage";
 import type { CoverageMapData } from "istanbul-lib-coverage";
+
+import { createCoverageMap } from "istanbul-lib-coverage";
 import { mkdir, writeFile } from "node:fs/promises";
 import * as path from "node:path";
 
@@ -21,10 +22,10 @@ const coverageLabels = new WeakMap<ElectronApplication, string>();
 export const isCoverageEnabled = Boolean(process.env[COVERAGE_ENV]);
 
 /**
- * Associates a descriptive label with an Electron application for coverage
+ * Associates a descriptive label with an Electron app for coverage
  * output.
  *
- * @param electronApp - The Electron application instance spawned by Playwright.
+ * @param electronApp - The Electron app instance spawned by Playwright.
  * @param label - Human-readable identifier to embed in the coverage artifact
  *   name.
  */
@@ -45,7 +46,7 @@ export function tagElectronAppCoverage(
  *
  * @returns The raw Istanbul coverage object or `null` when not available.
  */
-async function extractCoverageFromWindow(page: Page): Promise<unknown | null> {
+async function extractCoverageFromWindow(page: Page): Promise<null | unknown> {
     return await page.evaluate(() => {
         const globalTarget = globalThis as typeof globalThis & {
             __coverage__?: unknown;
@@ -57,7 +58,7 @@ async function extractCoverageFromWindow(page: Page): Promise<unknown | null> {
 /**
  * Collects coverage from all Electron windows and writes merged results.
  *
- * @param electronApp - The Electron application under test.
+ * @param electronApp - The Electron app under test.
  * @param label - Optional coverage artifact label to improve traceability.
  */
 export async function collectCoverageFromElectronApp(
@@ -96,7 +97,7 @@ export async function collectCoverageFromElectronApp(
     await mkdir(NYC_OUTPUT_DIR, { recursive: true });
     const labelSource = label ?? coverageLabels.get(electronApp);
     const sanitizedLabel = labelSource
-        ?.replace(/[^a-zA-Z0-9-_]+/g, "-")
+        ?.replaceAll(/[^\w\-]+/g, "-")
         .toLowerCase();
     if (labelSource) {
         coverageLabels.delete(electronApp);

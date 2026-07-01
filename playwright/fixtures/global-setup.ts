@@ -9,6 +9,7 @@
  */
 
 import type { FullConfig } from "@playwright/test";
+
 import { execSync } from "node:child_process";
 import * as path from "node:path";
 
@@ -18,7 +19,7 @@ function withMaxOldSpaceSize(
 ): string {
     const trimmed = (nodeOptions ?? "").trim();
     const stripped = trimmed
-        ? trimmed.replace(/--max_old_space_size=\d+/gu, "").trim()
+        ? trimmed.replaceAll(/--max_old_space_size=\d+/gv, "").trim()
         : "";
     const maxOldSpaceFlag = `--max_old_space_size=${sizeMb}`;
 

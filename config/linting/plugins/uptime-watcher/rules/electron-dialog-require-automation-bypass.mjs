@@ -163,17 +163,17 @@ export const electronDialogRequireAutomationBypassRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require an automation escape hatch when using Electron dialog APIs",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-dialog-require-automation-bypass.md",
         },
-        schema: [],
         messages: {
             missingAutomationBypass:
                 "Electron dialog call (dialog.{{methodName}}) must be guarded for automation. Add a readProcessEnv('PLAYWRIGHT_TEST'|'HEADLESS') check to avoid blocking Playwright runs.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import {
     isEmptyString,
     validateFormFields,
@@ -86,7 +87,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validateRequiredString("   ");
+            const result = validateRequiredString(' '.repeat(3));
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Field is required");
@@ -242,7 +243,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validateUrl("   ");
+            const result = validateUrl(' '.repeat(3));
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("URL is required");
@@ -380,7 +381,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result = validatePort("   ");
+            const result = validatePort(' '.repeat(3));
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Port is required");
@@ -775,7 +776,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            expect(isEmptyString("   ")).toBeTruthy();
+            expect(isEmptyString(' '.repeat(3))).toBeTruthy();
         });
 
         it("should return false for non-empty string", async ({
@@ -813,7 +814,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailPattern = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/v;
             const result = validatePattern("test@example.com", emailPattern);
 
             expect(result.isValid).toBeTruthy();
@@ -829,7 +830,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailPattern = /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/v;
             const result = validatePattern("invalid-email", emailPattern);
 
             expect(result.isValid).toBeFalsy();
@@ -845,7 +846,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const pattern = /\d+/;
+            const pattern = /\d+/v;
             const result = validatePattern("", pattern);
 
             expect(result.isValid).toBeFalsy();
@@ -861,8 +862,8 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const pattern = /\d+/;
-            const result = validatePattern("   ", pattern);
+            const pattern = /\d+/v;
+            const result = validatePattern(' '.repeat(3), pattern);
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Field is required");
@@ -877,7 +878,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const pattern = /\d+/;
+            const pattern = /\d+/v;
             const result = validatePattern("", pattern, "Phone Number");
 
             expect(result.isValid).toBeFalsy();
@@ -893,7 +894,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const pattern = /\d+/;
+            const pattern = /\d+/v;
             const result = validatePattern(
                 "abc",
                 pattern,
@@ -917,7 +918,7 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Validation", "type");
 
             const ipPattern =
-                /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d{1,2})\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d{1,2})$/;
+                /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d{1,2})\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d{1,2})$/v;
 
             expect(
                 validatePattern("192.168.1.1", ipPattern).isValid

@@ -117,7 +117,7 @@ function assertCanonicalBase64(args: { label: string; value: string }): void {
     }
 
     // Standard base64 (not URL-safe).
-    if (!/^[A-Za-z0-9+/]+={0,2}$/u.test(value)) {
+    if (!/^[+/0-9A-Za-z]+={0,2}$/u.test(value)) {
         throw new Error(`Invalid ${label}: base64 contains invalid characters`);
     }
 }

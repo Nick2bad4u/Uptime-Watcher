@@ -134,7 +134,7 @@ export class StatusUpdateManager {
      *
      * @internal
      */
-    private cleanupFunctions: Array<() => void> = [];
+    private cleanupFunctions: (() => void)[] = [];
 
     /**
      * Function to trigger full site data sync from backend.
@@ -215,10 +215,10 @@ export class StatusUpdateManager {
             const currentSites = this.getSites();
 
             // Log if site not found in development mode
-            const siteExists = currentSites.some(
+            const isSiteExists = currentSites.some(
                 (site) => site.identifier === event.siteIdentifier
             );
-            if (!siteExists && isDevelopment()) {
+            if (!isSiteExists && isDevelopment()) {
                 logger.debug(`Site ${event.siteIdentifier} not found in store`);
             }
 
@@ -294,7 +294,7 @@ export class StatusUpdateManager {
         const errors: string[] = [];
         let listenersAttached = 0;
         const expectedListeners = StatusUpdateManager.EXPECTED_LISTENER_COUNT;
-        let encounteredListenerFailure = false;
+        let isEncounteredListenerFailure = false;
 
         try {
             await this.fullResyncSites();
@@ -331,7 +331,7 @@ export class StatusUpdateManager {
             index,
             { register, scope },
         ] of listenerDescriptors.entries()) {
-            if (encounteredListenerFailure) {
+            if (isEncounteredListenerFailure) {
                 break;
             }
 
@@ -354,7 +354,7 @@ export class StatusUpdateManager {
                     `Failed to register ${scope} listener`,
                     normalizedError
                 );
-                encounteredListenerFailure = true;
+                isEncounteredListenerFailure = true;
                 listenersAttached = 0;
                 this.unsubscribe();
             }
@@ -370,7 +370,7 @@ export class StatusUpdateManager {
             listenerStates,
             success:
                 isEmpty(errors) &&
-                !encounteredListenerFailure &&
+                !isEncounteredListenerFailure &&
                 listenersAttached === expectedListeners,
         } satisfies StatusUpdateSubscriptionResult;
     }

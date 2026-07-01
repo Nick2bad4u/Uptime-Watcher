@@ -1,3 +1,9 @@
+import type {
+    SerializedDatabaseBackupResult,
+    SerializedDatabaseRestoreResult,
+} from "@shared/types/ipc";
+
+import { DATA_CHANNELS } from "@shared/types/preload";
 /**
  * Focused tests for the data preload domain.
  *
@@ -10,12 +16,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { IpcResponse } from "../../../preload/core/bridgeFactory";
+
 import { dataApi } from "../../../preload/domains/dataApi";
-import { DATA_CHANNELS } from "@shared/types/preload";
-import type {
-    SerializedDatabaseBackupResult,
-    SerializedDatabaseRestoreResult,
-} from "@shared/types/ipc";
 
 const ipcRenderer = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -183,14 +185,14 @@ describe("dataApi", () => {
             };
             ipcRenderer.invoke.mockResolvedValueOnce(response);
 
-            const result = await dataApi.importData(payload);
+            const isResult = await dataApi.importData(payload);
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
                 DATA_CHANNELS.importData,
                 payload,
                 ipcContext
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("throws if the import fails", async () => {

@@ -12,44 +12,6 @@ const fallbackSequence: { value: number } = {
     value: 0,
 };
 
-function nextFallbackSequence(): number {
-    fallbackSequence.value = (fallbackSequence.value + 1) % 1_000_000;
-    return fallbackSequence.value;
-}
-
-function toBaseThirtySixSixChars(value: number): string {
-    return value.toString(36).padStart(6, "0").slice(-6);
-}
-
-function toUint32(value: number): number {
-    const modulus = 2 ** 32;
-    const remainder = value % modulus;
-    return remainder < 0 ? remainder + modulus : remainder;
-}
-
-function tryGenerateCryptoFallbackId(): string | undefined {
-    try {
-        const values = new Uint32Array(2);
-        globalThis.crypto.getRandomValues(values);
-        return (
-            toBaseThirtySixSixChars(values[0] ?? 0) +
-            toBaseThirtySixSixChars(values[1] ?? 0)
-        );
-    } catch {
-        return undefined;
-    }
-}
-
-function generateDeterministicFallbackId(
-    nowMs: number,
-    sequence: number
-): string {
-    const low = toUint32(nowMs + sequence);
-    // 2654435761 is the 32-bit golden ratio constant (0x9E3779B1).
-    const high = toUint32(Math.floor(nowMs / 1000) + sequence * 2_654_435_761);
-    return `${toBaseThirtySixSixChars(low)}${toBaseThirtySixSixChars(high)}`;
-}
-
 /**
  * Generate a unique identifier string using crypto.randomUUID.
  *
@@ -73,8 +35,8 @@ export function generateUuid(): string {
     // Check if crypto and randomUUID are available
     // Use try-catch for runtime environment detection
     try {
-        if (typeof globalThis.crypto.randomUUID === "function") {
-            return globalThis.crypto.randomUUID();
+        if (typeof crypto.randomUUID === "function") {
+            return crypto.randomUUID();
         }
     } catch {
         // Crypto is not available, fall through to fallback
@@ -92,4 +54,42 @@ export function generateUuid(): string {
         generateDeterministicFallbackId(now, sequence);
 
     return `site-${randomPart}-${timestampPart}`;
+}
+
+function generateDeterministicFallbackId(
+    nowMs: number,
+    sequence: number
+): string {
+    const low = toUint32(nowMs + sequence);
+    // 2654435761 is the 32-bit golden ratio constant (0x9E3779B1).
+    const high = toUint32(Math.floor(nowMs / 1000) + sequence * 2_654_435_761);
+    return `${toBaseThirtySixSixChars(low)}${toBaseThirtySixSixChars(high)}`;
+}
+
+function nextFallbackSequence(): number {
+    fallbackSequence.value = (fallbackSequence.value + 1) % 1_000_000;
+    return fallbackSequence.value;
+}
+
+function toBaseThirtySixSixChars(value: number): string {
+    return value.toString(36).padStart(6, "0").slice(-6);
+}
+
+function toUint32(value: number): number {
+    const modulus = 2 ** 32;
+    const remainder = value % modulus;
+    return remainder < 0 ? remainder + modulus : remainder;
+}
+
+function tryGenerateCryptoFallbackId(): string | undefined {
+    try {
+        const values = new Uint32Array(2);
+        crypto.getRandomValues(values);
+        return (
+            toBaseThirtySixSixChars(values[0] ?? 0) +
+            toBaseThirtySixSixChars(values[1] ?? 0)
+        );
+    } catch {
+        return undefined;
+    }
 }

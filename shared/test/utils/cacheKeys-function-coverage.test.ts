@@ -7,6 +7,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { isStandardizedCacheKey, parseCacheKey } from "../../utils/cacheKeys";
 
 describe("Cache Keys Function Coverage", () => {
@@ -138,7 +139,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            const result = parseCacheKey("site:site-123" as any);
+            const result = parseCacheKey("site:site-123");
             expect(result).toEqual({
                 prefix: "site",
                 identifier: "site-123",
@@ -157,7 +158,7 @@ describe("Cache Keys Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Caching", "type");
 
-            const result = parseCacheKey("site:loading:site-123" as any);
+            const result = parseCacheKey("site:loading:site-123");
             expect(result).toEqual({
                 prefix: "site",
                 operation: "loading",
@@ -242,7 +243,7 @@ describe("Cache Keys Function Coverage", () => {
             expect(isStandardizedCacheKey(key)).toBeTruthy();
 
             // Then parse successfully
-            const parsed = parseCacheKey(key as any);
+            const parsed = parseCacheKey(key);
             expect(parsed.prefix).toBe("site");
             expect(parsed.operation).toBe("loading");
             expect(parsed.identifier).toBe("site-123");

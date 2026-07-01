@@ -60,7 +60,7 @@ export interface HistoryRow {
  *
  * @internal
  */
-function safeNumber(value: unknown, fallback: number = 0): number {
+function safeNumber(value: unknown, fallback = 0): number {
     if (typeof value === "number" && !Number.isNaN(value)) return value;
     if (typeof value === "string") {
         const parsed = Number(value);

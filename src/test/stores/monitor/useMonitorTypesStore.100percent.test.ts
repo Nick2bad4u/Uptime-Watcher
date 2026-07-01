@@ -18,13 +18,17 @@
  * - Complete validation result transformation paths
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { act, renderHook } from "@testing-library/react";
-import { BASE_MONITOR_TYPES, type Monitor } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
-import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import type { UnknownArray } from "type-fest";
+
+import { BASE_MONITOR_TYPES, type Monitor } from "@shared/types";
+import { act, renderHook } from "@testing-library/react";
+import { isDefined, objectKeys  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Store the original implementations to restore later
@@ -33,14 +37,14 @@ const originalLogStoreAction = vi.hoisted(() => vi.fn());
 const originalSafeExtractIpcData = vi.hoisted(() => vi.fn());
 
 // Mock dependencies with full control over their behavior (partial mock to retain exports).
-vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
+vi.mock(import('@shared/utils/errorHandling'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("@shared/utils/errorHandling")>();
 
     return {
         ...actual,
         ensureError: vi.fn((error) => {
-            if (error instanceof Error) {
+            if (Error.isError(error)) {
                 return error;
             }
             // Create an object that behaves like an Error for testing
@@ -57,7 +61,7 @@ vi.mock("@shared/utils/errorHandling", async (importOriginal) => {
     };
 });
 
-vi.mock("../../../stores/utils", async (importOriginal) => {
+vi.mock(import('../../../stores/utils'), async (importOriginal) => {
     const actual =
         await importOriginal<typeof import("../../../stores/utils")>();
     return {
@@ -109,9 +113,7 @@ const createMonitorTypeConfig = (
                 type: "url",
             },
         ] satisfies MonitorTypeConfig["fields"]),
-    ...(overrides.uiConfig === undefined
-        ? {}
-        : { uiConfig: overrides.uiConfig }),
+    ...(overrides.uiConfig !== undefined && { uiConfig: overrides.uiConfig }),
 });
 
 describe("useMonitorTypesStore - 100% Coverage", () => {
@@ -135,7 +137,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     return await operation();
                 } catch (error: unknown) {
                     const errorMessage =
-                        error instanceof Error ? error.message : String(error);
+                        Error.isError(error) ? error.message : String(error);
                     store.setError(errorMessage);
                     throw error;
                 } finally {
@@ -284,7 +286,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(emptyResult.current.monitorTypes).toEqual([]);
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
         });
     });
 
@@ -309,7 +311,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 { type: undefined },
                 { type: 42 },
                 { type: "" }, // Empty string
-                { type: "   " }, // Whitespace only
+                { type: ' '.repeat(3) }, // Whitespace only
                 { type: "valid", extraField: "ignored" }, // Extra fields should be allowed
                 { notType: "invalid" },
                 {
@@ -477,7 +479,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                             throw errorType;
                         } catch (error: unknown) {
                             const errorMessage =
-                                error instanceof Error
+                                Error.isError(error)
                                     ? error.message
                                     : String(error);
                             store.setError(errorMessage);
@@ -675,7 +677,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             // Final state should be consistent
             expect(
                 useErrorStore.getState().getStoreError("monitor-types")
-            ).toBe(undefined);
+            ).toBeUndefined();
             expect(
                 typeof useErrorStore
                     .getState()
@@ -1005,10 +1007,10 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             // With the stricter MonitorTypesStore contract, `type` is a
             // MonitorType (not an arbitrary string). Exercise logging with
             // edge-case payload shapes instead.
-            const edgeCasePayloads: readonly unknown[] = [
+            const edgeCasePayloads: Readonly<UnknownArray> = [
                 {},
                 { text: "" },
-                { whitespace: "   " },
+                { whitespace: ' '.repeat(3) },
                 { special: "special-chars-!@#$%^&*()" },
                 { unicode: "unicode-测试" },
                 {
@@ -1182,7 +1184,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             expect(result.current.monitorTypes).toHaveLength(1000);
-            expect(Object.keys(result.current.fieldConfigs)).toHaveLength(
+            expect(objectKeys(result.current.fieldConfigs)).toHaveLength(
                 BASE_MONITOR_TYPES.length
             );
 
@@ -1221,7 +1223,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                         return await operation();
                     } catch (error: unknown) {
                         const errorMessage =
-                            error instanceof Error
+                            Error.isError(error)
                                 ? error.message
                                 : String(error);
                         store.setError(errorMessage);
@@ -1369,7 +1371,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(
                 stateChanges.some(
                     (change) =>
-                        change.storeErrors["monitor-types"] === undefined
+                        !isDefined(change.storeErrors["monitor-types"])
                 )
             ).toBeTruthy();
 

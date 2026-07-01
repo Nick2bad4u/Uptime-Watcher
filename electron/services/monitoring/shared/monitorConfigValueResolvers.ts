@@ -74,11 +74,11 @@ export function resolveRequiredMonitorUrlField(
         return valueResult;
     }
 
-    const urlLooksValid = isValidUrl(valueResult.value, {
-        ...(protocols ? { protocols: [...protocols] } : {}),
+    const isUrlLooksValid = isValidUrl(valueResult.value, {
+        ...(protocols && { protocols: [...protocols] }),
     });
 
-    if (!urlLooksValid) {
+    if (!isUrlLooksValid) {
         return {
             message: errorMessage,
             ok: false,

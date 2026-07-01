@@ -5,16 +5,18 @@
  *   timeout handling, retry operations, and cancellation management.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-    createCombinedAbortSignal,
+    type CombineSignalsOptions,
     createAbortableOperation,
+    createCombinedAbortSignal,
+    isAbortError,
+    raceWithAbort,
     retryWithAbort,
     sleep,
-    raceWithAbort,
-    isAbortError,
-    type CombineSignalsOptions,
 } from "../../../../shared/utils/abortUtils.js";
 
 describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
@@ -175,7 +177,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             expect(cleanup).toHaveBeenCalledTimes(1);
 
                             // Verify signal was passed
-                            const passedSignal = operation.mock.calls[0]?.[0];
+                            const passedSignal = arrayFirst(operation.mock.calls)?.[0];
                             expect(passedSignal).toBeInstanceOf(AbortSignal);
                         }
                     )
@@ -215,7 +217,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                                     // Simulate long operation
                                     new Promise((resolve, reject) => {
                                         const timeout = setTimeout(
-                                            () => resolve("success"),
+                                            () => { resolve("success"); },
                                             1000
                                         );
                                         signal.addEventListener("abort", () => {
@@ -234,7 +236,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
 
                             // Abort after delay
-                            setTimeout(() => controller.abort(), abortDelay);
+                            setTimeout(() => { controller.abort(); }, abortDelay);
                             vi.advanceTimersByTime(abortDelay);
 
                             await expect(promise).rejects.toThrow("Aborted");
@@ -279,7 +281,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
 
                             // Abort before sleep completes
                             setTimeout(
-                                () => controller.abort("Test abort"),
+                                () => { controller.abort("Test abort"); },
                                 abortMs
                             );
                             vi.advanceTimersByTime(abortMs);
@@ -368,7 +370,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             const controller = new AbortController();
                             const operation = new Promise((resolve) =>
                                 setTimeout(
-                                    () => resolve(result),
+                                    () => { resolve(result); },
                                     operationDelay
                                 )
                             );
@@ -379,7 +381,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
 
                             // Schedule abort after operation should complete
-                            setTimeout(() => controller.abort(), signalDelay);
+                            setTimeout(() => { controller.abort(); }, signalDelay);
 
                             // Advance time to complete operation but not abort
                             vi.advanceTimersByTime(operationDelay + 10);
@@ -399,7 +401,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             const controller = new AbortController();
                             const operation = new Promise((resolve) =>
                                 setTimeout(
-                                    () => resolve("success"),
+                                    () => { resolve("success"); },
                                     operationDelay
                                 )
                             );
@@ -410,7 +412,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             );
 
                             // Abort before operation completes
-                            setTimeout(() => controller.abort(), abortDelay);
+                            setTimeout(() => { controller.abort(); }, abortDelay);
                             vi.advanceTimersByTime(abortDelay + 10);
 
                             await expect(promise).rejects.toThrow(
@@ -430,7 +432,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                             controller.abort(reason);
 
                             const operation = new Promise((resolve) =>
-                                setTimeout(() => resolve("success"), 1000)
+                                setTimeout(() => { resolve("success"); }, 1000)
                             );
 
                             await expect(
@@ -492,7 +494,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.integer({ max: 0 }), // non-positive numbers
-                        fc.constant(Number.NaN) // NaN (but not Infinity since it throws)
+                        fc.constant(NaN) // NaN (but not Infinity since it throws)
                     ),
                     (invalidTimeout) => {
                         expect(() => {
@@ -512,7 +514,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                     (options) => {
                         expect(() => {
                             createCombinedAbortSignal(
-                                options as CombineSignalsOptions | undefined
+                                options
                             );
                         }).not.toThrow();
                     }
@@ -526,7 +528,7 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                     fc.integer({ min: 100, max: 1000 }), // Timeout
                     (timeoutMs) => {
                         const clearTimeoutSpy = vi.spyOn(
-                            global,
+                            globalThis,
                             "clearTimeout"
                         );
 

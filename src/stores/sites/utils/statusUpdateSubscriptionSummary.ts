@@ -9,6 +9,25 @@ import type { StatusUpdateManager } from "./statusUpdateHandler";
 export const FALLBACK_EXPECTED_LISTENERS = 4;
 
 /**
+ * Build a normalized failure summary for status update subscriptions.
+ */
+export function buildStatusSubscriptionFailureSummary(args: {
+    errors: string[];
+    expectedListeners: number;
+    message: string;
+}): StatusUpdateSubscriptionSummary {
+    return {
+        errors: args.errors,
+        expectedListeners: args.expectedListeners,
+        listenersAttached: 0,
+        listenerStates: [],
+        message: args.message,
+        subscribed: false,
+        success: false,
+    };
+}
+
+/**
  * Resolve the expected listener count for status update subscriptions.
  *
  * @remarks
@@ -36,25 +55,6 @@ export function resolveExpectedListenerCount(
     }
 
     return FALLBACK_EXPECTED_LISTENERS;
-}
-
-/**
- * Build a normalized failure summary for status update subscriptions.
- */
-export function buildStatusSubscriptionFailureSummary(args: {
-    errors: string[];
-    expectedListeners: number;
-    message: string;
-}): StatusUpdateSubscriptionSummary {
-    return {
-        errors: args.errors,
-        expectedListeners: args.expectedListeners,
-        listenersAttached: 0,
-        listenerStates: [],
-        message: args.message,
-        subscribed: false,
-        success: false,
-    };
 }
 
 /**

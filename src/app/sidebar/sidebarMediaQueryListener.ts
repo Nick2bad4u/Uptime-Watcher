@@ -16,12 +16,6 @@ export interface MutableRef<T> {
     current: T;
 }
 
-/** Refs required by {@link setupSidebarMediaQueryListener}. */
-export interface SidebarMediaQueryListenerRefs {
-    mediaQueryRef: MutableRef<MediaQueryList | null>;
-    unsubscribeRef: MutableRef<(() => void) | null>;
-}
-
 /** Options for {@link setupSidebarMediaQueryListener}. */
 export interface SetupSidebarMediaQueryListenerOptions {
     /** Close the compact sidebar drawer when entering compact mode. */
@@ -34,6 +28,23 @@ export interface SetupSidebarMediaQueryListenerOptions {
 
     /** Update compact viewport state from the media query match result. */
     setIsCompactViewport: (next: boolean) => void;
+}
+
+/** Refs required by {@link setupSidebarMediaQueryListener}. */
+export interface SidebarMediaQueryListenerRefs {
+    mediaQueryRef: MutableRef<MediaQueryList | null>;
+    unsubscribeRef: MutableRef<(() => void) | null>;
+}
+
+/**
+ * Clean up the sidebar breakpoint listener.
+ */
+export function cleanupSidebarMediaQueryListener(options: {
+    refs: SidebarMediaQueryListenerRefs;
+}): void {
+    options.refs.unsubscribeRef.current?.();
+    options.refs.unsubscribeRef.current = null;
+    options.refs.mediaQueryRef.current = null;
 }
 
 /**
@@ -61,15 +72,4 @@ export function setupSidebarMediaQueryListener(
         mediaQuery,
         options.onBreakpointChange
     );
-}
-
-/**
- * Clean up the sidebar breakpoint listener.
- */
-export function cleanupSidebarMediaQueryListener(options: {
-    refs: SidebarMediaQueryListenerRefs;
-}): void {
-    options.refs.unsubscribeRef.current?.();
-    options.refs.unsubscribeRef.current = null;
-    options.refs.mediaQueryRef.current = null;
 }

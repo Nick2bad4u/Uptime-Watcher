@@ -5,9 +5,11 @@
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ErrorAlert } from "../../components/common/ErrorAlert/ErrorAlert";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { ErrorAlertVariant } from "../../components/common/ErrorAlert/ErrorAlert";
+
+import { ErrorAlert } from "../../components/common/ErrorAlert/ErrorAlert";
 
 describe("ErrorAlert - Complete Coverage", () => {
     beforeEach(() => {
@@ -46,8 +48,8 @@ describe("ErrorAlert - Complete Coverage", () => {
 
             render(
                 <ErrorAlert
-                    message="Test message"
                     className="custom-error-class"
+                    message="Test message"
                 />
             );
 
@@ -829,10 +831,10 @@ describe("ErrorAlert - Complete Coverage", () => {
             const mockDismiss = vi.fn();
             render(
                 <ErrorAlert
-                    message="Full props test"
-                    variant="warning"
                     className="custom-alert"
+                    message="Full props test"
                     onDismiss={mockDismiss}
+                    variant="warning"
                 />
             );
 

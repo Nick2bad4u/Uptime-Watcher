@@ -149,7 +149,7 @@ export const useSettingsController = ({
         theme: currentThemeName,
     } = settings;
 
-    const prefersReducedMotion = usePrefersReducedMotion();
+    const isPrefersReducedMotion = usePrefersReducedMotion();
 
     const {
         clearVolumePreviewTimeout,
@@ -162,12 +162,12 @@ export const useSettingsController = ({
                 inAppAlertsSoundEnabled,
                 inAppAlertVolume,
                 playInAppAlertTone,
-                prefersReducedMotion,
+                prefersReducedMotion: isPrefersReducedMotion,
             }),
             [
                 inAppAlertsSoundEnabled,
                 inAppAlertVolume,
-                prefersReducedMotion,
+                isPrefersReducedMotion,
             ]
         )
     );
@@ -206,7 +206,7 @@ export const useSettingsController = ({
     );
 
     const handleReset = useCallback(async () => {
-        const confirmed = await requestConfirmation({
+        const isConfirmed = await requestConfirmation({
             cancelLabel: "Keep Settings",
             confirmLabel: "Reset",
             details: "All application settings will revert to their defaults.",
@@ -215,7 +215,7 @@ export const useSettingsController = ({
             tone: "danger",
         });
 
-        if (!confirmed) {
+        if (!isConfirmed) {
             return;
         }
 
@@ -246,12 +246,12 @@ export const useSettingsController = ({
 
     const handleInAppAlertsChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            const enabled = event.target.checked;
+            const isEnabled = event.target.checked;
             const updates: Partial<AppSettings> = {
-                inAppAlertsEnabled: enabled,
+                inAppAlertsEnabled: isEnabled,
             };
 
-            if (!enabled) {
+            if (!isEnabled) {
                 updates.inAppAlertsSoundEnabled = false;
                 applySettingChanges(updates, {
                     forceKeys: ["inAppAlertsSoundEnabled"],
@@ -296,7 +296,7 @@ export const useSettingsController = ({
                 inAppAlertVolume: normalizedVolume,
             });
 
-            if (prefersReducedMotion) {
+            if (isPrefersReducedMotion) {
                 setPendingVolume(normalizedVolume);
                 clearVolumePreviewTimeout();
                 return;
@@ -309,7 +309,7 @@ export const useSettingsController = ({
             clearVolumePreviewTimeout,
             inAppAlertsEnabled,
             inAppAlertsSoundEnabled,
-            prefersReducedMotion,
+            isPrefersReducedMotion,
             scheduleVolumePreview,
             setPendingVolume,
         ]
@@ -339,12 +339,12 @@ export const useSettingsController = ({
 
     const handleSystemNotificationsChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            const enabled = event.target.checked;
+            const isEnabled = event.target.checked;
             const updates: Partial<AppSettings> = {
-                systemNotificationsEnabled: enabled,
+                systemNotificationsEnabled: isEnabled,
             };
 
-            if (!enabled) {
+            if (!isEnabled) {
                 updates.systemNotificationsSoundEnabled = false;
                 applySettingChanges(updates, {
                     forceKeys: ["systemNotificationsSoundEnabled"],
@@ -400,10 +400,10 @@ export const useSettingsController = ({
 
     const isVolumeControlDisabled =
         !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
-    const sliderDisabled = isLoading || isVolumeControlDisabled;
+    const isSliderDisabled = isLoading || isVolumeControlDisabled;
     const clampedVolume = clampNormalizedVolume(inAppAlertVolume);
     const volumePercent = convertNormalizedVolumeToSliderPercent(clampedVolume);
-    const automaticPreviewSuppressed = prefersReducedMotion;
+    const isAutomaticPreviewSuppressed = isPrefersReducedMotion;
     const isVolumeSilent = clampedVolume <= 0;
 
     const backupSummary: BackupSummary | null = useMemo(() => {
@@ -460,22 +460,15 @@ export const useSettingsController = ({
     const inAppAlertVolumeControl = useMemo(
         () => (
             <SettingsAlertVolumeControl
-                automaticPreviewSuppressed={automaticPreviewSuppressed}
-                disabled={sliderDisabled}
+                automaticPreviewSuppressed={isAutomaticPreviewSuppressed}
+                disabled={isSliderDisabled}
                 isVolumeSilent={isVolumeSilent}
                 onPreviewClick={handleInAppAlertPreviewClick}
                 onVolumeChange={handleInAppAlertVolumeChange}
                 volumePercent={volumePercent}
             />
         ),
-        [
-            automaticPreviewSuppressed,
-            handleInAppAlertPreviewClick,
-            handleInAppAlertVolumeChange,
-            isVolumeSilent,
-            sliderDisabled,
-            volumePercent,
-        ]
+        [handleInAppAlertPreviewClick, handleInAppAlertVolumeChange, isAutomaticPreviewSuppressed, isSliderDisabled, isVolumeSilent, volumePercent]
     );
 
     const systemNotificationsControl = useMemo(
@@ -651,7 +644,7 @@ export const useSettingsController = ({
     const handleRestoreFileChange = useCallback(
         async (event: ChangeEvent<HTMLInputElement>) => {
             const input = event.currentTarget;
-            const [file] = Array.from(input.files ?? []);
+            const [file] = [...input.files ?? []];
             if (!file) {
                 return;
             }

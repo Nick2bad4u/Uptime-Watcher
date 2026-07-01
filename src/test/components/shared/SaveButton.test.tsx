@@ -4,10 +4,12 @@
  * @file Comprehensive tests for SaveButton component
  */
 
-import { describe, expect, it, vi } from "vitest";
+import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
     SaveButton,
     type SaveButtonProperties,
@@ -23,7 +25,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         className,
@@ -36,13 +38,13 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
         ...props
     }: ThemedButtonMockProperties) => (
         <button
-            data-testid="themed-button"
+            aria-label={ariaLabel}
             className={className}
+            data-size={size}
+            data-testid="themed-button"
+            data-variant={variant}
             disabled={disabled}
             onClick={onClick}
-            aria-label={ariaLabel}
-            data-size={size}
-            data-variant={variant}
             {...props}
         >
             {icon && <span data-testid="button-icon">{icon}</span>}
@@ -397,8 +399,8 @@ describe(SaveButton, () => {
             render(
                 <SaveButton
                     {...defaultProps}
-                    onClick={mockOnClick}
                     disabled={true}
+                    onClick={mockOnClick}
                 />
             );
 
@@ -428,8 +430,8 @@ describe(SaveButton, () => {
             render(
                 <SaveButton
                     {...defaultProps}
-                    onClick={mockOnClick}
                     isLoading={true}
+                    onClick={mockOnClick}
                 />
             );
 
@@ -572,8 +574,8 @@ describe(SaveButton, () => {
             render(
                 <SaveButton
                     {...defaultProps}
-                    data-cy="save-btn"
                     data-automation-id="save-button"
+                    data-cy="save-btn"
                 />
             );
 
@@ -931,12 +933,12 @@ describe(SaveButton, () => {
 
             render(
                 <SaveButton
-                    onClick={mockOnClick}
                     aria-label="Custom save label"
                     className="integration-test"
-                    size="lg"
                     disabled={false}
                     isLoading={false}
+                    onClick={mockOnClick}
+                    size="lg"
                 />
             );
 

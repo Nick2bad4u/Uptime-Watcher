@@ -1,10 +1,9 @@
-import { describe, expect, it } from "vitest";
-
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_MANIFEST_VERSION,
     parseCloudSyncManifest,
 } from "@shared/types/cloudSyncManifest";
-import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { describe, expect, it } from "vitest";
 
 describe("cloudSyncManifest", () => {
     it("drops invalid device IDs from the manifest devices map", () => {

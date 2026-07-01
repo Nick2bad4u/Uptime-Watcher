@@ -7,7 +7,8 @@
  * @file Function coverage validation for environment utilities
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import * as environmentModule from "../../utils/environment.js";
 
 describe("Function Coverage Validation", () => {

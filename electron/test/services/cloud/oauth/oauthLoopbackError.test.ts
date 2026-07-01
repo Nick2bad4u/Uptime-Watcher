@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { normalizeProviderOAuthLoopbackError } from "@electron/services/cloud/oauth/oauthLoopbackError";
+import { describe, expect, it } from "vitest";
 
 describe(normalizeProviderOAuthLoopbackError, () => {
     it("maps state mismatches to provider-specific errors", () => {

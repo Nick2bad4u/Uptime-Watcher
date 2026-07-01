@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides consistent caching behavior, event emission, statistics, and
- * invalidation strategies across the entire application. Features TTL
+ * invalidation strategies across the entire app. Features TTL
  * expiration, LRU eviction, bulk operations, and comprehensive metrics tracking
  * for optimal performance monitoring.
  *
@@ -87,7 +87,7 @@ const createKeyWithOptionalTtlPayload = <TKey extends string>(
     cacheName: context.cacheName,
     key: data.key,
     timestamp: context.timestamp,
-    ...(isDefined(data.ttl) ? { ttl: data.ttl } : {}),
+    ...(isDefined(data.ttl) && { ttl: data.ttl }),
 });
 
 const createKeyWithReasonPayload = <TKey extends string>(
@@ -245,7 +245,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * item cache events are not emitted during bulk operations.
      */
     public bulkUpdate(items: Iterable<CacheItemInput<TValue, TKey>>): void {
-        const entries = Array.from(items);
+        const entries = [...items];
 
         if (isEmpty(entries)) {
             logger.debug(
@@ -283,7 +283,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
     public replaceAll(items: Iterable<CacheItemInput<TValue, TKey>>): void {
         this.clear();
 
-        const entries = Array.from(items);
+        const entries = [...items];
 
         if (isEmpty(entries)) {
             this.emitEvent("internal:cache:bulk-updated", { itemCount: 0 });
@@ -301,12 +301,14 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         let cleaned = 0;
         const cleanedKeys: TKey[] = [];
 
-        for (const [key, entry] of this.cache.entries()) {
-            if (entry.expiresAt && entry.expiresAt < now) {
-                this.cache.delete(key);
-                cleanedKeys.push(key);
-                cleaned++;
+        for (const [key, entry] of this.cache) {
+            if (!entry.expiresAt || entry.expiresAt >= now) {
+                continue;
             }
+
+            this.cache.delete(key);
+            cleanedKeys.push(key);
+            cleaned++;
         }
 
         if (cleaned > 0) {
@@ -350,16 +352,16 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Delete item from cache.
      */
     public delete(key: TKey): boolean {
-        const deleted = this.cache.delete(key);
+        const isDeleted = this.cache.delete(key);
 
-        if (deleted) {
+        if (isDeleted) {
             this.updateSize();
             logger.debug(`[Cache:${this.config.name}] Deleted item: ${key}`);
             this.emitEvent("internal:cache:item-deleted", { key });
             this.notifyInvalidation(key);
         }
 
-        return deleted;
+        return isDeleted;
     }
 
     /**
@@ -447,9 +449,9 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Invalidate specific key.
      */
     public invalidate(key: TKey): void {
-        const deleted = this.delete(key);
+        const isDeleted = this.delete(key);
 
-        if (deleted) {
+        if (isDeleted) {
             logger.debug(`[Cache:${this.config.name}] Invalidated key: ${key}`);
             this.emitEvent("internal:cache:item-invalidated", { key });
             // Note: notifyInvalidation already called by delete() method
@@ -582,7 +584,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         const expiredKeys: TKey[] = [];
         const now = Date.now();
 
-        for (const [key, entry] of this.cache.entries()) {
+        for (const [key, entry] of this.cache) {
             if (entry.expiresAt && entry.expiresAt < now) {
                 this.cache.delete(key);
                 expiredKeys.push(key);
@@ -607,14 +609,16 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Evict least recently used item.
      */
     private evictLRU(): void {
-        let oldestKey: TKey | undefined = undefined;
-        let oldestTime = Number.POSITIVE_INFINITY;
+        let oldestKey: TKey | undefined;
+        let oldestTime = Infinity;
 
-        for (const [key, entry] of this.cache.entries()) {
-            if (entry.timestamp < oldestTime) {
-                oldestTime = entry.timestamp;
-                oldestKey = key;
+        for (const [key, entry] of this.cache) {
+            if (!(entry.timestamp < oldestTime)) {
+                continue;
             }
+
+            oldestTime = entry.timestamp;
+            oldestKey = key;
         }
 
         if (oldestKey) {
@@ -666,21 +670,25 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      * Record cache hit and update statistics.
      */
     private recordHit(): void {
-        if (this.config.enableStats) {
-            this.stats.hits++;
-            this.stats.lastAccess = Date.now();
-            this.updateHitRatio();
+        if (!this.config.enableStats) {
+            return;
         }
+
+        this.stats.hits++;
+        this.stats.lastAccess = Date.now();
+        this.updateHitRatio();
     }
 
     /**
      * Record cache miss and update statistics.
      */
     private recordMiss(): void {
-        if (this.config.enableStats) {
-            this.stats.misses++;
-            this.updateHitRatio();
+        if (!this.config.enableStats) {
+            return;
         }
+
+        this.stats.misses++;
+        this.updateHitRatio();
     }
 
     /**
@@ -733,7 +741,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         if (options?.emitEvent ?? true) {
             this.emitEvent("internal:cache:item-cached", {
                 key,
-                ...(requestedTTL > 0 ? { ttl: requestedTTL } : {}),
+                ...((requestedTTL > 0) && { ttl: requestedTTL }),
             });
         }
     }

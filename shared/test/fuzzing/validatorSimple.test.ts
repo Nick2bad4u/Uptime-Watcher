@@ -2,9 +2,9 @@
  * @file Simple Fast-Check fuzzing tests for validatorUtils targeting line 333
  */
 
-import { describe, expect } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { safeInteger, isValidInteger } from "@shared/validation/validatorUtils";
+import { isValidInteger, safeInteger } from "@shared/validation/validatorUtils";
+import { describe, expect } from "vitest";
 
 describe("ValidatorUtils Fuzzing - Line 333", () => {
     describe("safeInteger - Line 333 validation boundary conditions", () => {
@@ -22,8 +22,8 @@ describe("ValidatorUtils Fuzzing - Line 333", () => {
         test.prop([fc.constantFrom("", " ", "123.456", "NaN", "abc")])(
             "should correctly identify invalid integers",
             (invalidValue) => {
-                const result = isValidInteger(invalidValue);
-                expect(result).toBeFalsy();
+                const isResult = isValidInteger(invalidValue);
+                expect(isResult).toBeFalsy();
             }
         );
     });

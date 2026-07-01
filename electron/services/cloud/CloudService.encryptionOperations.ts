@@ -86,12 +86,12 @@ export async function setEncryptionPassphrase(
                     salt,
                 });
 
-                const valid = verifyKeyCheckBase64({
+                const isValid = verifyKeyCheckBase64({
                     key: candidateKey,
                     keyCheckBase64: remoteEncryption.keyCheckBase64,
                 });
 
-                if (valid) {
+                if (isValid) {
                     return candidateKey;
                 }
 

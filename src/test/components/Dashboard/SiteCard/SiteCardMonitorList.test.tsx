@@ -1,17 +1,17 @@
+import type { Monitor } from "@shared/types";
 import type { ReactNode } from "react";
+import type { UnknownRecord } from "type-fest";
 
 import { render, screen } from "@testing-library/react";
 import {
+    afterAll,
+    beforeAll,
+    beforeEach,
     describe,
     expect,
     it,
-    beforeAll,
-    afterAll,
-    beforeEach,
     vi,
 } from "vitest";
-
-import type { Monitor } from "@shared/types";
 
 import { SiteCardMonitorList } from "../../../../components/Dashboard/SiteCard/SiteCardMonitorList";
 
@@ -19,7 +19,7 @@ interface ThemedComponentProperties extends Record<string, unknown> {
     readonly children?: ReactNode;
 }
 
-type TooltipRenderFunction = (props: Record<string, unknown>) => ReactNode;
+type TooltipRenderFunction = (props: UnknownRecord) => ReactNode;
 
 interface TooltipProperties extends Record<string, unknown> {
     readonly children: TooltipRenderFunction;
@@ -81,13 +81,13 @@ function createMonitor(
         timeout,
         type,
         ...rest,
-    } as Monitor;
+    };
 }
 
 const { statusIconInvocations, createIconStub } = vi.hoisted(() => {
     const calls: { readonly status: string }[] = [];
     const factory = (status: string) =>
-        function IconStub(props: Record<string, unknown>) {
+        function IconStub(props: UnknownRecord) {
             calls.push({ status });
             return <span aria-label={`icon-${status}`} {...props} />;
         };
@@ -98,13 +98,13 @@ const { statusIconInvocations, createIconStub } = vi.hoisted(() => {
     } as const;
 });
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({ children, ...props }: ThemedComponentProperties) => (
-        <span {...(props as Record<string, unknown>)}>{children}</span>
+        <span {...(props)}>{children}</span>
     ),
 }));
 
-vi.mock("../../../../utils/icons", () => ({
+vi.mock(import('../../../../utils/icons'), () => ({
     AppIcons: {
         metrics: {
             activity: createIconStub("activity"),
@@ -121,7 +121,7 @@ vi.mock("../../../../utils/icons", () => ({
     },
 }));
 
-vi.mock("../../../../components/common/Tooltip/Tooltip", () => ({
+vi.mock(import('../../../../components/common/Tooltip/Tooltip'), () => ({
     Tooltip: ({ children }: TooltipProperties) => (
         <>{children({ "data-tooltip": "stub" })}</>
     ),

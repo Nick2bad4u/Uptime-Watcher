@@ -11,8 +11,8 @@
  * @since 2024
  */
 
-import { describe, expect, it } from "vitest";
 import * as helpersModule from "@shared/utils/typeHelpers";
+import { describe, expect, it } from "vitest";
 
 describe("shared/utils/typeHelpers Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {

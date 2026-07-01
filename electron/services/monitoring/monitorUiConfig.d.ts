@@ -2,11 +2,6 @@ import type { Monitor } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 /**
- * Shared monitor UI configuration shape that is serialized across IPC.
- */
-export type SharedMonitorUiConfig = NonNullable<MonitorTypeConfig["uiConfig"]>;
-
-/**
  * Extended UI configuration used by the renderer when displaying monitors.
  *
  * @remarks
@@ -35,3 +30,8 @@ export interface MonitorUIConfig extends SharedMonitorUiConfig {
     /** Function to format title suffix for history charts */
     formatTitleSuffix?: (monitor: Monitor) => string;
 }
+
+/**
+ * Shared monitor UI configuration shape that is serialized across IPC.
+ */
+export type SharedMonitorUiConfig = NonNullable<MonitorTypeConfig["uiConfig"]>;

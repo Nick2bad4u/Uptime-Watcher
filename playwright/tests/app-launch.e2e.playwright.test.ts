@@ -1,11 +1,12 @@
 /**
  * Basic Electron app launch and initialization tests.
  *
- * These tests verify that the Electron application can be launched, initialized
+ * These tests verify that the Electron app can be launched, initialized
  * properly, and basic functionality works as expected.
  */
 
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+
 import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
@@ -41,18 +42,18 @@ test.describe(
                 const electronApp = await launchElectronApp();
 
                 // Verify the app launched
-                expect(electronApp).toBeTruthy();
+                expect.soft(electronApp).toBeTruthy();
 
                 // Get app info
                 const isPackaged = await electronApp.evaluate(
-                    async ({ app }) => {
+                    async ({ app }) =>
                         // This runs in Electron's main process
-                        return app.isPackaged;
-                    }
+                         app.isPackaged
+
                 );
 
                 // Should not be packaged in development/test mode
-                expect(isPackaged).toBe(false);
+                expect.soft(isPackaged).toBe(false);
 
                 // Close the app
                 await electronApp.close();
@@ -82,11 +83,11 @@ test.describe(
                 const window = await electronApp.firstWindow();
 
                 // Verify window exists
-                expect(window).toBeTruthy();
+                expect.soft(window).toBeTruthy();
 
                 // Check window title
                 const title = await window.title();
-                expect(title).toContain("Uptime Watcher");
+                expect.soft(title).toContain("Uptime Watcher");
 
                 // Take a screenshot for debugging
                 await window.screenshot({
@@ -119,20 +120,16 @@ test.describe(
                 const electronApp = await launchElectronApp();
 
                 // Get app name and version
-                const appName = await electronApp.evaluate(async ({ app }) => {
-                    return app.getName();
-                });
+                const appName = await electronApp.evaluate(async ({ app }) => app.getName());
 
                 const appVersion = await electronApp.evaluate(
-                    async ({ app }) => {
-                        return app.getVersion();
-                    }
+                    async ({ app }) => app.getVersion()
                 );
 
                 // Verify app metadata
                 // In development mode, app name defaults to "Electron" unless explicitly set
-                expect(appName).toMatch(/^(uptime-watcher|Electron)$/); // Allow both dev and production names
-                expect(appVersion).toMatch(/^\d+\.\d+\.\d+/); // Semver pattern
+                expect.soft(appName).toMatch(/^(Electron|uptime-watcher)$/v); // Allow both dev and production names
+                expect.soft(appVersion).toMatch(/^\d+\.\d+\.\d+/v); // Semver pattern
 
                 await electronApp.close();
             }
@@ -167,7 +164,7 @@ test.describe(
                     return app.isReady();
                 });
 
-                expect(isReady).toBe(true);
+                expect.soft(isReady).toBe(true);
 
                 await electronApp.close();
             }

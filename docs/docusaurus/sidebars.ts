@@ -14,7 +14,7 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
  *
  * Create as many sidebars as you want.
  */
-const sidebars: SidebarsConfig = {
+const sidebars = {
     unifiedSidebar: [
         {
             className: "sb-doc-overview",
@@ -215,6 +215,6 @@ const sidebars: SidebarsConfig = {
             type: "category",
         },
     ],
-};
+} satisfies SidebarsConfig;
 
 export default sidebars;

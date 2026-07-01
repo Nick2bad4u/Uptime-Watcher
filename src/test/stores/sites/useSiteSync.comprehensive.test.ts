@@ -3,6 +3,12 @@
  * site sync functions
  */
 
+import type { Site, StatusUpdate } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+
+import { fc, test } from "@fast-check/vitest";
+import { mockConstructableReturnValueOnce } from "@shared/test/helpers/vitestConstructors";
+import { arrayAt, arrayFirst, objectAssign   } from "ts-extras";
 import {
     afterAll,
     afterEach,
@@ -10,16 +16,23 @@ import {
     describe,
     expect,
     it,
-    vi,
     type Mock,
+    vi,
 } from "vitest";
-import { fc, test } from "@fast-check/vitest";
-import type { Site, StatusUpdate } from "@shared/types";
-import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+
+import type {
+    initialSitesState} from "../../../stores/sites/useSitesState";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
-import { mockConstructableReturnValueOnce } from "@shared/test/helpers/vitestConstructors";
-import { createMockFunction } from "../../utils/mockFactories";
+
+import { logger } from "../../../services/logger";
+import {
+    createSitesStateActions
+} from "../../../stores/sites/useSitesState";
+// Import the modules after mocking
+import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
+import { logStoreAction } from "../../../stores/utils";
 import { installElectronApiMock } from "../../utils/electronApiMock";
+import { createMockFunction } from "../../utils/mockFactories";
 
 const LISTENER_NAMES = [
     "monitor:status-changed",
@@ -54,7 +67,7 @@ const buildSite = (identifier: string): Site => ({
 });
 
 // Mock all the dependencies
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -64,11 +77,11 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -77,9 +90,9 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../shared/utils/errorHandling", () => ({
+vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     ensureError: vi.fn((error: unknown): Error => {
-        if (error instanceof Error) return error;
+        if (Error.isError(error)) return error;
         return new Error(String(error));
     }),
     withErrorHandling: vi.fn(async (operation) => {
@@ -92,7 +105,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     }),
 }));
 
-vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
+vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
     StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
         return {
             getExpectedListenerCount: vi.fn(() => 4),
@@ -115,7 +128,7 @@ const mockStateSyncService = vi.hoisted(() => ({
     requestFullSync: vi.fn(),
 }));
 
-vi.mock("../../../services/StateSyncService", () => ({
+vi.mock(import('../../../services/StateSyncService'), () => ({
     StateSyncService: mockStateSyncService,
 }));
 
@@ -127,15 +140,6 @@ const { restore: restoreElectronApi } = installElectronApiMock(
 afterAll(() => {
     restoreElectronApi();
 });
-
-// Import the modules after mocking
-import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import {
-    createSitesStateActions,
-    initialSitesState,
-} from "../../../stores/sites/useSitesState";
-import { logStoreAction } from "../../../stores/utils";
-import { logger } from "../../../services/logger";
 
 const logStoreActionMock = vi.mocked(logStoreAction);
 
@@ -195,7 +199,7 @@ describe("useSiteSync", () => {
 
             await syncActions.fullResyncSites();
 
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
             expect(mockDeps.setSites).toHaveBeenCalledWith(
                 fullSyncResult.sites
             );
@@ -222,7 +226,7 @@ describe("useSiteSync", () => {
             let resolveSync: (() => void) | undefined;
             mockStateSyncService.requestFullSync.mockReturnValue(
                 new Promise((resolve) => {
-                    resolveSync = () => resolve(fullSyncResult);
+                    resolveSync = () => { resolve(fullSyncResult); };
                 })
             );
 
@@ -270,7 +274,7 @@ describe("useSiteSync", () => {
             const result = await syncActions.getSyncStatus();
 
             expect(result).toEqual(mockStatus);
-            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalledWith();
         });
 
         it("should handle getSyncStatus errors with fallback", async ({
@@ -492,7 +496,7 @@ describe("useSiteSync", () => {
             expect(
                 StatusUpdateManagerMock.mock.instances.length
             ).toBeGreaterThanOrEqual(2);
-            expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
+            expect(arrayFirst(unsubscribeSpies)).toHaveBeenCalledTimes(1);
             expect(
                 mockDeps.setStatusSubscriptionSummary
             ).toHaveBeenNthCalledWith(1, undefined);
@@ -720,7 +724,7 @@ describe("useSiteSync", () => {
             const stateActions = createSitesStateActions(
                 (updater) => {
                     const partial = updater(state);
-                    Object.assign(state, { ...state, ...partial });
+                    objectAssign(state, { ...state, ...partial });
                     return partial;
                 },
                 () => state
@@ -731,7 +735,7 @@ describe("useSiteSync", () => {
 
             mockDeps.getSites = () => state.sites;
             mockDeps.setSites = stateActions.setSites;
-            mockDeps.onSiteDelta = vi.fn();
+            vi.spyOn(mockDeps, 'onSiteDelta').mockImplementation();
 
             syncActions = createSiteSyncActions(mockDeps);
 
@@ -898,7 +902,7 @@ describe("useSiteSync", () => {
         beforeEach(() => {
             // Reset mocks specifically for this describe block
             vi.clearAllMocks();
-            mockDeps.setSites = vi.fn();
+            vi.spyOn(mockDeps, 'setSites').mockImplementation();
             syncActions = createSiteSyncActions(mockDeps);
         });
 
@@ -927,13 +931,13 @@ describe("useSiteSync", () => {
             await syncActions.syncSites();
 
             // Verify sync was called and completed
-            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledWith();
             expect(mockDeps.setSites).toHaveBeenCalledWith(
                 fullSyncResult.sites
             );
 
             const lastLog =
-                logStoreActionMock.mock.calls.at(-1)?.[2] ?? undefined;
+                arrayAt(logStoreActionMock.mock.calls, -1)?.[2] ?? undefined;
             expect(lastLog).toMatchObject({
                 status: "success",
                 success: true,
@@ -1020,7 +1024,7 @@ describe("useSiteSync", () => {
                 fullSyncResult.sites
             );
 
-            const lastLogArgs = logStoreActionMock.mock.calls.at(-1);
+            const lastLogArgs = arrayAt(logStoreActionMock.mock.calls, -1);
             expect(lastLogArgs?.[0]).toBe("SitesStore");
             expect(lastLogArgs?.[1]).toBe("syncSites");
             expect(lastLogArgs?.[2]).toMatchObject({

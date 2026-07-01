@@ -3,8 +3,9 @@
  *   semantic search analysis of error handling and conditional branches
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { unsafeJsonifiable } from "@shared/test/helpers/jsonTestHelpers";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { UptimeEventName } from "../events/eventTypes";
 
 describe("High-Impact Branch Coverage Tests", () => {
@@ -198,7 +199,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                     // Test invalid monitor type
                     const invalidTypeResult =
                         validationModule.validateMonitorData(
-                            "invalid-type" as any,
+                            "invalid-type",
                             {}
                         );
                     expect(invalidTypeResult.success).toBeFalsy();
@@ -359,7 +360,7 @@ describe("High-Impact Branch Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             try {
-                // eslint-disable-next-line unicorn/no-keyword-prefix
+
                 const typeGuardsModule =
                     await import("../../shared/utils/typeGuards.js");
                 // eslint-enable-next-line unicorn/no-keyword-prefix
@@ -389,8 +390,8 @@ describe("High-Impact Branch Coverage Tests", () => {
 
                     // Test custom Error subclasses
                     class CustomError extends Error {
-                        constructor(message?: string) {
-                            super(message);
+                        constructor(message?: string, options?: ErrorOptions) {
+                            super(message, options);
                             this.name = "CustomError";
                         }
                     }
@@ -437,7 +438,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                         typeGuardsModule.isFiniteNumber(-Infinity)
                     ).toBeFalsy();
                     expect(
-                        typeGuardsModule.isFiniteNumber(Number.NaN)
+                        typeGuardsModule.isFiniteNumber(NaN)
                     ).toBeFalsy();
                     expect(typeGuardsModule.isFiniteNumber("42")).toBeFalsy();
                     expect(typeGuardsModule.isFiniteNumber(null)).toBeFalsy();
@@ -598,7 +599,7 @@ describe("High-Impact Branch Coverage Tests", () => {
                         )
                     ).toContain("2023");
                     expect(
-                        stringConversionModule.safeStringify(/regex/g)
+                        stringConversionModule.safeStringify(/regex/gv)
                     ).toContain("regex");
                     expect(
                         stringConversionModule.safeStringify(

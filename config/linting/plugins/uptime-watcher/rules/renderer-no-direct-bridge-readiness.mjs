@@ -143,17 +143,17 @@ export const rendererNoDirectBridgeReadinessRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow calling waitForElectronBridge outside the renderer IPC helper utilities.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-direct-bridge-readiness.md",
         },
-        schema: [],
         messages: {
             preferServiceHelpers:
                 "Do not call {{callee}} directly. Use getIpcServiceHelpers / createIpcServiceHelpers so bridge readiness stays centralized.",
         },
+        schema: [],
+        type: "problem",
     },
 };

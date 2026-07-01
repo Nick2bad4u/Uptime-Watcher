@@ -4,7 +4,7 @@
  * @module portRetry
  *
  * @file Comprehensive tests for the performPortCheckWithRetry function in the
- *   Uptime Watcher application.
+ *   Uptime Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,7 +15,16 @@
  * @tags ["test", "monitoring", "port", "retry", "backoff"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { RETRY_BACKOFF } from "../../../../constants";
+import { isDev } from "../../../../electronUtils";
+import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";
+import { handlePortCheckError } from "../../../../services/monitoring/utils/portErrorHandling";
+// Import after mocks are set up
+import { performPortCheckWithRetry } from "../../../../services/monitoring/utils/portRetry";
+import { logger } from "../../../../utils/logger";
+import { withOperationalHooks } from "../../../../utils/operationalHooks";
 
 // Mock dependencies before importing the module under test
 vi.mock("../../../../electronUtils", () => ({
@@ -49,15 +58,6 @@ vi.mock("../../../../constants", () => ({
         MAX_DELAY: 5000,
     },
 }));
-
-// Import after mocks are set up
-import { performPortCheckWithRetry } from "../../../../services/monitoring/utils/portRetry";
-import { isDev } from "../../../../electronUtils";
-import { logger } from "../../../../utils/logger";
-import { withOperationalHooks } from "../../../../utils/operationalHooks";
-import { performSinglePortCheck } from "../../../../services/monitoring/utils/portChecker";
-import { handlePortCheckError } from "../../../../services/monitoring/utils/portErrorHandling";
-import { RETRY_BACKOFF } from "../../../../constants";
 
 describe(performPortCheckWithRetry, () => {
     const mockResult = {

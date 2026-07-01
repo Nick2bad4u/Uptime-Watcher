@@ -8,7 +8,6 @@ const TrashIcon = AppIcons.actions.remove;
 const EditIcon = AppIcons.actions.edit;
 
 const meta: Meta<typeof ThemedIconButton> = {
-    component: ThemedIconButton,
     args: {
         icon: <SettingsIcon />,
         tooltip: "Open settings",
@@ -16,6 +15,7 @@ const meta: Meta<typeof ThemedIconButton> = {
     argTypes: {
         onClick: { action: "clicked" },
     },
+    component: ThemedIconButton,
     parameters: {
         layout: "centered",
     },
@@ -31,8 +31,8 @@ export const Default: Story = {};
 export const Danger: Story = {
     args: {
         icon: <TrashIcon />,
-        variant: "error",
         tooltip: "Delete monitor",
+        variant: "error",
     },
 };
 

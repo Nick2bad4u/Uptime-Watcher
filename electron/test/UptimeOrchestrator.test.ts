@@ -3,15 +3,6 @@
  * all orchestration paths, error handling, and event coordination.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-
-import { UptimeOrchestrator } from "../UptimeOrchestrator";
-import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator.types";
-import { DatabaseManager } from "../managers/DatabaseManager";
-import { MonitorManager } from "../managers/MonitorManager";
-import { SiteManager } from "../managers/SiteManager";
-import type { UptimeEvents } from "../events/eventTypes";
-import type { EventMetadata } from "@shared/types/events";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -19,8 +10,19 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
+import type { EventMetadata } from "@shared/types/events";
+
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ApplicationError } from "@shared/utils/errorHandling";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { UptimeEvents } from "../events/eventTypes";
+import type { DatabaseManager } from "../managers/DatabaseManager";
+import type { MonitorManager } from "../managers/MonitorManager";
+import type { SiteManager } from "../managers/SiteManager";
+import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator.types";
+
+import { UptimeOrchestrator } from "../UptimeOrchestrator";
 
 // Mock all dependencies with proper typing
 const mockBackupBuffer = Buffer.from("test");
@@ -296,7 +298,7 @@ describe(UptimeOrchestrator, () => {
                 invalidDependencies
             );
             expect(() =>
-                invalidOrchestrator["validateInitialization"]()
+                { invalidOrchestrator.validateInitialization(); }
             ).toThrow(
                 "DatabaseManager not properly initialized - missing initialize method"
             );
@@ -321,7 +323,7 @@ describe(UptimeOrchestrator, () => {
                 invalidDependencies
             );
             expect(() =>
-                invalidOrchestrator["validateInitialization"]()
+                { invalidOrchestrator.validateInitialization(); }
             ).toThrow(
                 "SiteManager not properly initialized - missing initialize method"
             );
@@ -346,7 +348,7 @@ describe(UptimeOrchestrator, () => {
                 invalidDependencies
             );
             expect(() =>
-                invalidOrchestrator["validateInitialization"]()
+                { invalidOrchestrator.validateInitialization(); }
             ).toThrow(
                 "MonitorManager not properly initialized - missing startMonitoring method"
             );
@@ -461,7 +463,7 @@ describe(UptimeOrchestrator, () => {
                     monitoring: true,
                     responseTime: 0,
                     retryAttempts: 3,
-                } as Monitor,
+                },
             ],
             monitoring: true,
         };
@@ -560,7 +562,7 @@ describe(UptimeOrchestrator, () => {
             ).mockResolvedValueOnce(true);
             vi.mocked(mockSiteManager.removeSite).mockResolvedValueOnce(true);
 
-            const result = await orchestrator.removeSite("test-site");
+            const isResult = await orchestrator.removeSite("test-site");
 
             expect(
                 mockMonitorManager.stopMonitoringForSite
@@ -571,7 +573,7 @@ describe(UptimeOrchestrator, () => {
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should abort removal when monitoring stop fails", async ({
@@ -587,9 +589,9 @@ describe(UptimeOrchestrator, () => {
                 mockMonitorManager.stopMonitoringForSite
             ).mockResolvedValueOnce(false);
 
-            const result = await orchestrator.removeSite("site-failure");
+            const isResult = await orchestrator.removeSite("site-failure");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(mockSiteManager.removeSite).not.toHaveBeenCalled();
             expect(
                 mockMonitorManager.startMonitoringForSite
@@ -610,9 +612,9 @@ describe(UptimeOrchestrator, () => {
             ).mockResolvedValueOnce(true);
             vi.mocked(mockSiteManager.removeSite).mockResolvedValueOnce(false);
 
-            const result = await orchestrator.removeSite("test-site");
+            const isResult = await orchestrator.removeSite("test-site");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
@@ -646,7 +648,7 @@ describe(UptimeOrchestrator, () => {
             });
             expect(error.cause).toBeInstanceOf(Error);
             expect((error.cause as Error).message).toMatch(
-                /Critical state inconsistency/
+                /Critical state inconsistency/v
             );
         });
 
@@ -768,7 +770,7 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result = await orchestrator.startMonitoringForSite(
+            const isResult = await orchestrator.startMonitoringForSite(
                 "test-site",
                 "monitor-1"
             );
@@ -776,7 +778,7 @@ describe(UptimeOrchestrator, () => {
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should start monitoring for site without monitor ID", async ({
@@ -788,13 +790,13 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result =
+            const isResult =
                 await orchestrator.startMonitoringForSite("test-site");
 
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", undefined);
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should stop monitoring for site", async ({ task, annotate }) => {
@@ -803,7 +805,7 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result = await orchestrator.stopMonitoringForSite(
+            const isResult = await orchestrator.stopMonitoringForSite(
                 "test-site",
                 "monitor-1"
             );
@@ -811,7 +813,7 @@ describe(UptimeOrchestrator, () => {
             expect(
                 mockMonitorManager.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should stop monitoring for site without monitor ID", async ({
@@ -823,13 +825,13 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            const result =
+            const isResult =
                 await orchestrator.stopMonitoringForSite("test-site");
 
             expect(
                 mockMonitorManager.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", undefined);
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should remove monitor successfully", async ({ task, annotate }) => {
@@ -1036,7 +1038,7 @@ describe(UptimeOrchestrator, () => {
             await annotate("Type: Import Operation", "type");
 
             const testData = '{"sites": []}';
-            const result = await orchestrator.importData(testData);
+            const isResult = await orchestrator.importData(testData);
 
             expect(mockDatabaseManager.importData).toHaveBeenCalledWith(
                 testData
@@ -1051,7 +1053,7 @@ describe(UptimeOrchestrator, () => {
                     source: STATE_SYNC_SOURCE.DATABASE,
                 })
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should get history limit", async ({ task, annotate }) => {
@@ -1422,7 +1424,7 @@ describe(UptimeOrchestrator, () => {
 
             expect(forwardedSiteAddedEvents).toHaveLength(1);
             expect(
-                forwardedSiteAddedEvents[0]?._originalMeta as EventMetadata
+                forwardedSiteAddedEvents[0]?._originalMeta!
             ).toStrictEqual(metadata);
         });
 
@@ -1855,7 +1857,7 @@ describe(UptimeOrchestrator, () => {
                 monitoring: true,
                 monitors: [monitor],
                 name: "Test Site",
-            } as unknown as Site;
+            };
 
             const manualResult: StatusUpdate = {
                 monitor,
@@ -2005,10 +2007,10 @@ describe(UptimeOrchestrator, () => {
             const emittedPayload = emitTypedSpy.mock.calls.find(
                 ([eventName]) => eventName === "monitor:check-completed"
             )?.[1] as
+                | undefined
                 | {
                       result: StatusUpdate;
-                  }
-                | undefined;
+                  };
 
             expect(emittedPayload).toBeDefined();
             expect(emittedPayload?.result.site?.identifier).toBe(

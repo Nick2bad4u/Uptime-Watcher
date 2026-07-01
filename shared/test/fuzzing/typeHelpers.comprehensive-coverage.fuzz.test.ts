@@ -17,8 +17,8 @@
  * @packageDocumentation
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -180,7 +180,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             expect(isRecord({})).toBeTruthy();
             expect(isRecord(Object.create(null))).toBeTruthy();
             expect(isRecord(new Date())).toBeTruthy();
-            expect(isRecord(/(?:)/)).toBeTruthy();
+            expect(isRecord(/(?:)/v)).toBeTruthy();
             expect(isRecord(null)).toBeFalsy();
             expect(isRecord([])).toBeFalsy();
             expect(isRecord(() => {})).toBeFalsy();
@@ -189,12 +189,12 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
         test.prop([fc.anything()])(
             "should be consistent with internal logic",
             (value) => {
-                const result = isRecord(value);
-                const expected =
+                const isResult = isRecord(value);
+                const isExpected =
                     typeof value === "object" &&
                     value !== null &&
                     !Array.isArray(value);
-                expect(result).toBe(expected);
+                expect(isResult).toBe(isExpected);
             }
         );
     });

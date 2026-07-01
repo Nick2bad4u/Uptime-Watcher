@@ -37,17 +37,12 @@ export class UptimeOrchestratorEventHandlers {
 
     private readonly snapshotSyncCoordinator: SnapshotSyncCoordinator;
 
-    /** Event handler for sites cache update requests. */
-    public readonly handleUpdateSitesCacheRequestedEvent = (
-        data: UpdateSitesCacheRequestData
-    ): void => {
-        this.snapshotSyncCoordinator.handleUpdateSitesCacheRequestedEvent(data);
-    };
-
-    /** Event handler for retrieving sites from cache. */
-    public readonly handleGetSitesFromCacheRequestedEvent = (): void => {
-        this.snapshotSyncCoordinator.handleGetSitesFromCacheRequestedEvent();
-    };
+    public constructor(options: UptimeOrchestratorEventHandlersOptions) {
+        this.monitoringLifecycleCoordinator =
+            options.monitoringLifecycleCoordinator;
+        this.onDatabaseInitialized = options.onDatabaseInitialized;
+        this.snapshotSyncCoordinator = options.snapshotSyncCoordinator;
+    }
 
     /** Event handler for database initialization completion. */
     public readonly handleDatabaseInitializedEvent = (): void => {
@@ -61,6 +56,20 @@ export class UptimeOrchestratorEventHandlers {
         });
     };
 
+    /** Event handler for retrieving sites from cache. */
+    public readonly handleGetSitesFromCacheRequestedEvent = (): void => {
+        this.snapshotSyncCoordinator.handleGetSitesFromCacheRequestedEvent();
+    };
+
+    /** Event handler for monitoring status check requests. */
+    public readonly handleIsMonitoringActiveRequestedEvent = (
+        data: IsMonitoringActiveRequestData
+    ): void => {
+        this.monitoringLifecycleCoordinator.handleIsMonitoringActiveRequestedEvent(
+            data
+        );
+    };
+
     /** Event handler for manual monitor check completion events. */
     public readonly handleManualCheckCompletedEvent = (
         eventData: UptimeEvents["internal:monitor:manual-check-completed"] & {
@@ -68,6 +77,15 @@ export class UptimeOrchestratorEventHandlers {
         }
     ): void => {
         this.snapshotSyncCoordinator.handleManualCheckCompletedEvent(eventData);
+    };
+
+    /** Event handler for monitoring restart requests. */
+    public readonly handleRestartMonitoringRequestedEvent = (
+        data: RestartMonitoringRequestData
+    ): void => {
+        this.monitoringLifecycleCoordinator.handleRestartMonitoringRequestedEvent(
+            data
+        );
     };
 
     /** Event handler for monitoring start requests. */
@@ -88,28 +106,10 @@ export class UptimeOrchestratorEventHandlers {
         );
     };
 
-    /** Event handler for monitoring status check requests. */
-    public readonly handleIsMonitoringActiveRequestedEvent = (
-        data: IsMonitoringActiveRequestData
+    /** Event handler for sites cache update requests. */
+    public readonly handleUpdateSitesCacheRequestedEvent = (
+        data: UpdateSitesCacheRequestData
     ): void => {
-        this.monitoringLifecycleCoordinator.handleIsMonitoringActiveRequestedEvent(
-            data
-        );
+        this.snapshotSyncCoordinator.handleUpdateSitesCacheRequestedEvent(data);
     };
-
-    /** Event handler for monitoring restart requests. */
-    public readonly handleRestartMonitoringRequestedEvent = (
-        data: RestartMonitoringRequestData
-    ): void => {
-        this.monitoringLifecycleCoordinator.handleRestartMonitoringRequestedEvent(
-            data
-        );
-    };
-
-    public constructor(options: UptimeOrchestratorEventHandlersOptions) {
-        this.monitoringLifecycleCoordinator =
-            options.monitoringLifecycleCoordinator;
-        this.onDatabaseInitialized = options.onDatabaseInitialized;
-        this.snapshotSyncCoordinator = options.snapshotSyncCoordinator;
-    }
 }

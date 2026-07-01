@@ -1,10 +1,10 @@
 /**
- * Settings store types and interfaces. Manages application preferences and
+ * Settings store types and interfaces. Manages app preferences and
  * configuration.
  *
  * @remarks
  * Defines the interface for the settings store which handles user preferences,
- * application configuration, and backend synchronization for persistent
+ * app configuration, and backend synchronization for persistent
  * settings.
  *
  * @packageDocumentation
@@ -13,7 +13,7 @@
 import type { AppSettings } from "../types";
 
 /**
- * Settings store interface for managing application configuration.
+ * Settings store interface for managing app configuration.
  *
  * @remarks
  * Comprehensive interface for settings management that provides:
@@ -41,7 +41,7 @@ export interface SettingsStore {
      * - Merging default values for missing settings
      * - Handling initialization errors gracefully
      *
-     * Should be called during application startup to ensure settings are
+     * Should be called during app startup to ensure settings are
      * properly configured.
      *
      * @returns Promise resolving to initialization result with status
@@ -82,7 +82,7 @@ export interface SettingsStore {
      * - Providing user feedback on operation status
      *
      * This operation cannot be undone and affects all user preferences. Backend
-     * synchronization ensures settings are persisted across application
+     * synchronization ensures settings are persisted across app
      * restarts and synchronized with other instances.
      *
      * @returns Promise resolving to reset operation result
@@ -95,10 +95,10 @@ export interface SettingsStore {
     }>;
 
     /**
-     * Current application settings configuration.
+     * Current app settings configuration.
      *
      * @remarks
-     * Contains all user preferences and application configuration including
+     * Contains all user preferences and app configuration including
      * theme settings, notification preferences, monitoring parameters, and
      * other customizable options.
      */
@@ -123,7 +123,7 @@ export interface SettingsStore {
     }>;
 
     /**
-     * Updates multiple application settings with persistence.
+     * Updates multiple app settings with persistence.
      *
      * @remarks
      * Updates one or more settings values with automatic persistence to local

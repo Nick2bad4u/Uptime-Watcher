@@ -45,12 +45,12 @@ export function useCompactSidebarAutoDismiss(args: {
                     return;
                 }
 
-                const interactedWithinSidebar =
+                const isInteractedWithinSidebar =
                     SIDEBAR_DISMISS_INTERACTIVE_SELECTORS.some(
                         (selector) => target.closest(selector) !== null
                     );
 
-                if (interactedWithinSidebar) {
+                if (isInteractedWithinSidebar) {
                     return;
                 }
 
@@ -61,7 +61,7 @@ export function useCompactSidebarAutoDismiss(args: {
                 }
             };
 
-            document.addEventListener("pointerdown", handlePointerDown, true);
+            document.addEventListener("pointerdown", handlePointerDown, {capture: true});
 
             return () => {
                 document.removeEventListener(

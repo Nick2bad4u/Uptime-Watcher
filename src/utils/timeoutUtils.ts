@@ -75,32 +75,6 @@ export function clampTimeoutSeconds(timeoutSeconds: number): number {
 }
 
 /**
- * Converts timeout from milliseconds to seconds for UI display.
- *
- * @remarks
- * Performs direct division without rounding to preserve precision. For UI
- * display where whole seconds are preferred, consider using Math.round() or
- * Math.floor() on the result.
- *
- * @example
- *
- * ```typescript
- * const seconds = timeoutMsToSeconds(5000); // Returns 5
- * const precise = timeoutMsToSeconds(5500); // Returns 5.5
- * const rounded = Math.round(timeoutMsToSeconds(5500)); // Returns 6
- * ```
- *
- * @param timeoutMs - Timeout value in milliseconds.
- *
- * @returns Timeout value in seconds (may include decimal places).
- *
- * @public
- */
-export function timeoutMsToSeconds(timeoutMs: number): number {
-    return timeoutMs / 1000;
-}
-
-/**
  * Gets timeout in seconds from monitor configuration with default fallback.
  *
  * @remarks
@@ -188,6 +162,32 @@ export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
         timeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
         timeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX
     );
+}
+
+/**
+ * Converts timeout from milliseconds to seconds for UI display.
+ *
+ * @remarks
+ * Performs direct division without rounding to preserve precision. For UI
+ * display where whole seconds are preferred, consider using Math.round() or
+ * Math.floor() on the result.
+ *
+ * @example
+ *
+ * ```typescript
+ * const seconds = timeoutMsToSeconds(5000); // Returns 5
+ * const precise = timeoutMsToSeconds(5500); // Returns 5.5
+ * const rounded = Math.round(timeoutMsToSeconds(5500)); // Returns 6
+ * ```
+ *
+ * @param timeoutMs - Timeout value in milliseconds.
+ *
+ * @returns Timeout value in seconds (may include decimal places).
+ *
+ * @public
+ */
+export function timeoutMsToSeconds(timeoutMs: number): number {
+    return timeoutMs / 1000;
 }
 
 /**

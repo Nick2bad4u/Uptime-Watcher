@@ -3,18 +3,18 @@
  * states and error handling in the new store structure
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock the new store modules
-vi.mock("../stores/sites/useSitesStore", () => ({
+vi.mock(import('../stores/sites/useSitesStore'), () => ({
     useSitesStore: vi.fn(),
 }));
 
-vi.mock("../stores/error/useErrorStore", () => ({
+vi.mock(import('../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(),
 }));
 
-vi.mock("../stores/ui/useUiStore", () => ({
+vi.mock(import('../stores/ui/useUiStore'), () => ({
     useUIStore: vi.fn(),
 }));
 

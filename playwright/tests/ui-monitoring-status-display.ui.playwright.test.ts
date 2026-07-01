@@ -3,14 +3,15 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     closeSiteDetails,
     createSiteViaModal,
@@ -18,10 +19,9 @@ import {
     openSiteDetails,
     removeAllSites,
     resetApplicationState,
-    waitForSiteMonitoringHydration,
     WAIT_TIMEOUTS,
+    waitForSiteMonitoringHydration,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 test.describe(
     "monitoring status display - modern ui",
@@ -85,21 +85,21 @@ test.describe(
                 const statusDisplay = page.getByTestId(
                     "monitoring-status-display"
                 );
-                await expect(statusDisplay).toBeVisible({
+                await expect.soft(statusDisplay).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(statusDisplay).toContainText(/Monitor Status/i);
-                await expect(statusDisplay).toContainText(/(0|1)\/1 active/);
-                await expect(statusDisplay).toContainText(/Website URL/i);
-                await expect(statusDisplay).toContainText("example.com");
+                await expect.soft(statusDisplay).toContainText(/monitor status/i);
+                await expect.soft(statusDisplay).toContainText(/(0|1)\/1 active/v);
+                await expect.soft(statusDisplay).toContainText(/website url/i);
+                await expect.soft(statusDisplay).toContainText("example.com");
 
-                const monitorEntries = page.getByTestId(/monitor-status-/);
-                await expect(monitorEntries).toHaveCount(1);
+                const monitorEntries = page.getByTestId(/monitor-status-/v);
+                await expect.soft(monitorEntries).toHaveCount(1);
                 const monitorEntry = monitorEntries.first();
-                await expect(monitorEntry).toContainText(/HTTP/i);
+                await expect.soft(monitorEntry).toContainText(/http/iv);
 
                 const connectionSnippet = await monitorEntry.textContent();
-                expect(connectionSnippet ?? "").toContain("example.com");
+                expect.soft(connectionSnippet ?? "").toContain("example.com");
             }
         );
     }

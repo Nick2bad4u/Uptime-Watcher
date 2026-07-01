@@ -28,7 +28,7 @@ export interface ChartData {
     /** Chart.js compatible line chart data configuration */
     lineChartData: {
         /** Array of datasets for the chart */
-        datasets: Array<{
+        datasets: {
             /** Background color for data points */
             backgroundColor: string;
             /** Border color for the line */
@@ -36,12 +36,12 @@ export interface ChartData {
             /** Width of the line border */
             borderWidth: number;
             /** Array of data points with x,y coordinates */
-            data: Array<{
+            data: {
                 /** X-axis value (typically timestamp) */
                 x: number;
                 /** Y-axis value (typically response time or status) */
                 y: number;
-            }>;
+            }[];
             /** Whether to fill the area under the line */
             fill: boolean;
             /** Label for the dataset in legend */
@@ -56,7 +56,7 @@ export interface ChartData {
             pointRadius: number;
             /** Curve tension for the line (0 = straight, 1 = curved) */
             tension: number;
-        }>;
+        }[];
     };
 }
 
@@ -173,8 +173,8 @@ function calculateDowntimePeriods(
     filteredHistory: readonly StatusHistory[]
 ): DowntimePeriod[] {
     const downtimePeriods: DowntimePeriod[] = [];
-    let downtimeEnd: number | undefined = undefined; // Most recent "down" timestamp
-    let downtimeStart: number | undefined = undefined; // Earliest "down" timestamp in the period
+    let downtimeEnd: number | undefined; // Most recent "down" timestamp
+    let downtimeStart: number | undefined; // Earliest "down" timestamp in the period
 
     // Process in reverse chronological order (newest to oldest)
     for (let i = filteredHistory.length - 1; i >= 0; i--) {
@@ -240,7 +240,7 @@ function calculateResponseMetrics(filteredHistory: readonly StatusHistory[]): {
         responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
 
     // Calculate percentiles
-    const sortedResponseTimes = Array.from(responseTimes).toSorted(
+    const sortedResponseTimes = [...responseTimes].toSorted(
         (a, b) => a - b
     );
     const getPercentile = (p: number): number => {
@@ -303,7 +303,7 @@ function filterHistoryByTimeRange(
  */
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
-        const sortedHistory = Array.from(monitor.history).toSorted(
+        const sortedHistory = [...monitor.history].toSorted(
             (a, b) => a.timestamp - b.timestamp
         );
 
@@ -456,7 +456,7 @@ export const SiteAnalyticsUtils = {
         /** Percentage points below target SLA (0 if compliant). */
         deficit: number;
     } {
-        const compliant = uptime >= targetSLA;
+        const isCompliant = uptime >= targetSLA;
         const deficit = Math.max(0, targetSLA - uptime);
         const allowedDowntime = (100 - targetSLA) / 100;
         const actualDowntime = (100 - uptime) / 100;
@@ -464,7 +464,7 @@ export const SiteAnalyticsUtils = {
         return {
             actualDowntime,
             allowedDowntime,
-            compliant,
+            compliant: isCompliant,
             deficit,
         };
     },

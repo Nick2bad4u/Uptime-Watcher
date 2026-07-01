@@ -1,10 +1,9 @@
+import { ENCRYPTION_KEY_BYTES } from "@electron/services/cloud/internal/cloudServicePrimitives";
+import { SECRET_KEY_ENCRYPTION_DERIVED_KEY } from "@electron/services/cloud/internal/cloudServiceSettings";
+import { resolveStoredDerivedEncryptionKey } from "@electron/services/cloud/internal/derivedEncryptionKeyState";
 import { describe, expect, it } from "vitest";
 
 import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
-
-import { ENCRYPTION_KEY_BYTES } from "@electron/services/cloud/internal/cloudServicePrimitives";
-import { resolveStoredDerivedEncryptionKey } from "@electron/services/cloud/internal/derivedEncryptionKeyState";
-import { SECRET_KEY_ENCRYPTION_DERIVED_KEY } from "@electron/services/cloud/internal/cloudServiceSettings";
 
 describe(resolveStoredDerivedEncryptionKey, () => {
     it("returns missing when no key is stored", async () => {

@@ -13,8 +13,7 @@ import type { MonitorRepository } from "./MonitorRepository";
 import type { SettingsRepository } from "./SettingsRepository";
 import type { SiteRepository } from "./SiteRepository";
 
-// Logger type available for internal use - external consumers should import
-// from ../interfaces
+// Logger type available for internal use - external consumers should import from ../interfaces
 
 /**
  * Configuration for monitoring operations.
@@ -87,7 +86,7 @@ export class SiteLoadingError extends Error {
         super(`Failed to load sites: ${message}`, options);
         this.name = "SiteLoadingError";
         const causeStack =
-            options?.cause instanceof Error ? options.cause.stack : undefined;
+            Error.isError(options?.cause) ? options.cause.stack : undefined;
         if (causeStack && this.stack) {
             // Preserve both stack traces for better debugging
             this.stack = `${this.stack}\nCaused by: ${causeStack}`;
@@ -117,7 +116,7 @@ export class DataImportExportError extends Error {
         this.name = "DataImportExportError";
 
         const causeStack =
-            options?.cause instanceof Error ? options.cause.stack : undefined;
+            Error.isError(options?.cause) ? options.cause.stack : undefined;
         if (causeStack && this.stack) {
             this.stack = `${this.stack}\nCaused by: ${causeStack}`;
         }
@@ -139,8 +138,8 @@ export class SiteNotFoundError extends Error {
      *
      * @param identifier - The site identifier that was not found
      */
-    public constructor(identifier: string) {
-        super(`Site not found: ${identifier}`);
+    public constructor(identifier: string, options: ErrorOptions) {
+        super(`Site not found: ${identifier}`, options);
         this.name = "SiteNotFoundError";
     }
 }

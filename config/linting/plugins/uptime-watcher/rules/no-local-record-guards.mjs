@@ -99,17 +99,17 @@ export const noLocalRecordGuardsRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow local record-guard helper declarations (use shared type helpers instead)",
             recommended: true,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-local-record-guards.md",
         },
-        schema: [],
         messages: {
             noLocalRecordGuards:
                 "Do not declare a local '{{name}}' helper. Import 'isRecord' and/or 'ensureRecordLike' from '@shared/utils/typeHelpers' instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

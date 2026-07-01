@@ -1,17 +1,19 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
-import { FormField } from "../../../components/AddSiteForm/FormField";
-import { TextField } from "../../../components/AddSiteForm/TextField";
-import { SelectField } from "../../../components/AddSiteForm/SelectField";
-import { RadioGroup } from "../../../components/AddSiteForm/RadioGroup";
+
 import type { FormFieldProperties } from "../../../components/AddSiteForm/FormField";
-import type { TextFieldProperties } from "../../../components/AddSiteForm/TextField";
-import type { SelectFieldProperties } from "../../../components/AddSiteForm/SelectField";
 import type { RadioGroupProperties } from "../../../components/AddSiteForm/RadioGroup";
+import type { SelectFieldProperties } from "../../../components/AddSiteForm/SelectField";
+import type { TextFieldProperties } from "../../../components/AddSiteForm/TextField";
+
+import { FormField } from "../../../components/AddSiteForm/FormField";
+import { RadioGroup } from "../../../components/AddSiteForm/RadioGroup";
+import { SelectField } from "../../../components/AddSiteForm/SelectField";
+import { TextField } from "../../../components/AddSiteForm/TextField";
 
 // Mock all dependencies
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (
         <div data-testid="themed-box" {...props}>
             {children}
@@ -19,7 +21,7 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
     )),
 }));
 
-vi.mock("../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../theme/components/ThemedText'), () => ({
     ThemedText: vi.fn(({ children, ...props }) => (
         <span data-testid="themed-text" {...props}>
             {children}
@@ -27,34 +29,34 @@ vi.mock("../../../theme/components/ThemedText", () => ({
     )),
 }));
 
-vi.mock("../../../theme/components/ThemedInput", () => ({
+vi.mock(import('../../../theme/components/ThemedInput'), () => ({
     ThemedInput: vi.fn(({ onChange, value, placeholder, ...props }) => (
         <input
             {...props}
-            value={value || ""}
-            placeholder={placeholder}
-            onChange={(e) => onChange?.(e)}
             data-testid="themed-input"
+            onChange={(e) => onChange?.(e)}
+            placeholder={placeholder}
+            value={value || ""}
         />
     )),
 }));
 
-vi.mock("../../../theme/components/ThemedSelect", () => ({
+vi.mock(import('../../../theme/components/ThemedSelect'), () => ({
     ThemedSelect: vi.fn(({ children, value, onChange, ...props }) => (
         <select
             {...props}
-            value={value}
-            onChange={(e) => onChange?.(e)}
             data-testid="themed-select"
+            onChange={(e) => onChange?.(e)}
+            value={value}
         >
             {children}
         </select>
     )),
 }));
 
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: vi.fn(({ children, onClick, ...props }) => (
-        <button {...props} onClick={onClick} data-testid="themed-button">
+        <button {...props} data-testid="themed-button" onClick={onClick}>
             {children}
         </button>
     )),
@@ -103,7 +105,7 @@ describe("FormFields Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             render(<FormField {...defaultFormFieldProps} required={true} />);
-            expect(screen.getByText(/\*/)).toBeInTheDocument();
+            expect(screen.getByText(/\*/v)).toBeInTheDocument();
         });
 
         it("should display error message", ({ task, annotate }) => {
@@ -363,7 +365,7 @@ describe("FormFields Components - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             render(<TextField {...defaultTextFieldProps} required={true} />);
-            expect(screen.getByText(/\*/)).toBeInTheDocument();
+            expect(screen.getByText(/\*/v)).toBeInTheDocument();
         });
 
         it("should display validation error", ({ task, annotate }) => {
@@ -460,9 +462,9 @@ describe("FormFields Components - Complete Coverage", () => {
             render(
                 <TextField
                     {...defaultTextFieldProps}
-                    type="number"
-                    min={1}
                     max={100}
+                    min={1}
+                    type="number"
                 />
             );
             const input = screen.getByTestId("themed-input");
@@ -934,25 +936,25 @@ describe("FormFields Components - Complete Coverage", () => {
                     <TextField
                         id="site-name"
                         label="Site Name"
-                        value=""
                         onChange={handleTextChange}
                         placeholder="Enter site name"
+                        value=""
                     />
                     <SelectField
                         id="monitor-type"
                         label="Monitor Type"
-                        value="http"
+                        onChange={handleSelectChange}
                         options={[
                             { value: "http", label: "HTTP" },
                             { value: "port", label: "Port" },
                         ]}
-                        onChange={handleSelectChange}
+                        value="http"
                     />
                     <RadioGroup
                         id="add-mode"
                         label="Add Mode"
                         name="addMode"
-                        value="new"
+                        onChange={handleRadioChange}
                         options={[
                             { value: "new", label: "Create New Site" },
                             {
@@ -960,7 +962,7 @@ describe("FormFields Components - Complete Coverage", () => {
                                 label: "Add to Existing Site",
                             },
                         ]}
-                        onChange={handleRadioChange}
+                        value="new"
                     />
                 </div>
             );

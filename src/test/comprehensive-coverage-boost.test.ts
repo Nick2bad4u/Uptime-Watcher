@@ -4,7 +4,8 @@
  * report
  */
 
-import { describe, it, expect } from "vitest";
+import { arrayAt, arrayFirst, arrayIncludes, stringSplit    } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 describe("Comprehensive Coverage Boost Tests", () => {
     describe("Type Definitions Coverage", () => {
@@ -136,7 +137,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(mockFormData).toBeDefined();
             expect(Array.isArray(mockFormData.monitors)).toBeTruthy();
             expect(mockFormData.monitors).toHaveLength(1);
-            expect(mockFormData.monitors[0]?.type).toBe("http");
+            expect(arrayFirst(mockFormData.monitors)?.type).toBe("http");
             expect(mockFormData.validation.hasErrors).toBeFalsy();
         });
     });
@@ -196,7 +197,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             expect(log.message).toBe("Test message");
             expect(log.context.userId).toBe(123);
             expect(log.timestamp).toMatch(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/v
             );
         });
 
@@ -285,7 +286,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
             };
 
             const isValidTab = (tab: string) =>
-                mockNavigationState.availableTabs.includes(tab);
+                arrayIncludes(mockNavigationState.availableTabs, tab);
 
             expect(isValidTab("overview")).toBeTruthy();
             expect(isValidTab("analytics")).toBeTruthy();
@@ -388,8 +389,8 @@ describe("Comprehensive Coverage Boost Tests", () => {
                     !filename.includes("/") &&
                     !filename.includes("\\"),
                 getFileExtension: (filename: string) => {
-                    const parts = filename.split(".");
-                    return parts.length > 1 ? parts.at(-1) : "";
+                    const parts = stringSplit(filename, ".");
+                    return parts.length > 1 ? arrayAt(parts, -1) : "";
                 },
             };
 
@@ -567,14 +568,14 @@ describe("Comprehensive Coverage Boost Tests", () => {
             // Test fallbacks.ts edge cases (lines 100,164)
             const mockFallbacks = {
                 getFallbackValue: <T>(
-                    value: T | null | undefined,
+                    value: null | T | undefined,
                     fallback: T
                 ): T => value ?? fallback,
                 getFallbackFunction: <T>(
                     fn: (() => T) | null | undefined,
                     fallback: () => T
                 ): (() => T) => fn ?? fallback,
-                getFallbackArray: <T>(arr: T[] | null | undefined): T[] =>
+                getFallbackArray: <T>(arr: null | T[] | undefined): T[] =>
                     arr ?? [],
             };
 

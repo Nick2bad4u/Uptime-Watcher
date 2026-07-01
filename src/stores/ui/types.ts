@@ -3,7 +3,7 @@
  * interface interactions.
  *
  * @remarks
- * This store is responsible for managing the UI state of the application,
+ * This store is responsible for managing the UI state of the app,
  * including modal visibility, selected site, active tabs, and chart time
  * ranges. All state mutations must be performed via store actions.
  *
@@ -81,7 +81,7 @@ export interface UIStore {
     /**
      * Opens an external URL using the system's default browser.
      *
-     * @param url - The URL to open externally.
+     * @param URL - The URL to open externally.
      * @param context - Optional context for logging purposes.
      */
     openExternal: (url: string, context?: { siteName?: string }) => void;

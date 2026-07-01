@@ -143,7 +143,7 @@ export interface SitesStateActions {
     /** Clear optimistic monitoring locks for the provided monitors. */
     clearOptimisticMonitoringLocks: (
         siteIdentifier: Site["identifier"],
-        monitorIds: ReadonlyArray<Monitor["id"]>
+        monitorIds: readonly Monitor["id"][]
     ) => void;
     /** Returns a snapshot of the current optimistic monitoring locks */
     getOptimisticMonitoringLocks: () => Partial<
@@ -159,7 +159,7 @@ export interface SitesStateActions {
     /** Register optimistic monitoring locks for monitors. */
     registerOptimisticMonitoringLock: (
         siteIdentifier: Site["identifier"],
-        monitorIds: ReadonlyArray<Monitor["id"]>,
+        monitorIds: readonly Monitor["id"][],
         monitoring: boolean,
         durationMs: number
     ) => void;
@@ -230,8 +230,8 @@ export const createSitesStateActions = (
                 const nextLocks = {
                     ...state.optimisticMonitoringLocks,
                 };
-                const removed = Reflect.deleteProperty(nextLocks, key);
-                return removed ? { optimisticMonitoringLocks: nextLocks } : {};
+                const isRemoved = Reflect.deleteProperty(nextLocks, key);
+                return isRemoved ? { optimisticMonitoringLocks: nextLocks } : {};
             });
         }, durationMs + 25);
 
@@ -271,7 +271,7 @@ export const createSitesStateActions = (
         },
         clearOptimisticMonitoringLocks: (
             siteIdentifier: Site["identifier"],
-            monitorIds: ReadonlyArray<Monitor["id"]>
+            monitorIds: readonly Monitor["id"][]
         ): void => {
             if (isEmpty(monitorIds)) {
                 return;
@@ -281,7 +281,7 @@ export const createSitesStateActions = (
                 const currentLocks: SitesState["optimisticMonitoringLocks"] = {
                     ...state.optimisticMonitoringLocks,
                 };
-                let changed = false;
+                let isChanged = false;
 
                 for (const monitorId of monitorIds) {
                     const key = buildMonitoringLockKey(
@@ -289,18 +289,18 @@ export const createSitesStateActions = (
                         monitorId
                     );
                     if (isDefined(currentLocks[key])) {
-                        const removed = Reflect.deleteProperty(
+                        const isRemoved = Reflect.deleteProperty(
                             currentLocks,
                             key
                         );
-                        if (removed) {
+                        if (isRemoved) {
                             cancelLockExpiryTimer(key);
-                            changed = true;
+                            isChanged = true;
                         }
                     }
                 }
 
-                return changed
+                return isChanged
                     ? { optimisticMonitoringLocks: currentLocks }
                     : {};
             });
@@ -334,7 +334,7 @@ export const createSitesStateActions = (
         },
         registerOptimisticMonitoringLock: (
             siteIdentifier: Site["identifier"],
-            monitorIds: ReadonlyArray<Monitor["id"]>,
+            monitorIds: readonly Monitor["id"][],
             monitoring: boolean,
             durationMs: number
         ): void => {
@@ -464,7 +464,7 @@ export const createSitesStateActions = (
             const normalizedSites = isEmpty(lockEntries)
                 ? sites
                 : sites.map((site) => {
-                      let siteMutated = false;
+                      let isSiteMutated = false;
                       const normalizedMonitors: Monitor[] = [];
 
                       for (const monitor of site.monitors) {
@@ -482,7 +482,7 @@ export const createSitesStateActions = (
                           } else if (monitor.monitoring === lock.monitoring) {
                               normalizedMonitors.push(monitor);
                           } else {
-                              siteMutated = true;
+                              isSiteMutated = true;
                               normalizedMonitors.push({
                                   ...monitor,
                                   monitoring: lock.monitoring,
@@ -490,7 +490,7 @@ export const createSitesStateActions = (
                           }
                       }
 
-                      if (!siteMutated) {
+                      if (!isSiteMutated) {
                           return site;
                       }
 
@@ -526,7 +526,7 @@ export const createSitesStateActions = (
 
                 const siteLookup = new Map<Site["identifier"], Site>(
                     sitesForState.map(
-                        (site) => [site.identifier, site] as const
+                        (site) => [site, site.identifier] as const
                     )
                 );
 
@@ -535,15 +535,17 @@ export const createSitesStateActions = (
                 for (const [siteId, monitorId] of collectSelectedMonitorEntries(
                     selectedMonitorIds
                 )) {
-                    if (setHas(validIdentifiers, siteId)) {
-                        const candidateSite = siteLookup.get(siteId);
-                        if (
-                            candidateSite?.monitors.some(
-                                (monitor) => monitor.id === monitorId
-                            )
-                        ) {
-                            nextSelectedMonitorIds[siteId] = monitorId;
-                        }
+                    if (!setHas(validIdentifiers, siteId)) {
+                        continue;
+                    }
+
+                    const candidateSite = siteLookup.get(siteId);
+                    if (
+                        candidateSite?.monitors.some(
+                            (monitor) => monitor.id === monitorId
+                        )
+                    ) {
+                        nextSelectedMonitorIds[siteId] = monitorId;
                     }
                 }
 
@@ -554,11 +556,11 @@ export const createSitesStateActions = (
                         ...optimisticMonitoringLocks,
                     };
                     for (const key of expiredLockKeys) {
-                        const removed = Reflect.deleteProperty(
+                        const isRemoved = Reflect.deleteProperty(
                             optimisticMonitoringLocks,
                             key
                         );
-                        if (removed) {
+                        if (isRemoved) {
                             cancelLockExpiryTimer(key);
                         }
                     }

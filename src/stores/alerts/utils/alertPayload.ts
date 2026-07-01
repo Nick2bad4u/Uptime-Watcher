@@ -97,8 +97,6 @@ export function mapStatusUpdateToAlert(update: StatusUpdate): StatusAlertInput {
         siteName,
         status: update.status,
         timestamp,
-        ...(update.previousStatus
-            ? { previousStatus: update.previousStatus }
-            : {}),
+        ...(update.previousStatus && { previousStatus: update.previousStatus }),
     } satisfies StatusAlertInput;
 }

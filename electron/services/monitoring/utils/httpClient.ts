@@ -44,7 +44,7 @@ import type { MonitorServiceConfig } from "../types";
  * @public
  */
 function ensureErrorInstance(error: unknown): Error {
-    return error instanceof Error
+    return Error.isError(error)
         ? error
         : new Error(getUserFacingErrorDetail(error));
 }
@@ -246,7 +246,7 @@ function getSharedHttpsAgent(): https.Agent {
 const ALLOWED_REDIRECT_PROTOCOLS = new Set(["http:", "https:"]);
 
 /**
- * Prevent following redirects to unsupported schemes (e.g. file:, javascript:)
+ * Prevent following redirects to unsupported schemes (e.g. file:, JavaScript:)
  * or redirects that include credentials.
  */
 function enforceRedirectSafety(options: unknown): void {
@@ -260,7 +260,7 @@ function enforceRedirectSafety(options: unknown): void {
 
     if (protocol.length > 0 && !setHas(ALLOWED_REDIRECT_PROTOCOLS, protocol)) {
         const error = new Error(
-            `Unsupported redirect protocol: ${String(protocol)}`
+            `Unsupported redirect protocol: ${protocol}`
         );
         Reflect.set(error, "code", "UW_UNSUPPORTED_REDIRECT_PROTOCOL");
         throw error;

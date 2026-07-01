@@ -7,7 +7,7 @@
  * measurement. Designed for reliable DNS resolution verification across
  * different record types including A, AAAA, CNAME, MX, TXT, NS, and SRV.
  *
- * The service uses the native Node.js dns module for cross-platform DNS
+ * The service uses the native Node.js DNS module for cross-platform DNS
  * resolution, ensuring consistent behavior across Windows, macOS, and Linux
  * platforms. Supports all common DNS record types with proper error handling
  * and response formatting.
@@ -105,7 +105,7 @@ function isDnsAttemptFailedError(
  *
  * Implements the {@link IMonitorService} interface to provide DNS resolution
  * monitoring with advanced features for reliability and performance. Uses the
- * native Node.js dns module for cross-platform DNS resolution.
+ * native Node.js DNS module for cross-platform DNS resolution.
  *
  * The service automatically handles different types of DNS failures and
  * provides detailed error reporting for troubleshooting resolution issues. All
@@ -113,7 +113,7 @@ function isDnsAttemptFailedError(
  *
  * Key features:
  *
- * - Cross-platform DNS resolution using Node.js dns module
+ * - Cross-platform DNS resolution using Node.js DNS module
  * - Support for A, AAAA, CNAME, MX, TXT, NS, and SRV record types
  * - Configurable timeout and retry behavior
  * - Detailed response time measurement
@@ -300,7 +300,7 @@ export class DnsMonitor implements IMonitorService {
                     // Keep operation name stable to prevent log/event
                     // cardinality explosions.
                     operationName: "dns-resolution-check",
-                    ...(signal ? { signal } : {}),
+                    ...(signal && { signal }),
                 }
             );
 
@@ -373,7 +373,7 @@ export class DnsMonitor implements IMonitorService {
             timeoutMessage: `DNS resolution timeout after ${timeout}ms`,
             timeoutMs: timeout,
             unrefTimer: true,
-            ...(signal ? { signal } : {}),
+            ...(signal && { signal }),
         });
 
         const formatted = this.formatDnsResult(
@@ -448,7 +448,7 @@ export class DnsMonitor implements IMonitorService {
      * @remarks
      * Returns the string identifier used to route monitoring requests to this
      * service implementation. Uses the {@link MonitorType} union type for type
-     * safety and consistency across the application.
+     * safety and consistency across the app.
      *
      * @returns The monitor type identifier
      */
@@ -564,13 +564,13 @@ export class DnsMonitor implements IMonitorService {
             let details = parsedDetails;
 
             // Check expected value if provided (skip for ANY which returns heterogeneous records)
-            let success = true;
+            let isSuccess = true;
             if (
                 expectedValue &&
                 !skipExpectedValueCheck &&
                 actualValues.length > 0
             ) {
-                success = actualValues.some(
+                isSuccess = actualValues.some(
                     (value) =>
                         value
                             .toLowerCase()
@@ -580,14 +580,14 @@ export class DnsMonitor implements IMonitorService {
                             .includes(value.toLowerCase())
                 );
 
-                if (!success) {
+                if (!isSuccess) {
                     details += ` (Expected: ${expectedValue})`;
                 }
             }
 
             return {
                 details,
-                success: success && hasRecords,
+                success: isSuccess && hasRecords,
             };
         } catch {
             return {

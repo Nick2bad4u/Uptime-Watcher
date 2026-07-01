@@ -135,22 +135,23 @@ export const rendererNoElectronImportRule = {
              * }} node
              */
             CallExpression(node) {
-                if (
-                    node.callee.type === "Identifier" &&
-                    node.callee.name === "require" &&
-                    node.arguments.length > 0
-                ) {
-                    const [firstArgument] = node.arguments;
-                    if (
-                        firstArgument?.type === "Literal" &&
-                        typeof firstArgument.value === "string"
-                    ) {
-                        handleStaticSpecifier(
-                            firstArgument,
-                            firstArgument.value
-                        );
-                    }
+                if (node.callee.type !== "Identifier" ||
+                    node.callee.name !== "require" ||
+                    node.arguments.length === 0) {
+                    return;
                 }
+
+                const [firstArgument] = node.arguments;
+                if (
+                    firstArgument?.type === "Literal" &&
+                    typeof firstArgument.value === "string"
+                ) {
+                    handleStaticSpecifier(
+                        firstArgument,
+                        firstArgument.value
+                    );
+                }
+
             },
 
             /**
@@ -180,17 +181,17 @@ export const rendererNoElectronImportRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow renderer code from importing Electron packages or backend modules directly.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-electron-import.md",
         },
-        schema: [],
         messages: {
             forbiddenElectronImport:
                 'Renderer modules must not import from "{{module}}". Use preload bridges or shared contracts instead.',
         },
+        schema: [],
+        type: "problem",
     },
 };

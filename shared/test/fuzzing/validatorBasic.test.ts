@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { safeInteger } from "@shared/validation/validatorUtils";
+import { describe, expect, it } from "vitest";
 
 describe("ValidatorUtils Basic Test", () => {
     it("should work with basic string conversion", () => {

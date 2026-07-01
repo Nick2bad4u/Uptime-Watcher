@@ -55,12 +55,12 @@ export const StatusAlertToast = ({
 }: StatusAlertToastProperties): JSX.Element => {
     useEffect(
         function autoDismissAlert(): () => void {
-            const timeout = window.setTimeout(() => {
+            const timeout = globalThis.setTimeout(() => {
                 onDismiss(alert.id);
             }, AUTO_DISMISS_DURATION_MS);
 
             return function cleanupAutoDismiss(): void {
-                window.clearTimeout(timeout);
+                globalThis.clearTimeout(timeout);
             };
         },
         [alert.id, onDismiss]

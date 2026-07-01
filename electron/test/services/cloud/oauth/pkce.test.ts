@@ -2,11 +2,9 @@
  * Tests for OAuth PKCE generation utilities.
  */
 
-import * as crypto from "node:crypto";
-
-import { describe, expect, it } from "vitest";
-
 import { createPkcePair } from "@electron/services/cloud/oauth/pkce";
+import * as crypto from "node:crypto";
+import { describe, expect, it } from "vitest";
 
 function encodeBase64Url(buffer: Buffer): string {
     return buffer

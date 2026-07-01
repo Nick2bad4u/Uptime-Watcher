@@ -24,7 +24,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 try {
                     throw error;
                 } catch (error_) {
-                    return error_ instanceof Error
+                    return Error.isError(error_)
                         ? error_.message
                         : String(error_);
                 }
@@ -53,14 +53,14 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
             // Common switch pattern with default case
             const handleStatus = (status: string): string => {
                 switch (status) {
-                    case "up": {
-                        return "success";
-                    }
                     case "down": {
                         return "error";
                     }
                     case "pending": {
                         return "warning";
+                    }
+                    case "up": {
+                        return "success";
                     }
                     default: {
                         return "unknown";
@@ -83,11 +83,11 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
             const getEnvironmentConfig = (env: string) => {
                 switch (env) {
-                    case "production": {
-                        return { debug: false, logging: "error" };
-                    }
                     case "development": {
                         return { debug: true, logging: "debug" };
+                    }
+                    case "production": {
+                        return { debug: false, logging: "error" };
                     }
                     case "test": {
                         return { debug: false, logging: "none" };
@@ -133,7 +133,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
             const processValue = (
                 value: unknown
-            ): { type: string; isValid: boolean } => {
+            ): { isValid: boolean; type: string; } => {
                 if (value === null || value === undefined) {
                     return { type: "empty", isValid: false };
                 }
@@ -166,7 +166,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
                 isValid: false,
             });
             expect(processValue(42)).toEqual({ type: "number", isValid: true });
-            expect(processValue(Number.NaN)).toEqual({
+            expect(processValue(NaN)).toEqual({
                 type: "number",
                 isValid: false,
             });
@@ -247,7 +247,7 @@ describe("Switch Defaults and Conditional Branch Coverage", () => {
 
             const validateObject = (
                 obj: unknown
-            ): { valid: boolean; reason: string } => {
+            ): { reason: string; valid: boolean; } => {
                 if (obj === null) {
                     return { valid: false, reason: "null" };
                 }

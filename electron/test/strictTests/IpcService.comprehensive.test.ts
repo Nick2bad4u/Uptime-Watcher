@@ -6,18 +6,8 @@
  * response formatting.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ipcMain } from "electron";
-import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
-import { createHash } from "node:crypto";
+import type { IpcMainEvent, IpcMainInvokeEvent } from "electron";
 
-import { IpcService } from "../../../electron/services/ipc/IpcService";
-import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
-import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
-import type { NotificationService } from "../../../electron/services/notifications/NotificationService";
-import { CloudService } from "../../../electron/services/cloud/CloudService";
-import { InMemorySecretStore } from "./utils/InMemorySecretStore";
-import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     BASE_MONITOR_TYPES,
     type Monitor,
@@ -25,6 +15,18 @@ import {
     type MonitoringStopSummary,
     type Site,
 } from "@shared/types";
+import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { ipcMain } from "electron";
+import { createHash } from "node:crypto";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { NotificationService } from "../../services/notifications/NotificationService";
+import type { AutoUpdaterService } from "../../services/updater/AutoUpdaterService";
+import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
+
+import { CloudService } from "../../services/cloud/CloudService";
+import { IpcService } from "../../services/ipc/IpcService";
+import { InMemorySecretStore } from "./utils/InMemorySecretStore";
 
 const mockBackupBuffer = Buffer.from("mock backup data");
 const mockBackupMetadata = {
@@ -224,7 +226,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             type: "unknown" as any,
             preventDefault: vi.fn(),
             defaultPrevented: false,
-        } as unknown as IpcMainEvent;
+        };
 
         // Create mock services with all required methods
         let historyLimit = 1000; // Track the history limit value

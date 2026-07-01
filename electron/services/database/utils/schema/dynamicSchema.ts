@@ -27,7 +27,7 @@ import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
 
 function assertSafeSqlIdentifier(identifier: string, context: string): void {
-    const isSafe = /^[A-Za-z_]\w*$/u.test(identifier);
+    const isSafe = /^[A-Z_a-z]\w*$/u.test(identifier);
     if (!isSafe) {
         throw new Error(
             `[DynamicSchema] Unsafe SQL identifier rejected (${context}): '${identifier}'`
@@ -497,8 +497,8 @@ function toSnakeCase(str: string): string {
 
     // Handle leading uppercase to avoid leading underscore
     return str
-        .replace(/^[A-Z]/u, (match) => match.toLowerCase())
-        .replaceAll(/[A-Z]/gu, (letter) => `_${letter.toLowerCase()}`);
+            .replace(/^[A-Z]/u, (match) => match.toLowerCase())
+            .replaceAll(/[A-Z]/gu, (letter) => `_${letter.toLowerCase()}`);
 }
 
 /**

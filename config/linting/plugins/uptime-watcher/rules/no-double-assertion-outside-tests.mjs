@@ -50,18 +50,18 @@ const noDoubleAssertionOutsideTestsRule = createTypedRule({
     },
     defaultOptions: [],
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow double assertions (e.g. `as unknown as`) outside test files.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-double-assertion-outside-tests.md",
         },
-        schema: [],
         messages: {
             disallowDoubleAssertion:
                 "Avoid double assertions outside tests; prefer safe narrowing or validated conversion paths.",
         },
+        schema: [],
+        type: "problem",
     },
     name: "no-double-assertion-outside-tests",
 });

@@ -3,11 +3,12 @@
  * on error paths and edge cases
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ValidationError } from "@shared/utils/validationError";
-import { logger } from "../utils/logger";
 import { safeInteger } from "@shared/validation/validatorUtils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { logger } from "../utils/logger";
 
 // Mock dependencies
 vi.mock("electron", () => ({
@@ -46,7 +47,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
 
             // All should match expected format (16 hex characters)
             for (const id of ids) {
-                expect(id).toMatch(/^[\da-f]{16}$/);
+                expect(id).toMatch(/^[\da-f]{16}$/v);
                 expect(id).toHaveLength(16);
             }
         });
@@ -160,11 +161,11 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 undefined,
                 0,
                 -0,
-                Number.POSITIVE_INFINITY,
+                Infinity,
                 Number.NEGATIVE_INFINITY,
-                Number.NaN,
+                NaN,
                 "",
-                "   ",
+                ' '.repeat(3),
                 "0",
                 "false",
                 false,
@@ -177,7 +178,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 new Date("invalid"),
                 Symbol("test"),
                 () => {},
-                /regex/,
+                /regex/v,
                 new Error("test"),
             ];
 
@@ -185,7 +186,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             for (const value of testValues) {
                 expect(() => {
                     // Type checks and operations
-                    const typeResult = typeof value; // eslint-disable-line unicorn/no-keyword-prefix
+                    const typeResult = typeof value;
                     const isArray = Array.isArray(value);
                     const isNullish = value === null;
                     const isNull = value === null;
@@ -204,7 +205,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                     }
 
                     // Use the results to avoid unused variable warnings
-                    expect(typeof typeResult).toBe("string"); // eslint-disable-line unicorn/no-keyword-prefix
+                    expect(typeof typeResult).toBe("string");
                     expect(typeof isArray).toBe("boolean");
                     expect(typeof isNullish).toBe("boolean");
                     expect(typeof isNull).toBe("boolean");
@@ -247,7 +248,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 // Should handle any error type without throwing
                 expect(() => {
                     const errorString =
-                        error instanceof Error ? error.message : String(error);
+                        Error.isError(error) ? error.message : String(error);
                     expect(typeof errorString).toBe("string");
                 }).not.toThrow();
             }
@@ -337,7 +338,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 Promise.resolve(0),
                 Promise.resolve(false),
                 new Promise((resolve) =>
-                    setTimeout(() => resolve("delayed"), 1)
+                    setTimeout(() => { resolve("delayed"); }, 1)
                 ),
             ];
 
@@ -359,7 +360,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Timeout")), 10)
+                setTimeout(() => { reject(new Error("Timeout")); }, 10)
             );
 
             const racePromise = Promise.race([
@@ -388,7 +389,7 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 {},
                 { timeout: 0 },
                 { timeout: -1 },
-                { timeout: Number.POSITIVE_INFINITY },
+                { timeout: Infinity },
                 { timeout: "5000" },
                 { timeout: null },
                 { retries: 0 },
@@ -410,11 +411,11 @@ describe("Utility Files - Missing Branch Coverage", () => {
                         300_000
                     );
                     const retries = safeInteger(config.retries, 3, 0, 10);
-                    const enabled = Boolean(config.enabled);
+                    const isEnabled = Boolean(config.enabled);
 
                     expect(typeof timeout).toBe("number");
                     expect(typeof retries).toBe("number");
-                    expect(typeof enabled).toBe("boolean");
+                    expect(typeof isEnabled).toBe("boolean");
                 }).not.toThrow();
             }
         });

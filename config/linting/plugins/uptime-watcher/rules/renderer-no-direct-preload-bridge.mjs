@@ -13,7 +13,7 @@ import { NORMALIZED_SRC_DIR } from "../_internal/repo-paths.mjs";
 // Repo path constants live in ../_internal/repo-paths.mjs
 
 /**
- * ESLint rule preventing renderer application code from accessing
+ * ESLint rule preventing renderer app code from accessing
  * `window.electronAPI` directly.
  *
  * @remarks
@@ -127,17 +127,17 @@ export const rendererNoDirectPreloadBridgeRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow direct window.electronAPI usage outside the IPC service helper utilities.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-direct-preload-bridge.md",
         },
-        schema: [],
         messages: {
             avoidDirectBridge:
                 "Do not access {{owner}}.electronAPI directly. Use the established src/services/*Service wrappers (via getIpcServiceHelpers) instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

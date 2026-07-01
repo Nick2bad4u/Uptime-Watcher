@@ -273,14 +273,14 @@ export function useOverflowMarquee<
 
             const evaluateOverflow = (): void => {
                 const element = containerRef.current;
-                const next = measureOverflow(element);
-                dispatchOverflow(next);
+                const isNext = measureOverflow(element);
+                dispatchOverflow(isNext);
             };
 
             evaluateOverflow();
 
             const element = containerRef.current;
-            const hasWindow = isDefined(globalThis.window);
+            const hasWindow = isDefined(globalThis);
             const shouldAttachWindowListener = hasWindow && element !== null;
 
             const handleResize = (): void => {
@@ -288,7 +288,7 @@ export function useOverflowMarquee<
             };
 
             if (shouldAttachWindowListener) {
-                globalThis.window.addEventListener("resize", handleResize);
+                window.addEventListener("resize", handleResize);
             }
 
             const supportsResizeObserver =
@@ -305,7 +305,7 @@ export function useOverflowMarquee<
 
             return function cleanupOverflowObservation(): void {
                 if (shouldAttachWindowListener) {
-                    globalThis.window.removeEventListener(
+                    window.removeEventListener(
                         "resize",
                         handleResize
                     );

@@ -3,6 +3,8 @@
  * theming, and form integration logic are covered.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import {
     fireEvent,
     render,
@@ -11,7 +13,8 @@ import {
     within,
 } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteModal } from "../../../components/AddSiteForm/AddSiteModal";
 
@@ -20,8 +23,8 @@ interface ThemeState {
 }
 
 interface BoxInvocation {
-    readonly props: Record<string, unknown>;
     readonly children: ReactNode;
+    readonly props: UnknownRecord;
 }
 
 interface FormInvocation {
@@ -30,49 +33,49 @@ interface FormInvocation {
 
 const { themeState, boxInvocations, formInvocations, closeIconSpy } =
     vi.hoisted(() => ({
-        themeState: { isDark: false } as ThemeState,
-        boxInvocations: [] as BoxInvocation[],
-        formInvocations: [] as FormInvocation[],
+        themeState: { isDark: false },
+        boxInvocations: safeCastTo<BoxInvocation[]>([]),
+        formInvocations: safeCastTo<FormInvocation[]>([]),
         closeIconSpy: vi.fn(({ size }: { readonly size?: number }) => (
-            <svg data-testid="add-site-modal-close-icon" data-size={size} />
+            <svg data-size={size} data-testid="add-site-modal-close-icon" />
         )),
     }));
 
-vi.mock("../../../theme/useTheme", () => ({
+vi.mock(import('../../../theme/useTheme'), () => ({
     useTheme: () => themeState,
 }));
 
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({
         children,
         ...props
-    }: { readonly children: ReactNode } & Record<string, unknown>) => {
+    }: UnknownRecord & { readonly children: ReactNode }) => {
         boxInvocations.push({ children, props });
         return <div {...props}>{children}</div>;
     },
 }));
 
-vi.mock("../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         as,
         children,
         ...props
-    }: {
+    }: UnknownRecord & {
         readonly as?: string;
         readonly children: ReactNode;
-    } & Record<string, unknown>) => {
+    }) => {
         const tagName = typeof as === "string" ? as : "span";
         return createElement(tagName, props, children);
     },
 }));
 
-vi.mock("../../../utils/icons", () => ({
+vi.mock(import('../../../utils/icons'), () => ({
     AppIcons: {
         actions: {
             add: ({ size }: { readonly size?: number }) => (
                 <svg
-                    data-testid="add-site-modal-action-icon"
                     data-size={size}
+                    data-testid="add-site-modal-action-icon"
                 />
             ),
         },
@@ -82,7 +85,7 @@ vi.mock("../../../utils/icons", () => ({
     },
 }));
 
-vi.mock("../../../components/AddSiteForm/AddSiteForm", () => ({
+vi.mock(import('../../../components/AddSiteForm/AddSiteForm'), () => ({
     AddSiteForm: ({ onSuccess }: { readonly onSuccess: () => void }) => {
         formInvocations.push({ onSuccess });
         return (
@@ -119,7 +122,7 @@ describe(AddSiteModal, () => {
             )
         ).toBeInTheDocument();
         expect(formInvocations).toHaveLength(1);
-        expect(typeof formInvocations[0]!.onSuccess).toBe("function");
+        expect(typeof arrayFirst(formInvocations)!.onSuccess).toBe("function");
 
         fireEvent.click(screen.getByTestId("add-site-form-stub"));
         await waitFor(() => {
@@ -162,7 +165,7 @@ describe(AddSiteModal, () => {
         await waitFor(() => {
             expect(handleClose).toHaveBeenCalledTimes(1);
         });
-        expect(closeIconSpy).toHaveBeenCalled();
-        expect(closeIconSpy.mock.calls[0]?.[0]).toEqual({ size: 18 });
+        expect(closeIconSpy).toHaveBeenCalledWith();
+        expect(arrayFirst(closeIconSpy.mock.calls)?.[0]).toEqual({ size: 18 });
     });
 });

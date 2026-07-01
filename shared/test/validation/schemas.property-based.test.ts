@@ -1,6 +1,7 @@
-import { describe, expect } from "vitest";
-import * as fc from "fast-check";
 import { test } from "@fast-check/vitest";
+import * as fc from "fast-check";
+import { describe, expect } from "vitest";
+
 import {
     baseMonitorSchema,
     httpMonitorSchema,
@@ -13,7 +14,7 @@ import {
 
 // Valid identifier generator (alphanumeric + optional hyphens/underscores)
 const validIdentifierArbitrary = fc.stringMatching(
-    /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/
+    /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u
 );
 
 // Base monitor arbitrary

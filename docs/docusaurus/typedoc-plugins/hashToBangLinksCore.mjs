@@ -1,6 +1,6 @@
 // @ts-check
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- This file intentionally uses JSDoc types that trigger TSDoc warnings in this repo; disable the rule for the whole file.
-/* eslint-disable @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types -- This is runtime code used by a TypeDoc plugin; we use JSDoc for typing without introducing TSDoc parsing issues. */
+
+
 
 /**
  * @typedef {import("typedoc").Comment} Comment
@@ -39,8 +39,8 @@ function isUrlLike(moduleSource) {
     // Windows drive letter followed by `:` (e.g. `C:`) with a path segment is
     // not a URL.
     if (
-        /^[A-Za-z]$/u.test(scheme) &&
-        /[\\/]/u.test(moduleSource.slice(firstColon + 1))
+        /^[A-Za-z]$/v.test(scheme) &&
+        /[/\\]/u.test(moduleSource.slice(firstColon + 1))
     ) {
         return false;
     }
@@ -126,21 +126,21 @@ export function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
  */
 export function convertHashLinksToBangLinksInParts(parts) {
     for (const part of parts) {
-        if (
-            part.kind === "inline-tag" &&
-            (part.tag === "@link" ||
-                part.tag === "@linkcode" ||
-                part.tag === "@linkplain")
-        ) {
-            const rewritten = convertHashLinksToBangLinksInInlineTagText(
-                part.text
-            );
-            if (rewritten !== part.text) {
-                part.text = rewritten;
-                // Ensure TypeDoc re-resolves this link based on updated text.
-                delete part.target;
-                delete part.tsLinkText;
-            }
+        if (part.kind !== "inline-tag" ||
+            part.tag !== "@link" &&
+                part.tag !== "@linkcode" &&
+                part.tag !== "@linkplain") {
+            continue;
+        }
+
+        const rewritten = convertHashLinksToBangLinksInInlineTagText(
+            part.text
+        );
+        if (rewritten !== part.text) {
+            part.text = rewritten;
+            // Ensure TypeDoc re-resolves this link based on updated text.
+            delete part.target;
+            delete part.tsLinkText;
         }
     }
 }

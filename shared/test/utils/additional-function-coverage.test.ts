@@ -1,18 +1,19 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import * as errorCatalog from "../../utils/errorCatalog";
+import * as errorHandling from "../../utils/errorHandling";
 import * as objectSafety from "../../utils/objectSafety";
+import * as siteStatus from "../../utils/siteStatus";
 import * as guardUtils from "../../utils/typeGuards";
+import { validateMonitorType } from "../../utils/validation";
 import { getMonitorValidationErrors } from "../../validation/monitorSchemas";
 import { validateSiteData } from "../../validation/siteSchemas";
-import { validateMonitorType } from "../../utils/validation";
 
 const validation = {
     getMonitorValidationErrors,
     validateMonitorType,
-    validateSite: (site: unknown) => validateSiteData(site as any).success,
+    validateSite: (site: unknown) => validateSiteData(site).success,
 };
-import * as siteStatus from "../../utils/siteStatus";
-import * as errorHandling from "../../utils/errorHandling";
-import * as errorCatalog from "../../utils/errorCatalog";
 
 describe("Utils Additional Function Coverage", () => {
     describe("objectSafety module", () => {
@@ -184,15 +185,15 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isArray([
+            const isResult1 = guardUtils.isArray([
                 1,
                 2,
                 3,
             ]);
-            const result2 = guardUtils.isArray("not array");
+            const isResult2 = guardUtils.isArray("not array");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isFunction function", async ({ task, annotate }) => {
@@ -204,11 +205,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isFunction(() => {});
-            const result2 = guardUtils.isFunction("not function");
+            const isResult1 = guardUtils.isFunction(() => {});
+            const isResult2 = guardUtils.isFunction("not function");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isError function", async ({ task, annotate }) => {
@@ -220,11 +221,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const result1 = guardUtils.isError(new Error("test"));
-            const result2 = guardUtils.isError("not error");
+            const isResult1 = guardUtils.isError(new Error("test"));
+            const isResult2 = guardUtils.isError("not error");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isDate function", async ({ task, annotate }) => {
@@ -236,11 +237,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isDate(new Date());
-            const result2 = guardUtils.isDate("not date");
+            const isResult1 = guardUtils.isDate(new Date());
+            const isResult2 = guardUtils.isDate("not date");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call hasProperty function", async ({ task, annotate }) => {
@@ -253,11 +254,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const obj = { test: "value" };
-            const result1 = guardUtils.hasProperty(obj, "test");
-            const result2 = guardUtils.hasProperty(obj, "missing");
+            const isResult1 = guardUtils.hasProperty(obj, "test");
+            const isResult2 = guardUtils.hasProperty(obj, "missing");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isPositiveNumber function", async ({
@@ -272,13 +273,13 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isPositiveNumber(5);
-            const result2 = guardUtils.isPositiveNumber(-5);
-            const result3 = guardUtils.isPositiveNumber(0);
+            const isResult1 = guardUtils.isPositiveNumber(5);
+            const isResult2 = guardUtils.isPositiveNumber(-5);
+            const isResult3 = guardUtils.isPositiveNumber(0);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
 
         it("should call isBoolean function", async ({ task, annotate }) => {
@@ -290,11 +291,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isBoolean(true);
-            const result2 = guardUtils.isBoolean("not boolean");
+            const isResult1 = guardUtils.isBoolean(true);
+            const isResult2 = guardUtils.isBoolean("not boolean");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isFiniteNumber function", async ({
@@ -309,11 +310,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            const result1 = guardUtils.isFiniteNumber(5);
-            const result2 = guardUtils.isFiniteNumber(Infinity);
+            const isResult1 = guardUtils.isFiniteNumber(5);
+            const isResult2 = guardUtils.isFiniteNumber(Infinity);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isNonNegativeNumber function", async ({
@@ -328,13 +329,13 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isNonNegativeNumber(5);
-            const result2 = guardUtils.isNonNegativeNumber(-5);
-            const result3 = guardUtils.isNonNegativeNumber(0);
+            const isResult1 = guardUtils.isNonNegativeNumber(5);
+            const isResult2 = guardUtils.isNonNegativeNumber(-5);
+            const isResult3 = guardUtils.isNonNegativeNumber(0);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeTruthy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeTruthy();
         });
 
         it("should call isNonNullObject function", async ({
@@ -349,13 +350,13 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isNonNullObject({});
-            const result2 = guardUtils.isNonNullObject(null);
-            const result3 = guardUtils.isNonNullObject([]);
+            const isResult1 = guardUtils.isNonNullObject({});
+            const isResult2 = guardUtils.isNonNullObject(null);
+            const isResult3 = guardUtils.isNonNullObject([]);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
 
         it("should call isString function", async ({ task, annotate }) => {
@@ -367,11 +368,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isString("test");
-            const result2 = guardUtils.isString(123);
+            const isResult1 = guardUtils.isString("test");
+            const isResult2 = guardUtils.isString(123);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call isValidPort function", async ({ task, annotate }) => {
@@ -383,13 +384,13 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isValidPort(80);
-            const result2 = guardUtils.isValidPort(99_999);
-            const result3 = guardUtils.isValidPort(-1);
+            const isResult1 = guardUtils.isValidPort(80);
+            const isResult2 = guardUtils.isValidPort(99_999);
+            const isResult3 = guardUtils.isValidPort(-1);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
-            expect(result3).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
+            expect(isResult3).toBeFalsy();
         });
 
         it("should call isValidTimestamp function", async ({
@@ -404,11 +405,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result1 = guardUtils.isValidTimestamp(1_640_995_200_000);
-            const result2 = guardUtils.isValidTimestamp(-1);
+            const isResult1 = guardUtils.isValidTimestamp(1_640_995_200_000);
+            const isResult2 = guardUtils.isValidTimestamp(-1);
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
     });
 
@@ -446,11 +447,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Validation", "type");
 
-            const result1 = validation.validateMonitorType("http");
-            const result2 = validation.validateMonitorType("invalid");
+            const isResult1 = validation.validateMonitorType("http");
+            const isResult2 = validation.validateMonitorType("invalid");
 
-            expect(result1).toBeTruthy();
-            expect(result2).toBeFalsy();
+            expect(isResult1).toBeTruthy();
+            expect(isResult2).toBeFalsy();
         });
 
         it("should call validateSite function", async ({ task, annotate }) => {
@@ -470,9 +471,9 @@ describe("Utils Additional Function Coverage", () => {
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
             };
-            const result = validation.validateSite(site);
+            const isResult = validation.validateSite(site);
 
-            expect(typeof result).toBe("boolean");
+            expect(typeof isResult).toBe("boolean");
         });
     });
 
@@ -666,11 +667,11 @@ describe("Utils Additional Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const result = errorCatalog.isKnownErrorMessage(
+            const isResult = errorCatalog.isKnownErrorMessage(
                 "Network connection failed"
             );
 
-            expect(typeof result).toBe("boolean");
+            expect(typeof isResult).toBe("boolean");
         });
     });
 });

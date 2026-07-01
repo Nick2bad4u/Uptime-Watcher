@@ -3,7 +3,7 @@
  *
  * @remarks
  * Handles monitoring start/stop operations and manual checks. Uses centralized
- * error store for consistent error handling across the application.
+ * error store for consistent error handling across the app.
  *
  * @packageDocumentation
  */
@@ -178,15 +178,9 @@ export const createSiteMonitoringActions = (
                 siteIdentifier: statusUpdate.siteIdentifier,
                 status: statusUpdate.status,
                 timestamp: statusUpdate.timestamp,
-                ...(isDefined(statusUpdate.details)
-                    ? { details: statusUpdate.details }
-                    : {}),
-                ...(isDefined(statusUpdate.previousStatus)
-                    ? { previousStatus: statusUpdate.previousStatus }
-                    : {}),
-                ...(isDefined(statusUpdate.responseTime)
-                    ? { responseTime: statusUpdate.responseTime }
-                    : {}),
+                ...(isDefined(statusUpdate.details) && { details: statusUpdate.details }),
+                ...(isDefined(statusUpdate.previousStatus) && { previousStatus: statusUpdate.previousStatus }),
+                ...(isDefined(statusUpdate.responseTime) && { responseTime: statusUpdate.responseTime }),
             };
 
             const updatedSites = safeApplyStatusUpdate(
@@ -228,7 +222,7 @@ export const createSiteMonitoringActions = (
             ? structuredClone(getSites())
             : undefined;
 
-        let applied = false;
+        let isApplied = false;
         const updatedMonitorIds = new Set<string>();
         let resolveReady: (() => void) | null = null;
         const whenReady = new Promise<void>((resolve) => {
@@ -250,7 +244,7 @@ export const createSiteMonitoringActions = (
                 return { changed: false, site };
             }
 
-            let monitorStateChanged = false;
+            let isMonitorStateChanged = false;
             const updatedMonitors: Monitor[] = [];
 
             for (const monitor of site.monitors) {
@@ -260,7 +254,7 @@ export const createSiteMonitoringActions = (
                 if (!shouldUpdate || monitor.monitoring === monitoring) {
                     updatedMonitors.push(monitor);
                 } else {
-                    monitorStateChanged = true;
+                    isMonitorStateChanged = true;
                     updatedMonitorIds.add(monitor.id);
                     updatedMonitors.push({
                         ...monitor,
@@ -269,7 +263,7 @@ export const createSiteMonitoringActions = (
                 }
             }
 
-            if (!monitorStateChanged) {
+            if (!isMonitorStateChanged) {
                 return { changed: false, site };
             }
 
@@ -285,27 +279,27 @@ export const createSiteMonitoringActions = (
         const executeUpdate = (): void => {
             try {
                 const currentSites = getSites();
-                let siteUpdated = false;
+                let isSiteUpdated = false;
                 const updatedSites: Site[] = [];
 
                 for (const site of currentSites) {
                     const { changed, site: normalizedSite } =
                         updateSiteForOptimism(site);
                     if (changed) {
-                        siteUpdated = true;
+                        isSiteUpdated = true;
                     }
                     updatedSites.push(normalizedSite);
                 }
 
-                if (!siteUpdated) {
+                if (!isSiteUpdated) {
                     resolveIfPending();
                     return;
                 }
 
                 setSites(updatedSites);
-                applied = true;
+                isApplied = true;
 
-                const monitorIds = Array.from(updatedMonitorIds);
+                const monitorIds = [...updatedMonitorIds];
                 if (monitorIds.length > 0) {
                     registerMonitoringLock(
                         siteIdentifier,
@@ -358,11 +352,11 @@ export const createSiteMonitoringActions = (
                 executeUpdate();
             }
 
-            if (!applied) {
+            if (!isApplied) {
                 return;
             }
 
-            const monitorIds = Array.from(updatedMonitorIds);
+            const monitorIds = [...updatedMonitorIds];
             if (monitorIds.length > 0) {
                 clearOptimisticMonitoringLocks(siteIdentifier, monitorIds);
             }
@@ -392,7 +386,7 @@ export const createSiteMonitoringActions = (
             }
         );
 
-        let operationError: unknown = undefined;
+        let operationError: unknown;
         const runOperation = async (): Promise<void> => {
             try {
                 await operation();

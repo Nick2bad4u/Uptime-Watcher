@@ -18,14 +18,14 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it } from "vitest";
-import fc from "fast-check";
-
 import {
     extractIpcResponseData,
     isIpcResponseEnvelope,
     safeExtractIpcResponseData,
 } from "@shared/utils/ipcResponse";
+import fc from "fast-check";
+import { safeCastTo } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 // Preserve the historical helper names used by this suite while delegating to
 // the canonical shared implementation.
@@ -46,8 +46,8 @@ describe("IPC Communication Fuzzing Tests", () => {
                     expect(() => isIpcResponse(input)).not.toThrow();
 
                     // Property: result should always be boolean
-                    const result = isIpcResponse(input);
-                    expect(typeof result).toBe("boolean");
+                    const isResult = isIpcResponse(input);
+                    expect(typeof isResult).toBe("boolean");
                 })
             );
         });
@@ -82,10 +82,10 @@ describe("IPC Communication Fuzzing Tests", () => {
                             warnings,
                         };
 
-                        const result = isIpcResponse(response);
+                        const isResult = isIpcResponse(response);
 
                         // Should return true since it has required 'success' boolean property
-                        expect(result).toBeTruthy();
+                        expect(isResult).toBeTruthy();
                     }
                 )
             );
@@ -106,7 +106,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                         fc.array(fc.anything())
                     ),
                     (input: unknown) => {
-                        const result = isIpcResponse(input);
+                        const isResult = isIpcResponse(input);
 
                         // These should all return false since they don't have proper success property
                         if (
@@ -114,10 +114,10 @@ describe("IPC Communication Fuzzing Tests", () => {
                             input === undefined ||
                             typeof input !== "object" ||
                             !("success" in input) ||
-                            typeof (input as { success: unknown }).success !==
+                            typeof (safeCastTo<{ success: unknown }>(input)).success !==
                                 "boolean"
                         ) {
-                            expect(result).toBeFalsy();
+                            expect(isResult).toBeFalsy();
                         }
                     }
                 )
@@ -143,8 +143,8 @@ describe("IPC Communication Fuzzing Tests", () => {
                         };
 
                         expect(() => isIpcResponse(response)).not.toThrow();
-                        const result = isIpcResponse(response);
-                        expect(result).toBeTruthy();
+                        const isResult = isIpcResponse(response);
+                        expect(isResult).toBeTruthy();
                     }
                 )
             );
@@ -157,7 +157,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                 fc.property(fc.anything(), (input: unknown) => {
                     if (isIpcResponse(input)) {
                         // May throw or return data based on success flag
-                        if ((input as { success: boolean }).success) {
+                        if ((safeCastTo<{ success: boolean }>(input)).success) {
                             expect(() => extractIpcData(input)).not.toThrow();
                         } else {
                             expect(() => extractIpcData(input)).toThrow();
@@ -193,7 +193,7 @@ describe("IPC Communication Fuzzing Tests", () => {
                         fc.constant(undefined),
                         fc.constant(null)
                     ),
-                    (error: string | undefined | null) => {
+                    (error: null | string | undefined) => {
                         const response = {
                             success: false,
                             error: error ?? undefined,

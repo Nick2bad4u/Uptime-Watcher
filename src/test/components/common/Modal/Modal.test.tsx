@@ -1,9 +1,8 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
-
 import type { ReactElement } from "react";
 
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { Modal } from "../../../../components/common/Modal/Modal";
 
@@ -33,12 +32,12 @@ describe(Modal, () => {
 
             return (
                 <>
-                    <button onClick={() => setOpen(true)} type="button">
+                    <button onClick={() => { setOpen(true); }} type="button">
                         Open
                     </button>
                     <Modal
                         isOpen={open}
-                        onRequestClose={() => setOpen(false)}
+                        onRequestClose={() => { setOpen(false); }}
                         title="Test modal"
                     >
                         <div>content</div>
@@ -54,12 +53,12 @@ describe(Modal, () => {
 
         fireEvent.click(screen.getByRole("button", { name: "Open" }));
 
-        await waitFor(() => expect(root).toHaveAttribute("inert"));
+        await waitFor(() => { expect(root).toHaveAttribute("inert"); });
         expect(root).toHaveAttribute("aria-hidden", "true");
 
         fireEvent.click(screen.getByRole("button", { name: "Close dialog" }));
 
-        await waitFor(() => expect(root).not.toHaveAttribute("inert"));
+        await waitFor(() => { expect(root).not.toHaveAttribute("inert"); });
         expect(root).not.toHaveAttribute("aria-hidden");
 
         unmount();
@@ -71,12 +70,12 @@ describe(Modal, () => {
 
             return (
                 <>
-                    <button onClick={() => setOpen(true)} type="button">
+                    <button onClick={() => { setOpen(true); }} type="button">
                         Open
                     </button>
                     <Modal
                         isOpen={open}
-                        onRequestClose={() => setOpen(false)}
+                        onRequestClose={() => { setOpen(false); }}
                         title="Focus modal"
                     >
                         <div>content</div>
@@ -115,7 +114,7 @@ describe(Modal, () => {
             return (
                 <Modal
                     isOpen={open}
-                    onRequestClose={() => setOpen(false)}
+                    onRequestClose={() => { setOpen(false); }}
                     title="Trap"
                 >
                     <button type="button">First</button>
@@ -159,20 +158,20 @@ describe(Modal, () => {
 
             return (
                 <>
-                    <button onClick={() => setOpenA(true)} type="button">
+                    <button onClick={() => { setOpenA(true); }} type="button">
                         Open A
                     </button>
-                    <button onClick={() => setOpenB(true)} type="button">
+                    <button onClick={() => { setOpenB(true); }} type="button">
                         Open B
                     </button>
 
                     <Modal
                         escapePriority={100}
                         isOpen={openA}
-                        onRequestClose={() => setOpenA(false)}
+                        onRequestClose={() => { setOpenA(false); }}
                         title="A"
                     >
-                        <button onClick={() => setOpenB(true)} type="button">
+                        <button onClick={() => { setOpenB(true); }} type="button">
                             Open B
                         </button>
                         <div>A content</div>
@@ -181,7 +180,7 @@ describe(Modal, () => {
                     <Modal
                         escapePriority={200}
                         isOpen={openB}
-                        onRequestClose={() => setOpenB(false)}
+                        onRequestClose={() => { setOpenB(false); }}
                         title="B"
                     >
                         <div>B content</div>
@@ -201,7 +200,7 @@ describe(Modal, () => {
         fireEvent.keyDown(document, { key: "Escape" });
 
         await waitFor(() =>
-            expect(screen.queryByText("B content")).not.toBeInTheDocument()
+            { expect(screen.queryByText("B content")).not.toBeInTheDocument(); }
         );
         expect(screen.getByText("A content")).toBeInTheDocument();
 

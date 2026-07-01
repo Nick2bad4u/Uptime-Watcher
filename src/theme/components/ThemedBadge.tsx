@@ -7,7 +7,7 @@
  * or labels with consistent theming. It supports multiple visual variants for
  * different contexts (success, warning, error, etc.), various sizes, and
  * optional icons. The badge integrates with the theme system for consistent
- * styling across the application.
+ * styling across the app.
  *
  * @example Status badge with icon:
  *

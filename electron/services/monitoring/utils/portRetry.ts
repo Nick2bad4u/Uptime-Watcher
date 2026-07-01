@@ -112,7 +112,7 @@ export async function performPortCheckWithRetry(
             () => performSinglePortCheck(host, port, timeout),
             {
                 ...config,
-                ...(signal ? { signal } : {}),
+                ...(signal && { signal }),
             }
         );
     } catch (error) {

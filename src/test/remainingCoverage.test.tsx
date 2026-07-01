@@ -4,18 +4,18 @@
  */
 
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ThemedIconButton } from "../theme/components/ThemedIconButton";
 
 // Mock the stores and other dependencies
-vi.mock("../stores", () => ({
+vi.mock(import('../stores'), () => ({
     useErrorStore: vi.fn(),
     useSettingsStore: vi.fn(),
     useSitesStore: vi.fn(),
 }));
 
-vi.mock("../services/logger", () => {
+vi.mock(import('../services/logger'), () => {
     const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
@@ -46,7 +46,7 @@ describe("Remaining Coverage Tests", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<ThemedIconButton icon="🔧" size="lg" onClick={() => {}} />);
+            render(<ThemedIconButton icon="🔧" onClick={() => {}} size="lg" />);
 
             const button = screen.getByRole("button");
             expect(button).toBeInTheDocument();

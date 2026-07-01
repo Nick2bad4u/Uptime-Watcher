@@ -2,7 +2,10 @@
  * Fixed ServiceContainer test - proper mocking approach
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import ServiceContainer after all mocks are set up
+import { ServiceContainer } from "../../services/ServiceContainer";
 
 // Create comprehensive mocks using vi.hoisted to ensure they're available before imports
 const mockSiteManager = vi.hoisted(() => {
@@ -208,9 +211,6 @@ vi.mock("../../services/updater/AutoUpdaterService", () => ({
         };
     }),
 }));
-
-// Import ServiceContainer after all mocks are set up
-import { ServiceContainer } from "../../services/ServiceContainer";
 
 describe("ServiceContainer - Fixed getSitesCache Test", () => {
     let container: ServiceContainer;

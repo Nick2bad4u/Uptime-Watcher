@@ -10,17 +10,6 @@ export interface PkcePair {
 }
 
 /**
- * Encodes a buffer to a base64url string.
- */
-function encodeUrlSafeBase64(buffer: Buffer): string {
-    return buffer
-        .toString("base64")
-        .replaceAll("+", "-")
-        .replaceAll("/", "_")
-        .replaceAll("=", "");
-}
-
-/**
  * Creates a PKCE verifier/challenge pair.
  */
 export function createPkcePair(): PkcePair {
@@ -32,4 +21,15 @@ export function createPkcePair(): PkcePair {
         codeChallengeMethod: "S256",
         codeVerifier,
     };
+}
+
+/**
+ * Encodes a buffer to a base64url string.
+ */
+function encodeUrlSafeBase64(buffer: Buffer): string {
+    return buffer
+        .toString("base64")
+        .replaceAll("+", "-")
+        .replaceAll("/", "_")
+        .replaceAll("=", "");
 }

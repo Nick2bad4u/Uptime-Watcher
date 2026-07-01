@@ -33,18 +33,6 @@ import {
 } from "../statusUpdateDiagnostics";
 
 /**
- * Structural ref type used by this module.
- *
- * @remarks
- * We intentionally avoid importing `React.MutableRefObject` because it is
- * deprecated in the project lint rules. `useRef()` values are structurally
- * compatible with this interface.
- */
-export interface MutableRef<T> {
-    current: T;
-}
-
-/**
  * Refs used to store cleanup callbacks for long-lived subscriptions.
  */
 export interface AppBootstrapCleanupRefs {
@@ -66,6 +54,18 @@ export interface AppBootstrapUpdateCountRefs {
 }
 
 /**
+ * Structural ref type used by this module.
+ *
+ * @remarks
+ * We intentionally avoid importing `React.MutableRefObject` because it is
+ * deprecated in the project lint rules. `useRef()` values are structurally
+ * compatible with this interface.
+ */
+export interface MutableRef<T> {
+    current: T;
+}
+
+/**
  * Options for {@link runAppBootstrap}.
  */
 export interface RunAppBootstrapOptions {
@@ -74,6 +74,44 @@ export interface RunAppBootstrapOptions {
     setIsInitialized: (next: boolean) => void;
     subscribeToUpdateStatusEvents: () => () => void;
     updateCountRefs: AppBootstrapUpdateCountRefs;
+}
+
+/**
+ * Clean up bootstrap-related subscriptions.
+ */
+export function cleanupAppBootstrap(options: {
+    cleanupRefs: AppBootstrapCleanupRefs;
+}): void {
+    const currentSitesStore =
+        typeof useSitesStore.getState === "function"
+            ? useSitesStore.getState()
+            : undefined;
+
+    const unsubscribeFromStatusUpdates =
+        currentSitesStore?.unsubscribeFromStatusUpdates;
+
+    if (typeof unsubscribeFromStatusUpdates === "function") {
+        unsubscribeFromStatusUpdates();
+    } else if (isDevelopment()) {
+        logger.warn(
+            "Sites store missing unsubscribeFromStatusUpdates implementation during app cleanup"
+        );
+    }
+
+    if (options.cleanupRefs.cacheSyncCleanupRef.current) {
+        options.cleanupRefs.cacheSyncCleanupRef.current();
+        options.cleanupRefs.cacheSyncCleanupRef.current = null;
+    }
+
+    if (options.cleanupRefs.syncEventsCleanupRef.current) {
+        options.cleanupRefs.syncEventsCleanupRef.current();
+        options.cleanupRefs.syncEventsCleanupRef.current = null;
+    }
+
+    if (options.cleanupRefs.updateStatusEventsCleanupRef.current) {
+        options.cleanupRefs.updateStatusEventsCleanupRef.current();
+        options.cleanupRefs.updateStatusEventsCleanupRef.current = null;
+    }
 }
 
 /**
@@ -217,43 +255,5 @@ export async function runAppBootstrap(
                 normalizedError.message ||
                     "Failed to initialize application. Please restart and try again."
             );
-    }
-}
-
-/**
- * Clean up bootstrap-related subscriptions.
- */
-export function cleanupAppBootstrap(options: {
-    cleanupRefs: AppBootstrapCleanupRefs;
-}): void {
-    const currentSitesStore =
-        typeof useSitesStore.getState === "function"
-            ? useSitesStore.getState()
-            : undefined;
-
-    const unsubscribeFromStatusUpdates =
-        currentSitesStore?.unsubscribeFromStatusUpdates;
-
-    if (typeof unsubscribeFromStatusUpdates === "function") {
-        unsubscribeFromStatusUpdates();
-    } else if (isDevelopment()) {
-        logger.warn(
-            "Sites store missing unsubscribeFromStatusUpdates implementation during app cleanup"
-        );
-    }
-
-    if (options.cleanupRefs.cacheSyncCleanupRef.current) {
-        options.cleanupRefs.cacheSyncCleanupRef.current();
-        options.cleanupRefs.cacheSyncCleanupRef.current = null;
-    }
-
-    if (options.cleanupRefs.syncEventsCleanupRef.current) {
-        options.cleanupRefs.syncEventsCleanupRef.current();
-        options.cleanupRefs.syncEventsCleanupRef.current = null;
-    }
-
-    if (options.cleanupRefs.updateStatusEventsCleanupRef.current) {
-        options.cleanupRefs.updateStatusEventsCleanupRef.current();
-        options.cleanupRefs.updateStatusEventsCleanupRef.current = null;
     }
 }

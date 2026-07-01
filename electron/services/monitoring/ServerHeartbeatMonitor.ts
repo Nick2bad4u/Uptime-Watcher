@@ -31,10 +31,6 @@ import {
 
 const DEFAULT_MAX_DRIFT_SECONDS = 60;
 
-type ServerHeartbeatMonitorInstance = Monitor & {
-    type: "server-heartbeat";
-};
-
 interface ServerHeartbeatContext {
     expectedStatus: string;
     maxDriftSeconds: number;
@@ -42,6 +38,10 @@ interface ServerHeartbeatContext {
     timestampField: string;
     url: string;
 }
+
+type ServerHeartbeatMonitorInstance = Monitor & {
+    type: "server-heartbeat";
+};
 
 function resolveMaxDriftSeconds(
     monitor: ServerHeartbeatMonitorInstance,

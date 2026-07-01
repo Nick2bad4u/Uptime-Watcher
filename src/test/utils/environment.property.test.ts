@@ -2,8 +2,11 @@
  * Fast-check powered property tests for environment utilities.
  */
 
-import { describe, expect } from "vitest";
+import type { UnknownRecord } from "type-fest";
+
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { safeCastTo } from "ts-extras";
+import { describe, expect } from "vitest";
 
 import {
     isPlaywrightAutomation,
@@ -15,16 +18,16 @@ interface ProcessStub {
     env?: Record<string, string | undefined>;
 }
 
-const globalTarget = globalThis as Record<string, unknown> & {
+const globalTarget = safeCastTo<UnknownRecord & {
     navigator?: Navigator;
     playwrightAutomation?: boolean;
     process?: ProcessStub | undefined;
-};
+}>(globalThis);
 
 const markerSentinel = Symbol("playwright-marker-sentinel");
 
 const restoreGlobalState = (snapshot: {
-    readonly marker: typeof markerSentinel | boolean;
+    readonly marker: boolean | typeof markerSentinel;
     readonly navigator: Navigator | undefined;
     readonly process: unknown;
 }): void => {
@@ -65,7 +68,7 @@ const withSandbox = <Value>(action: () => Value): Value => {
 
 const envKeyArbitrary = fc
     .string({ maxLength: 12, minLength: 1 })
-    .filter((key) => /^[A-Z_][\dA-Z_]*$/.test(key));
+    .filter((key) => /^[A-Z_][\dA-Z_]*$/v.test(key));
 
 const envValueArbitrary = fc.oneof(
     fc.string({ maxLength: 32 }),
@@ -111,6 +114,7 @@ describe("environment utilities", () => {
         async (key) => {
             await withSandbox(() => {
                 delete globalTarget.process;
+
                 expect(readProcessEnv(key)).toBeUndefined();
             });
         }
@@ -120,7 +124,8 @@ describe("environment utilities", () => {
         "readProcessEnv returns undefined when env object absent",
         async (key) => {
             await withSandbox(() => {
-                globalTarget.process = {} as any;
+                globalTarget.process = {};
+
                 expect(readProcessEnv(key)).toBeUndefined();
             });
         }
@@ -132,6 +137,7 @@ describe("environment utilities", () => {
     ])("readProcessEnv reflects provided env values", async (key, value) => {
         await withSandbox(() => {
             globalTarget.process = { env: { [key]: value } };
+
             expect(readProcessEnv(key)).toBe(value);
         });
     });
@@ -146,7 +152,7 @@ describe("environment utilities", () => {
                 delete globalTarget.navigator;
                 delete globalTarget.playwrightAutomation;
 
-                expect(isPlaywrightAutomation()).toBeTruthy();
+                expect(isPlaywrightAutomation()).toBe(true);
             });
         }
     );
@@ -161,7 +167,7 @@ describe("environment utilities", () => {
                 delete globalTarget.navigator;
                 delete globalTarget.playwrightAutomation;
 
-                expect(isPlaywrightAutomation()).toBeFalsy();
+                expect(isPlaywrightAutomation()).toBe(false);
             });
         }
     );
@@ -174,7 +180,7 @@ describe("environment utilities", () => {
                 globalTarget.navigator = { userAgent } as Navigator;
                 delete globalTarget.playwrightAutomation;
 
-                expect(isPlaywrightAutomation()).toBeTruthy();
+                expect(isPlaywrightAutomation()).toBe(true);
             });
         }
     );
@@ -187,7 +193,7 @@ describe("environment utilities", () => {
                 globalTarget.navigator = { userAgent } as Navigator;
                 delete globalTarget.playwrightAutomation;
 
-                expect(isPlaywrightAutomation()).toBeFalsy();
+                expect(isPlaywrightAutomation()).toBe(false);
             });
         }
     );
@@ -200,7 +206,7 @@ describe("environment utilities", () => {
                 delete globalTarget.navigator;
                 setPlaywrightAutomationMarker();
 
-                expect(isPlaywrightAutomation()).toBeTruthy();
+                expect(isPlaywrightAutomation()).toBe(true);
             });
         }
     );
@@ -213,7 +219,7 @@ describe("environment utilities", () => {
                 delete globalTarget.navigator;
                 delete globalTarget.playwrightAutomation;
 
-                expect(isPlaywrightAutomation()).toBeFalsy();
+                expect(isPlaywrightAutomation()).toBe(false);
             });
         }
     );

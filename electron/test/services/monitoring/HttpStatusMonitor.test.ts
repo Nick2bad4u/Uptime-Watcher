@@ -2,9 +2,10 @@
  * Test suite for HttpStatusMonitor service.
  */
 
+import type { Site } from "@shared/types";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpStatusMonitor } from "../../../services/monitoring/HttpStatusMonitor";
@@ -142,7 +143,7 @@ describe(HttpStatusMonitor, () => {
             timeout: 5000,
             type: "http-status",
             url: "https://example.com/api",
-        } as Site["monitors"][0];
+        };
     });
 
     afterEach(() => {
@@ -211,7 +212,7 @@ describe(HttpStatusMonitor, () => {
     });
 
     it("returns error result when expected status code is invalid", async () => {
-        const invalidMonitor = { ...monitor } as Site["monitors"][0];
+        const invalidMonitor = { ...monitor };
         Reflect.deleteProperty(invalidMonitor, "expectedStatusCode");
 
         const result = await monitorService.check(invalidMonitor);

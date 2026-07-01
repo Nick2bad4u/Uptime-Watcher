@@ -7,8 +7,8 @@ import {
 } from "@shared/ipc/rendererEvents";
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 /**
- * Main application service that orchestrates all other services and coordinates
- * application lifecycle across the Electron backend.
+ * Main app service that orchestrates all other services and coordinates
+ * app lifecycle across the Electron backend.
  *
  * @remarks
  * Uses dependency injection through {@link ServiceContainer} to manage all
@@ -102,14 +102,14 @@ const hasCloseFunction = (
 };
 
 /**
- * High-level coordinator responsible for wiring Electron application lifecycle
+ * High-level coordinator responsible for wiring Electron app lifecycle
  * events to the underlying service container and orchestrator.
  *
  * @public
  */
 export class ApplicationService {
     /**
-     * The container for all application services.
+     * The container for all app services.
      *
      * @readonly
      *
@@ -161,7 +161,7 @@ export class ApplicationService {
     }
 
     /**
-     * Cleans up resources before application shutdown.
+     * Cleans up resources before app shutdown.
      *
      * @remarks
      * Performs ordered shutdown of all services including IPC cleanup,
@@ -195,7 +195,7 @@ export class ApplicationService {
                 );
             }
 
-            // Remove application event listeners
+            // Remove app event listeners
             this.removeApplicationEventListeners();
 
             this.scopedSubscriptions.clearAll({
@@ -264,11 +264,11 @@ export class ApplicationService {
     }
 
     /**
-     * Handles the application ready event and initializes all services.
+     * Handles the app ready event and initializes all services.
      *
      * @remarks
      * Performs ordered initialization of all services through the
-     * {@link ServiceContainer}, creates the main application window, and sets up
+     * {@link ServiceContainer}, creates the main app window, and sets up
      * event handlers and auto-updater. This method is called automatically when
      * Electron's 'ready' event fires. Errors are caught and logged by the
      * calling {@link setupApplication} method.
@@ -302,7 +302,7 @@ export class ApplicationService {
      * @remarks
      * Creates a {@link ServiceContainer} instance with appropriate debug
      * settings and sets up application-level event handlers. This constructor
-     * should be called once during application startup.
+     * should be called once during app startup.
      *
      * @example
      *
@@ -327,11 +327,11 @@ export class ApplicationService {
      * Sets up application-level Electron event handlers.
      *
      * @remarks
-     * Configures handlers for core Electron application lifecycle events:
+     * Configures handlers for core Electron app lifecycle events:
      *
      * - 'ready': Triggers service initialization and window creation
-     * - 'window-all-closed': Handles application shutdown (platform-specific)
-     * - 'activate': Handles application reactivation (macOS dock click)
+     * - 'window-all-closed': Handles app shutdown (platform-specific)
+     * - 'activate': Handles app reactivation (macOS dock click)
      *
      * This method is called during construction to ensure event handlers are
      * registered before Electron's ready event fires.
@@ -345,7 +345,7 @@ export class ApplicationService {
     }
 
     /**
-     * Removes application event listeners. Called during cleanup to prevent
+     * Removes app event listeners. Called during cleanup to prevent
      * memory leaks.
      *
      * @internal
@@ -367,7 +367,7 @@ export class ApplicationService {
      * - Initialize the auto-updater mechanism
      * - Perform initial update check with error handling
      *
-     * Update check errors are logged but not re-thrown to prevent application
+     * Update check errors are logged but not re-thrown to prevent app
      * startup failures due to network issues.
      *
      * @internal
@@ -781,17 +781,13 @@ export class ApplicationService {
                         action: payload.action,
                         revision: payload.revision,
                         siteIdentifier: payload.siteIdentifier,
-                        ...(typeof sitesCount === "number"
-                            ? { sitesCount }
-                            : {}),
-                        ...(delta
-                            ? {
+                        ...((typeof sitesCount === "number") && { sitesCount }),
+                        ...(delta && {
                                   deltaAddedCount: delta.addedSites.length,
                                   deltaRemovedCount:
                                       delta.removedSiteIdentifiers.length,
                                   deltaUpdatedCount: delta.updatedSites.length,
-                              }
-                            : {}),
+                              }),
                         source: payload.source,
                     }
                 );

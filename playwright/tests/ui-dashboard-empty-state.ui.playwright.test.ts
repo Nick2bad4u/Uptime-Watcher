@@ -3,27 +3,27 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     closeModal,
+    ensureCardLayout,
     fillAddSiteForm,
     getSiteCardLocator,
-    submitAddSiteForm,
-    resetApplicationState,
-    ensureCardLayout,
-    WAIT_TIMEOUTS,
     openAddSiteModal,
+    resetApplicationState,
+    submitAddSiteForm,
+    WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
-function delayMs(ms: number): Promise<void> {
+async function delayMs(ms: number): Promise<void> {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
@@ -65,7 +65,7 @@ test.describe(
             if (page) {
                 await bestEffort({
                     label: "close modal",
-                    timeoutMs: 5_000,
+                    timeoutMs: 5000,
                     work: closeModal(page),
                 });
             }
@@ -86,10 +86,10 @@ test.describe(
             },
             async () => {
                 const emptyState = page.getByTestId("empty-state");
-                await expect(emptyState).toBeVisible({
+                await expect.soft(emptyState).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     emptyState.getByText("No sites are being monitored")
                 ).toBeVisible();
 
@@ -103,11 +103,11 @@ test.describe(
                 });
                 await submitAddSiteForm(page);
 
-                await expect(emptyState).toBeHidden({
+                await expect.soft(emptyState).toBeHidden({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                await expect(
+                await expect.soft(
                     page.getByTestId("site-count-label")
                 ).toContainText("Tracking 1 site", {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
@@ -115,7 +115,7 @@ test.describe(
 
                 await ensureCardLayout(page);
 
-                await expect(getSiteCardLocator(page, siteName)).toBeVisible({
+                await expect.soft(getSiteCardLocator(page, siteName)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
             }

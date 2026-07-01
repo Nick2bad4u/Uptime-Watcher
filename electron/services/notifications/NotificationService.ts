@@ -263,7 +263,7 @@ export class NotificationService {
             typeof request.body === "string" ? request.body : undefined;
 
         const notification = new Notification({
-            ...(isDefined(body) ? { body } : {}),
+            ...(isDefined(body) && { body }),
             silent: !this.config.playSound,
             title,
         });

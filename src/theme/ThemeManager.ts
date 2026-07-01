@@ -3,7 +3,7 @@
  * detection.
  *
  * @remarks
- * Manages theme switching throughout the application including automatic
+ * Manages theme switching throughout the app including automatic
  * detection of system preferences and manual theme overrides. Provides a
  * singleton service for consistent theme management across components.
  *
@@ -34,7 +34,7 @@ const isCssVariableKey = (value: PropertyKey): value is CssVariableKey =>
 const toCssToken = (value: CssVariableKey): string => value.toString();
 
 /**
- * Singleton service for managing application themes. Handles theme selection,
+ * Singleton service for managing app themes. Handles theme selection,
  * system preference detection, and automatic switching.
  */
 export class ThemeManager {
@@ -53,13 +53,6 @@ export class ThemeManager {
     public static getInstance(): ThemeManager {
         ThemeManager.instance ??= new ThemeManager();
         return ThemeManager.instance;
-    }
-
-    /**
-     * Type guard for concrete theme registry keys.
-     */
-    private isThemeRegistryKey(value: string): value is keyof typeof themes {
-        return objectHasOwn(themes, value);
     }
 
     /**
@@ -89,18 +82,6 @@ export class ThemeManager {
 
         // Remember the applied theme
         this.currentAppliedTheme = theme;
-    }
-
-    /**
-     * Check if two themes are the same (deep comparison of essential
-     * properties)
-     */
-    private isSameTheme(theme1: Theme, theme2: Theme): boolean {
-        return (
-            theme1.name === theme2.name &&
-            theme1.isDark === theme2.isDark &&
-            deepEqual(theme1.colors, theme2.colors)
-        );
     }
 
     /**
@@ -225,19 +206,6 @@ export class ThemeManager {
         return subscribePrefersDarkModeChange(callback);
     }
 
-    private forEachRecordEntry(
-        candidate: unknown,
-        visitor: (key: string, value: unknown) => void
-    ): void {
-        if (!isRecord(candidate)) {
-            return;
-        }
-
-        for (const [key, value] of objectEntries(candidate)) {
-            visitor(key, value);
-        }
-    }
-
     /**
      * Add border radius CSS variables from theme.
      */
@@ -257,89 +225,6 @@ export class ThemeManager {
         this.forEachColorVariable(theme.colors, (property, value) => {
             variables.push(`  ${property}: ${value};`);
         });
-    }
-
-    private forEachColorVariable(
-        colors: Theme["colors"],
-        visitor: (property: string, value: string) => void
-    ): void {
-        const colorGroups = colors;
-
-        if (!isRecord(colorGroups)) {
-            return;
-        }
-
-        for (const [categoryKey, colorValue] of objectEntries(colorGroups)) {
-            if (isCssVariableKey(categoryKey)) {
-                const categoryToken = toCssToken(categoryKey);
-                this.emitColorValue(categoryToken, colorValue, visitor);
-            }
-        }
-    }
-
-    private emitColorValue(
-        categoryToken: string,
-        colorValue: unknown,
-        visitor: (property: string, value: string) => void
-    ): void {
-        if (typeof colorValue === "string") {
-            visitor(`--color-${categoryToken}`, colorValue);
-        } else if (isRecord(colorValue)) {
-            this.emitColorShades(categoryToken, colorValue, visitor);
-        }
-    }
-
-    private emitColorShades(
-        categoryToken: string,
-        shades: UnknownRecord,
-        visitor: (property: string, value: string) => void
-    ): void {
-        for (const [shadeKey, nestedValue] of objectEntries(shades)) {
-            if (isCssVariableKey(shadeKey) && typeof nestedValue === "string") {
-                visitor(
-                    `--color-${categoryToken}-${toCssToken(shadeKey)}`,
-                    nestedValue
-                );
-            }
-        }
-    }
-
-    /**
-     * Add shadow CSS variables from theme.
-     */
-    private addShadowVariables(theme: Theme, variables: string[]): void {
-        const { shadows } = theme;
-        this.forEachRecordEntry(shadows, (size, value) => {
-            if (typeof value === "string") {
-                variables.push(`  --shadow-${size}: ${value};`);
-            }
-        });
-    }
-
-    /**
-     * Add spacing CSS variables from theme.
-     */
-    private addSpacingVariables(theme: Theme, variables: string[]): void {
-        const { spacing } = theme;
-        this.forEachRecordEntry(spacing, (size, value) => {
-            if (typeof value === "string") {
-                variables.push(`  --spacing-${size}: ${value};`);
-            }
-        });
-    }
-
-    /**
-     * Add typography CSS variables from theme.
-     */
-    private addTypographyVariables(theme: Theme, variables: string[]): void {
-        const { typography } = theme;
-        if (!isRecord(typography)) {
-            return;
-        }
-
-        this.addFontSizeVariables(typography.fontSize, variables);
-        this.addFontWeightVariables(typography.fontWeight, variables);
-        this.addLineHeightVariables(typography.lineHeight, variables);
     }
 
     /**
@@ -382,6 +267,44 @@ export class ThemeManager {
     }
 
     /**
+     * Add shadow CSS variables from theme.
+     */
+    private addShadowVariables(theme: Theme, variables: string[]): void {
+        const { shadows } = theme;
+        this.forEachRecordEntry(shadows, (size, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --shadow-${size}: ${value};`);
+            }
+        });
+    }
+
+    /**
+     * Add spacing CSS variables from theme.
+     */
+    private addSpacingVariables(theme: Theme, variables: string[]): void {
+        const { spacing } = theme;
+        this.forEachRecordEntry(spacing, (size, value) => {
+            if (typeof value === "string") {
+                variables.push(`  --spacing-${size}: ${value};`);
+            }
+        });
+    }
+
+    /**
+     * Add typography CSS variables from theme.
+     */
+    private addTypographyVariables(theme: Theme, variables: string[]): void {
+        const { typography } = theme;
+        if (!isRecord(typography)) {
+            return;
+        }
+
+        this.addFontSizeVariables(typography.fontSize, variables);
+        this.addFontWeightVariables(typography.fontWeight, variables);
+        this.addLineHeightVariables(typography.lineHeight, variables);
+    }
+
+    /**
      * Apply border radius CSS custom properties
      */
     private applyBorderRadius(
@@ -399,7 +322,7 @@ export class ThemeManager {
      * Apply color CSS custom properties
      */
     private applyColors(root: HTMLElement, colors: Theme["colors"]): void {
-        const properties: Array<[string, string]> = [];
+        const properties: [string, string][] = [];
 
         this.forEachColorVariable(colors, (property, value) => {
             properties.push([property, value]);
@@ -409,6 +332,48 @@ export class ThemeManager {
         for (const [property, value] of properties) {
             root.style.setProperty(property, value);
         }
+    }
+
+    /**
+     * Apply font size CSS custom properties
+     */
+    private applyFontSizeProperties(
+        root: HTMLElement,
+        fontSize: unknown
+    ): void {
+        this.forEachRecordEntry(fontSize, (size, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--font-size-${size}`, value);
+            }
+        });
+    }
+
+    /**
+     * Apply font weight CSS custom properties
+     */
+    private applyFontWeightProperties(
+        root: HTMLElement,
+        fontWeight: unknown
+    ): void {
+        this.forEachRecordEntry(fontWeight, (weight, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--font-weight-${weight}`, value);
+            }
+        });
+    }
+
+    /**
+     * Apply line height CSS custom properties
+     */
+    private applyLineHeightProperties(
+        root: HTMLElement,
+        lineHeight: unknown
+    ): void {
+        this.forEachRecordEntry(lineHeight, (height, value) => {
+            if (typeof value === "string") {
+                root.style.setProperty(`--line-height-${height}`, value);
+            }
+        });
     }
 
     /**
@@ -489,46 +454,83 @@ export class ThemeManager {
         this.applyLineHeightProperties(root, typography["lineHeight"]);
     }
 
-    /**
-     * Apply font size CSS custom properties
-     */
-    private applyFontSizeProperties(
-        root: HTMLElement,
-        fontSize: unknown
+    private emitColorShades(
+        categoryToken: string,
+        shades: UnknownRecord,
+        visitor: (property: string, value: string) => void
     ): void {
-        this.forEachRecordEntry(fontSize, (size, value) => {
-            if (typeof value === "string") {
-                root.style.setProperty(`--font-size-${size}`, value);
+        for (const [shadeKey, nestedValue] of objectEntries(shades)) {
+            if (isCssVariableKey(shadeKey) && typeof nestedValue === "string") {
+                visitor(
+                    `--color-${categoryToken}-${toCssToken(shadeKey)}`,
+                    nestedValue
+                );
             }
-        });
+        }
+    }
+
+    private emitColorValue(
+        categoryToken: string,
+        colorValue: unknown,
+        visitor: (property: string, value: string) => void
+    ): void {
+        if (typeof colorValue === "string") {
+            visitor(`--color-${categoryToken}`, colorValue);
+        } else if (isRecord(colorValue)) {
+            this.emitColorShades(categoryToken, colorValue, visitor);
+        }
+    }
+
+    private forEachColorVariable(
+        colors: Theme["colors"],
+        visitor: (property: string, value: string) => void
+    ): void {
+        const colorGroups = colors;
+
+        if (!isRecord(colorGroups)) {
+            return;
+        }
+
+        for (const [categoryKey, colorValue] of objectEntries(colorGroups)) {
+            if (!isCssVariableKey(categoryKey)) {
+                continue;
+            }
+
+            const categoryToken = toCssToken(categoryKey);
+            this.emitColorValue(categoryToken, colorValue, visitor);
+        }
+    }
+
+    private forEachRecordEntry(
+        candidate: unknown,
+        visitor: (key: string, value: unknown) => void
+    ): void {
+        if (!isRecord(candidate)) {
+            return;
+        }
+
+        for (const [key, value] of objectEntries(candidate)) {
+            visitor(key, value);
+        }
     }
 
     /**
-     * Apply font weight CSS custom properties
+     * Check if two themes are the same (deep comparison of essential
+     * properties)
      */
-    private applyFontWeightProperties(
-        root: HTMLElement,
-        fontWeight: unknown
-    ): void {
-        this.forEachRecordEntry(fontWeight, (weight, value) => {
-            if (typeof value === "string") {
-                root.style.setProperty(`--font-weight-${weight}`, value);
-            }
-        });
+    private isSameTheme(theme1: Theme, theme2: Theme): boolean {
+        return (
+            theme1.name === theme2.name &&
+            theme1.isDark === theme2.isDark &&
+            deepEqual(theme1.colors, theme2.colors)
+        );
     }
 
     /**
-     * Apply line height CSS custom properties
+     * Type guard for concrete theme registry keys.
      */
-    private applyLineHeightProperties(
-        root: HTMLElement,
-        lineHeight: unknown
-    ): void {
-        this.forEachRecordEntry(lineHeight, (height, value) => {
-            if (typeof value === "string") {
-                root.style.setProperty(`--line-height-${height}`, value);
-            }
-        });
+    private isThemeRegistryKey(value: string): value is keyof typeof themes {
+        return objectHasOwn(themes, value);
     }
 }
 
@@ -537,7 +539,7 @@ export class ThemeManager {
  *
  * @remarks
  * Provides convenient access to theme management functionality throughout the
- * application. This singleton ensures consistent theme state and provides a
+ * app. This singleton ensures consistent theme state and provides a
  * centralized API for theme operations.
  *
  * @example

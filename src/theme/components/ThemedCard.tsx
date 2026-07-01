@@ -6,7 +6,7 @@
  * This component provides a styled container with configurable theming,
  * optional header section, and interactive features like click and hover
  * states. The card integrates with the theme system for consistent styling
- * across the application. It supports various visual variants, padding, shadow,
+ * across the app. It supports various visual variants, padding, shadow,
  * and border radius configurations.
  *
  * @example Basic card with title and content:
@@ -77,6 +77,40 @@ import { renderColoredIcon } from "./iconUtils";
 import { ThemedBox } from "./ThemedBox";
 import { ThemedText } from "./ThemedText";
 
+/**
+ * Properties for the ThemedCard component.
+ *
+ * @public
+ */
+export interface ThemedCardProperties extends CoreComponentProperties {
+    /** Whether the card should have clickable styling and cursor pointer */
+    readonly clickable?: boolean;
+    /** Whether the card should have hover effects */
+    readonly hoverable?: boolean;
+    /** Icon element to display in the card header */
+    readonly icon?: ReactNode;
+    /** Color theme for the icon (uses theme color names) */
+    readonly iconColor?: string;
+    /** Click handler for the card */
+    readonly onClick?: ClickHandler;
+    /** Mouse enter handler for hover effects */
+    readonly onMouseEnter?: () => void;
+    /** Mouse leave handler for hover effects */
+    readonly onMouseLeave?: () => void;
+    /** Padding size for the card content */
+    readonly padding?: BoxPadding;
+    /** Border radius size for the card */
+    readonly rounded?: BoxRounded;
+    /** Shadow size for the card */
+    readonly shadow?: BoxShadow;
+    /** Subtitle text displayed in the card header */
+    readonly subtitle?: string;
+    /** Title text displayed in the card header */
+    readonly title?: string;
+    /** Visual variant for the card styling */
+    readonly variant?: BoxVariant;
+}
+
 interface ThemedCardHeaderRenderProperties {
     readonly headerStyle: CSSProperties;
     readonly icon?: ReactNode;
@@ -121,40 +155,6 @@ function renderThemedCardHeader({
             </div>
         </div>
     );
-}
-
-/**
- * Properties for the ThemedCard component.
- *
- * @public
- */
-export interface ThemedCardProperties extends CoreComponentProperties {
-    /** Whether the card should have clickable styling and cursor pointer */
-    readonly clickable?: boolean;
-    /** Whether the card should have hover effects */
-    readonly hoverable?: boolean;
-    /** Icon element to display in the card header */
-    readonly icon?: ReactNode;
-    /** Color theme for the icon (uses theme color names) */
-    readonly iconColor?: string;
-    /** Click handler for the card */
-    readonly onClick?: ClickHandler;
-    /** Mouse enter handler for hover effects */
-    readonly onMouseEnter?: () => void;
-    /** Mouse leave handler for hover effects */
-    readonly onMouseLeave?: () => void;
-    /** Padding size for the card content */
-    readonly padding?: BoxPadding;
-    /** Border radius size for the card */
-    readonly rounded?: BoxRounded;
-    /** Shadow size for the card */
-    readonly shadow?: BoxShadow;
-    /** Subtitle text displayed in the card header */
-    readonly subtitle?: string;
-    /** Title text displayed in the card header */
-    readonly title?: string;
-    /** Visual variant for the card styling */
-    readonly variant?: BoxVariant;
 }
 
 /**

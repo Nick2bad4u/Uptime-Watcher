@@ -3,25 +3,27 @@
  * lifecycle operations for sites and monitors.
  */
 
+import type { Site, StatusUpdate } from "@shared/types";
+
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 import {
     afterEach,
     beforeEach,
     describe,
     expect,
     it,
-    vi,
     type Mock,
+    vi,
 } from "vitest";
 
-import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
-import type { Site, StatusUpdate } from "@shared/types";
-import {
-    sampleOne,
-    siteNameArbitrary,
-} from "@shared/test/arbitraries/siteArbitraries";
 import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateSnapshot";
-import { createMockFunction } from "../../utils/mockFactories";
+
+import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import { installElectronApiMock } from "../../utils/electronApiMock";
+import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock electron API
 const mockElectronAPI = {
@@ -38,7 +40,7 @@ const mockElectronAPI = {
 let restoreElectronApi: (() => void) | undefined;
 
 // Mock error store
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -49,7 +51,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 }));
 
 // Mock store utils
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
     withErrorHandling: vi.fn(async (fn) => await fn()),
 }));

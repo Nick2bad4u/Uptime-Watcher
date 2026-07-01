@@ -20,7 +20,7 @@ describe("Validation Error Paths and Edge Cases", () => {
 
             const validateUrl = (
                 url: string
-            ): { valid: boolean; protocol?: string } => {
+            ): { protocol?: string; valid: boolean; } => {
                 try {
                     const parsed = new URL(url);
                     return { valid: true, protocol: parsed.protocol };
@@ -127,16 +127,16 @@ describe("Validation Error Paths and Edge Cases", () => {
             const mapMonitorStatus = (
                 status: string
             ): {
-                display: string;
                 color: string;
+                display: string;
                 severity: number;
             } => {
                 switch (status) {
-                    case "up": {
+                    case "degraded": {
                         return {
-                            display: "Online",
-                            color: "green",
-                            severity: 0,
+                            display: "Degraded",
+                            color: "yellow",
+                            severity: 2,
                         };
                     }
                     case "down": {
@@ -144,13 +144,6 @@ describe("Validation Error Paths and Edge Cases", () => {
                             display: "Offline",
                             color: "red",
                             severity: 3,
-                        };
-                    }
-                    case "degraded": {
-                        return {
-                            display: "Degraded",
-                            color: "yellow",
-                            severity: 2,
                         };
                     }
                     case "maintenance": {
@@ -165,6 +158,13 @@ describe("Validation Error Paths and Edge Cases", () => {
                             display: "Checking",
                             color: "gray",
                             severity: 1,
+                        };
+                    }
+                    case "up": {
+                        return {
+                            display: "Online",
+                            color: "green",
+                            severity: 0,
                         };
                     }
                     default: {
@@ -263,7 +263,7 @@ describe("Validation Error Paths and Edge Cases", () => {
                 value: unknown,
                 min?: number,
                 max?: number
-            ): number | null => {
+            ): null | number => {
                 let num: number;
 
                 if (typeof value === "number") {
@@ -532,8 +532,8 @@ describe("Validation Error Paths and Edge Cases", () => {
             expect(formatDuration(300_000)).toBe("5m");
             expect(formatDuration(7_200_000)).toBe("2h");
             expect(formatDuration(-1000)).toBe("Invalid");
-            expect(formatDuration(Number.POSITIVE_INFINITY)).toBe("Invalid");
-            expect(formatDuration(Number.NaN)).toBe("Invalid");
+            expect(formatDuration(Infinity)).toBe("Invalid");
+            expect(formatDuration(NaN)).toBe("Invalid");
         });
     });
     describe("Configuration validation edge cases", () => {
@@ -548,14 +548,14 @@ describe("Validation Error Paths and Edge Cases", () => {
             );
 
             interface Config {
-                timeout: number;
-                retries: number;
                 enabled: boolean;
+                retries: number;
+                timeout: number;
                 url?: string;
             }
 
             const mergeConfig = (
-                partial: Partial<Config> | null | undefined
+                partial: null | Partial<Config> | undefined
             ): Config => {
                 const defaults: Config = {
                     timeout: 5000,

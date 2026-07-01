@@ -4,7 +4,7 @@
  *   coverage impact
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock electron app
 vi.mock("electron", () => ({

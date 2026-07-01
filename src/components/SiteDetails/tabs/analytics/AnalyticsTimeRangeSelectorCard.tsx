@@ -46,12 +46,12 @@ export const AnalyticsTimeRangeSelectorCard = ({
     >;
 
     const rangeButtons = useMemo<
-        Array<{
+        {
             readonly handleClick: () => void;
             readonly isSelected: boolean;
             readonly range: ChartTimeRange;
             readonly variant: ButtonVariant;
-        }>
+        }[]
     >(
         () =>
             CHART_TIME_RANGES.map((range) => {

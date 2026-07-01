@@ -4,10 +4,10 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
@@ -23,17 +23,15 @@ async function toggleCheckboxAndRevert(
     label: string
 ): Promise<void> {
     const checkbox = page.getByLabel(label);
-    await expect(checkbox).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+    await expect.soft(checkbox).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-    const initialState = await checkbox.isChecked();
+    const isInitialState = await checkbox.isChecked();
 
     const toggleCheckbox = async (): Promise<void> => {
         await page.evaluate((accessibleLabel) => {
-            const target = Array.from(
-                document.querySelectorAll<HTMLInputElement>(
+            const target = [...document.querySelectorAll<HTMLInputElement>(
                     'input[type="checkbox"][aria-label]'
-                )
-            ).find(
+                )].find(
                 (element) =>
                     element.getAttribute("aria-label") === accessibleLabel
             );
@@ -49,15 +47,15 @@ async function toggleCheckboxAndRevert(
     };
 
     await toggleCheckbox();
-    await expect(page.getByLabel(label)).toHaveJSProperty(
+    await expect.soft(page.getByLabel(label)).toHaveJSProperty(
         "checked",
-        !initialState
+        !isInitialState
     );
 
     await toggleCheckbox();
-    await expect(page.getByLabel(label)).toHaveJSProperty(
+    await expect.soft(page.getByLabel(label)).toHaveJSProperty(
         "checked",
-        initialState
+        isInitialState
     );
 }
 
@@ -69,18 +67,18 @@ async function selectAlternateOption(
         Array.from(element.querySelectorAll("option"), (option) => option.value)
     );
 
-    expect(availableValues.length).toBeGreaterThan(1);
+    expect.soft(availableValues.length).toBeGreaterThan(1);
 
     const nextValue = availableValues.find((value) => value !== initialValue);
-    expect(nextValue).toBeDefined();
+    expect.soft(nextValue).toBeDefined();
 
-    const alternateValue = nextValue as string;
+    const alternateValue = nextValue!;
 
     await locator.selectOption(alternateValue);
-    await expect(locator).toHaveValue(alternateValue);
+    await expect.soft(locator).toHaveValue(alternateValue);
 
     await locator.selectOption(initialValue);
-    await expect(locator).toHaveValue(initialValue);
+    await expect.soft(locator).toHaveValue(initialValue);
 }
 
 function resolveAlternateTheme(
@@ -106,7 +104,7 @@ async function waitForThemeApplication(
     await page.waitForFunction(
         (targetTheme) => {
             const root = document.documentElement;
-            const themeClasses = Array.from(document.body.classList).filter(
+            const themeClasses = [...document.body.classList].filter(
                 (className) => className.startsWith("theme-")
             );
 
@@ -190,7 +188,7 @@ test.describe(
             },
             async () => {
                 await openSettingsModal(page);
-                await expect(page.getByTestId("settings-modal")).toBeVisible({
+                await expect.soft(page.getByTestId("settings-modal")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
@@ -220,20 +218,20 @@ test.describe(
             },
             async () => {
                 await openSettingsModal(page);
-                await expect(page.getByTestId("settings-modal")).toBeVisible({
+                await expect.soft(page.getByTestId("settings-modal")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
                 const historySelect = page.getByLabel(
                     "Maximum number of history records to keep per site"
                 );
-                await expect(historySelect).toBeVisible({
+                await expect.soft(historySelect).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await selectAlternateOption(historySelect);
 
                 const themeSelect = page.getByLabel("Select application theme");
-                await expect(themeSelect).toBeVisible({
+                await expect.soft(themeSelect).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
@@ -244,7 +242,7 @@ test.describe(
                         (option) => option.value
                     )
                 );
-                expect(themeOptions.length).toBeGreaterThan(1);
+                expect.soft(themeOptions.length).toBeGreaterThan(1);
 
                 const alternateTheme = resolveAlternateTheme(
                     themeOptions,
@@ -252,24 +250,24 @@ test.describe(
                 );
 
                 await themeSelect.selectOption(alternateTheme);
-                await expect(themeSelect).toHaveValue(alternateTheme);
+                await expect.soft(themeSelect).toHaveValue(alternateTheme);
 
                 await waitForThemeApplication(page, alternateTheme);
 
                 await themeSelect.selectOption(initialTheme);
-                await expect(themeSelect).toHaveValue(initialTheme);
+                await expect.soft(themeSelect).toHaveValue(initialTheme);
 
                 await waitForThemeApplication(page, initialTheme);
 
-                await expect(
+                await expect.soft(
                     page.getByRole("button", {
                         name: "Export monitoring data",
                     })
                 ).toBeEnabled();
-                await expect(
+                await expect.soft(
                     page.getByRole("button", { name: "Refresh history" })
                 ).toBeEnabled();
-                await expect(
+                await expect.soft(
                     page.getByRole("button", { name: "Reset everything" })
                 ).toBeEnabled();
             }

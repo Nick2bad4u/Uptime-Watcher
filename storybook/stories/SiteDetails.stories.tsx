@@ -41,6 +41,7 @@ const baseSite = createMockSite({
 
 const pausedSite = createMockSite({
     identifier: "site-maintenance",
+    monitoring: false,
     monitors: [
         createMockMonitor({
             id: "maintenance-port",
@@ -49,7 +50,6 @@ const pausedSite = createMockSite({
             type: "port",
         }),
     ],
-    monitoring: false,
     name: "Maintenance Window",
 });
 

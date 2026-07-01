@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,23 +15,24 @@
  * @tags ["test"]
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fc } from "@fast-check/vitest";
+import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { fc } from "@fast-check/vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { DatabaseService } from "../../../services/database/DatabaseService";
+
+import * as electronUtils from "../../../electronUtils";
 import {
     HistoryRepository,
     type HistoryRepositoryDependencies,
 } from "../../../services/database/HistoryRepository";
-import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { StatusHistory } from "@shared/types";
-
 // Import mocked modules
 import * as historyManipulation from "../../../services/database/utils/maintenance/historyManipulation";
 import * as historyQuery from "../../../services/database/utils/queries/historyQuery";
-import * as operationalHooks from "../../../utils/operationalHooks";
 import * as logger from "../../../utils/logger";
-import * as electronUtils from "../../../electronUtils";
+import * as operationalHooks from "../../../utils/operationalHooks";
 
 // Mock the modules
 vi.mock("../../../services/database/utils/maintenance/historyManipulation");
@@ -97,7 +98,7 @@ describe(HistoryRepository, () => {
             await annotate("Type: Constructor", "type");
 
             expect(historyRepository).toBeInstanceOf(HistoryRepository);
-            expect(historyRepository["databaseService"]).toBe(
+            expect(historyRepository.databaseService).toBe(
                 mockDatabaseService
             );
         });
@@ -707,7 +708,7 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const db = historyRepository["getDb"]();
+            const db = historyRepository.getDb();
 
             expect(mockDatabaseService.getDatabase).toHaveBeenCalledTimes(1);
             expect(db).toBe(mockDatabase);

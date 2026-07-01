@@ -16,10 +16,11 @@
  * @tags ["mutation-testing", "arrow-functions", "react", "filtering"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
 import { render, screen } from "@testing-library/react";
+import * as React from "react";
+import { objectEntries } from "ts-extras";
 import "@testing-library/jest-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("ArrowFunction Mutations", () => {
     beforeEach(() => {
@@ -39,7 +40,7 @@ describe("ArrowFunction Mutations", () => {
             const knownProperties = new Set(["knownProp1", "knownProp2"]);
 
             // Original logic: Object.entries(config).filter(([key]) => !knownProperties.has(key))
-            const unknownEntries = Object.entries(config).filter(
+            const unknownEntries = objectEntries(config).filter(
                 ([key]) => !knownProperties.has(key)
             );
 
@@ -57,7 +58,7 @@ describe("ArrowFunction Mutations", () => {
             const config = {};
             const knownProperties = new Set(["prop1", "prop2"]);
 
-            const unknownEntries = Object.entries(config).filter(
+            const unknownEntries = objectEntries(config).filter(
                 ([key]) => !knownProperties.has(key)
             );
             expect(unknownEntries).toEqual([]);
@@ -67,7 +68,7 @@ describe("ArrowFunction Mutations", () => {
             const config = { prop1: "val1", prop2: "val2" };
             const knownProperties = new Set(["prop1", "prop2"]);
 
-            const unknownEntries = Object.entries(config).filter(
+            const unknownEntries = objectEntries(config).filter(
                 ([key]) => !knownProperties.has(key)
             );
             expect(unknownEntries).toEqual([]);
@@ -272,7 +273,7 @@ describe("ArrowFunction Mutations", () => {
                 12,
             ]);
 
-            const sum = numbers.reduce((acc, n) => acc + n, 0);
+            const sum = Math.sumPrecise(numbers);
             expect(sum).toBe(21);
 
             const firstEven = numbers.find((n) => n % 2 === 0);
@@ -301,9 +302,9 @@ describe("ArrowFunction Mutations", () => {
                     <div>
                         {items.map((item) => (
                             <button
-                                key={item}
-                                onClick={() => handleClick(item)}
                                 data-testid={`button-${item}`}
+                                key={item}
+                                onClick={() => { handleClick(item); }}
                             >
                                 {item}
                             </button>
@@ -330,7 +331,7 @@ describe("ArrowFunction Mutations", () => {
         it("should handle Promise and async operations", async () => {
             const asyncOperation = async (value: number) =>
                 new Promise<number>((resolve) => {
-                    setTimeout(() => resolve(value * 2), 10);
+                    setTimeout(() => { resolve(value * 2); }, 10);
                 });
 
             const values = [

@@ -66,7 +66,7 @@ export async function performDirectCheck(args: {
             isManualCheck,
             monitor,
             operationId: "direct-check",
-            ...(signal ? { signal } : {}),
+            ...(signal && { signal }),
             site,
         });
 
@@ -93,7 +93,7 @@ export async function performDirectCheck(args: {
         };
 
         // Only update status if not a manual check on a paused monitor.
-        if (!(isManualCheck && monitor.status === "paused")) {
+        if (!isManualCheck || monitor.status !== "paused") {
             updateData.status = serviceResult.status;
         }
 
@@ -110,9 +110,7 @@ export async function performDirectCheck(args: {
                     ? { status: finalStatus }
                     : {
                           status: finalStatus,
-                          ...(typeof serviceResult.details === "string"
-                              ? { serviceDetails: serviceResult.details }
-                              : {}),
+                          ...((typeof serviceResult.details === "string") && { serviceDetails: serviceResult.details }),
                       }
             ),
             monitor: fallbackMonitor,
@@ -151,8 +149,7 @@ export async function performDirectCheck(args: {
             );
         }
 
-        // Emit monitor up/down events using the same canonical helper used by
-        // correlated checks.
+        // Emit monitor up/down events using the same canonical helper used by correlated checks.
         //
         // Preserve existing behavior: manual checks on paused monitors do not
         // emit up/down events.

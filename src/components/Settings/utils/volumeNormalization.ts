@@ -15,19 +15,19 @@ export function clampNormalizedVolume(value: number): number {
 }
 
 /**
- * Converts a slider percentage value (0-100) into a normalized volume.
- */
-export function convertSliderPercentToNormalizedVolume(
-    sliderPercent: number
-): number {
-    return clampNormalizedVolume(sliderPercent / 100);
-}
-
-/**
  * Converts a normalized volume into a slider percentage (rounded integer).
  */
 export function convertNormalizedVolumeToSliderPercent(
     normalizedVolume: number
 ): number {
     return Math.round(clampNormalizedVolume(normalizedVolume) * 100);
+}
+
+/**
+ * Converts a slider percentage value (0-100) into a normalized volume.
+ */
+export function convertSliderPercentToNormalizedVolume(
+    sliderPercent: number
+): number {
+    return clampNormalizedVolume(sliderPercent / 100);
 }

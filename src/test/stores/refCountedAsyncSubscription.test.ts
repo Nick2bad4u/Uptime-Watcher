@@ -24,6 +24,7 @@ describe(createRefCountedAsyncSubscription, () => {
         expect(subscription.getRefCount()).toBe(2);
 
         unsubscribeA();
+
         expect(subscription.getRefCount()).toBe(1);
 
         resolveStart(cleanup);
@@ -32,11 +33,13 @@ describe(createRefCountedAsyncSubscription, () => {
         expect(cleanup).not.toHaveBeenCalled();
 
         unsubscribeB();
+
         expect(subscription.getRefCount()).toBe(0);
         expect(cleanup).toHaveBeenCalledTimes(1);
 
         // Idempotent
         unsubscribeB();
+
         expect(cleanup).toHaveBeenCalledTimes(1);
     });
 
@@ -55,9 +58,11 @@ describe(createRefCountedAsyncSubscription, () => {
         });
 
         const unsubscribe = subscription.subscribe();
+
         expect(subscription.getRefCount()).toBe(1);
 
         unsubscribe();
+
         expect(subscription.getRefCount()).toBe(0);
 
         resolveStart(cleanup);

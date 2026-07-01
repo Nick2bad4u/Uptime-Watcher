@@ -15,7 +15,7 @@ import {
     CACHE_NAMES,
     type CacheConfig,
     type CacheConfigKey,
-} from "../../../shared/constants/cacheConfig";
+} from "../../constants/cacheConfig";
 
 describe("cacheConfig - Property-Based Fuzzing Tests", () => {
     describe("CACHE_CONFIG validation", () => {
@@ -133,7 +133,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
                         if (suffix) {
                             expect(result).toBe(`monitors-${suffix}`);
-                            expect(result).toMatch(/^monitors-.+$/);
+                            expect(result).toMatch(/^monitors-.+$/v);
                         } else {
                             expect(result).toBe("monitors");
                         }
@@ -181,7 +181,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
                         if (suffix) {
                             expect(result).toBe(`settings-${suffix}`);
-                            expect(result).toMatch(/^settings-.+$/);
+                            expect(result).toMatch(/^settings-.+$/v);
                         } else {
                             expect(result).toBe("settings");
                         }
@@ -226,7 +226,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
                         if (suffix) {
                             expect(result).toBe(`sites-${suffix}`);
-                            expect(result).toMatch(/^sites-.+$/);
+                            expect(result).toMatch(/^sites-.+$/v);
                         } else {
                             expect(result).toBe("sites");
                         }
@@ -277,7 +277,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     (operation) => {
                         const result = CACHE_NAMES.temporary(operation);
                         expect(result).toBe(`temporary-${operation}`);
-                        expect(result).toMatch(/^temporary-.+$/);
+                        expect(result).toMatch(/^temporary-.+$/v);
                         expect(typeof result).toBe("string");
                         expect(result.length).toBeGreaterThan(
                             "temporary-".length
@@ -496,7 +496,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                 expect(config.maxSize).toBeLessThanOrEqual(1000);
 
                 // Name should not be empty and should be lowercase with possible hyphens
-                expect(config.name).toMatch(/^[a-z][a-z-]*[a-z]$|^[a-z]$/);
+                expect(config.name).toMatch(/^[a-z][-a-z]*[a-z]$|^[a-z]$/u);
             }
         });
     });

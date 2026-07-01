@@ -246,12 +246,14 @@ const ThemedBoxComponent = ({
 
     // Handle keyboard interactions for interactive divs
     const handleKeyDown = (e: KeyboardEvent): void => {
-        if ((e.key === "Enter" || e.key === " ") && onClick) {
-            e.preventDefault();
-            // Safe to call since onClick is checked for existence above
-
-            onClick();
+        if (e.key !== "Enter" && e.key !== " " || !onClick) {
+            return;
         }
+
+        e.preventDefault();
+        // Safe to call since onClick is checked for existence above
+
+        onClick();
     };
 
     // Base props for all element types

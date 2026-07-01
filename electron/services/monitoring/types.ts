@@ -155,6 +155,21 @@ export interface MonitorCheckResult {
 }
 
 /**
+ * Fully-typed monitor configuration emitted by registry helpers.
+ *
+ * @remarks
+ * Extends {@link MonitorConfigurationInput} with a resolved monitor type to
+ * guarantee consumers operate on a strongly typed payload while still allowing
+ * optional overrides for the remaining monitor fields.
+ */
+export type MonitorConfiguration = Simplify<
+    MonitorConfigurationInput & {
+        /** Discriminant monitor type derived from the registry. */
+        type: MonitorType;
+    }
+>;
+
+/**
  * Partial monitor configuration accepted by registry helpers and migrations.
  *
  * @remarks
@@ -193,18 +208,3 @@ export interface MonitorServiceConfig extends MonitorConfigurationInput {
     timeout?: number;
     userAgent?: string;
 }
-
-/**
- * Fully-typed monitor configuration emitted by registry helpers.
- *
- * @remarks
- * Extends {@link MonitorConfigurationInput} with a resolved monitor type to
- * guarantee consumers operate on a strongly typed payload while still allowing
- * optional overrides for the remaining monitor fields.
- */
-export type MonitorConfiguration = Simplify<
-    MonitorConfigurationInput & {
-        /** Discriminant monitor type derived from the registry. */
-        type: MonitorType;
-    }
->;

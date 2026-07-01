@@ -33,13 +33,13 @@ export function createSeededRandom(seed: number): () => number {
 }
 
 const DARK_STAR_COLORS = [
-    "rgb(255 255 255)", // White
-    "rgb(224 242 254)", // Light Blue
-    "rgb(250 232 255)", // Light Purple
-    "rgb(240 253 250)", // Light Teal
-    "rgb(221 214 254)", // Violet
-    "rgb(251 207 232)", // Pink
     "rgb(165 243 252)", // Cyan
+    "rgb(221 214 254)", // Violet
+    "rgb(224 242 254)", // Light Blue
+    "rgb(240 253 250)", // Light Teal
+    "rgb(250 232 255)", // Light Purple
+    "rgb(251 207 232)", // Pink
+    "rgb(255 255 255)", // White
 ] as const;
 
 const LIGHT_STAR_COLORS = [

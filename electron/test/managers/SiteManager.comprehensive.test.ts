@@ -3,14 +3,17 @@
  * site management functions
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site, Monitor } from "@shared/types";
-import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import type { Monitor, Site } from "@shared/types";
+
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { IMonitoringOperations } from "../../managers/SiteManager.types";
+
 import { SiteManager } from "../../managers/SiteManager";
 import { formatSiteValidationErrors } from "../../managers/siteManager/formatSiteValidationErrors";
-import type { IMonitoringOperations } from "../../managers/SiteManager.types";
 
 /**
  * Helper function to create a complete Monitor object with all required
@@ -77,14 +80,14 @@ const cacheMocks = vi.hoisted(() => {
         getAll: vi.fn(() => [...cacheStore.values()]),
         entries: vi.fn(() => cacheStore.entries()),
         bulkUpdate: vi.fn(
-            (items: { key: string; data: Site; ttl?: number }[]) => {
+            (items: { data: Site; key: string; ttl?: number }[]) => {
                 for (const item of items) {
                     cacheStore.set(item.key, item.data);
                 }
             }
         ),
         replaceAll: vi.fn(
-            (items: { key: string; data: Site; ttl?: number }[]) => {
+            (items: { data: Site; key: string; ttl?: number }[]) => {
                 cacheStore.clear();
                 for (const item of items) {
                     cacheStore.set(item.key, item.data);
@@ -241,14 +244,14 @@ describe("SiteManager - Comprehensive", () => {
         mockCache.getAll.mockReturnValue([...cacheStore.values()]);
         mockCache.entries.mockReturnValue(cacheStore.entries());
         mockCache.bulkUpdate.mockImplementation(
-            (items: { key: string; data: Site; ttl?: number }[]) => {
+            (items: { data: Site; key: string; ttl?: number }[]) => {
                 for (const item of items) {
                     cacheStore.set(item.key, item.data);
                 }
             }
         );
         mockCache.replaceAll.mockImplementation(
-            (items: { key: string; data: Site; ttl?: number }[]) => {
+            (items: { data: Site; key: string; ttl?: number }[]) => {
                 cacheStore.clear();
                 for (const item of items) {
                     cacheStore.set(item.key, item.data);
@@ -587,13 +590,13 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockCache = siteManager["sitesCache"];
+            const mockCache = siteManager.sitesCache;
 
             // Mock cache.get to return undefined (cache miss)
             mockCache.get = vi.fn().mockReturnValue(undefined);
             // Mock getSiteFromDatabase to throw error
             vi.spyOn(
-                siteManager["siteRepositoryService"],
+                siteManager.siteRepositoryService,
                 "getSitesFromDatabase"
             ).mockRejectedValue(new Error("DB error"));
 
@@ -625,7 +628,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Type: Data Update", "type");
 
             const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
+                siteManager.siteRepositoryService;
             mockSiteRepositoryService.getSitesFromDatabase = vi
                 .fn()
                 .mockResolvedValue([mockSite]);
@@ -646,7 +649,7 @@ describe("SiteManager - Comprehensive", () => {
 
             const getSitesSpy = vi
                 .spyOn(
-                    siteManager["siteRepositoryService"],
+                    siteManager.siteRepositoryService,
                     "getSitesFromDatabase"
                 )
                 .mockRejectedValue(new Error("DB error"));
@@ -687,7 +690,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Type: Caching", "type");
 
             const result = siteManager.getSitesCache();
-            expect(result).toBe(siteManager["sitesCache"]);
+            expect(result).toBe(siteManager.sitesCache);
         });
     });
 
@@ -754,7 +757,7 @@ describe("SiteManager - Comprehensive", () => {
 
             mockCache.set(cachedSite.identifier, cachedSite);
 
-            const snapshot = await siteManager["getSiteSnapshotForMutation"](
+            const snapshot = await siteManager.getSiteSnapshotForMutation(
                 cachedSite.identifier
             );
 
@@ -784,7 +787,7 @@ describe("SiteManager - Comprehensive", () => {
                 databaseSite
             );
 
-            const snapshot = await siteManager["getSiteSnapshotForMutation"](
+            const snapshot = await siteManager.getSiteSnapshotForMutation(
                 databaseSite.identifier
             );
 
@@ -809,7 +812,7 @@ describe("SiteManager - Comprehensive", () => {
             );
 
             await expect(
-                siteManager["getSiteSnapshotForMutation"]("missing-site")
+                siteManager.getSiteSnapshotForMutation("missing-site")
             ).rejects.toThrow("Site with identifier missing-site not found");
         });
     });
@@ -971,9 +974,9 @@ describe("SiteManager - Comprehensive", () => {
                 return true;
             });
 
-            const result = await siteManager.removeSite("site-1");
+            const isResult = await siteManager.removeSite("site-1");
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:removed",
                 expect.objectContaining({
@@ -1023,17 +1026,17 @@ describe("SiteManager - Comprehensive", () => {
                 siteWriterService: mockSiteWriterServiceInstance,
             };
             siteManager = new SiteManager(testDeps);
-            const mockCache = siteManager["sitesCache"];
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockCache = siteManager.sitesCache;
+            const mockSiteWriterService = siteManager.siteWriterService;
 
             vi.mocked(mockCache.get).mockReturnValue(mockSite);
             vi.mocked(mockSiteWriterService.deleteSite).mockResolvedValue(
                 false
             );
 
-            const result = await siteManager.removeSite("site-1");
+            const isResult = await siteManager.removeSite("site-1");
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             // Should not emit events when deletion fails
             expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalled();
         });
@@ -1050,8 +1053,8 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Update", "type");
 
-            const mockCache = siteManager["sitesCache"];
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockCache = siteManager.sitesCache;
+            const mockSiteWriterService = siteManager.siteWriterService;
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
 
@@ -1145,8 +1148,8 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Update", "type");
 
-            const mockCache = siteManager["sitesCache"];
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockCache = siteManager.sitesCache;
+            const mockSiteWriterService = siteManager.siteWriterService;
 
             const newMonitor = createMockMonitor({
                 id: "monitor-2",
@@ -1197,8 +1200,8 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockCache = siteManager["sitesCache"];
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockCache = siteManager.sitesCache;
+            const mockSiteWriterService = siteManager.siteWriterService;
 
             const updates = { name: "Updated Site" };
             const updatedSite = { ...mockSite, ...updates };
@@ -1236,7 +1239,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Type: Data Update", "type");
 
             const sites = [mockSite];
-            const mockCache = siteManager["sitesCache"];
+            const mockCache = siteManager.sitesCache;
 
             await siteManager.updateSitesCache(sites);
 
@@ -1316,8 +1319,8 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockCache = siteManager["sitesCache"];
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockCache = siteManager.sitesCache;
+            const mockSiteWriterService = siteManager.siteWriterService;
 
             const updates = { monitors: [mockSite.monitors[0]!] };
             const updatedSite = { ...mockSite, ...updates };
@@ -1354,8 +1357,8 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockCache = siteManager["sitesCache"];
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockCache = siteManager.sitesCache;
+            const mockSiteWriterService = siteManager.siteWriterService;
 
             const newMonitor = createMockMonitor({
                 id: "monitor-2",
@@ -1402,7 +1405,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const config = siteManager["createMonitoringConfig"]();
+            const config = siteManager.createMonitoringConfig();
 
             await expect(
                 config.startMonitoring("site-1", "monitor-1")
@@ -1420,7 +1423,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            const config = siteManager["createMonitoringConfig"]();
+            const config = siteManager.createMonitoringConfig();
 
             await expect(
                 config.stopMonitoring("site-1", "monitor-1")
@@ -1448,7 +1451,7 @@ describe("SiteManager - Comprehensive", () => {
                 mockMonitoringOperations.setHistoryLimit
             ).mockRejectedValue(new Error("History limit error"));
 
-            const config = siteManager["createMonitoringConfig"]();
+            const config = siteManager.createMonitoringConfig();
 
             await expect(config.setHistoryLimit(100)).rejects.toThrow(
                 "History limit error"
@@ -1468,7 +1471,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const config = siteManager["createMonitoringConfig"]();
+            const config = siteManager.createMonitoringConfig();
 
             await config.setupNewMonitors(mockSite, ["monitor-1"]);
 
@@ -1486,14 +1489,14 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const config = siteManager["createMonitoringConfig"]();
+            const config = siteManager.createMonitoringConfig();
 
-            const result = await config.startMonitoring("site-1", "monitor-1");
+            const isResult = await config.startMonitoring("site-1", "monitor-1");
 
             expect(
                 mockMonitoringOperations.startMonitoringForSite
             ).toHaveBeenCalledWith("site-1", "monitor-1");
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should call stopMonitoring successfully", async ({
@@ -1505,14 +1508,14 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Monitoring", "type");
 
-            const config = siteManager["createMonitoringConfig"]();
+            const config = siteManager.createMonitoringConfig();
 
-            const result = await config.stopMonitoring("site-1", "monitor-1");
+            const isResult = await config.stopMonitoring("site-1", "monitor-1");
 
             expect(
                 mockMonitoringOperations.stopMonitoringForSite
             ).toHaveBeenCalledWith("site-1", "monitor-1");
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
     });
 
@@ -1530,7 +1533,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Loading", "type");
 
-            const mockCache = siteManager["sitesCache"];
+            const mockCache = siteManager.sitesCache;
             const stateSyncSpy = vi.spyOn(
                 siteManager,
                 "emitSitesStateSynchronized"
@@ -1540,7 +1543,7 @@ describe("SiteManager - Comprehensive", () => {
                 mockSite
             );
 
-            await siteManager["loadSiteInBackground"]("site-1");
+            await siteManager.loadSiteInBackground("site-1");
 
             expect(mockCache.set).toHaveBeenCalledWith("site-1", mockSite);
             expect(
@@ -1577,7 +1580,7 @@ describe("SiteManager - Comprehensive", () => {
                 undefined
             );
 
-            await siteManager["loadSiteInBackground"]("site-1");
+            await siteManager.loadSiteInBackground("site-1");
 
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:cache-miss",
@@ -1602,7 +1605,7 @@ describe("SiteManager - Comprehensive", () => {
                 new Error("DB error")
             );
 
-            await siteManager["loadSiteInBackground"]("site-1");
+            await siteManager.loadSiteInBackground("site-1");
 
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:cache-miss",
@@ -1624,7 +1627,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Type: Error Handling", "type");
 
             const mockSiteRepositoryService =
-                siteManager["siteRepositoryService"];
+                siteManager.siteRepositoryService;
 
             vi.mocked(
                 mockSiteRepositoryServiceInstance.getSitesFromDatabase
@@ -1634,7 +1637,7 @@ describe("SiteManager - Comprehensive", () => {
             );
 
             await expect(
-                siteManager["loadSiteInBackground"]("site-1")
+                siteManager.loadSiteInBackground("site-1")
             ).resolves.toBeUndefined();
 
             // Should not throw even if both DB and event emission fail
@@ -1655,7 +1658,7 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Validation", "type");
 
-            await siteManager["validateSite"](mockSite);
+            await siteManager.validateSite(mockSite);
 
             expect(
                 mockDeps.configurationManager.validateSiteConfiguration
@@ -1678,7 +1681,7 @@ describe("SiteManager - Comprehensive", () => {
                 errors: ["Invalid site"],
             });
 
-            await expect(siteManager["validateSite"](mockSite)).rejects.toThrow(
+            await expect(siteManager.validateSite(mockSite)).rejects.toThrow(
                 "Site validation failed for 'site-1': Invalid site"
             );
         });
@@ -1736,7 +1739,7 @@ describe("SiteManager - Comprehensive", () => {
             await siteManager.initialize();
 
             // Add site
-            const mockSiteWriterService = siteManager["siteWriterService"];
+            const mockSiteWriterService = siteManager.siteWriterService;
             vi.mocked(mockSiteWriterService.createSite).mockResolvedValue(
                 mockSite
             );
@@ -1772,8 +1775,8 @@ describe("SiteManager - Comprehensive", () => {
             // Remove site
             vi.mocked(mockCache.get).mockReturnValue(updatedSite);
             vi.mocked(mockSiteWriterService.deleteSite).mockResolvedValue(true);
-            const removed = await siteManager.removeSite("site-1");
-            expect(removed).toBeTruthy();
+            const isRemoved = await siteManager.removeSite("site-1");
+            expect(isRemoved).toBeTruthy();
         });
     });
 });

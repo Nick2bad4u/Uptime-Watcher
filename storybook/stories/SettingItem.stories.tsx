@@ -13,7 +13,7 @@ const meta: Meta<typeof SettingItem> = {
                 aria-label="Enable monitoring"
                 checked
                 onChange={() => {
-                    /* preview only */
+                    /* Preview only */
                 }}
             />
         ),
@@ -30,8 +30,8 @@ const meta: Meta<typeof SettingItem> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
 type SettingItemProps = ComponentProps<typeof SettingItem>;
+type Story = StoryObj<typeof meta>;
 
 const WithSelectStory = (args: SettingItemProps): ReactElement => {
     const rest = { ...args };

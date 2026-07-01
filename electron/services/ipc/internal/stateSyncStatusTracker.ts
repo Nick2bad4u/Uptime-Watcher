@@ -23,9 +23,9 @@ const createDefaultStateSyncStatus = (): StateSyncStatusSummary => ({
  * Tracks IPC-facing state sync status derived from orchestrator events.
  */
 export class StateSyncStatusTracker {
-    private readonly logger: Logger;
-
     private knownSiteIdentifiers = new Set<string>();
+
+    private readonly logger: Logger;
 
     private stateSyncStatus: StateSyncStatusSummary =
         createDefaultStateSyncStatus();
@@ -39,21 +39,6 @@ export class StateSyncStatusTracker {
      */
     public getStatus(): StateSyncStatusSummary {
         return this.stateSyncStatus;
-    }
-
-    /**
-     * Overrides the current state sync status snapshot.
-     */
-    public setStatus(summary: StateSyncStatusSummary): void {
-        this.stateSyncStatus = summary;
-    }
-
-    /**
-     * Resets the tracker to its initial state.
-     */
-    public reset(): void {
-        this.knownSiteIdentifiers = new Set();
-        this.stateSyncStatus = createDefaultStateSyncStatus();
     }
 
     /**
@@ -72,6 +57,21 @@ export class StateSyncStatusTracker {
         }
 
         this.updateStateSyncStatusFromEvent(normalized);
+    }
+
+    /**
+     * Resets the tracker to its initial state.
+     */
+    public reset(): void {
+        this.knownSiteIdentifiers = new Set();
+        this.stateSyncStatus = createDefaultStateSyncStatus();
+    }
+
+    /**
+     * Overrides the current state sync status snapshot.
+     */
+    public setStatus(summary: StateSyncStatusSummary): void {
+        this.stateSyncStatus = summary;
     }
 
     private updateStateSyncStatus(

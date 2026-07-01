@@ -31,14 +31,6 @@ export interface AnalyticsIconColors {
     readonly uptime: string;
 }
 
-type ProgressVariant = ComponentProps<typeof ThemedProgress>["variant"];
-
-type StrictProgressVariant = Exclude<ProgressVariant, undefined>;
-type BadgeVariant = Exclude<
-    ComponentProps<typeof ThemedBadge>["variant"],
-    undefined
->;
-
 /**
  * Props for {@link AnalyticsKeyMetricsGrid}.
  *
@@ -60,6 +52,14 @@ export interface AnalyticsKeyMetricsGridProperties {
     readonly uptime: string;
     readonly uptimeValue: number;
 }
+
+type BadgeVariant = Exclude<
+    ComponentProps<typeof ThemedBadge>["variant"],
+    undefined
+>;
+type ProgressVariant = ComponentProps<typeof ThemedProgress>["variant"];
+
+type StrictProgressVariant = Exclude<ProgressVariant, undefined>;
 
 /**
  * Renders the primary analytics KPIs as a responsive grid.

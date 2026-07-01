@@ -11,15 +11,6 @@ export interface GoogleDriveCreateResponse {
 }
 
 /**
- * File size value returned by Drive API.
- *
- * @remarks
- * Google APIs can return sizes as strings (and occasionally numbers depending
- * on client abstractions).
- */
-export type GoogleDriveFileSizeValue = number | string;
-
-/**
  * Minimal metadata payload returned by Drive `files.get()` when requesting
  * `fields: "modifiedTime,size"`.
  */
@@ -27,6 +18,15 @@ export interface GoogleDriveFileMetadata {
     readonly modifiedTime?: string | undefined;
     readonly size?: GoogleDriveFileSizeValue | undefined;
 }
+
+/**
+ * File size value returned by Drive API.
+ *
+ * @remarks
+ * Google APIs can return sizes as strings (and occasionally numbers depending
+ * on client abstractions).
+ */
+export type GoogleDriveFileSizeValue = number | string;
 
 /**
  * Normalized subset of the Google Drive `Schema$File` we depend on.

@@ -11,9 +11,9 @@ import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
  * @returns Latest timestamp in milliseconds, if any valid value exists.
  */
 export function getLatestHistoryTimestamp(
-    history: ReadonlyArray<Pick<StatusHistory, "timestamp">>
+    history: readonly Pick<StatusHistory, "timestamp">[]
 ): number | undefined {
-    let latestTimestamp: number | undefined = undefined;
+    let latestTimestamp: number | undefined;
 
     for (const record of history) {
         const { timestamp } = record;

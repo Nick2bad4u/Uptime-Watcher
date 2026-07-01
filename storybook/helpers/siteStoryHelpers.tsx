@@ -6,8 +6,6 @@ import { useUIStore } from "@app/stores/ui/useUiStore";
 import { useEffect } from "react";
 import { action } from "storybook/actions";
 
-/* eslint-disable perfectionist/sort-jsx-props -- Conflicting layered configs trigger circular fixes in this Storybook helper; prop order is intentional for clarity. */
-
 const DEFAULT_HISTORY_LENGTH = 6;
 const RESPONSE_INCREMENT = 25;
 const CHECK_INTERVAL_MS = 60_000;
@@ -77,7 +75,7 @@ const captureSitesState = (): ReturnType<typeof useSitesStore.getState> => {
     return {
         ...state,
         selectedMonitorIds: { ...state.selectedMonitorIds },
-        sites: Array.from(state.sites),
+        sites: [...state.sites],
     };
 };
 
@@ -119,7 +117,7 @@ export const setupSiteStoryEnvironment = (
                 },
             }));
         },
-        sites: Array.from(sites),
+        sites: [...sites],
         startSiteMonitoring: (siteIdentifier: string) => {
             action("sites/startSiteMonitoring")(siteIdentifier);
             return Promise.resolve();
@@ -171,10 +169,6 @@ export const setupSiteStoryEnvironment = (
     };
 };
 
-type StoryDecoratorParams = Parameters<Decorator>;
-type StoryDecoratorComponent = StoryDecoratorParams[0];
-type StoryDecoratorContext = StoryDecoratorParams[1];
-
 interface SiteDecoratorProps {
     readonly context: StoryDecoratorContext;
     readonly getSites: (context: {
@@ -182,6 +176,10 @@ interface SiteDecoratorProps {
     }) => readonly Site[];
     readonly StoryComponent: StoryDecoratorComponent;
 }
+type StoryDecoratorComponent = StoryDecoratorParams[0];
+type StoryDecoratorContext = StoryDecoratorParams[1];
+
+type StoryDecoratorParams = Parameters<Decorator>;
 
 // eslint-disable-next-line react-refresh/only-export-components -- Internal component accompanying utility exports within Storybook helpers.
 const SiteStoryDecorator = ({
@@ -224,5 +222,3 @@ export const createSiteDecorator = (
             />
         );
     };
-
-/* eslint-enable perfectionist/sort-jsx-props -- Prop ordering exceptions end here; resume default sorting enforcement. */

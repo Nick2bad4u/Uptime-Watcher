@@ -3,20 +3,29 @@
  * specifically identified by coverage analysis
  */
 
+import type { Site } from "@shared/types";
+
+import { mockConstructableReturnValueOnce } from "@shared/test/helpers/vitestConstructors";
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import { arrayFirst } from "ts-extras";
 import {
     afterAll,
     beforeEach,
     describe,
     expect,
     it,
-    vi,
     type Mock,
+    vi,
 } from "vitest";
-import type { Site } from "@shared/types";
+
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
-import { mockConstructableReturnValueOnce } from "@shared/test/helpers/vitestConstructors";
-import { createMockFunction } from "../../utils/mockFactories";
+
+import { logger } from "../../../services/logger";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+// Import after mocking
+import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { installElectronApiMock } from "../../utils/electronApiMock";
+import { createMockFunction } from "../../utils/mockFactories";
 
 const LISTENER_NAMES = [
     "monitor:status-changed",
@@ -39,7 +48,7 @@ const buildListenerStates = (attachedCount: number) =>
     }));
 
 // Mock all dependencies
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: {
         getState: vi.fn(() => ({
             clearStoreError: vi.fn(),
@@ -49,22 +58,22 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     },
 }));
 
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock("../../../../shared/utils/errorHandling", () => ({
+vi.mock(import('../../../../shared/utils/errorHandling'), () => ({
     ensureError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
     withErrorHandling: vi.fn(async (operation) => await operation()),
     withUtilityErrorHandling: vi.fn(),
     convertError: vi.fn((error) =>
-        error instanceof Error ? error : new Error(String(error))
+        Error.isError(error) ? error : new Error(String(error))
     ),
 }));
 
-vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
+vi.mock(import('../../../stores/sites/utils/statusUpdateHandler'), () => ({
     StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
         return {
             subscribe: vi.fn(async () => ({
@@ -79,7 +88,7 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     }),
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -88,7 +97,7 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../utils/errorHandling", () => ({
+vi.mock(import('../../../utils/errorHandling'), () => ({
     ensureError: vi.fn((error) => error),
 }));
 
@@ -99,7 +108,7 @@ const mockStateSyncService = vi.hoisted(() => ({
     requestFullSync: vi.fn(),
 }));
 
-vi.mock("../../../services/StateSyncService", () => ({
+vi.mock(import('../../../services/StateSyncService'), () => ({
     StateSyncService: mockStateSyncService,
 }));
 
@@ -111,12 +120,6 @@ const { restore: restoreElectronApi } = installElectronApiMock(
 afterAll(() => {
     restoreElectronApi();
 });
-
-// Import after mocking
-import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { withErrorHandling } from "@shared/utils/errorHandling";
-import { logger } from "../../../services/logger";
 
 describe("useSiteSync - Line Coverage Completion", () => {
     let mockDeps: any;
@@ -253,7 +256,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             expect(
                 StatusUpdateManagerMock.mock.instances.length
             ).toBeGreaterThanOrEqual(2);
-            expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
+            expect(arrayFirst(unsubscribeSpies)).toHaveBeenCalledTimes(1);
             expect(
                 mockDeps.setStatusSubscriptionSummary
             ).toHaveBeenNthCalledWith(1, undefined);
@@ -441,7 +444,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             eventHandler(deleteEvent);
 
-            expect(logger.error).toHaveBeenCalled();
+            expect(logger.error).toHaveBeenCalledWith();
             expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
     });

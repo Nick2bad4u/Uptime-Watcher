@@ -71,17 +71,17 @@ export const noOneDriveRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow any OneDrive-related identifiers/strings to prevent reintroducing a removed provider",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/no-onedrive.md",
         },
-        schema: [],
         messages: {
             noOneDrive:
                 "OneDrive integration is intentionally not supported in this repository. Remove this reference.",
         },
+        schema: [],
+        type: "problem",
     },
 };

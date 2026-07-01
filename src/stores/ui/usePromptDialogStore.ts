@@ -191,7 +191,7 @@ export async function requestPrompt(
         message: options.message,
         title: options.title,
         type: options.type ?? DEFAULT_INPUT_TYPE,
-        ...(options.placeholder ? { placeholder: options.placeholder } : {}),
+        ...(options.placeholder && { placeholder: options.placeholder }),
     };
 
     return new Promise<null | string>((resolve) => {

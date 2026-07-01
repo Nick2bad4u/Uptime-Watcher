@@ -1,10 +1,10 @@
 /**
  * Type definitions and event contracts for all events in the Uptime Watcher
- * application.
+ * app.
  *
  * @remarks
  * Provides compile-time type safety for event data and event names across the
- * application. Events are organized by domain (site, monitor, database, system,
+ * app. Events are organized by domain (site, monitor, database, system,
  * etc.) and include comprehensive metadata for debugging, auditing, and
  * middleware processing.
  *
@@ -16,10 +16,10 @@
 import { arrayIncludes, safeCastTo } from "ts-extras";
 
 /**
- * Comprehensive event map for the Uptime Watcher application.
+ * Comprehensive event map for the Uptime Watcher app.
  *
  * @remarks
- * Defines all events that can be emitted throughout the application lifecycle,
+ * Defines all events that can be emitted throughout the app lifecycle,
  * organized by functional domains. Each event includes strongly typed data for
  * compile-time safety and comprehensive metadata for debugging, auditing, and
  * event-driven workflows.
@@ -193,7 +193,7 @@ export const EVENT_CATEGORIES = {
      * Configuration change events.
      *
      * @remarks
-     * Events emitted when application configuration settings are modified,
+     * Events emitted when app configuration settings are modified,
      * including user preferences and system settings.
      */
     CONFIG: ["config:changed"] as const,
@@ -301,15 +301,15 @@ export const EVENT_CATEGORIES = {
      */
     MONITOR: [
         "monitor:added",
-        "monitor:check-completed",
-        "monitor:manual-check-started",
-        "monitor:schedule-updated",
         "monitor:backoff-applied",
-        "monitor:timeout",
-        "monitor:removed",
-        "monitor:status-changed",
-        "monitor:up",
+        "monitor:check-completed",
         "monitor:down",
+        "monitor:manual-check-started",
+        "monitor:removed",
+        "monitor:schedule-updated",
+        "monitor:status-changed",
+        "monitor:timeout",
+        "monitor:up",
         "notification:sent",
     ] as const,
 
@@ -355,7 +355,7 @@ export const EVENT_CATEGORIES = {
      *
      * @remarks
      * Events related to system operations including startup, shutdown, and
-     * system-level errors that affect the entire application.
+     * system-level errors that affect the entire app.
      */
     SYSTEM: [
         "system:error",
@@ -386,7 +386,7 @@ export const EVENT_PRIORITIES = {
      *
      * @remarks
      * Events that indicate system-level issues, performance problems, or
-     * application shutdown scenarios that need immediate processing.
+     * app shutdown scenarios that need immediate processing.
      */
     CRITICAL: [
         "performance:warning",
@@ -403,10 +403,10 @@ export const EVENT_PRIORITIES = {
      */
     HIGH: [
         "database:transaction-completed",
-        "monitor:status-changed",
-        "monitor:up",
         "monitor:down",
+        "monitor:status-changed",
         "monitor:timeout",
+        "monitor:up",
         "site:removed",
     ] as const,
 
@@ -418,7 +418,6 @@ export const EVENT_PRIORITIES = {
      * can be processed with lower priority.
      */
     LOW: [
-        "performance:metric",
         "internal:cache:all-invalidated",
         "internal:cache:bulk-updated",
         "internal:cache:cleanup-completed",
@@ -428,6 +427,7 @@ export const EVENT_PRIORITIES = {
         "internal:cache:item-evicted",
         "internal:cache:item-expired",
         "internal:cache:item-invalidated",
+        "performance:metric",
     ] as const,
 
     /**
@@ -440,9 +440,9 @@ export const EVENT_PRIORITIES = {
     MEDIUM: [
         "config:changed",
         "monitor:added",
+        "monitor:backoff-applied",
         "monitor:manual-check-started",
         "monitor:schedule-updated",
-        "monitor:backoff-applied",
         "notification:sent",
         "settings:history-limit-updated",
         "site:added",

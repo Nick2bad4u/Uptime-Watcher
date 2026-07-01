@@ -4,17 +4,17 @@
  * @packageDocumentation
  */
 
-import { test, fc } from "@fast-check/vitest";
+import { fc, test } from "@fast-check/vitest";
 import { expect } from "vitest";
 
 import {
     isNonEmptyString,
     isValidFQDN,
+    isValidHost,
     isValidIdentifier,
     isValidIdentifierArray,
     isValidInteger,
     isValidNumeric,
-    isValidHost,
     isValidPort,
     isValidUrl,
     safeInteger,
@@ -32,7 +32,7 @@ describe("Validation Utils Property-Based Tests", () => {
             }
         );
 
-        test.prop([fc.constantFrom("", "   ", "\t", "\n", "\r\n")])(
+        test.prop([fc.constantFrom("", ' '.repeat(3), "\t", "\n", "\r\n")])(
             "should reject empty or whitespace-only strings",
             (emptyStr) => {
                 expect(isNonEmptyString(emptyStr)).toBeFalsy();
@@ -80,7 +80,7 @@ describe("Validation Utils Property-Based Tests", () => {
             // Generate identifiers that must have at least one alphanumeric character
             fc
                 .string({ minLength: 1 })
-                .filter((s) => /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s)),
+                .filter((s) => /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u.test(s)),
         ])(
             "should accept valid identifiers (alphanumeric with underscores and hyphens)",
             (identifier) => {
@@ -108,7 +108,7 @@ describe("Validation Utils Property-Based Tests", () => {
                 fc
                     .string({ minLength: 1 })
                     .filter((s) =>
-                        /^[\dA-Za-z]+(?:[_-]*[\dA-Za-z]+)*$/.test(s)
+                        /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u.test(s)
                     ),
                 { minLength: 1 }
             ),
@@ -338,9 +338,9 @@ describe("Validation Utils Property-Based Tests", () => {
     describe("Integration Tests", () => {
         test.prop([
             fc.record({
-                identifier: fc.stringMatching(/^[\w-]+$/).filter((s) => {
+                identifier: fc.stringMatching(/^[\w-]+$/u).filter((s) => {
                     // Must contain at least one alphanumeric character
-                    const cleanedValue = s.replaceAll(/[_-]/g, "");
+                    const cleanedValue = s.replaceAll(/[-_]/gu, "");
                     return cleanedValue.length > 0;
                 }),
                 port: fc.integer({ min: 1, max: 65_535 }),
@@ -370,7 +370,7 @@ describe("Validation Utils Property-Based Tests", () => {
         }) => {
             const testData = g(() =>
                 fc.record({
-                    identifier: fc.stringMatching(/^[\w-]{1,20}$/),
+                    identifier: fc.stringMatching(/^[\w-]{1,20}$/u),
                     port: fc.integer({ min: 1, max: 65_535 }),
                     host: fc.domain(),
                     url: fc.webUrl(),
@@ -399,15 +399,15 @@ describe("Validation Utils Property-Based Tests", () => {
             }
         });
 
-        test.prop([fc.array(fc.stringMatching(/^[\w-]{1,10}$/))])(
+        test.prop([fc.array(fc.stringMatching(/^[\w-]{1,10}$/u))])(
             "should handle batch validation correctly",
             (identifiers) => {
-                const arrayResult = isValidIdentifierArray(identifiers);
+                const isArrayResult = isValidIdentifierArray(identifiers);
                 const individualResults = identifiers.map((id) =>
                     isValidIdentifier(id)
                 );
 
-                expect(arrayResult).toBe(individualResults.every(Boolean));
+                expect(isArrayResult).toBe(individualResults.every(Boolean));
             }
         );
     });

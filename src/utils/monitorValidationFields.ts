@@ -11,6 +11,30 @@
  */
 
 /**
+ * Canonical monitor validation fields.
+ *
+ * @remarks
+ * All values are raw strings as entered by the user.
+ */
+export interface MonitorValidationFieldValues extends MonitorValidationFieldValuesBase {
+    /**
+     * Dynamic monitor field values are keyed by the backend field name.
+     */
+    [fieldName: string]: string;
+
+    /** Canonical field name (milliseconds). */
+    maxResponseTime: string;
+}
+
+/**
+ * UI-facing inputs used to build {@link MonitorValidationFieldValues}.
+ */
+export interface MonitorValidationFieldValuesInput extends MonitorValidationFieldValuesBase {
+    /** UI label (milliseconds). Mapped to `maxResponseTime`. */
+    maxResponseTimeMs: string;
+}
+
+/**
  * Common monitor fields shared by the input and canonical field maps.
  */
 interface MonitorValidationFieldValuesBase {
@@ -37,30 +61,6 @@ interface MonitorValidationFieldValuesBase {
     replicaStatusUrl: string;
     replicationTimestampField: string;
     url: string;
-}
-
-/**
- * Canonical monitor validation fields.
- *
- * @remarks
- * All values are raw strings as entered by the user.
- */
-export interface MonitorValidationFieldValues extends MonitorValidationFieldValuesBase {
-    /**
-     * Dynamic monitor field values are keyed by the backend field name.
-     */
-    [fieldName: string]: string;
-
-    /** Canonical field name (milliseconds). */
-    maxResponseTime: string;
-}
-
-/**
- * UI-facing inputs used to build {@link MonitorValidationFieldValues}.
- */
-export interface MonitorValidationFieldValuesInput extends MonitorValidationFieldValuesBase {
-    /** UI label (milliseconds). Mapped to `maxResponseTime`. */
-    maxResponseTimeMs: string;
 }
 
 /**

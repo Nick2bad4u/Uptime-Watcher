@@ -6,8 +6,8 @@
  *   systematic function calls.
  */
 
-import { describe, expect, it } from "vitest";
 import * as guardsTestModule from "@shared/utils/typeGuards";
+import { describe, expect, it } from "vitest";
 
 describe("TypeGuards - Complete Function Coverage", () => {
     describe("Function Coverage Validation", () => {
@@ -43,7 +43,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isNumber(0)).toBeTruthy();
             expect(guardsTestModule.isNumber(-456)).toBeTruthy();
             expect(guardsTestModule.isNumber(3.14)).toBeTruthy();
-            expect(guardsTestModule.isNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isNumber(NaN)).toBeFalsy();
             expect(guardsTestModule.isNumber("123")).toBeFalsy();
             expect(guardsTestModule.isNumber(null)).toBeFalsy();
             expect(guardsTestModule.isNumber(undefined)).toBeFalsy();
@@ -136,7 +136,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isFiniteNumber(3.14)).toBeTruthy();
             expect(guardsTestModule.isFiniteNumber(Infinity)).toBeFalsy();
             expect(guardsTestModule.isFiniteNumber(-Infinity)).toBeFalsy();
-            expect(guardsTestModule.isFiniteNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isFiniteNumber(NaN)).toBeFalsy();
             expect(guardsTestModule.isFiniteNumber("123")).toBeFalsy();
 
             // Test isFunction function
@@ -162,7 +162,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isNonNegativeNumber(-1)).toBeFalsy();
             expect(guardsTestModule.isNonNegativeNumber(-0.1)).toBeFalsy();
             expect(
-                guardsTestModule.isNonNegativeNumber(Number.NaN)
+                guardsTestModule.isNonNegativeNumber(NaN)
             ).toBeFalsy();
             expect(guardsTestModule.isNonNegativeNumber("0")).toBeFalsy();
 
@@ -186,7 +186,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isPositiveNumber(0.1)).toBeTruthy();
             expect(guardsTestModule.isPositiveNumber(0)).toBeFalsy();
             expect(guardsTestModule.isPositiveNumber(-1)).toBeFalsy();
-            expect(guardsTestModule.isPositiveNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isPositiveNumber(NaN)).toBeFalsy();
             expect(guardsTestModule.isPositiveNumber("1")).toBeFalsy();
 
             // Test isString function
@@ -210,7 +210,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isValidPort(-1)).toBeFalsy();
             expect(guardsTestModule.isValidPort(3.14)).toBeFalsy();
             expect(guardsTestModule.isValidPort("80")).toBeFalsy();
-            expect(guardsTestModule.isValidPort(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isValidPort(NaN)).toBeFalsy();
 
             // Test isValidTimestamp function
             expect(typeof guardsTestModule.isValidTimestamp).toBe("function");
@@ -225,7 +225,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isValidTimestamp(0)).toBeFalsy(); // Must be > 0
             expect(guardsTestModule.isValidTimestamp(-1)).toBeFalsy();
             expect(guardsTestModule.isValidTimestamp(3.14)).toBeTruthy(); // Decimal numbers are valid
-            expect(guardsTestModule.isValidTimestamp(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isValidTimestamp(NaN)).toBeFalsy();
             expect(guardsTestModule.isValidTimestamp("timestamp")).toBeFalsy();
             expect(guardsTestModule.isValidTimestamp(null)).toBeFalsy();
         });
@@ -302,12 +302,12 @@ describe("TypeGuards - Complete Function Coverage", () => {
             expect(guardsTestModule.isNumber(Number.MAX_VALUE)).toBeTruthy();
             expect(guardsTestModule.isNumber(Number.MIN_VALUE)).toBeTruthy();
             expect(
-                guardsTestModule.isNumber(Number.POSITIVE_INFINITY)
+                guardsTestModule.isNumber(Infinity)
             ).toBeTruthy();
             expect(
                 guardsTestModule.isNumber(Number.NEGATIVE_INFINITY)
             ).toBeTruthy();
-            expect(guardsTestModule.isNumber(Number.NaN)).toBeFalsy();
+            expect(guardsTestModule.isNumber(NaN)).toBeFalsy();
 
             // Test isFiniteNumber with same values
             expect(
@@ -317,7 +317,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 guardsTestModule.isFiniteNumber(Number.MIN_VALUE)
             ).toBeTruthy();
             expect(
-                guardsTestModule.isFiniteNumber(Number.POSITIVE_INFINITY)
+                guardsTestModule.isFiniteNumber(Infinity)
             ).toBeFalsy();
             expect(
                 guardsTestModule.isFiniteNumber(Number.NEGATIVE_INFINITY)
@@ -364,7 +364,7 @@ describe("TypeGuards - Complete Function Coverage", () => {
                 1,
                 -1,
                 3.14,
-                Number.NaN,
+                NaN,
                 Infinity,
                 "",
                 "string",

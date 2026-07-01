@@ -29,8 +29,10 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it } from "vitest";
+import type { Monitor } from "@shared/types";
+
 import fc from "fast-check";
+import { describe, expect, it } from "vitest";
 
 import {
     isNullOrUndefined,
@@ -45,9 +47,7 @@ import {
     SiteDefaults,
 } from "../../utils/fallbacks";
 
-import type { Monitor } from "@shared/types";
-
-describe("Fallback Utils Property-Based Tests", () => {
+describe("fallback Utils Property-Based Tests", () => {
     // =============================================================================
     // Arbitraries
     // =============================================================================
@@ -57,21 +57,21 @@ describe("Fallback Utils Property-Based Tests", () => {
      */
     const monitorArbitrary = fc.record(
         {
-            id: fc.string({ minLength: 1, maxLength: 50 }),
-            type: fc.constantFrom("http", "ping", "port", "dns", "ssl", "api"),
-            status: fc.constantFrom("up", "down", "pending", "paused"),
-            url: fc.option(fc.webUrl()),
+            checkInterval: fc.option(
+                fc.integer({ min: 1000, max: 86_400_000 })
+            ), // 1s to 24h
             host: fc.option(
                 fc
                     .string({ minLength: 1, maxLength: 100 })
                     .filter((s) => s.trim().length > 0)
             ),
+            id: fc.string({ minLength: 1, maxLength: 50 }),
             port: fc.option(fc.integer({ min: 1, max: 65_535 })),
-            checkInterval: fc.option(
-                fc.integer({ min: 1000, max: 86_400_000 })
-            ), // 1s to 24h
-            timeout: fc.option(fc.integer({ min: 1000, max: 30_000 })), // 1s to 30s
             retryAttempts: fc.option(fc.integer({ min: 0, max: 10 })),
+            status: fc.constantFrom("up", "down", "pending", "paused"),
+            timeout: fc.option(fc.integer({ min: 1000, max: 30_000 })), // 1s to 30s
+            type: fc.constantFrom("http", "ping", "port", "dns", "ssl", "api"),
+            url: fc.option(fc.webUrl()),
         },
         {
             requiredKeys: [
@@ -100,8 +100,8 @@ describe("Fallback Utils Property-Based Tests", () => {
         }),
         fc.record({
             id: fc.oneof(fc.constant(null), fc.constant(undefined)),
-            type: fc.string(),
             status: fc.string(),
+            type: fc.string(),
         })
     );
 
@@ -115,8 +115,8 @@ describe("Fallback Utils Property-Based Tests", () => {
                 fc.property(
                     fc.oneof(fc.constant(null), fc.constant(undefined)),
                     (value) => {
-                        const result = isNullOrUndefined(value);
-                        expect(result).toBeTruthy();
+                        const isResult = isNullOrUndefined(value);
+                        expect(isResult).toBe(true);
                     }
                 )
             );
@@ -129,7 +129,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                         fc.string(),
                         fc.integer(),
                         fc.boolean(),
-                        fc.float({ noNaN: true, noDefaultInfinity: true }),
+                        fc.float({ noDefaultInfinity: true, noNaN: true }),
                         fc.array(fc.anything()),
                         fc.object(),
                         fc.constant(0),
@@ -137,8 +137,8 @@ describe("Fallback Utils Property-Based Tests", () => {
                         fc.constant(false)
                     ),
                     (value) => {
-                        const result = isNullOrUndefined(value);
-                        expect(result).toBeFalsy();
+                        const isResult = isNullOrUndefined(value);
+                        expect(isResult).toBe(false);
                     }
                 )
             );
@@ -149,10 +149,10 @@ describe("Fallback Utils Property-Based Tests", () => {
                 0,
                 "",
                 false,
-                Number.NaN,
+                NaN,
             ];
             for (const value of falsyValues) {
-                expect(isNullOrUndefined(value)).toBeFalsy();
+                expect(isNullOrUndefined(value)).toBe(false);
             }
         });
     });
@@ -174,6 +174,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                     fc.string(),
                     (value, fallback) => {
                         const result = withFallback(value, fallback);
+
                         expect(result).toBe(value);
                     }
                 )
@@ -187,6 +188,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                     fc.string(),
                     (value, fallback) => {
                         const result = withFallback(value, fallback);
+
                         expect(result).toBe(fallback);
                     }
                 )
@@ -220,8 +222,8 @@ describe("Fallback Utils Property-Based Tests", () => {
                     const result1 = withFallback(42, fallback);
                     const result2 = withFallback(null, fallback);
 
-                    expect(typeof result1).toBe("number");
-                    expect(typeof result2).toBe("number");
+                    expect(result1).toBeTypeOf("number");
+                    expect(result2).toBeTypeOf("number");
                     expect(result1).toBe(42);
                     expect(result2).toBe(fallback);
                 })
@@ -243,7 +245,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                         operationName
                     );
 
-                    expect(typeof wrappedFunction).toBe("function");
+                    expect(wrappedFunction).toBeTypeOf("function");
                     expect(wrappedFunction.constructor.name).toBe("Function"); // Not AsyncFunction
                 })
             );
@@ -263,7 +265,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                     );
 
                     // Should not throw when executed
-                    expect(() => wrappedFunction()).not.toThrow();
+                    expect(() => { wrappedFunction(); }).not.toThrow();
                 }),
                 { numRuns: 5 }
             ); // Reduced iterations to minimize async overhead
@@ -298,7 +300,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                             );
 
                             // Should not throw even when the async operation fails
-                            expect(() => wrappedFunction()).not.toThrow();
+                            expect(() => { wrappedFunction(); }).not.toThrow();
                         }
                     ),
                     { numRuns: 3 }
@@ -350,7 +352,8 @@ describe("Fallback Utils Property-Based Tests", () => {
                         operation,
                         `operation-${index}`
                     );
-                    expect(() => wrappedFunction()).not.toThrow();
+
+                    expect(() => { wrappedFunction(); }).not.toThrow();
                 }
 
                 // Allow time for async operations to complete
@@ -411,6 +414,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                             operationName,
                             fallbackValue
                         );
+
                         expect(result).toBe(fallbackValue);
                     }
                 )
@@ -452,6 +456,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                     `error-test-${index}`,
                     fallback
                 );
+
                 expect(result).toBe(fallback);
             }
         });
@@ -478,8 +483,8 @@ describe("Fallback Utils Property-Based Tests", () => {
                             fallbackValue
                         );
 
-                        expect(typeof successResult).toBe(typeof fallbackValue);
-                        expect(typeof failResult).toBe(typeof fallbackValue);
+                        expect(successResult).toBeTypeOf(typeof fallbackValue);
+                        expect(failResult).toBeTypeOf(typeof fallbackValue);
                         expect(successResult).toBe(successValue);
                         expect(failResult).toBe(fallbackValue);
                     }
@@ -501,14 +506,15 @@ describe("Fallback Utils Property-Based Tests", () => {
                     (url, siteFallback) => {
                         const monitor = {
                             id: "1",
-                            type: "http",
                             status: "up",
+                            type: "http",
                             url,
                         } as Monitor;
                         const result = getMonitorDisplayIdentifier(
                             monitor,
                             siteFallback
                         );
+
                         expect(result).toBe(url);
                     }
                 )
@@ -524,15 +530,16 @@ describe("Fallback Utils Property-Based Tests", () => {
                     fc.string({ minLength: 1 }),
                     (host, siteFallback) => {
                         const monitor = {
-                            id: "1",
-                            type: "ping",
-                            status: "up",
                             host,
+                            id: "1",
+                            status: "up",
+                            type: "ping",
                         } as Monitor;
                         const result = getMonitorDisplayIdentifier(
                             monitor,
                             siteFallback
                         );
+
                         expect(result).toBe(host);
                     }
                 )
@@ -545,20 +552,21 @@ describe("Fallback Utils Property-Based Tests", () => {
                     fc
                         .string({ minLength: 1 })
                         .filter((s) => s.trim().length > 0),
-                    fc.integer({ min: 1, max: 65_535 }),
+                    fc.integer({ max: 65_535, min: 1 }),
                     fc.string({ minLength: 1 }),
                     (host, port, siteFallback) => {
                         const monitor = {
-                            id: "1",
-                            type: "port",
-                            status: "up",
                             host,
+                            id: "1",
                             port,
+                            status: "up",
+                            type: "port",
                         } as Monitor;
                         const result = getMonitorDisplayIdentifier(
                             monitor,
                             siteFallback
                         );
+
                         expect(result).toBe(`${host}:${port}`);
                     }
                 )
@@ -573,13 +581,14 @@ describe("Fallback Utils Property-Based Tests", () => {
                     (type, siteFallback) => {
                         const monitor = {
                             id: "1",
-                            type,
                             status: "up",
+                            type,
                         } as Monitor;
                         const result = getMonitorDisplayIdentifier(
                             monitor,
                             siteFallback
                         );
+
                         expect(result).toBe(siteFallback);
                     }
                 )
@@ -596,7 +605,8 @@ describe("Fallback Utils Property-Based Tests", () => {
                             monitor as any,
                             siteFallback
                         );
-                        expect(typeof result).toBe("string");
+
+                        expect(result).toBeTypeOf("string");
                         expect(result.length).toBeGreaterThan(0);
                         // Should return siteFallback for invalid monitors
                         expect(result).toBe(siteFallback);
@@ -612,22 +622,23 @@ describe("Fallback Utils Property-Based Tests", () => {
                     fc
                         .string({ minLength: 1 })
                         .filter((s) => s.trim().length > 0),
-                    fc.integer({ min: 1, max: 65_535 }),
+                    fc.integer({ max: 65_535, min: 1 }),
                     fc.string({ minLength: 1 }),
                     (url, host, port, siteFallback) => {
                         // HTTP monitor with both URL and host - should prefer URL
                         const monitor = {
-                            id: "1",
-                            type: "http",
-                            status: "up",
-                            url,
                             host,
+                            id: "1",
                             port,
+                            status: "up",
+                            type: "http",
+                            url,
                         } as Monitor;
                         const result = getMonitorDisplayIdentifier(
                             monitor,
                             siteFallback
                         );
+
                         expect(result).toBe(url);
                     }
                 )
@@ -649,6 +660,7 @@ describe("Fallback Utils Property-Based Tests", () => {
 
             for (const [type, expectedLabel] of knownTypes) {
                 const result = getMonitorTypeDisplayLabel(type);
+
                 expect(result).toBe(expectedLabel);
             }
         });
@@ -656,7 +668,7 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should generate reasonable labels for unknown monitor types", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ minLength: 1, maxLength: 20 }).filter(
+                    fc.string({ maxLength: 20, minLength: 1 }).filter(
                         (s) =>
                             ![
                                 "http",
@@ -666,9 +678,10 @@ describe("Fallback Utils Property-Based Tests", () => {
                     ),
                     (unknownType) => {
                         const result = getMonitorTypeDisplayLabel(unknownType);
-                        expect(typeof result).toBe("string");
+
+                        expect(result).toBeTypeOf("string");
                         expect(result.length).toBeGreaterThan(0);
-                        expect(result.endsWith("Monitor")).toBeTruthy();
+                        expect(result.endsWith("Monitor")).toBe(true);
                     }
                 )
             );
@@ -684,6 +697,7 @@ describe("Fallback Utils Property-Based Tests", () => {
 
             for (const [input, _expectedPattern] of testCases) {
                 const result = getMonitorTypeDisplayLabel(input!);
+
                 expect(result).toContain("Monitor");
                 expect(result.split(" ").length).toBeGreaterThan(1);
             }
@@ -702,7 +716,8 @@ describe("Fallback Utils Property-Based Tests", () => {
 
             for (const input of invalidInputs) {
                 const result = getMonitorTypeDisplayLabel(input as any);
-                expect(typeof result).toBe("string");
+
+                expect(result).toBeTypeOf("string");
                 expect(result.length).toBeGreaterThan(0);
             }
         });
@@ -712,6 +727,7 @@ describe("Fallback Utils Property-Based Tests", () => {
                 fc.property(fc.string(), (monitorType) => {
                     const result1 = getMonitorTypeDisplayLabel(monitorType);
                     const result2 = getMonitorTypeDisplayLabel(monitorType);
+
                     expect(result1).toBe(result2);
                 })
             );
@@ -726,10 +742,11 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should return original string when shorter than or equal to maxLength", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ minLength: 0, maxLength: 50 }),
-                    fc.integer({ min: 50, max: 100 }),
+                    fc.string({ maxLength: 50, minLength: 0 }),
+                    fc.integer({ max: 100, min: 50 }),
                     (str, maxLength) => {
                         const result = truncateForLogging(str, maxLength);
+
                         expect(result).toBe(str);
                         expect(result.length).toBeLessThanOrEqual(maxLength);
                     }
@@ -740,10 +757,11 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should truncate strings longer than maxLength", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ minLength: 51, maxLength: 1000 }),
-                    fc.integer({ min: 1, max: 50 }),
+                    fc.string({ maxLength: 1000, minLength: 51 }),
+                    fc.integer({ max: 50, min: 1 }),
                     (str, maxLength) => {
                         const result = truncateForLogging(str, maxLength);
+
                         expect(result).toHaveLength(maxLength);
                         expect(result).toBe(str.slice(0, maxLength));
                     }
@@ -754,9 +772,10 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should use default maxLength of 50 when not specified", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ minLength: 51, maxLength: 1000 }),
+                    fc.string({ maxLength: 1000, minLength: 51 }),
                     (str) => {
                         const result = truncateForLogging(str);
+
                         expect(result).toHaveLength(50);
                         expect(result).toBe(str.slice(0, 50));
                     }
@@ -773,14 +792,16 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should handle unicode strings correctly", () => {
             fc.assert(
                 fc.property(
-                    fc.string({ unit: "binary", minLength: 1, maxLength: 200 }),
-                    fc.integer({ min: 10, max: 50 }),
+                    fc.string({ maxLength: 200, minLength: 1, unit: "binary" }),
+                    fc.integer({ max: 50, min: 10 }),
                     (unicodeStr: string, maxLength) => {
                         const result = truncateForLogging(
                             unicodeStr,
                             maxLength
                         );
+
                         expect(result.length).toBeLessThanOrEqual(maxLength);
+
                         if (unicodeStr.length > maxLength) {
                             expect(result).toHaveLength(maxLength);
                         } else {
@@ -795,12 +816,13 @@ describe("Fallback Utils Property-Based Tests", () => {
             const specialStrings = [
                 "line1\nline2\nline3 with more text than fifty characters total",
                 "tab\tseparated\tvalues\twith\tmore\tthan\tfifty\tcharacters",
-                String.raw`special chars: !@#$%^&*()[]{}|\:";'<>?,./ and more text`,
+                String.raw`special chars: !@#$%^&*()[]{}|:\";'<>?,./ and more text`,
                 "mixed\n\t\rwhitespace\n\tand\rmore\ntext\tthan\rfifty\nchars",
             ];
 
             for (const str of specialStrings) {
                 const result = truncateForLogging(str, 30);
+
                 expect(result).toHaveLength(30);
                 expect(result).toBe(str.slice(0, 30));
             }
@@ -811,7 +833,7 @@ describe("Fallback Utils Property-Based Tests", () => {
     // Default Values Constants Tests
     // =============================================================================
 
-    describe("Default values constants", () => {
+    describe("default values constants", () => {
         it("should have well-defined UiDefaults object with expected properties", () => {
             // Test that UiDefaults contains expected properties
             expect(UiDefaults).toHaveProperty("chartPeriod", "24h");
@@ -824,14 +846,14 @@ describe("Fallback Utils Property-Based Tests", () => {
             expect(UiDefaults).toHaveProperty("unknownLabel", "Unknown");
 
             // Test that all values have correct types
-            expect(typeof UiDefaults.chartPeriod).toBe("string");
-            expect(typeof UiDefaults.chartPoints).toBe("number");
-            expect(typeof UiDefaults.errorLabel).toBe("string");
-            expect(typeof UiDefaults.loadingDelay).toBe("number");
-            expect(typeof UiDefaults.loadingLabel).toBe("string");
-            expect(typeof UiDefaults.notAvailableLabel).toBe("string");
-            expect(typeof UiDefaults.pageSize).toBe("number");
-            expect(typeof UiDefaults.unknownLabel).toBe("string");
+            expect(UiDefaults.chartPeriod).toBeTypeOf("string");
+            expect(UiDefaults.chartPoints).toBeTypeOf("number");
+            expect(UiDefaults.errorLabel).toBeTypeOf("string");
+            expect(UiDefaults.loadingDelay).toBeTypeOf("number");
+            expect(UiDefaults.loadingLabel).toBeTypeOf("string");
+            expect(UiDefaults.notAvailableLabel).toBeTypeOf("string");
+            expect(UiDefaults.pageSize).toBeTypeOf("number");
+            expect(UiDefaults.unknownLabel).toBeTypeOf("string");
         });
 
         it("should have well-defined MonitorDefaults object with expected properties", () => {
@@ -842,16 +864,16 @@ describe("Fallback Utils Property-Based Tests", () => {
             expect(MonitorDefaults).toHaveProperty("timeout", 10_000);
 
             // Test that all values have correct types
-            expect(typeof MonitorDefaults.checkInterval).toBe("number");
-            expect(typeof MonitorDefaults.responseTime).toBe("number");
-            expect(typeof MonitorDefaults.retryAttempts).toBe("number");
-            expect(typeof MonitorDefaults.status).toBe("string");
-            expect(typeof MonitorDefaults.timeout).toBe("number");
+            expect(MonitorDefaults.checkInterval).toBeTypeOf("number");
+            expect(MonitorDefaults.responseTime).toBeTypeOf("number");
+            expect(MonitorDefaults.retryAttempts).toBeTypeOf("number");
+            expect(MonitorDefaults.status).toBeTypeOf("string");
+            expect(MonitorDefaults.timeout).toBeTypeOf("number");
         });
 
         it("should have valid SiteDefaults object", () => {
             expect(SiteDefaults).toHaveProperty("monitoring", true);
-            expect(typeof SiteDefaults.monitoring).toBe("boolean");
+            expect(SiteDefaults.monitoring).toBeTypeOf("boolean");
         });
     });
 
@@ -859,13 +881,13 @@ describe("Fallback Utils Property-Based Tests", () => {
     // Edge Cases and Robustness
     // =============================================================================
 
-    describe("Edge cases and robustness", () => {
+    describe("edge cases and robustness", () => {
         it("should handle null and undefined inputs across all functions", () => {
             const nullInputs = [null, undefined];
 
             for (const input of nullInputs) {
                 // These should handle null/undefined gracefully
-                expect(isNullOrUndefined(input)).toBeTruthy();
+                expect(isNullOrUndefined(input)).toBe(true);
                 expect(withFallback(input, "fallback")).toBe("fallback");
                 expect(() =>
                     getMonitorDisplayIdentifier(input as any, "fallback")
@@ -881,6 +903,7 @@ describe("Fallback Utils Property-Based Tests", () => {
         it("should handle extreme string lengths gracefully", () => {
             // Very long string
             const longString = "a".repeat(100_000);
+
             expect(() => truncateForLogging(longString, 50)).not.toThrow();
             expect(truncateForLogging(longString, 50)).toBe("a".repeat(50));
 
@@ -907,6 +930,7 @@ describe("Fallback Utils Property-Based Tests", () => {
             }
 
             const endTime = Date.now();
+
             expect(endTime - startTime).toBeLessThan(1000); // Should complete within 1 second
         });
     });
@@ -915,17 +939,18 @@ describe("Fallback Utils Property-Based Tests", () => {
     // Performance and Determinism
     // =============================================================================
 
-    describe("Performance and determinism", () => {
+    describe("performance and determinism", () => {
         it("should be deterministic for same inputs", () => {
             fc.assert(
                 fc.property(
                     fc.string(),
                     monitorArbitrary,
-                    fc.integer({ min: 10, max: 100 }),
+                    fc.integer({ max: 100, min: 10 }),
                     (str, monitor, maxLength) => {
                         // Multiple calls should return identical results
                         const type1 = getMonitorTypeDisplayLabel(str);
                         const type2 = getMonitorTypeDisplayLabel(str);
+
                         expect(type1).toBe(type2);
 
                         const id1 = getMonitorDisplayIdentifier(
@@ -936,10 +961,12 @@ describe("Fallback Utils Property-Based Tests", () => {
                             monitor,
                             "fallback"
                         );
+
                         expect(id1).toBe(id2);
 
                         const trunc1 = truncateForLogging(str, maxLength);
                         const trunc2 = truncateForLogging(str, maxLength);
+
                         expect(trunc1).toBe(trunc2);
                     }
                 )
@@ -950,26 +977,26 @@ describe("Fallback Utils Property-Based Tests", () => {
             fc.assert(
                 fc.property(
                     fc.array(monitorArbitrary, {
-                        minLength: 10,
                         maxLength: 100,
+                        minLength: 10,
                     }),
-                    fc.array(fc.string(), { minLength: 10, maxLength: 100 }),
+                    fc.array(fc.string(), { maxLength: 100, minLength: 10 }),
                     (monitors, strings) => {
                         const startTime = Date.now();
 
                         // Process all monitors and strings
                         const results = {
+                            fallbacks: strings.map((s) =>
+                                withFallback(s, "default")
+                            ),
                             identifiers: monitors.map((m) =>
                                 getMonitorDisplayIdentifier(m, "fallback")
-                            ),
-                            types: strings.map((s) =>
-                                getMonitorTypeDisplayLabel(s)
                             ),
                             truncated: strings.map((s) =>
                                 truncateForLogging(s, 30)
                             ),
-                            fallbacks: strings.map((s) =>
-                                withFallback(s, "default")
+                            types: strings.map((s) =>
+                                getMonitorTypeDisplayLabel(s)
                             ),
                         };
 
@@ -988,10 +1015,10 @@ describe("Fallback Utils Property-Based Tests", () => {
 
                         // All results should be strings
                         for (const result of results.identifiers) {
-                            expect(typeof result).toBe("string");
+                            expect(result).toBeTypeOf("string");
                         }
                         for (const result of results.types) {
-                            expect(typeof result).toBe("string");
+                            expect(result).toBeTypeOf("string");
                         }
                     }
                 )

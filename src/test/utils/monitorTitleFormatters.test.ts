@@ -2,41 +2,44 @@
  * @file Comprehensive tests for monitor title formatter utilities
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import type { Monitor } from "@shared/types";
+
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it } from "vitest";
+
 import {
     formatTitleSuffix,
     getTitleSuffixFormatter,
     registerTitleSuffixFormatter,
     type TitleSuffixFormatter,
 } from "../../utils/monitorTitleFormatters";
-import type { Monitor } from "@shared/types";
 
 /**
  * Mock monitor factory for testing
  */
 function createMockMonitor(overrides: Partial<Monitor> = {}): Monitor {
     return {
-        id: "test-monitor",
-        type: "http",
-        monitoring: true,
         checkInterval: 30_000,
-        timeout: 5000,
-        retryAttempts: 3,
-        responseTime: 0,
-        status: "pending",
         history: [],
+        id: "test-monitor",
+        monitoring: true,
+        responseTime: 0,
+        retryAttempts: 3,
+        status: "pending",
+        timeout: 5000,
+        type: "http",
         ...overrides,
-    } as Monitor;
+    };
 }
 
 describe("monitorTitleFormatters", () => {
     describe(formatTitleSuffix, () => {
         describe("HTTP monitor type", () => {
             it("should return formatted URL suffix for HTTP monitor with URL", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -57,8 +60,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for HTTP monitor without URL", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -79,8 +82,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for HTTP monitor with null URL", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -93,7 +96,7 @@ describe("monitorTitleFormatters", () => {
                 const monitor = createMockMonitor({
                     type: "http",
                 });
-                // Manually set url to null to test edge case
+                // Manually set URL to null to test edge case
                 (monitor as any).url = null;
 
                 const result = formatTitleSuffix(monitor);
@@ -102,8 +105,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for HTTP monitor with undefined URL", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -116,7 +119,7 @@ describe("monitorTitleFormatters", () => {
                 const monitor = createMockMonitor({
                     type: "http",
                 });
-                // Url is undefined by default
+                // URL is undefined by default
 
                 const result = formatTitleSuffix(monitor);
 
@@ -124,8 +127,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle HTTP monitor with special characters in URL", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -148,10 +151,10 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
-        describe("Port monitor type", () => {
+        describe("port monitor type", () => {
             it("should return formatted host:port suffix for port monitor with both host and port", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -162,9 +165,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "database.example.com",
                     port: 5432,
+                    type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -173,8 +176,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for port monitor without host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -185,8 +188,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     port: 5432,
+                    type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -195,8 +198,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for port monitor without port", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -207,8 +210,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "database.example.com",
+                    type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -217,8 +220,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for port monitor with null host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -229,8 +232,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     port: 5432,
+                    type: "port",
                 });
                 // Manually set host to null to test edge case
                 (monitor as any).host = null;
@@ -241,8 +244,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for port monitor with undefined host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -253,8 +256,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     port: 5432,
+                    type: "port",
                 });
                 // Host is already undefined in the base case
 
@@ -264,8 +267,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for port monitor with null port", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -276,8 +279,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "database.example.com",
+                    type: "port",
                 });
                 // Manually set port to null to test edge case
                 (monitor as any).port = null;
@@ -288,8 +291,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for port monitor with undefined port", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -300,8 +303,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "database.example.com",
+                    type: "port",
                 });
                 // Port is already undefined in the base case
 
@@ -311,8 +314,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle port monitor with IP address host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -323,9 +326,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "192.168.1.100",
                     port: 3306,
+                    type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -334,8 +337,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle port monitor with localhost", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -346,9 +349,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "localhost",
                     port: 8080,
+                    type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -357,8 +360,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle port monitor with high port numbers", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -369,9 +372,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "port",
                     host: "service.example.com",
                     port: 65_535,
+                    type: "port",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -393,8 +396,8 @@ describe("monitorTitleFormatters", () => {
 
             for (const monitorType of urlBasedMonitorTypes) {
                 it(`should include url suffix for ${monitorType} monitors`, async ({
-                    task,
                     annotate,
+                    task,
                 }) => {
                     await annotate(`Testing: ${task.name}`, "functional");
                     await annotate(
@@ -415,8 +418,8 @@ describe("monitorTitleFormatters", () => {
                 });
 
                 it(`should return empty suffix for ${monitorType} monitors without url`, async ({
-                    task,
                     annotate,
+                    task,
                 }) => {
                     await annotate(`Testing: ${task.name}`, "functional");
                     await annotate(
@@ -437,8 +440,8 @@ describe("monitorTitleFormatters", () => {
 
         describe("CDN edge consistency monitor type", () => {
             it("should prefer baselineUrl when available", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -449,9 +452,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "cdn-edge-consistency",
                     baselineUrl: "https://edge.primary.example.com",
                     replicaStatusUrl: "https://edge.backup.example.com",
+                    type: "cdn-edge-consistency",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -460,8 +463,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should fall back to replicaStatusUrl when baseline missing", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -472,8 +475,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "cdn-edge-consistency",
                     replicaStatusUrl: "https://edge.backup.example.com",
+                    type: "cdn-edge-consistency",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -482,8 +485,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty suffix when no urls are provided", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -503,10 +506,10 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
-        describe("Replication monitor type", () => {
+        describe("replication monitor type", () => {
             it("should prefer primaryStatusUrl when available", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -517,9 +520,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "replication",
                     primaryStatusUrl: "https://primary.replica.example.com",
                     replicaStatusUrl: "https://replica.example.com",
+                    type: "replication",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -528,8 +531,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should fall back to replicaStatusUrl", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -540,8 +543,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "replication",
                     replicaStatusUrl: "https://replica.example.com",
+                    type: "replication",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -550,8 +553,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should default to empty suffix when neither url is present", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -569,10 +572,10 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
-        describe("SSL monitor type", () => {
+        describe("sSL monitor type", () => {
             it("should include port when host and port are provided", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -583,9 +586,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "ssl",
                     host: "secure.example.com",
                     port: 443,
+                    type: "ssl",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -594,8 +597,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should include host without port when port missing", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -606,8 +609,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "ssl",
                     host: "secure.example.com",
+                    type: "ssl",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -616,8 +619,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty suffix when host missing", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -635,10 +638,10 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
-        describe("Ping monitor type", () => {
+        describe("ping monitor type", () => {
             it("should include host when provided", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -649,8 +652,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "ping",
                     host: "api.internal",
+                    type: "ping",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -659,8 +662,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty suffix when host missing", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -680,8 +683,8 @@ describe("monitorTitleFormatters", () => {
 
         describe("DNS monitor type", () => {
             it("should return formatted recordType host suffix for DNS monitor with both host and recordType", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -692,9 +695,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "dns",
                     host: "example.com",
                     recordType: "A",
+                    type: "dns",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -703,8 +706,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for DNS monitor without host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -715,8 +718,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "dns",
                     recordType: "A",
+                    type: "dns",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -725,8 +728,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for DNS monitor without recordType", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -737,8 +740,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "dns",
                     host: "example.com",
+                    type: "dns",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -747,8 +750,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for DNS monitor with null host", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -759,8 +762,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "dns",
                     recordType: "AAAA",
+                    type: "dns",
                 });
                 (monitor as any).host = null;
 
@@ -770,8 +773,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for DNS monitor with null recordType", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -782,8 +785,8 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "dns",
                     host: "example.com",
+                    type: "dns",
                 });
                 (monitor as any).recordType = null;
 
@@ -793,8 +796,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle various DNS record types", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -817,9 +820,9 @@ describe("monitorTitleFormatters", () => {
 
                 for (const recordType of recordTypes) {
                     const monitor = createMockMonitor({
-                        type: "dns",
                         host: "test.example.com",
                         recordType,
+                        type: "dns",
                     });
 
                     const result = formatTitleSuffix(monitor);
@@ -829,8 +832,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle DNS monitor with subdomain", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -841,9 +844,9 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "dns",
                     host: "api.subdomain.example.com",
                     recordType: "CNAME",
+                    type: "dns",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -852,10 +855,10 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
-        describe("Unknown monitor types", () => {
+        describe("unknown monitor types", () => {
             it("should return empty string for unknown monitor type", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -877,8 +880,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for custom monitor type without formatter", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -900,8 +903,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should return empty string for empty monitor type", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -923,10 +926,10 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
-        describe("Edge cases", () => {
+        describe("edge cases", () => {
             it("should handle monitor with mixed properties", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -937,10 +940,10 @@ describe("monitorTitleFormatters", () => {
                 await annotate("Type: Monitoring", "type");
 
                 const monitor = createMockMonitor({
-                    type: "http",
-                    url: "https://mixed.example.com",
                     host: "should-be-ignored.com",
                     port: 9999,
+                    type: "http",
+                    url: "https://mixed.example.com",
                 });
 
                 const result = formatTitleSuffix(monitor);
@@ -949,8 +952,8 @@ describe("monitorTitleFormatters", () => {
             });
 
             it("should handle monitor type case sensitivity", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate(
@@ -975,8 +978,8 @@ describe("monitorTitleFormatters", () => {
 
     describe(getTitleSuffixFormatter, () => {
         it("should return HTTP formatter for 'http' type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -986,12 +989,12 @@ describe("monitorTitleFormatters", () => {
             const formatter = getTitleSuffixFormatter("http");
 
             expect(formatter).toBeDefined();
-            expect(typeof formatter).toBe("function");
+            expect(formatter).toBeTypeOf("function");
         });
 
         it("should return port formatter for 'port' type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1001,12 +1004,12 @@ describe("monitorTitleFormatters", () => {
             const formatter = getTitleSuffixFormatter("port");
 
             expect(formatter).toBeDefined();
-            expect(typeof formatter).toBe("function");
+            expect(formatter).toBeTypeOf("function");
         });
 
         it("should return DNS formatter for 'dns' type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1016,12 +1019,12 @@ describe("monitorTitleFormatters", () => {
             const formatter = getTitleSuffixFormatter("dns");
 
             expect(formatter).toBeDefined();
-            expect(typeof formatter).toBe("function");
+            expect(formatter).toBeTypeOf("function");
         });
 
         it("should return undefined for unknown type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1034,8 +1037,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should return undefined for empty string type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1047,7 +1050,7 @@ describe("monitorTitleFormatters", () => {
             expect(formatter).toBeUndefined();
         });
 
-        it("should handle case sensitivity", async ({ task, annotate }) => {
+        it("should handle case sensitivity", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
             await annotate("Category: Utility", "category");
@@ -1059,8 +1062,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should return formatter function that works correctly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1074,7 +1077,9 @@ describe("monitorTitleFormatters", () => {
             });
 
             expect(formatter).toBeDefined();
+
             const result = formatter!(monitor);
+
             expect(result).toBe(" (https://test.example.com)");
         });
     });
@@ -1086,8 +1091,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should register a new formatter for custom type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1100,13 +1105,14 @@ describe("monitorTitleFormatters", () => {
             registerTitleSuffixFormatter("custom", customFormatter);
 
             const formatter = getTitleSuffixFormatter("custom");
+
             expect(formatter).toBeDefined();
             expect(formatter).toBe(customFormatter);
         });
 
         it("should use registered custom formatter in formatTitleSuffix", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1121,16 +1127,17 @@ describe("monitorTitleFormatters", () => {
             const monitor = createMockMonitor({
                 url: "API Monitor",
             });
-            // Manually set type to api to test custom formatter
+            // Manually set type to API to test custom formatter
             (monitor as any).type = "api";
 
             const result = formatTitleSuffix(monitor);
+
             expect(result).toBe(" [API Monitor]");
         });
 
         it("should replace existing formatter when registering same type", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1144,18 +1151,20 @@ describe("monitorTitleFormatters", () => {
             registerTitleSuffixFormatter("replaceable", newFormatter);
 
             const formatter = getTitleSuffixFormatter("replaceable");
+
             expect(formatter).toBe(newFormatter);
 
             const monitor = createMockMonitor({});
             // Manually set type to replaceable to test custom formatter
             (monitor as any).type = "replaceable";
             const result = formatTitleSuffix(monitor);
+
             expect(result).toBe(" (New)");
         });
 
         it("should register formatter that accesses monitor properties", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1163,26 +1172,27 @@ describe("monitorTitleFormatters", () => {
             await annotate("Type: Monitoring", "type");
 
             const databaseFormatter: TitleSuffixFormatter = (monitor) => {
-                const host = monitor.host as string;
-                const database = (monitor as any).database as string;
+                const host = monitor.host!;
+                const database = safeCastTo<string>((monitor as any).database);
                 return host && database ? ` (${host}/${database})` : "http";
             };
 
             registerTitleSuffixFormatter("database", databaseFormatter);
 
             const monitor = createMockMonitor({
-                type: "database",
-                host: "db.example.com",
                 database: "users_db",
+                host: "db.example.com",
+                type: "database",
             } as any);
 
             const result = formatTitleSuffix(monitor);
+
             expect(result).toBe(" (db.example.com/users_db)");
         });
 
         it("should register formatter that returns empty string conditionally", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1197,13 +1207,13 @@ describe("monitorTitleFormatters", () => {
             registerTitleSuffixFormatter("conditional", conditionalFormatter);
 
             const enabledMonitor = createMockMonitor({
-                type: "conditional",
                 enabled: true,
+                type: "conditional",
             } as any);
 
             const disabledMonitor = createMockMonitor({
-                type: "conditional",
                 enabled: false,
+                type: "conditional",
             } as any);
 
             expect(formatTitleSuffix(enabledMonitor)).toBe(" (Active)");
@@ -1211,8 +1221,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should register formatter with complex logic", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1220,15 +1230,17 @@ describe("monitorTitleFormatters", () => {
             await annotate("Type: Business Logic", "type");
 
             const complexFormatter: TitleSuffixFormatter = (monitor) => {
-                const url = monitor.url as string;
-                const host = monitor.host as string;
-                const port = monitor.port as number;
+                const url = monitor.url!;
+                const host = monitor.host!;
+                const port = monitor.port!;
 
                 if (url && url !== "complex") {
                     return ` (${url})`;
-                } else if (host && port) {
+                }
+                if (host && port) {
                     return ` (${host}:${port})`;
-                } else if (host) {
+                }
+                if (host) {
                     return ` (${host})`;
                 }
                 return " (No endpoint)";
@@ -1237,9 +1249,9 @@ describe("monitorTitleFormatters", () => {
             registerTitleSuffixFormatter("complex", complexFormatter);
 
             const urlMonitor = createMockMonitor({
-                url: "https://api.example.com",
                 host: "ignored.com",
                 port: 8080,
+                url: "https://api.example.com",
             });
             // Manually set type to complex to test custom formatter
             (urlMonitor as any).type = "complex";
@@ -1274,8 +1286,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should handle registration with empty type string", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1288,13 +1300,14 @@ describe("monitorTitleFormatters", () => {
             registerTitleSuffixFormatter("", emptyTypeFormatter);
 
             const formatter = getTitleSuffixFormatter("");
+
             expect(formatter).toBeDefined();
             expect(formatter).toBe(emptyTypeFormatter);
         });
 
         it("should not affect existing built-in formatters", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1314,7 +1327,7 @@ describe("monitorTitleFormatters", () => {
             // Register custom formatter for different type
             registerTitleSuffixFormatter("custom", () => " (Custom)");
 
-            // Verify original formatter still works for http
+            // Verify original formatter still works for HTTP
             expect(formatTitleSuffix(httpMonitor)).toBe(
                 " (https://original.example.com)"
             );
@@ -1323,14 +1336,15 @@ describe("monitorTitleFormatters", () => {
             const customMonitor = createMockMonitor({});
             // Manually set type to custom to test custom formatter
             (customMonitor as any).type = "custom";
+
             expect(formatTitleSuffix(customMonitor)).toBe(" (Custom)");
         });
     });
 
-    describe("Integration tests", () => {
+    describe("integration tests", () => {
         it("should work end-to-end with multiple monitor types", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1343,9 +1357,9 @@ describe("monitorTitleFormatters", () => {
                     url: "https://example.com",
                 }),
                 createMockMonitor({
-                    type: "port",
                     host: "db.example.com",
                     port: 5432,
+                    type: "port",
                 }),
                 createMockMonitor({}),
             ];
@@ -1365,8 +1379,8 @@ describe("monitorTitleFormatters", () => {
         });
 
         it("should demonstrate formatter registration workflow", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTitleFormatters", "component");
@@ -1375,7 +1389,7 @@ describe("monitorTitleFormatters", () => {
 
             // Register custom formatter
             registerTitleSuffixFormatter("ping", (monitor) => {
-                const host = monitor.host as string;
+                const host = monitor.host!;
                 return host ? ` (ping ${host})` : " (ping)";
             });
 
@@ -1398,33 +1412,35 @@ describe("monitorTitleFormatters", () => {
 
             // Verify getter works
             const formatter = getTitleSuffixFormatter("ping");
+
             expect(formatter).toBeDefined();
-            expect(typeof formatter).toBe("function");
+            expect(formatter).toBeTypeOf("function");
         });
     });
 
     // Property-based Tests
-    describe("Property-based Tests", () => {
+    describe("property-based Tests", () => {
         describe("formatTitleSuffix property tests", () => {
             test.prop([
                 fc.record({
-                    id: fc.string({ minLength: 1, maxLength: 50 }),
+                    checkInterval: fc.integer({ max: 300_000, min: 1000 }),
+                    history: safeCastTo<fc.Arbitrary<any[]>>(fc.constant([])),
+                    id: fc.string({ maxLength: 50, minLength: 1 }),
+                    monitoring: fc.boolean(),
+                    responseTime: fc.integer({ max: 10_000, min: 0 }),
+                    retryAttempts: fc.integer({ max: 10, min: 1 }),
+                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    timeout: fc.integer({ max: 30_000, min: 1000 }),
                     type: fc.constantFrom("http"),
                     url: fc.webUrl(),
-                    monitoring: fc.boolean(),
-                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                    timeout: fc.integer({ min: 1000, max: 30_000 }),
-                    retryAttempts: fc.integer({ min: 1, max: 10 }),
-                    responseTime: fc.integer({ min: 0, max: 10_000 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>,
                 }),
             ])(
                 "should format HTTP monitor titles with valid URLs",
                 (monitor) => {
                     const result = formatTitleSuffix(
-                        monitor as unknown as Monitor
+                        monitor
                     );
+
                     expect(result).toBe(` (${monitor.url})`);
                     expect(result).toContain(monitor.url);
                 }
@@ -1432,24 +1448,25 @@ describe("monitorTitleFormatters", () => {
 
             test.prop([
                 fc.record({
-                    id: fc.string({ minLength: 1, maxLength: 50 }),
-                    type: fc.constantFrom("port"),
+                    checkInterval: fc.integer({ max: 300_000, min: 1000 }),
+                    history: safeCastTo<fc.Arbitrary<any[]>>(fc.constant([])),
                     host: fc.domain(),
-                    port: fc.integer({ min: 1, max: 65_535 }),
+                    id: fc.string({ maxLength: 50, minLength: 1 }),
                     monitoring: fc.boolean(),
-                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                    timeout: fc.integer({ min: 1000, max: 30_000 }),
-                    retryAttempts: fc.integer({ min: 1, max: 10 }),
-                    responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    port: fc.integer({ max: 65_535, min: 1 }),
+                    responseTime: fc.integer({ max: 10_000, min: 0 }),
+                    retryAttempts: fc.integer({ max: 10, min: 1 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                    timeout: fc.integer({ max: 30_000, min: 1000 }),
+                    type: fc.constantFrom("port"),
                 }),
             ])(
                 "should format port monitor titles with host and port",
                 (monitor) => {
                     const result = formatTitleSuffix(
-                        monitor as unknown as Monitor
+                        monitor
                     );
+
                     expect(result).toBe(` (${monitor.host}:${monitor.port})`);
                     expect(result).toContain(monitor.host);
                     expect(result).toContain(monitor.port.toString());
@@ -1458,9 +1475,11 @@ describe("monitorTitleFormatters", () => {
 
             test.prop([
                 fc.record({
-                    id: fc.string({ minLength: 1, maxLength: 50 }),
-                    type: fc.constantFrom("dns"),
+                    checkInterval: fc.integer({ max: 300_000, min: 1000 }),
+                    history: safeCastTo<fc.Arbitrary<any[]>>(fc.constant([])),
                     host: fc.domain(),
+                    id: fc.string({ maxLength: 50, minLength: 1 }),
+                    monitoring: fc.boolean(),
                     recordType: fc.constantFrom(
                         "A",
                         "AAAA",
@@ -1469,20 +1488,19 @@ describe("monitorTitleFormatters", () => {
                         "TXT",
                         "NS"
                     ),
-                    monitoring: fc.boolean(),
-                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                    timeout: fc.integer({ min: 1000, max: 30_000 }),
-                    retryAttempts: fc.integer({ min: 1, max: 10 }),
-                    responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    responseTime: fc.integer({ max: 10_000, min: 0 }),
+                    retryAttempts: fc.integer({ max: 10, min: 1 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                    timeout: fc.integer({ max: 30_000, min: 1000 }),
+                    type: fc.constantFrom("dns"),
                 }),
             ])(
                 "should format DNS monitor titles with record type and host",
                 (monitor) => {
                     const result = formatTitleSuffix(
-                        monitor as unknown as Monitor
+                        monitor
                     );
+
                     expect(result).toBe(
                         ` (${monitor.recordType} ${monitor.host})`
                     );
@@ -1493,22 +1511,22 @@ describe("monitorTitleFormatters", () => {
 
             test.prop([
                 fc.record({
-                    id: fc.string({ minLength: 1, maxLength: 50 }),
-                    type: fc.string({ minLength: 1, maxLength: 20 }).filter(
+                    checkInterval: fc.integer({ max: 300_000, min: 1000 }),
+                    history: safeCastTo<fc.Arbitrary<any[]>>(fc.constant([])),
+                    id: fc.string({ maxLength: 50, minLength: 1 }),
+                    monitoring: fc.boolean(),
+                    responseTime: fc.integer({ max: 10_000, min: 0 }),
+                    retryAttempts: fc.integer({ max: 10, min: 1 }),
+                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    timeout: fc.integer({ max: 30_000, min: 1000 }),
+                    type: fc.string({ maxLength: 20, minLength: 1 }).filter(
                         (type) =>
                             ![
+                                "dns",
                                 "http",
                                 "port",
-                                "dns",
                             ].includes(type)
                     ),
-                    monitoring: fc.boolean(),
-                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                    timeout: fc.integer({ min: 1000, max: 30_000 }),
-                    retryAttempts: fc.integer({ min: 1, max: 10 }),
-                    responseTime: fc.integer({ min: 0, max: 10_000 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>,
                 }),
             ])(
                 "should return empty string for unknown monitor types",
@@ -1516,6 +1534,7 @@ describe("monitorTitleFormatters", () => {
                     const result = formatTitleSuffix(
                         monitor as unknown as Monitor
                     );
+
                     expect(result).toBe("");
                 }
             );
@@ -1526,24 +1545,26 @@ describe("monitorTitleFormatters", () => {
                 "should return formatter functions for valid monitor types",
                 (monitorType) => {
                     const formatter = getTitleSuffixFormatter(monitorType);
+
                     expect(formatter).toBeDefined();
-                    expect(typeof formatter).toBe("function");
+                    expect(formatter).toBeTypeOf("function");
                 }
             );
 
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 }).filter(
+                fc.string({ maxLength: 50, minLength: 1 }).filter(
                     (type) =>
                         ![
+                            "dns",
                             "http",
                             "port",
-                            "dns",
                         ].includes(type)
                 ),
             ])(
                 "should return undefined for invalid monitor types",
                 (monitorType) => {
                     const formatter = getTitleSuffixFormatter(monitorType);
+
                     expect(formatter).toBeUndefined();
                 }
             );
@@ -1551,7 +1572,7 @@ describe("monitorTitleFormatters", () => {
 
         describe("registerTitleSuffixFormatter property tests", () => {
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 }).filter(
+                fc.string({ maxLength: 50, minLength: 1 }).filter(
                     (str) =>
                         ![
                             "__proto__",
@@ -1569,13 +1590,14 @@ describe("monitorTitleFormatters", () => {
                     // Verify it can be retrieved
                     const retrievedFormatter =
                         getTitleSuffixFormatter(monitorType);
+
                     expect(retrievedFormatter).toBeDefined();
                     expect(retrievedFormatter).toBe(formatter);
                 }
             );
 
             test.prop([
-                fc.string({ minLength: 1, maxLength: 50 }).filter(
+                fc.string({ maxLength: 50, minLength: 1 }).filter(
                     (s) =>
                         ![
                             "__proto__",
@@ -1584,15 +1606,15 @@ describe("monitorTitleFormatters", () => {
                         ].includes(s)
                 ),
                 fc.record({
-                    id: fc.string({ minLength: 1, maxLength: 50 }),
-                    type: fc.string({ minLength: 1, maxLength: 20 }),
+                    checkInterval: fc.integer({ max: 300_000, min: 1000 }),
+                    history: safeCastTo<fc.Arbitrary<any[]>>(fc.constant([])),
+                    id: fc.string({ maxLength: 50, minLength: 1 }),
                     monitoring: fc.boolean(),
-                    checkInterval: fc.integer({ min: 1000, max: 300_000 }),
-                    timeout: fc.integer({ min: 1000, max: 30_000 }),
-                    retryAttempts: fc.integer({ min: 1, max: 10 }),
-                    responseTime: fc.integer({ min: 0, max: 10_000 }),
+                    responseTime: fc.integer({ max: 10_000, min: 0 }),
+                    retryAttempts: fc.integer({ max: 10, min: 1 }),
                     status: fc.constantFrom("up", "down", "pending", "paused"),
-                    history: fc.constant([]) as fc.Arbitrary<any[]>,
+                    timeout: fc.integer({ max: 30_000, min: 1000 }),
+                    type: fc.string({ maxLength: 20, minLength: 1 }),
                 }),
             ])(
                 "should register formatters that work with formatTitleSuffix",
@@ -1608,6 +1630,7 @@ describe("monitorTitleFormatters", () => {
 
                     // Test that formatTitleSuffix uses the custom formatter
                     const result = formatTitleSuffix(testMonitor);
+
                     expect(result).toBe(` (test-${monitor.id})`);
                 }
             );
@@ -1626,6 +1649,7 @@ describe("monitorTitleFormatters", () => {
                     // Verify the new formatter is used
                     const retrievedFormatter =
                         getTitleSuffixFormatter(monitorType);
+
                     expect(retrievedFormatter).toBe(newFormatter);
                 }
             );

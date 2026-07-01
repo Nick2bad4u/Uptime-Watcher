@@ -3,7 +3,7 @@
  *   comprehensive testing of all exported functions
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 // Import all modules that contribute to function coverage
 import * as sharedTypes from "../types";
@@ -243,11 +243,11 @@ describe("Final 90% Function Coverage Push", () => {
         customHandler?: (func: any, funcName: string) => void
     ): void => {
         const functions = Object.keys(moduleObject).filter(
-            (key) => typeof (moduleObject as any)[key] === "function"
+            (key) => typeof (moduleObject)[key] === "function"
         );
         for (const funcName of functions) {
             try {
-                const func = (moduleObject as any)[funcName];
+                const func = (moduleObject)[funcName];
                 if (customHandler) {
                     customHandler(func, funcName);
                 } else {
@@ -583,12 +583,12 @@ describe("Final 90% Function Coverage Push", () => {
         // Process all modules sequentially to avoid await in loop issues
         const processModule = async (module: any): Promise<void> => {
             const functions = Object.keys(module).filter(
-                (key) => typeof (module as any)[key] === "function"
+                (key) => typeof (module)[key] === "function"
             );
 
             for (const funcName of functions) {
                 try {
-                    const func = (module as any)[funcName];
+                    const func = (module)[funcName];
 
                     // Use special handler if available
                     if (specialFunctionHandlers[funcName]) {

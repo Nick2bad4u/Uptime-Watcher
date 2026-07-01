@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import the loggers to test
-import { logger, dbLogger, monitorLogger } from "../../utils/logger";
+import { dbLogger, logger, monitorLogger } from "../../utils/logger";
 
 describe("Logger Targeted Coverage", () => {
     beforeEach(() => {

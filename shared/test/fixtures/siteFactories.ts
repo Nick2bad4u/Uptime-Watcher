@@ -3,15 +3,15 @@
  */
 
 import {
-    STATUS_KIND,
-    type Monitor,
-    type Site,
-    type StatusHistory,
-} from "@shared/types";
-import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import {
+    type Monitor,
+    type Site,
+    STATUS_KIND,
+    type StatusHistory,
+} from "@shared/types";
 
 /**
  * Deterministic timestamp used across shared tests.

@@ -3,8 +3,6 @@
  * all MonitorManager functions
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { MonitorManager } from "../../managers/MonitorManager";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -12,7 +10,11 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
+import { MonitorManager } from "../../managers/MonitorManager";
 
 /**
  * Helper function to create a complete Monitor object with all required
@@ -247,11 +249,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "purpose"
             );
 
-            const result = manager.isMonitorActiveInScheduler(
+            const isResult = manager.isMonitorActiveInScheduler(
                 "site-1",
                 "monitor-1"
             );
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should return initial monitoring state as false", async ({
@@ -309,11 +311,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "purpose"
             );
 
-            const result = manager.restartMonitorWithNewConfig(
+            const isResult = manager.restartMonitorWithNewConfig(
                 "site-1",
                 mockMonitor
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
     });
 
@@ -516,7 +518,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                         monitoring: true,
                         // No checkInterval - this will trigger shouldApplyDefaultInterval
                         url: "https://example.com",
-                        checkInterval: 0, // Explicitly set to 0 to test default application
+                        checkInterval: 0, // Explicitly set to 0 to test default app
                     }),
                 ],
             };
@@ -590,7 +592,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             const monitorWithoutId = {
                 ...mockMonitor,
                 id: "invalid-id",
-            } as Monitor; // Use a valid string instead of undefined
+            }; // Use a valid string instead of undefined
             const siteWithInvalidMonitor = {
                 ...mockSite,
                 monitors: [monitorWithoutId],
@@ -668,7 +670,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
                 .mockResolvedValue(true);
 
-            const result = await manager.startMonitoringForSite(
+            const isResult = await manager.startMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
@@ -684,7 +686,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     operation: "started",
                 })
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should start monitoring for specific site without monitor ID using enhanced system", async () => {
@@ -693,7 +695,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
                 .mockResolvedValue(true);
 
-            const result = await manager.startMonitoringForSite("site-1");
+            const isResult = await manager.startMonitoringForSite("site-1");
 
             expect(startForSiteSpy).toHaveBeenCalled();
             expect(
@@ -705,7 +707,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     operation: "started",
                 })
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should handle failed start monitoring for site in enhanced system", async () => {
@@ -714,7 +716,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .spyOn(manager, "startMonitoringForSiteEnhanced" as any)
                 .mockResolvedValue(false);
 
-            const result = await manager.startMonitoringForSite("site-1");
+            const isResult = await manager.startMonitoringForSite("site-1");
 
             expect(startForSiteSpy).toHaveBeenCalled();
             expect(
@@ -723,7 +725,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "internal:monitor:started",
                 expect.any(Object)
             );
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
 
         it("should stop monitoring for all sites using enhanced system", async () => {
@@ -766,7 +768,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
                 .mockResolvedValue(true);
 
-            const result = await manager.stopMonitoringForSite(
+            const isResult = await manager.stopMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
@@ -783,7 +785,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     reason: "user",
                 })
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
         });
 
         it("should handle failed stop monitoring for site", async () => {
@@ -792,7 +794,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .spyOn(manager, "stopMonitoringForSiteEnhanced" as any)
                 .mockResolvedValue(false);
 
-            const result = await manager.stopMonitoringForSite("site-1");
+            const isResult = await manager.stopMonitoringForSite("site-1");
 
             expect(stopForSiteSpy).toHaveBeenCalled();
             expect(
@@ -801,7 +803,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 "internal:monitor:stopped",
                 expect.any(Object)
             );
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
         });
     });
 
@@ -813,11 +815,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .mockResolvedValue(true);
 
             // Test that the method can be called without causing infinite recursion
-            const result = await manager.startMonitoringForSite(
+            const isResult = await manager.startMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(startForSiteSpy).toHaveBeenCalled();
         });
 
@@ -828,11 +830,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 .mockResolvedValue(true);
 
             // Test that the method can be called without causing infinite recursion
-            const result = await manager.stopMonitoringForSite(
+            const isResult = await manager.stopMonitoringForSite(
                 "site-1",
                 "monitor-1"
             );
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(stopForSiteSpy).toHaveBeenCalled();
         });
 

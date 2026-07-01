@@ -2,7 +2,9 @@
  * Copy of working simple test with added SiteManager test
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ServiceContainer } from "../../services/ServiceContainer";
 
 // Create hoisted mock factory for TypedEventBus using constructor pattern
 const mockTypedEventBus = vi.hoisted(() => {
@@ -184,8 +186,6 @@ vi.mock("../../managers/ConfigurationManager", () => ({
         };
     }),
 }));
-
-import { ServiceContainer } from "../../services/ServiceContainer";
 
 describe("ServiceContainer - Copy of Simple Test", () => {
     let container: ServiceContainer;

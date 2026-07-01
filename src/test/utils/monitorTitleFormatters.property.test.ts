@@ -10,10 +10,11 @@
  * @since 2025-09-05
  */
 
-import { describe, expect, beforeEach } from "vitest";
+import type { Monitor } from "@shared/types";
+
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
-import type { Monitor } from "@shared/types";
+import { beforeEach, describe, expect } from "vitest";
 
 import {
     formatTitleSuffix,
@@ -22,20 +23,20 @@ import {
     type TitleSuffixFormatter,
 } from "../../utils/monitorTitleFormatters";
 
-describe("MonitorTitleFormatters Property-Based Tests", () => {
+describe("monitorTitleFormatters Property-Based Tests", () => {
     /**
      * Helper function to create basic monitor structure
      */
     const createBaseMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
-        id: "test-id",
-        type: "http",
-        status: "up",
         checkInterval: 30_000,
-        timeout: 5000,
-        retryAttempts: 3,
+        history: [],
+        id: "test-id",
         monitoring: true,
         responseTime: 0,
-        history: [],
+        retryAttempts: 3,
+        status: "up",
+        timeout: 5000,
+        type: "http",
         ...overrides,
     });
 
@@ -47,12 +48,12 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
         fc.constant("port"),
         fc.constant("ping"),
         fc.constant("dns"),
-        fc.string({ minLength: 1, maxLength: 20 }) // Custom types
+        fc.string({ maxLength: 20, minLength: 1 }) // Custom types
     );
 
     const urlArbitrary = fc.webUrl();
     const hostArbitrary = fc.domain();
-    const portArbitrary = fc.integer({ min: 1, max: 65_535 });
+    const portArbitrary = fc.integer({ max: 65_535, min: 1 });
     const recordTypeArbitrary = fc.oneof(
         fc.constant("A"),
         fc.constant("AAAA"),
@@ -68,7 +69,8 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             (type) => {
                 const monitor = createBaseMonitor({ type: type as any });
                 const result = formatTitleSuffix(monitor);
-                expect(typeof result).toBe("string");
+
+                expect(result).toBeTypeOf("string");
             }
         );
 
@@ -78,6 +80,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 const unknownType = `unknown-${type}-xyz`;
                 const monitor = createBaseMonitor({ type: unknownType as any });
                 const result = formatTitleSuffix(monitor);
+
                 expect(result).toBe("");
             }
         );
@@ -86,7 +89,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             test.prop([fc.option(urlArbitrary, { nil: undefined })])(
                 "should format HTTP monitor suffix with URL when present",
                 (url) => {
-                    // Only create monitor if url is defined to satisfy exactOptionalPropertyTypes
+                    // Only create monitor if URL is defined to satisfy exactOptionalPropertyTypes
                     const monitorData: Partial<Monitor> = { type: "http" };
                     if (url !== undefined) {
                         monitorData.url = url;
@@ -103,13 +106,14 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 }
             );
 
-            test.prop([fc.string({ minLength: 1, maxLength: 100 })])(
+            test.prop([fc.string({ maxLength: 100, minLength: 1 })])(
                 "should properly escape and handle various URL formats",
                 (url) => {
                     const monitor = createBaseMonitor({ type: "http", url });
                     const result = formatTitleSuffix(monitor);
-                    expect(result.startsWith(" (")).toBeTruthy();
-                    expect(result.endsWith(")")).toBeTruthy();
+
+                    expect(result.startsWith(" (")).toBe(true);
+                    expect(result.endsWith(")")).toBe(true);
                     expect(result).toContain(url);
                 }
             );
@@ -129,8 +133,11 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                         type: "http",
                         url: invalidUrl as any,
                     });
+
                     expect(() => formatTitleSuffix(monitor)).not.toThrow();
+
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe("");
                 }
             );
@@ -138,7 +145,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             test.prop([
                 fc.oneof(
                     fc.integer().filter((n) => n !== 0), // Truthy numbers
-                    fc.boolean().filter((b) => b === true) // Truthy boolean
+                    fc.boolean().filter(Boolean) // Truthy boolean
                 ),
             ])(
                 "should format HTTP monitors with truthy non-string URLs as strings",
@@ -147,15 +154,18 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                         type: "http",
                         url: truthyUrl as any,
                     });
+
                     expect(() => formatTitleSuffix(monitor)).not.toThrow();
+
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe(` (${truthyUrl})`);
                     expect(result).toContain(String(truthyUrl));
                 }
             );
         });
 
-        describe("Port monitors", () => {
+        describe("port monitors", () => {
             test.prop([
                 fc.option(hostArbitrary, { nil: undefined }),
                 fc.option(portArbitrary, { nil: undefined }),
@@ -184,11 +194,12 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 "should return empty string when port is missing",
                 (host) => {
                     const monitorData: Partial<Monitor> = {
-                        type: "port",
                         host,
+                        type: "port",
                     };
                     const monitor = createBaseMonitor(monitorData);
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe("");
                 }
             );
@@ -197,11 +208,12 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 "should return empty string when host is missing",
                 (port) => {
                     const monitorData: Partial<Monitor> = {
-                        type: "port",
                         port,
+                        type: "port",
                     };
                     const monitor = createBaseMonitor(monitorData);
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe("");
                 }
             );
@@ -221,12 +233,15 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 "should handle port monitors with invalid host/port properties",
                 (invalidHost, invalidPort) => {
                     const monitor = createBaseMonitor({
-                        type: "port",
                         host: invalidHost as any,
                         port: invalidPort as any,
+                        type: "port",
                     });
+
                     expect(() => formatTitleSuffix(monitor)).not.toThrow();
+
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe("");
                 }
             );
@@ -262,11 +277,12 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 "should return empty string when host is missing",
                 (recordType) => {
                     const monitorData: Partial<Monitor> = {
-                        type: "dns",
                         recordType,
+                        type: "dns",
                     };
                     const monitor = createBaseMonitor(monitorData);
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe("");
                 }
             );
@@ -274,15 +290,16 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             test.prop([hostArbitrary])(
                 "should return empty string when recordType is missing",
                 (host) => {
-                    const monitorData: Partial<Monitor> = { type: "dns", host };
+                    const monitorData: Partial<Monitor> = { host, type: "dns" };
                     const monitor = createBaseMonitor(monitorData);
                     const result = formatTitleSuffix(monitor);
+
                     expect(result).toBe("");
                 }
             );
         });
 
-        describe("Ping monitors", () => {
+        describe("ping monitors", () => {
             test.prop([fc.option(hostArbitrary, { nil: undefined })])(
                 "should include host suffix when available",
                 (host) => {
@@ -314,7 +331,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                     "dns",
                 ];
                 if (knownTypes.includes(monitorType)) {
-                    expect(typeof formatter).toBe("function");
+                    expect(formatter).toBeTypeOf("function");
                 } else {
                     expect(formatter).toBeUndefined();
                 }
@@ -326,6 +343,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             (monitorType) => {
                 const formatter1 = getTitleSuffixFormatter(monitorType);
                 const formatter2 = getTitleSuffixFormatter(monitorType);
+
                 expect(formatter1).toBe(formatter2);
             }
         );
@@ -337,19 +355,19 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
         });
 
         test.prop([
-            fc.string({ minLength: 1, maxLength: 20 }).filter(
+            fc.string({ maxLength: 20, minLength: 1 }).filter(
                 (s) =>
                     ![
-                        "http",
-                        "port",
-                        "dns",
-                        "ping",
                         "__proto__",
                         "constructor",
+                        "dns",
+                        "http",
+                        "ping",
+                        "port",
                         "prototype",
                     ].includes(s)
             ),
-            fc.string({ minLength: 1, maxLength: 100 }),
+            fc.string({ maxLength: 100, minLength: 1 }),
         ])(
             "should register and retrieve custom formatters",
             (customType, customSuffix) => {
@@ -359,6 +377,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 registerTitleSuffixFormatter(customType, customFormatter);
 
                 const retrievedFormatter = getTitleSuffixFormatter(customType);
+
                 expect(retrievedFormatter).toBe(customFormatter);
 
                 // Test that the formatter works
@@ -366,6 +385,7 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                     type: customType as any,
                 });
                 const result = formatTitleSuffix(testMonitor);
+
                 expect(result).toBe(customSuffix);
             }
         );
@@ -394,18 +414,20 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                 registerTitleSuffixFormatter(monitorType, secondFormatter);
 
                 const retrievedFormatter = getTitleSuffixFormatter(monitorType);
+
                 expect(retrievedFormatter).toBe(secondFormatter);
 
                 const testMonitor = createBaseMonitor({
                     type: monitorType as any,
                 });
                 const result = formatTitleSuffix(testMonitor);
+
                 expect(result).toBe(secondSuffix);
             }
         );
     });
 
-    describe("Edge cases and defensive programming", () => {
+    describe("edge cases and defensive programming", () => {
         test.prop([
             fc.oneof(
                 fc.constant(null),
@@ -416,13 +438,16 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
             "should handle monitors with invalid type properties",
             (invalidType) => {
                 const monitor = createBaseMonitor({ type: invalidType as any });
+
                 expect(() => formatTitleSuffix(monitor)).not.toThrow();
+
                 const result = formatTitleSuffix(monitor);
+
                 expect(result).toBe("");
             }
         );
 
-        describe("Formatter function edge cases", () => {
+        describe("formatter function edge cases", () => {
             test.prop([
                 fc.string({ minLength: 1 }).filter(
                     (s) =>
@@ -472,18 +497,19 @@ describe("MonitorTitleFormatters Property-Based Tests", () => {
                     });
 
                     const result = formatTitleSuffix(testMonitor);
+
                     // Should still work, as JavaScript coerces null to string
                     expect(
                         typeof result === "string" || result === null
-                    ).toBeTruthy();
+                    ).toBe(true);
                 }
             );
         });
 
         test.prop([
             fc.array(fc.constantFrom("http", "port", "dns", "ping"), {
-                minLength: 10,
                 maxLength: 100,
+                minLength: 10,
             }),
         ])(
             "should handle large numbers of monitors efficiently with known types only",

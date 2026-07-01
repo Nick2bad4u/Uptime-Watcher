@@ -6,15 +6,17 @@
  * monitor validation, ping execution, and error scenarios.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import type { Site } from "@shared/types";
 import type { MockedFunction } from "vitest";
 
-import { PingMonitor } from "../../../services/monitoring/PingMonitor";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type {
-    MonitorServiceConfig,
     MonitorCheckResult,
+    MonitorServiceConfig,
 } from "../../../services/monitoring/types";
-import type { Site } from "@shared/types";
+
+import { PingMonitor } from "../../../services/monitoring/PingMonitor";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 
 // Mock the ping retry utility
@@ -216,7 +218,7 @@ describe(PingMonitor, () => {
             await annotate("Type: Monitoring", "type");
 
             const httpMonitor = createMockPingMonitor({
-                type: "http" as any,
+                type: "http",
             });
 
             await expect(pingMonitor.check(httpMonitor)).rejects.toThrow(

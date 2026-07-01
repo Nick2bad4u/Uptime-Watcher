@@ -83,7 +83,7 @@ export const MaintenanceSection = ({
                 )}
             </Tooltip>
             <input
-                accept=".sqlite,.sqlite3,.db,.db3"
+                accept=".sqlite, .sqlite3, .db, .db3"
                 data-testid="settings-restore-input"
                 hidden
                 onChange={onRestoreFileChange}

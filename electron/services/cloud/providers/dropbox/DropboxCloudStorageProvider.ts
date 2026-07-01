@@ -283,7 +283,7 @@ export class DropboxCloudStorageProvider
         const rootPath = toDropboxPath("");
 
         const objects: CloudObjectEntry[] = [];
-        let cursor: string | undefined = undefined;
+        let cursor: string | undefined;
         let hasMore = true;
 
         while (hasMore) {
@@ -352,12 +352,12 @@ export class DropboxCloudStorageProvider
                 }
 
                 const key = fromDropboxPathOrNull(parsed.pathDisplay);
-                const matchesPrefix =
+                const isMatchesPrefix =
                     typeof key === "string" &&
                     key.length > 0 &&
                     (!normalizedPrefix || key.startsWith(normalizedPrefix));
 
-                if (!matchesPrefix) {
+                if (!isMatchesPrefix) {
                     return { cloudObject: null, isInvalid: false };
                 }
 

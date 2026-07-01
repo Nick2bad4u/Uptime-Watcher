@@ -3,9 +3,11 @@
  * all validation logic
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
 import type { Site, StatusHistory } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
 
 // Mock the MonitorTypeRegistry module
 vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
@@ -14,7 +16,7 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
         ["http", "port"].includes(type)
     ),
     validateMonitorData: vi.fn((type: string, data: any) => {
-        if (type === "http" && data.url && data.url.startsWith("https://")) {
+        if (type === "http" && data.url?.startsWith("https://")) {
             return {
                 success: true,
                 errors: [],
@@ -88,8 +90,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const monitor = createMockMonitor({ checkInterval: 0 });
 
-            const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeTruthy();
+            const isResult = validator.shouldApplyDefaultInterval(monitor);
+            expect(isResult).toBeTruthy();
         });
 
         it("should return false when checkInterval is not 0", async ({
@@ -103,8 +105,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const monitor = createMockMonitor({ checkInterval: 30_000 });
 
-            const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeFalsy();
+            const isResult = validator.shouldApplyDefaultInterval(monitor);
+            expect(isResult).toBeFalsy();
         });
 
         it("should return false when checkInterval exceeds minimum", async ({
@@ -118,8 +120,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const monitor = createMockMonitor({ checkInterval: 60_000 });
 
-            const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeFalsy();
+            const isResult = validator.shouldApplyDefaultInterval(monitor);
+            expect(isResult).toBeFalsy();
         });
 
         it("should return true when checkInterval is below minimum", async ({
@@ -133,8 +135,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const monitor = createMockMonitor({ checkInterval: 2500 });
 
-            const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeTruthy();
+            const isResult = validator.shouldApplyDefaultInterval(monitor);
+            expect(isResult).toBeTruthy();
         });
 
         it("should return true when checkInterval is negative", async ({
@@ -148,8 +150,8 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const monitor = createMockMonitor({ checkInterval: -1000 });
 
-            const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeTruthy();
+            const isResult = validator.shouldApplyDefaultInterval(monitor);
+            expect(isResult).toBeTruthy();
         });
 
         it("should return true when checkInterval is NaN", async ({
@@ -161,10 +163,10 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitor = createMockMonitor({ checkInterval: Number.NaN });
+            const monitor = createMockMonitor({ checkInterval: NaN });
 
-            const result = validator.shouldApplyDefaultInterval(monitor);
-            expect(result).toBeTruthy();
+            const isResult = validator.shouldApplyDefaultInterval(monitor);
+            expect(isResult).toBeTruthy();
         });
     });
 
@@ -298,10 +300,10 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             const monitoringStates = [true, false];
 
-            for (const monitoring of monitoringStates) {
+            for (const isMonitoring of monitoringStates) {
                 const monitor = createMockMonitor({
-                    id: `test-monitoring-${monitoring}`,
-                    monitoring,
+                    id: `test-monitoring-${isMonitoring}`,
+                    monitoring: isMonitoring,
                 });
 
                 const result = validator.validateMonitorConfiguration(monitor);
@@ -531,7 +533,7 @@ describe("MonitorValidator - Comprehensive Coverage", () => {
 
             for (const url of urlConfigurations) {
                 const monitor = createMockMonitor({
-                    id: `test-url-${url.replaceAll(/[^\dA-Za-z]/g, "")}`,
+                    id: `test-url-${url.replaceAll(/[^\da-z]/gi, "")}`,
                     url,
                 });
 

@@ -4,13 +4,14 @@
  * cases.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
-    type DbValue,
     addBooleanField,
     addNumberField,
     addStringField,
     convertDateForDb,
+    type DbValue,
     safeNumberConvert,
 } from "../../../../services/database/utils/converters/valueConverters";
 
@@ -237,7 +238,7 @@ describe("Value Converters Utility", () => {
                 updateFields,
                 updateValues
             );
-            addNumberField("nanValue", Number.NaN, updateFields, updateValues);
+            addNumberField("nanValue", NaN, updateFields, updateValues);
 
             expect(updateFields).toEqual([
                 "infinity = ?",
@@ -247,7 +248,7 @@ describe("Value Converters Utility", () => {
             expect(updateValues).toEqual([
                 Infinity,
                 -Infinity,
-                Number.NaN,
+                NaN,
             ]);
         });
     });
@@ -465,7 +466,7 @@ describe("Value Converters Utility", () => {
 
             expect(safeNumberConvert(Infinity)).toBe(Infinity);
             expect(safeNumberConvert(-Infinity)).toBe(-Infinity);
-            expect(safeNumberConvert(Number.NaN)).toBeNaN();
+            expect(safeNumberConvert(NaN)).toBeNaN();
         });
         it("should convert valid string numbers", async ({
             task,
@@ -548,7 +549,7 @@ describe("Value Converters Utility", () => {
             await annotate("Component: Value Converters Utility", "component");
 
             expect(safeNumberConvert("  42  ")).toBe(42);
-            expect(safeNumberConvert("   ")).toBe(0);
+            expect(safeNumberConvert(' '.repeat(3))).toBe(0);
             expect(safeNumberConvert("\t\n\r")).toBe(0);
         });
         it("should handle scientific notation", async ({ task, annotate }) => {

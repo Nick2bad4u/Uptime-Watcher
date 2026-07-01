@@ -86,13 +86,13 @@ function logDiagnosticsSnapshot({
     diagnosticsLog.info(
         "[IpcDiagnostics] Metrics snapshot",
         withLogContext({
-            ...(channel ? { channel } : {}),
+            ...(channel && { channel }),
             event: `diagnostics:metrics:${event}`,
             severity: "info",
         }),
         {
             event,
-            ...(channel ? { channel } : {}),
+            ...(channel && { channel }),
             snapshot: { ...metrics },
         }
     );
@@ -151,7 +151,7 @@ export function recordPreloadGuardFailure(
         channel: report.channel,
         guard: report.guard,
         timestamp: report.timestamp,
-        ...(report.reason ? { reason: report.reason } : {}),
+        ...(report.reason && { reason: report.reason }),
     };
 
     diagnosticsLog.warn(

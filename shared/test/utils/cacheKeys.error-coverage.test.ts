@@ -3,6 +3,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { parseCacheKey } from "../../utils/cacheKeys";
 
 describe("Cache Keys - Error Coverage", () => {
@@ -16,7 +17,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Type: Error Handling", "type");
 
         expect(() => {
-            parseCacheKey(":identifier" as any);
+            parseCacheKey(":identifier");
         }).toThrow("Invalid cache key format: :identifier");
     });
 
@@ -44,7 +45,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Type: Error Handling", "type");
 
         expect(() => {
-            parseCacheKey(":operation:identifier" as any);
+            parseCacheKey(":operation:identifier");
         }).toThrow("Invalid cache key format: :operation:identifier");
     });
 
@@ -58,7 +59,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Type: Error Handling", "type");
 
         expect(() => {
-            parseCacheKey("prefix::identifier" as any);
+            parseCacheKey("prefix::identifier");
         }).toThrow("Invalid cache key format: prefix::identifier");
     });
 
@@ -72,7 +73,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Type: Error Handling", "type");
 
         expect(() => {
-            parseCacheKey("prefix:operation:" as any);
+            parseCacheKey("prefix:operation:");
         }).toThrow("Invalid cache key format: prefix:operation:");
     });
 
@@ -86,7 +87,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Type: Error Handling", "type");
 
         expect(() => {
-            parseCacheKey(":" as any);
+            parseCacheKey(":");
         }).toThrow("Invalid cache key format: :");
     });
 
@@ -100,7 +101,7 @@ describe("Cache Keys - Error Coverage", () => {
         await annotate("Type: Error Handling", "type");
 
         expect(() => {
-            parseCacheKey("::" as any);
+            parseCacheKey("::");
         }).toThrow("Invalid cache key format: ::");
     });
 });

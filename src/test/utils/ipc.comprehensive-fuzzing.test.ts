@@ -17,9 +17,10 @@
  * @packageDocumentation
  */
 
-import { describe, expect, beforeEach, afterEach } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import { isEmpty, isInteger, objectKeys   } from "ts-extras";
+import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for IPC Messages
@@ -66,7 +67,7 @@ const ipcChannelNames = fc.oneof(
         "powershell"
     ),
     // Malicious channel names
-    fc.string({ minLength: 0, maxLength: 1000 })
+    fc.string({ maxLength: 1000, minLength: 0 })
 );
 
 /**
@@ -83,10 +84,10 @@ const ipcParameters = fc.oneof(
     // Complex types
     fc.array(fc.string()),
     fc.record({
+        enabled: fc.boolean(),
         id: fc.integer(),
         name: fc.string(),
         url: fc.string(),
-        enabled: fc.boolean(),
     }),
     // Edge cases
     fc.constantFrom(
@@ -95,9 +96,9 @@ const ipcParameters = fc.oneof(
         -1,
         Number.MAX_SAFE_INTEGER,
         Number.MIN_SAFE_INTEGER,
-        Number.POSITIVE_INFINITY,
+        Infinity,
         Number.NEGATIVE_INFINITY,
-        Number.NaN
+        NaN
     )
 );
 
@@ -110,7 +111,7 @@ const ipcMessages = fc.record({
         fc.constantFrom("invoke", "handle", "send", "sendSync"),
         fc.string()
     ),
-    params: fc.array(ipcParameters, { minLength: 0, maxLength: 10 }),
+    params: fc.array(ipcParameters, { maxLength: 10, minLength: 0 }),
     requestId: fc.oneof(fc.uuid(), fc.string(), fc.integer()),
     timestamp: fc.oneof(fc.date(), fc.integer(), fc.string()),
 });
@@ -119,35 +120,35 @@ const ipcMessages = fc.record({
  * Generates monitor configuration data for IPC testing
  */
 const monitorConfigData = fc.record({
-    name: fc.string({ minLength: 1, maxLength: 255 }),
-    url: fc.oneof(fc.webUrl(), fc.string()),
-    type: fc.constantFrom("http", "ping", "dns", "port"),
-    interval: fc.integer({ min: 1000, max: 300_000 }),
-    timeout: fc.integer({ min: 1000, max: 30_000 }),
-    retries: fc.integer({ min: 0, max: 5 }),
+    expectedStatus: fc.oneof(
+        fc.integer({ max: 599, min: 100 }),
+        fc.constant(200)
+    ),
     headers: fc.oneof(
         fc.record({}),
         fc.record({
-            "User-Agent": fc.string(),
-            "Content-Type": fc.string(),
             Authorization: fc.string(),
+            "Content-Type": fc.string(),
+            "User-Agent": fc.string(),
         })
     ),
-    expectedStatus: fc.oneof(
-        fc.integer({ min: 100, max: 599 }),
-        fc.constant(200)
-    ),
+    interval: fc.integer({ max: 300_000, min: 1000 }),
+    name: fc.string({ maxLength: 255, minLength: 1 }),
+    retries: fc.integer({ max: 5, min: 0 }),
+    timeout: fc.integer({ max: 30_000, min: 1000 }),
+    type: fc.constantFrom("http", "ping", "dns", "port"),
+    url: fc.oneof(fc.webUrl(), fc.string()),
 });
 
 // =============================================================================
 // IPC Communication Fuzzing Tests
 // =============================================================================
 
-describe("Comprehensive IPC Communication Fuzzing", () => {
+describe("comprehensive IPC Communication Fuzzing", () => {
     let performanceMetrics: {
         handler: string;
-        time: number;
         message: any;
+        time: number;
     }[] = [];
 
     beforeEach(() => {
@@ -176,14 +177,14 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
         performanceMetrics.push({
             handler: handlerName,
-            time: endTime - startTime,
             message: args,
+            time: endTime - startTime,
         });
 
         return result;
     }
 
-    describe("Message Structure Validation", () => {
+    describe("message Structure Validation", () => {
         fcTest.prop([ipcMessages])(
             "IPC messages should have valid structure",
             (message) => {
@@ -246,7 +247,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         errors.push("Invalid timestamp: number must be finite");
                     }
 
-                    return { valid: errors.length === 0, errors };
+                    return { errors, valid: isEmpty(errors) };
                 };
 
                 const result = measureIpcHandler(
@@ -258,29 +259,29 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                 // Property: Validation should never throw
                 expect(result).toHaveProperty("valid");
                 expect(result).toHaveProperty("errors");
-                expect(typeof result.valid).toBe("boolean");
-                expect(Array.isArray(result.errors)).toBeTruthy();
+                expect(result.valid).toBeTypeOf("boolean");
+                expect(Array.isArray(result.errors)).toBe(true);
 
                 // Property: Invalid channels should be rejected
                 if (message.channel === "" || message.channel.includes(" ")) {
-                    expect(result.valid).toBeFalsy();
+                    expect(result.valid).toBe(false);
                 }
 
                 // Property: Invalid methods should be rejected
                 if (
                     ![
-                        "invoke",
                         "handle",
+                        "invoke",
                         "send",
                         "sendSync",
                     ].includes(message.method)
                 ) {
-                    expect(result.valid).toBeFalsy();
+                    expect(result.valid).toBe(false);
                 }
             }
         );
 
-        fcTest.prop([fc.array(fc.string(), { minLength: 0, maxLength: 20 })])(
+        fcTest.prop([fc.array(fc.string(), { maxLength: 20, minLength: 0 })])(
             "IPC parameter arrays should be validated safely",
             (params) => {
                 const validateIpcParams = (parameters: string[]) => {
@@ -297,9 +298,9 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
                         return {
                             index,
-                            value: param,
-                            safe: !isDangerous,
                             length: param.length,
+                            safe: !isDangerous,
+                            value: param,
                         };
                     });
 
@@ -309,10 +310,10 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     );
 
                     return {
-                        totalParams: parameters.length,
-                        safeParams: safeParams.length,
+                        allSafe: isEmpty(dangerousParams),
                         dangerousParams: dangerousParams.length,
-                        allSafe: dangerousParams.length === 0,
+                        safeParams: safeParams.length,
+                        totalParams: parameters.length,
                     };
                 };
 
@@ -341,14 +342,14 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                         p.includes("process.")
                 );
                 if (hasDangerousContent) {
-                    expect(result.allSafe).toBeFalsy();
+                    expect(result.allSafe).toBe(false);
                     expect(result.dangerousParams).toBeGreaterThan(0);
                 }
             }
         );
     });
 
-    describe("Monitor Configuration IPC Handlers", () => {
+    describe("monitor Configuration IPC Handlers", () => {
         fcTest.prop([monitorConfigData])(
             "Monitor create IPC handler should validate configuration",
             (config) => {
@@ -407,12 +408,12 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     }
 
                     return {
-                        success: errors.length === 0,
                         errors,
                         monitorId:
-                            errors.length === 0
+                            isEmpty(errors)
                                 ? Math.floor(secureRandomFloat() * 1000) + 1
                                 : null,
+                        success: isEmpty(errors),
                     };
                 };
 
@@ -425,8 +426,8 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                 // Property: Handler should never throw
                 expect(result).toHaveProperty("success");
                 expect(result).toHaveProperty("errors");
-                expect(typeof result.success).toBe("boolean");
-                expect(Array.isArray(result.errors)).toBeTruthy();
+                expect(result.success).toBeTypeOf("boolean");
+                expect(Array.isArray(result.errors)).toBe(true);
 
                 // Property: Valid configuration should succeed
                 if (
@@ -446,22 +447,22 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                                 url.protocol === "http:" ||
                                 url.protocol === "https:"
                             ) {
-                                expect(result.success).toBeTruthy();
+                                expect(result.success).toBe(true);
                                 expect(result.monitorId).not.toBeNull();
                             }
                         } catch {
-                            expect(result.success).toBeFalsy();
+                            expect(result.success).toBe(false);
                         }
                     } else {
                         // Non-HTTP monitors don't need URL validation
-                        expect(result.success).toBeTruthy();
+                        expect(result.success).toBe(true);
                         expect(result.monitorId).not.toBeNull();
                     }
                 }
 
                 // Property: Invalid configuration should fail
                 if (!config.name || config.name.trim().length === 0) {
-                    expect(result.success).toBeFalsy();
+                    expect(result.success).toBe(false);
                     expect(result.errors.length).toBeGreaterThan(0);
                 }
             }
@@ -469,18 +470,18 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
         fcTest.prop([
             fc.record({
-                monitorId: fc.integer({ min: 1, max: 10_000 }),
+                monitorId: fc.integer({ max: 10_000, min: 1 }),
                 updates: fc.record({
-                    name: fc.oneof(fc.string(), fc.constant(undefined)),
-                    interval: fc.oneof(
-                        fc.integer({ min: 500, max: 400_000 }),
-                        fc.constant(undefined)
-                    ),
-                    timeout: fc.oneof(
-                        fc.integer({ min: 500, max: 40_000 }),
-                        fc.constant(undefined)
-                    ),
                     enabled: fc.oneof(fc.boolean(), fc.constant(undefined)),
+                    interval: fc.oneof(
+                        fc.integer({ max: 400_000, min: 500 }),
+                        fc.constant(undefined)
+                    ),
+                    name: fc.oneof(fc.string(), fc.constant(undefined)),
+                    timeout: fc.oneof(
+                        fc.integer({ max: 40_000, min: 500 }),
+                        fc.constant(undefined)
+                    ),
                 }),
             }),
         ])(
@@ -494,14 +495,14 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
                     // Validate monitor ID
                     if (
-                        !Number.isInteger(request.monitorId) ||
+                        !isInteger(request.monitorId) ||
                         request.monitorId <= 0
                     ) {
                         errors.push("Invalid monitor ID");
                     }
 
                     // Validate updates object
-                    if (Object.keys(request.updates).length === 0) {
+                    if (isEmpty(objectKeys(request.updates))) {
                         errors.push("No updates provided");
                     }
 
@@ -521,7 +522,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
                     if (request.updates.interval !== undefined) {
                         if (
-                            !Number.isInteger(request.updates.interval) ||
+                            !isInteger(request.updates.interval) ||
                             request.updates.interval < 1000 ||
                             request.updates.interval > 300_000
                         ) {
@@ -533,7 +534,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
                     if (request.updates.timeout !== undefined) {
                         if (
-                            !Number.isInteger(request.updates.timeout) ||
+                            !isInteger(request.updates.timeout) ||
                             request.updates.timeout < 1000 ||
                             request.updates.timeout > 30_000
                         ) {
@@ -561,10 +562,10 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     }
 
                     return {
-                        success: errors.length === 0,
                         errors,
-                        updatedFields: Object.keys(updates),
                         monitorId: request.monitorId,
+                        success: isEmpty(errors),
+                        updatedFields: objectKeys(updates),
                     };
                 };
 
@@ -577,24 +578,24 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                 // Property: Handler should never throw
                 expect(result).toHaveProperty("success");
                 expect(result).toHaveProperty("errors");
-                expect(Array.isArray(result.errors)).toBeTruthy();
-                expect(Array.isArray(result.updatedFields)).toBeTruthy();
+                expect(Array.isArray(result.errors)).toBe(true);
+                expect(Array.isArray(result.updatedFields)).toBe(true);
 
                 // Property: Invalid monitor ID should fail
                 if (updateRequest.monitorId <= 0) {
-                    expect(result.success).toBeFalsy();
+                    expect(result.success).toBe(false);
                     expect(result.errors).toContain("Invalid monitor ID");
                 }
 
                 // Property: Empty updates should fail
-                if (Object.keys(updateRequest.updates).length === 0) {
-                    expect(result.success).toBeFalsy();
+                if (isEmpty(objectKeys(updateRequest.updates))) {
+                    expect(result.success).toBe(false);
                 }
             }
         );
     });
 
-    describe("Error Handling and Security", () => {
+    describe("error Handling and Security", () => {
         fcTest.prop([
             fc.record({
                 channel: fc.string(),
@@ -615,16 +616,16 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
             (maliciousRequest) => {
                 const securityFilter = (request: typeof maliciousRequest) => {
                     const dangerousPatterns = [
-                        /eval\s*\(/,
-                        /Function\s*\(/,
-                        /require\s*\(/,
-                        /process\./,
-                        /global\./,
-                        /__dirname/,
-                        /__filename/,
-                        /Buffer\./,
-                        /child_process/,
-                        /fs\./,
+                        /eval\s*\(/v,
+                        /Function\s*\(/v,
+                        /require\s*\(/v,
+                        /process\./v,
+                        /global\./v,
+                        /__dirname/v,
+                        /__filename/v,
+                        /Buffer\./v,
+                        /child_process/v,
+                        /fs\./v,
                     ];
 
                     const payloadStr = JSON.stringify(request);
@@ -642,9 +643,9 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     }
 
                     return {
-                        safe: detectedThreats.length === 0,
-                        threats: detectedThreats,
                         blocked: detectedThreats.length > 0,
+                        safe: isEmpty(detectedThreats),
+                        threats: detectedThreats,
                     };
                 };
 
@@ -658,8 +659,8 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                 expect(result).toHaveProperty("safe");
                 expect(result).toHaveProperty("threats");
                 expect(result).toHaveProperty("blocked");
-                expect(typeof result.safe).toBe("boolean");
-                expect(Array.isArray(result.threats)).toBeTruthy();
+                expect(result.safe).toBeTypeOf("boolean");
+                expect(Array.isArray(result.threats)).toBe(true);
 
                 // Property: Known malicious patterns should be detected
                 if (
@@ -667,8 +668,8 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     maliciousRequest.maliciousPayload.includes("require(") ||
                     maliciousRequest.maliciousPayload.includes("process.")
                 ) {
-                    expect(result.safe).toBeFalsy();
-                    expect(result.blocked).toBeTruthy();
+                    expect(result.safe).toBe(false);
+                    expect(result.blocked).toBe(true);
                     expect(result.threats.length).toBeGreaterThan(0);
                 }
             }
@@ -676,7 +677,11 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
 
         fcTest.prop([
             fc.record({
-                handlerName: fc.string(),
+                errorData: fc.oneof(
+                    fc.string(),
+                    fc.record({}),
+                    fc.constant(null)
+                ),
                 errorType: fc.constantFrom(
                     "validation",
                     "network",
@@ -684,11 +689,7 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     "permission",
                     "internal"
                 ),
-                errorData: fc.oneof(
-                    fc.string(),
-                    fc.record({}),
-                    fc.constant(null)
-                ),
+                handlerName: fc.string(),
             }),
         ])(
             "IPC error handling should provide consistent error format",
@@ -723,22 +724,22 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                                 );
                             }
                             default: {
-                                return { success: true, data: "No error" };
+                                return { data: "No error", success: true };
                             }
                         }
                     } catch (error) {
                         return {
-                            success: false,
                             error: {
-                                type: scenario.errorType,
+                                data: scenario.errorData,
+                                handler: scenario.handlerName,
                                 message:
-                                    error instanceof Error
+                                    Error.isError(error)
                                         ? error.message
                                         : "Unknown error",
-                                handler: scenario.handlerName,
                                 timestamp: new Date().toISOString(),
-                                data: scenario.errorData,
+                                type: scenario.errorType,
                             },
+                            success: false,
                         };
                     }
                 };
@@ -776,9 +777,9 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
         );
     });
 
-    describe("Performance and Load Testing", () => {
+    describe("performance and Load Testing", () => {
         fcTest.prop(
-            [fc.array(ipcMessages, { minLength: 10, maxLength: 100 })],
+            [fc.array(ipcMessages, { maxLength: 100, minLength: 10 })],
             {
                 numRuns: 3, // Reduce runs for performance test
             }
@@ -792,8 +793,8 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     for (const message of messages) {
                         // Simulate message processing
                         const processed = {
-                            id: processedMessages.length + 1,
                             channel: message.channel,
+                            id: processedMessages.length + 1,
                             processed: true,
                             processingTime: secureRandomFloat() * 5, // Simulate variable processing time
                         };
@@ -804,10 +805,10 @@ describe("Comprehensive IPC Communication Fuzzing", () => {
                     const totalTime = endTime - startTime;
 
                     return {
-                        processed: processedMessages.length,
-                        totalTime,
                         averageTime: totalTime / processedMessages.length,
                         messages: processedMessages,
+                        processed: processedMessages.length,
+                        totalTime,
                     };
                 };
 

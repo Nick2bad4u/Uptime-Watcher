@@ -1,11 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
+import { logger } from "@app/services/logger";
 import {
     resetProcessSnapshotOverrideForTesting,
     setProcessSnapshotOverrideForTesting,
 } from "@shared/utils/environment";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { logger } from "@app/services/logger";
 import {
     createPersistConfig,
     debounce,

@@ -3,8 +3,7 @@
  * Tests the basic functionality and different code paths.
  */
 
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import type { Monitor } from "@shared/types";
 import type {
     ButtonHTMLAttributes,
     HTMLAttributes,
@@ -13,11 +12,13 @@ import type {
     SelectHTMLAttributes,
 } from "react";
 
+import { render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
-import type { Monitor } from "@shared/types";
 
 // Mock all external dependencies
-vi.mock("../../../../stores/settings/useSettingsStore", () => ({
+vi.mock(import('../../../../stores/settings/useSettingsStore'), () => ({
     useSettingsStore: (selector?: unknown) => {
         const state = {
             settings: { historyLimit: 25 },
@@ -33,7 +34,7 @@ vi.mock("../../../../stores/settings/useSettingsStore", () => ({
     },
 }));
 
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -45,7 +46,7 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../theme/components/StatusIndicator", () => ({
+vi.mock(import('../../../../theme/components/StatusIndicator'), () => ({
     StatusIndicator: ({
         children,
         ...props
@@ -56,7 +57,7 @@ vi.mock("../../../../theme/components/StatusIndicator", () => ({
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         ...props
@@ -65,7 +66,7 @@ vi.mock("../../../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedCard", () => ({
+vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
     ThemedCard: ({
         children,
         ...props
@@ -74,7 +75,7 @@ vi.mock("../../../../theme/components/ThemedCard", () => ({
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedSelect", () => ({
+vi.mock(import('../../../../theme/components/ThemedSelect'), () => ({
     ThemedSelect: ({
         children,
         ...props
@@ -83,7 +84,7 @@ vi.mock("../../../../theme/components/ThemedSelect", () => ({
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         children,
         ...props
@@ -92,7 +93,7 @@ vi.mock("../../../../theme/components/ThemedText", () => ({
     ),
 }));
 
-vi.mock("../../common/MonitorUiComponents", () => ({
+vi.mock(import('../../common/MonitorUiComponents'), () => ({
     DetailLabel: ({
         children,
         ...props
@@ -107,7 +108,7 @@ describe(HistoryTab, () => {
     );
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
 
-    const createMockMonitor = (historyLength: number = 5): Monitor => ({
+    const createMockMonitor = (historyLength = 5): Monitor => ({
         id: "test-monitor",
         type: "http",
         url: "https://example.com",
@@ -217,8 +218,8 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
-            expect(mockFormatFullTimestamp).toHaveBeenCalled();
-            expect(mockFormatResponseTime).toHaveBeenCalled();
+            expect(mockFormatFullTimestamp).toHaveBeenCalledWith();
+            expect(mockFormatResponseTime).toHaveBeenCalledWith();
             const upLabels = screen.getAllByText("Up");
             expect(upLabels.length).toBeGreaterThan(0);
             for (const label of upLabels) {

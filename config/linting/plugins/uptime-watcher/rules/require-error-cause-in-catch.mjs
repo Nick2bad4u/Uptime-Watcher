@@ -164,17 +164,17 @@ export const requireErrorCauseInCatchRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require Error(..., { cause }) when throwing inside catch blocks",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/require-error-cause-in-catch.md",
         },
-        schema: [],
         messages: {
             missingCause:
                 "When throwing a new built-in Error inside a catch block, include a `{ cause }` option to preserve the error chain.",
         },
+        schema: [],
+        type: "problem",
     },
 };

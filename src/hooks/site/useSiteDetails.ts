@@ -314,11 +314,11 @@ export function useSiteDetails({
 
     const localName = userEditedSiteName ?? currentSite.name;
     const setLocalName = setUserEditedSiteName;
-    const nameChanged = localName !== currentSite.name;
+    const isNameChanged = localName !== currentSite.name;
 
     // Derived state: computed during render
     const hasUnsavedChanges = resolveHasUnsavedChanges(
-        nameChanged,
+        isNameChanged,
         intervalChanged,
         retryAttemptsChanged,
         timeoutChanged
@@ -398,7 +398,7 @@ export function useSiteDetails({
     );
 
     // Check if site exists
-    const siteExists = sites.some((s) => s.identifier === site.identifier);
+    const isSiteExists = sites.some((s) => s.identifier === site.identifier);
 
     return {
         // UI state
@@ -443,7 +443,7 @@ export function useSiteDetails({
         setSiteDetailsChartTimeRange,
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
-        siteExists,
+        siteExists: isSiteExists,
         timeoutChanged,
     };
 }

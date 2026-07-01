@@ -31,9 +31,9 @@ const meta: Meta<SidebarRevealButtonStoryArgs> = {
         );
 
         const handleToggle = (): void => {
-            const nextState = !isSidebarOpen;
-            setIsSidebarOpen(nextState);
-            action("sidebar/toggle")(nextState ? "open" : "close");
+            const isNextState = !isSidebarOpen;
+            setIsSidebarOpen(isNextState);
+            action("sidebar/toggle")(isNextState ? "open" : "close");
         };
 
         return (

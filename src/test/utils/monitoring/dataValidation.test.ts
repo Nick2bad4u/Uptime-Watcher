@@ -3,25 +3,27 @@
  *   parseUptimeValue and safeGetHostname functions for 100% coverage
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { test } from "@fast-check/vitest";
-import fc from "fast-check";
 import { isValidUrl } from "@shared/validation/validatorUtils";
+import fc from "fast-check";
+import { arrayJoin } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { logger } from "../../../services/logger";
 import {
     parseUptimeValue,
     safeGetHostname,
 } from "../../../utils/monitoring/dataValidation";
-import { logger } from "../../../services/logger";
 
 const alphaNumericChars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
 const alphaNumCharArb = fc.constantFrom(...alphaNumericChars);
 const safeSegmentArb = fc
-    .array(alphaNumCharArb, { minLength: 1, maxLength: 8 })
-    .map((chars) => chars.join(""));
+    .array(alphaNumCharArb, { maxLength: 8, minLength: 1 })
+    .map((chars) => arrayJoin(chars, ""));
 const safeQueryArb = fc
-    .array(alphaNumCharArb, { minLength: 1, maxLength: 6 })
-    .map((chars) => chars.join(""));
+    .array(alphaNumCharArb, { maxLength: 6, minLength: 1 })
+    .map((chars) => arrayJoin(chars, ""));
 const safeHttpUrlArb = fc
     .tuple(
         fc.constantFrom("http", "https"),
@@ -36,44 +38,44 @@ const safeHttpUrlArb = fc
             segments,
             query,
         ]) => {
-            const path = segments.length > 0 ? `/${segments.join("/")}` : "";
+            const path = segments.length > 0 ? `/${arrayJoin(segments, "/")}` : "";
             const queryPart = query ? `?${query}=1` : "";
             return `${scheme}://${host}${path}${queryPart}`;
         }
     );
 
 // Mock the logger
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
-        warn: vi.fn(),
-        info: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
         app: {
-            started: vi.fn(),
             error: vi.fn(),
+            started: vi.fn(),
         },
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
         site: {
+            error: vi.fn(),
+            info: vi.fn(),
+        },
+        system: {
             error: vi.fn(),
             info: vi.fn(),
         },
         user: {
             action: vi.fn(),
         },
-        system: {
-            error: vi.fn(),
-            info: vi.fn(),
-        },
+        warn: vi.fn(),
     },
 }));
 
-describe("Monitoring Data Validation", () => {
+describe("monitoring Data Validation", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     describe(parseUptimeValue, () => {
-        it("should parse valid numeric strings", async ({ task, annotate }) => {
+        it("should parse valid numeric strings", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -87,8 +89,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should parse strings with percent signs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -103,8 +105,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should parse strings with whitespace", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -118,8 +120,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should parse strings with both percent signs and whitespace", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -132,7 +134,7 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue("  99.99%  ")).toBe(99.99);
         });
 
-        it("should clamp values above 100", async ({ task, annotate }) => {
+        it("should clamp values above 100", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -144,7 +146,7 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue(" 150% ")).toBe(100);
         });
 
-        it("should clamp values below 0", async ({ task, annotate }) => {
+        it("should clamp values below 0", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -158,7 +160,7 @@ describe("Monitoring Data Validation", () => {
 
         test.prop(
             [
-                fc.float({ min: -5000, max: 5000, noNaN: true }),
+                fc.float({ max: 5000, min: -5000, noNaN: true }),
                 fc.boolean(),
                 fc.boolean(),
             ],
@@ -182,8 +184,8 @@ describe("Monitoring Data Validation", () => {
         );
 
         it("should return 0 for invalid numeric strings and log warning", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -197,6 +199,7 @@ describe("Monitoring Data Validation", () => {
             );
 
             vi.clearAllMocks();
+
             expect(parseUptimeValue("abc123")).toBe(0);
             expect(logger.warn).toHaveBeenCalledWith(
                 "Invalid uptime value received",
@@ -204,6 +207,7 @@ describe("Monitoring Data Validation", () => {
             );
 
             vi.clearAllMocks();
+
             expect(parseUptimeValue("")).toBe(0);
             expect(logger.warn).toHaveBeenCalledWith(
                 "Invalid uptime value received",
@@ -212,8 +216,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should return 0 for NaN values and log warning", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -227,6 +231,7 @@ describe("Monitoring Data Validation", () => {
             );
 
             vi.clearAllMocks();
+
             expect(parseUptimeValue("undefined")).toBe(0);
             expect(logger.warn).toHaveBeenCalledWith(
                 "Invalid uptime value received",
@@ -234,7 +239,7 @@ describe("Monitoring Data Validation", () => {
             );
         });
 
-        it("should handle edge cases", async ({ task, annotate }) => {
+        it("should handle edge cases", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -246,7 +251,7 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue("99.9")).toBe(99.9);
         });
 
-        it("should handle scientific notation", async ({ task, annotate }) => {
+        it("should handle scientific notation", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -260,27 +265,27 @@ describe("Monitoring Data Validation", () => {
 
     describe(isValidUrl, () => {
         it("should return true for valid HTTPS URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("https://example.com")).toBeTruthy();
-            expect(isValidUrl("https://www.example.com")).toBeTruthy();
-            expect(isValidUrl("https://example.com:443")).toBeTruthy();
-            expect(isValidUrl("https://example.com/path")).toBeTruthy();
+            expect(isValidUrl("https://example.com")).toBe(true);
+            expect(isValidUrl("https://www.example.com")).toBe(true);
+            expect(isValidUrl("https://example.com:443")).toBe(true);
+            expect(isValidUrl("https://example.com/path")).toBe(true);
             expect(
                 isValidUrl("https://example.com/path?query=value")
-            ).toBeTruthy();
-            expect(isValidUrl("https://example.com#anchor")).toBeTruthy();
+            ).toBe(true);
+            expect(isValidUrl("https://example.com#anchor")).toBe(true);
         });
 
         it("should return true for valid HTTP/HTTPS URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -288,15 +293,15 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // Validator.js only accepts HTTP/HTTPS protocols by default
-            expect(isValidUrl("https://example.com")).toBeTruthy();
-            expect(isValidUrl("https://example.com")).toBeTruthy();
-            expect(isValidUrl("https://localhost")).toBeTruthy();
-            expect(isValidUrl("http://localhost:3000")).toBeTruthy();
+            expect(isValidUrl("https://example.com")).toBe(true);
+            expect(isValidUrl("https://example.com")).toBe(true);
+            expect(isValidUrl("https://localhost")).toBe(true);
+            expect(isValidUrl("http://localhost:3000")).toBe(true);
         });
 
         it("should handle different URL schemes per validator.js behavior", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -304,65 +309,65 @@ describe("Monitoring Data Validation", () => {
             await annotate("Type: Business Logic", "type");
 
             // Our validation rejects FTP protocol - only HTTP/HTTPS allowed
-            expect(isValidUrl("ftp://example.com")).toBeFalsy();
+            expect(isValidUrl("ftp://example.com")).toBe(false);
             // Validator.js rejects these protocols by default
-            expect(isValidUrl("file:///path/to/file")).toBeFalsy();
-            expect(isValidUrl("mailto:test@example.com")).toBeFalsy();
-            expect(isValidUrl("tel:+1234567890")).toBeFalsy();
+            expect(isValidUrl("file:///path/to/file")).toBe(false);
+            expect(isValidUrl("mailto:test@example.com")).toBe(false);
+            expect(isValidUrl("tel:+1234567890")).toBe(false);
         });
 
         it("should return false for invalid URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("not-a-url")).toBeFalsy();
-            expect(isValidUrl("example.com")).toBeFalsy(); // Missing protocol
-            expect(isValidUrl("://example.com")).toBeFalsy(); // Missing scheme
-            expect(isValidUrl("")).toBeFalsy();
+            expect(isValidUrl("not-a-url")).toBe(false);
+            expect(isValidUrl("example.com")).toBe(false); // Missing protocol
+            expect(isValidUrl("://example.com")).toBe(false); // Missing scheme
+            expect(isValidUrl("")).toBe(false);
         });
 
         it("should return false for null, undefined, and non-string inputs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl(null as any)).toBeFalsy();
-            expect(isValidUrl(undefined as any)).toBeFalsy();
-            expect(isValidUrl(123 as any)).toBeFalsy();
-            expect(isValidUrl({} as any)).toBeFalsy();
-            expect(isValidUrl([] as any)).toBeFalsy();
-            expect(isValidUrl(true as any)).toBeFalsy();
+            expect(isValidUrl(null as any)).toBe(false);
+            expect(isValidUrl(undefined as any)).toBe(false);
+            expect(isValidUrl(123 as any)).toBe(false);
+            expect(isValidUrl({} as any)).toBe(false);
+            expect(isValidUrl([] as any)).toBe(false);
+            expect(isValidUrl(true as any)).toBe(false);
         });
 
         it("should handle edge cases and malformed URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidUrl("https://")).toBeFalsy();
-            expect(isValidUrl("https:///")).toBeFalsy();
-            expect(isValidUrl("https://[")).toBeFalsy();
-            expect(isValidUrl("https://]")).toBeFalsy();
+            expect(isValidUrl("https://")).toBe(false);
+            expect(isValidUrl("https:///")).toBe(false);
+            expect(isValidUrl("https://[")).toBe(false);
+            expect(isValidUrl("https://]")).toBe(false);
             // Validator.js rejects URLs with double dots for security
-            expect(isValidUrl("https://example..com")).toBeFalsy();
+            expect(isValidUrl("https://example..com")).toBe(false);
         });
 
         it("should handle special characters in URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -372,35 +377,35 @@ describe("Monitoring Data Validation", () => {
             // Validator.js rejects URLs with unencoded spaces for security
             expect(
                 isValidUrl("https://example.com/path with spaces")
-            ).toBeFalsy();
+            ).toBe(false);
             expect(
                 isValidUrl("https://example.com/path%20with%20encoded%20spaces")
-            ).toBeTruthy();
+            ).toBe(true);
             expect(
                 isValidUrl("https://example.com/path?param=value&other=test")
-            ).toBeTruthy();
+            ).toBe(true);
         });
 
         test.prop([safeHttpUrlArb], { numRuns: 50 })(
             "returns true for any http/https URL with limited safe characters",
             (url) => {
-                expect(isValidUrl(url)).toBeTruthy();
+                expect(isValidUrl(url)).toBe(true);
             }
         );
 
         test.prop([fc.domain()], { numRuns: 30 })(
             "returns false for inputs missing a scheme",
             (domain) => {
-                expect(isValidUrl(domain)).toBeFalsy();
-                expect(isValidUrl(`${domain}/path`)).toBeFalsy();
+                expect(isValidUrl(domain)).toBe(false);
+                expect(isValidUrl(`${domain}/path`)).toBe(false);
             }
         );
     });
 
     describe(safeGetHostname, () => {
         it("should extract hostname from valid HTTPS URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -420,8 +425,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should extract hostname from URLs with paths and queries", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -448,8 +453,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should return empty string for invalid URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -463,8 +468,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should return empty string for null, undefined, and non-string inputs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -480,8 +485,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should handle edge cases and malformed URLs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -495,8 +500,8 @@ describe("Monitoring Data Validation", () => {
         });
 
         it("should handle URLs with special hostnames", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -509,7 +514,7 @@ describe("Monitoring Data Validation", () => {
             expect(safeGetHostname("https://[::1]")).toBe("[::1]"); // IPv6
         });
 
-        it("should use isValidUrl internally", async ({ task, annotate }) => {
+        it("should use isValidUrl internally", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
             await annotate("Category: Utility", "category");
@@ -535,10 +540,10 @@ describe("Monitoring Data Validation", () => {
         );
     });
 
-    describe("Integration tests", () => {
+    describe("integration tests", () => {
         it("should work together for URL processing workflow", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -552,29 +557,29 @@ describe("Monitoring Data Validation", () => {
             ];
 
             const results = urls.map((url) => ({
-                url,
-                isValid: isValidUrl(url),
                 hostname: safeGetHostname(url),
+                isValid: isValidUrl(url),
+                url,
             }));
 
             expect(results).toEqual([
                 {
-                    url: "https://example.com",
-                    isValid: true,
                     hostname: "example.com",
-                },
-                { url: "invalid-url", isValid: false, hostname: "" },
-                {
-                    url: "https://test.com:8080/path",
                     isValid: true,
+                    url: "https://example.com",
+                },
+                { hostname: "", isValid: false, url: "invalid-url" },
+                {
                     hostname: "test.com",
+                    isValid: true,
+                    url: "https://test.com:8080/path",
                 },
             ]);
         });
 
         it("should handle monitoring data validation workflow", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: dataValidation", "component");
@@ -588,19 +593,19 @@ describe("Monitoring Data Validation", () => {
             ];
 
             const processed = monitoringData.map((data) => ({
-                uptimeValue: parseUptimeValue(data.uptime),
-                isValidUrl: isValidUrl(data.url),
                 hostname: safeGetHostname(data.url),
+                isValidUrl: isValidUrl(data.url),
+                uptimeValue: parseUptimeValue(data.uptime),
             }));
 
             expect(processed).toEqual([
                 {
-                    uptimeValue: 95.5,
-                    isValidUrl: true,
                     hostname: "example.com",
+                    isValidUrl: true,
+                    uptimeValue: 95.5,
                 },
-                { uptimeValue: 0, isValidUrl: false, hostname: "" },
-                { uptimeValue: 100, isValidUrl: true, hostname: "test.com" },
+                { hostname: "", isValidUrl: false, uptimeValue: 0 },
+                { hostname: "test.com", isValidUrl: true, uptimeValue: 100 },
             ]);
 
             // Should have logged warning for invalid uptime

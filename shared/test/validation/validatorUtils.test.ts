@@ -11,9 +11,10 @@
  * @since 2024-01-XX
  */
 
-import { describe, expect, it } from "vitest";
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
+import { describe, expect, it } from "vitest";
+
 import {
     isNonEmptyString,
     isValidFQDN,
@@ -79,7 +80,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isNonEmptyString("")).toBeFalsy();
-            expect(isNonEmptyString("   ")).toBeFalsy();
+            expect(isNonEmptyString(' '.repeat(3))).toBeFalsy();
             expect(isNonEmptyString("\t")).toBeFalsy();
             expect(isNonEmptyString("\n")).toBeFalsy();
             expect(isNonEmptyString("\r\n")).toBeFalsy();
@@ -233,7 +234,7 @@ describe("validatorUtils", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(isValidIdentifier("")).toBeFalsy();
-            expect(isValidIdentifier("   ")).toBeFalsy();
+            expect(isValidIdentifier(' '.repeat(3))).toBeFalsy();
             expect(isValidIdentifier("\t")).toBeFalsy();
             expect(isValidIdentifier("\n")).toBeFalsy();
         });

@@ -13,9 +13,9 @@
  * @public
  */
 
-import { describe, it, expect } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { describe, expect, it } from "vitest";
 
 describe("Console Statement Remediation", () => {
     const projectRoot = path.resolve(import.meta.dirname, "../../../..");
@@ -61,32 +61,32 @@ describe("Console Statement Remediation", () => {
      * Extract console statements from a file
      */
     function extractConsoleStatements(filePath: string): {
-        line: number;
         content: string;
-        type: "error" | "warn" | "log" | "debug" | "info";
         context: string;
+        line: number;
+        type: "debug" | "error" | "info" | "log" | "warn";
     }[] {
         const content = fs.readFileSync(filePath, "utf8");
         const lines = content.split(String.raw`\n`);
         const consoleStatements: {
-            line: number;
             content: string;
-            type: "error" | "warn" | "log" | "debug" | "info";
             context: string;
+            line: number;
+            type: "debug" | "error" | "info" | "log" | "warn";
         }[] = [];
 
         const consoleRegex =
-            /console\.(?<method>error|warn|log|debug|info)\s*\(/;
+            /console\.(?<method>debug|error|info|log|warn)\s*\(/v;
 
         for (const [index, line] of lines.entries()) {
-            const match = line.match(consoleRegex);
+            const match = consoleRegex.exec(line);
             if (match) {
                 const type = match.groups?.["method"] as
-                    | "error"
-                    | "warn"
-                    | "log"
                     | "debug"
-                    | "info";
+                    | "error"
+                    | "info"
+                    | "log"
+                    | "warn";
 
                 // Get some context around the line
                 const startLine = Math.max(0, index - 2);
@@ -112,10 +112,10 @@ describe("Console Statement Remediation", () => {
      */
     function categorizeConsoleStatement(
         statement: {
-            line: number;
             content: string;
-            type: string;
             context: string;
+            line: number;
+            type: string;
         },
         filePath: string
     ): {
@@ -161,6 +161,11 @@ describe("Console Statement Remediation", () => {
         let replacement = "";
 
         switch (statement.type) {
+            case "debug": {
+                replacement = 'logger.debug("Debug information");';
+
+                break;
+            }
             case "error": {
                 replacement =
                     statement.context.includes("catch") ||
@@ -170,8 +175,8 @@ describe("Console Statement Remediation", () => {
 
                 break;
             }
-            case "warn": {
-                replacement = 'logger.warn("Warning message");';
+            case "info": {
+                replacement = 'logger.info("Information message");';
 
                 break;
             }
@@ -184,13 +189,8 @@ describe("Console Statement Remediation", () => {
 
                 break;
             }
-            case "debug": {
-                replacement = 'logger.debug("Debug information");';
-
-                break;
-            }
-            case "info": {
-                replacement = 'logger.info("Information message");';
+            case "warn": {
+                replacement = 'logger.warn("Warning message");';
 
                 break;
             }
@@ -214,13 +214,13 @@ describe("Console Statement Remediation", () => {
 
             const allFiles = srcDirs.flatMap((dir) => findTSFiles(dir));
             const analysisResults: {
-                file: string;
-                statements: ReturnType<typeof extractConsoleStatements>;
                 categorized: {
                     legitimate: number;
                     needsReplacement: number;
                     testFile: number;
                 };
+                file: string;
+                statements: ReturnType<typeof extractConsoleStatements>;
             }[] = [];
 
             let totalStatements = 0;
@@ -314,8 +314,8 @@ describe("Console Statement Remediation", () => {
                 file: string;
                 line: number;
                 original: string;
-                replacement: string;
                 reason: string;
+                replacement: string;
             }[] = [];
 
             for (const file of allFiles.slice(0, 30)) {
@@ -484,28 +484,28 @@ describe("Console Statement Remediation", () => {
 
             const replacementPatterns = [
                 {
-                    pattern: /console\.error\\\((?<args>.+)\\\);?/g,
+                    pattern: /console\.error\\\((?<args>.+)\\\);?/gv,
                     replacement: "logger.error($<args>);",
                     description: "Replace console.error with logger.error",
                 },
                 {
-                    pattern: /console\.warn\\\((?<args>.+)\\\);?/g,
+                    pattern: /console\.warn\\\((?<args>.+)\\\);?/gv,
                     replacement: "logger.warn($<args>);",
                     description: "Replace console.warn with logger.warn",
                 },
                 {
-                    pattern: /console\.log\\\((?<args>.+)\\\);?/g,
+                    pattern: /console\.log\\\((?<args>.+)\\\);?/gv,
                     replacement: "logger.info($<args>);",
                     description:
                         "Replace console.log with logger.info (review manually)",
                 },
                 {
-                    pattern: /console\.debug\\\((?<args>.+)\\\);?/g,
+                    pattern: /console\.debug\\\((?<args>.+)\\\);?/gv,
                     replacement: "logger.debug($<args>);",
                     description: "Replace console.debug with logger.debug",
                 },
                 {
-                    pattern: /console\.info\\\((?<args>.+)\\\);?/g,
+                    pattern: /console\.info\\\((?<args>.+)\\\);?/gv,
                     replacement: "logger.info($<args>);",
                     description: "Replace console.info with logger.info",
                 },

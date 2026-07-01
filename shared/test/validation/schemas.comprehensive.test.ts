@@ -3,35 +3,37 @@
  * all validation logic
  */
 
-import { describe, it, expect, vi } from "vitest";
-import fc from "fast-check";
 import type { UnknownRecord } from "type-fest";
+
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { STATUS_HISTORY_VALUES, STATUS_KIND } from "@shared/types";
+import fc from "fast-check";
+import { describe, expect, it, vi } from "vitest";
+
 import {
-    validateMonitorData,
-    validateMonitorField,
-    httpMonitorSchema,
-    portMonitorSchema,
-    pingMonitorSchema,
-    sslMonitorSchema,
-    monitorSchema,
     baseMonitorSchema,
-    monitorSchemas,
     cdnEdgeConsistencyMonitorSchema,
+    type HttpMonitor,
+    httpMonitorSchema,
+    type HttpStatusMonitor,
+    monitorSchema,
+    monitorSchemas,
+    type PingMonitor,
+    pingMonitorSchema,
+    type PortMonitor,
+    portMonitorSchema,
     replicationMonitorSchema,
     serverHeartbeatMonitorSchema,
-    websocketKeepaliveMonitorSchema,
-    type HttpMonitor,
-    type HttpStatusMonitor,
-    type PortMonitor,
-    type PingMonitor,
     type SslMonitor,
+    sslMonitorSchema,
+    validateMonitorData,
+    validateMonitorField,
+    websocketKeepaliveMonitorSchema,
 } from "../../validation/monitorSchemas";
 import {
+    type Site,
     siteSchema,
     validateSiteData,
-    type Site,
 } from "../../validation/siteSchemas";
 import { isValidHost, isValidUrl } from "../../validation/validatorUtils";
 
@@ -93,7 +95,7 @@ const siteIdentifierArbitrary = fc
         maxLength: 24,
     })
     .map((chars) => chars.join(""))
-    .filter((identifier) => /[a-zA-Z0-9]/u.test(identifier));
+    .filter((identifier) => /[0-9A-Za-z]/v.test(identifier));
 
 const nonEmptyNameArbitrary = fc
     .string({ minLength: 1, maxLength: 48 })
@@ -142,7 +144,7 @@ const pingMonitorArbitrary: fc.Arbitrary<PingMonitor> = fc
         ...monitor,
         type: "ping" as const,
         host,
-    })) as fc.Arbitrary<PingMonitor>;
+    }));
 
 const httpMonitorArbitrary: fc.Arbitrary<HttpMonitor> = fc
     .tuple(baseMonitorArbitrary, httpUrlArbitrary)
@@ -150,7 +152,7 @@ const httpMonitorArbitrary: fc.Arbitrary<HttpMonitor> = fc
         ...monitor,
         type: "http" as const,
         url,
-    })) as fc.Arbitrary<HttpMonitor>;
+    }));
 
 const siteArbitrary = fc.record({
     identifier: siteIdentifierArbitrary,
@@ -1378,8 +1380,8 @@ describe(validateSiteData, () => {
         const result = validateSiteData(siteData);
         expect(result.success).toBeTruthy();
         expect(result.errors).toHaveLength(0);
-        expect(result.metadata!["monitorCount"]).toBe(1);
-        expect(result.metadata!["siteIdentifier"]).toBe("test-site");
+        expect(result.metadata!.monitorCount).toBe(1);
+        expect(result.metadata!.siteIdentifier).toBe("test-site");
     });
 
     it("should return errors for invalid site data", async ({
@@ -1605,10 +1607,10 @@ describe("Edge cases and boundary conditions", () => {
         await annotate("Type: Business Logic", "type");
 
         const statuses = [
-            "up",
             "down",
-            "pending",
             "paused",
+            "pending",
+            "up",
         ] as const;
 
         for (const status of statuses) {

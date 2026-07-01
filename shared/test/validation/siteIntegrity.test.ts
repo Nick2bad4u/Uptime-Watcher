@@ -2,9 +2,10 @@
  * Regression coverage for shared site integrity helpers.
  */
 
+import type { Site } from "@shared/types";
+
 import { describe, expect, it } from "vitest";
 
-import type { Site } from "@shared/types";
 import {
     collectDuplicateSiteIdentifiers,
     DuplicateSiteIdentifierError,
@@ -42,7 +43,7 @@ describe("siteIntegrity", () => {
             buildSite("site-2", "Site 2"),
         ];
 
-        expect(() => ensureUniqueSiteIdentifiers(uniqueSites)).not.toThrow();
+        expect(() => { ensureUniqueSiteIdentifiers(uniqueSites); }).not.toThrow();
     });
 
     it("ensureUniqueSiteIdentifiers throws descriptive error when duplicates detected", () => {
@@ -52,7 +53,7 @@ describe("siteIntegrity", () => {
         ];
 
         expect(() =>
-            ensureUniqueSiteIdentifiers(duplicateSites, "shared-test")
+            { ensureUniqueSiteIdentifiers(duplicateSites, "shared-test"); }
         ).toThrow(DuplicateSiteIdentifierError);
 
         try {

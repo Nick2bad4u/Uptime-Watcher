@@ -2,9 +2,13 @@
  * Behavioral tests for the global {@link ConfirmDialog} component.
  */
 
-import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ConfirmDialog } from "../../../../components/common/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialogControls } from "../../../../stores/ui/useConfirmDialogStore";
 
 interface CapturedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     readonly "data-testid"?: string;
@@ -14,38 +18,38 @@ interface CapturedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const buttonProps: CapturedButtonProps[] = [];
 
-vi.mock("../../../../stores/ui/useConfirmDialogStore", () => ({
+vi.mock(import('../../../../stores/ui/useConfirmDialogStore'), () => ({
     useConfirmDialogControls: vi.fn(),
 }));
 
-vi.mock("../../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../../theme/components/ThemedBox'), () => ({
     ThemedBox: ({
         children,
         ...props
-    }: {
+    }: HTMLAttributes<HTMLElement> & {
         readonly children?: ReactNode;
-    } & HTMLAttributes<HTMLElement>) => (
+    }) => (
         <section {...props}>{children}</section>
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         children,
         ...props
-    }: {
+    }: HTMLAttributes<HTMLElement> & {
         readonly children?: ReactNode;
-    } & HTMLAttributes<HTMLElement>) => <span {...props}>{children}</span>,
+    }) => <span {...props}>{children}</span>,
 }));
 
-vi.mock("../../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         icon,
         ...props
-    }: {
+    }: CapturedButtonProps & {
         readonly children?: ReactNode;
-    } & CapturedButtonProps) => {
+    }) => {
         buttonProps.push(props);
         return (
             <button type="button" {...props}>
@@ -55,9 +59,6 @@ vi.mock("../../../../theme/components/ThemedButton", () => ({
         );
     },
 }));
-
-import { useConfirmDialogControls } from "../../../../stores/ui/useConfirmDialogStore";
-import { ConfirmDialog } from "../../../../components/common/ConfirmDialog/ConfirmDialog";
 
 const mockUseConfirmDialogControls = vi.mocked(useConfirmDialogControls);
 

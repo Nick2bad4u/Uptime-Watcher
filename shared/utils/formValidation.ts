@@ -4,7 +4,7 @@
  *
  * @remarks
  * This module provides standardized validation functions for common form
- * patterns found across the application, including required field validation,
+ * patterns found across the app, including required field validation,
  * string validation, URL validation, and custom validation helpers.
  *
  * @packageDocumentation
@@ -23,7 +23,7 @@ import {
  *
  * @remarks
  * Common pattern for required text field validation that appears throughout the
- * application.
+ * app.
  *
  * @param value - The string value to validate
  * @param fieldName - Optional field name for error messages
@@ -73,7 +73,7 @@ export function validateRequired(
  * @remarks
  * Standardizes URL validation across form components.
  *
- * @param url - The URL string to validate
+ * @param URL - The URL string to validate
  * @param fieldName - Optional field name for error messages
  *
  * @returns Validation result with success status and optional error message
@@ -220,7 +220,7 @@ export function validateTimeout(
  * @returns Array of validation error messages (empty if all valid)
  */
 export function validateFormFields(
-    validations: Array<() => { error?: string; isValid: boolean }>
+    validations: (() => { error?: string; isValid: boolean })[]
 ): string[] {
     const errors: string[] = [];
 

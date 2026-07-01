@@ -6,18 +6,20 @@
  * duration formatting.
  */
 
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import { describe, expect, it, vi } from "vitest";
-import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
 import type { Monitor, Site } from "@shared/types";
-import { calculateMaxDuration } from "../../../../utils/duration";
+
+import "@testing-library/jest-dom";
 import {
     sampleOne,
     siteIdentifierArbitrary,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+
+import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
+import { calculateMaxDuration } from "../../../../utils/duration";
 
 let sampledSiteName: string;
 let sampledSiteIdentifier: string;
@@ -25,7 +27,7 @@ let sampledMonitorUrl: string;
 const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         info: vi.fn(),
@@ -34,7 +36,7 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../theme/useTheme", () => ({
+vi.mock(import('../../../../theme/useTheme'), () => ({
     useTheme: () => ({
         currentTheme: {
             name: "light",
@@ -175,7 +177,7 @@ vi.mock("../../../../theme/useTheme", () => ({
     useThemeValue: () => "mockValue",
 }));
 
-vi.mock("../../../../utils/monitorTypeHelper", () => ({
+vi.mock(import('../../../../utils/monitorTypeHelper'), () => ({
     getMonitorTypeConfig: vi.fn().mockResolvedValue({
         fields: [
             {
@@ -187,7 +189,7 @@ vi.mock("../../../../utils/monitorTypeHelper", () => ({
     }),
 }));
 
-vi.mock("../../../../utils/fallbacks", () => ({
+vi.mock(import('../../../../utils/fallbacks'), () => ({
     getMonitorDisplayIdentifier: vi.fn(() => monitorIdentifierRef.value),
     getMonitorTypeDisplayLabel: vi.fn().mockReturnValue("URL"),
     UiDefaults: {
@@ -196,14 +198,14 @@ vi.mock("../../../../utils/fallbacks", () => ({
     },
 }));
 
-vi.mock("../../../../utils/time", () => ({
+vi.mock(import('../../../../utils/time'), () => ({
     formatRetryAttemptsText: vi.fn(
         (attempts: number) => `${attempts + 1} attempts + backoff`
     ),
     getIntervalLabel: vi.fn((interval: number) => `${interval / 1000}s`),
 }));
 
-vi.mock("../../../../constants", () => ({
+vi.mock(import('../../../../constants'), () => ({
     CHECK_INTERVALS: [
         30_000,
         60_000,
@@ -280,11 +282,11 @@ describe("SettingsTab arithmetic mutations", () => {
             render(<SettingsTab {...props} />);
 
             // Remains readable with the new help callout formatting.
-            expect(screen.getByText(/Current:\s*60s/u)).toBeInTheDocument();
+            expect(screen.getByText(/Current:\s*60s/v)).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 60,000,000 which would be incorrect
             expect(
-                screen.queryByText(/Currently:\s*60{7}s/u)
+                screen.queryByText(/Currently:\s*60{7}s/v)
             ).not.toBeInTheDocument();
         });
 
@@ -298,13 +300,13 @@ describe("SettingsTab arithmetic mutations", () => {
             // (Math.round(0.5) = 1)
             expect(
                 screen.getByText(
-                    /How often Uptime Watcher runs a check for this monitor/u
+                    /How often Uptime Watcher runs a check for this monitor/v
                 )
             ).toBeInTheDocument();
 
             // Mutation (/ 1000 -> * 1000) would yield 500,000 which would be incorrect
             expect(
-                screen.queryByText(/Currently:\s*50{5}s/u)
+                screen.queryByText(/Currently:\s*50{5}s/v)
             ).not.toBeInTheDocument();
         });
     });
@@ -321,12 +323,12 @@ describe("SettingsTab arithmetic mutations", () => {
 
             // Should display "4 attempts" (3 + 1 = 4) - target the specific span with just the attempts text
             expect(
-                screen.getByText(/\b4 attempts \+ backoff\./u)
+                screen.getByText(/\b4 attempts \+ backoff\./v)
             ).toBeInTheDocument();
 
             // Mutation (+ 1 -> - 1) would yield 2 attempts which would be incorrect
             expect(
-                screen.queryByText(/2 attempts \+ backoff/)
+                screen.queryByText(/2 attempts \+ backoff/v)
             ).not.toBeInTheDocument();
         });
 
@@ -341,12 +343,12 @@ describe("SettingsTab arithmetic mutations", () => {
 
             // Should display "1 attempts" (0 + 1 = 1)
             expect(
-                screen.getByText(/1 attempts \+ backoff/)
+                screen.getByText(/1 attempts \+ backoff/v)
             ).toBeInTheDocument();
 
             // Mutation (+ 1 -> - 1) would yield -1 attempts which would be incorrect
             expect(
-                screen.queryByText(/-1 attempts \+ backoff/)
+                screen.queryByText(/-1 attempts \+ backoff/v)
             ).not.toBeInTheDocument();
         });
     });
@@ -480,17 +482,17 @@ describe("SettingsTab arithmetic mutations", () => {
 
             render(<SettingsTab {...props} />);
 
-            expect(screen.getByText(/Current:\s*30s/u)).toBeInTheDocument();
+            expect(screen.getByText(/Current:\s*30s/v)).toBeInTheDocument();
 
             // Check retry attempts display: 2 + 1 = 3 attempts - target the specific span
             expect(
-                screen.getByText(/\b3 attempts \+ backoff\./u)
+                screen.getByText(/\b3 attempts \+ backoff\./v)
             ).toBeInTheDocument();
 
             // Check max duration calculation appears (calculateMaxDuration with all its arithmetic)
             // timeout=10, retryAttempts=2 -> should be around 22s total
             expect(
-                screen.getByText(/Maximum check duration/)
+                screen.getByText(/Maximum check duration/v)
             ).toBeInTheDocument();
         });
     });

@@ -36,7 +36,7 @@ interface StatusDistribution {
  *
  * @param analytics - Analytics computed by
  *   {@link src/hooks/site/useSiteAnalytics#useSiteAnalytics}.
- * @param currentTheme - Current application theme.
+ * @param currentTheme - Current app theme.
  *
  * @returns Memoized chart options and datasets.
  */

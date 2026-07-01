@@ -15,10 +15,8 @@
 
 import type { JSX } from "react";
 
-import { render, screen } from "@testing-library/react";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen  } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-
 // Import the jest-dom matchers for toBeInTheDocument
 import "@testing-library/jest-dom";
 
@@ -34,10 +32,10 @@ interface ThrowingComponentProperties {
     readonly throwMessage?: string;
 }
 
-let globalShouldThrow = true;
+let isGlobalShouldThrow = true;
 
 const ThrowingComponent = ({
-    shouldThrow = globalShouldThrow,
+    shouldThrow = isGlobalShouldThrow,
     throwMessage = "Test error for ErrorBoundary",
 }: ThrowingComponentProperties): JSX.Element => {
     if (shouldThrow) {
@@ -91,11 +89,11 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
 
         // Mock console.error to suppress error boundary log output
         const originalConsoleError = console.error;
-        console.error = vi.fn();
+        vi.spyOn(console, 'error').mockImplementation();
 
         try {
             // Set component to throw error initially
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
 
             render(
                 <ErrorBoundary fallback={MockFallback}>
@@ -109,11 +107,11 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             ).toBeInTheDocument();
 
             // Get the retry button
-            const retryButton = screen.getByRole("button", { name: /retry/i });
+            const retryButton = screen.getByRole("button", { name: /retry/iv });
             expect(retryButton).toBeInTheDocument();
 
             // Stop throwing errors so retry can succeed
-            globalShouldThrow = false;
+            isGlobalShouldThrow = false;
 
             // Click retry - this should increment retryCount from 0 to 1
             fireEvent.click(retryButton);
@@ -129,7 +127,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             expect(screen.queryByText("Error caught:")).not.toBeInTheDocument();
         } finally {
             console.error = originalConsoleError;
-            globalShouldThrow = true; // Reset for other tests
+            isGlobalShouldThrow = true; // Reset for other tests
         }
     });
 
@@ -147,11 +145,11 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Type: Arithmetic Operations", "type");
 
         const originalConsoleError = console.error;
-        console.error = vi.fn();
+        vi.spyOn(console, 'error').mockImplementation();
 
         try {
             // First mount with error
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
             const { rerender } = render(
                 <ErrorBoundary fallback={MockFallback}>
                     <ThrowingComponent />
@@ -162,17 +160,17 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             expect(
                 screen.getByText("Error caught: Test error for ErrorBoundary")
             ).toBeInTheDocument();
-            const retryButton = screen.getByRole("button", { name: /retry/i });
+            const retryButton = screen.getByRole("button", { name: /retry/iv });
 
             // First retry
-            globalShouldThrow = false;
+            isGlobalShouldThrow = false;
             fireEvent.click(retryButton);
             expect(
                 screen.getByText("Normal component content")
             ).toBeInTheDocument();
 
             // Second error cycle - use rerender instead of new render to avoid multiple components
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
             rerender(
                 <ErrorBoundary fallback={MockFallback}>
                     <ThrowingComponent throwMessage="Second error" />
@@ -183,8 +181,8 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             ).toBeInTheDocument();
 
             // Second retry - retryCount should be 1 + 1 = 2
-            globalShouldThrow = false;
-            const retryButton2 = screen.getByRole("button", { name: /retry/i });
+            isGlobalShouldThrow = false;
+            const retryButton2 = screen.getByRole("button", { name: /retry/iv });
             fireEvent.click(retryButton2);
 
             // Should succeed again - demonstrating consistent arithmetic
@@ -193,7 +191,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             ).toHaveLength(1);
         } finally {
             console.error = originalConsoleError;
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
         }
     });
 
@@ -211,24 +209,24 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Type: Arithmetic Operations", "type");
 
         const originalConsoleError = console.error;
-        console.error = vi.fn();
+        vi.spyOn(console, 'error').mockImplementation();
 
         try {
             // This test validates that retryCount arithmetic affects the key prop
             // which forces component remounting
 
             // Start with error state
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
             const { rerender } = render(
                 <ErrorBoundary fallback={MockFallback}>
                     <ThrowingComponent />
                 </ErrorBoundary>
             );
 
-            const retryButton = screen.getByRole("button", { name: /retry/i });
+            const retryButton = screen.getByRole("button", { name: /retry/iv });
 
             // Click retry to increment retryCount (should be 0 + 1 = 1)
-            globalShouldThrow = false;
+            isGlobalShouldThrow = false;
             fireEvent.click(retryButton);
 
             // Should now see normal content
@@ -237,7 +235,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             ).toHaveLength(1);
 
             // Trigger another error to test retryCount increment again
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
             rerender(
                 <ErrorBoundary fallback={MockFallback}>
                     <ThrowingComponent throwMessage="Second error test" />
@@ -249,8 +247,8 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             ).toBeInTheDocument();
 
             // Second retry should increment retryCount to 2
-            globalShouldThrow = false;
-            const retryButton2 = screen.getByRole("button", { name: /retry/i });
+            isGlobalShouldThrow = false;
+            const retryButton2 = screen.getByRole("button", { name: /retry/iv });
             fireEvent.click(retryButton2);
 
             // Should see normal content again - key should have changed due to retryCount increment
@@ -259,7 +257,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             ).toHaveLength(1);
         } finally {
             console.error = originalConsoleError;
-            globalShouldThrow = true;
+            isGlobalShouldThrow = true;
         }
     });
 });

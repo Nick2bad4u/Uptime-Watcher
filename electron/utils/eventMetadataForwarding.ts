@@ -97,25 +97,25 @@ export function attachForwardedMetadata<TPayload extends object>(
         timestamp: Date.now(),
     };
 
-    Object.defineProperty(payload, ORIGINAL_METADATA_SYMBOL, {
-        configurable: true,
-        enumerable: false,
-        value: originalMeta,
-        writable: false,
-    });
-
-    Object.defineProperty(payload, ORIGINAL_METADATA_PROPERTY_KEY, {
-        configurable: true,
-        enumerable: false,
-        value: originalMeta,
-        writable: false,
-    });
-
-    Object.defineProperty(payload, FORWARDED_METADATA_PROPERTY_KEY, {
-        configurable: true,
-        enumerable: false,
-        value: forwardedMetadata,
-        writable: false,
+    Object.defineProperties(payload, {
+        [ORIGINAL_METADATA_SYMBOL]: {
+            configurable: true,
+            enumerable: false,
+            value: originalMeta,
+            writable: false,
+        },
+        [ORIGINAL_METADATA_PROPERTY_KEY]: {
+            configurable: true,
+            enumerable: false,
+            value: originalMeta,
+            writable: false,
+        },
+        [FORWARDED_METADATA_PROPERTY_KEY]: {
+            configurable: true,
+            enumerable: false,
+            value: forwardedMetadata,
+            writable: false,
+        },
     });
 
     return payload;
@@ -152,7 +152,7 @@ export function stripForwardedEventMetadata<
     TPayload extends object | Readonly<UnknownArray>,
 >(payload: TPayload): StrippedForwardedEventMetadata<TPayload> {
     if (Array.isArray(payload)) {
-        const clonedArray = Array.from(payload);
+        const clonedArray = [...payload];
 
         Reflect.deleteProperty(clonedArray, FORWARDED_METADATA_PROPERTY_KEY);
         Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_PROPERTY_KEY);

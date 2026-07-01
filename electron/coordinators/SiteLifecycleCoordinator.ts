@@ -37,7 +37,7 @@ export class SiteLifecycleCoordinator {
     private readonly createContextualError: ContextualErrorFactory;
 
     public async addSite(siteData: Site): Promise<Site> {
-        let site: Site | undefined = undefined;
+        let site: Site | undefined;
 
         try {
             site = await this.siteManager.addSite(siteData);
@@ -75,11 +75,11 @@ export class SiteLifecycleCoordinator {
         siteIdentifier: string,
         monitorId: string
     ): Promise<Site> {
-        let monitoringStopped = false;
+        let isMonitoringStopped = false;
 
         try {
             // Phase 1: Stop monitoring immediately (reversible)
-            monitoringStopped = await this.monitorManager.stopMonitoringForSite(
+            isMonitoringStopped = await this.monitorManager.stopMonitoringForSite(
                 siteIdentifier,
                 monitorId
             );
@@ -87,7 +87,7 @@ export class SiteLifecycleCoordinator {
             // If stopping monitoring failed, log warning but continue with
             // database removal. The monitor may not be running, but the database
             // record should still be removed.
-            if (!monitoringStopped) {
+            if (!isMonitoringStopped) {
                 logger.warn(
                     `[SiteLifecycleCoordinator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
                 );
@@ -103,7 +103,7 @@ export class SiteLifecycleCoordinator {
             let failureCause: unknown = error;
 
             // If database removal failed after monitoring was stopped, attempt compensation
-            if (monitoringStopped) {
+            if (isMonitoringStopped) {
                 logger.warn(
                     `[SiteLifecycleCoordinator] Database removal failed for ${siteIdentifier}/${monitorId}, attempting to restart monitoring`
                 );
@@ -144,7 +144,7 @@ export class SiteLifecycleCoordinator {
                 code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
                 details: {
                     monitorId,
-                    monitoringStopped,
+                    monitoringStopped: isMonitoringStopped,
                     siteIdentifier,
                 },
                 message: `Failed to remove monitor ${siteIdentifier}/${monitorId}`,
@@ -169,23 +169,23 @@ export class SiteLifecycleCoordinator {
             );
         }
 
-        let monitoringStopped = false;
-        let siteRemoved = false;
+        let isMonitoringStopped = false;
+        let isSiteRemoved = false;
 
         try {
-            monitoringStopped =
+            isMonitoringStopped =
                 await this.monitorManager.stopMonitoringForSite(identifier);
 
-            if (!monitoringStopped) {
+            if (!isMonitoringStopped) {
                 logger.warn(
                     `[SiteLifecycleCoordinator] Aborting removal of ${identifier} because monitoring could not be stopped`
                 );
                 return false;
             }
 
-            siteRemoved = await this.siteManager.removeSite(identifier);
+            isSiteRemoved = await this.siteManager.removeSite(identifier);
 
-            if (siteRemoved) {
+            if (isSiteRemoved) {
                 return true;
             }
 
@@ -202,13 +202,13 @@ export class SiteLifecycleCoordinator {
 
             /* eslint-disable no-await-in-loop -- Compensation sequence must restart monitors sequentially */
             for (const monitorId of activeMonitorIds) {
-                const restartSucceeded =
+                const isRestartSucceeded =
                     await this.monitorManager.startMonitoringForSite(
                         identifier,
                         monitorId
                     );
 
-                if (!restartSucceeded) {
+                if (!isRestartSucceeded) {
                     const criticalError = new Error(
                         `Critical state inconsistency: Monitoring stopped for ${identifier} (monitor ${monitorId}) but restart failed after deletion failure`
                     );
@@ -235,9 +235,9 @@ export class SiteLifecycleCoordinator {
                 code: "ORCHESTRATOR_REMOVE_SITE_FAILED",
                 details: {
                     activeMonitorIds,
-                    monitoringStopped,
+                    monitoringStopped: isMonitoringStopped,
                     siteIdentifier: identifier,
-                    siteRemoved,
+                    siteRemoved: isSiteRemoved,
                 },
                 message: `Failed to remove site ${identifier}`,
                 operation: "orchestrator.removeSite",

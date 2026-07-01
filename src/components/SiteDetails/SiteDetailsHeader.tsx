@@ -163,7 +163,7 @@ function buildHeaderMeta(parameters: HeaderMetaParameters): HeaderMetaItem[] {
             key: "last-check",
             label: "Last Check",
             value: lastCheckRelative,
-            ...(lastCheckExact ? { tooltip: lastCheckExact } : {}),
+            ...(lastCheckExact && { tooltip: lastCheckExact }),
         });
     }
 

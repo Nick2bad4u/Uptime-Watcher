@@ -7,10 +7,11 @@
  * different environments (local development vs CI).
  */
 
-import { _electron as electron } from "@playwright/test";
 import type { ElectronApplication, Page } from "@playwright/test";
-import { execFileSync } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
+
+import { _electron as electron } from "@playwright/test";
+import { execFileSync } from "node:child_process";
 import { createWriteStream, type WriteStream } from "node:fs";
 import {
     access,
@@ -159,14 +160,14 @@ const waitForChildProcessExit = async (
             return;
         }
 
-        let settled = false;
+        let isSettled = false;
 
         const settle = (): void => {
-            if (settled) {
+            if (isSettled) {
                 return;
             }
 
-            settled = true;
+            isSettled = true;
             childProcess.off("close", settle);
             childProcess.off("exit", settle);
             resolve();
@@ -276,23 +277,23 @@ export async function launchElectronApp(
         // Note: we intentionally keep unrelated flags such as
         // `--max_old_space_size`.
         const withoutInspector = trimmed
-            .replace(/\s--inspect-brk(=\S+)?/gu, "")
-            .replace(/\s--inspect(=\S+)?/gu, "")
-            .replace(/\s--inspect-publish-uid=\S+/gu, "");
+            .replaceAll(/\s--inspect-brk(=\S+)?/gv, "")
+            .replaceAll(/\s--inspect(=\S+)?/gv, "")
+            .replaceAll(/\s--inspect-publish-uid=\S+/gv, "");
 
         // Remove VS Code js-debug bootloader injections.
         // Handles both quoted and unquoted paths.
         const withoutVsCodeBootloader = withoutInspector
-            .replace(
-                /\s--require\s+"?[^"]*?js-debug[^"]*?bootloader\.js"?/gu,
+            .replaceAll(
+                /\s--require(?:\s+"[^"]*?|\s[^"]*?)js-debug[^"]*?bootloader\.js"?/gv,
                 ""
             )
-            .replace(
-                /\s--require\s+"?[^"]*?ms-vscode\.js-debug[^"]*?bootloader\.js"?/gu,
+            .replaceAll(
+                /\s--require(?:\s+"[^"]*?|\s[^"]*?)ms-vscode\.js-debug[^"]*?bootloader\.js"?/gv,
                 ""
             );
 
-        return withoutVsCodeBootloader.replace(/\s{2,}/gu, " ").trim();
+        return withoutVsCodeBootloader.replaceAll(/\s{2,}/gv, " ").trim();
     };
 
     const existingNodeOptions = sanitizeNodeOptions(
@@ -303,7 +304,7 @@ export async function launchElectronApp(
         ? existingNodeOptions
         : [existingNodeOptions, disableWarningOption].filter(Boolean).join(" ");
 
-    const cleanupTasks: Array<() => Promise<void>> = [
+    const cleanupTasks: (() => Promise<void>)[] = [
         async () => {
             // Persist Electron log files for debugging flaky Playwright failures.
             // These live under userData (which we delete after each run).
@@ -371,10 +372,10 @@ export async function launchElectronApp(
         async () => {
             await Promise.allSettled([
                 new Promise<void>((resolve) =>
-                    stdoutStream.end(() => resolve())
+                    stdoutStream.end(() => { resolve(); })
                 ),
                 new Promise<void>((resolve) =>
-                    stderrStream.end(() => resolve())
+                    stderrStream.end(() => { resolve(); })
                 ),
             ]);
         },
@@ -393,13 +394,13 @@ export async function launchElectronApp(
         },
     ];
 
-    let cleanupTriggered = false;
+    let isCleanupTriggered = false;
     const runCleanup = async (): Promise<void> => {
-        if (cleanupTriggered) {
+        if (isCleanupTriggered) {
             return;
         }
 
-        cleanupTriggered = true;
+        isCleanupTriggered = true;
 
         await Promise.allSettled(
             cleanupTasks.map(async (task) => {
@@ -439,7 +440,7 @@ export async function launchElectronApp(
             ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
             ...customEnv,
         },
-        timeout: 30000, // Add timeout like codegen script
+        timeout: 30_000, // Add timeout like codegen script
     });
 
     const electronProcess = app.process();
@@ -474,7 +475,7 @@ export async function launchElectronApp(
         const page = await originalFirstWindow();
         attachWindowMetadata(page);
         return page;
-    }) as ElectronApplication["firstWindow"];
+    });
 
     app.on("close", () => {
         void (async (): Promise<void> => {
@@ -488,7 +489,7 @@ export async function launchElectronApp(
 
     if (isCoverageEnabled) {
         const originalClose = app.close.bind(app);
-        let coverageCollected = false;
+        let isCoverageCollected = false;
 
         (
             app as ElectronApplication & {
@@ -497,10 +498,10 @@ export async function launchElectronApp(
         ).close = (async () => {
             let coverageError: unknown;
 
-            if (!coverageCollected) {
+            if (!isCoverageCollected) {
                 try {
                     await collectCoverageFromElectronApp(app);
-                    coverageCollected = true;
+                    isCoverageCollected = true;
                 } catch (error) {
                     coverageError = error;
                 }
@@ -527,7 +528,7 @@ export async function launchElectronApp(
             if (closeError) {
                 throw closeError;
             }
-        }) as ElectronApplication["close"];
+        });
     } else {
         const originalClose = app.close.bind(app);
 
@@ -553,7 +554,7 @@ export async function launchElectronApp(
             if (closeError) {
                 throw closeError;
             }
-        }) as ElectronApplication["close"];
+        });
     }
 
     return app;

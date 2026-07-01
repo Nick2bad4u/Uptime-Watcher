@@ -108,17 +108,17 @@ export const electronNoImportMetaDirnameRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow import.meta.dirname/import.meta.filename in Electron sources to avoid bundle-time undefined crashes",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-import-meta-dirname.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "import.meta.{{propertyName}} is not allowed in Electron sources because bundlers may not preserve it. Prefer path.dirname(fileURLToPath(import.meta.url)).",
         },
+        schema: [],
+        type: "problem",
     },
 };

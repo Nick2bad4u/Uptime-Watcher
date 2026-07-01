@@ -2,9 +2,9 @@
  * Fast-check powered regression tests for the Tooltip component.
  */
 
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { fc, test as fcTest } from "@fast-check/vitest";
 
 import {
     Tooltip,
@@ -20,17 +20,17 @@ const tooltipPositions: readonly TooltipPosition[] = [
 
 const cssClassArbitrary = fc
     .string({ maxLength: 12, minLength: 1 })
-    .filter((value) => /^[A-Za-z0-9-]+$/u.test(value));
+    .filter((value) => /^[-0-9A-Za-z]+$/u.test(value));
 
 const contentArbitrary = fc
     .string({ maxLength: 40, minLength: 1 })
-    .filter((value) => /\S/u.test(value));
+    .filter((value) => /\S/v.test(value));
 
-let rafSpy: { mockRestore: () => void } | null = null;
+let rafSpy: null | { mockRestore: () => void } = null;
 
 beforeEach(() => {
     rafSpy = vi
-        .spyOn(window, "requestAnimationFrame")
+        .spyOn(globalThis, "requestAnimationFrame")
         .mockImplementation((callback: FrameRequestCallback) => {
             callback(0);
             return 1;
@@ -40,7 +40,7 @@ beforeEach(() => {
 afterEach(() => {
     rafSpy?.mockRestore();
     rafSpy = null;
-    document.body.innerHTML = "";
+    document.body.replaceChildren();
 });
 
 describe("Tooltip fast-check coverage", () => {
@@ -67,12 +67,12 @@ describe("Tooltip fast-check coverage", () => {
             </Tooltip>
         );
 
-        const trigger = document.querySelector("button") as HTMLButtonElement;
+        const trigger = document.querySelector("button")!;
         fireEvent.focus(trigger);
         expect(document.querySelector(".tooltip")).toBeNull();
 
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).not.toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
             { timeout: 500 }
         );
         const tooltip = document.querySelector(".tooltip");
@@ -81,7 +81,7 @@ describe("Tooltip fast-check coverage", () => {
 
         fireEvent.blur(trigger);
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
             { timeout: 500 }
         );
 
@@ -99,16 +99,16 @@ describe("Tooltip fast-check coverage", () => {
             </Tooltip>
         );
 
-        const trigger = document.querySelector("button") as HTMLButtonElement;
+        const trigger = document.querySelector("button")!;
         fireEvent.keyDown(trigger, { key: "Enter" });
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).not.toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
             { timeout: 500 }
         );
 
         fireEvent.keyDown(trigger, { key: "Escape" });
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
             { timeout: 500 }
         );
 
@@ -124,29 +124,29 @@ describe("Tooltip fast-check coverage", () => {
 
         const container = document.querySelector(
             ".tooltip-container"
-        ) as HTMLDivElement;
+        )!;
 
         fireEvent.mouseEnter(container);
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).not.toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
             { timeout: 500 }
         );
 
         fireEvent.mouseLeave(container);
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
             { timeout: 700 }
         );
 
         fireEvent.touchStart(container);
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).not.toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
             { timeout: 500 }
         );
 
         fireEvent.touchEnd(container);
         await waitFor(
-            () => expect(document.querySelector(".tooltip")).toBeNull(),
+            () => { expect(document.querySelector(".tooltip")).toBeNull(); },
             { timeout: 700 }
         );
 
@@ -191,16 +191,16 @@ describe("Tooltip fast-check coverage", () => {
 
             const container = document.querySelector(
                 ".tooltip-container"
-            ) as HTMLDivElement;
+            )!;
             fireEvent.mouseEnter(container);
             await waitFor(
-                () => expect(document.querySelector(".tooltip")).not.toBeNull(),
+                () => { expect(document.querySelector(".tooltip")).not.toBeNull(); },
                 { timeout: 500 }
             );
 
             const tooltip = document.querySelector(
                 ".tooltip"
-            ) as HTMLDivElement;
+            )!;
             expect(tooltip).not.toBeNull();
             expect(tooltip).toHaveClass(`tooltip--${position}`);
             expect(tooltip).toHaveClass(tooltipClass);

@@ -48,11 +48,57 @@ export class HistoryLimitCoordinator {
     /** Event bus used to consume and emit typed events. */
     private readonly eventBus: TypedEventBus<OrchestratorEvents>;
 
+    /** Tracks whether listeners have been registered. */
+    private isRegistered = false;
+
     /** Cached history-limit value for `previousLimit` telemetry. */
     private lastKnownLimit: number;
 
-    /** Tracks whether listeners have been registered. */
-    private isRegistered = false;
+    /**
+     * Creates a new {@link HistoryLimitCoordinator} instance.
+     *
+     * @param options - Construction options.
+     */
+    public constructor(options: HistoryLimitCoordinatorOptions) {
+        this.databaseManager = options.databaseManager;
+        this.eventBus = options.eventBus;
+        this.lastKnownLimit = this.resolveInitialHistoryLimit();
+    }
+
+    /**
+     * Gets the most recently observed history-limit value.
+     *
+     * @returns The cached history-limit.
+     */
+    public getLastKnownLimit(): number {
+        return this.lastKnownLimit;
+    }
+
+    /**
+     * Registers listeners for history-limit updates.
+     */
+    public register(): void {
+        if (this.isRegistered) return;
+
+        this.eventBus.on(
+            "internal:database:history-limit-updated",
+            this.handleHistoryLimitUpdatedEvent
+        );
+        this.isRegistered = true;
+    }
+
+    /**
+     * Removes previously registered listeners.
+     */
+    public unregister(): void {
+        if (!this.isRegistered) return;
+
+        this.eventBus.off(
+            "internal:database:history-limit-updated",
+            this.handleHistoryLimitUpdatedEvent
+        );
+        this.isRegistered = false;
+    }
 
     /**
      * Bound event handler forwarding database history-limit updates.
@@ -115,52 +161,6 @@ export class HistoryLimitCoordinator {
             previousLimit,
             timestamp,
         });
-    }
-
-    /**
-     * Creates a new {@link HistoryLimitCoordinator} instance.
-     *
-     * @param options - Construction options.
-     */
-    public constructor(options: HistoryLimitCoordinatorOptions) {
-        this.databaseManager = options.databaseManager;
-        this.eventBus = options.eventBus;
-        this.lastKnownLimit = this.resolveInitialHistoryLimit();
-    }
-
-    /**
-     * Registers listeners for history-limit updates.
-     */
-    public register(): void {
-        if (this.isRegistered) return;
-
-        this.eventBus.on(
-            "internal:database:history-limit-updated",
-            this.handleHistoryLimitUpdatedEvent
-        );
-        this.isRegistered = true;
-    }
-
-    /**
-     * Removes previously registered listeners.
-     */
-    public unregister(): void {
-        if (!this.isRegistered) return;
-
-        this.eventBus.off(
-            "internal:database:history-limit-updated",
-            this.handleHistoryLimitUpdatedEvent
-        );
-        this.isRegistered = false;
-    }
-
-    /**
-     * Gets the most recently observed history-limit value.
-     *
-     * @returns The cached history-limit.
-     */
-    public getLastKnownLimit(): number {
-        return this.lastKnownLimit;
     }
 
     /**

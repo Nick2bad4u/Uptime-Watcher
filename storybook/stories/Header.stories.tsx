@@ -1,5 +1,5 @@
 /**
- * Storybook coverage for the application Header component.
+ * Storybook coverage for the app Header component.
  */
 
 import type { SiteListLayoutMode } from "@app/stores/ui/types";
@@ -42,7 +42,7 @@ const sampleSites = [
 const withSidebarLayout: Decorator = (StoryComponent) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const toggleSidebar = useCallback(
-        () => setIsSidebarOpen((previous) => !previous),
+        () => { setIsSidebarOpen((previous) => !previous); },
         []
     );
     const providerValue = useMemo(

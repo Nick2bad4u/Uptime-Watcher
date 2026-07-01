@@ -39,14 +39,16 @@ export function resolveHeaderValue(
     const lowerName = headerName.toLowerCase();
 
     for (const [key, value] of objectEntries(headers)) {
-        if (key.toLowerCase() === lowerName) {
-            if (typeof value === "string") {
-                return value;
-            }
+        if (key.toLowerCase() !== lowerName) {
+            continue;
+        }
 
-            if (Array.isArray(value)) {
-                return arrayJoin(value, ", ");
-            }
+        if (typeof value === "string") {
+            return value;
+        }
+
+        if (Array.isArray(value)) {
+            return arrayJoin(value, ", ");
         }
     }
 

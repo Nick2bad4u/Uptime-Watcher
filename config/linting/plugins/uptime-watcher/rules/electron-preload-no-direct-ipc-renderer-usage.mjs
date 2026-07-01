@@ -102,17 +102,17 @@ export const electronPreloadNoDirectIpcRendererUsageRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow ipcRenderer usage in preload modules outside core bridge infrastructure.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-preload-no-direct-ipc-renderer-usage.md",
         },
-        schema: [],
         messages: {
             noDirectIpcRenderer:
                 "Do not use ipcRenderer directly in preload domain modules. Use the core bridgeFactory helpers instead.",
         },
+        schema: [],
+        type: "problem",
     },
 };

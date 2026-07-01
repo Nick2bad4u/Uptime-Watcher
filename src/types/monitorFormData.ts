@@ -26,7 +26,7 @@ import { isFinite as isFiniteNumber, isInteger, safeCastTo } from "ts-extras";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
-/* eslint-disable camelcase -- validator.js option keys are snake_case. */
+
 const URL_VALIDATION_OPTIONS = {
     allowSingleQuotes: true,
     require_tld: false,
@@ -37,58 +37,12 @@ const FQDN_VALIDATION_OPTIONS = {
     allow_underscores: true,
     require_tld: false,
 } as const;
-/* eslint-enable camelcase -- validator.js option keys are snake_case. */
+
 
 const WEBSOCKET_URL_VALIDATION_OPTIONS = {
     ...URL_VALIDATION_OPTIONS,
     protocols: ["ws", "wss"],
 };
-
-interface HeaderExpectationShape {
-    /** Expected value for the specified response header */
-    expectedHeaderValue?: string;
-    /** Header name to inspect */
-    headerName?: string;
-}
-
-type HeaderExpectationFields = RequireAllOrNoneFields<HeaderExpectationShape>;
-
-interface JsonExpectationShape {
-    /** Expected value at the JSON path */
-    expectedJsonValue?: string;
-    /** JSON path to evaluate in the response body */
-    jsonPath?: string;
-}
-
-type JsonExpectationFields = RequireAllOrNoneFields<JsonExpectationShape>;
-
-interface ReplicationRequirementShape {
-    /** Maximum acceptable replication lag in seconds */
-    maxReplicationLagSeconds?: number;
-    /** Primary status endpoint URL */
-    primaryStatusUrl?: string;
-    /** Replica status endpoint URL */
-    replicaStatusUrl?: string;
-    /** JSON path to replication timestamp value */
-    replicationTimestampField?: string;
-}
-
-type ReplicationRequirementFields =
-    RequireAllOrNoneFields<ReplicationRequirementShape>;
-
-interface HeartbeatRequirementShape {
-    /** Expected status string reported by the heartbeat */
-    heartbeatExpectedStatus?: string;
-    /** Maximum allowed drift in seconds */
-    heartbeatMaxDriftSeconds?: number;
-    /** JSON path to the heartbeat status field */
-    heartbeatStatusField?: string;
-    /** JSON path to the heartbeat timestamp field */
-    heartbeatTimestampField?: string;
-}
-
-type HeartbeatRequirementFields =
-    RequireAllOrNoneFields<HeartbeatRequirementShape>;
 
 /**
  * Base form data interface with common properties.
@@ -109,161 +63,6 @@ export interface BaseFormData {
 }
 
 /**
- * Dynamic form data for extensible monitor types.
- *
- * @remarks
- * Used when the monitor fields are not known at compile time but the renderer
- * still wants autocomplete for shared primitives.
- *
- * @public
- */
-export interface DynamicFormData extends UnknownRecord {
-    /** Monitor check interval in milliseconds */
-    checkInterval?: number;
-    monitoring?: boolean;
-    /** Number of retry attempts on failure */
-    retryAttempts?: number;
-    /** Request timeout in milliseconds */
-    timeout?: number;
-    /** Monitor type identifier */
-    type?: MonitorType;
-}
-
-/**
- * Form data for HTTP monitors.
- *
- * @public
- */
-export interface HttpFormData extends BaseFormData {
-    type: "http";
-    /** Target URL to monitor */
-    url: string;
-}
-
-/**
- * Form data for HTTP keyword monitors.
- *
- * @public
- */
-export interface HttpKeywordFormData extends BaseFormData {
-    /** Keyword that must appear in the response body */
-    bodyKeyword: string;
-    type: "http-keyword";
-    /** Target URL to monitor */
-    url: string;
-}
-
-/**
- * Form data for HTTP header monitors.
- *
- * @public
- */
-/**
- * Form state representation for HTTP header monitors.
- */
-export type HttpHeaderFormData = BaseFormData &
-    HeaderExpectationFields & {
-        type: "http-header";
-        /** Target URL to monitor */
-        url: string;
-    };
-
-/**
- * Form data for HTTP JSON monitors.
- *
- * @public
- */
-/**
- * Form state representation for HTTP JSON monitors.
- */
-export type HttpJsonFormData = BaseFormData &
-    JsonExpectationFields & {
-        type: "http-json";
-        /** Target URL to monitor */
-        url: string;
-    };
-
-/**
- * Form data for HTTP status monitors.
- *
- * @public
- */
-export interface HttpStatusFormData extends BaseFormData {
-    /** Expected HTTP status code */
-    expectedStatusCode: number;
-    type: "http-status";
-    /** Target URL to monitor */
-    url: string;
-}
-
-/**
- * Form data for HTTP latency monitors.
- *
- * @public
- */
-export interface HttpLatencyFormData extends BaseFormData {
-    /** Maximum acceptable response time in milliseconds */
-    maxResponseTime: number;
-    type: "http-latency";
-    /** Target URL to monitor */
-    url: string;
-}
-
-/**
- * Form data for ping monitors.
- *
- * @public
- */
-export interface PingFormData extends BaseFormData {
-    /** Target host to ping */
-    host: string;
-    type: "ping";
-}
-
-/**
- * Form data for port monitors.
- *
- * @public
- */
-export interface PortFormData extends BaseFormData {
-    /** Target host to monitor */
-    host: string;
-    /** Target port to monitor */
-    port: number;
-    type: "port";
-}
-
-/**
- * Form data for DNS monitors.
- *
- * @public
- */
-export interface DnsFormData extends BaseFormData {
-    /** Expected value for DNS record (optional) */
-    expectedValue?: string;
-    /** Target host to resolve */
-    host: string;
-    /** DNS record type to query */
-    recordType: DnsRecordType;
-    type: "dns";
-}
-
-/**
- * Form data for SSL certificate monitors.
- *
- * @public
- */
-export interface SslFormData extends BaseFormData {
-    /** Warning threshold in days before certificate expiry */
-    certificateWarningDays: number;
-    /** Target host serving the certificate */
-    host: string;
-    /** TLS port to connect to */
-    port: number;
-    type: "ssl";
-}
-
-/**
  * Form data for CDN edge consistency monitors.
  *
  * @public
@@ -275,84 +74,6 @@ export interface CdnEdgeConsistencyFormData extends BaseFormData {
     edgeLocations: string;
     type: "cdn-edge-consistency";
 }
-
-/**
- * Form data for replication monitors.
- *
- * @public
- */
-export type ReplicationFormData = BaseFormData &
-    ReplicationRequirementFields & {
-        type: "replication";
-    };
-
-/**
- * Form data for server heartbeat monitors.
- *
- * @public
- */
-export type ServerHeartbeatFormData = BaseFormData &
-    HeartbeatRequirementFields & {
-        type: "server-heartbeat";
-        /** Heartbeat endpoint URL */
-        url: string;
-    };
-
-/**
- * Form data for WebSocket keepalive monitors.
- *
- * @public
- */
-export interface WebsocketKeepaliveFormData extends BaseFormData {
-    /** Maximum allowed pong delay in milliseconds */
-    maxPongDelayMs: number;
-    type: "websocket-keepalive";
-    /** WebSocket endpoint URL */
-    url: string;
-}
-
-/**
- * Union type for all supported monitor form data types.
- *
- * @remarks
- * Simplified to flatten nested intersections for improved IntelliSense output.
- *
- * @public
- */
-export type MonitorFormData = Simplify<
-    | CdnEdgeConsistencyFormData
-    | DnsFormData
-    | HttpFormData
-    | HttpHeaderFormData
-    | HttpJsonFormData
-    | HttpKeywordFormData
-    | HttpLatencyFormData
-    | HttpStatusFormData
-    | PingFormData
-    | PortFormData
-    | ReplicationFormData
-    | ServerHeartbeatFormData
-    | SslFormData
-    | WebsocketKeepaliveFormData
->;
-
-// Optional key definitions for default form data creation
-type CdnEdgeConsistencyOptionalKeys = "baselineUrl" | "edgeLocations";
-type HttpHeaderOptionalKeys = "expectedHeaderValue" | "headerName" | "url";
-type HttpJsonOptionalKeys = "expectedJsonValue" | "jsonPath" | "url";
-type HttpLatencyOptionalKeys = "maxResponseTime" | "url";
-type ReplicationOptionalKeys =
-    | "maxReplicationLagSeconds"
-    | "primaryStatusUrl"
-    | "replicaStatusUrl"
-    | "replicationTimestampField";
-type ServerHeartbeatOptionalKeys =
-    | "heartbeatExpectedStatus"
-    | "heartbeatMaxDriftSeconds"
-    | "heartbeatStatusField"
-    | "heartbeatTimestampField"
-    | "url";
-type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
 
 /**
  * Creates default monitor form data for the specified monitor type.
@@ -404,6 +125,285 @@ export interface CreateDefaultFormData {
     (type: MonitorType): SetOptional<BaseFormData, never>;
 }
 
+/**
+ * Form data for DNS monitors.
+ *
+ * @public
+ */
+export interface DnsFormData extends BaseFormData {
+    /** Expected value for DNS record (optional) */
+    expectedValue?: string;
+    /** Target host to resolve */
+    host: string;
+    /** DNS record type to query */
+    recordType: DnsRecordType;
+    type: "dns";
+}
+
+/**
+ * Dynamic form data for extensible monitor types.
+ *
+ * @remarks
+ * Used when the monitor fields are not known at compile time but the renderer
+ * still wants autocomplete for shared primitives.
+ *
+ * @public
+ */
+export interface DynamicFormData extends UnknownRecord {
+    /** Monitor check interval in milliseconds */
+    checkInterval?: number;
+    monitoring?: boolean;
+    /** Number of retry attempts on failure */
+    retryAttempts?: number;
+    /** Request timeout in milliseconds */
+    timeout?: number;
+    /** Monitor type identifier */
+    type?: MonitorType;
+}
+
+/**
+ * Form data for HTTP monitors.
+ *
+ * @public
+ */
+export interface HttpFormData extends BaseFormData {
+    type: "http";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Form data for HTTP header monitors.
+ *
+ * @public
+ */
+/**
+ * Form state representation for HTTP header monitors.
+ */
+export type HttpHeaderFormData = BaseFormData &
+    HeaderExpectationFields & {
+        type: "http-header";
+        /** Target URL to monitor */
+        url: string;
+    };
+
+/**
+ * Form data for HTTP JSON monitors.
+ *
+ * @public
+ */
+/**
+ * Form state representation for HTTP JSON monitors.
+ */
+export type HttpJsonFormData = BaseFormData &
+    JsonExpectationFields & {
+        type: "http-json";
+        /** Target URL to monitor */
+        url: string;
+    };
+
+/**
+ * Form data for HTTP keyword monitors.
+ *
+ * @public
+ */
+export interface HttpKeywordFormData extends BaseFormData {
+    /** Keyword that must appear in the response body */
+    bodyKeyword: string;
+    type: "http-keyword";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Form data for HTTP latency monitors.
+ *
+ * @public
+ */
+export interface HttpLatencyFormData extends BaseFormData {
+    /** Maximum acceptable response time in milliseconds */
+    maxResponseTime: number;
+    type: "http-latency";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Form data for HTTP status monitors.
+ *
+ * @public
+ */
+export interface HttpStatusFormData extends BaseFormData {
+    /** Expected HTTP status code */
+    expectedStatusCode: number;
+    type: "http-status";
+    /** Target URL to monitor */
+    url: string;
+}
+
+/**
+ * Union type for all supported monitor form data types.
+ *
+ * @remarks
+ * Simplified to flatten nested intersections for improved IntelliSense output.
+ *
+ * @public
+ */
+export type MonitorFormData = Simplify<
+    | CdnEdgeConsistencyFormData
+    | DnsFormData
+    | HttpFormData
+    | HttpHeaderFormData
+    | HttpJsonFormData
+    | HttpKeywordFormData
+    | HttpLatencyFormData
+    | HttpStatusFormData
+    | PingFormData
+    | PortFormData
+    | ReplicationFormData
+    | ServerHeartbeatFormData
+    | SslFormData
+    | WebsocketKeepaliveFormData
+>;
+
+/**
+ * Form data for ping monitors.
+ *
+ * @public
+ */
+export interface PingFormData extends BaseFormData {
+    /** Target host to ping */
+    host: string;
+    type: "ping";
+}
+
+/**
+ * Form data for port monitors.
+ *
+ * @public
+ */
+export interface PortFormData extends BaseFormData {
+    /** Target host to monitor */
+    host: string;
+    /** Target port to monitor */
+    port: number;
+    type: "port";
+}
+
+/**
+ * Form data for replication monitors.
+ *
+ * @public
+ */
+export type ReplicationFormData = BaseFormData &
+    ReplicationRequirementFields & {
+        type: "replication";
+    };
+
+/**
+ * Form data for server heartbeat monitors.
+ *
+ * @public
+ */
+export type ServerHeartbeatFormData = BaseFormData &
+    HeartbeatRequirementFields & {
+        type: "server-heartbeat";
+        /** Heartbeat endpoint URL */
+        url: string;
+    };
+
+/**
+ * Form data for SSL certificate monitors.
+ *
+ * @public
+ */
+export interface SslFormData extends BaseFormData {
+    /** Warning threshold in days before certificate expiry */
+    certificateWarningDays: number;
+    /** Target host serving the certificate */
+    host: string;
+    /** TLS port to connect to */
+    port: number;
+    type: "ssl";
+}
+
+/**
+ * Form data for WebSocket keepalive monitors.
+ *
+ * @public
+ */
+export interface WebsocketKeepaliveFormData extends BaseFormData {
+    /** Maximum allowed pong delay in milliseconds */
+    maxPongDelayMs: number;
+    type: "websocket-keepalive";
+    /** WebSocket endpoint URL */
+    url: string;
+}
+
+// Optional key definitions for default form data creation
+type CdnEdgeConsistencyOptionalKeys = "baselineUrl" | "edgeLocations";
+
+type HeaderExpectationFields = RequireAllOrNoneFields<HeaderExpectationShape>;
+
+interface HeaderExpectationShape {
+    /** Expected value for the specified response header */
+    expectedHeaderValue?: string;
+    /** Header name to inspect */
+    headerName?: string;
+}
+
+type HeartbeatRequirementFields =
+    RequireAllOrNoneFields<HeartbeatRequirementShape>;
+
+interface HeartbeatRequirementShape {
+    /** Expected status string reported by the heartbeat */
+    heartbeatExpectedStatus?: string;
+    /** Maximum allowed drift in seconds */
+    heartbeatMaxDriftSeconds?: number;
+    /** JSON path to the heartbeat status field */
+    heartbeatStatusField?: string;
+    /** JSON path to the heartbeat timestamp field */
+    heartbeatTimestampField?: string;
+}
+
+type HttpHeaderOptionalKeys = "expectedHeaderValue" | "headerName" | "url";
+
+type HttpJsonOptionalKeys = "expectedJsonValue" | "jsonPath" | "url";
+
+type HttpLatencyOptionalKeys = "maxResponseTime" | "url";
+type JsonExpectationFields = RequireAllOrNoneFields<JsonExpectationShape>;
+interface JsonExpectationShape {
+    /** Expected value at the JSON path */
+    expectedJsonValue?: string;
+    /** JSON path to evaluate in the response body */
+    jsonPath?: string;
+}
+type ReplicationOptionalKeys =
+    | "maxReplicationLagSeconds"
+    | "primaryStatusUrl"
+    | "replicaStatusUrl"
+    | "replicationTimestampField";
+type ReplicationRequirementFields =
+    RequireAllOrNoneFields<ReplicationRequirementShape>;
+interface ReplicationRequirementShape {
+    /** Maximum acceptable replication lag in seconds */
+    maxReplicationLagSeconds?: number;
+    /** Primary status endpoint URL */
+    primaryStatusUrl?: string;
+    /** Replica status endpoint URL */
+    replicaStatusUrl?: string;
+    /** JSON path to replication timestamp value */
+    replicationTimestampField?: string;
+}
+type ServerHeartbeatOptionalKeys =
+    | "heartbeatExpectedStatus"
+    | "heartbeatMaxDriftSeconds"
+    | "heartbeatStatusField"
+    | "heartbeatTimestampField"
+    | "url";
+
+type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
+
 function createDefaultFormDataImpl(
     type: MonitorType
 ): SetOptional<BaseFormData, never> {
@@ -426,6 +426,52 @@ function createDefaultFormDataImpl(
 export const createDefaultFormData: CreateDefaultFormData = castUnchecked(
     createDefaultFormDataImpl
 );
+
+/**
+ * Type guard to check if form data is for CDN edge consistency monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link CdnEdgeConsistencyFormData}
+ *   contract.
+ *
+ * @public
+ */
+export function isCdnEdgeConsistencyFormData(
+    data: Partial<MonitorFormData>
+): data is CdnEdgeConsistencyFormData {
+    return (
+        data.type === "cdn-edge-consistency" &&
+        typeof data.baselineUrl === "string" &&
+        isValidUrl(data.baselineUrl.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof data.edgeLocations === "string" &&
+        data.edgeLocations.trim() !== ""
+    );
+}
+
+/**
+ * Type guard to check if form data is for DNS monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link DnsFormData} contract.
+ *
+ * @public
+ */
+export function isDnsFormData(
+    data: Partial<MonitorFormData>
+): data is DnsFormData {
+    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
+    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+
+    return (
+        data.type === "dns" &&
+        host.length > 0 &&
+        (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
+        typeof data.recordType === "string" &&
+        data.recordType.trim() !== ""
+    );
+}
 
 /**
  * Type guard to check if form data is for HTTP monitor.
@@ -514,29 +560,6 @@ export function isHttpKeywordFormData(
 }
 
 /**
- * Type guard to check if form data is for HTTP status monitor.
- *
- * @param data - Form data to check.
- *
- * @returns `true` if data satisfies the {@link HttpStatusFormData} contract.
- *
- * @public
- */
-export function isHttpStatusFormData(
-    data: Partial<MonitorFormData>
-): data is HttpStatusFormData {
-    return (
-        data.type === "http-status" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.expectedStatusCode === "number" &&
-        isInteger(data.expectedStatusCode) &&
-        data.expectedStatusCode >= 100 &&
-        data.expectedStatusCode <= 599
-    );
-}
-
-/**
  * Type guard to check if form data is for HTTP latency monitor.
  *
  * @param data - Form data to check.
@@ -559,26 +582,25 @@ export function isHttpLatencyFormData(
 }
 
 /**
- * Type guard to check if form data is for DNS monitor.
+ * Type guard to check if form data is for HTTP status monitor.
  *
  * @param data - Form data to check.
  *
- * @returns `true` if data satisfies the {@link DnsFormData} contract.
+ * @returns `true` if data satisfies the {@link HttpStatusFormData} contract.
  *
  * @public
  */
-export function isDnsFormData(
+export function isHttpStatusFormData(
     data: Partial<MonitorFormData>
-): data is DnsFormData {
-    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
-    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
-
+): data is HttpStatusFormData {
     return (
-        data.type === "dns" &&
-        host.length > 0 &&
-        (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
-        typeof data.recordType === "string" &&
-        data.recordType.trim() !== ""
+        data.type === "http-status" &&
+        typeof data.url === "string" &&
+        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof data.expectedStatusCode === "number" &&
+        isInteger(data.expectedStatusCode) &&
+        data.expectedStatusCode >= 100 &&
+        data.expectedStatusCode <= 599
     );
 }
 
@@ -629,55 +651,6 @@ export function isPortFormData(
 }
 
 /**
- * Type guard to check if form data is for SSL monitor.
- *
- * @param data - Form data to check.
- *
- * @returns `true` if data satisfies the {@link SslFormData} contract.
- *
- * @public
- */
-export function isSslFormData(
-    data: Partial<MonitorFormData>
-): data is SslFormData {
-    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
-    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
-
-    return (
-        data.type === "ssl" &&
-        host.length > 0 &&
-        (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
-        typeof data.port === "number" &&
-        isValidPort(data.port) &&
-        typeof data.certificateWarningDays === "number" &&
-        data.certificateWarningDays >= 1 &&
-        data.certificateWarningDays <= 365
-    );
-}
-
-/**
- * Type guard to check if form data is for CDN edge consistency monitor.
- *
- * @param data - Form data to check.
- *
- * @returns `true` if data satisfies the {@link CdnEdgeConsistencyFormData}
- *   contract.
- *
- * @public
- */
-export function isCdnEdgeConsistencyFormData(
-    data: Partial<MonitorFormData>
-): data is CdnEdgeConsistencyFormData {
-    return (
-        data.type === "cdn-edge-consistency" &&
-        typeof data.baselineUrl === "string" &&
-        isValidUrl(data.baselineUrl.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.edgeLocations === "string" &&
-        data.edgeLocations.trim() !== ""
-    );
-}
-
-/**
  * Type guard to check if form data is for replication monitor.
  *
  * @param data - Form data to check.
@@ -723,6 +696,33 @@ export function isServerHeartbeatFormData(
         isNonEmptyString(data.heartbeatExpectedStatus) &&
         typeof data.heartbeatMaxDriftSeconds === "number" &&
         isFiniteNumber(data.heartbeatMaxDriftSeconds)
+    );
+}
+
+/**
+ * Type guard to check if form data is for SSL monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link SslFormData} contract.
+ *
+ * @public
+ */
+export function isSslFormData(
+    data: Partial<MonitorFormData>
+): data is SslFormData {
+    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
+    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+
+    return (
+        data.type === "ssl" &&
+        host.length > 0 &&
+        (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
+        typeof data.port === "number" &&
+        isValidPort(data.port) &&
+        typeof data.certificateWarningDays === "number" &&
+        data.certificateWarningDays >= 1 &&
+        data.certificateWarningDays <= 365
     );
 }
 

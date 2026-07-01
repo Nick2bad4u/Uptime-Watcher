@@ -188,7 +188,7 @@ class GoogleDriveHttpClient {
                     },
                     params: {
                         uploadType: "multipart",
-                        ...(fields ? { fields } : {}),
+                        ...(fields && { fields }),
                     },
                 });
 
@@ -268,7 +268,7 @@ class GoogleDriveHttpClient {
                         },
                         params: {
                             uploadType: "media",
-                            ...(fields ? { fields } : {}),
+                            ...(fields && { fields }),
                         },
                     }
                 );

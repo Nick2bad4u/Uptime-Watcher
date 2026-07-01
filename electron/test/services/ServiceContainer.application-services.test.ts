@@ -1,10 +1,11 @@
 /**
- * Focused tests for application service creation in ServiceContainer
+ * Focused tests for app service creation in ServiceContainer
  *
  * @file ServiceContainer Application Services Tests
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ServiceContainer } from "../../services/ServiceContainer.js";
 
 // Mock the TypedEventBus module with factory function
@@ -45,7 +46,7 @@ vi.mock("../../events/TypedEventBus.js", () => {
     };
 });
 
-// Mock simple application services
+// Mock simple app services
 vi.mock("../../managers/ConfigurationManager.js", () => ({
     ConfigurationManager: vi.fn(),
 }));
@@ -54,7 +55,7 @@ vi.mock("../../managers/DatabaseManager.js", () => ({
     DatabaseManager: vi.fn(),
 }));
 
-// Mock dependencies for application services
+// Mock dependencies for app services
 vi.mock("../../services/database/DatabaseService.js", () => ({
     DatabaseService: { getInstance: vi.fn() },
 }));

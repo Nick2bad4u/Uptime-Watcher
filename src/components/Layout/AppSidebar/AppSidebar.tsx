@@ -53,7 +53,7 @@ const STATUS_ICON_MAP: Record<SiteStatus, IconType> = {
 const mascotLogoUrl = new URL(
     "../../../../assets/UptimeWatcherMascot.avif",
     import.meta.url
-).toString();
+).href;
 
 /**
  * Maps a {@link SiteStatus} to a CSS modifier class.
@@ -104,7 +104,7 @@ export const AppSidebar: NamedExoticComponent = memo(
 
         const sitesByIdentifier = useMemo(
             () =>
-                new Map(sites.map((site) => [site.identifier, site] as const)),
+                new Map(sites.map((site) => [site, site.identifier] as const)),
             [sites]
         );
 

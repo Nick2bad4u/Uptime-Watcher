@@ -2,12 +2,14 @@
  * Tests for useSitesState module Tests core state management functionality
  */
 
-import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
-
 import type { Site } from "@shared/types";
-import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+
+import { logger } from "../../../services/logger";
 import {
     createSitesStateActions,
     initialSitesState,
@@ -17,11 +19,11 @@ import { buildMonitoringLockKey } from "../../../stores/sites/utils/optimisticMo
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock logging
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
 
-vi.mock("../../../services/logger", () => ({
+vi.mock(import('../../../services/logger'), () => ({
     logger: {
         debug: vi.fn(),
         error: vi.fn(),
@@ -29,8 +31,6 @@ vi.mock("../../../services/logger", () => ({
         warn: vi.fn(),
     },
 }));
-
-import { logger } from "../../../services/logger";
 
 describe("useSitesState", () => {
     let mockSet: Mock<
@@ -53,7 +53,7 @@ describe("useSitesState", () => {
     });
 
     const ensureDefined = <T>(
-        value: T | null | undefined,
+        value: null | T | undefined,
         message: string
     ): T => {
         if (value === null || value === undefined) {
@@ -162,7 +162,7 @@ describe("useSitesState", () => {
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
             // Test the function passed to set
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
@@ -310,7 +310,7 @@ describe("useSitesState", () => {
                 },
             ];
 
-            expect(() => stateActions.setSites(duplicateSites)).toThrow(
+            expect(() => { stateActions.setSites(duplicateSites); }).toThrow(
                 DuplicateSiteIdentifierError
             );
             expect(logger.error).toHaveBeenCalledWith(
@@ -423,7 +423,7 @@ describe("useSitesState", () => {
                     "Expected optimistic monitoring locks to be defined"
                 );
 
-                const normalizedSite = sites[0];
+                const normalizedSite = arrayFirst(sites);
                 expect(
                     normalizedSite?.monitors.find(
                         (monitor) => monitor.id === "mon-active"
@@ -521,7 +521,7 @@ describe("useSitesState", () => {
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
             // Test the function passed to set
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
@@ -566,7 +566,7 @@ describe("useSitesState", () => {
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             if (setFunction) {
                 const result = setFunction(
                     createState({
@@ -616,7 +616,7 @@ describe("useSitesState", () => {
 
             stateActions.removeSite("test-site");
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
@@ -662,7 +662,7 @@ describe("useSitesState", () => {
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             if (setFunction) {
                 const result = setFunction(
                     createState({
@@ -701,7 +701,7 @@ describe("useSitesState", () => {
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             if (setFunction) {
                 const result = setFunction(
                     createState({
@@ -849,7 +849,7 @@ describe("useSitesState", () => {
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
@@ -892,7 +892,7 @@ describe("useSitesState", () => {
 
             stateActions.setSelectedMonitorId("test-site", "monitor-2");
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             if (setFunction) {
                 const result = setFunction(
                     createState({
@@ -1016,7 +1016,7 @@ describe("useSitesState", () => {
 
             stateActions.addSite(newSite);
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             if (setFunction) {
                 setFunction(
                     createState({
@@ -1029,7 +1029,7 @@ describe("useSitesState", () => {
 
                 // Original array should be unchanged
                 expect(originalSites).toHaveLength(1);
-                expect(originalSites[0]).toBe(mockSite);
+                expect(arrayFirst(originalSites)).toBe(mockSite);
             }
         });
 
@@ -1063,7 +1063,7 @@ describe("useSitesState", () => {
 
             stateActions.setSelectedMonitorId("test-site", "monitor-1");
 
-            const setFunction = mockSet.mock.calls[0]?.[0];
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
             if (setFunction) {
                 setFunction(
                     createState({

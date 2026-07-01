@@ -3,7 +3,12 @@
  * These tests target specific mutations that survived Stryker testing
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    withIpcHandler,
+    withIpcHandlerValidation,
+} from "../../../services/ipc/utils";
 
 // Mock logger and environment utilities used indirectly via electronUtils.isDev()
 vi.mock("../../../utils/logger", () => {
@@ -23,11 +28,6 @@ vi.mock("../../../utils/logger", () => {
 vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => true),
 }));
-
-import {
-    withIpcHandler,
-    withIpcHandlerValidation,
-} from "../../../services/ipc/utils";
 
 describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => {
     beforeEach(() => {

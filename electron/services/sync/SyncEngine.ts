@@ -151,8 +151,8 @@ export class SyncEngine {
 
         const deviceId = await this.getOrCreateDeviceId();
 
-        // Read the remote manifest first so we can advance nextOpId if the
-        // local settings have been reset but the deviceId is still present.
+        // Read the remote manifest first so we can advance nextOpId if the local settings have been reset but the
+        // deviceId is still present.
         //
         // Without this, we can accidentally reuse old opIds which may be
         // treated as already-compacted and dropped by other devices.
@@ -239,10 +239,8 @@ export class SyncEngine {
 
                   const compactedUpTo =
                       compacted[metadata.deviceId]?.compactedUpToOpId;
-                  return !(
-                      compactedUpTo !== undefined &&
-                      metadata.lastOpId <= compactedUpTo
-                  );
+                  return compactedUpTo === undefined ||
+                      metadata.lastOpId > compactedUpTo;
               })
             : opObjects;
 
@@ -267,7 +265,7 @@ export class SyncEngine {
 
         const remoteOps = operationsByObject.flat().filter((op) => {
             const compactedUpTo = compacted[op.deviceId]?.compactedUpToOpId;
-            return !(compactedUpTo !== undefined && op.opId <= compactedUpTo);
+            return compactedUpTo === undefined || op.opId > compactedUpTo;
         });
 
         const mergedState = applyCloudSyncOperationsToState(
@@ -320,8 +318,8 @@ export class SyncEngine {
 
         await transport.writeManifest(nextManifest);
 
-        // Best-effort cleanup: delete the previous snapshot and any fully
-        // compacted operation objects to keep remote storage bounded.
+        // Best-effort cleanup: delete the previous snapshot and any fully compacted operation objects to keep remote
+        // storage bounded.
         //
         // @remarks
         // This is especially important when enabling encryption after older
@@ -405,13 +403,15 @@ export class SyncEngine {
 
             const mergedMonitors: Monitor[] = [];
             for (const monitorConfig of objectValues(desiredMonitors)) {
-                if (monitorConfig.siteIdentifier === identifier) {
-                    const merged = this.mergeMonitorConfig(
-                        existingMonitors,
-                        monitorConfig
-                    );
-                    mergedMonitors.push(merged);
+                if (monitorConfig.siteIdentifier !== identifier) {
+                    continue;
                 }
+
+                const merged = this.mergeMonitorConfig(
+                    existingMonitors,
+                    monitorConfig
+                );
+                mergedMonitors.push(merged);
             }
 
             desiredSitesWithMonitors[identifier] = {
@@ -554,11 +554,11 @@ export class SyncEngine {
             );
         }
 
-        if (typeof globalThis.crypto.randomUUID !== "function") {
+        if (typeof crypto.randomUUID !== "function") {
             throw new TypeError("crypto.randomUUID is unavailable");
         }
 
-        const deviceId = globalThis.crypto.randomUUID();
+        const deviceId = crypto.randomUUID();
         await this.settings.set(SETTINGS_KEY_DEVICE_ID, deviceId);
         return deviceId;
     }

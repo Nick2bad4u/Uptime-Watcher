@@ -4,6 +4,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("StringConversion - Missing Lines Coverage", () => {
@@ -60,7 +61,7 @@ describe("StringConversion - Missing Lines Coverage", () => {
                 ),
             ];
 
-            for (const [_index, edgeCase] of edgeCases.entries()) {
+            for (const edgeCase of edgeCases) {
                 try {
                     const result = safeStringify(edgeCase);
                     expect(typeof result).toBe("string");

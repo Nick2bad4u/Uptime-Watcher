@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
-import { TypedEventBus } from "../../../events/TypedEventBus";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { UptimeEvents } from "../../../events/eventTypes.js";
+
+import { TypedEventBus } from "../../../events/TypedEventBus";
+import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 const flushMicrotasks = async (): Promise<void> => {
     await Promise.resolve();

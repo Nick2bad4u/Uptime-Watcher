@@ -132,17 +132,17 @@ export const rendererNoPreloadBridgeWritesRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow mutating window.electronAPI in renderer code (non-test).",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-preload-bridge-writes.md",
         },
-        schema: [],
         messages: {
             noBridgeWrites:
                 "Do not assign/define window.electronAPI in application code. Preload owns the bridge; renderer should only read it via services.",
         },
+        schema: [],
+        type: "problem",
     },
 };

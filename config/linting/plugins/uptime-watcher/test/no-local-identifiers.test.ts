@@ -16,8 +16,8 @@ ruleTester.run("no-local-identifiers", getPluginRule("no-local-identifiers"), {
                 {
                     banned: [
                         {
-                            name: "forbidden",
                             kinds: ["variable"],
+                            name: "forbidden",
                         },
                     ],
                 },
@@ -32,8 +32,8 @@ ruleTester.run("no-local-identifiers", getPluginRule("no-local-identifiers"), {
                 {
                     banned: [
                         {
-                            name: "forbidden",
                             kinds: ["variable"],
+                            name: "forbidden",
                         },
                     ],
                 },

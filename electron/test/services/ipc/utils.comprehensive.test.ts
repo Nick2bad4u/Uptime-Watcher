@@ -4,10 +4,13 @@
  * testing strategy.
  */
 
+import {
+    DATA_CHANNELS,
+    MONITOR_TYPES_CHANNELS,
+    MONITORING_CHANNELS,
+} from "@shared/types/preload";
 import { ipcMain } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-import { logger } from "../../../utils/logger";
 
 import {
     createErrorResponse,
@@ -18,11 +21,7 @@ import {
     withIpcHandlerValidation,
 } from "../../../services/ipc/utils";
 import { IpcValidators } from "../../../services/ipc/validators/IpcValidators";
-import {
-    DATA_CHANNELS,
-    MONITORING_CHANNELS,
-    MONITOR_TYPES_CHANNELS,
-} from "@shared/types/preload";
+import { logger } from "../../../utils/logger";
 
 // Mock electron modules
 vi.mock("electron", () => ({
@@ -69,11 +68,11 @@ vi.mock("@shared/validation/validatorUtils", () => ({
             return false;
         }
 
-        return /^[\da-f]+$/u.test(value);
+        return /^[\da-f]+$/v.test(value);
     }),
     isValidUrl: vi.fn(
         (value) =>
-            typeof value === "string" && /^(?:https?:\/\/)[^\s]+$/u.test(value)
+            typeof value === "string" && /^https?:\/\/\S+$/v.test(value)
     ),
 }));
 
@@ -154,7 +153,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = IpcValidators.optionalString("   ", "testParam");
+                const result = IpcValidators.optionalString(' '.repeat(3), "testParam");
                 expect(result).toBe(
                     "testParam must be a non-empty string when provided"
                 );
@@ -268,7 +267,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = IpcValidators.requiredNumber(
-                    3.141_59,
+                    3.14159,
                     "testParam"
                 );
                 expect(result).toBeNull();
@@ -284,7 +283,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredNumber(
-                    Number.NaN,
+                    NaN,
                     "testParam"
                 );
                 expect(result).toBe("testParam must be a valid number");
@@ -666,7 +665,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = IpcValidators.requiredString("   ", "testParam");
+                const result = IpcValidators.requiredString(' '.repeat(3), "testParam");
                 expect(result).toBe("testParam must be a non-empty string");
             });
 
@@ -1702,13 +1701,13 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const paramHandler = async (_value: string) => "param handler";
 
                 expect(() =>
-                    registerStandardizedIpcHandler(
+                    { registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.validatedExecution,
                         paramHandler as never,
                         null,
                         registeredHandlers
-                    )
-                ).toThrow(/Missing validateParams/u);
+                    ); }
+                ).toThrow(/Missing validateParams/v);
             });
 
             it("should execute registered handler with validation", async ({
@@ -1909,12 +1908,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 );
 
                 expect(() =>
-                    registerStandardizedIpcHandler(
+                    { registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.duplicate,
                         vi.fn(),
                         null,
                         registeredHandlers
-                    )
+                    ); }
                 ).toThrow(
                     `[IpcService] Attempted to register duplicate IPC handler for channel '${CHANNELS_FOR_TESTS.duplicate}'`
                 );
@@ -1952,12 +1951,12 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
 
                 expect(() =>
-                    registerStandardizedIpcHandler(
+                    { registerStandardizedIpcHandler(
                         CHANNELS_FOR_TESTS.failure,
                         vi.fn(),
                         vi.fn().mockReturnValue(null),
                         registeredHandlers
-                    )
+                    ); }
                 ).toThrow(registrationError);
 
                 expect(

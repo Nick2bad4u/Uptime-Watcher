@@ -3,13 +3,15 @@
  * tests exercise shared code for coverage reporting
  */
 
+import { fc, test } from "@fast-check/vitest";
 import { describe, expect, it } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
 import type { Monitor, Site } from "../../types.js";
+
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "../../constants/monitoring";
+import { validateMonitorType } from "../../utils/validation";
 import { getMonitorValidationErrors } from "../../validation/monitorSchemas";
 import { validateSiteData } from "../../validation/siteSchemas";
-import { validateMonitorType } from "../../utils/validation";
 
 describe("Shared Validation - Backend Coverage", () => {
     describe(getMonitorValidationErrors, () => {
@@ -150,10 +152,10 @@ describe("Shared Validation - Backend Coverage", () => {
                 fc.string().filter(
                     (s) =>
                         ![
-                            "http",
-                            "port",
-                            "ping",
                             "dns",
+                            "http",
+                            "ping",
+                            "port",
                         ].includes(s)
                 )
             ),
@@ -164,7 +166,7 @@ describe("Shared Validation - Backend Coverage", () => {
         test.prop({
             stringInput: fc.string({ minLength: 1, maxLength: 20 }),
         })("should handle arbitrary strings correctly", (props) => {
-            const result = validateMonitorType(props.stringInput);
+            const isResult = validateMonitorType(props.stringInput);
             const validTypes = [
                 "http",
                 "port",
@@ -173,9 +175,9 @@ describe("Shared Validation - Backend Coverage", () => {
             ];
 
             if (validTypes.includes(props.stringInput)) {
-                expect(result).toBeTruthy();
+                expect(isResult).toBeTruthy();
             } else {
-                expect(result).toBeFalsy();
+                expect(isResult).toBeFalsy();
             }
         });
     });
@@ -221,13 +223,13 @@ describe("Shared Validation - Backend Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(
-                validateSiteData(null as unknown as Partial<Site>).success
+                validateSiteData(null).success
             ).toBeFalsy();
             expect(
                 validateSiteData(undefined as unknown as Partial<Site>).success
             ).toBeFalsy();
             expect(
-                validateSiteData("string" as unknown as Partial<Site>).success
+                validateSiteData("string").success
             ).toBeFalsy();
         });
 

@@ -4,26 +4,32 @@
  * @file Src/test/hooks/site/useSiteDetails.test.ts
  */
 
+import type * as React from "react";
+
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
-import { renderHook, act } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import React from "react";
-import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
+import { act, renderHook } from "@testing-library/react";
+import { arrayFirst, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SelectorHookMock } from "../../utils/createSelectorHookMock";
 
+import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
+import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
+import { useConfirmDialog } from "../../../hooks/ui/useConfirmDialog";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
 import { createSitesStoreMock } from "../../utils/createSitesStoreMock";
 
 // Define types locally since they are not exported from types
 interface Site {
     identifier: string;
-    name: string;
     monitoring: boolean;
     monitors: any[];
+    name: string;
 }
 
 // Mock validation utilities
-vi.mock("../../../utils/monitorValidation", () => ({
+vi.mock(import('../../../utils/monitorValidation'), () => ({
     validateMonitorFieldClientSide: vi.fn((_type, field, value) => {
         if (
             field === "checkInterval" &&
@@ -71,10 +77,10 @@ const mockUpdateMonitorTimeout = vi.fn();
 const mockUpdateSiteCheckInterval = vi.fn();
 
 const useSitesStoreMockRef = vi.hoisted(() => ({
-    current: undefined as SelectorHookMock<any> | undefined,
+    current: safeCastTo<SelectorHookMock<any> | undefined>(undefined),
 }));
 
-vi.mock("../../../stores/sites/useSitesStore", async () => {
+vi.mock(import('../../../stores/sites/useSitesStore'), async () => {
     const { createSelectorHookMock } =
         await import("../../utils/createSelectorHookMock");
     const { createSitesStoreMock } =
@@ -89,14 +95,14 @@ vi.mock("../../../stores/sites/useSitesStore", async () => {
     };
 });
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(() => ({
         clearError: vi.fn(),
         isLoading: false,
     })),
 }));
 
-vi.mock("../../../stores/ui/useUiStore", () => ({
+vi.mock(import('../../../stores/ui/useUiStore'), () => ({
     useUIStore: vi.fn(() => ({
         activeSiteDetailsTab: "overview",
         setActiveSiteDetailsTab: vi.fn(),
@@ -108,7 +114,7 @@ vi.mock("../../../stores/ui/useUiStore", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/site/useSiteAnalytics", () => ({
+vi.mock(import('../../../hooks/site/useSiteAnalytics'), () => ({
     useSiteAnalytics: vi.fn(() => ({
         chartData: [],
         isLoading: false,
@@ -116,7 +122,7 @@ vi.mock("../../../hooks/site/useSiteAnalytics", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+vi.mock(import('../../../hooks/ui/useConfirmDialog'), () => ({
     useConfirmDialog: vi.fn(() => vi.fn(async () => true)),
 }));
 
@@ -125,11 +131,6 @@ Object.defineProperty(globalThis, "confirm", {
     writable: true,
     value: vi.fn(() => true),
 });
-
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { useUIStore } from "../../../stores/ui/useUiStore";
-import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
-import { useConfirmDialog } from "../../../hooks/ui/useConfirmDialog";
 const mockUseConfirmDialog = vi.mocked(useConfirmDialog);
 
 describe("useSiteDetails Hook - Basic Coverage", () => {
@@ -368,7 +369,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             );
 
             expect(result.current.analytics).toBeDefined();
-            expect(useSiteAnalytics).toHaveBeenCalled();
+            expect(useSiteAnalytics).toHaveBeenCalledWith();
         });
     });
 
@@ -1043,7 +1044,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const siteWithInactiveMonitor = {
                 ...mockSite,
-                monitors: [{ ...mockSite.monitors[0], monitoring: false }],
+                monitors: [{ ...arrayFirst(mockSite.monitors), monitoring: false }],
             };
 
             const { result } = renderHook(() =>

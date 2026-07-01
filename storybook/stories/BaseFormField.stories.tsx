@@ -29,6 +29,11 @@ const meta: Meta<BaseFormFieldProperties> = {
         label: "Site Name",
         required: true,
     },
+    argTypes: {
+        children: {
+            control: false,
+        },
+    },
     component: BaseFormField,
     parameters: {
         docs: {
@@ -38,11 +43,6 @@ const meta: Meta<BaseFormFieldProperties> = {
             },
         },
         layout: "centered",
-    },
-    argTypes: {
-        children: {
-            control: false,
-        },
     },
     tags: ["autodocs"],
 } satisfies Meta<BaseFormFieldProperties>;

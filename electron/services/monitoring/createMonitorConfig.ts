@@ -9,22 +9,6 @@ import {
 } from "../../constants";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 
-function resolveFiniteNumber(source: unknown): number | undefined { if (typeof source === "number") {
-        return isFiniteNumber(source) ? source : undefined; }
-
-    if (typeof source === "string") {
-        const trimmed = source.trim();
-        if (trimmed.length === 0) {
-            return undefined;
-        }
-
-        const parsed = Number(trimmed);
-        return isFiniteNumber(parsed) ? parsed : undefined;
-    }
-
-    return undefined;
-}
-
 /**
  * Normalized configuration values resolved for a monitor instance.
  *
@@ -100,4 +84,20 @@ export function createMonitorConfig(
     );
 
     return { checkInterval, retryAttempts, timeout };
+}
+
+function resolveFiniteNumber(source: unknown): number | undefined { if (typeof source === "number") {
+        return isFiniteNumber(source) ? source : undefined; }
+
+    if (typeof source === "string") {
+        const trimmed = source.trim();
+        if (trimmed.length === 0) {
+            return undefined;
+        }
+
+        const parsed = Number(trimmed);
+        return isFiniteNumber(parsed) ? parsed : undefined;
+    }
+
+    return undefined;
 }

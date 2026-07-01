@@ -10,9 +10,9 @@ ruleTester.run("prefer-shared-alias", getPluginRule("prefer-shared-alias"), {
     invalid: [
         {
             code: "import { foo } from '../shared/utils/foo';",
-            output: "import { foo } from '@shared/utils/foo';",
             errors: [{ messageId: "useAlias" }],
             filename: repoPath("src", "app.ts"),
+            output: "import { foo } from '@shared/utils/foo';",
         },
     ],
     valid: [

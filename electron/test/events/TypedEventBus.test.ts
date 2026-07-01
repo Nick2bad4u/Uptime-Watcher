@@ -4,7 +4,7 @@
  * @module Unknown
  *
  * @file Comprehensive tests for unknown functionality in the Uptime Watcher
- *   application.
+ *   app.
  *
  * @author GitHub Copilot
  *
@@ -15,18 +15,19 @@
  * @tags ["test"]
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-    TypedEventBus,
     type EventPayloadValue,
+    TypedEventBus,
 } from "../../events/TypedEventBus";
 
 // Create a simple test event map
 interface TestEvents extends Record<string, EventPayloadValue> {
-    "test-event": { data: string };
-    "another-event": { value: number };
     [key: string]: EventPayloadValue;
     [key: symbol]: EventPayloadValue;
+    "another-event": { value: number };
+    "test-event": { data: string };
 }
 
 describe(TypedEventBus, () => {

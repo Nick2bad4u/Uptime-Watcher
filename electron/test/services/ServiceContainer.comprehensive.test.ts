@@ -5,7 +5,15 @@
  * handling, debugging capabilities, and event forwarding mechanisms.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+// Now import the modules to apply mocks
+import type { Site } from "@shared/types";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+    ServiceContainer,
+    type ServiceContainerConfig,
+} from "../../services/ServiceContainer";
 
 // Create hoisted mock factory for TypedEventBus using constructor function pattern
 const MockTypedEventBus = vi.hoisted(() => {
@@ -59,13 +67,6 @@ vi.mock("../events/TypedEventBus", () => ({
 vi.mock("../events/TypedEventBus", () => ({
     TypedEventBus: MockTypedEventBus,
 }));
-
-// Now import the modules to apply mocks
-import type { Site } from "@shared/types";
-import {
-    ServiceContainer,
-    type ServiceContainerConfig,
-} from "../../services/ServiceContainer";
 
 vi.mock("../../managers/ConfigurationManager", () => ({
     ConfigurationManager: function MockConfigurationManager() {
@@ -1164,12 +1165,12 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 true
             );
 
-            const result = await monitorManager.startMonitoringForSite(
+            const isResult = await monitorManager.startMonitoringForSite(
                 "site1",
                 "monitor1"
             );
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(monitorManager.startMonitoringForSite).toHaveBeenCalledWith(
                 "site1",
                 "monitor1"
@@ -1192,12 +1193,12 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 true
             );
 
-            const result = await monitorManager.stopMonitoringForSite(
+            const isResult = await monitorManager.stopMonitoringForSite(
                 "site1",
                 "monitor1"
             );
 
-            expect(result).toBeTruthy();
+            expect(isResult).toBeTruthy();
             expect(monitorManager.stopMonitoringForSite).toHaveBeenCalledWith(
                 "site1",
                 "monitor1"

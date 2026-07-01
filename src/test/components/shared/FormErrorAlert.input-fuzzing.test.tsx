@@ -38,24 +38,26 @@
 
 /* eslint-disable unicorn/prefer-string-replace-all */
 
-import { describe, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
+import type { JSX } from "react/jsx-runtime";
+
+import { fc, test as fcTest } from "@fast-check/vitest";
 import {
-    render,
-    screen,
-    fireEvent,
     // eslint-disable-next-line testing-library/no-manual-cleanup
     cleanup,
+    fireEvent,
+    render,
+    screen,
 } from "@testing-library/react";
-
 import "@testing-library/jest-dom";
-import type { JSX } from "react/jsx-runtime";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, type Mock, vi } from "vitest";
+
 import { FormErrorAlert } from "../../../components/shared/FormErrorAlert";
 import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock themed components
-vi.mock("../../../theme/components/ThemedBox", () => ({
+vi.mock(import('../../../theme/components/ThemedBox'), () => ({
     ThemedBox: vi.fn(({ children, className, variant, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
@@ -71,14 +73,14 @@ vi.mock("../../../theme/components/ThemedBox", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../theme/components/ThemedText'), () => ({
     ThemedText: vi.fn(({ children, className, size, variant, ...props }) => {
         const safeProps = sanitizeDomProps(props);
         return (
             <span
                 className={className}
-                data-testid="themed-text"
                 data-size={size}
+                data-testid="themed-text"
                 data-variant={variant}
                 {...safeProps}
             >
@@ -88,18 +90,18 @@ vi.mock("../../../theme/components/ThemedText", () => ({
     }),
 }));
 
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: vi.fn(
         ({ children, onClick, className, size, variant, ...props }) => {
             const safeProps = sanitizeDomProps(props);
             return (
                 <button
-                    type="button"
                     className={className}
-                    onClick={onClick}
-                    data-testid="themed-button"
                     data-size={size}
+                    data-testid="themed-button"
                     data-variant={variant}
+                    onClick={onClick}
+                    type="button"
                     {...safeProps}
                 >
                     {children}
@@ -120,7 +122,7 @@ const errorMessageArbitrary = fc.oneof(
     fc.constant("Validation error: Invalid input"),
     fc.constant("Server error: 500 Internal Server Error"),
     fc.constant(""),
-    fc.constant("   "), // Whitespace only
+    fc.constant(' '.repeat(3)), // Whitespace only
     fc.constant("Error with special characters: !@#$%^&*()"),
     fc.constant("Multi-line\nerror\nmessage"),
     fc.constant("Error with\ttabs\tand\tspaces"),
@@ -214,11 +216,11 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                     // HTML normalizes whitespace (tabs/newlines become spaces)
 
                     const normalizedExpected = errorMessage
-                        .replaceAll(/\s+/g, " ")
+                        .replaceAll(/\s+/gv, " ")
                         .trim();
 
                     const actualText =
-                        errorText.textContent?.replaceAll(/\s+/g, " ").trim() ||
+                        errorText.textContent?.replaceAll(/\s+/gv, " ").trim() ||
                         "";
 
                     if (normalizedExpected) {
@@ -276,7 +278,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
 
                 const { rerender } = render(
                     <FormErrorAlert
-                        error={errorMessages[0] ?? null}
+                        error={arrayFirst(errorMessages) ?? null}
                         onClearError={mockOnClearError}
                     />
                 );
@@ -293,13 +295,13 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                         const errorText = screen.getByTestId("themed-text");
                         // HTML normalizes whitespace (tabs/newlines become spaces)
                         const normalizedExpected = errorMessages[i]!.replace(
-                            /\s+/g,
+                            /\s+/gv,
                             " "
                         ).trim();
 
                         const actualText =
                             errorText.textContent
-                                ?.replaceAll(/\s+/g, " ")
+                                ?.replaceAll(/\s+/gv, " ")
                                 .trim() || "";
                         expect(actualText).toBe(normalizedExpected);
                     }
@@ -320,8 +322,8 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 render(
                     <FormErrorAlert
                         error={errorMessage}
-                        onClearError={mockOnClearError}
                         isDark={isDark}
+                        onClearError={mockOnClearError}
                     />
                 );
 
@@ -353,8 +355,8 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 const { rerender } = render(
                     <FormErrorAlert
                         error={errorMessage}
-                        onClearError={mockOnClearError}
                         isDark={false}
+                        onClearError={mockOnClearError}
                     />
                 );
 
@@ -364,8 +366,8 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                     rerender(
                         <FormErrorAlert
                             error={errorMessage}
-                            onClearError={mockOnClearError}
                             isDark={isDark}
+                            onClearError={mockOnClearError}
                         />
                     );
 
@@ -499,12 +501,12 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                         // HTML normalizes whitespace (tabs/newlines become spaces)
 
                         const normalizedExpected = nextError
-                            .replaceAll(/\s+/g, " ")
+                            .replaceAll(/\s+/gv, " ")
                             .trim();
 
                         const actualText =
                             errorText.textContent
-                                ?.replaceAll(/\s+/g, " ")
+                                ?.replaceAll(/\s+/gv, " ")
                                 .trim() || "";
                         expect(actualText).toBe(normalizedExpected);
                     } else {
@@ -529,9 +531,9 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
 
                 render(
                     <FormErrorAlert
+                        className={className}
                         error={errorMessage}
                         onClearError={mockOnClearError}
-                        className={className}
                     />
                 );
 
@@ -560,10 +562,10 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 cleanupIteration();
                 render(
                     <FormErrorAlert
-                        error={config.error ?? null}
-                        onClearError={mockOnClearError}
-                        isDark={config.isDark}
                         className={config.className}
+                        error={config.error ?? null}
+                        isDark={config.isDark}
+                        onClearError={mockOnClearError}
                     />
                 );
 
@@ -655,7 +657,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                 const alerts: JSX.Element[] = [];
                 for (let i = 0; i < scenario.alertCount; i++) {
                     alerts.push(
-                        <div key={i} data-testid={`error-alert-${i}`}>
+                        <div data-testid={`error-alert-${i}`} key={i}>
                             <FormErrorAlert
                                 error={`Error message ${i}`}
                                 onClearError={onClearHandlers[i] ?? (() => {})}
@@ -675,7 +677,7 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                     const updatedAlerts: JSX.Element[] = [];
                     for (let i = 0; i < scenario.alertCount; i++) {
                         updatedAlerts.push(
-                            <div key={i} data-testid={`error-alert-${i}`}>
+                            <div data-testid={`error-alert-${i}`} key={i}>
                                 <FormErrorAlert
                                     error={`Updated error ${i}-${changeIndex}`}
                                     onClearError={

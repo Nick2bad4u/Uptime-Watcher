@@ -3,25 +3,26 @@
  *   Targets achieving 100% test coverage with advanced property-based testing
  */
 
+// Import types
+import type { Monitor, MonitorType, Site } from "@shared/types";
+
 import { fc } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
+import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
+import { arrayFirst, safeCastTo  } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
 // Import all functions to test
 import {
     addMonitorToSite,
-    findMonitorInSite,
-    normalizeMonitor,
     createDefaultMonitor,
+    findMonitorInSite,
+    monitorOperations,
+    normalizeMonitor,
     removeMonitorFromSite,
     updateMonitorInSite,
     validateMonitorExists,
-    monitorOperations,
 } from "../../../../stores/sites/utils/monitorOperations";
-
-// Import types
-import type { Monitor, Site, MonitorType } from "@shared/types";
-import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () => {
     // Helper generators for fast-check
@@ -45,7 +46,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
     const httpMonitorArb = fc.record({
         id: monitorIdArb,
-        type: fc.constant("http" as MonitorType),
+        type: fc.constant("http"),
         url: urlArb,
         status: fc.constant(DEFAULT_MONITOR_STATUS),
         monitoring: fc.boolean(),
@@ -69,7 +70,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
     const portMonitorArb = fc.record({
         id: monitorIdArb,
-        type: fc.constant("port" as MonitorType),
+        type: fc.constant("port"),
         host: hostArb,
         port: portArb,
         status: fc.constant(DEFAULT_MONITOR_STATUS),
@@ -94,7 +95,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
     const pingMonitorArb = fc.record({
         id: monitorIdArb,
-        type: fc.constant("ping" as MonitorType),
+        type: fc.constant("ping"),
         host: hostArb,
         status: fc.constant(DEFAULT_MONITOR_STATUS),
         monitoring: fc.boolean(),
@@ -118,7 +119,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
     const dnsMonitorArb = fc.record({
         id: monitorIdArb,
-        type: fc.constant("dns" as MonitorType),
+        type: fc.constant("dns"),
         host: hostArb,
         recordType: fc.constantFrom("A", "AAAA", "CNAME", "MX", "TXT", "NS"),
         status: fc.constant(DEFAULT_MONITOR_STATUS),
@@ -148,7 +149,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         dnsMonitorArb
     );
 
-    const siteArb = fc.record({
+    const siteArb = safeCastTo<fc.Arbitrary<Site>>(fc.record({
         identifier: siteIdArb,
         name: fc.string({ minLength: 1, maxLength: 100 }),
         monitoring: fc.boolean(),
@@ -156,10 +157,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             maxLength: 10,
             selector: (monitor) => monitor.id,
         }),
-    }) as fc.Arbitrary<Site>;
+    }));
 
     // Create a partial monitor generator that properly handles Partial<Monitor> type
-    const partialMonitorArb = fc.record(
+    const partialMonitorArb = safeCastTo<fc.Arbitrary<Partial<Monitor>>>(fc.record(
         {
             id: fc.option(monitorIdArb),
             type: fc.option(monitorTypeArb),
@@ -182,7 +183,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             retryAttempts: fc.option(retryAttemptsArb),
         },
         { requiredKeys: [] }
-    ) as fc.Arbitrary<Partial<Monitor>>;
+    ));
 
     describe("addMonitorToSite function coverage", () => {
         it("should add monitors to sites with immutable updates", () => {
@@ -222,7 +223,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         identifier: siteIdArb,
                         name: fc.string({ minLength: 1, maxLength: 100 }),
                         monitoring: fc.boolean(),
-                        monitors: fc.constant([] as Monitor[]),
+                        monitors: fc.constant(safeCastTo<Monitor[]>([])),
                     }),
                     monitorArb,
                     (emptySite, monitor) => {
@@ -232,7 +233,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         );
 
                         expect(updatedSite.monitors).toHaveLength(1);
-                        expect(updatedSite.monitors[0]).toBe(monitor);
+                        expect(arrayFirst(updatedSite.monitors)).toBe(monitor);
                     }
                 )
             );
@@ -324,7 +325,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         identifier: siteIdArb,
                         name: fc.string({ minLength: 1, maxLength: 100 }),
                         monitoring: fc.boolean(),
-                        monitors: fc.constant([] as Monitor[]),
+                        monitors: fc.constant(safeCastTo<Monitor[]>([])),
                     }),
                     fc.string({ minLength: 1, maxLength: 50 }),
                     (emptySite, anyId) => {
@@ -392,23 +393,6 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     expect(normalized.type).toBe(monitorType);
 
                     switch (monitorType) {
-                        case "http": {
-                            expect(normalized.url).toBeDefined();
-                            expect(typeof normalized.url).toBe("string");
-                            break;
-                        }
-                        case "port": {
-                            expect(normalized.host).toBeDefined();
-                            expect(normalized.port).toBeDefined();
-                            expect(typeof normalized.host).toBe("string");
-                            expect(typeof normalized.port).toBe("number");
-                            break;
-                        }
-                        case "ping": {
-                            expect(normalized.host).toBeDefined();
-                            expect(typeof normalized.host).toBe("string");
-                            break;
-                        }
                         case "dns": {
                             expect(normalized.host).toBeDefined();
                             expect(normalized.recordType).toBeDefined();
@@ -420,6 +404,23 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                                     "string"
                                 );
                             }
+                            break;
+                        }
+                        case "http": {
+                            expect(normalized.url).toBeDefined();
+                            expect(typeof normalized.url).toBe("string");
+                            break;
+                        }
+                        case "ping": {
+                            expect(normalized.host).toBeDefined();
+                            expect(typeof normalized.host).toBe("string");
+                            break;
+                        }
+                        case "port": {
+                            expect(normalized.host).toBeDefined();
+                            expect(normalized.port).toBeDefined();
+                            expect(typeof normalized.host).toBe("string");
+                            expect(typeof normalized.port).toBe("number");
                             break;
                         }
                     }
@@ -520,7 +521,8 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     expect(BASE_MONITOR_TYPES).toContain(defaultMonitor.type);
                     expect(typeof defaultMonitor.monitoring).toBe("boolean");
 
-                    // Should apply overrides when valid (monitoring is required boolean, null/undefined trigger defaults)
+                    // Should apply overrides when valid (monitoring is required boolean,
+                    // null/undefined trigger defaults)
                     if (
                         overrides.monitoring !== null &&
                         overrides.monitoring !== undefined
@@ -531,7 +533,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     }
                     if (
                         overrides.type &&
-                        BASE_MONITOR_TYPES.includes(overrides.type as any)
+                        BASE_MONITOR_TYPES.includes(overrides.type)
                     ) {
                         expect(defaultMonitor.type).toBe(overrides.type);
                     }
@@ -555,7 +557,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                 fc.property(
                     siteArb.filter((site) => site.monitors.length > 0),
                     (site) => {
-                        const targetMonitor = site.monitors[0];
+                        const targetMonitor = arrayFirst(site.monitors);
                         expect(targetMonitor).toBeDefined(); // Assert it exists
                         const updatedSite = removeMonitorFromSite(
                             site,
@@ -608,7 +610,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     siteArb.filter((site) => site.monitors.length > 0),
                     partialMonitorArb,
                     (site, updates) => {
-                        const targetMonitor = site.monitors[0];
+                        const targetMonitor = arrayFirst(site.monitors);
                         expect(targetMonitor).toBeDefined(); // Assert it exists
                         // Extract only the update fields, don't use the ID from updates
                         const updateFields = { ...updates };
@@ -663,10 +665,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                 fc.property(
                     siteArb.filter((site) => site.monitors.length > 0),
                     (site) => {
-                        const targetMonitor = site.monitors[0];
+                        const targetMonitor = arrayFirst(site.monitors);
                         expect(targetMonitor).toBeDefined(); // Assert it exists
                         expect(() =>
-                            validateMonitorExists(site, targetMonitor!.id)
+                            { validateMonitorExists(site, targetMonitor!.id); }
                         ).not.toThrow();
                     }
                 )
@@ -684,7 +686,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         }
 
                         expect(() =>
-                            validateMonitorExists(site, nonExistentId)
+                            { validateMonitorExists(site, nonExistentId); }
                         ).toThrow();
                     }
                 )
@@ -697,7 +699,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     fc.string({ minLength: 1, maxLength: 50 }),
                     (monitorId) => {
                         expect(() =>
-                            validateMonitorExists(undefined, monitorId)
+                            { validateMonitorExists(undefined, monitorId); }
                         ).toThrow();
                     }
                 )
@@ -775,10 +777,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     fc.string().filter(
                         (s) =>
                             ![
-                                "up",
                                 "down",
-                                "pending",
                                 "paused",
+                                "pending",
+                                "up",
                             ].includes(s)
                     ),
                     (monitor, invalidStatus) => {
@@ -903,7 +905,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                 fc.property(
                     siteArb.filter((site) => site.monitors.length > 0),
                     (site) => {
-                        const originalMonitor = site.monitors[0];
+                        const originalMonitor = arrayFirst(site.monitors);
                         expect(originalMonitor).toBeDefined(); // Assert it exists
 
                         // Test that operations don't mutate original objects

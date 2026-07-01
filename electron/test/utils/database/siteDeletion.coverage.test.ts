@@ -40,7 +40,7 @@ function createSiteAdapter(overrides: Partial<SiteAdapterStub> = {}): {
     };
 
     return {
-        adapter: siteMocks as unknown,
+        adapter: siteMocks,
         mocks: siteMocks,
     };
 }

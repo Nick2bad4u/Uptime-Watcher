@@ -20,7 +20,7 @@ export const LOGGER_INTERFACES_MODULE_MARKER =
  *
  * @remarks
  * Defines the minimum contract for all logger implementations across the
- * application. All logging methods accept a message string followed by optional
+ * app. All logging methods accept a message string followed by optional
  * additional arguments for structured logging and context information.
  *
  * @public
@@ -92,13 +92,13 @@ export interface ExtendedLogger extends BaseLogger {
 }
 
 /**
- * Specialized logger interface for application lifecycle events.
+ * Specialized logger interface for app lifecycle events.
  *
  * @public
  */
 export interface AppLogger {
     /**
-     * Log application errors with context.
+     * Log app errors with context.
      *
      * @param context - The context where the error occurred
      * @param error - The error object
@@ -114,12 +114,12 @@ export interface AppLogger {
     performance: (operation: string, duration: number) => void;
 
     /**
-     * Log application startup.
+     * Log app startup.
      */
     started: () => void;
 
     /**
-     * Log application shutdown.
+     * Log app shutdown.
      */
     stopped: () => void;
 }

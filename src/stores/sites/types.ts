@@ -39,6 +39,51 @@ import type { SitesState as SitesStateShape } from "./useSitesState";
 export type SiteMonitoringActions = BaseSiteMonitoring;
 
 /**
+ * Dependencies interface for site operations. Defines the minimal interface
+ * needed by operation helpers.
+ *
+ * @remarks
+ * Provides the essential dependencies required by site operation utilities to
+ * perform CRUD operations and synchronization tasks.
+ *
+ * @public
+ */
+export interface SiteOperationsDependencies {
+    /** Get all current sites from the store */
+    getSites: () => Site[];
+    /** Remove a site from the store */
+    removeSite: (identifier: string) => void;
+    /** External service dependencies required for operations */
+    services: SiteOperationsServiceDependencies;
+    /** Persist latest backup metadata */
+    setLastBackupMetadata: (
+        metadata: SerializedDatabaseBackupResult["metadata"] | undefined
+    ) => void;
+    /** Replace all sites in the store */
+    setSites: (sites: Site[]) => void;
+    /** Synchronize sites from backend storage */
+    syncSites: () => Promise<void>;
+}
+
+/**
+ * External services consumed by site operations.
+ *
+ * @public
+ */
+export interface SiteOperationsServiceDependencies {
+    /** Data export operations */
+    data: Pick<
+        DataBackupService,
+        "downloadSqliteBackup" | "restoreSqliteBackup" | "saveSqliteBackup"
+    >;
+    /** Site service operations */
+    site: Pick<
+        SiteDataService,
+        "addSite" | "getSites" | "removeMonitor" | "removeSite" | "updateSite"
+    >;
+}
+
+/**
  * Sites store actions interface for managing site operations.
  *
  * @remarks
@@ -101,49 +146,12 @@ export type SitesState = SitesStateShape;
  */
 export type SitesStore = Simplify<SitesActions & SitesState>;
 
-/**
- * Dependencies interface for site operations. Defines the minimal interface
- * needed by operation helpers.
- *
- * @remarks
- * Provides the essential dependencies required by site operation utilities to
- * perform CRUD operations and synchronization tasks.
- *
- * @public
- */
-export interface SiteOperationsDependencies {
-    /** Get all current sites from the store */
-    getSites: () => Site[];
-    /** Remove a site from the store */
-    removeSite: (identifier: string) => void;
-    /** External service dependencies required for operations */
-    services: SiteOperationsServiceDependencies;
-    /** Persist latest backup metadata */
-    setLastBackupMetadata: (
-        metadata: SerializedDatabaseBackupResult["metadata"] | undefined
-    ) => void;
-    /** Replace all sites in the store */
-    setSites: (sites: Site[]) => void;
-    /** Synchronize sites from backend storage */
-    syncSites: () => Promise<void>;
-}
-
-/**
- * External services consumed by site operations.
- *
- * @public
- */
-export interface SiteOperationsServiceDependencies {
-    /** Data export operations */
-    data: Pick<
-        DataBackupService,
-        "downloadSqliteBackup" | "restoreSqliteBackup" | "saveSqliteBackup"
-    >;
-    /** Site service operations */
-    site: Pick<
-        SiteDataService,
-        "addSite" | "getSites" | "removeMonitor" | "removeSite" | "updateSite"
-    >;
+interface DataBackupService {
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+    restoreSqliteBackup: (
+        payload: SerializedDatabaseRestorePayload
+    ) => Promise<SerializedDatabaseRestoreResult>;
+    saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
 }
 
 interface SiteDataService {
@@ -152,12 +160,4 @@ interface SiteDataService {
     removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<Site>;
     removeSite: (identifier: string) => Promise<boolean>;
     updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
-}
-
-interface DataBackupService {
-    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
-    restoreSqliteBackup: (
-        payload: SerializedDatabaseRestorePayload
-    ) => Promise<SerializedDatabaseRestoreResult>;
-    saveSqliteBackup: () => Promise<SerializedDatabaseBackupSaveResult>;
 }

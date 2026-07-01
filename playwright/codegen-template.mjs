@@ -127,11 +127,9 @@ const locatorTransforms = /** @type {Record<string, string>} */ ({
     'locator(".input")': 'getByRole("textbox")',
     'locator(".link")': 'getByRole("link")',
 
-    // Note: Body/html locators are intentionally not mapped here because there are no semantic
-    // alternatives. These broad selectors are generally problematic and should be avoided:
-    // - They match too many elements, making tests brittle
-    // - They don't reflect how users interact with the page
-    // - They're not accessible/semantic
+    // Note: Body/html locators are intentionally not mapped here because there are no semantic alternatives.
+    // These broad selectors are generally problematic and should be avoided: - They match too many elements,
+    // making tests brittle - They don't reflect how users interact with the page - They're not accessible/semantic
     //
     // Instead of locator("body") or locator("html"), consider:
     // - Targeting specific semantic elements with getByRole(), getByText(), etc.
@@ -202,7 +200,7 @@ function applyLintCompliantTransforms(codegenOutput) {
 
     // Batch locator transformations using a single regex and replacer
     const locatorKeys = Object.keys(locatorTransforms).map((k) =>
-        k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        RegExp.escape(k)
     );
     if (locatorKeys.length > 0) {
         const locatorRegex = new RegExp(locatorKeys.join("|"), "g");
@@ -214,7 +212,7 @@ function applyLintCompliantTransforms(codegenOutput) {
 
     // Batch title transformations using a single regex and replacer
     const titleKeys = Object.keys(titleTransforms).map((k) =>
-        k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        RegExp.escape(k)
     );
     if (titleKeys.length > 0) {
         const titleRegex = new RegExp(titleKeys.join("|"), "g");
@@ -230,7 +228,7 @@ function applyLintCompliantTransforms(codegenOutput) {
         transformed.includes("test(")
     ) {
         // Find all import statements
-        const importRegex = /^import.*?;$/gm;
+        const importRegex = /^import.*?;$/gmv;
         let lastImportMatch;
         let match;
         while ((match = importRegex.exec(transformed)) !== null) {
@@ -238,7 +236,7 @@ function applyLintCompliantTransforms(codegenOutput) {
         }
 
         // Find all top-level test cases
-        const testCaseRegex = /^test\([^]*?=>\s*{[^]*?}\s*\);?/gm;
+        const testCaseRegex = /^test\([\s\S]*?=>\s*\{[\s\S]*?\}\s*\);?/gmv;
         const testCases = [];
         let testMatch;
         while ((testMatch = testCaseRegex.exec(transformed)) !== null) {
@@ -263,23 +261,23 @@ function applyLintCompliantTransforms(codegenOutput) {
         // Determine describe block name
         const firstTestTitleMatch =
             testCases.length > 0 && testCases[0]
-                ? testCases[0].code.match(/test\("([^"]+)"/)
+                ? (/test\("([^"]+)"/v.exec(testCases[0].code))
                 : null;
         const describeName =
-            firstTestTitleMatch && firstTestTitleMatch[1]
+            firstTestTitleMatch?.[1]
                 ? firstTestTitleMatch[1]
-                      .replace(/^should\s+/, "")
-                      .replace(/\s+/g, " ")
+                      .replace(/^should\s+/v, "")
+                      .replaceAll(/\s+/gv, " ")
                 : "Generated Test";
 
         // Insert describe block after last import
-        let insertionIndex = lastImportMatch
+        const insertionIndex = lastImportMatch
             ? lastImportMatch.index + lastImportMatch[0].length
             : 0;
         const describeBlock =
-            `\n\ntest.describe("${describeName}", () => {\n` +
-            testCases.map((tc) => tc.code).join("\n\n") +
-            `\n});\n`;
+            `\n\ntest.describe("${describeName}", () => {\n${
+            testCases.map((tc) => tc.code).join("\n\n")
+            }\n});\n`;
 
         transformed =
             codeWithoutTests.slice(0, insertionIndex) +
@@ -295,19 +293,19 @@ function applyLintCompliantTransforms(codegenOutput) {
      * NETWORK_IDLE_REPLACEMENT constant below.
      */
     const NETWORK_IDLE_REPLACEMENT = "domcontentloaded";
-    transformed = transformed.replace(
-        /waitForLoadState\(['"]networkidle['"]\)/g,
+    transformed = transformed.replaceAll(
+        /waitForLoadState\(["']networkidle["']\)/gv,
         `waitForLoadState("${NETWORK_IDLE_REPLACEMENT}")`
     );
 
     // Add comments for body/html locators with consistent indentation
-    transformed = transformed.replace(
-        /^([ \t]*)page\.locator\(['"]body['"]\)/gm,
+    transformed = transformed.replaceAll(
+        /^([\t ]*)page\.locator\(["']body["']\)/gmv,
         (_, indent) =>
             `${indent}// TODO: Replace with semantic locator\n${indent}page.locator("body")`
     );
-    transformed = transformed.replace(
-        /^([ \t]*)page\.locator\(['"]html['"]\)/gm,
+    transformed = transformed.replaceAll(
+        /^([\t ]*)page\.locator\(["']html["']\)/gmv,
         (_, indent) =>
             `${indent}// TODO: Replace with semantic locator\n${indent}page.locator("html")`
     );

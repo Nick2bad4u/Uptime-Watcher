@@ -2,7 +2,7 @@
 
 /**
  * Vitest configuration for Electron backend tests. Standalone config file that
- * doesn't inherit from main vite config to avoid conflicts. Specifically
+ * doesn't inherit from main Vite config to avoid conflicts. Specifically
  * targets electron and shared files for backend testing.
  */
 
@@ -22,7 +22,7 @@ const dirname = import.meta.dirname;
  */
 const vitestElectronConfig: UserConfig = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-backend",
-    // Parity: json handling consistent (important if backend loads JSON fixtures)
+    // Parity: JSON handling consistent (important if backend loads JSON fixtures)
     json: {
         namedExports: true,
         stringify: true,
@@ -168,7 +168,7 @@ const vitestElectronConfig: UserConfig = defineConfig({
         maxWorkers: Math.max(
             1,
             Number(
-                // eslint-disable-next-line n/no-process-env -- safe for test time use
+
                 process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
             )
         ),

@@ -1,9 +1,9 @@
 /**
- * Configuration value type definitions for the Uptime Watcher application.
+ * Configuration value type definitions for the Uptime Watcher app.
  *
  * @remarks
  * These types provide better type safety for configuration values stored in the
- * database and used throughout the application. All values are stored as
+ * database and used throughout the app. All values are stored as
  * strings in the database but represent different underlying types.
  *
  * @packageDocumentation
@@ -55,7 +55,7 @@ export interface KnownConfigValues {
 }
 
 /**
- * Supported application themes with open-ended extension support.
+ * Supported app themes with open-ended extension support.
  */
 export type ThemeIdentifier = LiteralUnion<
     "dark" | "high-contrast" | "light",

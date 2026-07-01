@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import {
     isValidHistoryRow,
     isValidMonitorRow,
@@ -292,7 +293,7 @@ describe("Database Types - Complete Function Coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(isValidSiteRow({ identifier: "   " })).toBeFalsy();
+            expect(isValidSiteRow({ identifier: ' '.repeat(3) })).toBeFalsy();
         });
     });
 

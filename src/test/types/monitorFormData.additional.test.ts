@@ -3,17 +3,19 @@
  * complete function coverage
  */
 import { describe, expect, it } from "vitest";
+
+import type { PingFormData, PortFormData } from "../../types/monitorFormData";
+
 import {
+    createDefaultFormData,
     isDnsFormData,
+    isHttpFormData,
     isPingFormData,
     isPortFormData,
-    isHttpFormData,
     isValidMonitorFormData,
     safeGetFormProperty,
     safeSetFormProperty,
-    createDefaultFormData,
 } from "../../types/monitorFormData";
-import type { PingFormData, PortFormData } from "../../types/monitorFormData";
 
 describe("monitorFormData functions - Additional Coverage", () => {
     describe("isDnsFormData - Edge Cases", () => {
@@ -305,7 +307,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
 
             const data = {
                 type: "http",
-                // Missing url
+                // Missing URL
                 name: "Incomplete Monitor",
             };
             expect(isValidMonitorFormData(data)).toBeFalsy();
@@ -433,7 +435,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "config", { ssl: true });
-            expect((data as any)["config"]).toEqual({ ssl: true });
+            expect((data as any).config).toEqual({ ssl: true });
             expect(data.name).toBe("Test");
         });
 
@@ -450,7 +452,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "tags", ["api", "health"]);
-            expect((data as any)["tags"]).toEqual(["api", "health"]);
+            expect((data as any).tags).toEqual(["api", "health"]);
             expect(data.name).toBe("Test");
         });
 
@@ -470,7 +472,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 name: "Test",
             };
             safeSetFormProperty(data, "ssl", true);
-            expect((data as any)["ssl"]).toBeTruthy();
+            expect((data as any).ssl).toBeTruthy();
             expect(data.name).toBe("Test");
         });
 
@@ -491,10 +493,10 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 existing: "value",
             };
             safeSetFormProperty(data, "nullValue", null);
-            expect((data as any)["nullValue"]).toBeNull();
+            expect((data as any).nullValue).toBeNull();
 
             safeSetFormProperty(data, "undefinedValue", undefined);
-            expect((data as any)["undefinedValue"]).toBeUndefined();
+            expect((data as any).undefinedValue).toBeUndefined();
         });
 
         it("should preserve all existing properties", async ({
@@ -520,7 +522,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
             expect(data.timeout).toBe(5000);
             expect(data.ssl).toBeTruthy();
             expect(data.tags).toEqual(["api"]);
-            expect((data as any)["newProp"]).toBe("newValue");
+            expect((data as any).newProp).toBe("newValue");
         });
     });
 
@@ -538,13 +540,13 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     "DNS"
                 );
-            }).toThrow(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/iv);
 
             expect(() => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     "HTTP"
                 );
-            }).toThrow(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/iv);
         });
 
         it("should handle empty string type", async ({ task, annotate }) => {
@@ -560,7 +562,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     ""
                 );
-            }).toThrow(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/iv);
         });
 
         it("should handle very long type names", async ({ task, annotate }) => {
@@ -579,7 +581,7 @@ describe("monitorFormData functions - Additional Coverage", () => {
                 (createDefaultFormData as unknown as (type: string) => unknown)(
                     longType
                 );
-            }).toThrow(/invalid monitor type/i);
+            }).toThrow(/invalid monitor type/iv);
         });
 
         it("should create consistent base properties for all types", async ({

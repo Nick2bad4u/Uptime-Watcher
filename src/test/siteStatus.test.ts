@@ -2,15 +2,16 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect } from "vitest";
+import type { Site } from "@shared/types";
+
 import {
-    calculateSiteStatus,
     calculateSiteMonitoringStatus,
+    calculateSiteStatus,
     getSiteDisplayStatus,
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
-import type { Site } from "@shared/types";
+import { describe, expect, it } from "vitest";
 
 describe("siteStatus utilities - Uncovered Lines", () => {
     describe(calculateSiteStatus, () => {

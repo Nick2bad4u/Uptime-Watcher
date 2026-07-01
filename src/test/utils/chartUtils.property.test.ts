@@ -18,14 +18,17 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it } from "vitest";
+import type { UnknownRecord } from "type-fest";
+
 import fc from "fast-check";
+import { arrayJoin, objectFromEntries, safeCastTo   } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
 import {
-    getScaleConfigSafe,
-    getScaleConfig,
-    getNestedScalePropertySafe,
     getNestedScaleProperty,
+    getNestedScalePropertySafe,
+    getScaleConfig,
+    getScaleConfigSafe,
     getScaleProperty,
 } from "../../utils/chartUtils";
 
@@ -179,7 +182,7 @@ describe("Chart Utils Property-Based Tests", () => {
                     minLength: 1,
                     maxLength: 3,
                 })
-                .map((parts) => `${base}.${parts.join(".")}`)
+                .map((parts) => `${base}.${arrayJoin(parts, ".")}`)
         ),
         // Invalid paths
         fc.oneof(
@@ -213,7 +216,7 @@ describe("Chart Utils Property-Based Tests", () => {
                         expect(typeof result.exists).toBe("boolean");
 
                         // If the axis exists in the config, should return exists=true
-                        if (config.scales && config.scales[axis]) {
+                        if (config.scales?.[axis]) {
                             expect(result.exists).toBeTruthy();
                             expect(typeof result.config).toBe("object");
                         }
@@ -272,7 +275,7 @@ describe("Chart Utils Property-Based Tests", () => {
                     (config, axis) => {
                         const result = getScaleConfig(config, axis);
 
-                        if (config.scales && config.scales[axis]) {
+                        if (config.scales?.[axis]) {
                             expect(result).toBeDefined();
                             expect(typeof result).toBe("object");
                         } else {
@@ -404,7 +407,7 @@ describe("Chart Utils Property-Based Tests", () => {
 
                         if (path === "") {
                             // Empty path should return the scale config itself if scale exists
-                            if (config.scales && config.scales[axis]) {
+                            if (config.scales?.[axis]) {
                                 // The function splits "" into [""] and tries to find a property named ""
                                 // This is actually the expected behavior - empty string is not a valid path
                                 expect(result.exists).toBeFalsy();
@@ -523,9 +526,8 @@ describe("Chart Utils Property-Based Tests", () => {
                         const result = getScaleProperty(config, axis, property);
 
                         // Always assert something (repo enforces requireAssertions).
-                        const scale = config.scales?.[axis] as
-                            | Record<string, unknown>
-                            | undefined;
+                        const scale = safeCastTo<| undefined
+                            | UnknownRecord>(config.scales?.[axis]);
                         const expected = scale?.[property];
                         expect(result).toEqual(expected);
 
@@ -560,12 +562,12 @@ describe("Chart Utils Property-Based Tests", () => {
                     fc.string({ minLength: 1 }).filter(
                         (s) =>
                             ![
-                                "type",
-                                "display",
                                 "beginAtZero",
-                                "title",
+                                "display",
                                 "grid",
                                 "ticks",
+                                "title",
+                                "type",
                             ].includes(s)
                     ),
                     (config, axis, property) => {
@@ -573,8 +575,7 @@ describe("Chart Utils Property-Based Tests", () => {
 
                         // For non-existent properties, should return undefined
                         if (
-                            config.scales &&
-                            config.scales[axis] &&
+                            config.scales?.[axis] &&
                             !(property in config.scales[axis])
                         ) {
                             expect(result).toBeUndefined();
@@ -667,7 +668,7 @@ describe("Chart Utils Property-Based Tests", () => {
             const largeConfig = fc.record({
                 scales: fc.record({
                     x: fc.record(
-                        Object.fromEntries(
+                        objectFromEntries(
                             Array.from({ length: 100 }, (_, i) => [
                                 `property${i}`,
                                 fc.oneof(

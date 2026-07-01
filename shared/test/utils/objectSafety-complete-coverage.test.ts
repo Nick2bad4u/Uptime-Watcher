@@ -4,7 +4,8 @@
  * Tests all exported functions to achieve 100% function coverage
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
 import {
     safeObjectAccess,
     safeObjectIteration,
@@ -160,10 +161,10 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
 
             const callback = vi.fn();
 
-            safeObjectIteration(null as any, callback);
-            safeObjectIteration(undefined as any, callback);
-            safeObjectIteration("string" as any, callback);
-            safeObjectIteration(123 as any, callback);
+            safeObjectIteration(null, callback);
+            safeObjectIteration(undefined, callback);
+            safeObjectIteration("string", callback);
+            safeObjectIteration(123, callback);
 
             expect(callback).not.toHaveBeenCalled();
         });

@@ -4,13 +4,14 @@
  */
 
 import { describe, expect, it } from "vitest";
+
 import { calculateMaxDuration } from "../../utils/duration";
 
 describe(calculateMaxDuration, () => {
-    describe("Basic Calculations", () => {
+    describe("basic Calculations", () => {
         it("should calculate duration correctly with no retries", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -24,8 +25,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should calculate duration correctly with single retry", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -46,8 +47,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should calculate duration correctly with multiple retries", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -68,21 +69,18 @@ describe(calculateMaxDuration, () => {
         });
     });
 
-    describe("Exponential Backoff Logic", () => {
+    describe("exponential Backoff Logic", () => {
         it("should apply exponential backoff correctly for first few retries", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Test individual backoff calculations
-            // Retry 0: 0.5 * 2^0 = 0.5s
-            // Retry 1: 0.5 * 2^1 = 1s
-            // Retry 2: 0.5 * 2^2 = 2s
-            // Retry 3: 0.5 * 2^3 = 4s
+            // Test individual backoff calculations Retry 0: 0.5 * 2^0 = 0.5s Retry 1: 0.5 * 2^1 = 1s Retry 2:
+            // 0.5 * 2^2 = 2s Retry 3: 0.5 * 2^3 = 4s
 
             // Test with timeout=0 to isolate backoff calculation
             expect(calculateMaxDuration(0, 1)).toBe("1s"); // 0 + 0.5 -> 1s
@@ -91,8 +89,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should cap backoff time at 5 seconds per retry", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -103,8 +101,7 @@ describe(calculateMaxDuration, () => {
             const timeout = 1;
             const retryAttempts = 10; // This would normally give very large backoff times
 
-            // Expected backoff: 0.5 + 1 + 2 + 4 + 5 + 5 + 5 + 5 + 5 + 5 = 37.5s
-            // Total: 1 * 11 + 37.5 = 48.5s -> 49s
+            // Expected backoff: 0.5 + 1 + 2 + 4 + 5 + 5 + 5 + 5 + 5 + 5 = 37.5s Total: 1 * 11 + 37.5 = 48.5s -> 49s
 
             // Act
             const result = calculateMaxDuration(timeout, retryAttempts);
@@ -114,8 +111,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should handle zero retry attempts correctly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -128,8 +125,8 @@ describe(calculateMaxDuration, () => {
         });
     });
 
-    describe("Time Unit Formatting", () => {
-        it("should format seconds correctly", async ({ task, annotate }) => {
+    describe("time Unit Formatting", () => {
+        it("should format seconds correctly", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -141,7 +138,7 @@ describe(calculateMaxDuration, () => {
             expect(calculateMaxDuration(59, 0)).toBe("59s");
         });
 
-        it("should format minutes correctly", async ({ task, annotate }) => {
+        it("should format minutes correctly", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -154,7 +151,7 @@ describe(calculateMaxDuration, () => {
             expect(calculateMaxDuration(120, 0)).toBe("2m"); // Exactly 120s -> 2m
         });
 
-        it("should format hours correctly", async ({ task, annotate }) => {
+        it("should format hours correctly", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -168,8 +165,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should round up fractional units correctly", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -187,8 +184,8 @@ describe(calculateMaxDuration, () => {
         });
     });
 
-    describe("Edge Cases", () => {
-        it("should handle zero timeout", async ({ task, annotate }) => {
+    describe("edge Cases", () => {
+        it("should handle zero timeout", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -200,7 +197,7 @@ describe(calculateMaxDuration, () => {
             expect(calculateMaxDuration(0, 2)).toBe("2s"); // 0.5 + 1 -> 2s
         });
 
-        it("should handle zero retry attempts", async ({ task, annotate }) => {
+        it("should handle zero retry attempts", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -212,7 +209,7 @@ describe(calculateMaxDuration, () => {
             expect(calculateMaxDuration(4000, 0)).toBe("2h");
         });
 
-        it("should handle large timeout values", async ({ task, annotate }) => {
+        it("should handle large timeout values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -223,7 +220,7 @@ describe(calculateMaxDuration, () => {
             expect(calculateMaxDuration(10_000, 0)).toBe("3h"); // 10000s -> 3h
         });
 
-        it("should handle large retry counts", async ({ task, annotate }) => {
+        it("should handle large retry counts", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -239,11 +236,11 @@ describe(calculateMaxDuration, () => {
             const result = calculateMaxDuration(timeout, retryAttempts);
 
             // Assert
-            expect(result).toBeTruthy();
-            expect(result).toMatch(/^\d+[hms]$/); // Should be valid format
+            expect(result).toBe(true);
+            expect(result).toMatch(/^\d+[hms]$/v); // Should be valid format
         });
 
-        it("should handle fractional timeouts", async ({ task, annotate }) => {
+        it("should handle fractional timeouts", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
@@ -256,16 +253,15 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should handle negative inputs gracefully", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // These are edge cases that shouldn't normally happen,
-            // but the function should not crash
+            // These are edge cases that shouldn't normally happen, but the function should not crash
 
             // Act & Assert
             expect(() => calculateMaxDuration(-5, 0)).not.toThrow();
@@ -274,10 +270,10 @@ describe(calculateMaxDuration, () => {
         });
     });
 
-    describe("Real-world Scenarios", () => {
+    describe("real-world Scenarios", () => {
         it("should calculate correct duration for typical HTTP timeout scenarios", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -290,8 +286,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should calculate correct duration for ping monitoring", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -304,8 +300,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should calculate correct duration for database connection timeouts", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -318,8 +314,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should calculate correct duration for long-running tasks", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -332,10 +328,10 @@ describe(calculateMaxDuration, () => {
         });
     });
 
-    describe("Mathematical Properties", () => {
+    describe("mathematical Properties", () => {
         it("should always increase duration with more retries", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -364,8 +360,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should always increase duration with higher timeout", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -391,8 +387,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should maintain consistent backoff calculation", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -414,22 +410,22 @@ describe(calculateMaxDuration, () => {
         });
     });
 
-    describe("Return Value Format", () => {
-        it("should always return a string", async ({ task, annotate }) => {
+    describe("return Value Format", () => {
+        it("should always return a string", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
             // Act & Assert
-            expect(typeof calculateMaxDuration(10, 0)).toBe("string");
-            expect(typeof calculateMaxDuration(100, 5)).toBe("string");
-            expect(typeof calculateMaxDuration(0, 0)).toBe("string");
+            expect(calculateMaxDuration(10, 0)).toBeTypeOf("string");
+            expect(calculateMaxDuration(100, 5)).toBeTypeOf("string");
+            expect(calculateMaxDuration(0, 0)).toBeTypeOf("string");
         });
 
         it("should always return a valid time format", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -437,7 +433,7 @@ describe(calculateMaxDuration, () => {
             await annotate("Type: Business Logic", "type");
 
             // Arrange
-            const timeFormatRegex = /^\d+[hms]$/;
+            const timeFormatRegex = /^\d+[hms]$/v;
 
             // Act & Assert
             expect(calculateMaxDuration(5, 0)).toMatch(timeFormatRegex);
@@ -446,8 +442,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should never return zero time with positive inputs", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -461,8 +457,8 @@ describe(calculateMaxDuration, () => {
         });
 
         it("should return consistent format for similar values", async ({
-            task,
             annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: duration", "component");
@@ -470,18 +466,18 @@ describe(calculateMaxDuration, () => {
             await annotate("Type: Business Logic", "type");
 
             // Values that should all be in seconds
-            expect(calculateMaxDuration(30, 0)).toMatch(/^\d+s$/);
-            expect(calculateMaxDuration(45, 0)).toMatch(/^\d+s$/);
-            expect(calculateMaxDuration(59, 0)).toMatch(/^\d+s$/);
+            expect(calculateMaxDuration(30, 0)).toMatch(/^\d+s$/v);
+            expect(calculateMaxDuration(45, 0)).toMatch(/^\d+s$/v);
+            expect(calculateMaxDuration(59, 0)).toMatch(/^\d+s$/v);
 
             // Values that should all be in minutes
-            expect(calculateMaxDuration(60, 0)).toMatch(/^\d+m$/);
-            expect(calculateMaxDuration(120, 0)).toMatch(/^\d+m$/);
-            expect(calculateMaxDuration(1800, 0)).toMatch(/^\d+m$/);
+            expect(calculateMaxDuration(60, 0)).toMatch(/^\d+m$/v);
+            expect(calculateMaxDuration(120, 0)).toMatch(/^\d+m$/v);
+            expect(calculateMaxDuration(1800, 0)).toMatch(/^\d+m$/v);
 
             // Values that should all be in hours
-            expect(calculateMaxDuration(3600, 0)).toMatch(/^\d+h$/);
-            expect(calculateMaxDuration(7200, 0)).toMatch(/^\d+h$/);
+            expect(calculateMaxDuration(3600, 0)).toMatch(/^\d+h$/v);
+            expect(calculateMaxDuration(7200, 0)).toMatch(/^\d+h$/v);
         });
     });
 });

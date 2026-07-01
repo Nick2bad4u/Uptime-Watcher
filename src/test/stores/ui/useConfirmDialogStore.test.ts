@@ -2,8 +2,9 @@
  * Comprehensive tests for the confirmation dialog store utilities.
  */
 
-import { act, renderHook } from "@testing-library/react";
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { act, renderHook } from "@testing-library/react";
+import { arrayAt, safeCastTo  } from "ts-extras";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -203,14 +204,10 @@ describe(useConfirmDialogStore, () => {
     ): ConfirmDialogOptions => ({
         message: options.message,
         title: options.title,
-        ...(options.cancelLabel === undefined
-            ? {}
-            : { cancelLabel: options.cancelLabel }),
-        ...(options.confirmLabel === undefined
-            ? {}
-            : { confirmLabel: options.confirmLabel }),
-        ...(options.details === undefined ? {} : { details: options.details }),
-        ...(options.tone === undefined ? {} : { tone: options.tone }),
+        ...(options.cancelLabel !== undefined && { cancelLabel: options.cancelLabel }),
+        ...(options.confirmLabel !== undefined && { confirmLabel: options.confirmLabel }),
+        ...(options.details !== undefined && { details: options.details }),
+        ...(options.tone !== undefined && { tone: options.tone }),
     });
 
     fcTest.prop([confirmDialogOptionsArb, fc.boolean()])(
@@ -229,7 +226,7 @@ describe(useConfirmDialogStore, () => {
                 message: options.message,
                 title: options.title,
                 tone: options.tone ?? "default",
-                ...(options.details ? { details: options.details } : {}),
+                ...(options.details && { details: options.details }),
             } as const;
 
             expect(state.request).toStrictEqual(expectedRequest);
@@ -262,13 +259,13 @@ describe(useConfirmDialogStore, () => {
 
             useConfirmDialogStore.getState().confirm();
 
-            await expect(confirmations.at(-1)).resolves.toBeTruthy();
+            await expect(arrayAt(confirmations, -1)).resolves.toBeTruthy();
             expect(useConfirmDialogStore.getState().request).toBeNull();
         }
     );
 
     it("exposes Playwright automation helpers on the global scope", async () => {
-        const automationTarget = globalThis as typeof globalThis & {
+        const automationTarget = safeCastTo<typeof globalThis & {
             playwrightConfirmDialog?: {
                 cancel: () => void;
                 confirm: () => void;
@@ -277,7 +274,7 @@ describe(useConfirmDialogStore, () => {
                     listener: (state: ConfirmDialogStoreState) => void
                 ) => () => void;
             };
-        };
+        }>(globalThis);
 
         const bridge = automationTarget.playwrightConfirmDialog;
         expect(bridge).toBeDefined();

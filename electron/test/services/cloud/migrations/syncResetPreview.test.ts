@@ -1,11 +1,9 @@
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 
-import { describe, expect, it } from "vitest";
-
-import { CLOUD_SYNC_MANIFEST_VERSION } from "@shared/types/cloudSyncManifest";
-import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
-
 import { buildCloudSyncResetPreview } from "@electron/services/cloud/migrations/syncResetPreview";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { CLOUD_SYNC_MANIFEST_VERSION } from "@shared/types/cloudSyncManifest";
+import { describe, expect, it } from "vitest";
 
 describe(buildCloudSyncResetPreview, () => {
     it("builds per-device breakdown from op object keys", () => {

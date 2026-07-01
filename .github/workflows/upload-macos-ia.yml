@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Upload macOS Distributables To Archive Org
+name: Upload macOS Distributables to Archive Org
 run-name: Upload macOS Distributables To Archive Org
 
 on:

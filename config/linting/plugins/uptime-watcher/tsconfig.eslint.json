@@ -26,10 +26,10 @@
             ]
         },
         "rootDir": "../../../..",
+        "tsBuildInfoFile": "../../../../.cache/tsbuildinfo/tsconfig.uptime-watcher-eslint.tsbuildinfo",
         "types": [
             "node"
-        ],
-        "tsBuildInfoFile": "../../../../.cache/tsbuildinfo/tsconfig.uptime-watcher-eslint.tsbuildinfo"
+        ]
     },
     "exclude": [
         "**/node_modules/**",

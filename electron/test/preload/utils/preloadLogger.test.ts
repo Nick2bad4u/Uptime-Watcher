@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { buildPayloadPreview } from "@electron/preload/utils/preloadLogger";
+import { describe, expect, it } from "vitest";
 
 describe(buildPayloadPreview, () => {
     it("serializes circular references instead of returning undefined", () => {

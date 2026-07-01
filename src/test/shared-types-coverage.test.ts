@@ -2,10 +2,10 @@
  * Tests for shared/types modules to improve coverage
  */
 
-import { describe, it, expect } from "vitest";
+import { arrayFirst, arrayIncludes  } from "ts-extras";
+import { describe, expect, it } from "vitest";
 
-// Import the actual types to test them
-// These imports will help with coverage of type definitions
+// Import the actual types to test them These imports will help with coverage of type definitions
 
 describe("Shared Types Coverage", () => {
     describe("FormData Types", () => {
@@ -17,16 +17,16 @@ describe("Shared Types Coverage", () => {
 
             // Test the actual formData.ts structures (lines 204-236)
             interface MockFormData {
+                monitors: {
+                    configuration: Record<string, any>;
+                    name: string;
+                    type: string;
+                }[];
                 siteName: string;
                 url: string;
-                monitors: {
-                    type: string;
-                    name: string;
-                    configuration: Record<string, any>;
-                }[];
                 validation?: {
-                    isValid: boolean;
                     errors: string[];
+                    isValid: boolean;
                 };
             }
 
@@ -52,7 +52,7 @@ describe("Shared Types Coverage", () => {
             expect(formData.siteName).toBe("Test Site");
             expect(formData.url).toBe("https://example.com");
             expect(formData.monitors).toHaveLength(1);
-            expect(formData.monitors[0]?.type).toBe("http");
+            expect(arrayFirst(formData.monitors)?.type).toBe("http");
             expect(formData.validation?.isValid).toBeTruthy();
         });
 
@@ -97,9 +97,9 @@ describe("Shared Types Coverage", () => {
             };
 
             expect(
-                validateField(fieldValidations[0]!, "Test Site")
+                validateField(arrayFirst(fieldValidations)!, "Test Site")
             ).toBeTruthy();
-            expect(validateField(fieldValidations[0]!, "")).toBeFalsy();
+            expect(validateField(arrayFirst(fieldValidations)!, "")).toBeFalsy();
             expect(
                 validateField(fieldValidations[1]!, "https://example.com")
             ).toBeTruthy();
@@ -121,18 +121,18 @@ describe("Shared Types Coverage", () => {
 
             // Test monitorConfig.ts structures (lines 262-294)
             interface MonitorConfig {
-                type: "http" | "ping" | "port" | "dns";
-                name: string;
-                enabled: boolean;
-                interval: number;
-                timeout: number;
-                retryAttempts: number;
-                configuration: Record<string, any>;
                 alerts?: {
                     onFailure: boolean;
                     onRecovery: boolean;
                     threshold: number;
                 };
+                configuration: Record<string, any>;
+                enabled: boolean;
+                interval: number;
+                name: string;
+                retryAttempts: number;
+                timeout: number;
+                type: "dns" | "http" | "ping" | "port";
             }
 
             const httpMonitor: MonitorConfig = {
@@ -175,20 +175,20 @@ describe("Shared Types Coverage", () => {
             await annotate("Type: Validation", "type");
 
             interface MonitorValidator {
-                validateType: (type: string) => boolean;
                 validateInterval: (interval: number) => boolean;
-                validateTimeout: (timeout: number) => boolean;
                 validateRetryAttempts: (attempts: number) => boolean;
+                validateTimeout: (timeout: number) => boolean;
+                validateType: (type: string) => boolean;
             }
 
             const validator: MonitorValidator = {
                 validateType: (type: string) =>
-                    [
+                    arrayIncludes([
+                        "dns",
                         "http",
                         "ping",
                         "port",
-                        "dns",
-                    ].includes(type),
+                    ], type),
                 validateInterval: (interval: number) =>
                     interval >= 30_000 && interval <= 3_600_000,
                 validateTimeout: (timeout: number) =>
@@ -220,49 +220,49 @@ describe("Shared Types Coverage", () => {
 
             // Test themeConfig.ts structures (lines 435-490)
             interface ThemeConfig {
-                name: string;
-                displayName: string;
+                borderRadius: {
+                    lg: string;
+                    md: string;
+                    sm: string;
+                };
                 colors: {
+                    background: string;
+                    error: string;
+                    info: string;
                     primary: string;
                     secondary: string;
                     success: string;
-                    warning: string;
-                    error: string;
-                    info: string;
-                    background: string;
                     surface: string;
                     text: {
+                        disabled: string;
                         primary: string;
                         secondary: string;
-                        disabled: string;
                     };
+                    warning: string;
+                };
+                displayName: string;
+                name: string;
+                shadows: {
+                    lg: string;
+                    md: string;
+                    sm: string;
                 };
                 spacing: {
-                    xs: number;
-                    sm: number;
-                    md: number;
                     lg: number;
+                    md: number;
+                    sm: number;
                     xl: number;
+                    xs: number;
                 };
                 typography: {
                     fontFamily: string;
                     fontSize: {
-                        xs: string;
-                        sm: string;
-                        md: string;
                         lg: string;
+                        md: string;
+                        sm: string;
                         xl: string;
+                        xs: string;
                     };
-                };
-                shadows: {
-                    sm: string;
-                    md: string;
-                    lg: string;
-                };
-                borderRadius: {
-                    sm: string;
-                    md: string;
-                    lg: string;
                 };
             }
 
@@ -326,9 +326,9 @@ describe("Shared Types Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             interface ThemeUtils {
+                applyTheme: (themeName: string) => void;
                 getColorByStatus: (status: string) => string;
                 getSpacingValue: (size: string) => number;
-                applyTheme: (themeName: string) => void;
             }
 
             const themeUtils: ThemeUtils = {
@@ -340,7 +340,7 @@ describe("Shared Types Coverage", () => {
                         unknown: "#6b7280",
                     };
                     return (statusColors[status] ??
-                        statusColors["unknown"]) as string;
+                        statusColors["unknown"])!;
                 },
                 getSpacingValue: (size: string) => {
                     const spacing: Record<string, number> = {
@@ -350,10 +350,10 @@ describe("Shared Types Coverage", () => {
                         lg: 24,
                         xl: 32,
                     };
-                    return (spacing[size] ?? spacing["md"]) as number;
+                    return (spacing[size] ?? spacing["md"])!;
                 },
                 applyTheme: (themeName: string) => {
-                    // Mock theme application
+                    // Mock theme app
                     document.documentElement.dataset["theme"] = themeName;
                 },
             };
@@ -379,23 +379,23 @@ describe("Shared Types Coverage", () => {
 
             // Test validation.ts structures (lines 122-163)
             interface ValidationResult<T = any> {
-                isValid: boolean;
                 data?: T;
                 errors: {
+                    code: string;
                     field: string;
                     message: string;
-                    code: string;
                 }[];
-                warnings: {
-                    field: string;
-                    message: string;
-                    code: string;
-                }[];
+                isValid: boolean;
                 metadata?: {
+                    context?: Record<string, any>;
                     validatedAt: Date;
                     validator: string;
-                    context?: Record<string, any>;
                 };
+                warnings: {
+                    code: string;
+                    field: string;
+                    message: string;
+                }[];
             }
 
             const validationResult: ValidationResult<{ url: string }> = {
@@ -425,7 +425,7 @@ describe("Shared Types Coverage", () => {
             expect(validationResult.isValid).toBeFalsy();
             expect(validationResult.errors).toHaveLength(1);
             expect(validationResult.warnings).toHaveLength(1);
-            expect(validationResult.errors[0]?.code).toBe("REQUIRED_FIELD");
+            expect(arrayFirst(validationResult.errors)?.code).toBe("REQUIRED_FIELD");
             expect(validationResult.metadata?.validator).toBe("SiteValidator");
         });
 
@@ -440,10 +440,10 @@ describe("Shared Types Coverage", () => {
 
             interface ValidationRule {
                 field: string;
-                type: "required" | "format" | "range" | "custom";
                 message: string;
-                validator?: (value: any) => boolean;
                 parameters?: Record<string, any>;
+                type: "custom" | "format" | "range" | "required";
+                validator?: (value: any) => boolean;
             }
 
             const validationRules: ValidationRule[] = [
@@ -471,13 +471,6 @@ describe("Shared Types Coverage", () => {
                 value: any
             ): boolean => {
                 switch (rule.type) {
-                    case "required": {
-                        return (
-                            value !== null &&
-                            value !== undefined &&
-                            value !== ""
-                        );
-                    }
                     case "format": {
                         return rule.validator ? rule.validator(value) : true;
                     }
@@ -490,6 +483,13 @@ describe("Shared Types Coverage", () => {
                         }
                         return true;
                     }
+                    case "required": {
+                        return (
+                            value !== null &&
+                            value !== undefined &&
+                            value !== ""
+                        );
+                    }
                     default: {
                         return true;
                     }
@@ -497,9 +497,9 @@ describe("Shared Types Coverage", () => {
             };
 
             expect(
-                applyValidationRule(validationRules[0]!, "Test Site")
+                applyValidationRule(arrayFirst(validationRules)!, "Test Site")
             ).toBeTruthy();
-            expect(applyValidationRule(validationRules[0]!, "")).toBeFalsy();
+            expect(applyValidationRule(arrayFirst(validationRules)!, "")).toBeFalsy();
             expect(
                 applyValidationRule(validationRules[1]!, "https://example.com")
             ).toBeTruthy();

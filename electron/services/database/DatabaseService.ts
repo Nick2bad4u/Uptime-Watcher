@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides centralized database initialization, connection management, and
- * transaction utilities for the application. Uses node-sqlite3-wasm for
+ * transaction utilities for the app. Uses node-sqlite3-wasm for
  * database operations.
  */
 
@@ -70,14 +70,14 @@ const TRANSACTION_RETRY_MAX_DELAY_MS = 750;
  * - Built for Electron main process environment
  * - Uses node-sqlite3-wasm (compiled for Node.js compatibility)
  * - No platform-specific caveats for Windows/macOS/Linux
- * - WASM binary ensures consistent behavior across platforms
+ * - WebAssembly binary ensures consistent behavior across platforms
  *
  * **Thread Safety:**
  *
  * - Singleton pattern ensures single database connection
  * - Node-sqlite3-wasm operations are synchronous and thread-safe
  * - Multiple initialize() calls return same connection (idempotent)
- * - Concurrent access handled at application service layer
+ * - Concurrent access handled at app service layer
  *
  * @example
  *
@@ -104,7 +104,7 @@ export class DatabaseService {
      *
      * @remarks
      * Uses singleton pattern to ensure only one database connection exists
-     * throughout the application lifecycle.
+     * throughout the app lifecycle.
      *
      * @example
      *
@@ -157,8 +157,8 @@ export class DatabaseService {
     ): Promise<T> {
         const db = this.getDatabase();
 
-        // Nested transaction scenario: use SAVEPOINT so callers still get an
-        // atomic boundary even when already inside a broader transaction.
+        // Nested transaction scenario: use SAVEPOINT so callers still get an atomic boundary even when already inside
+        // a broader transaction.
         //
         // SQLite doesn't support nested BEGIN/COMMIT, but savepoints are the
         // supported mechanism.
@@ -285,7 +285,7 @@ export class DatabaseService {
      * - Safe to call multiple times (idempotent operation)
      * - In node-sqlite3-wasm, pending operations complete before close
      * - All transactions are completed synchronously before closure
-     * - Should be called during application shutdown for proper cleanup
+     * - Should be called during app shutdown for proper cleanup
      *
      * **Platform Compatibility:**
      *

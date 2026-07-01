@@ -8,59 +8,61 @@
  *
  * Test Coverage:
  *
- * - Theme application and switching
+ * - Theme app and switching
  * - CSS variable generation from theme objects
  * - Custom theme creation and merging
  * - System theme preference detection
  * - Theme validation and edge cases
- * - DOM integration and style application
+ * - DOM integration and style app
  * - Performance characteristics under load
  */
 
 /* Property-based tests require magic numbers and flexible object validation */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import { arrayAt, arrayFirst, stringSplit   } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ThemeManager } from "../../theme/ThemeManager";
 import type {
     Theme,
-    ThemeName,
-    ThemeColors,
-    ThemeTypography,
-    ThemeSpacing,
-    ThemeShadows,
     ThemeBorderRadius,
+    ThemeColors,
+    ThemeName,
+    ThemeShadows,
+    ThemeSpacing,
+    ThemeTypography,
 } from "../../theme/types";
+
+import { ThemeManager } from "../../theme/ThemeManager";
 import { themes } from "../../theme/themes";
 
 // Mock DOM environment for testing
 const mockDocument = {
-    documentElement: {
-        style: {
-            setProperty: vi.fn(),
-            removeProperty: vi.fn(),
-        },
-        classList: {
-            add: vi.fn(),
-            remove: vi.fn(),
-            contains: vi.fn().mockReturnValue(false),
-        },
-    },
     body: {
         classList: {
             add: vi.fn(),
-            remove: vi.fn(),
             contains: vi.fn().mockReturnValue(false),
+            remove: vi.fn(),
+        },
+    },
+    documentElement: {
+        classList: {
+            add: vi.fn(),
+            contains: vi.fn().mockReturnValue(false),
+            remove: vi.fn(),
+        },
+        style: {
+            removeProperty: vi.fn(),
+            setProperty: vi.fn(),
         },
     },
 };
 
 const mockWindow = {
     matchMedia: vi.fn(() => ({
-        matches: false,
         addEventListener: vi.fn(),
+        matches: false,
         removeEventListener: vi.fn(),
     })),
 };
@@ -68,9 +70,9 @@ const mockWindow = {
 // Arbitraries for theme generation
 const colorArbitrary = fc
     .tuple(
-        fc.integer({ min: 0, max: 255 }),
-        fc.integer({ min: 0, max: 255 }),
-        fc.integer({ min: 0, max: 255 })
+        fc.integer({ max: 255, min: 0 }),
+        fc.integer({ max: 255, min: 0 }),
+        fc.integer({ max: 255, min: 0 })
     )
     .map(
         ([
@@ -162,14 +164,14 @@ const themeColorsArbitrary: fc.Arbitrary<ThemeColors> = fc.record({
 });
 
 const fontSizeArbitrary = fc.record({
-    "2xl": fc.string({ minLength: 4, maxLength: 8 }).map((s) => `${s}rem`),
-    "3xl": fc.string({ minLength: 4, maxLength: 8 }).map((s) => `${s}rem`),
-    "4xl": fc.string({ minLength: 4, maxLength: 8 }).map((s) => `${s}rem`),
-    base: fc.string({ minLength: 3, maxLength: 6 }).map((s) => `${s}rem`),
-    lg: fc.string({ minLength: 3, maxLength: 6 }).map((s) => `${s}rem`),
-    sm: fc.string({ minLength: 3, maxLength: 6 }).map((s) => `${s}rem`),
-    xl: fc.string({ minLength: 3, maxLength: 6 }).map((s) => `${s}rem`),
-    xs: fc.string({ minLength: 3, maxLength: 6 }).map((s) => `${s}rem`),
+    "2xl": fc.string({ maxLength: 8, minLength: 4 }).map((s) => `${s}rem`),
+    "3xl": fc.string({ maxLength: 8, minLength: 4 }).map((s) => `${s}rem`),
+    "4xl": fc.string({ maxLength: 8, minLength: 4 }).map((s) => `${s}rem`),
+    base: fc.string({ maxLength: 6, minLength: 3 }).map((s) => `${s}rem`),
+    lg: fc.string({ maxLength: 6, minLength: 3 }).map((s) => `${s}rem`),
+    sm: fc.string({ maxLength: 6, minLength: 3 }).map((s) => `${s}rem`),
+    xl: fc.string({ maxLength: 6, minLength: 3 }).map((s) => `${s}rem`),
+    xs: fc.string({ maxLength: 6, minLength: 3 }).map((s) => `${s}rem`),
 });
 
 const fontWeightArbitrary = fc.record({
@@ -180,19 +182,19 @@ const fontWeightArbitrary = fc.record({
 });
 
 const lineHeightArbitrary = fc.record({
-    normal: fc.float({ min: 1, max: 2 }).map((n) => n.toString()),
-    relaxed: fc.float({ min: 1.5, max: 2.5 }).map((n) => n.toString()),
-    tight: fc.float({ min: 1, max: 1.5 }).map((n) => n.toString()),
+    normal: fc.float({ max: 2, min: 1 }).map((n) => n.toString()),
+    relaxed: fc.float({ max: 2.5, min: 1.5 }).map((n) => n.toString()),
+    tight: fc.float({ max: 1.5, min: 1 }).map((n) => n.toString()),
 });
 
 const fontFamilyArbitrary = fc.record({
-    mono: fc.array(fc.string({ minLength: 5, maxLength: 15 }), {
-        minLength: 1,
+    mono: fc.array(fc.string({ maxLength: 15, minLength: 5 }), {
         maxLength: 3,
+        minLength: 1,
     }),
-    sans: fc.array(fc.string({ minLength: 5, maxLength: 15 }), {
-        minLength: 1,
+    sans: fc.array(fc.string({ maxLength: 15, minLength: 5 }), {
         maxLength: 3,
+        minLength: 1,
     }),
 });
 
@@ -204,7 +206,7 @@ const themeTypographyArbitrary: fc.Arbitrary<ThemeTypography> = fc.record({
 });
 
 const spacingValueArbitrary = fc
-    .integer({ min: 1, max: 100 })
+    .integer({ max: 100, min: 1 })
     .map((n) => `${n}rem`);
 const themeSpacingArbitrary: fc.Arbitrary<ThemeSpacing> = fc.record({
     "2xl": spacingValueArbitrary,
@@ -216,7 +218,7 @@ const themeSpacingArbitrary: fc.Arbitrary<ThemeSpacing> = fc.record({
     xs: spacingValueArbitrary,
 });
 
-const shadowArbitrary = fc.string({ minLength: 10, maxLength: 50 });
+const shadowArbitrary = fc.string({ maxLength: 50, minLength: 10 });
 const themeShadowsArbitrary: fc.Arbitrary<ThemeShadows> = fc.record({
     inner: shadowArbitrary,
     lg: shadowArbitrary,
@@ -226,7 +228,7 @@ const themeShadowsArbitrary: fc.Arbitrary<ThemeShadows> = fc.record({
 });
 
 const borderRadiusArbitrary = fc
-    .integer({ min: 0, max: 50 })
+    .integer({ max: 50, min: 0 })
     .map((n) => (n === 0 ? "0" : `${n}px`));
 const themeBorderRadiusArbitrary: fc.Arbitrary<ThemeBorderRadius> = fc.record({
     full: fc.constant("9999px"),
@@ -238,13 +240,13 @@ const themeBorderRadiusArbitrary: fc.Arbitrary<ThemeBorderRadius> = fc.record({
 });
 
 const completeThemeArbitrary: fc.Arbitrary<Theme> = fc.record({
-    name: fc.string({ minLength: 3, maxLength: 20 }),
-    isDark: fc.boolean(),
-    colors: themeColorsArbitrary,
-    typography: themeTypographyArbitrary,
-    spacing: themeSpacingArbitrary,
-    shadows: themeShadowsArbitrary,
     borderRadius: themeBorderRadiusArbitrary,
+    colors: themeColorsArbitrary,
+    isDark: fc.boolean(),
+    name: fc.string({ maxLength: 20, minLength: 3 }),
+    shadows: themeShadowsArbitrary,
+    spacing: themeSpacingArbitrary,
+    typography: themeTypographyArbitrary,
 });
 
 const validThemeNameArbitrary: fc.Arbitrary<ThemeName> = fc.constantFrom(
@@ -254,7 +256,7 @@ const validThemeNameArbitrary: fc.Arbitrary<ThemeName> = fc.constantFrom(
     "system"
 );
 
-describe("ThemeManager Property-Based Tests", () => {
+describe("themeManager Property-Based Tests", () => {
     let themeManager: ThemeManager;
     let originalDocument: typeof document;
     let originalWindow: typeof window;
@@ -265,10 +267,10 @@ describe("ThemeManager Property-Based Tests", () => {
         themeManager = ThemeManager.getInstance();
 
         // Mock DOM environment
-        originalDocument = global.document;
-        originalWindow = global.window;
-        global.document = mockDocument as any;
-        global.window = mockWindow as any;
+        originalDocument = document;
+        originalWindow = globalThis;
+        globalThis.document = mockDocument as any;
+        globalThis.window = mockWindow as any;
 
         // Clear all mocks
         vi.clearAllMocks();
@@ -276,8 +278,8 @@ describe("ThemeManager Property-Based Tests", () => {
 
     afterEach(() => {
         // Restore original environment
-        global.document = originalDocument;
-        global.window = originalWindow;
+        globalThis.document = originalDocument;
+        globalThis.window = originalWindow;
         vi.clearAllMocks();
     });
 
@@ -285,20 +287,21 @@ describe("ThemeManager Property-Based Tests", () => {
         "should successfully apply any valid theme to DOM",
         (theme) => {
             // Apply theme should not throw and should call style setProperty
-            expect(() => themeManager.applyTheme(theme)).not.toThrow();
+            expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
 
             // Verify CSS properties were set
             expect(
                 mockDocument.documentElement.style.setProperty
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
 
             // Verify color properties were applied
             const setPropertyCalls = (
                 mockDocument.documentElement.style.setProperty as any
             ).mock.calls;
             const colorCalls = setPropertyCalls.filter((call: any[]) =>
-                call[0].startsWith("--color-")
+                arrayFirst(call).startsWith("--color-")
             );
+
             expect(colorCalls.length).toBeGreaterThan(0);
         }
     );
@@ -309,25 +312,25 @@ describe("ThemeManager Property-Based Tests", () => {
             const cssVariables = themeManager.generateCSSVariables(theme);
 
             // Should return a string
-            expect(typeof cssVariables).toBe("string");
+            expect(cssVariables).toBeTypeOf("string");
 
             // Should start with :root
-            expect(cssVariables).toMatch(/^:root\s*{/);
+            expect(cssVariables).toMatch(/^:root\s*\{/v);
 
             // Should end with closing brace
-            expect(cssVariables).toMatch(/}\s*$/);
+            expect(cssVariables).toMatch(/\}\s*$/v);
 
             // Should contain CSS custom properties
-            expect(cssVariables).toMatch(/--[\w-]+:/);
+            expect(cssVariables).toMatch(/--[\w-]+:/u);
 
             // Should contain color variables
-            expect(cssVariables).toMatch(/--color-/);
+            expect(cssVariables).toMatch(/--color-/v);
 
             // Should contain typography variables
-            expect(cssVariables).toMatch(/--font-/);
+            expect(cssVariables).toMatch(/--font-/v);
 
             // Should contain spacing variables
-            expect(cssVariables).toMatch(/--spacing-/);
+            expect(cssVariables).toMatch(/--spacing-/v);
         }
     );
 
@@ -335,14 +338,14 @@ describe("ThemeManager Property-Based Tests", () => {
         completeThemeArbitrary,
         fc.record(
             {
-                name: fc.string({ minLength: 1, maxLength: 50 }),
-                isDark: fc.boolean(),
                 colors: fc.record(
                     {
                         primary: fc.record({ 500: colorArbitrary }),
                     },
                     { requiredKeys: [] }
                 ),
+                isDark: fc.boolean(),
+                name: fc.string({ maxLength: 50, minLength: 1 }),
             },
             { requiredKeys: [] }
         ),
@@ -385,7 +388,7 @@ describe("ThemeManager Property-Based Tests", () => {
             const theme = themeManager.getTheme(themeName);
 
             expect(theme).toBeDefined();
-            expect(typeof theme).toBe("object");
+            expect(theme).toBeTypeOf("object");
             expect(theme).toHaveProperty("name");
             expect(theme).toHaveProperty("isDark");
             expect(theme).toHaveProperty("colors");
@@ -411,7 +414,7 @@ describe("ThemeManager Property-Based Tests", () => {
 
             if (isValid) {
                 expect(availableThemes).toContain(
-                    potentialThemeName as ThemeName
+                    potentialThemeName
                 );
             } else {
                 expect(availableThemes).not.toContain(
@@ -426,12 +429,13 @@ describe("ThemeManager Property-Based Tests", () => {
         (isDarkMode) => {
             // Mock matchMedia response
             (mockWindow.matchMedia as any).mockReturnValue({
-                matches: isDarkMode,
                 addEventListener: vi.fn(),
+                matches: isDarkMode,
                 removeEventListener: vi.fn(),
             });
 
             const preference = themeManager.getSystemThemePreference();
+
             expect(preference).toBe(isDarkMode ? "dark" : "light");
         }
     );
@@ -473,7 +477,7 @@ describe("ThemeManager Property-Based Tests", () => {
     );
 
     fcTest.prop([
-        fc.array(completeThemeArbitrary, { minLength: 5, maxLength: 20 }),
+        fc.array(completeThemeArbitrary, { maxLength: 20, minLength: 5 }),
     ])(
         "should handle multiple rapid theme switches without errors",
         (themes) => {
@@ -486,7 +490,7 @@ describe("ThemeManager Property-Based Tests", () => {
             // Should have called setProperty for each unique theme
             expect(
                 mockDocument.documentElement.style.setProperty
-            ).toHaveBeenCalled();
+            ).toHaveBeenCalledWith();
         }
     );
 
@@ -498,13 +502,13 @@ describe("ThemeManager Property-Based Tests", () => {
             // Register listener
             const cleanup = themeManager.onSystemThemeChange(callback);
 
-            expect(typeof cleanup).toBe("function");
+            expect(cleanup).toBeTypeOf("function");
             expect(mockWindow.matchMedia).toHaveBeenCalledWith(
                 "(prefers-color-scheme: dark)"
             );
 
             // Cleanup should not throw
-            expect(() => cleanup()).not.toThrow();
+            expect(() => { cleanup(); }).not.toThrow();
         }
     );
 
@@ -514,28 +518,27 @@ describe("ThemeManager Property-Based Tests", () => {
             const cssVariables = themeManager.generateCSSVariables(theme);
 
             // Split into lines and check format
-            const lines = cssVariables
-                .split("\n")
+            const lines = stringSplit(cssVariables, "\n")
                 .filter((line) => line.trim().length > 0);
 
             // First line should be :root {
-            expect(lines[0]!.trim()).toBe(":root {");
+            expect(arrayFirst(lines)!.trim()).toBe(":root {");
 
             // Last line should be }
-            expect(lines.at(-1)!.trim()).toBe("}");
+            expect(arrayAt(lines, -1)!.trim()).toBe("}");
 
             // Middle lines should be CSS variables
             const variableLines = lines.slice(1, -1);
             for (const line of variableLines) {
-                expect(line).toMatch(/^\s+--[\w-]+:\s*.+;$/);
+                expect(line).toMatch(/^\s+--[\w-]+:\s*(?:\S.*|[\t\v\f \xa0\u{1680}\u{2000}-\u{200a}\u{202F}\u{205f}\u{3000}\u{feff}]);$/u);
             }
 
             // Should contain expected variable types
-            expect(cssVariables).toMatch(/--color-background-primary/);
-            expect(cssVariables).toMatch(/--font-size-base/);
-            expect(cssVariables).toMatch(/--spacing-md/);
-            expect(cssVariables).toMatch(/--shadow-md/);
-            expect(cssVariables).toMatch(/--radius-md/);
+            expect(cssVariables).toMatch(/--color-background-primary/v);
+            expect(cssVariables).toMatch(/--font-size-base/v);
+            expect(cssVariables).toMatch(/--spacing-md/v);
+            expect(cssVariables).toMatch(/--shadow-md/v);
+            expect(cssVariables).toMatch(/--radius-md/v);
         }
     );
 
@@ -551,19 +554,22 @@ describe("ThemeManager Property-Based Tests", () => {
     );
 
     it("should handle missing document gracefully", () => {
-        global.document = undefined as any;
+        globalThis.document = undefined as any;
 
         const theme = themes.light;
-        expect(() => themeManager.applyTheme(theme)).not.toThrow();
+
+        expect(() => { themeManager.applyTheme(theme); }).not.toThrow();
     });
 
     it("should handle missing window gracefully", () => {
-        global.window = undefined as any;
+        globalThis.window = undefined as any;
 
         const preference = themeManager.getSystemThemePreference();
+
         expect(preference).toBe("light");
 
         const cleanup = themeManager.onSystemThemeChange(vi.fn());
-        expect(typeof cleanup).toBe("function");
+
+        expect(cleanup).toBeTypeOf("function");
     });
 });

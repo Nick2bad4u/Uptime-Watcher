@@ -13,7 +13,7 @@ version     = "1.0.0"
 
 [changelog]
     # template for the changelog header
-    header = """
+    header                   = """
 <!-- markdownlint-disable -->
 <!-- eslint-disable markdown/no-missing-label-refs -->
 # Changelog\n
@@ -21,7 +21,7 @@ All notable changes to this project will be documented in this file.\n
 """
     # template for the changelog body
     # https://keats.github.io/tera/docs/#introduction
-    body = """
+    body                     = """
 {% if version %}\
   ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
 {% else %}\
@@ -56,7 +56,7 @@ All notable changes to this project will be documented in this file.\n
 {% endif %}
 """
     # template for the changelog footer
-    footer = """
+    footer                   = """
 ## Contributors
 Thanks to all the [contributors](https://github.com/Nick2bad4u/Uptime-Watcher/graphs/contributors) for their hard work!
 ## License
@@ -64,17 +64,26 @@ This project license is here: [Project License](https://github.com/Nick2bad4u/Up
 *This changelog was automatically generated with [git-cliff](https://github.com/orhun/git-cliff).*
 """
     # Remove leading and trailing whitespace from the changelog content
-    trim = true
+    trim                     = true
     # postprocessors
-    postprocessors = [
+    postprocessors           = [
         # { pattern = 'Uptime-Watcher', replace = "[Uptime-Watcher](https://github.com/Nick2bad4u/Uptime-Watcher)" }, # replace repository URL
-        { pattern = 'Merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
-        { pattern = '\[dependency\]', replace = 'test' },
-        { pattern = 'merge branch', replace = "[chore] Merge Branch" }, # replace merge branch commit messages
+        { pattern = "Merge branch", replace = "[chore] Merge Branch" },                                                                                                                            # replace merge branch commit messages
+        { pattern = '\[dependency\]', replace = "test" },
+        { pattern = "merge branch", replace = "[chore] Merge Branch" },                                                                                                                            # replace merge branch commit messages
         # Clean up Dependabot messages - remove verbose table content
-        { pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependency group" },
-        { pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update npm dependencies" },
-        { pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*', replace = "[dependency] Update dependencies" },
+        {
+            pattern = 'Bump the.*?group with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*',
+            replace = "[dependency] Update dependency group"
+        },
+        {
+            pattern = 'Bumps the npm-all group.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*',
+            replace = "[dependency] Update npm dependencies"
+        },
+        {
+            pattern = '\[dependency\] \[chore\] Bump the.*?with \d+ updates.*?(\n\n|\|.*?\|.*?\n)*',
+            replace = "[dependency] Update dependencies"
+        },
 
         # Clean up individual package bump messages
         { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
@@ -83,11 +92,10 @@ This project license is here: [Project License](https://github.com/Nick2bad4u/Up
         { pattern = 'Bump ([a-zA-Z0-9@\-\/]+) to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
         { pattern = 'Bumps \[([^\]]+)\].*?from.*?to.*?(\n\n.*?)*', replace = "[dependency] Update $1" },
         # Generic bump message cleanup
-        { pattern = 'Bump', replace = "[dependency] Update" },
-
+        { pattern = "Bump", replace = "[dependency] Update" },
     ]
     protect_breaking_commits = false
-    render_always = true
+    render_always            = true
     # render body even when there are no releases to process
     # render_always = true
     # output file path
@@ -95,15 +103,15 @@ This project license is here: [Project License](https://github.com/Nick2bad4u/Up
 
 [git]
     # parse the commits based on https://www.conventionalcommits.org
-    conventional_commits = true
+    conventional_commits  = true
     # filter out the commits that are not conventional
     filter_unconventional = false
     # process each line of a commit as an individual commit
-    split_commits = false
+    split_commits         = false
     # regex for preprocessing the commit messages
-    use_branch_tags = false
+    use_branch_tags       = false
     # use branch tags to group commits
-    recurse_submodules = true
+    recurse_submodules    = true
     # recurse into submodules to find commits
     # commit_preprocessors = [
     #   # Replace issue numbers
@@ -121,7 +129,7 @@ This project license is here: [Project License](https://github.com/Nick2bad4u/Up
     # This convention helps in visually distinguishing commit groups.
     # Updated to match the project's commit emoji conventions:
     # 🔧 [build], 🧹 [chore], 👷 [ci], 📝 [docs], ✨ [feat], 🛠️ [fix], ⚡ [perf], 🚜 [refactor], ⏪ [revert], 🎨 [style], 🧪 [test]
-    commit_parsers = [
+    commit_parsers        = [
         # Project-specific emoji-based commit types
         { message = "^⏪.*\\[revert\\]", group = "<!-- 10 -->⏪ Reverts" },
         { message = "^⚡.*\\[perf\\]", group = "<!-- 4 -->⚡ Performance" },
@@ -182,12 +190,12 @@ This project license is here: [Project License](https://github.com/Nick2bad4u/Up
         { message = ".*", group = "<!-- 13 -->🛠️ Other Changes" },
     ]
     # filter out the commits that are not matched by commit parsers
-    filter_commits = false
+    filter_commits        = false
     # sort the tags topologically
-    topo_order = true
+    topo_order            = true
     # sort the commits inside sections by oldest/newest order
     # possible values: "oldest" (chronological order) or "newest" (reverse chronological order)
-    sort_commits = "newest"
+    sort_commits          = "newest"
 
     # GitHub integration for better changelog links
     # [remote.github]

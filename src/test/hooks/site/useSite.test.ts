@@ -5,20 +5,25 @@
  */
 
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useSite } from "../../../hooks/site/useSite";
+import { useSiteActions } from "../../../hooks/site/useSiteActions";
+import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
+import { useSiteStats } from "../../../hooks/site/useSiteStats";
+import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { createMockSite } from "../../utils/mockFactories";
 
 // Define types locally since they are not exported from types
 interface Site {
     identifier: string;
-    name: string;
     monitoring: boolean;
     monitors: any[];
+    name: string;
 }
 
 // Mock all the sub-hooks
-vi.mock("../../../hooks/site/useSiteMonitor", () => ({
+vi.mock(import('../../../hooks/site/useSiteMonitor'), () => ({
     useSiteMonitor: vi.fn(() => ({
         filteredHistory: [
             { timestamp: Date.now(), status: "up", responseTime: 100 },
@@ -39,7 +44,7 @@ vi.mock("../../../hooks/site/useSiteMonitor", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/site/useSiteStats", () => ({
+vi.mock(import('../../../hooks/site/useSiteStats'), () => ({
     useSiteStats: vi.fn(() => ({
         uptime: 99.5,
         averageResponseTime: 150,
@@ -47,7 +52,7 @@ vi.mock("../../../hooks/site/useSiteStats", () => ({
     })),
 }));
 
-vi.mock("../../../hooks/site/useSiteActions", () => ({
+vi.mock(import('../../../hooks/site/useSiteActions'), () => ({
     useSiteActions: vi.fn(() => ({
         handleCheckNow: vi.fn(),
         handleStartMonitoring: vi.fn(),
@@ -58,7 +63,7 @@ vi.mock("../../../hooks/site/useSiteActions", () => ({
     })),
 }));
 
-vi.mock("../../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../../stores/error/useErrorStore'), () => ({
     useErrorStore: vi.fn(
         (selector?: (state: { isLoading: boolean }) => unknown) => {
             const state = {
@@ -72,11 +77,6 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
         }
     ),
 }));
-
-import { useSiteMonitor } from "../../../hooks/site/useSiteMonitor";
-import { useSiteStats } from "../../../hooks/site/useSiteStats";
-import { useSiteActions } from "../../../hooks/site/useSiteActions";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
 
 describe("useSite Hook - Coverage Tests", () => {
     const mockSite: Site = createMockSite({
@@ -114,7 +114,7 @@ describe("useSite Hook - Coverage Tests", () => {
                 type: "http",
                 monitoring: true,
             });
-            expect(useErrorStore).toHaveBeenCalled();
+            expect(useErrorStore).toHaveBeenCalledWith();
         });
 
         it("should pass filteredHistory from monitor to stats", async ({

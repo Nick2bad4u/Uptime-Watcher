@@ -5,7 +5,13 @@
  * using Vitest hoisted mocks for all heavyweight dependencies.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import ServiceContainer after mocks are set up
+import {
+    ServiceContainer,
+    type ServiceContainerConfig,
+} from "../../services/ServiceContainer";
 
 // Create comprehensive hoisted mocks using constructor function pattern
 const mockEventBus = vi.hoisted(() => {
@@ -265,12 +271,6 @@ vi.mock("../../services/WindowService", () => ({
         };
     },
 }));
-
-// Import ServiceContainer after mocks are set up
-import {
-    ServiceContainer,
-    type ServiceContainerConfig,
-} from "../../services/ServiceContainer";
 
 describe("ServiceContainer - Hoisted Mocks", () => {
     let container: ServiceContainer;

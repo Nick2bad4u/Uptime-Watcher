@@ -172,7 +172,7 @@ export function isDate(value: unknown): value is Date {
  * @returns `true` when the value is an Error instance.
  */
 export function isError(value: unknown): value is Error {
-    return value instanceof Error;
+    return Error.isError(value);
 }
 
 /**

@@ -3,14 +3,16 @@
  * uncovered lines and edge cases to achieve 100% coverage.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import type {
     ButtonHTMLAttributes,
     ComponentProps,
     PropsWithChildren,
 } from "react";
+
+import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { ActionButtonGroup } from "../../components/Dashboard/SiteCard/components/ActionButtonGroup";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
@@ -22,7 +24,7 @@ type ThemedButtonMockProperties = PropsWithChildren<
     }
 >;
 
-vi.mock("../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         onClick,
@@ -31,10 +33,10 @@ vi.mock("../../theme/components/ThemedButton", () => ({
         ...props
     }: ThemedButtonMockProperties) => (
         <button
-            onClick={onClick}
-            disabled={disabled}
             aria-label={ariaLabel}
-            data-testid={`themed-button-${ariaLabel?.toLowerCase().replaceAll(/\s+/g, "-")}`}
+            data-testid={`themed-button-${ariaLabel?.toLowerCase().replaceAll(/\s+/gv, "-")}`}
+            disabled={disabled}
+            onClick={onClick}
             {...props}
         >
             {children}
@@ -44,7 +46,7 @@ vi.mock("../../theme/components/ThemedButton", () => ({
 
 // Mock SiteMonitoringButton
 vi.mock(
-    "../../components/common/SiteMonitoringButton/SiteMonitoringButton",
+    import('../../components/common/SiteMonitoringButton/SiteMonitoringButton'),
     () => ({
         SiteMonitoringButton: ({
             onStartSiteMonitoring,
@@ -62,18 +64,18 @@ vi.mock(
             readonly onStopSiteMonitoring: () => void;
         }) => (
             <div
-                data-testid="site-monitoring-button"
                 className={className}
                 data-compact={compact}
+                data-testid="site-monitoring-button"
             >
                 <button
+                    data-testid="site-monitoring-action"
+                    disabled={isLoading}
                     onClick={
                         allMonitorsRunning
                             ? onStopSiteMonitoring
                             : onStartSiteMonitoring
                     }
-                    disabled={isLoading}
-                    data-testid="site-monitoring-action"
                 >
                     {allMonitorsRunning ? "Stop Site" : "Start Site"}
                 </button>
@@ -227,8 +229,8 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
             fireEvent(checkButton, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalled();
-            expect(onCheckNow).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalledWith();
+            expect(onCheckNow).toHaveBeenCalledWith();
         });
 
         it("should be disabled when isLoading is true", ({
@@ -486,8 +488,8 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
             fireEvent(startButton, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalled();
-            expect(onStartMonitoring).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalledWith();
+            expect(onStartMonitoring).toHaveBeenCalledWith();
         });
 
         it("should stop event propagation on stop monitoring click", ({
@@ -525,8 +527,8 @@ describe("ActionButtonGroup - Complete Coverage", () => {
 
             fireEvent(stopButton, mockEvent);
 
-            expect(stopPropagation).toHaveBeenCalled();
-            expect(onStopMonitoring).toHaveBeenCalled();
+            expect(stopPropagation).toHaveBeenCalledWith();
+            expect(onStopMonitoring).toHaveBeenCalledWith();
         });
 
         it("should disable start button when loading", ({ task, annotate }) => {
@@ -828,7 +830,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             // Simulate a click that might not have an event object
             fireEvent.click(checkButton);
 
-            expect(onCheckNow).toHaveBeenCalled();
+            expect(onCheckNow).toHaveBeenCalledWith();
             // Should not throw error when event is undefined
         });
 
@@ -860,7 +862,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             });
             fireEvent.click(startButton);
 
-            expect(onStartMonitoring).toHaveBeenCalled();
+            expect(onStartMonitoring).toHaveBeenCalledWith();
         });
 
         it("should handle stop monitoring click without event object", ({
@@ -891,7 +893,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
             });
             fireEvent.click(stopButton);
 
-            expect(onStopMonitoring).toHaveBeenCalled();
+            expect(onStopMonitoring).toHaveBeenCalledWith();
         });
     });
 

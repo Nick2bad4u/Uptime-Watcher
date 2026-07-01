@@ -6,25 +6,27 @@
  *   100% coverage for all statements, branches, functions, and lines.
  */
 
-import { act, renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { test, fc } from "@fast-check/vitest";
-
-import { DEFAULT_CHECK_INTERVAL } from "../../constants";
-import { useAddSiteForm } from "../../components/SiteDetails/useAddSiteForm";
 import type { MonitorType } from "@shared/types";
+
+import { fc, test } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import { act, renderHook } from "@testing-library/react";
+import { arrayJoin, safeCastTo  } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAddSiteForm } from "../../components/SiteDetails/useAddSiteForm";
+import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 
 // Mock the useMonitorFields hook
 const mockGetFields = vi.fn();
-vi.mock("../../hooks/useMonitorFields", () => ({
+vi.mock(import('../../hooks/useMonitorFields'), () => ({
     useMonitorFields: () => ({
         getFields: mockGetFields,
     }),
 }));
 
 // Mock generateUuid function
-vi.mock("../../utils/data/generateUuid", () => ({
+vi.mock(import('../../utils/data/generateUuid'), () => ({
     generateUuid: () => "mock-uuid-12345",
 }));
 
@@ -41,16 +43,16 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                         { name: "checkInterval", required: false },
                     ];
                 }
+                case "ping": {
+                    return [
+                        { name: "host", required: true },
+                        { name: "checkInterval", required: false },
+                    ];
+                }
                 case "port": {
                     return [
                         { name: "host", required: true },
                         { name: "port", required: true },
-                        { name: "checkInterval", required: false },
-                    ];
-                }
-                case "ping": {
-                    return [
-                        { name: "host", required: true },
                         { name: "checkInterval", required: false },
                     ];
                 }
@@ -390,7 +392,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setPort("8080"); // This should be reset because HTTP doesn't use port
             });
 
-            // Change to port monitor (uses host and port, not url)
+            // Change to port monitor (uses host and port, not URL)
             await act(async () => {
                 result.current.setMonitorType("port");
             });
@@ -526,7 +528,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
                 act(() => {
                     result.current.setAddMode("new");
-                    result.current.setName("   "); // Whitespace only
+                    result.current.setName(' '.repeat(3)); // Whitespace only
                     result.current.setUrl("https://example.com");
                 });
 
@@ -633,7 +635,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setAddMode("new");
                     result.current.setName("My Site");
                     result.current.setMonitorType("http");
-                    result.current.setUrl("   "); // Whitespace only
+                    result.current.setUrl(' '.repeat(3)); // Whitespace only
                 });
 
                 expect(result.current.isFormValid()).toBeFalsy();
@@ -1172,7 +1174,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 });
 
                 expect(result.current.url).toBe(testUrl);
-                expect(testUrl).toMatch(/^https?:\/\//);
+                expect(testUrl).toMatch(/^https?:\/\//v);
             }
         );
 
@@ -1236,31 +1238,31 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
         );
 
         test.prop([
-            fc.constantFrom(
+            safeCastTo<fc.Arbitrary<MonitorType>>(fc.constantFrom(
                 "http",
                 "port",
                 "ping",
                 "dns"
-            ) as fc.Arbitrary<MonitorType>,
+            )),
         ])(
             "should handle monitor type changes correctly",
             async (monitorType) => {
                 mockGetFields.mockImplementation((type: MonitorType) => {
                     switch (type) {
+                        case "dns": {
+                            return [{ name: "host", required: true }];
+                        }
                         case "http": {
                             return [{ name: "url", required: true }];
+                        }
+                        case "ping": {
+                            return [{ name: "host", required: true }];
                         }
                         case "port": {
                             return [
                                 { name: "host", required: true },
                                 { name: "port", required: true },
                             ];
-                        }
-                        case "ping": {
-                            return [{ name: "host", required: true }];
-                        }
-                        case "dns": {
-                            return [{ name: "host", required: true }];
                         }
                         default: {
                             return [];
@@ -1313,7 +1315,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 const { result } = renderHook(() => useAddSiteForm());
 
                 act(() => {
-                    result.current.setAddMode(addMode as any);
+                    result.current.setAddMode(addMode);
                 });
 
                 expect(result.current.addMode).toBe(addMode);
@@ -1325,7 +1327,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             "should handle form errors correctly",
             async (errorMessages) => {
                 const { result } = renderHook(() => useAddSiteForm());
-                const errorMessage = errorMessages.join("; ");
+                const errorMessage = arrayJoin(errorMessages, "; ");
 
                 act(() => {
                     result.current.setFormError(errorMessage);
@@ -1342,11 +1344,11 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
         );
 
         test.prop([
-            fc.constantFrom(
+            safeCastTo<fc.Arbitrary<MonitorType>>(fc.constantFrom(
                 "http",
                 "port",
                 "ping"
-            ) as fc.Arbitrary<MonitorType>,
+            )),
         ])(
             "should handle complex form state updates correctly",
             async (monitorType) => {
@@ -1364,13 +1366,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                         testUrl = "https://example.com";
                         break;
                     }
+                    case "ping": {
+                        testHost = "example.com";
+                        break;
+                    }
                     case "port": {
                         testHost = "example.com";
                         testPort = "8080";
-                        break;
-                    }
-                    case "ping": {
-                        testHost = "example.com";
                         break;
                     }
                     default: {
@@ -1410,16 +1412,16 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                         expect(result.current.port).toBe(""); // Should be empty for HTTP
                         break;
                     }
-                    case "port": {
-                        expect(result.current.url).toBe(""); // Should be empty for port
-                        expect(result.current.host).toBe(testHost);
-                        expect(result.current.port).toBe(testPort);
-                        break;
-                    }
                     case "ping": {
                         expect(result.current.url).toBe(""); // Should be empty for ping
                         expect(result.current.host).toBe(testHost);
                         expect(result.current.port).toBe(""); // Should be empty for ping
+                        break;
+                    }
+                    case "port": {
+                        expect(result.current.url).toBe(""); // Should be empty for port
+                        expect(result.current.host).toBe(testHost);
+                        expect(result.current.port).toBe(testPort);
                         break;
                     }
                     default: {
@@ -1431,7 +1433,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 expect(testName.trim().length).toBeGreaterThan(0);
 
                 if (monitorType === "http") {
-                    expect(testUrl).toMatch(/^https?:\/\//);
+                    expect(testUrl).toMatch(/^https?:\/\//v);
                 } else if (monitorType === "port") {
                     const portNum = Number.parseInt(testPort, 10);
                     expect(portNum).toBeGreaterThanOrEqual(1);
@@ -1467,7 +1469,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
         test.prop([
             fc.oneof(
                 fc.constant(""),
-                fc.constant("   "),
+                fc.constant(' '.repeat(3)),
                 fc.constant("\t\n"),
                 fc.string().filter((s) => s.trim().length === 0)
             ),
@@ -1477,7 +1479,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 const { result } = renderHook(() => useAddSiteForm());
 
                 await act(async () => {
-                    // Set monitor type to http so url field is used (port monitors don't use url field)
+                    // Set monitor type to HTTP so URL field is used (port monitors don't use URL field)
                     result.current.setMonitorType("http");
                     result.current.setName(emptyInput);
                     result.current.setUrl(emptyInput);
@@ -1489,7 +1491,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 // validation is handled separately.
                 expect(result.current.name).toBe(emptyInput.trimStart());
                 expect(result.current.url).toBe(emptyInput);
-                // Host field is not used by http monitors, so it gets reset to ""
+                // Host field is not used by HTTP monitors, so it gets reset to ""
                 expect(result.current.host).toBe("");
 
                 // Verify input characteristics
@@ -1550,7 +1552,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                         result.current.setMonitorType("http");
                     });
                 } else if (hasUrl && hasHostOrPort) {
-                    // If both types of fields, use http as default and only test compatible fields
+                    // If both types of fields, use HTTP as default and only test compatible fields
                     await act(async () => {
                         result.current.setMonitorType("http");
                     });
@@ -1577,20 +1579,20 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
                         await act(async () => {
                             switch (update.field) {
-                                case "name": {
-                                    result.current.setName(update.value);
-                                    break;
-                                }
-                                case "url": {
-                                    result.current.setUrl(update.value);
-                                    break;
-                                }
                                 case "host": {
                                     result.current.setHost(update.value);
                                     break;
                                 }
+                                case "name": {
+                                    result.current.setName(update.value);
+                                    break;
+                                }
                                 case "port": {
                                     result.current.setPort(update.value);
+                                    break;
+                                }
+                                case "url": {
+                                    result.current.setUrl(update.value);
                                     break;
                                 }
                             }

@@ -2,26 +2,27 @@
  * @file Basic tests for useMonitorTypesStore
  */
 
-import { renderHook, act } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
+import { act, renderHook } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useErrorStore } from "../../../stores/error/useErrorStore";
+import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
+import { createMonitorTypeConfig } from "../../utils/createMonitorTypeConfig";
+
 // Mock the store utils module
-vi.mock("../../../stores/utils", () => ({
+vi.mock(import('../../../stores/utils'), () => ({
     logStoreAction: vi.fn(),
 }));
-
-import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
-import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { createMonitorTypeConfig } from "../../utils/createMonitorTypeConfig";
 
 // Mock the electron API
 const mockElectronAPI = {
     monitorTypes: {
-        getMonitorTypes: vi.fn().mockResolvedValue([
+        getMonitorTypes: vi.fn().mockResolvedValue(safeCastTo<MonitorTypeConfig[]>([
             createMonitorTypeConfig({
                 description: "HTTP monitoring",
                 displayName: "HTTP",
@@ -54,12 +55,12 @@ const mockElectronAPI = {
                 ],
                 type: "port",
             }),
-        ] as MonitorTypeConfig[]),
+        ])),
         validateMonitorData: vi.fn().mockResolvedValue({
             success: true,
             errors: [],
             warnings: [],
-        } as ValidationResult),
+        }),
         formatMonitorDetail: vi.fn().mockResolvedValue("Formatted detail"),
         formatMonitorTitleSuffix: vi.fn().mockResolvedValue(" (formatted)"),
     },
@@ -92,7 +93,7 @@ describe(useMonitorTypesStore, () => {
         if (!globalThis.window) {
             globalThis.window = {} as never;
         }
-        (globalThis.window as any).electronAPI = mockElectronAPI;
+        (globalThis as any).electronAPI = mockElectronAPI;
     });
 
     it("should initialize with default state", async ({ task, annotate }) => {
@@ -106,9 +107,8 @@ describe(useMonitorTypesStore, () => {
         expect(result.current.monitorTypes).toEqual([]);
         expect(result.current.fieldConfigs).toEqual({});
         expect(result.current.isLoaded).toBeFalsy();
-        expect(useErrorStore.getState().getStoreError("monitor-types")).toBe(
-            undefined
-        );
+        expect(useErrorStore.getState().getStoreError("monitor-types")).toBeUndefined(
+            );
     });
 
     it("should load monitor types successfully", async ({ task, annotate }) => {
@@ -119,7 +119,7 @@ describe(useMonitorTypesStore, () => {
 
         const mockMonitorTypes: MonitorTypeConfig[] = [
             {
-                type: "http" as MonitorType,
+                type: "http",
                 displayName: "HTTP",
                 description: "HTTP monitoring",
                 version: "1.0.0",
@@ -146,7 +146,7 @@ describe(useMonitorTypesStore, () => {
 
         expect(result.current.monitorTypes).toEqual(mockMonitorTypes);
         expect(result.current.isLoaded).toBeTruthy();
-        expect(result.current.fieldConfigs["http"]).toEqual([
+        expect(result.current.fieldConfigs.http).toEqual([
             { name: "url", type: "url", required: true, label: "URL" },
         ]);
     });

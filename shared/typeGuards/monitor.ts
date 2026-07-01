@@ -17,7 +17,7 @@ export function isMonitorOfType<T extends MonitorType>(
 export function assertMonitorType<T extends MonitorType>(
     monitor: Monitor,
     type: T,
-    context: string = "monitor"
+    context = "monitor"
 ): asserts monitor is Monitor & { type: T } {
     if (monitor.type !== type) {
         throw new Error(

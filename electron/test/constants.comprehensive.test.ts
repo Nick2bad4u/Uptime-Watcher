@@ -4,7 +4,7 @@
  * @module Constants
  *
  * @file Comprehensive tests for backend constants configuration in the Uptime
- *   Watcher application.
+ *   Watcher app.
  *
  * @author GitHub Copilot
  *
@@ -15,18 +15,18 @@
  * @tags ["test", "electron", "constants", "configuration"]
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Import all constants from the module under test
 import {
-    DEFAULT_REQUEST_TIMEOUT,
-    DEFAULT_CHECK_INTERVAL,
-    USER_AGENT,
-    RETRY_BACKOFF,
-    DEFAULT_HISTORY_LIMIT,
-    DB_FILE_NAME,
-    DEFAULT_SITE_NAME,
     BACKUP_DB_FILE_NAME,
+    DB_FILE_NAME,
+    DEFAULT_CHECK_INTERVAL,
+    DEFAULT_HISTORY_LIMIT,
+    DEFAULT_REQUEST_TIMEOUT,
+    DEFAULT_SITE_NAME,
+    RETRY_BACKOFF,
+    USER_AGENT,
 } from "../constants";
 
 describe("Backend Constants", () => {
@@ -264,8 +264,8 @@ describe("Backend Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(DB_FILE_NAME).toMatch(/\.sqlite$/);
-            expect(BACKUP_DB_FILE_NAME).toMatch(/\.sqlite$/);
+            expect(DB_FILE_NAME).toMatch(/\.sqlite$/v);
+            expect(BACKUP_DB_FILE_NAME).toMatch(/\.sqlite$/v);
         });
 
         it("should have different main and backup database names", async ({
@@ -291,7 +291,7 @@ describe("Backend Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             // Check for valid file name characters (avoiding problematic ones)
-            const validFileNamePattern = /^[\w.-]+$/;
+            const validFileNamePattern = /^[\w\-.]+$/v;
             expect(DB_FILE_NAME).toMatch(validFileNamePattern);
             expect(BACKUP_DB_FILE_NAME).toMatch(validFileNamePattern);
         });
@@ -446,7 +446,7 @@ describe("Backend Constants", () => {
             ];
 
             for (const name of constantNames) {
-                expect(name).toMatch(/^[A-Z_]+$/);
+                expect(name).toMatch(/^[A-Z_]+$/v);
             }
         });
     });

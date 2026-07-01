@@ -6,12 +6,11 @@
  *   payloads.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     ERROR_CATALOG,
     getUnknownErrorMessage,
 } from "@shared/utils/errorCatalog";
+import { describe, expect, it } from "vitest";
 
 describe(getUnknownErrorMessage, () => {
     it("returns the original message when the input is an Error instance", () => {

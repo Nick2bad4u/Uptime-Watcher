@@ -3,7 +3,10 @@
  */
 
 import { render, screen } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { StatusIndicator } from "../../theme/components/StatusIndicator";
 
 const themeMock = vi.hoisted(() => ({
     currentTheme: {
@@ -29,9 +32,9 @@ const themeMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/useTheme", async (importOriginal) => {
+vi.mock(import('../../theme/useTheme'), async (importOriginal) => {
     const actual =
-        (await importOriginal()) as typeof import("../../theme/useTheme");
+        safeCastTo<typeof import("../../theme/useTheme")>(await importOriginal());
     return {
         ...actual,
         useTheme: () => themeMock,
@@ -43,17 +46,15 @@ const statusUtilsMock = vi.hoisted(() => ({
     getStatusIconComponent: vi.fn(() =>
         vi.fn(({ color, size }: { color: string; size: number }) => (
             <span
-                data-testid="status-icon"
                 data-color={color}
                 data-size={size}
+                data-testid="status-icon"
             />
         ))
     ),
 }));
 
-vi.mock("../../utils/status", () => statusUtilsMock);
-
-import { StatusIndicator } from "../../theme/components/StatusIndicator";
+vi.mock(import('../../utils/status'), () => statusUtilsMock);
 
 describe("StatusIndicator coverage", () => {
     beforeEach(() => {
@@ -70,7 +71,7 @@ describe("StatusIndicator coverage", () => {
         // eslint-disable-next-line testing-library/no-container -- Component does not expose semantic roles for the indicator dot
         const dot = container.querySelector(
             ".themed-status-indicator__dot"
-        ) as HTMLElement | null;
+        );
         expect(dot).not.toBeNull();
         expect(dot).toHaveClass("themed-status-indicator__dot");
         expect(dot?.style.animation).toContain("pulse");
@@ -98,7 +99,7 @@ describe("StatusIndicator coverage", () => {
         // eslint-disable-next-line testing-library/no-container -- Component does not render semantic roles for sizing assertions
         const dot = container.querySelector(
             ".themed-status-indicator__dot"
-        ) as HTMLElement | null;
+        );
         expect(dot).not.toBeNull();
         expect(dot?.style.getPropertyValue("--status-indicator-size")).toBe(
             "14px"

@@ -6,11 +6,6 @@ import {
     SETTINGS_KEY_PROVIDER,
 } from "./cloudServiceSettings";
 
-type ProviderConnectionContext = Pick<
-    CloudServiceOperationContext,
-    "secretStore" | "settings"
->;
-
 /**
  * Snapshot of cloud-provider settings and secrets captured before a provider
  * connect attempt mutates persisted state.
@@ -21,6 +16,11 @@ export interface ProviderConnectionStateSnapshot {
     readonly previousProvider: string;
     readonly previousStoredTokens: string | undefined;
 }
+
+type ProviderConnectionContext = Pick<
+    CloudServiceOperationContext,
+    "secretStore" | "settings"
+>;
 
 /**
  * Captures provider connection state so failed connect attempts can roll back

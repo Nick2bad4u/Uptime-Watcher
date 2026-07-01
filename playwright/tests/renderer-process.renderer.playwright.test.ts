@@ -52,13 +52,13 @@ test.describe(
                 await window.waitForLoadState("domcontentloaded");
 
                 // Wait for React app to initialize - check for root element
-                await expect(window.getByTestId("app-root")).toBeVisible({
-                    timeout: 15000,
+                await expect.soft(window.getByTestId("app-root")).toBeVisible({
+                    timeout: 15_000,
                 });
 
                 // Wait for any content to appear in the root element
-                await expect(window.getByTestId("app-root")).not.toBeEmpty({
-                    timeout: 10000,
+                await expect.soft(window.getByTestId("app-root")).not.toBeEmpty({
+                    timeout: 10_000,
                 });
 
                 // Take a screenshot of the loaded UI
@@ -97,11 +97,11 @@ test.describe(
                 // Wait for React to hydrate (look for React-specific elements)
                 const hasReactRoot = await window.evaluate(() => {
                     // Check if React has mounted
-                    const rootElement = document.getElementById("root");
+                    const rootElement = document.querySelector("#root");
                     return rootElement && rootElement.children.length > 0;
                 });
 
-                expect(hasReactRoot).toBe(true);
+                expect.soft(hasReactRoot).toBe(true);
 
                 await electronApp.close();
             }
@@ -144,7 +144,7 @@ test.describe(
                 const clickableElements = buttons + links;
 
                 // Should have some interactive elements
-                expect(clickableElements).toBeGreaterThan(0);
+                expect.soft(clickableElements).toBeGreaterThan(0);
 
                 await electronApp.close();
             }
@@ -174,8 +174,7 @@ test.describe(
                 const window = await electronApp.firstWindow();
                 await window.waitForLoadState("domcontentloaded");
 
-                // Get initial viewport size - may be null initially
-                // Don't assert initial viewport since it may be null for Electron windows
+                // Get initial viewport size - may be null initially Don't assert initial viewport since it may be null for Electron windows
 
                 // Resize window via Electron API
                 await electronApp.evaluate(async ({ BrowserWindow }) => {
@@ -199,9 +198,9 @@ test.describe(
                     }
                 );
 
-                expect(bounds).toBeTruthy();
-                expect(bounds?.width).toBeGreaterThan(0);
-                expect(bounds?.height).toBeGreaterThan(0);
+                expect.soft(bounds).toBeTruthy();
+                expect.soft(bounds?.width).toBeGreaterThan(0);
+                expect.soft(bounds?.height).toBeGreaterThan(0);
 
                 await electronApp.close();
             }
@@ -251,13 +250,13 @@ test.describe(
                         }),
                         new Promise((_, reject) =>
                             setTimeout(
-                                () => reject(new Error("Timeout")),
-                                10000
+                                () => { reject(new Error("Timeout")); },
+                                10_000
                             )
                         ),
                     ]);
 
-                    expect(typeof canOpenDevTools).toBe("boolean");
+                    expect.soft(typeof canOpenDevTools).toBe("boolean");
                     console.log(`Dev tools check result: ${canOpenDevTools}`);
                 } catch (error) {
                     console.log(
@@ -267,7 +266,7 @@ test.describe(
                 }
 
                 // Always succeed - dev tools availability is environment dependent
-                expect(electronApp).toBeTruthy();
+                expect.soft(electronApp).toBeTruthy();
 
                 await electronApp.close();
             }

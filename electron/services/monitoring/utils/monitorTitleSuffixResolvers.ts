@@ -8,45 +8,6 @@ const wrapSuffix = (value: string): string =>
 type MonitorTitleSuffixResolver = (monitor: Monitor) => string;
 
 /**
- * Creates a monitor-type gated title suffix resolver.
- *
- * @remarks
- * Several monitor types share the same control-flow:
- *
- * 1. Ensure the monitor "type" matches
- * 2. Derive a suffix string from monitor fields
- * 3. Wrap the suffix in parentheses (or return empty string)
- *
- * Centralizing that boilerplate keeps each exported factory focused on the
- * monitor-specific formatting logic.
- */
-function createMonitorTypeTitleSuffixResolver(args: {
-    monitorType: string;
-    resolve: (monitor: Monitor) => string;
-}): MonitorTitleSuffixResolver {
-    return (monitor: Monitor): string => {
-        if (monitor.type !== args.monitorType) {
-            return "";
-        }
-
-        return wrapSuffix(args.resolve(monitor));
-    };
-}
-
-/**
- * Creates a title suffix resolver for monitor types that should display host.
- */
-export function createHostTitleSuffixResolver(args: {
-    monitorType: string;
-}): (monitor: Monitor) => string {
-    return createMonitorTypeTitleSuffixResolver({
-        monitorType: args.monitorType,
-        resolve: (monitor) =>
-            typeof monitor.host === "string" ? monitor.host : "",
-    });
-}
-
-/**
  * Creates a title suffix resolver for host:port monitor types.
  */
 export function createHostPortTitleSuffixResolver(args: {
@@ -65,6 +26,19 @@ export function createHostPortTitleSuffixResolver(args: {
 
             return `${host}:${port}`;
         },
+    });
+}
+
+/**
+ * Creates a title suffix resolver for monitor types that should display host.
+ */
+export function createHostTitleSuffixResolver(args: {
+    monitorType: string;
+}): (monitor: Monitor) => string {
+    return createMonitorTypeTitleSuffixResolver({
+        monitorType: args.monitorType,
+        resolve: (monitor) =>
+            typeof monitor.host === "string" ? monitor.host : "",
     });
 }
 
@@ -114,4 +88,30 @@ export function createTlsTitleSuffixResolver(args: {
             return `${host}${portSuffix}`;
         },
     });
+}
+
+/**
+ * Creates a monitor-type gated title suffix resolver.
+ *
+ * @remarks
+ * Several monitor types share the same control-flow:
+ *
+ * 1. Ensure the monitor "type" matches
+ * 2. Derive a suffix string from monitor fields
+ * 3. Wrap the suffix in parentheses (or return empty string)
+ *
+ * Centralizing that boilerplate keeps each exported factory focused on the
+ * monitor-specific formatting logic.
+ */
+function createMonitorTypeTitleSuffixResolver(args: {
+    monitorType: string;
+    resolve: (monitor: Monitor) => string;
+}): MonitorTitleSuffixResolver {
+    return (monitor: Monitor): string => {
+        if (monitor.type !== args.monitorType) {
+            return "";
+        }
+
+        return wrapSuffix(args.resolve(monitor));
+    };
 }

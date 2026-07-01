@@ -16,15 +16,18 @@
  * @file
  */
 
-import { describe, test, expect, beforeEach, vi, afterEach } from "vitest";
+import type { CacheValue } from "@shared/types/configTypes";
+
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { arrayFirst } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest";
+
 import {
-    TypedCache,
     AppCaches,
     clearAllCaches,
     getCachedOrFetch,
+    TypedCache,
 } from "../../utils/cache";
-import type { CacheValue } from "@shared/types/configTypes";
 
 describe("Cache Utils Property-Based Tests", () => {
     let originalDateNow: typeof Date.now;
@@ -34,7 +37,7 @@ describe("Cache Utils Property-Based Tests", () => {
         // Mock Date.now for predictable timing in tests
         originalDateNow = Date.now;
         mockTime = 1_000_000; // Start at a predictable time
-        Date.now = vi.fn(() => mockTime);
+        vi.spyOn(Date, 'now').mockImplementation(() => mockTime);
     });
 
     afterEach(() => {
@@ -65,7 +68,7 @@ describe("Cache Utils Property-Based Tests", () => {
             }
 
             // Verify all unique entries can be retrieved with their latest values
-            for (const [key, expectedValue] of expectedValues.entries()) {
+            for (const [key, expectedValue] of expectedValues) {
                 expect(cache.get(key)).toBe(expectedValue);
                 expect(cache.has(key)).toBeTruthy();
             }
@@ -118,11 +121,11 @@ describe("Cache Utils Property-Based Tests", () => {
 
             // Delete first entry if it exists
             if (entries.length > 0) {
-                const firstEntry = entries[0];
+                const firstEntry = arrayFirst(entries);
                 if (firstEntry) {
                     const [firstKey] = firstEntry;
-                    const deleted = cache.delete(firstKey);
-                    expect(deleted).toBeTruthy();
+                    const isDeleted = cache.delete(firstKey);
+                    expect(isDeleted).toBeTruthy();
                     expect(cache.get(firstKey)).toBeUndefined();
                     expect(cache.has(firstKey)).toBeFalsy();
 
@@ -237,7 +240,7 @@ describe("Cache Utils Property-Based Tests", () => {
                 // Filter to unique keys only to avoid duplicate key issues
                 const uniqueEntries = entries.filter(
                     (entry, index, arr) =>
-                        arr.findIndex((e) => e[0] === entry[0]) === index
+                        arr.findIndex((e) => arrayFirst(e) === arrayFirst(entry)) === index
                 );
 
                 const cache = new TypedCache<string, string>({
@@ -281,7 +284,7 @@ describe("Cache Utils Property-Based Tests", () => {
                 // Filter to ensure unique keys and sufficient entries
                 const uniqueEntries = entries.filter(
                     (entry, index, arr) =>
-                        arr.findIndex((e) => e[0] === entry[0]) === index
+                        arr.findIndex((e) => arrayFirst(e) === arrayFirst(entry)) === index
                 );
 
                 if (uniqueEntries.length < maxSize + 3) {
@@ -301,7 +304,7 @@ describe("Cache Utils Property-Based Tests", () => {
                 expect(cache.size).toBe(maxSize);
 
                 // Access first entry to make it recently used
-                const firstEntry = initialEntries[0];
+                const firstEntry = arrayFirst(initialEntries);
                 let firstKey: string | undefined;
                 if (firstEntry) {
                     [firstKey] = firstEntry;
@@ -400,7 +403,7 @@ describe("Cache Utils Property-Based Tests", () => {
             clearAllCaches();
         });
 
-        test("AppCaches should have correct cache instances", () => {
+        it("AppCaches should have correct cache instances", () => {
             expect(AppCaches.general).toBeInstanceOf(TypedCache);
             expect(AppCaches.monitorTypes).toBeInstanceOf(TypedCache);
             expect(AppCaches.uiHelpers).toBeInstanceOf(TypedCache);
@@ -417,9 +420,9 @@ describe("Cache Utils Property-Based Tests", () => {
         ])("clearAllCaches should clear all app caches", (entries) => {
             // Add entries to all caches
             for (const [key, value] of entries) {
-                AppCaches.general.set(key, value as CacheValue);
-                AppCaches.monitorTypes.set(key, value as CacheValue);
-                AppCaches.uiHelpers.set(key, value as CacheValue);
+                AppCaches.general.set(key, value);
+                AppCaches.monitorTypes.set(key, value);
+                AppCaches.uiHelpers.set(key, value);
             }
 
             // Verify entries exist

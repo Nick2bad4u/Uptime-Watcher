@@ -1,9 +1,9 @@
 /**
- * Utilities for mapping monitor data between database rows and application
+ * Utilities for mapping monitor data between database rows and app
  * objects.
  *
  * @remarks
- * Provides conversion between raw database rows (snake_case) and application
+ * Provides conversion between raw database rows (snake_case) and app
  * monitor objects (camelCase). Integrates with the dynamic monitor type schema
  * system for extensibility. All mapping functions are type-safe and log errors
  * with full context.
@@ -111,7 +111,7 @@ function getSanitizedExpectedStatusCode(value: unknown): number | undefined {
  * @remarks
  * Uses centralized validation utilities for safe integer conversion with bounds
  * checking. Replaces manual Number() conversions with validator-based
- * safeInteger() function to prevent invalid data from reaching the application
+ * safeInteger() function to prevent invalid data from reaching the app
  * layer.
  *
  * @param dynamicMonitor - Mapped monitor data from database
@@ -155,7 +155,7 @@ function createBaseMonitor(dynamicMonitor: Monitor): Site["monitors"][0] {
  *
  * @remarks
  * Uses the centralized validator utilities to ensure consistent validation
- * across the application. Replaces manual regex validation with well-tested
+ * across the app. Replaces manual regex validation with well-tested
  * validator.js functions for improved security and reliability.
  *
  * @param row - Database row

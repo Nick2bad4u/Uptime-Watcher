@@ -14,8 +14,9 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { BaseFormField } from "../../../components/AddSiteForm/BaseFormField";
 import type { AriaProperties } from "../../../components/AddSiteForm/BaseFormField";
+
+import { BaseFormField } from "../../../components/AddSiteForm/BaseFormField";
 
 describe("BaseFormField - Additional Coverage", () => {
     it("should handle undefined error and undefined helpText (lines 97-98 false branches)", ({
@@ -36,9 +37,9 @@ describe("BaseFormField - Additional Coverage", () => {
         // This tests the false branches of both conditional spread operators
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
-                aria-label={ariaProps["aria-label"]}
                 aria-describedby={ariaProps["aria-describedby"]}
+                aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );
@@ -79,19 +80,19 @@ describe("BaseFormField - Additional Coverage", () => {
         // Testing error !== undefined (true) && helpText === undefined (false)
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
-                aria-label={ariaProps["aria-label"]}
                 aria-describedby={ariaProps["aria-describedby"]}
+                aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );
 
         render(
             <BaseFormField
+                error="This is an error"
                 id="test-field"
                 label="Test Label"
                 required={true}
-                error="This is an error"
                 // HelpText is undefined (not passed)
             >
                 {childrenSpy}
@@ -122,20 +123,20 @@ describe("BaseFormField - Additional Coverage", () => {
         // Testing error === undefined (false) && helpText !== undefined (true)
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
-                aria-label={ariaProps["aria-label"]}
                 aria-describedby={ariaProps["aria-describedby"]}
+                aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );
 
         render(
             <BaseFormField
+                // Error is undefined (not passed)
+                helpText="This is help text"
                 id="test-field"
                 label="Test Label"
                 required={false}
-                // Error is undefined (not passed)
-                helpText="This is help text"
             >
                 {childrenSpy}
             </BaseFormField>
@@ -166,20 +167,20 @@ describe("BaseFormField - Additional Coverage", () => {
         // Error should take precedence for aria-describedby
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
-                aria-label={ariaProps["aria-label"]}
                 aria-describedby={ariaProps["aria-describedby"]}
+                aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );
 
         render(
             <BaseFormField
+                error="This is an error"
+                helpText="This is help text"
                 id="test-field"
                 label="Test Label"
                 required={true}
-                error="This is an error"
-                helpText="This is help text"
             >
                 {childrenSpy}
             </BaseFormField>
@@ -209,20 +210,20 @@ describe("BaseFormField - Additional Coverage", () => {
         // Testing when error is an empty string (truthy for !== undefined but falsy for getAriaDescribedBy)
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
-                aria-label={ariaProps["aria-label"]}
                 aria-describedby={ariaProps["aria-describedby"]}
+                aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );
 
         render(
             <BaseFormField
+                error=""
+                helpText="This is help text"
                 id="test-field"
                 label="Test Label"
                 required={false}
-                error=""
-                helpText="This is help text"
             >
                 {childrenSpy}
             </BaseFormField>
@@ -252,20 +253,20 @@ describe("BaseFormField - Additional Coverage", () => {
         // Testing when helpText is an empty string (truthy for !== undefined but falsy for getAriaDescribedBy)
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
-                aria-label={ariaProps["aria-label"]}
                 aria-describedby={ariaProps["aria-describedby"]}
+                aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );
 
         render(
             <BaseFormField
+                // Error is undefined
+                helpText=""
                 id="test-field"
                 label="Test Label"
                 required={false}
-                // Error is undefined
-                helpText=""
             >
                 {childrenSpy}
             </BaseFormField>
@@ -295,18 +296,18 @@ describe("BaseFormField - Additional Coverage", () => {
         // Testing that the conditional spread operators work correctly for FormField props
         const childrenSpy = (ariaProps: AriaProperties) => (
             <div
-                data-testid="test-child"
                 data-aria-props={JSON.stringify(ariaProps)}
+                data-testid="test-child"
             />
         );
 
         render(
             <BaseFormField
+                error="Test error message"
+                helpText="Test help text"
                 id="test-field"
                 label="Test Label"
                 required={true}
-                error="Test error message"
-                helpText="Test help text"
             >
                 {childrenSpy}
             </BaseFormField>
@@ -342,8 +343,8 @@ describe("BaseFormField - Additional Coverage", () => {
         // Testing edge case with complex label text
         const childrenSpy = (ariaProps: AriaProperties) => (
             <input
-                data-testid="test-input"
                 aria-label={ariaProps["aria-label"]}
+                data-testid="test-input"
                 type="text"
             />
         );

@@ -1,7 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
+import type { Monitor, Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { EnhancedMonitorCheckConfig } from "../services/monitoring/EnhancedMonitorChecker";
-import type { Site, Monitor } from "@shared/types";
+
+import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
 
 describe("EnhancedMonitorChecker Targeted Coverage", () => {
     let mockConfig: EnhancedMonitorCheckConfig;
@@ -118,7 +121,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 status: "up",
                 responseTime: 150,
                 history: [],
-            } as Monitor;
+            };
 
             const checkResult = {
                 responseTime: 100,
@@ -169,7 +172,7 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
                 status: "up",
                 responseTime: 150,
                 history: [],
-            } as Monitor;
+            };
 
             // Call the private method through reflection - note correct method name
             const validateMethod = (

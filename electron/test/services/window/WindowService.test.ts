@@ -7,7 +7,12 @@
  * @file Comprehensive tests for WindowService
  */
 
+import { BrowserWindow, shell } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { isDev } from "../../../electronUtils";
+import { WindowService } from "../../../services/window/WindowService";
+import { logger } from "../../../utils/logger";
 
 // Mock electron module first
 vi.mock("electron", () => {
@@ -85,18 +90,12 @@ vi.mock("../../../../shared/utils/environment", async () => {
     };
 });
 
-// Mock node modules
-// NOTE: Do not mock node:path/node:url here.
+// Mock node modules NOTE: Do not mock node:path/node:URL here.
 // WindowService relies on real path and file URL behaviour for production
 // navigation hardening (e.g., path.resolve + fileURLToPath).
 
 // Mock global fetch for Vite server checking
 globalThis.fetch = vi.fn();
-
-import { BrowserWindow, shell } from "electron";
-import { isDev } from "../../../electronUtils";
-import { logger } from "../../../utils/logger";
-import { WindowService } from "../../../services/window/WindowService";
 
 describe(WindowService, () => {
     let windowService: WindowService;
@@ -398,7 +397,7 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(() => windowService.closeMainWindow()).not.toThrow();
+            expect(() => { windowService.closeMainWindow(); }).not.toThrow();
         });
 
         it("should not close if window is destroyed", async ({
@@ -821,7 +820,7 @@ describe(WindowService, () => {
         describe("development mode", () => {
             beforeEach(() => {
                 vi.mocked(isDev).mockReturnValue(true);
-                vi.mocked(globalThis.fetch).mockResolvedValue({
+                vi.mocked(fetch).mockResolvedValue({
                     ok: true,
                 } as Response);
             });
@@ -860,7 +859,7 @@ describe(WindowService, () => {
                     }
                 ).loadDevelopmentContent();
 
-                expect(globalThis.fetch).toHaveBeenCalledWith(
+                expect(fetch).toHaveBeenCalledWith(
                     "http://localhost:5173",
                     expect.objectContaining({
                         signal: expect.any(AbortSignal),
@@ -885,7 +884,7 @@ describe(WindowService, () => {
 
                 vi.mocked(isDev).mockReturnValue(true);
                 const error = new Error("Connection refused");
-                vi.mocked(globalThis.fetch).mockRejectedValue(error);
+                vi.mocked(fetch).mockRejectedValue(error);
 
                 // Create a new service just for this test to avoid affecting others
                 const testWindowService = new WindowService();
@@ -1168,7 +1167,7 @@ describe(WindowService, () => {
                 expect.objectContaining({
                     webPreferences: expect.objectContaining({
                         preload: expect.stringMatching(
-                            /dist[\\/]preload\.js$/u
+                            /dist[/\\]preload\.js$/u
                         ),
                     }),
                 })
@@ -1341,7 +1340,7 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalFetch = globalThis.fetch;
+            const originalFetch = fetch;
 
             const plainFetch = async () => ({ ok: true }) as Response;
 
@@ -1374,7 +1373,7 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalFetch = globalThis.fetch;
+            const originalFetch = fetch;
 
             let attempts = 0;
             const retryingFetch = async () => {
@@ -1395,7 +1394,7 @@ describe(WindowService, () => {
 
                 expect(attempts).toBe(2);
                 expect(logger.debug).toHaveBeenCalledWith(
-                    expect.stringMatching(/Waiting \d+ms before retry 2\/20/u)
+                    expect.stringMatching(/Waiting \d+ms before retry 2\/20/v)
                 );
             } finally {
                 (globalThis as any).fetch = originalFetch;
@@ -1411,10 +1410,10 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const originalFetch = globalThis.fetch;
+            const originalFetch = fetch;
             const failingFetch = vi.fn().mockResolvedValue({
                 ok: false,
-            } as Response);
+            });
 
             (globalThis as any).fetch = failingFetch;
 
@@ -1442,7 +1441,7 @@ describe(WindowService, () => {
 
             vi.useFakeTimers();
 
-            const originalFetch = globalThis.fetch;
+            const originalFetch = fetch;
             const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
 
             let attempts = 0;
@@ -1484,7 +1483,7 @@ describe(WindowService, () => {
 
             vi.useFakeTimers();
 
-            const originalFetch = globalThis.fetch;
+            const originalFetch = fetch;
             const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
             vi.mocked(logger.debug).mockClear();
 
@@ -1529,7 +1528,7 @@ describe(WindowService, () => {
 
             vi.useFakeTimers();
 
-            const originalFetch = globalThis.fetch;
+            const originalFetch = fetch;
             const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
             vi.mocked(logger.debug).mockClear();
 
@@ -1597,13 +1596,13 @@ describe(WindowService, () => {
             (windowService as any).mainWindow = null;
 
             // Should not crash when trying to show destroyed window
-            expect(() => readyCallback()).not.toThrow();
+            expect(() => { readyCallback(); }).not.toThrow();
         });
     });
 
     describe("environment flag helper", () => {
         it("should return false when process is undefined", () => {
-            const originalProcess = globalThis.process;
+            const originalProcess = process;
 
             try {
                 (globalThis as any).process = undefined;

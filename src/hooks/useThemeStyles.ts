@@ -77,6 +77,65 @@ export interface ThemeStyles {
 const TRANSITION_EASING = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
 
 /**
+ * React hook for theme-aware CSS-in-JS styles with collapse state support.
+ *
+ * @remarks
+ * Provides comprehensive styling that automatically adapts to user's theme
+ * preference with proper SSR support and runtime theme change reactivity. The
+ * hook listens to media query changes and updates styles accordingly.
+ *
+ * @param isCollapsed - Whether the component is in collapsed state (default:
+ *   `false`).
+ *
+ * @returns Complete {@link ThemeStyles} object with all CSS-in-JS style
+ *   properties.
+ *
+ * @public
+ *
+ * @see {@link useMount} for the lifecycle helper used to manage listeners.
+ */
+export function useThemeStyles(isCollapsed = false): ThemeStyles {
+    // Use state to track theme changes for reactivity
+    const [isDarkMode, setIsDarkMode] = useState(() => getPrefersDarkMode());
+
+    const cleanupRef = useRef<(() => void) | null>(null);
+
+    /**
+     * Named event handler for media query changes.
+     *
+     * @internal
+     */
+    const handleThemeChange = useCallback((isDark: boolean): void => {
+        setIsDarkMode(isDark);
+    }, []);
+
+    // Set up media query listener for theme changes
+    useMount(
+        useCallback(() => {
+            cleanupRef.current =
+                subscribePrefersDarkModeChange(handleThemeChange);
+        }, [handleThemeChange]),
+        useCallback(() => {
+            cleanupRef.current?.();
+            cleanupRef.current = null;
+        }, [])
+    );
+
+    return useMemo<ThemeStyles>(
+        () => ({
+            collapseButtonStyle: getCollapseButtonStyle(isDarkMode),
+            contentStyle: getContentStyle(isCollapsed),
+            headerStyle: getHeaderStyle(isCollapsed, isDarkMode),
+            metaStyle: getMetaStyle(isDarkMode),
+            overlayStyle: getOverlayStyle(isDarkMode),
+            titleStyle: getTitleStyle(isDarkMode),
+            urlStyle: getUrlStyle(isDarkMode),
+        }),
+        [isCollapsed, isDarkMode]
+    );
+}
+
+/**
  * Generates collapse button styles based on theme.
  *
  * @param isDarkMode - Whether dark mode is active.
@@ -278,63 +337,4 @@ function getUrlStyle(isDarkMode: boolean): CSSProperties {
         transition: `color ${TRANSITION_EASING}, opacity ${TRANSITION_EASING}`,
         wordBreak: "break-all",
     };
-}
-
-/**
- * React hook for theme-aware CSS-in-JS styles with collapse state support.
- *
- * @remarks
- * Provides comprehensive styling that automatically adapts to user's theme
- * preference with proper SSR support and runtime theme change reactivity. The
- * hook listens to media query changes and updates styles accordingly.
- *
- * @param isCollapsed - Whether the component is in collapsed state (default:
- *   `false`).
- *
- * @returns Complete {@link ThemeStyles} object with all CSS-in-JS style
- *   properties.
- *
- * @public
- *
- * @see {@link useMount} for the lifecycle helper used to manage listeners.
- */
-export function useThemeStyles(isCollapsed = false): ThemeStyles {
-    // Use state to track theme changes for reactivity
-    const [isDarkMode, setIsDarkMode] = useState(() => getPrefersDarkMode());
-
-    const cleanupRef = useRef<(() => void) | null>(null);
-
-    /**
-     * Named event handler for media query changes.
-     *
-     * @internal
-     */
-    const handleThemeChange = useCallback((isDark: boolean): void => {
-        setIsDarkMode(isDark);
-    }, []);
-
-    // Set up media query listener for theme changes
-    useMount(
-        useCallback(() => {
-            cleanupRef.current =
-                subscribePrefersDarkModeChange(handleThemeChange);
-        }, [handleThemeChange]),
-        useCallback(() => {
-            cleanupRef.current?.();
-            cleanupRef.current = null;
-        }, [])
-    );
-
-    return useMemo<ThemeStyles>(
-        () => ({
-            collapseButtonStyle: getCollapseButtonStyle(isDarkMode),
-            contentStyle: getContentStyle(isCollapsed),
-            headerStyle: getHeaderStyle(isCollapsed, isDarkMode),
-            metaStyle: getMetaStyle(isDarkMode),
-            overlayStyle: getOverlayStyle(isDarkMode),
-            titleStyle: getTitleStyle(isDarkMode),
-            urlStyle: getUrlStyle(isDarkMode),
-        }),
-        [isCollapsed, isDarkMode]
-    );
 }

@@ -3,13 +3,14 @@
  * branch logic, error fallbacks, and interaction handlers.
  */
 
-import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ChartOptions } from "chart.js";
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import type { ReactNode } from "react";
+
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { arrayAt, arrayFirst, safeCastTo   } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AnalyticsTabProperties } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
-import { AnalyticsTab } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
-import { CHART_TIME_RANGES } from "../../../../constants";
 import type { DowntimePeriod } from "../../../../hooks/site/useSiteAnalytics";
 import type {
     ResponseTimeChartData,
@@ -17,7 +18,8 @@ import type {
     UptimeChartData,
 } from "../../../../services/chartConfig";
 
-import type { ReactNode } from "react";
+import { AnalyticsTab } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
+import { CHART_TIME_RANGES } from "../../../../constants";
 
 interface ButtonInvocation {
     readonly children: ReactNode;
@@ -44,7 +46,7 @@ interface ChartInvocation {
 }
 
 interface AvailabilityState {
-    variant: "success" | "warning" | "danger";
+    variant: "danger" | "success" | "warning";
 }
 
 const {
@@ -58,18 +60,18 @@ const {
     userActionLogs,
     errorLogs,
 } = vi.hoisted(() => ({
-    availabilityState: { variant: "success" } as AvailabilityState,
-    badgeInvocations: [] as BadgeInvocation[],
-    buttonInvocations: [] as ButtonInvocation[],
-    progressInvocations: [] as ProgressInvocation[],
-    responseTimeChartInvocations: [] as ChartInvocation[],
-    statusChartInvocations: [] as ChartInvocation[],
-    uptimeChartInvocations: [] as ChartInvocation[],
-    userActionLogs: [] as {
+    availabilityState: { variant: "success" },
+    badgeInvocations: safeCastTo<BadgeInvocation[]>([]),
+    buttonInvocations: safeCastTo<ButtonInvocation[]>([]),
+    progressInvocations: safeCastTo<ProgressInvocation[]>([]),
+    responseTimeChartInvocations: safeCastTo<ChartInvocation[]>([]),
+    statusChartInvocations: safeCastTo<ChartInvocation[]>([]),
+    uptimeChartInvocations: safeCastTo<ChartInvocation[]>([]),
+    userActionLogs: safeCastTo<{
         readonly event: string;
         readonly payload: unknown;
-    }[],
-    errorLogs: [] as (readonly [string, Error])[],
+    }[]>([]),
+    errorLogs: safeCastTo<(readonly [string, Error])[]>([]),
 }));
 
 const themeStub = vi.hoisted(() => ({
@@ -82,19 +84,9 @@ const themeStub = vi.hoisted(() => ({
         success: "rgb(46, 204, 113)",
         warning: "rgb(241, 196, 15)",
     },
-})) as {
-    colors: {
-        readonly error: string;
-        readonly primary: {
-            readonly 500: string;
-            readonly 600: string;
-        };
-        readonly success: string;
-        readonly warning: string;
-    };
-};
+}));
 
-vi.mock("../../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../../theme/components/ThemedButton'), () => ({
     ThemedButton: ({
         children,
         onClick,
@@ -115,13 +107,13 @@ vi.mock("../../../../theme/components/ThemedButton", () => ({
     },
 }));
 
-vi.mock("../../../../theme/components/ThemedCard", () => ({
+vi.mock(import('../../../../theme/components/ThemedCard'), () => ({
     ThemedCard: ({ children }: { readonly children: ReactNode }) => (
         <section>{children}</section>
     ),
 }));
 
-vi.mock("../../../../theme/components/ThemedBadge", () => ({
+vi.mock(import('../../../../theme/components/ThemedBadge'), () => ({
     ThemedBadge: ({
         children,
         size,
@@ -136,7 +128,7 @@ vi.mock("../../../../theme/components/ThemedBadge", () => ({
     },
 }));
 
-vi.mock("../../../../theme/components/ThemedProgress", () => ({
+vi.mock(import('../../../../theme/components/ThemedProgress'), () => ({
     ThemedProgress: ({
         showLabel,
         value,
@@ -151,7 +143,7 @@ vi.mock("../../../../theme/components/ThemedProgress", () => ({
     },
 }));
 
-vi.mock("../../../../theme/components/ThemedText", () => ({
+vi.mock(import('../../../../theme/components/ThemedText'), () => ({
     ThemedText: ({
         children,
         style,
@@ -161,7 +153,7 @@ vi.mock("../../../../theme/components/ThemedText", () => ({
     }) => <span style={style}>{children}</span>,
 }));
 
-vi.mock("../../../../theme/useTheme", () => ({
+vi.mock(import('../../../../theme/useTheme'), () => ({
     useTheme: () => ({
         currentTheme: themeStub,
     }),
@@ -174,7 +166,7 @@ vi.mock("../../../../theme/useTheme", () => ({
     }),
 }));
 
-vi.mock("../../../../components/common/MonitorUiComponents", () => ({
+vi.mock(import('../../../../components/common/MonitorUiComponents'), () => ({
     ConditionalResponseTime: ({
         children,
     }: {
@@ -182,28 +174,28 @@ vi.mock("../../../../components/common/MonitorUiComponents", () => ({
     }) => <>{children}</>,
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/ResponseTimeChart", () => ({
+vi.mock(import('../../../../components/SiteDetails/charts/ResponseTimeChart'), () => ({
     ResponseTimeChart: ({ data, options }: ChartInvocation) => {
         responseTimeChartInvocations.push({ data, options });
         return <div data-testid="response-time-chart" />;
     },
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/StatusChart", () => ({
+vi.mock(import('../../../../components/SiteDetails/charts/StatusChart'), () => ({
     StatusChart: ({ data, options }: ChartInvocation) => {
         statusChartInvocations.push({ data, options });
         return <div data-testid="status-chart" />;
     },
 }));
 
-vi.mock("../../../../components/SiteDetails/charts/UptimeChart", () => ({
+vi.mock(import('../../../../components/SiteDetails/charts/UptimeChart'), () => ({
     UptimeChart: ({ data, options }: ChartInvocation) => {
         uptimeChartInvocations.push({ data, options });
         return <div data-testid="uptime-chart" />;
     },
 }));
 
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         error: (message: string, error: Error) => {
             errorLogs.push([message, error]);
@@ -306,9 +298,9 @@ const baseUptimeChartData: UptimeChartData = {
     ],
 };
 
-const emptyLineOptions = {} as ChartOptions<"line">;
-const emptyBarOptions = {} as ChartOptions<"bar">;
-const emptyDoughnutOptions = {} as ChartOptions<"doughnut">;
+const emptyLineOptions = safeCastTo<ChartOptions<"line">>({});
+const emptyBarOptions = safeCastTo<ChartOptions<"bar">>({});
+const emptyDoughnutOptions = safeCastTo<ChartOptions<"doughnut">>({});
 
 /**
  * Create analytics tab properties with deterministic defaults for testing.
@@ -342,7 +334,7 @@ const createAnalyticsProps = (
         overrides.setSiteDetailsChartTimeRange ?? vi.fn(),
     showAdvancedMetrics: overrides.showAdvancedMetrics ?? false,
     siteDetailsChartTimeRange:
-        overrides.siteDetailsChartTimeRange ?? CHART_TIME_RANGES[0],
+        overrides.siteDetailsChartTimeRange ?? arrayFirst(CHART_TIME_RANGES),
     totalChecks: 52,
     totalDowntime: 540_000,
     upCount: 49,
@@ -375,11 +367,11 @@ describe(AnalyticsTab, () => {
 
         render(<AnalyticsTab {...props} />);
 
-        const progressInvocation = progressInvocations.at(-1);
+        const progressInvocation = arrayAt(progressInvocations, -1);
         expect(progressInvocation?.variant).toBe("error");
         expect(progressInvocation?.value).toBeCloseTo(99.5);
 
-        const badgeInvocation = badgeInvocations.at(-1);
+        const badgeInvocation = arrayAt(badgeInvocations, -1);
         expect(badgeInvocation?.variant).toBe("error");
 
         const advanceToggle = screen.getByRole("button", {
@@ -409,8 +401,8 @@ describe(AnalyticsTab, () => {
         expect(screen.getByText("2 incidents")).toBeInTheDocument();
         expect(screen.getByText("540s")).toBeInTheDocument();
         expect(screen.getByText("52")).toBeInTheDocument();
-        expect(screen.getByText(/Up:\s*49/u)).toBeInTheDocument();
-        expect(screen.getByText(/Down:\s*3/u)).toBeInTheDocument();
+        expect(screen.getByText(/Up:\s*49/v)).toBeInTheDocument();
+        expect(screen.getByText(/Down:\s*3/v)).toBeInTheDocument();
 
         const p50Element = screen
             .getAllByText("80 ms")

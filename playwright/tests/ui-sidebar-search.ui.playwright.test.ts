@@ -4,21 +4,21 @@
  */
 
 import {
-    expect,
-    test,
     type ElectronApplication,
+    expect,
     type Page,
+    test,
 } from "@playwright/test";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
     createSiteViaModal,
     removeAllSites,
     resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
-import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 test.describe(
     "sidebar search - modern ui",
@@ -83,11 +83,11 @@ test.describe(
                     name: "Search monitored sites",
                 });
 
-                await expect(searchBox).toBeVisible({
+                await expect.soft(searchBox).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect(navigation.getByRole("button")).toHaveCount(
+                await expect.soft(navigation.getByRole("button")).toHaveCount(
                     createdSiteNames.length,
                     {
                         timeout: WAIT_TIMEOUTS.LONG,
@@ -98,41 +98,41 @@ test.describe(
                 const betaSiteName = createdSiteNames[1]!;
 
                 await searchBox.fill("Alpha");
-                await expect(navigation.getByRole("button")).toHaveCount(1, {
+                await expect.soft(navigation.getByRole("button")).toHaveCount(1, {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     navigation.getByRole("button", {
                         name: new RegExp(alphaSiteName),
                     })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await searchBox.fill("Beta");
-                await expect(navigation.getByRole("button")).toHaveCount(1, {
+                await expect.soft(navigation.getByRole("button")).toHaveCount(1, {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     navigation.getByRole("button", {
                         name: new RegExp(betaSiteName),
                     })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await searchBox.fill("Nope");
-                await expect(navigation.getByRole("button")).toHaveCount(0, {
+                await expect.soft(navigation.getByRole("button")).toHaveCount(0, {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await expect(
+                await expect.soft(
                     navigation.getByText("No sites match your search.")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 await searchBox.fill("");
-                await expect(navigation.getByRole("button")).toHaveCount(
+                await expect.soft(navigation.getByRole("button")).toHaveCount(
                     createdSiteNames.length,
                     {
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     }
                 );
-                await expect(
+                await expect.soft(
                     navigation.getByText("No sites match your search.")
                 ).toBeHidden({ timeout: WAIT_TIMEOUTS.SHORT });
             }

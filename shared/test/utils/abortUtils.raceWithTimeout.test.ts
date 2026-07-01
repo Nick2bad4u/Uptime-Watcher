@@ -59,15 +59,14 @@ describe("shared/utils/abortUtils - raceWithTimeout", () => {
             unrefTimer: true,
         });
 
-        const rejectionExpectation = promise.then(
+        const rejectionExpectation = promise.catch((error: unknown) => {
+                expect(error).toBeInstanceOf(Error);
+                expect((error as Error).message).toMatch(/timed out/iv);
+            }).then(
             () => {
                 throw new Error(
                     "Expected raceWithTimeout to reject on timeout"
                 );
-            },
-            (error: unknown) => {
-                expect(error).toBeInstanceOf(Error);
-                expect((error as Error).message).toMatch(/timed out/i);
             }
         );
         await vi.advanceTimersByTimeAsync(25);
@@ -95,12 +94,11 @@ describe("shared/utils/abortUtils - raceWithTimeout", () => {
             signal: controller.signal,
         });
 
-        const rejectionExpectation = promise.then(
+        const rejectionExpectation = promise.catch((error: unknown) => {
+                expect(isAbortError(error)).toBeTruthy();
+            }).then(
             () => {
                 throw new Error("Expected raceWithTimeout to reject on abort");
-            },
-            (error: unknown) => {
-                expect(isAbortError(error)).toBeTruthy();
             }
         );
 

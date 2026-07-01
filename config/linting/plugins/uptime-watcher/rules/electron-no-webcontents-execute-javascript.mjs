@@ -91,16 +91,16 @@ export const electronNoWebcontentsExecuteJavascriptRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description: "disallow webContents.executeJavaScript usage",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-webcontents-execute-javascript.md",
         },
-        schema: [],
         messages: {
             disallowed:
                 "Do not call executeJavaScript from Electron. Use validated IPC through the preload bridge.",
         },
+        schema: [],
+        type: "problem",
     },
 };

@@ -6,10 +6,11 @@
  * @since 2024
  */
 
-import fc from "fast-check";
 import { test } from "@fast-check/vitest";
-import { describe, expect, it } from "vitest";
 import { MAX_TIMEOUT_MILLISECONDS } from "@shared/types/units";
+import fc from "fast-check";
+import { describe, expect, it } from "vitest";
+
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -34,12 +35,12 @@ describe("SafeConversions utilities fuzzing tests", () => {
         );
 
         it("should return default for NaN input", () => {
-            expect(safeNumberConversion(Number.NaN)).toBe(0);
-            expect(safeNumberConversion(Number.NaN, 42)).toBe(42);
+            expect(safeNumberConversion(NaN)).toBe(0);
+            expect(safeNumberConversion(NaN, 42)).toBe(42);
         });
 
         it("sanitizes NaN defaults for invalid inputs", () => {
-            const fallback = Number.NaN;
+            const fallback = NaN;
             expect(safeNumberConversion("invalid", fallback)).toBe(0);
             expect(safeNumberConversion(false, fallback)).toBe(0);
         });
@@ -398,7 +399,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         });
 
         test("should return default value for infinity", () => {
-            expect(safeParseTimeout(Number.POSITIVE_INFINITY)).toBe(10_000);
+            expect(safeParseTimeout(Infinity)).toBe(10_000);
             expect(safeParseTimeout(Number.NEGATIVE_INFINITY)).toBe(10_000);
         });
 

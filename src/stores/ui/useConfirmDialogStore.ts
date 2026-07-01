@@ -253,11 +253,11 @@ export async function requestConfirmation(
     const request: ConfirmDialogRequest = {
         cancelLabel: options.cancelLabel ?? DEFAULT_CANCEL_LABEL,
         confirmLabel: options.confirmLabel ?? DEFAULT_CONFIRM_LABEL,
-        ...(options.emphasisText ? { emphasisText: options.emphasisText } : {}),
+        ...(options.emphasisText && { emphasisText: options.emphasisText }),
         message: options.message,
         title: options.title,
         tone: options.tone ?? "default",
-        ...(options.details ? { details: options.details } : {}),
+        ...(options.details && { details: options.details }),
     };
 
     return new Promise<boolean>((resolve) => {

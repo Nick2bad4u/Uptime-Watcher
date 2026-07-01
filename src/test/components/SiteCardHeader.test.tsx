@@ -4,14 +4,14 @@
 
 import { describe, expect, it, vi } from "vitest";
 
-describe("SiteCardHeader", () => {
+describe("siteCardHeader", () => {
     const mockSite = {
-        identifier: "test-site",
-        name: "Test Site",
-        url: "https://example.com",
-        monitors: [],
         created_at: 1_640_995_200_000,
+        identifier: "test-site",
+        monitors: [],
+        name: "Test Site",
         updated_at: 1_640_995_200_000,
+        url: "https://example.com",
     };
 
     const defaultProps = {
@@ -37,7 +37,7 @@ describe("SiteCardHeader", () => {
         },
     };
 
-    it("should render without crashing", ({ task, annotate }) => {
+    it("should render without crashing", ({ annotate, task }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: SiteCardHeader", "component");
         annotate("Category: Component", "category");
@@ -52,11 +52,12 @@ describe("SiteCardHeader", () => {
             // Just test that it doesn't throw
             const mockComponent = () => "SiteCardHeader mock";
             const result = mockComponent();
+
             expect(result).toBeDefined();
         }).not.toThrow();
     });
 
-    it("should handle basic props", ({ task, annotate }) => {
+    it("should handle basic props", ({ annotate, task }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: SiteCardHeader", "component");
         annotate("Category: Component", "category");
@@ -68,12 +69,13 @@ describe("SiteCardHeader", () => {
         annotate("Type: Business Logic", "type");
 
         const props = { ...defaultProps };
+
         expect(props.site.site.name).toBe("Test Site");
-        expect(props.display.isLoading).toBeFalsy();
-        expect(props.monitoring.isMonitoring).toBeFalsy();
+        expect(props.display.isLoading).toBe(false);
+        expect(props.monitoring.isMonitoring).toBe(false);
     });
 
-    it("should handle different site states", ({ task, annotate }) => {
+    it("should handle different site states", ({ annotate, task }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: SiteCardHeader", "component");
         annotate("Category: Component", "category");
@@ -102,6 +104,7 @@ describe("SiteCardHeader", () => {
                     isMonitoring: state.isMonitoring,
                 },
             };
+
             expect(props.display.isLoading).toBe(state.isLoading);
             expect(props.monitoring.isMonitoring).toBe(state.isMonitoring);
         }

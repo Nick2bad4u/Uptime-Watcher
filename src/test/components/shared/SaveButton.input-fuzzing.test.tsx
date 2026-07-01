@@ -27,19 +27,21 @@
  * - Error handling with invalid props
  */
 
-import { describe, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
-import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-
-import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
+
+import { fc, test as fcTest } from "@fast-check/vitest";
+import { secureRandomFloat } from "@shared/test/testHelpers";
+import "@testing-library/jest-dom";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { arrayJoin, stringSplit  } from "ts-extras";
+import { afterEach, beforeEach, describe, expect, type Mock, vi } from "vitest";
+
 import { SaveButton } from "../../../components/shared/SaveButton";
 import { sanitizeDomProps } from "../../utils/domPropSanitizer";
 import { createMockFunction } from "../../utils/mockFactories";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 
 // Mock ThemedButton component
-vi.mock("../../../theme/components/ThemedButton", () => ({
+vi.mock(import('../../../theme/components/ThemedButton'), () => ({
     ThemedButton: vi.fn(
         ({
             children,
@@ -55,14 +57,14 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
             const safeProps = sanitizeDomProps(props);
             return (
                 <button
-                    type="button"
+                    aria-label={ariaLabel}
                     className={className}
-                    onClick={onClick}
-                    disabled={disabled}
+                    data-size={size}
                     data-testid="themed-button"
                     data-variant={variant}
-                    data-size={size}
-                    aria-label={ariaLabel}
+                    disabled={disabled}
+                    onClick={onClick}
+                    type="button"
                     {...safeProps}
                 >
                     {icon && <span data-testid="button-icon">{icon}</span>}
@@ -150,12 +152,12 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     expect(() => {
                         render(
                             <SaveButton
-                                onClick={mockOnClick}
-                                size={config.size}
-                                disabled={config.disabled}
-                                isLoading={config.isLoading}
                                 aria-label={config.ariaLabel}
                                 className={config.className}
+                                disabled={config.disabled}
+                                isLoading={config.isLoading}
+                                onClick={mockOnClick}
+                                size={config.size}
                             />,
                             { container }
                         );
@@ -165,14 +167,13 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     const button = screen.getByTestId("themed-button");
                     expect(button).toBeInTheDocument();
                     // Normalize whitespace for text content comparison
-                    const normalizedText = button.textContent
-                        ?.split(/\s+/)
-                        .join(" ")
+                    const normalizedText = arrayJoin(button.textContent
+                        ?.split(/\s+/v), " ")
                         .trim();
 
                     // The icon is an SVG (no text), so only the label is
                     // expected in textContent.
-                    expect(normalizedText).toMatch(/Save/);
+                    expect(normalizedText).toMatch(/Save/v);
 
                     const icon = screen.getByTestId("button-icon");
                     expect(icon.querySelector("svg")).not.toBeNull();
@@ -219,8 +220,8 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 try {
                     render(
                         <SaveButton
-                            onClick={mockOnClick}
                             aria-label={ariaLabel}
+                            onClick={mockOnClick}
                         />,
                         { container }
                     );
@@ -257,9 +258,9 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 try {
                     render(
                         <SaveButton
-                            onClick={mockOnClick}
                             disabled={disabled}
                             isLoading={isLoading}
+                            onClick={mockOnClick}
                         />,
                         { container }
                     );
@@ -295,27 +296,27 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             try {
                 const { rerender } = render(
                     <SaveButton
-                        onClick={mockOnClick}
                         disabled={false}
                         isLoading={false}
+                        onClick={mockOnClick}
                     />,
                     { container }
                 );
 
                 for (let i = 0; i < transitionCount; i++) {
-                    const disabled = i % 3 === 0;
+                    const isDisabled = i % 3 === 0;
                     const isLoading = i % 2 === 0;
 
                     rerender(
                         <SaveButton
-                            onClick={mockOnClick}
-                            disabled={disabled}
+                            disabled={isDisabled}
                             isLoading={isLoading}
+                            onClick={mockOnClick}
                         />
                     );
 
                     const button = screen.getByTestId("themed-button");
-                    const shouldBeDisabled = disabled || isLoading;
+                    const shouldBeDisabled = isDisabled || isLoading;
                     expect(button).toHaveProperty("disabled", shouldBeDisabled);
                 }
             } finally {
@@ -380,7 +381,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 try {
                     // Test disabled state
                     render(
-                        <SaveButton onClick={mockOnClick} disabled={true} />,
+                        <SaveButton disabled={true} onClick={mockOnClick} />,
                         {
                             container,
                         }
@@ -398,7 +399,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     mockOnClick.mockClear();
 
                     const { rerender: _rerender } = render(
-                        <SaveButton onClick={mockOnClick} isLoading={true} />,
+                        <SaveButton isLoading={true} onClick={mockOnClick} />,
                         { container }
                     );
                     const loadingButton = screen.getByTestId("themed-button");
@@ -431,12 +432,12 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 try {
                     render(
                         <SaveButton
-                            onClick={mockOnClick}
-                            size={config.size}
-                            disabled={config.disabled}
-                            isLoading={config.isLoading}
                             aria-label={config.ariaLabel}
                             className={config.className}
+                            disabled={config.disabled}
+                            isLoading={config.isLoading}
+                            onClick={mockOnClick}
+                            size={config.size}
                         />,
                         { container }
                     );
@@ -509,12 +510,12 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 try {
                     render(
                         <SaveButton
-                            onClick={mockOnClick}
-                            size={config.size}
-                            disabled={config.disabled}
-                            isLoading={config.isLoading}
                             aria-label={config.ariaLabel}
                             className={config.className}
+                            disabled={config.disabled}
+                            isLoading={config.isLoading}
+                            onClick={mockOnClick}
+                            size={config.size}
                         />,
                         { container }
                     );
@@ -547,8 +548,8 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                 try {
                     render(
                         <SaveButton
-                            onClick={mockOnClick}
                             className={className}
+                            onClick={mockOnClick}
                         />,
                         { container }
                     );
@@ -558,8 +559,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     const normalizedClassName = className.trim();
 
                     if (normalizedClassName.length > 0) {
-                        const expectedClasses = normalizedClassName
-                            .split(/\s+/u)
+                        const expectedClasses = stringSplit(normalizedClassName, /\s+/v)
                             .filter((candidate) => candidate.length > 0);
 
                         if (expectedClasses.length > 0) {
@@ -610,9 +610,9 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                     for (let i = 0; i < scenario.buttonCount; i++) {
                         buttons.push(
                             <SaveButton
+                                data-testid={`save-button-${i}`}
                                 key={i}
                                 onClick={onClickHandlers[i] ?? (() => {})}
-                                data-testid={`save-button-${i}`}
                             />
                         );
                     }
@@ -756,9 +756,9 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
                         // Re-render with different props that shouldn't affect icon memoization
                         rerender(
                             <SaveButton
-                                onClick={mockOnClick}
-                                disabled={i % 2 === 0}
                                 className={`class-${i}`}
+                                disabled={i % 2 === 0}
+                                onClick={mockOnClick}
                             />
                         );
 

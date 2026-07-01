@@ -3,7 +3,10 @@
  * detection logic handles overflow, dependency updates, and lifecycle hooks.
  */
 
+import type { UnknownRecord } from "type-fest";
+
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
 import {
     afterAll,
     afterEach,
@@ -34,7 +37,7 @@ class MockResizeObserver {
     }
 }
 
-const originalResizeObserver = global.ResizeObserver;
+const originalResizeObserver = ResizeObserver;
 
 interface ElementDimensions {
     readonly clientWidth: number;
@@ -58,8 +61,8 @@ const setDimensions = (
 };
 
 beforeAll(() => {
-    (globalThis as Record<string, unknown>)["ResizeObserver"] =
-        MockResizeObserver as unknown as typeof ResizeObserver;
+    (safeCastTo<UnknownRecord>(globalThis))["ResizeObserver"] =
+        MockResizeObserver;
 });
 
 beforeEach(() => {
@@ -67,7 +70,7 @@ beforeEach(() => {
 });
 
 afterAll(() => {
-    global.ResizeObserver = originalResizeObserver;
+    globalThis.ResizeObserver = originalResizeObserver;
 });
 
 afterEach(() => {
@@ -96,15 +99,15 @@ describe(useOverflowMarquee, () => {
 
         let resizeListener: ((event: Event) => void) | null = null;
 
-        const addEventListenerSpy = vi.spyOn(window, "addEventListener");
+        const addEventListenerSpy = vi.spyOn(globalThis, "addEventListener");
         addEventListenerSpy.mockImplementation(
             (type, listener: EventListenerOrEventListenerObject): void => {
                 if (type === "resize" && typeof listener === "function") {
-                    resizeListener = listener as (event: Event) => void;
+                    resizeListener = listener;
                 }
             }
         );
-        const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
+        const removeEventListenerSpy = vi.spyOn(globalThis, "removeEventListener");
 
         const { result, unmount } = renderHook(() =>
             useOverflowMarquee({ ref: externalRef })

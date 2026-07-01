@@ -537,8 +537,8 @@ export class SiteRepository {
                 );
                 // Apply consistent data normalization
                 const name = site.name ?? SITE_DEFAULTS.NAME;
-                const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-                const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
+                const isMonitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
+                const monitoringValue: 0 | 1 = isMonitoring ? 1 : 0;
 
                 stmt.run([
                     site.identifier,
@@ -598,9 +598,9 @@ export class SiteRepository {
         }
         try {
             const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
-            const deleted = result.changes > 0;
+            const isDeleted = result.changes > 0;
 
-            if (deleted) {
+            if (isDeleted) {
                 logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
             } else {
                 logger.warn(
@@ -608,7 +608,7 @@ export class SiteRepository {
                 );
             }
 
-            return deleted;
+            return isDeleted;
         } catch (error) {
             logger.error(
                 `[SiteRepository] Failed to delete site: ${identifier}`,
@@ -642,8 +642,8 @@ export class SiteRepository {
         const { identifier } = site;
         assertValidSiteIdentifier(identifier, "SiteRepository.upsertInternal");
         const name = site.name ?? SITE_DEFAULTS.NAME;
-        const monitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
-        const monitoringValue: 0 | 1 = monitoring ? 1 : 0;
+        const isMonitoring = site.monitoring ?? SITE_DEFAULTS.MONITORING;
+        const monitoringValue: 0 | 1 = isMonitoring ? 1 : 0;
 
         db.run(SITE_QUERIES.UPSERT, [
             identifier,
@@ -708,7 +708,7 @@ export class SiteRepository {
                 `[SiteRepository] Failed to find site: ${identifier}`,
                 error
             );
-            throw error instanceof Error
+            throw Error.isError(error)
                 ? error
                 : new Error(getUserFacingErrorDetail(error));
         }

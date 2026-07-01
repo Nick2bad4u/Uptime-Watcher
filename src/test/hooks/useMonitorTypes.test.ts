@@ -3,21 +3,21 @@
  *   configuration loading with error handling and fallback behavior
  */
 
-import { act, renderHook, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { test, fc } from "@fast-check/vitest";
-
-import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import type { MonitorTypeOption } from "@shared/types/monitorTypes";
 
+import { fc, test } from "@fast-check/vitest";
+import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../../constants";
+import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import { logger } from "../../services/logger";
 import { getMonitorTypeOptions } from "../../utils/monitorTypeHelper";
-import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 
 // Mock dependencies
-vi.mock("../../services/logger");
-vi.mock("../../utils/monitorTypeHelper");
+vi.mock(import('../../services/logger'));
+vi.mock(import('../../utils/monitorTypeHelper'));
 
 const mockLogger = vi.mocked(logger);
 const mockGetMonitorTypeOptions = vi.mocked(getMonitorTypeOptions);
@@ -26,7 +26,7 @@ describe("useMonitorTypes Hook", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset logger methods
-        mockLogger.error = vi.fn();
+        vi.spyOn(mockLogger, 'error').mockImplementation();
     });
 
     afterEach(() => {
@@ -701,7 +701,7 @@ describe("useMonitorTypes Hook", () => {
                     expect(typeof option.value).toBe("string");
                     expect(option.value.length).toBeGreaterThan(0);
                     expect(option.value.length).toBeLessThanOrEqual(20);
-                    expect(/^[\w-]+$/.test(option.value)).toBeTruthy();
+                    expect(/^[\w-]+$/u.test(option.value)).toBeTruthy();
                 }
             }
         );
@@ -1032,7 +1032,7 @@ describe("useMonitorTypes Hook", () => {
 
             mockGetMonitorTypeOptions.mockReturnValue(
                 new Promise((resolve) =>
-                    setTimeout(() => resolve(mockOptions), delayMs)
+                    setTimeout(() => { resolve(mockOptions); }, delayMs)
                 )
             );
 

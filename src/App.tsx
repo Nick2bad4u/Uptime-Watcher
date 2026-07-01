@@ -1,9 +1,9 @@
 import type { JSX } from "react/jsx-runtime";
 /**
- * Main App component for Uptime Watcher application.
+ * Main App component for Uptime Watcher app.
  *
  * @remarks
- * Manages global state, modals, notifications, and renders the main application
+ * Manages global state, modals, notifications, and renders the main app
  * layout. Coordinates between different views and handles application-wide
  * state management.
  */
@@ -72,11 +72,11 @@ import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 
 /**
- * Main application component that serves as the root of the Uptime Watcher app.
+ * Main app component that serves as the root of the Uptime Watcher app.
  *
  * @remarks
  * This is the primary entry point component that orchestrates the entire
- * application including state management, theming, error handling, and
+ * app including state management, theming, error handling, and
  * real-time updates. Uses deferred state updates via timeouts to comply with
  * React best practices.
  *
@@ -125,13 +125,13 @@ export const App: NamedExoticComponent = memo(
         // Sites store
         // Settings store - store is initialized via the initialization effect below
         // Store subscription happens automatically when store is accessed
-        const systemNotificationsEnabled = useSettingsStore(
+        const isSystemNotificationsEnabled = useSettingsStore(
             useCallback(
                 (state) => state.settings.systemNotificationsEnabled,
                 []
             )
         );
-        const systemNotificationsSoundEnabled = useSettingsStore(
+        const isSystemNotificationsSoundEnabled = useSettingsStore(
             useCallback(
                 (state) => state.settings.systemNotificationsSoundEnabled,
                 []
@@ -223,7 +223,7 @@ export const App: NamedExoticComponent = memo(
             null
         );
         const settingsSubscriptionRef = useRef<(() => void) | null>(null);
-        const debugSubscriptionsRef = useRef<Array<() => void>>([]);
+        const debugSubscriptionsRef = useRef<(() => void)[]>([]);
         const settingsUpdateCountRef = useRef(0);
         const sitesUpdateCountRef = useRef(0);
         const uiUpdateCountRef = useRef(0);
@@ -268,7 +268,7 @@ export const App: NamedExoticComponent = memo(
         });
 
         /**
-         * Initializes the application by setting up stores, cache sync, and
+         * Initializes the app by setting up stores, cache sync, and
          * status update subscriptions.
          *
          * @remarks
@@ -302,7 +302,7 @@ export const App: NamedExoticComponent = memo(
         }, [subscribeToUpdateStatusEvents]);
 
         /**
-         * Cleans up application resources when the component unmounts.
+         * Cleans up app resources when the component unmounts.
          *
          * @remarks
          * Unsubscribes from status updates and cleans up cache synchronization
@@ -348,16 +348,15 @@ export const App: NamedExoticComponent = memo(
         useEffect(
             function syncNotificationPreferencesEffect(): void {
                 logger.debug("[App:syncNotifEffect] triggered", {
-                    soundEnabled: systemNotificationsSoundEnabled,
-                    systemEnabled: systemNotificationsEnabled,
+                    soundEnabled: isSystemNotificationsSoundEnabled,
+                    systemEnabled: isSystemNotificationsEnabled,
                 });
                 void synchronizeNotificationPreferences();
             },
-            [systemNotificationsEnabled, systemNotificationsSoundEnabled]
+            [isSystemNotificationsEnabled, isSystemNotificationsSoundEnabled]
         );
 
-        // Update status events are subscribed during the initialization pipeline
-        // via the UpdatesStore to keep event ownership consistent.
+        // Update status events are subscribed during the initialization pipeline via the UpdatesStore to keep event ownership consistent.
 
         // Focus-based state synchronization (disabled by default for performance)
         useBackendFocusSync(false); // Set to true to enable focus-based backend sync
@@ -421,8 +420,8 @@ export const App: NamedExoticComponent = memo(
                 return;
             }
 
-            const next = !isSidebarOpen;
-            persistSidebarPreference(next);
+            const isNext = !isSidebarOpen;
+            persistSidebarPreference(isNext);
         }, [
             isCompactViewport,
             isSidebarOpen,

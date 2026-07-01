@@ -3,9 +3,19 @@
  *   42.37% coverage by testing all public methods and error paths
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Site } from "@shared/types";
+
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
+
+import { PortMonitor } from "../../../services/monitoring/PortMonitor";
+import {
+    createMonitorConfig,
+    createMonitorErrorResult,
+    validateMonitorHostAndPort,
+} from "../../../services/monitoring/shared/monitorServiceHelpers";
+import { performPortCheckWithRetry } from "../../../services/monitoring/utils/portRetry";
 
 // Mock the modules before importing
 vi.mock("../../../services/monitoring/utils/portRetry", () => ({
@@ -17,14 +27,6 @@ vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     createMonitorConfig: vi.fn(),
     createMonitorErrorResult: vi.fn(),
 }));
-
-import { PortMonitor } from "../../../services/monitoring/PortMonitor";
-import { performPortCheckWithRetry } from "../../../services/monitoring/utils/portRetry";
-import {
-    createMonitorConfig,
-    createMonitorErrorResult,
-    validateMonitorHostAndPort,
-} from "../../../services/monitoring/shared/monitorServiceHelpers";
 
 describe("PortMonitor Coverage Tests", () => {
     let portMonitor: PortMonitor;

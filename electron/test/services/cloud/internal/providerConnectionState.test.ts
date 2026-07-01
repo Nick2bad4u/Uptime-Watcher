@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
-import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
-
 import {
     SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
     SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
@@ -13,6 +10,8 @@ import {
     captureProviderConnectionState,
     restoreProviderConnectionState,
 } from "../../../../services/cloud/internal/providerConnectionState";
+import { InMemorySecretStore } from "../../../utils/InMemorySecretStore";
+import { createInMemoryCloudSettingsAdapter } from "./createInMemoryCloudSettingsAdapter";
 
 describe("providerConnectionState", () => {
     it("captures provider settings, token snapshot, and optional account label", async () => {

@@ -13,7 +13,7 @@
  * - Automatic error logging with contextual information
  * - Customizable fallback UI for different error scenarios
  * - Retry mechanism that remounts failed components
- * - Integration with application logging infrastructure
+ * - Integration with app logging infrastructure
  * - TypeScript support with proper error type handling
  *
  * @example

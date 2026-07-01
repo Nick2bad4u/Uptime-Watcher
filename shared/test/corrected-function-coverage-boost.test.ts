@@ -8,7 +8,7 @@
  * counting.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Import actual utility modules with their real exports
 import * as cacheKeysModule from "../utils/cacheKeys";
@@ -76,7 +76,7 @@ describe("Function Coverage Boost - Targeting Actual Exports", () => {
             ).toBeFalsy();
 
             const parsedKey = cacheKeysModule.parseCacheKey(
-                "config:test" as any
+                "config:test"
             );
             expect(parsedKey.prefix).toBe("config");
             expect(parsedKey.identifier).toBe("test");

@@ -4,16 +4,17 @@
 
 import type { CSSProperties } from "react";
 
-import { describe, expect, vi } from "vitest";
-import { render } from "@testing-library/react";
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { render } from "@testing-library/react";
+import { arrayAt } from "ts-extras";
+import { describe, expect, vi } from "vitest";
 
 import {
     MarqueeText,
     type MarqueeTextProperties,
 } from "../../../../components/common/MarqueeText/MarqueeText";
 
-vi.mock("../../../../hooks/ui/useOverflowMarquee", async () => {
+vi.mock(import('../../../../hooks/ui/useOverflowMarquee'), async () => {
     const actual = await vi.importActual<
         typeof import("../../../../hooks/ui/useOverflowMarquee")
     >("../../../../hooks/ui/useOverflowMarquee");
@@ -33,7 +34,7 @@ const mockUseOverflowMarquee = vi.mocked(useOverflowMarquee);
 
 const cssClassArbitrary = fc
     .string({ maxLength: 12, minLength: 1 })
-    .filter((value) => /^[\w-]+$/.test(value));
+    .filter((value) => /^[\w-]+$/u.test(value));
 
 const optionalCssClassArbitrary = fc.oneof(
     cssClassArbitrary,
@@ -120,11 +121,11 @@ describe("MarqueeText fast-check coverage", () => {
 
             const props: MarqueeTextProperties = {
                 text,
-                ...(className === undefined ? {} : { className }),
-                ...(trackClassName === undefined ? {} : { trackClassName }),
-                ...(segmentClassName === undefined ? {} : { segmentClassName }),
-                ...(textProps === undefined ? {} : { textProps }),
-                ...(activeClassName === undefined ? {} : { activeClassName }),
+                ...(className !== undefined && { className }),
+                ...(trackClassName !== undefined && { trackClassName }),
+                ...(segmentClassName !== undefined && { segmentClassName }),
+                ...(textProps !== undefined && { textProps }),
+                ...(activeClassName !== undefined && { activeClassName }),
             };
 
             const { container, unmount } = render(<MarqueeText {...props} />);
@@ -146,7 +147,7 @@ describe("MarqueeText fast-check coverage", () => {
 
             const trackElem = wrapper.querySelector(
                 ".marquee-text__track"
-            ) as HTMLElement | null;
+            );
             expect(trackElem).not.toBeNull();
             if (trackClassName) {
                 expect(trackElem).toHaveClass(trackClassName);
@@ -165,7 +166,7 @@ describe("MarqueeText fast-check coverage", () => {
                 expect(segment).toHaveClass(textPropsClassName);
             }
 
-            const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
+            const callArgs = arrayAt(mockUseOverflowMarquee.mock.calls, -1);
             expect(callArgs).toBeDefined();
             expect(callArgs?.[0]?.dependencies).toEqual([text]);
 
@@ -222,11 +223,11 @@ describe("MarqueeText fast-check coverage", () => {
 
             const props: MarqueeTextProperties = {
                 text,
-                ...(className === undefined ? {} : { className }),
-                ...(activeClassName === undefined ? {} : { activeClassName }),
-                ...(cloneClassName === undefined ? {} : { cloneClassName }),
-                ...(segmentClassName === undefined ? {} : { segmentClassName }),
-                ...(textProps === undefined ? {} : { textProps }),
+                ...(className !== undefined && { className }),
+                ...(activeClassName !== undefined && { activeClassName }),
+                ...(cloneClassName !== undefined && { cloneClassName }),
+                ...(segmentClassName !== undefined && { segmentClassName }),
+                ...(textProps !== undefined && { textProps }),
             };
 
             const { container, unmount } = render(<MarqueeText {...props} />);
@@ -266,7 +267,7 @@ describe("MarqueeText fast-check coverage", () => {
                 expect(cloneSegment).toHaveClass(cloneClassName);
             }
 
-            const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
+            const callArgs = arrayAt(mockUseOverflowMarquee.mock.calls, -1);
             expect(callArgs).toBeDefined();
             expect(callArgs?.[0]?.dependencies).toEqual([text]);
 
@@ -293,7 +294,7 @@ describe("MarqueeText fast-check coverage", () => {
                 <MarqueeText dependencies={dependencies} text={text} />
             );
 
-            const callArgs = mockUseOverflowMarquee.mock.calls.at(-1);
+            const callArgs = arrayAt(mockUseOverflowMarquee.mock.calls, -1);
             expect(callArgs).toBeDefined();
             expect(callArgs?.[0]?.dependencies).toBe(dependencies);
 
@@ -336,8 +337,8 @@ describe("MarqueeText fast-check coverage", () => {
             const props: MarqueeTextProperties = {
                 style: baseStyle,
                 text: "stylish marquee",
-                ...(gap === undefined ? {} : { gap }),
-                ...(duration === undefined ? {} : { duration }),
+                ...(gap !== undefined && { gap }),
+                ...(duration !== undefined && { duration }),
             };
 
             const { container, unmount } = render(<MarqueeText {...props} />);

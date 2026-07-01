@@ -57,7 +57,7 @@ export async function migrateBackups(
         });
 
         const backups = await provider.listBackups();
-        const needsKey = determineBackupMigrationNeedsEncryptionKey(
+        const isNeedsKey = determineBackupMigrationNeedsEncryptionKey(
             request,
             backups
         );
@@ -66,13 +66,13 @@ export async function migrateBackups(
             await ctx.settings.get(SETTINGS_KEY_ENCRYPTION_MODE)
         );
 
-        if (needsKey && localEncryptionMode !== "passphrase") {
+        if (isNeedsKey && localEncryptionMode !== "passphrase") {
             throw new Error(
                 "Passphrase encryption must be enabled/unlocked on this device to migrate encrypted backups"
             );
         }
 
-        const encryptionKey = needsKey
+        const encryptionKey = isNeedsKey
             ? await ctx.getEncryptionKeyOrThrow()
             : undefined;
 

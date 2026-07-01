@@ -1,8 +1,8 @@
 /**
- * Header component providing global status overview and application controls.
+ * Header component providing global status overview and app controls.
  *
  * @remarks
- * Displays application title, global uptime statistics, monitor counts, status
+ * Displays app title, global uptime statistics, monitor counts, status
  * indicators, theme toggle, and settings access. Integrates with Zustand stores
  * for state management and provides responsive layout with accessibility
  * support.
@@ -36,7 +36,7 @@ import { StatusSubscriptionIndicator } from "./StatusSubscriptionIndicator";
 import { StatusSummary } from "./StatusSummary";
 
 /**
- * Main header component for the application.
+ * Main header component for the app.
  *
  * Features:
  *
@@ -46,7 +46,7 @@ import { StatusSummary } from "./StatusSummary";
  * - Settings modal trigger
  * - Responsive layout with proper text truncation
  *
- * @returns JSX element containing the application header
+ * @returns JSX element containing the app header
  */
 export const Header = (): JSX.Element => {
     type UiStoreState = ReturnType<typeof useUIStore.getState>;

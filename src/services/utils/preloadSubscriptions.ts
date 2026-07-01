@@ -21,8 +21,6 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import { subscribeWithValidatedCleanup } from "./cleanupHandlers";
 
-type LoggerLike = Pick<UnifiedLogger, "debug" | "error">;
-
 /**
  * Options for {@link subscribeWithCleanupValidation}.
  */
@@ -36,6 +34,8 @@ export interface PreloadSubscriptionOptions {
     /** Name of the renderer service owning the subscription (for log prefixing). */
     readonly serviceName: string;
 }
+
+type LoggerLike = Pick<UnifiedLogger, "debug" | "error">;
 
 /**
  * Subscribes to a preload-managed event while enforcing the cleanup contract.

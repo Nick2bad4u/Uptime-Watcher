@@ -17,6 +17,57 @@ const BLOCKED_PATH_SEGMENTS = new Set([
     "prototype",
 ]);
 
+/**
+ * Safely resolves a dot-separated path against unknown monitor response
+ * payloads.
+ *
+ * @param payload - Parsed response payload (object / array / primitive).
+ * @param path - Dot-separated path expression.
+ * @param options - Traversal options.
+ *
+ * @returns The resolved value, or undefined if path cannot be resolved safely.
+ */
+export function extractMonitorValueAtPath(
+    payload: unknown,
+    path: string,
+    options: MonitorPathTraversalOptions = DEFAULT_MONITOR_PATH_TRAVERSAL_OPTIONS
+): unknown {
+    const normalizedOptions = normalizeMonitorPathTraversalOptions(options);
+    const segments = normalizePathSegments(path, normalizedOptions);
+
+    if (!segments || isEmpty(segments)) {
+        return undefined;
+    }
+
+    let current: unknown = payload;
+
+    for (const segment of segments) {
+        if (Array.isArray(current)) {
+            const parsedIndex = Number.parseInt(segment, 10);
+            if (
+                Number.isNaN(parsedIndex) ||
+                parsedIndex < 0 ||
+                parsedIndex >= current.length
+            ) {
+                return undefined;
+            }
+            current = current[parsedIndex];
+        } else {
+            if (!current || typeof current !== "object") {
+                return undefined;
+            }
+
+            if (!Object.prototype.propertyIsEnumerable.call(current, segment)) {
+                return undefined;
+            }
+
+            current = Reflect.get(current, segment);
+        }
+    }
+
+    return current;
+}
+
 function decodePathSegment(segment: string): string | undefined {
     try {
         return decodeURIComponent(segment);
@@ -101,55 +152,4 @@ function normalizePathSegments(
     }
 
     return normalizedSegments;
-}
-
-/**
- * Safely resolves a dot-separated path against unknown monitor response
- * payloads.
- *
- * @param payload - Parsed response payload (object / array / primitive).
- * @param path - Dot-separated path expression.
- * @param options - Traversal options.
- *
- * @returns The resolved value, or undefined if path cannot be resolved safely.
- */
-export function extractMonitorValueAtPath(
-    payload: unknown,
-    path: string,
-    options: MonitorPathTraversalOptions = DEFAULT_MONITOR_PATH_TRAVERSAL_OPTIONS
-): unknown {
-    const normalizedOptions = normalizeMonitorPathTraversalOptions(options);
-    const segments = normalizePathSegments(path, normalizedOptions);
-
-    if (!segments || isEmpty(segments)) {
-        return undefined;
-    }
-
-    let current: unknown = payload;
-
-    for (const segment of segments) {
-        if (Array.isArray(current)) {
-            const parsedIndex = Number.parseInt(segment, 10);
-            if (
-                Number.isNaN(parsedIndex) ||
-                parsedIndex < 0 ||
-                parsedIndex >= current.length
-            ) {
-                return undefined;
-            }
-            current = current[parsedIndex];
-        } else {
-            if (!current || typeof current !== "object") {
-                return undefined;
-            }
-
-            if (!Object.prototype.propertyIsEnumerable.call(current, segment)) {
-                return undefined;
-            }
-
-            current = Reflect.get(current, segment);
-        }
-    }
-
-    return current;
 }

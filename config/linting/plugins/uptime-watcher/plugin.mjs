@@ -91,24 +91,24 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         version: "0.0.0",
     },
     rules: {
-        "electron-browserwindow-require-secure-webpreferences":
-            electronBrowserwindowRequireSecureWebpreferencesRule,
         "electron-browserwindow-require-preload":
             electronBrowserwindowRequirePreloadRule,
-        "electron-dialog-require-automation-bypass":
-            electronDialogRequireAutomationBypassRule,
-        "electron-no-app-getpath-at-module-scope":
-            electronNoAppGetpathAtModuleScopeRule,
+        "electron-browserwindow-require-secure-webpreferences":
+            electronBrowserwindowRequireSecureWebpreferencesRule,
         "electron-cloud-providers-drift-guards":
             electronCloudProvidersDriftGuardsRule,
+        "electron-dialog-require-automation-bypass":
+            electronDialogRequireAutomationBypassRule,
         "electron-ipc-handler-require-validator":
             electronIpcHandlerRequireValidatorRule,
         "electron-no-ad-hoc-error-code-suffix":
             electronNoAdHocErrorCodeSuffixRule,
-        "electron-no-console": electronNoConsoleRule,
-        "electron-no-dialog-sync": electronNoDialogSyncRule,
+        "electron-no-app-getpath-at-module-scope":
+            electronNoAppGetpathAtModuleScopeRule,
         "electron-no-browserwindow-outside-windowservice":
             electronNoBrowserwindowOutsideWindowserviceRule,
+        "electron-no-console": electronNoConsoleRule,
+        "electron-no-dialog-sync": electronNoDialogSyncRule,
         "electron-no-direct-ipc-handle": electronNoDirectIpcHandleRule,
         "electron-no-direct-ipc-handler-wrappers":
             electronNoDirectIpcHandlerWrappersRule,
@@ -121,23 +121,23 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "electron-no-local-string-safety-helpers":
             electronNoLocalStringSafetyHelpersRule,
         "electron-no-renderer-import": electronNoRendererImportRule,
+        "electron-no-shell-open-external": electronNoShellOpenExternalRule,
+        "electron-no-webcontents-execute-javascript":
+            electronNoWebcontentsExecuteJavascriptRule,
+        "electron-open-devtools-require-dev-only":
+            electronOpenDevtoolsRequireDevOnlyRule,
         "electron-prefer-read-process-env":
             electronPreferReadProcessEnvironmentRule,
         "electron-preload-no-direct-ipc-renderer-usage":
             electronPreloadNoDirectIpcRendererUsageRule,
         "electron-preload-no-inline-ipc-channel-constant":
             electronPreloadNoInlineIpcChannelConstantRule,
-        "electron-no-shell-open-external": electronNoShellOpenExternalRule,
-        "electron-no-webcontents-execute-javascript":
-            electronNoWebcontentsExecuteJavascriptRule,
-        "electron-open-devtools-require-dev-only":
-            electronOpenDevtoolsRequireDevOnlyRule,
         "electron-sync-no-local-ascii-digits":
             electronSyncNoLocalAsciiDigitsRule,
-        "logger-no-error-in-context": loggerNoErrorInContextRule,
         "ipc-handler-signature-matches-validator":
             ipcHandlerSignatureMatchesValidatorRule,
         "logger-context-json-serializable": loggerContextJsonSerializableRule,
+        "logger-no-error-in-context": loggerNoErrorInContextRule,
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "no-call-identifiers": noCallIdentifiersRule,
         "no-deprecated-exports": noDeprecatedExportsRule,
@@ -166,11 +166,11 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
         "renderer-no-import-internal-service-utils":
             rendererNoImportInternalServiceUtilitiesRule,
         "renderer-no-ipc-renderer-usage": rendererNoIpcRendererUsageRule,
-        "renderer-no-process-env": rendererNoProcessEnvRule,
         "renderer-no-preload-bridge-writes": rendererNoPreloadBridgeWritesRule,
+        "renderer-no-process-env": rendererNoProcessEnvRule,
         "renderer-no-window-open": rendererNoWindowOpenRule,
-        "require-error-cause-in-catch": requireErrorCauseInCatchRule,
         "require-ensure-error-in-catch": requireEnsureErrorInCatchRule,
+        "require-error-cause-in-catch": requireErrorCauseInCatchRule,
         "shared-no-outside-imports": sharedNoOutsideImportsRule,
         "shared-types-no-local-is-plain-object":
             sharedTypesNoLocalIsPlainObjectRule,
@@ -178,8 +178,8 @@ const uptimeWatcherPlugin = /** @type {any} */ ({
             storeActionsRequireFinallyResetRule,
         "test-no-mock-return-value-constructors":
             testNoMockReturnValueConstructorsRule,
-        "typed-eventbus-payload-assignable": typedEventbusPayloadAssignableRule,
         "tsdoc-no-console-example": tsdocNoConsoleExampleRule,
+        "typed-eventbus-payload-assignable": typedEventbusPayloadAssignableRule,
     },
 });
 
@@ -529,13 +529,13 @@ const flatDefaultConfig = withUptimeWatcherPlugin({
     // Generic (unscoped) configs. These intentionally rely on rules being
     // Internally defensive (path checks, etc.).
     all: unscopedAllConfig,
-    recommended: unscopedRecommendedConfig,
     default: unscopedDefaultConfig,
-
     // Common convention used by other plugins (helps muscle memory).
     "flat/all": flatAllConfig,
-    "flat/recommended": flatRecommendedConfig,
+
     "flat/default": flatDefaultConfig,
+    "flat/recommended": flatRecommendedConfig,
+    recommended: unscopedRecommendedConfig,
 
     // Repo-scoped convenience configs.
     // NOTE: arrays must be spread into the top-level config list.

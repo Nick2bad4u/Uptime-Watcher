@@ -2,9 +2,8 @@
  * Simple tests to improve ApplicationService coverage
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock external dependencies
 vi.mock("../../../utils/logger", () => ({

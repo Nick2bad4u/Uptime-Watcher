@@ -6,11 +6,12 @@
  * correlation functionality using AbortController.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-    MonitorOperationRegistry,
     type MonitorCheckOperation,
     type MonitorCheckResult,
+    MonitorOperationRegistry,
 } from "../../../services/monitoring/MonitorOperationRegistry";
 import { monitorLogger as logger } from "../../../utils/logger";
 
@@ -814,15 +815,15 @@ describe(MonitorOperationRegistry, () => {
             expect(result.signal.aborted).toBeFalsy();
 
             // Add event listener to test abort event
-            let abortEventFired = false;
+            let isAbortEventFired = false;
             result.signal.addEventListener("abort", () => {
-                abortEventFired = true;
+                isAbortEventFired = true;
             });
 
             registry.cancelOperations(mockMonitorId);
 
             expect(result.signal.aborted).toBeTruthy();
-            expect(abortEventFired).toBeTruthy();
+            expect(isAbortEventFired).toBeTruthy();
         });
 
         it("should combine timeout and additional signals correctly", async ({

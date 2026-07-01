@@ -240,10 +240,10 @@ export class DataBackupService {
         const backupPath = `${targetPath}.bak-${randomUUID()}`;
 
         const targetStat = await fs.lstat(targetPath).catch(() => null);
-        const targetExists =
+        const isTargetExists =
             targetStat?.isFile() === true && !targetStat.isSymbolicLink();
 
-        if (!targetExists) {
+        if (!isTargetExists) {
             await fs.rename(sourcePath, targetPath);
             return;
         }
@@ -264,7 +264,7 @@ export class DataBackupService {
     /* eslint-enable security/detect-non-literal-fs-filename -- Re-enable after user-path backup save helpers. */
 
     private async downloadDatabaseBackupImpl(): Promise<DatabaseBackupResult> {
-        let snapshotDir: string | undefined = undefined;
+        let snapshotDir: string | undefined;
         return this.withExclusiveDatabaseFileOperation(
             "download-backup",
             async () => {

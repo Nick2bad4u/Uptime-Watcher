@@ -72,16 +72,16 @@ export const preferTryGetErrorCodeRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "require tryGetErrorCode over asserting unknown errors as { code?: ... }",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/prefer-try-get-error-code.md",
         },
-        schema: [],
         messages: {
             prefer: "Use tryGetErrorCode(error) instead of asserting error as { code?: ... }.",
         },
+        schema: [],
+        type: "problem",
     },
 };

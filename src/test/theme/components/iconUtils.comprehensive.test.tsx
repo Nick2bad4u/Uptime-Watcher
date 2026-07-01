@@ -1,10 +1,11 @@
+import { render, screen } from "@testing-library/react";
+import * as React from "react";
 /**
  * Comprehensive tests for iconUtils functions to achieve complete function
  * coverage
  */
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
-import React from "react";
+
 import {
     getIconColorClass,
     renderColoredIcon,

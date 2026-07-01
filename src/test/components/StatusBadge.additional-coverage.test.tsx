@@ -8,9 +8,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import type { StatusBadgeProperties } from "../../components/common/StatusBadge";
+
 import { StatusBadge } from "../../components/common/StatusBadge";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
-import type { StatusBadgeProperties } from "../../components/common/StatusBadge";
 
 describe("StatusBadge - Additional Coverage", () => {
     it("should handle the default case in getIndicatorSize switch statement", ({
@@ -27,8 +28,7 @@ describe("StatusBadge - Additional Coverage", () => {
         annotate("Category: Component", "category");
         annotate("Type: Data Retrieval", "type");
 
-        // This test is designed to cover line 126 - the default case in the getIndicatorSize function
-        // We need to create a situation where an unexpected size value is passed
+        // This test is designed to cover line 126 - the default case in the getIndicatorSize function We need to create a situation where an unexpected size value is passed
 
         // Create a component that uses an invalid size to trigger the default case
         const TestStatusBadgeWithInvalidSize = () => {
@@ -38,9 +38,9 @@ describe("StatusBadge - Additional Coverage", () => {
             return (
                 <StatusBadge
                     label="Test"
-                    status="up"
-                    size={invalidSize}
                     showIcon
+                    size={invalidSize}
+                    status="up"
                 />
             );
         };
@@ -86,9 +86,9 @@ describe("StatusBadge - Additional Coverage", () => {
                 <ThemeProvider>
                     <StatusBadge
                         label={`Test-${size}`}
-                        status="up"
-                        size={size}
                         showIcon
+                        size={size}
+                        status="up"
                     />
                 </ThemeProvider>
             );
@@ -119,8 +119,8 @@ describe("StatusBadge - Additional Coverage", () => {
             <ThemeProvider>
                 <StatusBadge
                     label="Test Undefined Size"
-                    status="down"
                     showIcon
+                    status="down"
                 />
             </ThemeProvider>
         );
@@ -144,12 +144,11 @@ describe("StatusBadge - Additional Coverage", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        // This is an integration test to ensure the getIndicatorSize function
-        // handles all possible code paths including the default case
+        // This is an integration test to ensure the getIndicatorSize function handles all possible code paths including the default case
 
         interface TestCase {
-            size: any;
             expectedIndicatorSize: "lg" | "md" | "sm";
+            size: any;
         }
 
         const testCases: TestCase[] = [
@@ -179,9 +178,9 @@ describe("StatusBadge - Additional Coverage", () => {
                 <ThemeProvider>
                     <StatusBadge
                         label={`Test-${index}`}
-                        status="up"
-                        size={size}
                         showIcon
+                        size={size}
+                        status="up"
                     />
                 </ThemeProvider>
             );
@@ -210,10 +209,10 @@ describe("StatusBadge - Additional Coverage", () => {
         render(
             <ThemeProvider>
                 <StatusBadge
-                    label="custom"
-                    status="paused"
                     formatter={customFormatter}
+                    label="custom"
                     showIcon={false}
+                    status="paused"
                 />
             </ThemeProvider>
         );
@@ -236,8 +235,8 @@ describe("StatusBadge - Additional Coverage", () => {
             <ThemeProvider>
                 <StatusBadge
                     label="No Icon Test"
-                    status="up"
                     showIcon={false}
+                    status="up"
                 />
             </ThemeProvider>
         );
@@ -259,9 +258,9 @@ describe("StatusBadge - Additional Coverage", () => {
         render(
             <ThemeProvider>
                 <StatusBadge
+                    className="custom-class"
                     label="Class Test"
                     status="up"
-                    className="custom-class"
                 />
             </ThemeProvider>
         );

@@ -5,9 +5,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { HistoryLimitCoordinator } from "../../coordinators/HistoryLimitCoordinator";
-import type { OrchestratorEvents } from "../../UptimeOrchestrator.types";
 import type { DatabaseManager } from "../../managers/DatabaseManager";
+import type { OrchestratorEvents } from "../../UptimeOrchestrator.types";
+
+import { HistoryLimitCoordinator } from "../../coordinators/HistoryLimitCoordinator";
 import { TypedEventBus } from "../../events/TypedEventBus";
 
 const flushAsync = async (): Promise<void> =>

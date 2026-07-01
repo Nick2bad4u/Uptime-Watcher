@@ -42,12 +42,14 @@ export async function setupIndividualNewMonitorsOperation(args: {
     } = args;
 
     for (const monitor of newMonitors) {
-        if (shouldApplyDefaultInterval(monitor)) {
-            monitor.checkInterval = defaultCheckIntervalMs;
-            logger.debug(
-                `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
-            );
+        if (!shouldApplyDefaultInterval(monitor)) {
+            continue;
         }
+
+        monitor.checkInterval = defaultCheckIntervalMs;
+        logger.debug(
+            `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
+        );
     }
 
     if (site.monitoring) {

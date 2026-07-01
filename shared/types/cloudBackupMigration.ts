@@ -1,9 +1,12 @@
 import * as z from "zod";
 
 /**
- * Backup migration target encryption mode.
+ * Failure entry for a backup migration operation.
  */
-export type CloudBackupMigrationTarget = "encrypted" | "plaintext";
+export interface CloudBackupMigrationFailure {
+    key: string;
+    message: string;
+}
 
 /**
  * Request payload for migrating existing remote backups between plaintext and
@@ -26,14 +29,6 @@ export interface CloudBackupMigrationRequest {
 }
 
 /**
- * Failure entry for a backup migration operation.
- */
-export interface CloudBackupMigrationFailure {
-    key: string;
-    message: string;
-}
-
-/**
  * Result summary returned after a migration operation completes.
  */
 export interface CloudBackupMigrationResult {
@@ -46,6 +41,11 @@ export interface CloudBackupMigrationResult {
     startedAt: number;
     target: CloudBackupMigrationTarget;
 }
+
+/**
+ * Backup migration target encryption mode.
+ */
+export type CloudBackupMigrationTarget = "encrypted" | "plaintext";
 
 const cloudBackupMigrationTargetSchema = z.enum(["plaintext", "encrypted"]);
 

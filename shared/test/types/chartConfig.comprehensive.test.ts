@@ -1,7 +1,8 @@
 /**
  * Comprehensive tests for chartConfig utilities
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { hasPlugins, hasScales } from "../../types/chartConfig";
 
 describe("chartConfig utilities", () => {

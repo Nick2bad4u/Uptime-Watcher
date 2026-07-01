@@ -278,10 +278,9 @@ export interface UptimeChartDataPoint extends ChartDataPoint {
  * @public
  */
 
-// Note: Re-exports have been removed to comply with no-barrel-files rule.
-// Import ChartDataPoint, ChartDatasetConfig, ChartPluginsConfig, ChartScalesConfig,
-// ChartThemeConfig directly from "./chartConfig.js"
-// Import ChartData, ChartOptions directly from "chart.js"
+// Note: Re-exports have been removed to comply with no-barrel-files rule. Import ChartDataPoint, ChartDatasetConfig,
+// ChartPluginsConfig, ChartScalesConfig, ChartThemeConfig directly from "./chartConfig.js" Import ChartData,
+// ChartOptions directly from "chart.js"
 
 /**
  * Determines whether chart options use the hybrid Uptime Watcher format.

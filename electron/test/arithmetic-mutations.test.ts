@@ -13,7 +13,7 @@
  * @tags ["mutation-testing", "arithmetic", "stryker"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("ArithmeticOperator Mutation Tests", () => {
     beforeEach(() => {
@@ -106,10 +106,10 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Buffer Management", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: electron/services/monitoring/EnhancedMonitorChecker.ts, Line: 932
-            // Original: const pruneThreshold = historyLimit + bufferSize;
-            // Mutated: historyLimit - bufferSize
+            // This test specifically targets the mutation: File:
+            // electron/services/monitoring/EnhancedMonitorChecker.ts, Line: 932 Original:
+            // const pruneThreshold = historyLimit + bufferSize; Mutated:
+            // historyLimit - bufferSize
 
             const historyLimit = 1000;
             const bufferSize = 100;
@@ -143,10 +143,8 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Timing", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: electron/services/monitoring/HttpMonitor.ts, Line: 92
-            // Original: const since = now - last;
-            // Mutated: now + last
+            // This test specifically targets the mutation: File: electron/services/monitoring/HttpMonitor.ts, Line: 92
+            // Original: const since = now - last; Mutated: now + last
 
             const last = 1000; // Last check timestamp
             const now = 1500; // Current timestamp
@@ -177,10 +175,9 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Timing", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: electron/services/monitoring/HttpMonitor.ts, Line: 97
-            // Original: const waitFor = needDelay ? this.minIntervalMs - since : 25;
-            // Mutated: this.minIntervalMs + since
+            // This test specifically targets the mutation: File: electron/services/monitoring/HttpMonitor.ts, Line: 97
+            // Original: const waitFor = needDelay ? this.minIntervalMs - since : 25; Mutated:
+            // this.minIntervalMs + since
 
             const minIntervalMs = 1000;
             const since = 300; // Time elapsed since last check
@@ -257,7 +254,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
 
             // Mutated calculation would use division
             const mutatedBodyLength = 8 / 1024;
-            expect(mutatedBodyLength).toBe(0.007_812_5); // Fraction of a byte
+            expect(mutatedBodyLength).toBe(0.0078125); // Fraction of a byte
 
             // Correct value should be a reasonable buffer size
             expect(correctBodyLength).toBeGreaterThan(1000);
@@ -315,10 +312,9 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Statistics", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: electron/UptimeOrchestrator.ts, Line: 1221
-            // Original: const failed = setupResults.length - successful;
-            // Mutated: setupResults.length + successful
+            // This test specifically targets the mutation: File: electron/UptimeOrchestrator.ts, Line: 1221 Original:
+            // const failed = setupResults.length - successful; Mutated:
+            // setupResults.length + successful
 
             const setupResults = Array.from({ length: 10 }); // 10 total setup attempts
             const successful = 7; // 7 successful setups
@@ -382,10 +378,9 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Category: Retry Logic", "category");
             await annotate("Type: Arithmetic", "type");
 
-            // This test specifically targets the mutation:
-            // File: electron/utils/operationalHooks.ts, Line: 149
-            // Original: return initialDelay * attempt;
-            // Mutated: initialDelay / attempt
+            // This test specifically targets the mutation: File: electron/utils/operationalHooks.ts, Line: 149
+            // Original: return initialDelay * attempt; Mutated:
+            // initialDelay / attempt
 
             const initialDelay = 1000;
             const attempt = 3;
@@ -396,7 +391,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
 
             // Mutated calculation would divide
             const mutatedDelay = initialDelay / attempt;
-            expect(mutatedDelay).toBe(333.333_333_333_333_3);
+            expect(mutatedDelay).toBe(333.3333333333333);
 
             // Linear backoff should increase with attempts
             expect(correctDelay).toBeGreaterThan(initialDelay);
@@ -415,9 +410,7 @@ describe("ArithmeticOperator Mutation Tests", () => {
             await annotate("Type: Arithmetic", "type");
 
             // This test specifically targets the mutation:
-            // File: electron/utils/operationalHooks.ts, Line: 288
-            // Original: attempt: attempt + 1,
-            // Mutated: attempt - 1
+            // File: electron/utils/operationalHooks.ts, Line: 288 Original: attempt: attempt + 1, Mutated: attempt - 1
 
             const currentAttempt = 2;
 

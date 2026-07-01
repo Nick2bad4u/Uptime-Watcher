@@ -3,20 +3,6 @@
  * configuration for consistent testing behavior
  */
 
-import { EventEmitter } from "node:events";
-
-// Set max listeners to prevent memory leak warnings in tests
-const MAX_LISTENERS = 200; // Higher threshold for test environment
-
-// Set default max listeners for all EventEmitter instances
-EventEmitter.defaultMaxListeners = MAX_LISTENERS;
-
-// Set max listeners specifically for the process object
-process.setMaxListeners(MAX_LISTENERS);
-
-import { vi, type Mock } from "vitest";
-import fc from "fast-check";
-import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -29,8 +15,24 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
-import type { ElectronAPI } from "../types";
+
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
+import fc from "fast-check";
+import { EventEmitter } from "node:events";
+import { objectAssign, safeCastTo  } from "ts-extras";
+import { type Mock, vi } from "vitest";
+
+import type { ElectronAPI } from "../types";
+
+// Set max listeners to prevent memory leak warnings in tests
+const MAX_LISTENERS = 200; // Higher threshold for test environment
+
+// Set default max listeners for all EventEmitter instances
+EventEmitter.defaultMaxListeners = MAX_LISTENERS;
+
+// Set max listeners specifically for the process object
+process.setMaxListeners(MAX_LISTENERS);
 
 /**
  * Deep-mock helper type for domain bridge objects.
@@ -49,7 +51,7 @@ type DeepMocked<T> = T extends (...args: infer Args) => infer Return
       ? { [Key in keyof T]: DeepMocked<T[Key]> }
       : T;
 
-vi.mock("electron", () => ({
+vi.mock(import('electron'), () => ({
     app: {
         getPath: vi.fn(() => ""),
         isPackaged: false,
@@ -112,7 +114,7 @@ Object.defineProperty(URL, "revokeObjectURL", {
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
-const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
+const baseNumRuns = (safeCastTo<{ numRuns?: number }>(current)).numRuns ?? 10;
 const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
@@ -148,9 +150,7 @@ fc.configureGlobal({
     // examples: [],          // add any concrete inputs you want always tested
     // unbiased: false,    // keep default biasing unless you need unbiased generators
 
-    // RNG / reproducibility
-    // seed: undefined,    // set a specific number to reproduce runs
-    // randomType: 'xorshift128plus', // default; change if you need a different generator
+    // RNG / reproducibility seed: undefined,    // set a specific number to reproduce runs randomType: 'xorshift128plus', // default; change if you need a different generator
 
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,
@@ -679,15 +679,15 @@ Object.defineProperty(globalThis, "electronAPI", {
 });
 
 // Also assign to window for tests that access it via window.electronAPI
-Object.defineProperty(window, "electronAPI", {
+Object.defineProperty(globalThis, "electronAPI", {
     writable: true,
     configurable: true,
     value: mockElectronAPI,
 });
 
 // Mock Chart.js for component testing
-vi.mock("chart.js", () => {
-    const Chart = Object.assign(vi.fn(), {
+vi.mock(import('chart.js'), () => {
+    const Chart = objectAssign(vi.fn(), {
         register: vi.fn(),
     });
 
@@ -709,10 +709,10 @@ vi.mock("chart.js", () => {
     };
 });
 
-vi.mock("chartjs-adapter-date-fns", () => ({}));
+vi.mock(import('chartjs-adapter-date-fns'), () => ({}));
 
 // Mock react-chartjs-2
-vi.mock("react-chartjs-2", () => ({
+vi.mock(import('react-chartjs-2'), () => ({
     Line: vi.fn(),
     Bar: vi.fn(),
     Pie: vi.fn(),
@@ -720,7 +720,7 @@ vi.mock("react-chartjs-2", () => ({
 }));
 
 // Mock axios for HTTP requests
-vi.mock("axios", () => ({
+vi.mock(import('axios'), () => ({
     default: {
         get: vi.fn(),
         post: vi.fn(),
@@ -756,22 +756,23 @@ const createStorageMock = () => ({
     key: vi.fn(() => null),
 });
 
-Object.defineProperty(globalThis, "localStorage", {
-    value: createStorageMock(),
-});
-
-Object.defineProperty(globalThis, "sessionStorage", {
-    value: createStorageMock(),
+Object.defineProperties(globalThis, {
+    localStorage: {
+        value: createStorageMock(),
+    },
+    sessionStorage: {
+        value: createStorageMock(),
+    },
 });
 
 // Mock notifications
 const MockNotification = vi.fn() as any;
 MockNotification.permission = "granted";
-MockNotification.requestPermission = vi.fn(() => Promise.resolve("granted"));
+vi.spyOn(MockNotification, 'requestPermission').mockResolvedValue("granted");
 
 Object.defineProperty(globalThis, "Notification", {
     value: MockNotification,
 });
 
 // Export mock instances for test access
-export { mockElectronAPI, mockDate };
+export { mockDate, mockElectronAPI };

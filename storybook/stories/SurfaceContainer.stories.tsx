@@ -46,15 +46,15 @@ export const ElevatedSurface: Story = {
 export const InteractiveSurface: Story = {
     args: {
         as: "button",
-        onClick: action("surface-container/click"),
-        role: "button",
-        shadow: "md",
-        surface: "overlay",
-        variant: "secondary",
         children: (
             <ThemedText size="sm" weight="medium">
                 Clickable surface
             </ThemedText>
         ),
+        onClick: action("surface-container/click"),
+        role: "button",
+        shadow: "md",
+        surface: "overlay",
+        variant: "secondary",
     },
 };

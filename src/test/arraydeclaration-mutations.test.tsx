@@ -16,10 +16,11 @@
  * @tags ["mutation-testing", "array-declarations", "react-hooks", "dependency-arrays"]
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import * as React from "react";
+import { arrayFirst } from "ts-extras";
 import "@testing-library/jest-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("ArrayDeclaration Mutations - React Dependencies", () => {
     beforeEach(() => {
@@ -37,7 +38,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 }, [setter]); // Original: [setter]
 
                 return (
-                    <button onClick={handleClick} data-testid="test-button">
+                    <button data-testid="test-button" onClick={handleClick}>
                         Click me
                     </button>
                 );
@@ -84,7 +85,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 }, [currentSetter]); // Original: [currentSetter]
 
                 return (
-                    <button onClick={handleClick} data-testid="settings-button">
+                    <button data-testid="settings-button" onClick={handleClick}>
                         Show Settings
                     </button>
                 );
@@ -93,13 +94,13 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             const { rerender } = render(<TestComponent setterIndex={0} />);
 
             fireEvent.click(screen.getByTestId("settings-button"));
-            expect(mockSetters[0]).toHaveBeenCalledTimes(1);
+            expect(arrayFirst(mockSetters)).toHaveBeenCalledTimes(1);
 
             rerender(<TestComponent setterIndex={1} />);
 
             fireEvent.click(screen.getByTestId("settings-button"));
             expect(mockSetters[1]).toHaveBeenCalledTimes(1);
-            expect(mockSetters[0]).toHaveBeenCalledTimes(1); // Should not be called again
+            expect(arrayFirst(mockSetters)).toHaveBeenCalledTimes(1); // Should not be called again
 
             rerender(<TestComponent setterIndex={2} />);
 
@@ -281,32 +282,32 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
                 return (
                     <div>
                         <button
-                            onClick={themeCallback}
                             data-testid="theme-button"
+                            onClick={themeCallback}
                         >
                             Theme
                         </button>
                         <button
-                            onClick={historyCallback}
                             data-testid="history-button"
+                            onClick={historyCallback}
                         >
                             History
                         </button>
                         <button
-                            onClick={settingCallback1}
                             data-testid="setting1-button"
+                            onClick={settingCallback1}
                         >
                             Setting 1
                         </button>
                         <button
-                            onClick={settingCallback2}
                             data-testid="setting2-button"
+                            onClick={settingCallback2}
                         >
                             Setting 2
                         </button>
                         <button
-                            onClick={settingCallback3}
                             data-testid="setting3-button"
+                            onClick={settingCallback3}
                         >
                             Setting 3
                         </button>
@@ -330,7 +331,7 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
 
             // Test other callbacks
             fireEvent.click(screen.getByTestId("history-button"));
-            expect(handleHistoryLimitChange).toHaveBeenCalled();
+            expect(handleHistoryLimitChange).toHaveBeenCalledWith();
 
             fireEvent.click(screen.getByTestId("setting1-button"));
             expect(handleSettingChange).toHaveBeenCalledWith("setting1");

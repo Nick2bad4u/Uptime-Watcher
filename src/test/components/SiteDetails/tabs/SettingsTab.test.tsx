@@ -3,17 +3,19 @@
  * various props combinations, edge cases, and user interactions.
  */
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
-
-import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
 import type { Monitor, Site } from "@shared/types";
+
 import {
     sampleOne,
     siteIdentifierArbitrary,
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { arrayFirst } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
 
 let sampledSiteName: string;
 let sampledSiteIdentifier: string;
@@ -21,7 +23,7 @@ let sampledMonitorUrl: string;
 const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
-vi.mock("../../../../constants", () => ({
+vi.mock(import('../../../../constants'), () => ({
     CHECK_INTERVALS: [
         30_000,
         60_000,
@@ -35,7 +37,7 @@ vi.mock("../../../../constants", () => ({
     ARIA_LABEL: "aria-label",
 }));
 
-vi.mock("../../../../services/logger", () => ({
+vi.mock(import('../../../../services/logger'), () => ({
     logger: {
         error: vi.fn(),
         warn: vi.fn(),
@@ -47,7 +49,7 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-vi.mock("../../../../theme/useTheme", () => ({
+vi.mock(import('../../../../theme/useTheme'), () => ({
     useTheme: vi.fn(() => ({
         currentTheme: {
             name: "light",
@@ -188,7 +190,7 @@ vi.mock("../../../../theme/useTheme", () => ({
     useThemeValue: vi.fn(() => "mockValue"),
 }));
 
-vi.mock("../../../../utils/monitorTypeHelper", () => ({
+vi.mock(import('../../../../utils/monitorTypeHelper'), () => ({
     getMonitorTypeConfig: vi.fn().mockResolvedValue({
         fields: [
             {
@@ -200,7 +202,7 @@ vi.mock("../../../../utils/monitorTypeHelper", () => ({
     }),
 }));
 
-vi.mock("../../../../utils/fallbacks", () => ({
+vi.mock(import('../../../../utils/fallbacks'), () => ({
     getMonitorDisplayIdentifier: vi.fn(() => monitorIdentifierRef.value),
     getMonitorTypeDisplayLabel: vi.fn().mockReturnValue("URL"),
     UiDefaults: {
@@ -209,7 +211,7 @@ vi.mock("../../../../utils/fallbacks", () => ({
     },
 }));
 
-vi.mock("../../../../utils/time", () => ({
+vi.mock(import('../../../../utils/time'), () => ({
     formatRetryAttemptsText: vi.fn().mockReturnValue("3 retry attempts"),
     getIntervalLabel: vi.fn().mockImplementation((interval) => {
         const value = typeof interval === "number" ? interval : interval.value;
@@ -217,11 +219,11 @@ vi.mock("../../../../utils/time", () => ({
     }),
 }));
 
-vi.mock("../../../../utils/duration", () => ({
+vi.mock(import('../../../../utils/duration'), () => ({
     calculateMaxDuration: vi.fn().mockReturnValue("45 seconds"),
 }));
 
-vi.mock("../../../../utils/errorHandling", () => ({
+vi.mock(import('../../../../utils/errorHandling'), () => ({
     withUtilityErrorHandling: vi
         .fn()
         .mockImplementation(async (fn, _desc, fallback) => {
@@ -366,7 +368,7 @@ describe(SettingsTab, () => {
             render(<SettingsTab {...baseProps} />);
 
             const identifierInput = screen.getByDisplayValue(
-                baseMockMonitor.url as string
+                baseMockMonitor.url!
             );
             expect(identifierInput).toBeInTheDocument();
             expect(identifierInput).toBeDisabled();
@@ -435,7 +437,7 @@ describe(SettingsTab, () => {
 
             const retryInput = screen.getByPlaceholderText(
                 "Enter retry attempts"
-            ) as HTMLInputElement;
+            );
             expect(retryInput).toBeInTheDocument();
             expect(retryInput).toHaveAttribute("type", "number");
             expect(retryInput).toHaveValue(3);
@@ -483,7 +485,7 @@ describe(SettingsTab, () => {
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
             const saveButtons = screen.getAllByText("Save");
-            expect(saveButtons[0]).not.toBeDisabled();
+            expect(arrayFirst(saveButtons)).not.toBeDisabled();
         });
 
         it("should disable save button when no changes", ({
@@ -506,7 +508,7 @@ describe(SettingsTab, () => {
             const saveButtons = screen.getAllByRole("button", {
                 name: /save/i,
             });
-            expect(saveButtons[0]).toBeDisabled();
+            expect(arrayFirst(saveButtons)).toBeDisabled();
         });
 
         it("should call handleSaveName when save button is clicked", async ({
@@ -526,8 +528,8 @@ describe(SettingsTab, () => {
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
             const saveButtons = screen.getAllByText("Save");
-            expect(saveButtons[0]).toBeDefined();
-            fireEvent.click(saveButtons[0]!);
+            expect(arrayFirst(saveButtons)).toBeDefined();
+            fireEvent.click(arrayFirst(saveButtons)!);
 
             await waitFor(() => {
                 expect(baseProps.handleSaveName).toHaveBeenCalledTimes(1);
@@ -764,7 +766,7 @@ describe(SettingsTab, () => {
             expect(
                 screen.getByText(/maximum check duration/i)
             ).toBeInTheDocument();
-            expect(screen.getByText(/~\s*\d+s/)).toBeInTheDocument();
+            expect(screen.getByText(/~\s*\d+s/v)).toBeInTheDocument();
         });
 
         it("should not show maximum duration when retry attempts is 0", ({
@@ -784,7 +786,7 @@ describe(SettingsTab, () => {
             render(<SettingsTab {...baseProps} localRetryAttempts={0} />);
 
             expect(
-                screen.queryByText(/Maximum check duration/)
+                screen.queryByText(/Maximum check duration/v)
             ).not.toBeInTheDocument();
         });
     });
@@ -862,7 +864,7 @@ describe(SettingsTab, () => {
             // Check for both the heading and button, but test them separately
             expect(screen.getAllByText("Remove Site")).toHaveLength(2);
             expect(
-                screen.getByText(/This action cannot be undone/)
+                screen.getByText(/This action cannot be undone/v)
             ).toBeInTheDocument();
         });
 
@@ -931,8 +933,8 @@ describe(SettingsTab, () => {
             render(
                 <SettingsTab
                     {...baseProps}
-                    isLoading={true}
                     hasUnsavedChanges={true}
+                    isLoading={true}
                 />
             );
 
@@ -940,7 +942,7 @@ describe(SettingsTab, () => {
             const saveButtons = screen.getAllByRole("button", {
                 name: /save/i,
             });
-            expect(saveButtons[0]).toBeDisabled();
+            expect(arrayFirst(saveButtons)).toBeDisabled();
         });
 
         it("should show loading state on remove button", ({

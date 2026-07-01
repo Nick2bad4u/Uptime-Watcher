@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { MIN_CHECK_INTERVAL } from "../../../services/monitoring/constants";
 import {
     applySchedulerJitter,
     computeMonitorSchedulerDelay,
 } from "../../../services/monitoring/MonitorSchedulerPolicy";
-import { MIN_CHECK_INTERVAL } from "../../../services/monitoring/constants";
 
 const midpointRandomInt = (min: number, max: number): number =>
     Math.floor((min + max - 1) / 2);

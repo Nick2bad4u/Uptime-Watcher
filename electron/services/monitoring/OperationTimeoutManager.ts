@@ -126,8 +126,7 @@ export class OperationTimeoutManager {
             void this.handleTimeout(operationId);
         }, timeoutMs);
 
-        // Avoid keeping the Node/Electron process alive solely because of an
-        // operation timeout timer.
+        // Avoid keeping the Node/Electron process alive solely because of an operation timeout timer.
         //
         // This is especially important when a monitor is stopped while an
         // operation is still unwinding, or when shutdown occurs while stale

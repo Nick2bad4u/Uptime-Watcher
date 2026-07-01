@@ -3,12 +3,12 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatusIndicator } from "@app/theme/components/StatusIndicator";
 
 const meta: Meta<typeof StatusIndicator> = {
-    component: StatusIndicator,
     args: {
-        status: "up",
-        size: "md",
         showText: false,
+        size: "md",
+        status: "up",
     },
+    component: StatusIndicator,
     parameters: {
         layout: "centered",
     },
@@ -30,7 +30,7 @@ export const WithText: Story = {
 
 export const Sizes: Story = {
     render: (args) => (
-        <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
+        <div style={{ alignItems: "center", display: "flex", gap: "1.5rem" }}>
             <StatusIndicator {...args} size="sm" status="up" />
             <StatusIndicator {...args} size="md" status="degraded" />
             <StatusIndicator {...args} showText size="lg" status="down" />
@@ -41,13 +41,13 @@ export const Sizes: Story = {
 export const AllStatuses: Story = {
     render: () => {
         const statuses = [
-            "up",
             "degraded",
-            "pending",
-            "paused",
             "down",
-            "unknown",
             "mixed",
+            "paused",
+            "pending",
+            "unknown",
+            "up",
         ] as const;
 
         return (
@@ -62,8 +62,8 @@ export const AllStatuses: Story = {
                     <div
                         key={status}
                         style={{
-                            display: "flex",
                             alignItems: "center",
+                            display: "flex",
                             gap: "0.75rem",
                         }}
                     >

@@ -3,7 +3,6 @@
  * electron/test to ensure coverage tracking
  */
 
-import { describe, expect, it } from "vitest";
 import {
     safeNumberConversion,
     safeParseCheckInterval,
@@ -16,6 +15,7 @@ import {
     safeParseTimeout,
     safeParseTimestamp,
 } from "@shared/utils/safeConversions";
+import { describe, expect, it } from "vitest";
 
 describe("Shared Safe Conversions - Backend Coverage", () => {
     describe(safeNumberConversion, () => {

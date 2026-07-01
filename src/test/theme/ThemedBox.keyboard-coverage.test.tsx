@@ -3,9 +3,10 @@
  * targeting lines 111-113 (onKeyDown handler)
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { createElement, type ReactElement } from "react";
+import { describe, expect, it, vi } from "vitest";
+
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
@@ -31,7 +32,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             const mockOnClick = vi.fn();
 
             renderWithTheme(
-                <ThemedBox onClick={mockOnClick} as="div">
+                <ThemedBox as="div" onClick={mockOnClick}>
                     Interactive content
                 </ThemedBox>
             );
@@ -64,7 +65,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             const mockOnClick = vi.fn();
 
             renderWithTheme(
-                <ThemedBox onClick={mockOnClick} as="div">
+                <ThemedBox as="div" onClick={mockOnClick}>
                     Interactive content
                 </ThemedBox>
             );
@@ -96,7 +97,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             const mockOnClick = vi.fn();
 
             renderWithTheme(
-                <ThemedBox onClick={mockOnClick} as="div">
+                <ThemedBox as="div" onClick={mockOnClick}>
                     Interactive content
                 </ThemedBox>
             );
@@ -160,7 +161,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             const mockOnClick = vi.fn();
 
             renderWithTheme(
-                <ThemedBox onClick={mockOnClick} as="button">
+                <ThemedBox as="button" onClick={mockOnClick}>
                     Button content
                 </ThemedBox>
             );
@@ -193,7 +194,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             const mockOnClick = vi.fn();
 
             renderWithTheme(
-                <ThemedBox onClick={mockOnClick} as="div">
+                <ThemedBox as="div" onClick={mockOnClick}>
                     Interactive content
                 </ThemedBox>
             );
@@ -259,9 +260,9 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
 
             renderWithTheme(
                 <ThemedBox
-                    onClick={vi.fn()}
-                    as="div"
                     aria-label="Custom label"
+                    as="div"
+                    onClick={vi.fn()}
                     role="tab"
                 >
                     Content
@@ -284,7 +285,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             renderWithTheme(
-                <ThemedBox onClick={vi.fn()} as="div" tabIndex={5}>
+                <ThemedBox as="div" onClick={vi.fn()} tabIndex={5}>
                     Content
                 </ThemedBox>
             );
@@ -308,7 +309,7 @@ describe("ThemedBox - Keyboard Interaction Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             renderWithTheme(
-                <ThemedBox onClick={vi.fn()} as="div">
+                <ThemedBox as="div" onClick={vi.fn()}>
                     Content
                 </ThemedBox>
             );

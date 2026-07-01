@@ -16,40 +16,10 @@ import { isDefined } from "ts-extras";
 
 import { type AriaProperties, BaseFormField } from "../BaseFormField";
 
-function buildBaseFormFieldProps(args: {
-    readonly error: string | undefined;
-    readonly helpText: string | undefined;
-    readonly id: string;
-    readonly label: string;
-    readonly required: boolean;
-}): FormFieldBaseProperties & { readonly required: boolean } {
-    return {
-        ...(isDefined(args.error) && { error: args.error }),
-        ...(isDefined(args.helpText) && { helpText: args.helpText }),
-        id: args.id,
-        label: args.label,
-        required: args.required,
-    };
-}
-
-function renderBaseFormField(
-    props: FormFieldBaseProperties & { readonly required: boolean },
-    renderControl: (ariaProps: AriaProperties) => ReactElement
-): ReactElement {
-    const { error, helpText, id, label, required } = props;
-
-    return (
-        <BaseFormField
-            {...(isDefined(error) && { error })}
-            {...(isDefined(helpText) && { helpText })}
-            id={id}
-            label={label}
-            required={required}
-        >
-            {renderControl}
-        </BaseFormField>
-    );
-}
+/**
+ * Base properties shared across custom-wrapped form field components.
+ */
+export type FieldWrapperPropsBase = FormFieldBaseProperties;
 
 /**
  * Base properties shared across string-based form field components.
@@ -63,6 +33,11 @@ export interface StringFieldPropsBase extends FormFieldBaseProperties {
     readonly value: string;
 }
 
+interface FieldWrapperRenderParameters<TProps extends FieldWrapperPropsBase> {
+    readonly ariaProps: AriaProperties;
+    readonly props: TProps;
+}
+
 interface StringFieldRenderParameters<
     TProps extends StringFieldPropsBase,
     TElement extends HTMLElement,
@@ -70,6 +45,42 @@ interface StringFieldRenderParameters<
     readonly ariaProps: AriaProperties;
     readonly handleChange: (event: ChangeEvent<TElement>) => void;
     readonly props: TProps;
+}
+
+/**
+ * Creates a memoized form field component that only needs to supply custom
+ * rendering while inheriting the shared wrapper logic.
+ */
+export function createFieldWrapper<
+    TProps extends FieldWrapperPropsBase,
+>(options: {
+    readonly displayName: string;
+    readonly renderControl: (
+        parameters: FieldWrapperRenderParameters<TProps>
+    ) => ReactElement;
+}): NamedExoticComponent<TProps> {
+    const FieldComponent = memo((props: TProps): ReactElement => {
+        const { error, helpText, id, label, required = false } = props;
+
+        return renderBaseFormField(
+            buildBaseFormFieldProps({
+                error,
+                helpText,
+                id,
+                label,
+                required,
+            }),
+            (ariaProps) =>
+                options.renderControl({
+                    ariaProps,
+                    props,
+                })
+        );
+    });
+
+    FieldComponent.displayName = options.displayName;
+
+    return FieldComponent;
 }
 
 /**
@@ -124,48 +135,37 @@ export function createStringField<
     return FieldComponent;
 }
 
-/**
- * Base properties shared across custom-wrapped form field components.
- */
-export type FieldWrapperPropsBase = FormFieldBaseProperties;
-
-interface FieldWrapperRenderParameters<TProps extends FieldWrapperPropsBase> {
-    readonly ariaProps: AriaProperties;
-    readonly props: TProps;
+function buildBaseFormFieldProps(args: {
+    readonly error: string | undefined;
+    readonly helpText: string | undefined;
+    readonly id: string;
+    readonly label: string;
+    readonly required: boolean;
+}): FormFieldBaseProperties & { readonly required: boolean } {
+    return {
+        ...(isDefined(args.error) && { error: args.error }),
+        ...(isDefined(args.helpText) && { helpText: args.helpText }),
+        id: args.id,
+        label: args.label,
+        required: args.required,
+    };
 }
 
-/**
- * Creates a memoized form field component that only needs to supply custom
- * rendering while inheriting the shared wrapper logic.
- */
-export function createFieldWrapper<
-    TProps extends FieldWrapperPropsBase,
->(options: {
-    readonly displayName: string;
-    readonly renderControl: (
-        parameters: FieldWrapperRenderParameters<TProps>
-    ) => ReactElement;
-}): NamedExoticComponent<TProps> {
-    const FieldComponent = memo((props: TProps): ReactElement => {
-        const { error, helpText, id, label, required = false } = props;
+function renderBaseFormField(
+    props: FormFieldBaseProperties & { readonly required: boolean },
+    renderControl: (ariaProps: AriaProperties) => ReactElement
+): ReactElement {
+    const { error, helpText, id, label, required } = props;
 
-        return renderBaseFormField(
-            buildBaseFormFieldProps({
-                error,
-                helpText,
-                id,
-                label,
-                required,
-            }),
-            (ariaProps) =>
-                options.renderControl({
-                    ariaProps,
-                    props,
-                })
-        );
-    });
-
-    FieldComponent.displayName = options.displayName;
-
-    return FieldComponent;
+    return (
+        <BaseFormField
+            {...(isDefined(error) && { error })}
+            {...(isDefined(helpText) && { helpText })}
+            id={id}
+            label={label}
+            required={required}
+        >
+            {renderControl}
+        </BaseFormField>
+    );
 }

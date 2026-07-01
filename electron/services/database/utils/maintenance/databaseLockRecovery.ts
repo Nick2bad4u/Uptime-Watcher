@@ -55,9 +55,9 @@ const resolveCandidatePath = (directory: string, candidate: string): string => {
 const deriveBaseNameWithoutExtension = (baseName: string): string => {
     const normalized = baseName.toLowerCase();
     for (const extension of [
-        ".sqlite3",
-        ".sqlite",
         ".db",
+        ".sqlite",
+        ".sqlite3",
     ] as const) {
         if (normalized.endsWith(extension)) {
             return baseName.slice(0, -extension.length);
@@ -90,7 +90,7 @@ const performRelocation = (
     recoveryState: { ensured: boolean }
 ): DatabaseLockArtifact => {
     if (!recoveryState.ensured) {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Recovery directory path validated earlier; synchronous creation keeps initialization deterministic.
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Recovery directory path validated earlier; synchronous creation keeps initialization deterministic.
         mkdirSync(recoveryDirectory, { recursive: true });
         recoveryState.ensured = true;
     }
@@ -115,7 +115,7 @@ const performRelocation = (
         )
     );
 
-    // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Paths validated to stay inside the user data directory; synchronous move maintains deterministic initialization.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Paths validated to stay inside the user data directory; synchronous move maintains deterministic initialization.
     renameSync(resolvedCandidate, relocatedPath);
 
     return {
@@ -136,7 +136,7 @@ export interface DatabaseLockArtifact {
  * Aggregated outcome of the lock artifact cleanup routine.
  */
 export interface DatabaseLockCleanupResult {
-    readonly failed: Array<{ path: string; reason: string }>;
+    readonly failed: { path: string; reason: string }[];
     readonly missing: string[];
     readonly relocated: DatabaseLockArtifact[];
 }
@@ -176,7 +176,7 @@ export const generateLockArtifactCandidates = (dbPath: string): string[] => {
         }
     }
 
-    return Array.from(candidates);
+    return [...candidates];
 };
 
 /**
@@ -197,11 +197,11 @@ export const listExistingLockArtifacts = (dbPath: string): string[] => {
                 directory,
                 candidate
             );
-            const candidateExists =
-                // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Path validated to remain within the user data directory; synchronous check keeps startup deterministic.
+            const isCandidateExists =
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path validated to remain within the user data directory; synchronous check keeps startup deterministic.
                 existsSync(resolvedCandidate);
 
-            if (candidateExists) {
+            if (isCandidateExists) {
                 existing.push(resolvedCandidate);
             }
         } catch {
@@ -233,10 +233,10 @@ export const cleanupDatabaseLockArtifacts = (
 
     const relocated: DatabaseLockArtifact[] = [];
     const missing: string[] = [];
-    const failed: Array<{ path: string; reason: string }> = [];
+    const failed: { path: string; reason: string }[] = [];
 
     for (const candidate of generateLockArtifactCandidates(dbPath)) {
-        let resolvedCandidate: string | undefined = undefined;
+        let resolvedCandidate: string | undefined;
 
         try {
             resolvedCandidate = resolveCandidatePath(directory, candidate);
@@ -249,11 +249,11 @@ export const cleanupDatabaseLockArtifacts = (
 
         if (resolvedCandidate) {
             try {
-                const candidateExists =
-                    // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Path validated to remain within the user data directory; synchronous check keeps startup deterministic.
+                const isCandidateExists =
+                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path validated to remain within the user data directory; synchronous check keeps startup deterministic.
                     existsSync(resolvedCandidate);
 
-                if (candidateExists) {
+                if (isCandidateExists) {
                     const artifact = performRelocation(
                         resolvedCandidate,
                         directory,

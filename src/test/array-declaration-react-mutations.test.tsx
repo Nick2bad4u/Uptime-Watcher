@@ -15,9 +15,9 @@
  * @tags ["mutation-testing", "react", "hooks", "dependency-arrays"]
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import { useEffect, useCallback, useMemo, useState } from "react";
+import { act, renderHook } from "@testing-library/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("React Component Array Declaration Mutation Tests", () => {
     beforeEach(() => {
@@ -41,8 +41,8 @@ describe("React Component Array Declaration Mutation Tests", () => {
                 "mutation"
             );
 
-            // Test the useCallback hooks with empty dependency arrays
-            // These should run only once during component initialization
+            // Test the useCallback hooks with empty dependency arrays These should run only once during component
+            // initialization
 
             const TestComponent = () => {
                 const [showLoadingOverlay, setShowLoadingOverlay] =

@@ -1,6 +1,5 @@
+import { type Monitor, STATUS_KIND } from "@shared/types";
 import { describe, expect, it } from "vitest";
-
-import { STATUS_KIND, type Monitor } from "@shared/types";
 
 import {
     extractNestedFieldValue,
@@ -61,6 +60,6 @@ describe(extractNestedFieldValue, () => {
         expect(
             extractNestedFieldValue({ details: {} }, "details.missing")
         ).toBe(undefined);
-        expect(extractNestedFieldValue({ details: {} }, "   ")).toBe(undefined);
+        expect(extractNestedFieldValue({ details: {} }, ' '.repeat(3))).toBe(undefined);
     });
 });

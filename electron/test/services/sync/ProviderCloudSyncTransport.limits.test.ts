@@ -1,8 +1,8 @@
-import { ProviderCloudSyncTransport } from "@electron/services/sync/ProviderCloudSyncTransport";
-import type { CloudObjectEntry } from "@electron/services/cloud/providers/CloudStorageProvider.types";
-import type { CloudStorageProvider } from "@electron/services/cloud/providers/CloudStorageProvider.types";
+import type { CloudObjectEntry, CloudStorageProvider  } from "@electron/services/cloud/providers/CloudStorageProvider.types";
 import type { CloudProviderKind } from "@shared/types/cloud";
 import type { CloudSyncOperation } from "@shared/types/cloudSync";
+
+import { ProviderCloudSyncTransport } from "@electron/services/sync/ProviderCloudSyncTransport";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { describe, expect, it } from "vitest";
 
@@ -107,7 +107,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/../evil.ndjson")
-        ).rejects.toThrow(/invalid/i);
+        ).rejects.toThrow(/invalid/iv);
     });
 
     it("rejects operations keys with an invalid filename format", async () => {
@@ -121,7 +121,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject(
                 "sync/devices/a/ops/not-a-valid-name.ndjson"
             )
-        ).rejects.toThrow(/expected/i);
+        ).rejects.toThrow(/expected/iv);
     });
 
     it("rejects operations keys containing backslashes", async () => {
@@ -149,7 +149,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
             transport.readOperationsObject(
                 "sync/devices/a:evil/ops/1-1-1.ndjson"
             )
-        ).rejects.toThrow(/tokens are not allowed|must not contain/i);
+        ).rejects.toThrow(/must not contain|tokens are not allowed/i);
     });
 
     it("rejects appendOperations when deviceId contains path separators", async () => {
@@ -263,7 +263,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrow(/at line 2:/i);
+        ).rejects.toThrow(/at line 2:/iv);
     });
 
     it("rejects operation objects that contain operations for a different deviceId", async () => {
@@ -288,7 +288,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrow(/unexpected deviceid/i);
+        ).rejects.toThrow(/unexpected deviceid/iv);
     });
 
     it("rejects operation objects whose opId range does not match the key metadata", async () => {
@@ -330,7 +330,7 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
 
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
-        ).rejects.toThrow(/invalid utf-8/i);
+        ).rejects.toThrow(/invalid utf-8/iv);
     });
 });
 
@@ -371,7 +371,7 @@ describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
             transport.readSnapshot(
                 `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
             )
-        ).rejects.toThrow(/invalid utf-8/i);
+        ).rejects.toThrow(/invalid utf-8/iv);
     });
 
     it("rejects oversized snapshots", async () => {

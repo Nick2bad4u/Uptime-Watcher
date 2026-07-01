@@ -20,7 +20,7 @@ export function deriveCloudBackupOriginalPath(fileName: string): string {
     }
 
     // eslint-disable-next-line typefest/prefer-ts-extras-string-split -- ts-extras stringSplit currently accepts string separators only.
-    const segments = trimmed.split(/[\\/]/u).filter(Boolean);
+    const segments = trimmed.split(/[/\\]/u).filter(Boolean);
     return arrayAt(segments, -1) ?? "backup.sqlite";
 }
 
@@ -42,5 +42,4 @@ export function serializeBackupMetadata(args: {
     };
 }
 
-// No conversion helper is necessary: serialized backup metadata is already in
-// a runtime-safe shape for cross-process transport.
+// No conversion helper is necessary: serialized backup metadata is already in a runtime-safe shape for cross-process transport.

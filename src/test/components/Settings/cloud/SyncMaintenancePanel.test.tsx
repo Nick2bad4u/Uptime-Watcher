@@ -2,28 +2,30 @@
  * Tests for the SyncMaintenancePanel (destructive remote sync reset UI).
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { CloudStatusSummary } from "@shared/types/cloud";
+import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import "@testing-library/jest-dom";
 
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
-import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
-import type { CloudStatusSummary } from "@shared/types/cloud";
+
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { arrayFirst } from "ts-extras";
+import { describe, expect, it, vi } from "vitest";
+
+import { SyncMaintenancePanel } from "../../../../components/Settings/cloud/SyncMaintenancePanel";
 
 const formatFullTimestampMock = vi.hoisted(() => vi.fn(() => "2025-01-01"));
 
-vi.mock("../../../../utils/time", () => ({
+vi.mock(import('../../../../utils/time'), () => ({
     formatFullTimestamp: formatFullTimestampMock,
 }));
-
-import { SyncMaintenancePanel } from "../../../../components/Settings/cloud/SyncMaintenancePanel";
 
 const writeClipboardTextMock = vi.hoisted(() =>
     vi.fn(async (_text: string) => {})
 );
 
-vi.mock("../../../../services/SystemService", () => ({
+vi.mock(import('../../../../services/SystemService'), () => ({
     SystemService: {
         writeClipboardText: writeClipboardTextMock,
     },
@@ -210,7 +212,7 @@ describe(SyncMaintenancePanel, () => {
             screen.getByText("Operation logs by device")
         ).toBeInTheDocument();
         expect(
-            screen.getByText(/device-a — 2 op object\(s\)/)
+            screen.getByText(/device-a — 2 op object\(s\)/v)
         ).toBeInTheDocument();
         // Timestamps are formatted through the helper.
         expect(screen.getByText("Oldest: 2025-01-01")).toBeInTheDocument();
@@ -255,7 +257,7 @@ describe(SyncMaintenancePanel, () => {
         ).resolves.toBeInTheDocument();
 
         expect(writeClipboardTextMock).toHaveBeenCalledTimes(1);
-        const payload = writeClipboardTextMock.mock.calls[0]?.[0];
+        const payload = arrayFirst(writeClipboardTextMock.mock.calls)?.[0];
         expect(payload).toContain("Cloud Sync Diagnostics");
         expect(payload).toContain("No secrets");
         expect(payload).toContain("seededSnapshotKey");

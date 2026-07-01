@@ -1,10 +1,11 @@
+import type { InputHTMLAttributes, SelectHTMLAttributes } from "react";
+
+import { render, screen } from "@testing-library/react";
+import * as React from "react";
 /**
  * Tests for FormFields.tsx uncovered scenarios
  */
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import type { InputHTMLAttributes, SelectHTMLAttributes } from "react";
-import React from "react";
+import { describe, expect, it, vi } from "vitest";
 
 type MockThemedTextProps = React.HTMLAttributes<HTMLSpanElement> & {
     readonly size?: string;
@@ -16,7 +17,7 @@ type MockThemedInputProps = InputHTMLAttributes<HTMLInputElement>;
 type MockThemedSelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
 // Mock the themed components
-vi.mock("../../theme", () => ({
+vi.mock(import('../../theme'), () => ({
     useTheme: () => ({
         theme: {
             colors: {
@@ -62,11 +63,11 @@ const TestFormField = ({
     helpText,
     children,
 }: {
-    id: string;
-    label: string;
+    children?: React.ReactNode;
     error?: string;
     helpText?: string;
-    children?: React.ReactNode;
+    id: string;
+    label: string;
 }) => {
     // This mimics the FormField component structure to test getAriaDescribedBy
     const getAriaDescribedBy = (
@@ -91,9 +92,9 @@ const TestFormField = ({
                 <span>{label}</span>
             </label>
             <input
-                id={id}
                 aria-describedby={ariaDescribedBy}
                 data-testid={`input-${id}`}
+                id={id}
             />
             {children}
             {error && (
@@ -151,9 +152,9 @@ describe("FormFields - Uncovered Lines Coverage", () => {
 
         render(
             <TestFormField
+                error="Test error"
                 id="test-field"
                 label="Test Field"
-                error="Test error"
             />
         );
 
@@ -178,9 +179,9 @@ describe("FormFields - Uncovered Lines Coverage", () => {
 
         render(
             <TestFormField
+                helpText="Test help text"
                 id="test-field"
                 label="Test Field"
-                helpText="Test help text"
             />
         );
 
@@ -206,9 +207,9 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         // Test with helpText but no error - should show helpText
         const { rerender } = render(
             <TestFormField
+                helpText="Help text should show"
                 id="test-field"
                 label="Test Field"
-                helpText="Help text should show"
             />
         );
 
@@ -217,10 +218,10 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         // Test with both error and helpText - should show error, not helpText
         rerender(
             <TestFormField
-                id="test-field"
-                label="Test Field"
                 error="Error message"
                 helpText="Help text should NOT show"
+                id="test-field"
+                label="Test Field"
             />
         );
 
@@ -247,10 +248,10 @@ describe("FormFields - Uncovered Lines Coverage", () => {
         // Test with empty strings - these should NOT trigger error/helpText paths
         render(
             <TestFormField
-                id="test-field"
-                label="Test Field"
                 error=""
                 helpText=""
+                id="test-field"
+                label="Test Field"
             />
         );
 

@@ -6,8 +6,9 @@
  * across a wide range of inputs, ensuring robustness and edge case handling.
  */
 
+import { fc, test } from "@fast-check/vitest";
 import { describe, expect } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("StringConversion - Property-Based Tests", () => {
@@ -40,10 +41,10 @@ describe("StringConversion - Property-Based Tests", () => {
             // Handle special float cases
             if (Number.isNaN(props.value)) {
                 expect(result).toBe("NaN");
-            } else if (Number.isFinite(props.value) === false) {
-                expect(result).toMatch(/^-?Infinity$/);
-            } else {
+            } else if (Number.isFinite(props.value)) {
                 expect(Number(result)).toBeCloseTo(props.value);
+            } else {
+                expect(result).toMatch(/^-?Infinity$/v);
             }
         });
 
@@ -54,7 +55,7 @@ describe("StringConversion - Property-Based Tests", () => {
 
             expect(result).toBe(String(props.value));
             expect(typeof result).toBe("string");
-            expect(result).toMatch(/^(?:true|false)$/);
+            expect(result).toMatch(/^(?:false|true)$/v);
         });
 
         test.prop({
@@ -144,7 +145,7 @@ describe("StringConversion - Property-Based Tests", () => {
             for (const sym of testSymbols) {
                 const result = safeStringify(sym);
                 expect(typeof result).toBe("string");
-                expect(result).toMatch(/^Symbol\(/);
+                expect(result).toMatch(/^Symbol\(/v);
                 expect(result).toBe(sym.toString());
             }
         });
@@ -194,7 +195,7 @@ describe("StringConversion - Property-Based Tests", () => {
                 Symbol("test"),
                 42n,
                 new Date(),
-                /regex/,
+                /regex/v,
                 new Map(),
                 new Set(),
             ];
@@ -212,7 +213,7 @@ describe("StringConversion - Property-Based Tests", () => {
                 "",
                 0,
                 false,
-                Number.NaN,
+                NaN,
                 Infinity,
                 -Infinity,
             ];
@@ -235,9 +236,9 @@ describe("StringConversion - Property-Based Tests", () => {
 
         test("should handle edge cases predictably", () => {
             const edgeCases = [
-                [Number.POSITIVE_INFINITY, "Infinity"],
+                [Infinity, "Infinity"],
                 [Number.NEGATIVE_INFINITY, "-Infinity"],
-                [Number.NaN, "NaN"],
+                [NaN, "NaN"],
                 [Number.MAX_SAFE_INTEGER, String(Number.MAX_SAFE_INTEGER)],
                 [Number.MIN_SAFE_INTEGER, String(Number.MIN_SAFE_INTEGER)],
                 [0, "0"],

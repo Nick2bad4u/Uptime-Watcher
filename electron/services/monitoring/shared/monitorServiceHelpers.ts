@@ -49,7 +49,7 @@ export type NormalizedMonitorConfig = NormalizedMonitorConfigType;
  */
 export function createMonitorErrorResult(
     error: string,
-    responseTime: number = 0
+    responseTime = 0
 ): MonitorCheckResult {
     return {
         error,
@@ -82,7 +82,7 @@ export function validateMonitorHost(monitor: Monitor): null | string {
     // - localhost
     // - FQDNs (including intranet-style single-label names)
     // This is intentionally more permissive than `isValidHost` alone.
-    const hostLooksValid =
+    const isHostLooksValid =
         isValidHost(host) ||
         isValidFQDN(host, {
             allow_trailing_dot: true,
@@ -90,7 +90,7 @@ export function validateMonitorHost(monitor: Monitor): null | string {
             require_tld: false,
         });
 
-    if (!hostLooksValid) {
+    if (!isHostLooksValid) {
         return "Monitor missing valid host";
     }
 

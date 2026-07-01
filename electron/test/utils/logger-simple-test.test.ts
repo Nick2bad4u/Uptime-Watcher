@@ -26,8 +26,8 @@ describe("Logger Mock Test", () => {
     });
 
     it("should call the mocked debug function when logger.debug is called", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: logger-simple-test", "component");
@@ -43,8 +43,8 @@ describe("Logger Mock Test", () => {
     });
 
     it("should call the mocked info function when logger.info is called", async ({
-        task,
         annotate,
+        task,
     }) => {
         await annotate(`Testing: ${task.name}`, "functional");
         await annotate("Component: logger-simple-test", "component");

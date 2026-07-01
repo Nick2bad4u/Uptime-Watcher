@@ -12,12 +12,12 @@ import type { PluginOption } from "vite";
 export interface PlaywrightCoveragePluginOptions {
     /** When `true`, Istanbul instrumentation is inserted into the bundle build. */
     readonly enabled: boolean;
-    /** Project root passed to the Istanbul plugin for accurate path resolution. */
-    readonly projectRoot: string;
-    /** Glob patterns that must be instrumented. */
-    readonly include: readonly string[];
     /** Glob patterns that must be excluded from instrumentation. */
     readonly exclude: readonly string[];
+    /** Glob patterns that must be instrumented. */
+    readonly include: readonly string[];
+    /** Project root passed to the Istanbul plugin for accurate path resolution. */
+    readonly projectRoot: string;
 }
 
 /**
@@ -33,21 +33,21 @@ export async function createPlaywrightCoveragePlugin({
     exclude,
     include,
     projectRoot,
-}: PlaywrightCoveragePluginOptions): Promise<PluginOption | null> {
+}: PlaywrightCoveragePluginOptions): Promise<null | PluginOption> {
     if (!enabled) {
         return null;
     }
 
     const { default: istanbul } = await import(
-        /* webpackChunkName: "vite-plugin-istanbul" */
+        /* WebpackChunkName: "vite-plugin-istanbul" */
         "vite-plugin-istanbul"
     );
 
     return istanbul({
         cwd: projectRoot,
-        exclude: Array.from(exclude),
+        exclude: [...exclude],
         extension: [".ts", ".tsx"],
         forceBuildInstrument: true,
-        include: Array.from(include),
+        include: [...include],
     });
 }

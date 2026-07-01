@@ -4,23 +4,25 @@
  * functionality.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Site } from "@shared/types";
+
 import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
 import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { UptimeEvents } from "../../events/eventTypes.js";
+import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
+import type { DatabaseService } from "../../services/database/DatabaseService";
+import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type { SettingsRepository } from "../../services/database/SettingsRepository";
+import type { SiteRepository } from "../../services/database/SiteRepository";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
-import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import type { UptimeEvents } from "../../events/eventTypes.js";
-import { DatabaseService } from "../../services/database/DatabaseService";
-import { HistoryRepository } from "../../services/database/HistoryRepository";
-import { MonitorRepository } from "../../services/database/MonitorRepository";
-import { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteRepository } from "../../services/database/SiteRepository";
 
 // Mock all dependencies
 const mockEventEmitter = {
@@ -129,7 +131,7 @@ vi.mock("../../services/database/serviceFactory", () => ({
             clear: vi.fn(() => {
                 store.clear();
             }),
-            replaceAll: vi.fn((items: { key: string; data: Site }[]) => {
+            replaceAll: vi.fn((items: { data: Site; key: string; }[]) => {
                 store.clear();
                 for (const { key, data } of items) {
                     store.set(key, data);
@@ -476,9 +478,9 @@ describe(DatabaseManager, () => {
             );
 
             const testData = '{"invalid": "data"}';
-            const result = await databaseManager.importData(testData);
+            const isResult = await databaseManager.importData(testData);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 {
@@ -530,9 +532,9 @@ describe(DatabaseManager, () => {
             );
 
             const testData = '{"sites": []}';
-            const result = await databaseManager.importData(testData);
+            const isResult = await databaseManager.importData(testData);
 
-            expect(result).toBeFalsy();
+            expect(isResult).toBeFalsy();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:data-imported",
                 expect.objectContaining({
@@ -707,7 +709,7 @@ describe(DatabaseManager, () => {
                     operation: "data-exported",
                     success: true,
                     timestamp: expect.any(Number),
-                    fileName: expect.stringMatching(/^export-\d+\.json$/),
+                    fileName: expect.stringMatching(/^export-\d+\.json$/v),
                 })
             );
         });

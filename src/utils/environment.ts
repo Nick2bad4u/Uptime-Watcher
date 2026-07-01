@@ -23,19 +23,6 @@ interface MaybeNavigator {
 }
 
 /**
- * Reads an environment variable from the ambient Node.js process if available.
- *
- * @param key - Environment variable name.
- *
- * @returns Environment variable value or `undefined` when unavailable.
- *
- * @public
- */
-export function readProcessEnv(key: string): string | undefined {
-    return getEnvVar(key);
-}
-
-/**
  * Detects Playwright automation environment via env flags, UA hints, or global
  * markers.
  *
@@ -62,6 +49,19 @@ export function isPlaywrightAutomation(): boolean {
     const automationTarget = safeCastTo<UnknownRecord>(globalThis);
 
     return automationTarget["playwrightAutomation"] === true;
+}
+
+/**
+ * Reads an environment variable from the ambient Node.js process if available.
+ *
+ * @param key - Environment variable name.
+ *
+ * @returns Environment variable value or `undefined` when unavailable.
+ *
+ * @public
+ */
+export function readProcessEnv(key: string): string | undefined {
+    return getEnvVar(key);
 }
 
 /**

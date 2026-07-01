@@ -6,13 +6,12 @@
  *   compile-time typings through {@link RendererEventPayload} queries.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
     type RendererEventPayloadMap,
 } from "@shared/ipc/rendererEvents";
+import { describe, expect, it } from "vitest";
 
 const EXPECTED_CHANNEL_MAP = {
     CACHE_INVALIDATED: "cache:invalidated",
@@ -69,7 +68,7 @@ describe("RENDERER_EVENT_CHANNELS", () => {
         const canonicalKeys = Object.keys(RENDERER_EVENT_CHANNELS);
 
         expect(
-            canonicalKeys.every((key) => /^[A-Z_]+$/u.test(key))
+            canonicalKeys.every((key) => /^[A-Z_]+$/v.test(key))
         ).toBeTruthy();
     });
 });

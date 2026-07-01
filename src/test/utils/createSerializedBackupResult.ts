@@ -23,12 +23,12 @@ export const createSerializedBackupResult = (
     buffer: overrides.buffer ?? new ArrayBuffer(16),
     fileName: overrides.fileName ?? "uptime-watcher-backup.sqlite",
     metadata: {
+        appVersion:
+            overrides.metadata?.appVersion ?? DEFAULT_METADATA.appVersion,
         checksum: overrides.metadata?.checksum ?? DEFAULT_METADATA.checksum,
         createdAt: overrides.metadata?.createdAt ?? DEFAULT_METADATA.createdAt,
         originalPath:
             overrides.metadata?.originalPath ?? DEFAULT_METADATA.originalPath,
-        appVersion:
-            overrides.metadata?.appVersion ?? DEFAULT_METADATA.appVersion,
         retentionHintDays:
             overrides.metadata?.retentionHintDays ??
             DEFAULT_METADATA.retentionHintDays,

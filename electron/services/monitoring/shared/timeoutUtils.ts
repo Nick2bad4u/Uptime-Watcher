@@ -20,10 +20,6 @@ import {
     SECONDS_TO_MS_MULTIPLIER,
 } from "../constants";
 
-function isValidTimeoutMs(value: unknown): value is number {
-    return typeof value === "number" && isFiniteNumber(value) && value > 0;
-}
-
 /**
  * Resolves the base timeout in milliseconds.
  */
@@ -40,4 +36,8 @@ export function resolveMonitorBaseTimeoutMs(timeoutMs?: number): number {
  */
 export function resolveMonitorOperationTimeoutMs(timeoutMs?: number): number {
     return resolveMonitorBaseTimeoutMs(timeoutMs) + MONITOR_TIMEOUT_BUFFER_MS;
+}
+
+function isValidTimeoutMs(value: unknown): value is number {
+    return typeof value === "number" && isFiniteNumber(value) && value > 0;
 }

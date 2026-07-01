@@ -2,9 +2,8 @@
  * Small canonical coverage test for monitor/site validators.
  */
 
-import { describe, expect, it } from "vitest";
-
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
+import { describe, expect, it } from "vitest";
 
 describe("Canonical validation - missing coverage", () => {
     it("reports unknown monitor types", () => {

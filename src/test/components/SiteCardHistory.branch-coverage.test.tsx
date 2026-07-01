@@ -3,16 +3,15 @@
  * target untested conditional branches to improve coverage metrics.
  */
 
-import { render, screen } from "@testing-library/react";
-
-import { describe, expect, it, vi } from "vitest";
-
 import type { Monitor, StatusHistory } from "@shared/types";
+
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { SiteCardHistory } from "../../components/Dashboard/SiteCard/SiteCardHistory";
 
 // Mock the dependencies
-vi.mock("../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: vi.fn(() => ({
         options: [
             { value: "http", label: "HTTP" },
@@ -22,7 +21,7 @@ vi.mock("../../hooks/useMonitorTypes", () => ({
     })),
 }));
 
-vi.mock("../../utils/monitorTitleFormatters", () => ({
+vi.mock(import('../../utils/monitorTitleFormatters'), () => ({
     formatTitleSuffix: vi.fn((monitor: Monitor) => {
         if (monitor.url) return ` - ${monitor.url}`;
         if (monitor.host && monitor.port)
@@ -31,7 +30,7 @@ vi.mock("../../utils/monitorTitleFormatters", () => ({
     }),
 }));
 
-vi.mock("../../components/common/HistoryChart", () => ({
+vi.mock(import('../../components/common/HistoryChart'), () => ({
     HistoryChart: vi.fn(({ title, history, maxItems }) => (
         <div data-testid="history-chart">
             <div data-testid="chart-title">{title}</div>

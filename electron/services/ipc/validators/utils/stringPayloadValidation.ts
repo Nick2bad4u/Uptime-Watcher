@@ -3,6 +3,20 @@ import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { IpcValidators } from "../IpcValidators";
 
 /**
+ * Options for validating an optional string payload with a byte budget.
+ *
+ * @internal
+ */
+export interface OptionalStringPayloadValidationOptions {
+    /** Maximum allowed UTF-8 byte length for the payload. */
+    readonly maxBytes: number;
+    /** Error message when the payload exceeds the byte budget. */
+    readonly maxBytesMessage: string;
+    /** The IPC parameter name used in error messages. */
+    readonly paramName: string;
+}
+
+/**
  * Options for validating a required string payload with a byte budget.
  *
  * @internal
@@ -19,17 +33,35 @@ export interface StringPayloadValidationOptions {
 }
 
 /**
- * Options for validating an optional string payload with a byte budget.
+ * Validates an optional string payload against a byte budget.
+ *
+ * @param value - Candidate payload value.
+ * @param options - Validation options.
+ *
+ * @returns Validation errors (empty when valid).
  *
  * @internal
  */
-export interface OptionalStringPayloadValidationOptions {
-    /** Maximum allowed UTF-8 byte length for the payload. */
-    readonly maxBytes: number;
-    /** Error message when the payload exceeds the byte budget. */
-    readonly maxBytesMessage: string;
-    /** The IPC parameter name used in error messages. */
-    readonly paramName: string;
+export function validateOptionalStringPayload(
+    value: unknown,
+    options: OptionalStringPayloadValidationOptions
+): string[] {
+    const optionalError = IpcValidators.optionalString(
+        value,
+        options.paramName
+    );
+    if (optionalError) {
+        return [optionalError];
+    }
+
+    if (
+        typeof value === "string" &&
+        getUtfByteLength(value) > options.maxBytes
+    ) {
+        return [options.maxBytesMessage];
+    }
+
+    return [];
 }
 
 /**
@@ -63,38 +95,6 @@ export function validateRequiredStringPayload(
     }
 
     if (getUtfByteLength(value) > options.maxBytes) {
-        return [options.maxBytesMessage];
-    }
-
-    return [];
-}
-
-/**
- * Validates an optional string payload against a byte budget.
- *
- * @param value - Candidate payload value.
- * @param options - Validation options.
- *
- * @returns Validation errors (empty when valid).
- *
- * @internal
- */
-export function validateOptionalStringPayload(
-    value: unknown,
-    options: OptionalStringPayloadValidationOptions
-): string[] {
-    const optionalError = IpcValidators.optionalString(
-        value,
-        options.paramName
-    );
-    if (optionalError) {
-        return [optionalError];
-    }
-
-    if (
-        typeof value === "string" &&
-        getUtfByteLength(value) > options.maxBytes
-    ) {
         return [options.maxBytesMessage];
     }
 

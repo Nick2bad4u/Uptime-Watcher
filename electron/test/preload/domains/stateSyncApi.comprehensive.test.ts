@@ -3,8 +3,22 @@
  * property-based testing for robust coverage
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import type { Site } from "@shared/types";
+import type {
+    StateSyncFullSyncResult,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
+
+import { STATE_SYNC_CHANNELS } from "@shared/types/preload";
 import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { IpcResponse } from "../../../preload/core/bridgeFactory";
+
+import {
+    stateSyncApi,
+    type StateSyncApiInterface,
+} from "../../../preload/domains/stateSyncApi";
 
 // Mock electron using vi.hoisted() to ensure proper initialization order
 const mockIpcRenderer = vi.hoisted(() => ({
@@ -21,18 +35,6 @@ vi.mock("electron", () => ({
 const ipcContext = expect.objectContaining({
     __uptimeWatcherIpcContext: true,
 });
-
-import {
-    stateSyncApi,
-    type StateSyncApiInterface,
-} from "../../../preload/domains/stateSyncApi";
-import { STATE_SYNC_CHANNELS } from "@shared/types/preload";
-import type { Site } from "@shared/types";
-import type {
-    StateSyncFullSyncResult,
-    StateSyncStatusSummary,
-} from "@shared/types/stateSync";
-import type { IpcResponse } from "../../../preload/core/bridgeFactory";
 
 // Helper functions for creating properly formatted IPC responses
 function createIpcResponse<T>(data: T): IpcResponse<T> {
@@ -286,9 +288,9 @@ describe("State Sync Domain API", () => {
         // Must match the shared Zod schemas:
         // - identifier: /^[\dA-Z:_-]+$/i
         // - name: /^[\dA-Z .:_-]+$/i
-        const siteIdentifierArb = fc.stringMatching(/^[\w:-]{1,50}$/);
+        const siteIdentifierArb = fc.stringMatching(/^[\w\-:]{1,50}$/v);
         const siteNameArb = fc
-            .stringMatching(/^[\w .:-]{1,120}$/)
+            .stringMatching(/^[\w \-.:]{1,120}$/v)
             .filter((name) => name.trim().length > 0);
 
         it("should handle various full sync scenarios", async () => {
@@ -475,7 +477,7 @@ describe("State Sync Domain API", () => {
             );
 
             await expect(api.getSyncStatus()).rejects.toThrow(
-                /failed validation/i
+                /failed validation/iv
             );
         });
 

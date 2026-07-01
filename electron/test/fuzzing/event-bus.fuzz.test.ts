@@ -17,24 +17,25 @@
  * @packageDocumentation
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
-    TypedEventBus,
     type EventPayloadValue,
+    TypedEventBus,
 } from "../../events/TypedEventBus";
 
 // Define test event map with index signature for TypedEventBus compatibility
 interface TestEvents extends Record<string, EventPayloadValue> {
-    "test:simple": { message: string };
+    [key: string]: EventPayloadValue; // Index signature for UnknownRecord constraint
+    [key: symbol]: EventPayloadValue; // Symbol index signature
     "test:complex": {
-        id: string;
         data: unknown;
+        id: string;
         metadata?: Record<string, unknown> | undefined;
     };
     "test:empty": Record<string, never>;
-    [key: string]: EventPayloadValue; // Index signature for UnknownRecord constraint
-    [key: symbol]: EventPayloadValue; // Symbol index signature
+    "test:simple": { message: string };
 }
 
 describe("TypedEventBus Fuzzing Tests", () => {
@@ -219,12 +220,12 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             const config = middlewareConfigs[i];
 
                             // Check if this middleware will be reached (all previous must call next)
-                            const allPreviousCallNext = middlewareConfigs
+                            const isAllPreviousCallNext = middlewareConfigs
                                 .slice(0, i)
                                 .every((prev) => prev.shouldCallNext);
 
                             if (
-                                allPreviousCallNext &&
+                                isAllPreviousCallNext &&
                                 (config!.behavior === "throw" ||
                                     config!.behavior === "async-throw")
                             ) {
@@ -333,7 +334,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                         );
 
                         let registeredCount = 0;
-                        let threwError = false;
+                        let isThrewError = false;
 
                         try {
                             for (let i = 0; i < middlewareCount; i++) {
@@ -344,15 +345,15 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                 );
                                 registeredCount++;
                             }
-                        } catch (error) {
-                            threwError = true;
+                        } catch {
+                            isThrewError = true;
                         }
 
                         if (middlewareCount <= 5) {
-                            expect(threwError).toBeFalsy();
+                            expect(isThrewError).toBeFalsy();
                             expect(registeredCount).toBe(middlewareCount);
                         } else {
-                            expect(threwError).toBeTruthy();
+                            expect(isThrewError).toBeTruthy();
                             expect(registeredCount).toBeLessThan(
                                 middlewareCount
                             );
@@ -412,7 +413,7 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             eventBus.emitTyped("test:complex", largeEventData),
                             new Promise((_, reject) =>
                                 setTimeout(
-                                    () => reject(new Error("Timeout")),
+                                    () => { reject(new Error("Timeout")); },
                                     5000
                                 )
                             ),
@@ -595,11 +596,11 @@ describe("TypedEventBus Fuzzing Tests", () => {
                                             await new Promise((_, reject) =>
                                                 setTimeout(
                                                     () =>
-                                                        reject(
+                                                        { reject(
                                                             new Error(
                                                                 config.errorMessage
                                                             )
-                                                        ),
+                                                        ); },
                                                     50
                                                 )
                                             );

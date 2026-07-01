@@ -1,4 +1,5 @@
 import type { Monitor, MonitorType } from "@shared/types";
+
 import { MONITOR_STATUS } from "@shared/types";
 import { describe, expect, it } from "vitest";
 
@@ -95,7 +96,7 @@ function buildMonitor<TType extends FixtureKey>(type: TType): Monitor {
         timeout: 10_000,
         type,
         ...overrides,
-    } as Monitor;
+    };
 }
 
 describe("MonitorTypeRegistry runtime coverage", () => {
@@ -140,7 +141,7 @@ describe("MonitorTypeRegistry runtime coverage", () => {
         const invalid = createMonitorWithTypeGuards("non-existent", {});
 
         expect(invalid.success).toBeFalsy();
-        expect(invalid.errors[0]).toMatch(/Invalid monitor type/);
+        expect(invalid.errors[0]).toMatch(/Invalid monitor type/v);
     });
 
     it("invokes UI formatters and service factories for every monitor type", () => {
@@ -152,7 +153,7 @@ describe("MonitorTypeRegistry runtime coverage", () => {
                 remaining.delete(config.type);
             }
 
-            const monitor = buildMonitor(config.type as FixtureKey);
+            const monitor = buildMonitor(config.type);
             const serviceInstance = config.serviceFactory();
             expect(serviceInstance).toBeTruthy();
 

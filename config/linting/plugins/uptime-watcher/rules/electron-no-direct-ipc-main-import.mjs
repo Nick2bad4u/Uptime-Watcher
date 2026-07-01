@@ -140,17 +140,17 @@ export const electronNoDirectIpcMainImportRule = {
     },
 
     meta: {
-        type: "problem",
         docs: {
             description:
                 "disallow importing ipcMain outside electron/services/ipc/*.",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/electron-no-direct-ipc-main-import.md",
         },
-        schema: [],
         messages: {
             avoidIpcMain:
                 "Do not import ipcMain here. Use the centralized IpcService / registerStandardizedIpcHandler utilities under electron/services/ipc/.",
         },
+        schema: [],
+        type: "problem",
     },
 };

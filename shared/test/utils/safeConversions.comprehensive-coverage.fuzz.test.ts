@@ -104,7 +104,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             );
 
             // NaN should return default
-            expect(safeNumberConversion(Number.NaN, defaultValue)).toBe(
+            expect(safeNumberConversion(NaN, defaultValue)).toBe(
                 defaultValue
             );
 
@@ -297,7 +297,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             expect(safeParseInt("abc123", defaultValue)).toBe(defaultValue);
             expect(safeParseInt(Infinity, defaultValue)).toBe(defaultValue);
             expect(safeParseInt(-Infinity, defaultValue)).toBe(defaultValue);
-            expect(safeParseInt(Number.NaN, defaultValue)).toBe(defaultValue);
+            expect(safeParseInt(NaN, defaultValue)).toBe(defaultValue);
         });
     });
 
@@ -636,7 +636,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             }
         );
 
-        test.prop([fc.constantFrom(Infinity, -Infinity, Number.NaN)])(
+        test.prop([fc.constantFrom(Infinity, -Infinity, NaN)])(
             "all conversion functions handle special float values consistently",
             (specialValue) => {
                 // For numeric inputs: preserve ±Infinity in safeNumberConversion and safeParseFloat
@@ -677,7 +677,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             const inputs = [
                 undefined,
                 null,
-                Number.NaN,
+                NaN,
                 Infinity,
                 -Infinity,
                 "",

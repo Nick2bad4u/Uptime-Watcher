@@ -77,7 +77,7 @@ export function getMonitorTypeConfig(
  * @public
  */
 export function getRegisteredMonitorTypes(): readonly string[] {
-    return Array.from(monitorTypes.keys());
+    return [...monitorTypes.keys()];
 }
 
 /**
@@ -158,7 +158,7 @@ function validateMonitorTypeInternal(
  * @public
  */
 export function getAllMonitorTypeConfigs(): BaseMonitorConfig[] {
-    return Array.from(monitorTypes.values());
+    return [...monitorTypes.values()];
 }
 
 /**

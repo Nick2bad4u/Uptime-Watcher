@@ -9,16 +9,17 @@
  *   calculation utilities.
  */
 
-import { describe, it, expect } from "vitest";
-import { test, fc } from "@fast-check/vitest";
+import { fc, test } from "@fast-check/vitest";
+import { describe, expect, it } from "vitest";
+
 import { calculateMaxDuration } from "../../utils/duration";
 
-describe("Duration Utilities", () => {
+describe("duration Utilities", () => {
     describe(calculateMaxDuration, () => {
-        describe("Basic functionality", () => {
+        describe("basic functionality", () => {
             it("should calculate duration with no retry attempts", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -26,6 +27,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(10, 0);
+
                 // Timeout: 10 seconds * 1 attempt = 10 seconds
                 // backoff: 0 (no retries)
                 // total: 10 seconds
@@ -33,8 +35,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should calculate duration with single retry attempt", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -42,6 +44,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(5, 1);
+
                 // Timeout: 5 seconds * 2 attempts = 10 seconds
                 // backoff: 0.5 seconds (first retry)
                 // total: Math.ceil(10.5) = 11 seconds
@@ -49,8 +52,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should calculate duration with multiple retry attempts", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -58,6 +61,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(2, 3);
+
                 // Timeout: 2 seconds * 4 attempts = 8 seconds
                 // backoff: 0.5 + 1.0 + 2.0 = 3.5 seconds
                 // total: Math.ceil(11.5) = 12 seconds
@@ -65,10 +69,10 @@ describe("Duration Utilities", () => {
             });
         });
 
-        describe("Exponential backoff calculation", () => {
+        describe("exponential backoff calculation", () => {
             it("should calculate correct backoff for first few retries", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -76,6 +80,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 2);
+
                 // Timeout: 1 second * 3 attempts = 3 seconds
                 // backoff: 0.5 + 1.0 = 1.5 seconds
                 // total: Math.ceil(4.5) = 5 seconds
@@ -83,8 +88,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should cap backoff at 5 seconds per retry", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -92,6 +97,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 5);
+
                 // Timeout: 1 second * 6 attempts = 6 seconds
                 // backoff: 0.5 + 1.0 + 2.0 + 4.0 + 5.0 = 12.5 seconds (4th retry capped at 5s)
                 // total: Math.ceil(18.5) = 19 seconds
@@ -99,8 +105,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle very high retry counts with capped backoff", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -108,6 +114,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1, 10);
+
                 // Timeout: 1 second * 11 attempts = 11 seconds
                 // backoff: 0.5 + 1.0 + 2.0 + 4.0 + 5.0 + 5.0 + 5.0 + 5.0 + 5.0 + 5.0 = 37.5 seconds
                 // total: Math.ceil(48.5) = 49 seconds
@@ -115,10 +122,10 @@ describe("Duration Utilities", () => {
             });
         });
 
-        describe("Duration formatting - seconds", () => {
+        describe("duration formatting - seconds", () => {
             it("should format short durations in seconds", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -131,8 +138,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should format exactly 60 seconds as minutes", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -140,15 +147,16 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(60, 0);
+
                 // 60 seconds = 1 minute
                 expect(result).toBe("1m");
             });
         });
 
-        describe("Duration formatting - minutes", () => {
+        describe("duration formatting - minutes", () => {
             it("should format durations between 1-59 minutes", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -156,21 +164,24 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result1 = calculateMaxDuration(61, 0);
+
                 // 61 seconds = Math.ceil(61/60) = 2 minutes
                 expect(result1).toBe("2m");
 
                 const result2 = calculateMaxDuration(120, 0);
+
                 // 120 seconds = Math.ceil(120/60) = 2 minutes
                 expect(result2).toBe("2m");
 
                 const result3 = calculateMaxDuration(3540, 0);
+
                 // 3540 seconds = Math.ceil(3540/60) = 59 minutes
                 expect(result3).toBe("59m");
             });
 
             it("should handle duration that rounds up to next minute", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -178,13 +189,14 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(119, 0);
+
                 // 119 seconds = Math.ceil(119/60) = 2 minutes
                 expect(result).toBe("2m");
             });
 
             it("should format exactly 3600 seconds as hours", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -192,15 +204,16 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(3600, 0);
+
                 // 3600 seconds = 1 hour
                 expect(result).toBe("1h");
             });
         });
 
-        describe("Duration formatting - hours", () => {
+        describe("duration formatting - hours", () => {
             it("should format durations over 1 hour", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -208,21 +221,24 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result1 = calculateMaxDuration(3601, 0);
+
                 // 3601 seconds = Math.ceil(3601/3600) = 2 hours
                 expect(result1).toBe("2h");
 
                 const result2 = calculateMaxDuration(7200, 0);
+
                 // 7200 seconds = Math.ceil(7200/3600) = 2 hours
                 expect(result2).toBe("2h");
 
                 const result3 = calculateMaxDuration(10_800, 0);
+
                 // 10800 seconds = Math.ceil(10800/3600) = 3 hours
                 expect(result3).toBe("3h");
             });
 
             it("should handle very large durations", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -230,26 +246,28 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(86_400, 0);
+
                 // 86400 seconds = 24 hours
                 expect(result).toBe("24h");
             });
         });
 
-        describe("Edge cases", () => {
-            it("should handle zero timeout", async ({ task, annotate }) => {
+        describe("edge cases", () => {
+            it("should handle zero timeout", async ({ annotate, task }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(0, 0);
+
                 // 0 seconds timeout still has 1 attempt
                 expect(result).toBe("0s");
             });
 
             it("should handle zero timeout with retries", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -257,6 +275,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(0, 2);
+
                 // Timeout: 0 * 3 = 0 seconds
                 // backoff: 0.5 + 1.0 = 1.5 seconds
                 // total: Math.ceil(1.5) = 2 seconds
@@ -264,8 +283,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle fractional timeout values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -273,6 +292,7 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1.5, 1);
+
                 // Timeout: 1.5 * 2 = 3 seconds
                 // backoff: 0.5 seconds
                 // total: Math.ceil(3.5) = 4 seconds
@@ -280,8 +300,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle large timeout values", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -289,13 +309,14 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(1800, 0);
+
                 // 1800 seconds = Math.ceil(1800/60) = 30 minutes
                 expect(result).toBe("30m");
             });
 
             it("should handle large retry counts", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -303,17 +324,18 @@ describe("Duration Utilities", () => {
                 await annotate("Type: Business Logic", "type");
 
                 const result = calculateMaxDuration(10, 20);
+
                 // Timeout: 10 * 21 = 210 seconds
                 // backoff: significant amount with capping at 5s per retry
                 // This should result in minutes
-                expect(result).toMatch(/^\d+m$/);
+                expect(result).toMatch(/^\d+m$/v);
             });
         });
 
-        describe("Real-world scenarios", () => {
+        describe("real-world scenarios", () => {
             it("should handle typical monitoring scenarios", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -322,20 +344,23 @@ describe("Duration Utilities", () => {
 
                 // Common scenario: 30 second timeout, 3 retries
                 const result1 = calculateMaxDuration(30, 3);
-                expect(result1).toMatch(/^\d+[ms]$/);
+
+                expect(result1).toMatch(/^\d+[ms]$/v);
 
                 // Quick check scenario: 5 second timeout, 1 retry
                 const result2 = calculateMaxDuration(5, 1);
+
                 expect(result2).toBe("11s");
 
                 // Long running check: 2 minute timeout, 2 retries
                 const result3 = calculateMaxDuration(120, 2);
-                expect(result3).toMatch(/^\d+m$/);
+
+                expect(result3).toMatch(/^\d+m$/v);
             });
 
             it("should provide predictable results for common configurations", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -353,10 +378,10 @@ describe("Duration Utilities", () => {
             });
         });
 
-        describe("Mathematical accuracy", () => {
+        describe("mathematical accuracy", () => {
             it("should correctly calculate exponential backoff sequence", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -373,8 +398,8 @@ describe("Duration Utilities", () => {
             });
 
             it("should handle edge of unit boundaries precisely", async ({
-                task,
                 annotate,
+                task,
             }) => {
                 await annotate(`Testing: ${task.name}`, "functional");
                 await annotate("Component: duration", "component");
@@ -383,35 +408,39 @@ describe("Duration Utilities", () => {
 
                 // Test exactly at 60 seconds boundary
                 const result1 = calculateMaxDuration(59, 0);
+
                 expect(result1).toBe("59s");
 
                 const result2 = calculateMaxDuration(60, 0);
+
                 expect(result2).toBe("1m");
 
                 // Test exactly at 3600 seconds boundary
                 const result3 = calculateMaxDuration(3599, 0);
+
                 expect(result3).toBe("60m");
 
                 const result4 = calculateMaxDuration(3600, 0);
+
                 expect(result4).toBe("1h");
             });
         });
 
-        describe("Property-Based Fuzzing Tests", () => {
+        describe("property-Based Fuzzing Tests", () => {
             // Helper function to parse duration strings to seconds for comparison
             const parseToSeconds = (duration: string): number => {
                 const unit = duration.at(-1);
                 const value = Number.parseInt(duration.slice(0, -1), 10);
 
                 switch (unit) {
-                    case "s": {
-                        return value;
+                    case "h": {
+                        return value * 3600;
                     }
                     case "m": {
                         return value * 60;
                     }
-                    case "h": {
-                        return value * 3600;
+                    case "s": {
+                        return value;
                     }
                     default: {
                         return value;
@@ -422,11 +451,11 @@ describe("Duration Utilities", () => {
             describe("calculateMaxDuration property tests", () => {
                 test.prop([
                     fc.float({
-                        min: Math.fround(0.1),
                         max: Math.fround(300),
+                        min: Math.fround(0.1),
                         noNaN: true,
                     }),
-                    fc.integer({ min: 0, max: 10 }),
+                    fc.integer({ max: 10, min: 0 }),
                 ])(
                     "should always return a valid duration string format",
                     (timeout, retryAttempts) => {
@@ -436,10 +465,11 @@ describe("Duration Utilities", () => {
                         );
 
                         // Property: Result should match duration format pattern
-                        expect(result).toMatch(/^\d+[hms]$/);
+                        expect(result).toMatch(/^\d+[hms]$/v);
 
                         // Property: Should be one of the three valid unit types
                         const unit = result.at(-1);
+
                         expect([
                             "s",
                             "m",
@@ -451,15 +481,16 @@ describe("Duration Utilities", () => {
                             result.slice(0, -1),
                             10
                         );
+
                         expect(numericPart).toBeGreaterThan(0);
                     }
                 );
 
                 test.prop([
                     fc
-                        .float({ min: Math.fround(0.1), max: Math.fround(100) })
+                        .float({ max: Math.fround(100), min: Math.fround(0.1) })
                         .filter((x) => !Number.isNaN(x) && Number.isFinite(x)),
-                    fc.integer({ min: 0, max: 20 }),
+                    fc.integer({ max: 20, min: 0 }),
                 ])(
                     "should increase duration with more retry attempts",
                     (timeout, retryAttempts) => {
@@ -484,7 +515,7 @@ describe("Duration Utilities", () => {
                 );
 
                 test.prop([
-                    fc.float({ min: Math.fround(0.1), max: Math.fround(60) }),
+                    fc.float({ max: Math.fround(60), min: Math.fround(0.1) }),
                     fc.constant(0),
                 ])(
                     "should format seconds correctly for short durations",
@@ -496,19 +527,20 @@ describe("Duration Utilities", () => {
 
                         // Property: For single timeout under 60s with no retries, should be in seconds
                         if (Math.ceil(timeout) < 60) {
-                            expect(result).toMatch(/^\d+s$/);
+                            expect(result).toMatch(/^\d+s$/v);
 
                             const seconds = Number.parseInt(
                                 result.slice(0, -1),
                                 10
                             );
+
                             expect(seconds).toBe(Math.ceil(timeout));
                         }
                     }
                 );
 
                 test.prop([
-                    fc.float({ min: Math.fround(60), max: Math.fround(3599) }),
+                    fc.float({ max: Math.fround(3599), min: Math.fround(60) }),
                     fc.constant(0),
                 ])(
                     "should format minutes correctly for medium durations",
@@ -523,12 +555,13 @@ describe("Duration Utilities", () => {
                             Math.ceil(timeout) >= 60 &&
                             Math.ceil(timeout) < 3600
                         ) {
-                            expect(result).toMatch(/^\d+m$/);
+                            expect(result).toMatch(/^\d+m$/v);
 
                             const minutes = Number.parseInt(
                                 result.slice(0, -1),
                                 10
                             );
+
                             expect(minutes).toBe(Math.ceil(timeout / 60));
                         }
                     }
@@ -536,8 +569,8 @@ describe("Duration Utilities", () => {
 
                 test.prop([
                     fc.float({
-                        min: Math.fround(3600),
                         max: Math.fround(10_800),
+                        min: Math.fround(3600),
                     }),
                     fc.constant(0),
                 ])(
@@ -550,20 +583,21 @@ describe("Duration Utilities", () => {
 
                         // Property: For timeouts 3600s+, should be in hours
                         if (Math.ceil(timeout) >= 3600) {
-                            expect(result).toMatch(/^\d+h$/);
+                            expect(result).toMatch(/^\d+h$/v);
 
                             const hours = Number.parseInt(
                                 result.slice(0, -1),
                                 10
                             );
+
                             expect(hours).toBe(Math.ceil(timeout / 3600));
                         }
                     }
                 );
 
                 test.prop([
-                    fc.float({ min: Math.fround(1), max: Math.fround(30) }),
-                    fc.integer({ min: 1, max: 5 }),
+                    fc.float({ max: Math.fround(30), min: Math.fround(1) }),
+                    fc.integer({ max: 5, min: 1 }),
                 ])(
                     "should demonstrate exponential backoff effect",
                     (timeout, retryAttempts) => {
@@ -578,11 +612,11 @@ describe("Duration Utilities", () => {
                         const timeoutTime = timeout * totalAttempts;
                         const backoffTime =
                             retryAttempts > 0
-                                ? Array.from(
+                                ? Math.sumPrecise(Array.from(
                                       { length: retryAttempts },
                                       (_, index) =>
                                           Math.min(0.5 * 2 ** index, 5)
-                                  ).reduce((a, b) => a + b, 0)
+                                  ))
                                 : 0;
 
                         const totalTime = Math.ceil(timeoutTime + backoffTime);
@@ -602,7 +636,7 @@ describe("Duration Utilities", () => {
                     }
                 );
 
-                test.prop([fc.constant(0), fc.integer({ min: 0, max: 5 })])(
+                test.prop([fc.constant(0), fc.integer({ max: 5, min: 0 })])(
                     "should handle zero timeout gracefully",
                     (timeout, retryAttempts) => {
                         const result = calculateMaxDuration(
@@ -611,7 +645,7 @@ describe("Duration Utilities", () => {
                         );
 
                         // Property: Zero timeout should still produce a valid result
-                        expect(result).toMatch(/^\d+[hms]$/);
+                        expect(result).toMatch(/^\d+[hms]$/v);
 
                         // Property: Should handle zero timeout correctly
                         const numericPart = Number.parseInt(
@@ -629,7 +663,7 @@ describe("Duration Utilities", () => {
                 );
 
                 test.prop([
-                    fc.float({ min: Math.fround(0.1), max: Math.fround(100) }),
+                    fc.float({ max: Math.fround(100), min: Math.fround(0.1) }),
                 ])("should be deterministic and consistent", (timeout) => {
                     const retryAttempts = 3; // Fixed for consistency testing
 
@@ -651,7 +685,7 @@ describe("Duration Utilities", () => {
                     expect(result2).toBe(result3);
                 });
 
-                test.prop([fc.integer({ min: 0, max: 100 })])(
+                test.prop([fc.integer({ max: 100, min: 0 })])(
                     "should cap backoff at 5 seconds per retry attempt",
                     (retryAttempts) => {
                         const timeout = 1; // Fixed timeout to isolate backoff testing
@@ -665,11 +699,11 @@ describe("Duration Utilities", () => {
                         const timeoutTime = timeout * totalAttempts;
                         const backoffTime =
                             retryAttempts > 0
-                                ? Array.from(
+                                ? Math.sumPrecise(Array.from(
                                       { length: retryAttempts },
                                       (_, index) =>
                                           Math.min(0.5 * 2 ** index, 5)
-                                  ).reduce((a, b) => a + b, 0)
+                                  ))
                                 : 0;
 
                         const totalTime = Math.ceil(timeoutTime + backoffTime);
@@ -691,6 +725,7 @@ describe("Duration Utilities", () => {
                         // (This is verified by the algorithm itself - Math.min ensures cap)
                         for (let i = 0; i < Math.min(retryAttempts, 10); i++) {
                             const individualBackoff = Math.min(0.5 * 2 ** i, 5);
+
                             expect(individualBackoff).toBeLessThanOrEqual(5);
                         }
                     }
@@ -698,9 +733,9 @@ describe("Duration Utilities", () => {
 
                 test.prop([
                     fc
-                        .float({ min: Math.fround(0.1), max: Math.fround(10) })
+                        .float({ max: Math.fround(10), min: Math.fround(0.1) })
                         .filter((x) => !Number.isNaN(x) && Number.isFinite(x)),
-                    fc.integer({ min: 0, max: 3 }),
+                    fc.integer({ max: 3, min: 0 }),
                 ])(
                     "should respect monotonicity with timeout increases",
                     (timeout, retryAttempts) => {
@@ -725,14 +760,14 @@ describe("Duration Utilities", () => {
                             );
 
                             switch (unit) {
-                                case "s": {
-                                    return value;
+                                case "h": {
+                                    return value * 3600;
                                 }
                                 case "m": {
                                     return value * 60;
                                 }
-                                case "h": {
-                                    return value * 3600;
+                                case "s": {
+                                    return value;
                                 }
                                 default: {
                                     return value;
@@ -766,11 +801,11 @@ describe("Duration Utilities", () => {
                         const totalSeconds = Math.ceil(timeout);
 
                         if (totalSeconds < 60) {
-                            expect(result).toMatch(/^\d+s$/);
+                            expect(result).toMatch(/^\d+s$/v);
                         } else if (totalSeconds < 3600) {
-                            expect(result).toMatch(/^\d+m$/);
+                            expect(result).toMatch(/^\d+m$/v);
                         } else {
-                            expect(result).toMatch(/^\d+h$/);
+                            expect(result).toMatch(/^\d+h$/v);
                         }
                     }
                 );

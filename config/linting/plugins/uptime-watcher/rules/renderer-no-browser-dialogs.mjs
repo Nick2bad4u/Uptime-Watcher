@@ -165,17 +165,17 @@ export const rendererNoBrowserDialogsRule = {
     },
 
     meta: {
-        type: "suggestion",
         docs: {
             description:
                 "disallow alert/confirm/prompt in renderer code so UX flows use the shared dialog system",
             recommended: false,
             url: "https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/config/linting/plugins/uptime-watcher/docs/rules/renderer-no-browser-dialogs.md",
         },
-        schema: [],
         messages: {
             avoidBrowserDialog:
                 'Replace browser dialog "{{dialog}}" with the shared confirmation dialog utilities.',
         },
+        schema: [],
+        type: "suggestion",
     },
 };

@@ -3,10 +3,12 @@
  * Unit tests for the WebSocket keepalive monitor service.
  */
 
+import type { Site } from "@shared/types";
 import type { EventEmitter as NodeEventEmitter } from "node:events";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import { WebsocketKeepaliveMonitor } from "../../../services/monitoring/WebsocketKeepaliveMonitor";
 
 const socketReadyState = {
     CONNECTING: 0,
@@ -16,9 +18,9 @@ const socketReadyState = {
 } as const;
 
 interface CapturedWebSocket extends NodeEventEmitter {
-    readyState: number;
-    ping: ReturnType<typeof vi.fn>;
     close: ReturnType<typeof vi.fn>;
+    ping: ReturnType<typeof vi.fn>;
+    readyState: number;
     terminate: ReturnType<typeof vi.fn>;
 }
 
@@ -58,7 +60,7 @@ vi.mock("ws", async () => {
     class CapturingWebSocket extends LocalWebSocket {
         public constructor(url: string, _options?: unknown) {
             super(url);
-            socketInstances.push(this as CapturedWebSocket);
+            socketInstances.push(this);
         }
     }
 
@@ -74,8 +76,6 @@ vi.mock("../../../utils/operationalHooks", () => ({
         operation()
     ),
 }));
-
-import { WebsocketKeepaliveMonitor } from "../../../services/monitoring/WebsocketKeepaliveMonitor";
 
 function createMonitor(
     overrides: Partial<Site["monitors"][0]> = {}
@@ -94,7 +94,7 @@ function createMonitor(
         type: "websocket-keepalive",
         url: "ws://example.com/socket",
         ...overrides,
-    } as Site["monitors"][0];
+    };
 }
 
 describe("WebsocketKeepaliveMonitor service", () => {

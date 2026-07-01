@@ -11,50 +11,26 @@ import type {
 } from "./monitorValidationTypes";
 
 /**
- * Validates a required string field and returns the resulting error messages.
+ * Validates an optional string field when it is provided as a non-empty value.
  */
-export function validateRequiredStringField<
+export function validateOptionalTrimmedStringField<
     TType extends MonitorType,
-    TField extends StringFieldName<TType>,
+    TField extends MonitorFieldName<TType>,
 >(
     type: TType,
     fieldName: TField,
-    value: OptionalMonitorFieldValue<TType, TField>,
-    missingMessage: string
+    value: OptionalMonitorFieldValue<TType, TField>
 ): string[] {
     if (typeof value !== "string") {
-        return [missingMessage];
+        return [];
+    }
+
+    if (value.trim().length === 0) {
+        return [];
     }
 
     const result = sharedValidateMonitorField(type, fieldName, value);
-    const errors = Array.from(result.errors);
-
-    // eslint-disable-next-line typefest/prefer-ts-extras-is-empty -- The installed ts-extras typings trigger no-unsafe-call here, while a direct length check remains fully type-safe.
-    if (value.trim().length === 0 && errors.length === 0) {
-        errors.push(missingMessage);
-    }
-
-    return errors;
-}
-
-/**
- * Validates a required number field and returns the resulting error messages.
- */
-export function validateRequiredNumberField<
-    TType extends MonitorType,
-    TField extends NumberFieldName<TType>,
->(
-    type: TType,
-    fieldName: TField,
-    value: OptionalMonitorFieldValue<TType, TField>,
-    missingMessage: string
-): string[] {
-    if (typeof value !== "number" || Number.isNaN(value)) {
-        return [missingMessage];
-    }
-
-    const result = sharedValidateMonitorField(type, fieldName, value);
-    return Array.from(result.errors);
+    return [...result.errors];
 }
 
 /**
@@ -78,28 +54,52 @@ export function validateRequiredIntegerField<
     }
 
     const result = sharedValidateMonitorField(type, fieldName, value);
-    return Array.from(result.errors);
+    return [...result.errors];
 }
 
 /**
- * Validates an optional string field when it is provided as a non-empty value.
+ * Validates a required number field and returns the resulting error messages.
  */
-export function validateOptionalTrimmedStringField<
+export function validateRequiredNumberField<
     TType extends MonitorType,
-    TField extends MonitorFieldName<TType>,
+    TField extends NumberFieldName<TType>,
 >(
     type: TType,
     fieldName: TField,
-    value: OptionalMonitorFieldValue<TType, TField>
+    value: OptionalMonitorFieldValue<TType, TField>,
+    missingMessage: string
 ): string[] {
-    if (typeof value !== "string") {
-        return [];
-    }
-
-    if (value.trim().length === 0) {
-        return [];
+    if (typeof value !== "number" || Number.isNaN(value)) {
+        return [missingMessage];
     }
 
     const result = sharedValidateMonitorField(type, fieldName, value);
-    return Array.from(result.errors);
+    return [...result.errors];
+}
+
+/**
+ * Validates a required string field and returns the resulting error messages.
+ */
+export function validateRequiredStringField<
+    TType extends MonitorType,
+    TField extends StringFieldName<TType>,
+>(
+    type: TType,
+    fieldName: TField,
+    value: OptionalMonitorFieldValue<TType, TField>,
+    missingMessage: string
+): string[] {
+    if (typeof value !== "string") {
+        return [missingMessage];
+    }
+
+    const result = sharedValidateMonitorField(type, fieldName, value);
+    const errors = [...result.errors];
+
+    // eslint-disable-next-line typefest/prefer-ts-extras-is-empty -- The installed ts-extras typings trigger no-unsafe-call here, while a direct length check remains fully type-safe.
+    if (value.trim().length === 0 && errors.length === 0) {
+        errors.push(missingMessage);
+    }
+
+    return errors;
 }

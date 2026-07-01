@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { objectAssign } from "ts-extras";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
 import { createSelectorHookMock } from "../utils/createSelectorHookMock";
@@ -9,7 +10,7 @@ import {
 } from "../utils/createSitesStoreMock";
 
 // Mock the hooks
-vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
+vi.mock(import('../../components/SiteDetails/useAddSiteForm'), () => ({
     useAddSiteForm: () => ({
         addMode: "existing",
         baselineUrl: "",
@@ -104,7 +105,7 @@ vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     }),
 }));
 
-vi.mock("../../hooks/useMonitorTypes", () => ({
+vi.mock(import('../../hooks/useMonitorTypes'), () => ({
     useMonitorTypes: () => ({
         options: [
             { label: "HTTP", value: "http" },
@@ -117,7 +118,7 @@ vi.mock("../../hooks/useMonitorTypes", () => ({
 }));
 
 // Mock the stores
-vi.mock("../../stores/error/useErrorStore", () => ({
+vi.mock(import('../../stores/error/useErrorStore'), () => ({
     useErrorStore: (() => {
         const state = {
             clearAllErrors: vi.fn(),
@@ -148,7 +149,7 @@ vi.mock("../../stores/error/useErrorStore", () => ({
 
         store.getState = () => state;
         store.setState = (partial) => {
-            Object.assign(state, partial);
+            objectAssign(state, partial);
         };
         store.subscribe = () => () => {
             // no-op
@@ -169,7 +170,7 @@ const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 (globalThis as any).__useSitesStoreMock_basic__ = useSitesStoreMock;
 
-vi.mock("../../stores/sites/useSitesStore", () => ({
+vi.mock(import('../../stores/sites/useSitesStore'), () => ({
     useSitesStore: (selector?: any, equality?: any) =>
         (globalThis as any).__useSitesStoreMock_basic__?.(selector, equality),
 }));
@@ -183,13 +184,13 @@ const resetSitesStoreState = (): void => {
 };
 
 // Mock other hooks
-vi.mock("../../hooks/useDelayedButtonLoading", () => ({
+vi.mock(import('../../hooks/useDelayedButtonLoading'), () => ({
     useDelayedButtonLoading: () => ({
         isShowingLoading: false,
     }),
 }));
 
-vi.mock("../../hooks/useDynamicHelpText", () => ({
+vi.mock(import('../../hooks/useDynamicHelpText'), () => ({
     useDynamicHelpText: () => ({
         host: "Enter host address",
         port: "Enter port number",
@@ -218,8 +219,8 @@ describe("AddSiteForm Component", () => {
         render(<AddSiteForm />);
 
         // Check for the presence of key elements
-        expect(screen.getByText(/add mode/i)).toBeInTheDocument();
-        expect(screen.getByText(/monitor type/i)).toBeInTheDocument();
+        expect(screen.getByText(/add mode/iv)).toBeInTheDocument();
+        expect(screen.getByText(/monitor type/iv)).toBeInTheDocument();
     });
 
     it("should display different mode options", ({ task, annotate }) => {
@@ -255,7 +256,7 @@ describe("AddSiteForm Component", () => {
 
         // Check for monitor type select element specifically
         const monitorTypeSelect = screen.getByRole("combobox", {
-            name: /monitor type/i,
+            name: /monitor type/iv,
         });
         expect(monitorTypeSelect).toBeInTheDocument();
 

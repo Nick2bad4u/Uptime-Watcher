@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides standardized key generation functions to ensure consistency across
- * all cache implementations throughout the application. All cache keys follow a
+ * all cache implementations throughout the app. All cache keys follow a
  * predictable pattern: `domain:operation:identifier` or `domain:identifier`.
  *
  * @example
@@ -90,7 +90,7 @@ function createCacheKey(
  *
  * @remarks
  * Provides domain-specific key generation functions that ensure consistent
- * cache key patterns across the entire application. All functions return
+ * cache key patterns across the entire app. All functions return
  * properly formatted cache keys following the established conventions.
  *
  * @public
@@ -295,7 +295,7 @@ export const CacheKeys = {
  *
  * @remarks
  * Provides type safety for cache key validation and ensures only standardized
- * keys are used throughout the application.
+ * keys are used throughout the app.
  *
  * @public
  */

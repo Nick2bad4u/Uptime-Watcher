@@ -4,8 +4,8 @@
  *
  * @remarks
  * This component provides a styled input field that integrates with the
- * application's theme system. It supports various input types (text, email,
- * number, password, url), accessibility attributes, and validation constraints.
+ * app's theme system. It supports various input types (text, email,
+ * number, password, URL), accessibility attributes, and validation constraints.
  * The input automatically applies appropriate colors, focus states, and
  * disabled states based on the current theme.
  *

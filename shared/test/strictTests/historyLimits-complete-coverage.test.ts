@@ -6,14 +6,13 @@
  *   consumers across renderer and Electron layers.
  */
 
-import { describe, expect, it } from "vitest";
-
 import {
     DEFAULT_HISTORY_LIMIT,
     DEFAULT_HISTORY_LIMIT_RULES,
-    normalizeHistoryLimit,
     type HistoryLimitRules,
+    normalizeHistoryLimit,
 } from "@shared/constants/history";
+import { describe, expect, it } from "vitest";
 
 describe("DEFAULT_HISTORY_LIMIT_RULES", () => {
     it("exposes the expected immutable defaults", () => {
@@ -42,14 +41,14 @@ describe(normalizeHistoryLimit, () => {
     });
 
     it("throws a TypeError when provided non-finite input", () => {
-        expect(() => normalizeHistoryLimit(Number.NaN)).toThrow(TypeError);
+        expect(() => normalizeHistoryLimit(NaN)).toThrow(TypeError);
         expect(() => normalizeHistoryLimit("25" as unknown as number)).toThrow(
             TypeError
         );
     });
 
     it("throws a RangeError when the value is infinite or above the maximum", () => {
-        expect(() => normalizeHistoryLimit(Number.POSITIVE_INFINITY)).toThrow(
+        expect(() => normalizeHistoryLimit(Infinity)).toThrow(
             RangeError
         );
         expect(() =>

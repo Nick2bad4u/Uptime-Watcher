@@ -3,7 +3,8 @@
  * Targeting the unreachable paths in the switch statement
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - Complete Coverage", () => {
@@ -46,8 +47,7 @@ describe("String Conversion - Complete Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // The undefined case in the switch is unreachable due to early return
-            // The default case is unreachable in normal JS
+            // The undefined case in the switch is unreachable due to early return The default case is unreachable in normal JS
 
             // Create an object that might confuse the type system
 
@@ -57,15 +57,9 @@ describe("String Conversion - Complete Coverage", () => {
             const proxyValue = new Proxy(
                 {},
                 {
-                    get() {
-                        return undefined;
-                    },
-                    has() {
-                        return false;
-                    },
-                    ownKeys() {
-                        return [];
-                    },
+                    get: () => undefined,
+                    has: () => false,
+                    ownKeys: () => [],
                 }
             );
 
@@ -100,9 +94,9 @@ describe("String Conversion - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test with primitive wrapper objects
-            expect(safeStringify(String("test"))).toContain("test");
-            expect(safeStringify(Number(123))).toContain("123");
-            expect(safeStringify(Boolean(true))).toContain("true");
+            expect(safeStringify("test")).toContain("test");
+            expect(safeStringify(123)).toContain("123");
+            expect(safeStringify(true)).toContain("true");
 
             // Test with null prototype objects
             const nullProtoObj = Object.create(null);
@@ -197,7 +191,7 @@ describe("String Conversion - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test special number values
-            expect(safeStringify(Number.NaN)).toBe("NaN");
+            expect(safeStringify(NaN)).toBe("NaN");
             expect(safeStringify(Infinity)).toBe("Infinity");
             expect(safeStringify(-Infinity)).toBe("-Infinity");
             expect(safeStringify(0)).toBe("0");

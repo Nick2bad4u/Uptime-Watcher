@@ -7,7 +7,7 @@
  * support, various visual variants (primary, secondary, danger, etc.), multiple
  * sizes, loading states, and icon positioning. The button follows accessibility
  * best practices with proper ARIA support. It integrates seamlessly with the
- * application's theme system.
+ * app's theme system.
  *
  * @example Primary button with icon:
  *

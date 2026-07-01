@@ -1,7 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { fc, test } from "@fast-check/vitest";
 import type { JsonValue } from "type-fest";
 
+import { fc, test } from "@fast-check/vitest";
 import {
     safeJsonParse,
     safeJsonParseArray,
@@ -9,6 +8,8 @@ import {
     safeJsonStringify,
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
+import { describe, expect, it } from "vitest";
+
 import {
     acceptAnyJsonValue,
     unsafeJsonifiable,

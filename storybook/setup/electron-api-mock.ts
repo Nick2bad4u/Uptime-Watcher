@@ -1,5 +1,5 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
-/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, sonarjs/pseudo-random -- Disable Strict Rules */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-parameters, sonarjs/pseudo-random -- Disable Strict Rules */
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
@@ -44,7 +44,7 @@ interface ElectronMockState {
 const DEFAULT_HISTORY_LIMIT = 30;
 
 const clone = <Value>(value: Value): Value => {
-    if (typeof globalThis.structuredClone === "function") {
+    if (typeof structuredClone === "function") {
         return globalThis.structuredClone(value);
     }
 
@@ -61,10 +61,10 @@ const mockState: ElectronMockState = {
 
 const getCloudStatus = (): CloudStatusSummary => {
     const baseDirectory = mockState.cloudFilesystemBaseDirectory;
-    const connected =
+    const isConnected =
         typeof baseDirectory === "string" && baseDirectory.length > 0;
 
-    if (!connected) {
+    if (!isConnected) {
         return {
             backupsEnabled: false,
             configured: false,
@@ -208,7 +208,7 @@ const electronAPIMockDefinition = {
             config: CloudBackupMigrationRequest
         ): Promise<CloudBackupMigrationResult> => {
             const startedAt = Date.now();
-            const targetEncrypted = config.target === "encrypted";
+            const isTargetEncrypted = config.target === "encrypted";
 
             const failures: CloudBackupMigrationResult["failures"] = [];
             let migrated = 0;
@@ -218,20 +218,20 @@ const electronAPIMockDefinition = {
             const nextBackups: CloudBackupEntry[] = [];
             for (const entry of mockState.cloudBackups) {
                 processedCount += 1;
-                if (entry.encrypted === targetEncrypted) {
+                if (entry.encrypted === isTargetEncrypted) {
                     skipped += 1;
                     nextBackups.push(entry);
                 } else {
-                    const nextFileName = targetEncrypted
+                    const nextFileName = isTargetEncrypted
                         ? `${entry.fileName}.enc`
-                        : entry.fileName.replace(/\.enc$/u, "");
-                    const nextKey = targetEncrypted
+                        : entry.fileName.replace(/\.enc$/v, "");
+                    const nextKey = isTargetEncrypted
                         ? `${entry.key}.enc`
-                        : entry.key.replace(/\.enc$/u, "");
+                        : entry.key.replace(/\.enc$/v, "");
 
                     const migratedEntry: CloudBackupEntry = {
                         ...entry,
-                        encrypted: targetEncrypted,
+                        encrypted: isTargetEncrypted,
                         fileName: nextFileName,
                         key: nextKey,
                     };
@@ -306,7 +306,6 @@ const electronAPIMockDefinition = {
             };
         },
         setEncryptionPassphrase: async (
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Storybook mock only; never log or persist passphrases.
             _passphrase: string
         ): Promise<CloudStatusSummary> => getCloudStatus(),
         uploadLatestBackup: async (): Promise<CloudBackupEntry> => {
@@ -493,7 +492,7 @@ const electronAPIMockDefinition = {
             for (const site of mockState.sites) {
                 attempted += site.monitors.length;
             }
-            const alreadyActive =
+            const isAlreadyActive =
                 siteCount > 0 &&
                 mockState.sites.every(
                     (site) =>
@@ -513,10 +512,10 @@ const electronAPIMockDefinition = {
             const succeeded = attempted;
 
             return {
-                alreadyActive,
+                alreadyActive: isAlreadyActive,
                 attempted,
                 failed: 0,
-                isMonitoring: alreadyActive || succeeded > 0,
+                isMonitoring: isAlreadyActive || succeeded > 0,
                 partialFailures: false,
                 siteCount,
                 skipped: 0,
@@ -747,7 +746,7 @@ export const setMockHistoryLimit = (historyLimit: number): void => {
 
 export const installElectronAPIMock = (): ElectronAPI => {
     if (typeof window !== "undefined") {
-        const windowRecord = window as Partial<Pick<Window, "electronAPI">>;
+        const windowRecord = globalThis as Partial<Pick<Window, "electronAPI">>;
 
         windowRecord.electronAPI ??= electronAPIMock;
     }

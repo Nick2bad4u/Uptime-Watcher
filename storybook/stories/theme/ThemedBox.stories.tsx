@@ -4,23 +4,23 @@ import { ThemedBox } from "@app/theme/components/ThemedBox";
 import { ThemedText } from "@app/theme/components/ThemedText";
 
 const meta: Meta<typeof ThemedBox> = {
-    component: ThemedBox,
     args: {
-        padding: "lg",
-        variant: "primary",
-        shadow: "md",
         children: (
             <ThemedText>
                 Flexible container for grouping related content with themed
                 styling.
             </ThemedText>
         ),
+        padding: "lg",
+        shadow: "md",
+        variant: "primary",
     },
     argTypes: {
         onClick: { action: "clicked" },
         onMouseEnter: { action: "mouse-enter" },
         onMouseLeave: { action: "mouse-leave" },
     },
+    component: ThemedBox,
     parameters: {
         layout: "padded",
     },
@@ -35,15 +35,15 @@ export const Default: Story = {};
 
 export const SecondarySurface: Story = {
     args: {
-        variant: "secondary",
-        surface: "elevated",
-        rounded: "xl",
-        shadow: "lg",
         children: (
             <ThemedText variant="secondary">
                 Elevated secondary surface for dashboard sections.
             </ThemedText>
         ),
+        rounded: "xl",
+        shadow: "lg",
+        surface: "elevated",
+        variant: "secondary",
     },
 };
 

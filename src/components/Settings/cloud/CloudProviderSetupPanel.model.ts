@@ -53,17 +53,17 @@ export const CLOUD_PROVIDER_SETUP_PANEL_TABS: readonly CloudProviderSetupPanelTa
             label: "Local folder",
         },
         {
-            description: "Stores app data in Google Drive appDataFolder.",
-            icon: AppIcons.brands.googleDrive,
-            isAvailable: true,
-            key: "google-drive",
-            label: "Google Drive",
-        },
-        {
             description: "Planned provider integration.",
             icon: AppIcons.ui.cloud,
             isAvailable: false,
             key: "webdav",
             label: "WebDAV",
+        },
+        {
+            description: "Stores app data in Google Drive appDataFolder.",
+            icon: AppIcons.brands.googleDrive,
+            isAvailable: true,
+            key: "google-drive",
+            label: "Google Drive",
         },
     ] as const;

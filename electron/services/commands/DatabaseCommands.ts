@@ -257,7 +257,7 @@ export abstract class DatabaseCommand<
  */
 export class DatabaseCommandExecutor {
     /** Array of successfully executed commands for potential rollback operations */
-    private readonly executedCommands: Array<IDatabaseCommand<unknown>> = [];
+    private readonly executedCommands: IDatabaseCommand<unknown>[] = [];
 
     /**
      * Executes a command with automatic rollback on failure.
@@ -353,7 +353,7 @@ export class DatabaseCommandExecutor {
                 }
             } catch (error) {
                 errors.push(
-                    error instanceof Error
+                    Error.isError(error)
                         ? error
                         : new Error(getUserFacingErrorDetail(error))
                 );
@@ -490,7 +490,7 @@ export class SaveBackupToPathCommand extends DatabaseCommand<DatabaseBackupMetad
 }
 
 /**
- * Command for exporting all application data to JSON.
+ * Command for exporting all app data to JSON.
  *
  * @remarks
  * Encapsulates the logic for exporting all data and emitting a success event.
@@ -532,7 +532,7 @@ export class ExportDataCommand extends DatabaseCommand<string> {
 }
 
 /**
- * Command for importing application data from JSON.
+ * Command for importing app data from JSON.
  *
  * @remarks
  * Encapsulates the logic for importing data, updating the cache, and emitting a
@@ -652,8 +652,8 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors.push("Import data must be valid JSON");
         } else {
             const validation = validateImportData(parseResult.data);
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison ensures stable narrowing under strict TS.
-            if (validation.ok === false) {
+
+            if (!validation.ok) {
                 errors.push(
                     validation.error.message,
                     ...validation.error.issues.slice(0, 3)
@@ -727,14 +727,14 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             )
         );
 
-        const invalidSites: Array<{
+        const invalidSites: {
             errors: readonly string[];
             identifier: string;
-        }> = [];
+        }[] = [];
 
-        validationResults.forEach((result, index) => {
+        for (const [index, result] of validationResults.entries()) {
             if (result.success) {
-                return;
+                continue;
             }
 
             const canonicalSite = canonicalSites[index];
@@ -744,7 +744,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
                     ? canonicalSite.identifier
                     : "<unknown>",
             });
-        });
+        }
 
         if (invalidSites.length > 0) {
             const formattedErrors = arrayJoin(

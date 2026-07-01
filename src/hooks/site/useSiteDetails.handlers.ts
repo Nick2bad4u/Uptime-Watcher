@@ -42,101 +42,6 @@ import {
 } from "./useSiteDetails.utils";
 
 /**
- * Selection handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
- *
- * @public
- */
-export function useSiteDetailsSelectionHandlers(
-    activeSiteDetailsTab: SiteDetailsTab,
-    currentSiteIdentifier: string,
-    setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void,
-    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void
-): {
-    readonly handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
-} {
-    const handleMonitorIdChange = useCallback(
-        (e: ChangeEvent<HTMLSelectElement>) => {
-            applySelectedMonitorIdChange({
-                activeSiteDetailsTab,
-                newMonitorId: e.target.value,
-                setActiveSiteDetailsTab,
-                setSelectedMonitorId,
-                siteIdentifier: currentSiteIdentifier,
-            });
-        },
-        [
-            activeSiteDetailsTab,
-            currentSiteIdentifier,
-            setActiveSiteDetailsTab,
-            setSelectedMonitorId,
-        ]
-    );
-
-    return { handleMonitorIdChange };
-}
-
-/**
- * Remove-site / remove-monitor handlers for
- * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
- *
- * @public
- */
-export function useSiteDetailsRemovalHandlers(
-    clearError: () => void,
-    currentSite: Site,
-    deleteSite: (siteIdentifier: string) => Promise<void>,
-    removeMonitorFromSite: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>,
-    requestConfirmation: (options: ConfirmDialogOptions) => Promise<boolean>,
-    selectedMonitor: Monitor | undefined
-): {
-    readonly handleRemoveMonitor: () => Promise<void>;
-    readonly handleRemoveSite: () => Promise<void>;
-} {
-    const handleRemoveSite = useCallback(async () => {
-        await runSiteDetailsOperation(
-            "useSiteDetails.handleRemoveSite",
-            async () =>
-                removeSiteWithConfirmation({
-                    clearError,
-                    currentSite,
-                    deleteSite,
-                    requestConfirmation,
-                })
-        );
-    }, [
-        clearError,
-        currentSite,
-        deleteSite,
-        requestConfirmation,
-    ]);
-
-    const handleRemoveMonitor = useCallback(async () => {
-        await runSiteDetailsOperation(
-            "useSiteDetails.handleRemoveMonitor",
-            async () =>
-                removeMonitorWithConfirmation({
-                    clearError,
-                    currentSite,
-                    removeMonitorFromSite,
-                    requestConfirmation,
-                    selectedMonitor,
-                })
-        );
-    }, [
-        clearError,
-        currentSite,
-        removeMonitorFromSite,
-        requestConfirmation,
-        selectedMonitor,
-    ]);
-
-    return { handleRemoveMonitor, handleRemoveSite };
-}
-
-/**
  * Monitoring handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
  *
  * @public
@@ -280,6 +185,143 @@ export function useSiteDetailsMonitoringHandlers(
         handleStopMonitoring,
         handleStopSiteMonitoring,
     };
+}
+
+/**
+ * Site-name save handler for
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ *
+ * @public
+ */
+export function useSiteDetailsNameHandler(
+    clearError: () => void,
+    currentSiteIdentifier: string,
+    currentSiteName: string,
+    localName: string,
+    modifySite: (
+        siteIdentifier: string,
+        updates: { readonly name: string }
+    ) => Promise<void>,
+    setUserEditedSiteName: (value: string | undefined) => void
+): { readonly handleSaveName: () => Promise<void> } {
+    const handleSaveName = useCallback(async () => {
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleSaveName",
+            async () =>
+                saveSiteName({
+                    clearError,
+                    currentSiteIdentifier,
+                    currentSiteName,
+                    localName,
+                    modifySite,
+                    setUserEditedSiteName,
+                })
+        );
+    }, [
+        clearError,
+        currentSiteIdentifier,
+        currentSiteName,
+        localName,
+        modifySite,
+        setUserEditedSiteName,
+    ]);
+
+    return { handleSaveName };
+}
+
+/**
+ * Remove-site / remove-monitor handlers for
+ * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ *
+ * @public
+ */
+export function useSiteDetailsRemovalHandlers(
+    clearError: () => void,
+    currentSite: Site,
+    deleteSite: (siteIdentifier: string) => Promise<void>,
+    removeMonitorFromSite: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>,
+    requestConfirmation: (options: ConfirmDialogOptions) => Promise<boolean>,
+    selectedMonitor: Monitor | undefined
+): {
+    readonly handleRemoveMonitor: () => Promise<void>;
+    readonly handleRemoveSite: () => Promise<void>;
+} {
+    const handleRemoveSite = useCallback(async () => {
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleRemoveSite",
+            async () =>
+                removeSiteWithConfirmation({
+                    clearError,
+                    currentSite,
+                    deleteSite,
+                    requestConfirmation,
+                })
+        );
+    }, [
+        clearError,
+        currentSite,
+        deleteSite,
+        requestConfirmation,
+    ]);
+
+    const handleRemoveMonitor = useCallback(async () => {
+        await runSiteDetailsOperation(
+            "useSiteDetails.handleRemoveMonitor",
+            async () =>
+                removeMonitorWithConfirmation({
+                    clearError,
+                    currentSite,
+                    removeMonitorFromSite,
+                    requestConfirmation,
+                    selectedMonitor,
+                })
+        );
+    }, [
+        clearError,
+        currentSite,
+        removeMonitorFromSite,
+        requestConfirmation,
+        selectedMonitor,
+    ]);
+
+    return { handleRemoveMonitor, handleRemoveSite };
+}
+
+/**
+ * Selection handlers for {@link src/hooks/site/useSiteDetails#useSiteDetails}.
+ *
+ * @public
+ */
+export function useSiteDetailsSelectionHandlers(
+    activeSiteDetailsTab: SiteDetailsTab,
+    currentSiteIdentifier: string,
+    setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void,
+    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void
+): {
+    readonly handleMonitorIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+} {
+    const handleMonitorIdChange = useCallback(
+        (e: ChangeEvent<HTMLSelectElement>) => {
+            applySelectedMonitorIdChange({
+                activeSiteDetailsTab,
+                newMonitorId: e.target.value,
+                setActiveSiteDetailsTab,
+                setSelectedMonitorId,
+                siteIdentifier: currentSiteIdentifier,
+            });
+        },
+        [
+            activeSiteDetailsTab,
+            currentSiteIdentifier,
+            setActiveSiteDetailsTab,
+            setSelectedMonitorId,
+        ]
+    );
+
+    return { handleMonitorIdChange };
 }
 
 /**
@@ -474,46 +516,4 @@ export function useSiteDetailsSettingsHandlers(
         handleSaveTimeout,
         handleTimeoutChange,
     };
-}
-
-/**
- * Site-name save handler for
- * {@link src/hooks/site/useSiteDetails#useSiteDetails}.
- *
- * @public
- */
-export function useSiteDetailsNameHandler(
-    clearError: () => void,
-    currentSiteIdentifier: string,
-    currentSiteName: string,
-    localName: string,
-    modifySite: (
-        siteIdentifier: string,
-        updates: { readonly name: string }
-    ) => Promise<void>,
-    setUserEditedSiteName: (value: string | undefined) => void
-): { readonly handleSaveName: () => Promise<void> } {
-    const handleSaveName = useCallback(async () => {
-        await runSiteDetailsOperation(
-            "useSiteDetails.handleSaveName",
-            async () =>
-                saveSiteName({
-                    clearError,
-                    currentSiteIdentifier,
-                    currentSiteName,
-                    localName,
-                    modifySite,
-                    setUserEditedSiteName,
-                })
-        );
-    }, [
-        clearError,
-        currentSiteIdentifier,
-        currentSiteName,
-        localName,
-        modifySite,
-        setUserEditedSiteName,
-    ]);
-
-    return { handleSaveName };
 }
