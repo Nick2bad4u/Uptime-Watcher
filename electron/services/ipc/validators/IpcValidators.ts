@@ -66,7 +66,7 @@ export const IpcValidators = {
      * Validates a required number parameter.
      */
     requiredNumber: (value: unknown, paramName: string): null | string => {
-        if (typeof value !== "number" || Number.isNaN(value)) {
+        if (typeof value !== "number" || !Number.isFinite(value)) {
             return `${paramName} must be a valid number`;
         }
         return null;

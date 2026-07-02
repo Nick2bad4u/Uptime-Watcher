@@ -298,6 +298,38 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(result).toBe("testParam must be a valid number");
             });
 
+            it("should return error for positive infinity", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = IpcValidators.requiredNumber(
+                    Infinity,
+                    "testParam"
+                );
+                expect(result).toBe("testParam must be a valid number");
+            });
+
+            it("should return error for negative infinity", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = IpcValidators.requiredNumber(
+                    -Infinity,
+                    "testParam"
+                );
+                expect(result).toBe("testParam must be a valid number");
+            });
+
             it("should return error for string values", async ({
                 task,
                 annotate,
