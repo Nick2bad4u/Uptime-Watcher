@@ -1,6 +1,10 @@
 import type { CloudSyncState } from "@shared/types/cloudSyncState";
 
-import { normalizeCloudSyncState } from "@electron/services/sync/syncEngineState";
+import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import {
+    buildLocalOperations,
+    normalizeCloudSyncState,
+} from "@electron/services/sync/syncEngineState";
 import { describe, expect, it } from "vitest";
 
 const PROTOTYPE_PROPERTY_NAME = "__proto__";
@@ -89,5 +93,42 @@ describe(normalizeCloudSyncState, () => {
 
         expect(monitor?.fields["timeout"]?.value).toBeGreaterThan(0);
         expect(site?.fields["name"]?.value).toBe(PROTOTYPE_PROPERTY_NAME);
+    });
+});
+
+describe(buildLocalOperations, () => {
+    it("emits deletes for baseline keys that match inherited object properties", () => {
+        const { operations } = buildLocalOperations({
+            baseline: {
+                baselineVersion: 1,
+                createdAt: 0,
+                monitors: {},
+                settings: {},
+                sites: {
+                    toString: {
+                        identifier: "toString",
+                        monitoring: true,
+                        name: "Inherited key site",
+                    },
+                },
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            },
+            current: {
+                monitors: {},
+                settings: {},
+                sites: {},
+            },
+            deviceId: "device-1",
+            nextOpId: 1,
+            now: 10,
+        });
+
+        expect(operations).toContainEqual(
+            expect.objectContaining({
+                entityId: "toString",
+                entityType: "site",
+                kind: "delete-entity",
+            })
+        );
     });
 });

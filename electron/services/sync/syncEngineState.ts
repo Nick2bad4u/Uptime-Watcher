@@ -35,6 +35,9 @@ import {
 } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_BASELINE_VERSION,
+    createCloudSyncBaselineMonitors,
+    createCloudSyncBaselineSettings,
+    createCloudSyncBaselineSites,
     parseCloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import {
@@ -52,7 +55,7 @@ import {
     isDefined,
     isFinite as isFiniteValue,
     objectEntries,
-    objectHasIn,
+    objectHasOwn,
     objectKeys,
 } from "ts-extras";
 
@@ -542,9 +545,9 @@ export function createEmptyBaseline(): CloudSyncBaseline {
     return {
         baselineVersion: CLOUD_SYNC_BASELINE_VERSION,
         createdAt: 0,
-        monitors: {},
-        settings: {},
-        sites: {},
+        monitors: createCloudSyncBaselineMonitors(),
+        settings: createCloudSyncBaselineSettings(),
+        sites: createCloudSyncBaselineSites(),
         syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
     };
 }
@@ -714,7 +717,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     }
 
     for (const [siteId] of objectEntries(baselineSites)) {
-        if (!objectHasIn(args.current.sites, siteId)) {
+        if (!objectHasOwn(args.current.sites, siteId)) {
             emitDelete("site", siteId);
         }
     }
@@ -733,7 +736,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     }
 
     for (const [monitorId] of objectEntries(baselineMonitors)) {
-        if (!objectHasIn(args.current.monitors, monitorId)) {
+        if (!objectHasOwn(args.current.monitors, monitorId)) {
             emitDelete("monitor", monitorId);
         }
     }
