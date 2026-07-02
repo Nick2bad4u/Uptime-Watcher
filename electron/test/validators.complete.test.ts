@@ -13,6 +13,7 @@
  * @author Uptime-Watcher
  */
 
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { describe, expect, it } from "vitest";
 
 // Import all exported validator groups (domain modules)
@@ -1309,6 +1310,29 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     "not-a-number",
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("should reject non-finite and over-maximum history limits", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const invalidLimits = [
+                    Infinity,
+                    -Infinity,
+                    DEFAULT_HISTORY_LIMIT_RULES.maxLimit + 1,
+                ];
+
+                for (const limit of invalidLimits) {
+                    const result = SettingsHandlerValidators.updateHistoryLimit(
+                        [limit]
+                    );
+                    expect(isValidationFailure(result)).toBeTruthy();
+                }
             });
         });
     });
