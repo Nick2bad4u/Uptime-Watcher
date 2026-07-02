@@ -189,6 +189,30 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             );
         });
 
+        it("should return undefined for malformed numeric setting strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            for (const value of ["1e3", " ".repeat(3)]) {
+                vi.mocked(mockRepositories.settings.get).mockResolvedValue(
+                    value
+                );
+
+                const result =
+                    await siteRepositoryService.getHistoryLimitSetting();
+
+                expect(result).toBeUndefined();
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    `Invalid history limit setting: ${value}`
+                );
+            }
+        });
+
         it("should treat negative setting as unlimited history", async ({
             task,
             annotate,

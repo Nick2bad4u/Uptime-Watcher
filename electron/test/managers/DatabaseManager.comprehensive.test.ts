@@ -511,6 +511,24 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 DEFAULT_HISTORY_LIMIT_RULES.defaultLimit
             );
         });
+
+        it("should fall back to default when persisted history limit uses exponent notation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
+            vi.mocked(mockSettingsRepository.get).mockResolvedValue("1e3");
+
+            await databaseManager.initialize();
+
+            expect(databaseManager.getHistoryLimit()).toBe(
+                DEFAULT_HISTORY_LIMIT_RULES.defaultLimit
+            );
+        });
     });
 
     describe("LoadSites - Error Handling Branches", () => {

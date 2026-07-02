@@ -899,6 +899,25 @@ describe("DatabaseCommands", () => {
             expect(mockUpdateHistoryLimit).not.toHaveBeenCalled();
         });
 
+        it("should skip history limit propagation for malformed numeric strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Settings", "type");
+
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                sites: [createTestSite("test1")],
+                settings: { historyLimit: "1e3" },
+            });
+
+            await command.execute();
+
+            expect(mockUpdateHistoryLimit).not.toHaveBeenCalled();
+        });
+
         it("should fail when site validation fails", async ({
             task,
             annotate,

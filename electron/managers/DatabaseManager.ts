@@ -79,6 +79,7 @@ import {
     SaveBackupToPathCommand,
 } from "../services/commands/DatabaseCommands";
 import { setHistoryLimit as setHistoryLimitUtil } from "../services/database/historyLimitManager";
+import { parseHistoryLimitSetting } from "../services/database/utils/historyLimitSettingParser";
 import { createSiteCache } from "../services/database/serviceFactory";
 import { SiteLoadingOrchestrator } from "../services/database/SiteRepositoryService";
 import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
@@ -428,9 +429,16 @@ export class DatabaseManager {
                         );
 
                     if (isDefined(rawHistoryLimit)) {
-                        const parsedHistoryLimit = Number(rawHistoryLimit);
+                        const parsedHistoryLimit =
+                            parseHistoryLimitSetting(rawHistoryLimit);
 
                         try {
+                            if (!isDefined(parsedHistoryLimit)) {
+                                throw new TypeError(
+                                    `History limit setting must be an integer string, received: ${rawHistoryLimit}`
+                                );
+                            }
+
                             const normalizedHistoryLimit =
                                 normalizeHistoryLimit(
                                     parsedHistoryLimit,

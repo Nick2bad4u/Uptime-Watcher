@@ -57,6 +57,7 @@ import type { SiteRow } from "./utils/mappers/siteMapper";
 
 import { DEFAULT_SITE_NAME } from "../../constants";
 import { SiteLoadingError } from "./interfaces";
+import { parseHistoryLimitSetting } from "./utils/historyLimitSettingParser";
 
 /**
  * Service for handling site repository operations.
@@ -124,9 +125,9 @@ export class SiteRepositoryService {
             if (!historyLimitSetting) {
                 return undefined;
             }
-            const parsedLimit = Number(historyLimitSetting);
+            const parsedLimit = parseHistoryLimitSetting(historyLimitSetting);
 
-            if (Number.isNaN(parsedLimit)) {
+            if (!isDefined(parsedLimit)) {
                 this.logger.warn(
                     `Invalid history limit setting: ${historyLimitSetting}`
                 );

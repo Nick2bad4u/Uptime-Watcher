@@ -28,7 +28,6 @@ import {
     arrayJoin,
     isDefined,
     isEmpty,
-    isFinite as isFiniteNumber,
     safeCastTo,
     setHas,
 } from "ts-extras";
@@ -47,6 +46,7 @@ import type {
     DatabaseRestorePayload,
     DatabaseRestoreSummary,
 } from "../database/utils/backup/databaseBackup";
+import { parseHistoryLimitSetting } from "../database/utils/historyLimitSettingParser";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import { logger as backendLogger } from "../../utils/logger";
@@ -680,8 +680,8 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             return;
         }
 
-        const parsedHistoryLimit = Number(rawHistoryLimit);
-        if (!isFiniteNumber(parsedHistoryLimit)) {
+        const parsedHistoryLimit = parseHistoryLimitSetting(rawHistoryLimit);
+        if (!isDefined(parsedHistoryLimit)) {
             backendLogger.warn(
                 "[ImportDataCommand] Imported history limit is not a valid number",
                 {
