@@ -770,7 +770,7 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
 export function getMaxOpIdByDevice(
     operations: readonly CloudSyncOperation[]
 ): Record<string, number> {
-    const result: Record<string, number> = {};
+    const result = createNullPrototypeObject<Record<string, number>>();
 
     for (const op of operations) {
         result[op.deviceId] = Math.max(result[op.deviceId] ?? -1, op.opId);

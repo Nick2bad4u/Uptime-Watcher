@@ -3,6 +3,7 @@ import type { CloudSyncState } from "@shared/types/cloudSyncState";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     buildLocalOperations,
+    getMaxOpIdByDevice,
     normalizeCloudSyncState,
 } from "@electron/services/sync/syncEngineState";
 import { describe, expect, it } from "vitest";
@@ -130,5 +131,37 @@ describe(buildLocalOperations, () => {
                 kind: "delete-entity",
             })
         );
+    });
+});
+
+describe(getMaxOpIdByDevice, () => {
+    it("aggregates device IDs that match inherited object properties", () => {
+        const result = getMaxOpIdByDevice([
+            {
+                deviceId: "toString",
+                entityId: "site-1",
+                entityType: "site",
+                field: "name",
+                kind: "set-field",
+                opId: 1,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                timestamp: 1,
+                value: "Example",
+            },
+            {
+                deviceId: "toString",
+                entityId: "site-1",
+                entityType: "site",
+                field: "monitoring",
+                kind: "set-field",
+                opId: 7,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                timestamp: 2,
+                value: true,
+            },
+        ]);
+
+        expect(Object.getPrototypeOf(result)).toBeNull();
+        expect(result["toString"]).toBe(7);
     });
 });
