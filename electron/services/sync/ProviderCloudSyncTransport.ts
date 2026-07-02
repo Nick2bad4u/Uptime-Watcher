@@ -239,6 +239,27 @@ function createEmptyManifest(): CloudSyncManifest {
     };
 }
 
+function validateManifestSnapshotKey(manifest: CloudSyncManifest): void {
+    const { latestSnapshotKey } = manifest;
+    if (!latestSnapshotKey) {
+        return;
+    }
+
+    try {
+        assertSnapshotKey(latestSnapshotKey);
+    } catch (error) {
+        const resolved = ensureError(error);
+        throw new CloudSyncCorruptRemoteObjectError(
+            `Cloud sync manifest latestSnapshotKey is invalid: ${resolved.message}`,
+            {
+                cause: error,
+                key: MANIFEST_KEY,
+                kind: "manifest",
+            }
+        );
+    }
+}
+
 function createSnapshotKey(createdAt: number): string {
     const nonceHex = createSnapshotNonceHex();
     return `${getSnapshotsPrefix()}/${createdAt}-${nonceHex}.json`;
@@ -440,7 +461,9 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 return null;
             }
 
-            return parseCloudSyncManifest(JSON.parse(rawOrNull));
+            const manifest = parseCloudSyncManifest(JSON.parse(rawOrNull));
+            validateManifestSnapshotKey(manifest);
+            return manifest;
         } catch (error) {
             if (isProviderNotFoundError(error)) {
                 return null;
@@ -450,7 +473,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             // recover by rebuilding remote state.
             if (
                 isCloudSyncJsonValidationError(error) ||
-                isCloudSyncSizeLimitError(error)
+                isCloudSyncSizeLimitError(error) ||
+                ensureError(error) instanceof CloudSyncCorruptRemoteObjectError
             ) {
                 const resolved = ensureError(error);
                 logger.warn(
