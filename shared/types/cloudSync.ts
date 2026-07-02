@@ -20,6 +20,7 @@
 
 import type { JsonValue as TypeFestJsonValue } from "type-fest";
 
+import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
 import * as z from "zod";
 
 /**
@@ -78,6 +79,16 @@ const cloudSyncEntityTypeInternalSchema: z.ZodType<CloudSyncEntityType> =
 export const cloudSyncEntityTypeSchema: typeof cloudSyncEntityTypeInternalSchema =
     cloudSyncEntityTypeInternalSchema;
 
+const persistedDeviceIdSchema = z.string().superRefine((candidate, ctx) => {
+    const error = getPersistedDeviceIdValidationError(candidate);
+    if (error !== null) {
+        ctx.addIssue({
+            code: "custom",
+            message: error,
+        });
+    }
+});
+
 /**
  * Common write ordering key.
  *
@@ -99,7 +110,7 @@ export interface CloudSyncWriteKey {
 
 const cloudSyncWriteKeyInternalSchema: z.ZodType<CloudSyncWriteKey> = z
     .object({
-        deviceId: z.string().min(1),
+        deviceId: persistedDeviceIdSchema,
         opId: z.int().nonnegative().max(MAX_SAFE_INT),
         timestamp: z.int().nonnegative().max(MAX_SAFE_INT),
     })
@@ -146,7 +157,7 @@ export type CloudSyncOperation =
 
 const setFieldOperationSchema = z
     .object({
-        deviceId: z.string().min(1),
+        deviceId: persistedDeviceIdSchema,
         entityId: z.string().min(1),
         entityType: cloudSyncEntityTypeInternalSchema,
         opId: z.int().nonnegative().max(MAX_SAFE_INT),

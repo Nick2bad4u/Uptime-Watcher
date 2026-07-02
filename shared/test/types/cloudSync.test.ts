@@ -1,7 +1,12 @@
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
+    cloudSyncWriteKeySchema,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
+import {
+    MAX_PERSISTED_DEVICE_ID_BYTES,
+    getPersistedDeviceIdValidationError,
+} from "@shared/validation/persistedDeviceIdValidation";
 import { describe, expect, it } from "vitest";
 
 describe("cloudSync", () => {
@@ -58,5 +63,37 @@ describe("cloudSync", () => {
             expect(parsedObject[" key "]).toBe(2);
             expect(parsedObject["key"]).toBe(1);
         }
+    });
+
+    it.each([
+        " device-1 ",
+        "device/1",
+        "device:1",
+        "__proto__",
+        "d".repeat(MAX_PERSISTED_DEVICE_ID_BYTES + 1),
+    ])("rejects unsafe operation deviceId %s", (deviceId) => {
+        const input = {
+            deviceId,
+            entityId: "settings-key",
+            entityType: "settings",
+            kind: "delete-entity",
+            opId: 3,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 3,
+        } as const;
+
+        expect(() => parseCloudSyncOperation(input)).toThrow(
+            getPersistedDeviceIdValidationError(deviceId) ?? "Invalid input"
+        );
+    });
+
+    it("applies persisted deviceId validation to write keys", () => {
+        expect(() =>
+            cloudSyncWriteKeySchema.parse({
+                deviceId: "device\n1",
+                opId: 1,
+                timestamp: 1,
+            })
+        ).toThrow("deviceId must not contain control characters");
     });
 });
