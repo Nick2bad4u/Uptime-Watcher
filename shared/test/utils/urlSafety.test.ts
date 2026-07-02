@@ -138,6 +138,11 @@ describe("urlSafety", () => {
                 isAllowedExternalOpenUrl("https://example.com\rInjected")
             ).toBeFalsy();
         });
+
+        it("blocks mailto URLs without a valid address", () => {
+            expect(isAllowedExternalOpenUrl("mailto:not-an-email")).toBeFalsy();
+            expect(isAllowedExternalOpenUrl("mailto:")).toBeFalsy();
+        });
     });
 
     describe(validateExternalOpenUrlCandidate, () => {

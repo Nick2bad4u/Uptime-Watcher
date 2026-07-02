@@ -451,7 +451,7 @@ export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
             return parsed.hostname.length > 0;
         }
         case "mailto:": {
-            return parsed.pathname.length > 0;
+            return validator.isEmail(parsed.pathname);
         }
         default: {
             return false;
