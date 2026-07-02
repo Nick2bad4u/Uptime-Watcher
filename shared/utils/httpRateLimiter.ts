@@ -1,6 +1,10 @@
 import { createAbortError } from "@shared/utils/abortError";
 import { sleepUnref } from "@shared/utils/abortUtils";
 
+const DEFAULT_MAX_CONCURRENT = 1;
+const DEFAULT_MAX_WAIT_MS = 30_000;
+const DEFAULT_MIN_INTERVAL_MS = 0;
+
 function assertNotAborted(signal: AbortSignal | undefined): void {
     if (!signal?.aborted) {
         return;
@@ -9,6 +13,22 @@ function assertNotAborted(signal: AbortSignal | undefined): void {
     throw createAbortError({
         cause: Reflect.get(signal, "reason"),
     });
+}
+
+function normalizeNonNegativeInteger(value: number, fallback: number): number {
+    if (!Number.isFinite(value) || value < 0) {
+        return fallback;
+    }
+
+    return Math.trunc(value);
+}
+
+function normalizePositiveInteger(value: number, fallback: number): number {
+    if (!Number.isFinite(value) || value <= 0) {
+        return fallback;
+    }
+
+    return Math.trunc(value);
 }
 
 /**
@@ -130,8 +150,22 @@ export class HttpRateLimiter {
     }
 
     public constructor(config: HttpRateLimiterConfig) {
-        this.config = config;
-        this.maxWaitMs = config.maxWaitMs ?? 30_000;
+        this.maxWaitMs = normalizeNonNegativeInteger(
+            config.maxWaitMs ?? DEFAULT_MAX_WAIT_MS,
+            DEFAULT_MAX_WAIT_MS
+        );
+        this.config = {
+            ...config,
+            maxConcurrent: normalizePositiveInteger(
+                config.maxConcurrent,
+                DEFAULT_MAX_CONCURRENT
+            ),
+            maxWaitMs: this.maxWaitMs,
+            minIntervalMs: normalizeNonNegativeInteger(
+                config.minIntervalMs,
+                DEFAULT_MIN_INTERVAL_MS
+            ),
+        };
     }
 
     private toKey(url: string): string {
