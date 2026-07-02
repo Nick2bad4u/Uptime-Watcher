@@ -131,11 +131,27 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
         const [shouldRender, setShouldRender] = useState(false);
         const showTimerRef = useRef<null | ReturnType<typeof setTimeout>>(null);
         const hideTimerRef = useRef<null | ReturnType<typeof setTimeout>>(null);
+        const visibilityRafRef = useRef<null | number>(null);
         const tooltipId = useId();
         const containerRef = useRef<HTMLDivElement | null>(null);
         const tooltipRef = useRef<HTMLDivElement | null>(null);
 
+        const cancelVisibilityFrame = useCallback((): void => {
+            const rafId = visibilityRafRef.current;
+            if (rafId === null) {
+                return;
+            }
+
+            visibilityRafRef.current = null;
+
+            if (typeof cancelAnimationFrame === "function") {
+                globalThis.cancelAnimationFrame(rafId);
+            }
+        }, []);
+
         const clearTimers = useCallback((): void => {
+            cancelVisibilityFrame();
+
             if (showTimerRef.current) {
                 clearTimeout(showTimerRef.current);
                 showTimerRef.current = null;
@@ -145,7 +161,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 clearTimeout(hideTimerRef.current);
                 hideTimerRef.current = null;
             }
-        }, []);
+        }, [cancelVisibilityFrame]);
 
         const showTooltip = useCallback(() => {
             if (disabled) {
@@ -159,15 +175,19 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                     typeof window !== "undefined" &&
                     typeof requestAnimationFrame === "function"
                 ) {
-                    globalThis.requestAnimationFrame(() => {
-                        setIsVisible(true);
-                    });
+                    visibilityRafRef.current = globalThis.requestAnimationFrame(
+                        () => {
+                            visibilityRafRef.current = null;
+                            setIsVisible(true);
+                        }
+                    );
                 } else {
                     setIsVisible(true);
                 }
             };
 
             showTimerRef.current = setTimeout(() => {
+                showTimerRef.current = null;
                 setShouldRender(true);
                 commitVisible();
             }, delay);
@@ -178,6 +198,8 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
         ]);
 
         const hideTooltip = useCallback(() => {
+            cancelVisibilityFrame();
+
             if (showTimerRef.current) {
                 clearTimeout(showTimerRef.current);
                 showTimerRef.current = null;
@@ -190,10 +212,10 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             }
 
             hideTimerRef.current = setTimeout(() => {
-                setShouldRender(false);
                 hideTimerRef.current = null;
+                setShouldRender(false);
             }, 200);
-        }, []);
+        }, [cancelVisibilityFrame]);
 
         useMount(noop, clearTimers);
 

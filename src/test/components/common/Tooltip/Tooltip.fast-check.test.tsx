@@ -3,7 +3,7 @@
  */
 
 import { fc, test as fcTest } from "@fast-check/vitest";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -40,6 +40,7 @@ beforeEach(() => {
 afterEach(() => {
     rafSpy?.mockRestore();
     rafSpy = null;
+    vi.useRealTimers();
     document.body.replaceChildren();
 });
 
@@ -165,6 +166,40 @@ describe("Tooltip fast-check coverage", () => {
         );
 
         unmount();
+    });
+
+    it("cancels a pending visibility animation frame on unmount", () => {
+        vi.useFakeTimers();
+
+        rafSpy?.mockRestore();
+        rafSpy = vi
+            .spyOn(globalThis, "requestAnimationFrame")
+            .mockReturnValue(123);
+
+        const cancelAnimationFrameSpy = vi
+            .spyOn(globalThis, "cancelAnimationFrame")
+            .mockImplementation(() => {});
+
+        const { unmount } = render(
+            <Tooltip content="Pending frame helper" delay={0}>
+                {(triggerProps) => <span {...triggerProps}>Hover me</span>}
+            </Tooltip>
+        );
+
+        const container = document.querySelector(".tooltip-container")!;
+        fireEvent.mouseEnter(container);
+
+        act(() => {
+            vi.advanceTimersByTime(0);
+        });
+
+        expect(document.querySelector(".tooltip")).not.toBeNull();
+
+        unmount();
+
+        expect(cancelAnimationFrameSpy).toHaveBeenCalledWith(123);
+
+        cancelAnimationFrameSpy.mockRestore();
     });
 
     fcTest.prop(
