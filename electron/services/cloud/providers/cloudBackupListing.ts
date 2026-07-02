@@ -1,7 +1,7 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { isPresent, setHas } from "ts-extras";
+import { isPresent, setHas, stringSplit } from "ts-extras";
 
 import type { CloudObjectEntry } from "./CloudStorageProvider.types";
 
@@ -69,6 +69,39 @@ export async function listBackupsFromMetadataObjects(args: {
                                 key: metadataObject.key,
                                 message:
                                     "Backup metadata buffer contained invalid JSON or did not match the expected schema.",
+                            }
+                        );
+                        return null;
+                    }
+
+                    if (parsed.key !== backupKey) {
+                        logger.warn(
+                            "[cloudBackupListing] Backup metadata key mismatch; skipping",
+                            {
+                                backupKey,
+                                key: metadataObject.key,
+                                message:
+                                    "Backup metadata key does not match its sidecar object path.",
+                                metadataKey: parsed.key,
+                            }
+                        );
+                        return null;
+                    }
+
+                    const expectedFileName =
+                        stringSplit(backupKey, "/").pop() ?? "";
+                    if (
+                        expectedFileName.length > 0 &&
+                        parsed.fileName !== expectedFileName
+                    ) {
+                        logger.warn(
+                            "[cloudBackupListing] Backup metadata fileName mismatch; skipping",
+                            {
+                                expectedFileName,
+                                key: metadataObject.key,
+                                message:
+                                    "Backup metadata fileName does not match its backup object path.",
+                                metadataFileName: parsed.fileName,
                             }
                         );
                         return null;
