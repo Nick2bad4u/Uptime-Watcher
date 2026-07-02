@@ -100,12 +100,6 @@ export default {
             // Especially useful for fluid typography and spacing
         },
 
-        // Viewport height correction for mobile and desktop apps
-        "postcss-viewport-height-correction": {
-            // Fixes 100vh issues in mobile browsers and Electron
-            // Adds fallback for browsers that don't support dynamic viewport units
-        },
-
         // Round sub-pixel values for crisp rendering
         "postcss-round-subpixels": {
             // Rounds sub-pixel values to nearest full pixel
