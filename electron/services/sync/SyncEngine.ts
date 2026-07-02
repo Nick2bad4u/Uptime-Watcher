@@ -15,6 +15,7 @@ import {
     CLOUD_SYNC_BASELINE_VERSION,
     type CloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
+import { createCloudSyncManifestDevices } from "@shared/types/cloudSyncManifest";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { createSingleFlight } from "@shared/utils/singleFlight";
@@ -301,10 +302,10 @@ export class SyncEngine {
         const nextManifest: CloudSyncManifest = {
             ...remoteManifest,
             devices: snapshotTrusted
-                ? {
-                      ...remoteManifest.devices,
-                  }
-                : {},
+                ? createCloudSyncManifestDevices(
+                      objectEntries(remoteManifest.devices)
+                  )
+                : createCloudSyncManifestDevices(),
             lastCompactionAt: snapshot.createdAt,
             latestSnapshotKey: snapshotEntry.key,
         };

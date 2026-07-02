@@ -1,11 +1,37 @@
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_MANIFEST_VERSION,
+    createCloudSyncManifestDevices,
     parseCloudSyncManifest,
 } from "@shared/types/cloudSyncManifest";
 import { describe, expect, it } from "vitest";
 
 describe("cloudSyncManifest", () => {
+    it("returns a null-prototype devices map when all device IDs are valid", () => {
+        const parsed = parseCloudSyncManifest({
+            devices: {
+                "device-a": { compactedUpToOpId: 1, lastSeenAt: 10 },
+                "device-b": { compactedUpToOpId: 2, lastSeenAt: 20 },
+            },
+            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(Object.getPrototypeOf(parsed.devices)).toBeNull();
+        expect(Object.keys(parsed.devices)).toEqual(["device-a", "device-b"]);
+        expect(parsed.devices["device-b"]?.compactedUpToOpId).toBe(2);
+    });
+
+    it("creates null-prototype manifest devices maps", () => {
+        const devices = createCloudSyncManifestDevices([
+            ["device-a", { compactedUpToOpId: 1, lastSeenAt: 10 }],
+        ]);
+
+        expect(Object.getPrototypeOf(devices)).toBeNull();
+        expect(Object.hasOwn(devices, "device-a")).toBeTruthy();
+        expect(devices["device-a"]?.lastSeenAt).toBe(10);
+    });
+
     it("drops invalid device IDs from the manifest devices map", () => {
         const parsed = parseCloudSyncManifest({
             devices: {

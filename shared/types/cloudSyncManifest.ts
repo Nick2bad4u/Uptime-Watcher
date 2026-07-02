@@ -9,7 +9,7 @@ import {
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
-import { objectEntries, objectKeys } from "ts-extras";
+import { objectEntries } from "ts-extras";
 import * as z from "zod";
 
 export const CLOUD_SYNC_MANIFEST_VERSION = 1 as const;
@@ -48,17 +48,16 @@ const cloudSyncManifestInternalSchema = z
  */
 const MAX_MANIFEST_DEVICES = 512;
 
+export interface CloudSyncManifestDeviceCompaction {
+    compactedUpToOpId: number;
+    lastSeenAt: number;
+}
+
 /**
  * Remote manifest holding pointers and compaction metadata.
  */
 export interface CloudSyncManifest {
-    devices: Record<
-        string,
-        {
-            compactedUpToOpId: number;
-            lastSeenAt: number;
-        }
-    >;
+    devices: Record<string, CloudSyncManifestDeviceCompaction>;
     /** Optional remote encryption configuration (non-secret). */
     encryption?: CloudEncryptionConfig | undefined;
     /** Timestamp (epoch ms) of last compaction/snapshot. */
@@ -75,6 +74,25 @@ export interface CloudSyncManifest {
      */
     resetAt?: number | undefined;
     syncSchemaVersion: typeof CLOUD_SYNC_SCHEMA_VERSION;
+}
+
+/**
+ * Builds a manifest device map that is safe for remote-derived device IDs.
+ */
+export function createCloudSyncManifestDevices(
+    entries: readonly [string, CloudSyncManifestDeviceCompaction][] = []
+): CloudSyncManifest["devices"] {
+    const devices = createNullPrototypeObject<CloudSyncManifest["devices"]>();
+    for (const [deviceId, meta] of entries) {
+        Object.defineProperty(devices, deviceId, {
+            configurable: true,
+            enumerable: true,
+            value: meta,
+            writable: true,
+        });
+    }
+
+    return devices;
 }
 
 /**
@@ -100,25 +118,8 @@ export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
                   .slice(0, MAX_MANIFEST_DEVICES)
             : validEntries;
 
-    if (limited.length === objectKeys(parsed.devices).length) {
-        return parsed;
-    }
-
-    // IMPORTANT: Avoid Object.fromEntries with untrusted keys. Even if keys are
-    // validated, defense-in-depth matters and null-prototype records avoid
-    // prototype pollution edge cases.
-    const devices = createNullPrototypeObject<CloudSyncManifest["devices"]>();
-    for (const [deviceId, meta] of limited) {
-        Object.defineProperty(devices, deviceId, {
-            configurable: true,
-            enumerable: true,
-            value: meta,
-            writable: true,
-        });
-    }
-
     return {
         ...parsed,
-        devices,
+        devices: createCloudSyncManifestDevices(limited),
     };
 }
