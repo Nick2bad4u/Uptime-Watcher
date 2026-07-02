@@ -2,11 +2,47 @@ import {
     startLoopbackOAuthServer,
     type LoopbackOAuthServer,
 } from "@electron/services/cloud/oauth/LoopbackOAuthServer";
-import { get } from "node:http";
+import { createServer, get, type Server } from "node:http";
 import { describe, expect, it } from "vitest";
 
 async function closeServer(server: LoopbackOAuthServer): Promise<void> {
     await server.close();
+}
+
+async function closeNodeServer(server: Server): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
+        server.close((error) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve();
+        });
+    });
+}
+
+async function listenOnLoopback(): Promise<{
+    readonly port: number;
+    readonly server: Server;
+}> {
+    const server = createServer((_request, response) => {
+        response.statusCode = 204;
+        response.end();
+    });
+
+    await new Promise<void>((resolve, reject) => {
+        server.once("error", reject);
+        server.listen(0, "127.0.0.1", resolve);
+    });
+
+    const address = server.address();
+    if (!address || typeof address === "string") {
+        await closeNodeServer(server);
+        throw new Error("Expected loopback test server to expose a port");
+    }
+
+    return { port: address.port, server };
 }
 
 async function requestUrl(
@@ -76,5 +112,40 @@ describe(startLoopbackOAuthServer, () => {
         } finally {
             await closeServer(server);
         }
+    });
+
+    it("rejects cleanly and closes partial listeners when a port is already in use", async () => {
+        const blocker = await listenOnLoopback();
+
+        let thrown: unknown;
+        let unexpectedServer: LoopbackOAuthServer | undefined;
+        try {
+            unexpectedServer = await startLoopbackOAuthServer({
+                port: blocker.port,
+                redirectHost: "127.0.0.1",
+            });
+        } catch (error: unknown) {
+            thrown = error;
+        } finally {
+            if (unexpectedServer) {
+                await closeServer(unexpectedServer);
+            }
+            await closeNodeServer(blocker.server);
+        }
+
+        expect(thrown).toBeInstanceOf(Error);
+        const message = (thrown as Error).message.toLowerCase();
+        expect(
+            message.includes("eaddrinuse") ||
+                message.includes("address already in use") ||
+                message.includes("listen")
+        ).toBeTruthy();
+
+        const server = await startLoopbackOAuthServer({
+            port: blocker.port,
+            redirectHost: "127.0.0.1",
+        });
+
+        await closeServer(server);
     });
 });

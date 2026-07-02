@@ -3,7 +3,6 @@ import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { randomBytes } from "node:crypto";
-import { once } from "node:events";
 import { createServer } from "node:http";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
@@ -75,8 +74,41 @@ async function listenHttpServer(
     server: Server,
     args: { host: string; port: number }
 ): Promise<void> {
-    server.listen(args.port, args.host);
-    await once(server, "listening");
+    await new Promise<void>((resolve, reject) => {
+        const listeners: {
+            onError?: (error: Error) => void;
+            onListening?: () => void;
+        } = {};
+
+        const cleanup = (): void => {
+            if (listeners.onError) {
+                server.off("error", listeners.onError);
+            }
+            if (listeners.onListening) {
+                server.off("listening", listeners.onListening);
+            }
+        };
+
+        listeners.onError = (error: Error): void => {
+            cleanup();
+            reject(error);
+        };
+
+        listeners.onListening = (): void => {
+            cleanup();
+            resolve();
+        };
+
+        server.once("error", listeners.onError);
+        server.once("listening", listeners.onListening);
+
+        try {
+            server.listen(args.port, args.host);
+        } catch (error: unknown) {
+            cleanup();
+            reject(ensureError(error));
+        }
+    });
 }
 
 function resolvePortFromServer(server: Server): number {
@@ -363,7 +395,7 @@ export async function startLoopbackOAuthServer(args?: {
     // Listen on both IPv4 and IPv6 loopback when possible.
     // Some environments may not have ::1 configured; in that case we proceed
     // with IPv4 only.
-    await Promise.all(
+    const listenResults = await Promise.allSettled(
         servers.map(async ({ host, server }) => {
             try {
                 await listenHttpServer(server, { host, port: requestedPort });
@@ -389,6 +421,21 @@ export async function startLoopbackOAuthServer(args?: {
             }
         })
     );
+
+    const failedListen = listenResults.find(
+        (result): result is PromiseRejectedResult =>
+            result.status === "rejected"
+    );
+    if (failedListen) {
+        await Promise.all(
+            servers.map(async ({ server }) => {
+                if (server.listening) {
+                    await closeHttpServer(server).catch(() => {});
+                }
+            })
+        );
+        throw failedListen.reason;
+    }
 
     const [primaryServer] = servers;
     if (!primaryServer) {
