@@ -689,6 +689,7 @@
         "is-immutable-type": {
             "eslint": "$eslint"
         },
+        "qs": "^6.15.3",
         "stylelint-config-standard-scss": {
             "stylelint": "$stylelint"
         },
