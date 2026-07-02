@@ -35,6 +35,8 @@ function deleteEntity(
     };
 }
 
+const PROTOTYPE_PROPERTY_NAME = "__proto__";
+
 describe("cloudSyncState", () => {
     it("applies set-field operations into a derived state", () => {
         const state = applyCloudSyncOperations([
@@ -212,5 +214,103 @@ describe("cloudSyncState", () => {
             initialState.site["site-1"]?.fields["monitoring"]?.value
         ).toBeTruthy();
         expect(next.site["site-1"]?.fields["monitoring"]?.value).toBeFalsy();
+    });
+
+    it("stores prototype-named entity ids as own state entries", () => {
+        const state = applyCloudSyncOperations([
+            setField({
+                deviceId: "a",
+                entityId: "__proto__",
+                entityType: "site",
+                field: "monitoring",
+                opId: 1,
+                syncSchemaVersion: 1,
+                timestamp: 1,
+                value: true,
+            }),
+        ]);
+
+        expect(Object.getPrototypeOf(state.site)).toBeNull();
+        expect(Object.hasOwn(state.site, PROTOTYPE_PROPERTY_NAME)).toBeTruthy();
+        expect(state.site[PROTOTYPE_PROPERTY_NAME]?.entityId).toBe(
+            PROTOTYPE_PROPERTY_NAME
+        );
+        expect(
+            state.site[PROTOTYPE_PROPERTY_NAME]?.fields["monitoring"]?.value
+        ).toBeTruthy();
+    });
+
+    it("stores prototype-named fields as own field entries", () => {
+        const state = applyCloudSyncOperations([
+            setField({
+                deviceId: "a",
+                entityId: "site-1",
+                entityType: "site",
+                field: "__proto__",
+                opId: 1,
+                syncSchemaVersion: 1,
+                timestamp: 1,
+                value: "field-value",
+            }),
+        ]);
+
+        const entity = state.site["site-1"];
+
+        expect(entity).toBeDefined();
+        expect(Object.getPrototypeOf(entity?.fields)).toBeNull();
+        expect(
+            Object.hasOwn(entity?.fields ?? {}, PROTOTYPE_PROPERTY_NAME)
+        ).toBeTruthy();
+        expect(entity?.fields[PROTOTYPE_PROPERTY_NAME]?.value).toBe(
+            "field-value"
+        );
+    });
+
+    it("normalizes cloned snapshot maps before applying new operations", () => {
+        const initialState = JSON.parse(`{
+            "monitor": {},
+            "settings": {},
+            "site": {
+                "__proto__": {
+                    "entityId": "__proto__",
+                    "entityType": "site",
+                    "fields": {
+                        "__proto__": {
+                            "value": "old-value",
+                            "write": {
+                                "deviceId": "a",
+                                "opId": 1,
+                                "timestamp": 1
+                            }
+                        }
+                    }
+                }
+            }
+        }`) as CloudSyncState;
+
+        const next = applyCloudSyncOperationsToState(initialState, [
+            setField({
+                deviceId: "a",
+                entityId: "__proto__",
+                entityType: "site",
+                field: "__proto__",
+                opId: 2,
+                syncSchemaVersion: 1,
+                timestamp: 2,
+                value: "new-value",
+            }),
+        ]);
+
+        const entity = next.site[PROTOTYPE_PROPERTY_NAME];
+
+        expect(Object.getPrototypeOf(next.site)).toBeNull();
+        expect(entity?.entityId).toBe(PROTOTYPE_PROPERTY_NAME);
+        expect(Object.getPrototypeOf(entity?.fields)).toBeNull();
+        expect(
+            Object.hasOwn(entity?.fields ?? {}, PROTOTYPE_PROPERTY_NAME)
+        ).toBeTruthy();
+        expect(entity?.fields[PROTOTYPE_PROPERTY_NAME]?.value).toBe(
+            "new-value"
+        );
     });
 });

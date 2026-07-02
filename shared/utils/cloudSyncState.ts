@@ -16,9 +16,20 @@ import type { Writable } from "type-fest";
 
 import { compareCloudSyncWriteKey } from "@shared/types/cloudSync";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
-import { isDefined, objectEntries, objectValues } from "ts-extras";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import {
+    isDefined,
+    objectEntries,
+    objectHasOwn,
+    objectValues,
+} from "ts-extras";
 
 type Mutable<T> = Writable<T>;
+type CloudSyncEntityStateMap = Record<string, CloudSyncEntityState>;
+type CloudSyncFieldValueMap = Record<string, CloudSyncFieldValue>;
+type MutableCloudSyncState = Mutable<
+    Record<CloudSyncEntityType, CloudSyncEntityStateMap>
+>;
 
 const OPERATION_KIND_RANK: Readonly<
     Record<CloudSyncOperation["kind"], number>
@@ -151,19 +162,52 @@ function compareOperationsDeterministic(
     return compareStrings(leftKey, rightKey);
 }
 
-function createEmptyState(): Mutable<
-    Record<CloudSyncEntityType, Record<string, CloudSyncEntityState>>
-> {
+function createEntityMap(): CloudSyncEntityStateMap {
+    return createNullPrototypeObject<CloudSyncEntityStateMap>();
+}
+
+function createFieldMap(): CloudSyncFieldValueMap {
+    return createNullPrototypeObject<CloudSyncFieldValueMap>();
+}
+
+function setRecordValue<T>(
+    target: Record<string, T>,
+    key: string,
+    value: T
+): void {
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
+}
+
+function setEntityValue(
+    target: CloudSyncEntityStateMap,
+    key: string,
+    value: CloudSyncEntityState
+): void {
+    setRecordValue(target, key, value);
+}
+
+function setFieldValue(
+    target: CloudSyncFieldValueMap,
+    key: string,
+    value: CloudSyncFieldValue
+): void {
+    setRecordValue(target, key, value);
+}
+
+function createEmptyState(): MutableCloudSyncState {
     return {
-        monitor: {},
-        settings: {},
-        site: {},
+        monitor: createEntityMap(),
+        settings: createEntityMap(),
+        site: createEntityMap(),
     };
 }
 
-function cloneState(
-    initialState: CloudSyncState
-): Mutable<Record<CloudSyncEntityType, Record<string, CloudSyncEntityState>>> {
+function cloneState(initialState: CloudSyncState): MutableCloudSyncState {
     const state = createEmptyState();
 
     for (const entityType of [
@@ -174,26 +218,30 @@ function cloneState(
         for (const [entityId, entity] of objectEntries(
             initialState[entityType]
         )) {
-            const nextFields: Record<string, CloudSyncFieldValue> = {};
+            const nextFields = createFieldMap();
             for (const [field, fieldValue] of objectEntries(entity.fields)) {
-                nextFields[field] = {
+                setFieldValue(nextFields, field, {
                     value: fieldValue.value,
                     write: fieldValue.write,
-                };
+                });
             }
 
-            state[entityType][entityId] = entity.deleted
-                ? {
-                      deleted: entity.deleted,
-                      entityId: entity.entityId,
-                      entityType: entity.entityType,
-                      fields: nextFields,
-                  }
-                : {
-                      entityId: entity.entityId,
-                      entityType: entity.entityType,
-                      fields: nextFields,
-                  };
+            setEntityValue(
+                state[entityType],
+                entityId,
+                entity.deleted
+                    ? {
+                          deleted: entity.deleted,
+                          entityId: entity.entityId,
+                          entityType: entity.entityType,
+                          fields: nextFields,
+                      }
+                    : {
+                          entityId: entity.entityId,
+                          entityType: entity.entityType,
+                          fields: nextFields,
+                      }
+            );
         }
     }
 
@@ -228,25 +276,30 @@ function getLatestEntityWrite(
 }
 
 function upsertEntity(
-    state: Mutable<
-        Record<CloudSyncEntityType, Record<string, CloudSyncEntityState>>
-    >,
+    state: MutableCloudSyncState,
     entityType: CloudSyncEntityType,
     entityId: string
 ): CloudSyncEntityState {
-    state[entityType][entityId] ??= {
-        entityId,
-        entityType,
-        fields: {},
-    };
+    const entities = state[entityType];
 
-    return state[entityType][entityId];
+    if (!objectHasOwn(entities, entityId)) {
+        setEntityValue(entities, entityId, {
+            entityId,
+            entityType,
+            fields: createFieldMap(),
+        });
+    }
+
+    const entity = entities[entityId];
+    if (!entity) {
+        throw new Error(`Failed to upsert cloud sync entity: ${entityId}`);
+    }
+
+    return entity;
 }
 
 function applyOperation(
-    state: Mutable<
-        Record<CloudSyncEntityType, Record<string, CloudSyncEntityState>>
-    >,
+    state: MutableCloudSyncState,
     operation: CloudSyncOperation
 ): void {
     const write: CloudSyncWriteKey = {
@@ -265,10 +318,10 @@ function applyOperation(
         const latestEntityWrite = getLatestEntityWrite(entity);
 
         if (shouldReplaceWrite(latestEntityWrite, write)) {
-            state[operation.entityType][operation.entityId] = {
+            setEntityValue(state[operation.entityType], operation.entityId, {
                 ...entity,
                 deleted: write,
-            };
+            });
         }
         return;
     }
@@ -287,39 +340,42 @@ function applyOperation(
         return;
     }
 
-    const nextFields: Record<string, CloudSyncFieldValue> = {
-        ...entity.fields,
-        [operation.field]: {
-            value: operation.value,
-            write,
-        },
-    };
+    const nextFields = createFieldMap();
+    for (const [field, fieldValue] of objectEntries(entity.fields)) {
+        setFieldValue(nextFields, field, fieldValue);
+    }
+    setFieldValue(nextFields, operation.field, {
+        value: operation.value,
+        write,
+    });
 
     const shouldResurrect =
         isDefined(existingDeletion) &&
         compareCloudSyncWriteKey(existingDeletion, write) < 0;
 
     if (shouldResurrect) {
-        state[operation.entityType][operation.entityId] = {
+        setEntityValue(state[operation.entityType], operation.entityId, {
             entityId: entity.entityId,
             entityType: entity.entityType,
             fields: nextFields,
-        };
+        });
         return;
     }
 
-    state[operation.entityType][operation.entityId] = isDefined(
-        existingDeletion
-    )
-        ? {
-              ...entity,
-              deleted: existingDeletion,
-              fields: nextFields,
-          }
-        : {
-              ...entity,
-              fields: nextFields,
-          };
+    setEntityValue(
+        state[operation.entityType],
+        operation.entityId,
+        isDefined(existingDeletion)
+            ? {
+                  ...entity,
+                  deleted: existingDeletion,
+                  fields: nextFields,
+              }
+            : {
+                  ...entity,
+                  fields: nextFields,
+              }
+    );
 }
 
 /**
