@@ -295,6 +295,46 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result.responseTime).toBe(500); // 1500 - 1000
         });
+        it("should calculate response time when start time is zero", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
+            // Arrange
+            const mockInstance = {
+                interceptors: {
+                    request: {
+                        use: vi.fn(),
+                    },
+                    response: {
+                        use: vi.fn(),
+                    },
+                },
+            } as unknown as AxiosInstance;
+
+            vi.spyOn(performance, "now").mockReturnValue(250);
+
+            // Act
+            setupTimingInterceptors(mockInstance);
+
+            const responseInterceptor = (
+                mockInstance.interceptors.response.use as any
+            ).mock.calls[0][0];
+            const response = {
+                config: {
+                    metadata: {
+                        startTime: 0,
+                    },
+                },
+            } as any;
+
+            const result = responseInterceptor(response);
+
+            // Assert
+            expect(result.responseTime).toBe(250);
+        });
         it("should not calculate response time if no start time", async ({
             task,
             annotate,

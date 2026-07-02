@@ -94,7 +94,7 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
     // Add response interceptor to calculate duration
     axiosInstance.interceptors.response.use(
         (response) => {
-            if (response.config.metadata?.startTime) {
+            if (isDefined(response.config.metadata?.startTime)) {
                 const duration =
                     performance.now() - response.config.metadata.startTime;
                 response.responseTime = Math.round(duration);
