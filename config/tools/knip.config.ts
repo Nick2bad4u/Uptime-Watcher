@@ -37,7 +37,6 @@ const knipConfig: KnipConfig = {
         "open-cli",
         "powershell",
         "repomix",
-        "resolve-audit",
         "rimraf",
         "scorecard-check",
         "serve",
