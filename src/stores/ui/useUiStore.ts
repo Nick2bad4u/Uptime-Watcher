@@ -67,6 +67,17 @@ interface UIPersistedState {
     surfaceDensity: InterfaceDensity;
 }
 
+const UI_PERSIST_VERSION = 1;
+
+const ENTERPRISE_UI_DEFAULTS = {
+    siteCardPresentation: "grid",
+    siteListLayout: "list",
+    surfaceDensity: "compact",
+} as const satisfies Pick<
+    UIPersistedState,
+    "siteCardPresentation" | "siteListLayout" | "surfaceDensity"
+>;
+
 const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
     "controls",
     "monitor",
@@ -343,13 +354,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             showSettings: false,
             showSiteDetails: false,
             sidebarCollapsedPreference: false,
-            siteCardPresentation: "stacked",
+            siteCardPresentation: "grid",
             siteDetailsChartTimeRange: "24h",
             siteDetailsHeaderCollapsedState: {},
             siteDetailsTabState: safeCastTo<Record<string, SiteDetailsTab>>({}),
-            siteListLayout: "card-large",
+            siteListLayout: "list",
             siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
-            surfaceDensity: "comfortable",
+            surfaceDensity: "compact",
             syncActiveSiteDetailsTab: (siteIdentifier: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
                     siteIdentifier,
@@ -397,8 +408,21 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             // Selectively persist stable UI preferences across sessions while
             // keeping transient state (modals, selections) in memory only.
             ...UI_PERSIST_CONFIG,
+            migrate: (persistedState: unknown, version: number) => {
+                const state = persistedState as Partial<UIPersistedState>;
+
+                if (version < UI_PERSIST_VERSION) {
+                    return {
+                        ...state,
+                        ...ENTERPRISE_UI_DEFAULTS,
+                    } as UIPersistedState;
+                }
+
+                return state as UIPersistedState;
+            },
             // Re-state required fields explicitly for exactOptionalPropertyTypes.
             name: UI_PERSIST_CONFIG.name,
+            version: UI_PERSIST_VERSION,
         }
     )
 );

@@ -18,13 +18,11 @@ import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedText } from "../../theme/components/ThemedText";
-import { useTheme } from "../../theme/useTheme";
 import { getMonitorTypeDisplayLabel } from "../../utils/fallbacks";
 import { AppIcons } from "../../utils/icons";
 import { normalizeMonitorExternalUrl } from "../../utils/monitoring/monitorExternalUrl";
 import { getLatestMonitorHistoryTimestamp } from "../../utils/monitoring/monitorHistoryTime";
 import { formatFullTimestamp, formatRelativeTimestamp } from "../../utils/time";
-import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { MonitoringStatusDisplay } from "./MonitoringStatusDisplay";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
@@ -318,7 +316,6 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
         site,
     }: SiteDetailsHeaderProperties): JSX.Element {
         const styles = useThemeStyles();
-        const { isDark } = useTheme();
         const openExternal = useUIStore(selectOpenExternal);
         const toggleSiteDetailsHeaderCollapsed = useUIStore(
             selectToggleSiteDetailsHeaderCollapsed
@@ -406,10 +403,6 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                 data-testid="site-details-header"
                 style={styles.headerStyle}
             >
-                <GalaxyBackground
-                    className="galaxy-background--banner"
-                    isDark={isDark}
-                />
                 <div
                     className="site-details-header__overlay"
                     style={styles.overlayStyle}

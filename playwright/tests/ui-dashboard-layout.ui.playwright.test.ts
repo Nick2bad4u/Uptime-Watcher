@@ -100,7 +100,7 @@ test.describe(
                 const initialClasses = await page.evaluate(
                     () => document.querySelector(".site-grid")?.className ?? ""
                 );
-                expect.soft(initialClasses).toContain("site-grid--stacked");
+                expect.soft(initialClasses).toContain("site-grid--balanced");
 
                 const listButton = page.getByRole("button", { name: "List" });
                 await listButton.click();

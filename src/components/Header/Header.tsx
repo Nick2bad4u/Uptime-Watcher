@@ -29,7 +29,6 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
-import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import "./Header.css";
 import { HeaderControls } from "./HeaderControls";
 import { StatusSubscriptionIndicator } from "./StatusSubscriptionIndicator";
@@ -112,10 +111,6 @@ export const Header = (): JSX.Element => {
                 shadow="md"
                 surface="elevated"
             >
-                <GalaxyBackground
-                    className="galaxy-background--hero"
-                    isDark={isDark}
-                />
                 <div className="app-topbar__status-indicator relative z-10">
                     <StatusSubscriptionIndicator />
                 </div>
@@ -183,7 +178,7 @@ export const Header = (): JSX.Element => {
                             onShowAddSiteModal={handleShowAddSiteModal}
                             onShowSettings={handleShowSettings}
                             onToggleTheme={toggleTheme}
-                            orientation="vertical"
+                            orientation="horizontal"
                         />
                     </div>
                 </div>

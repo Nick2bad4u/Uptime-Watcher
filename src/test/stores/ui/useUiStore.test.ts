@@ -75,7 +75,9 @@ describe(useUIStore, () => {
             store.setShowSettings(false);
             store.setShowSiteDetails(false);
             store.setSiteDetailsChartTimeRange("24h");
-            store.setSiteListLayout("card-large");
+            store.setSiteCardPresentation("grid");
+            store.setSiteListLayout("list");
+            store.setSurfaceDensity("compact");
         });
         vi.clearAllMocks();
         localStorageMock.clear();
@@ -100,8 +102,8 @@ describe(useUIStore, () => {
             expect(result.current.showSettings).toBeFalsy();
             expect(result.current.showSiteDetails).toBeFalsy();
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
-            expect(result.current.siteCardPresentation).toBe("stacked");
-            expect(result.current.siteListLayout).toBe("card-large");
+            expect(result.current.siteCardPresentation).toBe("grid");
+            expect(result.current.siteListLayout).toBe("list");
             expect(result.current.siteDetailsHeaderCollapsedState).toEqual({});
             expect(result.current.siteTableColumnWidths).toMatchObject({
                 controls: 16,
@@ -112,6 +114,7 @@ describe(useUIStore, () => {
                 status: 12,
                 uptime: 12,
             });
+            expect(result.current.surfaceDensity).toBe("compact");
         });
 
         it("should have all required action methods", async ({
@@ -590,13 +593,45 @@ describe(useUIStore, () => {
 
             const { result } = renderHook(() => useUIStore());
 
-            expect(result.current.siteListLayout).toBe("card-large");
+            expect(result.current.siteListLayout).toBe("list");
 
             act(() => {
-                result.current.setSiteListLayout("list");
+                result.current.setSiteListLayout("card-compact");
             });
 
-            expect(result.current.siteListLayout).toBe("list");
+            expect(result.current.siteListLayout).toBe("card-compact");
+        });
+
+        it("should migrate old persisted layout preferences to enterprise defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Migration", "type");
+
+            const migrate = useUIStore.persist.getOptions().migrate;
+            expect(migrate).toBeTypeOf("function");
+
+            const migrated = await migrate?.(
+                {
+                    showAdvancedMetrics: true,
+                    sidebarCollapsedPreference: true,
+                    siteCardPresentation: "stacked",
+                    siteListLayout: "card-large",
+                    surfaceDensity: "comfortable",
+                },
+                0
+            );
+
+            expect(migrated).toMatchObject({
+                showAdvancedMetrics: true,
+                sidebarCollapsedPreference: true,
+                siteCardPresentation: "grid",
+                siteListLayout: "list",
+                surfaceDensity: "compact",
+            });
         });
 
         it("should handle multiple layout switches", async ({

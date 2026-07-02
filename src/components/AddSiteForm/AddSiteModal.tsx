@@ -20,7 +20,6 @@ import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
-import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { AddSiteForm } from "./AddSiteForm";
 import "./AddSiteModal.css";
 
@@ -91,10 +90,6 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                     surface="overlay"
                 >
                     <div className="modal-shell__header add-site-modal__header">
-                        <GalaxyBackground
-                            className="galaxy-background--banner galaxy-background--banner-compact"
-                            isDark={isDark}
-                        />
                         <div className="modal-shell__header-content">
                             <div className="modal-shell__title-group">
                                 <div className="flex items-center gap-2">

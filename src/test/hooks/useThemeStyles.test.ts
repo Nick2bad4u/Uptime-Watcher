@@ -74,8 +74,8 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles(false));
 
-            expect(result.current.headerStyle.background).toContain(
-                "rgba(59, 130, 246, 0.12)"
+            expect(result.current.headerStyle.background).toBe(
+                "var(--color-surface-elevated)"
             );
             expect(result.current.headerStyle.color).toBe("#0f172a");
             expect(result.current.headerStyle.height).toBe("auto");
@@ -96,7 +96,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles(true));
 
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("146px");
+            expect(result.current.headerStyle.minHeight).toBe("7rem");
             expect(result.current.headerStyle.marginBottom).toBe("0.5rem");
             expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
         });
@@ -114,8 +114,8 @@ describe("useThemeStyles Hook", () => {
 
             // Header styles
             expect(result.current.headerStyle.color).toBe("#0f172a");
-            expect(result.current.headerStyle.background).toContain(
-                "rgba(59, 130, 246, 0.12)"
+            expect(result.current.headerStyle.background).toBe(
+                "var(--color-surface-elevated)"
             );
 
             // Title styles
@@ -145,9 +145,7 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles());
 
-            expect(result.current.headerStyle.boxShadow).toContain(
-                "rgba(15, 23, 42, 0.2)"
-            );
+            expect(result.current.headerStyle.boxShadow).toBe("none");
             expect(result.current.titleStyle.textShadow).toContain(
                 "rgba(59, 130, 246, 0.1)"
             );
@@ -171,8 +169,8 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles(false));
 
-            expect(result.current.headerStyle.background).toContain(
-                "rgba(37, 99, 235, 0.22)"
+            expect(result.current.headerStyle.background).toBe(
+                "var(--color-surface-elevated)"
             );
             expect(result.current.headerStyle.color).toBe("#f5f7fa");
             expect(result.current.titleStyle.color).toBe("#f3f4f6");
@@ -191,7 +189,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles(true));
 
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("146px");
+            expect(result.current.headerStyle.minHeight).toBe("7rem");
             expect(result.current.headerStyle.marginBottom).toBe("0.5rem");
             expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
         });
@@ -209,8 +207,8 @@ describe("useThemeStyles Hook", () => {
 
             // Header styles
             expect(result.current.headerStyle.color).toBe("#f5f7fa");
-            expect(result.current.headerStyle.background).toContain(
-                "rgba(37, 99, 235, 0.22)"
+            expect(result.current.headerStyle.background).toBe(
+                "var(--color-surface-elevated)"
             );
 
             // Title styles
@@ -240,9 +238,7 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles());
 
-            expect(result.current.headerStyle.boxShadow).toContain(
-                "rgba(4, 8, 18, 0.7)"
-            );
+            expect(result.current.headerStyle.boxShadow).toBe("none");
             expect(result.current.titleStyle.textShadow).toContain(
                 "rgba(59, 130, 246, 0.3)"
             );
@@ -386,7 +382,7 @@ describe("useThemeStyles Hook", () => {
             rerender({ collapsed: true });
 
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("146px");
+            expect(result.current.headerStyle.minHeight).toBe("7rem");
             expect(result.current.headerStyle.marginBottom).toBe("0.5rem");
             expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
 
@@ -561,7 +557,7 @@ describe("useThemeStyles Hook", () => {
             expect(result.current.collapseButtonStyle.borderRadius).toBe(
                 "0.375rem"
             );
-            expect(result.current.headerStyle.borderRadius).toBe("0.75rem");
+            expect(result.current.headerStyle.borderRadius).toBe("0.5rem");
             expect(result.current.overlayStyle.borderRadius).toBe("0.75rem");
         });
     });
@@ -642,7 +638,7 @@ describe("useThemeStyles Hook", () => {
             expect(result.current.lightStyles.headerStyle.height).toBe("auto");
             expect(result.current.darkStyles.headerStyle.height).toBe("auto");
             expect(result.current.darkStyles.headerStyle.minHeight).toBe(
-                "146px"
+                "7rem"
             );
         });
 

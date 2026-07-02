@@ -109,8 +109,8 @@ describe(useThemeStyles, () => {
 
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.headerStyle.background).toContain(
-            "rgba(59, 130, 246, 0.12)"
+        expect(result.current.headerStyle.background).toBe(
+            "var(--color-surface-elevated)"
         );
         expect(result.current.headerStyle.color).toBe("#0f172a");
     });
@@ -135,8 +135,8 @@ describe(useThemeStyles, () => {
 
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.headerStyle.background).toContain(
-            "rgba(37, 99, 235, 0.22)"
+        expect(result.current.headerStyle.background).toBe(
+            "var(--color-surface-elevated)"
         );
         expect(result.current.headerStyle.color).toBe("#f5f7fa");
     });
@@ -157,7 +157,7 @@ describe(useThemeStyles, () => {
         expect(result.current.collapseButtonStyle.padding).toBe("0.5rem");
     });
 
-    it("should provide header styles with gradients", async ({
+    it("should provide compact flat header styles", async ({
         task,
         annotate,
     }) => {
@@ -168,11 +168,11 @@ describe(useThemeStyles, () => {
 
         const { result } = renderHook(() => useThemeStyles());
 
-        expect(result.current.headerStyle.background).toContain(
-            "linear-gradient"
+        expect(result.current.headerStyle.background).toBe(
+            "var(--color-surface-elevated)"
         );
-        expect(result.current.headerStyle.borderRadius).toBe("0.75rem");
-        expect(result.current.headerStyle.boxShadow).toBeDefined();
+        expect(result.current.headerStyle.borderRadius).toBe("0.5rem");
+        expect(result.current.headerStyle.boxShadow).toBe("none");
     });
 
     it("should provide overlay styles", async ({ task, annotate }) => {
@@ -332,7 +332,7 @@ describe(useThemeStyles, () => {
         expect(lightResult.current.headerStyle.color).not.toBe(
             darkResult.current.headerStyle.color
         );
-        expect(lightResult.current.headerStyle.background).not.toBe(
+        expect(lightResult.current.headerStyle.background).toBe(
             darkResult.current.headerStyle.background
         );
     });

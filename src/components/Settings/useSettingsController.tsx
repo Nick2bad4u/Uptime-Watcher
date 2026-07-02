@@ -21,7 +21,6 @@ import { formatByteSize } from "../../utils/formatting/formatByteSize";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
-import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { SettingsAlertVolumeControl } from "./sections/SettingsAlertVolumeControl";
 import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
 import { useSettingsChangeHandlers } from "./useSettingsChangeHandlers";
@@ -791,15 +790,7 @@ export const useSettingsController = ({
         ]
     );
 
-    const headerBackground = useMemo(
-        () => (
-            <GalaxyBackground
-                className="galaxy-background--banner galaxy-background--banner-compact"
-                isDark={isDark}
-            />
-        ),
-        [isDark]
-    );
+    const headerBackground = null;
 
     const headerIcon = useMemo(
         () => <SettingsHeaderIcon size={22} />,

@@ -55,13 +55,13 @@ const createUiState = (): UIStore => ({
     showAdvancedMetrics: false,
     showSettings: false,
     showSiteDetails: false,
-    siteCardPresentation: "stacked",
+    siteCardPresentation: "grid",
     siteDetailsChartTimeRange: "24h",
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
-    siteListLayout: "card-compact",
+    siteListLayout: "list",
     siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
-    surfaceDensity: "comfortable",
+    surfaceDensity: "compact",
     sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: vi.fn(),
     toggleSiteDetailsHeaderCollapsed: vi.fn(),
@@ -256,7 +256,7 @@ describe(Header, () => {
         );
 
         const controls = document.querySelector(".header-controls");
-        expect(controls).toHaveClass("header-controls--vertical");
+        expect(controls).not.toHaveClass("header-controls--vertical");
 
         const summary = document.querySelector(
             ".header-status-summary__container"
