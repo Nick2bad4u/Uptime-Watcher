@@ -107,7 +107,13 @@ describe("Electron Main Process", () => {
         );
 
         const { BrowserWindow } = await import("electron");
-        const window = new BrowserWindow();
+        const window = new BrowserWindow({
+            webPreferences: {
+                contextIsolation: true,
+                nodeIntegration: false,
+                sandbox: true,
+            },
+        });
 
         expect(window).toBeDefined();
         expect(window.loadFile).toBeDefined();
