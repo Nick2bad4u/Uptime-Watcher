@@ -19,6 +19,16 @@ import { spawn } from "node:child_process";
 import { _electron as electron } from "playwright";
 import { existsSync } from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT_ROOT = path.resolve(SCRIPT_DIR, "..");
+const PLAYWRIGHT_CLI_PATH = path.join(
+    PROJECT_ROOT,
+    "node_modules",
+    "playwright",
+    "cli.js"
+);
 
 // Will be loaded dynamically in main()
 /** @type {function(string): string | undefined} */
@@ -85,14 +95,36 @@ async function startDevServer() {
     console.log("🚀 Starting development server...");
 
     return new Promise((resolve, reject) => {
-        const devServer = spawn("npm", ["run", "dev"], {
+        const npmInvocation = resolveNpmRunInvocation("dev");
+        let settled = false;
+        const timeout = setTimeout(() => {
+            if (!settled) {
+                settled = true;
+                reject(new Error("Dev server startup timeout"));
+            }
+        }, 30_000);
+
+        const devServer = spawn(npmInvocation.command, npmInvocation.args, {
+            cwd: PROJECT_ROOT,
             stdio: "pipe",
-            shell: process.platform === "win32",
         });
+
+        const rejectOnce = (error) => {
+            if (!settled) {
+                settled = true;
+                clearTimeout(timeout);
+                reject(error);
+            }
+        };
 
         devServer.stdout?.on("data", (data) => {
             const output = data.toString();
             if (output.includes("Local:") && output.includes("5173")) {
+                if (settled) {
+                    return;
+                }
+                settled = true;
+                clearTimeout(timeout);
                 console.log("✅ Development server started");
                 resolve("http://localhost:5173");
             }
@@ -102,10 +134,12 @@ async function startDevServer() {
             console.error("Dev server error:", data.toString());
         });
 
-        // Timeout after 30 seconds
-        setTimeout(() => {
-            reject(new Error("Dev server startup timeout"));
-        }, 30_000);
+        devServer.on("error", rejectOnce);
+        devServer.on("close", (code) => {
+            rejectOnce(
+                new Error(`Dev server exited before startup with code ${code}`)
+            );
+        });
     });
 }
 
@@ -175,44 +209,48 @@ async function startElectronWithInspector() {
  * @param {{ viewport?: string; output?: string }} options - Configuration
  *   options.
  *
- * @returns {string[]} Command array.
+ * @returns {{ args: string[]; command: string; displayCommand: string }}
+ *   Command invocation.
  */
 function buildCodegenCommand(target, options) {
-    const cmd = [
-        "npx",
-        "playwright",
-        "codegen",
-    ];
+    assertLocalPlaywrightCli();
+
+    const args = ["codegen"];
 
     // Add viewport
     if (options.viewport) {
-        cmd.push("--viewport-size", options.viewport);
+        args.push("--viewport-size", options.viewport);
     }
 
     // Add output file if specified
     if (options.output) {
-        cmd.push("--output", options.output);
+        args.push("--output", options.output);
     }
 
     // Add target (URL or Electron path)
-    cmd.push(target);
+    args.push(target);
 
-    return cmd;
+    return {
+        args: [PLAYWRIGHT_CLI_PATH, ...args],
+        command: process.execPath,
+        displayCommand: `playwright ${args.join(" ")}`,
+    };
 }
 
 /**
  * Run the codegen command.
  *
- * @param {string[]} cmd - Command array to execute.
+ * @param {{ args: string[]; command: string; displayCommand: string }} cmd -
+ *   Command invocation to execute.
  *
  * @returns {import("child_process").ChildProcess} The spawned process.
  */
 function runCodegen(cmd) {
-    console.log(`🎬 Running: ${cmd.join(" ")}`);
+    console.log(`🎬 Running: ${cmd.displayCommand}`);
 
-    const codegen = spawn(cmd[0] ?? "npx", cmd.slice(1), {
+    const codegen = spawn(cmd.command, cmd.args, {
+        cwd: PROJECT_ROOT,
         stdio: "inherit",
-        shell: process.platform === "win32",
     });
 
     /**
@@ -239,6 +277,60 @@ function runCodegen(cmd) {
 }
 
 /**
+ * Resolve a portable npm script invocation without shell string parsing.
+ *
+ * @param {string} scriptName - Npm script to run.
+ *
+ * @returns {{ args: string[]; command: string }} Child process invocation.
+ */
+function resolveNpmRunInvocation(scriptName) {
+    const npmExecPath = process.env["npm_execpath"];
+
+    if (npmExecPath) {
+        return {
+            args: [
+                npmExecPath,
+                "run",
+                scriptName,
+            ],
+            command: process.execPath,
+        };
+    }
+
+    if (process.platform === "win32") {
+        return {
+            args: [
+                "/d",
+                "/s",
+                "/c",
+                "npm",
+                "run",
+                scriptName,
+            ],
+            command: "cmd.exe",
+        };
+    }
+
+    return {
+        args: ["run", scriptName],
+        command: "npm",
+    };
+}
+
+/**
+ * Ensure the local Playwright CLI is installed before launching codegen.
+ *
+ * @returns {void}
+ */
+function assertLocalPlaywrightCli() {
+    if (!existsSync(PLAYWRIGHT_CLI_PATH)) {
+        throw new Error(
+            `Playwright CLI not found: ${PLAYWRIGHT_CLI_PATH}. Run npm install before running codegen.`
+        );
+    }
+}
+
+/**
  * Entrypoint for the Playwright codegen helper.
  *
  * @returns {Promise<void>} Resolves after codegen completes.
@@ -246,16 +338,15 @@ function runCodegen(cmd) {
 async function main() {
     // Load custom transformations
     try {
-        // Get current directory safely for ESM
-        const currentDir = new URL(".", import.meta.url).pathname;
         const templatePath = path.join(
-            currentDir,
-            "..",
+            PROJECT_ROOT,
             "playwright",
             "codegen-template.mjs"
         );
         if (existsSync(templatePath)) {
-            const transformModule = await import(templatePath);
+            const transformModule = await import(
+                pathToFileURL(templatePath).href
+            );
             applyLintCompliantTransforms =
                 transformModule.applyLintCompliantTransforms;
             console.log("✅ Loaded lint-compliant transform functions");

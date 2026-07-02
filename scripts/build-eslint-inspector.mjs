@@ -9,7 +9,8 @@
 
 import fs from "fs-extra";
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import * as path from "node:path";
 // Configuration - using process.cwd() since we'll run from project root
 const PROJECT_ROOT = process.cwd();
@@ -26,6 +27,13 @@ const ESLINT_INSPECTOR_OUTPUT_DIR = path.join(
 const ESLINT_INSPECTOR_TARGET_DIR = path.join(
     DOCUSAURUS_STATIC_DIR,
     "eslint-inspector"
+);
+const ESLINT_CONFIG_INSPECTOR_BIN = path.join(
+    PROJECT_ROOT,
+    "node_modules",
+    "@eslint",
+    "config-inspector",
+    "bin.mjs"
 );
 
 // Check for local testing flag
@@ -77,7 +85,13 @@ async function buildESLintInspector() {
             NUXT_CDN_URL: "/eslint-inspector/",
         };
 
-        execSync("npx @eslint/config-inspector@latest build", {
+        if (!existsSync(ESLINT_CONFIG_INSPECTOR_BIN)) {
+            throw new Error(
+                `ESLint Config Inspector CLI not found: ${ESLINT_CONFIG_INSPECTOR_BIN}. Run npm install before building the inspector.`
+            );
+        }
+
+        execFileSync(process.execPath, [ESLINT_CONFIG_INSPECTOR_BIN, "build"], {
             stdio: "inherit",
             cwd: PROJECT_ROOT,
             env: buildEnv,
