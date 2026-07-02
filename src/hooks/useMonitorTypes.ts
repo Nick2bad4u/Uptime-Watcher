@@ -43,7 +43,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { convertError } from "@shared/utils/errorHandling";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
 import { logger } from "../services/logger";
@@ -86,14 +86,30 @@ export function useMonitorTypes(): UseMonitorTypesResult {
     >([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | undefined>();
+    const isMountedRef = useRef(false);
 
-    const loadMonitorTypes = async (): Promise<void> => {
+    const isMounted = useCallback((): boolean => isMountedRef.current, []);
+
+    const loadMonitorTypes = useCallback(async (): Promise<void> => {
+        if (!isMounted()) {
+            return;
+        }
+
         try {
             setIsLoading(true);
             setError(undefined);
             const monitorOptions = await getMonitorTypeOptions();
+
+            if (!isMounted()) {
+                return;
+            }
+
             setOptions(monitorOptions);
         } catch (loadError) {
+            if (!isMounted()) {
+                return;
+            }
+
             const { error: normalizedError, wasError } =
                 convertError(loadError);
             const trimmedMessage = normalizedError.message.trim();
@@ -110,15 +126,25 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             // Use centralized fallback options to ensure consistency
             setOptions([...FALLBACK_MONITOR_TYPE_OPTIONS]);
         } finally {
-            setIsLoading(false);
+            if (isMounted()) {
+                setIsLoading(false);
+            }
         }
-    };
+    }, [isMounted]);
 
     const refresh = useCallback(async () => {
         await loadMonitorTypes();
-    }, []);
+    }, [loadMonitorTypes]);
 
-    useMount(useCallback(() => loadMonitorTypes(), []));
+    useMount(
+        useCallback(() => {
+            isMountedRef.current = true;
+            void loadMonitorTypes();
+        }, [loadMonitorTypes]),
+        useCallback(() => {
+            isMountedRef.current = false;
+        }, [])
+    );
 
     return {
         error,

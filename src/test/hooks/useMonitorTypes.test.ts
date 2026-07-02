@@ -570,6 +570,36 @@ describe("useMonitorTypes Hook", () => {
             expect(mockGetMonitorTypeOptions).toHaveBeenCalledTimes(1);
         });
 
+        it("should ignore refresh calls after unmount", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Lifecycle", "type");
+
+            const initialOptions: MonitorTypeOption[] = [
+                { label: "HTTP", value: "http" },
+            ];
+            mockGetMonitorTypeOptions.mockResolvedValue(initialOptions);
+
+            const { result, unmount } = renderHook(() => useMonitorTypes());
+
+            await waitFor(() => {
+                expect(result.current.isLoading).toBeFalsy();
+            });
+
+            const { refresh } = result.current;
+            mockGetMonitorTypeOptions.mockClear();
+
+            unmount();
+
+            await refresh();
+
+            expect(mockGetMonitorTypeOptions).not.toHaveBeenCalled();
+        });
+
         it("should work with real-world monitor type data", async ({
             task,
             annotate,
