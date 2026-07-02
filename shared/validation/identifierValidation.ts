@@ -9,7 +9,11 @@
  */
 
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import { MONITOR_ID_REQUIRED_MESSAGE } from "@shared/validation/monitorFieldConstants";
+import {
+    MONITOR_ID_MAX_LENGTH,
+    MONITOR_ID_REQUIRED_MESSAGE,
+    MONITOR_ID_TOO_LONG_MESSAGE,
+} from "@shared/validation/monitorFieldConstants";
 import {
     SITE_IDENTIFIER_MAX_LENGTH,
     SITE_IDENTIFIER_REQUIRED_MESSAGE,
@@ -17,8 +21,8 @@ import {
 } from "@shared/validation/siteFieldConstants";
 
 /**
- * Throws if the supplied monitor identifier is empty/whitespace or contains
- * ASCII control characters.
+ * Throws if the supplied monitor identifier is empty/whitespace, too long, or
+ * contains ASCII control characters.
  *
  * @param monitorId - Monitor identifier candidate.
  * @param context - Human-readable context included in thrown errors.
@@ -26,6 +30,10 @@ import {
 export function assertValidMonitorId(monitorId: string, context: string): void {
     if (monitorId.trim().length === 0) {
         throw new TypeError(`[${context}] ${MONITOR_ID_REQUIRED_MESSAGE}`);
+    }
+
+    if (monitorId.length > MONITOR_ID_MAX_LENGTH) {
+        throw new RangeError(`[${context}] ${MONITOR_ID_TOO_LONG_MESSAGE}`);
     }
 
     if (hasAsciiControlCharacters(monitorId)) {
@@ -67,7 +75,11 @@ export function assertValidSiteIdentifier(
  * Returns whether a monitor identifier is acceptable for repository operations.
  */
 export function isValidMonitorId(monitorId: string): boolean {
-    return monitorId.trim().length > 0 && !hasAsciiControlCharacters(monitorId);
+    return (
+        monitorId.trim().length > 0 &&
+        monitorId.length <= MONITOR_ID_MAX_LENGTH &&
+        !hasAsciiControlCharacters(monitorId)
+    );
 }
 
 /**
