@@ -1,3 +1,4 @@
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
@@ -28,16 +29,39 @@ export async function writeFileWithinDirectory(args: {
         baseDirectory,
         `${fileName}.rollback-${randomUUID()}`
     );
+    let isRollbackCreated = false;
 
     try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath is sanitized and confined to baseDirectory.
+        const existingTarget = await fs
+            .lstat(targetPath)
+            .catch((error: unknown) => {
+                if (tryGetErrorCode(error) === "ENOENT") {
+                    return null;
+                }
+
+                throw error;
+            });
+
+        if (
+            existingTarget &&
+            (existingTarget.isSymbolicLink() || !existingTarget.isFile())
+        ) {
+            throw new Error(
+                `[DataBackupService] Refusing to overwrite non-file backup target: ${targetPath}`
+            );
+        }
+
         // Path is validated by resolvePathWithinDirectory to prevent traversal.
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath is sanitized and confined to baseDirectory.
         await fs.writeFile(tmpPath, contents);
         await syncFileSafely(tmpPath);
 
-        // Best-effort rollback.
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath/rollbackPath are sanitized and confined to baseDirectory.
-        await fs.rename(targetPath, rollbackPath).catch(() => {});
+        if (existingTarget) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath/rollbackPath are sanitized and confined to baseDirectory.
+            await fs.rename(targetPath, rollbackPath);
+            isRollbackCreated = true;
+        }
 
         // Atomic swap.
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath/targetPath are confined to baseDirectory.
@@ -48,14 +72,18 @@ export async function writeFileWithinDirectory(args: {
         await fs.rm(tmpPath, { force: true }).catch(() => {});
 
         // Best-effort rollback (no-op if rollback doesn't exist).
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are sanitized and confined to baseDirectory.
-        await fs.rename(rollbackPath, targetPath).catch(() => {});
+        if (isRollbackCreated) {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are sanitized and confined to baseDirectory.
+            await fs.rename(rollbackPath, targetPath).catch(() => {});
+        }
         await syncDirectorySafely(baseDirectory);
 
         throw ensureError(error);
     } finally {
         // Best-effort cleanup (no-op if rollback doesn't exist).
-        await fs.rm(rollbackPath, { force: true }).catch(() => {});
+        if (isRollbackCreated) {
+            await fs.rm(rollbackPath, { force: true }).catch(() => {});
+        }
     }
 
     return targetPath;
