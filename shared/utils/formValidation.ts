@@ -10,10 +10,11 @@
  * @packageDocumentation
  */
 
-import { isFinite as isFiniteNumber, isPresent } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, isPresent } from "ts-extras";
 
 import {
     isValidInteger,
+    isValidNumeric,
     isValidPort as isValidPortValue,
     isValidUrl,
 } from "../validation/validatorUtils";
@@ -182,10 +183,16 @@ export function validateTimeout(
     minSeconds = 1,
     maxSeconds = 300
 ): { error?: string; isValid: boolean } {
-    const timeoutNum =
-        typeof timeout === "string" ? Number.parseFloat(timeout) : timeout;
+    const timeoutNum = (() => {
+        if (typeof timeout !== "string") {
+            return isFiniteNumber(timeout) ? timeout : undefined;
+        }
 
-    if (Number.isNaN(timeoutNum)) {
+        const timeoutStr = timeout.trim();
+        return isValidNumeric(timeoutStr) ? Number(timeoutStr) : undefined;
+    })();
+
+    if (!isDefined(timeoutNum)) {
         return {
             error: `${fieldName} must be a valid number`,
             isValid: false,

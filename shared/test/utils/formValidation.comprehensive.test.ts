@@ -480,6 +480,21 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
             expect(result.error).toBeUndefined();
         });
 
+        it("should return valid for whitespace-padded timeout string", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formValidation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            const result = validateTimeout(" 15.5 ");
+
+            expect(result.isValid).toBeTruthy();
+            expect(result.error).toBeUndefined();
+        });
+
         it("should return valid for minimum timeout", async ({
             task,
             annotate,
@@ -523,6 +538,30 @@ describe("Form Validation Utilities - Comprehensive Coverage", () => {
 
             expect(result.isValid).toBeFalsy();
             expect(result.error).toBe("Timeout must be a valid number");
+        });
+
+        it("should return invalid for malformed numeric timeout strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: formValidation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidValues = [
+                "15abc",
+                "1.2.3",
+                "Infinity",
+                "e8",
+            ];
+
+            for (const value of invalidValues) {
+                const result = validateTimeout(value);
+
+                expect(result.isValid).toBeFalsy();
+                expect(result.error).toBe("Timeout must be a valid number");
+            }
         });
 
         it("should return invalid for timeout below minimum", async ({
