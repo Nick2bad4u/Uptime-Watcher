@@ -14,7 +14,7 @@ on:
             - "completed"
 
 permissions:
-    contents: "write"
+    contents: "read"
 
 concurrency:
     group: "flatpak-build-${{ github.ref }}"
@@ -25,6 +25,8 @@ jobs:
         name: "Build Flatpak bundle"
         runs-on: "ubuntu-latest"
         timeout-minutes: 60
+        permissions:
+            contents: "write"
         defaults:
             run:
                 shell: "bash"
