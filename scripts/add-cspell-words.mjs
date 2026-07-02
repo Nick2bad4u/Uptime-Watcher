@@ -27,14 +27,21 @@
  * @requires cspell (installed globally or via npx)
  */
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as fsSync from "node:fs";
 import * as path from "node:path";
 
 const __dirname = import.meta.dirname;
 
-const cspellConfigPath = "--config .cspell.json";
+const cspellConfigPath = ".cspell.json";
+const cspellBinPath = path.join(
+    __dirname,
+    "..",
+    "node_modules",
+    "cspell",
+    "bin.mjs"
+);
 
 /**
  * Configuration object for the script with validation and defaults.
@@ -364,21 +371,23 @@ async function readCurrentWords(filePath, logger) {
  * @returns {Promise<string>} CSpell output.
  */
 async function runCSpell(config, logger) {
-    const cspellCommand = [
-        "npx",
-        "cspell",
-        `"${config.filePatterns.join(",")}"`,
+    const cspellArgs = [
+        cspellBinPath,
+        config.filePatterns.join(","),
         "--gitignore",
+        "--config",
         cspellConfigPath,
         "--words-only",
         "--unique",
         "--no-progress",
-    ].join(" ");
+    ];
 
-    logger.debug(`Running command: ${cspellCommand}`);
+    logger.debug(
+        `Running command: ${process.execPath} ${cspellArgs.join(" ")}`
+    );
 
     try {
-        return execSync(cspellCommand, {
+        return execFileSync(process.execPath, cspellArgs, {
             stdio: "pipe",
             encoding: "utf8",
             maxBuffer: 1024 * 1024 * 10, // 10MB buffer
