@@ -113,11 +113,6 @@
         "cognitive-complexity": "cognitive-complexity-ts --threshold 10",
         "commit": "git-cz",
         "context": "repomix --config config/tools/repomix.config.json --compress --include \"src/**,electron/**,shared/**\" --ignore \"**/test/**\"",
-        "contrib": "all-contributors",
-        "contrib:add": "all-contributors add",
-        "contrib:check": "all-contributors check",
-        "contrib:compare": "npm run contrib:check",
-        "contrib:generate": "all-contributors generate",
         "copy-sqlite": "npm run copy-wasm",
         "copy-wasm": "cpy node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm dist/ --flat",
         "debug:electron": "electron --inspect=5858 .",
@@ -691,12 +686,6 @@
         "eslint-plugin-total-functions": {
             "eslint": "$eslint"
         },
-        "eslint-plugin-usememo-recommendations": {
-            "@typescript-eslint/utils": {
-                "eslint": "$eslint"
-            },
-            "eslint": "$eslint"
-        },
         "is-immutable-type": {
             "eslint": "$eslint"
         },
@@ -709,6 +698,7 @@
         "stylelint-high-performance-animation": {
             "stylelint": "$stylelint"
         },
+        "tmp": "^0.2.7",
         "vite": {
             "tsx": "$tsx"
         },
@@ -845,7 +835,6 @@
         "@vitest/eslint-plugin": "^1.6.16",
         "@vitest/snapshot": "^4.1.9",
         "@vitest/ui": "^4.1.9",
-        "all-contributors-cli": "^6.26.1",
         "async": "^3.2.6",
         "autoprefixer": "^10.5.0",
         "babel-plugin-react-compiler": "^1.0.0",
@@ -974,7 +963,6 @@
         "eslint-plugin-typefest": "^1.2.5",
         "eslint-plugin-undefined-css-classes": "^0.1.5",
         "eslint-plugin-uptime-watcher": "workspace:*",
-        "eslint-plugin-usememo-recommendations": "^1.0.2",
         "eslint-plugin-validate-jsx-nesting": "^0.1.1",
         "eslint-plugin-xss": "^0.1.12",
         "eslint-plugin-yml": "^3.3.2",
@@ -1120,7 +1108,6 @@
         "secretlint-config-nick2bad4u": "^1.1.0",
         "sort-package-json": "^3.6.1",
         "storybook": "^10.3.6",
-        "storybook-addon-jsx": "^7.3.14",
         "stylelint": "^17.14.0",
         "stylelint-config-nick2bad4u": "^1.0.19",
         "tailwind-csstree": "^0.3.1",
@@ -1152,7 +1139,6 @@
         "vite-bundle-visualizer": "^1.2.1",
         "vite-css-modules": "^1.15.0",
         "vite-plugin-checker": "^0.13.0",
-        "vite-plugin-devtools-json": "^1.0.0",
         "vite-plugin-electron": "^0.29.1",
         "vite-plugin-istanbul": "^8.0.0",
         "vite-plugin-mcp": "^0.3.2",

@@ -63,7 +63,6 @@ const config: StorybookConfig = {
         "@storybook/addon-docs",
         "@storybook/addon-links",
         "@storybook/addon-themes",
-        "storybook-addon-jsx",
         ...(isCoverageMode()
             ? ([
                   {

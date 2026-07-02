@@ -15,7 +15,6 @@ import pc from "picocolors";
 import { defineConfig, normalizePath, type UserConfigFnObject } from "vite";
 import { analyzer } from "vite-bundle-analyzer";
 import { patchCssModules } from "vite-css-modules";
-import devtoolsJson from "vite-plugin-devtools-json";
 import electron from "vite-plugin-electron";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -445,7 +444,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                       }),
                   ]
                 : []),
-            devtoolsJson({ normalizeForWindowsContainer: true }),
             // Bundle analysis tools are build-only. Running them during `vite serve`
             // (especially alongside vite-plugin-electron's internal watch builds)
             // can cause significant memory pressure on Windows.
