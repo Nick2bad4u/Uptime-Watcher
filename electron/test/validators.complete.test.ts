@@ -14,6 +14,10 @@
  */
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
+import {
+    MONITOR_ID_MAX_LENGTH,
+    MONITOR_ID_TOO_LONG_MESSAGE,
+} from "@shared/validation/monitorFieldConstants";
 import { describe, expect, it } from "vitest";
 
 // Import all exported validator groups (domain modules)
@@ -433,6 +437,22 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     "only-site",
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("should reject monitor identifiers that exceed the shared limit", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = MonitoringHandlerValidators.checkSiteNow([
+                    "site-id",
+                    "m".repeat(MONITOR_ID_MAX_LENGTH + 1),
+                ]);
+                expect(result).toContain(MONITOR_ID_TOO_LONG_MESSAGE);
             });
         });
 

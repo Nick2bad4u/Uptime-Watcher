@@ -6,6 +6,7 @@ import {
     baseMonitorSchema,
     httpMonitorSchema,
 } from "../../validation/monitorSchemas";
+import { MONITOR_ID_MAX_LENGTH } from "../../validation/monitorFieldConstants";
 
 /**
  * Custom fast-check arbitraries for Zod schemas Replacing zod-fast-check due to
@@ -15,7 +16,7 @@ import {
 // Valid identifier generator (alphanumeric + optional hyphens/underscores)
 const validIdentifierArbitrary = fc.stringMatching(
     /^[\dA-Za-z]+(?:[-_]*[\dA-Za-z]+)*$/u
-);
+).filter((identifier) => identifier.length <= MONITOR_ID_MAX_LENGTH);
 
 // Base monitor arbitrary
 const baseMonitorArbitrary = fc.record({

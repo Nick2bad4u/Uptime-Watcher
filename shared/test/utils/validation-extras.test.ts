@@ -8,6 +8,10 @@
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { validateMonitorType } from "@shared/utils/validation";
+import {
+    MONITOR_ID_MAX_LENGTH,
+    MONITOR_ID_TOO_LONG_MESSAGE,
+} from "@shared/validation/monitorFieldConstants";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
 import { describe, expect, it } from "vitest";
@@ -55,6 +59,17 @@ describe("getMonitorValidationErrors (canonical Zod)", () => {
         const errors = getMonitorValidationErrors({ type: "http", id: "" });
         expect(
             errors.some((error) => error.includes("Monitor ID is required"))
+        ).toBeTruthy();
+    });
+
+    it("surfaces too-long monitor ID errors", () => {
+        const errors = getMonitorValidationErrors({
+            id: "m".repeat(MONITOR_ID_MAX_LENGTH + 1),
+            type: "http",
+        });
+
+        expect(
+            errors.some((error) => error.includes(MONITOR_ID_TOO_LONG_MESSAGE))
         ).toBeTruthy();
     });
 
