@@ -103,7 +103,7 @@ for (const [filePath, data] of Object.entries(coverageData)) {
 
     // Calculate line coverage
     // If l (lines) map is missing or empty, try to derive per-line coverage from statementMap
-    const statementMap = data.statementMap ?? data.statementMap ?? {};
+    const statementMap = data.statementMap ?? {};
     let derivedLines = lines;
     if (
         Object.keys(derivedLines).length === 0 &&
