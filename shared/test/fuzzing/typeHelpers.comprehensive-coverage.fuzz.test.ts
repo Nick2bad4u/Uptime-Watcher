@@ -270,7 +270,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
             expect(safePropertyAccess(obj, "nonexistent")).toBeUndefined();
         });
 
-        test.prop([fc.string()])(
+        test.prop([safeDynamicKey])(
             "should handle inherited properties",
             (key) => {
                 const parent = { [key]: "inherited" };
