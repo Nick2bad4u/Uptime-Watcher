@@ -1,5 +1,14 @@
 import * as path from "node:path";
 
+interface PathComparisonModule {
+    readonly resolve: (value: string) => string;
+    readonly sep: string;
+}
+
+function getPathModule(platform: NodeJS.Platform): PathComparisonModule {
+    return platform === "win32" ? path.win32 : path.posix;
+}
+
 /**
  * Resolve the production distribution directory used for file:// navigation.
  */
@@ -15,6 +24,7 @@ export function isPathWithinDirectory(
     directory: string,
     platform: NodeJS.Platform = process.platform
 ): boolean {
+    const pathModule = getPathModule(platform);
     const normalizedValue = normalizePathForComparison(value, platform);
     const normalizedDirectory = normalizePathForComparison(directory, platform);
 
@@ -22,9 +32,9 @@ export function isPathWithinDirectory(
         return true;
     }
 
-    const directoryPrefix = normalizedDirectory.endsWith(path.sep)
+    const directoryPrefix = normalizedDirectory.endsWith(pathModule.sep)
         ? normalizedDirectory
-        : `${normalizedDirectory}${path.sep}`;
+        : `${normalizedDirectory}${pathModule.sep}`;
 
     return normalizedValue.startsWith(directoryPrefix);
 }
@@ -44,6 +54,6 @@ export function normalizePathForComparison(
     value: string,
     platform: NodeJS.Platform = process.platform
 ): string {
-    const normalized = path.resolve(value);
+    const normalized = getPathModule(platform).resolve(value);
     return platform === "win32" ? normalized.toLowerCase() : normalized;
 }
