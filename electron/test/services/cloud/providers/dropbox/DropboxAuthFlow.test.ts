@@ -141,7 +141,7 @@ describe(DropboxAuthFlow, () => {
 
             expect(capturedState).toBeTruthy();
             expect(capturedRedirectUri).toMatch(
-                /^https:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
+                /^http:\/\/127\.0\.0\.1:\d+\/oauth2\/callback$/v
             );
 
             if (capturedRedirectUri === undefined) {

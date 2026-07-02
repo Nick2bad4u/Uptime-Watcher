@@ -400,7 +400,8 @@ export async function startLoopbackOAuthServer(args?: {
     const port = resolvePortFromServer(primaryServer.server);
     // Loopback callback listener is an HTTP server (createServer from node:HTTP),
     // so redirect URIs must use HTTP:// to avoid browser TLS protocol errors.
-    const origin = `https://${redirectHost}:${port}`;
+    // eslint-disable-next-line sdl/no-insecure-url -- OAuth loopback redirects are HTTP on localhost by design.
+    const origin = `http://${redirectHost}:${port}`;
     const redirectUri = isOmitPath ? origin : `${origin}${expectedPath}`;
 
     return {
