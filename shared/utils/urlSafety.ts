@@ -640,21 +640,25 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
     const withoutTrailingDot = normalized.endsWith(".")
         ? normalized.slice(0, -1)
         : normalized;
+    const withoutIpv6Brackets =
+        withoutTrailingDot.startsWith("[") && withoutTrailingDot.endsWith("]")
+            ? withoutTrailingDot.slice(1, -1)
+            : withoutTrailingDot;
 
-    if (withoutTrailingDot.length === 0) {
+    if (withoutIpv6Brackets.length === 0) {
         return true;
     }
 
     // RFC 6761 reserves `localhost` and `*.localhost`.
     if (
-        withoutTrailingDot === "localhost" ||
-        withoutTrailingDot.endsWith(".localhost")
+        withoutIpv6Brackets === "localhost" ||
+        withoutIpv6Brackets.endsWith(".localhost")
     ) {
         return true;
     }
 
     // RFC 6762 reserves `.local` for mDNS.
-    if (withoutTrailingDot.endsWith(".local")) {
+    if (withoutIpv6Brackets.endsWith(".local")) {
         return true;
     }
 
@@ -662,18 +666,18 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
     // We treat them as private to avoid leaking local hostnames to third-party
     // services.
     if (
-        !withoutTrailingDot.includes(".") &&
-        !withoutTrailingDot.includes(":")
+        !withoutIpv6Brackets.includes(".") &&
+        !withoutIpv6Brackets.includes(":")
     ) {
         return true;
     }
 
-    if (isPrivateIpv4(withoutTrailingDot)) {
+    if (isPrivateIpv4(withoutIpv6Brackets)) {
         return true;
     }
 
-    if (withoutTrailingDot.includes(":")) {
-        return isPrivateIpv6(withoutTrailingDot);
+    if (withoutIpv6Brackets.includes(":")) {
+        return isPrivateIpv6(withoutIpv6Brackets);
     }
 
     return false;

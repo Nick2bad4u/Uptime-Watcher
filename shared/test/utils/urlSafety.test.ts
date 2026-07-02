@@ -54,17 +54,25 @@ describe("urlSafety", () => {
 
         it("detects IPv6 link-local and ULA addresses", () => {
             expect(isPrivateNetworkHostname("::1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[::1]")).toBeTruthy();
             expect(isPrivateNetworkHostname("::")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[::]")).toBeTruthy();
             expect(isPrivateNetworkHostname("fe80::1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[fe80::1]")).toBeTruthy();
             expect(isPrivateNetworkHostname("fe90::1")).toBeTruthy();
             expect(isPrivateNetworkHostname("febf::1")).toBeTruthy();
             expect(isPrivateNetworkHostname("fd00::1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[fd00::1]")).toBeTruthy();
             expect(isPrivateNetworkHostname("fc00::1")).toBeTruthy();
         });
 
         it("detects IPv4-mapped IPv6 private addresses (dotted and hex)", () => {
             expect(isPrivateNetworkHostname("::ffff:192.168.0.1")).toBeTruthy();
+            expect(
+                isPrivateNetworkHostname("[::ffff:192.168.0.1]")
+            ).toBeTruthy();
             expect(isPrivateNetworkHostname("::ffff:c0a8:0001")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[::ffff:c0a8:0001]")).toBeTruthy();
             expect(isPrivateNetworkHostname("::ffff:c0a8:1")).toBeTruthy();
         });
 
@@ -340,6 +348,10 @@ describe("urlSafety", () => {
             expect(tryGetSafeThirdPartyHttpUrl("https://192.168.1.1")).toBe(
                 null
             );
+            expect(tryGetSafeThirdPartyHttpUrl("http://[::1]")).toBe(null);
+            expect(
+                tryGetSafeThirdPartyHttpUrl("https://[::ffff:192.168.1.1]")
+            ).toBe(null);
         });
 
         it("returns null for URLs with credentials", () => {
