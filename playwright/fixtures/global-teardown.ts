@@ -3,36 +3,20 @@
  *
  * @packageDocumentation Invoked
  *
- * once after the Playwright suite wraps up to ensure Electron
- * processes spawned during the run are terminated cleanly.
+ * once after the Playwright suite wraps up.
  */
 
-import { execSync } from "node:child_process";
-
 /**
- * Terminates lingering Electron processes spawned during Playwright runs.
+ * Reports completion of Playwright global teardown.
+ *
+ * @remarks
+ * Electron applications launched by tests are closed by `launchElectronApp`
+ * cleanup hooks, which target only the child process they own. Keeping global
+ * teardown side-effect free avoids terminating unrelated Electron apps that
+ * happen to be open on a developer machine.
  */
 async function globalTeardown(): Promise<void> {
     console.log("🧹 Cleaning up after Playwright tests...");
-
-    // Clean up any temporary files or processes
-    // Kill any remaining Electron processes
-    try {
-        if (process.platform === "win32") {
-            // Windows
-            execSync("taskkill /F /IM electron.exe /T", {
-                stdio: "ignore",
-            });
-        } else {
-            // MacOS/Linux
-            execSync("pkill -f electron", {
-                stdio: "ignore",
-            });
-        }
-    } catch {
-        // Ignore errors - processes might not be running
-    }
-
     console.log("✅ Cleanup complete");
 }
 

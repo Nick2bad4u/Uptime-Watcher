@@ -10,8 +10,50 @@
 
 import type { FullConfig } from "@playwright/test";
 
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import * as path from "node:path";
+
+interface CommandInvocation {
+    readonly args: readonly string[];
+    readonly command: string;
+}
+
+function resolveNpmRunInvocation(scriptName: string): CommandInvocation {
+    const npmExecPath = process.env["npm_execpath"];
+
+    if (npmExecPath) {
+        return {
+            args: [
+                npmExecPath,
+                "run",
+                scriptName,
+            ],
+            command: process.execPath,
+        };
+    }
+
+    if (process.platform === "win32") {
+        return {
+            args: [
+                "/d",
+                "/s",
+                "/c",
+                "npm",
+                "run",
+                scriptName,
+            ],
+            command: "cmd.exe",
+        };
+    }
+
+    return {
+        args: [
+            "run",
+            scriptName,
+        ],
+        command: "npm",
+    };
+}
 
 function withMaxOldSpaceSize(
     nodeOptions: string | undefined,
@@ -49,12 +91,13 @@ async function globalSetup(_config: FullConfig): Promise<void> {
         );
     } else {
         try {
-            const buildCommand = process.env["PLAYWRIGHT_COVERAGE"]
-                ? "npm run build:playwright-coverage"
-                : "npm run build:electron-main";
+            const buildScript = process.env["PLAYWRIGHT_COVERAGE"]
+                ? "build:playwright-coverage"
+                : "build:electron-main";
+            const buildInvocation = resolveNpmRunInvocation(buildScript);
 
-            console.log(`📦 Building Electron app via: ${buildCommand}`);
-            execSync(buildCommand, {
+            console.log(`📦 Building Electron app via: npm run ${buildScript}`);
+            execFileSync(buildInvocation.command, [...buildInvocation.args], {
                 stdio: "inherit",
                 cwd: path.resolve(__dirname, "../.."),
                 env: {
