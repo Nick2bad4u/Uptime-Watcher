@@ -1,5 +1,8 @@
 import type { CloudStatusSummary } from "@shared/types/cloud";
 
+import { promises as fs } from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 import type { CloudServiceOperationContext } from "../../../services/cloud/CloudService.operationContext";
@@ -7,6 +10,7 @@ import type { CloudServiceOperationContext } from "../../../services/cloud/Cloud
 import {
     connectDropbox,
     connectGoogleDrive,
+    configureFilesystemProvider,
 } from "../../../services/cloud/CloudService.providerOperations";
 import {
     SETTINGS_KEY_DROPBOX_TOKENS,
@@ -313,5 +317,62 @@ describe("CloudService.providerOperations", () => {
         await expect(
             secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
         ).resolves.toBe("dropbox");
+    });
+
+    it("does not commit filesystem provider when base directory persistence fails", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-provider-")
+        );
+
+        try {
+            const secretStore = new InMemorySecretStore();
+            const baseSettings = createSettingsAdapter({
+                [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/previous",
+                [SETTINGS_KEY_PROVIDER]: "dropbox",
+            });
+
+            const settings: CloudServiceOperationContext["settings"] = {
+                ...baseSettings,
+                set: async (key, value) => {
+                    if (key === SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY) {
+                        throw new Error("base directory persistence failed");
+                    }
+
+                    await baseSettings.set(key, value);
+                },
+            };
+
+            await secretStore.setSecret(
+                SETTINGS_KEY_DROPBOX_TOKENS,
+                "dropbox-tokens"
+            );
+
+            const ctx = createOperationContext({
+                loadDropboxDeps: async () => {
+                    throw new Error("not used");
+                },
+                loadGoogleDriveDeps: async () => {
+                    throw new Error("not used");
+                },
+                secretStore,
+                settings,
+            });
+
+            await expect(
+                configureFilesystemProvider(ctx, { baseDirectory })
+            ).rejects.toThrow("base directory persistence failed");
+
+            await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+                "dropbox"
+            );
+            await expect(
+                settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+            ).resolves.toBe("/tmp/previous");
+            await expect(
+                secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+            ).resolves.toBe("dropbox-tokens");
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
     });
 });

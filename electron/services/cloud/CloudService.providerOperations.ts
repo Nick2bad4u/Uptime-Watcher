@@ -180,11 +180,11 @@ export async function configureFilesystemProvider(
             );
         }
 
-        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
         await ctx.settings.set(
             SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
             canonical
         );
+        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
 
         // Switching to the filesystem provider means OAuth-based providers are
         // no longer configured. Clear any stored OAuth secrets so we don't
