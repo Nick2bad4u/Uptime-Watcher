@@ -18,6 +18,7 @@
 import {
     isDefined,
     isFinite as isFiniteNumber,
+    isSafeInteger,
     objectEntries,
     safeCastTo,
 } from "ts-extras";
@@ -238,8 +239,15 @@ export function readNumberEnv(key: string, defaultValue: number): number {
         return defaultValue;
     }
 
-    const parsed = Number.parseInt(value, 10);
-    return isFiniteNumber(parsed) && parsed > 0 ? parsed : defaultValue;
+    const normalized = value.trim();
+    if (!/^\d+$/u.test(normalized)) {
+        return defaultValue;
+    }
+
+    const parsed = Number.parseInt(normalized, 10);
+    return isFiniteNumber(parsed) && isSafeInteger(parsed) && parsed > 0
+        ? parsed
+        : defaultValue;
 }
 
 /**

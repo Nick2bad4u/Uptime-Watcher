@@ -16,6 +16,7 @@ import {
     isNodeEnvironment,
     isProduction,
     isTest,
+    readNumberEnv,
 } from "../../utils/environment";
 
 describe("shared/utils/environment.ts - Complete Function Coverage", () => {
@@ -238,6 +239,59 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             globalThis.process = undefined as any;
             expect(getNodeEnv()).toBe("development");
+        });
+    });
+
+    describe(readNumberEnv, () => {
+        it("should read positive integer environment values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            globalThis.process = {
+                env: { TEST_LIMIT: " 42 " },
+            } as any;
+
+            expect(readNumberEnv("TEST_LIMIT", 10)).toBe(42);
+        });
+
+        it("should reject malformed numeric environment values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const invalidValues = [
+                "",
+                "0",
+                "-1",
+                "1.5",
+                "1e3",
+                "10junk",
+                "Infinity",
+                String(Number.MAX_SAFE_INTEGER + 1),
+            ];
+
+            for (const value of invalidValues) {
+                globalThis.process = {
+                    env: { TEST_LIMIT: value },
+                } as any;
+
+                expect(readNumberEnv("TEST_LIMIT", 10)).toBe(10);
+            }
         });
     });
 
