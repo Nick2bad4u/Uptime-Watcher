@@ -1,4 +1,8 @@
-import { SafeStorageSecretStore } from "@electron/services/cloud/secrets/SecretStore";
+import {
+    FallbackSecretStore,
+    SafeStorageSecretStore,
+    type SecretStore,
+} from "@electron/services/cloud/secrets/SecretStore";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("electron", () => ({
@@ -59,5 +63,59 @@ describe(SafeStorageSecretStore, () => {
             undefined
         );
         expect(settings.get("cloud.dropbox.tokens")).toBe("");
+    });
+});
+
+class MutableSecretStore implements SecretStore {
+    public readonly values = new Map<string, string>();
+
+    public shouldFailGet = false;
+
+    public shouldFailSet = false;
+
+    public async deleteSecret(key: string): Promise<void> {
+        this.values.delete(key);
+    }
+
+    public async getSecret(key: string): Promise<string | undefined> {
+        if (this.shouldFailGet) {
+            throw new Error("get failed");
+        }
+
+        return this.values.get(key);
+    }
+
+    public async setSecret(key: string, value: string): Promise<void> {
+        if (this.shouldFailSet) {
+            throw new Error("set failed");
+        }
+
+        this.values.set(key, value);
+    }
+}
+
+describe(FallbackSecretStore, () => {
+    it("clears stale fallback values after primary storage succeeds", async () => {
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        primary.shouldFailSet = true;
+        await store.setSecret("cloud.dropbox.tokens", "old-token-json");
+        expect(fallback.values.get("cloud.dropbox.tokens")).toBe(
+            "old-token-json"
+        );
+
+        primary.shouldFailSet = false;
+        await store.setSecret("cloud.dropbox.tokens", "new-token-json");
+        expect(primary.values.get("cloud.dropbox.tokens")).toBe(
+            "new-token-json"
+        );
+        expect(fallback.values.has("cloud.dropbox.tokens")).toBeFalsy();
+
+        primary.shouldFailGet = true;
+        await expect(
+            store.getSecret("cloud.dropbox.tokens")
+        ).resolves.toBeUndefined();
     });
 });

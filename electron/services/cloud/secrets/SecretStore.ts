@@ -80,6 +80,7 @@ export class FallbackSecretStore implements SecretStore {
     public async setSecret(key: string, value: string): Promise<void> {
         try {
             await this.primary.setSecret(key, value);
+            await this.fallback.deleteSecret(key).catch(() => {});
             return;
         } catch {
             // Ignore
