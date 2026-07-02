@@ -10,9 +10,15 @@ import {
     cloudSyncWriteKeySchema,
     jsonValueSchema,
 } from "@shared/types/cloudSync";
+import { objectEntries } from "ts-extras";
 import * as z from "zod";
 
 export const CLOUD_SYNC_SNAPSHOT_VERSION = 1 as const;
+const CLOUD_SYNC_STATE_ENTITY_TYPES = [
+    "monitor",
+    "settings",
+    "site",
+] as const;
 
 const cloudSyncFieldValueSchema = z
     .object({
@@ -36,7 +42,36 @@ const cloudSyncStateInternalSchema = z
         settings: z.record(z.string().min(1), cloudSyncEntityStateSchema),
         site: z.record(z.string().min(1), cloudSyncEntityStateSchema),
     })
-    .strict();
+    .strict()
+    .superRefine((state, ctx) => {
+        for (const entityType of CLOUD_SYNC_STATE_ENTITY_TYPES) {
+            for (const [entityId, entity] of objectEntries(state[entityType])) {
+                if (entity.entityId !== entityId) {
+                    ctx.addIssue({
+                        code: "custom",
+                        message: "entityId must match its state map key",
+                        path: [
+                            entityType,
+                            entityId,
+                            "entityId",
+                        ],
+                    });
+                }
+
+                if (entity.entityType !== entityType) {
+                    ctx.addIssue({
+                        code: "custom",
+                        message: "entityType must match its state map",
+                        path: [
+                            entityType,
+                            entityId,
+                            "entityType",
+                        ],
+                    });
+                }
+            }
+        }
+    });
 
 /** Runtime schema for validating {@link CloudSyncState}. */
 export const cloudSyncStateSchema: z.ZodType<CloudSyncState> =
