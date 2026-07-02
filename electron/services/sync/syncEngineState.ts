@@ -77,6 +77,8 @@ const DEFAULT_WRITE_KEY: CloudSyncWriteKey = {
 
 type CloudSyncEntityStateMap = Record<string, CloudSyncEntityState>;
 type CloudSyncFieldValueMap = Record<string, CloudSyncFieldValue>;
+type CloudSyncMonitorConfigMap = Record<string, CloudSyncMonitorConfig>;
+type CloudSyncSiteConfigMap = Record<string, CloudSyncSiteConfig>;
 
 function createEntityMap(): CloudSyncEntityStateMap {
     return createNullPrototypeObject<CloudSyncEntityStateMap>();
@@ -84,6 +86,18 @@ function createEntityMap(): CloudSyncEntityStateMap {
 
 function createFieldMap(): CloudSyncFieldValueMap {
     return createNullPrototypeObject<CloudSyncFieldValueMap>();
+}
+
+function createMonitorConfigMap(): CloudSyncMonitorConfigMap {
+    return createNullPrototypeObject<CloudSyncMonitorConfigMap>();
+}
+
+function createSettingsConfigMap(): CloudSyncSettingsConfig {
+    return createNullPrototypeObject<CloudSyncSettingsConfig>();
+}
+
+function createSiteConfigMap(): CloudSyncSiteConfigMap {
+    return createNullPrototypeObject<CloudSyncSiteConfigMap>();
 }
 
 function setRecordValue<T>(
@@ -111,6 +125,30 @@ function setFieldValue(
     target: CloudSyncFieldValueMap,
     key: string,
     value: CloudSyncFieldValue
+): void {
+    setRecordValue(target, key, value);
+}
+
+function setMonitorConfig(
+    target: CloudSyncMonitorConfigMap,
+    key: string,
+    value: CloudSyncMonitorConfig
+): void {
+    setRecordValue(target, key, value);
+}
+
+function setSettingConfig(
+    target: CloudSyncSettingsConfig,
+    key: string,
+    value: string
+): void {
+    setRecordValue(target, key, value);
+}
+
+function setSiteConfig(
+    target: CloudSyncSiteConfigMap,
+    key: string,
+    value: CloudSyncSiteConfig
 ): void {
     setRecordValue(target, key, value);
 }
@@ -363,14 +401,20 @@ function toSiteConfig(site: Site): CloudSyncSiteConfig {
 function toSettingsConfig(
     settings: Record<string, string>
 ): CloudSyncSettingsConfig {
-    const filtered: Record<string, string> = {};
+    const filtered = createSettingsConfigMap();
     for (const [key, value] of objectEntries(settings)) {
         if (shouldSyncSettingKey(key)) {
-            filtered[key] = value;
+            setSettingConfig(filtered, key, value);
         }
     }
 
-    return cloudSyncSettingsConfigSchema.parse(filtered);
+    const parsed = cloudSyncSettingsConfigSchema.parse(filtered);
+    const result = createSettingsConfigMap();
+    for (const [key, value] of objectEntries(parsed)) {
+        setSettingConfig(result, key, value);
+    }
+
+    return result;
 }
 
 /**
@@ -403,16 +447,17 @@ export function buildCanonicalLocalState(
     sites: Site[],
     settings: Record<string, string>
 ): CanonicalLocalState {
-    const siteConfigs: Record<string, CloudSyncSiteConfig> = {};
-    const monitorConfigs: Record<string, CloudSyncMonitorConfig> = {};
+    const siteConfigs = createSiteConfigMap();
+    const monitorConfigs = createMonitorConfigMap();
 
     for (const site of sites) {
-        siteConfigs[site.identifier] = toSiteConfig(site);
+        setSiteConfig(siteConfigs, site.identifier, toSiteConfig(site));
 
         for (const monitor of site.monitors) {
-            monitorConfigs[monitor.id] = toMonitorConfig(
-                site.identifier,
-                monitor
+            setMonitorConfig(
+                monitorConfigs,
+                monitor.id,
+                toMonitorConfig(site.identifier, monitor)
             );
         }
     }
@@ -432,7 +477,7 @@ export function buildCanonicalLocalState(
 export function buildDesiredSitesFromSyncState(
     siteState: CloudSyncState["site"]
 ): Record<string, CloudSyncSiteConfig> {
-    const desiredSites: Record<string, CloudSyncSiteConfig> = {};
+    const desiredSites = createSiteConfigMap();
 
     for (const [siteId, entity] of objectEntries(siteState)) {
         if (isDefined(entity.deleted)) {
@@ -453,7 +498,7 @@ export function buildDesiredSitesFromSyncState(
         });
 
         if (parsed.success) {
-            desiredSites[siteId] = parsed.data;
+            setSiteConfig(desiredSites, siteId, parsed.data);
         }
     }
 
@@ -472,17 +517,18 @@ export function buildDesiredSitesFromSyncState(
 export function buildDesiredMonitorsFromSyncState(
     monitorState: CloudSyncState["monitor"]
 ): Record<string, CloudSyncMonitorConfig> {
-    const desiredMonitors: Record<string, CloudSyncMonitorConfig> = {};
+    const desiredMonitors = createMonitorConfigMap();
 
     for (const [monitorId, entity] of objectEntries(monitorState)) {
         if (isDefined(entity.deleted)) {
             continue;
         }
 
-        const candidate: UnknownRecord = { id: monitorId };
+        const candidate = createNullPrototypeObject<UnknownRecord>();
+        setRecordValue<unknown>(candidate, "id", monitorId);
         for (const [field, fieldValue] of objectEntries(entity.fields)) {
             if (field !== "id" && fieldValue.value !== null) {
-                candidate[field] = fieldValue.value;
+                setRecordValue<unknown>(candidate, field, fieldValue.value);
             }
         }
 
@@ -503,7 +549,7 @@ export function buildDesiredMonitorsFromSyncState(
 
         const parsed = cloudSyncMonitorConfigSchema.safeParse(candidate);
         if (parsed.success) {
-            desiredMonitors[monitorId] = parsed.data;
+            setMonitorConfig(desiredMonitors, monitorId, parsed.data);
         }
     }
 
@@ -518,7 +564,7 @@ export function buildDesiredMonitorsFromSyncState(
 export function buildDesiredSettingsFromSyncState(
     settingsState: CloudSyncState["settings"]
 ): CloudSyncSettingsConfig {
-    const desiredSettings: CloudSyncSettingsConfig = {};
+    const desiredSettings = createSettingsConfigMap();
 
     for (const [key, entity] of objectEntries(settingsState)) {
         if (!shouldSyncSettingKey(key) || isDefined(entity.deleted)) {
@@ -527,7 +573,7 @@ export function buildDesiredSettingsFromSyncState(
 
         const value = entity.fields["value"]?.value;
         if (typeof value === "string") {
-            desiredSettings[key] = value;
+            setSettingConfig(desiredSettings, key, value);
         }
     }
 

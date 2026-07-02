@@ -1,7 +1,12 @@
 import type { CloudSyncState } from "@shared/types/cloudSyncState";
+import type { Site } from "@shared/types";
 
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
+    buildCanonicalLocalState,
+    buildDesiredMonitorsFromSyncState,
+    buildDesiredSettingsFromSyncState,
+    buildDesiredSitesFromSyncState,
     buildLocalOperations,
     getMaxOpIdByDevice,
     normalizeCloudSyncState,
@@ -9,6 +14,12 @@ import {
 import { describe, expect, it } from "vitest";
 
 const PROTOTYPE_PROPERTY_NAME = "__proto__";
+const INHERITED_PROPERTY_NAME = "toString";
+const WRITE = {
+    deviceId: "device-1",
+    opId: 1,
+    timestamp: 1,
+} as const;
 
 describe(normalizeCloudSyncState, () => {
     it("normalizes remote-keyed maps into null-prototype dictionaries", () => {
@@ -134,11 +145,147 @@ describe(buildLocalOperations, () => {
     });
 });
 
+describe("syncEngineState map builders", () => {
+    it("builds canonical local state with null-prototype maps", () => {
+        const site: Site = {
+            identifier: PROTOTYPE_PROPERTY_NAME,
+            monitoring: true,
+            monitors: [
+                {
+                    checkInterval: 60_000,
+                    history: [],
+                    id: INHERITED_PROPERTY_NAME,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending",
+                    timeout: 10_000,
+                    type: "http",
+                    url: "https://example.com",
+                },
+            ],
+            name: "Prototype site",
+        };
+
+        const current = buildCanonicalLocalState([site], {
+            [INHERITED_PROPERTY_NAME]: "setting-value",
+        });
+
+        expect(Object.getPrototypeOf(current.sites)).toBeNull();
+        expect(Object.getPrototypeOf(current.monitors)).toBeNull();
+        expect(Object.getPrototypeOf(current.settings)).toBeNull();
+        expect(Object.hasOwn(current.sites, PROTOTYPE_PROPERTY_NAME)).toBe(
+            true
+        );
+        expect(Object.hasOwn(current.monitors, INHERITED_PROPERTY_NAME)).toBe(
+            true
+        );
+        expect(Object.hasOwn(current.settings, INHERITED_PROPERTY_NAME)).toBe(
+            true
+        );
+    });
+
+    it("builds desired site maps with prototype-named site ids", () => {
+        const state = {
+            [PROTOTYPE_PROPERTY_NAME]: {
+                entityId: PROTOTYPE_PROPERTY_NAME,
+                entityType: "site",
+                fields: {
+                    monitoring: {
+                        value: true,
+                        write: WRITE,
+                    },
+                    name: {
+                        value: "Prototype site",
+                        write: WRITE,
+                    },
+                },
+            },
+        } satisfies CloudSyncState["site"];
+
+        const desired = buildDesiredSitesFromSyncState(state);
+
+        expect(Object.getPrototypeOf(desired)).toBeNull();
+        expect(Object.hasOwn(desired, PROTOTYPE_PROPERTY_NAME)).toBe(true);
+        expect(desired[PROTOTYPE_PROPERTY_NAME]?.identifier).toBe(
+            PROTOTYPE_PROPERTY_NAME
+        );
+    });
+
+    it("builds desired monitor maps with inherited-property monitor ids", () => {
+        const state = {
+            [INHERITED_PROPERTY_NAME]: {
+                entityId: INHERITED_PROPERTY_NAME,
+                entityType: "monitor",
+                fields: {
+                    checkInterval: {
+                        value: 60_000,
+                        write: WRITE,
+                    },
+                    monitoring: {
+                        value: true,
+                        write: WRITE,
+                    },
+                    retryAttempts: {
+                        value: 3,
+                        write: WRITE,
+                    },
+                    siteIdentifier: {
+                        value: "site-1",
+                        write: WRITE,
+                    },
+                    timeout: {
+                        value: 10_000,
+                        write: WRITE,
+                    },
+                    type: {
+                        value: "http",
+                        write: WRITE,
+                    },
+                    url: {
+                        value: "https://example.com",
+                        write: WRITE,
+                    },
+                },
+            },
+        } as const satisfies CloudSyncState["monitor"];
+
+        const desired = buildDesiredMonitorsFromSyncState(state);
+
+        expect(Object.getPrototypeOf(desired)).toBeNull();
+        expect(Object.hasOwn(desired, INHERITED_PROPERTY_NAME)).toBe(true);
+        expect(desired[INHERITED_PROPERTY_NAME]?.id).toBe(
+            INHERITED_PROPERTY_NAME
+        );
+    });
+
+    it("builds desired settings maps with inherited-property keys", () => {
+        const state = {
+            [INHERITED_PROPERTY_NAME]: {
+                entityId: INHERITED_PROPERTY_NAME,
+                entityType: "settings",
+                fields: {
+                    value: {
+                        value: "setting-value",
+                        write: WRITE,
+                    },
+                },
+            },
+        } as const satisfies CloudSyncState["settings"];
+
+        const desired = buildDesiredSettingsFromSyncState(state);
+
+        expect(Object.getPrototypeOf(desired)).toBeNull();
+        expect(Object.hasOwn(desired, INHERITED_PROPERTY_NAME)).toBe(true);
+        expect(desired[INHERITED_PROPERTY_NAME]).toBe("setting-value");
+    });
+});
+
 describe(getMaxOpIdByDevice, () => {
     it("aggregates device IDs that match inherited object properties", () => {
         const result = getMaxOpIdByDevice([
             {
-                deviceId: "toString",
+                deviceId: INHERITED_PROPERTY_NAME,
                 entityId: "site-1",
                 entityType: "site",
                 field: "name",
@@ -149,7 +296,7 @@ describe(getMaxOpIdByDevice, () => {
                 value: "Example",
             },
             {
-                deviceId: "toString",
+                deviceId: INHERITED_PROPERTY_NAME,
                 entityId: "site-1",
                 entityType: "site",
                 field: "monitoring",
@@ -162,6 +309,6 @@ describe(getMaxOpIdByDevice, () => {
         ]);
 
         expect(Object.getPrototypeOf(result)).toBeNull();
-        expect(result["toString"]).toBe(7);
+        expect(result[INHERITED_PROPERTY_NAME]).toBe(7);
     });
 });
