@@ -17,7 +17,10 @@ import {
 } from "@shared/types/cloudSyncBaseline";
 import { createCloudSyncManifestDevices } from "@shared/types/cloudSyncManifest";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
-import { safeObjectOmit } from "@shared/utils/objectSafety";
+import {
+    createNullPrototypeObject,
+    safeObjectOmit,
+} from "@shared/utils/objectSafety";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
@@ -27,7 +30,7 @@ import {
     isFinite as isFiniteNumber,
     isSafeInteger,
     objectEntries,
-    objectHasIn,
+    objectHasOwn,
     objectKeys,
     objectValues,
     setHas,
@@ -509,7 +512,7 @@ export class SyncEngine {
         }
 
         for (const key of objectKeys(existingFiltered)) {
-            if (!objectHasIn(desired, key)) {
+            if (!objectHasOwn(desired, key)) {
                 await this.settings.delete(key);
             }
         }
@@ -695,7 +698,7 @@ export class SyncEngine {
         )) {
             const { siteIdentifier } = monitorConfig;
 
-            if (objectHasIn(desiredSites, siteIdentifier)) {
+            if (objectHasOwn(desiredSites, siteIdentifier)) {
                 const existingMonitors =
                     localMonitorsBySite.get(siteIdentifier) ?? [];
 
@@ -742,7 +745,7 @@ export class SyncEngine {
 
             if (
                 mergedValidMonitorsById.has(monitorId) &&
-                objectHasIn(desiredSites, siteIdentifier)
+                objectHasOwn(desiredSites, siteIdentifier)
             ) {
                 const current = monitorIdsBySite.get(siteIdentifier) ?? [];
                 monitorIdsBySite.set(siteIdentifier, [...current, monitorId]);
@@ -786,20 +789,32 @@ export class SyncEngine {
             }
         }
 
-        const nextSite: Record<string, CloudSyncEntityState> = {};
+        const nextSite =
+            createNullPrototypeObject<Record<string, CloudSyncEntityState>>();
         for (const [siteId, entity] of objectEntries(state.site)) {
             if (isDefined(entity.deleted) || setHas(keepSiteIds, siteId)) {
-                nextSite[siteId] = entity;
+                Object.defineProperty(nextSite, siteId, {
+                    configurable: true,
+                    enumerable: true,
+                    value: entity,
+                    writable: true,
+                });
             }
         }
 
-        const nextMonitor: Record<string, CloudSyncEntityState> = {};
+        const nextMonitor =
+            createNullPrototypeObject<Record<string, CloudSyncEntityState>>();
         for (const [monitorId, entity] of objectEntries(state.monitor)) {
             if (
                 isDefined(entity.deleted) ||
                 setHas(keepMonitorIds, monitorId)
             ) {
-                nextMonitor[monitorId] = entity;
+                Object.defineProperty(nextMonitor, monitorId, {
+                    configurable: true,
+                    enumerable: true,
+                    value: entity,
+                    writable: true,
+                });
             }
         }
 

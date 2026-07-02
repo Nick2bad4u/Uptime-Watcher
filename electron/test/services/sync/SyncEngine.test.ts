@@ -1,4 +1,5 @@
 import type { Monitor, Site } from "@shared/types";
+import type { CloudSyncState } from "@shared/types/cloudSyncState";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -82,6 +83,17 @@ class InMemoryOrchestrator {
     }
 }
 
+interface SyncEnginePrivateAccess {
+    applySettings: (
+        existing: Record<string, string>,
+        desired: Record<string, string>
+    ) => Promise<void>;
+    buildSanitizedMergedStateForApplication: (args: {
+        localSites: Site[];
+        state: CloudSyncState;
+    }) => CloudSyncState;
+}
+
 function createMonitor(args: {
     id: string;
     monitoring: boolean;
@@ -124,6 +136,105 @@ function canonicalizeSites(sites: Site[]): unknown {
 }
 
 describe("SyncEngine (ADR-016)", () => {
+    it("deletes synced settings whose keys match inherited object properties", async () => {
+        const settings = new InMemorySettingsAdapter();
+        await settings.set("toString", "old-value");
+
+        const engine = new SyncEngine({
+            orchestrator: new InMemoryOrchestrator([]),
+            settings,
+        });
+
+        await (engine as unknown as SyncEnginePrivateAccess).applySettings(
+            { toString: "old-value" },
+            {}
+        );
+
+        expect(await settings.get("toString")).toBeUndefined();
+    });
+
+    it("keeps sanitized sync state maps as null-prototype dictionaries", () => {
+        const engine = new SyncEngine({
+            orchestrator: new InMemoryOrchestrator([]),
+            settings: new InMemorySettingsAdapter(),
+        });
+
+        const write = {
+            deviceId: "device-1",
+            opId: 1,
+            timestamp: 1,
+        };
+        const state = {
+            monitor: {
+                "monitor-1": {
+                    entityId: "monitor-1",
+                    entityType: "monitor",
+                    fields: {
+                        checkInterval: {
+                            value: DEFAULT_CHECK_INTERVAL,
+                            write,
+                        },
+                        monitoring: {
+                            value: true,
+                            write,
+                        },
+                        retryAttempts: {
+                            value: 3,
+                            write,
+                        },
+                        siteIdentifier: {
+                            value: "site-1",
+                            write,
+                        },
+                        timeout: {
+                            value: DEFAULT_REQUEST_TIMEOUT,
+                            write,
+                        },
+                        type: {
+                            value: "http",
+                            write,
+                        },
+                        url: {
+                            value: "https://example.com",
+                            write,
+                        },
+                    },
+                },
+            },
+            settings: {},
+            site: {
+                "site-1": {
+                    entityId: "site-1",
+                    entityType: "site",
+                    fields: {
+                        monitoring: {
+                            value: true,
+                            write,
+                        },
+                        name: {
+                            value: "Valid site",
+                            write,
+                        },
+                    },
+                },
+            },
+        } satisfies CloudSyncState;
+
+        const sanitized = (
+            engine as unknown as SyncEnginePrivateAccess
+        ).buildSanitizedMergedStateForApplication({
+            localSites: [],
+            state,
+        });
+
+        expect(Object.getPrototypeOf(sanitized.site)).toBeNull();
+        expect(Object.getPrototypeOf(sanitized.monitor)).toBeNull();
+        expect(Object.hasOwn(sanitized.site, "site-1")).toBeTruthy();
+        expect(sanitized.site["site-1"]?.entityId).toBe("site-1");
+        expect(Object.hasOwn(sanitized.monitor, "monitor-1")).toBeTruthy();
+        expect(sanitized.monitor["monitor-1"]?.entityId).toBe("monitor-1");
+    });
+
     it("converges configuration across two devices", async () => {
         vi.useFakeTimers();
 
