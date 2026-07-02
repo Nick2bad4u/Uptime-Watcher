@@ -71,6 +71,48 @@ describe(DropboxTokenManager, () => {
         vi.useRealTimers();
     });
 
+    it("persists a rotated refresh token when Dropbox returns one", async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
+
+        const secretStore = new InMemorySecretStore();
+
+        const refreshAccessToken = vi.fn(async () => undefined);
+        const getAccessToken = vi.fn(() => "new-access");
+        const getAccessTokenExpiresAt = vi.fn(
+            () => new Date(Date.now() + 3_600_000)
+        );
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+            authFactory: () => ({
+                getAccessToken,
+                getAccessTokenExpiresAt,
+                getRefreshToken: () => "rotated-refresh",
+                refreshAccessToken,
+                setAccessToken: () => {},
+                setAccessTokenExpiresAt: () => {},
+                setClientId: () => {},
+                setRefreshToken: () => {},
+            }),
+        });
+
+        await manager.storeTokens({
+            accessToken: "old-access",
+            expiresAtEpochMs: Date.now() - 1,
+            refreshToken: "old-refresh",
+        });
+
+        await expect(manager.getAccessToken()).resolves.toBe("new-access");
+
+        const stored = await manager.getStoredTokens();
+        expect(stored?.refreshToken).toBe("rotated-refresh");
+
+        vi.useRealTimers();
+    });
+
     it("deduplicates concurrent refreshes", async () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));

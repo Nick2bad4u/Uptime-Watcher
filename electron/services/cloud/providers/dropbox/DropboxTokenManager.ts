@@ -164,10 +164,17 @@ export class DropboxTokenManager {
             );
         }
 
+        const refreshedRefreshToken = auth.getRefreshToken();
+        const refreshToken =
+            typeof refreshedRefreshToken === "string" &&
+            refreshedRefreshToken.trim().length > 0
+                ? refreshedRefreshToken
+                : tokens.refreshToken;
+
         return {
             accessToken,
             expiresAtEpochMs: expiresAt.getTime(),
-            refreshToken: tokens.refreshToken,
+            refreshToken,
         };
     }
 
