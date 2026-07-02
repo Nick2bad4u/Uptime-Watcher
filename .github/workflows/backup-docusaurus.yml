@@ -152,29 +152,61 @@ jobs:
                       echo "❌ Build directory not found"
                   fi
 
-            - name: "Validate backup token"
+            - name: "Validate backup credentials"
               if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               shell: "bash"
               env:
+                  DOCUSAURUS_BACKUP_SSH_KEY: "${{ secrets.DOCUSAURUS_BACKUP_SSH_KEY }}"
                   DOCUSAURUS_BACKUP_TOKEN: "${{ secrets.DOCUSAURUS_BACKUP_TOKEN }}"
               run: |
                   set -euo pipefail
-                  if [[ -z "${DOCUSAURUS_BACKUP_TOKEN}" ]]; then
-                      echo "::error::Missing DOCUSAURUS_BACKUP_TOKEN secret."
-                      echo "::error::Create a classic PAT (or fine-grained PAT) with contents:read/write access to ${DOCUSAURUS_BACKUP_REPO}."
+                  if [[ -z "${DOCUSAURUS_BACKUP_SSH_KEY}" && -z "${DOCUSAURUS_BACKUP_TOKEN}" ]]; then
+                      echo "::error::Missing Docusaurus backup credentials."
+                      echo "::error::Set DOCUSAURUS_BACKUP_SSH_KEY to a write deploy key for ${DOCUSAURUS_BACKUP_REPO}, or set DOCUSAURUS_BACKUP_TOKEN to a PAT with contents:read/write access."
                       exit 1
                   fi
+
+            - name: "Configure backup SSH key"
+              if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
+              shell: "bash"
+              env:
+                  DOCUSAURUS_BACKUP_SSH_KEY: "${{ secrets.DOCUSAURUS_BACKUP_SSH_KEY }}"
+              run: |
+                  set -euo pipefail
+                  if [[ -z "${DOCUSAURUS_BACKUP_SSH_KEY}" ]]; then
+                      echo "ℹ️ DOCUSAURUS_BACKUP_SSH_KEY is not set; falling back to token authentication."
+                      exit 0
+                  fi
+
+                  mkdir -p "${HOME}/.ssh"
+                  printf '%s\n' "${DOCUSAURUS_BACKUP_SSH_KEY}" > "${HOME}/.ssh/docusaurus_backup"
+                  chmod 600 "${HOME}/.ssh/docusaurus_backup"
+                  ssh-keyscan github.com >> "${HOME}/.ssh/known_hosts"
+                  chmod 600 "${HOME}/.ssh/known_hosts"
+                  {
+                      echo "Host github.com"
+                      echo "    HostName github.com"
+                      echo "    User git"
+                      echo "    IdentityFile ${HOME}/.ssh/docusaurus_backup"
+                      echo "    IdentitiesOnly yes"
+                  } >> "${HOME}/.ssh/config"
+                  chmod 600 "${HOME}/.ssh/config"
 
             - name: "Clone backup repository"
               if: "steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'"
               shell: "bash"
               env:
+                  DOCUSAURUS_BACKUP_SSH_KEY: "${{ secrets.DOCUSAURUS_BACKUP_SSH_KEY }}"
                   DOCUSAURUS_BACKUP_TOKEN: "${{ secrets.DOCUSAURUS_BACKUP_TOKEN }}"
               run: |
                   set -euo pipefail
                   echo "📥 Cloning backup repository ${DOCUSAURUS_BACKUP_REPO}..."
                   rm -rf backup-repo
-                  git clone --depth=1 "https://x-access-token:${DOCUSAURUS_BACKUP_TOKEN}@github.com/${DOCUSAURUS_BACKUP_REPO}.git" backup-repo
+                  if [[ -n "${DOCUSAURUS_BACKUP_SSH_KEY}" ]]; then
+                      git clone --depth=1 "git@github.com:${DOCUSAURUS_BACKUP_REPO}.git" backup-repo
+                  else
+                      git clone --depth=1 "https://x-access-token:${DOCUSAURUS_BACKUP_TOKEN}@github.com/${DOCUSAURUS_BACKUP_REPO}.git" backup-repo
+                  fi
                   cd backup-repo
                   git checkout "${DOCUSAURUS_BACKUP_BRANCH}" 2>/dev/null || git checkout -b "${DOCUSAURUS_BACKUP_BRANCH}"
 
