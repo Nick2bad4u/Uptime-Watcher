@@ -7,6 +7,8 @@
  * duplication across monitor builders and logging/validation helpers.
  */
 
+import { isSafeInteger } from "ts-extras";
+
 /**
  * Parses a possibly-empty string as an integer.
  */
@@ -16,8 +18,12 @@ export function parseOptionalInteger(value?: string): number | undefined {
         return undefined;
     }
 
+    if (!/^\d+$/u.test(trimmedValue)) {
+        return undefined;
+    }
+
     const parsed = Number.parseInt(trimmedValue, 10);
-    return Number.isNaN(parsed) ? undefined : parsed;
+    return isSafeInteger(parsed) ? parsed : undefined;
 }
 
 /**
