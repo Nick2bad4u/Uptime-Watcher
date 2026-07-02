@@ -62,4 +62,37 @@ describe(buildCloudSyncResetPreview, () => {
         expect(b?.oldestCreatedAtEpochMs).toBe(150);
         expect(b?.newestCreatedAtEpochMs).toBe(150);
     });
+
+    it("excludes malformed ops-like keys from per-device breakdown", () => {
+        const manifest: CloudSyncManifest = {
+            devices: {},
+            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        };
+
+        const preview = buildCloudSyncResetPreview({
+            manifest,
+            syncObjects: [
+                {
+                    key: "sync/devices/a:evil/ops/100-1-2.ndjson",
+                    lastModifiedAt: 0,
+                    sizeBytes: 1,
+                },
+                {
+                    key: "sync/devices/a/ops/100-9-1.ndjson",
+                    lastModifiedAt: 0,
+                    sizeBytes: 1,
+                },
+                {
+                    key: "sync/devices/a/ops/1e3-1-2.ndjson",
+                    lastModifiedAt: 0,
+                    sizeBytes: 1,
+                },
+            ],
+        });
+
+        expect(preview.operationObjectCount).toBe(3);
+        expect(preview.operationDeviceIds).toEqual([]);
+        expect(preview.perDevice).toEqual([]);
+    });
 });

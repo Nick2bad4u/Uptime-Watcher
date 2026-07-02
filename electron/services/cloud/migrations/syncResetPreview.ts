@@ -1,14 +1,11 @@
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
-import {
-    isDefined,
-    isFinite as isFiniteNumber,
-    objectKeys,
-    safeCastTo,
-} from "ts-extras";
+import { isDefined, objectKeys, safeCastTo } from "ts-extras";
 
 import type { CloudObjectEntry } from "../providers/CloudStorageProvider.types";
+
+import { parseOpsObjectKeyMetadata } from "../../sync/syncEngineKeyUtils";
 
 interface PreviewDevice {
     deviceId: string;
@@ -16,9 +13,6 @@ interface PreviewDevice {
     oldestCreatedAtEpochMs?: number | undefined;
     operationObjectCount: number;
 }
-
-const opsKeyPattern =
-    /^sync\/devices\/(?<deviceId>[^/]+)\/ops\/(?<createdAtEpochMs>\d+)-\d+-\d+\.ndjson$/u;
 
 /**
  * Builds a {@link CloudSyncResetPreview} from a remote manifest and a list of
@@ -72,15 +66,9 @@ export function buildCloudSyncResetPreview(args: {
         if (key.includes("/ops/")) {
             operationObjectCount += 1;
 
-            const match = opsKeyPattern.exec(key);
-            const deviceId = match?.groups?.["deviceId"];
-            const createdAtString = match?.groups?.["createdAtEpochMs"];
-
-            if (deviceId && createdAtString) {
-                const createdAtEpochMs = Number(createdAtString);
-                if (isFiniteNumber(createdAtEpochMs)) {
-                    upsertDeviceOperation(deviceId, createdAtEpochMs);
-                }
+            const metadata = parseOpsObjectKeyMetadata(key);
+            if (metadata) {
+                upsertDeviceOperation(metadata.deviceId, metadata.createdAt);
             }
         } else if (key.includes("/snapshots/")) {
             snapshotObjectCount += 1;
