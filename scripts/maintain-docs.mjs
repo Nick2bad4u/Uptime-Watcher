@@ -20,7 +20,7 @@
 
 import { readFile, writeFile, readdir } from "node:fs/promises";
 import * as path from "node:path";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import { remark } from "remark";
 import remarkToc from "remark-toc";
@@ -56,8 +56,15 @@ async function getGitLastModified(filePath) {
         const relativePath = path
             .relative(ROOT_DIRECTORY, filePath)
             .replaceAll("\\", "/");
-        const output = execSync(
-            `git log -1 --format="%ci" -- "${relativePath}"`,
+        const output = execFileSync(
+            "git",
+            [
+                "log",
+                "-1",
+                "--format=%ci",
+                "--",
+                relativePath,
+            ],
             {
                 cwd: ROOT_DIRECTORY,
                 encoding: "utf8",

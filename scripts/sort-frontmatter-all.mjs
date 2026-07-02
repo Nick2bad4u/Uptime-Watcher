@@ -1,7 +1,7 @@
 // Scripts/sort-frontmatter-all.mjs
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 const __dirname = import.meta.dirname;
 const repoRoot = path.resolve(__dirname, "..");
@@ -103,5 +103,5 @@ if (allFiles.length === 0) {
 for (const file of allFiles) {
     const rel = path.relative(repoRoot, file);
     console.log(`Sorting frontmatter in ${rel}`);
-    execSync(`node "${sorterPath}" "${file}"`, { stdio: "inherit" });
+    execFileSync(process.execPath, [sorterPath, file], { stdio: "inherit" });
 }
