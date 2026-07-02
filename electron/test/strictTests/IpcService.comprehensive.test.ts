@@ -74,6 +74,10 @@ vi.mock("../../electron/utils/logger", () => ({
     },
 }));
 
+vi.mock("../../electronUtils", () => ({
+    isDev: vi.fn(() => true),
+}));
+
 // Mock MonitorTypeRegistry
 vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
     getAllMonitorTypeConfigs: vi.fn(() => [

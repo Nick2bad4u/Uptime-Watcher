@@ -29,6 +29,7 @@ import type {
 } from "./types";
 
 import { logger } from "../../utils/logger";
+import { isDev } from "../../electronUtils";
 import { extractIpcCorrelationContext } from "./internal/ipcCorrelationContext";
 import { createSafeErrorMessage } from "./internal/ipcErrorUtils";
 import {
@@ -85,7 +86,7 @@ function isTrustedIpcSender(event: IpcMainInvokeEvent): boolean {
     try {
         const senderUrl = new URL(senderFrame.url);
 
-        if (senderUrl.origin === VITE_DEV_ORIGIN) {
+        if (isDev() && senderUrl.origin === VITE_DEV_ORIGIN) {
             return true;
         }
 

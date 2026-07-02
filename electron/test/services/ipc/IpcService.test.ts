@@ -161,6 +161,10 @@ vi.mock("../../utils/logger", () => ({
     diagnosticsLogger: mockLogger,
 }));
 
+vi.mock("../../../electronUtils", () => ({
+    isDev: vi.fn(() => true),
+}));
+
 vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     getAllMonitorTypeConfigs: mockGetAllMonitorTypeConfigs,
     getMonitorTypeConfig: mockGetMonitorTypeConfig,

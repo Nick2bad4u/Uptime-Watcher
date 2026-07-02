@@ -12,6 +12,7 @@ import {
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { isDev } from "../../../electronUtils";
 import {
     createErrorResponse,
     createSuccessResponse,
@@ -100,6 +101,7 @@ const createTrustedIpcEvent = (): IpcMainInvokeEvent =>
 describe("IPC Utils - Comprehensive Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(isDev).mockReturnValue(true);
     });
 
     describe("IpcValidators - Parameter Validation", () => {
@@ -1585,6 +1587,44 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(mockHandler).toHaveBeenCalledWith();
                 expect(result.success).toBeTruthy();
                 expect(result.data).toBe("execution test");
+            });
+
+            it("should reject Vite dev-origin IPC senders outside development mode", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Security", "type");
+
+                vi.mocked(isDev).mockReturnValue(false);
+
+                const mockHandler = vi.fn().mockResolvedValue("blocked");
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.execution,
+                    mockHandler,
+                    null,
+                    registeredHandlers
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
+                const result = await registeredFunction(
+                    createTrustedIpcEvent()
+                );
+
+                expect(mockHandler).not.toHaveBeenCalled();
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain("Untrusted IPC sender");
             });
 
             it("should return an error response when the success payload validator fails", async ({
