@@ -14,6 +14,7 @@ import {
     useDeferredValue,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 import { arrayFirst, isEmpty } from "ts-extras";
@@ -99,8 +100,48 @@ export const AppSidebar: NamedExoticComponent = memo(
 
         const [query, setQuery] = useState("");
         const deferredQuery = useDeferredValue(query);
+        const scrollFrameRef = useRef<null | number>(null);
 
         const SearchIcon = AppIcons.actions.search;
+
+        const cancelPendingScrollFrame = useCallback((): void => {
+            const frameId = scrollFrameRef.current;
+            if (frameId === null) {
+                return;
+            }
+
+            scrollFrameRef.current = null;
+
+            if (typeof cancelAnimationFrame === "function") {
+                globalThis.cancelAnimationFrame(frameId);
+            }
+        }, []);
+
+        useEffect(
+            function cleanupPendingScrollFrame(): () => void {
+                return cancelPendingScrollFrame;
+            },
+            [cancelPendingScrollFrame]
+        );
+
+        const scheduleSiteCardScroll = useCallback(
+            (siteIdentifier: string): void => {
+                cancelPendingScrollFrame();
+
+                if (typeof requestAnimationFrame !== "function") {
+                    scrollToSiteCard(siteIdentifier);
+                    return;
+                }
+
+                scrollFrameRef.current = globalThis.requestAnimationFrame(
+                    () => {
+                        scrollFrameRef.current = null;
+                        scrollToSiteCard(siteIdentifier);
+                    }
+                );
+            },
+            [cancelPendingScrollFrame]
+        );
 
         const sitesByIdentifier = useMemo(
             () =>
@@ -181,13 +222,11 @@ export const AppSidebar: NamedExoticComponent = memo(
                     toggleSidebar();
                 }
 
-                // Scroll to the site card in the main content area
-                requestAnimationFrame(() => {
-                    scrollToSiteCard(siteIdentifier);
-                });
+                scheduleSiteCardScroll(siteIdentifier);
             },
             [
                 isSidebarOpen,
+                scheduleSiteCardScroll,
                 selectSite,
                 setSelectedMonitorId,
                 setShowSiteDetails,
