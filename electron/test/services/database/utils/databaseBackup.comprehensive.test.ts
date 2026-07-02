@@ -23,8 +23,10 @@ vi.mock("../../../../../electron/utils/logger", () => ({
     },
 }));
 
-let mockReadFile: ReturnType<typeof vi.spyOn>;
-let mockStat: ReturnType<typeof vi.spyOn>;
+let mockClose: ReturnType<typeof vi.fn>;
+let mockOpen: ReturnType<typeof vi.spyOn>;
+let mockReadFile: ReturnType<typeof vi.fn>;
+let mockStat: ReturnType<typeof vi.fn>;
 
 describe("databaseBackup.ts - Comprehensive Coverage", () => {
     const testDbPath = "/test/path/database.sqlite";
@@ -33,13 +35,20 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Spy (and restore) instead of module-mocking node:fs to avoid leaking
-        // a mocked fs implementation into unrelated suites.
-        mockReadFile = vi.spyOn(fs, "readFile");
-        mockStat = vi.spyOn(fs, "stat");
-        mockStat.mockResolvedValue({
+        mockClose = vi.fn().mockResolvedValue(undefined);
+        mockReadFile = vi.fn().mockResolvedValue(testBuffer);
+        mockStat = vi.fn().mockResolvedValue({
             size: testBuffer.byteLength,
         });
+
+        // Spy (and restore) instead of module-mocking node:fs to avoid leaking
+        // a mocked fs implementation into unrelated suites.
+        mockOpen = vi.spyOn(fs, "open");
+        mockOpen.mockResolvedValue({
+            close: mockClose,
+            readFile: mockReadFile,
+            stat: mockStat,
+        } as never);
     });
 
     afterEach(() => {
@@ -70,7 +79,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             });
             expect(result.metadata.createdAt).toBeGreaterThanOrEqual(startTime);
             expect(result.metadata.createdAt).toBeLessThanOrEqual(Date.now());
-            expect(mockReadFile).toHaveBeenCalledWith(testDbPath);
+            expect(mockOpen).toHaveBeenCalledWith(testDbPath, "r");
+            expect(mockReadFile).toHaveBeenCalledWith();
             expect(logger.info).toHaveBeenCalledWith(
                 "[DatabaseBackup] Database backup created successfully",
                 expect.objectContaining({
@@ -172,7 +182,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
             const result = await createDatabaseBackup(specialPath);
 
             expect(result.metadata.originalPath).toBe(specialPath);
-            expect(mockReadFile).toHaveBeenCalledWith(specialPath);
+            expect(mockOpen).toHaveBeenCalledWith(specialPath, "r");
+            expect(mockReadFile).toHaveBeenCalledWith();
         });
         it("should preserve buffer content integrity", async ({
             task,
@@ -383,7 +394,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
 
                 const result = await createDatabaseBackup("");
 
-                expect(mockReadFile).toHaveBeenCalledWith("");
+                expect(mockOpen).toHaveBeenCalledWith("", "r");
+                expect(mockReadFile).toHaveBeenCalledWith();
                 expect(result.metadata.originalPath).toBe("");
             });
             it("should handle very long file paths", async ({
@@ -401,7 +413,8 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                 const result = await createDatabaseBackup(longPath);
 
                 expect(result.metadata.originalPath).toBe(longPath);
-                expect(mockReadFile).toHaveBeenCalledWith(longPath);
+                expect(mockOpen).toHaveBeenCalledWith(longPath, "r");
+                expect(mockReadFile).toHaveBeenCalledWith();
             });
             it("should handle empty custom filename", async ({
                 task,
@@ -608,7 +621,11 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                             expect(result.metadata.createdAt).toBeGreaterThan(
                                 0
                             );
-                            expect(mockReadFile).toHaveBeenCalledWith(testPath);
+                            expect(mockOpen).toHaveBeenCalledWith(
+                                testPath,
+                                "r"
+                            );
+                            expect(mockReadFile).toHaveBeenCalledWith();
                         }
                     )
                 );

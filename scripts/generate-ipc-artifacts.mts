@@ -134,7 +134,7 @@ const prefixExclusions = new Set(["settings"]);
  * @returns Suffix appended to `on` for bridge listener method names.
  */
 function deriveMethodSuffix(channel: string): string {
-    const [potentialPrefix, ...rest] = channel.split(":");
+    const [potentialPrefix = "", ...rest] = channel.split(":");
     const segments =
         rest.length > 0 && prefixExclusions.has(potentialPrefix)
             ? rest

@@ -54,6 +54,7 @@ const noUpdate = process.argv.includes("--no-update");
 
 /**
  * @property {boolean} hasUpdate - Indicates if an update is available.
+ * @property {boolean} updateCheckFailed - Indicates if the update check failed.
  * @property {string} latestVersion - The latest version hash.
  * @property {string | null} currentVersion - The current version hash or null
  *   if unknown.
@@ -71,6 +72,16 @@ const noUpdate = process.argv.includes("--no-update");
  */
 function sanitizeForSingleLineLog(value) {
     return value.replaceAll(/[\r\n\u2028\u2029]/g, " ");
+}
+
+/**
+ * @param {unknown} error
+ *
+ * @returns {string}
+ */
+function getSanitizedErrorMessage(error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return sanitizeForSingleLineLog(message);
 }
 
 /**
@@ -149,8 +160,7 @@ async function getLatestCommitHash() {
                         } catch (error) {
                             reject(
                                 new Error(
-                                    // @ts-expect-error -- Unknown ok for error messages
-                                    `Failed to parse GitHub API response: ${error.message}`
+                                    `Failed to parse GitHub API response: ${getSanitizedErrorMessage(error)}`
                                 )
                             );
                         }
@@ -159,7 +169,9 @@ async function getLatestCommitHash() {
             )
             .on("error", (error) => {
                 reject(
-                    new Error(`Failed to fetch latest commit: ${error.message}`)
+                    new Error(
+                        `Failed to fetch latest commit: ${getSanitizedErrorMessage(error)}`
+                    )
                 );
             });
     });
@@ -190,8 +202,7 @@ function saveVersion(version) {
         console.log(`[wasm-download] Saved version: ${version}`);
     } catch (error) {
         console.warn(
-            // @ts-expect-error -- Unknown ok for error messages
-            `[wasm-download] Warning: Could not save version file: ${error.message}`
+            `[wasm-download] Warning: Could not save version file: ${getSanitizedErrorMessage(error)}`
         );
     }
 }
@@ -216,6 +227,7 @@ async function checkForUpdates() {
             );
             return {
                 hasUpdate: true,
+                updateCheckFailed: false,
                 latestVersion: latestHash,
                 currentVersion: null,
             };
@@ -225,22 +237,28 @@ async function checkForUpdates() {
             console.log("[wasm-download] New version available!");
             return {
                 hasUpdate: true,
+                updateCheckFailed: false,
                 latestVersion: latestHash,
                 currentVersion,
             };
         }
 
         console.log("[wasm-download] You have the latest version");
-        return { hasUpdate: false, latestVersion: latestHash, currentVersion };
+        return {
+            hasUpdate: false,
+            updateCheckFailed: false,
+            latestVersion: latestHash,
+            currentVersion,
+        };
     } catch (error) {
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
+        const errorMessage = getSanitizedErrorMessage(error);
         console.warn(
-            `[wasm-download] Warning: Could not check for updates: ${sanitizeForSingleLineLog(errorMessage)}`
+            `[wasm-download] Warning: Could not check for updates: ${errorMessage}`
         );
         return {
             hasUpdate: false,
-            error: sanitizeForSingleLineLog(errorMessage),
+            updateCheckFailed: true,
+            error: errorMessage,
         };
     }
 }
@@ -332,7 +350,7 @@ function download(urlToFetch, destPath, redirectCount = 0) {
                         })
                         .catch((err) => {
                             console.warn(
-                                `[wasm-download] Warning: Could not save version: ${err.message}`
+                                `[wasm-download] Warning: Could not save version: ${getSanitizedErrorMessage(err)}`
                             );
                             console.log(
                                 `[wasm-download] Success! Download completed but version tracking unavailable`
@@ -359,9 +377,9 @@ async function main() {
     if (checkUpdateOnly) {
         try {
             const result = await checkForUpdates();
-            if (result.error) {
+            if (result.updateCheckFailed) {
                 console.error(
-                    `[wasm-download] Error checking for updates: ${result.error}`
+                    `[wasm-download] Error checking for updates: ${result.error ?? "unknown error"}`
                 );
                 process.exit(1);
             }
@@ -379,8 +397,9 @@ async function main() {
                 process.exit(0);
             }
         } catch (error) {
-            // @ts-expect-error -- Unknown ok for error messages
-            console.error(`[wasm-download] Error: ${error.message}`);
+            console.error(
+                `[wasm-download] Error: ${getSanitizedErrorMessage(error)}`
+            );
             process.exit(1);
         }
     }
@@ -408,8 +427,8 @@ async function main() {
     if (!noUpdate && !forceDownload) {
         try {
             const result = await checkForUpdates();
-            if (result.hasUpdate || result.error) {
-                if (result.error) {
+            if (result.hasUpdate || result.updateCheckFailed) {
+                if (result.updateCheckFailed) {
                     console.log(
                         "[wasm-download] Could not check for updates, proceeding with download..."
                     );
@@ -456,8 +475,7 @@ async function main() {
             }
         } catch (error) {
             console.error(
-                // @ts-expect-error -- Unknown ok for error messages
-                `[wasm-download] Error checking for updates: ${error.message}`
+                `[wasm-download] Error checking for updates: ${getSanitizedErrorMessage(error)}`
             );
             console.log("[wasm-download] Proceeding with download anyway...");
         }
@@ -506,6 +524,8 @@ function startDownload() {
 
 // Run the main function
 main().catch((error) => {
-    console.error(`[wasm-download] Unexpected error: ${error.message}`);
+    console.error(
+        `[wasm-download] Unexpected error: ${getSanitizedErrorMessage(error)}`
+    );
     process.exit(1);
 });

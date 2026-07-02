@@ -236,18 +236,22 @@ export async function createDatabaseBackup(
         // DbPath originates from app-controlled directories (userData, temporary
         // folders). Inline lint suppression documents the trusted origin.
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- temp directory path constructed from trusted OS paths and sanitized file names
-        const fileStats = await fs.stat(dbPath);
+        const fileHandle = await fs.open(dbPath, "r");
+        let buffer: Buffer;
 
-        if (fileStats.size > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
-            throw new Error(
-                `Database backup exceeds maximum allowed size (${fileStats.size} > ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes)`
-            );
+        try {
+            const fileStats = await fileHandle.stat();
+
+            if (fileStats.size > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
+                throw new Error(
+                    `Database backup exceeds maximum allowed size (${fileStats.size} > ${DEFAULT_MAX_BACKUP_SIZE_BYTES} bytes)`
+                );
+            }
+
+            buffer = await fileHandle.readFile();
+        } finally {
+            await fileHandle.close();
         }
-
-        // DbPath originates from app-controlled directories (userData, temporary
-        // folders). Inline lint suppression documents the trusted origin.
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- temp directory path constructed from trusted OS paths and sanitized file names
-        const buffer = await fs.readFile(dbPath);
 
         if (buffer.byteLength > DEFAULT_MAX_BACKUP_SIZE_BYTES) {
             throw new Error(
