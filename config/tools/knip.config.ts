@@ -73,6 +73,9 @@ const knipConfig: KnipConfig = {
         "async",
         "chartjs-adapter-date-fns",
         "chartjs-plugin-zoom",
+        // Docusaurus' CSS minimizer worker requires this at build time from
+        // the root css-minimizer-webpack-plugin package path.
+        "clean-css",
         "cli-table3",
         "cssnano",
         "cssnano-preset-advanced",

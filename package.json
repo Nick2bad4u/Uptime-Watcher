@@ -841,6 +841,7 @@
         "autoprefixer": "^10.5.0",
         "babel-plugin-react-compiler": "^1.0.0",
         "canvas": "^3.2.3",
+        "clean-css": "^5.3.3",
         "cli-table3": "^0.6.5",
         "cognitive-complexity-ts": "^0.8.1",
         "concurrently": "^9.2.3",
