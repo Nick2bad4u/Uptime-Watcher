@@ -57,8 +57,17 @@
         "write-translations": "docusaurus write-translations"
     },
     "overrides": {
+        "copy-webpack-plugin": {
+            "serialize-javascript": "^7.0.7"
+        },
+        "css-minimizer-webpack-plugin": {
+            "serialize-javascript": "^7.0.7"
+        },
         "minimatch@3.1.2": {
             "brace-expansion": "^1.1.15"
+        },
+        "sockjs": {
+            "uuid": "^11.1.1"
         }
     },
     "dependencies": {
