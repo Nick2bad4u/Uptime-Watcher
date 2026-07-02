@@ -3,11 +3,12 @@
     z-index: var(--z-index-toast, 1600);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md, 1rem);
-    inline-size: min(24rem, 90vi);
-    inset-block-end: var(--spacing-3xl, 2.5rem);
-    inset-inline-end: var(--spacing-3xl, 2.5rem);
+    gap: 0.5rem;
+    inline-size: min(22rem, 90vi);
+    inset-block-end: 1rem;
+    inset-inline-end: 1rem;
     max-inline-size: 90vi;
+
     /* Allow clicks to pass through the toaster region except for the toast
        buttons themselves (which set pointer-events: auto). */
     pointer-events: none;
@@ -16,37 +17,54 @@
 .status-alert {
     display: grid;
     align-items: flex-start;
-    padding: var(--spacing-md, 1rem) var(--spacing-lg, 1.25rem);
-    border: none;
-    border-radius: var(--border-radius-xl, 1.25rem);
-    backdrop-filter: blur(18px);
-    background-color: var(--surface-overlay-color, rgb(15 23 42 / 92%));
+    padding: 0.625rem 0.75rem;
+    border: 1px solid
+        color-mix(
+            in srgb,
+            var(--color-border-secondary, #334155) 60%,
+            transparent
+        );
+    border-radius: 0.5rem;
+    backdrop-filter: blur(10px);
+    background-color: color-mix(
+        in srgb,
+        var(--color-surface-elevated, #111827) 94%,
+        transparent
+    );
     border-inline-start: 4px solid transparent;
-    box-shadow: 0 18px 40px rgb(15 23 42 / 28%);
+    box-shadow: 0 10px 28px rgb(15 23 42 / 18%);
     color: var(--color-text-primary, #0f172a);
     cursor: pointer;
-    gap: var(--spacing-md, 1rem);
+    gap: 0.625rem;
     grid-template-columns:
         [status-alert-icon] auto
         [status-alert-content] 1fr
         [status-alert-actions] auto
         [status-alert-end];
-    pointer-events: auto;
+    pointer-events: none;
     text-align: start;
-    transition: transform 160ms ease-out;
+    transition:
+        border-color 140ms ease,
+        color 140ms ease;
 
     @media (prefers-color-scheme: light) {
-        background-color: var(--color-surface-light, rgb(255 255 255 / 96%));
-        box-shadow: 0 16px 32px rgb(15 23 42 / 18%);
+        background-color: color-mix(
+            in srgb,
+            var(--color-surface-light, #ffffff) 96%,
+            transparent
+        );
+        box-shadow: 0 8px 22px rgb(15 23 42 / 12%);
         color: var(--color-text-primary, #111827);
     }
 
     &:hover,
     &:focus-visible {
-        box-shadow:
-            0 22px 52px rgb(15 23 42 / 34%),
-            0 0 0 1px rgb(15 23 42 / 35%);
-        transform: translateY(-2px);
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500, #3b82f6) 42%,
+            var(--color-border-secondary, #334155)
+        );
+        box-shadow: 0 12px 30px rgb(15 23 42 / 18%);
     }
 }
 
@@ -55,9 +73,11 @@
     align-items: center;
     align-self: flex-start;
     justify-content: center;
-    border-radius: var(--border-radius-lg, 0.75rem);
-    block-size: 1.75rem;
-    inline-size: 1.75rem;
+    border-radius: 0.375rem;
+    block-size: 1.5rem;
+    cursor: pointer;
+    inline-size: 1.5rem;
+    pointer-events: auto;
 }
 
 .status-alert__indicator {
@@ -69,7 +89,7 @@
 .status-alert__content {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs, 0.5rem);
+    gap: 0.25rem;
     min-inline-size: 0;
 }
 
@@ -77,18 +97,19 @@
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--spacing-sm, 0.75rem);
+    gap: 0.5rem;
 }
 
 .status-alert__title {
     color: var(--color-text-primary, inherit);
-    font-size: var(--font-size-sm, 1rem);
+    font-size: 0.875rem;
     font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.25;
 }
 
 .status-alert__timestamp {
     color: var(--color-text-tertiary, rgb(148 163 184 / 90%));
-    font-size: var(--font-size-xs, 0.75rem);
+    font-size: 0.75rem;
     white-space: nowrap;
 }
 
@@ -97,9 +118,9 @@
     flex-wrap: wrap;
     margin: 0;
     color: var(--color-text-secondary, rgb(100 116 139 / 95%));
-    font-size: var(--font-size-sm, 0.875rem);
-    gap: var(--spacing-xs, 0.5rem);
-    line-height: 1.375;
+    font-size: 0.875rem;
+    gap: 0.375rem;
+    line-height: 1.25;
 }
 
 .status-alert__separator {
@@ -110,8 +131,8 @@
     display: flex;
     flex-wrap: wrap;
     color: var(--color-text-tertiary, rgb(148 163 184 / 90%));
-    font-size: var(--font-size-xs, 0.75rem);
-    gap: var(--spacing-xs, 0.5rem);
+    font-size: 0.75rem;
+    gap: 0.375rem;
 }
 
 .status-alert__dismiss {
@@ -120,13 +141,13 @@
     align-self: flex-start;
     justify-content: center;
     border: none;
-    border-radius: var(--border-radius-lg, 0.75rem);
+    border-radius: 0.375rem;
     background-color: transparent;
-    block-size: 1.75rem;
+    block-size: 1.5rem;
     color: inherit;
-    inline-size: 1.75rem;
+    inline-size: 1.5rem;
     pointer-events: auto;
-    transition: transform 150ms ease;
+    transition: color 140ms ease;
 
     @media screen and (prefers-reduced-motion: reduce) {
         display: flex;
@@ -134,11 +155,11 @@
         align-self: flex-start;
         justify-content: center;
         border: none;
-        border-radius: var(--border-radius-lg, 0.75rem);
+        border-radius: 0.375rem;
         background-color: transparent;
-        block-size: 1.75rem;
+        block-size: 1.5rem;
         color: inherit;
-        inline-size: 1.75rem;
+        inline-size: 1.5rem;
         pointer-events: auto;
         transition: none;
     }
@@ -146,7 +167,6 @@
     &:hover,
     &:focus {
         background-color: var(--color-border-primary, rgb(148 163 184 / 16%));
-        transform: scale(1.05);
     }
 
     &:focus-visible {
@@ -157,7 +177,6 @@
                 var(--color-primary-500, #3b82f6) 55%,
                 transparent
             );
-        transform: scale(1.05);
     }
 }
 
@@ -180,7 +199,7 @@
 @media (width <= 768px) {
     .status-alert-toaster {
         inline-size: auto;
-        inset-inline: var(--spacing-lg, 1rem);
+        inset-inline: 0.75rem;
         max-inline-size: none;
     }
 }

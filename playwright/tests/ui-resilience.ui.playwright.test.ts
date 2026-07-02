@@ -15,6 +15,7 @@ import { tagElectronAppCoverage } from "../utils/coverage";
 import { DEFAULT_TEST_SITE_URL } from "../utils/testData";
 import {
     closeModal,
+    ensureCardLayout,
     fillAddSiteForm,
     openAddSiteModal,
     removeAllSites,
@@ -80,6 +81,7 @@ test.describe(
                     url: DEFAULT_TEST_SITE_URL,
                 });
                 await submitAddSiteForm(page);
+                await ensureCardLayout(page);
 
                 const maliciousCard = page
                     .getByTestId("site-card")

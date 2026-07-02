@@ -12,6 +12,7 @@ import {
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 import {
+    ensureCardLayout,
     fillAddSiteForm,
     getSiteCardLocator,
     openAddSiteModal,
@@ -117,6 +118,7 @@ test.describe(
                 await submitAddSiteForm(page);
 
                 await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
+                await ensureCardLayout(page);
 
                 const siteCardLocator = getSiteCardLocator(page, uniqueName);
                 await expect.soft(siteCardLocator).toBeVisible({
@@ -274,6 +276,7 @@ test.describe(
 
                         await submitAddSiteForm(page);
                         await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
+                        await ensureCardLayout(page);
 
                         const heartbeatSiteCard = getSiteCardLocator(
                             page,

@@ -239,7 +239,9 @@ test.describe(
                     .soft(recoveredAlertId)
                     .toHaveAttribute("data-alert-id");
 
-                await latestToastEntry.click();
+                await latestToastEntry
+                    .locator(".status-alert__dismissIcon")
+                    .click();
 
                 // Wait for the specific toast we clicked to be removed after
                 // dismissal. We cannot assert that *all* recovered toasts are
