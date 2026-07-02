@@ -47,6 +47,7 @@ import {
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { ensureError } from "@shared/utils/errorHandling";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import {
     isDefined,
     isFinite as isFiniteValue,
@@ -70,6 +71,46 @@ const DEFAULT_WRITE_KEY: CloudSyncWriteKey = {
     opId: 0,
     timestamp: 0,
 };
+
+type CloudSyncEntityStateMap = Record<string, CloudSyncEntityState>;
+type CloudSyncFieldValueMap = Record<string, CloudSyncFieldValue>;
+
+function createEntityMap(): CloudSyncEntityStateMap {
+    return createNullPrototypeObject<CloudSyncEntityStateMap>();
+}
+
+function createFieldMap(): CloudSyncFieldValueMap {
+    return createNullPrototypeObject<CloudSyncFieldValueMap>();
+}
+
+function setRecordValue<T>(
+    target: Record<string, T>,
+    key: string,
+    value: T
+): void {
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
+}
+
+function setEntityValue(
+    target: CloudSyncEntityStateMap,
+    key: string,
+    value: CloudSyncEntityState
+): void {
+    setRecordValue(target, key, value);
+}
+
+function setFieldValue(
+    target: CloudSyncFieldValueMap,
+    key: string,
+    value: CloudSyncFieldValue
+): void {
+    setRecordValue(target, key, value);
+}
 
 function isFiniteNumber(value: unknown): value is number {
     return typeof value === "number" && isFiniteValue(value);
@@ -100,6 +141,31 @@ function normalizeCloudSyncFieldValue<
     };
 }
 
+function cloneCloudSyncFields(
+    fields: Readonly<Record<string, CloudSyncFieldValue>>
+): CloudSyncFieldValueMap {
+    const nextFields = createFieldMap();
+    for (const [field, fieldValue] of objectEntries(fields)) {
+        setFieldValue(nextFields, field, fieldValue);
+    }
+
+    return nextFields;
+}
+
+function cloneCloudSyncEntityMap(
+    entities: Readonly<Record<string, CloudSyncEntityState>>
+): CloudSyncEntityStateMap {
+    const nextEntities = createEntityMap();
+    for (const [entityId, entity] of objectEntries(entities)) {
+        setEntityValue(nextEntities, entityId, {
+            ...entity,
+            fields: cloneCloudSyncFields(entity.fields),
+        });
+    }
+
+    return nextEntities;
+}
+
 /**
  * Stabilizes merged sync state by filling required default fields that may be
  * missing from remote operations.
@@ -110,66 +176,87 @@ function normalizeCloudSyncFieldValue<
  * devices can observe partial configs that fail validation.
  */
 export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
-    const nextSite: Record<string, CloudSyncEntityState> = {};
+    const nextSite = createEntityMap();
     for (const [siteId, entity] of objectEntries(state.site)) {
-        const fields: Record<string, CloudSyncFieldValue> = {
-            ...entity.fields,
-        };
+        const fields = cloneCloudSyncFields(entity.fields);
 
-        fields["monitoring"] = normalizeCloudSyncFieldValue({
-            current: fields["monitoring"],
-            defaultValue: true,
-            isValid: isBoolean,
-        });
+        setFieldValue(
+            fields,
+            "monitoring",
+            normalizeCloudSyncFieldValue({
+                current: fields["monitoring"],
+                defaultValue: true,
+                isValid: isBoolean,
+            })
+        );
 
-        fields["name"] = normalizeCloudSyncFieldValue({
-            current: fields["name"],
-            defaultValue: siteId,
-            isValid: isNonEmptyString,
-        });
+        setFieldValue(
+            fields,
+            "name",
+            normalizeCloudSyncFieldValue({
+                current: fields["name"],
+                defaultValue: siteId,
+                isValid: isNonEmptyString,
+            })
+        );
 
-        nextSite[siteId] = {
+        setEntityValue(nextSite, siteId, {
             ...entity,
             fields,
-        };
+        });
     }
 
-    const nextMonitor: Record<string, CloudSyncEntityState> = {};
+    const nextMonitor = createEntityMap();
     for (const [monitorId, entity] of objectEntries(state.monitor)) {
-        const fields: Record<string, CloudSyncFieldValue> = {
-            ...entity.fields,
-        };
+        const fields = cloneCloudSyncFields(entity.fields);
 
-        fields["monitoring"] = normalizeCloudSyncFieldValue({
-            current: fields["monitoring"],
-            defaultValue: true,
-            isValid: isBoolean,
-        });
-        fields["checkInterval"] = normalizeCloudSyncFieldValue({
-            current: fields["checkInterval"],
-            defaultValue: DEFAULT_CHECK_INTERVAL,
-            isValid: isFiniteNumber,
-        });
-        fields["retryAttempts"] = normalizeCloudSyncFieldValue({
-            current: fields["retryAttempts"],
-            defaultValue: DEFAULT_RETRY_ATTEMPTS,
-            isValid: isFiniteNumber,
-        });
-        fields["timeout"] = normalizeCloudSyncFieldValue({
-            current: fields["timeout"],
-            defaultValue: DEFAULT_REQUEST_TIMEOUT,
-            isValid: isFiniteNumber,
-        });
+        setFieldValue(
+            fields,
+            "monitoring",
+            normalizeCloudSyncFieldValue({
+                current: fields["monitoring"],
+                defaultValue: true,
+                isValid: isBoolean,
+            })
+        );
+        setFieldValue(
+            fields,
+            "checkInterval",
+            normalizeCloudSyncFieldValue({
+                current: fields["checkInterval"],
+                defaultValue: DEFAULT_CHECK_INTERVAL,
+                isValid: isFiniteNumber,
+            })
+        );
+        setFieldValue(
+            fields,
+            "retryAttempts",
+            normalizeCloudSyncFieldValue({
+                current: fields["retryAttempts"],
+                defaultValue: DEFAULT_RETRY_ATTEMPTS,
+                isValid: isFiniteNumber,
+            })
+        );
+        setFieldValue(
+            fields,
+            "timeout",
+            normalizeCloudSyncFieldValue({
+                current: fields["timeout"],
+                defaultValue: DEFAULT_REQUEST_TIMEOUT,
+                isValid: isFiniteNumber,
+            })
+        );
 
-        nextMonitor[monitorId] = {
+        setEntityValue(nextMonitor, monitorId, {
             ...entity,
             fields,
-        };
+        });
     }
 
     return {
         ...state,
         monitor: nextMonitor,
+        settings: cloneCloudSyncEntityMap(state.settings),
         site: nextSite,
     };
 }
