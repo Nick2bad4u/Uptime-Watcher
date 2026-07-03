@@ -602,19 +602,18 @@ export class SiteRepository {
             const isDeleted = result.changes > 0;
 
             if (isDeleted) {
-                logger.debug(`[SiteRepository] Deleted site: ${identifier}`);
+                logger.debug("[SiteRepository] Deleted site", { identifier });
             } else {
-                logger.warn(
-                    `[SiteRepository] Site not found for deletion: ${identifier}`
-                );
+                logger.warn("[SiteRepository] Site not found for deletion", {
+                    identifier,
+                });
             }
 
             return isDeleted;
         } catch (error) {
-            logger.error(
-                `[SiteRepository] Failed to delete site: ${identifier}`,
-                error
-            );
+            logger.error("[SiteRepository] Failed to delete site", error, {
+                identifier,
+            });
             throw error;
         }
     }
