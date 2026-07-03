@@ -5,6 +5,8 @@ import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import { validateCloudBackupEntry } from "@shared/validation/cloudBackupSchemas";
 import { arrayJoin } from "ts-extras";
 
+const utfEightDecoder = new TextDecoder("utf-8", { fatal: true });
+
 /**
  * Returns the canonical metadata sidecar key for a backup object key.
  *
@@ -14,6 +16,12 @@ import { arrayJoin } from "ts-extras";
  */
 export function backupMetadataKeyForBackupKey(backupKey: string): string {
     return `${backupKey}.metadata.json`;
+}
+
+function decodeMetadataBufferStrict(buffer: Buffer): string {
+    // Buffer#toString("utf8") replaces invalid byte sequences. Provider
+    // metadata is integrity-sensitive, so corrupt bytes should stay corrupt.
+    return utfEightDecoder.decode(buffer);
 }
 
 /**
@@ -44,7 +52,7 @@ export function parseCloudBackupMetadataFile(
 export function parseCloudBackupMetadataFileBuffer(
     buffer: Buffer
 ): CloudBackupEntry {
-    const parsed: unknown = JSON.parse(buffer.toString("utf8"));
+    const parsed: unknown = JSON.parse(decodeMetadataBufferStrict(buffer));
     return parseCloudBackupMetadataFile(parsed);
 }
 
@@ -72,7 +80,14 @@ export function serializeCloudBackupMetadataFile(
 export function tryParseCloudBackupMetadataFileBuffer(
     buffer: Buffer
 ): CloudBackupEntry | null {
-    const parsed = tryParseJsonRecord(buffer.toString("utf8"));
+    let text: string;
+    try {
+        text = decodeMetadataBufferStrict(buffer);
+    } catch {
+        return null;
+    }
+
+    const parsed = tryParseJsonRecord(text);
     if (!parsed) {
         return null;
     }
