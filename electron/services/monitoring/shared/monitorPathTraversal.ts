@@ -63,11 +63,16 @@ export function extractMonitorValueAtPath(
                 return undefined;
             }
 
-            if (!Object.prototype.propertyIsEnumerable.call(current, segment)) {
+            const descriptor = Object.getOwnPropertyDescriptor(
+                current,
+                segment
+            );
+
+            if (!descriptor?.enumerable || !("value" in descriptor)) {
                 return undefined;
             }
 
-            current = Reflect.get(current, segment);
+            current = descriptor.value;
         }
     }
 

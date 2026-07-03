@@ -56,4 +56,33 @@ describe(extractMonitorValueAtPath, () => {
             extractMonitorValueAtPath(payload, "data.items.1a.name")
         ).toBeUndefined();
     });
+
+    it("does not invoke accessors while traversing object paths", () => {
+        let getterCalls = 0;
+        const payload = {};
+
+        Object.defineProperty(payload, "details", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                return {
+                    status: "up",
+                };
+            },
+        });
+
+        expect(extractMonitorValueAtPath(payload, "details.status")).toBe(
+            undefined
+        );
+        expect(getterCalls).toBe(0);
+    });
+
+    it("resolves values from null-prototype response objects", () => {
+        const payload = Object.create(null) as Record<string, unknown>;
+        payload["details"] = Object.assign(Object.create(null), {
+            status: "up",
+        });
+
+        expect(extractMonitorValueAtPath(payload, "details.status")).toBe("up");
+    });
 });
