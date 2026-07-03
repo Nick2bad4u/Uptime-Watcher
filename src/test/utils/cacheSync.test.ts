@@ -491,7 +491,8 @@ describe("cacheSync", () => {
                 );
                 expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 expect(mockLogger.debug).toHaveBeenCalledWith(
-                    "[CacheSync] Cleared monitorType cache"
+                    "[CacheSync] Cleared cache",
+                    { cacheType: "monitorType" }
                 );
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
@@ -757,8 +758,9 @@ describe("cacheSync", () => {
 
                 expect(mockEnsureError).toHaveBeenCalledWith(testError);
                 expect(mockLogger.error).toHaveBeenCalledWith(
-                    "[CacheSync] Failed to clear monitorType cache:",
-                    testError
+                    "[CacheSync] Failed to clear cache",
+                    testError,
+                    { cacheType: "monitorType" }
                 );
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
@@ -790,8 +792,9 @@ describe("cacheSync", () => {
                     "[CacheSync] Clearing all frontend caches"
                 );
                 expect(mockLogger.error).toHaveBeenCalledWith(
-                    "[CacheSync] Failed to clear monitorType cache:",
-                    testError
+                    "[CacheSync] Failed to clear cache",
+                    testError,
+                    { cacheType: "monitorType" }
                 );
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
@@ -905,8 +908,9 @@ describe("cacheSync", () => {
                 expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
                 expect(mockEnsureError).toHaveBeenCalledWith(resyncError);
                 expect(mockLogger.error).toHaveBeenCalledWith(
-                    "Failed to resynchronize sites after cache invalidation (all):",
-                    resyncError
+                    "Failed to resynchronize sites after cache invalidation",
+                    resyncError,
+                    { context: "all" }
                 );
             });
 
@@ -936,8 +940,9 @@ describe("cacheSync", () => {
                 expect(monitorRefreshSpy).not.toHaveBeenCalled();
                 expect(mockEnsureError).toHaveBeenCalledWith(resyncError);
                 expect(mockLogger.error).toHaveBeenCalledWith(
-                    "Failed to resynchronize sites after cache invalidation (site):",
-                    resyncError
+                    "Failed to resynchronize sites after cache invalidation",
+                    resyncError,
+                    { context: "site" }
                 );
             });
         });
@@ -1292,8 +1297,9 @@ describe("cacheSync", () => {
                 // Property: Errors should be properly logged (during clearAllFrontendCaches)
                 if (testErrors.length > 0) {
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        "[CacheSync] Failed to clear monitorType cache:",
-                        expect.any(Error)
+                        "[CacheSync] Failed to clear cache",
+                        expect.any(Error),
+                        { cacheType: "monitorType" }
                     );
                 }
             }

@@ -81,8 +81,9 @@ export function setupCacheSync(): () => void {
                     await useSitesStore.getState().fullResyncSites();
                 } catch (error) {
                     logger.error(
-                        `Failed to resynchronize sites after cache invalidation (${context}):`,
-                        ensureError(error)
+                        "Failed to resynchronize sites after cache invalidation",
+                        ensureError(error),
+                        { context }
                     );
                 }
             };
@@ -202,11 +203,12 @@ function clearAllFrontendCaches(): void {
     for (const [cacheType, clearer] of CACHE_CLEARERS) {
         try {
             clearer();
-            logger.debug(`[CacheSync] Cleared ${cacheType} cache`);
+            logger.debug("[CacheSync] Cleared cache", { cacheType });
         } catch (error) {
             logger.error(
-                `[CacheSync] Failed to clear ${cacheType} cache:`,
-                ensureError(error)
+                "[CacheSync] Failed to clear cache",
+                ensureError(error),
+                { cacheType }
             );
         }
     }
