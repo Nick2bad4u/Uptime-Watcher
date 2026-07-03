@@ -427,6 +427,44 @@ describe(DefaultErrorFallback, () => {
             expect(screen.getByText(longMessage)).toBeInTheDocument();
         });
 
+        it("should bound very long error messages", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            const error = new Error(`denied ${"x".repeat(1200)}`);
+            render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
+
+            const expectedMessage = `denied ${"x".repeat(993)}...`;
+            expect(screen.getByText(expectedMessage)).toBeInTheDocument();
+        });
+
+        it("should sanitize displayed error messages", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            const error = new Error(
+                "refresh_token=SUPER_SECRET_TOKEN&status=failed\n\twith detail"
+            );
+            const { container } = render(
+                <DefaultErrorFallback error={error} onRetry={mockOnRetry} />
+            );
+
+            expect(container.textContent).not.toContain("SUPER_SECRET_TOKEN");
+            expect(container.textContent).not.toContain("\n");
+            expect(container.textContent).not.toContain("\t");
+            expect(
+                screen.getByText(
+                    "refresh_token=[redacted]&status=failed with detail"
+                )
+            ).toBeInTheDocument();
+        });
+
         it("should handle error messages with special characters", ({
             task,
             annotate,

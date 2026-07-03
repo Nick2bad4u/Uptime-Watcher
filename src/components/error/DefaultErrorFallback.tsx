@@ -2,7 +2,11 @@
  * Default fallback component for error boundaries
  */
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { type FC, useCallback } from "react";
+
+const DEFAULT_ERROR_MESSAGE =
+    "An unexpected error occurred while loading this section.";
 
 /**
  * Default fallback component for error boundary
@@ -25,8 +29,8 @@ export const DefaultErrorFallback: FC<
         error?.message &&
         typeof error.message === "string" &&
         error.message.trim()
-            ? error.message
-            : "An unexpected error occurred while loading this section.";
+            ? getUserFacingErrorDetail(error)
+            : DEFAULT_ERROR_MESSAGE;
 
     return (
         <div className="border-error-default bg-error-muted flex flex-col items-center justify-center rounded-lg border p-8">
