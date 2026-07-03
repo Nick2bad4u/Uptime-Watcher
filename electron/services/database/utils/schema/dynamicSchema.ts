@@ -9,14 +9,22 @@
  * @public
  */
 
-import type { Monitor, MonitorStatus, MonitorType } from "@shared/types";
+import {
+    MONITOR_STATUS,
+    MONITOR_STATUS_VALUES,
+    type Monitor,
+    type MonitorStatus,
+    type MonitorType,
+} from "@shared/types";
 import type { MonitorRow } from "@shared/types/database";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
+import { validateMonitorType } from "@shared/utils/validation";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
+    arrayIncludes,
     arrayJoin,
     isDefined,
     isPresent,
@@ -66,6 +74,14 @@ const isValidEpochMs = (value: unknown): value is number =>
     isSafeInteger(value) &&
     value >= 0 &&
     value <= MAX_VALID_DATE_EPOCH_MS;
+
+const normalizeMonitorStatus = (value: unknown): MonitorStatus =>
+    typeof value === "string" && arrayIncludes(MONITOR_STATUS_VALUES, value)
+        ? value
+        : MONITOR_STATUS.DOWN;
+
+const normalizeMonitorType = (value: unknown): MonitorType =>
+    validateMonitorType(value) ? value : "http";
 
 /**
  * Field mapping configuration for transforming monitor fields to database
@@ -829,7 +845,6 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     const lastCheckedDate = getValidLastCheckedDate(row.last_checked);
 
     // Create the base monitor object with proper type safety
-    /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type assertions are safe for database row to monitor object conversion with known schema */
     const monitor: Monitor = {
         activeOperations,
         checkInterval: row.check_interval ?? 300_000,
@@ -838,9 +853,9 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         monitoring: (row.enabled ?? 0) === 1, // Map enabled -> monitoring for frontend consistency
         responseTime: row.response_time ?? -1,
         retryAttempts: row.retry_attempts ?? 3,
-        status: (row.status ?? "down") as MonitorStatus,
+        status: normalizeMonitorStatus(row.status),
         timeout: row.timeout ?? 5000,
-        type: (row.type ?? "http") as MonitorType,
+        type: normalizeMonitorType(row.type),
         // Add conditional fields based on monitor type
         ...(row.host && { host: row.host }),
         ...(row.port && { port: row.port }),
@@ -882,11 +897,11 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
 
         return monitor;
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable type assertion checks after controlled cast back to Monitor interface */
 
     // Log warning if monitor type config is missing to prevent silent field loss
     dbLogger.warn(
-        `Monitor type configuration not found for type '${monitor.type}', dynamic fields may be lost`
+        "Monitor type configuration not found; dynamic fields may be lost",
+        { monitorType: monitor.type }
     );
 
     return monitor;

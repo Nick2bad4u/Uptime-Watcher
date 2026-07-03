@@ -79,6 +79,51 @@ describe("dynamic schema conversion", () => {
         expect(monitor.port).toBe(443);
     });
 
+    it("defaults invalid persisted monitor status values", async ({
+        annotate,
+        task,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: DynamicSchema", "component");
+        await annotate("Category: Database Utils", "category");
+        await annotate("Type: Validation", "type");
+
+        const { mapRowToMonitor } = await import(
+            "../../../../services/database/utils/schema/dynamicSchema"
+        );
+
+        const monitor = mapRowToMonitor({
+            id: "monitor-1",
+            site_identifier: "site-1",
+            status: "not-a-status",
+            type: "port",
+        });
+
+        expect(monitor.status).toBe("down");
+    });
+
+    it("defaults invalid persisted monitor type values", async ({
+        annotate,
+        task,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: DynamicSchema", "component");
+        await annotate("Category: Database Utils", "category");
+        await annotate("Type: Validation", "type");
+
+        const { mapRowToMonitor } = await import(
+            "../../../../services/database/utils/schema/dynamicSchema"
+        );
+
+        const monitor = mapRowToMonitor({
+            id: "monitor-1",
+            site_identifier: "site-1",
+            type: "not-a-monitor-type",
+        });
+
+        expect(monitor.type).toBe("http");
+    });
+
     it("defaults invalid INTEGER dynamic fields read from rows", async ({
         annotate,
         task,
