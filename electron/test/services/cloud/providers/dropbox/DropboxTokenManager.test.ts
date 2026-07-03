@@ -236,4 +236,58 @@ describe(DropboxTokenManager, () => {
 
         await expect(manager.getStoredTokens()).resolves.toBeUndefined();
     });
+
+    it("clears stored tokens after successful revoke", async () => {
+        const secretStore = new InMemorySecretStore();
+        const authTokenRevoke = vi.fn(async () => undefined);
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            clientFactory: () => ({ authTokenRevoke }),
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+
+        await manager.storeTokens({
+            accessToken: "access",
+            expiresAtEpochMs: Date.now() + 10 * 60_000,
+            refreshToken: "refresh",
+        });
+
+        await expect(manager.revokeStoredTokens()).resolves.toBeUndefined();
+
+        expect(authTokenRevoke).toHaveBeenCalledTimes(1);
+        await expect(manager.getStoredTokens()).resolves.toBeUndefined();
+        await expect(
+            secretStore.getSecret("cloud.dropbox.tokens")
+        ).resolves.toBeUndefined();
+    });
+
+    it("clears stored tokens when revoke fails", async () => {
+        const secretStore = new InMemorySecretStore();
+        const authTokenRevoke = vi.fn(async () => {
+            throw new Error("network down");
+        });
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            clientFactory: () => ({ authTokenRevoke }),
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+
+        await manager.storeTokens({
+            accessToken: "access",
+            expiresAtEpochMs: Date.now() + 10 * 60_000,
+            refreshToken: "refresh",
+        });
+
+        await expect(manager.revokeStoredTokens()).resolves.toBeUndefined();
+
+        expect(authTokenRevoke).toHaveBeenCalledTimes(1);
+        await expect(manager.getStoredTokens()).resolves.toBeUndefined();
+        await expect(
+            secretStore.getSecret("cloud.dropbox.tokens")
+        ).resolves.toBeUndefined();
+    });
 });

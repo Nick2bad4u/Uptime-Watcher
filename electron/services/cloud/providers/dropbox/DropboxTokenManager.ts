@@ -183,8 +183,9 @@ export class DropboxTokenManager {
      * token) via Dropbox's `/2/auth/token/revoke` endpoint.
      *
      * @remarks
-     * This is best-effort. Disconnect should still succeed even if the network
-     * is unavailable.
+     * Network revocation is best-effort. Local stored tokens are cleared after
+     * the revoke attempt so disconnect does not leave stale credentials
+     * behind.
      */
     public async revokeStoredTokens(): Promise<void> {
         const tokens = await this.getStoredTokens();
@@ -204,6 +205,8 @@ export class DropboxTokenManager {
         } catch {
             // Best-effort: ignore token revoke failures.
         }
+
+        await this.clearTokens();
     }
 
     public async storeTokens(tokens: DropboxTokens): Promise<void> {
