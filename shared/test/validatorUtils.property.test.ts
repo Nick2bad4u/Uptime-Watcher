@@ -714,6 +714,18 @@ describe("Validator Utils Property-Based Tests", () => {
             expect(safeInteger("150", 0, 0, 100)).toBe(100); // Clamped to max
             expect(safeInteger("abc", 42, 0, 100)).toBe(42); // Default value
         });
+
+        it("should ignore non-finite bounds and normalize decimal bounds", () => {
+            expect(safeInteger("5", 0, Infinity, 10)).toBe(5);
+            expect(safeInteger("15", 0, 0, Infinity)).toBe(15);
+            expect(safeInteger("15", 0, 0, Number.NaN)).toBe(15);
+            expect(safeInteger("1", 0, 1.5, 10)).toBe(2);
+            expect(safeInteger("11", 0, 0, 10.5)).toBe(10);
+        });
+
+        it("should leave values unchanged when normalized bounds are contradictory", () => {
+            expect(safeInteger("7", 0, 10, 5)).toBe(7);
+        });
     });
 
     describe("Performance and Edge Cases", () => {

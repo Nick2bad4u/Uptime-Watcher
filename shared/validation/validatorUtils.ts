@@ -511,6 +511,10 @@ export function safeInteger(
     min?: number,
     max?: number
 ): number {
+    const normalizedMin =
+        isDefined(min) && isFiniteNumber(min) ? Math.ceil(min) : undefined;
+    const normalizedMax =
+        isDefined(max) && isFiniteNumber(max) ? Math.floor(max) : undefined;
     const str = ((): string | undefined => {
         try {
             return String(value);
@@ -529,12 +533,20 @@ export function safeInteger(
 
     let num = Number.parseInt(str, 10);
 
-    if (isDefined(min) && num < min) {
-        num = min;
+    if (
+        isDefined(normalizedMin) &&
+        isDefined(normalizedMax) &&
+        normalizedMin > normalizedMax
+    ) {
+        return num;
     }
 
-    if (isDefined(max) && num > max) {
-        num = max;
+    if (isDefined(normalizedMin) && num < normalizedMin) {
+        num = normalizedMin;
+    }
+
+    if (isDefined(normalizedMax) && num > normalizedMax) {
+        num = normalizedMax;
     }
 
     return num;
