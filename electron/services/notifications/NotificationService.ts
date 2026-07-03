@@ -2,6 +2,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { Notification } from "electron";
 import { isDefined, isFinite as isFiniteNumber, setHas } from "ts-extras";
 
@@ -31,6 +32,15 @@ const LOG_TEMPLATES = {
 } as const;
 
 export const DEFAULT_DOWN_ALERT_COOLDOWN_MS = 90_000;
+
+const MAX_NOTIFICATION_BODY_CHARS = 500;
+const MAX_NOTIFICATION_TITLE_CHARS = 120;
+const MAX_NOTIFICATION_BODY_DETAIL_CHARS =
+    MAX_NOTIFICATION_BODY_CHARS - "...".length;
+const MAX_NOTIFICATION_TITLE_DETAIL_CHARS =
+    MAX_NOTIFICATION_TITLE_CHARS - "...".length;
+const NOTIFICATION_FALLBACK_BODY = "Status changed.";
+const NOTIFICATION_FALLBACK_TITLE = "Uptime Watcher";
 
 type MonitorStatusKind = "down" | "up";
 
@@ -67,6 +77,18 @@ interface NotificationContext {
     responseTime?: number;
     site: Site;
     status: MonitorStatusKind;
+}
+
+function normalizeNotificationText(args: {
+    fallback: string;
+    maxLength: number;
+    value: string;
+}): string {
+    return (
+        normalizeUserFacingErrorDetail(args.value, {
+            maxLength: args.maxLength,
+        }) ?? args.fallback
+    );
 }
 
 /**
@@ -254,13 +276,19 @@ export class NotificationService {
             return;
         }
 
-        const title = request.title.trim();
-        if (title.length === 0) {
+        const title = normalizeUserFacingErrorDetail(request.title, {
+            maxLength: MAX_NOTIFICATION_TITLE_DETAIL_CHARS,
+        });
+        if (!title) {
             return;
         }
 
         const body =
-            typeof request.body === "string" ? request.body : undefined;
+            typeof request.body === "string"
+                ? normalizeUserFacingErrorDetail(request.body, {
+                      maxLength: MAX_NOTIFICATION_BODY_DETAIL_CHARS,
+                  })
+                : undefined;
 
         const notification = new Notification({
             ...(isDefined(body) && { body }),
@@ -395,10 +423,21 @@ export class NotificationService {
             urgency: "critical" | "normal";
         }
     ): void {
+        const body = normalizeNotificationText({
+            fallback: NOTIFICATION_FALLBACK_BODY,
+            maxLength: MAX_NOTIFICATION_BODY_DETAIL_CHARS,
+            value: options.body,
+        });
+        const title = normalizeNotificationText({
+            fallback: NOTIFICATION_FALLBACK_TITLE,
+            maxLength: MAX_NOTIFICATION_TITLE_DETAIL_CHARS,
+            value: options.title,
+        });
+
         const notification = new Notification({
-            body: options.body,
+            body,
             silent: !this.config.playSound,
-            title: options.title,
+            title,
             urgency: options.urgency,
         });
         notification.show();

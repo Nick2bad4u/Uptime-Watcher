@@ -178,6 +178,44 @@ describe(NotificationService, () => {
             service.notifyMonitorDown(sampleSite, "monitor-1");
             expect(notificationCtor).not.toHaveBeenCalled();
         });
+
+        it("sanitizes user-configured monitor notification text", () => {
+            const sampleMonitor = sampleSite.monitors.at(0);
+            if (!sampleMonitor) {
+                throw new Error("Expected sample site to include a monitor");
+            }
+
+            const siteWithSensitiveLabel: Site = {
+                ...sampleSite,
+                name: "Example\nsecret_token=site-secret-token",
+                monitors: [
+                    {
+                        ...sampleMonitor,
+                        url: `https://example.com/check?access_token=monitor-secret-token${"x".repeat(600)}`,
+                    },
+                ],
+            };
+
+            service.notifyMonitorDown(siteWithSensitiveLabel, "monitor-1");
+
+            const [[options]] = notificationCtor.mock.calls as [
+                [
+                    {
+                        body: string;
+                        title: string;
+                    },
+                ],
+            ];
+
+            expect(options.title).toContain("[redacted]");
+            expect(options.title).not.toContain("site-secret-token");
+            expect(options.title).not.toMatch(/[\n\r]/u);
+            expect(options.title.length).toBeLessThanOrEqual(120);
+            expect(options.body).toContain("[redacted]");
+            expect(options.body).not.toContain("monitor-secret-token");
+            expect(options.body).not.toMatch(/[\n\r]/u);
+            expect(options.body.length).toBeLessThanOrEqual(500);
+        });
     });
 
     describe("up notifications", () => {
@@ -233,6 +271,33 @@ describe(NotificationService, () => {
 
         expect(errorSpy).toHaveBeenCalled();
         expect(notificationCtor).not.toHaveBeenCalled();
+    });
+
+    describe("app event notifications", () => {
+        it("sanitizes app event notification text", () => {
+            service.notifyAppEvent({
+                body: `Upload failed\nrefresh_token=body-secret-token\r\n${"x".repeat(600)}`,
+                title: "Upload failed\naccess_token=title-secret-token",
+            });
+
+            const [[options]] = notificationCtor.mock.calls as [
+                [
+                    {
+                        body?: string;
+                        title: string;
+                    },
+                ],
+            ];
+
+            expect(options.title).toContain("[redacted]");
+            expect(options.title).not.toContain("title-secret-token");
+            expect(options.title).not.toMatch(/[\n\r]/u);
+            expect(options.title.length).toBeLessThanOrEqual(120);
+            expect(options.body).toContain("[redacted]");
+            expect(options.body).not.toContain("body-secret-token");
+            expect(options.body).not.toMatch(/[\n\r]/u);
+            expect(options.body?.length).toBeLessThanOrEqual(500);
+        });
     });
 
     describe("notification:sent diagnostics event", () => {
