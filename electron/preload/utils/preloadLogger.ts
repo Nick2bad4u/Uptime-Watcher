@@ -159,7 +159,12 @@ const serializeValue = (value: unknown): unknown => {
 
     if (value instanceof Map) {
         return {
-            entries: [...value].slice(0, 5),
+            entries: [...value].slice(0, 5).map(([entryKey, entryValue]) => [
+                serializeValue(entryKey),
+                typeof entryKey === "string" && isSensitiveKeyName(entryKey)
+                    ? REDACTED_PLACEHOLDER
+                    : serializeValue(entryValue),
+            ]),
             size: value.size,
             type: "Map",
         };

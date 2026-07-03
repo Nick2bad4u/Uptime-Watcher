@@ -94,4 +94,18 @@ describe(buildPayloadPreview, () => {
         expect(preview).toContain("access_token=[redacted]");
         expect(preview).toContain("refresh_token=[redacted]");
     });
+
+    it("redacts sensitive Map values by key name", () => {
+        const preview = buildPayloadPreview(
+            new Map<string, string>([
+                ["refreshToken", "refresh-secret"],
+                ["visible", "ordinary-value"],
+            ])
+        );
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).not.toContain("refresh-secret");
+        expect(preview).toContain("[REDACTED]");
+        expect(preview).toContain("ordinary-value");
+    });
 });
