@@ -36,6 +36,21 @@ describe(isCancellationError, () => {
 
         expect(isCancellationError(error)).toBeFalsy();
     });
+
+    it("does not invoke code accessors while checking cancellation", () => {
+        let getterCalls = 0;
+        const error = new Error("not cancelled");
+        Object.defineProperty(error, "code", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("code getter should not run");
+            },
+        });
+
+        expect(isCancellationError(error)).toBeFalsy();
+        expect(getterCalls).toBe(0);
+    });
 });
 
 describe(handleCheckError, () => {

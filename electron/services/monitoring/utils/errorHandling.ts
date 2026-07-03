@@ -15,11 +15,12 @@
 import type { AxiosError } from "axios";
 import type { UnknownRecord } from "type-fest";
 
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import axios from "axios";
-import { safeCastTo, setHas } from "ts-extras";
+import { setHas } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 
@@ -84,13 +85,7 @@ const TOO_MANY_REDIRECTS_ERROR_MESSAGE = "Too many redirects";
 const UNSUPPORTED_REDIRECT_ERROR_MESSAGE = "Redirected to an unsupported URL";
 
 function normalizeErrorCode(error: Error): string | undefined {
-    const candidate: unknown = Reflect.get(safeCastTo<object>(error), "code");
-
-    if (typeof candidate === "string" && candidate.trim() !== "") {
-        return candidate.toUpperCase();
-    }
-
-    return undefined;
+    return tryGetErrorCode(error)?.trim().toUpperCase() || undefined;
 }
 
 function buildSafeErrorLogData(args: {
