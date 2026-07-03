@@ -28,4 +28,21 @@ describe("cloudBackupMigration", () => {
 
         expect(parsed.success).toBeFalsy();
     });
+
+    it("rejects CloudBackupMigrationResult with invalid timestamp values", () => {
+        for (const completedAt of [-1, 1.5]) {
+            const parsed = safeParseCloudBackupMigrationResult({
+                completedAt,
+                deleteSource: false,
+                failures: [],
+                migrated: 1,
+                processed: 1,
+                skipped: 0,
+                startedAt: 1,
+                target: "encrypted",
+            });
+
+            expect(parsed.success).toBeFalsy();
+        }
+    });
 });

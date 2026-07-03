@@ -48,6 +48,7 @@ export interface CloudBackupMigrationResult {
 export type CloudBackupMigrationTarget = "encrypted" | "plaintext";
 
 const cloudBackupMigrationTargetSchema = z.enum(["plaintext", "encrypted"]);
+const epochMsSchema = z.int().nonnegative();
 
 const cloudBackupMigrationRequestInternalSchema: z.ZodType<CloudBackupMigrationRequest> =
     z
@@ -82,13 +83,13 @@ const cloudBackupMigrationFailureSchema: z.ZodType<CloudBackupMigrationFailure> 
 const cloudBackupMigrationResultInternalSchema: z.ZodType<CloudBackupMigrationResult> =
     z
         .object({
-            completedAt: z.number(),
+            completedAt: epochMsSchema,
             deleteSource: z.boolean(),
             failures: z.array(cloudBackupMigrationFailureSchema),
             migrated: z.int().nonnegative(),
             processed: z.int().nonnegative(),
             skipped: z.int().nonnegative(),
-            startedAt: z.number(),
+            startedAt: epochMsSchema,
             target: cloudBackupMigrationTargetSchema,
         })
         .strict();
