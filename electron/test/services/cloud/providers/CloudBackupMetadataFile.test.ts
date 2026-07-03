@@ -3,6 +3,7 @@ import type { CloudBackupEntry } from "@shared/types/cloud";
 import { describe, expect, it } from "vitest";
 
 import {
+    MAX_CLOUD_BACKUP_METADATA_FILE_BYTES,
     parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
     tryParseCloudBackupMetadataFileBuffer,
@@ -56,6 +57,22 @@ describe("CloudBackupMetadataFile buffer parsing", () => {
                     0xfe,
                     0xfd,
                 ])
+            )
+        ).toBeNull();
+    });
+
+    it("throws when strict metadata parsing receives an oversized sidecar", () => {
+        expect(() =>
+            parseCloudBackupMetadataFileBuffer(
+                Buffer.alloc(MAX_CLOUD_BACKUP_METADATA_FILE_BYTES + 1)
+            )
+        ).toThrow(/exceeded/u);
+    });
+
+    it("returns null when best-effort metadata parsing receives an oversized sidecar", () => {
+        expect(
+            tryParseCloudBackupMetadataFileBuffer(
+                Buffer.alloc(MAX_CLOUD_BACKUP_METADATA_FILE_BYTES + 1)
             )
         ).toBeNull();
     });

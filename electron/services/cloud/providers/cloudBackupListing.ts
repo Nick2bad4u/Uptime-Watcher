@@ -6,7 +6,10 @@ import { isPresent, setHas, stringSplit } from "ts-extras";
 import type { CloudObjectEntry } from "./CloudStorageProvider.types";
 
 import { logger } from "../../../utils/logger";
-import { tryParseCloudBackupMetadataFileBuffer } from "./CloudBackupMetadataFile";
+import {
+    MAX_CLOUD_BACKUP_METADATA_FILE_BYTES,
+    tryParseCloudBackupMetadataFileBuffer,
+} from "./CloudBackupMetadataFile";
 
 /**
  * Lists backups by discovering metadata objects and hydrating them.
@@ -50,6 +53,24 @@ export async function listBackupsFromMetadataObjects(args: {
                                 key: metadataObject.key,
                                 message:
                                     "Metadata sidecar exists without the corresponding backup object.",
+                            }
+                        );
+                        return null;
+                    }
+
+                    if (
+                        metadataObject.sizeBytes >
+                        MAX_CLOUD_BACKUP_METADATA_FILE_BYTES
+                    ) {
+                        logger.warn(
+                            "[cloudBackupListing] Backup metadata is too large; skipping",
+                            {
+                                key: metadataObject.key,
+                                maxSizeBytes:
+                                    MAX_CLOUD_BACKUP_METADATA_FILE_BYTES,
+                                message:
+                                    "Backup metadata sidecar exceeded the maximum supported size.",
+                                sizeBytes: metadataObject.sizeBytes,
                             }
                         );
                         return null;

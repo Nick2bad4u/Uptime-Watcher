@@ -7,6 +7,8 @@ import { arrayJoin } from "ts-extras";
 
 const utfEightDecoder = new TextDecoder("utf-8", { fatal: true });
 
+export const MAX_CLOUD_BACKUP_METADATA_FILE_BYTES: number = 64 * 1024;
+
 /**
  * Returns the canonical metadata sidecar key for a backup object key.
  *
@@ -19,6 +21,12 @@ export function backupMetadataKeyForBackupKey(backupKey: string): string {
 }
 
 function decodeMetadataBufferStrict(buffer: Buffer): string {
+    if (buffer.byteLength > MAX_CLOUD_BACKUP_METADATA_FILE_BYTES) {
+        throw new TypeError(
+            `Backup metadata file exceeded ${MAX_CLOUD_BACKUP_METADATA_FILE_BYTES} bytes`
+        );
+    }
+
     // Buffer#toString("utf8") replaces invalid byte sequences. Provider
     // metadata is integrity-sensitive, so corrupt bytes should stay corrupt.
     return utfEightDecoder.decode(buffer);

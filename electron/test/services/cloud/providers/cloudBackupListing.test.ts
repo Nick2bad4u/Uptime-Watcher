@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { CloudObjectEntry } from "../../../../services/cloud/providers/CloudStorageProvider.types";
 
 import { listBackupsFromMetadataObjects } from "../../../../services/cloud/providers/cloudBackupListing";
+import { MAX_CLOUD_BACKUP_METADATA_FILE_BYTES } from "../../../../services/cloud/providers/CloudBackupMetadataFile";
 
 vi.mock("../../../../utils/logger", () => ({
     logger: {
@@ -119,6 +120,31 @@ describe(listBackupsFromMetadataObjects, () => {
         });
 
         expect(results).toEqual([]);
+    });
+
+    it("skips metadata sidecars whose reported size is too large", async () => {
+        const objects: CloudObjectEntry[] = [
+            {
+                key: "backups/a.sqlite",
+                lastModifiedAt: 2,
+                sizeBytes: 10,
+            },
+            {
+                key: "backups/a.sqlite.metadata.json",
+                lastModifiedAt: 2,
+                sizeBytes: MAX_CLOUD_BACKUP_METADATA_FILE_BYTES + 1,
+            },
+        ];
+
+        const downloadObjectBuffer = vi.fn<(key: string) => Promise<Buffer>>();
+
+        const results = await listBackupsFromMetadataObjects({
+            downloadObjectBuffer,
+            objects,
+        });
+
+        expect(results).toEqual([]);
+        expect(downloadObjectBuffer).not.toHaveBeenCalled();
     });
 
     it("skips metadata sidecars whose stored fileName does not match the backup key basename", async () => {
