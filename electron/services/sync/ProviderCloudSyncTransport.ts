@@ -630,8 +630,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         }
 
         if (
-            actualMinOpId < expectations.firstOpId ||
-            actualMaxOpId > expectations.lastOpId
+            actualMinOpId !== expectations.firstOpId ||
+            actualMaxOpId !== expectations.lastOpId
         ) {
             throw new CloudSyncCorruptRemoteObjectError(
                 `Cloud sync operation object '${key}' opId range is inconsistent with key metadata`,

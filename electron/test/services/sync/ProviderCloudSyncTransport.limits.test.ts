@@ -359,6 +359,31 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         ).rejects.toThrow(/opid range is inconsistent/i);
     });
 
+    it("rejects operation objects whose opIds are inside but narrower than the key metadata", async () => {
+        const operationLine = JSON.stringify({
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 2,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        } satisfies CloudSyncOperation);
+
+        const provider = createProvider({
+            downloadObject: async () =>
+                Buffer.from(`${operationLine}\n`, "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readOperationsObject("sync/devices/a/ops/1-1-3.ndjson")
+        ).rejects.toThrow(/opid range is inconsistent/i);
+    });
+
     it("rejects operation objects containing invalid UTF-8", async () => {
         const provider = createProvider({
             downloadObject: async () =>
