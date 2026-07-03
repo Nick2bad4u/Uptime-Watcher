@@ -66,6 +66,24 @@ async function toCloudObjectEntry(
     };
 }
 
+async function assertSafeExistingDirectory(
+    absolutePath: string,
+    segment: string
+): Promise<void> {
+    const currentStat = await fs.lstat(absolutePath);
+    if (currentStat.isSymbolicLink()) {
+        throw new Error(
+            `Refusing to create cloud directory through symlinked path component: ${segment}`
+        );
+    }
+
+    if (!currentStat.isDirectory()) {
+        throw new Error(
+            `Expected directory but found non-directory entry at '${absolutePath}'`
+        );
+    }
+}
+
 /**
  * Local filesystem-backed cloud provider.
  *
@@ -178,17 +196,8 @@ export class FilesystemCloudStorageProvider
             // eslint-disable-next-line no-await-in-loop -- must create/check each segment sequentially to prevent symlink races
             const stat = await fs.lstat(cursor).catch(() => null);
             if (stat) {
-                if (stat.isSymbolicLink()) {
-                    throw new Error(
-                        `Refusing to create cloud directory through symlinked path component: ${segment}`
-                    );
-                }
-
-                if (!stat.isDirectory()) {
-                    throw new Error(
-                        `Expected directory but found non-directory entry at '${cursor}'`
-                    );
-                }
+                // eslint-disable-next-line no-await-in-loop -- each path segment must be verified before proceeding to children
+                await assertSafeExistingDirectory(cursor, segment);
             } else {
                 // eslint-disable-next-line no-await-in-loop -- mkdir must be sequential with the lstat above
                 await fs.mkdir(cursor).catch((error: unknown) => {
@@ -201,7 +210,11 @@ export class FilesystemCloudStorageProvider
                     throw error;
                 });
 
-                // Directory created.
+                // Directory created, or another process won the creation race.
+                // Re-check it to avoid trusting an `EEXIST` result for a
+                // symlink or non-directory entry.
+                // eslint-disable-next-line no-await-in-loop -- verification must follow mkdir for this path component
+                await assertSafeExistingDirectory(cursor, segment);
             }
         }
     }

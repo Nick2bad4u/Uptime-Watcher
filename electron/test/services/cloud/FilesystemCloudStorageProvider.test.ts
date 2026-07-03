@@ -250,4 +250,93 @@ describe("FilesystemCloudStorageProvider", () => {
             await fs.rm(outsideDirectory, { force: true, recursive: true });
         }
     });
+
+    it("rechecks directories created by a concurrent EEXIST race", async () => {
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const outsideDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-race-outside-")
+        );
+        const racedDirectory = path.join(appRoot, "race");
+        const probeLink = path.join(appRoot, "probe-link");
+        const symlinkType = process.platform === "win32" ? "junction" : "dir";
+
+        await fs.mkdir(appRoot, { recursive: true });
+        try {
+            await fs.symlink(outsideDirectory, probeLink, symlinkType);
+            await fs.rm(probeLink, { force: true, recursive: true });
+        } catch (error: unknown) {
+            const code =
+                typeof error === "object" && error !== null && "code" in error
+                    ? String(error.code)
+                    : "";
+
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+
+            if (code === "EPERM" || code === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        const actualFsPromises =
+            await vi.importActual<typeof import("node:fs/promises")>(
+                "node:fs/promises"
+            );
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:fs/promises", () => ({
+            ...actualFsPromises,
+            mkdir: vi.fn(
+                async (...args: Parameters<typeof actualFsPromises.mkdir>) => {
+                    const [target] = args;
+                    if (path.resolve(String(target)) === racedDirectory) {
+                        await fs.symlink(
+                            outsideDirectory,
+                            racedDirectory,
+                            symlinkType
+                        );
+                        const error = new Error("Directory already exists");
+                        Object.defineProperty(error, "code", {
+                            configurable: true,
+                            value: "EEXIST",
+                        });
+                        throw error;
+                    }
+
+                    return actualFsPromises.mkdir(...args);
+                }
+            ),
+        }));
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const errorModule =
+            await import("../../../services/cloud/providers/cloudProviderErrors");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            await expect(
+                provider.uploadObject({
+                    buffer: Buffer.from("escape"),
+                    key: "race/escape.txt",
+                    overwrite: true,
+                })
+            ).rejects.toThrow(errorModule.CloudProviderOperationError);
+
+            await expect(
+                fs.access(path.join(outsideDirectory, "escape.txt"))
+            ).rejects.toThrow();
+        } finally {
+            vi.doUnmock("node:fs/promises");
+            await fs.rm(racedDirectory, { force: true, recursive: true });
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+        }
+    });
 });
