@@ -417,6 +417,46 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
 
             expect(operation).toHaveBeenCalledTimes(1);
         });
+
+        it("should default non-finite retry counts", async () => {
+            const operation = vi.fn().mockRejectedValue(new Error("Fails"));
+
+            const promise = retryWithAbort(operation, {
+                initialDelay: 0,
+                maxRetries: Number.POSITIVE_INFINITY,
+            });
+
+            await Promise.all([
+                vi.runAllTimersAsync(),
+                expect(promise).rejects.toThrow("Fails"),
+            ]);
+            expect(operation).toHaveBeenCalledTimes(4); // Initial + default 3 retries
+        });
+
+        it("should default non-finite max delay caps", async () => {
+            const operation = vi.fn().mockRejectedValue(new Error("Fails"));
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+
+            const promise = retryWithAbort(operation, {
+                backoffMultiplier: 10,
+                initialDelay: 1000,
+                maxDelay: Number.NaN,
+                maxRetries: 1,
+            });
+
+            await Promise.all([
+                vi.runAllTimersAsync(),
+                expect(promise).rejects.toThrow("Fails"),
+            ]);
+
+            expect(setTimeoutSpy).toHaveBeenCalledWith(
+                expect.any(Function),
+                1000
+            );
+            expect(operation).toHaveBeenCalledTimes(2);
+
+            setTimeoutSpy.mockRestore();
+        });
     });
 
     describe(isAbortError, () => {

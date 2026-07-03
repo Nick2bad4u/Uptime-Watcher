@@ -7,6 +7,9 @@ import { calculateBackoffDelayMs } from "./backoff";
 const NOOP_TIMEOUT_REJECT: (reason: unknown) => void = () => {
     // Replaced immediately when a timeout promise is created.
 };
+const DEFAULT_RETRY_INITIAL_DELAY_MS = 1000;
+const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
+const DEFAULT_RETRY_MAX_RETRIES = 3;
 
 function tryUnrefTimer(timeoutId: unknown): void {
     const record = ensureRecordLike(timeoutId);
@@ -18,6 +21,39 @@ function tryUnrefTimer(timeoutId: unknown): void {
     if (typeof unref === "function") {
         Reflect.apply(unref, record, []);
     }
+}
+
+function normalizeNonNegativeInteger(
+    value: number | undefined,
+    fallback: number
+): number {
+    if (!isDefined(value) || !isFiniteNumber(value)) {
+        return fallback;
+    }
+
+    return Math.max(0, Math.trunc(value));
+}
+
+function normalizeNonNegativeMs(
+    value: number | undefined,
+    fallback: number
+): number {
+    if (!isDefined(value) || !isFiniteNumber(value)) {
+        return fallback;
+    }
+
+    return Math.max(0, value);
+}
+
+function normalizePositiveMs(
+    value: number | undefined,
+    fallback: number
+): number {
+    if (!isDefined(value) || !isFiniteNumber(value) || value <= 0) {
+        return fallback;
+    }
+
+    return value;
 }
 
 /**
@@ -398,13 +434,19 @@ export async function retryWithAbort<T>(
     operation: () => Promise<T>,
     options: RetryWithAbortOptions = {}
 ): Promise<T> {
-    const {
-        backoffMultiplier = 2,
-        initialDelay = 1000,
-        maxDelay = 30_000,
-        maxRetries = 3,
-        signal,
-    } = options;
+    const { backoffMultiplier = 2, signal } = options;
+    const initialDelay = normalizeNonNegativeMs(
+        options.initialDelay,
+        DEFAULT_RETRY_INITIAL_DELAY_MS
+    );
+    const maxDelay = normalizePositiveMs(
+        options.maxDelay,
+        DEFAULT_RETRY_MAX_DELAY_MS
+    );
+    const maxRetries = normalizeNonNegativeInteger(
+        options.maxRetries,
+        DEFAULT_RETRY_MAX_RETRIES
+    );
 
     let lastError: Error = new Error("No errors occurred");
 
