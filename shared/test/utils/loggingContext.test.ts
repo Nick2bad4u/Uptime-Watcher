@@ -73,6 +73,28 @@ describe("logging context helpers", () => {
         });
     });
 
+    it("does not invoke accessors while normalizing object metadata", () => {
+        let getterCalls = 0;
+        const input = {
+            stable: "value",
+        };
+
+        Object.defineProperty(input, "token", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                return "SECRET";
+            },
+        });
+
+        const sanitized = normalizeLogValue(input);
+
+        expect(sanitized).toEqual({
+            stable: "value",
+        });
+        expect(getterCalls).toBe(0);
+    });
+
     it("handles circular references safely", () => {
         const input: Record<string, unknown> = {
             name: "root",
@@ -112,6 +134,32 @@ describe("logging context helpers", () => {
                 },
             })
         );
+    });
+
+    it("does not invoke Error cause accessors while normalizing errors", () => {
+        let getterCalls = 0;
+        const error = new Error("boom");
+
+        Object.defineProperty(error, "cause", {
+            enumerable: false,
+            get() {
+                getterCalls += 1;
+                return {
+                    token: "SECRET",
+                };
+            },
+        });
+
+        const sanitized = normalizeLogValue(error);
+
+        expect(sanitized).toEqual(
+            expect.objectContaining({
+                message: "boom",
+                name: "Error",
+            })
+        );
+        expect(sanitized).not.toHaveProperty("cause");
+        expect(getterCalls).toBe(0);
     });
 
     it("serializes Date values instead of dropping them", () => {

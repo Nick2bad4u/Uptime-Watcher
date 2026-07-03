@@ -6,9 +6,7 @@ import {
     isDefined,
     isEmpty,
     isFinite as isFiniteNumber,
-    objectEntries,
     objectHasIn,
-    safeCastTo,
     setHas,
 } from "ts-extras";
 
@@ -308,7 +306,15 @@ function normalizeNonPlainObject(
     }
 
     if (Error.isError(candidate)) {
-        const errorWithCause = safeCastTo(candidate);
+        const causeDescriptor = Object.getOwnPropertyDescriptor(
+            candidate,
+            "cause"
+        );
+        const cause =
+            causeDescriptor && "value" in causeDescriptor
+                ? (causeDescriptor.value as unknown)
+                : undefined;
+
         return {
             kind: "normalized",
             value: {
@@ -317,10 +323,7 @@ function normalizeNonPlainObject(
                 ...(candidate.stack && {
                     stack: normalizeLogString(candidate.stack),
                 }),
-                ...(objectHasIn(
-                    castUnchecked<UnknownRecord>(errorWithCause),
-                    "cause"
-                ) && { cause: normalize(errorWithCause.cause) }),
+                ...(isDefined(cause) && { cause: normalize(cause) }),
             } satisfies UnknownRecord,
         };
     }
@@ -385,7 +388,20 @@ export const normalizeLogValue = (value: unknown): unknown => {
 
         if (isRecord(candidate)) {
             const sanitizedRecord: UnknownRecord = {};
-            for (const [key, entry] of objectEntries(candidate)) {
+            for (const key of Reflect.ownKeys(candidate)) {
+                if (typeof key !== "string") {
+                    continue;
+                }
+
+                const descriptor = Object.getOwnPropertyDescriptor(
+                    candidate,
+                    key
+                );
+                if (!descriptor?.enumerable || !("value" in descriptor)) {
+                    continue;
+                }
+
+                const entry = descriptor.value as unknown;
                 Object.defineProperty(sanitizedRecord, key, {
                     configurable: true,
                     enumerable: true,
