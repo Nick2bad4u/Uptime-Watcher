@@ -163,25 +163,12 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  * @see {@link setupTimingInterceptors}
  */
 // Security / performance tunables (can be overridden via env for emergency mitigation)
-const DEFAULT_MAX_REDIRECTS = readNumberEnv("UW_HTTP_MAX_REDIRECTS", 3);
-const DEFAULT_MAX_CONTENT_LENGTH = readNumberEnv(
-    "UW_HTTP_MAX_CONTENT_LENGTH",
-    1 * 1024 * 1024
-); // 1MB
-const DEFAULT_MAX_BODY_LENGTH = readNumberEnv(
-    "UW_HTTP_MAX_BODY_LENGTH",
-    8 * 1024
-); // 8KB request body cap
-
-const DEFAULT_AGENT_MAX_SOCKETS = readNumberEnv("UW_HTTP_MAX_SOCKETS", 32);
-const DEFAULT_AGENT_MAX_FREE_SOCKETS = readNumberEnv(
-    "UW_HTTP_MAX_FREE_SOCKETS",
-    8
-);
-const DEFAULT_AGENT_KEEP_ALIVE_MSECS = readNumberEnv(
-    "UW_HTTP_KEEP_ALIVE_MSECS",
-    1000
-);
+const MAX_REDIRECTS_CAP = 10;
+const MAX_CONTENT_LENGTH_CAP = 10 * 1024 * 1024; // 10MB
+const MAX_BODY_LENGTH_CAP = 1 * 1024 * 1024; // 1MB
+const MAX_AGENT_SOCKETS_CAP = 256;
+const MAX_AGENT_FREE_SOCKETS_CAP = 64;
+const MAX_AGENT_KEEP_ALIVE_MSECS_CAP = 60_000;
 
 function normalizePositiveInteger(value: number, fallback: number): number {
     if (!isFiniteNumber(value) || value <= 0) {
@@ -190,6 +177,52 @@ function normalizePositiveInteger(value: number, fallback: number): number {
 
     return Math.trunc(value);
 }
+
+function readBoundedPositiveIntegerEnv(args: {
+    readonly defaultValue: number;
+    readonly key: string;
+    readonly maxValue: number;
+}): number {
+    return Math.min(
+        normalizePositiveInteger(args.maxValue, args.defaultValue),
+        normalizePositiveInteger(
+            readNumberEnv(args.key, args.defaultValue),
+            args.defaultValue
+        )
+    );
+}
+
+const DEFAULT_MAX_REDIRECTS = readBoundedPositiveIntegerEnv({
+    defaultValue: 3,
+    key: "UW_HTTP_MAX_REDIRECTS",
+    maxValue: MAX_REDIRECTS_CAP,
+});
+const DEFAULT_MAX_CONTENT_LENGTH = readBoundedPositiveIntegerEnv({
+    defaultValue: 1 * 1024 * 1024,
+    key: "UW_HTTP_MAX_CONTENT_LENGTH",
+    maxValue: MAX_CONTENT_LENGTH_CAP,
+});
+const DEFAULT_MAX_BODY_LENGTH = readBoundedPositiveIntegerEnv({
+    defaultValue: 8 * 1024,
+    key: "UW_HTTP_MAX_BODY_LENGTH",
+    maxValue: MAX_BODY_LENGTH_CAP,
+});
+
+const DEFAULT_AGENT_MAX_SOCKETS = readBoundedPositiveIntegerEnv({
+    defaultValue: 32,
+    key: "UW_HTTP_MAX_SOCKETS",
+    maxValue: MAX_AGENT_SOCKETS_CAP,
+});
+const DEFAULT_AGENT_MAX_FREE_SOCKETS = readBoundedPositiveIntegerEnv({
+    defaultValue: 8,
+    key: "UW_HTTP_MAX_FREE_SOCKETS",
+    maxValue: MAX_AGENT_FREE_SOCKETS_CAP,
+});
+const DEFAULT_AGENT_KEEP_ALIVE_MSECS = readBoundedPositiveIntegerEnv({
+    defaultValue: 1000,
+    key: "UW_HTTP_KEEP_ALIVE_MSECS",
+    maxValue: MAX_AGENT_KEEP_ALIVE_MSECS_CAP,
+});
 
 const sharedAgents: {
     http: http.Agent | null;

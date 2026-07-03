@@ -160,6 +160,96 @@ describe("HTTP Client Utils", () => {
                 }
             }
         });
+        it("should clamp oversized HTTP environment tunables", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
+            const originalValues = {
+                UW_HTTP_KEEP_ALIVE_MSECS:
+                    process.env["UW_HTTP_KEEP_ALIVE_MSECS"],
+                UW_HTTP_MAX_BODY_LENGTH: process.env["UW_HTTP_MAX_BODY_LENGTH"],
+                UW_HTTP_MAX_CONTENT_LENGTH:
+                    process.env["UW_HTTP_MAX_CONTENT_LENGTH"],
+                UW_HTTP_MAX_FREE_SOCKETS:
+                    process.env["UW_HTTP_MAX_FREE_SOCKETS"],
+                UW_HTTP_MAX_REDIRECTS: process.env["UW_HTTP_MAX_REDIRECTS"],
+                UW_HTTP_MAX_SOCKETS: process.env["UW_HTTP_MAX_SOCKETS"],
+            };
+
+            process.env["UW_HTTP_KEEP_ALIVE_MSECS"] = "999999999";
+            process.env["UW_HTTP_MAX_BODY_LENGTH"] = "999999999";
+            process.env["UW_HTTP_MAX_CONTENT_LENGTH"] = "999999999";
+            process.env["UW_HTTP_MAX_FREE_SOCKETS"] = "999999999";
+            process.env["UW_HTTP_MAX_REDIRECTS"] = "999999999";
+            process.env["UW_HTTP_MAX_SOCKETS"] = "999999999";
+
+            try {
+                vi.resetModules();
+                const freshAxios = vi.mocked((await import("axios")).default);
+                freshAxios.create.mockReturnValue(mockAxiosInstance);
+
+                const { createHttpClient: createFreshHttpClient } =
+                    await import(
+                        "../../../../services/monitoring/utils/httpClient"
+                    );
+
+                createFreshHttpClient({});
+
+                expect(freshAxios.create).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        maxBodyLength: 1 * 1024 * 1024,
+                        maxContentLength: 10 * 1024 * 1024,
+                        maxRedirects: 10,
+                    })
+                );
+            } finally {
+                if (originalValues.UW_HTTP_KEEP_ALIVE_MSECS === undefined) {
+                    delete process.env["UW_HTTP_KEEP_ALIVE_MSECS"];
+                } else {
+                    process.env["UW_HTTP_KEEP_ALIVE_MSECS"] =
+                        originalValues.UW_HTTP_KEEP_ALIVE_MSECS;
+                }
+
+                if (originalValues.UW_HTTP_MAX_BODY_LENGTH === undefined) {
+                    delete process.env["UW_HTTP_MAX_BODY_LENGTH"];
+                } else {
+                    process.env["UW_HTTP_MAX_BODY_LENGTH"] =
+                        originalValues.UW_HTTP_MAX_BODY_LENGTH;
+                }
+
+                if (originalValues.UW_HTTP_MAX_CONTENT_LENGTH === undefined) {
+                    delete process.env["UW_HTTP_MAX_CONTENT_LENGTH"];
+                } else {
+                    process.env["UW_HTTP_MAX_CONTENT_LENGTH"] =
+                        originalValues.UW_HTTP_MAX_CONTENT_LENGTH;
+                }
+
+                if (originalValues.UW_HTTP_MAX_FREE_SOCKETS === undefined) {
+                    delete process.env["UW_HTTP_MAX_FREE_SOCKETS"];
+                } else {
+                    process.env["UW_HTTP_MAX_FREE_SOCKETS"] =
+                        originalValues.UW_HTTP_MAX_FREE_SOCKETS;
+                }
+
+                if (originalValues.UW_HTTP_MAX_REDIRECTS === undefined) {
+                    delete process.env["UW_HTTP_MAX_REDIRECTS"];
+                } else {
+                    process.env["UW_HTTP_MAX_REDIRECTS"] =
+                        originalValues.UW_HTTP_MAX_REDIRECTS;
+                }
+
+                if (originalValues.UW_HTTP_MAX_SOCKETS === undefined) {
+                    delete process.env["UW_HTTP_MAX_SOCKETS"];
+                } else {
+                    process.env["UW_HTTP_MAX_SOCKETS"] =
+                        originalValues.UW_HTTP_MAX_SOCKETS;
+                }
+                vi.resetModules();
+            }
+        });
         it("should setup timing interceptors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: types", "component");
