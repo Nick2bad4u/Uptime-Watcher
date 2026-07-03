@@ -26,8 +26,6 @@ const knipConfig: KnipConfig = {
         "scripts/**",
     ],
     ignoreBinaries: [
-        "deploy",
-        "docusaurus",
         "gitleaks",
         "git-cz",
         "grype",
@@ -47,9 +45,6 @@ const knipConfig: KnipConfig = {
         "typesync",
         "winget",
         "yamllint",
-        // False-positive: Knip treats the `-c config/tools/knip.config.ts`
-        // CLI argument in package.json scripts as an unlisted binary.
-        "config/tools/knip.config.ts",
     ],
     ignoreDependencies: [
         ".*eslint-formatter-.*",
