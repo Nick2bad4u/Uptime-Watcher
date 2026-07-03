@@ -11,6 +11,7 @@ import {
     createCombinedAbortSignal,
     isAbortError,
     raceWithAbort,
+    retryWithAbort,
 } from "../../utils/abortUtils.js";
 
 class SpyAbortSignal {
@@ -185,6 +186,29 @@ describe("AbortUtils Function Coverage Tests", () => {
         });
     });
 
+    describe(retryWithAbort, () => {
+        test("should not invoke thrown object toString when retries are exhausted", async () => {
+            let toStringCalls = 0;
+            const thrown = {
+                toString: () => {
+                    toStringCalls += 1;
+                    throw new Error("toString should not run");
+                },
+            };
+
+            await expect(
+                retryWithAbort(() => Promise.reject(thrown), {
+                    maxRetries: 0,
+                })
+            ).rejects.toMatchObject({
+                cause: thrown,
+                message: "[non-error thrown object]",
+            });
+
+            expect(toStringCalls).toBe(0);
+        });
+    });
+
     describe(raceWithAbort, () => {
         test("should resolve with operation result when not aborted", async () => {
             const operation = Promise.resolve("success");
@@ -229,6 +253,26 @@ describe("AbortUtils Function Coverage Tests", () => {
             await expect(
                 raceWithAbort(operation, controller.signal)
             ).rejects.toThrow("operation failed");
+        });
+
+        test("should not invoke rejection object toString", async () => {
+            let toStringCalls = 0;
+            const reason = {
+                toString: () => {
+                    toStringCalls += 1;
+                    throw new Error("toString should not run");
+                },
+            };
+            const controller = new AbortController();
+
+            await expect(
+                raceWithAbort(Promise.reject(reason), controller.signal)
+            ).rejects.toMatchObject({
+                cause: reason,
+                message: "[non-error thrown object]",
+            });
+
+            expect(toStringCalls).toBe(0);
         });
 
         test("should remove abort listener when operation resolves", async () => {

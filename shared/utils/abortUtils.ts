@@ -67,6 +67,40 @@ function normalizeOptionalTimeoutMs(
     return Math.min(value, MAX_SAFE_TIMER_DELAY_MS);
 }
 
+function createErrorFromUnknownReason(reason: unknown): Error {
+    if (Error.isError(reason)) {
+        return reason;
+    }
+
+    const message = ((): string => {
+        if (reason === null) {
+            return "null";
+        }
+
+        if (typeof reason === "string") {
+            return reason;
+        }
+
+        if (
+            typeof reason === "number" ||
+            typeof reason === "boolean" ||
+            typeof reason === "bigint"
+        ) {
+            return reason.toString();
+        }
+
+        if (typeof reason === "symbol") {
+            return reason.description
+                ? `Symbol(${reason.description})`
+                : "Symbol()";
+        }
+
+        return `[non-error thrown ${typeof reason}]`;
+    })();
+
+    return new Error(message, { cause: reason });
+}
+
 /**
  * Configuration for building a composite {@link AbortSignal}.
  *
@@ -472,7 +506,7 @@ export async function retryWithAbort<T>(
             // eslint-disable-next-line no-await-in-loop -- retry operations require sequential awaits
             return await operation();
         } catch (error) {
-            lastError = Error.isError(error) ? error : new Error(String(error));
+            lastError = createErrorFromUnknownReason(error);
 
             // Don't delay after the last attempt
             if (attempt === maxRetries) {
@@ -614,10 +648,7 @@ export async function raceWithAbort<T>(
         let isListenerAttached = false;
 
         function rejectWith(reason: unknown): void {
-            const error = Error.isError(reason)
-                ? reason
-                : new Error(String(reason));
-            reject(error);
+            reject(createErrorFromUnknownReason(reason));
         }
 
         function handleAbort(): void {
