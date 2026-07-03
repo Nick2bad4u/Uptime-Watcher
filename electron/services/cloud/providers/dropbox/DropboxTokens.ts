@@ -1,5 +1,7 @@
 import * as z from "zod";
 
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
+
 /**
  * Stored OAuth tokens for Dropbox.
  */
@@ -12,7 +14,7 @@ export interface DropboxTokens {
 const dropboxTokensSchema: z.ZodType<DropboxTokens> = z
     .object({
         accessToken: z.string().trim().min(1),
-        expiresAtEpochMs: z.int().nonnegative(),
+        expiresAtEpochMs: epochMsSchema,
         refreshToken: z.string().trim().min(1),
     })
     .strict();

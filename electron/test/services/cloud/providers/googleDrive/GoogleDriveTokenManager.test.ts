@@ -1,4 +1,5 @@
 import { GoogleDriveTokenManager } from "@electron/services/cloud/providers/googleDrive/GoogleDriveTokenManager";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { InMemorySecretStore } from "../../../../utils/InMemorySecretStore";
@@ -157,6 +158,47 @@ describe(GoogleDriveTokenManager, () => {
         await secretStore.setSecret(
             "cloud.googleDrive.tokens",
             JSON.stringify({ accessToken: "", expiresAt: -1, refreshToken: "" })
+        );
+
+        await expect(manager.getTokens()).resolves.toBeUndefined();
+    });
+
+    it("rejects token expirations outside the JavaScript Date range before storing", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await expect(
+            manager.setTokens({
+                accessToken: "access",
+                expiresAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                refreshToken: "refresh",
+            })
+        ).rejects.toThrow();
+
+        await expect(
+            secretStore.getSecret("cloud.googleDrive.tokens")
+        ).resolves.toBeUndefined();
+    });
+
+    it("treats stored expirations outside the JavaScript Date range as disconnected", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await secretStore.setSecret(
+            "cloud.googleDrive.tokens",
+            JSON.stringify({
+                accessToken: "access",
+                expiresAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                refreshToken: "refresh",
+            })
         );
 
         await expect(manager.getTokens()).resolves.toBeUndefined();

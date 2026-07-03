@@ -207,9 +207,10 @@ export class DropboxTokenManager {
     }
 
     public async storeTokens(tokens: DropboxTokens): Promise<void> {
+        const parsed = parseDropboxTokens(tokens);
         await this.secretStore.setSecret(
             this.tokenStorageKey,
-            JSON.stringify(tokens)
+            JSON.stringify(parsed)
         );
     }
 }

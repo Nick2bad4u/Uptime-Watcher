@@ -1,5 +1,6 @@
 import { DropboxTokenManager } from "@electron/services/cloud/providers/dropbox/DropboxTokenManager";
 import { InMemorySecretStore } from "@electron/test/utils/InMemorySecretStore";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it, vi } from "vitest";
 
 describe(DropboxTokenManager, () => {
@@ -188,6 +189,49 @@ describe(DropboxTokenManager, () => {
         await secretStore.setSecret(
             "cloud.dropbox.tokens",
             JSON.stringify({ accessToken: "", expiresAtEpochMs: -1 })
+        );
+
+        await expect(manager.getStoredTokens()).resolves.toBeUndefined();
+    });
+
+    it("rejects token expirations outside the JavaScript Date range before storing", async () => {
+        const secretStore = new InMemorySecretStore();
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+
+        await expect(
+            manager.storeTokens({
+                accessToken: "access",
+                expiresAtEpochMs: MAX_VALID_DATE_EPOCH_MS + 1,
+                refreshToken: "refresh",
+            })
+        ).rejects.toThrow();
+
+        await expect(
+            secretStore.getSecret("cloud.dropbox.tokens")
+        ).resolves.toBeUndefined();
+    });
+
+    it("treats stored expirations outside the JavaScript Date range as disconnected", async () => {
+        const secretStore = new InMemorySecretStore();
+
+        const manager = new DropboxTokenManager({
+            appKey: "app-key",
+            secretStore,
+            tokenStorageKey: "cloud.dropbox.tokens",
+        });
+
+        await secretStore.setSecret(
+            "cloud.dropbox.tokens",
+            JSON.stringify({
+                accessToken: "access",
+                expiresAtEpochMs: MAX_VALID_DATE_EPOCH_MS + 1,
+                refreshToken: "refresh",
+            })
         );
 
         await expect(manager.getStoredTokens()).resolves.toBeUndefined();

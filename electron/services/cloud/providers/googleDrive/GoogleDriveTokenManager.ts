@@ -1,5 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { createSingleFlight } from "@shared/utils/singleFlight";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import axios from "axios";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
@@ -26,7 +27,7 @@ export interface GoogleDriveTokens {
 const googleTokenSchema: z.ZodType<GoogleDriveTokens> = z
     .object({
         accessToken: z.string().trim().min(1),
-        expiresAt: z.int().nonnegative(),
+        expiresAt: epochMsSchema,
         refreshToken: z.string().trim().min(1),
         scope: z.string().trim().optional(),
         tokenType: z.string().trim().optional(),
@@ -67,9 +68,10 @@ export class GoogleDriveTokenManager {
     }
 
     public async setTokens(tokens: GoogleDriveTokens): Promise<void> {
+        const parsed = googleTokenSchema.parse(tokens);
         await this.secretStore.setSecret(
             this.storageKey,
-            JSON.stringify(tokens)
+            JSON.stringify(parsed)
         );
     }
 
