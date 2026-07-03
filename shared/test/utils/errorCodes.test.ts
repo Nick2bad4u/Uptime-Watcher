@@ -20,4 +20,19 @@ describe("tryGetErrorCode()", () => {
         const error = Object.assign(new Error("boom"), { code: "EACCES" });
         expect(tryGetErrorCode(error)).toBe("EACCES");
     });
+
+    it("does not invoke code accessors", () => {
+        let getterCalls = 0;
+        const error = new Error("boom");
+        Object.defineProperty(error, "code", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("code getter should not run");
+            },
+        });
+
+        expect(tryGetErrorCode(error)).toBeUndefined();
+        expect(getterCalls).toBe(0);
+    });
 });

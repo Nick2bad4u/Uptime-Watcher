@@ -21,4 +21,19 @@ describe("abortError", () => {
         expect(isAbortError(new Error("other"))).toBeFalsy();
         expect(isAbortError(null)).toBeFalsy();
     });
+
+    it("does not invoke code accessors while detecting AbortError values", () => {
+        let getterCalls = 0;
+        const error = new Error("other");
+        Object.defineProperty(error, "code", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("code getter should not run");
+            },
+        });
+
+        expect(isAbortError(error)).toBeFalsy();
+        expect(getterCalls).toBe(0);
+    });
 });

@@ -102,6 +102,21 @@ describe("AbortUtils Function Coverage Tests", () => {
             expect(isAbortError(error)).toBeTruthy();
         });
 
+        test("should not invoke Error code accessors", () => {
+            let getterCalls = 0;
+            const error = new Error("Regular error");
+            Object.defineProperty(error, "code", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("code getter should not run");
+                },
+            });
+
+            expect(isAbortError(error)).toBeFalsy();
+            expect(getterCalls).toBe(0);
+        });
+
         test("should return true for Error with mixed case cancelled message", () => {
             const error = new Error("Request was CANCELLED by user");
             expect(isAbortError(error)).toBeTruthy();

@@ -63,10 +63,11 @@ import type { Promisable, Tagged, UnknownRecord } from "type-fest";
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { sleepUnref } from "@shared/utils/abortUtils";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { isDefined, safeCastTo } from "ts-extras";
+import { isDefined } from "ts-extras";
 import * as z from "zod";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -85,13 +86,7 @@ interface OperationalErrorMetadata {
 }
 
 function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
-    const codeCandidate: unknown = Reflect.get(
-        safeCastTo<object>(error),
-        "code"
-    );
-    const errorCode =
-        typeof codeCandidate === "string" ? codeCandidate : undefined;
-
+    const errorCode = tryGetErrorCode(error);
     const { cause, message: errorMessage, name: errorName } = error;
 
     const causeError = Error.isError(cause) ? cause : undefined;

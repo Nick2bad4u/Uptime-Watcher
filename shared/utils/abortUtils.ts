@@ -1,4 +1,5 @@
 import { createAbortError } from "@shared/utils/abortError";
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
 import { isDefined, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
@@ -569,8 +570,7 @@ export async function retryWithAbort<T>(
  */
 export function isAbortError(error: unknown): boolean {
     if (Error.isError(error)) {
-        const codeCandidate: unknown = Reflect.get(error, "code");
-        if (codeCandidate === "ERR_CANCELED") {
+        if (tryGetErrorCode(error) === "ERR_CANCELED") {
             return true;
         }
 
@@ -587,8 +587,7 @@ export function isAbortError(error: unknown): boolean {
 
     // Handle DOMException (e.g., from fetch AbortController)
     if (error instanceof DOMException) {
-        const codeCandidate: unknown = Reflect.get(error, "code");
-        if (codeCandidate === "ERR_CANCELED") {
+        if (tryGetErrorCode(error) === "ERR_CANCELED") {
             return true;
         }
 

@@ -228,6 +228,50 @@ describe("Operational Hooks", () => {
             errorSpy.mockRestore();
         });
 
+        it("should not invoke error code accessors while building failure metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            let getterCalls = 0;
+            const failure = new Error("failed with accessor code");
+            Object.defineProperty(failure, "code", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("code getter should not run");
+                },
+            });
+
+            const mockOperation = vi.fn().mockRejectedValue(failure);
+            const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => {
+                // no-op for test isolation
+            });
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    emitEvents: false,
+                    failureLogLevel: "warn",
+                    maxRetries: 1,
+                    operationName: "accessor-code",
+                })
+            ).rejects.toThrow("failed with accessor code");
+
+            expect(warnSpy).toHaveBeenCalledWith(
+                expect.stringContaining("accessor-code"),
+                expect.not.objectContaining({
+                    errorCode: expect.any(String),
+                })
+            );
+            expect(getterCalls).toBe(0);
+
+            warnSpy.mockRestore();
+        });
+
         it("downgrades AbortError logging to debug", async ({
             task,
             annotate,

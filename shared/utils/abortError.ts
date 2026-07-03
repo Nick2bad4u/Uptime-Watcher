@@ -13,6 +13,8 @@
  * utilities such as `isCancellationError` in the monitoring layer.
  */
 
+import { tryGetErrorCode } from "./errorCodes";
+
 /**
  * A standardized abort error.
  */
@@ -47,6 +49,5 @@ export function isAbortError(value: unknown): value is AbortError {
         return true;
     }
 
-    const codeCandidate: unknown = Reflect.get(value, "code");
-    return codeCandidate === "ERR_CANCELED";
+    return tryGetErrorCode(value) === "ERR_CANCELED";
 }
