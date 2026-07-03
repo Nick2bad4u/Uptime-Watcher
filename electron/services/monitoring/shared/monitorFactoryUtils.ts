@@ -22,7 +22,9 @@ export function buildMonitorFactory<T>(factory: () => T, scope: string): T {
         return factory();
     } catch (error) {
         const normalizedError = ensureError(error);
-        normalizedError.message = `Failed to initialise ${scope}: ${normalizedError.message}`;
-        throw normalizedError;
+        throw new Error(
+            `Failed to initialise ${scope}: ${normalizedError.message}`,
+            { cause: error }
+        );
     }
 }
