@@ -91,6 +91,23 @@ describe("cloudSyncManifest", () => {
         expect(Object.getPrototypeOf(parsed.devices)).toBeNull();
     });
 
+    it("normalizes device IDs when using the exported schema directly", () => {
+        const result = cloudSyncManifestSchema.safeParse({
+            devices: {
+                "ok-device": { compactedUpToOpId: 0, lastSeenAt: 1 },
+                "bad/device": { compactedUpToOpId: 0, lastSeenAt: 2 },
+            },
+            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(result.success).toBeTruthy();
+        if (result.success) {
+            expect(Object.keys(result.data.devices)).toEqual(["ok-device"]);
+            expect(Object.getPrototypeOf(result.data.devices)).toBeNull();
+        }
+    });
+
     it("caps the devices map to the most recently seen devices", () => {
         const devices: Record<
             string,

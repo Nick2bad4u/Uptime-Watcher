@@ -100,15 +100,14 @@ export function createCloudSyncManifestDevices(
  * Runtime schema for validating {@link CloudSyncManifest}.
  */
 export const cloudSyncManifestSchema: z.ZodType<CloudSyncManifest> =
-    cloudSyncManifestInternalSchema;
+    cloudSyncManifestInternalSchema.transform((manifest) =>
+        normalizeCloudSyncManifest(manifest)
+    );
 
-/**
- * Parses and validates a manifest payload.
- */
-export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
-    const parsed = cloudSyncManifestInternalSchema.parse(candidate);
-
-    const validEntries = objectEntries(parsed.devices).filter(([deviceId]) =>
+function normalizeCloudSyncManifest(
+    manifest: z.infer<typeof cloudSyncManifestInternalSchema>
+): CloudSyncManifest {
+    const validEntries = objectEntries(manifest.devices).filter(([deviceId]) =>
         isValidPersistedDeviceId(deviceId)
     );
 
@@ -120,7 +119,14 @@ export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
             : validEntries;
 
     return {
-        ...parsed,
+        ...manifest,
         devices: createCloudSyncManifestDevices(limited),
     };
+}
+
+/**
+ * Parses and validates a manifest payload.
+ */
+export function parseCloudSyncManifest(candidate: unknown): CloudSyncManifest {
+    return cloudSyncManifestSchema.parse(candidate);
 }
