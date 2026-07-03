@@ -1,6 +1,7 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { stringSplit } from "ts-extras";
 
 import {
@@ -84,6 +85,22 @@ export async function downloadBackupWithMetadata(args: {
  *
  * @returns The {@link CloudBackupEntry} describing the uploaded backup.
  */
+function assertCanonicalBackupFileName(fileName: string): void {
+    const normalized = normalizePathSeparatorsToPosix(fileName);
+    const basename = stringSplit(normalized, "/").pop() ?? "";
+
+    if (
+        fileName !== fileName.trim() ||
+        normalized !== fileName ||
+        basename !== fileName ||
+        basename.length === 0
+    ) {
+        throw new Error(
+            "Backup fileName must be a single normalized path segment"
+        );
+    }
+}
+
 export async function uploadBackupWithMetadata(args: {
     /** Provider-specific backups key prefix (typically `backups/`). */
     readonly backupsPrefix: string;
@@ -111,6 +128,8 @@ export async function uploadBackupWithMetadata(args: {
         overwrite?: boolean;
     }) => Promise<unknown>;
 }): Promise<CloudBackupEntry> {
+    assertCanonicalBackupFileName(args.fileName);
+
     const backupKey = `${args.backupsPrefix}${args.fileName}`;
 
     const entry = parseCloudBackupMetadataFile({

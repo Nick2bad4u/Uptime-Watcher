@@ -74,6 +74,42 @@ describe(downloadBackupWithMetadata, () => {
 });
 
 describe(uploadBackupWithMetadata, () => {
+    it.each([
+        ["nested path", "nested/backup.sqlite"],
+        ["windows path", String.raw`nested\backup.sqlite`],
+        ["leading whitespace", " backup.sqlite"],
+        ["trailing whitespace", "backup.sqlite "],
+        ["empty name", ""],
+    ])(
+        "rejects non-canonical backup fileName values from %s before uploading",
+        async (_caseName, fileName) => {
+            const uploadObject = vi.fn<
+                (args: { buffer: Buffer; key: string }) => Promise<void>
+            >();
+
+            await expect(
+                uploadBackupWithMetadata({
+                    backupsPrefix: "backups/",
+                    buffer: Buffer.from("backup", "utf8"),
+                    encrypted: false,
+                    fileName,
+                    metadata: {
+                        appVersion: "1.0.0",
+                        checksum: "abc",
+                        createdAt: 1,
+                        originalPath: "backup.sqlite",
+                        retentionHintDays: 30,
+                        schemaVersion: 1,
+                        sizeBytes: 6,
+                    },
+                    uploadObject,
+                })
+            ).rejects.toThrow(/single normalized path segment/iv);
+
+            expect(uploadObject).not.toHaveBeenCalled();
+        }
+    );
+
     it("rejects invalid metadata before uploading backup bytes", async () => {
         const uploadObject = vi.fn<
             (args: { buffer: Buffer; key: string }) => Promise<void>
