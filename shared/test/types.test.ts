@@ -800,15 +800,14 @@ describe(validateMonitor, () => {
 
         monitor.responseTime = 150; // Reset
 
-        // NaN is considered a number type in JavaScript, so it passes type check
+        // Non-finite values are rejected at the shared runtime boundary.
         monitor.timeout = NaN;
-        expect(validateMonitor(monitor)).toBeTruthy();
+        expect(validateMonitor(monitor)).toBeFalsy();
 
         monitor.timeout = 5000; // Reset
 
-        // Infinity is also considered a number type
         monitor.checkInterval = Infinity;
-        expect(validateMonitor(monitor)).toBeTruthy();
+        expect(validateMonitor(monitor)).toBeFalsy();
     });
 });
 

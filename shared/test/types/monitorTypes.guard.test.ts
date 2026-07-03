@@ -28,6 +28,23 @@ describe("monitor type runtime guards", () => {
         ).toBeFalsy();
     });
 
+    it("rejects non-finite numeric field bounds", () => {
+        const baseField = {
+            label: "Port",
+            name: "port",
+            required: true,
+            type: "number" as const,
+        };
+
+        expect(
+            isMonitorFieldDefinition({ ...baseField, max: Infinity })
+        ).toBeFalsy();
+        expect(
+            isMonitorFieldDefinition({ ...baseField, min: -Infinity })
+        ).toBeFalsy();
+        expect(isMonitorFieldDefinition({ ...baseField, min: NaN })).toBeFalsy();
+    });
+
     it("accepts valid monitor type configurations", () => {
         const config = {
             description: "HTTP endpoint monitoring",

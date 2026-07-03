@@ -10,7 +10,12 @@ import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 
 import { isObject } from "@shared/utils/typeGuards";
 import { validateMonitorType } from "@shared/utils/validation";
-import { isDefined, isEmpty, setHas } from "ts-extras";
+import {
+    isDefined,
+    isEmpty,
+    isFinite as isFiniteNumber,
+    setHas,
+} from "ts-extras";
 
 /**
  * Shared representation of a monitor type configuration used by frontend and
@@ -184,10 +189,10 @@ const isOptionalString = (value: unknown): value is string | undefined =>
  *
  * @param value - Value to check.
  *
- * @returns `true` when the value is either undefined or a number.
+ * @returns `true` when the value is either undefined or a finite number.
  */
 const isOptionalNumber = (value: unknown): value is number | undefined =>
-    !isDefined(value) || typeof value === "number";
+    !isDefined(value) || (typeof value === "number" && isFiniteNumber(value));
 
 /**
  * Checks whether a value is an optional boolean.

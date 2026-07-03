@@ -7,7 +7,12 @@ import type { DnsRecordType } from "@shared/types/schemaTypes";
 import type { UnknownRecord, ValueOf } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { arrayIncludes, isDefined, safeCastTo } from "ts-extras";
+import {
+    arrayIncludes,
+    isDefined,
+    isFinite as isFiniteNumber,
+    safeCastTo,
+} from "ts-extras";
 
 export const STATUS_KIND = {
     DEGRADED: "degraded",
@@ -519,6 +524,9 @@ function isValidActiveOperations(
     return true;
 }
 
+const isFiniteMonitorNumber = (value: unknown): value is number =>
+    typeof value === "number" && isFiniteNumber(value);
+
 /**
  * Determines whether a string represents a computed site-only status value.
  *
@@ -594,10 +602,10 @@ export function validateMonitor(monitor: unknown): monitor is Monitor {
         typeof monitor["status"] === "string" &&
         isMonitorStatus(monitor["status"]) &&
         typeof monitor["monitoring"] === "boolean" &&
-        typeof monitor["responseTime"] === "number" &&
-        typeof monitor["checkInterval"] === "number" &&
-        typeof monitor["timeout"] === "number" &&
-        typeof monitor["retryAttempts"] === "number" &&
+        isFiniteMonitorNumber(monitor["responseTime"]) &&
+        isFiniteMonitorNumber(monitor["checkInterval"]) &&
+        isFiniteMonitorNumber(monitor["timeout"]) &&
+        isFiniteMonitorNumber(monitor["retryAttempts"]) &&
         Array.isArray(monitor["history"]) &&
         (!isDefined(monitor["activeOperations"]) ||
             isValidActiveOperations(monitor["activeOperations"]))
