@@ -444,6 +444,23 @@ describe(HistoryTab, () => {
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(10);
         });
+
+        it("should ignore invalid display limit dropdown values", () => {
+            const monitor = createMockMonitor(50);
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
+
+            const select = document.querySelector(".themed-select");
+            expect(select).toBeInTheDocument();
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(25);
+
+            fireEvent.change(select!, { target: { value: "not-a-number" } });
+
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(25);
+        });
     });
 
     describe("Data Formatting", () => {

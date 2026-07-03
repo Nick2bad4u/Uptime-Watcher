@@ -11,7 +11,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import type { AppSettings } from "../../stores/types";
 import type { BackupSummary } from "./sections/BackupSummary";
 
-import { DEFAULT_HISTORY_LIMIT } from "../../constants";
+import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { logger } from "../../services/logger";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
@@ -110,6 +110,10 @@ function formatBackupSummaryDate(createdAt: number): string {
         timeStyle: "short",
     }).format(backupDate);
 }
+
+const VALID_HISTORY_LIMIT_OPTION_VALUES = new Set(
+    HISTORY_LIMIT_OPTIONS.map((option) => String(option.value))
+);
 
 /**
  * Extracted controller hook for
@@ -252,7 +256,17 @@ export const useSettingsController = ({
 
     const handleHistoryLimitSelectChange = useCallback(
         (event: ChangeEvent<HTMLSelectElement>) => {
-            void handleHistoryLimitChange(Number(event.target.value));
+            const { value } = event.target;
+
+            if (!VALID_HISTORY_LIMIT_OPTION_VALUES.has(value)) {
+                logger.warn("Unknown history limit value selected", {
+                    value,
+                });
+                return;
+            }
+
+            const selectedLimit = Number(value);
+            void handleHistoryLimitChange(selectedLimit);
         },
         [handleHistoryLimitChange]
     );

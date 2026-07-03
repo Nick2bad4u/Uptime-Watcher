@@ -472,6 +472,19 @@ describe("Settings Component", () => {
         expect(mockSettingsStore.persistHistoryLimit).toHaveBeenCalledWith(500);
     });
 
+    it("should ignore invalid history limit changes", () => {
+        render(<Settings onClose={mockOnClose} />);
+
+        const input = screen.getByLabelText(
+            "Maximum number of history records to keep per site"
+        );
+        fireEvent.change(input, { target: { value: "not-a-number" } });
+
+        expect(
+            mockSettingsStore.persistHistoryLimit
+        ).not.toHaveBeenCalled();
+    });
+
     it("should handle reset settings", async ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: Settings", "component");

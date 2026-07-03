@@ -48,6 +48,7 @@ import {
     arrayIncludes,
     isEmpty,
     isFinite as isFiniteNumber,
+    isInteger,
     safeCastTo,
 } from "ts-extras";
 
@@ -309,37 +310,39 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         // Dropdown options: a curated set of record counts plus an "All"
         // entry, clamped to the resolved backend limit and the available
         // history length.
-        const maxShow = Math.min(backendLimit, historyLength);
-        const showOptions: number[] = [];
-        for (const option of [
-            10,
-            25,
-            50,
-            100,
-            250,
-            500,
-            1000,
-            10_000,
-        ] as const) {
-            if (option <= maxShow) {
-                showOptions.push(option);
+        const finalShowOptions = useMemo(() => {
+            const maxShow = Math.min(backendLimit, historyLength);
+            const showOptions: number[] = [];
+            for (const option of [
+                10,
+                25,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                10_000,
+            ] as const) {
+                if (option <= maxShow) {
+                    showOptions.push(option);
+                }
             }
-        }
 
-        // Always include 'All' if there are fewer than backendLimit
-        if (
-            historyLength > 0 &&
-            historyLength <= backendLimit &&
-            !arrayIncludes(showOptions, historyLength)
-        ) {
-            showOptions.push(historyLength);
-        }
+            // Always include 'All' if there are fewer than backendLimit
+            if (
+                historyLength > 0 &&
+                historyLength <= backendLimit &&
+                !arrayIncludes(showOptions, historyLength)
+            ) {
+                showOptions.push(historyLength);
+            }
 
-        // Ensure we always have at least one valid option, even for small history
-        // counts.
-        const finalShowOptions = isEmpty(showOptions)
-            ? [historyLength > 0 ? historyLength : 10]
-            : showOptions;
+            // Ensure we always have at least one valid option, even for small
+            // history counts.
+            return isEmpty(showOptions)
+                ? [historyLength > 0 ? historyLength : 10]
+                : showOptions;
+        }, [backendLimit, historyLength]);
 
         // Compute effective history limit - use user preference or auto-calculated
         // value
@@ -458,8 +461,14 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         const handleHistoryLimitChange = useCallback(
             (event: ChangeEvent<HTMLSelectElement>) => {
+                const parsedLimit = Number(event.target.value);
+                const selectedLimit =
+                    isInteger(parsedLimit) &&
+                    finalShowOptions.includes(parsedLimit)
+                        ? parsedLimit
+                        : safeHistoryLimit;
                 const newLimit = Math.min(
-                    Number.parseInt(event.target.value, 10),
+                    selectedLimit,
                     backendLimit,
                     historyLength
                 );
@@ -472,7 +481,9 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             },
             [
                 backendLimit,
+                finalShowOptions,
                 historyLength,
+                safeHistoryLimit,
                 selectedMonitor.id,
             ]
         );
