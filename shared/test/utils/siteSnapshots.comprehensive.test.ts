@@ -159,6 +159,24 @@ describe("siteSnapshots", () => {
         });
         expect(overlayDate?.lastChecked).toBeInstanceOf(Date);
 
+        const overlayEpoch = toMonitorSnapshotOverlay({
+            lastChecked: Date.UTC(2025, 0, 3),
+        });
+        expect(overlayEpoch?.lastChecked?.toISOString()).toBe(
+            "2025-01-03T00:00:00.000Z"
+        );
+
+        expect(
+            toMonitorSnapshotOverlay({
+                lastChecked: "July 3, 2026",
+            })
+        ).toBeUndefined();
+        expect(
+            toMonitorSnapshotOverlay({
+                lastChecked: "2026-02-30T00:00:00.000Z",
+            })
+        ).toBeUndefined();
+
         // Cover invalid status branch (should produce no overlay).
         expect(
             toMonitorSnapshotOverlay({ status: "not-a-status" as any })

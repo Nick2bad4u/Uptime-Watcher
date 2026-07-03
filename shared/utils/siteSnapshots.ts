@@ -14,6 +14,7 @@ import type { RequireAtLeastOne, UnknownRecord } from "type-fest";
 
 import { isMonitorStatus } from "@shared/types";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { isDefined, objectValues, safeCastTo } from "ts-extras";
 
 import { calculateSiteSyncDelta } from "./siteSyncDelta";
@@ -166,7 +167,16 @@ const normalizeDateValue = (value: unknown): Date | undefined => {
         return value;
     }
 
-    if (isNonEmptyString(value) || isFiniteNumber(value)) {
+    if (isNonEmptyString(value)) {
+        const result = safeParseIsoTimestamp(value);
+        if (!result.success) {
+            return undefined;
+        }
+
+        return new Date(result.data);
+    }
+
+    if (isFiniteNumber(value)) {
         const parsed = new Date(value);
         return Number.isNaN(parsed.getTime()) ? undefined : parsed;
     }
