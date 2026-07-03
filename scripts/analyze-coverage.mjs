@@ -24,6 +24,23 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { createRequire } from "node:module";
+
+/**
+ * Minimal interface for the optional `cli-table3` dependency used by this
+ * script when available.
+ *
+ * @typedef {{
+ *     push: (row: unknown[]) => void;
+ *     toString: () => string;
+ * }} CliTable
+ *
+ * @typedef {new (options: {
+ *     colWidths: number[];
+ *     head: string[];
+ *     style: { border: unknown[]; head: unknown[] };
+ * }) => CliTable} CliTableConstructor
+ */
+
 // Small ANSI color helpers (avoid extra deps)
 const colors = {
     reset: (/** @type {any} */ s) => `\u001B[0m${s}\u001B[0m`,
@@ -306,7 +323,7 @@ function printCoverageSection(header, files) {
     // Try to require cli-table3 synchronously so we avoid top-level await lint warnings
     try {
         const requireC = createRequire(import.meta.url);
-        // @ts-ignore require possibly missing in some environments
+        /** @type {CliTableConstructor} */
         const Table = requireC("cli-table3");
 
         const table = new Table({

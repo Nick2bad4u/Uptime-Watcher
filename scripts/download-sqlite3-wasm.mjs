@@ -86,6 +86,8 @@ function getSanitizedErrorMessage(error) {
 
 /**
  * @param {string} message
+ *
+ * @returns {never}
  */
 function failAndExit(message) {
     console.error(
@@ -287,7 +289,6 @@ function download(urlToFetch, destPath, redirectCount = 0) {
             if (!location) {
                 failAndExit("Redirect response missing 'location' header");
             }
-            // @ts-expect-error -- Unknown ok for error messages
             return download(location, destPath, redirectCount + 1);
         }
 
