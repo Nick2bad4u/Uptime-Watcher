@@ -16,7 +16,7 @@ import { monitorStatusEnumValues } from "./statusValidationPrimitives";
 /**
  * Schema ensuring that timestamp fields contain ISO 8601 date strings.
  */
-const isoTimestampSchema: z.ZodType<string> = z
+export const isoTimestampSchema: z.ZodType<string> = z
     .string()
     .trim()
     .pipe(
@@ -24,6 +24,11 @@ const isoTimestampSchema: z.ZodType<string> = z
             error: "Timestamp must be a valid ISO 8601 string",
         })
     );
+
+export const safeParseIsoTimestamp = (
+    value: unknown
+): ReturnType<typeof isoTimestampSchema.safeParse> =>
+    isoTimestampSchema.safeParse(value);
 
 type MonitorStatusEnumSchema = z.ZodType<MonitorStatus>;
 

@@ -11,7 +11,10 @@ import { describe, expect, it } from "vitest";
 
 import type { StatusUpdate } from "../../types";
 
-import { statusUpdateSchema } from "../../validation/statusUpdateSchemas";
+import {
+    safeParseIsoTimestamp,
+    statusUpdateSchema,
+} from "../../validation/statusUpdateSchemas";
 import { createValidHttpMonitor } from "./testHelpers";
 
 const createValidStatusUpdate = (): StatusUpdate => {
@@ -108,6 +111,30 @@ describe("statusUpdateSchema", () => {
             expect(result.error.issues.map((issue) => issue.message)).toContain(
                 "monitorId must reference a monitor in site.monitors"
             );
+        }
+    });
+});
+
+describe(safeParseIsoTimestamp, () => {
+    it("trims and accepts valid ISO timestamp strings", () => {
+        const result = safeParseIsoTimestamp(
+            "  2026-07-03T00:00:00.000Z  "
+        );
+
+        expect(result.success).toBeTruthy();
+        if (result.success) {
+            expect(result.data).toBe("2026-07-03T00:00:00.000Z");
+        }
+    });
+
+    it("rejects loose or impossible timestamp strings", () => {
+        for (const timestamp of [
+            "2026-07-03",
+            "July 3, 2026",
+            "2026-02-30T00:00:00.000Z",
+            "2026-07-03T00:00:00.000",
+        ]) {
+            expect(safeParseIsoTimestamp(timestamp).success).toBeFalsy();
         }
     });
 });

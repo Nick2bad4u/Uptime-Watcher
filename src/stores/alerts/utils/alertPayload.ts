@@ -5,6 +5,7 @@
 import type { Monitor, StatusUpdate } from "@shared/types";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 
 import type { StatusAlertInput } from "../useAlertStore";
 
@@ -78,8 +79,13 @@ function deriveMonitorName(
  * Converts an ISO timestamp string into an epoch value with fallback.
  */
 function deriveAlertTimestamp(timestamp: string): number {
-    const parsed = Date.parse(timestamp);
-    return Number.isNaN(parsed) ? Date.now() : parsed;
+    const result = safeParseIsoTimestamp(timestamp);
+    if (!result.success) {
+        return Date.now();
+    }
+
+    const parsed = Date.parse(result.data);
+    return Number.isFinite(parsed) ? parsed : Date.now();
 }
 
 /**

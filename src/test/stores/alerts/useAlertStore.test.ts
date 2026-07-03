@@ -394,16 +394,33 @@ describe(useAlertStore, () => {
         const fixedNow = 1_725_000_000_000;
         const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
 
-        const update = createStatusUpdate({
-            // Force deriveAlertTimestamp to take the Date.now() fallback path
-            timestamp: "not-a-valid-timestamp",
-        });
+        try {
+            for (const timestamp of [
+                "not-a-valid-timestamp",
+                "July 3, 2026",
+                "2026-02-30T00:00:00.000Z",
+            ]) {
+                const update = createStatusUpdate({
+                    timestamp,
+                });
 
-        const alert = mapStatusUpdateToAlert(update);
+                const alert = mapStatusUpdateToAlert(update);
 
-        expect(alert.timestamp).toBe(fixedNow);
+                expect(alert.timestamp).toBe(fixedNow);
+            }
+        } finally {
+            nowSpy.mockRestore();
+        }
+    });
 
-        nowSpy.mockRestore();
+    it("trims valid ISO timestamps when mapping status updates", () => {
+        const alert = mapStatusUpdateToAlert(
+            createStatusUpdate({
+                timestamp: "  2026-07-03T00:00:00.000Z  ",
+            })
+        );
+
+        expect(alert.timestamp).toBe(Date.parse("2026-07-03T00:00:00.000Z"));
     });
 });
 
