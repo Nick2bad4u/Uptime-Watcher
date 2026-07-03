@@ -5,7 +5,7 @@
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
 
-import { isDefined } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { SitesTelemetryPayload } from "./operationHelpers";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
@@ -47,6 +47,12 @@ type MonitoringLifecycleEvent =
     | RendererEventPayloadMap["monitoring:started"]
     | RendererEventPayloadMap["monitoring:stopped"];
 
+function resolveFiniteNumber(value: unknown): number | undefined {
+    return typeof value === "number" && isFiniteNumber(value)
+        ? value
+        : undefined;
+}
+
 /**
  * Builds a telemetry payload for monitoring lifecycle events.
  */
@@ -61,25 +67,19 @@ export function buildMonitoringLifecycleTelemetry(args: {
     const timestampValue = event.timestamp;
     const { activeMonitors, reason } = event;
 
-    const monitorCount =
-        isDefined(monitorCountValue) && typeof monitorCountValue === "number"
-            ? monitorCountValue
-            : undefined;
-    const siteCount =
-        isDefined(siteCountValue) && typeof siteCountValue === "number"
-            ? siteCountValue
-            : undefined;
-    const timestamp =
-        isDefined(timestampValue) && typeof timestampValue === "number"
-            ? timestampValue
-            : undefined;
+    const monitorCount = resolveFiniteNumber(monitorCountValue);
+    const siteCount = resolveFiniteNumber(siteCountValue);
+    const timestamp = resolveFiniteNumber(timestampValue);
+    const resolvedActiveMonitors = resolveFiniteNumber(activeMonitors);
 
     return {
         phase,
         ...(isDefined(timestamp) && { timestamp }),
         ...(isDefined(monitorCount) && { monitorCount }),
         ...(isDefined(siteCount) && { siteCount }),
-        ...(typeof activeMonitors === "number" && { activeMonitors }),
+        ...(isDefined(resolvedActiveMonitors) && {
+            activeMonitors: resolvedActiveMonitors,
+        }),
         ...(typeof reason === "string" && { reason }),
     } satisfies SitesTelemetryPayload;
 }

@@ -1,6 +1,7 @@
 import type { StatusUpdate } from "@shared/types";
 
 import { isRecord } from "@shared/utils/typeHelpers";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 import type { MonitorCheckResult } from "../types";
@@ -32,7 +33,7 @@ export function isValidServiceResult(
         return false;
     }
 
-    return typeof responseTime === "number";
+    return typeof responseTime === "number" && isFiniteNumber(responseTime);
 }
 
 /**
