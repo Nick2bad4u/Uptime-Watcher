@@ -350,12 +350,13 @@ describe("Logger Service - Basic Coverage", () => {
             logger.app.error("startup", testError);
 
             expect(mockError).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Application error in startup",
+                "[UPTIME-WATCHER] Application error",
                 {
                     message: "App error",
                     name: "Error",
                     stack: testError.stack,
-                }
+                },
+                { context: "startup" }
             );
         });
 
@@ -368,7 +369,8 @@ describe("Logger Service - Basic Coverage", () => {
             logger.app.performance("database-query", 150);
 
             expect(mockDebug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Performance: database-query took 150ms"
+                "[UPTIME-WATCHER] Performance",
+                { duration: 150, operation: "database-query" }
             );
         });
     });

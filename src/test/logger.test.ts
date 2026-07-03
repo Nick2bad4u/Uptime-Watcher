@@ -173,12 +173,45 @@ describe("Frontend Logger Service", () => {
             logger.app.error("startup", error);
 
             expect(mockLog.error).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Application error in startup",
+                "[UPTIME-WATCHER] Application error",
                 {
                     message: error.message,
                     name: error.name,
                     stack: error.stack,
+                },
+                { context: "startup" }
+            );
+        });
+
+        it("should redact app error context metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const error = new Error("App error");
+            logger.app.error(
+                "https://example.com/callback?access_token=context-secret",
+                error
+            );
+
+            expect(mockLog.error).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Application error",
+                {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                },
+                {
+                    context:
+                        "https://example.com/callback?access_token=[redacted]",
                 }
+            );
+            expect(String(mockLog.error.mock.calls)).not.toContain(
+                "context-secret"
             );
         });
 
@@ -190,7 +223,8 @@ describe("Frontend Logger Service", () => {
 
             logger.app.performance("database-query", 150);
             expect(mockLog.debug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Performance: database-query took 150ms"
+                "[UPTIME-WATCHER] Performance",
+                { duration: 150, operation: "database-query" }
             );
         });
     });

@@ -26,7 +26,6 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 import { serializeError } from "@shared/utils/logger/common";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import * as fc from "fast-check";
-import { arrayAt } from "ts-extras";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock electron-log/renderer
@@ -400,18 +399,11 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 logger.app.error(context, error);
 
                 // Assert
-                expect(mockError).toHaveBeenCalled();
-
-                // Verify context and error are included
-                const calls = mockError.mock.calls;
-                const lastCall = arrayAt(calls, -1);
-                expect(lastCall).toBeDefined();
-                expect(
-                    lastCall?.some(
-                        (arg: any) =>
-                            typeof arg === "string" && arg.includes(context)
-                    )
-                ).toBeTruthy();
+                expect(mockError).toHaveBeenCalledWith(
+                    "[UPTIME-WATCHER] Application error",
+                    expect.objectContaining({ message: error.message }),
+                    { context }
+                );
             }
         );
 
@@ -423,20 +415,10 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             logger.app.performance(operation, duration);
 
             // Assert
-            expect(mockDebug).toHaveBeenCalled();
-
-            // Verify operation and duration are logged
-            const calls = mockDebug.mock.calls;
-            const lastCall = arrayAt(calls, -1);
-            expect(lastCall).toBeDefined();
-            expect(
-                lastCall?.some(
-                    (arg: any) =>
-                        typeof arg === "string" &&
-                        (arg.includes(operation) ||
-                            arg.includes(duration.toString()))
-                )
-            ).toBeTruthy();
+            expect(mockDebug).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Performance",
+                { duration, operation }
+            );
         });
     });
 

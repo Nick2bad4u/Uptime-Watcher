@@ -259,11 +259,12 @@ const loggerInstance: LoggerInterface = {
     // Log app lifecycle events
     app: {
         error: (context: string, error: Error): void => {
-            baseLoggerMethods.error(`Application error in ${context}`, error);
+            baseLoggerMethods.error("Application error", error, { context });
         },
         performance: (operation: string, duration: number): void => {
             baseLoggerMethods.debug(
-                `Performance: ${operation} took ${duration}ms`
+                "Performance",
+                { duration, operation }
             );
         },
         started: (): void => {
