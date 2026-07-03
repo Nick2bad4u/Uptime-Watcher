@@ -34,13 +34,20 @@ import {
 
 const mockFsPromises = vi.hoisted(() => ({
     copyFile: vi.fn(),
+    lstat: vi.fn(),
+    mkdir: vi.fn(),
     mkdtemp: vi.fn(),
-    open: vi.fn(async () => ({
-        close: vi.fn(async () => undefined),
-        sync: vi.fn(async () => undefined),
-    })),
+    open: vi.fn(async () => {
+        const read = vi.fn(async () => ({ bytesRead: 0 }));
+        return {
+            close: vi.fn(async () => undefined),
+            read,
+            sync: vi.fn(async () => undefined),
+        };
+    }),
     rename: vi.fn(),
     rm: vi.fn(),
+    stat: vi.fn(),
     writeFile: vi.fn(),
 }));
 
@@ -178,11 +185,16 @@ describe(DataBackupService, () => {
         mockDatabasePrepare.mockClear();
         mockDatabaseGet.mockClear();
         mockDatabaseInstance.close.mockClear();
+        mockFsPromises.lstat.mockRejectedValue(
+            Object.assign(new Error("ENOENT"), { code: "ENOENT" })
+        );
+        mockFsPromises.mkdir.mockResolvedValue(undefined);
         mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-dir");
         mockFsPromises.writeFile.mockResolvedValue(undefined);
         mockFsPromises.copyFile.mockResolvedValue(undefined);
         mockFsPromises.rename.mockResolvedValue(undefined);
         mockFsPromises.rm.mockResolvedValue(undefined);
+        mockFsPromises.stat.mockResolvedValue({ size: 1024 });
 
         // Reset app.getPath mock
         vi.mocked(app.getPath).mockReturnValue("/test/userdata");
@@ -742,6 +754,58 @@ describe(DataBackupService, () => {
                         originalPath: backupResult.fileName,
                     }),
                 })
+            );
+        });
+    });
+
+    describe("saveDatabaseBackupToPath", () => {
+        it("rejects existing non-file destinations before creating a snapshot", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            mockFsPromises.lstat.mockResolvedValue({
+                isFile: () => false,
+                isSymbolicLink: () => false,
+            });
+
+            await expect(
+                dataBackupService.saveDatabaseBackupToPath(targetPath)
+            ).rejects.toThrow(
+                "Refusing to overwrite a non-file path when saving backup"
+            );
+
+            expect(mockFsPromises.mkdir).toHaveBeenCalledWith(
+                path.dirname(targetPath),
+                { recursive: true }
+            );
+            expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
+            expect(mockFsPromises.copyFile).not.toHaveBeenCalled();
+        });
+
+        it("cleans the copied temp destination when the final target becomes non-file", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            const nonFileStat = {
+                isFile: () => false,
+                isSymbolicLink: () => false,
+            };
+
+            mockFsPromises.lstat
+                .mockRejectedValueOnce(
+                    Object.assign(new Error("ENOENT"), { code: "ENOENT" })
+                )
+                .mockResolvedValueOnce(nonFileStat);
+
+            await expect(
+                dataBackupService.saveDatabaseBackupToPath(targetPath)
+            ).rejects.toThrow(
+                "Refusing to overwrite a non-file path when saving backup"
+            );
+
+            expect(mockFsPromises.copyFile).toHaveBeenCalledWith(
+                path.resolve("/tmp/mock-dir", "backup-snapshot.sqlite"),
+                expect.stringContaining(`${path.basename(targetPath)}.tmp-`)
+            );
+            expect(mockFsPromises.rm).toHaveBeenCalledWith(
+                expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
+                { force: true }
             );
         });
     });

@@ -146,7 +146,14 @@ export class DataBackupService {
                     );
                 }
 
+                if (existing && !existing.isFile()) {
+                    throw new Error(
+                        "Refusing to overwrite a non-file path when saving backup"
+                    );
+                }
+
                 let snapshotDir: null | string = null;
+                let tempDestination: null | string = null;
                 try {
                     snapshotDir = await createTempDirectory(BACKUP_TEMP_PREFIX);
                     const snapshotPath = createConsistentSnapshot({
@@ -164,7 +171,7 @@ export class DataBackupService {
                         );
                     }
 
-                    const tempDestination = path.join(
+                    tempDestination = path.join(
                         directory,
                         `${path.basename(targetPath)}.tmp-${randomUUID()}`
                     );
@@ -198,6 +205,12 @@ export class DataBackupService {
                             directoryPath: snapshotDir,
                             logger: this.logger,
                         });
+                    }
+
+                    if (tempDestination) {
+                        await fs
+                            .rm(tempDestination, { force: true })
+                            .catch(() => {});
                     }
                 }
             }
@@ -240,8 +253,19 @@ export class DataBackupService {
         const backupPath = `${targetPath}.bak-${randomUUID()}`;
 
         const targetStat = await fs.lstat(targetPath).catch(() => null);
-        const isTargetExists =
-            targetStat?.isFile() === true && !targetStat.isSymbolicLink();
+        if (targetStat?.isSymbolicLink()) {
+            throw new Error(
+                "Refusing to overwrite a symlink path when saving backup"
+            );
+        }
+
+        if (targetStat && !targetStat.isFile()) {
+            throw new Error(
+                "Refusing to overwrite a non-file path when saving backup"
+            );
+        }
+
+        const isTargetExists = targetStat?.isFile() === true;
 
         if (!isTargetExists) {
             await fs.rename(sourcePath, targetPath);
