@@ -395,6 +395,7 @@ export class DataBackupService {
                         baseDirectory: tempDir,
                         contents: buffer,
                         fileName: safeTempFileName,
+                        logger: this.logger,
                     });
 
                     const metadata = buildRestoreMetadata({
@@ -438,6 +439,7 @@ export class DataBackupService {
                         baseDirectory: app.getPath("userData"),
                         contents: preRestore.buffer,
                         fileName: preRestoreFileName,
+                        logger: this.logger,
                     });
 
                     await replaceDatabaseFile({
@@ -551,6 +553,7 @@ export class DataBackupService {
                         baseDirectory: tempDir,
                         contents: buffer,
                         fileName: safeFileName,
+                        logger: this.logger,
                     });
 
                     // The incoming metadata may be untrusted (e.g. downloaded

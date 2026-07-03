@@ -1,3 +1,5 @@
+import type { Logger } from "@shared/utils/logger/interfaces";
+
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
@@ -17,8 +19,9 @@ export async function writeFileWithinDirectory(args: {
     readonly baseDirectory: string;
     readonly contents: Parameters<typeof fs.writeFile>[1];
     readonly fileName: string;
+    readonly logger?: Logger;
 }): Promise<string> {
-    const { baseDirectory, contents, fileName } = args;
+    const { baseDirectory, contents, fileName, logger } = args;
 
     const targetPath = resolvePathWithinDirectory(baseDirectory, fileName);
     const tmpPath = resolvePathWithinDirectory(
@@ -30,6 +33,7 @@ export async function writeFileWithinDirectory(args: {
         `${fileName}.rollback-${randomUUID()}`
     );
     let isRollbackCreated = false;
+    let shouldDeleteRollback = false;
 
     try {
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath is sanitized and confined to baseDirectory.
@@ -66,6 +70,7 @@ export async function writeFileWithinDirectory(args: {
         // Atomic swap.
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- tmpPath/targetPath are confined to baseDirectory.
         await fs.rename(tmpPath, targetPath);
+        shouldDeleteRollback = isRollbackCreated;
         await syncDirectorySafely(baseDirectory);
     } catch (error) {
         // Best-effort cleanup.
@@ -73,15 +78,26 @@ export async function writeFileWithinDirectory(args: {
 
         // Best-effort rollback (no-op if rollback doesn't exist).
         if (isRollbackCreated) {
-            // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are sanitized and confined to baseDirectory.
-            await fs.rename(rollbackPath, targetPath).catch(() => {});
+            try {
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are sanitized and confined to baseDirectory.
+                await fs.rename(rollbackPath, targetPath);
+                isRollbackCreated = false;
+            } catch (rollbackError: unknown) {
+                logger?.warn(
+                    "[DataBackupService] Failed to rollback backup artifact write",
+                    ensureError(rollbackError),
+                    { fileName, targetPath }
+                );
+            }
         }
         await syncDirectorySafely(baseDirectory);
 
         throw ensureError(error);
     } finally {
-        // Best-effort cleanup (no-op if rollback doesn't exist).
-        if (isRollbackCreated) {
+        // Best-effort cleanup after a successful replacement only. If rollback
+        // restoration failed, keep the rollback file as the last known copy of
+        // the original target.
+        if (shouldDeleteRollback && isRollbackCreated) {
             await fs.rm(rollbackPath, { force: true }).catch(() => {});
         }
     }

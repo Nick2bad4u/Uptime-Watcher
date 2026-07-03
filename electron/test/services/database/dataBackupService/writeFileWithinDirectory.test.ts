@@ -8,9 +8,10 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { writeFileWithinDirectory } from "../../../../services/database/dataBackupService/writeFileWithinDirectory";
+import * as fsSafeOps from "../../../../utils/fsSafeOps";
 
 describe(writeFileWithinDirectory, () => {
     let tempDirectory = "";
@@ -22,6 +23,7 @@ describe(writeFileWithinDirectory, () => {
     });
 
     afterEach(async () => {
+        vi.restoreAllMocks();
         await rm(tempDirectory, { force: true, recursive: true });
     });
 
@@ -47,6 +49,25 @@ describe(writeFileWithinDirectory, () => {
         });
 
         await expect(readFile(filePath, "utf8")).resolves.toBe("new");
+    });
+
+    it("restores the original file when a late replacement step fails", async () => {
+        const filePath = path.join(tempDirectory, "backup.sqlite");
+        await writeFile(filePath, "old");
+
+        vi.spyOn(fsSafeOps, "syncDirectorySafely")
+            .mockRejectedValueOnce(new Error("sync failed"))
+            .mockResolvedValueOnce();
+
+        await expect(
+            writeFileWithinDirectory({
+                baseDirectory: tempDirectory,
+                contents: "new",
+                fileName: "backup.sqlite",
+            })
+        ).rejects.toThrow("sync failed");
+
+        await expect(readFile(filePath, "utf8")).resolves.toBe("old");
     });
 
     it("refuses to replace an existing directory", async () => {
