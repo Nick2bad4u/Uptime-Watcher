@@ -442,6 +442,7 @@ export class DataBackupService {
 
                     await replaceDatabaseFile({
                         databaseService: this.databaseService,
+                        logger: this.logger,
                         sourcePath: tempFilePath,
                         targetPath: dbPath,
                     });
@@ -580,6 +581,7 @@ export class DataBackupService {
 
                     await replaceDatabaseFile({
                         databaseService: this.databaseService,
+                        logger: this.logger,
                         sourcePath: tempFilePath,
                         targetPath: dbPath,
                     });

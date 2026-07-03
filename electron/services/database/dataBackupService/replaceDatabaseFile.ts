@@ -1,3 +1,5 @@
+import type { Logger } from "@shared/utils/logger/interfaces";
+
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import * as fs from "node:fs/promises";
@@ -20,10 +22,11 @@ import {
  */
 export async function replaceDatabaseFile(args: {
     readonly databaseService: DatabaseService;
+    readonly logger?: Logger;
     readonly sourcePath: string;
     readonly targetPath: string;
 }): Promise<void> {
-    const { databaseService, sourcePath, targetPath } = args;
+    const { databaseService, logger, sourcePath, targetPath } = args;
 
     databaseService.close();
 
@@ -100,7 +103,12 @@ export async function replaceDatabaseFile(args: {
             await renameIfExists(rollbackShmPath, shmPath);
             await renameIfExists(rollbackJournalPath, journalPath);
             isHadExistingTarget = false;
-        } catch {
+        } catch (rollbackError: unknown) {
+            logger?.warn(
+                "[DataBackupService] Failed to rollback database replacement after copy failure",
+                ensureError(rollbackError),
+                { targetPath }
+            );
             // Best effort. We still surface the original copy error below.
         }
     }
@@ -121,7 +129,12 @@ export async function replaceDatabaseFile(args: {
                 await renameIfExists(rollbackShmPath, shmPath);
                 await renameIfExists(rollbackJournalPath, journalPath);
                 databaseService.initialize();
-            } catch {
+            } catch (rollbackError: unknown) {
+                logger?.warn(
+                    "[DataBackupService] Failed to rollback database replacement after reinitialize failure",
+                    ensureError(rollbackError),
+                    { targetPath }
+                );
                 // If rollback fails, we still surface the init error below.
             }
         }
