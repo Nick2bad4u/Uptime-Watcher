@@ -31,6 +31,25 @@ describe(createOperationalHookContext, () => {
 
         expect(rehydrated).toBe(branded);
     });
+
+    it("should not invoke context accessors while freezing metadata", () => {
+        let getterCalls = 0;
+        const contextInput = { operation: "seed" };
+        Object.defineProperty(contextInput, "secret", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("context getter should not run");
+            },
+        });
+
+        const context = createOperationalHookContext(contextInput);
+
+        expect(context).toEqual({ operation: "seed" });
+        expect(Object.hasOwn(context, "secret")).toBeFalsy();
+        expect(Object.isFrozen(context)).toBeTruthy();
+        expect(getterCalls).toBe(0);
+    });
 });
 
 describe("Operational Hooks", () => {

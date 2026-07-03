@@ -64,6 +64,7 @@ import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { sleepUnref } from "@shared/utils/abortUtils";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { ensureError } from "@shared/utils/errorHandling";
+import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined, safeCastTo } from "ts-extras";
 import * as z from "zod";
@@ -150,7 +151,7 @@ const isOperationalHookContext = (
 const freezeOperationalContext = (
     context: Readonly<UnknownRecord>
 ): OperationalHookContext => {
-    const frozen = Object.freeze({ ...context });
+    const frozen = freezeOwnEnumerableDataProperties(context);
     if (!isOperationalHookContext(frozen)) {
         throw new Error("Failed to normalize operational hook context");
     }
