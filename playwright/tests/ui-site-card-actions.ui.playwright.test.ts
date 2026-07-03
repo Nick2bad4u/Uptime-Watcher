@@ -233,15 +233,20 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const recoveredAlertId = latestToastEntry;
+                const recoveredAlertId =
+                    await latestToastEntry.getAttribute("data-alert-id");
 
                 await expect
-                    .soft(recoveredAlertId)
+                    .soft(latestToastEntry)
                     .toHaveAttribute("data-alert-id");
 
-                await latestToastEntry
-                    .locator(".status-alert__dismissIcon")
-                    .click();
+                if (!recoveredAlertId) {
+                    throw new TypeError(
+                        "Expected recovered alert to include data-alert-id"
+                    );
+                }
+
+                await latestToastEntry.click();
 
                 // Wait for the specific toast we clicked to be removed after
                 // dismissal. We cannot assert that *all* recovered toasts are
