@@ -219,6 +219,22 @@ const computeDelayMs = (args: {
     return Math.min(args.baseDelay * BACKOFF_FACTOR ** exponent, MAX_DELAY);
 };
 
+const normalizeBaseDelay = (baseDelay: number | undefined): number => {
+    if (baseDelay === undefined || !Number.isFinite(baseDelay)) {
+        return DEFAULT_BASE_DELAY;
+    }
+
+    return Math.max(0, baseDelay);
+};
+
+const normalizeMaxAttempts = (maxAttempts: number | undefined): number => {
+    if (maxAttempts === undefined || !Number.isFinite(maxAttempts)) {
+        return DEFAULT_MAX_ATTEMPTS;
+    }
+
+    return Math.max(1, Math.trunc(maxAttempts));
+};
+
 /**
  * Waits for the preload-exposed electron bridge to become available.
  *
@@ -231,12 +247,13 @@ export async function waitForElectronBridge(
     options: WaitForElectronBridgeOptions = {}
 ): Promise<void> {
     const {
-        baseDelay = DEFAULT_BASE_DELAY,
+        baseDelay: configuredBaseDelay,
         contracts = [],
-        maxAttempts = DEFAULT_MAX_ATTEMPTS,
+        maxAttempts: configuredMaxAttempts,
     } = options;
 
-    const attempts = Math.max(1, maxAttempts);
+    const attempts = normalizeMaxAttempts(configuredMaxAttempts);
+    const baseDelay = normalizeBaseDelay(configuredBaseDelay);
 
     try {
         await withRetry(

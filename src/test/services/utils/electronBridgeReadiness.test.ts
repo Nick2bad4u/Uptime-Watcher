@@ -108,4 +108,40 @@ describe(waitForElectronBridge, () => {
             },
         });
     });
+
+    it("defaults non-finite maxAttempts before polling", async () => {
+        const promise = waitForElectronBridge({
+            baseDelay: 0,
+            contracts: [{ domain: "sites" }],
+            maxAttempts: Number.POSITIVE_INFINITY,
+        }).catch((error: unknown) => error as ElectronBridgeNotReadyError);
+
+        await vi.runAllTimersAsync();
+
+        const error = await promise;
+        expect(error).toBeInstanceOf(ElectronBridgeNotReadyError);
+        expect(error).toMatchObject({
+            diagnostics: {
+                missingDomains: ["sites"],
+            },
+        });
+    });
+
+    it("defaults non-finite baseDelay before scheduling retries", async () => {
+        const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+
+        const promise = waitForElectronBridge({
+            baseDelay: Number.POSITIVE_INFINITY,
+            contracts: [{ domain: "sites" }],
+            maxAttempts: 2,
+        }).catch((error: unknown) => error as ElectronBridgeNotReadyError);
+
+        await vi.runAllTimersAsync();
+
+        const error = await promise;
+        expect(error).toBeInstanceOf(ElectronBridgeNotReadyError);
+        expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 100);
+
+        setTimeoutSpy.mockRestore();
+    });
 });
