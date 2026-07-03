@@ -3,6 +3,7 @@ import {
     SafeStorageSecretStore,
     type SecretStore,
 } from "@electron/services/cloud/secrets/SecretStore";
+import { logger } from "@electron/utils/logger";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("electron", () => ({
@@ -83,6 +84,42 @@ describe(SafeStorageSecretStore, () => {
             undefined
         );
         expect(settings.get("cloud.dropbox.tokens")).toBe("");
+    });
+
+    it("logs when an undecryptable secret cannot be cleared", async () => {
+        const loggerWarn = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => {});
+        const store = new SafeStorageSecretStore({
+            settings: {
+                get: async () =>
+                    Buffer.from("not-encrypted", "utf8").toString("base64"),
+                set: async () => {
+                    throw new Error("settings write failed");
+                },
+            },
+        });
+
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            undefined
+        );
+
+        expect(loggerWarn).toHaveBeenCalledWith(
+            "[SafeStorageSecretStore] Stored secret could not be decrypted; clearing",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "Invalid ciphertext",
+            }
+        );
+        expect(loggerWarn).toHaveBeenCalledWith(
+            "[SafeStorageSecretStore] Failed to clear undecryptable stored secret",
+            {
+                key: "cloud.dropbox.tokens",
+                message: "settings write failed",
+            }
+        );
+
+        loggerWarn.mockRestore();
     });
 });
 

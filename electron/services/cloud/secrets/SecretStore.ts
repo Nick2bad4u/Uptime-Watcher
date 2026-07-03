@@ -1,5 +1,8 @@
 import { safeStorage } from "electron";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+
+import { logger } from "../../../utils/logger";
 import { decodeCanonicalBase64 } from "../internal/cloudServicePrimitives";
 
 /**
@@ -158,9 +161,26 @@ export class SafeStorageSecretStore implements SecretStore {
                 value: stored,
             });
             return safeStorage.decryptString(encrypted);
-        } catch {
+        } catch (error) {
+            logger.warn(
+                "[SafeStorageSecretStore] Stored secret could not be decrypted; clearing",
+                {
+                    key,
+                    message: getUserFacingErrorDetail(error),
+                }
+            );
             // If decryption fails (machine/user change, corruption), treat as missing.
-            await this.settings.set(key, "").catch(() => {});
+            try {
+                await this.settings.set(key, "");
+            } catch (clearError) {
+                logger.warn(
+                    "[SafeStorageSecretStore] Failed to clear undecryptable stored secret",
+                    {
+                        key,
+                        message: getUserFacingErrorDetail(clearError),
+                    }
+                );
+            }
             return undefined;
         }
     }
