@@ -70,11 +70,22 @@ vi.mock("../../../utils/operationalHooks", () => ({
     withOperationalHooks: withOperationalHooksMock,
 }));
 
-vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
-    createMonitorConfig: createMonitorConfigMock,
-    createMonitorErrorResult: createMonitorErrorResultMock,
-    validateMonitorUrl: validateMonitorUrlMock,
-}));
+vi.mock(
+    "../../../services/monitoring/shared/monitorServiceHelpers",
+    async (importOriginal) => {
+        const actual =
+            await importOriginal<
+                typeof import("../../../services/monitoring/shared/monitorServiceHelpers")
+            >();
+
+        return {
+            ...actual,
+            createMonitorConfig: createMonitorConfigMock,
+            createMonitorErrorResult: createMonitorErrorResultMock,
+            validateMonitorUrl: validateMonitorUrlMock,
+        };
+    }
+);
 
 vi.mock("../../../services/monitoring/utils/errorHandling", () => ({
     handleCheckError: handleCheckErrorMock,
