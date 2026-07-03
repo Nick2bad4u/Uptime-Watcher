@@ -3,7 +3,10 @@ import type {
     CloudStorageProvider,
 } from "@electron/services/cloud/providers/CloudStorageProvider.types";
 import type { CloudProviderKind } from "@shared/types/cloud";
-import type { CloudSyncOperation } from "@shared/types/cloudSync";
+import type {
+    CloudSyncOperation,
+    CloudSyncSetFieldOperation,
+} from "@shared/types/cloudSync";
 
 import { ProviderCloudSyncTransport } from "@electron/services/sync/ProviderCloudSyncTransport";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
@@ -62,6 +65,42 @@ function createProvider(
         ...base,
         ...overrides,
     };
+}
+
+function createOperation(
+    overrides: Partial<CloudSyncSetFieldOperation> = {}
+): CloudSyncSetFieldOperation {
+    return {
+        deviceId: "a",
+        entityId: "e",
+        entityType: "site",
+        field: "x",
+        kind: "set-field",
+        opId: 1,
+        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        timestamp: 1,
+        value: true,
+        ...overrides,
+    };
+}
+
+async function withEnvVar<T>(
+    key: string,
+    value: string,
+    callback: () => Promise<T>
+): Promise<T> {
+    const original = process.env[key];
+    process.env[key] = value;
+
+    try {
+        return await callback();
+    } finally {
+        if (original === undefined) {
+            Reflect.deleteProperty(process.env, key);
+        } else {
+            process.env[key] = original;
+        }
+    }
 }
 
 describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
@@ -335,6 +374,83 @@ describe("ProviderCloudSyncTransport.readOperationsObject limits", () => {
         await expect(
             transport.readOperationsObject("sync/devices/a/ops/1-1-1.ndjson")
         ).rejects.toThrow(/invalid utf-8/iv);
+    });
+});
+
+describe("ProviderCloudSyncTransport.appendOperations upload limits", () => {
+    it("rejects operation batches that exceed the configured operation count before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "x",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await withEnvVar("UW_CLOUD_SYNC_MAX_OPS_OBJECT_LINES", "1", async () => {
+            await expect(
+                transport.appendOperations("a", [
+                    createOperation({ opId: 1 }),
+                    createOperation({ field: "y", opId: 2 }),
+                ])
+            ).rejects.toThrow(/max operation count/i);
+        });
+
+        expect(uploaded).toBeFalsy();
+    });
+
+    it("rejects operation batches with oversized serialized lines before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "x",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await withEnvVar("UW_CLOUD_SYNC_MAX_OPS_LINE_CHARS", "20", async () => {
+            await expect(
+                transport.appendOperations("a", [createOperation()])
+            ).rejects.toThrow(/line exceeds max length/i);
+        });
+
+        expect(uploaded).toBeFalsy();
+    });
+
+    it("rejects operation batches that exceed the configured byte limit before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "x",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await withEnvVar("UW_CLOUD_SYNC_MAX_OPS_OBJECT_BYTES", "20", async () => {
+            await expect(
+                transport.appendOperations("a", [createOperation()])
+            ).rejects.toThrow(/exceeds size limit/i);
+        });
+
+        expect(uploaded).toBeFalsy();
     });
 });
 

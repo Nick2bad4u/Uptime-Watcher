@@ -154,11 +154,53 @@ function assertValidEpochMs(value: number, label: string): void {
     }
 }
 
-function toNdjson(operations: readonly CloudSyncOperation[]): string {
-    return `${arrayJoin(
-        operations.map((op) => JSON.stringify(op)),
-        "\n"
-    )}\n`;
+function assertSerializedOperationsWithinLimits(args: {
+    byteLength: number;
+    lineChars: readonly number[];
+    maxBytes: number;
+    maxLineChars: number;
+    maxLines: number;
+}): void {
+    const { byteLength, lineChars, maxBytes, maxLineChars, maxLines } = args;
+
+    if (lineChars.length > maxLines) {
+        throw new Error(
+            `Cloud sync operation object exceeds max operation count (${maxLines})`
+        );
+    }
+
+    const oversizedLineIndex = lineChars.findIndex(
+        (lineLength) => lineLength > maxLineChars
+    );
+    if (oversizedLineIndex !== -1) {
+        throw new Error(
+            `Cloud sync operation line exceeds max length (${maxLineChars} chars) at line ${oversizedLineIndex + 1}`
+        );
+    }
+
+    if (byteLength > maxBytes) {
+        throw new Error(
+            `Cloud sync operation object exceeds size limit (${maxBytes} bytes)`
+        );
+    }
+}
+
+function serializeOperationsForUpload(
+    operations: readonly CloudSyncOperation[]
+): Buffer {
+    const lines = operations.map((operation) => JSON.stringify(operation));
+    const payload = `${arrayJoin(lines, "\n")}\n`;
+    const buffer = encodeUtf8(payload);
+
+    assertSerializedOperationsWithinLimits({
+        byteLength: buffer.byteLength,
+        lineChars: lines.map((line) => line.length),
+        maxBytes: getMaxOpsObjectBytes(),
+        maxLineChars: getMaxOpsLineChars(),
+        maxLines: getMaxOpsObjectLines(),
+    });
+
+    return buffer;
 }
 
 function parseNdjsonOperations(args: {
@@ -384,7 +426,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         const lastOpId = maxOpId;
 
         return this.provider.uploadObject({
-            buffer: encodeUtf8(toNdjson(operations)),
+            buffer: serializeOperationsForUpload(operations),
             key: createOpsKey(deviceId, createdAt, firstOpId, lastOpId),
             overwrite: false,
         });
