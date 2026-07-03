@@ -4,6 +4,7 @@
 
 import type { MonitorFieldDefinition } from "@shared/types";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it, vi } from "vitest";
 import * as z from "zod";
 
@@ -105,6 +106,10 @@ describe("dynamic schema conversion", () => {
         ["invalid Date", new Date("invalid")],
         ["NaN number", Number.NaN],
         ["infinite number", Infinity],
+        ["fractional timestamp", 123.45],
+        ["negative timestamp", -1],
+        ["unsafe timestamp", Number.MAX_SAFE_INTEGER + 1],
+        ["timestamp outside Date range", MAX_VALID_DATE_EPOCH_MS + 1],
     ])(
         "discards invalid lastChecked values from %s when writing rows",
         async (_caseName, lastChecked) => {
@@ -149,10 +154,13 @@ describe("dynamic schema conversion", () => {
     });
 
     it.each([
+        ["fractional timestamp", 1.5],
         ["missing timestamp", undefined],
         ["NaN timestamp", Number.NaN],
+        ["negative timestamp", -1],
+        ["unsafe timestamp", Number.MAX_SAFE_INTEGER + 1],
         ["infinite timestamp", Infinity],
-        ["invalid date range", 8.64e15 + 1],
+        ["invalid date range", MAX_VALID_DATE_EPOCH_MS + 1],
     ])(
         "omits lastChecked for %s when reading rows",
         async (_caseName, lastChecked) => {
@@ -204,18 +212,31 @@ describe("dynamic schema conversion", () => {
     });
 
     it.each([
-        ["createdAt", "created_at"],
-        ["updatedAt", "updated_at"],
+        ["NaN timestamp", "createdAt", "created_at", Number.NaN],
+        ["fractional timestamp", "createdAt", "created_at", 1.5],
+        ["negative timestamp", "updatedAt", "updated_at", -1],
+        [
+            "unsafe timestamp",
+            "createdAt",
+            "created_at",
+            Number.MAX_SAFE_INTEGER + 1,
+        ],
+        [
+            "timestamp outside Date range",
+            "updatedAt",
+            "updated_at",
+            MAX_VALID_DATE_EPOCH_MS + 1,
+        ],
     ] as const)(
-        "defaults invalid required timestamp field %s when writing rows",
-        async (sourceField, rowField) => {
+        "defaults invalid required timestamp field %s from %s when writing rows",
+        async (_caseName, sourceField, rowField, timestamp) => {
             const { mapMonitorToRow } = await import(
                 "../../../../services/database/utils/schema/dynamicSchema"
             );
 
             const before = Date.now();
             const row = mapMonitorToRow({
-                [sourceField]: Number.NaN,
+                [sourceField]: timestamp,
                 type: "port",
             });
             const after = Date.now();

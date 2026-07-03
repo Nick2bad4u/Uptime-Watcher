@@ -15,10 +15,12 @@ import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     arrayJoin,
     isDefined,
     isPresent,
+    isSafeInteger,
     safeCastTo,
     setHas,
 } from "ts-extras";
@@ -58,6 +60,12 @@ const RESERVED_MONITOR_COLUMN_NAMES = new Set<string>([
     "type",
     "updated_at",
 ]);
+
+const isValidEpochMs = (value: unknown): value is number =>
+    typeof value === "number" &&
+    isSafeInteger(value) &&
+    value >= 0 &&
+    value <= MAX_VALID_DATE_EPOCH_MS;
 
 /**
  * Field mapping configuration for transforming monitor fields to database
@@ -136,11 +144,11 @@ export type MonitorRowSource = Monitor &
 function convertLastCheckedField(lastChecked: unknown): null | number {
     if (lastChecked instanceof Date) {
         const timestamp = lastChecked.getTime();
-        if (Number.isFinite(timestamp)) {
+        if (isValidEpochMs(timestamp)) {
             return timestamp;
         }
     }
-    if (typeof lastChecked === "number" && Number.isFinite(lastChecked)) {
+    if (isValidEpochMs(lastChecked)) {
         return lastChecked;
     }
     // Log warning when discarding invalid data to help debugging
@@ -153,12 +161,11 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
 }
 
 function getValidLastCheckedDate(timestamp: unknown): Date | undefined {
-    if (typeof timestamp !== "number" || !Number.isFinite(timestamp)) {
+    if (!isValidEpochMs(timestamp)) {
         return undefined;
     }
 
-    const date = new Date(timestamp);
-    return Number.isFinite(date.getTime()) ? date : undefined;
+    return new Date(timestamp);
 }
 
 function getFieldDefaultValue(mapping: FieldMapping): unknown {
@@ -171,13 +178,13 @@ function convertRequiredTimestampField(
     value: unknown,
     fieldName: string
 ): number {
-    if (typeof value === "number" && Number.isFinite(value)) {
+    if (isValidEpochMs(value)) {
         return value;
     }
 
     if (value instanceof Date) {
         const timestamp = value.getTime();
-        if (Number.isFinite(timestamp)) {
+        if (isValidEpochMs(timestamp)) {
             return timestamp;
         }
     }
