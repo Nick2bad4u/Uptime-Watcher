@@ -395,6 +395,23 @@ describe("ProviderCloudSyncTransport.readManifest decoding", () => {
 });
 
 describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
+    it("rejects snapshots containing invalid JSON as corrupt remote objects", async () => {
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from("{not-json", "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readSnapshot(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
+            )
+        ).rejects.toMatchObject({
+            kind: "snapshot",
+            name: "CloudSyncCorruptRemoteObjectError",
+        });
+    });
+
     it("rejects snapshots containing invalid UTF-8", async () => {
         const provider = createProvider({
             downloadObject: async () =>

@@ -632,7 +632,23 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 }
             })();
 
-            return parseCloudSyncSnapshot(JSON.parse(raw));
+            const parsedSnapshot = ((): unknown => {
+                try {
+                    return JSON.parse(raw);
+                } catch (error: unknown) {
+                    const resolved = ensureError(error);
+                    throw new CloudSyncCorruptRemoteObjectError(
+                        `Cloud sync snapshot '${key}' contains invalid JSON: ${resolved.message}`,
+                        {
+                            cause: error,
+                            key,
+                            kind: "snapshot",
+                        }
+                    );
+                }
+            })();
+
+            return parseCloudSyncSnapshot(parsedSnapshot);
         } catch (error) {
             if (
                 ensureError(error) instanceof CloudSyncCorruptRemoteObjectError
