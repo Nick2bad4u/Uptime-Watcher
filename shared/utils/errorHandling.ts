@@ -63,8 +63,13 @@ function formatUnknownErrorCause(cause: unknown): string {
         return normalizeErrorMessage(cause);
     }
 
-    if (typeof cause === "number" || typeof cause === "boolean") {
-        return cause.toString();
+    if (
+        typeof cause === "bigint" ||
+        typeof cause === "boolean" ||
+        typeof cause === "number" ||
+        typeof cause === "symbol"
+    ) {
+        return String(cause);
     }
 
     try {

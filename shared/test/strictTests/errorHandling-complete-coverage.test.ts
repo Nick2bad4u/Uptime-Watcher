@@ -91,6 +91,27 @@ describe(ApplicationError, () => {
         expect((nullCause.cause as Error).message).toBe("null");
         expect(undefinedCause.cause).toBeUndefined();
     });
+
+    it("preserves primitive bigint and symbol cause descriptions", () => {
+        const bigintCause = new ApplicationError({
+            cause: 123n,
+            code: "E_BIGINT",
+            message: "Bigint cause",
+        });
+
+        const symbolCause = new ApplicationError({
+            cause: Symbol.for("shared-cause"),
+            code: "E_SYMBOL",
+            message: "Symbol cause",
+        });
+
+        expect(bigintCause.cause).toBeInstanceOf(Error);
+        expect((bigintCause.cause as Error).message).toBe("123");
+        expect(symbolCause.cause).toBeInstanceOf(Error);
+        expect((symbolCause.cause as Error).message).toBe(
+            "Symbol(shared-cause)"
+        );
+    });
 });
 
 describe(convertError, () => {
