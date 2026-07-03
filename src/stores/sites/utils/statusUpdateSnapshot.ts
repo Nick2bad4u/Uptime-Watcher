@@ -1,6 +1,7 @@
 import type { Monitor, MonitorStatus, Site } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../services/logger";
@@ -8,6 +9,17 @@ import {
     mergeMonitorStatusChange,
     type MonitorStatusChangedEvent,
 } from "./statusUpdateMerge";
+
+function normalizeStatusUpdateSnapshotTimestamp(value: Date | string): string {
+    if (value instanceof Date) {
+        return isFiniteNumber(value.getTime())
+            ? value.toISOString()
+            : new Date().toISOString();
+    }
+
+    const result = safeParseIsoTimestamp(value);
+    return result.success ? result.data : new Date().toISOString();
+}
 
 /**
  * Status update payload used by the renderer to apply an optimistic snapshot
@@ -71,10 +83,7 @@ export const applyStatusUpdateSnapshot = (
         timestamp: rawTimestamp,
     } = statusUpdate;
 
-    const parsedTimestamp = Date.parse(String(rawTimestamp));
-    const timestamp = isFiniteNumber(parsedTimestamp)
-        ? new Date(parsedTimestamp).toISOString()
-        : new Date().toISOString();
+    const timestamp = normalizeStatusUpdateSnapshotTimestamp(rawTimestamp);
 
     const resolvedPreviousStatus = previousStatus ?? status;
     const resolvedResponseTime = responseTime ?? monitor?.responseTime ?? 0;
