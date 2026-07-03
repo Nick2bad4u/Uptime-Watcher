@@ -74,6 +74,33 @@ describe(downloadBackupWithMetadata, () => {
 });
 
 describe(uploadBackupWithMetadata, () => {
+    it("rejects invalid metadata before uploading backup bytes", async () => {
+        const uploadObject = vi.fn<
+            (args: { buffer: Buffer; key: string }) => Promise<void>
+        >();
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("backup", "utf8"),
+                encrypted: false,
+                fileName: "backup.sqlite",
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 6,
+                },
+                uploadObject,
+            })
+        ).rejects.toThrow(/expected format/iv);
+
+        expect(uploadObject).not.toHaveBeenCalled();
+    });
+
     it("attempts to delete the backup when metadata upload fails", async () => {
         const uploadObject = vi
             .fn<(args: { buffer: Buffer; key: string }) => Promise<void>>()

@@ -5,6 +5,7 @@ import { stringSplit } from "ts-extras";
 
 import {
     backupMetadataKeyForBackupKey,
+    parseCloudBackupMetadataFile,
     parseCloudBackupMetadataFileBuffer,
     serializeCloudBackupMetadataFile,
 } from "./CloudBackupMetadataFile";
@@ -112,12 +113,12 @@ export async function uploadBackupWithMetadata(args: {
 }): Promise<CloudBackupEntry> {
     const backupKey = `${args.backupsPrefix}${args.fileName}`;
 
-    const entry: CloudBackupEntry = {
+    const entry = parseCloudBackupMetadataFile({
         encrypted: args.encrypted,
         fileName: args.fileName,
         key: backupKey,
         metadata: args.metadata,
-    };
+    });
 
     await args.uploadObject({
         buffer: args.buffer,
