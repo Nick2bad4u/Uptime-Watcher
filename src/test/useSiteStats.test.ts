@@ -395,6 +395,43 @@ describe(useSiteStats, () => {
 
             expect(result.current.averageResponseTime).toBe(250); // (200+300)/2 = 250
         });
+
+        it("should ignore non-finite response times", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStats", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const history: StatusHistory[] = [
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: 1_640_995_200_000,
+                },
+                {
+                    responseTime: Infinity,
+                    status: "up",
+                    timestamp: 1_640_991_600_000,
+                },
+                {
+                    responseTime: NaN,
+                    status: "up",
+                    timestamp: 1_640_988_000_000,
+                },
+                {
+                    responseTime: 300,
+                    status: "up",
+                    timestamp: 1_640_984_400_000,
+                },
+            ];
+
+            const { result } = renderHook(() => useSiteStats(history));
+
+            expect(result.current.averageResponseTime).toBe(250);
+        });
     });
 
     describe("Check Count", () => {

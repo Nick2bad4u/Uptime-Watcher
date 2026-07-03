@@ -8,7 +8,7 @@
 import type { StatusHistory } from "@shared/types";
 
 import { useMemo } from "react";
-import { isEmpty } from "ts-extras";
+import { isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Interface for site statistics data
@@ -98,6 +98,7 @@ export function useSiteStats(history: StatusHistory[]): SiteStats {
             (record) =>
                 record.status === "up" &&
                 typeof record.responseTime === "number" &&
+                isFiniteNumber(record.responseTime) &&
                 record.responseTime > 0
         );
         const averageResponseTime =
