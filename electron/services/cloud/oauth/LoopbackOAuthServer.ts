@@ -2,6 +2,7 @@ import type { IncomingMessage, Server, ServerResponse } from "node:http";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
@@ -40,24 +41,6 @@ function escapeHtml(value: string): string {
         .replaceAll("'", "&#39;");
 }
 
-function removeAsciiControlCharacters(value: string): string {
-    let sanitized = "";
-    for (const character of value) {
-        const codePoint = character.codePointAt(0);
-        if (
-            codePoint !== undefined &&
-            (codePoint < 0x20 || codePoint === 0x7f)
-        ) {
-            sanitized += " ";
-            continue;
-        }
-
-        sanitized += character;
-    }
-
-    return sanitized;
-}
-
 function normalizeCallbackErrorDetail(args: {
     readonly error: null | string;
     readonly errorDescription: null | string;
@@ -67,19 +50,15 @@ function normalizeCallbackErrorDetail(args: {
         return null;
     }
 
-    const sanitized = removeAsciiControlCharacters(rawDetail)
-        .replaceAll(/\s+/gu, " ")
-        .trim();
-    const normalized =
-        sanitized.length > 0
-            ? sanitized
-            : (args.error ?? "provider_error").trim();
-
-    if (normalized.length <= MAX_CALLBACK_ERROR_DETAIL_CHARS) {
-        return normalized;
-    }
-
-    return `${normalized.slice(0, MAX_CALLBACK_ERROR_DETAIL_CHARS)}...`;
+    return (
+        normalizeUserFacingErrorDetail(rawDetail, {
+            maxLength: MAX_CALLBACK_ERROR_DETAIL_CHARS,
+        }) ??
+        normalizeUserFacingErrorDetail(args.error ?? "provider_error", {
+            maxLength: MAX_CALLBACK_ERROR_DETAIL_CHARS,
+        }) ??
+        "provider_error"
+    );
 }
 
 function assertSafeRedirectHost(redirectHost: string): void {

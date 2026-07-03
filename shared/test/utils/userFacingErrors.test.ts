@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { getUserFacingErrorDetail } from "../../utils/userFacingErrors";
+import {
+    getUserFacingErrorDetail,
+    normalizeUserFacingErrorDetail,
+} from "../../utils/userFacingErrors";
 
 describe(getUserFacingErrorDetail, () => {
     it("redacts secret query params in Error messages", () => {
@@ -30,5 +33,28 @@ describe(getUserFacingErrorDetail, () => {
 
         expect(detail).not.toContain("token=abc");
         expect(detail).toContain("token=[redacted]");
+    });
+
+    it("compacts control characters and whitespace", () => {
+        const detail = getUserFacingErrorDetail(
+            new Error("Request failed\n\twith\r\nextra spacing")
+        );
+
+        expect(detail).toBe("Request failed with extra spacing");
+    });
+
+    it("bounds long details", () => {
+        const detail = normalizeUserFacingErrorDetail(
+            `denied ${"x".repeat(100)}`,
+            {
+                maxLength: 20,
+            }
+        );
+
+        expect(detail).toBe(`denied ${"x".repeat(13)}...`);
+    });
+
+    it("falls back for blank string details after normalization", () => {
+        expect(getUserFacingErrorDetail("\n\t")).toBe("Unknown error");
     });
 });

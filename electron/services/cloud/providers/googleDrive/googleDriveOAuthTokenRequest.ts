@@ -1,6 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
-import { normalizeLogValue } from "@shared/utils/loggingContext";
+import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 
 import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
@@ -15,46 +15,22 @@ const GOOGLE_OAUTH_TOKEN_ENDPOINT =
 
 const MAX_FALLBACK_BODY_CHARS = 500;
 const MAX_SAFE_DETAIL_CHARS = 500;
-const MIN_PRINTABLE_ASCII_CODE_POINT = 0x20;
-const DELETE_CONTROL_CODE_POINT = 0x7f;
-
-const isAsciiControlCharacter = (value: string): boolean => {
-    const codePoint = value.codePointAt(0);
-    return (
-        codePoint !== undefined &&
-        (codePoint < MIN_PRINTABLE_ASCII_CODE_POINT ||
-            codePoint === DELETE_CONTROL_CODE_POINT)
-    );
-};
-
-const normalizeDetailWhitespace = (value: string): string =>
-    Array.from(value, (character) =>
-        isAsciiControlCharacter(character) ? " " : character
-    )
-        .join("")
-        .replaceAll(/\s+/gu, " ")
-        .trim();
-
-const truncateDetailString = (value: string): string =>
-    value.length <= MAX_SAFE_DETAIL_CHARS
-        ? value
-        : `${value.slice(0, MAX_SAFE_DETAIL_CHARS)}...`;
 
 const toSafeDetailString = (value: unknown): string | undefined => {
-    const normalized = normalizeLogValue(value);
     const detail =
-        typeof normalized === "string"
-            ? normalized
-            : typeof normalized === "number" || typeof normalized === "boolean"
-              ? String(normalized)
+        typeof value === "string"
+            ? value
+            : typeof value === "number" || typeof value === "boolean"
+              ? String(value)
               : undefined;
 
     if (!detail) {
         return undefined;
     }
 
-    const compacted = normalizeDetailWhitespace(detail);
-    return compacted ? truncateDetailString(compacted) : undefined;
+    return normalizeUserFacingErrorDetail(detail, {
+        maxLength: MAX_SAFE_DETAIL_CHARS,
+    });
 };
 
 const toTruncatedBodyString = (value: unknown): string | undefined => {
