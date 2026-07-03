@@ -351,8 +351,9 @@ export class SnapshotSyncCoordinator {
                     return { site: site.identifier, success: true } as const;
                 } catch (error) {
                     logger.error(
-                        `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
-                        error
+                        "[UptimeOrchestrator] Failed to setup monitoring for site",
+                        error,
+                        { siteIdentifier: site.identifier }
                     );
                     return {
                         error,
@@ -377,7 +378,13 @@ export class SnapshotSyncCoordinator {
 
             if (criticalFailures > 0) {
                 const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
-                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
+                logger.error(
+                    "[UptimeOrchestrator] Critical monitoring setup failures",
+                    {
+                        criticalFailures,
+                        siteCount: data.sites.length,
+                    }
+                );
                 // For critical operations, we might want to emit an error event
                 await this.emitTyped("system:error", {
                     context: "site-monitoring-setup",
@@ -389,12 +396,14 @@ export class SnapshotSyncCoordinator {
                 });
             } else {
                 logger.warn(
-                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
+                    "[UptimeOrchestrator] Site monitoring setup completed",
+                    { failed, successful }
                 );
             }
         } else {
             logger.info(
-                `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
+                "[UptimeOrchestrator] Successfully set up monitoring for loaded sites",
+                { successful }
             );
         }
     }
