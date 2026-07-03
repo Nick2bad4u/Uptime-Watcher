@@ -210,7 +210,13 @@ export class DataBackupService {
                     if (tempDestination) {
                         await fs
                             .rm(tempDestination, { force: true })
-                            .catch(() => {});
+                            .catch((cleanupError: unknown) => {
+                                this.logger.warn(
+                                    "[DataBackupService] Failed to remove temporary backup destination",
+                                    ensureError(cleanupError),
+                                    { tempDestination }
+                                );
+                            });
                     }
                 }
             }

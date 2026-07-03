@@ -809,6 +809,40 @@ describe(DataBackupService, () => {
             );
         });
 
+        it("logs temporary destination cleanup failures without replacing the save error", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            const nonFileStat = {
+                isFile: () => false,
+                isSymbolicLink: () => false,
+            };
+            const cleanupError = new Error("temp cleanup failed");
+
+            mockFsPromises.lstat
+                .mockRejectedValueOnce(
+                    Object.assign(new Error("ENOENT"), { code: "ENOENT" })
+                )
+                .mockResolvedValueOnce(nonFileStat);
+            mockFsPromises.rm
+                .mockResolvedValueOnce(undefined)
+                .mockRejectedValueOnce(cleanupError);
+
+            await expect(
+                dataBackupService.saveDatabaseBackupToPath(targetPath)
+            ).rejects.toThrow(
+                "Refusing to overwrite a non-file path when saving backup"
+            );
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataBackupService] Failed to remove temporary backup destination",
+                cleanupError,
+                expect.objectContaining({
+                    tempDestination: expect.stringContaining(
+                        `${path.basename(targetPath)}.tmp-`
+                    ),
+                })
+            );
+        });
+
         it("surfaces rollback failures when replacing an existing backup fails", async () => {
             const targetPath = path.resolve("backup-target.sqlite");
             const fileStat = {
