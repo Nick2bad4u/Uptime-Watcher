@@ -67,10 +67,6 @@ const mockSiteRepository = {
 } as unknown as SiteRepository;
 
 // Mock external modules
-vi.mock("../../services/database/databaseInitializer", () => ({
-    initDatabase: vi.fn(() => Promise.resolve()),
-}));
-
 vi.mock("../../services/database/DataBackupService", () => ({
     DataBackupService: vi.fn(),
 }));

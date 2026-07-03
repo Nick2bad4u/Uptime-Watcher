@@ -70,12 +70,6 @@ const arbitrarySettings = fc.record({
 
 describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
     describe("Database Module Imports", () => {
-        it("should import database initializer", async () => {
-            const { initDatabase } =
-                await import("../../../electron/services/database/databaseInitializer");
-            expect(typeof initDatabase).toBe("function");
-        });
-
         it("should import repository classes", async () => {
             const { SiteRepository } =
                 await import("../../../electron/services/database/SiteRepository");
