@@ -1,5 +1,8 @@
 import { ensureError } from "@shared/utils/errorHandling";
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import {
+    getUserFacingErrorDetail,
+    normalizeUserFacingErrorDetail,
+} from "@shared/utils/userFacingErrors";
 import { isDefined } from "ts-extras";
 
 import { AppNotificationService } from "../../../services/AppNotificationService";
@@ -8,6 +11,9 @@ import { useAlertStore } from "../../alerts/useAlertStore";
 import { useSettingsStore } from "../../settings/useSettingsStore";
 
 const CLOUD_OPERATION_STARTED_TOAST_TTL_MS = 15_000;
+const MAX_APP_NOTIFICATION_BODY_CHARS = 500;
+const MAX_APP_NOTIFICATION_BODY_DETAIL_CHARS =
+    MAX_APP_NOTIFICATION_BODY_CHARS - "...".length;
 
 /**
  * Returns the user-facing error detail string used by CloudStore notifications.
@@ -74,9 +80,15 @@ export async function dispatchSystemNotificationIfEnabled(request: {
         return;
     }
 
+    const body = isDefined(request.body)
+        ? normalizeUserFacingErrorDetail(request.body, {
+              maxLength: MAX_APP_NOTIFICATION_BODY_DETAIL_CHARS,
+          })
+        : undefined;
+
     try {
         await AppNotificationService.notifyAppEvent({
-            ...(isDefined(request.body) && { body: request.body }),
+            ...(isDefined(body) && { body }),
             title: request.title,
         });
     } catch (error: unknown) {
