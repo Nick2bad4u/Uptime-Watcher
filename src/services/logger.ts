@@ -326,14 +326,16 @@ const loggerInstance: LoggerInterface = {
     // Log system/electron events
     system: {
         notification: (title: string, body: string): void => {
-            baseLoggerMethods.debug(`Notification sent: ${title} - ${body}`);
+            baseLoggerMethods.debug("Notification sent", { body, title });
         },
         tray: (action: string): void => {
-            baseLoggerMethods.debug(`Tray action: ${action}`);
+            baseLoggerMethods.debug("Tray action", { action });
         },
         window: (action: string, windowName?: string): void => {
-            const nameInfo = windowName ? ` (${windowName})` : "";
-            baseLoggerMethods.debug(`Window ${action}${nameInfo}`);
+            baseLoggerMethods.debug("Window action", {
+                action,
+                ...(windowName && { windowName }),
+            });
         },
     },
 

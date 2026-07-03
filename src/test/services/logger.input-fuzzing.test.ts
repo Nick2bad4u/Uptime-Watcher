@@ -527,7 +527,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockDebug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Notification sent: ${title} - ${body}`
+                    "[UPTIME-WATCHER] Notification sent",
+                    { body, title }
                 );
             }
         );
@@ -540,7 +541,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockDebug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Tray action: ${action}`
+                    "[UPTIME-WATCHER] Tray action",
+                    { action }
                 );
             }
         );
@@ -553,9 +555,13 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             logger.system.window(action, windowName ?? undefined);
 
             // Assert
-            const nameInfo = windowName ? ` (${windowName})` : "";
+            const details = {
+                action,
+                ...(windowName && { windowName }),
+            };
             expect(mockDebug).toHaveBeenCalledWith(
-                `[UPTIME-WATCHER] Window ${action}${nameInfo}`
+                "[UPTIME-WATCHER] Window action",
+                details
             );
         });
     });

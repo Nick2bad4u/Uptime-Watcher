@@ -355,7 +355,34 @@ describe("Frontend Logger Service", () => {
 
             logger.system.notification("Site Down", "example.com is down");
             expect(mockLog.debug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Notification sent: Site Down - example.com is down"
+                "[UPTIME-WATCHER] Notification sent",
+                { body: "example.com is down", title: "Site Down" }
+            );
+        });
+
+        it("should redact notification metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            logger.system.notification(
+                "Sync failed",
+                "https://example.com/callback?refresh_token=notification-secret"
+            );
+
+            expect(mockLog.debug).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Notification sent",
+                {
+                    body: "https://example.com/callback?refresh_token=[redacted]",
+                    title: "Sync failed",
+                }
+            );
+            expect(String(mockLog.debug.mock.calls)).not.toContain(
+                "notification-secret"
             );
         });
 
@@ -367,7 +394,8 @@ describe("Frontend Logger Service", () => {
 
             logger.system.tray("show");
             expect(mockLog.debug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Tray action: show"
+                "[UPTIME-WATCHER] Tray action",
+                { action: "show" }
             );
         });
 
@@ -382,7 +410,8 @@ describe("Frontend Logger Service", () => {
 
             logger.system.window("opened", "main");
             expect(mockLog.debug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Window opened (main)"
+                "[UPTIME-WATCHER] Window action",
+                { action: "opened", windowName: "main" }
             );
         });
 
@@ -397,7 +426,8 @@ describe("Frontend Logger Service", () => {
 
             logger.system.window("closed");
             expect(mockLog.debug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Window closed"
+                "[UPTIME-WATCHER] Window action",
+                { action: "closed" }
             );
         });
     });

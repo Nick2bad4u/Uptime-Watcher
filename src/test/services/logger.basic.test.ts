@@ -514,7 +514,8 @@ describe("Logger Service - Basic Coverage", () => {
             );
 
             expect(mockDebug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Notification sent: Site Down - example.com is unreachable"
+                "[UPTIME-WATCHER] Notification sent",
+                { body: "example.com is unreachable", title: "Site Down" }
             );
         });
 
@@ -527,7 +528,8 @@ describe("Logger Service - Basic Coverage", () => {
             logger.system.tray("show");
 
             expect(mockDebug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Tray action: show"
+                "[UPTIME-WATCHER] Tray action",
+                { action: "show" }
             );
         });
 
@@ -543,7 +545,8 @@ describe("Logger Service - Basic Coverage", () => {
             logger.system.window("minimize");
 
             expect(mockDebug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Window minimize"
+                "[UPTIME-WATCHER] Window action",
+                { action: "minimize" }
             );
         });
 
@@ -559,7 +562,8 @@ describe("Logger Service - Basic Coverage", () => {
             logger.system.window("close", "main");
 
             expect(mockDebug).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Window close (main)"
+                "[UPTIME-WATCHER] Window action",
+                { action: "close", windowName: "main" }
             );
         });
     });
