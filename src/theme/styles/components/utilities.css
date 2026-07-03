@@ -371,23 +371,6 @@
 }
 
 @media (prefers-color-scheme: dark) {
-    .themed-tooltip::before {
-        background: color-mix(
-            in srgb,
-            var(--shadow-inverse-color) 90%,
-            transparent
-        );
-        color: var(--color-black);
-    }
-
-    .themed-tooltip::after {
-        border-block-start-color: color-mix(
-            in srgb,
-            var(--shadow-inverse-color) 90%,
-            transparent
-        );
-    }
-
     .themed-checkbox {
         border-color: var(--color-border-secondary);
         background: var(--color-surface-elevated);
