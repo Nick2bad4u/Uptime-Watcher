@@ -49,6 +49,12 @@ describe("CloudBackupMetadataFile buffer parsing", () => {
         ).toThrow();
     });
 
+    it("throws a contextual error when strict metadata parsing receives invalid JSON", () => {
+        expect(() =>
+            parseCloudBackupMetadataFileBuffer(Buffer.from("{not-json", "utf8"))
+        ).toThrow(/Backup metadata file contained invalid JSON/u);
+    });
+
     it("returns null when best-effort metadata parsing receives invalid UTF-8", () => {
         expect(
             tryParseCloudBackupMetadataFileBuffer(
@@ -57,6 +63,14 @@ describe("CloudBackupMetadataFile buffer parsing", () => {
                     0xfe,
                     0xfd,
                 ])
+            )
+        ).toBeNull();
+    });
+
+    it("returns null when best-effort metadata parsing receives invalid JSON", () => {
+        expect(
+            tryParseCloudBackupMetadataFileBuffer(
+                Buffer.from("{not-json", "utf8")
             )
         ).toBeNull();
     });
