@@ -394,7 +394,10 @@ describe("Frontend Logger Service", () => {
 
             logger.user.settingsChange("theme", "dark", "light");
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Settings change: theme - dark -> light"
+                "[UPTIME-WATCHER] Settings change: theme",
+                {
+                    theme: { newValue: "light", oldValue: "dark" },
+                }
             );
         });
 
@@ -411,7 +414,39 @@ describe("Frontend Logger Service", () => {
             const newValue = { interval: 600, timeout: 15 };
             logger.user.settingsChange("monitoring", oldValue, newValue);
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Settings change: monitoring - [object Object] -> [object Object]"
+                "[UPTIME-WATCHER] Settings change: monitoring",
+                {
+                    monitoring: { newValue, oldValue },
+                }
+            );
+        });
+
+        it("should redact sensitive settings changes", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            logger.user.settingsChange(
+                "password",
+                "old-password-secret",
+                "new-password-secret"
+            );
+
+            expect(mockLog.info).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Settings change: password",
+                {
+                    password: "[redacted]",
+                }
+            );
+            expect(String(mockLog.info.mock.calls)).not.toContain(
+                "old-password-secret"
+            );
+            expect(String(mockLog.info.mock.calls)).not.toContain(
+                "new-password-secret"
             );
         });
     });

@@ -591,7 +591,10 @@ describe("Logger Service - Basic Coverage", () => {
             logger.user.settingsChange("theme", "light", "dark");
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Settings change: theme - light -> dark"
+                "[UPTIME-WATCHER] Settings change: theme",
+                {
+                    theme: { newValue: "dark", oldValue: "light" },
+                }
             );
         });
 
@@ -610,7 +613,10 @@ describe("Logger Service - Basic Coverage", () => {
             logger.user.settingsChange("monitor-config", oldValue, newValue);
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Settings change: monitor-config - [object Object] -> [object Object]"
+                "[UPTIME-WATCHER] Settings change: monitor-config",
+                {
+                    "monitor-config": { newValue, oldValue },
+                }
             );
         });
     });

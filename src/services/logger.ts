@@ -349,9 +349,15 @@ const loggerInstance: LoggerInterface = {
             oldValue: unknown,
             newValue: unknown
         ): void => {
-            baseLoggerMethods.info(
-                `Settings change: ${setting} - ${String(oldValue)} -> ${String(newValue)}`
-            );
+            const details: Record<string, unknown> = {};
+            Object.defineProperty(details, setting, {
+                configurable: true,
+                enumerable: true,
+                value: { newValue, oldValue },
+                writable: true,
+            });
+
+            baseLoggerMethods.info(`Settings change: ${setting}`, details);
         },
     },
 

@@ -589,9 +589,18 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
                 // Act
                 logger.user.settingsChange(setting, oldValue, newValue);
 
+                const expectedDetails: Record<string, unknown> = {};
+                Object.defineProperty(expectedDetails, setting, {
+                    configurable: true,
+                    enumerable: true,
+                    value: { newValue, oldValue },
+                    writable: true,
+                });
+
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Settings change: ${setting} - ${oldValue} -> ${newValue}`
+                    `[UPTIME-WATCHER] Settings change: ${setting}`,
+                    expectedDetails
                 );
             }
         );
