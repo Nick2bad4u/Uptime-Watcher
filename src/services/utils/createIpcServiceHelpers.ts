@@ -15,8 +15,9 @@
 import type { Except } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import log from "electron-log/renderer";
-import { isDefined, objectHasIn } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import * as loggerModule from "../logger";
 import {
@@ -46,7 +47,8 @@ const isLoggerLike = (candidate: unknown): candidate is LoggerLike => {
         return false;
     }
 
-    return typeof Reflect.get(candidate, "error") === "function";
+    const error = getOwnDataProperty(candidate, "error");
+    return error.found && typeof error.value === "function";
 };
 
 /**
@@ -62,15 +64,8 @@ const safeGetModuleExport = (
         return undefined;
     }
 
-    try {
-        if (objectHasIn(module, property)) {
-            return Reflect.get(module, property);
-        }
-    } catch {
-        return undefined;
-    }
-
-    return undefined;
+    const moduleExport = getOwnDataProperty(module, property);
+    return moduleExport.found ? moduleExport.value : undefined;
 };
 
 /**

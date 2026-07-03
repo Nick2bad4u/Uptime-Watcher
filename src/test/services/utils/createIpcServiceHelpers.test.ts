@@ -221,11 +221,14 @@ describe("createIpcServiceHelpers", () => {
     });
 
     it("falls back to an electron-log structured logger when no shared logger is available", async () => {
+        let accessCount = 0;
         const loggerModule = {
             get Logger(): never {
+                accessCount += 1;
                 throw new Error("Logger getter should not be invoked");
             },
             get logger(): never {
+                accessCount += 1;
                 throw new Error("logger getter should not be invoked");
             },
         } satisfies UnknownRecord;
@@ -255,5 +258,6 @@ describe("createIpcServiceHelpers", () => {
             failure
         );
         expect(electronLog.debug).not.toHaveBeenCalled();
+        expect(accessCount).toBe(0);
     });
 });
