@@ -3,6 +3,7 @@
  */
 
 import { setTimeout as delay } from "node:timers/promises";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Sleeps for the given duration.
@@ -15,6 +16,10 @@ export async function sleepMs(
     durationMs: number,
     signal?: AbortSignal
 ): Promise<void> {
+    if (!isFiniteNumber(durationMs)) {
+        return;
+    }
+
     const ms = Math.max(0, Math.trunc(durationMs));
 
     if (ms === 0) {
