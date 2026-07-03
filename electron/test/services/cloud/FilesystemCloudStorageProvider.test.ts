@@ -199,4 +199,55 @@ describe("FilesystemCloudStorageProvider", () => {
             expect(typed.target).toBe("sync/existing.txt");
         }
     });
+
+    it("refuses to use the app root after it is replaced with a symlink", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+        await provider.uploadObject({
+            buffer: Buffer.from("initial"),
+            key: "sync/initial.txt",
+            overwrite: true,
+        });
+
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const outsideDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-outside-")
+        );
+
+        await fs.rm(appRoot, { force: true, recursive: true });
+
+        const symlinkType = process.platform === "win32" ? "junction" : "dir";
+        try {
+            await fs.symlink(outsideDirectory, appRoot, symlinkType);
+        } catch (error: unknown) {
+            const code =
+                typeof error === "object" && error !== null && "code" in error
+                    ? String(error.code)
+                    : "";
+
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+
+            if (code === "EPERM" || code === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        try {
+            await expect(
+                provider.uploadObject({
+                    buffer: Buffer.from("escape"),
+                    key: "sync/escape.txt",
+                    overwrite: true,
+                })
+            ).rejects.toThrow(CloudProviderOperationError);
+
+            await expect(
+                fs.access(path.join(outsideDirectory, "sync", "escape.txt"))
+            ).rejects.toThrow();
+        } finally {
+            await fs.rm(appRoot, { force: true, recursive: true });
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+        }
+    });
 });

@@ -116,13 +116,17 @@ export class FilesystemCloudStorageProvider
     }
 
     private async getAppRootRealPath(): Promise<string> {
-        if (this.appRootRealPath) {
-            return this.appRootRealPath;
+        await this.ensureAppRoot();
+        const currentRealPath = await fs.realpath(this.appRoot);
+
+        if (this.appRootRealPath && this.appRootRealPath !== currentRealPath) {
+            throw new Error(
+                "Filesystem cloud root changed while provider is active"
+            );
         }
 
-        await this.ensureAppRoot();
-        this.appRootRealPath = await fs.realpath(this.appRoot);
-        return this.appRootRealPath;
+        this.appRootRealPath = currentRealPath;
+        return currentRealPath;
     }
 
     private async assertNoSymlinkPathComponents(
@@ -319,11 +323,11 @@ export class FilesystemCloudStorageProvider
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
-        await this.ensureAppRoot();
         const normalizedKey =
             FilesystemCloudStorageProvider.normalizeObjectKey(key);
 
         try {
+            await this.ensureAppRoot();
             const absolute = await this.resolveKeyPath(normalizedKey);
             return await fs.readFile(absolute);
         } catch (error) {
@@ -347,13 +351,13 @@ export class FilesystemCloudStorageProvider
         key: string;
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
-        await this.ensureAppRoot();
         const key = FilesystemCloudStorageProvider.normalizeObjectKey(args.key);
         const isOverwrite = args.overwrite ?? false;
 
         let tempPath: null | string = null;
 
         try {
+            await this.ensureAppRoot();
             const targetPath = await this.resolveKeyPath(key);
             await this.ensureSafeDirectory(path.dirname(targetPath));
 
@@ -451,11 +455,11 @@ export class FilesystemCloudStorageProvider
     }
 
     public async deleteObject(key: string): Promise<void> {
-        await this.ensureAppRoot();
         const normalizedKey =
             FilesystemCloudStorageProvider.normalizeObjectKey(key);
 
         try {
+            await this.ensureAppRoot();
             const absolute = await this.resolveKeyPath(normalizedKey);
 
             const stat = await fs.lstat(absolute).catch(() => null);
@@ -494,6 +498,15 @@ export class FilesystemCloudStorageProvider
 
     private async ensureAppRoot(): Promise<void> {
         await fs.mkdir(this.appRoot, { recursive: true });
+        const stat = await fs.lstat(this.appRoot);
+
+        if (stat.isSymbolicLink()) {
+            throw new Error("Filesystem cloud root must not be a symlink");
+        }
+
+        if (!stat.isDirectory()) {
+            throw new Error("Filesystem cloud root must be a directory");
+        }
     }
 
     private async resolveKeyPath(key: string): Promise<string> {
