@@ -97,6 +97,10 @@ export function useSiteActions(
     site: Site,
     monitor: Monitor | undefined
 ): SiteActionsResult {
+    const monitorCount = Array.isArray(site.monitors)
+        ? site.monitors.length
+        : 0;
+
     const {
         checkSiteNow,
         setSelectedMonitorId,
@@ -205,7 +209,7 @@ export function useSiteActions(
         runLoggedSiteOperation({
             onSuccess: () => {
                 logger.user.action("Started site-wide monitoring", {
-                    monitorsCount: site.monitors.length,
+                    monitorsCount: monitorCount,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
                 });
@@ -215,8 +219,8 @@ export function useSiteActions(
         });
     }, [
         site.identifier,
-        site.monitors.length,
         site.name,
+        monitorCount,
         startSiteMonitoring,
     ]);
 
@@ -225,7 +229,7 @@ export function useSiteActions(
         runLoggedSiteOperation({
             onSuccess: () => {
                 logger.user.action("Stopped site-wide monitoring", {
-                    monitorsCount: site.monitors.length,
+                    monitorsCount: monitorCount,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
                 });
@@ -235,8 +239,8 @@ export function useSiteActions(
         });
     }, [
         site.identifier,
-        site.monitors.length,
         site.name,
+        monitorCount,
         stopSiteMonitoring,
     ]);
 

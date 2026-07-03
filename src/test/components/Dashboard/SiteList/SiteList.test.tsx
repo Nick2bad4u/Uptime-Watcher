@@ -21,6 +21,15 @@ import {
 import { createMockSite } from "../../../utils/mockFactories";
 
 // Mock the stores and theme
+const uiStoreState = vi.hoisted(() => ({
+    setSiteCardPresentation: vi.fn(),
+    setSiteListLayout: vi.fn(),
+    setSurfaceDensity: vi.fn(),
+    siteCardPresentation: "grid",
+    siteListLayout: "card-large",
+    surfaceDensity: "comfortable",
+}));
+
 // Standard creation bridged through global to avoid hoist-time import errors
 const sitesStoreState = createSitesStoreMock({
     sites: [],
@@ -38,8 +47,21 @@ vi.mock("../../../../stores/sites/useSitesStore", () => ({
         ),
 }));
 
+vi.mock("../../../../stores/ui/useUiStore", () => ({
+    useUIStore: (selector?: any) =>
+        typeof selector === "function" ? selector(uiStoreState) : uiStoreState,
+}));
+
 vi.mock("../../../../theme/useTheme", () => ({
     useTheme: vi.fn(),
+    useThemeClasses: vi.fn(() => ({
+        getBackgroundClass: vi.fn(() => ({ backgroundColor: "transparent" })),
+        getBorderClass: vi.fn(() => ({ borderColor: "transparent" })),
+        getColor: vi.fn(() => "#000000"),
+        getStatusClass: vi.fn(() => ({ color: "#000000" })),
+        getSurfaceClass: vi.fn(() => ({ backgroundColor: "transparent" })),
+        getTextClass: vi.fn(() => ({ color: "#000000" })),
+    })),
 }));
 
 // Mock the components
@@ -79,7 +101,15 @@ const setSitesSnapshot = (sites: Site[] | undefined): void => {
 const createMockTheme = (isDark = false) => ({
     isDark,
     availableThemes: safeCastTo<ThemeName[]>(["dark", "light"]),
-    currentTheme: { colors: {}, spacing: {} } as any,
+    currentTheme: {
+        borderRadius: { md: "8px" },
+        colors: {},
+        spacing: { md: "12px", sm: "8px", xs: "4px" },
+        typography: {
+            fontSize: { sm: "14px" },
+            fontWeight: { medium: 500 },
+        },
+    } as any,
     getColor: vi.fn(),
     getStatusColor: vi.fn(),
     setTheme: vi.fn(),
@@ -153,6 +183,9 @@ describe(SiteList, () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        uiStoreState.siteCardPresentation = "grid";
+        uiStoreState.siteListLayout = "card-large";
+        uiStoreState.surfaceDensity = "comfortable";
         useSitesStoreMock.mockClear();
         resetSitesStoreState();
     });

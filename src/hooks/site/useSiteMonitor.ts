@@ -80,9 +80,14 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
         [site, sites]
     );
 
+    const latestMonitors = useMemo(
+        () => (Array.isArray(latestSite.monitors) ? latestSite.monitors : []),
+        [latestSite.monitors]
+    );
+
     const monitorIds = useMemo(
-        () => latestSite.monitors.map((m) => m.id),
-        [latestSite]
+        () => latestMonitors.map((m) => m.id),
+        [latestMonitors]
     );
 
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
@@ -91,8 +96,8 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
         getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
 
     const monitor = useMemo(
-        () => latestSite.monitors.find((m) => m.id === selectedMonitorId),
-        [latestSite, selectedMonitorId]
+        () => latestMonitors.find((m) => m.id === selectedMonitorId),
+        [latestMonitors, selectedMonitorId]
     );
 
     const status = monitor?.status ?? DEFAULT_MONITOR_STATUS;

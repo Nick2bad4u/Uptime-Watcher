@@ -46,9 +46,14 @@ export function useDashboardSiteSummaryMeta(args: {
         [latestSiteName, siteIdentifier]
     );
 
-    const runtimeSummary = useMemo(
-        () => getMonitorRuntimeSummary(monitors),
+    const normalizedMonitors = useMemo(
+        () => (Array.isArray(monitors) ? monitors : []),
         [monitors]
+    );
+
+    const runtimeSummary = useMemo(
+        () => getMonitorRuntimeSummary(normalizedMonitors),
+        [normalizedMonitors]
     );
 
     return useMemo(
