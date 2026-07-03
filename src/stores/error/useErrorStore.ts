@@ -40,6 +40,13 @@ import type { ErrorStore } from "./types";
 
 import { logStoreAction } from "../utils";
 
+const normalizeStoredErrorMessage = (
+    error: string | undefined
+): string | undefined =>
+    error === undefined || error.trim().length === 0
+        ? error
+        : getUserFacingErrorDetail(error);
+
 /**
  * Zustand store for centralized error management across the app.
  *
@@ -90,7 +97,7 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
             const raw = get().storeErrors[store] as unknown;
 
             if (typeof raw === "string") {
-                return raw;
+                return normalizeStoredErrorMessage(raw);
             }
 
             if (isPresent(raw)) {
@@ -104,8 +111,9 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
         lastError: undefined,
         operationLoading: {},
         setError: (error: string | undefined): void => {
-            logStoreAction("ErrorStore", "setError", { error });
-            set({ lastError: error });
+            const lastError = normalizeStoredErrorMessage(error);
+            logStoreAction("ErrorStore", "setError", { error: lastError });
+            set({ lastError });
         },
         setLoading: (loading: boolean): void => {
             logStoreAction("ErrorStore", "setLoading", { loading });
@@ -124,11 +132,15 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
             }));
         },
         setStoreError: (store: string, error: string | undefined): void => {
-            logStoreAction("ErrorStore", "setStoreError", { error, store });
+            const storeError = normalizeStoredErrorMessage(error);
+            logStoreAction("ErrorStore", "setStoreError", {
+                error: storeError,
+                store,
+            });
             set((state) => ({
                 storeErrors: {
                     ...state.storeErrors,
-                    [store]: error,
+                    [store]: storeError,
                 },
             }));
         },

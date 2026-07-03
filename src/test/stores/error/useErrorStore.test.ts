@@ -127,6 +127,32 @@ describe(useErrorStore, () => {
 
             expect(result.current.lastError).toBe("");
         });
+
+        it("should sanitize global error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useErrorStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const { result } = renderHook(() => useErrorStore());
+
+            act(() => {
+                result.current.setError(
+                    `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+                );
+            });
+
+            const message = result.current.lastError ?? "";
+            expect(message).not.toContain("SUPER_SECRET_TOKEN");
+            expect(message).not.toContain("\n");
+            expect(message).not.toContain("\t");
+            expect(message).toContain("refresh_token=[redacted]&status=failed");
+            expect(message.endsWith("...")).toBeTruthy();
+            expect(message.length).toBeLessThanOrEqual(1003);
+        });
     });
 
     describe("Store-Specific Error Management", () => {
@@ -161,6 +187,37 @@ describe(useErrorStore, () => {
 
             const sitesError = result.current.getStoreError("sites");
             expect(sitesError).toBe(errorMessage);
+        });
+
+        it("should sanitize store-specific errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useErrorStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const { result } = renderHook(() => useErrorStore());
+
+            act(() => {
+                result.current.setStoreError(
+                    "sites",
+                    `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+                );
+            });
+
+            const stored = result.current.storeErrors["sites"] ?? "";
+            const retrieved = result.current.getStoreError("sites") ?? "";
+            expect(stored).toBe(retrieved);
+            expect(retrieved).not.toContain("SUPER_SECRET_TOKEN");
+            expect(retrieved).not.toContain("\n");
+            expect(retrieved).not.toContain("\t");
+            expect(retrieved).toContain(
+                "refresh_token=[redacted]&status=failed"
+            );
+            expect(retrieved.endsWith("...")).toBeTruthy();
+            expect(retrieved.length).toBeLessThanOrEqual(1003);
         });
 
         it("should return undefined for non-existent store errors", async ({
