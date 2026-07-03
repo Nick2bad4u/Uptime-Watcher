@@ -40,39 +40,39 @@ export function createMonitorConfig(
     defaults: Partial<NormalizedMonitorConfig> = {}
 ): NormalizedMonitorConfig {
     const fallbackTimeoutCandidate =
-        resolveFiniteNumber(defaults.timeout) ?? DEFAULT_REQUEST_TIMEOUT;
+        resolveFiniteInteger(defaults.timeout) ?? DEFAULT_REQUEST_TIMEOUT;
     const fallbackTimeout =
         fallbackTimeoutCandidate > 0
-            ? Math.trunc(fallbackTimeoutCandidate)
+            ? fallbackTimeoutCandidate
             : DEFAULT_REQUEST_TIMEOUT;
 
-    const timeoutCandidate = resolveFiniteNumber(partial.timeout);
+    const timeoutCandidate = resolveFiniteInteger(partial.timeout);
     const timeout =
         isDefined(timeoutCandidate) && timeoutCandidate > 0
-            ? Math.trunc(timeoutCandidate)
+            ? timeoutCandidate
             : fallbackTimeout;
 
     const fallbackRetryCandidate =
-        resolveFiniteNumber(defaults.retryAttempts) ?? DEFAULT_RETRY_ATTEMPTS;
+        resolveFiniteInteger(defaults.retryAttempts) ?? DEFAULT_RETRY_ATTEMPTS;
     const fallbackRetryAttempts =
         fallbackRetryCandidate >= 0
-            ? Math.max(0, Math.trunc(fallbackRetryCandidate))
+            ? Math.max(0, fallbackRetryCandidate)
             : DEFAULT_RETRY_ATTEMPTS;
 
-    const retryCandidate = resolveFiniteNumber(partial.retryAttempts);
+    const retryCandidate = resolveFiniteInteger(partial.retryAttempts);
     const retryAttempts =
         isDefined(retryCandidate) && retryCandidate >= 0
-            ? Math.max(0, Math.trunc(retryCandidate))
+            ? Math.max(0, retryCandidate)
             : fallbackRetryAttempts;
 
     const fallbackIntervalCandidate =
-        resolveFiniteNumber(defaults.checkInterval) ?? DEFAULT_CHECK_INTERVAL;
+        resolveFiniteInteger(defaults.checkInterval) ?? DEFAULT_CHECK_INTERVAL;
     const normalizedFallbackInterval =
         fallbackIntervalCandidate > 0
-            ? Math.trunc(fallbackIntervalCandidate)
+            ? fallbackIntervalCandidate
             : DEFAULT_CHECK_INTERVAL;
 
-    const intervalCandidate = resolveFiniteNumber(partial.checkInterval);
+    const intervalCandidate = resolveFiniteInteger(partial.checkInterval);
     const intervalSource =
         isDefined(intervalCandidate) && intervalCandidate > 0
             ? intervalCandidate
@@ -80,15 +80,17 @@ export function createMonitorConfig(
 
     const checkInterval = Math.max(
         MIN_MONITOR_CHECK_INTERVAL_MS,
-        Math.trunc(intervalSource)
+        intervalSource
     );
 
     return { checkInterval, retryAttempts, timeout };
 }
 
-function resolveFiniteNumber(source: unknown): number | undefined {
+function resolveFiniteInteger(source: unknown): number | undefined {
     if (typeof source === "number") {
-        return isFiniteNumber(source) ? source : undefined;
+        return isFiniteNumber(source) && Number.isInteger(source)
+            ? source
+            : undefined;
     }
 
     if (typeof source === "string") {
@@ -98,7 +100,9 @@ function resolveFiniteNumber(source: unknown): number | undefined {
         }
 
         const parsed = Number(trimmed);
-        return isFiniteNumber(parsed) ? parsed : undefined;
+        return isFiniteNumber(parsed) && Number.isInteger(parsed)
+            ? parsed
+            : undefined;
     }
 
     return undefined;
