@@ -204,7 +204,8 @@ describe("Frontend Logger Service", () => {
 
             logger.site.added("example.com");
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site added: example.com"
+                "[UPTIME-WATCHER] Site added",
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -216,7 +217,8 @@ describe("Frontend Logger Service", () => {
 
             logger.site.removed("example.com");
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site removed: example.com"
+                "[UPTIME-WATCHER] Site removed",
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -231,7 +233,12 @@ describe("Frontend Logger Service", () => {
 
             logger.site.check("example.com", "up", 200);
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check: example.com - Status: up (200ms)"
+                "[UPTIME-WATCHER] Site check",
+                {
+                    responseTime: 200,
+                    siteIdentifier: "example.com",
+                    status: "up",
+                }
             );
         });
 
@@ -246,7 +253,11 @@ describe("Frontend Logger Service", () => {
 
             logger.site.check("example.com", "down");
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check: example.com - Status: down"
+                "[UPTIME-WATCHER] Site check",
+                {
+                    siteIdentifier: "example.com",
+                    status: "down",
+                }
             );
         });
 
@@ -258,7 +269,12 @@ describe("Frontend Logger Service", () => {
 
             logger.site.statusChange("example.com", "down", "up");
             expect(mockLog.info).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site status change: example.com - down -> up"
+                "[UPTIME-WATCHER] Site status change",
+                {
+                    newStatus: "up",
+                    oldStatus: "down",
+                    siteIdentifier: "example.com",
+                }
             );
         });
 
@@ -270,7 +286,9 @@ describe("Frontend Logger Service", () => {
 
             logger.site.error("example.com", "Connection timeout");
             expect(mockLog.error).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check error: example.com - Connection timeout"
+                "[UPTIME-WATCHER] Site check error",
+                "Connection timeout",
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -286,12 +304,44 @@ describe("Frontend Logger Service", () => {
             const error = new Error("Network error");
             logger.site.error("example.com", error);
             expect(mockLog.error).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check error: example.com",
+                "[UPTIME-WATCHER] Site check error",
                 {
                     message: error.message,
                     name: error.name,
                     stack: error.stack,
+                },
+                { siteIdentifier: "example.com" }
+            );
+        });
+
+        it("should redact URL-shaped site identifiers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: logger", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            logger.site.added(
+                "https://user-secret:password-secret@example.com/path?access_token=query-secret"
+            );
+
+            expect(mockLog.info).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Site added",
+                {
+                    siteIdentifier:
+                        "https://%5Bredacted%5D:%5Bredacted%5D@example.com/path?access_token=[redacted]",
                 }
+            );
+            expect(String(mockLog.info.mock.calls)).not.toContain(
+                "user-secret"
+            );
+            expect(String(mockLog.info.mock.calls)).not.toContain(
+                "password-secret"
+            );
+            expect(String(mockLog.info.mock.calls)).not.toContain(
+                "query-secret"
             );
         });
     });

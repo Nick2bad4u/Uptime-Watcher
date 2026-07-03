@@ -287,41 +287,39 @@ const loggerInstance: LoggerInterface = {
     // Log site monitoring events
     site: {
         added: (identifier: string): void => {
-            baseLoggerMethods.info(`Site added: ${identifier}`);
+            baseLoggerMethods.info("Site added", { siteIdentifier: identifier });
         },
         check: (
             identifier: string,
             status: string,
             responseTime?: number
         ): void => {
-            const timeInfo = responseTime ? ` (${responseTime}ms)` : "";
-            baseLoggerMethods.info(
-                `Site check: ${identifier} - Status: ${status}${timeInfo}`
-            );
+            baseLoggerMethods.info("Site check", {
+                ...(typeof responseTime === "number" && { responseTime }),
+                siteIdentifier: identifier,
+                status,
+            });
         },
         error: (identifier: string, error: Error | string): void => {
-            if (typeof error === "string") {
-                baseLoggerMethods.error(
-                    `Site check error: ${identifier} - ${error}`
-                );
-            } else {
-                baseLoggerMethods.error(
-                    `Site check error: ${identifier}`,
-                    error
-                );
-            }
+            baseLoggerMethods.error("Site check error", error, {
+                siteIdentifier: identifier,
+            });
         },
         removed: (identifier: string): void => {
-            baseLoggerMethods.info(`Site removed: ${identifier}`);
+            baseLoggerMethods.info("Site removed", {
+                siteIdentifier: identifier,
+            });
         },
         statusChange: (
             identifier: string,
             oldStatus: string,
             newStatus: string
         ): void => {
-            baseLoggerMethods.info(
-                `Site status change: ${identifier} - ${oldStatus} -> ${newStatus}`
-            );
+            baseLoggerMethods.info("Site status change", {
+                newStatus,
+                oldStatus,
+                siteIdentifier: identifier,
+            });
         },
     },
 

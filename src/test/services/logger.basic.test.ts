@@ -383,7 +383,8 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.added("example.com");
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site added: example.com"
+                "[UPTIME-WATCHER] Site added",
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -396,7 +397,8 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.removed("example.com");
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site removed: example.com"
+                "[UPTIME-WATCHER] Site removed",
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -412,7 +414,12 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.check("example.com", "up", 250);
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check: example.com - Status: up (250ms)"
+                "[UPTIME-WATCHER] Site check",
+                {
+                    responseTime: 250,
+                    siteIdentifier: "example.com",
+                    status: "up",
+                }
             );
         });
 
@@ -428,7 +435,11 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.check("example.com", "down");
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check: example.com - Status: down"
+                "[UPTIME-WATCHER] Site check",
+                {
+                    siteIdentifier: "example.com",
+                    status: "down",
+                }
             );
         });
 
@@ -441,7 +452,9 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.error("example.com", "Connection timeout");
 
             expect(mockError).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check error: example.com - Connection timeout"
+                "[UPTIME-WATCHER] Site check error",
+                "Connection timeout",
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -459,12 +472,13 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.error("example.com", testError);
 
             expect(mockError).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site check error: example.com",
+                "[UPTIME-WATCHER] Site check error",
                 {
                     message: "Network error",
                     name: "Error",
                     stack: testError.stack,
-                }
+                },
+                { siteIdentifier: "example.com" }
             );
         });
 
@@ -477,7 +491,12 @@ describe("Logger Service - Basic Coverage", () => {
             logger.site.statusChange("example.com", "up", "down");
 
             expect(mockInfo).toHaveBeenCalledWith(
-                "[UPTIME-WATCHER] Site status change: example.com - up -> down"
+                "[UPTIME-WATCHER] Site status change",
+                {
+                    newStatus: "down",
+                    oldStatus: "up",
+                    siteIdentifier: "example.com",
+                }
             );
         });
     });

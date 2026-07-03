@@ -449,7 +449,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site added: ${siteIdentifier}`
+                    "[UPTIME-WATCHER] Site added",
+                    { siteIdentifier }
                 );
             }
         );
@@ -462,7 +463,8 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site removed: ${siteIdentifier}`
+                    "[UPTIME-WATCHER] Site removed",
+                    { siteIdentifier }
                 );
             }
         );
@@ -490,7 +492,12 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site status change: ${siteIdentifier} - ${oldStatus} -> ${newStatus}`
+                    "[UPTIME-WATCHER] Site status change",
+                    {
+                        newStatus,
+                        oldStatus,
+                        siteIdentifier,
+                    }
                 );
             }
         );
