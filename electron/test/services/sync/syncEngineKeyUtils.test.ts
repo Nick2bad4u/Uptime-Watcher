@@ -2,6 +2,7 @@ import {
     parseOpsObjectFileNameMetadata,
     parseOpsObjectKeyMetadata,
 } from "@electron/services/sync/syncEngineKeyUtils";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 describe("syncEngineKeyUtils", () => {
@@ -16,6 +17,26 @@ describe("syncEngineKeyUtils", () => {
 
         it("rejects exponent notation", () => {
             expect(parseOpsObjectFileNameMetadata("1e3-0-9.ndjson")).toBeNull();
+        });
+
+        it("accepts the maximum JavaScript Date epoch timestamp", () => {
+            expect(
+                parseOpsObjectFileNameMetadata(
+                    `${MAX_VALID_DATE_EPOCH_MS}-0-9.ndjson`
+                )
+            ).toEqual({
+                createdAt: MAX_VALID_DATE_EPOCH_MS,
+                firstOpId: 0,
+                lastOpId: 9,
+            });
+        });
+
+        it("rejects timestamps outside the JavaScript Date range", () => {
+            expect(
+                parseOpsObjectFileNameMetadata(
+                    `${MAX_VALID_DATE_EPOCH_MS + 1}-0-9.ndjson`
+                )
+            ).toBeNull();
         });
 
         it("rejects lastOpId < firstOpId", () => {
@@ -47,6 +68,14 @@ describe("syncEngineKeyUtils", () => {
         it("rejects non-digit numeric segments (e.g. exponent notation)", () => {
             expect(
                 parseOpsObjectKeyMetadata("sync/devices/a/ops/1e3-0-9.ndjson")
+            ).toBeNull();
+        });
+
+        it("rejects createdAt values outside the JavaScript Date range", () => {
+            expect(
+                parseOpsObjectKeyMetadata(
+                    `sync/devices/a/ops/${MAX_VALID_DATE_EPOCH_MS + 1}-0-9.ndjson`
+                )
             ).toBeNull();
         });
 

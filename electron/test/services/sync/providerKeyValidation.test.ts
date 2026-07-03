@@ -6,6 +6,7 @@ import {
     isValidOpsObjectKey,
 } from "@electron/services/sync/providerKeyValidation";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 describe("providerKeyValidation", () => {
@@ -83,6 +84,14 @@ describe("providerKeyValidation", () => {
         it("rejects mismatched schema versions", () => {
             expect(() => {
                 assertSnapshotKey("sync/snapshots/999/1.json");
+            }).toThrow(/invalid snapshot key/i);
+        });
+
+        it("rejects snapshot timestamps outside the JavaScript Date range", () => {
+            expect(() => {
+                assertSnapshotKey(
+                    `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/${MAX_VALID_DATE_EPOCH_MS + 1}.json`
+                );
             }).toThrow(/invalid snapshot key/i);
         });
     });

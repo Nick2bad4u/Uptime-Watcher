@@ -4,6 +4,8 @@
 
 import { isSafeInteger, stringSplit } from "ts-extras";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+
 import { isAsciiDigits, isValidPersistedDeviceId } from "./syncEngineUtils";
 
 export const OPS_OBJECT_SUFFIX = ".ndjson" as const;
@@ -66,6 +68,7 @@ export function parseOpsObjectFileNameMetadata(
     if (
         !isSafeInteger(createdAt) ||
         createdAt < 0 ||
+        createdAt > MAX_VALID_DATE_EPOCH_MS ||
         !isSafeInteger(firstOpId) ||
         firstOpId < 0 ||
         !isSafeInteger(lastOpId) ||

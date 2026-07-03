@@ -13,7 +13,9 @@
  * don't drift across transports/migrations/tests.
  */
 
-import { isDefined, stringSplit } from "ts-extras";
+import { isDefined, isSafeInteger, stringSplit } from "ts-extras";
+
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 
 import { isAsciiDigits } from "./syncEngineUtils";
 
@@ -76,6 +78,15 @@ export function isValidSnapshotFileName(fileName: string): boolean {
     }
 
     if (!isAsciiDigits(createdAtRaw)) {
+        return false;
+    }
+
+    const createdAt = Number(createdAtRaw);
+    if (
+        !isSafeInteger(createdAt) ||
+        createdAt < 0 ||
+        createdAt > MAX_VALID_DATE_EPOCH_MS
+    ) {
         return false;
     }
 

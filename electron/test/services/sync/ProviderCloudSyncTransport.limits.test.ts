@@ -7,6 +7,7 @@ import type { CloudSyncOperation } from "@shared/types/cloudSync";
 
 import { ProviderCloudSyncTransport } from "@electron/services/sync/ProviderCloudSyncTransport";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 function createProvider(
@@ -467,6 +468,38 @@ describe("ProviderCloudSyncTransport.appendOperations key metadata", () => {
         await transport.appendOperations("a", [op5, op2], 123);
         expect(uploadedKey).toBe("sync/devices/a/ops/123-2-5.ndjson");
     });
+
+    it("rejects createdAtEpochMs values outside the JavaScript Date range", async () => {
+        const provider = createProvider({
+            uploadObject: async ({ key }): Promise<CloudObjectEntry> => ({
+                key,
+                lastModifiedAt: Date.now(),
+                sizeBytes: 1,
+            }),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        const operation: CloudSyncOperation = {
+            deviceId: "a",
+            entityId: "e",
+            entityType: "site",
+            field: "x",
+            kind: "set-field",
+            opId: 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: 1,
+            value: true,
+        };
+
+        await expect(
+            transport.appendOperations(
+                "a",
+                [operation],
+                MAX_VALID_DATE_EPOCH_MS + 1
+            )
+        ).rejects.toThrow(/createdatepochms.*javascript date range/i);
+    });
 });
 
 describe("ProviderCloudSyncTransport snapshot key validation", () => {
@@ -526,6 +559,20 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
                 `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1-0123456789abcdef0123456789abcdef.json`
             )
         ).resolves.toBeTruthy();
+    });
+
+    it("rejects snapshot keys outside the JavaScript Date range", async () => {
+        const provider = createProvider({
+            downloadObject: async () => Buffer.from("{}", "utf8"),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readSnapshot(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/${MAX_VALID_DATE_EPOCH_MS + 1}.json`
+            )
+        ).rejects.toThrow(/invalid snapshot key/i);
     });
 });
 

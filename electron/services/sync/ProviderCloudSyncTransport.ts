@@ -16,6 +16,7 @@ import {
 import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     arrayJoin,
     isEmpty,
@@ -145,6 +146,14 @@ function decodeUtfEightStrict(buffer: Buffer): string {
     return utfEightDecoder.decode(buffer);
 }
 
+function assertValidEpochMs(value: number, label: string): void {
+    if (!isSafeInteger(value) || value < 0 || value > MAX_VALID_DATE_EPOCH_MS) {
+        throw new Error(
+            `${label} must be a non-negative epoch millisecond timestamp within the JavaScript Date range`
+        );
+    }
+}
+
 function toNdjson(operations: readonly CloudSyncOperation[]): string {
     return `${arrayJoin(
         operations.map((op) => JSON.stringify(op)),
@@ -261,6 +270,7 @@ function validateManifestSnapshotKey(manifest: CloudSyncManifest): void {
 }
 
 function createSnapshotKey(createdAt: number): string {
+    assertValidEpochMs(createdAt, "snapshot.createdAt");
     const nonceHex = createSnapshotNonceHex();
     return `${getSnapshotsPrefix()}/${createdAt}-${nonceHex}.json`;
 }
@@ -325,6 +335,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         createdAt: number,
         state: CloudSyncSnapshot["state"]
     ): CloudSyncSnapshot {
+        assertValidEpochMs(createdAt, "createdAt");
+
         return {
             createdAt,
             snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
@@ -345,11 +357,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         assertValidSyncDeviceId(deviceId);
 
         const createdAtCandidate = createdAtEpochMs ?? Date.now();
-        if (!isSafeInteger(createdAtCandidate) || createdAtCandidate < 0) {
-            throw new Error(
-                "createdAtEpochMs must be a non-negative safe integer"
-            );
-        }
+        assertValidEpochMs(createdAtCandidate, "createdAtEpochMs");
 
         const createdAt = createdAtCandidate;
 
