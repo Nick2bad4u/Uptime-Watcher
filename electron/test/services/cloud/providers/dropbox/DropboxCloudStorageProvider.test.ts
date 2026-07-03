@@ -376,4 +376,56 @@ describe(DropboxCloudStorageProvider, () => {
             expect(typed.target).toBe("sync/foo.txt");
         }
     });
+
+    it("bounds and sanitizes Dropbox error summaries in operation errors", async () => {
+        const tokenManager = {
+            getAccessToken: vi.fn().mockResolvedValue("token"),
+        };
+
+        const dropboxError = new DropboxResponseError(
+            500,
+            {},
+            {
+                error_summary: `refresh_token=SUPER_SECRET_REFRESH_TOKEN denied\n\t${"x".repeat(700)}`,
+            }
+        );
+
+        const filesUpload = vi.fn().mockRejectedValue(dropboxError);
+
+        const provider = new DropboxCloudStorageProvider({
+            clientFactory: () => ({
+                filesListFolder: vi.fn(),
+                filesListFolderContinue: vi.fn(),
+                filesUpload,
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
+            tokenManager: tokenManager as never,
+        });
+
+        try {
+            await provider.uploadObject({
+                buffer: Buffer.from("hey", "utf8"),
+                key: "sync/foo.txt",
+                overwrite: true,
+            });
+            throw new Error("Expected uploadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
+
+            const message = (error as CloudProviderOperationError).message;
+            const messagePrefix = "Dropbox upload failed: HTTP 500: ";
+            expect(message.startsWith(messagePrefix)).toBeTruthy();
+            expect(message).not.toContain("\n");
+            expect(message).not.toContain("\t");
+            expect(message).not.toContain("SUPER_SECRET_REFRESH_TOKEN");
+            expect(message).toContain("refresh_token=[redacted]");
+            expect(message.endsWith("...")).toBeTruthy();
+            expect(message.length).toBeLessThanOrEqual(
+                messagePrefix.length + 503
+            );
+        }
+    });
 });

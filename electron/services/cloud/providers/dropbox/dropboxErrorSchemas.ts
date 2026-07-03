@@ -1,4 +1,5 @@
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
@@ -14,6 +15,44 @@ const dropboxErrorSummarySchema: z.ZodType<DropboxErrorSummaryPayload> = z
         error_summary: z.string().trim().min(1).optional(),
     })
     .loose();
+
+const MAX_DROPBOX_ERROR_SUMMARY_CHARS = 500;
+
+function removeAsciiControlCharacters(value: string): string {
+    let sanitized = "";
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint < 0x20 || codePoint === 0x7f)
+        ) {
+            sanitized += " ";
+            continue;
+        }
+
+        sanitized += character;
+    }
+
+    return sanitized;
+}
+
+function normalizeDropboxErrorSummary(value: string): string | undefined {
+    const normalized = normalizeLogValue(value);
+    if (typeof normalized !== "string") {
+        return undefined;
+    }
+
+    const sanitized = removeAsciiControlCharacters(normalized)
+        .replaceAll(/\s+/gu, " ")
+        .trim();
+    if (!sanitized) {
+        return undefined;
+    }
+
+    return sanitized.length <= MAX_DROPBOX_ERROR_SUMMARY_CHARS
+        ? sanitized
+        : `${sanitized.slice(0, MAX_DROPBOX_ERROR_SUMMARY_CHARS)}...`;
+}
 
 /**
  * Best-effort extraction of a Dropbox `error_summary` string.
@@ -80,7 +119,9 @@ function tryParseDropboxErrorSummaryFromObject(
 ): string | undefined {
     const parsed = dropboxErrorSummarySchema.safeParse(value);
     if (parsed.success) {
-        return parsed.data.error_summary;
+        return parsed.data.error_summary
+            ? normalizeDropboxErrorSummary(parsed.data.error_summary)
+            : undefined;
     }
 
     formatZodIssues(parsed.error.issues);
