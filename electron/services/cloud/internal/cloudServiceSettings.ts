@@ -8,6 +8,7 @@
 
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
+import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 
 import type { CloudSettingsAdapter } from "../CloudService.types";
@@ -79,5 +80,8 @@ export async function setLastError(
     settings: CloudSettingsAdapter,
     message: string
 ): Promise<void> {
-    await settings.set(SETTINGS_KEY_LAST_ERROR, message);
+    await settings.set(
+        SETTINGS_KEY_LAST_ERROR,
+        normalizeUserFacingErrorDetail(message) ?? ""
+    );
 }

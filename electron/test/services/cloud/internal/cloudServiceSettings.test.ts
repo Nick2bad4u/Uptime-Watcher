@@ -1,7 +1,11 @@
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { parseEpochMsSetting } from "../../../../services/cloud/internal/cloudServiceSettings";
+import {
+    parseEpochMsSetting,
+    SETTINGS_KEY_LAST_ERROR,
+    setLastError,
+} from "@electron/services/cloud/internal/cloudServiceSettings";
 
 describe(parseEpochMsSetting, () => {
     it("parses valid persisted epoch millisecond values", () => {
@@ -25,5 +29,31 @@ describe(parseEpochMsSetting, () => {
         ]) {
             expect(parseEpochMsSetting(value)).toBeNull();
         }
+    });
+});
+
+describe(setLastError, () => {
+    it("normalizes persisted cloud errors before writing settings", async () => {
+        const set = vi.fn<Parameters<typeof setLastError>[0]["set"]>();
+
+        await setLastError(
+            {
+                get: vi.fn(),
+                set,
+            },
+            `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+        );
+
+        expect(set).toHaveBeenCalledWith(
+            SETTINGS_KEY_LAST_ERROR,
+            expect.stringContaining("refresh_token=[redacted]&status=failed")
+        );
+        const persisted = set.mock.calls[0]?.[1];
+        expect(persisted).toBeDefined();
+        expect(persisted).not.toContain("SUPER_SECRET_TOKEN");
+        expect(persisted).not.toContain("\n");
+        expect(persisted).not.toContain("\t");
+        expect(persisted?.endsWith("...")).toBeTruthy();
+        expect(persisted?.length).toBeLessThanOrEqual(1003);
     });
 });

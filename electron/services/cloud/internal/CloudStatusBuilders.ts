@@ -3,7 +3,10 @@ import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 import type { UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import {
+    getUserFacingErrorDetail,
+    normalizeUserFacingErrorDetail,
+} from "@shared/utils/userFacingErrors";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
 import { objectHasIn, safeCastTo } from "ts-extras";
 
@@ -68,7 +71,12 @@ export type CloudStatusBuilderDependencies = Readonly<{
 function buildLastErrorSpread(lastError: string | undefined): {
     readonly lastError?: string;
 } {
-    return lastError ? { lastError } : {};
+    const normalizedLastError =
+        lastError === undefined
+            ? undefined
+            : normalizeUserFacingErrorDetail(lastError);
+
+    return normalizedLastError ? { lastError: normalizedLastError } : {};
 }
 
 type CloudStatusBuildOverrides = Readonly<{
