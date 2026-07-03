@@ -2,6 +2,7 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { arrayAt, arrayJoin, isDefined, setHas, stringSplit } from "ts-extras";
 
 import type {
@@ -238,10 +239,14 @@ export function buildDiagnosticsPayload(args: {
 export function buildDiagnosticsText(args: {
     readonly payload: DiagnosticsPayload;
 }): DiagnosticsText {
-    const json = JSON.stringify(args.payload, null, 2);
+    const json = JSON.stringify(normalizeLogValue(args.payload), null, 2);
     const generatedAt =
         args.payload.generatedAtEpochMs > 0
             ? formatFullTimestamp(args.payload.generatedAtEpochMs)
+            : "—";
+    const lastError =
+        typeof args.payload.context.lastError === "string"
+            ? normalizeDiagnosticText(args.payload.context.lastError)
             : "—";
 
     const lines: string[] = [
@@ -258,7 +263,7 @@ export function buildDiagnosticsText(args: {
         `- Encryption: ${args.payload.context.encryptionMode} (locked: ${args.payload.context.encryptionLocked})`,
         `- Last sync: ${args.payload.context.lastSyncAt === null ? "—" : formatFullTimestamp(args.payload.context.lastSyncAt)}`,
         `- Last backup: ${args.payload.context.lastBackupAt === null ? "—" : formatFullTimestamp(args.payload.context.lastBackupAt)}`,
-        `- Last error: ${args.payload.context.lastError ?? "—"}`,
+        `- Last error: ${lastError}`,
         "",
         "Reset maintenance",
         `- Can reset now: ${args.payload.resetMaintenance.canReset}`,
@@ -275,4 +280,9 @@ export function buildDiagnosticsText(args: {
     ];
 
     return { json, text: arrayJoin(lines, "\n") };
+}
+
+function normalizeDiagnosticText(value: string): string {
+    const normalized = normalizeLogValue(value);
+    return typeof normalized === "string" ? normalized : value;
 }

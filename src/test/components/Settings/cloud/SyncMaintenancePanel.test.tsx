@@ -226,7 +226,12 @@ describe(SyncMaintenancePanel, () => {
         const lastResult: CloudSyncResetResult = {
             completedAt: 10,
             deletedObjects: 5,
-            failedDeletions: [],
+            failedDeletions: [
+                {
+                    key: "sync/ops/access_token=delete-secret",
+                    message: "delete failed refresh_token=delete-secret",
+                },
+            ],
             resetAt: 123,
             seededSnapshotKey: "sync/snapshots/new",
             startedAt: 1,
@@ -243,7 +248,10 @@ describe(SyncMaintenancePanel, () => {
                 onRefreshPreview={vi.fn()}
                 onResetRemoteSyncState={vi.fn()}
                 preview={preview}
-                status={createStatus()}
+                status={createStatus({
+                    lastError:
+                        "sync failed Authorization Bearer status-secret",
+                })}
                 syncEnabled={true}
             />
         );
@@ -261,6 +269,9 @@ describe(SyncMaintenancePanel, () => {
         expect(payload).toContain("Cloud Sync Diagnostics");
         expect(payload).toContain("No secrets");
         expect(payload).toContain("seededSnapshotKey");
+        expect(payload).toContain("[redacted]");
+        expect(payload).not.toContain("status-secret");
+        expect(payload).not.toContain("delete-secret");
     });
 
     it("shows an error message when clipboard copy fails", async () => {
