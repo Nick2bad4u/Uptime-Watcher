@@ -91,9 +91,15 @@ class MutableSecretStore implements SecretStore {
 
     public shouldFailGet = false;
 
+    public shouldFailDelete = false;
+
     public shouldFailSet = false;
 
     public async deleteSecret(key: string): Promise<void> {
+        if (this.shouldFailDelete) {
+            throw new Error("delete failed");
+        }
+
         this.values.delete(key);
     }
 
@@ -137,5 +143,33 @@ describe(FallbackSecretStore, () => {
         await expect(
             store.getSecret("cloud.dropbox.tokens")
         ).resolves.toBeUndefined();
+    });
+
+    it("updates fallback value when stale fallback deletion fails after primary storage succeeds", async () => {
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        primary.shouldFailSet = true;
+        await store.setSecret("cloud.dropbox.tokens", "old-token-json");
+        expect(fallback.values.get("cloud.dropbox.tokens")).toBe(
+            "old-token-json"
+        );
+
+        primary.shouldFailSet = false;
+        fallback.shouldFailDelete = true;
+        await store.setSecret("cloud.dropbox.tokens", "new-token-json");
+
+        expect(primary.values.get("cloud.dropbox.tokens")).toBe(
+            "new-token-json"
+        );
+        expect(fallback.values.get("cloud.dropbox.tokens")).toBe(
+            "new-token-json"
+        );
+
+        primary.shouldFailGet = true;
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            "new-token-json"
+        );
     });
 });
