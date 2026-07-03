@@ -12,10 +12,11 @@ import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 import type { RequireAtLeastOne, UnknownRecord } from "type-fest";
 
-import { isMonitorStatus } from "@shared/types";
+import { isMonitorStatus, STATUS_HISTORY_VALUES } from "@shared/types";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
-import { isDefined, objectValues, safeCastTo } from "ts-extras";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+import { arrayIncludes, isDefined, objectValues, safeCastTo } from "ts-extras";
 
 import { calculateSiteSyncDelta } from "./siteSyncDelta";
 import {
@@ -223,8 +224,14 @@ export const isStatusHistoryEntry = (
 
     return (
         isFiniteNumber(responseTime) &&
+        Number.isInteger(responseTime) &&
+        responseTime >= -1 &&
         isFiniteNumber(timestamp) &&
-        typeof status === "string"
+        Number.isInteger(timestamp) &&
+        timestamp >= 0 &&
+        timestamp <= MAX_VALID_DATE_EPOCH_MS &&
+        typeof status === "string" &&
+        arrayIncludes(STATUS_HISTORY_VALUES, status)
     );
 };
 

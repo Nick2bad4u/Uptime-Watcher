@@ -5,6 +5,7 @@
 import type { Monitor, Site, StatusHistory } from "@shared/types";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     deriveSiteSnapshot,
     deriveSiteSyncChangeSet,
@@ -102,6 +103,17 @@ describe("siteSnapshots", () => {
     it("validates status history entries and arrays", () => {
         expect(isStatusHistoryEntry(createHistory())).toBeTruthy();
         expect(isStatusHistoryEntry({})).toBeFalsy();
+
+        for (const invalidHistory of [
+            createHistory({ responseTime: -2 }),
+            createHistory({ responseTime: 10.5 }),
+            createHistory({ status: "pending" as any }),
+            createHistory({ timestamp: -1 }),
+            createHistory({ timestamp: 1.5 }),
+            createHistory({ timestamp: MAX_VALID_DATE_EPOCH_MS + 1 }),
+        ]) {
+            expect(isStatusHistoryEntry(invalidHistory)).toBeFalsy();
+        }
 
         expect(isStatusHistoryArray([createHistory()])).toBeTruthy();
         expect(isStatusHistoryArray([{}])).toBeFalsy();
@@ -213,6 +225,15 @@ describe("siteSnapshots", () => {
         expect(merged.monitoring).toBeFalsy();
         expect(merged.history[0]?.timestamp).toBe(2);
         expect(merged.checkInterval).toBe(canonical.checkInterval);
+
+        const mergedWithInvalidHistory = mergeMonitorSnapshots(canonical, {
+            history: [
+                createHistory({
+                    status: "not-a-history-status" as any,
+                }),
+            ],
+        });
+        expect(mergedWithInvalidHistory).toBe(canonical);
     });
 
     it("mergeSiteSnapshots merges monitor overlays by id", () => {
