@@ -34,8 +34,9 @@ import type { Site } from "@shared/types";
 import type { Promisable } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
-import { isDefined, safeCastTo } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -103,6 +104,50 @@ export const DEFAULT_SITE_TABLE_COLUMN_WIDTHS: Record<
     status: 12,
     uptime: 12,
 });
+
+const normalizeSiteTableColumnWidths = (
+    widths?: Partial<Record<SiteTableColumnKey, number>>,
+    base: Record<SiteTableColumnKey, number> = DEFAULT_SITE_TABLE_COLUMN_WIDTHS
+): Record<SiteTableColumnKey, number> => {
+    const updated: Record<SiteTableColumnKey, number> = { ...base };
+
+    for (const columnKey of SITE_TABLE_COLUMN_KEYS) {
+        const width = widths?.[columnKey];
+        if (isDefined(width) && isFiniteNumber(width) && width > 0) {
+            updated[columnKey] = width;
+        }
+    }
+
+    return updated;
+};
+
+const getDefaultUIPersistedState = (): UIPersistedState => ({
+    activeSiteDetailsTab: "site-overview",
+    showAdvancedMetrics: false,
+    sidebarCollapsedPreference: false,
+    siteCardPresentation: ENTERPRISE_UI_DEFAULTS.siteCardPresentation,
+    siteDetailsChartTimeRange: "24h",
+    siteDetailsHeaderCollapsedState: {},
+    siteDetailsTabState: {},
+    siteListLayout: ENTERPRISE_UI_DEFAULTS.siteListLayout,
+    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    surfaceDensity: ENTERPRISE_UI_DEFAULTS.surfaceDensity,
+});
+
+const normalizeUIPersistedState = (
+    state: Partial<UIPersistedState>
+): UIPersistedState => {
+    const defaults = getDefaultUIPersistedState();
+
+    return {
+        ...defaults,
+        ...state,
+        siteTableColumnWidths: normalizeSiteTableColumnWidths(
+            state.siteTableColumnWidths,
+            defaults.siteTableColumnWidths
+        ),
+    };
+};
 
 /**
  * Interface for the UI store with persistence capabilities.
@@ -328,22 +373,12 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 logStoreAction("UIStore", "setSiteTableColumnWidths", {
                     widths,
                 });
-                set((state) => {
-                    const updated: Record<SiteTableColumnKey, number> = {
-                        ...state.siteTableColumnWidths,
-                    };
-
-                    for (const columnKey of SITE_TABLE_COLUMN_KEYS) {
-                        const width = widths[columnKey];
-                        if (isDefined(width) && !Number.isNaN(width)) {
-                            updated[columnKey] = width;
-                        }
-                    }
-
-                    return {
-                        siteTableColumnWidths: updated,
-                    };
-                });
+                set((state) => ({
+                    siteTableColumnWidths: normalizeSiteTableColumnWidths(
+                        widths,
+                        state.siteTableColumnWidths
+                    ),
+                }));
             },
             setSurfaceDensity: (density: InterfaceDensity): void => {
                 logStoreAction("UIStore", "setSurfaceDensity", { density });
@@ -409,16 +444,21 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             // keeping transient state (modals, selections) in memory only.
             ...UI_PERSIST_CONFIG,
             migrate: (persistedState: unknown, version: number) => {
-                const state = persistedState as Partial<UIPersistedState>;
+                const state: Partial<UIPersistedState> =
+                    isRecord(persistedState)
+                        ? castUnchecked<Partial<UIPersistedState>>(
+                              persistedState
+                          )
+                        : {};
 
                 if (version < UI_PERSIST_VERSION) {
-                    return {
+                    return normalizeUIPersistedState({
                         ...state,
                         ...ENTERPRISE_UI_DEFAULTS,
-                    } as UIPersistedState;
+                    });
                 }
 
-                return state as UIPersistedState;
+                return normalizeUIPersistedState(state);
             },
             // Re-state required fields explicitly for exactOptionalPropertyTypes.
             name: UI_PERSIST_CONFIG.name,

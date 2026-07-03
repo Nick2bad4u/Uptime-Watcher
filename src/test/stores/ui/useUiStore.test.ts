@@ -13,7 +13,10 @@ import type {
     SiteListLayoutMode,
 } from "../../../stores/ui/types";
 
-import { useUIStore } from "../../../stores/ui/useUiStore";
+import {
+    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+    useUIStore,
+} from "../../../stores/ui/useUiStore";
 
 // Mock the store utils (partial) so createPersistConfig remains available.
 vi.mock("../../../stores/utils", async (importOriginal) => {
@@ -68,6 +71,9 @@ describe(useUIStore, () => {
             useUIStore.setState({
                 siteDetailsHeaderCollapsedState: {},
                 siteDetailsTabState: {},
+                siteTableColumnWidths: {
+                    ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+                },
             });
             store.setActiveSiteDetailsTab("site-overview");
             store.selectSite(undefined);
@@ -175,6 +181,36 @@ describe(useUIStore, () => {
             expect(result.current.siteTableColumnWidths.site).toBe(28);
             expect(result.current.siteTableColumnWidths.response).toBe(10);
             expect(result.current.siteTableColumnWidths.controls).toBe(16);
+        });
+
+        it("should ignore invalid column widths", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Validation", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.setSiteTableColumnWidths({
+                    controls: Infinity,
+                    monitor: -Infinity,
+                    response: Number.NaN,
+                    running: 0,
+                    site: -1,
+                    status: 18,
+                });
+            });
+
+            expect(result.current.siteTableColumnWidths.controls).toBe(16);
+            expect(result.current.siteTableColumnWidths.monitor).toBe(14);
+            expect(result.current.siteTableColumnWidths.response).toBe(12);
+            expect(result.current.siteTableColumnWidths.running).toBe(10);
+            expect(result.current.siteTableColumnWidths.site).toBe(24);
+            expect(result.current.siteTableColumnWidths.status).toBe(18);
         });
     });
 
