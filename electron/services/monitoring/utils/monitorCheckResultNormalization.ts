@@ -81,7 +81,7 @@ export function buildStatusUpdateMonitorCheckResult(args: {
     timestamp?: Date;
 }): StatusUpdateMonitorCheckResult {
     const { monitorId, operationId, serviceResult } = args;
-    const timestamp = args.timestamp ?? new Date();
+    const timestamp = resolveStatusUpdateTimestamp(args.timestamp);
 
     return {
         details:
@@ -95,4 +95,12 @@ export function buildStatusUpdateMonitorCheckResult(args: {
         status: serviceResult.status,
         timestamp,
     };
+}
+
+function resolveStatusUpdateTimestamp(timestamp: Date | undefined): Date {
+    if (timestamp instanceof Date && isFiniteNumber(timestamp.getTime())) {
+        return timestamp;
+    }
+
+    return new Date();
 }

@@ -63,5 +63,24 @@ describe("monitorCheckResultNormalization", () => {
                 timestamp,
             });
         });
+
+        it("replaces invalid timestamps with a valid completion date", () => {
+            const before = Date.now();
+            const result = buildStatusUpdateMonitorCheckResult({
+                monitorId: "monitor-1",
+                operationId: "operation-1",
+                serviceResult: {
+                    responseTime: 321,
+                    status: "up",
+                },
+                timestamp: new Date(Number.NaN),
+            });
+            const after = Date.now();
+
+            expect(result.timestamp).toBeInstanceOf(Date);
+            expect(Number.isFinite(result.timestamp.getTime())).toBeTruthy();
+            expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(before);
+            expect(result.timestamp.getTime()).toBeLessThanOrEqual(after);
+        });
     });
 });
