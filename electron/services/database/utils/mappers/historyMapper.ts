@@ -63,7 +63,12 @@ export interface HistoryRow {
 function safeNumber(value: unknown, fallback = 0): number {
     if (typeof value === "number" && isFiniteNumber(value)) return value;
     if (typeof value === "string") {
-        const parsed = Number(value);
+        const trimmed = value.trim();
+        if (trimmed.length === 0) {
+            return fallback;
+        }
+
+        const parsed = Number(trimmed);
         if (isFiniteNumber(parsed)) return parsed;
     }
     return fallback;
