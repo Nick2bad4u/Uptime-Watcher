@@ -2,8 +2,8 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import type { CloudEncryptionMode } from "@shared/types/cloudEncryption";
 import type { UnknownRecord } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
 import { objectHasIn, safeCastTo } from "ts-extras";
 
@@ -132,7 +132,7 @@ export async function buildDropboxStatus(args: {
             isConnected = true;
         } catch (error) {
             isConnected = false;
-            connectionError = ensureError(error).message;
+            connectionError = getUserFacingErrorDetail(error);
         }
     } else if (provider) {
         // Fallback for unexpected provider implementation.
