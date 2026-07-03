@@ -54,7 +54,7 @@ interface DurationUnitDefinition {
  * @public
  */
 export function formatDuration(ms: number): string {
-    if (!Number.isFinite(ms)) {
+    if (!Number.isFinite(ms) || ms < 0) {
         return UiDefaults.notAvailableLabel;
     }
 
@@ -75,7 +75,7 @@ function formatRoundedDuration(
     milliseconds: number,
     units: readonly DurationUnitDefinition[]
 ): string {
-    if (!Number.isFinite(milliseconds)) {
+    if (!Number.isFinite(milliseconds) || milliseconds < 0) {
         return UiDefaults.notAvailableLabel;
     }
 
@@ -237,7 +237,7 @@ export function formatRelativeTimestamp(timestamp: number): string {
  * @public
  */
 export function formatResponseDuration(milliseconds: number): string {
-    if (!Number.isFinite(milliseconds)) {
+    if (!Number.isFinite(milliseconds) || milliseconds < 0) {
         return UiDefaults.notAvailableLabel;
     }
 
@@ -278,7 +278,7 @@ export function formatResponseDuration(milliseconds: number): string {
  * @public
  */
 export function formatResponseTime(time?: number): string {
-    if (typeof time !== "number" || !Number.isFinite(time)) {
+    if (typeof time !== "number" || !Number.isFinite(time) || time < 0) {
         return UiDefaults.notAvailableLabel;
     }
     if (time < 1000) {

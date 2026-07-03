@@ -465,14 +465,11 @@ describe("time Utils Property-Based Tests", () => {
         fcTest.prop([fc.double({ max: 1000, min: -1000, noNaN: true })])(
             "should handle negative durations gracefully",
             (ms) => {
-                // Functions should not throw for negative inputs
-                expect(() => formatDuration(Math.abs(ms))).not.toThrow();
-                expect(() =>
-                    formatIntervalDuration(Math.abs(ms))
-                ).not.toThrow();
-                expect(() =>
-                    formatResponseDuration(Math.abs(ms))
-                ).not.toThrow();
+                const negativeMs = -Math.abs(ms);
+
+                expect(formatDuration(negativeMs)).toBe("N/A");
+                expect(formatIntervalDuration(negativeMs)).toBe("N/A");
+                expect(formatResponseDuration(negativeMs)).toBe("N/A");
             }
         );
 

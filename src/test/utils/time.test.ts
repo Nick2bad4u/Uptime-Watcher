@@ -105,6 +105,19 @@ describe("time Utilities", () => {
             expect(formatDuration(Infinity)).toBe("N/A");
             expect(formatDuration(-Infinity)).toBe("N/A");
         });
+
+        it("should return fallback for negative durations", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatDuration(-1)).toBe("N/A");
+            expect(formatDuration(-1000)).toBe("N/A");
+        });
     });
 
     describe(formatFullTimestamp, () => {
@@ -256,6 +269,19 @@ describe("time Utilities", () => {
             expect(formatIntervalDuration(Number.NaN)).toBe("N/A");
             expect(formatIntervalDuration(Infinity)).toBe("N/A");
             expect(formatIntervalDuration(-Infinity)).toBe("N/A");
+        });
+
+        it("should return fallback for negative intervals", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatIntervalDuration(-1)).toBe("N/A");
+            expect(formatIntervalDuration(-1000)).toBe("N/A");
         });
     });
 
@@ -503,6 +529,19 @@ describe("time Utilities", () => {
             expect(formatResponseDuration(Infinity)).toBe("N/A");
             expect(formatResponseDuration(-Infinity)).toBe("N/A");
         });
+
+        it("should return fallback for negative response durations", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatResponseDuration(-1)).toBe("N/A");
+            expect(formatResponseDuration(-1000)).toBe("N/A");
+        });
     });
 
     describe(formatResponseTime, () => {
@@ -575,6 +614,19 @@ describe("time Utilities", () => {
             expect(formatResponseTime(1000.1)).toBe("1.00s");
             expect(formatResponseTime(1234.567)).toBe("1.23s"); // Rounds down
             expect(formatResponseTime(1234.999)).toBe("1.23s"); // Rounds down
+        });
+
+        it("should return fallback for negative response times", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatResponseTime(-1)).toBe("N/A");
+            expect(formatResponseTime(-1000)).toBe("N/A");
         });
 
         it("should handle very large values", async ({ annotate, task }) => {
