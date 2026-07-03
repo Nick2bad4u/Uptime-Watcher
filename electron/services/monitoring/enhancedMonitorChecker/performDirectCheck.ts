@@ -169,7 +169,9 @@ export async function performDirectCheck(args: {
 
         return statusUpdate;
     } catch (error) {
-        logger.error(`Direct monitor check failed for ${monitor.id}`, error);
+        logger.error("Direct monitor check failed", error, {
+            monitorId: monitor.id,
+        });
         return undefined;
     }
 }

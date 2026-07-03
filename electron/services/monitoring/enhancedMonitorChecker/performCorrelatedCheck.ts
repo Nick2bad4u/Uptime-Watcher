@@ -93,7 +93,7 @@ export async function performCorrelatedCheck(args: {
             return await handleSuccessfulCheck(site, monitor, checkResult);
         }
     } catch (error) {
-        logger.error(`Monitor check failed for ${monitorId}`, error);
+        logger.error("Monitor check failed", error, { monitorId });
         cleanupOperation(operationId);
     }
 

@@ -17,7 +17,7 @@ export async function fetchFreshMonitorWithHistory(args: {
     const freshMonitor = await monitorRepository.findByIdentifier(monitorId);
 
     if (!freshMonitor) {
-        logger.warn(`Fresh monitor data not found for ${monitorId}`);
+        logger.warn("Fresh monitor data not found", { monitorId });
         return undefined;
     }
 
