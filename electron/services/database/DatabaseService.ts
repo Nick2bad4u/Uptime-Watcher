@@ -179,15 +179,27 @@ export class DatabaseService {
                 });
             } catch (error) {
                 const normalizedError = ensureError(error);
+                const rollbackErrors: Error[] = [];
                 try {
                     db.run(`ROLLBACK TO ${savepointName}`);
                     db.run(`RELEASE ${savepointName}`);
                 } catch (rollbackError) {
+                    const normalizedRollbackError = ensureError(rollbackError);
+                    rollbackErrors.push(normalizedRollbackError);
                     logger.error(
                         "[DatabaseService] Failed to rollback savepoint",
-                        ensureError(rollbackError)
+                        normalizedRollbackError
                     );
                 }
+
+                if (rollbackErrors.length > 0) {
+                    throw new AggregateError(
+                        [normalizedError, ...rollbackErrors],
+                        "[DatabaseService] Nested transaction failed and savepoint rollback failed",
+                        { cause: error }
+                    );
+                }
+
                 throw normalizedError;
             }
         }
@@ -208,6 +220,7 @@ export class DatabaseService {
                 });
             } catch (error) {
                 const normalizedError = ensureError(error);
+                const rollbackErrors: Error[] = [];
 
                 // Only attempt rollback if a transaction is actually active.
                 // This prevents "cannot rollback - no transaction is active" errors.
@@ -223,9 +236,19 @@ export class DatabaseService {
                         );
                     }
                 } catch (rollbackError) {
+                    const normalizedRollbackError = ensureError(rollbackError);
+                    rollbackErrors.push(normalizedRollbackError);
                     logger.error(
                         "[DatabaseService] Failed to rollback active transaction",
-                        ensureError(rollbackError)
+                        normalizedRollbackError
+                    );
+                }
+
+                if (rollbackErrors.length > 0) {
+                    throw new AggregateError(
+                        [normalizedError, ...rollbackErrors],
+                        "[DatabaseService] Transaction failed and rollback failed",
+                        { cause: error }
                     );
                 }
 

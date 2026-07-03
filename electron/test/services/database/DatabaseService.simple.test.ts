@@ -322,6 +322,105 @@ describe("DatabaseService Coverage Tests", () => {
             vi.useRealTimers();
         }
     });
+
+    it("should surface top-level rollback failures", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  inTransaction?: boolean;
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        expect(dbInstance).toBeDefined();
+
+        const operationError = new Error("operation failed");
+        const rollbackError = new Error("rollback failed");
+        let isInTransaction = false;
+
+        Object.defineProperty(dbInstance!, "inTransaction", {
+            configurable: true,
+            get: () => isInTransaction,
+        });
+        dbInstance!.run.mockImplementation((sql: string) => {
+            if (sql === "BEGIN TRANSACTION") {
+                isInTransaction = true;
+                return undefined;
+            }
+
+            if (sql === "ROLLBACK") {
+                throw rollbackError;
+            }
+
+            return undefined;
+        });
+
+        await expect(
+            instance.executeTransaction(async () => {
+                throw operationError;
+            })
+        ).rejects.toMatchObject({
+            cause: operationError,
+            errors: expect.arrayContaining([operationError, rollbackError]),
+            message: "[DatabaseService] Transaction failed and rollback failed",
+        });
+
+        instance.close();
+    });
+
+    it("should surface nested savepoint rollback failures", async () => {
+        vi.resetModules();
+
+        const { DatabaseService } =
+            await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
+
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  inTransaction?: boolean;
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        expect(dbInstance).toBeDefined();
+
+        const operationError = new Error("nested operation failed");
+        const rollbackError = new Error("savepoint rollback failed");
+
+        dbInstance!.inTransaction = true;
+        dbInstance!.run.mockImplementation((sql: string) => {
+            if (sql.startsWith("ROLLBACK TO ")) {
+                throw rollbackError;
+            }
+
+            return undefined;
+        });
+
+        await expect(
+            instance.executeTransaction(async () => {
+                throw operationError;
+            })
+        ).rejects.toMatchObject({
+            cause: operationError,
+            errors: expect.arrayContaining([operationError, rollbackError]),
+            message:
+                "[DatabaseService] Nested transaction failed and savepoint rollback failed",
+        });
+
+        instance.close();
+    });
+
     it("should handle cleanup operations", async () => {
         const { DatabaseService } =
             await import("../../../services/database/DatabaseService");
