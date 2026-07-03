@@ -54,6 +54,10 @@ interface DurationUnitDefinition {
  * @public
  */
 export function formatDuration(ms: number): string {
+    if (!Number.isFinite(ms)) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
@@ -71,6 +75,10 @@ function formatRoundedDuration(
     milliseconds: number,
     units: readonly DurationUnitDefinition[]
 ): string {
+    if (!Number.isFinite(milliseconds)) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     const fallbackUnit = arrayAt(units, -1);
 
     if (!fallbackUnit) {
@@ -229,6 +237,10 @@ export function formatRelativeTimestamp(timestamp: number): string {
  * @public
  */
 export function formatResponseDuration(milliseconds: number): string {
+    if (!Number.isFinite(milliseconds)) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     // Handle extremely small values (effectively zero) by rounding to 0
     // Only round to 0 for values smaller than or equal to 1e-10 to avoid scientific notation
     if (milliseconds <= 1e-10 && milliseconds > 0) {
@@ -266,7 +278,7 @@ export function formatResponseDuration(milliseconds: number): string {
  * @public
  */
 export function formatResponseTime(time?: number): string {
-    if (!time && time !== 0) {
+    if (typeof time !== "number" || !Number.isFinite(time)) {
         return UiDefaults.notAvailableLabel;
     }
     if (time < 1000) {

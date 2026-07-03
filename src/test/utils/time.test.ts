@@ -91,6 +91,20 @@ describe("time Utilities", () => {
             expect(formatDuration(1500)).toBe("1s"); // 1.5 seconds rounds down
             expect(formatDuration(61_500)).toBe("1m 1s"); // 61.5 seconds = 1m 1s
         });
+
+        it("should return fallback for non-finite durations", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatDuration(Number.NaN)).toBe("N/A");
+            expect(formatDuration(Infinity)).toBe("N/A");
+            expect(formatDuration(-Infinity)).toBe("N/A");
+        });
     });
 
     describe(formatFullTimestamp, () => {
@@ -228,6 +242,20 @@ describe("time Utilities", () => {
 
             expect(formatIntervalDuration(172_800_000)).toBe("48h"); // 2 days
             expect(formatIntervalDuration(604_800_000)).toBe("168h"); // 1 week
+        });
+
+        it("should return fallback for non-finite durations", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatIntervalDuration(Number.NaN)).toBe("N/A");
+            expect(formatIntervalDuration(Infinity)).toBe("N/A");
+            expect(formatIntervalDuration(-Infinity)).toBe("N/A");
         });
     });
 
@@ -461,21 +489,38 @@ describe("time Utilities", () => {
             expect(formatResponseDuration(999.9)).toBe("999.9ms");
             expect(formatResponseDuration(1000.1)).toBe("1s");
         });
-    });
 
-    describe(formatResponseTime, () => {
-        it("should return 'N/A' for undefined, null, or missing values", async ({
+        it("should return fallback for non-finite durations", async ({
             annotate,
             task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            await annotate("Type: Validation", "type");
+
+            expect(formatResponseDuration(Number.NaN)).toBe("N/A");
+            expect(formatResponseDuration(Infinity)).toBe("N/A");
+            expect(formatResponseDuration(-Infinity)).toBe("N/A");
+        });
+    });
+
+    describe(formatResponseTime, () => {
+        it("should return 'N/A' for missing or non-finite values", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
 
             expect(formatResponseTime(undefined)).toBe("N/A");
             expect(formatResponseTime()).toBe("N/A");
             expect(formatResponseTime(null as any)).toBe("N/A");
+            expect(formatResponseTime(Number.NaN)).toBe("N/A");
+            expect(formatResponseTime(Infinity)).toBe("N/A");
+            expect(formatResponseTime(-Infinity)).toBe("N/A");
         });
 
         it("should format zero as milliseconds", async ({ annotate, task }) => {
