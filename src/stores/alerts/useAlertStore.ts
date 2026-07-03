@@ -46,14 +46,22 @@ const nextFallbackAlertCounter = (() => {
 const generateAlertId = (): string => {
     const cryptoObject = safeCastTo<
         (Crypto & { randomUUID?: () => string }) | undefined
-    >(crypto);
-    if (cryptoObject?.randomUUID) {
-        return cryptoObject.randomUUID();
+    >(globalThis.crypto);
+    if (typeof cryptoObject?.randomUUID === "function") {
+        try {
+            return cryptoObject.randomUUID();
+        } catch {
+            // Fall through to getRandomValues or the deterministic fallback.
+        }
     }
 
-    if (cryptoObject?.getRandomValues) {
+    if (typeof cryptoObject?.getRandomValues === "function") {
         const buffer = new Uint32Array(2);
-        cryptoObject.getRandomValues(buffer);
+        try {
+            cryptoObject.getRandomValues(buffer);
+        } catch {
+            return `alert-${Date.now()}-${nextFallbackAlertCounter()}`;
+        }
         const first = buffer.at(0);
         const second = buffer.at(1);
 

@@ -482,4 +482,85 @@ describe("useAlertStore identifier generation fallbacks", () => {
             globalThis.crypto = originalCrypto;
         }
     });
+
+    it("falls back when crypto is deleted from globalThis", () => {
+        const originalCrypto = crypto;
+        const fixedNow = 1_730_000_000_001;
+        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
+
+        try {
+            Reflect.deleteProperty(globalThis, "crypto");
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(alert.id).toMatch(/^alert-1730{9}1-\d+$/v);
+        } finally {
+            nowSpy.mockRestore();
+            globalThis.crypto = originalCrypto;
+        }
+    });
+
+    it("falls back to getRandomValues when randomUUID throws", () => {
+        const originalCrypto = crypto;
+        const mockGetRandomValues = vi.fn((buffer: Uint32Array) => {
+            buffer[0] = 42;
+            buffer[1] = 84;
+            return buffer;
+        });
+
+        try {
+            globalThis.crypto = {
+                getRandomValues: mockGetRandomValues,
+                randomUUID: vi.fn(() => {
+                    throw new Error("randomUUID failed");
+                }),
+            } as unknown as Crypto;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
+            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+        } finally {
+            globalThis.crypto = originalCrypto;
+        }
+    });
+
+    it("falls back to Date.now-based identifiers when getRandomValues throws", () => {
+        const originalCrypto = crypto;
+        const fixedNow = 1_730_000_000_002;
+        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
+
+        try {
+            globalThis.crypto = {
+                getRandomValues: vi.fn(() => {
+                    throw new Error("getRandomValues failed");
+                }),
+            } as unknown as Crypto;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(alert.id).toMatch(/^alert-1730{9}2-\d+$/v);
+        } finally {
+            nowSpy.mockRestore();
+            globalThis.crypto = originalCrypto;
+        }
+    });
 });
