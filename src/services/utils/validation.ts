@@ -12,6 +12,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { ApplicationError } from "@shared/utils/errorHandling";
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { isObject } from "@shared/utils/typeGuards";
 import {
     formatZodIssues,
@@ -19,6 +20,8 @@ import {
     type ZodIssuePathPart,
 } from "@shared/utils/zodIssueFormatting";
 import { arrayJoin, objectHasIn, safeCastTo } from "ts-extras";
+
+const MAX_RENDERER_SERVICE_DIAGNOSTICS_CHARS = 1000;
 
 const hasIssueArray = (
     value: unknown
@@ -81,17 +84,65 @@ interface ValidationContext {
     readonly serviceName: string;
 }
 
-const stringifyDiagnostics = (
+interface NormalizedDiagnostics {
+    readonly details?: UnknownRecord;
+    readonly suffix: string;
+}
+
+const truncateDiagnostics = (value: string): {
+    readonly truncated: boolean;
+    readonly value: string;
+} =>
+    value.length <= MAX_RENDERER_SERVICE_DIAGNOSTICS_CHARS
+        ? { truncated: false, value }
+        : {
+              truncated: true,
+              value: `${value.slice(
+                  0,
+                  MAX_RENDERER_SERVICE_DIAGNOSTICS_CHARS
+              )}...`,
+          };
+
+const normalizeDiagnostics = (
     diagnostics: undefined | UnknownRecord
-): string => {
+): NormalizedDiagnostics => {
     if (!diagnostics) {
-        return "";
+        return { suffix: "" };
     }
 
     try {
-        return ` | diagnostics=${JSON.stringify(diagnostics)}`;
+        const normalized = normalizeLogValue(diagnostics);
+        const serialized = JSON.stringify(normalized);
+
+        if (typeof serialized !== "string") {
+            return {
+                details: { diagnostics: "[unserializable]" },
+                suffix: " | diagnostics=[unserializable]",
+            };
+        }
+
+        const compacted = serialized.replaceAll(/\s+/gu, " ");
+        const truncated = truncateDiagnostics(compacted);
+        const normalizedRecord =
+            isObject(normalized) && !Array.isArray(normalized)
+                ? safeCastTo<UnknownRecord>(normalized)
+                : undefined;
+
+        return {
+            details:
+                normalizedRecord && !truncated.truncated
+                    ? normalizedRecord
+                    : {
+                          diagnosticsPreview: truncated.value,
+                          diagnosticsTruncated: truncated.truncated,
+                      },
+            suffix: ` | diagnostics=${truncated.value}`,
+        };
     } catch {
-        return " | diagnostics=[unserializable]";
+        return {
+            details: { diagnostics: "[unserializable]" },
+            suffix: " | diagnostics=[unserializable]",
+        };
     }
 };
 
@@ -152,21 +203,22 @@ export function validateServicePayload<T>(
     context: ValidationContext
 ): T {
     const { diagnostics, operation, serviceName } = context;
+    const normalizedDiagnostics = normalizeDiagnostics(diagnostics);
     const parsed: SafeParseResult<T> = ((): SafeParseResult<T> => {
         try {
             return validator(value);
         } catch (error: unknown) {
-            const diagnosticSuffix = stringifyDiagnostics(diagnostics);
-
             throw new ApplicationError({
                 cause: error,
                 code: "RENDERER_SERVICE_VALIDATOR_THREW",
                 details: {
-                    ...(diagnostics && { diagnostics }),
+                    ...(normalizedDiagnostics.details && {
+                        diagnostics: normalizedDiagnostics.details,
+                    }),
                     operation,
                     serviceName,
                 },
-                message: `[${serviceName}] ${operation} threw during validation${diagnosticSuffix}`,
+                message: `[${serviceName}] ${operation} threw during validation${normalizedDiagnostics.suffix}`,
                 operation,
             });
         }
@@ -193,18 +245,19 @@ export function validateServicePayload<T>(
             formattedIssues.length > 0
                 ? formattedIssues
                 : (fallbackReason ?? "unknown validation error");
-        const diagnosticSuffix = stringifyDiagnostics(diagnostics);
 
         throw new ApplicationError({
             cause: errorForEnsure,
             code: "RENDERER_SERVICE_INVALID_PAYLOAD",
             details: {
-                ...(diagnostics && { diagnostics }),
+                ...(normalizedDiagnostics.details && {
+                    diagnostics: normalizedDiagnostics.details,
+                }),
                 issues: messages,
                 operation,
                 serviceName,
             },
-            message: `[${serviceName}] ${operation} returned invalid payload: ${messages}${diagnosticSuffix}`,
+            message: `[${serviceName}] ${operation} returned invalid payload: ${messages}${normalizedDiagnostics.suffix}`,
             operation,
         });
     }

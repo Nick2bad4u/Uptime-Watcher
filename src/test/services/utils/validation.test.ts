@@ -20,7 +20,7 @@ describe(validateServicePayload, () => {
         expect(result).toBe(123);
     });
 
-    it("wraps validator exceptions with helpful context and preserves cause", () => {
+    it("wraps validator exceptions with sanitized diagnostics and preserves cause", () => {
         const cause = new Error("boom");
         const validator = (_value: unknown) => {
             throw cause;
@@ -30,23 +30,39 @@ describe(validateServicePayload, () => {
             validateServicePayload(validator, "x", {
                 serviceName: "TestService",
                 operation: "throws",
-                diagnostics: { stage: "parse" },
+                diagnostics: {
+                    access_token: "SUPER_SECRET",
+                    note: `parse\n${"x".repeat(1200)}`,
+                },
             });
             throw new Error("Expected validateServicePayload to throw");
         } catch (error: unknown) {
             expect(error).toBeInstanceOf(Error);
 
-            const thrown = error as Error & { cause?: unknown };
+            const thrown = error as Error & {
+                cause?: unknown;
+                details?: UnknownRecord;
+            };
             expect(thrown.message).toContain(
                 "[TestService] throws threw during validation"
             );
             expect(thrown.message).toContain("diagnostics=");
+            expect(thrown.message).not.toContain("SUPER_SECRET");
+            expect(thrown.message).not.toContain("\n");
+            expect(thrown.message.length).toBeLessThan(1200);
             expect(thrown.cause).toBe(cause);
+            expect(thrown.details?.["diagnostics"]).toEqual({
+                diagnosticsPreview: expect.stringContaining(
+                    '"access_token":"[redacted]"'
+                ),
+                diagnosticsTruncated: true,
+            });
         }
     });
 
-    it("formats invalid payload errors with issues and handles unserializable diagnostics", () => {
+    it("formats invalid payload errors with issues and handles circular diagnostics", () => {
         const diagnostics: UnknownRecord = {
+            refresh_token: "SUPER_SECRET",
             siteIdentifier: "site-1",
         };
         diagnostics["self"] = diagnostics;
@@ -90,7 +106,9 @@ describe(validateServicePayload, () => {
 
             const message = (error as Error).message;
             expect(message).toContain("missing");
-            expect(message).toContain("diagnostics=[unserializable]");
+            expect(message).toContain("diagnostics=");
+            expect(message).toContain('"self":"[Circular]"');
+            expect(message).not.toContain("SUPER_SECRET");
         }
     });
 });
