@@ -494,4 +494,104 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             );
         });
     });
+
+    describe("accessor-safe helpers", () => {
+        it("does not invoke accessors during safeObjectAccess", () => {
+            let getterCalls = 0;
+            const input = {};
+
+            Object.defineProperty(input, "token", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "SECRET";
+                },
+            });
+
+            expect(
+                objectSafetyModule.safeObjectAccess(input, "token", "fallback")
+            ).toBe("fallback");
+            expect(
+                objectSafetyModule.safeObjectAccess(
+                    input,
+                    "token",
+                    "fallback",
+                    (_value): _value is string => true
+                )
+            ).toBe("fallback");
+            expect(getterCalls).toBe(0);
+        });
+
+        it("does not invoke accessors during safeObjectIteration", () => {
+            let getterCalls = 0;
+            const visited: [string, unknown][] = [];
+            const input = {
+                stable: "value",
+            };
+
+            Object.defineProperty(input, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "SECRET";
+                },
+            });
+
+            objectSafetyModule.safeObjectIteration(input, (key, value) => {
+                visited.push([key, value]);
+            });
+
+            expect(visited).toEqual([["stable", "value"]]);
+            expect(getterCalls).toBe(0);
+        });
+
+        it("does not invoke accessors during safeObjectOmit", () => {
+            let getterCalls = 0;
+            const input = {
+                stable: "value",
+            };
+
+            Object.defineProperty(input, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "SECRET";
+                },
+            });
+
+            const result = objectSafetyModule.safeObjectOmit(input, []);
+
+            expect(result).toEqual({
+                stable: "value",
+            });
+            expect(Object.hasOwn(result, "computed")).toBeFalsy();
+            expect(getterCalls).toBe(0);
+        });
+
+        it("does not invoke accessors during safeObjectPick", () => {
+            let getterCalls = 0;
+            const input = {
+                stable: "value",
+            } as Record<string, unknown>;
+
+            Object.defineProperty(input, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "SECRET";
+                },
+            });
+
+            const result = objectSafetyModule.safeObjectPick(input, [
+                "computed",
+                "stable",
+            ]);
+
+            expect(result).toEqual({
+                stable: "value",
+            });
+            expect(Object.hasOwn(result, "computed")).toBeFalsy();
+            expect(getterCalls).toBe(0);
+        });
+    });
 });

@@ -41,6 +41,33 @@ export function createNullPrototypeObject<T extends object>(shape?: T): T {
     return castUnchecked<T>(Object.create(null));
 }
 
+function getOwnDataProperty(
+    obj: object,
+    key: PropertyKey
+):
+    | { readonly found: false }
+    | { readonly found: true; readonly value: unknown } {
+    const descriptor = Object.getOwnPropertyDescriptor(obj, key);
+    return descriptor && "value" in descriptor
+        ? { found: true, value: descriptor.value as unknown }
+        : { found: false };
+}
+
+function getOwnEnumerableDataEntries(obj: object): [PropertyKey, unknown][] {
+    const entries: [PropertyKey, unknown][] = [];
+
+    for (const key of Reflect.ownKeys(obj)) {
+        const descriptor = Object.getOwnPropertyDescriptor(obj, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        entries.push([key, descriptor.value as unknown]);
+    }
+
+    return entries;
+}
+
 /**
  * Type-safe object property access with fallback.
  *
@@ -79,7 +106,12 @@ export function safeObjectAccess<T>(
         return fallback;
     }
 
-    const value = obj[key];
+    const property = getOwnDataProperty(obj, key);
+    if (!property.found) {
+        return fallback;
+    }
+
+    const { value } = property;
 
     if (validator) {
         return validator(value) ? value : fallback;
@@ -116,8 +148,10 @@ export function safeObjectIteration(
     }
 
     try {
-        for (const [key, value] of objectEntries(obj)) {
-            visitor(key, value);
+        for (const [key, value] of getOwnEnumerableDataEntries(obj)) {
+            if (typeof key === "string") {
+                visitor(key, value);
+            }
         }
     } catch (error) {
         // Use basic console for shared utilities to avoid dependencies
@@ -209,11 +243,9 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
     //   own property.
     //
     const result = createNullPrototypeObject<Except<T, Extract<K, keyof T>>>();
-    const record = castUnchecked<UnknownRecord>(obj);
-
     // Copy enumerable string/number properties
-    for (const [key, value] of objectEntries(record)) {
-        if (!setHas(stringKeysToOmit, key)) {
+    for (const [key, value] of getOwnEnumerableDataEntries(obj)) {
+        if (typeof key === "string" && !setHas(stringKeysToOmit, key)) {
             Object.defineProperty(result, key, {
                 configurable: true,
                 enumerable: true,
@@ -225,14 +257,21 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
 
     // Copy symbol properties
     for (const symbol of Object.getOwnPropertySymbols(obj)) {
-        if (!setHas(symbolKeysToOmit, symbol)) {
-            Object.defineProperty(result, symbol, {
-                configurable: true,
-                enumerable: true,
-                value: record[symbol],
-                writable: true,
-            });
+        if (setHas(symbolKeysToOmit, symbol)) {
+            continue;
         }
+
+        const descriptor = Object.getOwnPropertyDescriptor(obj, symbol);
+        if (!descriptor || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(result, symbol, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value as unknown,
+            writable: true,
+        });
     }
 
     return result;
@@ -272,14 +311,21 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
     const result = createNullPrototypeObject<Pick<T, K>>();
 
     for (const key of keys) {
-        if (objectHasOwn(obj, key)) {
-            Object.defineProperty(result, key, {
-                configurable: true,
-                enumerable: true,
-                value: obj[key],
-                writable: true,
-            });
+        if (!objectHasOwn(obj, key)) {
+            continue;
         }
+
+        const descriptor = Object.getOwnPropertyDescriptor(obj, key);
+        if (!descriptor || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(result, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value as unknown,
+            writable: true,
+        });
     }
 
     return result;
