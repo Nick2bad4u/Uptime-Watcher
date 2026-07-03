@@ -10,8 +10,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BACKUP_DB_FILE_NAME } from "../../../../constants";
 // Import after mocking
 import {
+    computeDatabaseBackupChecksum,
     createDatabaseBackup,
     type DatabaseBackupResult,
+    validateDatabaseBackupPayload,
 } from "../../../../services/database/utils/backup/databaseBackup";
 import { logger } from "../../../../utils/logger";
 
@@ -585,6 +587,56 @@ describe("databaseBackup.ts - Comprehensive Coverage", () => {
                     expect(result.buffer).toBe(testCase);
                     expect(result.metadata.sizeBytes).toBe(testCase.length);
                 }
+            });
+        });
+
+        describe("validateDatabaseBackupPayload", () => {
+            it("should reject invalid numeric metadata invariants", () => {
+                const buffer = Buffer.from("valid backup");
+                const metadata = {
+                    appVersion: "1.0.0",
+                    checksum: computeDatabaseBackupChecksum(buffer),
+                    createdAt: 1,
+                    originalPath: testDbPath,
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: buffer.byteLength,
+                };
+
+                for (const invalidMetadata of [
+                    { ...metadata, createdAt: -1 },
+                    { ...metadata, retentionHintDays: -1 },
+                    { ...metadata, schemaVersion: -1 },
+                    { ...metadata, sizeBytes: -1 },
+                    { ...metadata, sizeBytes: 1.5 },
+                ]) {
+                    expect(() =>
+                        validateDatabaseBackupPayload({
+                            buffer,
+                            metadata: invalidMetadata,
+                        })
+                    ).toThrow(/non-negative integer/iu);
+                }
+            });
+
+            it("should reject invalid maximum size options", () => {
+                const buffer = Buffer.from("valid backup");
+                const metadata = {
+                    appVersion: "1.0.0",
+                    checksum: computeDatabaseBackupChecksum(buffer),
+                    createdAt: 1,
+                    originalPath: testDbPath,
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: buffer.byteLength,
+                };
+
+                expect(() =>
+                    validateDatabaseBackupPayload(
+                        { buffer, metadata },
+                        { maxSizeBytes: -1 }
+                    )
+                ).toThrow(/maxSizeBytes must be a non-negative integer/iu);
             });
         });
 

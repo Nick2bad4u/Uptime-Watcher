@@ -224,6 +224,12 @@ function normalizeBackupArgs(
     return normalized;
 }
 
+function assertNonNegativeInteger(name: string, value: number): void {
+    if (!Number.isInteger(value) || value < 0) {
+        throw new Error(`Backup metadata ${name} must be a non-negative integer`);
+    }
+}
+
 /**
  * Creates a byte-for-byte copy of the SQLite database for download/export.
  */
@@ -296,6 +302,12 @@ export function validateDatabaseBackupPayload(
 ): void {
     const { buffer, metadata } = payload;
     const { maxSizeBytes = DEFAULT_MAX_BACKUP_SIZE_BYTES } = options;
+
+    assertNonNegativeInteger("createdAt", metadata.createdAt);
+    assertNonNegativeInteger("retentionHintDays", metadata.retentionHintDays);
+    assertNonNegativeInteger("schemaVersion", metadata.schemaVersion);
+    assertNonNegativeInteger("sizeBytes", metadata.sizeBytes);
+    assertNonNegativeInteger("maxSizeBytes", maxSizeBytes);
 
     if (metadata.sizeBytes !== buffer.byteLength) {
         throw new Error(
