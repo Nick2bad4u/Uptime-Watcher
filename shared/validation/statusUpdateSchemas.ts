@@ -15,17 +15,14 @@ import { monitorStatusEnumValues } from "./statusValidationPrimitives";
 
 /**
  * Schema ensuring that timestamp fields contain ISO 8601 date strings.
- *
- * @remarks
- * Uses {@link Date.parse} for validation, mirroring the parsing strategy used
- * throughout the app when interpreting status update timestamps.
  */
 const isoTimestampSchema: z.ZodType<string> = z
     .string()
     .trim()
-    .refine(
-        (value) => !Number.isNaN(Date.parse(value)),
-        "Timestamp must be a valid ISO 8601 string"
+    .pipe(
+        z.iso.datetime({
+            error: "Timestamp must be a valid ISO 8601 string",
+        })
     );
 
 type MonitorStatusEnumSchema = z.ZodType<MonitorStatus>;

@@ -41,6 +41,34 @@ describe("statusUpdateSchema", () => {
         expect(result.success).toBeTruthy();
     });
 
+    it("accepts ISO timestamps with surrounding whitespace", () => {
+        const payload = createValidStatusUpdate();
+        payload.timestamp = "  2026-07-03T00:00:00.000Z  ";
+
+        const result = statusUpdateSchema.safeParse(payload);
+
+        expect(result.success).toBeTruthy();
+        if (result.success) {
+            expect(result.data.timestamp).toBe("2026-07-03T00:00:00.000Z");
+        }
+    });
+
+    it("rejects loose or impossible timestamp strings", () => {
+        for (const timestamp of [
+            "2026-07-03",
+            "July 3, 2026",
+            "2026-02-30T00:00:00.000Z",
+            "2026-07-03T00:00:00.000",
+        ]) {
+            const payload = createValidStatusUpdate();
+            payload.timestamp = timestamp;
+
+            const result = statusUpdateSchema.safeParse(payload);
+
+            expect(result.success).toBeFalsy();
+        }
+    });
+
     it("rejects payloads where monitorId mismatches monitor.id", () => {
         const payload = createValidStatusUpdate();
         payload.monitorId = "different-monitor";
