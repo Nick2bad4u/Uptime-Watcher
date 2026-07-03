@@ -394,6 +394,14 @@ const hasDisallowedUrlCharacters = (
     return !allowBackticks && value.includes("`");
 };
 
+const DEFAULT_SAFE_INTEGER_FALLBACK = 0;
+
+function normalizeSafeIntegerDefault(defaultValue: number): number {
+    return isFiniteNumber(defaultValue) && Number.isInteger(defaultValue)
+        ? defaultValue
+        : DEFAULT_SAFE_INTEGER_FALLBACK;
+}
+
 /**
  * Validates that a value is a valid URL.
  *
@@ -511,6 +519,7 @@ export function safeInteger(
     min?: number,
     max?: number
 ): number {
+    const normalizedDefault = normalizeSafeIntegerDefault(defaultValue);
     const normalizedMin =
         isDefined(min) && isFiniteNumber(min) ? Math.ceil(min) : undefined;
     const normalizedMax =
@@ -524,11 +533,11 @@ export function safeInteger(
     })();
 
     if (!isDefined(str)) {
-        return defaultValue;
+        return normalizedDefault;
     }
 
     if (!isValidInteger(str)) {
-        return defaultValue;
+        return normalizedDefault;
     }
 
     let num = Number.parseInt(str, 10);

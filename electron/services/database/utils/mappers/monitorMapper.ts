@@ -43,9 +43,11 @@ function copyDynamicFields(
     dynamicMonitor: UnknownRecord
 ): void {
     const excludedFields = new Set([
+        "bodyKeyword",
         "checkInterval",
         "createdAt",
         "enabled",
+        "expectedStatusCode",
         "followRedirects",
         "history",
         "id",
@@ -97,11 +99,17 @@ function getSanitizedBodyKeyword(value: unknown): string | undefined {
  * @returns The sanitized expectedStatusCode value, or undefined if invalid.
  */
 function getSanitizedExpectedStatusCode(value: unknown): number | undefined {
-    if (typeof value !== "number" || Number.isNaN(value)) {
+    if (
+        typeof value !== "number" ||
+        !Number.isFinite(value) ||
+        !Number.isInteger(value) ||
+        value < 100 ||
+        value > 599
+    ) {
         return undefined;
     }
 
-    return safeInteger(value, value, 100, 599);
+    return value;
 }
 
 /**

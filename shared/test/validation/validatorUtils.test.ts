@@ -846,6 +846,21 @@ describe("validatorUtils", () => {
             expect(safeInteger({}, 60)).toBe(60);
         });
 
+        it("should normalize invalid default values for invalid inputs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validatorUtils", "component");
+            await annotate("Category: Validation", "category");
+            await annotate("Type: Edge Case", "type");
+
+            expect(safeInteger("abc", Number.NaN)).toBe(0);
+            expect(safeInteger("abc", Infinity)).toBe(0);
+            expect(safeInteger("abc", -Infinity)).toBe(0);
+            expect(safeInteger("abc", 12.5)).toBe(0);
+        });
+
         it("should clamp to minimum value", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validatorUtils", "component");
