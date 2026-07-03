@@ -175,6 +175,27 @@ export function withFallback<T>(value: null | T | undefined, fallback: T): T {
     return value ?? fallback;
 }
 
+/**
+ * Normalizes an externally supplied response time.
+ *
+ * @param value - Candidate response time.
+ * @param fallback - Value used when `value` is missing or invalid.
+ *
+ * @returns A finite, non-negative, rounded response time.
+ */
+export function normalizeResponseTime(
+    value: unknown,
+    fallback = 0
+): number {
+    if (typeof value === "number" && isFiniteNumber(value)) {
+        return Math.max(0, Math.round(value));
+    }
+
+    return typeof fallback === "number" && isFiniteNumber(fallback)
+        ? Math.max(0, Math.round(fallback))
+        : 0;
+}
+
 const URL_LIST_SEPARATOR = /\r?\n|,/u;
 
 /**
@@ -227,7 +248,8 @@ const UNIX_SECONDS_THRESHOLD = 10_000_000_000;
  */
 export function normalizeTimestampValue(value: unknown): number | undefined {
     if (value instanceof Date) {
-        return value.getTime();
+        const timestamp = value.getTime();
+        return isFiniteNumber(timestamp) ? timestamp : undefined;
     }
 
     if (typeof value === "number" && isFiniteNumber(value)) {

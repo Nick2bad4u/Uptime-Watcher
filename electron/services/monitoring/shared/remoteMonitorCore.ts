@@ -27,7 +27,10 @@ import {
 } from "./monitorCoreHelpers";
 import { createMonitorRetryPlan } from "./monitorRetryUtils";
 import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
-import { createMonitorErrorResult } from "./monitorServiceHelpers";
+import {
+    createMonitorErrorResult,
+    normalizeResponseTime,
+} from "./monitorServiceHelpers";
 import {
     createMonitorServiceRuntimeState,
     updateMonitorServiceRuntimeState,
@@ -218,7 +221,10 @@ export function createRemoteMonitorService<
 
                 return {
                     data: parsed,
-                    responseTime: response.responseTime ?? timeout,
+                    responseTime: normalizeResponseTime(
+                        response.responseTime,
+                        timeout
+                    ),
                 };
             } catch (fetchError) {
                 throw createFetchError(url, fetchError);

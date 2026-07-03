@@ -37,6 +37,7 @@ import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
+    normalizeResponseTime,
     parseMonitorUrlList,
 } from "./shared/monitorServiceHelpers";
 import { createHttpClient } from "./utils/httpClient";
@@ -262,7 +263,10 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
 
             return {
                 hash,
-                responseTime: response.responseTime ?? timeout,
+                responseTime: normalizeResponseTime(
+                    response.responseTime,
+                    timeout
+                ),
                 status: response.status,
                 success: true,
             };

@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import {
     extractNestedFieldValue,
+    normalizeResponseTime,
+    normalizeTimestampValue,
     validateMonitorUrl,
 } from "../../../../services/monitoring/shared/monitorServiceHelpers";
 
@@ -63,5 +65,30 @@ describe(extractNestedFieldValue, () => {
         expect(extractNestedFieldValue({ details: {} }, " ".repeat(3))).toBe(
             undefined
         );
+    });
+});
+
+describe(normalizeTimestampValue, () => {
+    it("converts valid Date values to epoch milliseconds", () => {
+        expect(
+            normalizeTimestampValue(new Date("2025-01-02T03:04:05.000Z"))
+        ).toBe(1_735_787_045_000);
+    });
+
+    it("rejects invalid Date values", () => {
+        expect(normalizeTimestampValue(new Date(Number.NaN))).toBeUndefined();
+    });
+});
+
+describe(normalizeResponseTime, () => {
+    it("rounds finite response times to non-negative milliseconds", () => {
+        expect(normalizeResponseTime(12.6)).toBe(13);
+        expect(normalizeResponseTime(-4.4)).toBe(0);
+    });
+
+    it("uses a normalized fallback for invalid response times", () => {
+        expect(normalizeResponseTime(Number.NaN, 250.8)).toBe(251);
+        expect(normalizeResponseTime(Infinity, -10)).toBe(0);
+        expect(normalizeResponseTime("100", 75)).toBe(75);
     });
 });

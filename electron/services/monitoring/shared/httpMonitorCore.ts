@@ -53,6 +53,7 @@ import {
 import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
 import {
     createMonitorErrorResult,
+    normalizeResponseTime,
     validateMonitorUrl,
 } from "./monitorServiceHelpers";
 
@@ -284,7 +285,7 @@ export function createHttpMonitorService<
                 timeout,
                 signal
             );
-            const responseTime = response.responseTime ?? 0;
+            const responseTime = normalizeResponseTime(response.responseTime);
 
             if (safeUrlForLogging) {
                 logger.debug(
