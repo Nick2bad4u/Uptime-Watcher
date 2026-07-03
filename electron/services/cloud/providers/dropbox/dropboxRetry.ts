@@ -1,7 +1,7 @@
 import { logger } from "@electron/utils/logger";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { withRetry } from "@shared/utils/retry";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { isRecord, safePropertyAccess } from "@shared/utils/typeHelpers";
 import axios from "axios";
 import { DropboxResponseError } from "dropbox";
 import { randomInt } from "node:crypto";
@@ -83,8 +83,8 @@ function extractRetryableHttpFailure(error: unknown): null | {
     status?: number;
 } {
     if (error instanceof DropboxResponseError) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Dropbox SDK types `headers` as `any`.
-        const { headers, status } = error;
+        const headers = safePropertyAccess(error, "headers");
+        const status = safePropertyAccess(error, "status");
         const retryAfterMs = parseRetryAfterMs(
             readHeaderValue(headers, "retry-after")
         );
