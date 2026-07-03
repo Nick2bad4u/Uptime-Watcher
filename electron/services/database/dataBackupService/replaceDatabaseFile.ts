@@ -2,6 +2,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
@@ -32,17 +33,17 @@ export async function replaceDatabaseFile(args: {
 
     const targetDir = path.dirname(targetPath);
     const baseName = path.basename(targetPath);
-    const timestamp = Date.now();
+    const operationId = randomUUID();
     const rollbackPath = path.join(
         targetDir,
-        `${baseName}.rollback-${timestamp}`
+        `${baseName}.rollback-${operationId}`
     );
     const rollbackWalPath = `${rollbackPath}-wal`;
     const rollbackShmPath = `${rollbackPath}-shm`;
     const rollbackJournalPath = `${rollbackPath}-journal`;
     const incomingPath = path.join(
         targetDir,
-        `${baseName}.incoming-${timestamp}`
+        `${baseName}.incoming-${operationId}`
     );
 
     const walPath = `${targetPath}-wal`;
