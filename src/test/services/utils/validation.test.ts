@@ -111,4 +111,64 @@ describe(validateServicePayload, () => {
             expect(message).not.toContain("SUPER_SECRET");
         }
     });
+
+    it("does not invoke accessor-backed validation issue arrays", () => {
+        let getterCalls = 0;
+        const validationError = {
+            message: "fallback reason",
+        };
+        Object.defineProperty(validationError, "issues", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return [{ message: "accessor issue" }];
+            },
+        });
+        const validator = (_value: unknown) => ({
+            success: false as const,
+            error: validationError,
+        });
+
+        expect(() =>
+            validateServicePayload(validator, "x", {
+                serviceName: "TestService",
+                operation: "invalid",
+            })
+        ).toThrow(/fallback reason/v);
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke accessor-backed issue details", () => {
+        let getterCalls = 0;
+        const issue = {};
+        Object.defineProperty(issue, "message", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return "accessor issue";
+            },
+        });
+        Object.defineProperty(issue, "path", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return ["field"];
+            },
+        });
+        const validator = (_value: unknown) => ({
+            success: false as const,
+            error: {
+                issues: [issue],
+                message: "fallback reason",
+            },
+        });
+
+        expect(() =>
+            validateServicePayload(validator, "x", {
+                serviceName: "TestService",
+                operation: "invalid",
+            })
+        ).toThrow(/fallback reason/v);
+        expect(getterCalls).toBe(0);
+    });
 });

@@ -19,16 +19,50 @@ import {
     type ZodIssueLike,
     type ZodIssuePathPart,
 } from "@shared/utils/zodIssueFormatting";
-import { arrayJoin, objectHasIn, safeCastTo } from "ts-extras";
+import { arrayJoin, safeCastTo } from "ts-extras";
 
 const MAX_RENDERER_SERVICE_DIAGNOSTICS_CHARS = 1000;
 
-const hasIssueArray = (
-    value: unknown
-): value is { readonly issues: unknown[] } =>
-    isObject(value) &&
-    objectHasIn(value, "issues") &&
-    Array.isArray(safeCastTo<{ issues?: unknown }>(value).issues);
+const getOwnDataValue = (
+    value: object,
+    key: string
+):
+    | { readonly found: false }
+    | { readonly found: true; readonly value: unknown } => {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+
+    if (!descriptor || !("value" in descriptor)) {
+        return { found: false };
+    }
+
+    return { found: true, value: descriptor.value };
+};
+
+const getOwnStringDataProperty = (
+    value: object,
+    key: string
+): string | undefined => {
+    const property = getOwnDataValue(value, key);
+
+    return property.found && typeof property.value === "string"
+        ? property.value
+        : undefined;
+};
+
+const getOwnArrayDataProperty = (
+    value: unknown,
+    key: string
+): unknown[] | undefined => {
+    if (!isObject(value)) {
+        return undefined;
+    }
+
+    const property = getOwnDataValue(value, key);
+
+    return property.found && Array.isArray(property.value)
+        ? property.value
+        : undefined;
+};
 
 const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
     const normalized: ZodIssueLike[] = [];
@@ -38,13 +72,14 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
             continue;
         }
 
-        const rawMessage = issue["message"];
+        const rawMessage = getOwnStringDataProperty(issue, "message");
 
-        if (typeof rawMessage === "string") {
-            const rawPath = issue["path"];
-            const path = Array.isArray(rawPath)
-                ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath)
-                : undefined;
+        if (rawMessage) {
+            const rawPath = getOwnDataValue(issue, "path");
+            const path =
+                rawPath.found && Array.isArray(rawPath.value)
+                    ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath.value)
+                    : undefined;
 
             if (path) {
                 normalized.push({ message: rawMessage, path });
@@ -157,13 +192,16 @@ const describeValidationFailureReason = (
     }
 
     if (Error.isError(cause)) {
-        const trimmed = cause.message.trim();
-        return trimmed.length > 0 ? trimmed : undefined;
+        const message = getOwnStringDataProperty(cause, "message");
+        if (message) {
+            const trimmed = message.trim();
+            return trimmed.length > 0 ? trimmed : undefined;
+        }
     }
 
     if (isObject(cause)) {
-        const messageCandidate = cause["message"];
-        if (typeof messageCandidate === "string") {
+        const messageCandidate = getOwnStringDataProperty(cause, "message");
+        if (messageCandidate) {
             const trimmed = messageCandidate.trim();
             return trimmed.length > 0 ? trimmed : undefined;
         }
@@ -230,9 +268,8 @@ export function validateServicePayload<T>(
         const errorForEnsure = safeCastTo<{ readonly error: unknown }>(
             parsed
         ).error;
-        const issues = hasIssueArray(errorForEnsure)
-            ? normalizeZodIssueLikeArray(errorForEnsure.issues)
-            : [];
+        const rawIssues = getOwnArrayDataProperty(errorForEnsure, "issues");
+        const issues = rawIssues ? normalizeZodIssueLikeArray(rawIssues) : [];
 
         const formattedIssues = arrayJoin(
             formatZodIssues(issues, {
