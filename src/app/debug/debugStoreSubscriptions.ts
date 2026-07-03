@@ -13,14 +13,7 @@ import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useUpdatesStore } from "../../stores/updates/useUpdatesStore";
-
-/**
- * Structural ref type (compatible with `useRef`) without depending on
- * deprecated React types.
- */
-export interface MutableRef<T> {
-    current: T;
-}
+import type { MutableRef } from "../types";
 
 /** Update counters used for development logging. */
 export interface DebugStoreCountRefs {

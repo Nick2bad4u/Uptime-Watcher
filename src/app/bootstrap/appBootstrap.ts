@@ -14,6 +14,7 @@ import { isDevelopment, isProduction } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeCastTo } from "ts-extras";
 
+import type { MutableRef } from "../types";
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
 
 import {
@@ -51,18 +52,6 @@ export interface AppBootstrapUpdateCountRefs {
     sitesUpdateCountRef: MutableRef<number>;
     uiUpdateCountRef: MutableRef<number>;
     updatesUpdateCountRef: MutableRef<number>;
-}
-
-/**
- * Structural ref type used by this module.
- *
- * @remarks
- * We intentionally avoid importing `React.MutableRefObject` because it is
- * deprecated in the project lint rules. `useRef()` values are structurally
- * compatible with this interface.
- */
-export interface MutableRef<T> {
-    current: T;
 }
 
 /**

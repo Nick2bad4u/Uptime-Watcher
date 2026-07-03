@@ -7,14 +7,7 @@ import {
     subscribeToMediaQueryListChanges,
     tryGetMediaQueryList,
 } from "../../utils/mediaQueries";
-
-/**
- * Structural ref type (compatible with `useRef`) without depending on
- * deprecated React types.
- */
-export interface MutableRef<T> {
-    current: T;
-}
+import type { MutableRef } from "../types";
 
 /** Options for {@link setupSidebarMediaQueryListener}. */
 export interface SetupSidebarMediaQueryListenerOptions {
