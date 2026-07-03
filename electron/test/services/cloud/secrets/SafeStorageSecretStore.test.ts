@@ -64,6 +64,26 @@ describe(SafeStorageSecretStore, () => {
         );
         expect(settings.get("cloud.dropbox.tokens")).toBe("");
     });
+
+    it("clears non-canonical base64 secrets before decryption", async () => {
+        const settings = new Map<string, string>();
+
+        const store = new SafeStorageSecretStore({
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+        });
+
+        settings.set("cloud.dropbox.tokens", "not-base64!");
+
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            undefined
+        );
+        expect(settings.get("cloud.dropbox.tokens")).toBe("");
+    });
 });
 
 class MutableSecretStore implements SecretStore {

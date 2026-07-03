@@ -1,5 +1,7 @@
 import { safeStorage } from "electron";
 
+import { decodeCanonicalBase64 } from "../internal/cloudServicePrimitives";
+
 /**
  * Secret storage abstraction for cloud provider credentials.
  */
@@ -131,7 +133,11 @@ export class SafeStorageSecretStore implements SecretStore {
         }
 
         try {
-            return safeStorage.decryptString(Buffer.from(stored, "base64"));
+            const encrypted = decodeCanonicalBase64({
+                label: "stored secret",
+                value: stored,
+            });
+            return safeStorage.decryptString(encrypted);
         } catch {
             // If decryption fails (machine/user change, corruption), treat as missing.
             await this.settings.set(key, "").catch(() => {});
