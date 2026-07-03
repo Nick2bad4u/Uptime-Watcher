@@ -1641,6 +1641,59 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     )
                 ).toThrow(/HistoryRow/v);
             });
+
+            it("should reject blank string history timestamps", () => {
+                mockGet.mockReturnValue({
+                    monitorId: "monitor-1",
+                    status: "up",
+                    timestamp: " ",
+                });
+
+                expect(() =>
+                    queryHistoryRow(
+                        mockDb,
+                        "SELECT * FROM history WHERE monitor_id = ?",
+                        ["monitor-1"]
+                    )
+                ).toThrow(/HistoryRow/v);
+            });
+
+            it.each([Number.NaN, Infinity, -Infinity])(
+                "should reject non-finite numeric history response times: %s",
+                (responseTime) => {
+                    mockGet.mockReturnValue({
+                        monitorId: "monitor-1",
+                        responseTime,
+                        status: "up",
+                        timestamp: Date.now(),
+                    });
+
+                    expect(() =>
+                        queryHistoryRow(
+                            mockDb,
+                            "SELECT * FROM history WHERE monitor_id = ?",
+                            ["monitor-1"]
+                        )
+                    ).toThrow(/HistoryRow/v);
+                }
+            );
+
+            it("should reject infinite string history response times", () => {
+                mockGet.mockReturnValue({
+                    monitorId: "monitor-1",
+                    responseTime: "Infinity",
+                    status: "up",
+                    timestamp: Date.now(),
+                });
+
+                expect(() =>
+                    queryHistoryRow(
+                        mockDb,
+                        "SELECT * FROM history WHERE monitor_id = ?",
+                        ["monitor-1"]
+                    )
+                ).toThrow(/HistoryRow/v);
+            });
         });
         describe("Type Interfaces", () => {
             it("should export CountResult interface", async ({

@@ -313,6 +313,19 @@ export function queryForSingleRecord<TRow extends object = UnknownRecord>(
     return ensureValidRow(row, options, options?.label);
 }
 
+function isFiniteRowNumber(value: unknown): boolean {
+    if (typeof value === "number") {
+        return isFiniteNumber(value);
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        return trimmed.length > 0 && isFiniteNumber(Number(trimmed));
+    }
+
+    return false;
+}
+
 const isValidHistoryEntryRow = (
     row: UnknownRecord
 ): row is EnforcedRow<HistoryRow> => {
@@ -326,21 +339,13 @@ const isValidHistoryEntryRow = (
         return false;
     }
 
-    let hasValidTimestamp = false;
-    if (typeof timestamp === "number") {
-        hasValidTimestamp = isFiniteNumber(timestamp);
-    } else if (typeof timestamp === "string") {
-        hasValidTimestamp = isFiniteNumber(Number(timestamp));
-    }
-
-    if (!hasValidTimestamp) {
+    if (!isFiniteRowNumber(timestamp)) {
         return false;
     }
 
     return (
         !isDefined(responseTime) ||
-        typeof responseTime === "number" ||
-        typeof responseTime === "string"
+        isFiniteRowNumber(responseTime)
     );
 };
 
