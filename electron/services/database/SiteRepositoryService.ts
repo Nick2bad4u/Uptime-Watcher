@@ -111,7 +111,7 @@ export class SiteRepositoryService {
         const limit = await this.getHistoryLimitSetting();
         if (isDefined(limit)) {
             await monitoringConfig.setHistoryLimit(limit);
-            this.logger.info(`History limit applied: ${limit}`);
+            this.logger.info("History limit applied", { limit });
         }
     }
 
@@ -129,9 +129,9 @@ export class SiteRepositoryService {
             const parsedLimit = parseHistoryLimitSetting(historyLimitSetting);
 
             if (!isDefined(parsedLimit)) {
-                this.logger.warn(
-                    `Invalid history limit setting: ${historyLimitSetting}`
-                );
+                this.logger.warn("Invalid history limit setting", {
+                    value: historyLimitSetting,
+                });
                 return undefined;
             }
 
@@ -152,16 +152,14 @@ export class SiteRepositoryService {
             } catch (error) {
                 const normalizedError = ensureError(error);
                 this.logger.warn(
-                    `Invalid history limit setting: ${historyLimitSetting}`,
-                    normalizedError
+                    "Invalid history limit setting",
+                    normalizedError,
+                    { value: historyLimitSetting }
                 );
                 return undefined;
             }
         } catch (error) {
-            this.logger.warn(
-                "Could not load history limit from settings:",
-                error
-            );
+            this.logger.warn("Could not load history limit from settings", error);
             return undefined;
         }
     }
@@ -189,9 +187,7 @@ export class SiteRepositoryService {
                 await this.repositories.site.findByIdentifier(identifier);
 
             if (!siteRow) {
-                this.logger.debug(
-                    `[SiteRepositoryService] Site not found: ${identifier}`
-                );
+                this.logger.debug("Site not found", { identifier });
                 return undefined;
             }
 
@@ -253,7 +249,9 @@ export class SiteRepositoryService {
                 }))
             );
 
-            this.logger.info(`Loaded ${sites.length} sites into cache`);
+            this.logger.info("Sites loaded into cache", {
+                count: sites.length,
+            });
         } catch (error) {
             const normalizedError = ensureError(error);
             const message = `Failed to load sites into cache: ${getUnknownErrorMessage(error)}`;

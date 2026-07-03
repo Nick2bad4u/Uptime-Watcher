@@ -185,7 +185,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             expect(result).toBeUndefined();
             expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Invalid history limit setting: invalid"
+                "Invalid history limit setting",
+                { value: "invalid" }
             );
         });
 
@@ -208,7 +209,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
                 expect(result).toBeUndefined();
                 expect(mockLogger.warn).toHaveBeenCalledWith(
-                    `Invalid history limit setting: ${value}`
+                    "Invalid history limit setting",
+                    { value }
                 );
             }
         });
@@ -265,7 +267,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             expect(result).toBeUndefined();
             expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Could not load history limit from settings:",
+                "Could not load history limit from settings",
                 error
             );
         });
@@ -291,7 +293,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 50
             );
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "History limit applied: 50"
+                "History limit applied",
+                { limit: 50 }
             );
         });
 
@@ -654,7 +657,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(mockSiteCache.clear).not.toHaveBeenCalled();
             expect(mockSiteCache.set).not.toHaveBeenCalled();
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Loaded 2 sites into cache"
+                "Sites loaded into cache",
+                { count: 2 }
             );
         });
 
@@ -676,7 +680,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             expect(mockSiteCache.clear).not.toHaveBeenCalled();
             expect(mockSiteCache.set).not.toHaveBeenCalled();
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Loaded 0 sites into cache"
+                "Sites loaded into cache",
+                { count: 0 }
             );
         });
 
