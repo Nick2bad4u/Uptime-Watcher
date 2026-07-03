@@ -39,12 +39,18 @@ import {
 /**
  * Narrowed monitor type helper keyed by monitor "type" literal.
  */
+class InvalidJsonResponseError extends Error {
+    public constructor(url: string, error: unknown) {
+        const normalized = ensureError(error);
+        super(`Invalid JSON response from ${url}: ${normalized.message}`, {
+            cause: error,
+        });
+        this.name = "InvalidJsonResponseError";
+    }
+}
+
 function createInvalidJsonError(url: string, error: unknown): Error {
-    const normalized = ensureError(error);
-    return new Error(
-        `Invalid JSON response from ${url}: ${normalized.message}`,
-        { cause: error }
-    );
+    return new InvalidJsonResponseError(url, error);
 }
 
 function createFetchError(url: string, error: unknown): Error {
@@ -230,6 +236,10 @@ export function createRemoteMonitorService<
                     ),
                 };
             } catch (fetchError) {
+                if (fetchError instanceof InvalidJsonResponseError) {
+                    throw fetchError;
+                }
+
                 throw createFetchError(url, fetchError);
             }
         }

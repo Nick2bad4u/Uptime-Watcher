@@ -124,4 +124,20 @@ describe("ServerHeartbeatMonitor service", () => {
         expect(result.error).toContain("Failed to fetch heartbeat");
         expect(transportError.message).toBe("Network failure");
     });
+
+    it("keeps invalid JSON failures distinct from generic fetch failures", async () => {
+        httpGetMock.mockResolvedValue({
+            data: "{not-json",
+            responseTime: 25,
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Failed to fetch heartbeat");
+        expect(result.error).toContain("Invalid JSON response");
+        expect(result.error).not.toContain(
+            "Failed to fetch https://api.example.com/heartbeat"
+        );
+    });
 });

@@ -136,4 +136,28 @@ describe("ReplicationMonitor service", () => {
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed to fetch");
     });
+
+    it("keeps invalid JSON failures distinct from generic fetch failures", async () => {
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url.includes("primary")) {
+                return {
+                    data: "{not-json",
+                    responseTime: 30,
+                };
+            }
+
+            return {
+                data: {
+                    timestamp: Date.now(),
+                },
+                responseTime: 50,
+            };
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Invalid JSON response");
+        expect(result.error).not.toContain("Failed to fetch");
+    });
 });
