@@ -1,11 +1,36 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    createTimeoutSignal,
     mergeAbortSignals,
     withOptionalAbortSignal,
 } from "../../../../services/monitoring/shared/abortSignalUtils";
 
 describe("abortSignalUtils", () => {
+    describe(createTimeoutSignal, () => {
+        it.each([
+            Number.NaN,
+            Infinity,
+            -Infinity,
+            0,
+            -1,
+        ])(
+            "returns a non-aborted signal for invalid timeout %s",
+            (timeoutMs) => {
+                const signal = createTimeoutSignal(timeoutMs);
+
+                expect(signal.aborted).toBeFalsy();
+            }
+        );
+
+        it("preserves the external signal when timeout is invalid", () => {
+            const controller = new AbortController();
+            const signal = createTimeoutSignal(Number.NaN, controller.signal);
+
+            expect(signal).toBe(controller.signal);
+        });
+    });
+
     describe(mergeAbortSignals, () => {
         it.each([
             Number.NaN,

@@ -11,6 +11,11 @@ export function createTimeoutSignal(
     timeoutMs: number,
     signal?: AbortSignal
 ): AbortSignal {
+    const hasTimeout = isFiniteNumber(timeoutMs) && timeoutMs > 0;
+    if (!hasTimeout) {
+        return signal ?? new AbortController().signal;
+    }
+
     const timeoutSignal = AbortSignal.timeout(timeoutMs);
     return signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal;
 }
