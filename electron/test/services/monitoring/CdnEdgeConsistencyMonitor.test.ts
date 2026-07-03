@@ -131,6 +131,38 @@ describe("CdnEdgeConsistencyMonitor service", () => {
         expect(result.error).toContain("Failed request");
     });
 
+    it("does not invoke responseTime accessors on edge request errors", async () => {
+        const baselineBuffer = Buffer.from("baseline-response");
+        const edgeError = new Error("Failed edge request");
+        let accessCount = 0;
+
+        Object.defineProperty(edgeError, "responseTime", {
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return 25;
+            },
+        });
+
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url === monitor.baselineUrl) {
+                return {
+                    data: baselineBuffer,
+                    responseTime: 40,
+                    status: 200,
+                };
+            }
+
+            throw edgeError;
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Failed edge request");
+        expect(accessCount).toBe(0);
+    });
+
     it("validates configuration and returns error for missing baseline", async () => {
         monitor = createMonitor({ baselineUrl: "" });
 

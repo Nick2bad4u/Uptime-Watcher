@@ -12,6 +12,7 @@ import type { MonitorType, Site } from "@shared/types";
 import type { AxiosInstance } from "axios";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
@@ -274,15 +275,9 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             const normalized = ensureError(error);
 
             let responseTime = timeout;
-            if (
-                typeof error === "object" &&
-                error !== null &&
-                objectHasIn(
-                    castUnchecked<Record<PropertyKey, unknown>>(error),
-                    "responseTime"
-                )
-            ) {
-                const candidate: unknown = Reflect.get(error, "responseTime");
+            if (typeof error === "object" && error !== null) {
+                const property = getOwnDataProperty(error, "responseTime");
+                const candidate = property.found ? property.value : undefined;
                 if (
                     typeof candidate === "number" &&
                     isFiniteNumber(candidate)
