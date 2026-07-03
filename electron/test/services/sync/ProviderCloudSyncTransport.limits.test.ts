@@ -357,6 +357,20 @@ describe("ProviderCloudSyncTransport.readManifest decoding", () => {
         await expect(transport.readManifest()).resolves.toBeNull();
     });
 
+    it("treats invalid JSON manifest content as missing", async () => {
+        const provider = createProvider({
+            downloadObject: async (key) => {
+                if (key === "manifest.json") {
+                    return Buffer.from("{not-json", "utf8");
+                }
+                return Buffer.from("", "utf8");
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        await expect(transport.readManifest()).resolves.toBeNull();
+    });
+
     it("treats manifests with invalid latestSnapshotKey as missing", async () => {
         const provider = createProvider({
             downloadObject: async (key) => {

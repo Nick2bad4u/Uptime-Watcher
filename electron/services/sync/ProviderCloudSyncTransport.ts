@@ -469,7 +469,23 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 return null;
             }
 
-            const manifest = parseCloudSyncManifest(JSON.parse(rawOrNull));
+            const parsedManifest = ((): unknown => {
+                try {
+                    return JSON.parse(rawOrNull);
+                } catch (error: unknown) {
+                    const resolved = ensureError(error);
+                    throw new CloudSyncCorruptRemoteObjectError(
+                        `Cloud sync manifest contains invalid JSON: ${resolved.message}`,
+                        {
+                            cause: error,
+                            key: MANIFEST_KEY,
+                            kind: "manifest",
+                        }
+                    );
+                }
+            })();
+
+            const manifest = parseCloudSyncManifest(parsedManifest);
             validateManifestSnapshotKey(manifest);
             return manifest;
         } catch (error) {
