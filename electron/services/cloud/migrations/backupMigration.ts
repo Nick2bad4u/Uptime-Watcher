@@ -4,7 +4,7 @@ import type {
 } from "@shared/types/cloudBackupMigration";
 import type { AsyncReturnType } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { arrayJoin, isDefined, isEmpty, setHas } from "ts-extras";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
@@ -152,7 +152,7 @@ async function migrateSingleEntry(args: {
         };
     } catch (error) {
         return {
-            failureMessage: ensureError(error).message,
+            failureMessage: getUserFacingErrorDetail(error),
             migrated: false,
             postMigrationWarningMessage: undefined,
             targetKey,

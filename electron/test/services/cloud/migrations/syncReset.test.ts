@@ -15,9 +15,15 @@ import { describe, expect, it, vi } from "vitest";
 class InMemoryProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;
 
+    private deleteError: Error | undefined;
+
     private readonly objects = new Map<string, Buffer>();
 
     public async deleteObject(key: string): Promise<void> {
+        if (this.deleteError) {
+            throw this.deleteError;
+        }
+
         this.objects.delete(key);
     }
 
@@ -87,6 +93,10 @@ class InMemoryProvider implements CloudStorageProvider {
 
     public seedObject(key: string, value: string): void {
         this.objects.set(key, Buffer.from(value, "utf8"));
+    }
+
+    public setDeleteError(error: Error): void {
+        this.deleteError = error;
     }
 
     public readJson<T>(key: string): T {
@@ -172,5 +182,38 @@ describe(resetProviderCloudSyncState, () => {
         expect(nextManifest.resetAt).toBeTypeOf("number");
         expect(nextManifest.latestSnapshotKey).toBeUndefined();
         expect(Object.keys(nextManifest.devices)).toHaveLength(0);
+    });
+
+    it("sanitizes failed deletion messages in reset results", async () => {
+        const provider = new InMemoryProvider();
+        provider.seedObject("sync/devices/a/ops/1-1-1.ndjson", "{}");
+        provider.setDeleteError(
+            new Error(
+                `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+            )
+        );
+
+        const syncEngine: CloudSyncEngine = {
+            syncNow: vi.fn(async () => ({
+                appliedRemoteOperations: 0,
+                emittedLocalOperations: 0,
+                mergedEntities: 0,
+            })),
+        };
+
+        const result = await resetProviderCloudSyncState({
+            provider,
+            syncEngine,
+        });
+
+        expect(result.deletedObjects).toBe(0);
+        expect(result.failedDeletions).toHaveLength(1);
+        const message = result.failedDeletions[0]?.message ?? "";
+        expect(message).not.toContain("SUPER_SECRET_TOKEN");
+        expect(message).not.toContain("\n");
+        expect(message).not.toContain("\t");
+        expect(message).toContain("refresh_token=[redacted]&status=failed");
+        expect(message.endsWith("...")).toBeTruthy();
+        expect(message.length).toBeLessThanOrEqual(1003);
     });
 });

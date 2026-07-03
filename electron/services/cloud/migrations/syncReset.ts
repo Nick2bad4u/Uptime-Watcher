@@ -1,6 +1,7 @@
 import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isDefined } from "ts-extras";
 
 import type { CloudSyncEngine } from "../../sync/SyncEngine";
@@ -53,7 +54,7 @@ async function deleteObjectsBestEffort(args: {
                 if (!shouldIgnoreDeletionErrorDuringSyncReset(error)) {
                     failures.push({
                         key,
-                        message: ensureError(error).message,
+                        message: getUserFacingErrorDetail(error),
                     });
                 }
             }

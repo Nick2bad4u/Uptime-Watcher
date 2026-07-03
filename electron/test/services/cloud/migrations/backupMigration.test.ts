@@ -16,7 +16,7 @@ import {
     isEncryptedPayload,
 } from "@electron/services/cloud/crypto/cloudCrypto";
 import { migrateProviderBackups } from "@electron/services/cloud/migrations/backupMigration";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 class InMemoryBackupProvider implements CloudStorageProvider {
     public readonly kind = "filesystem" as const;
@@ -309,6 +309,48 @@ describe(migrateProviderBackups, () => {
         expect(result.failures[0]?.key).toBe(
             "backups/uptime-watcher-backup-10.sqlite"
         );
+    });
+
+    it("sanitizes migration failure messages", async () => {
+        const provider = new InMemoryBackupProvider();
+        provider.seedBackup({
+            buffer: Buffer.from("plain", "utf8"),
+            createdAt: 10,
+            encrypted: false,
+            fileName: "uptime-watcher-backup-10.sqlite",
+            key: "backups/uptime-watcher-backup-10.sqlite",
+        });
+
+        vi.spyOn(provider, "downloadBackup").mockRejectedValueOnce(
+            new Error(
+                `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+            )
+        );
+
+        const key = await derivePassphraseKey({
+            passphrase: "correct horse battery staple",
+            salt: generateEncryptionSalt(),
+        });
+
+        const request: CloudBackupMigrationRequest = {
+            deleteSource: false,
+            target: "encrypted",
+        };
+
+        const result = await migrateProviderBackups({
+            encryptionKey: key,
+            provider,
+            request,
+        });
+
+        expect(result.failures).toHaveLength(1);
+        const message = result.failures[0]?.message ?? "";
+        expect(message).not.toContain("SUPER_SECRET_TOKEN");
+        expect(message).not.toContain("\n");
+        expect(message).not.toContain("\t");
+        expect(message).toContain("refresh_token=[redacted]&status=failed");
+        expect(message.endsWith("...")).toBeTruthy();
+        expect(message.length).toBeLessThanOrEqual(1003);
     });
 
     it("refuses to overwrite an existing migrated target backup", async () => {

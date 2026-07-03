@@ -1,4 +1,4 @@
-import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -30,7 +30,7 @@ export async function collectSourceDeletionErrors(args: {
     return deletions
         .flatMap((result) =>
             result.status === "rejected"
-                ? [ensureError(result.reason).message]
+                ? [getUserFacingErrorDetail(result.reason)]
                 : []
         )
         .filter((message) => message.trim().length > 0);

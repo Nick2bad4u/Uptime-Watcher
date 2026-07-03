@@ -83,5 +83,32 @@ describe("backupMigrationHelpers", () => {
                 `cannot delete ${metadataKey}`,
             ]);
         });
+
+        it("sanitizes deletion failure messages", async () => {
+            const sourceKey = "backup-1.enc";
+            const deleteObject = vi.fn(async () => {
+                throw new Error(
+                    `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+                );
+            });
+
+            const errors = await collectSourceDeletionErrors({
+                deleteSource: true,
+                provider: createProvider(deleteObject),
+                sourceKey,
+            });
+
+            expect(errors).toHaveLength(2);
+            for (const message of errors) {
+                expect(message).not.toContain("SUPER_SECRET_TOKEN");
+                expect(message).not.toContain("\n");
+                expect(message).not.toContain("\t");
+                expect(message).toContain(
+                    "refresh_token=[redacted]&status=failed"
+                );
+                expect(message.endsWith("...")).toBeTruthy();
+                expect(message.length).toBeLessThanOrEqual(1003);
+            }
+        });
     });
 });
