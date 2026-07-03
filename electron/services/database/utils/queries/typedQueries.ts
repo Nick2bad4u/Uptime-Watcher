@@ -330,7 +330,7 @@ const isValidHistoryEntryRow = (
     if (typeof timestamp === "number") {
         hasValidTimestamp = isFiniteNumber(timestamp);
     } else if (typeof timestamp === "string") {
-        hasValidTimestamp = !Number.isNaN(Number(timestamp));
+        hasValidTimestamp = isFiniteNumber(Number(timestamp));
     }
 
     if (!hasValidTimestamp) {
