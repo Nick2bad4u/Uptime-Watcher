@@ -12,6 +12,7 @@
 import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { withRetry } from "@shared/utils/retry";
 import { isEmpty, safeCastTo } from "ts-extras";
 
@@ -132,11 +133,8 @@ const safeGetProperty = (target: unknown, key: PropertyKey): unknown => {
         return undefined;
     }
 
-    try {
-        return Reflect.get(target, key);
-    } catch {
-        return undefined;
-    }
+    const property = getOwnDataProperty(target, key);
+    return property.found ? property.value : undefined;
 };
 
 const obtainBridgeRoot = (): BridgeRoot | undefined => {

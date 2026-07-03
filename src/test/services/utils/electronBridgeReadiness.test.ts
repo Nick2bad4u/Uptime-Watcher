@@ -109,6 +109,82 @@ describe(waitForElectronBridge, () => {
         });
     });
 
+    it("does not invoke electronAPI accessors while checking bridge readiness", async () => {
+        let accessCount = 0;
+
+        vi.stubGlobal(
+            "window",
+            Object.defineProperty({}, "electronAPI", {
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return { sites: {} };
+                },
+            })
+        );
+
+        const promise = waitForElectronBridge({
+            baseDelay: 0,
+            contracts: [{ domain: "sites" }],
+            maxAttempts: 1,
+        }).catch((error: unknown) => error as ElectronBridgeNotReadyError);
+
+        await vi.runAllTimersAsync();
+
+        const error = await promise;
+        expect(error).toBeInstanceOf(ElectronBridgeNotReadyError);
+        expect(error).toMatchObject({
+            diagnostics: {
+                bridgeAvailable: false,
+                missingDomains: ["sites"],
+            },
+        });
+        expect(accessCount).toBe(0);
+    });
+
+    it("does not invoke domain or method accessors while evaluating contracts", async () => {
+        const bridge = {};
+        const sites = {};
+        let accessCount = 0;
+
+        Object.defineProperty(bridge, "sites", {
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return sites;
+            },
+        });
+        Object.defineProperty(sites, "getSites", {
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return vi.fn();
+            },
+        });
+        vi.stubGlobal("window", {
+            electronAPI: bridge,
+        });
+
+        const promise = waitForElectronBridge({
+            baseDelay: 0,
+            contracts: [{ domain: "sites", methods: ["getSites"] }],
+            maxAttempts: 1,
+        }).catch((error: unknown) => error as ElectronBridgeNotReadyError);
+
+        await vi.runAllTimersAsync();
+
+        const error = await promise;
+        expect(error).toBeInstanceOf(ElectronBridgeNotReadyError);
+        expect(error).toMatchObject({
+            diagnostics: {
+                bridgeAvailable: true,
+                missingDomains: ["sites"],
+                missingMethods: [],
+            },
+        });
+        expect(accessCount).toBe(0);
+    });
+
     it("defaults non-finite maxAttempts before polling", async () => {
         const promise = waitForElectronBridge({
             baseDelay: 0,
