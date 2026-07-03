@@ -277,6 +277,7 @@ export async function startLoopbackOAuthServer(args?: {
     let rejectPromise: ((error: unknown) => void) | null = null;
     let expectedStateValue: null | string = null;
     let pendingCallback: LoopbackOAuthCallback | null = null;
+    let pendingCallbackError: Error | null = null;
 
     const callbackPromise = new Promise<LoopbackOAuthCallback>(
         (resolve, reject) => {
@@ -316,11 +317,14 @@ export async function startLoopbackOAuthServer(args?: {
                     title: "Authorization failed",
                 });
 
+                const error = new Error(
+                    `OAuth callback error: ${callbackError}`
+                );
                 if (!isResolved && expectedStateValue !== null) {
                     isResolved = true;
-                    rejectPromise?.(
-                        new Error(`OAuth callback error: ${callbackError}`)
-                    );
+                    rejectPromise?.(error);
+                } else if (!isResolved) {
+                    pendingCallbackError ??= error;
                 }
                 return;
             }
@@ -332,11 +336,14 @@ export async function startLoopbackOAuthServer(args?: {
                     title: "Authorization failed",
                 });
 
+                const error = new Error(
+                    "OAuth callback missing required parameters"
+                );
                 if (!isResolved && expectedStateValue !== null) {
                     isResolved = true;
-                    rejectPromise?.(
-                        new Error("OAuth callback missing required parameters")
-                    );
+                    rejectPromise?.(error);
+                } else if (!isResolved) {
+                    pendingCallbackError ??= error;
                 }
 
                 return;
@@ -470,11 +477,22 @@ export async function startLoopbackOAuthServer(args?: {
         }): Promise<LoopbackOAuthCallback> => {
             expectedStateValue = expectedState;
 
-            if (pendingCallback?.state === expectedStateValue && !isResolved) {
+            if (pendingCallbackError && !isResolved) {
+                isResolved = true;
+                rejectPromise?.(pendingCallbackError);
+                pendingCallbackError = null;
+            } else if (
+                pendingCallback?.state === expectedStateValue &&
+                !isResolved
+            ) {
                 isResolved = true;
                 resolvePromise?.(pendingCallback);
                 pendingCallback = null;
             } else if (pendingCallback) {
+                if (!isResolved) {
+                    isResolved = true;
+                    rejectPromise?.(new Error("OAuth state mismatch"));
+                }
                 pendingCallback = null;
             }
 
