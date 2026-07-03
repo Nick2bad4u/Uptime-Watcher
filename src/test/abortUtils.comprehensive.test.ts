@@ -91,6 +91,30 @@ describe("abortUtils.ts - Comprehensive Coverage", () => {
             expect(signal.aborted).toBeFalsy();
         });
 
+        it("should ignore timeoutMs when it is non-finite", () => {
+            const signal = createCombinedAbortSignal({
+                timeoutMs: Number.POSITIVE_INFINITY,
+            });
+            expect(signal).toBeInstanceOf(AbortSignal);
+            expect(signal.aborted).toBeFalsy();
+        });
+
+        it("should cap oversized timeoutMs values", () => {
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+
+            const signal = createCombinedAbortSignal({
+                timeoutMs: Number.MAX_SAFE_INTEGER,
+            });
+
+            expect(signal).toBeInstanceOf(AbortSignal);
+            expect(setTimeoutSpy).toHaveBeenCalledWith(
+                expect.any(Function),
+                2_147_483_647
+            );
+
+            setTimeoutSpy.mockRestore();
+        });
+
         it("should include additional signals when provided", () => {
             const controller1 = new AbortController();
             const controller2 = new AbortController();

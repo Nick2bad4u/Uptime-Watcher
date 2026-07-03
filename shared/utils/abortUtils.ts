@@ -10,6 +10,7 @@ const NOOP_TIMEOUT_REJECT: (reason: unknown) => void = () => {
 const DEFAULT_RETRY_INITIAL_DELAY_MS = 1000;
 const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
 const DEFAULT_RETRY_MAX_RETRIES = 3;
+const MAX_SAFE_TIMER_DELAY_MS = 2_147_483_647;
 
 function tryUnrefTimer(timeoutId: unknown): void {
     const record = ensureRecordLike(timeoutId);
@@ -54,6 +55,14 @@ function normalizePositiveMs(
     }
 
     return value;
+}
+
+function normalizeOptionalTimeoutMs(value: number | undefined): number | undefined {
+    if (!isDefined(value) || !isFiniteNumber(value) || value <= 0) {
+        return undefined;
+    }
+
+    return Math.min(value, MAX_SAFE_TIMER_DELAY_MS);
 }
 
 /**
@@ -157,6 +166,7 @@ export function createCombinedAbortSignal(
     const additionalSignals = Array.isArray(additionalSignalsOption)
         ? additionalSignalsOption
         : [];
+    const normalizedTimeoutMs = normalizeOptionalTimeoutMs(timeoutMs);
 
     const signals: AbortSignal[] = [];
 
@@ -191,8 +201,8 @@ export function createCombinedAbortSignal(
     };
 
     // Add timeout signal if specified
-    if (isDefined(timeoutMs) && timeoutMs > 0) {
-        signals.push(createTimeoutSignal(timeoutMs, reason));
+    if (isDefined(normalizedTimeoutMs)) {
+        signals.push(createTimeoutSignal(normalizedTimeoutMs, reason));
     }
 
     // Add additional signals.

@@ -500,7 +500,8 @@ describe("abortUtils.ts - Comprehensive Fast-Check Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.integer({ max: 0 }), // non-positive numbers
-                        fc.constant(NaN) // NaN (but not Infinity since it throws)
+                        fc.constant(NaN),
+                        fc.constant(Number.POSITIVE_INFINITY)
                     ),
                     (invalidTimeout) => {
                         expect(() => {
