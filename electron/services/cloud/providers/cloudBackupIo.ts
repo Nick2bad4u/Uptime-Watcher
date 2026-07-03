@@ -159,7 +159,15 @@ export async function uploadBackupWithMetadata(args: {
         // Best-effort cleanup: a backup object without its metadata sidecar is
         // effectively undiscoverable via listBackups(), so try to remove it.
         if (args.deleteObject) {
-            await args.deleteObject(backupKey).catch(() => {});
+            try {
+                await args.deleteObject(backupKey);
+            } catch (cleanupError: unknown) {
+                throw new AggregateError(
+                    [error, cleanupError],
+                    `Failed to upload backup metadata and clean up orphaned backup object '${backupKey}'`,
+                    { cause: cleanupError }
+                );
+            }
         }
 
         throw error;

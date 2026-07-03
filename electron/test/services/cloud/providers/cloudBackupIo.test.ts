@@ -169,4 +169,43 @@ describe(uploadBackupWithMetadata, () => {
 
         expect(deleteObject).toHaveBeenCalledWith("backups/backup.sqlite");
     });
+
+    it("surfaces cleanup failure when metadata upload leaves an orphaned backup", async () => {
+        const metadataUploadError = new Error("metadata upload failed");
+        const cleanupError = new Error("cleanup failed");
+        const uploadObject = vi
+            .fn<(args: { buffer: Buffer; key: string }) => Promise<void>>()
+            .mockResolvedValueOnce(undefined)
+            .mockRejectedValueOnce(metadataUploadError);
+
+        const deleteObject = vi
+            .fn<(key: string) => Promise<void>>()
+            .mockRejectedValue(cleanupError);
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("backup", "utf8"),
+                deleteObject,
+                encrypted: false,
+                fileName: "backup.sqlite",
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 6,
+                },
+                uploadObject,
+            })
+        ).rejects.toMatchObject({
+            errors: [metadataUploadError, cleanupError],
+            message:
+                "Failed to upload backup metadata and clean up orphaned backup object 'backups/backup.sqlite'",
+        });
+
+        expect(deleteObject).toHaveBeenCalledWith("backups/backup.sqlite");
+    });
 });
