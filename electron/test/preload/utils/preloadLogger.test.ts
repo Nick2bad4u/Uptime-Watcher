@@ -108,4 +108,53 @@ describe(buildPayloadPreview, () => {
         expect(preview).toContain("[REDACTED]");
         expect(preview).toContain("ordinary-value");
     });
+
+    it("does not invoke object accessors while building previews", () => {
+        let getterCalls = 0;
+        const payload = {
+            safe: "visible",
+        };
+        Object.defineProperty(payload, "computed", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return "secret-from-getter";
+            },
+        });
+        Object.defineProperty(payload, "accessToken", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return "secret-token";
+            },
+        });
+
+        const preview = buildPayloadPreview(payload);
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain("[Accessor]");
+        expect(preview).toContain("[REDACTED]");
+        expect(preview).not.toContain("secret-from-getter");
+        expect(preview).not.toContain("secret-token");
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke Error cause accessors while building previews", () => {
+        let getterCalls = 0;
+        const error = new Error("failed");
+        Object.defineProperty(error, "cause", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return new Error("nested");
+            },
+        });
+
+        const preview = buildPayloadPreview({ error });
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain("failed");
+        expect(preview).not.toContain("nested");
+        expect(getterCalls).toBe(0);
+    });
 });

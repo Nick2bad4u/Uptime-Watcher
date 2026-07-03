@@ -24,12 +24,7 @@ import { isObject } from "@shared/utils/typeGuards";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { ipcRenderer } from "electron";
 import log from "electron-log/renderer";
-import {
-    isDefined,
-    isFinite as isFiniteNumber,
-    objectHasIn,
-    objectKeys,
-} from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectKeys } from "ts-extras";
 
 const PRELOAD_PREFIX = "PRELOAD";
 const DIAGNOSTICS_PREFIX = "PRELOAD:DIAGNOSTICS";
@@ -41,6 +36,7 @@ const MAX_PREVIEW_OBJECT_KEYS = 25;
 const MAX_PREVIEW_ARRAY_ITEMS = 25;
 
 const REDACTED_PLACEHOLDER = "[REDACTED]";
+const ACCESSOR_PLACEHOLDER = "[Accessor]";
 const CIRCULAR_PLACEHOLDER = "[Circular]";
 const INVALID_DATE_PLACEHOLDER = "[Invalid Date]";
 
@@ -109,22 +105,56 @@ const sanitizePreviewString = (value: string): string => {
     }
 };
 
-const getOriginalJsonHolderValue = (holder: unknown, key: string): unknown => {
-    if (key.length === 0 || typeof holder !== "object" || holder === null) {
-        return undefined;
+function getOwnDataValue(
+    holder: object,
+    key: string
+):
+    | { readonly found: false }
+    | { readonly found: true; readonly value: unknown } {
+    const descriptor = Object.getOwnPropertyDescriptor(holder, key);
+
+    if (!descriptor || !("value" in descriptor)) {
+        return { found: false };
     }
 
-    if (Array.isArray(holder)) {
-        const index = Number(key);
-        return Number.isInteger(index) && index >= 0
-            ? holder[index]
-            : undefined;
+    return { found: true, value: descriptor.value };
+}
+
+function serializeErrorCause(value: Error, seen: WeakSet<object>): unknown {
+    const cause = getOwnDataValue(value, "cause");
+
+    return cause.found && isDefined(cause.value)
+        ? serializeValue(cause.value, seen)
+        : undefined;
+}
+
+function serializeObjectPreview(
+    value: UnknownRecord,
+    seen: WeakSet<object>
+): UnknownRecord {
+    const keys = objectKeys(value);
+    const preview: UnknownRecord = {};
+
+    for (const key of keys.slice(0, MAX_PREVIEW_OBJECT_KEYS)) {
+        if (isSensitiveKeyName(key)) {
+            preview[key] = REDACTED_PLACEHOLDER;
+            continue;
+        }
+
+        const dataValue = getOwnDataValue(value, key);
+        preview[key] = dataValue.found
+            ? serializeValue(dataValue.value, seen)
+            : ACCESSOR_PLACEHOLDER;
     }
 
-    return objectHasIn(holder, key) ? holder[key] : undefined;
-};
+    if (keys.length > MAX_PREVIEW_OBJECT_KEYS) {
+        preview["previewTruncatedKeys"] = keys.length - MAX_PREVIEW_OBJECT_KEYS;
+    }
 
-const serializeValue = (value: unknown): unknown => {
+    return preview;
+}
+
+function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     if (typeof value === "function") {
         return formatFunctionPlaceholder(value.name || "");
     }
@@ -154,14 +184,26 @@ const serializeValue = (value: unknown): unknown => {
         };
     }
 
+    if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) {
+            return CIRCULAR_PLACEHOLDER;
+        }
+
+        seen.add(value);
+    }
+
     if (value instanceof Map) {
         return {
-            entries: [...value].slice(0, 5).map(([entryKey, entryValue]) => [
-                serializeValue(entryKey),
-                typeof entryKey === "string" && isSensitiveKeyName(entryKey)
-                    ? REDACTED_PLACEHOLDER
-                    : serializeValue(entryValue),
-            ]),
+            entries: [...value].slice(0, 5).map(([entryKey, entryValue]) => {
+                const serializedKey = serializeValue(entryKey, seen);
+
+                return [
+                    serializedKey,
+                    typeof entryKey === "string" && isSensitiveKeyName(entryKey)
+                        ? REDACTED_PLACEHOLDER
+                        : serializeValue(entryValue, seen),
+                ];
+            }),
             size: value.size,
             type: "Map",
         };
@@ -169,7 +211,9 @@ const serializeValue = (value: unknown): unknown => {
 
     if (value instanceof Set) {
         return {
-            sample: [...value].slice(0, 5),
+            sample: [...value]
+                .slice(0, 5)
+                .map((entryValue) => serializeValue(entryValue, seen)),
             size: value.size,
             type: "Set",
         };
@@ -199,86 +243,41 @@ const serializeValue = (value: unknown): unknown => {
     }
 
     if (Error.isError(value)) {
-        const { cause: errorCause, message, name, stack } = value;
         return {
-            cause: isDefined(errorCause)
-                ? serializeValue(errorCause)
-                : undefined,
-            message,
-            name,
-            stack,
+            cause: serializeErrorCause(value, seen),
+            message: value.message,
+            name: value.name,
+            stack: value.stack,
             type: "Error",
         };
     }
 
     if (Array.isArray(value)) {
         if (value.length <= MAX_PREVIEW_ARRAY_ITEMS) {
-            return value;
+            return value.map((item) => serializeValue(item, seen));
         }
 
         return {
             length: value.length,
-            sample: value.slice(0, MAX_PREVIEW_ARRAY_ITEMS),
+            sample: value
+                .slice(0, MAX_PREVIEW_ARRAY_ITEMS)
+                .map((item) => serializeValue(item, seen)),
             type: "Array",
         };
     }
 
     if (isObject(value)) {
-        const record = value;
-        const keys = objectKeys(record);
-
-        if (keys.length <= MAX_PREVIEW_OBJECT_KEYS) {
-            return record;
-        }
-
-        const preview: UnknownRecord = {};
-        for (const key of keys.slice(0, MAX_PREVIEW_OBJECT_KEYS)) {
-            preview[key] = record[key];
-        }
-
-        preview["previewTruncatedKeys"] = keys.length - MAX_PREVIEW_OBJECT_KEYS;
-        return preview;
+        return serializeObjectPreview(value, seen);
     }
 
     return value;
-};
+}
 
 const safeStringify = (value: unknown): string | undefined => {
     const seen = new WeakSet<object>();
 
     try {
-        return JSON.stringify(
-            value,
-            function replacer(
-                this: unknown,
-                key: string,
-                nested: unknown
-            ): unknown {
-                if (
-                    typeof key === "string" &&
-                    key.length > 0 &&
-                    isSensitiveKeyName(key)
-                ) {
-                    return REDACTED_PLACEHOLDER;
-                }
-
-                const originalNested = getOriginalJsonHolderValue(this, key);
-                if (originalNested instanceof Date) {
-                    return serializeDate(originalNested);
-                }
-
-                if (typeof nested === "object" && nested !== null) {
-                    if (seen.has(nested)) {
-                        return CIRCULAR_PLACEHOLDER;
-                    }
-
-                    seen.add(nested);
-                }
-
-                return serializeValue(nested);
-            },
-            2
-        );
+        return JSON.stringify(serializeValue(value, seen), undefined, 2);
     } catch {
         return undefined;
     }
