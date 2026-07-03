@@ -203,6 +203,26 @@ describe("siteSnapshots", () => {
             "2025-01-03T00:00:00.000Z"
         );
 
+        const overlayMaxEpoch = toMonitorSnapshotOverlay({
+            lastChecked: MAX_VALID_DATE_EPOCH_MS,
+        });
+        expect(overlayMaxEpoch?.lastChecked?.getTime()).toBe(
+            MAX_VALID_DATE_EPOCH_MS
+        );
+
+        for (const invalidLastChecked of [
+            -1,
+            1.5,
+            MAX_VALID_DATE_EPOCH_MS + 1,
+            new Date(MAX_VALID_DATE_EPOCH_MS + 1),
+        ]) {
+            expect(
+                toMonitorSnapshotOverlay({
+                    lastChecked: invalidLastChecked,
+                })
+            ).toBeUndefined();
+        }
+
         expect(
             toMonitorSnapshotOverlay({
                 lastChecked: "July 3, 2026",

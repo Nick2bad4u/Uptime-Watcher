@@ -167,8 +167,14 @@ function cloneSites(sites: Site[]): Site[] {
     return sites.map((site) => structuredClone(site));
 }
 
+const isValidDateEpochMs = (value: unknown): value is number =>
+    isFiniteNumber(value) &&
+    Number.isInteger(value) &&
+    value >= 0 &&
+    value <= MAX_VALID_DATE_EPOCH_MS;
+
 const normalizeDateValue = (value: unknown): Date | undefined => {
-    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    if (value instanceof Date && isValidDateEpochMs(value.getTime())) {
         return value;
     }
 
@@ -181,9 +187,9 @@ const normalizeDateValue = (value: unknown): Date | undefined => {
         return new Date(result.data);
     }
 
-    if (isFiniteNumber(value)) {
+    if (isValidDateEpochMs(value)) {
         const parsed = new Date(value);
-        return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+        return isValidDateEpochMs(parsed.getTime()) ? parsed : undefined;
     }
 
     return undefined;
