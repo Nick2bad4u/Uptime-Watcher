@@ -48,6 +48,21 @@ import { logger } from "../services/logger";
  * Stored as a WeakMap keyed by cache instance to avoid memory leaks.
  */
 const inFlightFetches = new WeakMap<object, Map<string, Promise<unknown>>>();
+const DEFAULT_MAX_SIZE = 100;
+
+function normalizeMaxSize(maxSize: number | undefined): number {
+    if (!isDefined(maxSize) || !Number.isFinite(maxSize)) {
+        return DEFAULT_MAX_SIZE;
+    }
+
+    return Math.max(1, Math.trunc(maxSize));
+}
+
+function normalizeTtl(ttl: number | undefined): number | undefined {
+    return isDefined(ttl) && Number.isFinite(ttl) && ttl > 0
+        ? ttl
+        : undefined;
+}
 
 /**
  * Configuration options for creating a {@link TypedCache} instance.
@@ -204,20 +219,17 @@ export class TypedCache<K, V> {
      *   CACHE_CONFIG format.
      */
     public constructor(options: CacheOptions = {}) {
-        this.maxSize = options.maxSize ?? 100;
+        this.maxSize = normalizeMaxSize(options.maxSize);
 
         const configuredTtl = options.ttl;
-        if (isDefined(configuredTtl) && configuredTtl <= 0) {
+        if (isDefined(configuredTtl) && !normalizeTtl(configuredTtl)) {
             logger.warn("[Cache] Invalid TTL configuration", {
                 configuredTtl,
                 context: "cache:TypedCache",
             });
         }
 
-        this.defaultTtl =
-            isDefined(configuredTtl) && configuredTtl > 0
-                ? configuredTtl
-                : undefined;
+        this.defaultTtl = normalizeTtl(configuredTtl);
     }
 
     /**
@@ -360,7 +372,7 @@ export class TypedCache<K, V> {
         }
 
         const now = Date.now();
-        const finalTtl = ttl ?? this.defaultTtl;
+        const finalTtl = normalizeTtl(ttl) ?? this.defaultTtl;
         this.cache.set(key, {
             lastAccessed: now,
             timestamp: now,

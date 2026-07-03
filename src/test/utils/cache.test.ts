@@ -264,6 +264,28 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key2")).toBeUndefined(); // Now should be expired
             });
 
+            it("should ignore non-finite per-entry TTL overrides", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const cache = new TypedCache<string, string>({ ttl: 1000 });
+
+                mockNow.mockReturnValue(1000);
+                cache.set("infinite", "value1", Number.POSITIVE_INFINITY);
+                cache.set("nan", "value2", Number.NaN);
+
+                mockNow.mockReturnValue(2100);
+
+                expect(cache.get("infinite")).toBeUndefined();
+                expect(cache.get("nan")).toBeUndefined();
+                expect(cache.size).toBe(0);
+            });
+
             it("should handle cache without TTL", async ({
                 task,
                 annotate,
@@ -351,6 +373,26 @@ describe("Cache Utilities", () => {
                 const cache = new TypedCache<string, string>({ maxSize: 0 }); // Zero max size
                 cache.set("key1", "value1");
                 expect(cache.size).toBe(1); // Should handle gracefully
+            });
+
+            it("should fall back to default maxSize for non-finite limits", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const cache = new TypedCache<string, string>({
+                    maxSize: Number.POSITIVE_INFINITY,
+                });
+
+                for (let i = 0; i < 105; i++) {
+                    cache.set(`key${i}`, `value${i}`);
+                }
+
+                expect(cache.size).toBe(100);
             });
 
             it("should handle LRU eviction when cache is exactly at maxSize", async ({
