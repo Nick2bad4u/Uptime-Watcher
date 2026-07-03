@@ -41,46 +41,56 @@ const hasAsciiControlCharacter = (value: string): boolean => {
     return false;
 };
 
-const sqliteRestoreFileNameSchema: z.ZodType<string> = z
-    .string()
-    .min(1)
-    .superRefine((fileName, context) => {
-        if (fileName !== fileName.trim()) {
-            context.addIssue({
-                code: "custom",
-                message:
-                    "Restore filename must not have leading or trailing whitespace",
-            });
-        }
+const createSqliteFileNameSchema = (label: string): z.ZodType<string> =>
+    z
+        .string()
+        .min(1)
+        .superRefine((fileName, context) => {
+            if (fileName !== fileName.trim()) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not have leading or trailing whitespace`,
+                });
+            }
 
-        if (hasAsciiControlCharacter(fileName)) {
-            context.addIssue({
-                code: "custom",
-                message: "Restore filename must not contain control characters",
-            });
-        }
+            if (hasAsciiControlCharacter(fileName)) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not contain control characters`,
+                });
+            }
 
-        if (getUtfByteLength(fileName) > MAX_SQLITE_RESTORE_FILE_NAME_BYTES) {
-            context.addIssue({
-                code: "custom",
-                message: `Restore filename must not exceed ${MAX_SQLITE_RESTORE_FILE_NAME_BYTES} bytes`,
-            });
-        }
+            if (
+                getUtfByteLength(fileName) > MAX_SQLITE_RESTORE_FILE_NAME_BYTES
+            ) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not exceed ${MAX_SQLITE_RESTORE_FILE_NAME_BYTES} bytes`,
+                });
+            }
 
-        if (fileName === "." || fileName === "..") {
-            context.addIssue({
-                code: "custom",
-                message: "Restore filename must be a valid file name",
-            });
-        }
+            if (fileName === "." || fileName === "..") {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must be a valid file name`,
+                });
+            }
 
-        if (normalizePathSeparatorsToPosix(fileName).includes("/")) {
-            context.addIssue({
-                code: "custom",
-                message: "Restore filename must not contain path separators",
-            });
-        }
-    });
+            if (normalizePathSeparatorsToPosix(fileName).includes("/")) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not contain path separators`,
+                });
+            }
+        });
+
+const sqliteRestoreFileNameSchema: z.ZodType<string> =
+    createSqliteFileNameSchema("Restore filename");
+
+const sqliteResultFileNameSchema: z.ZodType<string> =
+    createSqliteFileNameSchema("SQLite backup filename");
+
+const nonEmptyStringSchema: z.ZodType<string> = z.string().trim().min(1);
 
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
@@ -126,8 +136,8 @@ export const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatab
             z
                 .object({
                     canceled: z.literal(false),
-                    fileName: z.string().trim().min(1),
-                    filePath: z.string().trim().min(1),
+                    fileName: sqliteResultFileNameSchema,
+                    filePath: nonEmptyStringSchema,
                     metadata: serializedDatabaseBackupMetadataSchema,
                 })
                 .strict(),
@@ -160,7 +170,7 @@ export const serializedDatabaseRestoreResultSchema: z.ZodType<{
 }> = z
     .object({
         metadata: serializedDatabaseBackupMetadataSchema,
-        preRestoreFileName: z.string().trim().min(1).optional(),
+        preRestoreFileName: sqliteResultFileNameSchema.optional(),
         restoredAt: epochMsSchema,
     })
     .strict();

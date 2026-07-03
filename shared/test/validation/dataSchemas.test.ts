@@ -10,12 +10,23 @@ import {
 import {
     validateMonitorTypeConfigArray,
     validateSerializedDatabaseBackupResult,
+    validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestorePayload,
     validateSerializedDatabaseRestoreResult,
     validateValidationResult,
 } from "@shared/validation/dataSchemas";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
+
+const createMetadata = (sizeBytes = 8) => ({
+    appVersion: "1.0.0",
+    checksum: "abc",
+    createdAt: 1,
+    originalPath: "C:/x",
+    retentionHintDays: 30,
+    schemaVersion: 1,
+    sizeBytes,
+});
 
 describe("dataSchemas", () => {
     it("validates a serialized backup result payload", () => {
@@ -228,6 +239,62 @@ describe("dataSchemas", () => {
         });
 
         expect(parsed.success).toBeTruthy();
+    });
+
+    it("validates saved backup result filenames as renderer-safe basenames", () => {
+        const valid = validateSerializedDatabaseBackupSaveResult({
+            canceled: false,
+            fileName: "backup.sqlite",
+            filePath: "C:/backups/backup.sqlite",
+            metadata: createMetadata(),
+        });
+
+        expect(valid.success).toBeTruthy();
+
+        for (const fileName of [
+            " backup.sqlite",
+            "backup.sqlite ",
+            "backup\n.sqlite",
+            "../backup.sqlite",
+            ".",
+            `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
+        ]) {
+            expect(
+                validateSerializedDatabaseBackupSaveResult({
+                    canceled: false,
+                    fileName,
+                    filePath: "C:/backups/backup.sqlite",
+                    metadata: createMetadata(),
+                }).success
+            ).toBeFalsy();
+        }
+    });
+
+    it("validates restore result pre-restore filenames as renderer-safe basenames", () => {
+        const valid = validateSerializedDatabaseRestoreResult({
+            metadata: createMetadata(),
+            preRestoreFileName: "pre-restore.sqlite",
+            restoredAt: 123,
+        });
+
+        expect(valid.success).toBeTruthy();
+
+        for (const preRestoreFileName of [
+            " pre-restore.sqlite",
+            "pre-restore.sqlite ",
+            "pre-restore\n.sqlite",
+            "../pre-restore.sqlite",
+            ".",
+            `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
+        ]) {
+            expect(
+                validateSerializedDatabaseRestoreResult({
+                    metadata: createMetadata(),
+                    preRestoreFileName,
+                    restoredAt: 123,
+                }).success
+            ).toBeFalsy();
+        }
     });
 
     it("validates monitor type config arrays", () => {
