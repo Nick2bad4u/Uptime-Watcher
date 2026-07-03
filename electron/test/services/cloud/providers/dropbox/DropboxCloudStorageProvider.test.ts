@@ -160,6 +160,55 @@ describe(DropboxCloudStorageProvider, () => {
         ).toBeTruthy();
     });
 
+    it("skips Dropbox list entries with impossible modified times", async () => {
+        const tokenManager = {
+            getAccessToken: vi.fn().mockResolvedValue("token"),
+        };
+
+        const filesListFolder = vi.fn().mockResolvedValue({
+            result: {
+                cursor: "cursor",
+                entries: [
+                    {
+                        ".tag": "file",
+                        path_display: "/uptime-watcher/sync/bad-date.ndjson",
+                        server_modified: "2026-02-30T00:00:00.000Z",
+                        size: 1,
+                    },
+                ],
+                has_more: false,
+            },
+        });
+
+        const provider = new DropboxCloudStorageProvider({
+            clientFactory: () => ({
+                filesListFolder,
+                filesListFolderContinue: vi.fn(),
+                filesUpload: vi.fn(),
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
+            tokenManager: tokenManager as never,
+        });
+
+        const electronLogModule = await import("electron-log/main");
+        const mockLog = electronLogModule.default;
+        vi.mocked(mockLog.warn).mockClear();
+
+        await expect(provider.listObjects("sync")).resolves.toEqual([]);
+        expect(
+            vi
+                .mocked(mockLog.warn)
+                .mock.calls.some((call) =>
+                    String(call[0]).includes(
+                        "Skipped invalid Dropbox list-folder entries"
+                    )
+                )
+        ).toBeTruthy();
+    });
+
     it("uploads with overwrite/add mode and returns CloudObjectEntry from response", async () => {
         const tokenManager = {
             getAccessToken: vi.fn().mockResolvedValue("token"),
@@ -239,6 +288,44 @@ describe(DropboxCloudStorageProvider, () => {
                 overwrite: true,
             })
         ).rejects.toThrow("Dropbox returned an unexpected upload response");
+    });
+
+    it("rejects Dropbox upload responses with impossible modified times", async () => {
+        const tokenManager = {
+            getAccessToken: vi.fn().mockResolvedValue("token"),
+        };
+
+        const filesUpload = vi.fn().mockResolvedValue({
+            result: {
+                ".tag": "file",
+                path_display: "/uptime-watcher/sync/foo.txt",
+                server_modified: "2026-02-30T00:00:00.000Z",
+                size: 3,
+            },
+        });
+
+        const provider = new DropboxCloudStorageProvider({
+            clientFactory: () => ({
+                filesListFolder: vi.fn(),
+                filesListFolderContinue: vi.fn(),
+                filesUpload,
+                filesDownload: vi.fn(),
+                filesDeleteV2: vi.fn(),
+                usersGetCurrentAccount: vi.fn(),
+                authTokenRevoke: vi.fn(),
+            }),
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("hey", "utf8"),
+                key: "sync/foo.txt",
+                overwrite: true,
+            })
+        ).rejects.toThrow(
+            "Dropbox returned an unexpected server_modified timestamp"
+        );
     });
 
     it("throws EEXIST when overwrite is false and the Dropbox path conflicts", async () => {

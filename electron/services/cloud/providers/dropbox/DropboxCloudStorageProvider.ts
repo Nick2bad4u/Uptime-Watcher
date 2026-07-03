@@ -7,8 +7,9 @@ import {
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { Dropbox, DropboxResponseError } from "dropbox";
-import { isFinite as isFiniteNumber, objectValues } from "ts-extras";
+import { objectValues } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -98,6 +99,11 @@ function fromDropboxPathOrNull(pathDisplay: string): null | string {
     } catch {
         return null;
     }
+}
+
+function parseDropboxTimestamp(value: string): number | null {
+    const parsed = safeParseIsoTimestamp(value);
+    return parsed.success ? Date.parse(parsed.data) : null;
 }
 
 function describeDropboxSdkErrorRich(error: unknown): string | undefined {
@@ -361,8 +367,10 @@ export class DropboxCloudStorageProvider
                     return { cloudObject: null, isInvalid: false };
                 }
 
-                const lastModifiedAt = Date.parse(parsed.serverModified);
-                if (!isFiniteNumber(lastModifiedAt)) {
+                const lastModifiedAt = parseDropboxTimestamp(
+                    parsed.serverModified
+                );
+                if (lastModifiedAt === null) {
                     return { cloudObject: null, isInvalid: true };
                 }
 
@@ -506,8 +514,10 @@ export class DropboxCloudStorageProvider
             );
         }
 
-        const lastModifiedAt = Date.parse(uploadData.serverModified);
-        if (!isFiniteNumber(lastModifiedAt)) {
+        const lastModifiedAt = parseDropboxTimestamp(
+            uploadData.serverModified
+        );
+        if (lastModifiedAt === null) {
             throw new CloudProviderOperationError(
                 "Dropbox returned an unexpected server_modified timestamp",
                 {
