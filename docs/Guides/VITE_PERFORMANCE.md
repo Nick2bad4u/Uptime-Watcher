@@ -112,7 +112,6 @@ The following files are pre-warmed for optimal performance in `vite.config.ts`:
 ### Chart Utilities
 
 - `./src/services/chartConfig.ts` - Chart.js configuration
-- `./src/utils/chartUtils.ts` - Chart utility functions
 
 ### Frequently Used Components
 

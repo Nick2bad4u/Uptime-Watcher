@@ -225,10 +225,6 @@ vi.mock("../../../../utils/time", () => ({
     }),
 }));
 
-vi.mock("../../../../utils/duration", () => ({
-    calculateMaxDuration: vi.fn().mockReturnValue("45 seconds"),
-}));
-
 vi.mock("../../../../utils/errorHandling", () => ({
     withUtilityErrorHandling: vi
         .fn()

@@ -714,7 +714,6 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
 
                               // Chart utilities and configuration (used by all chart components)
                               "./src/services/chartConfig.ts",
-                              "./src/utils/chartUtils.ts",
 
                               // Shared types and utilities
                               "./shared/types.ts",

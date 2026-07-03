@@ -19,7 +19,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
-import { calculateMaxDuration } from "../../../../utils/duration";
 
 let sampledSiteName: string;
 let sampledSiteIdentifier: string;
@@ -353,124 +352,6 @@ describe("SettingsTab arithmetic mutations", () => {
         });
     });
 
-    describe("calculateMaxDuration arithmetic mutations", () => {
-        describe("timeout * totalAttempts multiplication", () => {
-            it("should calculate timeout time correctly (kills * -> / mutation)", () => {
-                // Test timeout: 10s, retryAttempts: 2
-                // totalAttempts = 2 + 1 = 3
-                // timeoutTime = 10 * 3 = 30s
-                const result = calculateMaxDuration(10, 2);
-
-                // Should include the timeout portion in total calculation
-                // With 2 retries, backoff = 0.5 + 1.0 = 1.5s
-                // Total = 30 + 1.5 = 31.5s -> Math.ceil = 32s
-                expect(result).toBe("32s");
-
-                // Mutation (* -> /) would yield 10 / 3 = 3.33s timeoutTime
-                // Total would be much smaller, definitely not 32s
-            });
-        });
-
-        describe("retryAttempts + 1 addition", () => {
-            it("should calculate total attempts correctly (kills + -> - mutation)", () => {
-                // Test with 1 retry attempt
-                const result = calculateMaxDuration(5, 1);
-
-                // TotalAttempts = 1 + 1 = 2
-                // timeoutTime = 5 * 2 = 10s
-                // backoffTime = 0.5s (one retry)
-                // total = 10 + 0.5 = 10.5s -> Math.ceil = 11s
-                expect(result).toBe("11s");
-
-                // Mutation (+ 1 -> - 1) would yield totalAttempts = 0
-                // timeoutTime = 5 * 0 = 0, total would be much smaller
-            });
-        });
-
-        describe("0.5 * 2 ** index exponential backoff", () => {
-            it("should calculate exponential backoff correctly (kills * -> / and ** -> + mutations)", () => {
-                // Test with multiple retries to verify exponential calculation
-                const result = calculateMaxDuration(1, 3); // Very short timeout to isolate backoff effect
-
-                // totalAttempts = 3 + 1 = 4
-                // timeoutTime = 1 * 4 = 4s
-                // backoffTime for 3 retries: 0.5*2^0 + 0.5*2^1 + 0.5*2^2 = 0.5 + 1.0 + 2.0 = 3.5s
-                // total = 4 + 3.5 = 7.5s -> Math.ceil = 8s
-                expect(result).toBe("8s");
-
-                // Mutation (* -> /) would yield 0.5 / 2^index, much smaller values
-                // Mutation (** -> +) would yield 0.5 * (2 + index), linear instead of exponential
-            });
-
-            it("should cap backoff at 5 seconds per attempt", () => {
-                // Test with many retries to verify the cap
-                const result = calculateMaxDuration(1, 5); // 5 retries
-
-                // totalAttempts = 5 + 1 = 6
-                // timeoutTime = 1 * 6 = 6s
-                // backoffTime for 5 retries: 0.5 + 1.0 + 2.0 + 4.0 + 5.0 = 12.5s (last two capped at 5)
-                // total = 6 + 12.5 = 18.5s -> Math.ceil = 19s
-                expect(result).toBe("19s");
-            });
-        });
-
-        describe("Math.ceil(totalTime / 60) division for minutes", () => {
-            it("should convert to minutes correctly (kills / -> * mutation)", () => {
-                // Create a scenario that results in minutes
-                const result = calculateMaxDuration(30, 2); // 30s timeout, 2 retries
-
-                // totalAttempts = 2 + 1 = 3
-                // timeoutTime = 30 * 3 = 90s
-                // backoffTime = 0.5 + 1.0 = 1.5s
-                // total = 90 + 1.5 = 91.5s -> Math.ceil = 92s
-                // Since 92s >= 60s, convert: Math.ceil(92 / 60) = Math.ceil(1.53) = 2m
-                expect(result).toBe("2m");
-
-                // Mutation (/ 60 -> * 60) would yield Math.ceil(92 * 60) = 5520m which is wrong
-            });
-        });
-
-        describe("Math.ceil(totalTime / 3600) division for hours", () => {
-            it("should convert to hours correctly (kills / -> * mutation)", () => {
-                // Create a scenario that results in hours
-                const result = calculateMaxDuration(600, 5); // 10min timeout, 5 retries
-
-                // totalAttempts = 5 + 1 = 6
-                // timeoutTime = 600 * 6 = 3600s
-                // backoffTime = 0.5 + 1.0 + 2.0 + 4.0 + 5.0 = 12.5s
-                // total = 3600 + 12.5 = 3612.5s -> Math.ceil = 3613s
-                // Since 3613s >= 3600s, convert: Math.ceil(3613 / 3600) = Math.ceil(1.003) = 2h
-                expect(result).toBe("2h");
-
-                // Mutation (/ 3600 -> * 3600) would yield Math.ceil(3613 * 3600) = massive number
-            });
-        });
-
-        describe("Edge cases and comprehensive arithmetic validation", () => {
-            it("should handle zero retries (no backoff)", () => {
-                const result = calculateMaxDuration(15, 0);
-
-                // TotalAttempts = 0 + 1 = 1
-                // timeoutTime = 15 * 1 = 15s
-                // backoffTime = 0s (no retries)
-                // total = 15 + 0 = 15s
-                expect(result).toBe("15s");
-            });
-
-            it("should handle very large values correctly", () => {
-                // Test boundary between minutes and hours
-                const result = calculateMaxDuration(1200, 1); // 20min timeout, 1 retry
-
-                // totalAttempts = 1 + 1 = 2
-                // timeoutTime = 1200 * 2 = 2400s
-                // backoffTime = 0.5s
-                // total = 2400 + 0.5 = 2400.5s -> Math.ceil = 2401s
-                // Since 2401s < 3600s but >= 60s: Math.ceil(2401 / 60) = Math.ceil(40.02) = 41m
-                expect(result).toBe("41m");
-            });
-        });
-    });
-
     describe("Integration test - multiple arithmetic operations working together", () => {
         it("should display all arithmetic calculations correctly in UI", () => {
             const props = {
@@ -489,7 +370,7 @@ describe("SettingsTab arithmetic mutations", () => {
                 screen.getByText(/\b3 attempts \+ backoff\./v)
             ).toBeInTheDocument();
 
-            // Check max duration calculation appears (calculateMaxDuration with all its arithmetic)
+            // Check max duration calculation appears.
             // timeout=10, retryAttempts=2 -> should be around 22s total
             expect(
                 screen.getByText(/Maximum check duration/v)

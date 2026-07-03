@@ -11,7 +11,50 @@ import {
     ChartConfigService,
     createChartConfigs,
 } from "../services/chartConfig";
-import { getNestedScaleProperty, getScaleProperty } from "../utils/chartUtils";
+
+function getNestedScaleProperty(
+    config: unknown,
+    axis: "x" | "y",
+    path: string
+): unknown {
+    const scale = getScale(config, axis);
+    if (!scale) {
+        return undefined;
+    }
+
+    return path.split(".").reduce<unknown>((current, key) => {
+        if (
+            current &&
+            typeof current === "object" &&
+            Object.hasOwn(current, key)
+        ) {
+            return (current as Record<string, unknown>)[key];
+        }
+
+        return undefined;
+    }, scale);
+}
+
+function getScaleProperty(
+    config: unknown,
+    axis: "x" | "y",
+    property: string
+): unknown {
+    return getNestedScaleProperty(config, axis, property);
+}
+
+function getScale(config: unknown, axis: "x" | "y"): unknown {
+    if (!config || typeof config !== "object") {
+        return undefined;
+    }
+
+    const scales = (config as { readonly scales?: unknown }).scales;
+    if (!scales || typeof scales !== "object") {
+        return undefined;
+    }
+
+    return (scales as Partial<Record<"x" | "y", unknown>>)[axis];
+}
 
 // Mock theme object for testing
 const mockTheme: Theme = {

@@ -24,7 +24,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DefaultErrorFallback } from "../components/error/DefaultErrorFallback";
 // Import stores
 import { useErrorStore } from "../stores/error/useErrorStore";
-import { withErrorBoundary } from "../stores/error/withErrorBoundary";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useUIStore } from "../stores/ui/useUiStore";
 import { installElectronApiMock } from "./utils/electronApiMock";
@@ -99,27 +98,6 @@ describe("Frontend Functions Coverage - Target 90%+ Threshold", () => {
             });
             fireEvent.click(retryButton);
             expect(onRetry).toHaveBeenCalled();
-        });
-
-        it("should exercise withErrorBoundary HOC functions", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: frontend-functions-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: frontend-functions-coverage", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Error Handling", "type");
-
-            const TestComponent = () => <div>Test Component</div>;
-            const WrappedComponent = withErrorBoundary(TestComponent);
-
-            render(<WrappedComponent />);
-            expect(screen.getByText("Test Component")).toBeInTheDocument();
         });
 
         it("should exercise error store functions", ({ task, annotate }) => {
