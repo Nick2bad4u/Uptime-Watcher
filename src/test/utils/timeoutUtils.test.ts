@@ -110,9 +110,7 @@ describe("timeout Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(clampTimeoutMs(Number.NaN)).toBe(
-                TIMEOUT_CONSTRAINTS_MS.MIN
-            );
+            expect(clampTimeoutMs(Number.NaN)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
             expect(clampTimeoutMs(Infinity)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
             expect(clampTimeoutMs(Number.NEGATIVE_INFINITY)).toBe(
                 TIMEOUT_CONSTRAINTS_MS.MIN
@@ -213,9 +211,7 @@ describe("timeout Utilities", () => {
             expect(clampTimeoutSeconds(Number.NaN)).toBe(
                 TIMEOUT_CONSTRAINTS.MIN
             );
-            expect(clampTimeoutSeconds(Infinity)).toBe(
-                TIMEOUT_CONSTRAINTS.MIN
-            );
+            expect(clampTimeoutSeconds(Infinity)).toBe(TIMEOUT_CONSTRAINTS.MIN);
             expect(clampTimeoutSeconds(Number.NEGATIVE_INFINITY)).toBe(
                 TIMEOUT_CONSTRAINTS.MIN
             );

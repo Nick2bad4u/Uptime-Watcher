@@ -192,9 +192,7 @@ describe("HTTP Client Utils", () => {
                 freshAxios.create.mockReturnValue(mockAxiosInstance);
 
                 const { createHttpClient: createFreshHttpClient } =
-                    await import(
-                        "../../../../services/monitoring/utils/httpClient"
-                    );
+                    await import("../../../../services/monitoring/utils/httpClient");
 
                 createFreshHttpClient({});
 

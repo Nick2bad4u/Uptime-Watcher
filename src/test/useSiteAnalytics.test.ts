@@ -879,11 +879,7 @@ describe(useSiteAnalytics, () => {
                 ...mockMonitorEmpty,
                 history: [
                     validRecord,
-                    createStatusRecord(
-                        Number.POSITIVE_INFINITY,
-                        "up",
-                        100
-                    ),
+                    createStatusRecord(Number.POSITIVE_INFINITY, "up", 100),
                     createStatusRecord(now - 2000, "up", Number.NaN),
                     createStatusRecord(now - 3000, "up", -1),
                 ],

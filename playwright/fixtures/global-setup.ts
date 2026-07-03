@@ -47,10 +47,7 @@ function resolveNpmRunInvocation(scriptName: string): CommandInvocation {
     }
 
     return {
-        args: [
-            "run",
-            scriptName,
-        ],
+        args: ["run", scriptName],
         command: "npm",
     };
 }

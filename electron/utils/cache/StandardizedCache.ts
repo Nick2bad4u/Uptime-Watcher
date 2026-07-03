@@ -554,7 +554,11 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
             {
                 onError: (error) => {
                     const metadata = { cacheName: name, eventType };
-                    logger.error("Cache event emission failed", error, metadata);
+                    logger.error(
+                        "Cache event emission failed",
+                        error,
+                        metadata
+                    );
                     diagnosticsLogger.error(
                         "Cache event emission failure",
                         error,
@@ -674,11 +678,9 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
                     });
                 }
             } catch (error) {
-                logger.error(
-                    "Cache invalidation callback failed",
-                    error,
-                    { cacheName: this.config.name }
-                );
+                logger.error("Cache invalidation callback failed", error, {
+                    cacheName: this.config.name,
+                });
             }
         }
     }

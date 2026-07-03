@@ -164,9 +164,7 @@ describe(startLoopbackOAuthServer, () => {
                     expectedState: "expected-state",
                     timeoutMs: 1000,
                 })
-            ).rejects.toThrow(
-                /^OAuth callback error: denied x{293}\.\.\.$/u
-            );
+            ).rejects.toThrow(/^OAuth callback error: denied x{293}\.\.\.$/u);
         } finally {
             await closeServer(server);
         }

@@ -1658,7 +1658,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 ).toThrow(/HistoryRow/v);
             });
 
-            it.each([Number.NaN, Infinity, -Infinity])(
+            it.each([
+                Number.NaN,
+                Infinity,
+                -Infinity,
+            ])(
                 "should reject non-finite numeric history response times: %s",
                 (responseTime) => {
                     mockGet.mockReturnValue({

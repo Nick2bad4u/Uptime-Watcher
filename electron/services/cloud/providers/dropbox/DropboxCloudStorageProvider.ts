@@ -514,9 +514,7 @@ export class DropboxCloudStorageProvider
             );
         }
 
-        const lastModifiedAt = parseDropboxTimestamp(
-            uploadData.serverModified
-        );
+        const lastModifiedAt = parseDropboxTimestamp(uploadData.serverModified);
         if (lastModifiedAt === null) {
             throw new CloudProviderOperationError(
                 "Dropbox returned an unexpected server_modified timestamp",

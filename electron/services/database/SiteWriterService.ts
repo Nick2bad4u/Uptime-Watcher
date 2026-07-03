@@ -133,7 +133,9 @@ export class SiteWriterService {
      *         },
      *     ],
      * });
-     * logger.info("Monitor created", { monitorId: newSite.monitors[0].id });
+     * logger.info("Monitor created", {
+     *     monitorId: newSite.monitors[0].id,
+     * });
      * ```
      *
      * @param siteData - Site configuration including monitors to create
@@ -258,9 +260,12 @@ export class SiteWriterService {
                 }
 
                 if (deletionResult.siteDeleted) {
-                    this.logger.info("Site removed successfully from database", {
-                        identifier,
-                    });
+                    this.logger.info(
+                        "Site removed successfully from database",
+                        {
+                            identifier,
+                        }
+                    );
                     this.logger.debug("Monitors removed for site", {
                         identifier,
                         monitorCount: deletionResult.monitorCount,
@@ -394,9 +399,13 @@ export class SiteWriterService {
                 }
             }
         } catch (error) {
-            this.logger.error("Failed to handle monitor interval changes", error, {
-                siteIdentifier: identifier,
-            });
+            this.logger.error(
+                "Failed to handle monitor interval changes",
+                error,
+                {
+                    siteIdentifier: identifier,
+                }
+            );
             // Don't throw - this is a side effect operation that shouldn't
             // fail the update
         }
@@ -838,10 +847,13 @@ export class SiteWriterService {
     ): void {
         if (!newMonitor.id) {
             // Safety check - this should not happen in this context
-            this.logger.warn("Attempted to update existing monitor without ID", {
-                newMonitor,
-                siteIdentifier,
-            });
+            this.logger.warn(
+                "Attempted to update existing monitor without ID",
+                {
+                    newMonitor,
+                    siteIdentifier,
+                }
+            );
             return;
         }
 

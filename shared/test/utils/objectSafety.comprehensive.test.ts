@@ -328,7 +328,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const errorCallback = vi.fn().mockImplementation(() => {
-                throw new Error("Callback failed Authorization Bearer callback-secret");
+                throw new Error(
+                    "Callback failed Authorization Bearer callback-secret"
+                );
             });
             const consoleSpy = vi
                 .spyOn(console, "error")

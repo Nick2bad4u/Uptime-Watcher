@@ -42,7 +42,9 @@ describe("monitor type runtime guards", () => {
         expect(
             isMonitorFieldDefinition({ ...baseField, min: -Infinity })
         ).toBeFalsy();
-        expect(isMonitorFieldDefinition({ ...baseField, min: NaN })).toBeFalsy();
+        expect(
+            isMonitorFieldDefinition({ ...baseField, min: NaN })
+        ).toBeFalsy();
     });
 
     it("accepts valid monitor type configurations", () => {

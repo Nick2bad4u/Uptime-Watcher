@@ -19,11 +19,13 @@ describe(buildDropboxStatus, () => {
             deleteObject: vi.fn(),
             downloadBackup: vi.fn(),
             downloadObject: vi.fn(),
-            getAccountLabel: vi.fn().mockRejectedValue(
-                new Error(
-                    `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
-                )
-            ),
+            getAccountLabel: vi
+                .fn()
+                .mockRejectedValue(
+                    new Error(
+                        `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+                    )
+                ),
             isConnected: vi.fn(),
             kind: "dropbox",
             listBackups: vi.fn(),

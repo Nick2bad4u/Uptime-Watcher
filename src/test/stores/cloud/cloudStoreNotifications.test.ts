@@ -46,9 +46,9 @@ describe(dispatchSystemNotificationIfEnabled, () => {
             title: "Backup restored",
         });
 
-        expect(
-            appNotificationServiceMock.notifyAppEvent
-        ).toHaveBeenCalledTimes(1);
+        expect(appNotificationServiceMock.notifyAppEvent).toHaveBeenCalledTimes(
+            1
+        );
 
         const [[request]] = appNotificationServiceMock.notifyAppEvent.mock
             .calls as [[AppNotificationRequest]];

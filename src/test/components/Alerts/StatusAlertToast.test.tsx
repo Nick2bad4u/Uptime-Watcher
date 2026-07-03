@@ -131,9 +131,10 @@ describe(StatusAlertToast, () => {
     it("falls back when an invalid status reaches the renderer", () => {
         const onDismiss = vi.fn();
         const alert = createAlert({
-            previousStatus: castUnchecked<
-                NonNullable<StatusAlert["previousStatus"]>
-            >("bogus"),
+            previousStatus:
+                castUnchecked<NonNullable<StatusAlert["previousStatus"]>>(
+                    "bogus"
+                ),
             status: castUnchecked<StatusAlert["status"]>("bogus"),
         });
 

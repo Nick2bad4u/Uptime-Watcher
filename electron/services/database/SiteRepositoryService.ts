@@ -159,7 +159,10 @@ export class SiteRepositoryService {
                 return undefined;
             }
         } catch (error) {
-            this.logger.warn("Could not load history limit from settings", error);
+            this.logger.warn(
+                "Could not load history limit from settings",
+                error
+            );
             return undefined;
         }
     }

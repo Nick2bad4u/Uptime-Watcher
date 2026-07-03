@@ -222,9 +222,9 @@ describe("FilesystemCloudStorageProvider", () => {
         ).resolves.toBe("kept");
 
         const syncEntries = await fs.readdir(syncDirectory);
-        expect(
-            syncEntries.filter((entry) => entry.includes(".tmp-"))
-        ).toEqual([]);
+        expect(syncEntries.filter((entry) => entry.includes(".tmp-"))).toEqual(
+            []
+        );
     });
 
     it("refuses to use the app root after it is replaced with a symlink", async () => {

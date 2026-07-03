@@ -241,7 +241,13 @@ describe(useAlertStore, () => {
         });
         expect(validToast.ttlMs).toBe(1);
 
-        for (const ttlMs of [0, -1, Infinity, -Infinity, Number.NaN]) {
+        for (const ttlMs of [
+            0,
+            -1,
+            Infinity,
+            -Infinity,
+            Number.NaN,
+        ]) {
             const toast = store.enqueueToast({
                 title: "Invalid",
                 ttlMs,

@@ -148,10 +148,9 @@ describe("historyLimitManager", () => {
             expect(
                 mockHistoryRepository.pruneAllHistoryInternal
             ).toHaveBeenCalledWith(mockDatabase, limit);
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "History limit set",
-                { limit }
-            );
+            expect(mockLogger.debug).toHaveBeenCalledWith("History limit set", {
+                limit,
+            });
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 "History pruned to limit",
                 { limit }
@@ -192,10 +191,9 @@ describe("historyLimitManager", () => {
             expect(
                 mockHistoryRepository.pruneAllHistoryInternal
             ).toHaveBeenCalledWith(mockDatabase, expectedLimit);
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "History limit set",
-                { limit: expectedLimit }
-            );
+            expect(mockLogger.debug).toHaveBeenCalledWith("History limit set", {
+                limit: expectedLimit,
+            });
         });
 
         it("should set limit to 0 for negative values without pruning", async ({
@@ -232,10 +230,9 @@ describe("historyLimitManager", () => {
             expect(
                 mockHistoryRepository.pruneAllHistoryInternal
             ).not.toHaveBeenCalled();
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "History limit set",
-                { limit: expectedLimit }
-            );
+            expect(mockLogger.debug).toHaveBeenCalledWith("History limit set", {
+                limit: expectedLimit,
+            });
             expect(mockLogger.debug).not.toHaveBeenCalledWith(
                 "History pruned to limit",
                 expect.anything()
@@ -276,10 +273,9 @@ describe("historyLimitManager", () => {
             expect(
                 mockHistoryRepository.pruneAllHistoryInternal
             ).not.toHaveBeenCalled();
-            expect(mockLogger.debug).toHaveBeenCalledWith(
-                "History limit set",
-                { limit: expectedLimit }
-            );
+            expect(mockLogger.debug).toHaveBeenCalledWith("History limit set", {
+                limit: expectedLimit,
+            });
             expect(mockLogger.debug).not.toHaveBeenCalledWith(
                 "History pruned to limit",
                 expect.anything()

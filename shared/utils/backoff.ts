@@ -67,8 +67,8 @@ export type BackoffStrategy = "exponential" | "linear";
  * - Negative / non-finite inputs are treated as `0` so retry helpers never
  *   schedule negative timeouts or throw while handling an already-failing
  *   operation.
- * - Finite values that exceed the maximum safe JavaScript timer delay are
- *   capped so retry loops do not accidentally schedule immediate timers.
+ * - Finite values that exceed the maximum safe JavaScript timer delay are capped
+ *   so retry loops do not accidentally schedule immediate timers.
  */
 export function calculateBackoffDelayMs(options: BackoffDelayOptions): number {
     const attemptIndex = isFiniteNumber(options.attemptIndex)

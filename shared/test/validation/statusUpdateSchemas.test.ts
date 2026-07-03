@@ -126,9 +126,7 @@ describe("statusUpdateSchema", () => {
 
 describe(safeParseIsoTimestamp, () => {
     it("trims and accepts valid ISO timestamp strings", () => {
-        const result = safeParseIsoTimestamp(
-            "  2026-07-03T00:00:00.000Z  "
-        );
+        const result = safeParseIsoTimestamp("  2026-07-03T00:00:00.000Z  ");
 
         expect(result.success).toBeTruthy();
         if (result.success) {

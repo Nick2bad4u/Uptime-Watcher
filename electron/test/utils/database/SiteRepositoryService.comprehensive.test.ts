@@ -878,9 +878,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 siteRepositoryService,
                 "loadSitesIntoCache"
             ).mockRejectedValue(
-                new Error(
-                    "SQLite failed\naccess_token=site-load-secret-token"
-                )
+                new Error("SQLite failed\naccess_token=site-load-secret-token")
             );
 
             const result = await siteLoadingOrchestrator.loadSitesFromDatabase(

@@ -41,9 +41,8 @@ describe("dynamic schema conversion", () => {
     ])(
         "defaults invalid INTEGER dynamic fields from %s instead of persisting them",
         async (_caseName, port) => {
-            const { mapMonitorToRow } = await import(
-                "../../../../services/database/utils/schema/dynamicSchema"
-            );
+            const { mapMonitorToRow } =
+                await import("../../../../services/database/utils/schema/dynamicSchema");
 
             const row = mapMonitorToRow({
                 port: port as number,
@@ -60,9 +59,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapMonitorToRow, mapRowToMonitor } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapMonitorToRow, mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         const row = mapMonitorToRow({
             port: 443,
@@ -88,9 +86,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapRowToMonitor } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         const monitor = mapRowToMonitor({
             id: "monitor-1",
@@ -111,9 +108,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapRowToMonitor } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         const monitor = mapRowToMonitor({
             id: "monitor-1",
@@ -133,9 +129,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapRowToMonitor } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         const monitor = mapRowToMonitor({
             id: "monitor-1",
@@ -158,9 +153,8 @@ describe("dynamic schema conversion", () => {
     ])(
         "discards invalid lastChecked values from %s when writing rows",
         async (_caseName, lastChecked) => {
-            const { mapMonitorToRow } = await import(
-                "../../../../services/database/utils/schema/dynamicSchema"
-            );
+            const { mapMonitorToRow } =
+                await import("../../../../services/database/utils/schema/dynamicSchema");
 
             const row = mapMonitorToRow({
                 lastChecked: lastChecked as Date,
@@ -180,9 +174,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapMonitorToRow } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapMonitorToRow } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         expect(
             mapMonitorToRow({
@@ -209,9 +202,8 @@ describe("dynamic schema conversion", () => {
     ])(
         "omits lastChecked for %s when reading rows",
         async (_caseName, lastChecked) => {
-            const { mapRowToMonitor } = await import(
-                "../../../../services/database/utils/schema/dynamicSchema"
-            );
+            const { mapRowToMonitor } =
+                await import("../../../../services/database/utils/schema/dynamicSchema");
 
             const monitor = mapRowToMonitor({
                 id: "monitor-1",
@@ -235,9 +227,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapRowToMonitor } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         const epochMonitor = mapRowToMonitor({
             id: "monitor-1",
@@ -257,9 +248,24 @@ describe("dynamic schema conversion", () => {
     });
 
     it.each([
-        ["NaN timestamp", "createdAt", "created_at", Number.NaN],
-        ["fractional timestamp", "createdAt", "created_at", 1.5],
-        ["negative timestamp", "updatedAt", "updated_at", -1],
+        [
+            "NaN timestamp",
+            "createdAt",
+            "created_at",
+            Number.NaN,
+        ],
+        [
+            "fractional timestamp",
+            "createdAt",
+            "created_at",
+            1.5,
+        ],
+        [
+            "negative timestamp",
+            "updatedAt",
+            "updated_at",
+            -1,
+        ],
         [
             "unsafe timestamp",
             "createdAt",
@@ -275,9 +281,8 @@ describe("dynamic schema conversion", () => {
     ] as const)(
         "defaults invalid required timestamp field %s from %s when writing rows",
         async (_caseName, sourceField, rowField, timestamp) => {
-            const { mapMonitorToRow } = await import(
-                "../../../../services/database/utils/schema/dynamicSchema"
-            );
+            const { mapMonitorToRow } =
+                await import("../../../../services/database/utils/schema/dynamicSchema");
 
             const before = Date.now();
             const row = mapMonitorToRow({
@@ -300,9 +305,8 @@ describe("dynamic schema conversion", () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        const { mapMonitorToRow } = await import(
-            "../../../../services/database/utils/schema/dynamicSchema"
-        );
+        const { mapMonitorToRow } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
 
         const row = mapMonitorToRow({
             createdAt: 1_680_000_000_000,

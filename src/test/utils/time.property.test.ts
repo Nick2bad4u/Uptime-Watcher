@@ -124,11 +124,12 @@ describe("time Utils Property-Based Tests", () => {
             expect(result).toMatch(/^\d+h \d+m$/v);
         });
 
-        fcTest.prop([
-            fc.constantFrom(Number.NaN, Infinity, -Infinity),
-        ])("should return fallback for non-finite durations", (ms) => {
-            expect(formatDuration(ms)).toBe("N/A");
-        });
+        fcTest.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
+            "should return fallback for non-finite durations",
+            (ms) => {
+                expect(formatDuration(ms)).toBe("N/A");
+            }
+        );
     });
 
     describe("formatFullTimestamp function", () => {
@@ -207,11 +208,12 @@ describe("time Utils Property-Based Tests", () => {
             expect(formatIntervalDuration(3_600_000)).toBe("1h");
         });
 
-        fcTest.prop([
-            fc.constantFrom(Number.NaN, Infinity, -Infinity),
-        ])("should return fallback for non-finite durations", (ms) => {
-            expect(formatIntervalDuration(ms)).toBe("N/A");
-        });
+        fcTest.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
+            "should return fallback for non-finite durations",
+            (ms) => {
+                expect(formatIntervalDuration(ms)).toBe("N/A");
+            }
+        );
     });
 
     describe("formatRelativeTimestamp function", () => {
@@ -316,11 +318,12 @@ describe("time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([
-            fc.constantFrom(Number.NaN, Infinity, -Infinity),
-        ])("should return fallback for non-finite durations", (ms) => {
-            expect(formatResponseDuration(ms)).toBe("N/A");
-        });
+        fcTest.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
+            "should return fallback for non-finite durations",
+            (ms) => {
+                expect(formatResponseDuration(ms)).toBe("N/A");
+            }
+        );
     });
 
     describe("formatResponseTime function", () => {
@@ -353,11 +356,12 @@ describe("time Utils Property-Based Tests", () => {
             }
         );
 
-        fcTest.prop([
-            fc.constantFrom(Number.NaN, Infinity, -Infinity),
-        ])("should return fallback for non-finite values", (time) => {
-            expect(formatResponseTime(time)).toBe("N/A");
-        });
+        fcTest.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
+            "should return fallback for non-finite values",
+            (time) => {
+                expect(formatResponseTime(time)).toBe("N/A");
+            }
+        );
 
         it("should handle zero correctly", () => {
             expect(formatResponseTime(0)).toBe("0ms");

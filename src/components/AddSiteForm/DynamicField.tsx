@@ -146,10 +146,7 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
                     });
                 }
             },
-            [
-                field.name,
-                handleChange,
-            ]
+            [field.name, handleChange]
         );
 
         const handleStringChange = useCallback(

@@ -31,57 +31,62 @@ async function runFirstMonitorAction(
     targetName: string,
     action: "start" | "stop"
 ): Promise<void> {
-    await page.evaluate(async ({ action: requestedAction, targetName }) => {
-        const globalTarget = globalThis as typeof globalThis & {
-            electronAPI?: {
-                monitoring?: {
-                    startMonitoringForMonitor?: (
-                        siteIdentifier: string,
-                        monitorId: string
-                    ) => Promise<unknown>;
-                    stopMonitoringForMonitor?: (
-                        siteIdentifier: string,
-                        monitorId: string
-                    ) => Promise<unknown>;
-                };
-                sites?: {
-                    getSites?: () => Promise<unknown>;
+    await page.evaluate(
+        async ({ action: requestedAction, targetName }) => {
+            const globalTarget = globalThis as typeof globalThis & {
+                electronAPI?: {
+                    monitoring?: {
+                        startMonitoringForMonitor?: (
+                            siteIdentifier: string,
+                            monitorId: string
+                        ) => Promise<unknown>;
+                        stopMonitoringForMonitor?: (
+                            siteIdentifier: string,
+                            monitorId: string
+                        ) => Promise<unknown>;
+                    };
+                    sites?: {
+                        getSites?: () => Promise<unknown>;
+                    };
                 };
             };
-        };
 
-        const sitesResult =
-            (await globalTarget.electronAPI?.sites?.getSites?.()) ?? [];
+            const sitesResult =
+                (await globalTarget.electronAPI?.sites?.getSites?.()) ?? [];
 
-        if (!Array.isArray(sitesResult)) {
-            return;
-        }
+            if (!Array.isArray(sitesResult)) {
+                return;
+            }
 
-        const targetSite = sitesResult.find(
-            (candidate) =>
-                candidate &&
-                typeof candidate === "object" &&
-                "name" in candidate &&
-                (candidate as { name?: string }).name === targetName
-        ) as
-            | undefined
-            | {
-                  identifier?: string;
-                  monitors?: { id?: string }[];
-              };
+            const targetSite = sitesResult.find(
+                (candidate) =>
+                    candidate &&
+                    typeof candidate === "object" &&
+                    "name" in candidate &&
+                    (candidate as { name?: string }).name === targetName
+            ) as
+                | undefined
+                | {
+                      identifier?: string;
+                      monitors?: { id?: string }[];
+                  };
 
-        const monitorId = targetSite?.monitors?.[0]?.id;
-        if (!targetSite?.identifier || !monitorId) {
-            return;
-        }
+            const monitorId = targetSite?.monitors?.[0]?.id;
+            if (!targetSite?.identifier || !monitorId) {
+                return;
+            }
 
-        const monitorAction =
-            requestedAction === "start"
-                ? globalTarget.electronAPI?.monitoring?.startMonitoringForMonitor
-                : globalTarget.electronAPI?.monitoring?.stopMonitoringForMonitor;
+            const monitorAction =
+                requestedAction === "start"
+                    ? globalTarget.electronAPI?.monitoring
+                          ?.startMonitoringForMonitor
+                    : globalTarget.electronAPI?.monitoring
+                          ?.stopMonitoringForMonitor;
 
-        await monitorAction?.(targetSite.identifier, monitorId);
-    }, { action, targetName });
+            await monitorAction?.(targetSite.identifier, monitorId);
+        },
+        { action, targetName }
+    );
 }
 
 test.describe(

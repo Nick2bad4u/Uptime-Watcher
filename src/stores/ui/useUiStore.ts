@@ -444,12 +444,11 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             // keeping transient state (modals, selections) in memory only.
             ...UI_PERSIST_CONFIG,
             migrate: (persistedState: unknown, version: number) => {
-                const state: Partial<UIPersistedState> =
-                    isRecord(persistedState)
-                        ? castUnchecked<Partial<UIPersistedState>>(
-                              persistedState
-                          )
-                        : {};
+                const state: Partial<UIPersistedState> = isRecord(
+                    persistedState
+                )
+                    ? castUnchecked<Partial<UIPersistedState>>(persistedState)
+                    : {};
 
                 if (version < UI_PERSIST_VERSION) {
                     return normalizeUIPersistedState({

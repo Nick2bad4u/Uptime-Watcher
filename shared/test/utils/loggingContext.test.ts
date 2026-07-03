@@ -122,7 +122,9 @@ describe("logging context helpers", () => {
     it("serializes invalid Date values without throwing", () => {
         const invalidDate = new Date(Number.NaN);
 
-        expect(() => normalizeLogValue({ checkedAt: invalidDate })).not.toThrow();
+        expect(() =>
+            normalizeLogValue({ checkedAt: invalidDate })
+        ).not.toThrow();
         expect(normalizeLogValue({ checkedAt: invalidDate })).toEqual({
             checkedAt: "[Invalid Date]",
         });

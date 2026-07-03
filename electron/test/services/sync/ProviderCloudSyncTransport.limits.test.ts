@@ -393,14 +393,18 @@ describe("ProviderCloudSyncTransport.appendOperations upload limits", () => {
 
         const transport = ProviderCloudSyncTransport.create(provider);
 
-        await withEnvVar("UW_CLOUD_SYNC_MAX_OPS_OBJECT_LINES", "1", async () => {
-            await expect(
-                transport.appendOperations("a", [
-                    createOperation({ opId: 1 }),
-                    createOperation({ field: "y", opId: 2 }),
-                ])
-            ).rejects.toThrow(/max operation count/i);
-        });
+        await withEnvVar(
+            "UW_CLOUD_SYNC_MAX_OPS_OBJECT_LINES",
+            "1",
+            async () => {
+                await expect(
+                    transport.appendOperations("a", [
+                        createOperation({ opId: 1 }),
+                        createOperation({ field: "y", opId: 2 }),
+                    ])
+                ).rejects.toThrow(/max operation count/i);
+            }
+        );
 
         expect(uploaded).toBeFalsy();
     });
@@ -444,11 +448,15 @@ describe("ProviderCloudSyncTransport.appendOperations upload limits", () => {
 
         const transport = ProviderCloudSyncTransport.create(provider);
 
-        await withEnvVar("UW_CLOUD_SYNC_MAX_OPS_OBJECT_BYTES", "20", async () => {
-            await expect(
-                transport.appendOperations("a", [createOperation()])
-            ).rejects.toThrow(/exceeds size limit/i);
-        });
+        await withEnvVar(
+            "UW_CLOUD_SYNC_MAX_OPS_OBJECT_BYTES",
+            "20",
+            async () => {
+                await expect(
+                    transport.appendOperations("a", [createOperation()])
+                ).rejects.toThrow(/exceeds size limit/i);
+            }
+        );
 
         expect(uploaded).toBeFalsy();
     });

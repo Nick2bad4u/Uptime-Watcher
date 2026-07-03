@@ -83,9 +83,10 @@ describe(uploadBackupWithMetadata, () => {
     ])(
         "rejects non-canonical backup fileName values from %s before uploading",
         async (_caseName, fileName) => {
-            const uploadObject = vi.fn<
-                (args: { buffer: Buffer; key: string }) => Promise<void>
-            >();
+            const uploadObject =
+                vi.fn<
+                    (args: { buffer: Buffer; key: string }) => Promise<void>
+                >();
 
             await expect(
                 uploadBackupWithMetadata({
@@ -111,9 +112,8 @@ describe(uploadBackupWithMetadata, () => {
     );
 
     it("rejects invalid metadata before uploading backup bytes", async () => {
-        const uploadObject = vi.fn<
-            (args: { buffer: Buffer; key: string }) => Promise<void>
-        >();
+        const uploadObject =
+            vi.fn<(args: { buffer: Buffer; key: string }) => Promise<void>>();
 
         await expect(
             uploadBackupWithMetadata({

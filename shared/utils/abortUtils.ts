@@ -57,7 +57,9 @@ function normalizePositiveMs(
     return value;
 }
 
-function normalizeOptionalTimeoutMs(value: number | undefined): number | undefined {
+function normalizeOptionalTimeoutMs(
+    value: number | undefined
+): number | undefined {
     if (!isDefined(value) || !isFiniteNumber(value) || value <= 0) {
         return undefined;
     }

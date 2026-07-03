@@ -38,7 +38,9 @@ describe(readStoredJsonSecret, () => {
 
         expect(parse).not.toHaveBeenCalled();
         expect(clear).toHaveBeenCalledTimes(1);
-        await expect(secretStore.getSecret(storageKey)).resolves.toBeUndefined();
+        await expect(
+            secretStore.getSecret(storageKey)
+        ).resolves.toBeUndefined();
         expect(logger.warn).toHaveBeenCalledWith(
             "[TestTokenManager] Stored tokens exceeded maximum size; clearing",
             {

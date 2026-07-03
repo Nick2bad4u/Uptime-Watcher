@@ -109,10 +109,7 @@ const sanitizePreviewString = (value: string): string => {
     }
 };
 
-const getOriginalJsonHolderValue = (
-    holder: unknown,
-    key: string
-): unknown => {
+const getOriginalJsonHolderValue = (holder: unknown, key: string): unknown => {
     if (key.length === 0 || typeof holder !== "object" || holder === null) {
         return undefined;
     }

@@ -184,10 +184,7 @@ export function withFallback<T>(value: null | T | undefined, fallback: T): T {
  *
  * @returns A finite, non-negative, rounded response time.
  */
-export function normalizeResponseTime(
-    value: unknown,
-    fallback = 0
-): number {
+export function normalizeResponseTime(value: unknown, fallback = 0): number {
     if (typeof value === "number" && isFiniteNumber(value)) {
         return Math.max(0, Math.round(value));
     }

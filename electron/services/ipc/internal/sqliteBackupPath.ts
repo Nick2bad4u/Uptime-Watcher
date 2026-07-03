@@ -2,10 +2,7 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import * as path from "node:path";
 
 const SQLITE_EXTENSION = ".sqlite" as const;
-const SQLITE_COMPATIBLE_EXTENSIONS = new Set([
-    ".db",
-    SQLITE_EXTENSION,
-]);
+const SQLITE_COMPATIBLE_EXTENSIONS = new Set([".db", SQLITE_EXTENSION]);
 const PLAYWRIGHT_BACKUP_DIRECTORY = "playwright-backups" as const;
 
 function normalizeBackupFileName(fileName: string): string {

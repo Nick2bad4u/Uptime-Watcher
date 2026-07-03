@@ -21,9 +21,7 @@ describe("repository identifier validation", () => {
         it("accepts monitor IDs at the shared max length", () => {
             const monitorId = "m".repeat(MONITOR_ID_MAX_LENGTH);
 
-            expect(() =>
-                assertValidMonitorId(monitorId, "test")
-            ).not.toThrow();
+            expect(() => assertValidMonitorId(monitorId, "test")).not.toThrow();
             expect(isValidMonitorId(monitorId)).toBeTruthy();
         });
 

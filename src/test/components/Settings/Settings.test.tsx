@@ -480,9 +480,7 @@ describe("Settings Component", () => {
         );
         fireEvent.change(input, { target: { value: "not-a-number" } });
 
-        expect(
-            mockSettingsStore.persistHistoryLimit
-        ).not.toHaveBeenCalled();
+        expect(mockSettingsStore.persistHistoryLimit).not.toHaveBeenCalled();
     });
 
     it("should handle reset settings", async ({ task, annotate }) => {

@@ -134,13 +134,10 @@ describe("DynamicField coverage", () => {
         expect(onChange).toHaveBeenLastCalledWith("");
 
         numericProps.onChange("invalid");
-        expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid numeric input",
-            {
-                fieldName: "port",
-                value: "invalid",
-            }
-        );
+        expect(loggerErrorMock).toHaveBeenCalledWith("Invalid numeric input", {
+            fieldName: "port",
+            value: "invalid",
+        });
     });
 
     it("renders select field with options", async () => {

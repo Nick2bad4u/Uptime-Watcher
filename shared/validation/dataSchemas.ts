@@ -48,7 +48,8 @@ const sqliteRestoreFileNameSchema: z.ZodType<string> = z
         if (fileName !== fileName.trim()) {
             context.addIssue({
                 code: "custom",
-                message: "Restore filename must not have leading or trailing whitespace",
+                message:
+                    "Restore filename must not have leading or trailing whitespace",
             });
         }
 

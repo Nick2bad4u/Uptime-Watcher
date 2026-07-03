@@ -262,10 +262,7 @@ const loggerInstance: LoggerInterface = {
             baseLoggerMethods.error("Application error", error, { context });
         },
         performance: (operation: string, duration: number): void => {
-            baseLoggerMethods.debug(
-                "Performance",
-                { duration, operation }
-            );
+            baseLoggerMethods.debug("Performance", { duration, operation });
         },
         started: (): void => {
             baseLoggerMethods.info("Application started");
@@ -288,7 +285,9 @@ const loggerInstance: LoggerInterface = {
     // Log site monitoring events
     site: {
         added: (identifier: string): void => {
-            baseLoggerMethods.info("Site added", { siteIdentifier: identifier });
+            baseLoggerMethods.info("Site added", {
+                siteIdentifier: identifier,
+            });
         },
         check: (
             identifier: string,

@@ -2,7 +2,11 @@
  * Helpers for converting status updates into alert payloads.
  */
 
-import { isMonitorStatus, type Monitor, type StatusUpdate } from "@shared/types";
+import {
+    isMonitorStatus,
+    type Monitor,
+    type StatusUpdate,
+} from "@shared/types";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";

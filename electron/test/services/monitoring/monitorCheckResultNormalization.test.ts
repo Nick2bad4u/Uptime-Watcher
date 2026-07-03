@@ -8,17 +8,18 @@ import {
 
 describe("monitorCheckResultNormalization", () => {
     describe(isValidServiceResult, () => {
-        it.each([Number.NaN, Infinity, -Infinity])(
-            "rejects non-finite response time %s",
-            (responseTime) => {
-                expect(
-                    isValidServiceResult({
-                        responseTime,
-                        status: "up",
-                    })
-                ).toBeFalsy();
-            }
-        );
+        it.each([
+            Number.NaN,
+            Infinity,
+            -Infinity,
+        ])("rejects non-finite response time %s", (responseTime) => {
+            expect(
+                isValidServiceResult({
+                    responseTime,
+                    status: "up",
+                })
+            ).toBeFalsy();
+        });
 
         it("accepts finite response times", () => {
             expect(

@@ -226,7 +226,9 @@ function normalizeBackupArgs(
 
 function assertNonNegativeInteger(name: string, value: number): void {
     if (!Number.isInteger(value) || value < 0) {
-        throw new Error(`Backup metadata ${name} must be a non-negative integer`);
+        throw new Error(
+            `Backup metadata ${name} must be a non-negative integer`
+        );
     }
 }
 

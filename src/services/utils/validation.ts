@@ -89,7 +89,9 @@ interface NormalizedDiagnostics {
     readonly suffix: string;
 }
 
-const truncateDiagnostics = (value: string): {
+const truncateDiagnostics = (
+    value: string
+): {
     readonly truncated: boolean;
     readonly value: string;
 } =>

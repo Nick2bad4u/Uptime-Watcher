@@ -343,10 +343,7 @@ const isValidHistoryEntryRow = (
         return false;
     }
 
-    return (
-        !isDefined(responseTime) ||
-        isFiniteRowNumber(responseTime)
-    );
+    return !isDefined(responseTime) || isFiniteRowNumber(responseTime);
 };
 
 const HISTORY_ROW_VALIDATION: RowValidationOptions<HistoryRow> = {

@@ -67,7 +67,9 @@ function getMergedEvent(): MonitorStatusChangedEvent {
     expect(event).toBeDefined();
 
     if (!event) {
-        throw new Error("Expected mergeMonitorStatusChange to receive an event");
+        throw new Error(
+            "Expected mergeMonitorStatusChange to receive an event"
+        );
     }
 
     return event;

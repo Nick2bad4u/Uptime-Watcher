@@ -57,7 +57,7 @@ describe(buildPayloadPreview, () => {
 
         expect(preview).toBeTypeOf("string");
         expect(preview).toContain("[Invalid Date]");
-        expect(preview).toContain("\"ok\": true");
+        expect(preview).toContain('"ok": true');
         expect(preview).not.toContain("[unserializable-payload]");
     });
 

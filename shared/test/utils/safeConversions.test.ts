@@ -346,9 +346,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             );
 
             expect(safeParsePort("invalid", 0)).toBe(80);
-            expect(safeParsePort("invalid", Number.POSITIVE_INFINITY)).toBe(
-                80
-            );
+            expect(safeParsePort("invalid", Number.POSITIVE_INFINITY)).toBe(80);
             expect(safeParsePort("invalid", Number.NaN)).toBe(80);
         });
     });

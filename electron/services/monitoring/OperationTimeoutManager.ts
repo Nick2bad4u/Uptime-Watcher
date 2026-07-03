@@ -68,9 +68,13 @@ export class OperationTimeoutManager {
                 operation.monitorId
             );
         } catch (error) {
-            logger.warn("Failed to clear active operations for monitor", error, {
-                monitorId: operation.monitorId,
-            });
+            logger.warn(
+                "Failed to clear active operations for monitor",
+                error,
+                {
+                    monitorId: operation.monitorId,
+                }
+            );
         } finally {
             // Always remove this operation from the registry (even if already
             // aborted). Otherwise aborted operations can leak indefinitely when

@@ -249,8 +249,7 @@ describe(SyncMaintenancePanel, () => {
                 onResetRemoteSyncState={vi.fn()}
                 preview={preview}
                 status={createStatus({
-                    lastError:
-                        "sync failed Authorization Bearer status-secret",
+                    lastError: "sync failed Authorization Bearer status-secret",
                 })}
                 syncEnabled={true}
             />

@@ -7,19 +7,22 @@ import {
 
 describe("abortSignalUtils", () => {
     describe(mergeAbortSignals, () => {
-        it.each([Number.NaN, Infinity, -Infinity, 0, -1])(
-            "ignores invalid optional timeout %s",
-            (timeoutMs) => {
-                const controller = new AbortController();
+        it.each([
+            Number.NaN,
+            Infinity,
+            -Infinity,
+            0,
+            -1,
+        ])("ignores invalid optional timeout %s", (timeoutMs) => {
+            const controller = new AbortController();
 
-                expect(
-                    mergeAbortSignals({
-                        baseSignal: controller.signal,
-                        timeoutMs,
-                    })
-                ).toBe(controller.signal);
-            }
-        );
+            expect(
+                mergeAbortSignals({
+                    baseSignal: controller.signal,
+                    timeoutMs,
+                })
+            ).toBe(controller.signal);
+        });
 
         it("preserves additional signals when optional timeout is invalid", () => {
             const baseController = new AbortController();

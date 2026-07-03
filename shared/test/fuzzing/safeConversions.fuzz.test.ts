@@ -324,9 +324,12 @@ describe("SafeConversions utilities fuzzing tests", () => {
                 fc.constant(Number.NaN),
                 fc.constant(Number.POSITIVE_INFINITY)
             ),
-        ])("should fall back when custom default is invalid", (defaultValue) => {
-            expect(safeParsePort("invalid", defaultValue)).toBe(80);
-        });
+        ])(
+            "should fall back when custom default is invalid",
+            (defaultValue) => {
+                expect(safeParsePort("invalid", defaultValue)).toBe(80);
+            }
+        );
     });
 
     describe(safeParsePositiveInt, () => {

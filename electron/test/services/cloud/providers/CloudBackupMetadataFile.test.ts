@@ -38,14 +38,24 @@ describe("CloudBackupMetadataFile buffer parsing", () => {
 
     it("throws when strict metadata parsing receives invalid UTF-8", () => {
         expect(() =>
-            parseCloudBackupMetadataFileBuffer(Buffer.from([0xff, 0xfe, 0xfd]))
+            parseCloudBackupMetadataFileBuffer(
+                Buffer.from([
+                    0xff,
+                    0xfe,
+                    0xfd,
+                ])
+            )
         ).toThrow();
     });
 
     it("returns null when best-effort metadata parsing receives invalid UTF-8", () => {
         expect(
             tryParseCloudBackupMetadataFileBuffer(
-                Buffer.from([0xff, 0xfe, 0xfd])
+                Buffer.from([
+                    0xff,
+                    0xfe,
+                    0xfd,
+                ])
             )
         ).toBeNull();
     });

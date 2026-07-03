@@ -28,7 +28,11 @@ describe("cloudSchemas", () => {
     });
 
     it("rejects CloudStatusSummary with invalid timestamp values", () => {
-        for (const timestamp of [-1, 1.5, MAX_VALID_DATE_EPOCH_MS + 1]) {
+        for (const timestamp of [
+            -1,
+            1.5,
+            MAX_VALID_DATE_EPOCH_MS + 1,
+        ]) {
             const parsed = validateCloudStatusSummary({
                 backupsEnabled: false,
                 configured: false,

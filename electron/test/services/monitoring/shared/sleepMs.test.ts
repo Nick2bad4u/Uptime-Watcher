@@ -7,12 +7,15 @@ describe(sleepMs, () => {
         vi.useRealTimers();
     });
 
-    it.each([Number.NaN, Infinity, -Infinity, -1, 0])(
-        "resolves immediately for invalid duration %s",
-        async (durationMs) => {
-            await expect(sleepMs(durationMs)).resolves.toBeUndefined();
-        }
-    );
+    it.each([
+        Number.NaN,
+        Infinity,
+        -Infinity,
+        -1,
+        0,
+    ])("resolves immediately for invalid duration %s", async (durationMs) => {
+        await expect(sleepMs(durationMs)).resolves.toBeUndefined();
+    });
 
     it("waits for finite positive durations", async () => {
         vi.useFakeTimers();

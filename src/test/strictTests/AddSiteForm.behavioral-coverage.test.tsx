@@ -493,10 +493,9 @@ describe("AddSiteForm behavioral coverage", () => {
         radioGroupProps?.onChange("existing");
         expect(formStateRefs.setAddMode).toHaveBeenCalledWith("existing");
         radioGroupProps?.onChange("unsupported");
-        expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid add mode value",
-            { value: "unsupported" }
-        );
+        expect(loggerErrorMock).toHaveBeenCalledWith("Invalid add mode value", {
+            value: "unsupported",
+        });
     });
 
     it("renders new-site fields and help text guidance", () => {

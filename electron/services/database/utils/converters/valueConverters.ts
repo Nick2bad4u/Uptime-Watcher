@@ -24,11 +24,10 @@ export type DbValue = null | number | string;
  *
  * @remarks
  * -
- *
- * - finite `number` and `string` values pass through
+ * - Finite `number` and `string` values pass through
  * - `boolean` becomes `1`/`0`
  * - `null` becomes `null`
- * - non-finite numbers, `undefined`, and all other types return `undefined`
+ * - Non-finite numbers, `undefined`, and all other types return `undefined`
  *   (caller decides whether to skip the field or coerce to `null`)
  *
  * Prefer this helper instead of ad-hoc `typeof` chains so the conversion rules

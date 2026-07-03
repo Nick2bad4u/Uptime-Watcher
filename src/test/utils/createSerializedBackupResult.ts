@@ -42,10 +42,7 @@ export const createSerializedBackupResult = (
 });
 
 export const createSerializedRestoreResult = (
-    overrides: Omit<
-        Partial<SerializedDatabaseRestoreResult>,
-        "metadata"
-    > & {
+    overrides: Omit<Partial<SerializedDatabaseRestoreResult>, "metadata"> & {
         metadata?: Partial<SerializedDatabaseRestoreResult["metadata"]>;
     } = {}
 ): SerializedDatabaseRestoreResult => ({

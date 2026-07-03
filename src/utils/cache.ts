@@ -59,9 +59,7 @@ function normalizeMaxSize(maxSize: number | undefined): number {
 }
 
 function normalizeTtl(ttl: number | undefined): number | undefined {
-    return isDefined(ttl) && Number.isFinite(ttl) && ttl > 0
-        ? ttl
-        : undefined;
+    return isDefined(ttl) && Number.isFinite(ttl) && ttl > 0 ? ttl : undefined;
 }
 
 /**

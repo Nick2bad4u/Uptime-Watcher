@@ -209,7 +209,9 @@ function getJsonBytesForNumber(value: number): number {
 function getJsonBytesForDate(value: Date): number {
     const timestamp = value.getTime();
     return getJsonBytesForString(
-        isFiniteNumber(timestamp) ? value.toISOString() : INVALID_DATE_JSON_VALUE
+        isFiniteNumber(timestamp)
+            ? value.toISOString()
+            : INVALID_DATE_JSON_VALUE
     );
 }
 
