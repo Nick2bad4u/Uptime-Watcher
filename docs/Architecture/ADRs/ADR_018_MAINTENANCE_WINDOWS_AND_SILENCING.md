@@ -73,7 +73,7 @@ Maintenance windows are evaluated in a timezone-aware manner.
 - Store `startAtMs` and `endAtMs` as UTC epoch milliseconds.
 - Optionally store `timeZone` (IANA) for display.
 
-2. **Weekly recurring window (local time in a timezone)**
+1. **Weekly recurring window (local time in a timezone)**
 
 - Store a `timeZone` (IANA, e.g. `"America/New_York"`).
 - Store `daysOfWeek` as an array of ISO weekday numbers (`1..7`).

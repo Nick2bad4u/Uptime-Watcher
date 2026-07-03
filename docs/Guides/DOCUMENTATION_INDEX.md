@@ -66,40 +66,40 @@ System design, patterns, and architectural decisions:
 
 #### ADRs (Architecture Decision Records)
 
-| Document                                                                                                                                                 | Decision                                    | Status      |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ----------- |
-| [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                                                                   | Database access pattern                     | ✅ Accepted  |
-| [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)                                                    | Event system design                         | ✅ Accepted  |
-| [ADR\_003\_ERROR\_HANDLING\_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)                                                        | Error handling approach                     | ✅ Accepted  |
-| [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)                                                    | Zustand state management                    | ✅ Accepted  |
-| [ADR\_005\_IPC\_COMMUNICATION\_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)                                                  | IPC communication design                    | ✅ Accepted  |
-| [ADR\_006\_STANDARDIZED\_CACHE\_CONFIGURATION.md](../Architecture/ADRs/ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md)                                      | Cache configuration standardization         | ✅ Accepted  |
-| [ADR\_007\_SERVICE\_CONTAINER\_DEPENDENCY\_INJECTION.md](../Architecture/ADRs/ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md)                         | Service container/DI                        | ✅ Accepted  |
-| [ADR\_008\_MONITOR\_TYPE\_REGISTRY.md](../Architecture/ADRs/ADR_008_MONITOR_TYPE_REGISTRY.md)                                                            | Monitor type registry + plugin architecture | ✅ Accepted  |
-| [ADR\_009\_VALIDATION\_STRATEGY.md](../Architecture/ADRs/ADR_009_VALIDATION_STRATEGY.md)                                                                 | Validation strategy                         | ✅ Accepted  |
-| [ADR\_010\_TESTING\_STRATEGY.md](../Architecture/ADRs/ADR_010_TESTING_STRATEGY.md)                                                                       | Testing strategy                            | ✅ Accepted  |
-| [ADR\_011\_SCHEDULER\_AND\_BACKOFF.md](../Architecture/ADRs/ADR_011_SCHEDULER_AND_BACKOFF.md)                                                            | Scheduler and backoff                       | ✅ Accepted  |
-| [ADR\_012\_NOTIFICATIONS\_AND\_ALERTING.md](../Architecture/ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)                                                  | Notifications policy                        | ✅ Accepted  |
-| [ADR\_013\_DATA\_PORTABILITY\_AND\_BACKUP.md](../Architecture/ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)                                               | Data portability + backup/restore           | ✅ Accepted  |
-| [ADR\_014\_LOGGING\_TELEMETRY\_AND\_DIAGNOSTICS.md](../Architecture/ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)                                   | Logging + diagnostics                       | ✅ Accepted  |
-| [ADR\_015\_CLOUD\_SYNC\_AND\_REMOTE\_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                                            | Cloud sync + remote backups                 | ✅ Accepted  |
-| [ADR\_016\_MULTI\_DEVICE\_SYNC\_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                                                       | True multi-device sync model                | ✅ Accepted  |
-| [ADR\_017\_EXTERNAL\_ALERT\_INTEGRATIONS.md](../Architecture/ADRs/ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md)                                                | Slack/Discord/webhook alerts                | 💡 Proposed |
-| [ADR\_018\_MAINTENANCE\_WINDOWS\_AND\_SILENCING.md](../Architecture/ADRs/ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md)                                   | Maintenance windows + silence rules         | 💡 Proposed |
-| [ADR\_019\_TEMPLATES\_AND\_BULK\_OPERATIONS.md](../Architecture/ADRs/ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md)                                           | Templates + bulk import/export              | 💡 Proposed |
-| [ADR\_020\_SUPPORT\_DIAGNOSTICS\_BUNDLE.md](../Architecture/ADRs/ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md)                                                  | Diagnostics bundle export                   | 💡 Proposed |
-| [ADR\_021\_CLOUD\_PROVIDER\_SELECTION\_AND\_SETTINGS\_UI.md](../Architecture/ADRs/ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md)                   | Cloud provider selection UI + roadmap       | ✅ Accepted  |
-| [ADR\_022\_OAUTH\_LOOPBACK\_REDIRECT\_AND\_CALLBACK\_ROUTING.md](../Architecture/ADRs/ADR_022_OAUTH_LOOPBACK_REDIRECT_AND_CALLBACK_ROUTING.md)           | OAuth loopback redirect + callback routing  | ✅ Accepted  |
-| [ADR\_023\_SECRET\_STORAGE\_AND\_ENCRYPTION\_POLICY.md](../Architecture/ADRs/ADR_023_SECRET_STORAGE_AND_ENCRYPTION_POLICY.md)                            | Secret storage + encryption policy          | ✅ Accepted  |
-| [ADR\_024\_CLOUD\_PROVIDER\_SWITCHING\_AND\_MIGRATION\_POLICY.md](../Architecture/ADRs/ADR_024_CLOUD_PROVIDER_SWITCHING_AND_MIGRATION_POLICY.md)         | Cloud provider switching policy             | ✅ Accepted  |
-| [ADR\_025\_RELEASE\_ASSET\_NAMING\_AND\_UPLOAD\_STRATEGY.md](../Architecture/ADRs/ADR_025_RELEASE_ASSET_NAMING_AND_UPLOAD_STRATEGY.md)                   | Release asset naming + upload strategy      | ✅ Accepted  |
-| [ADR\_026\_ELECTRON\_SECURITY\_MODEL\_AND\_RENDERER\_ISOLATION.md](../Architecture/ADRs/ADR_026_ELECTRON_SECURITY_MODEL_AND_RENDERER_ISOLATION.md)       | Electron security model + isolation         | ✅ Accepted  |
-| [ADR\_027\_AUTO\_UPDATE\_STRATEGY\_AND\_RELEASE\_CHANNELS.md](../Architecture/ADRs/ADR_027_AUTO_UPDATE_STRATEGY_AND_RELEASE_CHANNELS.md)                 | Auto-update strategy + release channels     | ✅ Accepted  |
-| [ADR\_028\_DATABASE\_SCHEMA\_VERSIONING\_AND\_MIGRATIONS.md](../Architecture/ADRs/ADR_028_DATABASE_SCHEMA_VERSIONING_AND_MIGRATIONS.md)                  | Database schema versioning + migrations     | ✅ Accepted  |
-| [ADR\_029\_BACKUP\_FORMAT\_ENCRYPTION\_AND\_COMPATIBILITY\_POLICY.md](../Architecture/ADRs/ADR_029_BACKUP_FORMAT_ENCRYPTION_AND_COMPATIBILITY_POLICY.md) | Backup format + encryption compatibility    | ✅ Accepted  |
-| [ADR\_030\_APP\_CONFIGURATION\_AND\_SETTINGS\_PERSISTENCE\_MODEL.md](../Architecture/ADRs/ADR_030_APP_CONFIGURATION_AND_SETTINGS_PERSISTENCE_MODEL.md)   | App configuration + settings persistence    | ✅ Accepted  |
-| [ADR\_031\_PACKAGING\_SIGNING\_AND\_NOTARIZATION\_POLICY.md](../Architecture/ADRs/ADR_031_PACKAGING_SIGNING_AND_NOTARIZATION_POLICY.md)                  | Packaging + signing/notarization policy     | ✅ Accepted  |
-| [ADR\_032\_SUPPORT\_AND\_DIAGNOSTICS\_DATA\_POLICY.md](../Architecture/ADRs/ADR_032_SUPPORT_AND_DIAGNOSTICS_DATA_POLICY.md)                              | Support/diagnostics data policy             | ✅ Accepted  |
+| Document                                                                                                                                                 | Decision                                    | Status   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------- |
+| [ADR\_001\_REPOSITORY\_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                                                                   | Database access pattern                     | Accepted |
+| [ADR\_002\_EVENT\_DRIVEN\_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)                                                    | Event system design                         | Accepted |
+| [ADR\_003\_ERROR\_HANDLING\_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)                                                        | Error handling approach                     | Accepted |
+| [ADR\_004\_FRONTEND\_STATE\_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)                                                    | Zustand state management                    | Accepted |
+| [ADR\_005\_IPC\_COMMUNICATION\_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)                                                  | IPC communication design                    | Accepted |
+| [ADR\_006\_STANDARDIZED\_CACHE\_CONFIGURATION.md](../Architecture/ADRs/ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md)                                      | Cache configuration standardization         | Accepted |
+| [ADR\_007\_SERVICE\_CONTAINER\_DEPENDENCY\_INJECTION.md](../Architecture/ADRs/ADR_007_SERVICE_CONTAINER_DEPENDENCY_INJECTION.md)                         | Service container/DI                        | Accepted |
+| [ADR\_008\_MONITOR\_TYPE\_REGISTRY.md](../Architecture/ADRs/ADR_008_MONITOR_TYPE_REGISTRY.md)                                                            | Monitor type registry + plugin architecture | Accepted |
+| [ADR\_009\_VALIDATION\_STRATEGY.md](../Architecture/ADRs/ADR_009_VALIDATION_STRATEGY.md)                                                                 | Validation strategy                         | Accepted |
+| [ADR\_010\_TESTING\_STRATEGY.md](../Architecture/ADRs/ADR_010_TESTING_STRATEGY.md)                                                                       | Testing strategy                            | Accepted |
+| [ADR\_011\_SCHEDULER\_AND\_BACKOFF.md](../Architecture/ADRs/ADR_011_SCHEDULER_AND_BACKOFF.md)                                                            | Scheduler and backoff                       | Accepted |
+| [ADR\_012\_NOTIFICATIONS\_AND\_ALERTING.md](../Architecture/ADRs/ADR_012_NOTIFICATIONS_AND_ALERTING.md)                                                  | Notifications policy                        | Accepted |
+| [ADR\_013\_DATA\_PORTABILITY\_AND\_BACKUP.md](../Architecture/ADRs/ADR_013_DATA_PORTABILITY_AND_BACKUP.md)                                               | Data portability + backup/restore           | Accepted |
+| [ADR\_014\_LOGGING\_TELEMETRY\_AND\_DIAGNOSTICS.md](../Architecture/ADRs/ADR_014_LOGGING_TELEMETRY_AND_DIAGNOSTICS.md)                                   | Logging + diagnostics                       | Accepted |
+| [ADR\_015\_CLOUD\_SYNC\_AND\_REMOTE\_BACKUP.md](../Architecture/ADRs/ADR_015_CLOUD_SYNC_AND_REMOTE_BACKUP.md)                                            | Cloud sync + remote backups                 | Accepted |
+| [ADR\_016\_MULTI\_DEVICE\_SYNC\_MODEL.md](../Architecture/ADRs/ADR_016_MULTI_DEVICE_SYNC_MODEL.md)                                                       | True multi-device sync model                | Accepted |
+| [ADR\_017\_EXTERNAL\_ALERT\_INTEGRATIONS.md](../Architecture/ADRs/ADR_017_EXTERNAL_ALERT_INTEGRATIONS.md)                                                | Slack/Discord/webhook alerts                | Proposed |
+| [ADR\_018\_MAINTENANCE\_WINDOWS\_AND\_SILENCING.md](../Architecture/ADRs/ADR_018_MAINTENANCE_WINDOWS_AND_SILENCING.md)                                   | Maintenance windows + silence rules         | Proposed |
+| [ADR\_019\_TEMPLATES\_AND\_BULK\_OPERATIONS.md](../Architecture/ADRs/ADR_019_TEMPLATES_AND_BULK_OPERATIONS.md)                                           | Templates + bulk import/export              | Proposed |
+| [ADR\_020\_SUPPORT\_DIAGNOSTICS\_BUNDLE.md](../Architecture/ADRs/ADR_020_SUPPORT_DIAGNOSTICS_BUNDLE.md)                                                  | Diagnostics bundle export                   | Proposed |
+| [ADR\_021\_CLOUD\_PROVIDER\_SELECTION\_AND\_SETTINGS\_UI.md](../Architecture/ADRs/ADR_021_CLOUD_PROVIDER_SELECTION_AND_SETTINGS_UI.md)                   | Cloud provider selection UI + roadmap       | Accepted |
+| [ADR\_022\_OAUTH\_LOOPBACK\_REDIRECT\_AND\_CALLBACK\_ROUTING.md](../Architecture/ADRs/ADR_022_OAUTH_LOOPBACK_REDIRECT_AND_CALLBACK_ROUTING.md)           | OAuth loopback redirect + callback routing  | Accepted |
+| [ADR\_023\_SECRET\_STORAGE\_AND\_ENCRYPTION\_POLICY.md](../Architecture/ADRs/ADR_023_SECRET_STORAGE_AND_ENCRYPTION_POLICY.md)                            | Secret storage + encryption policy          | Accepted |
+| [ADR\_024\_CLOUD\_PROVIDER\_SWITCHING\_AND\_MIGRATION\_POLICY.md](../Architecture/ADRs/ADR_024_CLOUD_PROVIDER_SWITCHING_AND_MIGRATION_POLICY.md)         | Cloud provider switching policy             | Accepted |
+| [ADR\_025\_RELEASE\_ASSET\_NAMING\_AND\_UPLOAD\_STRATEGY.md](../Architecture/ADRs/ADR_025_RELEASE_ASSET_NAMING_AND_UPLOAD_STRATEGY.md)                   | Release asset naming + upload strategy      | Accepted |
+| [ADR\_026\_ELECTRON\_SECURITY\_MODEL\_AND\_RENDERER\_ISOLATION.md](../Architecture/ADRs/ADR_026_ELECTRON_SECURITY_MODEL_AND_RENDERER_ISOLATION.md)       | Electron security model + isolation         | Accepted |
+| [ADR\_027\_AUTO\_UPDATE\_STRATEGY\_AND\_RELEASE\_CHANNELS.md](../Architecture/ADRs/ADR_027_AUTO_UPDATE_STRATEGY_AND_RELEASE_CHANNELS.md)                 | Auto-update strategy + release channels     | Accepted |
+| [ADR\_028\_DATABASE\_SCHEMA\_VERSIONING\_AND\_MIGRATIONS.md](../Architecture/ADRs/ADR_028_DATABASE_SCHEMA_VERSIONING_AND_MIGRATIONS.md)                  | Database schema versioning + migrations     | Accepted |
+| [ADR\_029\_BACKUP\_FORMAT\_ENCRYPTION\_AND\_COMPATIBILITY\_POLICY.md](../Architecture/ADRs/ADR_029_BACKUP_FORMAT_ENCRYPTION_AND_COMPATIBILITY_POLICY.md) | Backup format + encryption compatibility    | Accepted |
+| [ADR\_030\_APP\_CONFIGURATION\_AND\_SETTINGS\_PERSISTENCE\_MODEL.md](../Architecture/ADRs/ADR_030_APP_CONFIGURATION_AND_SETTINGS_PERSISTENCE_MODEL.md)   | App configuration + settings persistence    | Accepted |
+| [ADR\_031\_PACKAGING\_SIGNING\_AND\_NOTARIZATION\_POLICY.md](../Architecture/ADRs/ADR_031_PACKAGING_SIGNING_AND_NOTARIZATION_POLICY.md)                  | Packaging + signing/notarization policy     | Accepted |
+| [ADR\_032\_SUPPORT\_AND\_DIAGNOSTICS\_DATA\_POLICY.md](../Architecture/ADRs/ADR_032_SUPPORT_AND_DIAGNOSTICS_DATA_POLICY.md)                              | Support/diagnostics data policy             | Accepted |
 
 #### Patterns & standards
 

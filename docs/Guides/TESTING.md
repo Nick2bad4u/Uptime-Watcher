@@ -34,14 +34,14 @@ The project has three separate Vitest configurations:
 - Comprehensive ElectronAPI mocking
 - Coverage reports to `./coverage/`
 
-2. **Backend Tests** (`vitest.electron.config.ts`):
+1. **Backend Tests** (`vitest.electron.config.ts`):
 
 - Tests Electron main process code in `electron/` directory
 - Uses Node.js environment
 - Database and service layer testing
 - Coverage reports to `./coverage/electron/`
 
-3. **Shared Tests** (`vitest.shared.config.ts`):
+1. **Shared Tests** (`vitest.shared.config.ts`):
 
 - Tests shared utilities in `shared/` directory
 - Cross-platform utility testing

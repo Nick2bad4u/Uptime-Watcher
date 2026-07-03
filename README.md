@@ -44,7 +44,7 @@
 
 <strong>A Electron desktop application for uptime monitoring</strong> <em>Track multiple services simultaneously with real-time updates, response time analytics, and historical data visualization</em>
 
-<comment> Application screenshots will be added here once available </comment></div>
+</div>
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/main/assets/UptimeWatcherMascot.png" alt="Uptime Watcher Mascot" width="50%">
@@ -177,7 +177,7 @@ npm run electron-dev               # Append flags if needed: npm run electron-de
 
 <div align="center"><em>Application screenshots and demo videos will be added in future releases.</em>
 
-### Key interface components:
+### Key interface components
 
 - 📊 <strong>Main Dashboard</strong>: Real-time monitoring overview with service status across all 14 monitor types
 - ⚙️ <strong>Monitor Configuration</strong>: Easy setup for HTTP variants, TCP ports, DNS, ping, SSL certificates, CDN edge checks, replication lag, heartbeat validation, and WebSocket keepalive

@@ -271,6 +271,7 @@ Operational tips:
 - Capture noisy output (for example, fast-check shrinking logs) into `temp/` when needed: `npx vitest run src/test/foo.test.ts *> temp/foo.log`. Skim the log with `Get-Content -Tail` or `Select-String`, then delete it immediately so stale results do not linger.
 - This repo uses **Vitest**, not Jest, so Jest-only flags such as `--runTestsByPath` are **not supported**. Passing them will cause a CLI error like `Unknown option --runTestsByPath`.
 - Default workflow for a fast feedback loop:
+
   ```powershell
   Set-Location "c:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher"
   # Fast signal for specific suites
@@ -318,19 +319,19 @@ The typical workflow used to raise coverage for `src/stores/alerts/useAlertStore
 
 This prints a table of files sorted by lowest coverage. For example, it may show that `src/stores/alerts/useAlertStore.ts` has lower function/branch coverage than the surrounding code.
 
-3. **Inspect the target module and tests**:
+1. **Inspect the target module and tests**:
 
 - Open `src/stores/alerts/useAlertStore.ts` to understand the queueing logic, timestamp normalization, and ID generation.
 - Open `src/test/stores/alerts/useAlertStore.test.ts` to see existing scenarios and helper builders for `StatusUpdate` payloads.
 
-4. **Design targeted tests for uncovered branches**. Concretely, additional tests were added to cover:
+1. **Design targeted tests for uncovered branches**. Concretely, additional tests were added to cover:
 
 - Site-name derivation when the site name is blank but the identifier is present.
 - Fallbacks to the event `siteIdentifier` and the final `"unknown-site"` branch when all identifiers are missing.
 - Timestamp normalization when `StatusUpdate.timestamp` is not a parseable date (forcing a `Date.now()` fallback).
 - Identifier generation behavior when `globalThis.crypto.randomUUID` is unavailable, using both `crypto.getRandomValues` and a pure `Date.now()` fallback.
 
-5. **Re-run tests and coverage** to confirm the new behavior and improved metrics:
+1. **Re-run tests and coverage** to confirm the new behavior and improved metrics:
 
    ```powershell
    npm run test
@@ -338,7 +339,7 @@ This prints a table of files sorted by lowest coverage. For example, it may show
    node scripts/analyze-coverage.mjs --no-color --format table --limit 20
    ```
 
-6. **Clean up temporary logs** created during this workflow (for example, any coverage logs captured under `temp/`). Keeping `temp/` tidy prevents accidental re-use of stale analysis.
+2. **Clean up temporary logs** created during this workflow (for example, any coverage logs captured under `temp/`). Keeping `temp/` tidy prevents accidental re-use of stale analysis.
 
 ### Coverage analysis workflow
 

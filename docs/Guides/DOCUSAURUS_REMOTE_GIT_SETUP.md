@@ -17,22 +17,22 @@ topics:
 
 # Git Subtree Setup Instructions
 
-## What's been done:
+## What's been done
 
 1. ✅ Updated `docs/docusaurus/package.json` to point to the correct repository URL: `https://github.com/Nick2bad4u/Uptime-Watcher-Docusaurus.git`
 2. ✅ Your root `package.json` already has the git subtree commands configured:
    - `npm run docs:backup` - Push docs/docusaurus to the separate repository
    - `npm run docs:backup:force` - Force push (use with caution)
 
-## Manual Setup Steps:
+## Manual Setup Steps
 
-### 1. Add the Git remote for the docusaurus repository:
+### 1. Add the Git remote for the docusaurus repository
 
 ```bash
 git remote add origin-docs https://github.com/Nick2bad4u/Uptime-Watcher-Docusaurus.git
 ```
 
-### 2. Verify the remote was added:
+### 2. Verify the remote was added
 
 ```bash
 git remote -v
@@ -40,13 +40,13 @@ git remote -v
 
 You should see both `origin` (your main repo) and `origin-docs` (your docusaurus repo).
 
-### 3. Test the setup by pushing your docs:
+### 3. Test the setup by pushing your docs
 
 ```bash
 npm run docs:backup
 ```
 
-## VS Code Setup:
+## VS Code Setup
 
 ### Option 1: Use VS Code Terminal
 
@@ -60,13 +60,13 @@ npm run docs:backup
 2. Click the "..." menu in the Source Control panel
 3. You can manage remotes from here, but command line is easier for subtree operations
 
-## How it works:
+## How it works
 
 - The `docs:backup` command uses `git subtree push` to push only the `docs/docusaurus` folder to the separate repository
 - This keeps your documentation in sync with a standalone repository that can be deployed independently
 - The main repository stays clean and the docs can have their own deployment pipeline
 
-## Troubleshooting:
+## Troubleshooting
 
 If you get an error about the remote already existing:
 
@@ -75,7 +75,7 @@ git remote remove origin-docs
 git remote add origin-docs https://github.com/Nick2bad4u/Uptime-Watcher-Docusaurus.git
 ```
 
-## Testing the setup:
+## Testing the setup
 
 1. Make a small change to a file in `docs/docusaurus`
 2. Commit the change to your main repository

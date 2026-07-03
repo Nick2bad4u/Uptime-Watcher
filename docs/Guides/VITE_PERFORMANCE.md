@@ -127,20 +127,20 @@ The following files are pre-warmed for optimal performance in `vite.config.ts`:
 
 ## 🎯 Performance Benefits
 
-### Expected Improvements:
+### Expected Improvements
 
 1. **Faster Initial Load** - Pre-warmed files ready immediately
 2. **Reduced Request Waterfalls** - Critical imports cached
 3. **Better Chart Performance** - Chart.js components pre-loaded
 4. **Smoother Navigation** - Core components ready
 
-### Monitoring Results:
+### Monitoring Results
 
 Use `npm run dev:warmup` to verify files are being warmed up correctly.
 
 ## 🔍 Identifying Additional Warmup Candidates
 
-### Finding Slow Files:
+### Finding Slow Files
 
 ```bash
 npm run profile:transform
@@ -152,7 +152,7 @@ Look for:
 - Frequently imported utilities
 - Large component trees
 
-### Finding Import Waterfalls:
+### Finding Import Waterfalls
 
 ```bash
 npm run profile
@@ -290,6 +290,7 @@ Watch console for warmup effectiveness and transform times.
    ```
 
 3. **Minimize prop drilling with Zustand stores**:
+
    ```tsx
    // Instead of passing props through multiple levels
    const { sites, updateSite } = useSitesStore();
@@ -318,6 +319,7 @@ Watch console for warmup effectiveness and transform times.
    ```
 
 3. **Use dynamic imports for large libraries**:
+
    ```typescript
    const chartJs = await import("chart.js");
    ```
@@ -338,6 +340,7 @@ Watch console for warmup effectiveness and transform times.
    ```
 
 3. **Keep dependencies up to date**:
+
    ```bash
    npm run dep:check
    npm run dep:update

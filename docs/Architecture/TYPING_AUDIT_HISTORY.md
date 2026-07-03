@@ -163,18 +163,16 @@ helpers and their shared counterparts.
 3. `src/types/ipc.ts` reimplements the IPC envelope instead of re-exporting the
    shared helpers and lacks excess-property checks.
 
-> Note (2026-02-01): `src/types/ipc.ts` has since been removed in favour of the
-> canonical shared helpers in `shared/utils/ipcResponse.ts` and the channel
-> contracts in `shared/types/ipc.ts`.
-
-> Note (2026-02-01): `src/types/monitor-forms.ts` has since been removed to
-> eliminate duplication; renderer form typing is now centralized in
-> `src/types/monitorFormData.ts` + `src/utils/monitorValidation.ts`.
-
-> Note (2026-02-01): renderer monitor forms now use `MonitorType` for the
-> discriminator field and have begun reusing shared schema types (e.g.
-> `DnsRecordType` for DNS record selection), reducing drift between shared Zod
-> schemas and renderer form state.
+- Note (2026-02-01): `src/types/ipc.ts` has since been removed in favour of the
+  canonical shared helpers in `shared/utils/ipcResponse.ts` and the channel
+  contracts in `shared/types/ipc.ts`.
+- Note (2026-02-01): `src/types/monitor-forms.ts` has since been removed to
+  eliminate duplication; renderer form typing is now centralized in
+  `src/types/monitorFormData.ts` + `src/utils/monitorValidation.ts`.
+- Note (2026-02-01): renderer monitor forms now use `MonitorType` for the
+  discriminator field and have begun reusing shared schema types (e.g.
+  `DnsRecordType` for DNS record selection), reducing drift between shared Zod
+  schemas and renderer form state.
 
 #### Recommended Follow-ups (Renderer Types Audit)
 

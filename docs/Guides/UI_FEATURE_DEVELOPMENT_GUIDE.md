@@ -995,7 +995,7 @@ Follow the base tag guidelines in `docs/TSDoc/`:
 
 - /\`\`\`tsx
 
-- <component prop="value">;</component>
+- `<ComponentName prop="value" />`
 
 - /\`\`\` -
 
@@ -1185,14 +1185,14 @@ useMount(
 
 ### Common Event System Issues
 
-**❌ Wrong Event Names**
+#### ❌ Wrong Event Names
 
 ```typescript
 // Wrong - event doesn't exist in UptimeEvents
 eventEmitter.emit("statusUpdate", data);
 ```
 
-**✅ Correct Event Names**
+#### ✅ Correct Event Names
 
 ```typescript
 // Right - use defined events
@@ -1206,7 +1206,7 @@ await eventEmitter.emitTyped("monitor:status-changed", {
 });
 ```
 
-**❌ Disconnected Event Buses**
+#### ❌ Disconnected Event Buses
 
 ```typescript
 // Wrong - using separate event bus that doesn't forward to main
@@ -1214,7 +1214,7 @@ const separateEventBus = new TypedEventBus("MyService");
 separateEventBus.emit("monitor:up", data); // Never reaches frontend
 ```
 
-**✅ Connected Event System**
+#### ✅ Connected Event System
 
 ```typescript
 // Right - use manager event bus with forwarding setup
@@ -1232,7 +1232,7 @@ separateEventBus.emit("monitor:up", data); // Never reaches frontend
 
 ### Integration with Existing Systems
 
-**❌ Reinventing Services**
+#### ❌ Reinventing Services
 
 ```typescript
 // Wrong - creating new placeholder implementations
@@ -1242,7 +1242,7 @@ private performPortCheck(): Promise<boolean> {
 }
 ```
 
-**✅ Using Existing Services**
+#### ✅ Using Existing Services
 
 ```typescript
 // Right - leverage existing monitor services
@@ -1255,14 +1255,14 @@ private async performTypeSpecificCheck(monitor: Monitor): Promise<boolean> {
 
 ### Code Quality and Security Guidelines
 
-**❌ Magic Numbers**
+#### ❌ Magic Numbers
 
 ```typescript
 // Wrong - hardcoded values
 const timeoutMs = (monitor.timeout || 30) * 1000 + 5000;
 ```
 
-**✅ Named Constants**
+#### ✅ Named Constants
 
 ```typescript
 // Right - use defined constants
@@ -1276,14 +1276,14 @@ const timeoutMs =
  MONITOR_TIMEOUT_BUFFER_MS;
 ```
 
-**❌ Performance Issues in Validation**
+#### ❌ Performance Issues In Validation
 
 ```typescript
 // Wrong - every() doesn't short-circuit optimally
 return array.every((item) => typeof item === "string");
 ```
 
-**✅ Optimized Validation**
+#### ✅ Optimized Validation
 
 ```typescript
 // Right - early return for better performance
@@ -1293,14 +1293,14 @@ for (const item of array) {
 return true;
 ```
 
-**❌ Unsafe JSON Parsing**
+#### ❌ Unsafe JSON Parsing
 
 ```typescript
 // Wrong - no content validation
 const data = JSON.parse(dbValue);
 ```
 
-**✅ Secure JSON Parsing with Validation**
+#### ✅ Secure JSON Parsing With Validation
 
 ```typescript
 // Right - validate parsed content structure and safety

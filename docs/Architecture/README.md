@@ -380,7 +380,7 @@ with the implemented architecture:
 
 ### IPC validation expectations (data + monitor types)
 
-**Request + response symmetry**
+#### Request + Response Symmetry
 
 - All IPC traffic that crosses the Electron bridge must validate on _both_
   the main-process handler and the renderer service. The canonical schemas
@@ -391,7 +391,7 @@ with the implemented architecture:
   shared validator. Main-process handlers use the same schema when serializing
   results back to the renderer.
 
-**Monitor type registry**
+#### Monitor Type Registry
 
 - `shared/validation/dataSchemas.ts#monitorTypeConfigArraySchema` defines the
   authoritative shape for monitor types and their `fields`. Renderer-side
@@ -401,7 +401,7 @@ with the implemented architecture:
   UI surfaces can fail fast when the backend returns invalid data. Valid but
   empty arrays remain a supported scenario (e.g., onboarding flows).
 
-**Data exports, imports, and backups**
+#### Data Exports, Imports, And Backups
 
 - `DataService` wraps every IPC call with `runDataOperation`, a helper that
   uses `withUtilityErrorHandling` to log `[DataService] <operation>` context.
@@ -419,7 +419,7 @@ For full implementation details, see the code references listed in
 `docs/Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md` and
 `docs/Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md`.
 
-**End-to-end flow**
+#### End-To-End Flow
 
 1. **Renderer settings request**
    - The UI calls `SettingsService.updateHistoryLimit` in
@@ -479,7 +479,7 @@ For full implementation details, see the code references listed in
      payload, ensuring the renderer reflects the same limit as the backend and
      that future monitoring operations use the updated retention rules.
 
-**Error handling semantics**
+#### Error Handling Semantics
 
 - **Invalid user input**: When the caller supplies a limit that violates the
   shared history rules (for example, exceeding the configured maximum),
@@ -692,7 +692,7 @@ This subsection summarizes how site state synchronization works across main,
 preload, and renderer. It complements the detailed mutation and lifecycle
 guidance in `docs/Architecture/Stores/sites.md`.
 
-**Main-process responsibilities**
+#### Main-Process Responsibilities
 
 1. **Authoritative state and events**
    - `SiteManager` maintains the canonical in-memory cache of `Site` entities
@@ -711,9 +711,9 @@ guidance in `docs/Architecture/Stores/sites.md`.
    - Both handlers use shared `StateSyncStatusSummary` and
      `StateSyncFullSyncResult` contracts from `@shared/types/stateSync`.
 
-**Preload responsibilities**
+#### Preload Responsibilities
 
-3. **Validation and channel exposure**
+1. **Validation and channel exposure**
    - `electron/preload/domains/eventsApi.ts` validates
      state-sync-related events using the `StateSyncEventData` guard from
      `@shared/types/events` before they reach renderer callbacks.
@@ -723,9 +723,9 @@ guidance in `docs/Architecture/Stores/sites.md`.
      exposes the corresponding broadcast subscription via
      `window.electronAPI.events.onStateSyncEvent`.
 
-**Renderer responsibilities**
+#### Renderer Responsibilities
 
-4. **IPC abstraction**
+1. **IPC abstraction**
    - `src/services/StateSyncService.ts` is the single renderer entrypoint for
      state-sync IPC:
      - `getSyncStatus()` wraps `stateSync.getSyncStatus()` and parses the
@@ -736,7 +736,7 @@ guidance in `docs/Architecture/Stores/sites.md`.
        handling invalid payloads and coordinating automatic recovery via full
        sync when needed.
 
-5. **Store coordination**
+2. **Store coordination**
    - `src/stores/sites/useSiteSync.ts` composes the site sync actions on top
      of `StateSyncService` and the shared snapshot utilities:
      - `fullResyncSites()` coalesces concurrent resync requests, delegates to
@@ -752,7 +752,7 @@ guidance in `docs/Architecture/Stores/sites.md`.
      - Status-update subscription helpers rely on `StatusUpdateManager` while
        keeping cache invalidations and state sync semantics aligned.
 
-6. **Cache invalidation and debounce**
+3. **Cache invalidation and debounce**
    - Cache invalidation events (`cache:invalidated`) act as **coarse-grained
      triggers** that tell the renderer “something changed” at the cache or
      database layer, but they do **not** carry the new site data themselves.
@@ -761,7 +761,7 @@ guidance in `docs/Architecture/Stores/sites.md`.
      to a **single** resynchronization request rather than a cascade of
      redundant full-syncs.
 
-7. **State-sync events as the payload carrier**
+4. **State-sync events as the payload carrier**
    - The actual site snapshots and deltas always flow through
      `state-sync-event` renderer broadcasts (payload: `StateSyncEventData`) and
      the state-sync IPC surface (`STATE_SYNC_CHANNELS.requestFullSync` /

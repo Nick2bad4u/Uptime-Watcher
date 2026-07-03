@@ -79,7 +79,7 @@ There are two distinct user flows:
   settings) inside a single transaction, then inserts the imported dataset.
 - The UI must present an explicit destructive confirmation.
 
-2. **Templates + bulk edit** (planned)
+1. **Templates + bulk edit** (planned)
 
 - Template application and bulk edits must be non-destructive by default.
 - Deletions are never implied by applying a template.

@@ -199,7 +199,7 @@ export class SiteRepository {
 
 ##### Migration Example
 
-###### **Before (React Context)**:
+###### **Before (React Context)**
 
 ```typescript
 // Complex provider setup
@@ -219,7 +219,7 @@ export const SitesProvider: React.FC = ({ children }) => {
 };
 ```
 
-###### **After (Zustand with Modular Composition)**:
+###### **After (Zustand with Modular Composition)**
 
 ```typescript
 import { SiteService } from "@app/services/SiteService";
@@ -306,7 +306,7 @@ config that powers both the web preview and the Electron renderer bundle.
 
 ##### Event System Migration Example
 
-###### **Before (Basic Events)**:
+###### **Before (Basic Events)**
 
 > Historical note: the snippet below shows the pre-bridge / pre-service era.
 > In the current architecture, renderer event subscriptions flow through the
@@ -325,7 +325,7 @@ ipcRenderer.on("site:updated", (event, data) => {
 });
 ```
 
-###### **After (TypedEventBus)**:
+###### **After (TypedEventBus)**
 
 ```typescript
 // Type-safe events with automatic metadata

@@ -67,15 +67,19 @@ npm run check:ipc      # Verifies generated artifacts match committed output
 
 1. **Edit schemas** in `shared/ipc/rendererEvents.ts` or related shared files.
 2. **Regenerate artifacts**:
+
    ```bash
    npm run generate:ipc
    ```
+
 3. **Review diffs** in `shared/types/eventsBridge.ts` and `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`.
 4. **Commit all changed files** together with the source modification.
 5. **Validate** locally:
+
    ```bash
    npm run check:ipc
    ```
+
    The command should exit cleanly without creating diffs.
 6. **Run the default test/lint tasks** (`npm run lint:all:fix`, `npm run test`) when touching contracts that affect runtime behavior.
 

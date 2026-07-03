@@ -2,6 +2,7 @@ node_modules/
 docs/docusaurus/node_modules/
 docs/docusaurus/build/
 docs/docusaurus/.docusaurus/
+docs/TSDoc/
 docs/Packages/
 docs/Validator.md
 .github/instructions/*.md

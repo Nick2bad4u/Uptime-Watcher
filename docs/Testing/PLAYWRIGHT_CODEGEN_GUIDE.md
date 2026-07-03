@@ -268,6 +268,7 @@ npx playwright codegen --target=typescript --output=my-test.ts http://localhost:
 7. **Add to appropriate test file** based on naming convention
 
 8. **Run and verify:**
+
    ```bash
    npx playwright test your-new-test.ts
    ```
