@@ -1,6 +1,8 @@
 import type { StatusUpdateSubscriptionSummary } from "../baseTypes";
 import type { StatusUpdateManager } from "./statusUpdateHandler";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+
 /**
  * Default listener count used for diagnostics when the underlying
  * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
@@ -17,7 +19,7 @@ export function buildStatusSubscriptionFailureSummary(args: {
     message: string;
 }): StatusUpdateSubscriptionSummary {
     return {
-        errors: args.errors,
+        errors: args.errors.map((error) => getUserFacingErrorDetail(error)),
         expectedListeners: args.expectedListeners,
         listenersAttached: 0,
         listenerStates: [],
