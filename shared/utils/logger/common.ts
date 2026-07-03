@@ -6,10 +6,9 @@
  * log output regardless of execution environment.
  */
 
-import type { UnknownArray, UnknownRecord } from "type-fest";
+import type { UnknownArray } from "type-fest";
 
-import { castUnchecked } from "@shared/utils/typeHelpers";
-import { isDefined, objectHasIn, safeCastTo } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import { normalizeLogValue } from "../loggingContext";
 
@@ -54,6 +53,21 @@ function safeNormalizeLogString(value: string): string {
     return typeof sanitized === "string" ? sanitized : value;
 }
 
+function getOwnDataCause(error: Error):
+    | { readonly found: false }
+    | {
+          readonly found: true;
+          readonly value: unknown;
+      } {
+    const descriptor = Object.getOwnPropertyDescriptor(error, "cause");
+
+    if (!descriptor || !("value" in descriptor)) {
+        return { found: false };
+    }
+
+    return { found: true, value: descriptor.value };
+}
+
 function safeSerializeErrorInternal(
     error: Error,
     depth: number
@@ -67,16 +81,13 @@ function safeSerializeErrorInternal(
 
         return safeNormalizeLogValue(cause);
     };
+    const ownCause = getOwnDataCause(error);
 
     return {
         message: safeNormalizeLogString(error.message),
         name: safeNormalizeLogString(error.name),
         ...(error.stack && { stack: safeNormalizeLogString(error.stack) }),
-        ...(objectHasIn(castUnchecked<UnknownRecord>(error), "cause") && {
-            cause: safeSerializeCause(
-                safeCastTo<{ cause?: unknown }>(error).cause
-            ),
-        }),
+        ...(ownCause.found && { cause: safeSerializeCause(ownCause.value) }),
     } satisfies SerializedError;
 }
 

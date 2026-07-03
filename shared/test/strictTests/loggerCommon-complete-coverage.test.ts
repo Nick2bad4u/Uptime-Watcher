@@ -75,6 +75,28 @@ describe(serializeError, () => {
         expect(serialized?.message).not.toContain("refresh_token=def");
         expect(serialized?.cause).toBe("Authorization: [redacted]");
     });
+
+    it("does not invoke Error cause accessors while serializing errors", () => {
+        let getterCalls = 0;
+        const error = new Error("boom");
+        Object.defineProperty(error, "cause", {
+            configurable: true,
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return { Authorization: "Bearer secret" };
+            },
+        });
+
+        const serialized = serializeError(error);
+
+        expect(serialized).toMatchObject({
+            message: "boom",
+            name: "Error",
+        });
+        expect(serialized).not.toHaveProperty("cause");
+        expect(getterCalls).toBe(0);
+    });
 });
 
 describe(buildLogArguments, () => {
