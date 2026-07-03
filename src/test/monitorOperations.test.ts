@@ -741,6 +741,82 @@ describe("monitorOperations", () => {
                 url: "wss://example.com/socket",
             });
         });
+
+        it("should accept complete numeric strings for type-specific thresholds", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(
+                normalizeMonitor({
+                    maxResponseTime: "2500.9" as never,
+                    type: "http-latency",
+                }).maxResponseTime
+            ).toBe(2500);
+
+            expect(
+                normalizeMonitor({
+                    maxPongDelayMs: "5000.9" as never,
+                    type: "websocket-keepalive",
+                }).maxPongDelayMs
+            ).toBe(5000);
+
+            expect(
+                normalizeMonitor({
+                    heartbeatMaxDriftSeconds: "120.9" as never,
+                    type: "server-heartbeat",
+                }).heartbeatMaxDriftSeconds
+            ).toBe(120);
+
+            expect(
+                normalizeMonitor({
+                    maxReplicationLagSeconds: "30.9" as never,
+                    type: "replication",
+                }).maxReplicationLagSeconds
+            ).toBe(30);
+        });
+
+        it("should reject partially numeric type-specific threshold strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(
+                normalizeMonitor({
+                    maxResponseTime: "2500ms" as never,
+                    type: "http-latency",
+                }).maxResponseTime
+            ).toBe(2000);
+
+            expect(
+                normalizeMonitor({
+                    maxPongDelayMs: "5000ms" as never,
+                    type: "websocket-keepalive",
+                }).maxPongDelayMs
+            ).toBe(1500);
+
+            expect(
+                normalizeMonitor({
+                    heartbeatMaxDriftSeconds: "120 seconds" as never,
+                    type: "server-heartbeat",
+                }).heartbeatMaxDriftSeconds
+            ).toBe(60);
+
+            expect(
+                normalizeMonitor({
+                    maxReplicationLagSeconds: "30 seconds" as never,
+                    type: "replication",
+                }).maxReplicationLagSeconds
+            ).toBe(10);
+        });
     });
 
     describe(findMonitorInSite, () => {

@@ -66,6 +66,16 @@ function ensureTrimmedStringOrFallback(
     return fallback;
 }
 
+function parseFiniteNumberString(value: string): number | undefined {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) {
+        return undefined;
+    }
+
+    const parsed = Number(trimmed);
+    return isFiniteNumber(parsed) ? parsed : undefined;
+}
+
 const DEFAULT_MONITOR_TIMEOUT_MS = 30_000;
 const DEFAULT_MONITOR_RETRY_ATTEMPTS = 3;
 const IS_DEFAULT_MONITOR_MONITORING = true;
@@ -477,8 +487,8 @@ function applyHttpLatencyMonitorDefaults(
     ) {
         numericLatency = Math.trunc(maxResponseTime);
     } else if (typeof maxResponseTime === "string") {
-        const parsed = Number.parseFloat(maxResponseTime);
-        if (isFiniteNumber(parsed)) {
+        const parsed = parseFiniteNumberString(maxResponseTime);
+        if (parsed !== undefined) {
             numericLatency = Math.trunc(parsed);
         }
     }
@@ -505,9 +515,9 @@ function applyWebsocketKeepaliveMonitorDefaults(
     ) {
         maxPongDelay = Math.trunc(maxPongDelayValue);
     } else if (typeof maxPongDelayValue === "string") {
-        const parsed = Number.parseInt(maxPongDelayValue, 10);
-        if (isFiniteNumber(parsed)) {
-            maxPongDelay = parsed;
+        const parsed = parseFiniteNumberString(maxPongDelayValue);
+        if (parsed !== undefined) {
+            maxPongDelay = Math.trunc(parsed);
         }
     }
 
@@ -542,9 +552,9 @@ function applyServerHeartbeatMonitorDefaults(
     if (typeof maxDriftValue === "number" && isFiniteNumber(maxDriftValue)) {
         maxDrift = Math.trunc(maxDriftValue);
     } else if (typeof maxDriftValue === "string") {
-        const parsed = Number.parseInt(maxDriftValue, 10);
-        if (isFiniteNumber(parsed)) {
-            maxDrift = parsed;
+        const parsed = parseFiniteNumberString(maxDriftValue);
+        if (parsed !== undefined) {
+            maxDrift = Math.trunc(parsed);
         }
     }
 
@@ -578,9 +588,9 @@ function applyReplicationMonitorDefaults(
     if (typeof maxLagValue === "number" && isFiniteNumber(maxLagValue)) {
         maxLagSeconds = Math.trunc(maxLagValue);
     } else if (typeof maxLagValue === "string") {
-        const parsed = Number.parseInt(maxLagValue, 10);
-        if (isFiniteNumber(parsed)) {
-            maxLagSeconds = parsed;
+        const parsed = parseFiniteNumberString(maxLagValue);
+        if (parsed !== undefined) {
+            maxLagSeconds = Math.trunc(parsed);
         }
     }
 
