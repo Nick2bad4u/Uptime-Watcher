@@ -9,7 +9,7 @@ import {
 import type { MonitorStatusChangedEvent } from "../../../../stores/sites/utils/statusUpdateMerge";
 
 const mergeMonitorStatusChangeMock = vi.hoisted(() =>
-    vi.fn((sites: Site[]) => sites)
+    vi.fn((sites: Site[], _event: MonitorStatusChangedEvent) => sites)
 );
 
 vi.mock("../../../../services/logger", () => ({

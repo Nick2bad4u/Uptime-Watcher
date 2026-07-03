@@ -3,7 +3,10 @@ import type {
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
 
-type BackupOverrides = Partial<SerializedDatabaseBackupResult> & {
+type BackupOverrides = Omit<
+    Partial<SerializedDatabaseBackupResult>,
+    "metadata"
+> & {
     metadata?: Partial<SerializedDatabaseBackupResult["metadata"]>;
 };
 
@@ -39,7 +42,10 @@ export const createSerializedBackupResult = (
 });
 
 export const createSerializedRestoreResult = (
-    overrides: Partial<SerializedDatabaseRestoreResult> & {
+    overrides: Omit<
+        Partial<SerializedDatabaseRestoreResult>,
+        "metadata"
+    > & {
         metadata?: Partial<SerializedDatabaseRestoreResult["metadata"]>;
     } = {}
 ): SerializedDatabaseRestoreResult => ({

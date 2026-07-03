@@ -563,7 +563,9 @@ describe("Settings Component", () => {
         });
         fireEvent.click(syncButton);
 
-        expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
+        await waitFor(() => {
+            expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
+        });
     });
 
     it("should handle SQLite backup save", ({ task, annotate }) => {
@@ -589,11 +591,10 @@ describe("Settings Component", () => {
 
     it("should display fallback text for invalid backup summary timestamps", () => {
         updateSitesStoreMock(sitesStoreState, {
-            lastBackupMetadata: createSerializedBackupResult({
-                metadata: {
-                    createdAt: Number.POSITIVE_INFINITY,
-                },
-            }).metadata,
+            lastBackupMetadata: {
+                ...createSerializedBackupResult().metadata,
+                createdAt: Number.POSITIVE_INFINITY,
+            },
         });
 
         render(<Settings onClose={mockOnClose} />);
