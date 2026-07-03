@@ -45,6 +45,19 @@ function resolveMaxLength(
         : DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS;
 }
 
+function getOwnStringDataProperty(
+    value: object,
+    key: string
+): string | undefined {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+
+    return descriptor &&
+        "value" in descriptor &&
+        typeof descriptor.value === "string"
+        ? descriptor.value
+        : undefined;
+}
+
 /**
  * Redacts, compacts, and bounds a user-facing error detail string.
  */
@@ -77,22 +90,24 @@ export function normalizeUserFacingErrorDetail(
  * Intended for UI strings and IPC error payloads where we want a stable message
  * without leaking internal details.
  *
- * - {@link Error} values return `error.message`.
- * - Plain objects with a string `message` property return that message.
+ * - {@link Error} values return their own data `message` property.
+ * - Plain objects with an own string data `message` property return that message.
  * - Strings and numbers are surfaced as-is.
  * - Everything else falls back to {@link ERROR_CATALOG.system.UNKNOWN_ERROR}.
  */
 export function getUserFacingErrorDetail(error: unknown): string {
     if (Error.isError(error)) {
+        const message = getOwnStringDataProperty(error, "message");
+
         return (
-            normalizeUserFacingErrorDetail(error.message) ??
+            (message && normalizeUserFacingErrorDetail(message)) ??
             ERROR_CATALOG.system.UNKNOWN_ERROR
         );
     }
 
     if (isRecord(error)) {
-        const messageCandidate = error["message"];
-        if (typeof messageCandidate === "string") {
+        const messageCandidate = getOwnStringDataProperty(error, "message");
+        if (messageCandidate) {
             return (
                 normalizeUserFacingErrorDetail(messageCandidate) ??
                 ERROR_CATALOG.system.UNKNOWN_ERROR

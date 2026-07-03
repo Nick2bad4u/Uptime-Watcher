@@ -26,6 +26,37 @@ describe(getUserFacingErrorDetail, () => {
         expect(detail).toContain("[redacted]");
     });
 
+    it("does not invoke record message accessors", () => {
+        let getterCalls = 0;
+        const error = {};
+        Object.defineProperty(error, "message", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return "Authorization: Bearer SECRET_TOKEN";
+            },
+        });
+
+        expect(getUserFacingErrorDetail(error)).toBe("Unknown error");
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke Error message accessors", () => {
+        let getterCalls = 0;
+        const error = new Error("hidden");
+        Object.defineProperty(error, "message", {
+            configurable: true,
+            enumerable: false,
+            get: () => {
+                getterCalls += 1;
+                return "Authorization: Bearer SECRET_TOKEN";
+            },
+        });
+
+        expect(getUserFacingErrorDetail(error)).toBe("Unknown error");
+        expect(getterCalls).toBe(0);
+    });
+
     it("redacts secrets in string errors", () => {
         const detail = getUserFacingErrorDetail(
             "GET https://example.com/callback?token=abc"
