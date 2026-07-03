@@ -26,6 +26,8 @@ describe(shouldRemediateMonitorInterval, () => {
     it("flags non-numeric or missing values for remediation", () => {
         expect(shouldRemediateMonitorInterval(undefined)).toBeTruthy();
         expect(shouldRemediateMonitorInterval(NaN)).toBeTruthy();
+        expect(shouldRemediateMonitorInterval(Infinity)).toBeTruthy();
+        expect(shouldRemediateMonitorInterval(-Infinity)).toBeTruthy();
         expect(shouldRemediateMonitorInterval("15")).toBeTruthy();
     });
 

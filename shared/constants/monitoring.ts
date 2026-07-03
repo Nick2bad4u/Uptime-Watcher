@@ -1,3 +1,5 @@
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 /**
  * Default interval (in milliseconds) applied to monitors when no value is
  * provided or when incoming data fails validation.
@@ -30,7 +32,7 @@ export const MIN_MONITOR_CHECK_INTERVAL_MS = 5000;
  *   {@link MIN_MONITOR_CHECK_INTERVAL_MS}; otherwise, `false`.
  */
 export function shouldRemediateMonitorInterval(interval: unknown): boolean {
-    if (typeof interval !== "number" || Number.isNaN(interval)) {
+    if (typeof interval !== "number" || !isFiniteNumber(interval)) {
         return true;
     }
 
