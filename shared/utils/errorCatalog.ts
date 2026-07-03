@@ -441,6 +441,19 @@ export function isKnownErrorMessage(message: string): message is ErrorMessage {
     return arrayIncludes(allMessages, castUnchecked<ErrorMessage>(message));
 }
 
+function getOwnStringDataProperty(
+    value: object,
+    key: string
+): string | undefined {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+
+    return descriptor &&
+        "value" in descriptor &&
+        typeof descriptor.value === "string"
+        ? descriptor.value
+        : undefined;
+}
+
 /**
  * Derives a user-friendly message from an unknown error value.
  *
@@ -449,13 +462,17 @@ export function isKnownErrorMessage(message: string): message is ErrorMessage {
  * implementation so that fallback strings come from the centralized
  * {@link ERROR_CATALOG}.
  *
- * - When the supplied value is an {@link Error} instance, the underlying `message`
- *   property is returned.
+ * - When the supplied value is an {@link Error} instance, its own string data
+ *   `message` property is returned.
  * - All other values yield the provided fallback string.
  */
 export function getUnknownErrorMessage(
     error: unknown,
     fallback: string = ERROR_CATALOG.system.UNKNOWN_ERROR
 ): string {
-    return Error.isError(error) ? error.message : fallback;
+    if (!Error.isError(error)) {
+        return fallback;
+    }
+
+    return getOwnStringDataProperty(error, "message") ?? fallback;
 }

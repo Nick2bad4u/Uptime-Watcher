@@ -19,6 +19,23 @@ describe(getUnknownErrorMessage, () => {
         expect(getUnknownErrorMessage(error)).toBe("resolver failed");
     });
 
+    it("does not invoke Error message accessors", () => {
+        let getterCalls = 0;
+        const error = new Error("hidden");
+        Object.defineProperty(error, "message", {
+            configurable: true,
+            get: () => {
+                getterCalls += 1;
+                return "accessor message";
+            },
+        });
+
+        expect(getUnknownErrorMessage(error)).toBe(
+            ERROR_CATALOG.system.UNKNOWN_ERROR
+        );
+        expect(getterCalls).toBe(0);
+    });
+
     it("falls back to the default message when the value is not an Error", () => {
         expect(getUnknownErrorMessage(undefined)).toBe(
             ERROR_CATALOG.system.UNKNOWN_ERROR
