@@ -10,7 +10,7 @@ import {
     getPersistedDeviceIdValidationError as sharedGetPersistedDeviceIdValidationError,
     isValidPersistedDeviceId as sharedIsValidPersistedDeviceId,
 } from "@shared/validation/persistedDeviceIdValidation";
-import { arrayIncludes, isDefined } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 /**
  * Returns true when the string contains only ASCII digits.
@@ -83,15 +83,15 @@ export function isValidPersistedDeviceId(candidate: string): boolean {
     return impl(candidate);
 }
 
-function assertNoUndefined<T>(
-    values: (T | undefined)[],
+interface MapWithConcurrencyResultSlot<R> {
+    readonly value: R;
+}
+
+function assertAllResultsCompleted<R>(
+    results: (MapWithConcurrencyResultSlot<R> | undefined)[],
     message: string
-): asserts values is T[] {
-    const undefinedValue = undefined;
-    const undefinedEntries = values.filter(
-        (value): value is undefined => value === undefined
-    );
-    if (arrayIncludes(undefinedEntries, undefinedValue)) {
+): asserts results is MapWithConcurrencyResultSlot<R>[] {
+    if (results.some((result) => !isDefined(result))) {
         throw new Error(message);
     }
 }
@@ -107,9 +107,9 @@ export async function mapWithConcurrency<T, R>(args: {
     const { concurrency, items, task } = args;
     const workerCount = Math.max(1, Math.min(concurrency, items.length));
 
-    const results: (R | undefined)[] = Array.from(
+    const results = Array.from(
         { length: items.length },
-        (): R | undefined => undefined
+        (): MapWithConcurrencyResultSlot<R> | undefined => undefined
     );
     let index = 0;
 
@@ -124,15 +124,15 @@ export async function mapWithConcurrency<T, R>(args: {
             }
 
             // eslint-disable-next-line no-await-in-loop -- Worker loop performs bounded sequential IO.
-            results[currentIndex] = await task(item);
+            results[currentIndex] = { value: await task(item) };
         }
     });
 
     await Promise.all(workers);
 
-    assertNoUndefined(
+    assertAllResultsCompleted(
         results,
         "mapWithConcurrency: internal error (missing result)"
     );
-    return results;
+    return results.map((result) => result.value);
 }
