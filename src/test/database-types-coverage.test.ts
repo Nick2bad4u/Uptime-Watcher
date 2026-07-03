@@ -1341,13 +1341,21 @@ describe("Shared Database Types - Complete Coverage", () => {
             };
             expect(isValidHistoryRow(invalidStringRow)).toBeFalsy();
 
-            // Empty string timestamp should be accepted (converts to number 0)
+            // Empty string timestamps should be rejected instead of coercing
+            // to Unix epoch 0.
             const emptyStringRow = {
                 monitorId: "test",
                 status: "up",
                 timestamp: "",
             };
-            expect(isValidHistoryRow(emptyStringRow)).toBeTruthy();
+            expect(isValidHistoryRow(emptyStringRow)).toBeFalsy();
+
+            const infinityStringRow = {
+                monitorId: "test",
+                status: "up",
+                timestamp: "Infinity",
+            };
+            expect(isValidHistoryRow(infinityStringRow)).toBeFalsy();
         });
 
         it("should cover internal isValidTimestamp validation for other types", async ({

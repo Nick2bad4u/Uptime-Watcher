@@ -12,6 +12,7 @@ import {
     isValidSettingsRow,
     isValidSiteRow,
     type MonitorRow,
+    RowValidationUtils,
     safeGetRowProperty,
     type SettingsRow,
     type SiteRow,
@@ -113,6 +114,72 @@ describe("Shared Database Types - Backend Coverage", () => {
             };
 
             expect(isValidHistoryRow(invalidRow)).toBeFalsy();
+        });
+        it("should reject unsafe timestamp values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            for (const timestamp of ["", "Infinity", Infinity, 1.5, -1]) {
+                expect(
+                    isValidHistoryRow({
+                        monitorId: "test",
+                        status: "up",
+                        timestamp,
+                    })
+                ).toBeFalsy();
+            }
+        });
+    });
+    describe(RowValidationUtils.isValidTimestamp, () => {
+        it("should validate finite non-negative integer timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            expect(RowValidationUtils.isValidTimestamp(0)).toBeTruthy();
+            expect(
+                RowValidationUtils.isValidTimestamp(1_700_000_000_000)
+            ).toBeTruthy();
+            expect(
+                RowValidationUtils.isValidTimestamp("1700000000000")
+            ).toBeTruthy();
+        });
+
+        it("should reject non-finite, fractional, negative, and blank timestamps", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            for (const timestamp of [
+                "",
+                " ",
+                "1.5",
+                "Infinity",
+                -1,
+                1.5,
+                Infinity,
+                Number.NaN,
+            ]) {
+                expect(
+                    RowValidationUtils.isValidTimestamp(timestamp)
+                ).toBeFalsy();
+            }
         });
     });
     describe(isValidMonitorRow, () => {

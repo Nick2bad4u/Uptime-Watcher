@@ -219,11 +219,16 @@ export const RowValidationUtils = {
      */
     isValidTimestamp: (value: unknown): boolean => {
         if (typeof value === "number") {
-            return !Number.isNaN(value);
+            return Number.isSafeInteger(value) && value >= 0;
         }
         if (typeof value === "string") {
-            const numValue = Number(value);
-            return !Number.isNaN(numValue);
+            const trimmed = value.trim();
+            if (trimmed.length === 0) {
+                return false;
+            }
+
+            const numValue = Number(trimmed);
+            return Number.isSafeInteger(numValue) && numValue >= 0;
         }
         return false;
     },
