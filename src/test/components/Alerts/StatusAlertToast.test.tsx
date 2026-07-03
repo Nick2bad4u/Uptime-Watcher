@@ -10,6 +10,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 import { STATUS_KIND } from "@shared/types";
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import { safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { StatusAlert } from "../../../stores/alerts/useAlertStore";
@@ -126,6 +127,23 @@ describe(StatusAlertToast, () => {
         vi.advanceTimersByTime(12_000);
         expect(onDismiss).toHaveBeenCalledWith("alert-1");
     });
+
+    it("falls back when an invalid status reaches the renderer", () => {
+        const onDismiss = vi.fn();
+        const alert = createAlert({
+            previousStatus: safeCastTo<StatusAlert["previousStatus"]>("bogus"),
+            status: safeCastTo<StatusAlert["status"]>("bogus"),
+        });
+
+        render(<StatusAlertToast alert={alert} onDismiss={onDismiss} />);
+
+        expect(
+            screen.getByRole("button", { name: /pending for primary http/iv })
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText(/is now pending \(previously unknown\)/iv)
+        ).toBeInTheDocument();
+    });
 });
 
 describe(StatusAlertToaster, () => {
@@ -185,6 +203,20 @@ describe(StatusAlertToaster, () => {
 
         act(() => {
             enqueueAlertFromStatusUpdate(createStatusUpdate());
+        });
+
+        render(<StatusAlertToaster />);
+
+        expect(screen.queryByRole("status")).toBeNull();
+    });
+
+    it("does not enqueue alerts for invalid status values", () => {
+        const statusUpdate = createStatusUpdate({
+            status: safeCastTo<StatusUpdate["status"]>("bogus"),
+        });
+
+        act(() => {
+            enqueueAlertFromStatusUpdate(statusUpdate);
         });
 
         render(<StatusAlertToaster />);

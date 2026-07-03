@@ -1,4 +1,4 @@
-import type { StatusUpdate } from "@shared/types";
+import { isMonitorStatus, type StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import {
@@ -47,7 +47,8 @@ const hasNonEmptyStatusAlertSegment = (segment: unknown): boolean =>
 const hasRequiredStatusAlertFields = (update: StatusUpdate): boolean =>
     hasNonEmptyStatusAlertSegment(update.monitorId) &&
     hasNonEmptyStatusAlertSegment(update.siteIdentifier) &&
-    hasNonEmptyStatusAlertSegment(update.status) &&
+    typeof update.status === "string" &&
+    isMonitorStatus(update.status) &&
     hasNonEmptyStatusAlertSegment(update.timestamp);
 
 const pruneRecentStatusAlertFingerprints = (now: number): void => {

@@ -2,7 +2,7 @@
  * Helpers for converting status updates into alert payloads.
  */
 
-import type { Monitor, StatusUpdate } from "@shared/types";
+import { isMonitorStatus, type Monitor, type StatusUpdate } from "@shared/types";
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
@@ -103,6 +103,9 @@ export function mapStatusUpdateToAlert(update: StatusUpdate): StatusAlertInput {
         siteName,
         status: update.status,
         timestamp,
-        ...(update.previousStatus && { previousStatus: update.previousStatus }),
+        ...(typeof update.previousStatus === "string" &&
+            isMonitorStatus(update.previousStatus) && {
+                previousStatus: update.previousStatus,
+            }),
     } satisfies StatusAlertInput;
 }

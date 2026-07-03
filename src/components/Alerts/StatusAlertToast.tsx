@@ -5,6 +5,7 @@
 import type { JSX } from "react";
 
 import {
+    isMonitorStatus,
     type MonitorStatus,
     type SiteStatus,
     STATUS_KIND,
@@ -68,7 +69,7 @@ export const StatusAlertToast = ({
 
     const candidateStatus = alert.status;
     const resolvedStatus: MonitorStatus =
-        typeof candidateStatus === "string" && candidateStatus.length > 0
+        typeof candidateStatus === "string" && isMonitorStatus(candidateStatus)
             ? candidateStatus
             : STATUS_KIND.PENDING;
     const tone = STATUS_TONE[resolvedStatus];
@@ -99,7 +100,7 @@ export const StatusAlertToast = ({
 
     const previousLabel =
         typeof alert.previousStatus === "string" &&
-        alert.previousStatus.length > 0
+        isMonitorStatus(alert.previousStatus)
             ? formatStatusLabel(alert.previousStatus)
             : "Unknown";
     const currentLabel = formatStatusLabel(resolvedStatus);
