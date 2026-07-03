@@ -2,7 +2,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
-import { arrayFirst, arrayJoin } from "ts-extras";
+import { arrayFirst, arrayJoin, isFinite as isFiniteNumber } from "ts-extras";
 import * as z from "zod";
 
 /**
@@ -53,7 +53,9 @@ export function tryDescribeGoogleDriveApiError(
 
     const statusCandidate = response?.["status"];
     const status =
-        typeof statusCandidate === "number" ? statusCandidate : undefined;
+        typeof statusCandidate === "number" && isFiniteNumber(statusCandidate)
+            ? statusCandidate
+            : undefined;
 
     const data = normalizeGoogleApiErrorCandidate(response?.["data"]);
 

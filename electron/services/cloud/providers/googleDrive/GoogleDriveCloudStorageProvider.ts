@@ -112,7 +112,9 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
     }
 
     const { status }: { status?: unknown } = safeCastTo(response);
-    return typeof status === "number" ? status : undefined;
+    return typeof status === "number" && isFiniteNumber(status)
+        ? status
+        : undefined;
 }
 
 function ensureTrailingSlash(prefix: string): string {
