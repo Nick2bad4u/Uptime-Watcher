@@ -132,6 +132,12 @@ describe("siteSnapshots", () => {
             )
         ).toBeFalsy();
 
+        for (const responseTime of [-2, 10.5]) {
+            expect(
+                isMonitorSnapshot(createMonitor({ responseTime }))
+            ).toBeFalsy();
+        }
+
         expect(isSiteSnapshot(createSite())).toBeTruthy();
         expect(isSiteSnapshot({ identifier: "x" })).toBeFalsy();
 
@@ -164,6 +170,10 @@ describe("siteSnapshots", () => {
         expect(overlay?.lastChecked).toBeInstanceOf(Date);
         expect(overlay?.monitoring).toBeFalsy();
         expect(overlay?.activeOperations).toEqual(["op"]);
+
+        for (const responseTime of [-2, 10.5]) {
+            expect(toMonitorSnapshotOverlay({ responseTime })).toBeUndefined();
+        }
 
         // Cover Date passthrough branch.
         const overlayDate = toMonitorSnapshotOverlay({

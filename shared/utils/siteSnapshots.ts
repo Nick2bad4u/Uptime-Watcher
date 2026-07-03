@@ -239,6 +239,9 @@ export const isStatusHistoryArray = (
     value: unknown
 ): value is StatusHistory[] => isArray(value, isStatusHistoryEntry);
 
+const isValidResponseTime = (value: unknown): value is number =>
+    isFiniteNumber(value) && Number.isInteger(value) && value >= -1;
+
 export const isMonitorSnapshot = (candidate: unknown): candidate is Monitor => {
     if (!isObject(candidate)) {
         return false;
@@ -261,7 +264,7 @@ export const isMonitorSnapshot = (candidate: unknown): candidate is Monitor => {
         isFiniteNumber(checkInterval) &&
         isArray(history, isStatusHistoryEntry) &&
         isBoolean(monitoring) &&
-        isFiniteNumber(responseTime) &&
+        isValidResponseTime(responseTime) &&
         isFiniteNumber(retryAttempts) &&
         isFiniteNumber(timeout) &&
         typeof type === "string" &&
@@ -397,7 +400,7 @@ export function toMonitorSnapshotOverlay(
         overlay.monitoring = monitoring;
     }
 
-    if (isFiniteNumber(responseTime)) {
+    if (isValidResponseTime(responseTime)) {
         overlay.responseTime = responseTime;
     }
 
