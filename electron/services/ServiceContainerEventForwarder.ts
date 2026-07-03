@@ -14,7 +14,7 @@ import type { EventMetadata } from "@shared/types/events";
 import { eventMetadataSchema } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { objectHasIn, safeCastTo } from "ts-extras";
+import { safeCastTo } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
 
@@ -28,6 +28,7 @@ import {
 import {
     FORWARDED_METADATA_PROPERTY_KEY,
     ORIGINAL_METADATA_PROPERTY_KEY,
+    readOwnForwardedMetadataValue,
     stripForwardedEventMetadata,
 } from "../utils/eventMetadataForwarding";
 import { fireAndForget } from "../utils/fireAndForget";
@@ -265,7 +266,10 @@ export class ServiceContainerEventForwarder {
         return (
             typeof maybeObject === "object" &&
             maybeObject !== null &&
-            objectHasIn(maybeObject, FORWARDED_METADATA_PROPERTY_KEY)
+            readOwnForwardedMetadataValue(
+                maybeObject,
+                FORWARDED_METADATA_PROPERTY_KEY
+            ) !== undefined
         );
     }
 
@@ -283,19 +287,21 @@ export class ServiceContainerEventForwarder {
         original?: EventMetadata;
     } {
         const forwarded = this.normalizeEventMetadata(
-            Reflect.get(payload, FORWARDED_METADATA_PROPERTY_KEY)
+            readOwnForwardedMetadataValue(
+                payload,
+                FORWARDED_METADATA_PROPERTY_KEY
+            )
         );
 
         const originalFromProperty = this.normalizeEventMetadata(
-            objectHasIn(payload, ORIGINAL_METADATA_PROPERTY_KEY)
-                ? Reflect.get(payload, ORIGINAL_METADATA_PROPERTY_KEY)
-                : undefined
+            readOwnForwardedMetadataValue(
+                payload,
+                ORIGINAL_METADATA_PROPERTY_KEY
+            )
         );
 
         const originalFromSymbol = this.normalizeEventMetadata(
-            objectHasIn(payload, ORIGINAL_METADATA_SYMBOL)
-                ? Reflect.get(payload, ORIGINAL_METADATA_SYMBOL)
-                : undefined
+            readOwnForwardedMetadataValue(payload, ORIGINAL_METADATA_SYMBOL)
         );
 
         const original =

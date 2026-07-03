@@ -14,6 +14,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Import after mocks
 import { ServiceContainer } from "../../services/ServiceContainer";
 import {
+    attachForwardedMetadata,
     FORWARDED_METADATA_PROPERTY_KEY,
     ORIGINAL_METADATA_PROPERTY_KEY,
 } from "../../utils/eventMetadataForwarding";
@@ -615,6 +616,101 @@ describe("ServiceContainer - Working Tests", () => {
                 Object.getOwnPropertyDescriptor(
                     sanitized,
                     ORIGINAL_METADATA_PROPERTY_KEY
+                )
+            ).toBeUndefined();
+        });
+
+        it("should ignore inherited metadata while stripping payloads", () => {
+            const forwardedMetadata = {
+                busId: "manager-bus",
+                correlationId: "corr-inherited",
+                eventName: "internal:site:added",
+                timestamp: Date.now(),
+            } as const;
+            const prototype = {
+                [FORWARDED_METADATA_PROPERTY_KEY]: forwardedMetadata,
+            };
+            const payload = Object.assign(Object.create(prototype), {
+                identifier: "site-object",
+                site: {
+                    identifier: "site-object",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Object Site",
+                },
+            }) as Record<string, unknown>;
+
+            const sanitized = invokeStripEventMetadata(
+                "site:added",
+                payload
+            ) as Record<string, unknown>;
+
+            expect(sanitized["identifier"]).toBe("site-object");
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    sanitized,
+                    FORWARDED_METADATA_PROPERTY_KEY
+                )
+            ).toBeUndefined();
+        });
+
+        it("should not invoke accessors while stripping object payload metadata", () => {
+            const forwardedMetadata = {
+                busId: "manager-bus",
+                correlationId: "corr-accessor",
+                eventName: "internal:site:added",
+                timestamp: Date.now(),
+            } as const;
+            let getterCalls = 0;
+            const payload = {
+                identifier: "site-object",
+                [FORWARDED_METADATA_PROPERTY_KEY]: forwardedMetadata,
+            } as Record<string, unknown>;
+
+            Object.defineProperty(payload, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "should-not-run";
+                },
+            });
+
+            const sanitized = invokeStripEventMetadata(
+                "site:added",
+                payload
+            ) as Record<string, unknown>;
+
+            expect(sanitized["identifier"]).toBe("site-object");
+            expect(sanitized["computed"]).toBeUndefined();
+            expect(getterCalls).toBe(0);
+        });
+
+        it("should not read inherited metadata when attaching forwarded metadata", () => {
+            const forwardedMetadata = {
+                busId: "manager-bus",
+                correlationId: "corr-attach",
+                eventName: "internal:site:added",
+                timestamp: Date.now(),
+            } as const;
+            const source = Object.create({
+                [FORWARDED_METADATA_PROPERTY_KEY]: forwardedMetadata,
+            });
+            const payload = {
+                identifier: "site-object",
+            };
+
+            const result = attachForwardedMetadata({
+                busId: "orchestrator-bus",
+                forwardedEvent: "site:added",
+                payload,
+                source,
+            });
+
+            expect(result).toBe(payload);
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    result,
+                    FORWARDED_METADATA_PROPERTY_KEY
                 )
             ).toBeUndefined();
         });

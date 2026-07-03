@@ -7,7 +7,6 @@ import type { EventMetadata } from "@shared/types/events";
 import type { Except, UnknownArray, UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { objectHasIn } from "ts-extras";
 
 import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
@@ -27,7 +26,24 @@ export const ORIGINAL_METADATA_PROPERTY_KEY = "_originalMeta" as const;
 
 type ForwardedMetadataKey =
     | typeof FORWARDED_METADATA_PROPERTY_KEY
-    | typeof ORIGINAL_METADATA_PROPERTY_KEY;
+    | typeof ORIGINAL_METADATA_PROPERTY_KEY
+    | typeof ORIGINAL_METADATA_SYMBOL;
+
+export function readOwnForwardedMetadataValue(
+    source: object,
+    key: ForwardedMetadataKey
+): unknown {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+}
+
+function isForwardedMetadataKey(key: PropertyKey): boolean {
+    return (
+        key === FORWARDED_METADATA_PROPERTY_KEY ||
+        key === ORIGINAL_METADATA_PROPERTY_KEY ||
+        key === ORIGINAL_METADATA_SYMBOL
+    );
+}
 
 type StrippedForwardedEventMetadata<TPayload> =
     TPayload extends Readonly<UnknownArray>
@@ -66,22 +82,19 @@ export function attachForwardedMetadata<TPayload extends object>(
         return payload;
     }
 
-    if (!objectHasIn(source, FORWARDED_METADATA_PROPERTY_KEY)) {
-        return payload;
-    }
-
-    const metaCandidate = Reflect.get(source, FORWARDED_METADATA_PROPERTY_KEY);
+    const metaCandidate = readOwnForwardedMetadataValue(
+        source,
+        FORWARDED_METADATA_PROPERTY_KEY
+    );
 
     if (!isEventMetadataGuard(metaCandidate)) {
         return payload;
     }
 
-    const originalMetaCandidate = objectHasIn(
+    const originalMetaCandidate = readOwnForwardedMetadataValue(
         source,
         ORIGINAL_METADATA_PROPERTY_KEY
-    )
-        ? Reflect.get(source, ORIGINAL_METADATA_PROPERTY_KEY)
-        : undefined;
+    );
 
     const originalMeta = isEventMetadataGuard(originalMetaCandidate)
         ? originalMetaCandidate
@@ -168,26 +181,25 @@ export function stripForwardedEventMetadata<
         );
     }
 
-    // At this point payload is a non-null object. Clone into a plain record to
-    // strip well-known metadata keys while preserving the remaining shape.
-    const typedPayload = castUnchecked<Record<PropertyKey, unknown>>(payload);
-    const clonedPayload = castUnchecked<UnknownRecord>({
-        ...typedPayload,
-    });
+    // At this point payload is a non-null object. Clone own enumerable data
+    // properties into a plain record while skipping event-bus metadata. This
+    // intentionally ignores accessors so forwarding cannot execute arbitrary
+    // getters while stripping metadata.
+    const clonedPayload = castUnchecked<Record<PropertyKey, unknown>>({});
+    for (const key of Reflect.ownKeys(payload)) {
+        if (isForwardedMetadataKey(key)) {
+            continue;
+        }
 
-    if (objectHasIn(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY)) {
-        Reflect.deleteProperty(clonedPayload, FORWARDED_METADATA_PROPERTY_KEY);
-    }
+        const descriptor = Object.getOwnPropertyDescriptor(payload, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
 
-    if (objectHasIn(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY)) {
-        Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_PROPERTY_KEY);
-    }
-
-    if (objectHasIn(clonedPayload, ORIGINAL_METADATA_SYMBOL)) {
-        Reflect.deleteProperty(clonedPayload, ORIGINAL_METADATA_SYMBOL);
+        Reflect.set(clonedPayload, key, descriptor.value);
     }
 
     return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(
-        clonedPayload
+        castUnchecked<UnknownRecord>(clonedPayload)
     );
 }
