@@ -23,7 +23,12 @@ import { isObject } from "@shared/utils/typeGuards";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { ipcRenderer } from "electron";
 import log from "electron-log/renderer";
-import { isDefined, objectKeys } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    objectHasIn,
+    objectKeys,
+} from "ts-extras";
 
 const PRELOAD_PREFIX = "PRELOAD";
 const DIAGNOSTICS_PREFIX = "PRELOAD:DIAGNOSTICS";
@@ -36,6 +41,7 @@ const MAX_PREVIEW_ARRAY_ITEMS = 25;
 
 const REDACTED_PLACEHOLDER = "[REDACTED]";
 const CIRCULAR_PLACEHOLDER = "[Circular]";
+const INVALID_DATE_PLACEHOLDER = "[Invalid Date]";
 
 const SENSITIVE_KEY_PATTERN =
     /api[-_]?key|authorization|passphrase|password|refresh|secret|token/iu;
@@ -86,6 +92,31 @@ const formatBigintPlaceholder = (value: bigint): string => value.toString();
 const truncate = (value: string, limit: number): string =>
     value.length > limit ? `${value.slice(0, limit)}…` : value;
 
+const serializeDate = (value: Date): string => {
+    const timestamp = value.getTime();
+    return isFiniteNumber(timestamp)
+        ? value.toISOString()
+        : INVALID_DATE_PLACEHOLDER;
+};
+
+const getOriginalJsonHolderValue = (
+    holder: unknown,
+    key: string
+): unknown => {
+    if (key.length === 0 || typeof holder !== "object" || holder === null) {
+        return undefined;
+    }
+
+    if (Array.isArray(holder)) {
+        const index = Number(key);
+        return Number.isInteger(index) && index >= 0
+            ? holder[index]
+            : undefined;
+    }
+
+    return objectHasIn(holder, key) ? holder[key] : undefined;
+};
+
 const serializeValue = (value: unknown): unknown => {
     if (typeof value === "function") {
         return formatFunctionPlaceholder(value.name || "");
@@ -132,7 +163,7 @@ const serializeValue = (value: unknown): unknown => {
     }
 
     if (value instanceof Date) {
-        return value.toISOString();
+        return serializeDate(value);
     }
 
     if (value instanceof URL) {
@@ -205,13 +236,22 @@ const safeStringify = (value: unknown): string | undefined => {
     try {
         return JSON.stringify(
             value,
-            (key: string, nested: unknown) => {
+            function replacer(
+                this: unknown,
+                key: string,
+                nested: unknown
+            ): unknown {
                 if (
                     typeof key === "string" &&
                     key.length > 0 &&
                     isSensitiveKeyName(key)
                 ) {
                     return REDACTED_PLACEHOLDER;
+                }
+
+                const originalNested = getOriginalJsonHolderValue(this, key);
+                if (originalNested instanceof Date) {
+                    return serializeDate(originalNested);
                 }
 
                 if (typeof nested === "object" && nested !== null) {

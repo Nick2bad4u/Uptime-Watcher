@@ -49,6 +49,18 @@ describe(buildPayloadPreview, () => {
         expect(preview).not.toContain("?");
     });
 
+    it("serializes invalid Date values without dropping the whole preview", () => {
+        const preview = buildPayloadPreview({
+            checkedAt: new Date(Number.NaN),
+            ok: true,
+        });
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain("[Invalid Date]");
+        expect(preview).toContain("\"ok\": true");
+        expect(preview).not.toContain("[unserializable-payload]");
+    });
+
     it("redacts mailto addresses", () => {
         const preview = buildPayloadPreview({
             url: "mailto:person@example.com?subject=hi",
