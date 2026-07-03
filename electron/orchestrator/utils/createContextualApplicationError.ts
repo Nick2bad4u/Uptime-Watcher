@@ -66,10 +66,12 @@ export function createContextualApplicationError(
         operation,
     });
 
-    diagnosticsLogger.error(`${diagnosticsPrefix} ${operation} failed`, {
+    diagnosticsLogger.error("Orchestrator operation failed", {
         code,
         details,
+        diagnosticsPrefix,
         error: appError,
+        operation,
     });
 
     return appError;

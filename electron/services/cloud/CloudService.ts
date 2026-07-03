@@ -139,9 +139,10 @@ export class CloudService {
                   }
                 : undefined;
 
-            logger.warn(`[CloudService] Operation '${operationName}' failed`, {
+            logger.warn("[CloudService] Operation failed", {
                 message: resolved.message,
                 name: resolved.name,
+                operationName,
                 ...(providerDetails && { providerDetails }),
             });
             throw resolved;

@@ -55,8 +55,12 @@ const logInvalidSnapshotAndThrow = (
         ...metadata,
         issues: error.issues,
     };
+    const logContext = {
+        ...errorContext,
+        reason: logMessage,
+    };
 
-    logger.error(`[SiteService] ${logMessage}`, error, errorContext);
+    logger.error("[SiteService] Invalid site snapshot", error, logContext);
 
     throw new ApplicationError({
         cause: error,

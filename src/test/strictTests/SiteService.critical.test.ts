@@ -233,10 +233,11 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith("", "");
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot returned after monitor removal",
+                "[SiteService] Invalid site snapshot",
                 expect.any(Error),
                 expect.objectContaining({
                     monitorId,
+                    reason: "Invalid site snapshot returned after monitor removal",
                     siteIdentifier,
                 })
             );
@@ -354,10 +355,11 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot returned after monitor removal",
+                "[SiteService] Invalid site snapshot",
                 expect.any(Error),
                 expect.objectContaining({
                     monitorId,
+                    reason: "Invalid site snapshot returned after monitor removal",
                     siteIdentifier,
                 })
             );
@@ -395,10 +397,11 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot returned after addSite",
+                "[SiteService] Invalid site snapshot",
                 expect.any(Error),
                 expect.objectContaining({
                     operation: "addSite",
+                    reason: "Invalid site snapshot returned after addSite",
                     siteIdentifier: "invalid-site",
                 })
             );
@@ -473,10 +476,11 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot returned after updateSite",
+                "[SiteService] Invalid site snapshot",
                 expect.any(Error),
                 expect.objectContaining({
                     operation: "updateSite",
+                    reason: "Invalid site snapshot returned after updateSite",
                     siteIdentifier: "site-123",
                 })
             );
@@ -599,10 +603,11 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith(longSiteId, longMonitorId);
             expect(logger.error).toHaveBeenCalledWith(
-                "[SiteService] Invalid site snapshot returned after monitor removal",
+                "[SiteService] Invalid site snapshot",
                 expect.any(Error),
                 expect.objectContaining({
                     monitorId: longMonitorId,
+                    reason: "Invalid site snapshot returned after monitor removal",
                     siteIdentifier: longSiteId,
                 })
             );
