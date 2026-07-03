@@ -18,7 +18,6 @@ import { requireRecordLike } from "@shared/utils/typeHelpers";
 import {
     arrayJoin,
     isDefined,
-    isFinite as isFiniteNumber,
     isPresent,
     safeCastTo,
     setHas,
@@ -299,6 +298,17 @@ function convertMonitoringToDbEnabled(monitor: UnknownRecord): 0 | 1 {
     return monitor["monitoring"] ? 1 : 0;
 }
 
+function convertIntegerSqlValue(value: unknown): number {
+    if (typeof value === "number" && Number.isSafeInteger(value)) {
+        return value;
+    }
+
+    dbLogger.warn(
+        `Invalid numeric value for INTEGER conversion: ${safeStringify(value)}, using 0 as fallback`
+    );
+    return 0;
+}
+
 /**
  * Core SQL value conversion logic shared between database conversion functions.
  *
@@ -318,15 +328,7 @@ function convertSqlValue(
 ): unknown {
     switch (sqlType) {
         case "INTEGER": {
-            const numValue = Number(value);
-            // Prevent non-finite numeric corruption in database
-            if (!isFiniteNumber(numValue)) {
-                dbLogger.warn(
-                    `Invalid numeric value for INTEGER conversion: ${String(value)}, using 0 as fallback`
-                );
-                return 0;
-            }
-            return numValue;
+            return convertIntegerSqlValue(value);
         }
         case "TEXT": {
             return safeStringify(value);
