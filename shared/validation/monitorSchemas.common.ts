@@ -28,6 +28,7 @@ import {
     monitorStatusEnumValues,
     statusHistoryEnumValues,
 } from "./statusValidationPrimitives";
+import { epochMsSchema } from "./timestampSchemas";
 import { isValidHost } from "./validatorUtils";
 
 /**
@@ -40,9 +41,9 @@ const statusHistorySchema = z
     .object({
         // Preserve raw status detail text when validating history entries.
         details: z.string().optional(),
-        responseTime: z.number(),
+        responseTime: z.int().min(-1),
         status: z.enum(statusHistoryEnumValues),
-        timestamp: z.number(),
+        timestamp: epochMsSchema,
     })
     .strict();
 
@@ -108,7 +109,7 @@ const baseMonitorSchema: BaseMonitorSchemaType = z
         // Preserve raw active operation identifiers when validating monitor state.
         activeOperations: z.array(z.string()).optional(),
         checkInterval: z
-            .number()
+            .int()
             .min(
                 VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN,
                 `Check interval must be at least ${MIN_MONITOR_CHECK_INTERVAL_MS}ms`
@@ -128,9 +129,9 @@ const baseMonitorSchema: BaseMonitorSchemaType = z
          * Uses -1 as a sentinel value to indicate "never checked" state.
          * Positive values represent actual response times in milliseconds.
          */
-        responseTime: z.number().min(-1), // -1 is sentinel for "never checked"
+        responseTime: z.int().min(-1), // -1 is sentinel for "never checked"
         retryAttempts: z
-            .number()
+            .int()
             .min(
                 VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN,
                 "Retry attempts cannot be negative"
@@ -141,7 +142,7 @@ const baseMonitorSchema: BaseMonitorSchemaType = z
             ),
         status: z.enum(monitorStatusEnumValues),
         timeout: z
-            .number()
+            .int()
             .min(
                 VALIDATION_CONSTRAINTS.TIMEOUT.MIN,
                 "Timeout must be at least 1 second"

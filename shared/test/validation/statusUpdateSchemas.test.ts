@@ -72,6 +72,15 @@ describe("statusUpdateSchema", () => {
         }
     });
 
+    it("rejects fractional response times", () => {
+        const payload = createValidStatusUpdate();
+        payload.responseTime = 100.5;
+
+        const result = statusUpdateSchema.safeParse(payload);
+
+        expect(result.success).toBeFalsy();
+    });
+
     it("rejects payloads where monitorId mismatches monitor.id", () => {
         const payload = createValidStatusUpdate();
         payload.monitorId = "different-monitor";

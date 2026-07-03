@@ -57,7 +57,7 @@ const createStatusUpdateSchema = (): StatusUpdateSchema =>
             monitor: monitorSchema,
             monitorId: monitorIdSchema,
             previousStatus: z.enum(monitorStatusEnumValues).optional(),
-            responseTime: z.number().optional(),
+            responseTime: z.int().min(-1).optional(),
             site: siteSchema,
             siteIdentifier: siteIdentifierSchema,
             status: z.enum(monitorStatusEnumValues),

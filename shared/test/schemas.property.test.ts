@@ -19,6 +19,7 @@ import {
     validateMonitorData,
 } from "../validation/monitorSchemas";
 import { siteSchema, validateSiteData } from "../validation/siteSchemas";
+import { MAX_VALID_DATE_EPOCH_MS } from "../validation/timestampSchemas";
 
 // Custom arbitraries for monitor data generation that match schema constraints
 const baseMonitorArbitrary = fc.record({
@@ -503,6 +504,55 @@ describe("Schema Property-Based Tests", () => {
                 }
             }
         );
+
+        test("should reject fractional monitor timing fields", () => {
+            const [validMonitor] = fc.sample(baseMonitorArbitrary, 1);
+            const invalidCases = [
+                { field: "checkInterval", value: 5000.5 },
+                { field: "responseTime", value: 100.5 },
+                { field: "retryAttempts", value: 1.5 },
+                { field: "timeout", value: 1000.5 },
+            ] as const;
+
+            for (const { field, value } of invalidCases) {
+                const result = baseMonitorSchema.safeParse({
+                    ...validMonitor,
+                    [field]: value,
+                });
+
+                expect(result.success).toBeFalsy();
+            }
+        });
+
+        test("should reject invalid status history numeric fields", () => {
+            const [validMonitor] = fc.sample(baseMonitorArbitrary, 1);
+            const validHistoryEntry = {
+                responseTime: 100,
+                status: "up",
+                timestamp: 0,
+            } as const;
+            const invalidHistories = [
+                [{ ...validHistoryEntry, responseTime: -2 }],
+                [{ ...validHistoryEntry, responseTime: 100.5 }],
+                [{ ...validHistoryEntry, timestamp: -1 }],
+                [{ ...validHistoryEntry, timestamp: 1.5 }],
+                [
+                    {
+                        ...validHistoryEntry,
+                        timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
+                    },
+                ],
+            ];
+
+            for (const history of invalidHistories) {
+                const result = baseMonitorSchema.safeParse({
+                    ...validMonitor,
+                    history,
+                });
+
+                expect(result.success).toBeFalsy();
+            }
+        });
 
         test("should round-trip through parsing and serialization", () => {
             const [originalData] = fc.sample(baseMonitorArbitrary, 1);
