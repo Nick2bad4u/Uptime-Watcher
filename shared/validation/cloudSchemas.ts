@@ -9,6 +9,7 @@ import {
     type CloudProviderDetails,
     type CloudStatusSummary,
 } from "@shared/types/cloud";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
 
@@ -20,7 +21,6 @@ const cloudProviderKindSchema = z.enum([
 ]);
 
 const cloudEncryptionModeSchema = z.enum(["none", "passphrase"]);
-const epochMsSchema = z.int().nonnegative();
 
 const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> =
     z.discriminatedUnion("kind", [

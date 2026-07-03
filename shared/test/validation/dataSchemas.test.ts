@@ -10,6 +10,7 @@ import {
     validateSerializedDatabaseRestoreResult,
     validateValidationResult,
 } from "@shared/validation/dataSchemas";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 describe("dataSchemas", () => {
@@ -89,6 +90,7 @@ describe("dataSchemas", () => {
 
         for (const invalidMetadata of [
             { ...metadata, createdAt: -1 },
+            { ...metadata, createdAt: MAX_VALID_DATE_EPOCH_MS + 1 },
             { ...metadata, retentionHintDays: -1 },
             { ...metadata, schemaVersion: -1 },
             { ...metadata, sizeBytes: -1 },
@@ -102,6 +104,26 @@ describe("dataSchemas", () => {
 
             expect(parsed.success).toBeFalsy();
         }
+    });
+
+    it("accepts serialized backup metadata at the Date upper bound", () => {
+        const buffer = new ArrayBuffer(8);
+
+        const parsed = validateSerializedDatabaseBackupResult({
+            buffer,
+            fileName: "backup.sqlite",
+            metadata: {
+                appVersion: "1.0.0",
+                checksum: "abc",
+                createdAt: MAX_VALID_DATE_EPOCH_MS,
+                originalPath: "C:/x",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: buffer.byteLength,
+            },
+        });
+
+        expect(parsed.success).toBeTruthy();
     });
 
     it("rejects when the buffer is not transferable", () => {
@@ -144,7 +166,11 @@ describe("dataSchemas", () => {
             sizeBytes: 8,
         };
 
-        for (const restoredAt of [-1, 1.5]) {
+        for (const restoredAt of [
+            -1,
+            1.5,
+            MAX_VALID_DATE_EPOCH_MS + 1,
+        ]) {
             const parsed = validateSerializedDatabaseRestoreResult({
                 metadata,
                 restoredAt,
@@ -152,6 +178,23 @@ describe("dataSchemas", () => {
 
             expect(parsed.success).toBeFalsy();
         }
+    });
+
+    it("accepts restore results at the Date upper bound", () => {
+        const parsed = validateSerializedDatabaseRestoreResult({
+            restoredAt: MAX_VALID_DATE_EPOCH_MS,
+            metadata: {
+                appVersion: "1.0.0",
+                checksum: "abc",
+                createdAt: MAX_VALID_DATE_EPOCH_MS,
+                originalPath: "C:/x",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: 8,
+            },
+        });
+
+        expect(parsed.success).toBeTruthy();
     });
 
     it("validates monitor type config arrays", () => {

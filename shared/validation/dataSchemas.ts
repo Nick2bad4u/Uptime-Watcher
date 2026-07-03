@@ -8,6 +8,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { safeCastTo } from "ts-extras";
 import * as z from "zod";
 
@@ -25,7 +26,7 @@ export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabas
         .object({
             appVersion: z.string().trim().min(1),
             checksum: z.string().trim().min(1),
-            createdAt: z.int().nonnegative(),
+            createdAt: epochMsSchema,
             originalPath: z.string().trim().min(1),
             retentionHintDays: z.int().nonnegative(),
             schemaVersion: z.int().nonnegative(),
@@ -90,7 +91,7 @@ export const serializedDatabaseRestoreResultSchema: z.ZodType<{
     .object({
         metadata: serializedDatabaseBackupMetadataSchema,
         preRestoreFileName: z.string().trim().min(1).optional(),
-        restoredAt: z.int().nonnegative(),
+        restoredAt: epochMsSchema,
     })
     .strict();
 
