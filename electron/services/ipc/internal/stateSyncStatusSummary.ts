@@ -1,6 +1,7 @@
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
@@ -8,6 +9,9 @@ const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
     isFiniteNumber(candidate) &&
     Number.isSafeInteger(candidate) &&
     candidate >= 0;
+
+const isValidEpochMs = (candidate: unknown): candidate is number =>
+    isNonNegativeSafeInteger(candidate) && candidate <= MAX_VALID_DATE_EPOCH_MS;
 
 /**
  * Builds a normalized {@link StateSyncStatusSummary}.
@@ -18,9 +22,7 @@ export function createStateSyncStatusSummary(args: {
     source: StateSyncStatusSummary["source"];
     synchronized: boolean;
 }): StateSyncStatusSummary {
-    const lastSyncAt = isNonNegativeSafeInteger(args.lastSyncAt)
-        ? args.lastSyncAt
-        : null;
+    const lastSyncAt = isValidEpochMs(args.lastSyncAt) ? args.lastSyncAt : null;
     const siteCount = isNonNegativeSafeInteger(args.siteCount)
         ? args.siteCount
         : 0;

@@ -1,4 +1,5 @@
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 import { normalizeStateSyncPayload } from "../../../../services/ipc/internal/stateSyncStatusNormalization";
@@ -25,6 +26,17 @@ describe(normalizeStateSyncPayload, () => {
         });
     });
 
+    it("accepts timestamps at the JavaScript Date upper bound", () => {
+        expect(
+            normalizeStateSyncPayload({
+                ...validBulkSyncPayload,
+                timestamp: MAX_VALID_DATE_EPOCH_MS,
+            })
+        ).toMatchObject({
+            timestamp: MAX_VALID_DATE_EPOCH_MS,
+        });
+    });
+
     it("rejects invalid bulk-sync numeric invariants", () => {
         for (const invalidPayload of [
             { ...validBulkSyncPayload, revision: -1 },
@@ -33,6 +45,10 @@ describe(normalizeStateSyncPayload, () => {
             { ...validBulkSyncPayload, siteCount: 1.5 },
             { ...validBulkSyncPayload, timestamp: -1 },
             { ...validBulkSyncPayload, timestamp: 1.5 },
+            {
+                ...validBulkSyncPayload,
+                timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
+            },
         ]) {
             expect(normalizeStateSyncPayload(invalidPayload)).toBeNull();
         }
@@ -56,6 +72,10 @@ describe(normalizeStateSyncPayload, () => {
             { ...validDeltaPayload, revision: 1.5 },
             { ...validDeltaPayload, timestamp: -1 },
             { ...validDeltaPayload, timestamp: 1.5 },
+            {
+                ...validDeltaPayload,
+                timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
+            },
         ]) {
             expect(normalizeStateSyncPayload(invalidPayload)).toBeNull();
         }

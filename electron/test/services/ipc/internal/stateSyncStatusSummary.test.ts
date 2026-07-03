@@ -1,4 +1,5 @@
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -23,6 +24,17 @@ describe(createStateSyncStatusSummary, () => {
         });
     });
 
+    it("preserves timestamps at the JavaScript Date upper bound", () => {
+        expect(
+            createStateSyncStatusSummary({
+                lastSyncAt: MAX_VALID_DATE_EPOCH_MS,
+                siteCount: 3,
+                source: STATE_SYNC_SOURCE.DATABASE,
+                synchronized: true,
+            }).lastSyncAt
+        ).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
     it("drops invalid timestamp and count values", () => {
         for (const summary of [
             createStateSyncStatusSummary({
@@ -34,6 +46,12 @@ describe(createStateSyncStatusSummary, () => {
             createStateSyncStatusSummary({
                 lastSyncAt: 1.5,
                 siteCount: 1.5,
+                source: STATE_SYNC_SOURCE.CACHE,
+                synchronized: false,
+            }),
+            createStateSyncStatusSummary({
+                lastSyncAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                siteCount: 3,
                 source: STATE_SYNC_SOURCE.CACHE,
                 synchronized: false,
             }),

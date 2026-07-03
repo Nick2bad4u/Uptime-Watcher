@@ -14,6 +14,7 @@ import type {
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
@@ -60,6 +61,9 @@ const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
     Number.isSafeInteger(candidate) &&
     candidate >= 0;
 
+const isValidEpochMs = (candidate: unknown): candidate is number =>
+    isNonNegativeSafeInteger(candidate) && candidate <= MAX_VALID_DATE_EPOCH_MS;
+
 const buildIdentifierOnlySites = (
     candidate: unknown
 ): SiteIdentifierSnapshot[] => {
@@ -94,7 +98,7 @@ export function normalizeStateSyncPayload(
             action !== STATE_SYNC_ACTION.DELETE &&
             action !== STATE_SYNC_ACTION.UPDATE) ||
         !isValidStateSyncSource(source) ||
-        !isNonNegativeSafeInteger(timestamp) ||
+        !isValidEpochMs(timestamp) ||
         !isNonNegativeSafeInteger(revision)
     ) {
         return null;
