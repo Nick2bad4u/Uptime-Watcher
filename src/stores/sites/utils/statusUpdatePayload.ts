@@ -5,10 +5,16 @@
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
 
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { SitesTelemetryPayload } from "./operationHelpers";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
+
+function normalizeStatusUpdateTimestamp(timestamp: string): string {
+    const result = safeParseIsoTimestamp(timestamp);
+    return result.success ? result.data : new Date().toISOString();
+}
 
 /**
  * Builds a {@link StatusUpdate} payload from a monitor status change event.
@@ -25,7 +31,7 @@ export function buildStatusUpdatePayload(args: {
         site,
         siteIdentifier: event.siteIdentifier,
         status: event.status,
-        timestamp: new Date(event.timestamp).toISOString(),
+        timestamp: normalizeStatusUpdateTimestamp(event.timestamp),
     };
 
     if (isDefined(event.details)) {
