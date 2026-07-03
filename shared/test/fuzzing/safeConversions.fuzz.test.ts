@@ -316,6 +316,17 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeParsePort("invalid")).toBe(80);
             expect(safeParsePort(-1, 443)).toBe(443);
         });
+
+        test.prop([
+            fc.oneof(
+                fc.integer({ max: 0 }),
+                fc.integer({ min: 65_536 }),
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY)
+            ),
+        ])("should fall back when custom default is invalid", (defaultValue) => {
+            expect(safeParsePort("invalid", defaultValue)).toBe(80);
+        });
     });
 
     describe(safeParsePositiveInt, () => {

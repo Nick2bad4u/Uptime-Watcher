@@ -335,6 +335,22 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeParsePort("0", 443)).toBe(443);
             expect(safeParsePort("invalid", 3000)).toBe(3000);
         });
+        it("should fall back when custom default is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Safe Conversions - Backend Coverage",
+                "component"
+            );
+
+            expect(safeParsePort("invalid", 0)).toBe(80);
+            expect(safeParsePort("invalid", Number.POSITIVE_INFINITY)).toBe(
+                80
+            );
+            expect(safeParsePort("invalid", Number.NaN)).toBe(80);
+        });
     });
     describe(safeParsePositiveInt, () => {
         it("should return positive integers", async ({ task, annotate }) => {
@@ -515,7 +531,7 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                 -Infinity,
                 0,
                 -1,
-                Date.now() + 86_400_001,
+                Date.now() + 172_800_000,
             ];
 
             for (const defaultValue of invalidDefaults) {

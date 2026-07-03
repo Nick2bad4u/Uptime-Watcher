@@ -249,10 +249,12 @@ export function safeParsePort(
     value: unknown,
     defaultValue: number | PortNumber = DEFAULT_PORT_NUMBER
 ): PortNumber {
+    const parsedDefault = safeParseInt(defaultValue, DEFAULT_PORT_NUMBER);
     const normalizedDefault =
-        typeof defaultValue === "number"
-            ? toPortNumber(defaultValue)
-            : defaultValue;
+        parsedDefault >= PORT_NUMBER_RANGE.MIN &&
+        parsedDefault <= PORT_NUMBER_RANGE.MAX
+            ? toPortNumber(parsedDefault)
+            : DEFAULT_PORT_NUMBER;
 
     const parsed = safeParseInt(value, normalizedDefault);
     return parsed >= PORT_NUMBER_RANGE.MIN && parsed <= PORT_NUMBER_RANGE.MAX
