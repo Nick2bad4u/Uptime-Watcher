@@ -131,7 +131,7 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
         const handleNumericChange = useCallback(
             (val: string) => {
                 const numericValue = Number(val);
-                if (val === "" || !Number.isNaN(numericValue)) {
+                if (val === "" || Number.isFinite(numericValue)) {
                     handleChange(val === "" ? 0 : numericValue);
                 } else {
                     logger.error(`Invalid numeric input: ${val}`);

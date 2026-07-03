@@ -451,6 +451,11 @@ describe("AddSiteForm behavioral coverage", () => {
         expect(loggerErrorMock).toHaveBeenCalledWith(
             "Invalid check interval value: NaN-value"
         );
+
+        intervalSelect?.onChange("Infinity");
+        expect(loggerErrorMock).toHaveBeenCalledWith(
+            "Invalid check interval value: Infinity"
+        );
     });
 
     it("provides dynamic field handlers that coerce values to strings", () => {

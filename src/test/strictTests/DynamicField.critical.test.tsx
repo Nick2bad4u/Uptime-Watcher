@@ -168,6 +168,20 @@ describe("DynamicField - Comprehensive Coverage", () => {
             expect(loggerErrorSpy).toHaveBeenCalledWith(
                 "Invalid numeric input: 123abc"
             );
+
+            loggerErrorSpy.mockClear();
+
+            Object.defineProperty(input, "value", {
+                value: "Infinity",
+                writable: true,
+                configurable: true,
+            });
+
+            input.dispatchEvent(changeEvent);
+
+            expect(loggerErrorSpy).toHaveBeenCalledWith(
+                "Invalid numeric input: Infinity"
+            );
         });
 
         it("should handle empty string input for number field", async ({
