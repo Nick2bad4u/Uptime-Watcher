@@ -3,7 +3,7 @@ import type { CloudStatusSummary } from "@shared/types/cloud";
 import { promises as fs } from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { CloudServiceOperationContext } from "../../../services/cloud/CloudService.operationContext";
 
@@ -11,14 +11,18 @@ import {
     connectDropbox,
     connectGoogleDrive,
     configureFilesystemProvider,
+    disconnect,
 } from "../../../services/cloud/CloudService.providerOperations";
 import {
     SETTINGS_KEY_DROPBOX_TOKENS,
+    SETTINGS_KEY_ENCRYPTION_MODE,
+    SETTINGS_KEY_ENCRYPTION_SALT,
     SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
     SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
     SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
     SETTINGS_KEY_PROVIDER,
 } from "../../../services/cloud/internal/cloudServiceSettings";
+import { logger } from "../../../utils/logger";
 import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 
 function createBaseStatus(): CloudStatusSummary {
@@ -83,6 +87,10 @@ function createOperationContext(args: {
 }
 
 describe("CloudService.providerOperations", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it("restores previous provider settings when Dropbox verification fails", async () => {
         const secretStore = new InMemorySecretStore();
         const settings = createSettingsAdapter({
@@ -374,5 +382,55 @@ describe("CloudService.providerOperations", () => {
         } finally {
             await fs.rm(baseDirectory, { force: true, recursive: true });
         }
+    });
+
+    it("logs failed Dropbox token revocation while clearing local disconnect state", async () => {
+        const secretStore = new InMemorySecretStore();
+        const settings = createSettingsAdapter({
+            [SETTINGS_KEY_DROPBOX_TOKENS]: "legacy-settings-token-copy",
+            [SETTINGS_KEY_ENCRYPTION_MODE]: "passphrase",
+            [SETTINGS_KEY_ENCRYPTION_SALT]: "salt",
+            [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/uw",
+            [SETTINGS_KEY_PROVIDER]: "dropbox",
+        });
+
+        await secretStore.setSecret(SETTINGS_KEY_DROPBOX_TOKENS, "tokens");
+
+        const loggerWarn = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => {});
+
+        const ctx = createOperationContext({
+            loadDropboxDeps: async () =>
+                ({
+                    DropboxTokenManager: class {
+                        public async revokeStoredTokens(): Promise<void> {
+                            throw new Error("revoke failed");
+                        }
+                    },
+                }) as never,
+            loadGoogleDriveDeps: async () => {
+                throw new Error("not used");
+            },
+            secretStore,
+            settings,
+        });
+
+        await disconnect(ctx);
+
+        expect(loggerWarn).toHaveBeenCalledWith(
+            "[CloudService] Failed to revoke provider tokens",
+            {
+                message: "revoke failed",
+                provider: "dropbox",
+            }
+        );
+        await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe("");
+        await expect(
+            settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+        ).resolves.toBe("");
+        await expect(
+            secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+        ).resolves.toBe(undefined);
     });
 });

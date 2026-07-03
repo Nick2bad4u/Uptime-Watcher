@@ -34,6 +34,15 @@ import {
 } from "./internal/providerConnectionState";
 import { deleteProviderSecretsBestEffort } from "./internal/providerSecretCleanup";
 
+function logTokenRevocationFailure(provider: string, error: unknown): void {
+    const resolved = ensureError(error);
+
+    logger.warn("[CloudService] Failed to revoke provider tokens", {
+        message: resolved.message,
+        provider,
+    });
+}
+
 /**
  * Disconnects from the configured provider and clears persisted config.
  */
@@ -52,7 +61,9 @@ export async function disconnect(
                 tokenStorageKey: SETTINGS_KEY_DROPBOX_TOKENS,
             });
 
-            await tokenManager.revokeStoredTokens().catch(() => {});
+            await tokenManager.revokeStoredTokens().catch((error: unknown) => {
+                logTokenRevocationFailure(provider, error);
+            });
         }
 
         if (provider === "google-drive") {
@@ -66,7 +77,9 @@ export async function disconnect(
                 storageKey: SETTINGS_KEY_GOOGLE_DRIVE_TOKENS,
             });
 
-            await tokenManager.revoke().catch(() => {});
+            await tokenManager.revoke().catch((error: unknown) => {
+                logTokenRevocationFailure(provider, error);
+            });
 
             await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
         }
