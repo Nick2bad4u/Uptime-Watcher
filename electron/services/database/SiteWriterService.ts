@@ -133,7 +133,7 @@ export class SiteWriterService {
      *         },
      *     ],
      * });
-     * logger.info(`Monitor ID: ${newSite.monitors[0].id}`); // Generated ID like 'mon_123'
+     * logger.info("Monitor created", { monitorId: newSite.monitors[0].id });
      * ```
      *
      * @param siteData - Site configuration including monitors to create
@@ -146,9 +146,9 @@ export class SiteWriterService {
     public async createSite(siteData: Site): Promise<Site> {
         return withDatabaseOperation(
             async () => {
-                this.logger.info(
-                    `Creating new site in database: ${siteData.identifier}`
-                );
+                this.logger.info("Creating new site in database", {
+                    identifier: siteData.identifier,
+                });
 
                 const normalizedMonitors = this.normalizeMonitorsForPersistence(
                     siteData.monitors,
@@ -179,9 +179,10 @@ export class SiteWriterService {
                     }
                 );
 
-                this.logger.info(
-                    `Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`
-                );
+                this.logger.info("Site created successfully in database", {
+                    identifier: site.identifier,
+                    name: site.name || "unnamed",
+                });
                 return site;
             },
             "site-writer-create",
@@ -238,7 +239,7 @@ export class SiteWriterService {
     ): Promise<boolean> {
         return withDatabaseOperation(
             async () => {
-                this.logger.info(`Removing site: ${identifier}`);
+                this.logger.info("Removing site", { identifier });
 
                 // Use executeTransaction for atomic multi-table deletion and capture result
                 const deletionResult = await this.withSiteMonitorTransaction(
@@ -257,20 +258,23 @@ export class SiteWriterService {
                 }
 
                 if (deletionResult.siteDeleted) {
-                    this.logger.info(
-                        `Site removed successfully from database: ${identifier}`
-                    );
-                    this.logger.debug(
-                        `Removed ${deletionResult.monitorCount} monitors for site: ${identifier}`
-                    );
+                    this.logger.info("Site removed successfully from database", {
+                        identifier,
+                    });
+                    this.logger.debug("Monitors removed for site", {
+                        identifier,
+                        monitorCount: deletionResult.monitorCount,
+                    });
                 } else {
-                    this.logger.warn(
-                        `Site not found in database for removal: ${identifier}`
-                    );
+                    this.logger.warn("Site not found in database for removal", {
+                        identifier,
+                    });
                 }
 
                 if (isRemoved) {
-                    this.logger.debug(`Site removed from cache: ${identifier}`);
+                    this.logger.debug("Site removed from cache", {
+                        identifier,
+                    });
                 }
 
                 // Return actual database deletion result, not cache status
@@ -327,9 +331,9 @@ export class SiteWriterService {
 
                 sitesCache.clear();
 
-                this.logger.info(
-                    `[SiteWriterService] Deleted ${sitesToDelete.length} sites from database`
-                );
+                this.logger.info("Sites deleted from database", {
+                    deletedCount: sitesToDelete.length,
+                });
 
                 return {
                     deletedCount: sitesToDelete.length,
@@ -365,9 +369,12 @@ export class SiteWriterService {
                     originalMonitor?.checkInterval !== newMonitor.checkInterval;
 
                 if (isIntervalChanged && newMonitor.id) {
-                    this.logger.debug(
-                        `Monitor ${newMonitor.id} interval changed from ${originalMonitor?.checkInterval} to ${newMonitor.checkInterval}`
-                    );
+                    this.logger.debug("Monitor interval changed", {
+                        monitorId: newMonitor.id,
+                        nextInterval: newMonitor.checkInterval,
+                        previousInterval: originalMonitor?.checkInterval,
+                        siteIdentifier: identifier,
+                    });
 
                     // Always stop to clean up any existing scheduling
                     // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop/start operations required
@@ -387,10 +394,9 @@ export class SiteWriterService {
                 }
             }
         } catch (error) {
-            this.logger.error(
-                `Failed to handle monitor interval changes for site ${identifier}:`,
-                error
-            );
+            this.logger.error("Failed to handle monitor interval changes", error, {
+                siteIdentifier: identifier,
+            });
             // Don't throw - this is a side effect operation that shouldn't
             // fail the update
         }
@@ -492,7 +498,7 @@ export class SiteWriterService {
                 // Update cache only after successful transaction
                 sitesCache.set(identifier, updatedSite);
 
-                this.logger.info(`Site updated successfully: ${identifier}`);
+                this.logger.info("Site updated successfully", { identifier });
                 return updatedSite;
             },
             "site-writer-update",
@@ -715,10 +721,11 @@ export class SiteWriterService {
     ): void {
         const newId = monitorTx.create(siteIdentifier, newMonitor);
         newMonitor.id = newId;
-        const reasonSuffix = reason ? ` (${reason})` : "";
-        this.logger.debug(
-            `Created new monitor ${newId} for site ${siteIdentifier}${reasonSuffix}`
-        );
+        this.logger.debug("Created new monitor", {
+            monitorId: newId,
+            reason,
+            siteIdentifier,
+        });
     }
 
     /**
@@ -812,9 +819,10 @@ export class SiteWriterService {
 
             if (shouldRemoveMonitor) {
                 monitorTx.deleteById(existingMonitor.id);
-                this.logger.debug(
-                    `Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`
-                );
+                this.logger.debug("Removed monitor from site", {
+                    monitorId: existingMonitor.id,
+                    siteIdentifier,
+                });
             }
         }
     }
@@ -830,20 +838,19 @@ export class SiteWriterService {
     ): void {
         if (!newMonitor.id) {
             // Safety check - this should not happen in this context
-            this.logger.warn(
-                `Attempted to update existing monitor without ID for site ${siteIdentifier}`,
-                {
-                    newMonitor,
-                }
-            );
+            this.logger.warn("Attempted to update existing monitor without ID", {
+                newMonitor,
+                siteIdentifier,
+            });
             return;
         }
 
         const updateData = buildMonitorUpdateData(newMonitor, existingMonitor);
         monitorTx.update(newMonitor.id, updateData);
-        this.logger.debug(
-            `Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`
-        );
+        this.logger.debug("Updated existing monitor", {
+            monitorId: newMonitor.id,
+            siteIdentifier,
+        });
     }
 
     /**

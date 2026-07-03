@@ -244,7 +244,8 @@ describe("SiteWriterService Coverage Tests", () => {
             );
             expect(result.monitors[0]!.id).toBe("new-monitor-id");
             expect(mockLogger.info).toHaveBeenCalledWith(
-                `Creating new site in database: ${siteData.identifier}`
+                "Creating new site in database",
+                { identifier: siteData.identifier }
             );
         });
 
@@ -420,10 +421,12 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(siteAdapter.delete).toHaveBeenCalledWith("test-site");
             expect(isResult).toBeTruthy();
             expect(mockLogger.info).toHaveBeenCalledWith(
-                "Site removed successfully from database: test-site"
+                "Site removed successfully from database",
+                { identifier: "test-site" }
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Removed 1 monitors for site: test-site"
+                "Monitors removed for site",
+                { identifier: "test-site", monitorCount: 1 }
             );
         });
 
@@ -466,7 +469,8 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(siteAdapter.delete).toHaveBeenCalledWith("nonexistent-site");
             expect(isResult).toBeFalsy();
             expect(mockLogger.warn).toHaveBeenCalledWith(
-                "Site not found in database for removal: nonexistent-site"
+                "Site not found in database for removal",
+                { identifier: "nonexistent-site" }
             );
         });
 
@@ -906,7 +910,13 @@ describe("SiteWriterService Coverage Tests", () => {
                 "monitor-1"
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Monitor monitor-1 interval changed from 30000 to 60000"
+                "Monitor interval changed",
+                {
+                    monitorId: "monitor-1",
+                    nextInterval: 60_000,
+                    previousInterval: 30_000,
+                    siteIdentifier: "test-site",
+                }
             );
         });
 
@@ -1026,8 +1036,9 @@ describe("SiteWriterService Coverage Tests", () => {
             ).resolves.not.toThrow();
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to handle monitor interval changes for site test-site:",
-                error
+                "Failed to handle monitor interval changes",
+                error,
+                { siteIdentifier: "test-site" }
             );
         });
 
@@ -1346,7 +1357,12 @@ describe("SiteWriterService Coverage Tests", () => {
                 })
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "Created new monitor new-monitor-id for site test-site (ID not found)"
+                "Created new monitor",
+                {
+                    monitorId: "new-monitor-id",
+                    reason: "ID not found",
+                    siteIdentifier: "test-site",
+                }
             );
         });
 
