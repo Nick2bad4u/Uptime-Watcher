@@ -96,8 +96,7 @@ export function validateRequiredStringField<
     const result = sharedValidateMonitorField(type, fieldName, value);
     const errors = [...result.errors];
 
-    // eslint-disable-next-line typefest/prefer-ts-extras-is-empty -- The installed ts-extras typings trigger no-unsafe-call here, while a direct length check remains fully type-safe.
-    if (value.trim().length === 0 && errors.length === 0) {
+    if (value.trim() === "" && errors[0] === undefined) {
         errors.push(missingMessage);
     }
 
