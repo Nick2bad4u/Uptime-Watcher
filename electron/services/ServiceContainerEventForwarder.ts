@@ -11,8 +11,9 @@
 
 import type { EventMetadata } from "@shared/types/events";
 
+import { eventMetadataSchema } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
-import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { objectHasIn, safeCastTo } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
@@ -271,25 +272,8 @@ export class ServiceContainerEventForwarder {
     private normalizeEventMetadata(
         candidate: unknown
     ): EventMetadata | undefined {
-        if (!isRecord(candidate)) {
-            return undefined;
-        }
-
-        if (
-            typeof candidate["busId"] !== "string" ||
-            typeof candidate["correlationId"] !== "string" ||
-            typeof candidate["eventName"] !== "string" ||
-            typeof candidate["timestamp"] !== "number"
-        ) {
-            return undefined;
-        }
-
-        return castUnchecked<EventMetadata>({
-            busId: candidate["busId"],
-            correlationId: candidate["correlationId"],
-            eventName: candidate["eventName"],
-            timestamp: candidate["timestamp"],
-        });
+        const parsed = eventMetadataSchema.safeParse(candidate);
+        return parsed.success ? parsed.data : undefined;
     }
 
     private extractForwardingMetadata<EventName extends EventKey<UptimeEvents>>(

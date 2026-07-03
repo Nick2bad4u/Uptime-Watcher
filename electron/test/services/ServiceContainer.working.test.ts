@@ -7,6 +7,7 @@ import type {
     MonitoringStopSummary,
 } from "@shared/types";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { EventEmitter } from "node:events";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -571,6 +572,51 @@ describe("ServiceContainer - Working Tests", () => {
             );
             expect(sourceDescriptor).toBeDefined();
             expect(sourceDescriptor?.enumerable).toBeTruthy();
+        });
+
+        it("should drop malformed forwarded metadata before reattaching", () => {
+            const payload = {
+                identifier: "site-object",
+                site: {
+                    identifier: "site-object",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Object Site",
+                },
+            } as Record<string, unknown>;
+
+            Object.assign(payload, {
+                [FORWARDED_METADATA_PROPERTY_KEY]: {
+                    busId: "manager-bus",
+                    correlationId: "corr-object",
+                    eventName: "internal:site:added",
+                    timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
+                },
+                [ORIGINAL_METADATA_PROPERTY_KEY]: {
+                    busId: "orchestrator-bus",
+                    correlationId: "orig-object",
+                    eventName: "site:added",
+                    timestamp: MAX_VALID_DATE_EPOCH_MS,
+                },
+            });
+
+            const sanitized = invokeStripEventMetadata(
+                "site:added",
+                payload
+            ) as Record<string, unknown>;
+
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    sanitized,
+                    FORWARDED_METADATA_PROPERTY_KEY
+                )
+            ).toBeUndefined();
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    sanitized,
+                    ORIGINAL_METADATA_PROPERTY_KEY
+                )
+            ).toBeUndefined();
         });
     });
 });
