@@ -18,6 +18,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -320,8 +321,13 @@ export function createHttpMonitorService<
             timeout: number,
             signal?: AbortSignal
         ): Promise<AxiosResponse> {
+            const followRedirectsProperty = getOwnDataProperty(
+                monitor,
+                "followRedirects"
+            );
             const shouldFollowRedirects =
-                Reflect.get(monitor, "followRedirects") !== false;
+                !followRedirectsProperty.found ||
+                followRedirectsProperty.value !== false;
 
             const response = await this.axiosInstance.get(url, {
                 ...(signal && { signal }),

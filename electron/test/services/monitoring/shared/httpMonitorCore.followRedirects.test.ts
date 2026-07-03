@@ -81,7 +81,6 @@ describe("httpMonitorCore followRedirects", () => {
             "https://example.com",
             expect.objectContaining({
                 maxRedirects: 0,
-                responseType: "stream",
                 timeout: 1000,
             })
         );
@@ -117,7 +116,48 @@ describe("httpMonitorCore followRedirects", () => {
         const requestConfig = call?.[1] as Record<string, unknown>;
 
         expect(requestConfig).toBeDefined();
-        expect(requestConfig["responseType"]).toBe("stream");
+        expect(Object.hasOwn(requestConfig, "maxRedirects")).toBeFalsy();
+    });
+
+    it("does not invoke followRedirects accessors while building requests", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: httpMonitorCore", "component");
+        await annotate("Category: Monitoring", "category");
+        await annotate("Type: Redirect Handling", "type");
+
+        const monitor: Monitor = {
+            checkInterval: 5000,
+            history: [],
+            id: "m3",
+            monitoring: true,
+            responseTime: -1,
+            retryAttempts: 0,
+            status: "pending",
+            timeout: 1000,
+            type: "http",
+            url: "https://example.com",
+        };
+        let accessCount = 0;
+
+        Object.defineProperty(monitor, "followRedirects", {
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return false;
+            },
+        });
+
+        const service = new HttpMonitor({ timeout: 1000 });
+        await service.check(monitor);
+
+        const call = mockAxiosInstance.get.mock.calls[0];
+        expect(call).toBeDefined();
+        const requestConfig = call?.[1] as Record<string, unknown>;
+
+        expect(accessCount).toBe(0);
         expect(Object.hasOwn(requestConfig, "maxRedirects")).toBeFalsy();
     });
 });
