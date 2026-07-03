@@ -1,5 +1,8 @@
 import type { SecretStore } from "../secrets/SecretStore";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+
+import { logger } from "../../../utils/logger";
 import {
     decodeStrictBase64,
     ENCRYPTION_KEY_BYTES,
@@ -41,10 +44,27 @@ export async function resolveStoredDerivedEncryptionKey(args: {
             }),
             kind: "available",
         };
-    } catch {
-        await args.secretStore
-            .deleteSecret(SECRET_KEY_ENCRYPTION_DERIVED_KEY)
-            .catch(() => {});
+    } catch (error) {
+        logger.warn(
+            "[CloudService] Stored derived encryption key was invalid; clearing",
+            {
+                message: getUserFacingErrorDetail(error),
+                storageKey: SECRET_KEY_ENCRYPTION_DERIVED_KEY,
+            }
+        );
+        try {
+            await args.secretStore.deleteSecret(
+                SECRET_KEY_ENCRYPTION_DERIVED_KEY
+            );
+        } catch (deleteError) {
+            logger.warn(
+                "[CloudService] Failed to clear invalid derived encryption key",
+                {
+                    message: getUserFacingErrorDetail(deleteError),
+                    storageKey: SECRET_KEY_ENCRYPTION_DERIVED_KEY,
+                }
+            );
+        }
         return { kind: "invalid" };
     }
 }
