@@ -1,4 +1,12 @@
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+    existsSync,
+    mkdirSync,
+    mkdtempSync,
+    readdirSync,
+    rmSync,
+    symlinkSync,
+    writeFileSync,
+} from "node:fs";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
@@ -106,5 +114,31 @@ describe("databaseLockRecovery utilities", () => {
         expect(existsSync(walPath)).toBeTruthy();
 
         renameSpy.mockRestore();
+    });
+
+    it("should refuse to relocate artifacts through a symlinked recovery directory", () => {
+        const walPath = `${dbPath}-wal`;
+        writeFileSync(walPath, "wal");
+
+        const outsideDirectory = path.join(tempDir, "outside");
+        mkdirSync(outsideDirectory);
+
+        const recoveryDirectory = path.join(tempDir, "stale-lock-artifacts");
+        const symlinkType = process.platform === "win32" ? "junction" : "dir";
+        symlinkSync(outsideDirectory, recoveryDirectory, symlinkType);
+
+        const result = cleanupDatabaseLockArtifacts(dbPath);
+
+        expect(result.relocated).toHaveLength(0);
+        expect(result.failed).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    path: walPath,
+                    reason: expect.stringMatching(/symlink/iv),
+                }),
+            ])
+        );
+        expect(existsSync(walPath)).toBeTruthy();
+        expect(readdirSync(outsideDirectory)).toEqual([]);
     });
 });

@@ -1,6 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, renameSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, renameSync } from "node:fs";
 import * as path from "node:path";
 
 const DATABASE_LOCK_ARTIFACT_SUFFIXES = Object.freeze([
@@ -67,6 +67,30 @@ const deriveBaseNameWithoutExtension = (baseName: string): string => {
     return baseName;
 };
 
+const ensureRecoveryDirectory = (
+    recoveryDirectory: string,
+    recoveryState: { ensured: boolean }
+): void => {
+    if (recoveryState.ensured) {
+        return;
+    }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Recovery directory path is validated by caller; synchronous creation keeps initialization deterministic.
+    mkdirSync(recoveryDirectory, { recursive: true });
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Recovery directory path is validated by caller before this check.
+    const stat = lstatSync(recoveryDirectory);
+    if (stat.isSymbolicLink()) {
+        throw new Error("Recovery directory must not be a symlink");
+    }
+
+    if (!stat.isDirectory()) {
+        throw new Error("Recovery path must be a directory");
+    }
+
+    recoveryState.ensured = true;
+};
+
 /**
  * Moves a lock artifact into the recovery directory and returns relocation
  * metadata.
@@ -89,11 +113,7 @@ const performRelocation = (
     recoveryDirectory: string,
     recoveryState: { ensured: boolean }
 ): DatabaseLockArtifact => {
-    if (!recoveryState.ensured) {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Recovery directory path validated earlier; synchronous creation keeps initialization deterministic.
-        mkdirSync(recoveryDirectory, { recursive: true });
-        recoveryState.ensured = true;
-    }
+    ensureRecoveryDirectory(recoveryDirectory, recoveryState);
 
     const uniqueSuffix: string = ((): string => {
         try {
