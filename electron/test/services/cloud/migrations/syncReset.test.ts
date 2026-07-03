@@ -198,6 +198,7 @@ describe(resetProviderCloudSyncState, () => {
                 appliedRemoteOperations: 0,
                 emittedLocalOperations: 0,
                 mergedEntities: 0,
+                snapshotKey: null,
             })),
         };
 

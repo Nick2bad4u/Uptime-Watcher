@@ -18,13 +18,19 @@ vi.mock("../../../utils/logger", () => ({
     },
 }));
 
+interface MockNotificationOptions {
+    body?: string;
+    title: string;
+}
+
 const { mockIsSupported, mockShow, notificationCtor } = vi.hoisted(() => {
     const mockShowImpl = vi.fn();
     const mockIsSupportedImpl = vi.fn(() => true);
 
-    const notificationCtorImpl = vi.fn(function NotificationMock(this: {
-        show: typeof mockShowImpl;
-    }) {
+    const notificationCtorImpl = vi.fn(function NotificationMock(
+        this: { show: typeof mockShowImpl },
+        _options: MockNotificationOptions
+    ) {
         this.show = mockShowImpl;
     });
 
@@ -66,6 +72,40 @@ const sampleSite: Site = {
         },
     ],
 };
+
+function isMockNotificationOptions(
+    value: unknown
+): value is MockNotificationOptions {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "title" in value &&
+        typeof value.title === "string" &&
+        (!("body" in value) || typeof value.body === "string")
+    );
+}
+
+function getFirstNotificationOptions(): MockNotificationOptions {
+    const [firstCall] = notificationCtor.mock.calls;
+    const [options] = firstCall ?? [];
+
+    if (!isMockNotificationOptions(options)) {
+        throw new Error("Expected Notification constructor options");
+    }
+
+    return options;
+}
+
+function getFirstNotificationOptionsWithBody(): MockNotificationOptions & {
+    body: string;
+} {
+    const options = getFirstNotificationOptions();
+    if (typeof options.body !== "string") {
+        throw new TypeError("Expected Notification constructor body");
+    }
+
+    return { ...options, body: options.body };
+}
 
 describe(NotificationService, () => {
     let service: NotificationService;
@@ -198,14 +238,7 @@ describe(NotificationService, () => {
 
             service.notifyMonitorDown(siteWithSensitiveLabel, "monitor-1");
 
-            const [[options]] = notificationCtor.mock.calls as [
-                [
-                    {
-                        body: string;
-                        title: string;
-                    },
-                ],
-            ];
+            const options = getFirstNotificationOptionsWithBody();
 
             expect(options.title).toContain("[redacted]");
             expect(options.title).not.toContain("site-secret-token");
@@ -280,14 +313,7 @@ describe(NotificationService, () => {
                 title: "Upload failed\naccess_token=title-secret-token",
             });
 
-            const [[options]] = notificationCtor.mock.calls as [
-                [
-                    {
-                        body?: string;
-                        title: string;
-                    },
-                ],
-            ];
+            const options = getFirstNotificationOptions();
 
             expect(options.title).toContain("[redacted]");
             expect(options.title).not.toContain("title-secret-token");
