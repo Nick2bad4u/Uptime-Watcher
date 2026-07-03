@@ -43,6 +43,7 @@ import {
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { toSerializedError } from "@shared/utils/errorSerialization";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isDefined } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -325,6 +326,12 @@ export class SiteLoadingOrchestrator {
         this.siteRepositoryService = siteRepositoryService;
     }
 
+    private getSafeFailureDetail(error: unknown): string {
+        return Error.isError(error)
+            ? getUserFacingErrorDetail(error)
+            : getUnknownErrorMessage(error);
+    }
+
     /**
      * Load sites from database and start monitoring. Coordinates all aspects of
      * site loading process.
@@ -354,7 +361,7 @@ export class SiteLoadingOrchestrator {
             };
         } catch (error) {
             return {
-                message: `Failed to load sites: ${getUnknownErrorMessage(error)}`,
+                message: `Failed to load sites: ${this.getSafeFailureDetail(error)}`,
                 sitesLoaded: 0,
                 success: false,
             };

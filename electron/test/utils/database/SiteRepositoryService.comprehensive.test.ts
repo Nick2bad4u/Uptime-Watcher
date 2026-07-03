@@ -860,6 +860,36 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             });
         });
 
+        it("should sanitize site loading failure details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.spyOn(
+                siteRepositoryService,
+                "loadSitesIntoCache"
+            ).mockRejectedValue(
+                new Error(
+                    "SQLite failed\naccess_token=site-load-secret-token"
+                )
+            );
+
+            const result = await siteLoadingOrchestrator.loadSitesFromDatabase(
+                mockSiteCache,
+                mockMonitoringConfig
+            );
+
+            expect(result.message).toContain("[redacted]");
+            expect(result.message).not.toContain("site-load-secret-token");
+            expect(result.message).not.toMatch(/[\n\r]/u);
+            expect(result.sitesLoaded).toBe(0);
+            expect(result.success).toBeFalsy();
+        });
+
         it("should handle error during settings application", async ({
             task,
             annotate,

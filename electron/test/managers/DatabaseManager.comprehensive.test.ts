@@ -559,6 +559,43 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             );
         });
 
+        it("should sanitize failed loadSitesFromDatabase messages before throwing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Loading", "type");
+
+            const mockOrchestrator = createSiteLoadingOrchestratorMock({
+                loadSitesFromDatabase: vi.fn().mockResolvedValue({
+                    message:
+                        "Failed to load sites\naccess_token=database-load-secret-token",
+                    sitesLoaded: 0,
+                    success: false,
+                }),
+            });
+
+            (databaseManager as any).siteLoadingOrchestrator = mockOrchestrator;
+
+            let thrownError: unknown;
+            try {
+                await databaseManager.initialize();
+            } catch (error: unknown) {
+                thrownError = error;
+            }
+
+            expect(thrownError).toBeInstanceOf(Error);
+            expect((thrownError as Error).message).toContain(
+                "access_token=[redacted]"
+            );
+            expect((thrownError as Error).message).not.toContain(
+                "database-load-secret-token"
+            );
+            expect((thrownError as Error).message).not.toMatch(/[\n\r]/u);
+        });
+
         it("should handle site cache operations during loadSites", async ({
             task,
             annotate,

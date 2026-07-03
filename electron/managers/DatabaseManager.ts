@@ -52,7 +52,10 @@ import type { Site } from "@shared/types";
 import { normalizeHistoryLimit } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import {
+    getUserFacingErrorDetail,
+    normalizeUserFacingErrorDetail,
+} from "@shared/utils/userFacingErrors";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -820,7 +823,10 @@ export class DatabaseManager {
         );
 
         if (!result.success) {
-            throw new Error(result.message);
+            throw new Error(
+                normalizeUserFacingErrorDetail(result.message) ??
+                    "Failed to load sites"
+            );
         }
 
         // Atomically replace the main cache (prevents race conditions)
