@@ -755,6 +755,33 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 expect.stringContaining("Unable to open external link")
             );
         });
+
+        it("should not invoke cause accessors when external navigation fails", async () => {
+            const url = "https://example.com";
+            let getterCalls = 0;
+            const failure = new Error("IPC failure");
+            Object.defineProperty(failure, "cause", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    getterCalls += 1;
+                    return new Error("nested");
+                },
+            });
+
+            mockOpenExternal.mockRejectedValueOnce(failure);
+
+            useUIStore.getState().openExternal(url);
+
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to open external URL via SystemService",
+                failure,
+                expect.anything()
+            );
+            expect(getterCalls).toBe(0);
+        });
     });
 
     describe("Complex State Interactions", () => {

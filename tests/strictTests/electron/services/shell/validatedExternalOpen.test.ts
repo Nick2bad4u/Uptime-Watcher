@@ -104,4 +104,41 @@ describe("validatedExternalOpen", () => {
         expect(result.errorCode).toBe("EPERM");
         expect(result.safeUrlForLogging).not.toContain("token=secret");
     });
+
+    it("does not invoke cause accessors while extracting failure metadata", async () => {
+        let getterCalls = 0;
+        const failure = new Error("boom");
+        Object.defineProperty(failure, "cause", {
+            configurable: true,
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return Object.assign(new Error("nested"), { code: "EACCES" });
+            },
+        });
+        openExternalMock.mockRejectedValueOnce(failure);
+
+        const { tryOpenExternalValidated } =
+            await import("@electron/services/shell/validatedExternalOpen");
+
+        const result = await tryOpenExternalValidated({
+            failureMessagePrefix: "Failed to open",
+            url: "https://example.com/real?token=secret",
+        });
+
+        expect(result.ok).toBeFalsy();
+        if (result.ok) {
+            throw new Error("Expected open failure");
+        }
+
+        if (result.outcome !== "open-failed") {
+            throw new Error(
+                `Expected open-failed outcome, got ${result.outcome}`
+            );
+        }
+
+        expect(result.errorName).toBe("Error");
+        expect(result.errorCode).toBeUndefined();
+        expect(getterCalls).toBe(0);
+    });
 });

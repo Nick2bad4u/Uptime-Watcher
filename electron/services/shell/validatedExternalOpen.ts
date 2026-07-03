@@ -6,7 +6,6 @@ import {
     type ExternalOpenUrlValidationResult,
     validateExternalOpenUrlCandidate,
 } from "@shared/utils/urlSafety";
-import { safeCastTo } from "ts-extras";
 
 import { openExternalOrThrow } from "./openExternalUtils";
 
@@ -96,6 +95,21 @@ export type TryOpenExternalValidatedResult =
           safeUrlForLogging: string;
       }>;
 
+function getOwnDataCause(error: Error):
+    | { readonly found: false }
+    | {
+          readonly found: true;
+          readonly value: unknown;
+      } {
+    const descriptor = Object.getOwnPropertyDescriptor(error, "cause");
+
+    if (!descriptor || !("value" in descriptor)) {
+        return { found: false };
+    }
+
+    return { found: true, value: descriptor.value };
+}
+
 /**
  * Best-effort external URL open that never throws.
  *
@@ -137,9 +151,14 @@ export async function tryOpenExternalValidated(args: {
         };
     } catch (error: unknown) {
         const resolved = ensureError(error);
-        const code = tryGetErrorCode(
-            safeCastTo<{ cause?: unknown }>(resolved).cause ?? resolved
-        );
+        const ownCause = getOwnDataCause(resolved);
+        const codeSource =
+            ownCause.found &&
+            ownCause.value !== null &&
+            ownCause.value !== undefined
+                ? ownCause.value
+                : resolved;
+        const code = tryGetErrorCode(codeSource);
 
         return {
             errorName: resolved.name,
