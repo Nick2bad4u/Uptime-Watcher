@@ -499,6 +499,34 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             );
             expect(safeParseTimestamp("0", customDefault)).toBe(customDefault);
         });
+        it("should normalize invalid custom defaults", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Safe Conversions - Backend Coverage",
+                "component"
+            );
+
+            const invalidDefaults = [
+                Number.NaN,
+                Infinity,
+                -Infinity,
+                0,
+                -1,
+                Date.now() + 86_400_001,
+            ];
+
+            for (const defaultValue of invalidDefaults) {
+                const beforeCall = Date.now();
+                const result = safeParseTimestamp("invalid", defaultValue);
+                const afterCall = Date.now() + 100;
+
+                expect(result).toBeGreaterThanOrEqual(beforeCall);
+                expect(result).toBeLessThanOrEqual(afterCall);
+            }
+        });
         it("should reject timestamps too far in future", async ({
             task,
             annotate,

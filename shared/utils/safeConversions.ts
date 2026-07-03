@@ -389,8 +389,14 @@ export function safeParseTimestamp(
     defaultValue?: number
 ): number {
     const currentTime = Date.now();
-    const fallback = defaultValue ?? currentTime;
     const upperBound = currentTime + 86_400_000;
+    const fallback =
+        defaultValue !== undefined &&
+        isFiniteNumber(defaultValue) &&
+        defaultValue > 0 &&
+        defaultValue <= upperBound
+            ? defaultValue
+            : currentTime;
     const parsed = safeNumberConversion(value, fallback);
 
     // Basic timestamp validation (must be positive, finite, and reasonable)
