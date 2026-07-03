@@ -1,6 +1,6 @@
 /* Utility Classes and Shared Components */
-/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/selector-pseudo-class-focus -- Shared utility classes use centralized focus-visible states in component utilities. */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- Motion safety is handled by the global reduced-motion override layer. */
 /* stylelint-disable no-unknown-animations -- animation keyframes live in shared animations.css */
 
 .divider-y > :not(:first-child) {

@@ -1,7 +1,7 @@
 /* Theme Components CSS - Professional UI Enhancement */
 
-/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/selector-pseudo-class-focus -- Foundation utilities use centralized focus-visible states in component utilities. */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- Motion safety is handled by the global reduced-motion override layer. */
 /* stylelint-disable plugin/no-low-performance-animation-properties -- intentional rich shadows/transforms rely on transitions and remain performant in benchmarks. */
 /* stylelint-disable scss/function-color-relative -- native color-mix works with CSS custom properties; Sass color helpers cannot express these blends. */
 

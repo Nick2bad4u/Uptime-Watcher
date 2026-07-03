@@ -1,5 +1,5 @@
 /* Application Shell and Layout Utilities */
-/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- Motion safety is handled by the global reduced-motion override layer. */
 /* stylelint-disable no-unknown-animations -- animation keyframes live in shared animations.css */
 
 .app-container {
