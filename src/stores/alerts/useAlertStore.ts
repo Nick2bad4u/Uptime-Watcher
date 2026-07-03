@@ -21,6 +21,12 @@ export const MAX_TOAST_QUEUE_LENGTH = 20;
 
 const DEFAULT_TOAST_TTL_MS = 5000;
 
+const isFiniteNonNegativeNumber = (value: unknown): value is number =>
+    typeof value === "number" && Number.isFinite(value) && value >= 0;
+
+const isFinitePositiveNumber = (value: unknown): value is number =>
+    typeof value === "number" && Number.isFinite(value) && value > 0;
+
 /**
  * Generates monotonically increasing fallback counters without using top-level
  * mutable state.
@@ -170,11 +176,9 @@ export const useAlertStore: AlertStoreHook = create<AlertStore>()((set) => ({
         }));
     },
     enqueueAlert: (input: StatusAlertInput): StatusAlert => {
-        const normalizedTimestamp =
-            typeof input.timestamp === "number" &&
-            !Number.isNaN(input.timestamp)
-                ? input.timestamp
-                : Date.now();
+        const normalizedTimestamp = isFiniteNonNegativeNumber(input.timestamp)
+            ? input.timestamp
+            : Date.now();
 
         const alert: StatusAlert = {
             ...input,
@@ -194,10 +198,9 @@ export const useAlertStore: AlertStoreHook = create<AlertStore>()((set) => ({
     },
     enqueueToast: (input: AppToastInput): AppToast => {
         const toastId = generateAlertId();
-        const ttlMs =
-            typeof input.ttlMs === "number" && input.ttlMs > 0
-                ? input.ttlMs
-                : DEFAULT_TOAST_TTL_MS;
+        const ttlMs = isFinitePositiveNumber(input.ttlMs)
+            ? input.ttlMs
+            : DEFAULT_TOAST_TTL_MS;
 
         const baseToast = {
             createdAtEpochMs: Date.now(),

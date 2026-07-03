@@ -20,13 +20,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     MAX_ALERT_QUEUE_LENGTH,
+    MAX_TOAST_QUEUE_LENGTH,
     useAlertStore,
 } from "../../../stores/alerts/useAlertStore";
 import { mapStatusUpdateToAlert } from "../../../stores/alerts/utils/alertPayload";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const resetAlertStore = (): void => {
-    useAlertStore.setState({ alerts: [] });
+    useAlertStore.setState({ alerts: [], toasts: [] });
 };
 
 const resetSettingsStore = (): void => {
@@ -125,6 +126,45 @@ describe(useAlertStore, () => {
         expect(customAlert.timestamp).toBe(1_700_000_000_000);
     });
 
+    it("normalizes non-finite and negative alert timestamps", () => {
+        const fixedNow = 1_730_000_000_000;
+        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
+        const store = useAlertStore.getState();
+
+        try {
+            for (const timestamp of [
+                Infinity,
+                -Infinity,
+                Number.NaN,
+                -1,
+            ]) {
+                const alert = store.enqueueAlert({
+                    monitorId: sampleOne(monitorIdArbitrary),
+                    monitorName: sampleOne(monitorNameArbitrary),
+                    siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                    siteName: sampleOne(siteNameArbitrary),
+                    status: STATUS_KIND.DOWN,
+                    timestamp,
+                });
+
+                expect(alert.timestamp).toBe(fixedNow);
+            }
+
+            const epochAlert = store.enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.UP,
+                timestamp: 0,
+            });
+
+            expect(epochAlert.timestamp).toBe(0);
+        } finally {
+            nowSpy.mockRestore();
+        }
+    });
+
     it("trims the alert queue to the maximum length", () => {
         const { enqueueAlert } = useAlertStore.getState();
 
@@ -189,6 +229,43 @@ describe(useAlertStore, () => {
 
         store.clearAlerts();
         expect(useAlertStore.getState().alerts).toHaveLength(0);
+    });
+
+    it("normalizes invalid toast TTL values", () => {
+        const store = useAlertStore.getState();
+
+        const validToast = store.enqueueToast({
+            title: "Valid",
+            ttlMs: 1,
+            variant: "info",
+        });
+        expect(validToast.ttlMs).toBe(1);
+
+        for (const ttlMs of [0, -1, Infinity, -Infinity, Number.NaN]) {
+            const toast = store.enqueueToast({
+                title: "Invalid",
+                ttlMs,
+                variant: "info",
+            });
+
+            expect(toast.ttlMs).toBe(5000);
+        }
+    });
+
+    it("trims the toast queue to the maximum length", () => {
+        const { enqueueToast } = useAlertStore.getState();
+
+        for (let index = 0; index < MAX_TOAST_QUEUE_LENGTH + 5; index += 1) {
+            enqueueToast({
+                title: `Toast ${index}`,
+                variant: "info",
+            });
+        }
+
+        const queuedToasts = useAlertStore.getState().toasts;
+
+        expect(queuedToasts).toHaveLength(MAX_TOAST_QUEUE_LENGTH);
+        expect(arrayAt(queuedToasts, -1)?.title).toBe("Toast 5");
     });
 
     it("maps status updates to alert payloads", () => {
