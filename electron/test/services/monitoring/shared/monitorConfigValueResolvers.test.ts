@@ -44,6 +44,31 @@ describe("monitorConfigValueResolvers", () => {
                 ok: false,
             });
         });
+
+        it("does not invoke accessors while resolving required strings", () => {
+            const monitor = {};
+            let accessCount = 0;
+
+            Object.defineProperty(monitor, "field", {
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return "value";
+                },
+            });
+
+            expect(
+                resolveRequiredMonitorStringField(
+                    monitor,
+                    "field",
+                    "field is required"
+                )
+            ).toStrictEqual({
+                message: "field is required",
+                ok: false,
+            });
+            expect(accessCount).toBe(0);
+        });
     });
 
     describe(resolveRequiredMonitorUrlField, () => {
@@ -120,6 +145,38 @@ describe("monitorConfigValueResolvers", () => {
             });
 
             expect(result).toBe(1500);
+        });
+
+        it("does not invoke accessors while resolving numeric overrides", () => {
+            const monitor = {};
+            const serviceConfig = {};
+            let accessCount = 0;
+
+            Object.defineProperty(monitor, "maxLag", {
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return 30;
+                },
+            });
+            Object.defineProperty(serviceConfig, "maxLag", {
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return 20;
+                },
+            });
+
+            const result = resolveMonitorNumericOverride({
+                fallbackValue: 10,
+                minimumValue: 0,
+                monitor,
+                monitorFieldName: "maxLag",
+                serviceConfig,
+            });
+
+            expect(result).toBe(10);
+            expect(accessCount).toBe(0);
         });
     });
 });

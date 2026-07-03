@@ -1,5 +1,6 @@
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isValidUrl } from "@shared/validation/validatorUtils";
-import { isFinite as isFiniteNumber, objectHasOwn } from "ts-extras";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Result of resolving a required monitor string field.
@@ -24,7 +25,8 @@ export function resolveRequiredMonitorStringField(
     fieldName: string,
     errorMessage: string
 ): RequiredMonitorStringFieldResult {
-    const candidate = Reflect.get(monitor, fieldName) as unknown;
+    const property = getOwnDataProperty(monitor, fieldName);
+    const candidate = property.found ? property.value : undefined;
     if (typeof candidate !== "string") {
         return {
             message: errorMessage,
@@ -130,18 +132,22 @@ export function resolveMonitorNumericOverride(options: {
             : candidate > minimumValue;
     };
 
-    const monitorCandidate = Reflect.get(monitor, monitorFieldName) as unknown;
+    const monitorProperty = getOwnDataProperty(monitor, monitorFieldName);
+    const monitorCandidate = monitorProperty.found
+        ? monitorProperty.value
+        : undefined;
     if (isCandidateAccepted(monitorCandidate)) {
         return monitorCandidate;
     }
 
     const resolvedServiceConfigFieldName =
         serviceConfigFieldName ?? monitorFieldName;
-    if (objectHasOwn(serviceConfig, resolvedServiceConfigFieldName)) {
-        const serviceCandidate = Reflect.get(
-            serviceConfig,
-            resolvedServiceConfigFieldName
-        );
+    const serviceConfigProperty = getOwnDataProperty(
+        serviceConfig,
+        resolvedServiceConfigFieldName
+    );
+    if (serviceConfigProperty.found) {
+        const serviceCandidate = serviceConfigProperty.value;
 
         if (isCandidateAccepted(serviceCandidate)) {
             return serviceCandidate;
