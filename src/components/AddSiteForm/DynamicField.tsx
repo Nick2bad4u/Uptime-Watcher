@@ -140,10 +140,16 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
                 if (Number.isFinite(numericValue)) {
                     handleChange(numericValue);
                 } else {
-                    logger.error(`Invalid numeric input: ${val}`);
+                    logger.error("Invalid numeric input", {
+                        fieldName: field.name,
+                        value: val,
+                    });
                 }
             },
-            [handleChange]
+            [
+                field.name,
+                handleChange,
+            ]
         );
 
         const handleStringChange = useCallback(

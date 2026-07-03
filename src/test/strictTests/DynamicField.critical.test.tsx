@@ -166,7 +166,11 @@ describe("DynamicField - Comprehensive Coverage", () => {
 
             // Verify that the logger was called for invalid input
             expect(loggerErrorSpy).toHaveBeenCalledWith(
-                "Invalid numeric input: 123abc"
+                "Invalid numeric input",
+                {
+                    fieldName: "port",
+                    value: "123abc",
+                }
             );
 
             loggerErrorSpy.mockClear();
@@ -180,7 +184,11 @@ describe("DynamicField - Comprehensive Coverage", () => {
             input.dispatchEvent(changeEvent);
 
             expect(loggerErrorSpy).toHaveBeenCalledWith(
-                "Invalid numeric input: Infinity"
+                "Invalid numeric input",
+                {
+                    fieldName: "port",
+                    value: "Infinity",
+                }
             );
         });
 

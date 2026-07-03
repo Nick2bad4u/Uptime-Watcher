@@ -398,7 +398,10 @@ describe("100% Coverage Edge Cases", () => {
             expect(result).toBe("fallback");
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "test-operation failed",
-                expect.any(Error)
+                expect.objectContaining({
+                    message: "Async error",
+                    name: "Error",
+                })
             );
         });
 
@@ -657,7 +660,8 @@ describe("100% Coverage Edge Cases", () => {
             fireEvent.change(select, { target: { value: "invalid" } });
             await waitFor(() => {
                 expect(logger.error).toHaveBeenCalledWith(
-                    expect.stringContaining("Invalid monitor type value")
+                    "Invalid monitor type value",
+                    { value: "" }
                 );
             });
         });

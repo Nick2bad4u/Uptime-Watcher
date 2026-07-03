@@ -268,7 +268,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 if (isValidMonitorType(value)) {
                     setMonitorType(value);
                 } else {
-                    logger.error(`Invalid monitor type value: ${value}`);
+                    logger.error("Invalid monitor type value", { value });
                 }
             },
             [setMonitorType]
@@ -280,7 +280,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 if (Number.isFinite(numericValue)) {
                     setCheckIntervalMs(numericValue);
                 } else {
-                    logger.error(`Invalid check interval value: ${value}`);
+                    logger.error("Invalid check interval value", { value });
                 }
             },
             [setCheckIntervalMs]
@@ -517,7 +517,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         const handleAddModeChange = useCallback(
             (value: string) => {
                 if (!isValidAddMode(value)) {
-                    logger.error(`Invalid add mode value: ${value}`);
+                    logger.error("Invalid add mode value", { value });
                     return;
                 }
 

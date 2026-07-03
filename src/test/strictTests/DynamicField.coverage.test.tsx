@@ -131,11 +131,15 @@ describe("DynamicField coverage", () => {
         expect(onChange).toHaveBeenLastCalledWith(9090);
 
         numericProps.onChange("");
-        expect(onChange).toHaveBeenLastCalledWith(0);
+        expect(onChange).toHaveBeenLastCalledWith("");
 
         numericProps.onChange("invalid");
         expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid numeric input: invalid"
+            "Invalid numeric input",
+            {
+                fieldName: "port",
+                value: "invalid",
+            }
         );
     });
 

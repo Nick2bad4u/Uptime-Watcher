@@ -122,22 +122,26 @@ describe("DynamicField - Additional Coverage", () => {
                 if (val === "" || !Number.isNaN(numericValue)) {
                     mockOnChange(val === "" ? 0 : numericValue);
                 } else {
-                    logger.error(`Invalid numeric input: ${val}`);
+                    logger.error("Invalid numeric input", { value: val });
                 }
             }
 
             // Should log errors for all invalid inputs
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Invalid numeric input: abc"
+                "Invalid numeric input",
+                { value: "abc" }
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Invalid numeric input: 123abc"
+                "Invalid numeric input",
+                { value: "123abc" }
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Invalid numeric input: !@#$"
+                "Invalid numeric input",
+                { value: "!@#$" }
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Invalid numeric input: ."
+                "Invalid numeric input",
+                { value: "." }
             );
         });
     });

@@ -439,7 +439,8 @@ describe("AddSiteForm behavioral coverage", () => {
 
         monitorSelect?.onChange("unsupported-type");
         expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid monitor type value: unsupported-type"
+            "Invalid monitor type value",
+            { value: "unsupported-type" }
         );
 
         const intervalSelect = selectFieldProps.get("checkInterval");
@@ -449,12 +450,14 @@ describe("AddSiteForm behavioral coverage", () => {
 
         intervalSelect?.onChange("NaN-value");
         expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid check interval value: NaN-value"
+            "Invalid check interval value",
+            { value: "NaN-value" }
         );
 
         intervalSelect?.onChange("Infinity");
         expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid check interval value: Infinity"
+            "Invalid check interval value",
+            { value: "Infinity" }
         );
     });
 
@@ -491,7 +494,8 @@ describe("AddSiteForm behavioral coverage", () => {
         expect(formStateRefs.setAddMode).toHaveBeenCalledWith("existing");
         radioGroupProps?.onChange("unsupported");
         expect(loggerErrorMock).toHaveBeenCalledWith(
-            "Invalid add mode value: unsupported"
+            "Invalid add mode value",
+            { value: "unsupported" }
         );
     });
 

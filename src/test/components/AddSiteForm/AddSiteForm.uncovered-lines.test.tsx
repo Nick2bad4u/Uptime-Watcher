@@ -422,9 +422,8 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         // The form should call the internal validation and log error
         await waitFor(() => {
             expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Invalid monitor type value: invalid-monitor-type"
-                )
+                "Invalid monitor type value",
+                { value: "invalid-monitor-type" }
             );
         });
     });
@@ -451,9 +450,8 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
 
         await waitFor(() => {
             expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Invalid check interval value: not-a-number"
-                )
+                "Invalid check interval value",
+                { value: "not-a-number" }
             );
         });
     });
@@ -633,9 +631,8 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
 
         await waitFor(() => {
             expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Invalid add mode value: invalid-add-mode"
-                )
+                "Invalid add mode value",
+                { value: "invalid-add-mode" }
             );
         });
     });
