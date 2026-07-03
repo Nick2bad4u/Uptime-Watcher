@@ -62,8 +62,24 @@ export class FallbackSecretStore implements SecretStore {
     }
 
     public async deleteSecret(key: string): Promise<void> {
-        await this.primary.deleteSecret(key).catch(() => {});
-        await this.fallback.deleteSecret(key).catch(() => {});
+        const results = await Promise.allSettled([
+            this.primary.deleteSecret(key),
+            this.fallback.deleteSecret(key),
+        ]);
+        const failures: unknown[] = [];
+        for (const result of results) {
+            if (result.status === "rejected") {
+                failures.push(result.reason);
+            }
+        }
+
+        if (failures.length > 0) {
+            throw new AggregateError(
+                failures,
+                `Failed to delete secret '${key}' from one or more stores`,
+                { cause: failures[0] }
+            );
+        }
     }
 
     public async getSecret(key: string): Promise<string | undefined> {

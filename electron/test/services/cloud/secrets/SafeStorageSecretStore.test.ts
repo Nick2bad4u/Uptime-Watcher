@@ -121,6 +121,45 @@ class MutableSecretStore implements SecretStore {
 }
 
 describe(FallbackSecretStore, () => {
+    it("deletes secrets from both stores", async () => {
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        await primary.setSecret("cloud.dropbox.tokens", "primary-token-json");
+        await fallback.setSecret("cloud.dropbox.tokens", "fallback-token-json");
+
+        await expect(
+            store.deleteSecret("cloud.dropbox.tokens")
+        ).resolves.toBeUndefined();
+
+        expect(primary.values.has("cloud.dropbox.tokens")).toBeFalsy();
+        expect(fallback.values.has("cloud.dropbox.tokens")).toBeFalsy();
+    });
+
+    it("reports partial delete failure after attempting both stores", async () => {
+        const primary = new MutableSecretStore();
+        const fallback = new MutableSecretStore();
+        const store = new FallbackSecretStore({ fallback, primary });
+
+        await primary.setSecret("cloud.dropbox.tokens", "primary-token-json");
+        await fallback.setSecret("cloud.dropbox.tokens", "fallback-token-json");
+        primary.shouldFailDelete = true;
+
+        await expect(
+            store.deleteSecret("cloud.dropbox.tokens")
+        ).rejects.toMatchObject({
+            errors: [expect.any(Error)],
+            message:
+                "Failed to delete secret 'cloud.dropbox.tokens' from one or more stores",
+        });
+
+        expect(primary.values.get("cloud.dropbox.tokens")).toBe(
+            "primary-token-json"
+        );
+        expect(fallback.values.has("cloud.dropbox.tokens")).toBeFalsy();
+    });
+
     it("clears stale fallback values after primary storage succeeds", async () => {
         const primary = new MutableSecretStore();
         const fallback = new MutableSecretStore();
