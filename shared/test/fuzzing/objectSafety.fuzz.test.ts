@@ -30,6 +30,7 @@ import {
     typedObjectKeys,
     typedObjectValues,
 } from "../../utils/objectSafety";
+import { normalizeLogValue } from "../../utils/loggingContext";
 
 type ValidatorFunction = (val: unknown) => val is unknown;
 
@@ -200,7 +201,7 @@ describe("objectSafety.ts fuzzing tests", () => {
                 expect(consoleSpy).toHaveBeenCalledWith(
                     "Object iteration failed for context:",
                     "Safe object iteration",
-                    expect.any(Error)
+                    expect.objectContaining({ message: "Callback error" })
                 );
 
                 consoleSpy.mockRestore();
@@ -219,10 +220,13 @@ describe("objectSafety.ts fuzzing tests", () => {
 
                 safeObjectIteration(obj, callback, context);
 
+                const expectedContext = normalizeLogValue(context);
                 expect(consoleSpy).toHaveBeenCalledWith(
                     "Object iteration failed for context:",
-                    context,
-                    expect.any(Error)
+                    typeof expectedContext === "string"
+                        ? expectedContext
+                        : context,
+                    expect.objectContaining({ message: "Test error" })
                 );
 
                 consoleSpy.mockRestore();

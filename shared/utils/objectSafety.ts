@@ -18,6 +18,7 @@ import {
     setHas,
 } from "ts-extras";
 
+import { normalizeLogValue } from "./loggingContext";
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
 
@@ -106,10 +107,11 @@ export function safeObjectIteration(
     visitor: (key: string, value: unknown) => void,
     context = "Safe object iteration"
 ): void {
+    const safeContext = normalizeDiagnosticString(context);
     if (!isObject(obj)) {
         // Use basic console for shared utilities to avoid dependencies
         // This is acceptable in shared utilities that can't import loggers
-        console.warn(`${context}: Expected object, got ${typeof obj}`);
+        console.warn(`${safeContext}: Expected object, got ${typeof obj}`);
         return;
     }
 
@@ -119,7 +121,24 @@ export function safeObjectIteration(
         }
     } catch (error) {
         // Use basic console for shared utilities to avoid dependencies
-        console.error("Object iteration failed for context:", context, error);
+        console.error(
+            "Object iteration failed for context:",
+            safeContext,
+            normalizeDiagnosticValue(error)
+        );
+    }
+}
+
+function normalizeDiagnosticString(value: string): string {
+    const normalized = normalizeLogValue(value);
+    return typeof normalized === "string" ? normalized : value;
+}
+
+function normalizeDiagnosticValue(value: unknown): unknown {
+    try {
+        return normalizeLogValue(value);
+    } catch {
+        return `[unserializable:${typeof value}]`;
     }
 }
 

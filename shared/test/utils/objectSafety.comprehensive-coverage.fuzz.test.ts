@@ -263,7 +263,7 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             expect(consoleSpy).toHaveBeenCalledWith(
                 "Object iteration failed for context:",
                 "Test context",
-                expect.any(Error)
+                expect.objectContaining({ message: "Callback error" })
             );
 
             consoleSpy.mockRestore();

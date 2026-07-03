@@ -312,7 +312,46 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(consoleSpy).toHaveBeenCalledWith(
                 "Object iteration failed for context:",
                 "Safe object iteration",
-                expect.any(Error)
+                expect.objectContaining({ message: "Callback error" })
+            );
+
+            consoleSpy.mockRestore();
+        });
+
+        it("should sanitize custom context and callback errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: objectSafety", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const errorCallback = vi.fn().mockImplementation(() => {
+                throw new Error("Callback failed Authorization Bearer callback-secret");
+            });
+            const consoleSpy = vi
+                .spyOn(console, "error")
+                .mockImplementation(() => {});
+
+            safeObjectIteration(
+                testObj,
+                errorCallback,
+                "Context access_token=context-secret"
+            );
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Object iteration failed for context:",
+                "Context access_token=[redacted]",
+                expect.objectContaining({
+                    message: "Callback failed Authorization [redacted]",
+                })
+            );
+            expect(String(consoleSpy.mock.calls)).not.toContain(
+                "context-secret"
+            );
+            expect(String(consoleSpy.mock.calls)).not.toContain(
+                "callback-secret"
             );
 
             consoleSpy.mockRestore();
@@ -339,7 +378,7 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(consoleSpy).toHaveBeenCalledWith(
                 "Object iteration failed for context:",
                 "Custom error context",
-                expect.any(Error)
+                expect.objectContaining({ message: "Callback error" })
             );
 
             consoleSpy.mockRestore();

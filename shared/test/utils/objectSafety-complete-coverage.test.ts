@@ -160,6 +160,9 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const callback = vi.fn();
+            const consoleSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             safeObjectIteration(null, callback);
             safeObjectIteration(undefined, callback);
@@ -167,6 +170,8 @@ describe("shared/utils/objectSafety.ts - Complete Function Coverage", () => {
             safeObjectIteration(123, callback);
 
             expect(callback).not.toHaveBeenCalled();
+            expect(consoleSpy).toHaveBeenCalledTimes(4);
+            consoleSpy.mockRestore();
         });
 
         it("should handle empty objects", async ({ task, annotate }) => {
