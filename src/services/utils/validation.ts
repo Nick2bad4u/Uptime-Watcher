@@ -12,6 +12,10 @@
 import type { UnknownRecord } from "type-fest";
 
 import { ApplicationError } from "@shared/utils/errorHandling";
+import {
+    getOwnDataProperty,
+    getOwnStringDataProperty,
+} from "@shared/utils/errorPropertyAccess";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { isObject } from "@shared/utils/typeGuards";
 import {
@@ -23,32 +27,6 @@ import { arrayJoin, safeCastTo } from "ts-extras";
 
 const MAX_RENDERER_SERVICE_DIAGNOSTICS_CHARS = 1000;
 
-const getOwnDataValue = (
-    value: object,
-    key: string
-):
-    | { readonly found: false }
-    | { readonly found: true; readonly value: unknown } => {
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-
-    if (!descriptor || !("value" in descriptor)) {
-        return { found: false };
-    }
-
-    return { found: true, value: descriptor.value };
-};
-
-const getOwnStringDataProperty = (
-    value: object,
-    key: string
-): string | undefined => {
-    const property = getOwnDataValue(value, key);
-
-    return property.found && typeof property.value === "string"
-        ? property.value
-        : undefined;
-};
-
 const getOwnArrayDataProperty = (
     value: unknown,
     key: string
@@ -57,7 +35,7 @@ const getOwnArrayDataProperty = (
         return undefined;
     }
 
-    const property = getOwnDataValue(value, key);
+    const property = getOwnDataProperty(value, key);
 
     return property.found && Array.isArray(property.value)
         ? property.value
@@ -75,7 +53,7 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
         const rawMessage = getOwnStringDataProperty(issue, "message");
 
         if (rawMessage) {
-            const rawPath = getOwnDataValue(issue, "path");
+            const rawPath = getOwnDataProperty(issue, "path");
             const path =
                 rawPath.found && Array.isArray(rawPath.value)
                     ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath.value)

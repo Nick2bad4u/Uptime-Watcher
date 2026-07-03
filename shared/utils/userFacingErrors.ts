@@ -1,4 +1,5 @@
 import { ERROR_CATALOG } from "./errorCatalog";
+import { getOwnStringDataProperty } from "./errorPropertyAccess";
 import { normalizeLogValue } from "./loggingContext";
 import { isRecord } from "./typeHelpers";
 
@@ -43,19 +44,6 @@ function resolveMaxLength(
         maxLength > 0
         ? maxLength
         : DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS;
-}
-
-function getOwnStringDataProperty(
-    value: object,
-    key: string
-): string | undefined {
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-
-    return descriptor &&
-        "value" in descriptor &&
-        typeof descriptor.value === "string"
-        ? descriptor.value
-        : undefined;
 }
 
 /**

@@ -27,6 +27,17 @@ export function getOwnDataProperty(
     return { found: true, value: descriptor.value };
 }
 
+export function getOwnStringDataProperty(
+    holder: object,
+    key: PropertyKey
+): string | undefined {
+    const property = getOwnDataProperty(holder, key);
+
+    return property.found && typeof property.value === "string"
+        ? property.value
+        : undefined;
+}
+
 function isNativeErrorStringGetter(
     value: unknown
 ): value is (this: Error) => unknown {

@@ -18,6 +18,7 @@ import {
     setHas,
 } from "ts-extras";
 
+import { getOwnDataProperty } from "./errorPropertyAccess";
 import { normalizeLogValue } from "./loggingContext";
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
@@ -39,18 +40,6 @@ export function createNullPrototypeObject<T extends object>(shape?: T): T {
     }
 
     return castUnchecked<T>(Object.create(null));
-}
-
-function getOwnDataProperty(
-    obj: object,
-    key: PropertyKey
-):
-    | { readonly found: false }
-    | { readonly found: true; readonly value: unknown } {
-    const descriptor = Object.getOwnPropertyDescriptor(obj, key);
-    return descriptor && "value" in descriptor
-        ? { found: true, value: descriptor.value as unknown }
-        : { found: false };
 }
 
 function getOwnEnumerableDataEntries(obj: object): [PropertyKey, unknown][] {
@@ -261,15 +250,15 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
             continue;
         }
 
-        const descriptor = Object.getOwnPropertyDescriptor(obj, symbol);
-        if (!descriptor || !("value" in descriptor)) {
+        const property = getOwnDataProperty(obj, symbol);
+        if (!property.found) {
             continue;
         }
 
         Object.defineProperty(result, symbol, {
             configurable: true,
             enumerable: true,
-            value: descriptor.value as unknown,
+            value: property.value,
             writable: true,
         });
     }
@@ -315,15 +304,15 @@ export function safeObjectPick<T extends UnknownRecord, K extends keyof T>(
             continue;
         }
 
-        const descriptor = Object.getOwnPropertyDescriptor(obj, key);
-        if (!descriptor || !("value" in descriptor)) {
+        const property = getOwnDataProperty(obj, key);
+        if (!property.found) {
             continue;
         }
 
         Object.defineProperty(result, key, {
             configurable: true,
             enumerable: true,
-            value: descriptor.value as unknown,
+            value: property.value,
             writable: true,
         });
     }

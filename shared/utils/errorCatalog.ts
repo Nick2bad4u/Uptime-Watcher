@@ -32,6 +32,7 @@
 
 import type { ValueOf } from "type-fest";
 
+import { getOwnStringDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { arrayIncludes, objectEntries, objectValues } from "ts-extras";
 
@@ -439,19 +440,6 @@ export function isKnownErrorMessage(message: string): message is ErrorMessage {
     );
 
     return arrayIncludes(allMessages, castUnchecked<ErrorMessage>(message));
-}
-
-function getOwnStringDataProperty(
-    value: object,
-    key: string
-): string | undefined {
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-
-    return descriptor &&
-        "value" in descriptor &&
-        typeof descriptor.value === "string"
-        ? descriptor.value
-        : undefined;
 }
 
 /**
