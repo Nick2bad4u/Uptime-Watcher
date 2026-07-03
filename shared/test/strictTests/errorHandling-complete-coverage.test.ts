@@ -48,7 +48,32 @@ describe(ApplicationError, () => {
         });
 
         expect(error.cause).toBeInstanceOf(Error);
-        expect((error.cause as Error).message).toBe("[unserializable:object]");
+        expect((error.cause as Error).message).toBe('{"self":"[Circular]"}');
+    });
+
+    it("redacts secret-like structured causes before wrapping", () => {
+        const error = new ApplicationError({
+            cause: {
+                accessToken: "token-secret",
+                nested: {
+                    url: "https://example.com/callback?refresh_token=refresh-secret",
+                },
+                visible: "plain detail",
+            },
+            code: "E_SECRET",
+            message: "Secret cause",
+        });
+
+        expect(error.cause).toBeInstanceOf(Error);
+        expect((error.cause as Error).message).toContain(
+            '"accessToken":"[redacted]"'
+        );
+        expect((error.cause as Error).message).toContain(
+            "refresh_token=[redacted]"
+        );
+        expect((error.cause as Error).message).toContain("plain detail");
+        expect((error.cause as Error).message).not.toContain("token-secret");
+        expect((error.cause as Error).message).not.toContain("refresh-secret");
     });
 
     it("supports null and undefined causes without wrapping", () => {
@@ -97,11 +122,20 @@ describe(convertError, () => {
 
         const result = convertError(problematic);
 
-        expect(result.error.message).toBe(
-            "[object cannot be converted to string]"
-        );
+        expect(result.error.message).toBe('{"self":"[Circular]"}');
         expect(result.originalType).toBe("object");
         expect(result.wasError).toBeFalsy();
+    });
+
+    it("redacts secret-like strings during conversion", () => {
+        const result = convertError(
+            "request failed Authorization Bearer string-secret"
+        );
+
+        expect(result.error.message).toBe(
+            "request failed Authorization [redacted]"
+        );
+        expect(result.error.message).not.toContain("string-secret");
     });
 });
 

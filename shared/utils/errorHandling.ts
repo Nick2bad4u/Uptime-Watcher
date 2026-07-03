@@ -27,6 +27,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined, objectHasIn } from "ts-extras";
 
@@ -59,7 +60,7 @@ function formatUnknownErrorCause(cause: unknown): string {
     }
 
     if (typeof cause === "string") {
-        return cause;
+        return normalizeErrorMessage(cause);
     }
 
     if (typeof cause === "number" || typeof cause === "boolean") {
@@ -67,13 +68,18 @@ function formatUnknownErrorCause(cause: unknown): string {
     }
 
     try {
-        const serialized = JSON.stringify(cause);
+        const serialized = JSON.stringify(normalizeLogValue(cause));
         return typeof serialized === "string"
             ? serialized
             : `[unserializable:${typeof cause}]`;
     } catch {
         return `[unserializable:${typeof cause}]`;
     }
+}
+
+function normalizeErrorMessage(message: string): string {
+    const normalized = normalizeLogValue(message);
+    return typeof normalized === "string" ? normalized : message;
 }
 
 /**
@@ -277,11 +283,14 @@ export function convertError(error: unknown): ErrorConversionResult {
     // Safely convert to string with fallback for problematic objects.
     const errorMessage = ((): string => {
         try {
-            return String(error);
+            return normalizeErrorMessage(String(error));
         } catch {
             // Fallback for objects that can't be converted to string
             try {
-                return JSON.stringify(error);
+                const serialized = JSON.stringify(normalizeLogValue(error));
+                return typeof serialized === "string"
+                    ? serialized
+                    : "[object cannot be converted to string]";
             } catch {
                 return "[object cannot be converted to string]";
             }

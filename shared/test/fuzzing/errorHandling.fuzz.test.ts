@@ -650,9 +650,7 @@ describe("convertError and ensureError fuzz coverage", () => {
         problematic.self = problematic;
 
         const result = convertError(problematic);
-        expect(result.error.message).toBe(
-            "[object cannot be converted to string]"
-        );
+        expect(result.error.message).toBe('{"self":"[Circular]"}');
         expect(result.originalType).toBe("object");
         expect(result.wasError).toBeFalsy();
     });
