@@ -313,6 +313,7 @@ export class GoogleDriveCloudStorageProvider
             const parentId = await this.getOrCreateFolderId(drive, dirSegments);
 
             const existing = await this.findChildByName(drive, {
+                excludeMimeType: GOOGLE_FOLDER_MIME_TYPE,
                 mimeType: undefined,
                 name: fileName,
                 parentId,
@@ -470,6 +471,7 @@ export class GoogleDriveCloudStorageProvider
         }
 
         const existing = await this.findChildByName(drive, {
+            excludeMimeType: GOOGLE_FOLDER_MIME_TYPE,
             mimeType: undefined,
             name: fileName,
             parentId,
@@ -508,7 +510,12 @@ export class GoogleDriveCloudStorageProvider
 
     private async findChildByName(
         drive: GoogleDriveClient,
-        args: { mimeType: string | undefined; name: string; parentId: string }
+        args: {
+            excludeMimeType?: string | undefined;
+            mimeType: string | undefined;
+            name: string;
+            parentId: string;
+        }
     ): Promise<null | { id: string }> {
         const safeName = escapeGoogleDriveQueryStringLiteral(args.name);
         const safeParentId = escapeGoogleDriveQueryStringLiteral(args.parentId);
@@ -521,6 +528,11 @@ export class GoogleDriveCloudStorageProvider
         if (args.mimeType) {
             conditions.push(
                 `mimeType = '${escapeGoogleDriveQueryStringLiteral(args.mimeType)}'`
+            );
+        }
+        if (args.excludeMimeType) {
+            conditions.push(
+                `mimeType != '${escapeGoogleDriveQueryStringLiteral(args.excludeMimeType)}'`
             );
         }
 

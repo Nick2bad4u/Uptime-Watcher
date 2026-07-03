@@ -147,4 +147,100 @@ describe(GoogleDriveCloudStorageProvider, () => {
             expect(typed.target).toBe("sync/existing.txt");
         }
     });
+
+    it("does not treat a same-name folder as an existing upload target", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "sync-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [], nextPageToken: null },
+            });
+
+        googleDriveClientMocks.driveStub.files.create.mockResolvedValueOnce({
+            data: { id: "created-file-id" },
+        });
+        googleDriveClientMocks.driveStub.files.get.mockResolvedValueOnce({
+            data: {
+                modifiedTime: "2026-07-03T00:00:00.000Z",
+                size: "7",
+            },
+        });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("payload"),
+                key: "sync/collision.txt",
+                overwrite: true,
+            })
+        ).resolves.toEqual({
+            key: "sync/collision.txt",
+            lastModifiedAt: Date.parse("2026-07-03T00:00:00.000Z"),
+            sizeBytes: 7,
+        });
+
+        const fileLookupQuery =
+            googleDriveClientMocks.driveStub.files.list.mock.calls[2]?.[0].q;
+        expect(fileLookupQuery).toContain(
+            "mimeType != 'application/vnd.google-apps.folder'"
+        );
+        expect(
+            googleDriveClientMocks.driveStub.files.update
+        ).not.toHaveBeenCalled();
+        expect(
+            googleDriveClientMocks.driveStub.files.create
+        ).toHaveBeenCalledWith(
+            expect.objectContaining({
+                requestBody: expect.objectContaining({
+                    name: "collision.txt",
+                    parents: ["sync-id"],
+                }),
+            })
+        );
+    });
+
+    it("does not treat a same-name folder as a downloadable object", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "sync-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [], nextPageToken: null },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(
+            provider.downloadObject("sync/collision.txt")
+        ).rejects.toThrow(CloudProviderOperationError);
+
+        const fileLookupQuery =
+            googleDriveClientMocks.driveStub.files.list.mock.calls[2]?.[0].q;
+        expect(fileLookupQuery).toContain(
+            "mimeType != 'application/vnd.google-apps.folder'"
+        );
+        expect(
+            googleDriveClientMocks.driveStub.files.get
+        ).not.toHaveBeenCalled();
+    });
 });
