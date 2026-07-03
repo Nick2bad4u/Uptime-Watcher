@@ -106,6 +106,13 @@ const SHORT_DURATION_UNITS: readonly DurationUnitDefinition[] = [
     },
 ] as const satisfies readonly DurationUnitDefinition[];
 
+function isValidTimestamp(timestamp: number): boolean {
+    return (
+        Number.isFinite(timestamp) &&
+        Number.isFinite(new Date(timestamp).getTime())
+    );
+}
+
 /**
  * Formats timestamp as a full localized date/time string.
  *
@@ -127,6 +134,10 @@ const SHORT_DURATION_UNITS: readonly DurationUnitDefinition[] = [
  * @public
  */
 export function formatFullTimestamp(timestamp: number): string {
+    if (!isValidTimestamp(timestamp)) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     return new Date(timestamp).toLocaleString();
 }
 
@@ -180,6 +191,10 @@ export function formatIntervalDuration(milliseconds: number): string {
  * @public
  */
 export function formatRelativeTimestamp(timestamp: number): string {
+    if (!isValidTimestamp(timestamp)) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     const now = Date.now();
     const diff = now - timestamp;
 

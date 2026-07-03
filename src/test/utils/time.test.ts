@@ -144,6 +144,20 @@ describe("time Utilities", () => {
             expect(result).toBeTypeOf("string");
             expect(result).toMatch(/69|70|1969|1970/v); // Unix epoch (timezone dependent)
         });
+
+        it("should return fallback for invalid timestamps", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatFullTimestamp(Number.NaN)).toBe("N/A");
+            expect(formatFullTimestamp(Infinity)).toBe("N/A");
+            expect(formatFullTimestamp(8.64e15 + 1)).toBe("N/A");
+        });
     });
 
     describe(formatIntervalDuration, () => {
@@ -361,6 +375,20 @@ describe("time Utilities", () => {
             const result = formatRelativeTimestamp(futureTimestamp);
 
             expect(result).toBeTypeOf("string");
+        });
+
+        it("should return fallback for invalid timestamps", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatRelativeTimestamp(Number.NaN)).toBe("N/A");
+            expect(formatRelativeTimestamp(Infinity)).toBe("N/A");
+            expect(formatRelativeTimestamp(8.64e15 + 1)).toBe("N/A");
         });
     });
 
@@ -933,9 +961,7 @@ describe("time Utilities", () => {
                 (timestamp) => {
                     const result = formatFullTimestamp(timestamp);
 
-                    // Property: Should not throw with special values
-                    expect(result).toBeTypeOf("string");
-                    expect(result.length).toBeGreaterThan(0);
+                    expect(result).toBe("N/A");
                 }
             );
         });

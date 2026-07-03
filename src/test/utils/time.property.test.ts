@@ -152,6 +152,12 @@ describe("time Utils Property-Based Tests", () => {
                 expect(result.length).toBeGreaterThan(0);
             }
         );
+
+        fcTest.prop([
+            fc.constantFrom(Number.NaN, Infinity, -Infinity, 8.64e15 + 1),
+        ])("should return fallback for invalid timestamps", (timestamp) => {
+            expect(formatFullTimestamp(timestamp)).toBe("N/A");
+        });
     });
 
     describe("formatIntervalDuration function", () => {
@@ -257,6 +263,12 @@ describe("time Utils Property-Based Tests", () => {
                 expect(result).toBe(expectedText);
             }
         );
+
+        fcTest.prop([
+            fc.constantFrom(Number.NaN, Infinity, -Infinity, 8.64e15 + 1),
+        ])("should return fallback for invalid timestamps", (timestamp) => {
+            expect(formatRelativeTimestamp(timestamp)).toBe("N/A");
+        });
     });
 
     describe("formatResponseDuration function", () => {
