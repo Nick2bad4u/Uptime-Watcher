@@ -8,6 +8,8 @@
 
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+
 import type { CloudSettingsAdapter } from "../CloudService.types";
 
 /**
@@ -52,14 +54,24 @@ export function parseBooleanSetting(value: string | undefined): boolean {
     return value === "true";
 }
 
-/** Parse a nullable number stored as a string. */
-export function parseNumberSetting(value: string | undefined): null | number {
+/** Parse a nullable epoch millisecond timestamp stored as a string. */
+export function parseEpochMsSetting(value: string | undefined): null | number {
     if (!isDefined(value)) {
         return null;
     }
 
-    const parsed = Number(value);
-    return isFiniteNumber(parsed) ? parsed : null;
+    const trimmed = value.trim();
+    if (trimmed.length === 0) {
+        return null;
+    }
+
+    const parsed = Number(trimmed);
+    return isFiniteNumber(parsed) &&
+        Number.isSafeInteger(parsed) &&
+        parsed >= 0 &&
+        parsed <= MAX_VALID_DATE_EPOCH_MS
+        ? parsed
+        : null;
 }
 
 /** Persist a user-facing last error string in settings. */

@@ -59,7 +59,7 @@ import {
     clearLastError,
     DEFAULT_DROPBOX_APP_KEY,
     parseBooleanSetting,
-    parseNumberSetting,
+    parseEpochMsSetting,
     setLastError,
     SETTINGS_KEY_DROPBOX_TOKENS,
     SETTINGS_KEY_ENCRYPTION_MODE,
@@ -403,10 +403,10 @@ export class CloudService {
         const isSyncEnabled = parseBooleanSetting(
             await this.settings.get(SETTINGS_KEY_SYNC_ENABLED)
         );
-        const lastBackupAt = parseNumberSetting(
+        const lastBackupAt = parseEpochMsSetting(
             await this.settings.get(SETTINGS_KEY_LAST_BACKUP_AT)
         );
-        const lastSyncAt = parseNumberSetting(
+        const lastSyncAt = parseEpochMsSetting(
             await this.settings.get(SETTINGS_KEY_LAST_SYNC_AT)
         );
         const lastErrorRaw = await this.settings.get(SETTINGS_KEY_LAST_ERROR);
