@@ -36,7 +36,10 @@ export function generateUuid(): string {
     // Use try-catch for runtime environment detection
     try {
         if (typeof crypto.randomUUID === "function") {
-            return crypto.randomUUID();
+            const candidate = crypto.randomUUID();
+            if (candidate.trim().length > 0) {
+                return candidate;
+            }
         }
     } catch {
         // Crypto is not available, fall through to fallback

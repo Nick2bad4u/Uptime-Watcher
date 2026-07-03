@@ -71,7 +71,7 @@ describe(generateUuid, () => {
             }
         });
 
-        it("should tolerate crypto.randomUUID returning an empty string", async ({
+        it("should fall back when crypto.randomUUID returns an empty string", async ({
             annotate,
             task,
         }) => {
@@ -84,7 +84,7 @@ describe(generateUuid, () => {
             const { restore } = installCryptoMock({ randomUUID });
 
             try {
-                expect(generateUuid()).toBe("");
+                expect(generateUuid()).toMatch(FALLBACK_ID_REGEX);
                 expect(randomUUID).toHaveBeenCalledTimes(1);
             } finally {
                 restore();
