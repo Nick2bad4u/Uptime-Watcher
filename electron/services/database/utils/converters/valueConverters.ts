@@ -211,9 +211,8 @@ export function convertDateForDb(
         return null;
     }
     if (value instanceof Date) {
-        // Check if the date is invalid
         if (Number.isNaN(value.getTime())) {
-            return "Invalid Date";
+            return null;
         }
         return value.toISOString();
     }

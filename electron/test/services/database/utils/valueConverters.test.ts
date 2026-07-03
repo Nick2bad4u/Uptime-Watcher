@@ -425,14 +425,17 @@ describe("Value Converters Utility", () => {
             expect(convertDateForDb(false as any)).toBeNull();
             expect(convertDateForDb(0 as any)).toBeNull();
         });
-        it("should handle invalid Date objects", async ({ task, annotate }) => {
+        it("should return null for invalid Date objects", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
             const invalidDate = new Date("invalid");
             const result = convertDateForDb(invalidDate);
 
-            expect(result).toBe("Invalid Date");
+            expect(result).toBeNull();
         });
         it("should handle current date", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
