@@ -15,7 +15,14 @@ import type { Simplify, UnknownRecord } from "type-fest";
 
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
-import { arrayJoin, isDefined, isPresent, safeCastTo, setHas } from "ts-extras";
+import {
+    arrayJoin,
+    isDefined,
+    isFinite as isFiniteNumber,
+    isPresent,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
 
 import { dbLogger } from "../../../../utils/logger";
 import { getAllMonitorTypeConfigs } from "../../../monitoring/MonitorTypeRegistry";
@@ -312,8 +319,8 @@ function convertSqlValue(
     switch (sqlType) {
         case "INTEGER": {
             const numValue = Number(value);
-            // Prevent NaN corruption in database
-            if (Number.isNaN(numValue)) {
+            // Prevent non-finite numeric corruption in database
+            if (!isFiniteNumber(numValue)) {
                 dbLogger.warn(
                     `Invalid numeric value for INTEGER conversion: ${String(value)}, using 0 as fallback`
                 );
