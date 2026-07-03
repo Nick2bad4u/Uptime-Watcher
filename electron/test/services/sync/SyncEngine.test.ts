@@ -994,6 +994,112 @@ describe("SyncEngine (ADR-016)", () => {
         }
     });
 
+    it("logs compacted remote sync object delete failures without failing sync", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uptime-watcher-sync-cleanup-")
+        );
+
+        try {
+            const provider = new FilesystemCloudStorageProvider({
+                baseDirectory,
+            });
+            const previousSnapshotKey = `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`;
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        createdAt: 1,
+                        snapshotVersion: 1,
+                        state: {
+                            monitor: {},
+                            settings: {},
+                            site: {},
+                        },
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: previousSnapshotKey,
+                overwrite: true,
+            });
+
+            await provider.uploadObject({
+                buffer: Buffer.from(
+                    JSON.stringify({
+                        devices: {},
+                        latestSnapshotKey: previousSnapshotKey,
+                        manifestVersion: 1,
+                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                    }),
+                    "utf8"
+                ),
+                key: "manifest.json",
+                overwrite: true,
+            });
+
+            const warnSpy = vi
+                .spyOn(logger, "warn")
+                .mockImplementation(() => {});
+
+            const providerWithFailingDelete = {
+                deleteObject: async (key: string) => {
+                    if (key === previousSnapshotKey) {
+                        throw new Error("delete denied");
+                    }
+
+                    await provider.deleteObject(key);
+                },
+                downloadBackup: async (
+                    ...args: Parameters<
+                        FilesystemCloudStorageProvider["downloadBackup"]
+                    >
+                ) => await provider.downloadBackup(...args),
+                downloadObject: async (key: string) =>
+                    await provider.downloadObject(key),
+                isConnected: async () => await provider.isConnected(),
+                kind: provider.kind,
+                listBackups: async (
+                    ...args: Parameters<
+                        FilesystemCloudStorageProvider["listBackups"]
+                    >
+                ) => await provider.listBackups(...args),
+                listObjects: async (prefix: string) =>
+                    await provider.listObjects(prefix),
+                uploadBackup: async (
+                    ...args: Parameters<
+                        FilesystemCloudStorageProvider["uploadBackup"]
+                    >
+                ) => await provider.uploadBackup(...args),
+                uploadObject: async (
+                    args: Parameters<
+                        FilesystemCloudStorageProvider["uploadObject"]
+                    >[0]
+                ) => await provider.uploadObject(args),
+            };
+
+            const engine = new SyncEngine({
+                orchestrator: new InMemoryOrchestrator([]),
+                settings: new InMemorySettingsAdapter(),
+            });
+
+            await expect(
+                engine.syncNow(providerWithFailingDelete)
+            ).resolves.toBeTruthy();
+
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[SyncEngine] Failed to delete compacted remote sync object; continuing",
+                {
+                    key: previousSnapshotKey,
+                    message: "delete denied",
+                }
+            );
+
+            warnSpy.mockRestore();
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
     it("regenerates an invalid stored deviceId instead of crashing sync", async () => {
         const baseDirectory = await fs.mkdtemp(
             path.join(os.tmpdir(), "uptime-watcher-sync-deviceId-")

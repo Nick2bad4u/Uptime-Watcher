@@ -366,8 +366,14 @@ export class SyncEngine {
                 try {
                     await transport.deleteObject(keyToDelete);
                     return true;
-                } catch {
-                    // Best-effort cleanup.
+                } catch (error) {
+                    logger.warn(
+                        "[SyncEngine] Failed to delete compacted remote sync object; continuing",
+                        {
+                            key: keyToDelete,
+                            message: getUserFacingErrorDetail(error),
+                        }
+                    );
                     return false;
                 }
             },
