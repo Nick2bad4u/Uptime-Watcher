@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "../../validation/timestampSchemas";
 import {
     type HistoryRow,
     isValidHistoryRow,
@@ -125,7 +126,15 @@ describe("Shared Database Types - Backend Coverage", () => {
                 "component"
             );
 
-            for (const timestamp of ["", "Infinity", Infinity, 1.5, -1]) {
+            for (const timestamp of [
+                "",
+                "Infinity",
+                Infinity,
+                1.5,
+                -1,
+                MAX_VALID_DATE_EPOCH_MS + 1,
+                String(MAX_VALID_DATE_EPOCH_MS + 1),
+            ]) {
                 expect(
                     isValidHistoryRow({
                         monitorId: "test",
@@ -154,6 +163,14 @@ describe("Shared Database Types - Backend Coverage", () => {
             expect(
                 RowValidationUtils.isValidTimestamp("1700000000000")
             ).toBeTruthy();
+            expect(
+                RowValidationUtils.isValidTimestamp(MAX_VALID_DATE_EPOCH_MS)
+            ).toBeTruthy();
+            expect(
+                RowValidationUtils.isValidTimestamp(
+                    String(MAX_VALID_DATE_EPOCH_MS)
+                )
+            ).toBeTruthy();
         });
 
         it("should reject non-finite, fractional, negative, and blank timestamps", async ({
@@ -175,6 +192,8 @@ describe("Shared Database Types - Backend Coverage", () => {
                 1.5,
                 Infinity,
                 Number.NaN,
+                MAX_VALID_DATE_EPOCH_MS + 1,
+                String(MAX_VALID_DATE_EPOCH_MS + 1),
             ]) {
                 expect(
                     RowValidationUtils.isValidTimestamp(timestamp)

@@ -9,6 +9,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isDefined, objectHasIn, stringSplit } from "ts-extras";
 
 /**
@@ -215,11 +216,15 @@ export const RowValidationUtils = {
         value === "up" || value === "down",
 
     /**
-     * Validates timestamp as numeric value.
+     * Validates timestamp as an epoch millisecond value representable by Date.
      */
     isValidTimestamp: (value: unknown): boolean => {
         if (typeof value === "number") {
-            return Number.isSafeInteger(value) && value >= 0;
+            return (
+                Number.isSafeInteger(value) &&
+                value >= 0 &&
+                value <= MAX_VALID_DATE_EPOCH_MS
+            );
         }
         if (typeof value === "string") {
             const trimmed = value.trim();
@@ -228,7 +233,11 @@ export const RowValidationUtils = {
             }
 
             const numValue = Number(trimmed);
-            return Number.isSafeInteger(numValue) && numValue >= 0;
+            return (
+                Number.isSafeInteger(numValue) &&
+                numValue >= 0 &&
+                numValue <= MAX_VALID_DATE_EPOCH_MS
+            );
         }
         return false;
     },
