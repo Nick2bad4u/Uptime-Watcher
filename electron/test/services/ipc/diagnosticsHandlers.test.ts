@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import {
+    MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
+    MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
+    MAX_DIAGNOSTICS_REPORT_REASON_BYTES,
+} from "../../../services/ipc/diagnosticsLimits";
 import { DiagnosticsHandlerTestUtils } from "../../../services/ipc/handlers/diagnosticsHandlers";
 
 describe("sanitizeDiagnosticsReport", () => {
@@ -34,5 +39,31 @@ describe("sanitizeDiagnosticsReport", () => {
             preview.length
         );
         expect(sanitizedReport.payloadPreview).not.toContain("Bearer ");
+    });
+
+    it("sanitizes and bounds report identifiers and reasons", () => {
+        const timestamp = Date.now();
+        const { sanitizedReport } =
+            DiagnosticsHandlerTestUtils.normalizeDiagnosticsReportPayload({
+                channel: `diagnostics-channel?access_token=SUPER_SECRET\n${"c".repeat(1000)}`,
+                guard: `payloadGuard\t${"g".repeat(1000)}`,
+                reason: `refresh_token=SUPER_SECRET\n${"r".repeat(1000)}`,
+                timestamp,
+            });
+
+        expect(sanitizedReport.channel).not.toContain("SUPER_SECRET");
+        expect(sanitizedReport.channel).not.toContain("\n");
+        expect(sanitizedReport.channel.length).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES
+        );
+        expect(sanitizedReport.guard).not.toContain("\t");
+        expect(sanitizedReport.guard.length).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_GUARD_BYTES
+        );
+        expect(sanitizedReport.reason).not.toContain("SUPER_SECRET");
+        expect(sanitizedReport.reason).not.toContain("\n");
+        expect(sanitizedReport.reason?.length).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_REASON_BYTES
+        );
     });
 });

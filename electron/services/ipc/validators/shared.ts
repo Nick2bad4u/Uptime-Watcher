@@ -23,6 +23,9 @@ import type { ParameterValueValidationResult } from "./utils/parameterValidation
 
 import {
     MAX_DIAGNOSTICS_METADATA_BYTES,
+    MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
+    MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
+    MAX_DIAGNOSTICS_REPORT_REASON_BYTES,
     MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
 } from "../diagnosticsLimits";
 import { validateGuardReportPayload } from "./utils/guardReportValidation";
@@ -94,8 +97,11 @@ const validatePreloadGuardReport: IpcParameterValidator = createParamValidator(
     [
         (report): ParameterValueValidationResult =>
             validateGuardReportPayload(report, {
+                maxChannelBytes: MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
+                maxGuardBytes: MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
                 maxMetadataBytes: MAX_DIAGNOSTICS_METADATA_BYTES,
                 maxPayloadPreviewBytes: MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
+                maxReasonBytes: MAX_DIAGNOSTICS_REPORT_REASON_BYTES,
             }),
     ]
 );

@@ -25,6 +25,9 @@ import { diagnosticsLogger, logger } from "../../../utils/logger";
 import {
     getUtfByteLength,
     MAX_DIAGNOSTICS_METADATA_BYTES,
+    MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
+    MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
+    MAX_DIAGNOSTICS_REPORT_REASON_BYTES,
     MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES,
     truncateUtfString,
 } from "../diagnosticsLimits";
@@ -55,6 +58,46 @@ const isPreloadGuardDiagnosticsReport = (
         typeof value["timestamp"] === "number"
     );
 };
+
+const normalizeDiagnosticsString = (
+    value: string,
+    maxBytes: number,
+    fallback: string
+): string => {
+    const normalized = normalizeLogValue(value);
+    if (typeof normalized !== "string") {
+        return fallback;
+    }
+
+    const compacted = normalized.replaceAll(/\s+/gu, " ").trim();
+    if (compacted.length === 0) {
+        return fallback;
+    }
+
+    return truncateUtfString(compacted, maxBytes).value;
+};
+
+const normalizeOptionalDiagnosticsString = (
+    value: string | undefined,
+    maxBytes: number
+): string | undefined => {
+    if (!isDefined(value)) {
+        return undefined;
+    }
+
+    const normalized = normalizeLogValue(value);
+    if (typeof normalized !== "string") {
+        return undefined;
+    }
+
+    const compacted = normalized.replaceAll(/\s+/gu, " ").trim();
+    if (compacted.length === 0) {
+        return undefined;
+    }
+
+    return truncateUtfString(compacted, maxBytes).value;
+};
+
 /**
  * Dependencies required to register diagnostics IPC handlers.
  */
@@ -101,11 +144,24 @@ const normalizeDiagnosticsReportPayload = (
         }
     }
 
+    const reason = normalizeOptionalDiagnosticsString(
+        report.reason,
+        MAX_DIAGNOSTICS_REPORT_REASON_BYTES
+    );
+
     const sanitizedReport: PreloadGuardDiagnosticsReport = {
-        channel: report.channel,
-        guard: report.guard,
+        channel: normalizeDiagnosticsString(
+            report.channel,
+            MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
+            "unknown-channel"
+        ),
+        guard: normalizeDiagnosticsString(
+            report.guard,
+            MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
+            "unknown-guard"
+        ),
         timestamp: report.timestamp,
-        ...(report.reason && { reason: report.reason }),
+        ...(reason && { reason }),
         ...(metadata && { metadata }),
         ...(payloadPreview && { payloadPreview }),
     };

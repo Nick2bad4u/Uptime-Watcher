@@ -6,6 +6,10 @@ import {
     validateDiagnosticsPayloadPreview,
 } from "./diagnosticsValidation";
 import { requireRecordParamValue } from "./recordValidation";
+import {
+    validateOptionalStringPayload,
+    validateRequiredStringPayload,
+} from "./stringPayloadValidation";
 
 /**
  * Options for validating preload guard reports.
@@ -13,10 +17,16 @@ import { requireRecordParamValue } from "./recordValidation";
  * @internal
  */
 export interface GuardReportValidationOptions {
+    /** Maximum allowed UTF-8 byte length for the channel identifier. */
+    readonly maxChannelBytes: number;
+    /** Maximum allowed UTF-8 byte length for the guard identifier. */
+    readonly maxGuardBytes: number;
     /** Maximum allowed UTF-8 byte length for serialized metadata. */
     readonly maxMetadataBytes: number;
     /** Maximum allowed UTF-8 byte length for payload preview text. */
     readonly maxPayloadPreviewBytes: number;
+    /** Maximum allowed UTF-8 byte length for the optional reason. */
+    readonly maxReasonBytes: number;
 }
 
 /**
@@ -39,26 +49,26 @@ export function validateGuardReportPayload(
     }
 
     const { record } = recordResult;
-    const channelError = IpcValidators.requiredString(
-        record["channel"],
-        "channel"
-    );
-
-    const guardError = IpcValidators.requiredString(record["guard"], "guard");
-
-    const reasonError = IpcValidators.optionalString(
-        record["reason"],
-        "reason"
-    );
-
     const timestampError = IpcValidators.requiredNumber(
         record["timestamp"],
         "timestamp"
     );
     const errors = [
-        ...(channelError ? [channelError] : []),
-        ...(guardError ? [guardError] : []),
-        ...(reasonError ? [reasonError] : []),
+        ...validateRequiredStringPayload(record["channel"], {
+            maxBytes: options.maxChannelBytes,
+            maxBytesMessage: `channel exceeds ${options.maxChannelBytes} bytes`,
+            paramName: "channel",
+        }),
+        ...validateRequiredStringPayload(record["guard"], {
+            maxBytes: options.maxGuardBytes,
+            maxBytesMessage: `guard exceeds ${options.maxGuardBytes} bytes`,
+            paramName: "guard",
+        }),
+        ...validateOptionalStringPayload(record["reason"], {
+            maxBytes: options.maxReasonBytes,
+            maxBytesMessage: `reason exceeds ${options.maxReasonBytes} bytes`,
+            paramName: "reason",
+        }),
         ...validateDiagnosticsPayloadPreview(record["payloadPreview"], {
             maxBytes: options.maxPayloadPreviewBytes,
         }),

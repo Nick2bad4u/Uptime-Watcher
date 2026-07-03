@@ -4,6 +4,9 @@ const textEncoder =
     typeof TextEncoder === "undefined" ? null : new TextEncoder();
 
 export const MAX_DIAGNOSTICS_METADATA_BYTES = 2048;
+export const MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES = 256;
+export const MAX_DIAGNOSTICS_REPORT_GUARD_BYTES = 128;
+export const MAX_DIAGNOSTICS_REPORT_REASON_BYTES = 512;
 export const MAX_DIAGNOSTICS_PAYLOAD_PREVIEW_BYTES = 4096;
 
 /**
