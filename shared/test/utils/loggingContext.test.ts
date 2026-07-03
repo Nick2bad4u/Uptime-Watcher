@@ -162,6 +162,33 @@ describe("logging context helpers", () => {
         expect(getterCalls).toBe(0);
     });
 
+    it("does not invoke Error core field accessors while normalizing errors", () => {
+        let getterCalls = 0;
+        const error = new Error("fallback");
+
+        for (const key of [
+            "message",
+            "name",
+            "stack",
+        ] as const) {
+            Object.defineProperty(error, key, {
+                configurable: true,
+                enumerable: key === "message",
+                get() {
+                    getterCalls += 1;
+                    return `accessor ${key}`;
+                },
+            });
+        }
+
+        const sanitized = normalizeLogValue(error);
+
+        expect(sanitized).toEqual({
+            message: "",
+        });
+        expect(getterCalls).toBe(0);
+    });
+
     it("serializes Date values instead of dropping them", () => {
         const date = new Date("2025-01-02T03:04:05.000Z");
         expect(normalizeLogValue(date)).toBe("2025-01-02T03:04:05.000Z");
