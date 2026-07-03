@@ -65,11 +65,13 @@ const RESERVED_MONITOR_COLUMN_NAMES = new Set<string>([
  *
  * @internal
  */
+type FieldDefaultValue = (() => unknown) | null | number | string;
+
 interface FieldMapping {
     /** Database column name */
     dbField: string;
     /** Default value if field is undefined */
-    defaultValue: unknown;
+    defaultValue: FieldDefaultValue;
     /** Monitor object field name */
     sourceField: string;
     /** Optional transformation function */
@@ -159,6 +161,33 @@ function getValidLastCheckedDate(timestamp: unknown): Date | undefined {
     return Number.isFinite(date.getTime()) ? date : undefined;
 }
 
+function getFieldDefaultValue(mapping: FieldMapping): unknown {
+    return typeof mapping.defaultValue === "function"
+        ? mapping.defaultValue()
+        : mapping.defaultValue;
+}
+
+function convertRequiredTimestampField(
+    value: unknown,
+    fieldName: string
+): number {
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return value;
+    }
+
+    if (value instanceof Date) {
+        const timestamp = value.getTime();
+        if (Number.isFinite(timestamp)) {
+            return timestamp;
+        }
+    }
+
+    dbLogger.warn(
+        `Invalid ${fieldName} value discarded: ${safeStringify(value)} (type: ${typeof value})`
+    );
+    return Date.now();
+}
+
 /**
  * Configuration for standard field mappings between monitor objects and
  * database rows.
@@ -187,8 +216,10 @@ const STANDARD_FIELD_MAPPINGS: FieldMapping[] = [
     },
     {
         dbField: "created_at",
-        defaultValue: Date.now(),
+        defaultValue: Date.now,
         sourceField: "createdAt",
+        transform: (value): number =>
+            convertRequiredTimestampField(value, "createdAt"),
     },
     {
         dbField: "last_checked",
@@ -238,8 +269,10 @@ const STANDARD_FIELD_MAPPINGS: FieldMapping[] = [
     },
     {
         dbField: "updated_at",
-        defaultValue: Date.now(),
+        defaultValue: Date.now,
         sourceField: "updatedAt",
+        transform: (value): number =>
+            convertRequiredTimestampField(value, "updatedAt"),
     },
 ];
 
@@ -371,7 +404,7 @@ function processFieldMapping(
             return {
                 dbField: mapping.dbField,
                 success: true,
-                value: mapping.defaultValue,
+                value: getFieldDefaultValue(mapping),
             };
         }
 
@@ -391,7 +424,7 @@ function processFieldMapping(
         return {
             dbField: mapping.dbField,
             success: false,
-            value: mapping.defaultValue,
+            value: getFieldDefaultValue(mapping),
         };
     }
 }
@@ -625,7 +658,7 @@ function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
                 dbLogger.warn(
                     `Using default value for field ${result.dbField} due to processing failure`
                 );
-                row[result.dbField] = mapping.defaultValue;
+                row[result.dbField] = result.value;
             }
         }
     }

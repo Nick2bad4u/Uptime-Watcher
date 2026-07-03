@@ -202,4 +202,49 @@ describe("dynamic schema conversion", () => {
         expect(epochMonitor.lastChecked).toEqual(new Date(0));
         expect(laterMonitor.lastChecked).toEqual(new Date(1_680_000_000_000));
     });
+
+    it.each([
+        ["createdAt", "created_at"],
+        ["updatedAt", "updated_at"],
+    ] as const)(
+        "defaults invalid required timestamp field %s when writing rows",
+        async (sourceField, rowField) => {
+            const { mapMonitorToRow } = await import(
+                "../../../../services/database/utils/schema/dynamicSchema"
+            );
+
+            const before = Date.now();
+            const row = mapMonitorToRow({
+                [sourceField]: Number.NaN,
+                type: "port",
+            });
+            const after = Date.now();
+
+            expect(row[rowField]).toBeGreaterThanOrEqual(before);
+            expect(row[rowField]).toBeLessThanOrEqual(after);
+        }
+    );
+
+    it("preserves finite required timestamp fields when writing rows", async ({
+        annotate,
+        task,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: DynamicSchema", "component");
+        await annotate("Category: Database Utils", "category");
+        await annotate("Type: Validation", "type");
+
+        const { mapMonitorToRow } = await import(
+            "../../../../services/database/utils/schema/dynamicSchema"
+        );
+
+        const row = mapMonitorToRow({
+            createdAt: 1_680_000_000_000,
+            type: "port",
+            updatedAt: new Date(1_680_000_001_000) as unknown as number,
+        });
+
+        expect(row.created_at).toBe(1_680_000_000_000);
+        expect(row.updated_at).toBe(1_680_000_001_000);
+    });
 });
