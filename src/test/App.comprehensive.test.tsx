@@ -249,10 +249,22 @@ describe("App Component - Comprehensive Coverage", () => {
         } as any;
     };
 
-    const renderApp = (): RenderResult => render(<App />);
+    const flushAppEffects = async (): Promise<void> => {
+        await act(async () => {
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+    };
 
-    const rerenderApp = (utils: RenderResult): RenderResult => {
+    const renderApp = async (): Promise<RenderResult> => {
+        const utils = render(<App />);
+        await flushAppEffects();
+        return utils;
+    };
+
+    const rerenderApp = async (utils: RenderResult): Promise<RenderResult> => {
         utils.rerender(<App />);
+        await flushAppEffects();
         return utils;
     };
 
@@ -494,8 +506,10 @@ describe("App Component - Comprehensive Coverage", () => {
 
             await renderApp();
 
-            // Wait a moment to ensure any potential loading overlay would have appeared
-            await new Promise((resolve) => setTimeout(resolve, 150));
+            // Wait a moment to ensure any potential loading overlay would have appeared.
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 150));
+            });
 
             // Loading overlay should not be present
             expect(
@@ -522,14 +536,14 @@ describe("App Component - Comprehensive Coverage", () => {
                 isLoading: true,
             });
 
-            const utils = renderApp();
+            const utils = await renderApp();
 
             // Quickly change to not loading before delay
             mockUseErrorStore.mockReturnValue({
                 ...defaultErrorStore,
                 isLoading: false,
             });
-            rerenderApp(utils);
+            await rerenderApp(utils);
 
             // Should not show loading overlay
             expect(
@@ -1152,7 +1166,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 cacheSyncCleanup
             );
 
-            const utils = renderApp();
+            const utils = await renderApp();
 
             // Wait for initialization to complete
             await waitFor(() => {

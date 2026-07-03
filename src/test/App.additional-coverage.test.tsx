@@ -2,6 +2,8 @@
  * @file Additional comprehensive test coverage for App component
  */
 
+import type { RenderResult } from "@testing-library/react";
+
 import {
     act,
     fireEvent,
@@ -19,22 +21,24 @@ import {
     type MockedFunction,
 } from "vitest";
 import "@testing-library/jest-dom";
-import * as React from "react";
 import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { objectAssign } from "ts-extras";
 
 import { App } from "../App";
+import type { MonitorTypesStore } from "../stores/monitor/types";
 import { defaultSettings } from "../stores/settings/state";
 
 // Import the actual store modules to mock them
 import * as useUpdatesStore from "../stores/updates/useUpdatesStore";
 import * as useSitesStore from "../stores/sites/useSitesStore";
 import * as useErrorStore from "../stores/error/useErrorStore";
+import * as useMonitorTypesStore from "../stores/monitor/useMonitorTypesStore";
 import * as useUIStore from "../stores/ui/useUiStore";
 import * as useSettingsStore from "../stores/settings/useSettingsStore";
 import * as useTheme from "../theme/useTheme";
@@ -63,42 +67,13 @@ vi.mock("../utils/cacheSync", () => ({
 // Create mock constants
 const mockIsDevelopment = vi.mocked(isDevelopment);
 
-// Mock components that have their own test files
-vi.mock("../components/ErrorBoundary", () => ({
-    default: ({ children }: { children: React.ReactNode }) => (
-        <div data-testid="error-boundary">{children}</div>
-    ),
+// Mock components that have their own test files.
+vi.mock("../components/Dashboard/SiteList/SiteList", () => ({
+    SiteList: () => <div data-testid="site-list">Site List Component</div>,
 }));
 
-vi.mock("../components/LoadingOverlay", () => ({
-    default: ({ message }: { message: string }) => (
-        <div data-testid="loading-overlay">{message}</div>
-    ),
-}));
-
-vi.mock("../components/ErrorAlert", () => ({
-    default: ({
-        message,
-        onClose,
-    }: {
-        message: string;
-        onClose: () => void;
-    }) => (
-        <div data-testid="error-alert">
-            {message}
-            <button onClick={onClose} type="button">
-                Close
-            </button>
-        </div>
-    ),
-}));
-
-vi.mock("../components/Header", () => ({
-    default: () => <div data-testid="header">Header Component</div>,
-}));
-
-vi.mock("../components/SiteList", () => ({
-    default: () => <div data-testid="site-list">Site List Component</div>,
+vi.mock("../components/Header/Header", () => ({
+    Header: () => <div data-testid="header">Header Component</div>,
 }));
 
 vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
@@ -234,6 +209,45 @@ const mockSettingsStoreState = {
     updateSettings: vi.fn(),
 };
 
+const mockMonitorTypes: MonitorTypeConfig[] = [
+    {
+        description: "HTTP endpoint monitoring",
+        displayName: "HTTP",
+        fields: [
+            {
+                label: "URL",
+                name: "url",
+                required: true,
+                type: "url",
+            },
+        ],
+        type: "http",
+        version: "1.0.0",
+    },
+];
+
+const mockMonitorTypesStoreState: MonitorTypesStore = {
+    fieldConfigs: {
+        http: mockMonitorTypes[0].fields,
+    },
+    formatMonitorDetail: vi.fn(async (_type, details) => details),
+    formatMonitorTitleSuffix: vi.fn(async (_type, monitor) => monitor.id),
+    getFieldConfig: vi.fn(
+        (type) => mockMonitorTypesStoreState.fieldConfigs[type]
+    ),
+    isLoaded: true,
+    loadMonitorTypes: vi.fn().mockResolvedValue(undefined),
+    monitorTypes: mockMonitorTypes,
+    refreshMonitorTypes: vi.fn().mockResolvedValue(undefined),
+    validateMonitorData: vi.fn(async (_type, data) => ({
+        data,
+        errors: [],
+        metadata: {},
+        success: true,
+        warnings: [],
+    })),
+};
+
 const mockThemeState = {
     availableThemes: ["light", "dark"] as any,
     currentTheme: {
@@ -340,11 +354,33 @@ const mockThemeState = {
 const mockUseUpdatesStore = vi.mocked(useUpdatesStore.useUpdatesStore);
 const mockUseSitesStore = vi.mocked(useSitesStore.useSitesStore);
 const mockUseErrorStore = vi.mocked(useErrorStore.useErrorStore);
+const mockUseMonitorTypesStore = vi.mocked(
+    useMonitorTypesStore.useMonitorTypesStore
+);
 const mockUseUIStore = vi.mocked(useUIStore.useUIStore);
 const mockUseSettingsStore = vi.mocked(useSettingsStore.useSettingsStore);
 const mockUseTheme = vi.mocked(useTheme.useTheme);
 const mockUseAvailabilityColors = vi.mocked(useTheme.useAvailabilityColors);
 const mockUseThemeClasses = vi.mocked(useTheme.useThemeClasses);
+
+const flushAppEffects = async (): Promise<void> => {
+    await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+    });
+};
+
+const renderApp = async (): Promise<RenderResult> => {
+    const utils = render(<App />);
+    await flushAppEffects();
+    return utils;
+};
+
+const rerenderApp = async (utils: RenderResult): Promise<RenderResult> => {
+    utils.rerender(<App />);
+    await flushAppEffects();
+    return utils;
+};
 
 /**
  * Retrieves the dashboard overview card that displays the monitored sites
@@ -507,6 +543,36 @@ describe("App Additional Coverage Tests", () => {
             updateSettings: vi.fn(),
         });
 
+        objectAssign(mockMonitorTypesStoreState, {
+            fieldConfigs: {
+                http: mockMonitorTypes[0].fields,
+            },
+            getFieldConfig: vi.fn(
+                (type) => mockMonitorTypesStoreState.fieldConfigs[type]
+            ),
+            isLoaded: true,
+            loadMonitorTypes: vi.fn().mockResolvedValue(undefined),
+            monitorTypes: mockMonitorTypes,
+            refreshMonitorTypes: vi.fn().mockResolvedValue(undefined),
+            validateMonitorData: vi.fn(async (_type, data) => ({
+                data,
+                errors: [],
+                metadata: {},
+                success: true,
+                warnings: [],
+            })),
+        });
+
+        mockUseMonitorTypesStore.mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (
+                      selector as (
+                          state: typeof mockMonitorTypesStoreState
+                      ) => unknown
+                  )(mockMonitorTypesStoreState)
+                : mockMonitorTypesStoreState
+        );
+
         mockUseSettingsStore.mockImplementation((selector?: unknown) =>
             typeof selector === "function"
                 ? (
@@ -547,6 +613,10 @@ describe("App Additional Coverage Tests", () => {
         // Mock the getState method for useSettingsStore (needed by App component initialization)
         vi.spyOn(mockUseSettingsStore as any, "getState").mockReturnValue(
             mockSettingsStoreState
+        );
+
+        vi.spyOn(mockUseMonitorTypesStore as any, "getState").mockReturnValue(
+            mockMonitorTypesStoreState
         );
 
         mockUseUIStore.mockImplementation((selector: any) =>
@@ -594,7 +664,7 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Import Operation", "type");
 
-        render(<App />);
+        await renderApp();
 
         // Verify main components are rendered using actual DOM structure
         expect(
@@ -622,7 +692,7 @@ describe("App Additional Coverage Tests", () => {
             ? [mockSitesStoreState.sites[0]]
             : [];
 
-        render(<App />);
+        await renderApp();
 
         // Check that site count uses the proper constant
         expect(getMonitoredSitesCardValue()).toBe("1");
@@ -651,7 +721,7 @@ describe("App Additional Coverage Tests", () => {
             isLoading: true,
         });
 
-        render(<App />);
+        await renderApp();
 
         // Wait for the loading overlay to appear after the 100ms delay
         await waitFor(
@@ -688,7 +758,7 @@ describe("App Additional Coverage Tests", () => {
 
         const user = userEvent.setup();
 
-        render(<App />);
+        await renderApp();
 
         // Verify error alert is displayed using role="alert"
         expect(screen.getByRole("alert")).toBeInTheDocument();
@@ -718,7 +788,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateError = "Update failed error";
         mockUpdatesStoreState.updateStatus = "error";
 
-        render(<App />);
+        await renderApp();
 
         // Check update error alert - should show the actual error message
         const message = screen.getByText("Update failed error");
@@ -750,7 +820,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "error";
 
-        render(<App />);
+        await renderApp();
 
         // Check update error fallback message
         const fallback = screen.getByText("Update failed.");
@@ -781,7 +851,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "available";
 
-        render(<App />);
+        await renderApp();
 
         // Check update available message and ensure icon is rendered
         const message = screen.getByText(
@@ -812,7 +882,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "downloading";
 
-        render(<App />);
+        await renderApp();
 
         // Check update downloading message and ensure icon is rendered
         const message = screen.getByText("Update is downloading...");
@@ -843,7 +913,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateError = undefined;
         mockUpdatesStoreState.updateStatus = "downloaded";
 
-        render(<App />);
+        await renderApp();
 
         const user = userEvent.setup();
 
@@ -881,7 +951,7 @@ describe("App Additional Coverage Tests", () => {
 
         mockUIStoreState.showSettings = true;
 
-        render(<App />);
+        await renderApp();
 
         await expect(
             screen.findByTestId("settings-modal")
@@ -904,7 +974,7 @@ describe("App Additional Coverage Tests", () => {
 
         mockThemeState.isDark = true;
 
-        render(<App />);
+        await renderApp();
 
         const appContainer = screen.getByTestId("app-container");
         expect(appContainer).toHaveClass("app-shell--dark");
@@ -927,7 +997,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateStatus = "error";
         mockUpdatesStoreState.updateError = "Test error";
 
-        render(<App />);
+        await renderApp();
 
         const user = userEvent.setup();
 
@@ -989,7 +1059,7 @@ describe("App Additional Coverage Tests", () => {
             mockSitesStore
         );
 
-        render(<App />);
+        await renderApp();
 
         // Wait for initialization to complete including subscription
         await waitFor(
@@ -1073,7 +1143,7 @@ describe("App Additional Coverage Tests", () => {
             mockSitesStore
         );
 
-        render(<App />);
+        await renderApp();
 
         // Wait for initialization to complete including subscription
         await waitFor(() => {
@@ -1116,7 +1186,7 @@ describe("App Additional Coverage Tests", () => {
         const toggleThemeMock = vi.fn();
         mockThemeState.toggleTheme = toggleThemeMock;
 
-        render(<App />);
+        await renderApp();
 
         // We need to mock a theme toggle button being clicked.
         // Since this would typically be in the Header component, we'll simulate the call
@@ -1163,7 +1233,7 @@ describe("App Additional Coverage Tests", () => {
             mockSettingsStoreGetState
         );
 
-        render(<App />);
+        await renderApp();
 
         // Wait for initialization to complete - this should call initializeSites
         await waitFor(() => {
@@ -1205,7 +1275,7 @@ describe("App Additional Coverage Tests", () => {
             updateSettings: vi.fn(),
         });
 
-        render(<App />);
+        await renderApp();
 
         // Wait for initialization to complete - this should call both initialization functions
         await waitFor(() => {
@@ -1258,7 +1328,7 @@ describe("App Additional Coverage Tests", () => {
             mockSettingsStoreGetState
         );
 
-        const { unmount } = render(<App />);
+        const { unmount } = await renderApp();
 
         unmount();
 
@@ -1310,7 +1380,7 @@ describe("App Additional Coverage Tests", () => {
             ];
         }
 
-        render(<App />);
+        await renderApp();
 
         // Check that site count reflects multiple sites
         expect(getMonitoredSitesCardValue()).toBe("2");
@@ -1329,7 +1399,7 @@ describe("App Additional Coverage Tests", () => {
 
         mockSitesStoreState.sites = [];
 
-        render(<App />);
+        await renderApp();
 
         // Check that site count shows zero
         expect(getMonitoredSitesCardValue()).toBe("0");
@@ -1350,11 +1420,11 @@ describe("App Additional Coverage Tests", () => {
         mockErrorStoreState.lastError = "Timeout test error";
         mockErrorStoreState.clearError = clearErrorMock;
 
-        const { rerender } = render(<App />);
+        const utils = await renderApp();
 
         // Clear the error
         mockErrorStoreState.lastError = undefined;
-        rerender(<App />);
+        await rerenderApp(utils);
 
         // Error should no longer be displayed
         expect(screen.queryByTestId("error-alert")).not.toBeInTheDocument();
@@ -1374,7 +1444,7 @@ describe("App Additional Coverage Tests", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        render(<App />);
+        await renderApp();
 
         // Verify the main container has the expected shell class
         const appContainer = screen.getByTestId("app-container");
@@ -1399,7 +1469,7 @@ describe("App Additional Coverage Tests", () => {
         mockUpdatesStoreState.updateStatus = "error";
         mockUpdatesStoreState.updateError = "Test error";
 
-        render(<App />);
+        await renderApp();
 
         const dismissButton = screen.getByText("Dismiss");
 
