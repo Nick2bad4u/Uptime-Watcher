@@ -70,4 +70,28 @@ describe(buildPayloadPreview, () => {
         expect(preview).toContain("mailto:[redacted]");
         expect(preview).not.toContain("person@example.com");
     });
+
+    it("redacts secrets embedded in raw string payloads", () => {
+        const preview = buildPayloadPreview(
+            "Authorization: Bearer super-secret refresh_token=refresh-secret"
+        );
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).not.toContain("super-secret");
+        expect(preview).not.toContain("refresh-secret");
+        expect(preview).toContain("[redacted]");
+    });
+
+    it("redacts secrets embedded in nested non-sensitive string fields", () => {
+        const preview = buildPayloadPreview({
+            message:
+                "callback failed access_token=access-secret refresh_token=refresh-secret",
+        });
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).not.toContain("access-secret");
+        expect(preview).not.toContain("refresh-secret");
+        expect(preview).toContain("access_token=[redacted]");
+        expect(preview).toContain("refresh_token=[redacted]");
+    });
 });

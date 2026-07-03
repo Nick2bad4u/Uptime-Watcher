@@ -15,6 +15,7 @@ import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { validateVoidIpcResponse } from "@shared/utils/ipcResponse";
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import {
     buildErrorLogArguments,
     buildLogArguments,
@@ -99,6 +100,15 @@ const serializeDate = (value: Date): string => {
         : INVALID_DATE_PLACEHOLDER;
 };
 
+const sanitizePreviewString = (value: string): string => {
+    try {
+        const normalized = normalizeLogValue(value);
+        return typeof normalized === "string" ? normalized : value;
+    } catch {
+        return value;
+    }
+};
+
 const getOriginalJsonHolderValue = (
     holder: unknown,
     key: string
@@ -135,13 +145,14 @@ const serializeValue = (value: unknown): unknown => {
             // not a URL
         }
 
-        if (value.length <= MAX_PREVIEW_STRING) {
-            return value;
+        const sanitized = sanitizePreviewString(value);
+        if (sanitized.length <= MAX_PREVIEW_STRING) {
+            return sanitized;
         }
 
         return {
-            length: value.length,
-            preview: truncate(value, MAX_PREVIEW_STRING),
+            length: sanitized.length,
+            preview: truncate(sanitized, MAX_PREVIEW_STRING),
             type: "string",
         };
     }
@@ -280,7 +291,7 @@ export const buildPayloadPreview = (
     }
 
     if (typeof payload === "string") {
-        return truncate(payload, limit);
+        return truncate(sanitizePreviewString(payload), limit);
     }
 
     if (typeof payload === "number" || typeof payload === "boolean") {
