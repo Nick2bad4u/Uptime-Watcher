@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+
 import { getLatestHistoryTimestamp } from "../../../utils/monitoring/monitorHistoryTime";
 
 describe(getLatestHistoryTimestamp, () => {
@@ -25,5 +27,25 @@ describe(getLatestHistoryTimestamp, () => {
         ]);
 
         expect(latest).toBe(2500);
+    });
+
+    it("ignores timestamps outside the supported Date range", () => {
+        const latest = getLatestHistoryTimestamp([
+            { timestamp: 2500 },
+            { timestamp: MAX_VALID_DATE_EPOCH_MS + 1 },
+            { timestamp: 5000 },
+        ]);
+
+        expect(latest).toBe(5000);
+    });
+
+    it("ignores fractional timestamps", () => {
+        const latest = getLatestHistoryTimestamp([
+            { timestamp: 2500 },
+            { timestamp: 5000.5 },
+            { timestamp: 5000 },
+        ]);
+
+        expect(latest).toBe(5000);
     });
 });

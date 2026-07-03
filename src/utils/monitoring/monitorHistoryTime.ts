@@ -1,6 +1,13 @@
 import type { Monitor, StatusHistory } from "@shared/types";
 
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+import { isDefined, isSafeInteger } from "ts-extras";
+
+const isValidHistoryTimestamp = (timestamp: unknown): timestamp is number =>
+    typeof timestamp === "number" &&
+    isSafeInteger(timestamp) &&
+    timestamp >= 0 &&
+    timestamp <= MAX_VALID_DATE_EPOCH_MS;
 
 /**
  * Computes the most recent monitor history timestamp from an arbitrary history
@@ -20,8 +27,7 @@ export function getLatestHistoryTimestamp(
         const hasLatestTimestamp = isDefined(latestTimestamp);
 
         if (
-            typeof timestamp === "number" &&
-            isFiniteNumber(timestamp) &&
+            isValidHistoryTimestamp(timestamp) &&
             (!hasLatestTimestamp || timestamp > (latestTimestamp ?? timestamp))
         ) {
             latestTimestamp = timestamp;
