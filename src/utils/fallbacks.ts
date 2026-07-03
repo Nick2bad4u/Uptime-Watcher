@@ -84,7 +84,9 @@ export function withAsyncErrorHandling(
             try {
                 await operation();
             } catch (error: unknown) {
-                logger.error(`${operationName} failed`, ensureError(error));
+                logger.error("Async operation failed", ensureError(error), {
+                    operationName,
+                });
             }
         })();
     };
@@ -113,7 +115,9 @@ export function withSyncErrorHandling<T>(
     try {
         return operation();
     } catch (error) {
-        logger.error(`${operationName} failed`, ensureError(error));
+        logger.error("Synchronous operation failed", ensureError(error), {
+            operationName,
+        });
         return fallbackValue;
     }
 }

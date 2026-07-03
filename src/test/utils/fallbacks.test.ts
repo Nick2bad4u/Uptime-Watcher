@@ -299,6 +299,7 @@ describe("fallback Utilities", () => {
             const asyncOperation = vi
                 .fn()
                 .mockRejectedValue(new Error("Async error"));
+            const logger = await import("../../services/logger");
             const handler = withAsyncErrorHandling(
                 asyncOperation,
                 "test operation"
@@ -308,6 +309,16 @@ describe("fallback Utilities", () => {
             expect(() => {
                 handler();
             }).not.toThrow();
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(logger.logger.error).toHaveBeenCalledWith(
+                "Async operation failed",
+                expect.objectContaining({
+                    message: "Async error",
+                    name: "Error",
+                }),
+                { operationName: "test operation" }
+            );
         });
 
         it("should work with different operation names", async ({
@@ -550,8 +561,9 @@ describe("fallback Utilities", () => {
                 );
 
                 expect(logger.logger.error).toHaveBeenCalledWith(
-                    "specific operation failed",
-                    error
+                    "Synchronous operation failed",
+                    error,
+                    { operationName: "specific operation" }
                 );
             });
         });
