@@ -2,8 +2,8 @@
  * Object inspection helpers used by safe JSON utilities and logging.
  *
  * @remarks
- * These helpers intentionally use `Reflect.ownKeys` + `Reflect.get` wrapped in
- * try/catch so they can safely inspect objects with throwing accessors.
+ * These helpers intentionally use `Reflect.ownKeys` and own property
+ * descriptors so they can inspect object data without invoking accessors.
  *
  * Keeping this logic centralized avoids duplicated implementations across the
  * Electron and shared layers.
@@ -15,16 +15,15 @@ import type { UnknownArray } from "type-fest";
 export function collectOwnPropertyValuesSafely(
     value: object
 ): Readonly<UnknownArray> {
-    if (Array.isArray(value)) {
-        return value;
-    }
-
     const values: unknown[] = [];
     for (const key of Reflect.ownKeys(value)) {
-        try {
-            values.push(Reflect.get(value, key));
-        } catch {
-            values.push(undefined);
+        if (Array.isArray(value) && key === "length") {
+            continue;
+        }
+
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (descriptor && "value" in descriptor) {
+            values.push(descriptor.value);
         }
     }
 

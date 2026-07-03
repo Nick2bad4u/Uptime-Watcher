@@ -421,6 +421,41 @@ describe("middleware.ts", () => {
             );
             expect(next).toHaveBeenCalled();
         });
+        it("does not invoke accessors while preparing verbose debug data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            let getterCalls = 0;
+            const payload = {
+                stable: "value",
+            };
+            Object.defineProperty(payload, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "should-not-run";
+                },
+            });
+
+            const next = vi.fn();
+            const mw = createDebugMiddleware({ enabled: true, verbose: true });
+            await mw("eventR", asEventPayload(payload), next);
+
+            expect(logger.debug).toHaveBeenCalledWith(
+                expect.stringContaining("Processing event 'eventR'"),
+                expect.objectContaining({
+                    data: { stable: "value" },
+                    serializedData: '{"stable":"value"}',
+                })
+            );
+            expect(getterCalls).toBe(0);
+            expect(next).toHaveBeenCalled();
+        });
         it("skips logging when not enabled", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");

@@ -78,11 +78,25 @@ const cloneObjectForLogging = (
         const clonedArray: unknown[] = [];
         clones.set(target, clonedArray);
 
-        for (const entry of value) {
+        for (const key of Reflect.ownKeys(value)) {
+            if (key === "length") {
+                continue;
+            }
+
+            const descriptor = Object.getOwnPropertyDescriptor(value, key);
+            if (!descriptor?.enumerable || !("value" in descriptor)) {
+                continue;
+            }
+
+            const entry = descriptor.value as unknown;
             if (isCloneableValue(entry)) {
-                clonedArray.push(cloneObjectForLogging(entry, clones, stack));
+                Reflect.set(
+                    clonedArray,
+                    key,
+                    cloneObjectForLogging(entry, clones, stack)
+                );
             } else {
-                clonedArray.push(entry);
+                Reflect.set(clonedArray, key, entry);
             }
         }
 
@@ -94,15 +108,16 @@ const cloneObjectForLogging = (
     clones.set(target, clonedObject);
 
     for (const key of Reflect.ownKeys(value)) {
-        try {
-            const propertyValue: unknown = Reflect.get(value, key);
-            const normalizedValue = isCloneableValue(propertyValue)
-                ? cloneObjectForLogging(propertyValue, clones, stack)
-                : propertyValue;
-            Reflect.set(clonedObject, key, normalizedValue);
-        } catch {
-            Reflect.set(clonedObject, key, undefined);
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
         }
+
+        const propertyValue = descriptor.value as unknown;
+        const normalizedValue = isCloneableValue(propertyValue)
+            ? cloneObjectForLogging(propertyValue, clones, stack)
+            : propertyValue;
+        Reflect.set(clonedObject, key, normalizedValue);
     }
 
     stack.delete(target);
@@ -141,7 +156,10 @@ function safeSerialize(data: unknown): string {
 
     if (Array.isArray(data) || typeof data === "object") {
         try {
-            return JSON.stringify(data);
+            const serializableData = isCloneableValue(data)
+                ? cloneObjectForLogging(data)
+                : data;
+            return JSON.stringify(serializableData);
         } catch (error) {
             const message = getUserFacingErrorDetail(error);
             return `${NON_SERIALIZABLE_PLACEHOLDER}: ${message}`;
