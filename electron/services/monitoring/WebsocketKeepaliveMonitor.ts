@@ -12,9 +12,9 @@
 import type { MonitorType, Site } from "@shared/types";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { getAbortSignalReason } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import { performance } from "node:perf_hooks";
-import { safeCastTo } from "ts-extras";
 import { WebSocket as NodeWebSocket } from "ws";
 
 import type {
@@ -116,7 +116,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             if (signal?.aborted) {
                 reject(
                     createAbortError({
-                        cause: Reflect.get(signal, "reason"),
+                        cause: getAbortSignalReason(signal),
                     })
                 );
                 return;
@@ -274,10 +274,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     }
                     rejectOnce(
                         createAbortError({
-                            cause: Reflect.get(
-                                safeCastTo<object>(signal),
-                                "reason"
-                            ),
+                            cause: getAbortSignalReason(signal),
                         })
                     );
                 };

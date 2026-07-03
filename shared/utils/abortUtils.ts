@@ -13,6 +13,19 @@ const DEFAULT_RETRY_MAX_DELAY_MS = 30_000;
 const DEFAULT_RETRY_MAX_RETRIES = 3;
 const MAX_SAFE_TIMER_DELAY_MS = 2_147_483_647;
 
+/**
+ * Reads a native {@link AbortSignal.reason} without trusting signal-shaped
+ * objects.
+ *
+ * @remarks
+ * Several tests and boundaries can pass AbortSignal-like objects. Limiting
+ * reason access to real AbortSignal instances avoids executing arbitrary
+ * `reason` getters on cast/fake objects.
+ */
+export function getAbortSignalReason(signal: AbortSignal | undefined): unknown {
+    return signal instanceof AbortSignal ? signal.reason : undefined;
+}
+
 function tryUnrefTimer(timeoutId: unknown): void {
     const record = ensureRecordLike(timeoutId);
     if (!record) {
@@ -327,7 +340,7 @@ async function sleepInternal(
         if (signal?.aborted) {
             reject(
                 createAbortError({
-                    cause: Reflect.get(signal, "reason"),
+                    cause: getAbortSignalReason(signal),
                     message: "Sleep was aborted",
                 })
             );
@@ -351,7 +364,7 @@ async function sleepInternal(
             signal?.removeEventListener("abort", handleAbort);
             reject(
                 createAbortError({
-                    cause: signal ? Reflect.get(signal, "reason") : undefined,
+                    cause: getAbortSignalReason(signal),
                     message: "Sleep was aborted",
                 })
             );
@@ -500,7 +513,7 @@ export async function retryWithAbort<T>(
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         // Check if operation was aborted
         if (signal?.aborted) {
-            throw createAbortError({ cause: Reflect.get(signal, "reason") });
+            throw createAbortError({ cause: getAbortSignalReason(signal) });
         }
 
         try {
@@ -639,7 +652,7 @@ export async function raceWithAbort<T>(
     signal: AbortSignal
 ): Promise<T> {
     if (signal.aborted) {
-        throw createAbortError({ cause: Reflect.get(signal, "reason") });
+        throw createAbortError({ cause: getAbortSignalReason(signal) });
     }
 
     return new Promise<T>((resolve, reject) => {
@@ -661,7 +674,7 @@ export async function raceWithAbort<T>(
                 signal.removeEventListener("abort", handleAbort);
             }
             rejectWith(
-                createAbortError({ cause: Reflect.get(signal, "reason") })
+                createAbortError({ cause: getAbortSignalReason(signal) })
             );
         }
 

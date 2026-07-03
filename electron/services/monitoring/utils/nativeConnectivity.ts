@@ -1,4 +1,5 @@
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { getAbortSignalReason } from "@shared/utils/abortUtils";
 /**
  * Native connectivity checking without external dependencies Replaces the ping
  * package entirely with TCP, DNS, and HTTP checks
@@ -147,7 +148,7 @@ async function checkTcpPort(
             cleanup(listener);
             reject(
                 createAbortError({
-                    cause: signal ? Reflect.get(signal, "reason") : undefined,
+                    cause: getAbortSignalReason(signal),
                 })
             );
         };
@@ -252,7 +253,7 @@ async function checkDnsResolution(
 
         if (result === ABORTED) {
             throw createAbortError({
-                cause: signal ? Reflect.get(signal, "reason") : undefined,
+                cause: getAbortSignalReason(signal),
             });
         }
 
@@ -429,7 +430,7 @@ export async function checkConnectivity(
 ): Promise<MonitorCheckResult> {
     if (signal?.aborted) {
         throw createAbortError({
-            cause: Reflect.get(signal, "reason"),
+            cause: getAbortSignalReason(signal),
         });
     }
 

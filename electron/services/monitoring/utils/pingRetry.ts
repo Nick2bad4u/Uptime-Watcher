@@ -50,6 +50,7 @@
  */
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { getAbortSignalReason } from "@shared/utils/abortUtils";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
@@ -99,7 +100,7 @@ export async function performSinglePingCheck(
 ): Promise<MonitorCheckResult> {
     if (signal?.aborted) {
         throw createAbortError({
-            cause: Reflect.get(signal, "reason"),
+            cause: getAbortSignalReason(signal),
         });
     }
 

@@ -45,7 +45,10 @@
 import type { MonitorType, Site } from "@shared/types";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
-import { raceWithTimeout } from "@shared/utils/abortUtils";
+import {
+    getAbortSignalReason,
+    raceWithTimeout,
+} from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
@@ -368,7 +371,7 @@ export class DnsMonitor implements IMonitorService {
         signal?: AbortSignal
     ): Promise<string> {
         if (signal?.aborted) {
-            throw createAbortError({ cause: Reflect.get(signal, "reason") });
+            throw createAbortError({ cause: getAbortSignalReason(signal) });
         }
 
         const result = await raceWithTimeout(resolver(host), {

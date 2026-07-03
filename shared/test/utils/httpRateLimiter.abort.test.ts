@@ -70,4 +70,29 @@ describe("HttpRateLimiter abort support", () => {
             vi.useRealTimers();
         }
     });
+
+    it("does not invoke reason accessors on signal-shaped aborted inputs", async () => {
+        let getterCalls = 0;
+        const signal = {
+            aborted: true,
+            get reason() {
+                getterCalls += 1;
+                throw new Error("reason getter should not run");
+            },
+        };
+        const operation = vi.fn(async () => "ok");
+        const limiter = new HttpRateLimiter({
+            maxConcurrent: 1,
+            minIntervalMs: 0,
+        });
+
+        await expect(
+            limiter.schedule("https://example.com/status", operation, {
+                signal: signal as unknown as AbortSignal,
+            })
+        ).rejects.toMatchObject({ name: "AbortError" });
+
+        expect(operation).not.toHaveBeenCalled();
+        expect(getterCalls).toBe(0);
+    });
 });

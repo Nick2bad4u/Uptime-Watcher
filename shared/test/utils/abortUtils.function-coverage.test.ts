@@ -9,6 +9,7 @@ import { describe, expect, test } from "vitest";
 
 import {
     createCombinedAbortSignal,
+    getAbortSignalReason,
     isAbortError,
     raceWithAbort,
     retryWithAbort,
@@ -68,6 +69,32 @@ class SpyAbortSignal {
 }
 
 describe("AbortUtils Function Coverage Tests", () => {
+    describe(getAbortSignalReason, () => {
+        test("should return native AbortSignal reasons", () => {
+            const controller = new AbortController();
+            const reason = new Error("native reason");
+            controller.abort(reason);
+
+            expect(getAbortSignalReason(controller.signal)).toBe(reason);
+        });
+
+        test("should not invoke reason accessors on signal-shaped objects", () => {
+            let getterCalls = 0;
+            const signal = {
+                aborted: true,
+                get reason() {
+                    getterCalls += 1;
+                    throw new Error("reason getter should not run");
+                },
+            };
+
+            expect(
+                getAbortSignalReason(signal as unknown as AbortSignal)
+            ).toBeUndefined();
+            expect(getterCalls).toBe(0);
+        });
+    });
+
     describe(isAbortError, () => {
         test("should return true for Error with AbortError name", () => {
             const error = new Error("Test error");

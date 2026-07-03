@@ -1,5 +1,5 @@
 import { createAbortError } from "@shared/utils/abortError";
-import { sleepUnref } from "@shared/utils/abortUtils";
+import { getAbortSignalReason, sleepUnref } from "@shared/utils/abortUtils";
 
 const DEFAULT_MAX_CONCURRENT = 1;
 const DEFAULT_MAX_WAIT_MS = 30_000;
@@ -11,7 +11,7 @@ function assertNotAborted(signal: AbortSignal | undefined): void {
     }
 
     throw createAbortError({
-        cause: Reflect.get(signal, "reason"),
+        cause: getAbortSignalReason(signal),
     });
 }
 
