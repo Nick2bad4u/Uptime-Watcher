@@ -2,6 +2,8 @@
  * AbortSignal helpers for monitoring.
  */
 
+import { isFinite as isFiniteNumber } from "ts-extras";
+
 /**
  * Creates a timeout signal and optionally merges it with an external signal.
  */
@@ -33,7 +35,10 @@ export function mergeAbortSignals(args: {
     readonly timeoutMs?: number;
 }): AbortSignal {
     const hasAdditionalSignals = Boolean(args.additionalSignals?.length);
-    const hasTimeout = typeof args.timeoutMs === "number";
+    const hasTimeout =
+        typeof args.timeoutMs === "number" &&
+        isFiniteNumber(args.timeoutMs) &&
+        args.timeoutMs > 0;
 
     if (!hasAdditionalSignals && !hasTimeout) {
         return args.baseSignal;
