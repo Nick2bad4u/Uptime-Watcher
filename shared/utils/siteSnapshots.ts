@@ -12,7 +12,11 @@ import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 import type { RequireAtLeastOne, UnknownRecord } from "type-fest";
 
-import { isMonitorStatus, STATUS_HISTORY_VALUES } from "@shared/types";
+import {
+    BASE_MONITOR_TYPES,
+    isMonitorStatus,
+    STATUS_HISTORY_VALUES,
+} from "@shared/types";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
@@ -242,6 +246,12 @@ export const isStatusHistoryArray = (
 const isValidResponseTime = (value: unknown): value is number =>
     isFiniteNumber(value) && Number.isInteger(value) && value >= -1;
 
+const isNonNegativeInteger = (value: unknown): value is number =>
+    isFiniteNumber(value) && Number.isInteger(value) && value >= 0;
+
+const isPositiveInteger = (value: unknown): value is number =>
+    isFiniteNumber(value) && Number.isInteger(value) && value > 0;
+
 export const isMonitorSnapshot = (candidate: unknown): candidate is Monitor => {
     if (!isObject(candidate)) {
         return false;
@@ -261,13 +271,14 @@ export const isMonitorSnapshot = (candidate: unknown): candidate is Monitor => {
 
     return (
         isNonEmptyString(id ?? undefined) &&
-        isFiniteNumber(checkInterval) &&
+        isPositiveInteger(checkInterval) &&
         isArray(history, isStatusHistoryEntry) &&
         isBoolean(monitoring) &&
         isValidResponseTime(responseTime) &&
-        isFiniteNumber(retryAttempts) &&
-        isFiniteNumber(timeout) &&
+        isNonNegativeInteger(retryAttempts) &&
+        isPositiveInteger(timeout) &&
         typeof type === "string" &&
+        arrayIncludes(BASE_MONITOR_TYPES, type) &&
         typeof status === "string" &&
         isMonitorStatus(status)
     );

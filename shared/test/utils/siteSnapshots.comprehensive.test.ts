@@ -138,6 +138,21 @@ describe("siteSnapshots", () => {
             ).toBeFalsy();
         }
 
+        for (const invalidTiming of [
+            { checkInterval: 0 },
+            { checkInterval: 1000.5 },
+            { retryAttempts: -1 },
+            { retryAttempts: 1.5 },
+            { timeout: 0 },
+            { timeout: 1000.5 },
+        ]) {
+            expect(isMonitorSnapshot(createMonitor(invalidTiming))).toBeFalsy();
+        }
+
+        expect(
+            isMonitorSnapshot(createMonitor({ type: "unknown-type" as any }))
+        ).toBeFalsy();
+
         expect(isSiteSnapshot(createSite())).toBeTruthy();
         expect(isSiteSnapshot({ identifier: "x" })).toBeFalsy();
 
