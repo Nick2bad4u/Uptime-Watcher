@@ -10,6 +10,7 @@ import {
     addBooleanField,
     addNumberField,
     addStringField,
+    convertToDbValue,
     convertDateForDb,
     type DbValue,
     safeNumberConvert,
@@ -35,6 +36,19 @@ describe("Value Converters Utility", () => {
             expect(values[0]).toBeNull();
             expect(typeof values[1]).toBe("number");
             expect(typeof values[2]).toBe("string");
+        });
+    });
+    describe(convertToDbValue, () => {
+        it("should reject non-finite numbers for database binding", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Value Converters Utility", "component");
+
+            expect(convertToDbValue(Infinity)).toBeUndefined();
+            expect(convertToDbValue(-Infinity)).toBeUndefined();
+            expect(convertToDbValue(NaN)).toBeUndefined();
         });
     });
     describe(addBooleanField, () => {
@@ -221,7 +235,7 @@ describe("Value Converters Utility", () => {
             expect(updateFields).toEqual(["converted = ?"]);
             expect(updateValues).toEqual([123]);
         });
-        it("should handle special number values", async ({
+        it("should skip non-finite number values", async ({
             task,
             annotate,
         }) => {
@@ -240,16 +254,8 @@ describe("Value Converters Utility", () => {
             );
             addNumberField("nanValue", NaN, updateFields, updateValues);
 
-            expect(updateFields).toEqual([
-                "infinity = ?",
-                "negInfinity = ?",
-                "nanValue = ?",
-            ]);
-            expect(updateValues).toEqual([
-                Infinity,
-                -Infinity,
-                NaN,
-            ]);
+            expect(updateFields).toEqual([]);
+            expect(updateValues).toEqual([]);
         });
     });
     describe(addStringField, () => {
@@ -457,16 +463,18 @@ describe("Value Converters Utility", () => {
             expect(safeNumberConvert(-10)).toBe(-10);
             expect(safeNumberConvert(3.14)).toBe(3.14);
         });
-        it("should preserve special number values", async ({
+        it("should reject non-finite number values", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            expect(safeNumberConvert(Infinity)).toBe(Infinity);
-            expect(safeNumberConvert(-Infinity)).toBe(-Infinity);
-            expect(safeNumberConvert(NaN)).toBeNaN();
+            expect(safeNumberConvert(Infinity)).toBeUndefined();
+            expect(safeNumberConvert(-Infinity)).toBeUndefined();
+            expect(safeNumberConvert(NaN)).toBeUndefined();
+            expect(safeNumberConvert("Infinity")).toBeUndefined();
+            expect(safeNumberConvert("-Infinity")).toBeUndefined();
         });
         it("should convert valid string numbers", async ({
             task,

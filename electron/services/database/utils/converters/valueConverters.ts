@@ -1,4 +1,4 @@
-import { isDefined, isPresent } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, isPresent } from "ts-extras";
 
 /**
  * Database value conversion utilities. Provides type-safe conversions between
@@ -25,12 +25,11 @@ export type DbValue = null | number | string;
  * @remarks
  * -
  *
- * `string` and `number` pass through
- *
+ * - finite `number` and `string` values pass through
  * - `boolean` becomes `1`/`0`
  * - `null` becomes `null`
- * - `undefined` and all other types return `undefined` (caller decides whether to
- *   skip the field or coerce to `null`)
+ * - non-finite numbers, `undefined`, and all other types return `undefined`
+ *   (caller decides whether to skip the field or coerce to `null`)
  *
  * Prefer this helper instead of ad-hoc `typeof` chains so the conversion rules
  * stay consistent across repositories and mappers.
@@ -41,7 +40,10 @@ export function convertToDbValue(value: unknown): DbValue | undefined {
 
     if (value === null) {
         result = null;
-    } else if (typeof value === "string" || typeof value === "number") {
+    } else if (
+        typeof value === "string" ||
+        (typeof value === "number" && isFiniteNumber(value))
+    ) {
         result = value;
     } else if (typeof value === "boolean") {
         result = value ? 1 : 0;
@@ -85,9 +87,10 @@ export function addBooleanField(
  * @remarks
  * Provides safe number conversion with explicit handling of edge cases:
  *
- * - Already a number: returned as-is (including 0, NaN, Infinity)
- * - Truthy values: converted using Number() constructor
- * - Falsy values (null, undefined, "", false, 0): returns undefined
+ * - Already a finite number: returned as-is (including 0)
+ * - Present values: converted using Number() constructor
+ * - Non-finite converted values return undefined
+ * - Nullish values and empty strings return undefined
  *
  * Note: This function treats 0 as a valid number that should be preserved,
  * unlike some truthy/falsy checks that would convert 0 to undefined.
@@ -101,11 +104,11 @@ export function addBooleanField(
  */
 export function safeNumberConvert(value: unknown): number | undefined {
     if (typeof value === "number") {
-        return value;
+        return isFiniteNumber(value) ? value : undefined;
     }
     if (isPresent(value) && value !== "") {
         const converted = Number(value);
-        return Number.isNaN(converted) ? undefined : converted;
+        return isFiniteNumber(converted) ? converted : undefined;
     }
     return undefined;
 }
@@ -135,9 +138,13 @@ export function addNumberField(
         return;
     }
 
-    updateFields.push(`${fieldName} = ?`);
     const convertedValue = safeNumberConvert(value);
-    updateValues.push(convertedValue ?? value);
+    if (!isDefined(convertedValue)) {
+        return;
+    }
+
+    updateFields.push(`${fieldName} = ?`);
+    updateValues.push(convertedValue);
 }
 
 /**
