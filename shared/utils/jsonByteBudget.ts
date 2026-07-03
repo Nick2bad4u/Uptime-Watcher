@@ -115,7 +115,24 @@ function addJsonBytesForObject(
         }
 
         for (let i = value.length - 1; i >= 0; i--) {
-            state.stack.push(value[i]);
+            const key = String(i);
+            const descriptor = Object.getOwnPropertyDescriptor(value, key);
+            if (!descriptor) {
+                if (key in value) {
+                    addBytes(state, state.maxBytes + 1);
+                    return;
+                }
+
+                state.stack.push(undefined);
+                continue;
+            }
+
+            if (!("value" in descriptor)) {
+                addBytes(state, state.maxBytes + 1);
+                return;
+            }
+
+            state.stack.push(descriptor.value);
         }
 
         return;
@@ -142,8 +159,14 @@ function addJsonBytesForObject(
             return;
         }
 
+        const descriptor = Object.getOwnPropertyDescriptor(record, key);
+        if (!descriptor || !("value" in descriptor)) {
+            addBytes(state, state.maxBytes + 1);
+            return;
+        }
+
         addBytes(state, getUtfByteLength(key) + 3);
-        state.stack.push(record[key]);
+        state.stack.push(descriptor.value);
     }
 }
 

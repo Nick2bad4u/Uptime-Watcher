@@ -24,4 +24,35 @@ describe("json byte budget helpers", () => {
             false
         );
     });
+
+    it("treats enumerable object accessors as over budget without invoking them", () => {
+        let accessed = false;
+        const payload: Record<string, unknown> = {};
+        Object.defineProperty(payload, "secret", {
+            enumerable: true,
+            get: () => {
+                accessed = true;
+                throw new Error("getter should not run");
+            },
+        });
+
+        expect(getJsonByteLengthUpTo(payload, 100)).toBeGreaterThan(100);
+        expect(accessed).toBe(false);
+    });
+
+    it("treats enumerable array accessors as over budget without invoking them", () => {
+        let accessed = false;
+        const payload: unknown[] = [];
+        payload.length = 1;
+        Object.defineProperty(payload, "0", {
+            enumerable: true,
+            get: () => {
+                accessed = true;
+                throw new Error("getter should not run");
+            },
+        });
+
+        expect(getJsonByteLengthUpTo(payload, 100)).toBeGreaterThan(100);
+        expect(accessed).toBe(false);
+    });
 });
