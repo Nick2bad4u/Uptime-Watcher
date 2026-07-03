@@ -10,6 +10,7 @@ import { useCallback, useMemo } from "react";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons, getIconSize } from "../../../utils/icons";
+import { formatFullTimestamp } from "../../../utils/time";
 import { ErrorAlert } from "../../common/ErrorAlert/ErrorAlert";
 import { SettingItem } from "../../shared/SettingItem";
 import { SettingsSection } from "../sections/SettingsSection";
@@ -23,7 +24,7 @@ function formatOptionalTimestamp(value: null | number): string {
         return "Never";
     }
 
-    return new Date(value).toLocaleString();
+    return formatFullTimestamp(value);
 }
 
 function resolveEncryptionStatusLabel(args: {

@@ -12,6 +12,7 @@ import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { formatByteSize } from "../../../utils/formatting/formatByteSize";
 import { AppIcons, getIconSize } from "../../../utils/icons";
+import { formatFullTimestamp } from "../../../utils/time";
 
 /**
  * Props for {@link RemoteBackupsPanel}.
@@ -101,9 +102,9 @@ export const RemoteBackupsPanel = ({
         <ul className="space-y-2">
             {backups.map((backup) => {
                 const encryptionSuffix = backup.encrypted ? " · Encrypted" : "";
-                const createdAt = new Date(
+                const createdAt = formatFullTimestamp(
                     backup.metadata.createdAt
-                ).toLocaleString();
+                );
 
                 return (
                     <li
