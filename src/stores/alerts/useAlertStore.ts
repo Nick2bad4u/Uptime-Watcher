@@ -10,6 +10,7 @@
 import type { MonitorStatus } from "@shared/types";
 import type { Except } from "type-fest";
 
+import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
@@ -218,9 +219,14 @@ export const useAlertStore: AlertStoreHook = create<AlertStore>()((set) => ({
             variant: input.variant,
         } as const;
 
-        const toast: AppToast =
+        const normalizedMessage =
             typeof input.message === "string"
-                ? { ...baseToast, message: input.message }
+                ? normalizeUserFacingErrorDetail(input.message)
+                : undefined;
+
+        const toast: AppToast =
+            typeof normalizedMessage === "string"
+                ? { ...baseToast, message: normalizedMessage }
                 : baseToast;
 
         set((state) => {

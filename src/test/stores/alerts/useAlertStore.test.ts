@@ -252,6 +252,19 @@ describe(useAlertStore, () => {
         }
     });
 
+    it("sanitizes optional toast detail messages", () => {
+        const toast = useAlertStore.getState().enqueueToast({
+            message:
+                "Upload failed\nsecret_token=uptime-secret-token\r\nRetry later",
+            title: "Upload failed",
+            variant: "error",
+        });
+
+        expect(toast.message).toContain("[redacted]");
+        expect(toast.message).not.toContain("uptime-secret-token");
+        expect(toast.message).not.toMatch(/[\n\r]/u);
+    });
+
     it("trims the toast queue to the maximum length", () => {
         const { enqueueToast } = useAlertStore.getState();
 
