@@ -40,6 +40,7 @@ import type { UpdateStatusEventData } from "@shared/types/events";
 import type { Merge, Promisable } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -98,6 +99,9 @@ const UPDATES_PERSIST_CONFIG = createPersistConfig<
 >("updates", (state) => ({
     updateStatus: state.updateStatus,
 }));
+
+const normalizeUpdateError = (error: string | undefined): string | undefined =>
+    error === undefined ? undefined : getUserFacingErrorDetail(error);
 
 /**
  * Zustand store for managing app updates and update lifecycle.
@@ -158,10 +162,12 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                         });
                     } catch (error: unknown) {
                         const normalizedError = ensureError(error);
+                        const updateError =
+                            getUserFacingErrorDetail(normalizedError);
 
-                        set({ updateError: normalizedError.message });
+                        set({ updateError });
                         logStoreAction("UpdatesStore", "applyUpdate", {
-                            error: normalizedError.message,
+                            error: updateError,
                             message:
                                 "Failed to trigger quit-and-install operation",
                             success: false,
@@ -182,10 +188,11 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                     });
                 },
                 setUpdateError: (error: string | undefined): void => {
+                    const updateError = normalizeUpdateError(error);
                     logStoreAction("UpdatesStore", "setUpdateError", {
-                        error,
+                        error: updateError,
                     });
-                    set({ updateError: error });
+                    set({ updateError });
                 },
                 setUpdateProgress: (progress: number): void => {
                     logStoreAction("UpdatesStore", "setUpdateProgress", {

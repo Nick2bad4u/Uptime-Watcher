@@ -192,6 +192,32 @@ describe(useUpdatesStore, () => {
             expect(result.current.updateError).toBe("Update failed");
         });
 
+        it("should sanitize update error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            act(() => {
+                result.current.setUpdateError(
+                    `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+                );
+            });
+
+            const message = result.current.updateError ?? "";
+            expect(message).not.toContain("SUPER_SECRET_TOKEN");
+            expect(message).not.toContain("\n");
+            expect(message).not.toContain("\t");
+            expect(message).toContain("refresh_token=[redacted]&status=failed");
+            expect(message.endsWith("...")).toBeTruthy();
+            expect(message.length).toBeLessThanOrEqual(1003);
+        });
+
         it("should clear update error", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useUpdatesStore", "component");
@@ -439,7 +465,9 @@ describe(useUpdatesStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            const failure = new Error("update failed");
+            const failure = new Error(
+                `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"x".repeat(1200)}`
+            );
             mockElectronAPIQuitAndInstall.mockRejectedValueOnce(failure);
 
             const { result } = renderHook(() => useUpdatesStore());
@@ -448,7 +476,13 @@ describe(useUpdatesStore, () => {
                 await result.current.applyUpdate();
             });
 
-            expect(result.current.updateError).toBe("update failed");
+            const message = result.current.updateError ?? "";
+            expect(message).not.toContain("SUPER_SECRET_TOKEN");
+            expect(message).not.toContain("\n");
+            expect(message).not.toContain("\t");
+            expect(message).toContain("refresh_token=[redacted]&status=failed");
+            expect(message.endsWith("...")).toBeTruthy();
+            expect(message.length).toBeLessThanOrEqual(1003);
         });
     });
 
