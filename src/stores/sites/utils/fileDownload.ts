@@ -9,6 +9,8 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeCastTo, stringSplit } from "ts-extras";
 
@@ -27,6 +29,41 @@ const FILE_DOWNLOAD_WARN_LOGGER: BrowserDownloadWarnLogger = {
         logger.warn(message, error);
     },
 };
+
+const WINDOWS_RESERVED_FILE_NAMES = new Set([
+    "aux",
+    "com1",
+    "com2",
+    "com3",
+    "com4",
+    "com5",
+    "com6",
+    "com7",
+    "com8",
+    "com9",
+    "con",
+    "lpt1",
+    "lpt2",
+    "lpt3",
+    "lpt4",
+    "lpt5",
+    "lpt6",
+    "lpt7",
+    "lpt8",
+    "lpt9",
+    "nul",
+    "prn",
+]);
+
+const WINDOWS_RESERVED_FILE_NAME_CHARACTERS = new Set([
+    '"',
+    "*",
+    ":",
+    "<",
+    ">",
+    "?",
+    "|",
+]);
 
 /**
  * Options for downloading a file in the browser.
@@ -225,6 +262,41 @@ export function generateBackupFileName(
     return `${prefix}-${timestamp}.${extension}`;
 }
 
+function hasReservedFileNameCharacter(fileName: string): boolean {
+    for (const character of fileName) {
+        if (WINDOWS_RESERVED_FILE_NAME_CHARACTERS.has(character)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isWindowsReservedFileName(fileName: string): boolean {
+    const [baseName] = stringSplit(fileName, ".");
+    return WINDOWS_RESERVED_FILE_NAMES.has((baseName ?? "").toLowerCase());
+}
+
+function normalizeSqliteBackupDownloadFileName(fileName: string): string {
+    const fallbackFileName = generateBackupFileName("uptime-watcher", "db");
+    const trimmedFileName = fileName.trim();
+
+    if (
+        trimmedFileName.length === 0 ||
+        trimmedFileName === "." ||
+        trimmedFileName === ".." ||
+        trimmedFileName.endsWith(".") ||
+        hasAsciiControlCharacters(trimmedFileName) ||
+        hasReservedFileNameCharacter(trimmedFileName) ||
+        isWindowsReservedFileName(trimmedFileName) ||
+        normalizePathSeparatorsToPosix(trimmedFileName).includes("/")
+    ) {
+        return fallbackFileName;
+    }
+
+    return trimmedFileName;
+}
+
 /**
  * Handles downloading SQLite backup data as a file.
  *
@@ -264,11 +336,9 @@ export async function handleSQLiteBackupDownload(
         return backupResult;
     }
 
-    const trimmedFileName = backupResult.fileName.trim();
-    const normalizedFileName =
-        trimmedFileName.length > 0
-            ? trimmedFileName
-            : generateBackupFileName("uptime-watcher", "db");
+    const normalizedFileName = normalizeSqliteBackupDownloadFileName(
+        backupResult.fileName
+    );
 
     // Create blob from the backup data using a fresh typed array view
     const blobData = new Uint8Array(backupResult.buffer);

@@ -719,6 +719,29 @@ describe("file Download Utility", () => {
             );
         });
 
+        it.each([
+            "../backup.sqlite",
+            String.raw`..\backup.sqlite`,
+            "C:backup.sqlite",
+            "backup\n.sqlite",
+            "backup?.sqlite",
+            "CON.sqlite",
+            "backup.",
+        ])(
+            "should fall back to generated filename when provided name is unsafe: %s",
+            async (fileName) => {
+                const payload = new Uint8Array([1, 2]);
+                const backup = buildBackupResult(payload, { fileName });
+                const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
+
+                await handleSQLiteBackupDownload(mockDownloadFunction);
+
+                expect(mockAnchor.download).toMatch(
+                    /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/u
+                );
+            }
+        );
+
         it("should handle click errors with proper error message", async ({
             annotate,
             task,
