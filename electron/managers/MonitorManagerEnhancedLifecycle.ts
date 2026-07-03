@@ -131,9 +131,12 @@ const toggleSingleMonitorEnhanced = async (args: {
         status
     );
 
-    config.logger.debug(
-        `${kind === "start" ? "Started" : "Stopped"} monitoring for ${identifier}:${monitorId} (enhanced)`
-    );
+    config.logger.debug("Monitoring toggled for monitor", {
+        identifier,
+        kind,
+        monitorId,
+        mode: "enhanced",
+    });
 
     return kind === "start"
         ? config.monitorScheduler.startMonitor(identifier, monitor)
@@ -146,7 +149,7 @@ const getSiteOrWarn = (
 ): null | Site => {
     const site = config.sites.get(identifier);
     if (!site) {
-        config.logger.warn(`Site not found: ${identifier}`);
+        config.logger.warn("Site not found", { identifier });
         return null;
     }
 
@@ -163,9 +166,10 @@ const getMonitorOrWarn = (
         (candidate) => candidate.id === monitorId
     );
     if (!monitor) {
-        config.logger.warn(
-            `Monitor ${monitorId} not found in site ${identifier}`
-        );
+        config.logger.warn("Monitor not found in site", {
+            identifier,
+            monitorId,
+        });
         return null;
     }
 
@@ -236,9 +240,10 @@ export async function startAllMonitoringEnhancedFlow(params: {
     let failed = 0;
     let skipped = 0;
 
-    config.logger.info(
-        `Starting monitoring across ${siteCount} sites (enhanced system)`
-    );
+    config.logger.info("Starting monitoring across sites", {
+        mode: "enhanced",
+        siteCount,
+    });
 
     await runSequentially(sites, async (site) => {
         const monitors = safeCastTo<(Site["monitors"][0] | undefined)[]>(
@@ -322,10 +327,10 @@ export async function startAllMonitoringEnhancedFlow(params: {
                 );
             } catch (error) {
                 failed += 1;
-                config.logger.error(
-                    `Failed to start monitor ${id} for site ${site.identifier}`,
-                    error
-                );
+                config.logger.error("Failed to start monitor", error, {
+                    monitorId: id,
+                    siteIdentifier: site.identifier,
+                });
             }
         });
 
@@ -457,10 +462,10 @@ export async function stopAllMonitoringEnhancedFlow(params: {
                 );
             } catch (error) {
                 failed += 1;
-                config.logger.error(
-                    `Failed to stop monitor ${monitorId} for site ${site.identifier}`,
-                    error
-                );
+                config.logger.error("Failed to stop monitor", error, {
+                    monitorId,
+                    siteIdentifier: site.identifier,
+                });
             }
         });
     });
@@ -533,10 +538,11 @@ const runEnhancedLifecycleBatch = async <TAcc>(args: {
 
             acc = combine(acc, isResult);
         } catch (error) {
-            config.logger.error(
-                `Enhanced ${actionLabel} failed for ${identifier}:${monitorWithId.id}`,
-                error
-            );
+            config.logger.error("Enhanced monitor action failed", error, {
+                actionLabel,
+                identifier,
+                monitorId: monitorWithId.id,
+            });
             acc = combine(acc, false);
         }
     });
@@ -586,9 +592,10 @@ const toggleMonitoringForSiteEnhancedFlow = async (params: {
                 Number.isNaN(monitor.checkInterval) ||
                 monitor.checkInterval <= 0)
         ) {
-            config.logger.warn(
-                `Monitor ${identifier}:${monitorId} has no valid check interval set`
-            );
+            config.logger.warn("Monitor has no valid check interval set", {
+                identifier,
+                monitorId,
+            });
             return false;
         }
 
@@ -604,10 +611,11 @@ const toggleMonitoringForSiteEnhancedFlow = async (params: {
                 site,
             });
         } catch (error) {
-            config.logger.error(
-                `Enhanced ${kind} failed for ${identifier}:${monitorId}`,
-                error
-            );
+            config.logger.error("Enhanced monitor toggle failed", error, {
+                identifier,
+                kind,
+                monitorId,
+            });
             return false;
         }
     }
