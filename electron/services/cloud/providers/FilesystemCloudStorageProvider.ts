@@ -451,8 +451,27 @@ export class FilesystemCloudStorageProvider
                 await renameTempToTarget();
                 await fs.rm(backupPath, { force: true });
             } catch (error) {
-                await fs.rm(tempPath, { force: true }).catch(() => {});
-                await fs.rename(backupPath, targetPath).catch(() => {});
+                const rollbackErrors: Error[] = [];
+
+                await fs
+                    .rm(tempPath, { force: true })
+                    .catch((rollbackError: unknown) => {
+                        rollbackErrors.push(ensureError(rollbackError));
+                    });
+                await fs
+                    .rename(backupPath, targetPath)
+                    .catch((rollbackError: unknown) => {
+                        rollbackErrors.push(ensureError(rollbackError));
+                    });
+
+                if (rollbackErrors.length > 0) {
+                    throw new AggregateError(
+                        [ensureError(error), ...rollbackErrors],
+                        "Failed to upload filesystem object and restore the previous object",
+                        { cause: error }
+                    );
+                }
+
                 throw error;
             }
 

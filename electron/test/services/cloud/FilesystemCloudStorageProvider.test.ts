@@ -200,6 +200,84 @@ describe("FilesystemCloudStorageProvider", () => {
         }
     });
 
+    it("surfaces rollback failures when an overwrite upload cannot restore the previous object", async () => {
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const targetPath = path.join(appRoot, "sync", "existing.txt");
+        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        await fs.writeFile(targetPath, "old");
+
+        const actualFsPromises =
+            await vi.importActual<typeof import("node:fs/promises")>(
+                "node:fs/promises"
+            );
+        const uploadError = new Error("rename temp failed");
+        const rollbackError = new Error("restore previous object failed");
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:fs/promises", () => ({
+            ...actualFsPromises,
+            rename: vi.fn(
+                async (...args: Parameters<typeof actualFsPromises.rename>) => {
+                    const [from, to] = args;
+                    const fromPath = path.resolve(String(from));
+                    const toPath = path.resolve(String(to));
+
+                    if (fromPath.includes(".tmp-") && toPath === targetPath) {
+                        throw uploadError;
+                    }
+
+                    if (fromPath.includes(".bak-") && toPath === targetPath) {
+                        throw rollbackError;
+                    }
+
+                    return actualFsPromises.rename(...args);
+                }
+            ),
+        }));
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const errorModule =
+            await import("../../../services/cloud/providers/cloudProviderErrors");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            let thrown: unknown;
+            try {
+                await provider.uploadObject({
+                    buffer: Buffer.from("new"),
+                    key: "sync/existing.txt",
+                    overwrite: true,
+                });
+            } catch (error: unknown) {
+                thrown = error;
+            }
+
+            expect(thrown).toBeInstanceOf(
+                errorModule.CloudProviderOperationError
+            );
+
+            const typed = thrown as InstanceType<
+                typeof errorModule.CloudProviderOperationError
+            >;
+            expect(typed.message).toContain(
+                "Failed to upload filesystem object 'sync/existing.txt': Failed to upload filesystem object and restore the previous object"
+            );
+            expect(typed.cause).toBeInstanceOf(AggregateError);
+            expect((typed.cause as AggregateError).errors).toEqual(
+                expect.arrayContaining([uploadError, rollbackError])
+            );
+        } finally {
+            vi.doUnmock("node:fs/promises");
+        }
+    });
+
     it("rejects non-file upload targets without leaving temp files", async () => {
         const provider = new FilesystemCloudStorageProvider({ baseDirectory });
         const appRoot = path.resolve(baseDirectory, "uptime-watcher");
