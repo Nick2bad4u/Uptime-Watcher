@@ -214,7 +214,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             operationTimeoutManager.clearTimeout(operationId);
 
             expect(monitorLogger.debug).toHaveBeenCalledWith(
-                `Cleared timeout for operation ${operationId}`
+                "Cleared timeout for operation",
+                { operationId }
             );
         });
 
@@ -234,9 +235,8 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             // Should not log debug message for non-existent timeout
             expect(monitorLogger.debug).not.toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Cleared timeout for operation non-existent"
-                )
+                "Cleared timeout for operation",
+                { operationId: "non-existent" }
             );
         });
 
