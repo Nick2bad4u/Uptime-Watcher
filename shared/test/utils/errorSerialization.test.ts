@@ -41,4 +41,24 @@ describe(toSerializedError, () => {
             stage: "serialize",
         });
     });
+
+    it("does not invoke custom error accessors while copying properties", () => {
+        let getterCalls = 0;
+        const error = new Error("boom");
+
+        Object.defineProperty(error, "details", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                return {
+                    token: "SECRET",
+                };
+            },
+        });
+
+        const serialized = toSerializedError(error);
+
+        expect(getterCalls).toBe(0);
+        expect(Object.hasOwn(serialized, "details")).toBeFalsy();
+    });
 });

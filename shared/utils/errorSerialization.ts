@@ -17,14 +17,13 @@ const copyAdditionalProperties = (
             key === "message" || key === "name" || key === "stack";
 
         if (!isCoreKey) {
-            try {
+            const descriptor = Object.getOwnPropertyDescriptor(source, key);
+            if (descriptor && "value" in descriptor) {
                 Reflect.set(
                     target,
                     key,
-                    normalizeLogValue(Reflect.get(source, key))
+                    normalizeLogValue(descriptor.value as unknown)
                 );
-            } catch {
-                Reflect.set(target, key, undefined);
             }
         }
     }
