@@ -212,6 +212,12 @@ vi.mock("../../../../utils/fallbacks", () => ({
 }));
 
 vi.mock("../../../../utils/time", () => ({
+    formatFullTimestamp: vi.fn((timestamp: number) =>
+        Number.isFinite(timestamp) &&
+        Number.isFinite(new Date(timestamp).getTime())
+            ? new Date(timestamp).toLocaleString()
+            : "N/A"
+    ),
     formatRetryAttemptsText: vi.fn().mockReturnValue("3 retry attempts"),
     getIntervalLabel: vi.fn().mockImplementation((interval) => {
         const value = typeof interval === "number" ? interval : interval.value;
@@ -844,6 +850,23 @@ describe(SettingsTab, () => {
             );
 
             expect(screen.getByText("Never")).toBeInTheDocument();
+        });
+
+        it("should display fallback text for invalid lastChecked dates", () => {
+            const monitorWithInvalidLastChecked = {
+                ...baseMockMonitor,
+                lastChecked: new Date(Number.NaN),
+            };
+
+            render(
+                <SettingsTab
+                    {...baseProps}
+                    selectedMonitor={monitorWithInvalidLastChecked}
+                />
+            );
+
+            expect(screen.getByText("N/A")).toBeInTheDocument();
+            expect(screen.queryByText(/Invalid Date/v)).not.toBeInTheDocument();
         });
     });
 

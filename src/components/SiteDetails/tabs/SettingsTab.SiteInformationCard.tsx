@@ -12,6 +12,7 @@ import { ThemedCard } from "../../../theme/components/ThemedCard";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
+import { formatFullTimestamp } from "../../../utils/time";
 
 const HistoryIcon = AppIcons.ui.history;
 const IdentifierIcon = AppIcons.ui.link;
@@ -23,7 +24,7 @@ const formatLastChecked = (lastChecked: Monitor["lastChecked"]): string => {
         return "Never";
     }
 
-    return new Date(lastChecked).toLocaleString();
+    return formatFullTimestamp(lastChecked.getTime());
 };
 
 /**
