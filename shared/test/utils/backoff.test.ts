@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateBackoffDelayMs } from "../../utils/backoff";
+import {
+    calculateBackoffDelayMs,
+    MAX_BACKOFF_DELAY_MS,
+} from "../../utils/backoff";
 
 describe(calculateBackoffDelayMs, () => {
     it("returns initial delay for first exponential retry (attemptIndex=0)", () => {
@@ -76,5 +79,25 @@ describe(calculateBackoffDelayMs, () => {
                 strategy: "exponential",
             })
         ).toBe(0);
+    });
+
+    it("caps exponential delays at the maximum safe timer delay", () => {
+        expect(
+            calculateBackoffDelayMs({
+                attemptIndex: 2048,
+                initialDelayMs: 1000,
+                strategy: "exponential",
+            })
+        ).toBe(MAX_BACKOFF_DELAY_MS);
+    });
+
+    it("caps linear delays at the maximum safe timer delay", () => {
+        expect(
+            calculateBackoffDelayMs({
+                attemptIndex: Number.MAX_SAFE_INTEGER,
+                initialDelayMs: 1000,
+                strategy: "linear",
+            })
+        ).toBe(MAX_BACKOFF_DELAY_MS);
     });
 });

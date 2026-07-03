@@ -20,6 +20,17 @@
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
+ * Largest delay value that can be scheduled safely with JavaScript timers.
+ *
+ * @remarks
+ * Node.js clamps larger `setTimeout` values down to 1ms, so retry helpers must
+ * saturate before handing delays to timer APIs.
+ *
+ * @public
+ */
+export const MAX_BACKOFF_DELAY_MS = 2_147_483_647;
+
+/**
  * Parameters for {@link calculateBackoffDelayMs}.
  */
 export interface BackoffDelayOptions {
@@ -56,6 +67,8 @@ export type BackoffStrategy = "exponential" | "linear";
  * - Negative / non-finite inputs are treated as `0` so retry helpers never
  *   schedule negative timeouts or throw while handling an already-failing
  *   operation.
+ * - Finite values that exceed the maximum safe JavaScript timer delay are
+ *   capped so retry loops do not accidentally schedule immediate timers.
  */
 export function calculateBackoffDelayMs(options: BackoffDelayOptions): number {
     const attemptIndex = isFiniteNumber(options.attemptIndex)
@@ -71,7 +84,7 @@ export function calculateBackoffDelayMs(options: BackoffDelayOptions): number {
     }
 
     if (options.strategy === "linear") {
-        return initialDelayMs * (attemptIndex + 1);
+        return capBackoffDelayMs(initialDelayMs * (attemptIndex + 1));
     }
 
     const rawMultiplier = options.multiplier ?? 2;
@@ -83,5 +96,13 @@ export function calculateBackoffDelayMs(options: BackoffDelayOptions): number {
         return 0;
     }
 
-    return initialDelayMs * multiplier ** attemptIndex;
+    return capBackoffDelayMs(initialDelayMs * multiplier ** attemptIndex);
+}
+
+function capBackoffDelayMs(delayMs: number): number {
+    if (!isFiniteNumber(delayMs)) {
+        return MAX_BACKOFF_DELAY_MS;
+    }
+
+    return Math.min(delayMs, MAX_BACKOFF_DELAY_MS);
 }
