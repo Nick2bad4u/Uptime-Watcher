@@ -873,6 +873,36 @@ describe(useSiteAnalytics, () => {
             expect(result.current.slowestResponse).toBe(0);
         });
 
+        it("should exclude records with invalid timestamps or response times", () => {
+            const validRecord = createStatusRecord(now - 1000, "up", 200);
+            const malformedHistoryMonitor: Monitor = {
+                ...mockMonitorEmpty,
+                history: [
+                    validRecord,
+                    createStatusRecord(
+                        Number.POSITIVE_INFINITY,
+                        "up",
+                        100
+                    ),
+                    createStatusRecord(now - 2000, "up", Number.NaN),
+                    createStatusRecord(now - 3000, "up", -1),
+                ],
+            };
+
+            const { result } = renderHook(() =>
+                useSiteAnalytics(malformedHistoryMonitor, "24h")
+            );
+
+            expect(result.current.filteredHistory).toEqual([validRecord]);
+            expect(result.current.totalChecks).toBe(1);
+            expect(result.current.avgResponseTime).toBe(200);
+            expect(result.current.percentileMetrics).toEqual({
+                p50: 200,
+                p95: 200,
+                p99: 200,
+            });
+        });
+
         it("should handle empty filtered history after time range filtering", async ({
             task,
             annotate,
@@ -1039,6 +1069,31 @@ describe(useChartData, () => {
             { x: 2000, y: 0 },
             { x: 3000, y: 150 },
         ]);
+    });
+
+    it("should exclude invalid chart history records", () => {
+        const malformedMonitor: Monitor = {
+            ...mockMonitor,
+            history: [
+                { responseTime: 150, status: "up", timestamp: 3000 },
+                {
+                    responseTime: 200,
+                    status: "up",
+                    timestamp: Number.POSITIVE_INFINITY,
+                },
+                { responseTime: Number.NaN, status: "up", timestamp: 1000 },
+                { responseTime: -1, status: "down", timestamp: 2000 },
+            ],
+        };
+
+        const { result } = renderHook(() =>
+            useChartData(malformedMonitor, mockTheme)
+        );
+
+        const dataset = arrayFirst(result.current.lineChartData.datasets);
+        expect(dataset?.data).toEqual([{ x: 3000, y: 150 }]);
+        expect(dataset?.pointBackgroundColor).toEqual(["#10b981"]);
+        expect(dataset?.pointBorderColor).toEqual(["#10b981"]);
     });
 
     it("should memoize chart data correctly", async ({ task, annotate }) => {

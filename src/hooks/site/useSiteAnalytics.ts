@@ -12,7 +12,11 @@ import type { Monitor, StatusHistory } from "@shared/types";
 
 import { typedObjectKeys } from "@shared/utils/objectSafety";
 import { useMemo } from "react";
-import { arrayIncludes, isDefined } from "ts-extras";
+import {
+    arrayIncludes,
+    isDefined,
+    isFinite as isFiniteNumber,
+} from "ts-extras";
 
 import type { Theme } from "../../theme/types";
 
@@ -79,6 +83,21 @@ const createDowntimePeriod = (start: number, end: number): DowntimePeriod => ({
     end,
     start,
 });
+
+function isValidHistoryTimestamp(timestamp: number): boolean {
+    return (
+        isFiniteNumber(timestamp) &&
+        isFiniteNumber(new Date(timestamp).getTime())
+    );
+}
+
+function isAnalyticsHistoryRecord(record: StatusHistory): boolean {
+    return (
+        isValidHistoryTimestamp(record.timestamp) &&
+        isFiniteNumber(record.responseTime) &&
+        record.responseTime >= 0
+    );
+}
 
 const isActiveDowntimeWindow = (args: {
     downtimeEnd: number | undefined;
@@ -284,7 +303,10 @@ function filterHistoryByTimeRange(
         : "24h";
 
     const cutoff = now - CHART_TIME_PERIODS[safeTimeRange];
-    return history.filter((record) => record.timestamp >= cutoff);
+    return history.filter(
+        (record) =>
+            isAnalyticsHistoryRecord(record) && record.timestamp >= cutoff
+    );
 }
 
 /**
@@ -303,9 +325,9 @@ function filterHistoryByTimeRange(
  */
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
-        const sortedHistory = [...monitor.history].toSorted(
-            (a, b) => a.timestamp - b.timestamp
-        );
+        const sortedHistory = monitor.history
+            .filter(isAnalyticsHistoryRecord)
+            .toSorted((a, b) => a.timestamp - b.timestamp);
 
         const lineChartData = {
             datasets: [
