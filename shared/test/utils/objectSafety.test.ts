@@ -545,6 +545,32 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             expect(getterCalls).toBe(0);
         });
 
+        it("does not invoke accessors when freezing enumerable data properties", () => {
+            let getterCalls = 0;
+            const symbolKey = Symbol("stable");
+            const input = {
+                stable: "value",
+                [symbolKey]: "symbol-value",
+            };
+
+            Object.defineProperty(input, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "SECRET";
+                },
+            });
+
+            const result =
+                objectSafetyModule.freezeOwnEnumerableDataProperties(input);
+
+            expect(result["stable"]).toBe("value");
+            expect(result[symbolKey]).toBe("symbol-value");
+            expect(Object.hasOwn(result, "computed")).toBeFalsy();
+            expect(Object.isFrozen(result)).toBeTruthy();
+            expect(getterCalls).toBe(0);
+        });
+
         it("does not invoke accessors during safeObjectOmit", () => {
             let getterCalls = 0;
             const input = {

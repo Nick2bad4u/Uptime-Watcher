@@ -58,6 +58,34 @@ function getOwnEnumerableDataEntries(obj: object): [PropertyKey, unknown][] {
 }
 
 /**
+ * Creates a frozen shallow copy of own enumerable data properties.
+ *
+ * @remarks
+ * Accessor properties are intentionally skipped so diagnostic/error metadata
+ * copying cannot execute user-defined getters.
+ *
+ * @param obj - Source object to copy from.
+ *
+ * @returns Frozen object containing only enumerable own data properties.
+ */
+export function freezeOwnEnumerableDataProperties(
+    obj: object
+): Readonly<UnknownRecord> {
+    const result: UnknownRecord = {};
+
+    for (const [key, value] of getOwnEnumerableDataEntries(obj)) {
+        Object.defineProperty(result, key, {
+            configurable: true,
+            enumerable: true,
+            value,
+            writable: true,
+        });
+    }
+
+    return Object.freeze(result);
+}
+
+/**
  * Type-safe object property access with fallback.
  *
  * @remarks

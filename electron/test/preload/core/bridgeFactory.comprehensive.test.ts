@@ -451,5 +451,29 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             expect(error.details).not.toBe(details);
             expect(Object.isFrozen(error.details)).toBeTruthy();
         });
+
+        it("does not invoke detail accessors while freezing metadata", () => {
+            let getterCalls = 0;
+            const details = { context: "test" };
+            Object.defineProperty(details, "secret", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("detail getter should not run");
+                },
+            });
+
+            const error = new IpcError(
+                "message",
+                DATA_CHANNELS.exportData,
+                undefined,
+                details
+            );
+
+            expect(error.details).toEqual({ context: "test" });
+            expect(Object.hasOwn(error.details ?? {}, "secret")).toBeFalsy();
+            expect(Object.isFrozen(error.details)).toBeTruthy();
+            expect(getterCalls).toBe(0);
+        });
     });
 });

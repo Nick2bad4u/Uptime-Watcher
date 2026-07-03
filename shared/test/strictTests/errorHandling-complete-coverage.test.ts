@@ -37,6 +37,29 @@ describe(ApplicationError, () => {
         expect(Object.isFrozen(error.details)).toBeTruthy();
     });
 
+    it("does not invoke detail accessors while freezing metadata", () => {
+        let getterCalls = 0;
+        const details = { scope: "sync" };
+        Object.defineProperty(details, "secret", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("detail getter should not run");
+            },
+        });
+
+        const error = new ApplicationError({
+            code: "E_DETAILS",
+            details,
+            message: "Metadata failed",
+        });
+
+        expect(error.details).toEqual({ scope: "sync" });
+        expect(Object.hasOwn(error.details ?? {}, "secret")).toBeFalsy();
+        expect(Object.isFrozen(error.details)).toBeTruthy();
+        expect(getterCalls).toBe(0);
+    });
+
     it("handles non-serializable causes gracefully", () => {
         const circular: Record<string, unknown> = {};
         circular["self"] = circular;

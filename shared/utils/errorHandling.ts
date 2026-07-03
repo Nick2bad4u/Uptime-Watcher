@@ -28,6 +28,7 @@
 import type { UnknownRecord } from "type-fest";
 
 import { normalizeLogValue } from "@shared/utils/loggingContext";
+import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined, objectHasIn } from "ts-extras";
 
@@ -149,7 +150,7 @@ export class ApplicationError extends Error {
         this.code = options.code;
         this.operation = options.operation;
         this.details = options.details
-            ? Object.freeze({ ...options.details })
+            ? freezeOwnEnumerableDataProperties(options.details)
             : undefined;
         this.cause = normalizedCause;
     }

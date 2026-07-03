@@ -42,6 +42,7 @@ import {
     validateVoidIpcResponse,
 } from "@shared/utils/ipcResponse";
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
+import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 import {
@@ -333,7 +334,9 @@ export class IpcError extends Error {
         this.name = "IpcError";
         this.channel = channel;
         this.originalError = originalError;
-        this.details = details ? Object.freeze({ ...details }) : undefined;
+        this.details = details
+            ? freezeOwnEnumerableDataProperties(details)
+            : undefined;
     }
 }
 
