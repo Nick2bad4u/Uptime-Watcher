@@ -82,6 +82,14 @@ function normalizeErrorMessage(message: string): string {
     return typeof normalized === "string" ? normalized : message;
 }
 
+function normalizeConsoleLogValue(value: unknown): unknown {
+    try {
+        return normalizeLogValue(value);
+    } catch {
+        return `[unserializable:${typeof value}]`;
+    }
+}
+
 /**
  * Normalize an unknown error cause to a proper {@link Error} instance when
  * needed.
@@ -245,9 +253,16 @@ function safeStoreOperation(
     } catch (error) {
         // Use basic console for shared utilities to avoid dependencies
         // This is acceptable in shared utilities that can't import loggers
-        console.warn("Store operation failed for:", operationName, error);
+        console.warn(
+            "Store operation failed for:",
+            operationName,
+            normalizeConsoleLogValue(error)
+        );
         if (originalError) {
-            console.error("Original operation error:", originalError);
+            console.error(
+                "Original operation error:",
+                normalizeConsoleLogValue(originalError)
+            );
         }
     }
 }
@@ -356,8 +371,11 @@ async function handleBackendOperation<T>(
             logger.error(errorMessage, error);
         } catch (error_) {
             const loggingError = ensureError(error_);
-            console.error(errorMessage, error);
-            console.warn("Logger error during error handling:", loggingError);
+            console.error(errorMessage, normalizeConsoleLogValue(error));
+            console.warn(
+                "Logger error during error handling:",
+                normalizeConsoleLogValue(loggingError)
+            );
         }
 
         throw error;
@@ -495,7 +513,10 @@ export async function withUtilityErrorHandling<T>(
         const wrappedError = ensureError(error);
 
         // Use console logging for shared utilities to avoid dependencies
-        console.error(`${operationName} failed`, wrappedError);
+        console.error(
+            `${operationName} failed`,
+            normalizeConsoleLogValue(wrappedError)
+        );
 
         if (shouldThrow) {
             throw wrappedError;

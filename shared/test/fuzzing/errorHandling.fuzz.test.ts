@@ -13,7 +13,11 @@ import {
     withErrorHandling,
     withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { describe, expect, it, vi } from "vitest";
+
+const sanitizedErrorMessage = (message: string) =>
+    expect.objectContaining({ message });
 
 describe("ErrorHandling fuzzing - line 141", () => {
     it("simple fuzz sanity check", () => {
@@ -46,12 +50,12 @@ describe("ErrorHandling fuzzing - line 141", () => {
             // Verify line 141 was hit - console.error should be called
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "Failed to test operation",
-                expect.any(Error)
+                sanitizedErrorMessage("Test error")
             );
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "Logger error during error handling:",
-                expect.any(Error)
+                expect.anything()
             );
 
             consoleErrorSpy.mockRestore();
@@ -104,11 +108,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
                     operationName
                         ? `Failed to ${operationName}`
                         : "Async operation failed",
-                    expect.any(Error)
+                    sanitizedErrorMessage(errorMessage)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
                     "Logger error during error handling:",
-                    expect.any(Error)
+                    expect.anything()
                 );
 
                 consoleErrorSpy.mockRestore();
@@ -143,11 +147,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 // Verify the specific message format for line 141
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     `Failed to ${operationName}`,
-                    expect.any(Error)
+                    sanitizedErrorMessage(errorMessage)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
                     "Logger error during error handling:",
-                    expect.any(Error)
+                    expect.anything()
                 );
 
                 consoleErrorSpy.mockRestore();
@@ -178,11 +182,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
             // Verify line 141 console.error call with default message
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "Async operation failed",
-                expect.any(Error)
+                sanitizedErrorMessage("Test error")
             );
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "Logger error during error handling:",
-                expect.any(Error)
+                expect.anything()
             );
 
             consoleErrorSpy.mockRestore();
@@ -217,11 +221,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 // Should still call console.error regardless of error type
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     "Failed to fuzz test",
-                    errorValue
+                    normalizeLogValue(errorValue)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
                     "Logger error during error handling:",
-                    expect.any(Error)
+                    expect.anything()
                 );
 
                 consoleErrorSpy.mockRestore();
@@ -267,18 +271,18 @@ describe("ErrorHandling fuzzing - line 141", () => {
                 ) {
                     expect(consoleErrorSpy).toHaveBeenCalledWith(
                         `Failed to ${invalidOperationName}`,
-                        expect.any(Error)
+                        sanitizedErrorMessage(errorMessage)
                     );
                 } else {
                     expect(consoleErrorSpy).toHaveBeenCalledWith(
                         "Async operation failed",
-                        expect.any(Error)
+                        sanitizedErrorMessage(errorMessage)
                     );
                 }
 
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
                     "Logger error during error handling:",
-                    expect.any(Error)
+                    expect.anything()
                 );
 
                 consoleErrorSpy.mockRestore();
@@ -380,11 +384,11 @@ describe("withErrorHandling backend fuzz coverage", () => {
 
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     expectedMessage,
-                    expect.any(Error)
+                    sanitizedErrorMessage(errorMessage)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
                     "Logger error during error handling:",
-                    expect.any(Error)
+                    sanitizedErrorMessage("logger failure")
                 );
             } finally {
                 consoleErrorSpy.mockRestore();
@@ -553,7 +557,7 @@ describe("withErrorHandling frontend fuzz integration", () => {
                 if (config.setErrorThrows && Boolean(errorValue)) {
                     expect(originalErrorLog).toEqual([
                         "Original operation error:",
-                        errorValue,
+                        normalizeLogValue(errorValue),
                     ]);
                 } else {
                     expect(originalErrorLog).toBeUndefined();
@@ -599,11 +603,11 @@ describe("withErrorHandling frontend fuzz integration", () => {
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "Store operation failed for:",
                 "set error state",
-                expect.any(Error)
+                sanitizedErrorMessage("set error failure")
             );
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "Original operation error:",
-                originalError
+                sanitizedErrorMessage("frontend failure")
             );
         } finally {
             consoleWarnSpy.mockRestore();
@@ -694,7 +698,7 @@ describe("withUtilityErrorHandling fuzz behavior", () => {
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "utility op failed",
-                failingError
+                sanitizedErrorMessage("utility failure")
             );
         } finally {
             consoleErrorSpy.mockRestore();
@@ -719,7 +723,7 @@ describe("withUtilityErrorHandling fuzz behavior", () => {
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 "utility fallback failed",
-                expect.any(Error)
+                sanitizedErrorMessage("utility failure")
             );
         } finally {
             consoleErrorSpy.mockRestore();

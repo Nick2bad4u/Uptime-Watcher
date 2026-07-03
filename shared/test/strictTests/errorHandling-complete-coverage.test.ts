@@ -198,8 +198,49 @@ describe(withErrorHandling, () => {
         expect(warnSpy).toHaveBeenCalledTimes(4);
         expect(errorSpy).toHaveBeenCalledWith(
             "Original operation error:",
-            expect.any(Error)
+            expect.objectContaining({ message: "frontend fail" })
         );
+    });
+
+    it("sanitizes fallback frontend console errors", async () => {
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {
+            /* noop */
+        });
+        const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {
+            /* noop */
+        });
+
+        const store: ErrorHandlingFrontendStore = {
+            clearError: vi.fn(),
+            setError: vi.fn(() => {
+                throw new Error("set error fail");
+            }),
+            setLoading: vi.fn(),
+        };
+
+        await expect(
+            withErrorHandling(async () => {
+                throw {
+                    accessToken: "token-secret",
+                    message: "failed Authorization Bearer bearer-secret",
+                };
+            }, store)
+        ).rejects.toThrow("[object Object]");
+
+        expect(errorSpy).toHaveBeenCalledWith(
+            "Original operation error:",
+            expect.objectContaining({
+                accessToken: "[redacted]",
+                message: "failed Authorization [redacted]",
+            })
+        );
+        expect(warnSpy).toHaveBeenCalledWith(
+            "Store operation failed for:",
+            "set error state",
+            expect.objectContaining({ message: "set error fail" })
+        );
+        expect(String(errorSpy.mock.calls)).not.toContain("token-secret");
+        expect(String(errorSpy.mock.calls)).not.toContain("bearer-secret");
     });
 
     it("logs backend failures with contextual messaging", async () => {
@@ -251,11 +292,62 @@ describe(withErrorHandling, () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "Failed to sync",
-            expect.any(Error)
+            expect.objectContaining({ message: "operation fail" })
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
             "Logger error during error handling:",
-            expect.any(Error)
+            expect.objectContaining({ message: "logger fail" })
+        );
+    });
+
+    it("sanitizes backend console fallback errors", async () => {
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {
+                /* noop */
+            });
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {
+                /* noop */
+            });
+
+        const logger = {
+            error: vi.fn(() => {
+                throw new Error("logger Authorization Bearer logger-secret");
+            }),
+        };
+
+        await expect(
+            withErrorHandling(
+                async () => {
+                    throw {
+                        refreshToken: "refresh-secret",
+                        message: "operation failed",
+                    };
+                },
+                { logger, operationName: "sync" }
+            )
+        ).rejects.toMatchObject({ message: "operation failed" });
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "Failed to sync",
+            expect.objectContaining({
+                message: "operation failed",
+                refreshToken: "[redacted]",
+            })
+        );
+        expect(consoleWarnSpy).toHaveBeenCalledWith(
+            "Logger error during error handling:",
+            expect.objectContaining({
+                message: "logger Authorization [redacted]",
+            })
+        );
+        expect(String(consoleErrorSpy.mock.calls)).not.toContain(
+            "refresh-secret"
+        );
+        expect(String(consoleWarnSpy.mock.calls)).not.toContain(
+            "logger-secret"
         );
     });
 });
@@ -286,7 +378,7 @@ describe(withUtilityErrorHandling, () => {
         expect(result).toBe("fallback");
         expect(consoleSpy).toHaveBeenCalledWith(
             "load data failed",
-            expect.any(Error)
+            expect.objectContaining({ message: "boom" })
         );
     });
 
@@ -310,7 +402,7 @@ describe(withUtilityErrorHandling, () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "dangerous failed",
-            expect.any(Error)
+            expect.objectContaining({ message: "fatal" })
         );
     });
 
@@ -329,7 +421,7 @@ describe(withUtilityErrorHandling, () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "dangerous failed",
-            expect.any(Error)
+            expect.objectContaining({ message: "fatal" })
         );
     });
 });

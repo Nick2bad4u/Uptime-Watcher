@@ -107,7 +107,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(mockConsole.warn).toHaveBeenCalledWith(
                 "Store operation failed for:",
                 "clear error state",
-                expect.any(Error)
+                expect.objectContaining({ message: "Store error" })
             );
         });
 
@@ -291,11 +291,11 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(mockConsole.warn).toHaveBeenCalledWith(
                 "Store operation failed for:",
                 "set error state",
-                storeError
+                expect.objectContaining({ message: "Store setError error" })
             );
             expect(mockConsole.error).toHaveBeenCalledWith(
                 "Original operation error:",
-                testError
+                expect.objectContaining({ message: "Operation error" })
             );
         });
 
@@ -326,7 +326,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             expect(mockConsole.warn).toHaveBeenCalledWith(
                 "Store operation failed for:",
                 "clear loading state in finally block",
-                finallyError
+                expect.objectContaining({ message: "Finally setLoading error" })
             );
         });
 
