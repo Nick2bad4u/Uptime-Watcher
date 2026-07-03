@@ -1,7 +1,8 @@
 import type { Site } from "@shared/types";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isObject } from "@shared/utils/typeGuards";
-import { objectHasIn } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -48,10 +49,52 @@ export function isDatabaseCommandContext(
     }
 
     return (
-        objectHasIn(value, "serviceFactory") &&
-        objectHasIn(value, "eventEmitter") &&
-        objectHasIn(value, "cache")
+        getOwnDataProperty(value, "serviceFactory").found &&
+        getOwnDataProperty(value, "eventEmitter").found &&
+        getOwnDataProperty(value, "cache").found
     );
+}
+
+function getRequiredContextProperty(
+    context: DatabaseCommandContext,
+    key: keyof DatabaseCommandContext
+): unknown {
+    const property = getOwnDataProperty(context, key);
+    if (!property.found) {
+        throw new TypeError(`Database command context is missing ${key}.`);
+    }
+
+    return property.value;
+}
+
+function getOptionalContextProperty(
+    context: DatabaseCommandContext,
+    key: keyof DatabaseCommandContext
+): unknown {
+    const property = getOwnDataProperty(context, key);
+    return property.found ? property.value : undefined;
+}
+
+function normalizeDatabaseCommandContext(
+    context: DatabaseCommandContext
+): DatabaseCommandContext {
+    return {
+        cache: castUnchecked<StandardizedCache<Site>>(
+            getRequiredContextProperty(context, "cache")
+        ),
+        configurationManager: castUnchecked<ConfigurationManager | undefined>(
+            getOptionalContextProperty(context, "configurationManager")
+        ),
+        eventEmitter: castUnchecked<TypedEventBus<UptimeEvents>>(
+            getRequiredContextProperty(context, "eventEmitter")
+        ),
+        serviceFactory: castUnchecked<DatabaseServiceFactory>(
+            getRequiredContextProperty(context, "serviceFactory")
+        ),
+        updateHistoryLimit: castUnchecked<
+            ((limit: number) => Promise<void>) | undefined
+        >(getOptionalContextProperty(context, "updateHistoryLimit")),
+    };
 }
 
 /**
@@ -64,8 +107,8 @@ export function isImportContext(
         return false;
     }
 
-    const data: unknown = Reflect.get(value, "data");
-    return typeof data === "string";
+    const data = getOwnDataProperty(value, "data");
+    return data.found && typeof data.value === "string";
 }
 
 /**
@@ -78,12 +121,18 @@ export function isRestoreContext(
         return false;
     }
 
-    const payload: unknown = Reflect.get(value, "payload");
+    const payloadProperty = getOwnDataProperty(value, "payload");
+    if (!payloadProperty.found) {
+        return false;
+    }
+
+    const { value: payload } = payloadProperty;
     if (payload === null || typeof payload !== "object") {
         return false;
     }
 
-    return Buffer.isBuffer(Reflect.get(payload, "buffer"));
+    const buffer = getOwnDataProperty(payload, "buffer");
+    return buffer.found && Buffer.isBuffer(buffer.value);
 }
 
 /**
@@ -95,7 +144,7 @@ export function resolveDatabaseCommandContext(
     cache?: StandardizedCache<Site>
 ): DatabaseCommandContext {
     if (isDatabaseCommandContext(value)) {
-        return value;
+        return normalizeDatabaseCommandContext(value);
     }
 
     if (!eventEmitter || !cache) {
