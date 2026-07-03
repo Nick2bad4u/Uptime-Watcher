@@ -133,9 +133,12 @@ export type MonitorRowSource = Monitor &
  */
 function convertLastCheckedField(lastChecked: unknown): null | number {
     if (lastChecked instanceof Date) {
-        return lastChecked.getTime();
+        const timestamp = lastChecked.getTime();
+        if (Number.isFinite(timestamp)) {
+            return timestamp;
+        }
     }
-    if (typeof lastChecked === "number") {
+    if (typeof lastChecked === "number" && Number.isFinite(lastChecked)) {
         return lastChecked;
     }
     // Log warning when discarding invalid data to help debugging
@@ -145,6 +148,15 @@ function convertLastCheckedField(lastChecked: unknown): null | number {
         );
     }
     return null;
+}
+
+function getValidLastCheckedDate(timestamp: unknown): Date | undefined {
+    if (typeof timestamp !== "number" || !Number.isFinite(timestamp)) {
+        return undefined;
+    }
+
+    const date = new Date(timestamp);
+    return Number.isFinite(date.getTime()) ? date : undefined;
 }
 
 /**
@@ -774,6 +786,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     // (monitorMapper) to ensure consistent logging and security validation.
     // This schema mapper focuses on dynamic field mapping only.
     const activeOperations: string[] = [];
+    const lastCheckedDate = getValidLastCheckedDate(row.last_checked);
 
     // Create the base monitor object with proper type safety
     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type assertions are safe for database row to monitor object conversion with known schema */
@@ -794,7 +807,9 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         ...(row.url && { url: row.url }),
         // Only add lastChecked if it exists to avoid undefined assignment with
         // exactOptionalPropertyTypes
-        ...(row.last_checked && { lastChecked: new Date(row.last_checked) }),
+        ...(isDefined(lastCheckedDate) && {
+            lastChecked: lastCheckedDate,
+        }),
     };
 
     // Dynamically map monitor type specific fields ONLY for the current monitor type

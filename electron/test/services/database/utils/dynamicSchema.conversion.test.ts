@@ -100,4 +100,106 @@ describe("dynamic schema conversion", () => {
 
         expect(monitor.port).toBe(0);
     });
+
+    it.each([
+        ["invalid Date", new Date("invalid")],
+        ["NaN number", Number.NaN],
+        ["infinite number", Infinity],
+    ])(
+        "discards invalid lastChecked values from %s when writing rows",
+        async (_caseName, lastChecked) => {
+            const { mapMonitorToRow } = await import(
+                "../../../../services/database/utils/schema/dynamicSchema"
+            );
+
+            const row = mapMonitorToRow({
+                lastChecked: lastChecked as Date,
+                type: "port",
+            });
+
+            expect(row.last_checked).toBeNull();
+        }
+    );
+
+    it("preserves finite lastChecked timestamps when writing rows", async ({
+        annotate,
+        task,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: DynamicSchema", "component");
+        await annotate("Category: Database Utils", "category");
+        await annotate("Type: Validation", "type");
+
+        const { mapMonitorToRow } = await import(
+            "../../../../services/database/utils/schema/dynamicSchema"
+        );
+
+        expect(
+            mapMonitorToRow({
+                lastChecked: new Date(0),
+                type: "port",
+            }).last_checked
+        ).toBe(0);
+        expect(
+            mapMonitorToRow({
+                lastChecked: 1_680_000_000_000 as unknown as Date,
+                type: "port",
+            }).last_checked
+        ).toBe(1_680_000_000_000);
+    });
+
+    it.each([
+        ["missing timestamp", undefined],
+        ["NaN timestamp", Number.NaN],
+        ["infinite timestamp", Infinity],
+        ["invalid date range", 8.64e15 + 1],
+    ])(
+        "omits lastChecked for %s when reading rows",
+        async (_caseName, lastChecked) => {
+            const { mapRowToMonitor } = await import(
+                "../../../../services/database/utils/schema/dynamicSchema"
+            );
+
+            const monitor = mapRowToMonitor({
+                id: "monitor-1",
+                ...(lastChecked !== undefined && {
+                    last_checked: lastChecked,
+                }),
+                site_identifier: "site-1",
+                type: "port",
+            });
+
+            expect(monitor).not.toHaveProperty("lastChecked");
+        }
+    );
+
+    it("preserves finite lastChecked dates when reading rows", async ({
+        annotate,
+        task,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: DynamicSchema", "component");
+        await annotate("Category: Database Utils", "category");
+        await annotate("Type: Validation", "type");
+
+        const { mapRowToMonitor } = await import(
+            "../../../../services/database/utils/schema/dynamicSchema"
+        );
+
+        const epochMonitor = mapRowToMonitor({
+            id: "monitor-1",
+            last_checked: 0,
+            site_identifier: "site-1",
+            type: "port",
+        });
+        const laterMonitor = mapRowToMonitor({
+            id: "monitor-2",
+            last_checked: 1_680_000_000_000,
+            site_identifier: "site-1",
+            type: "port",
+        });
+
+        expect(epochMonitor.lastChecked).toEqual(new Date(0));
+        expect(laterMonitor.lastChecked).toEqual(new Date(1_680_000_000_000));
+    });
 });
