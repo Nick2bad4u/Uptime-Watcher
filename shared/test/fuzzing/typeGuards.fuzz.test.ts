@@ -370,12 +370,14 @@ describe("TypeGuards Fuzzing Tests", () => {
                 if (isResult) {
                     expect(typeof value).toBe("number");
                     expect(Number.isNaN(value)).toBeFalsy();
+                    expect(Number.isFinite(value)).toBeTruthy();
                     expect(value).toBeGreaterThanOrEqual(0);
                 } else {
-                    // If not non-negative, it's either not a number, NaN, or negative
+                    // If not non-negative, it is not a finite number >= 0.
                     const isValidFalse =
                         typeof value !== "number" ||
                         Number.isNaN(value) ||
+                        !Number.isFinite(value) ||
                         value < 0;
                     expect(isValidFalse).toBeTruthy();
                 }

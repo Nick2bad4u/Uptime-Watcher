@@ -778,15 +778,14 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isNonNegativeNumber(null)).toBeFalsy();
         });
 
-        it("should handle infinity correctly", async ({ task, annotate }) => {
+        it("should reject infinite values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: guardFunctions", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Initialization", "type");
 
-            // Infinity is a number in JavaScript, so these should return true
-            expect(isNonNegativeNumber(Infinity)).toBeTruthy();
-            expect(isNonNegativeNumber(-Infinity)).toBeFalsy(); // negative
+            expect(isNonNegativeNumber(Infinity)).toBeFalsy();
+            expect(isNonNegativeNumber(-Infinity)).toBeFalsy();
         });
 
         it("should return false for non-numbers", async ({

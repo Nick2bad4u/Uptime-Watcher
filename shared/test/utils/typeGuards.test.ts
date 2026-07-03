@@ -663,10 +663,9 @@ describe("typeGuards", () => {
             expect(isNonNegativeNumber(0)).toBeTruthy();
             expect(isNonNegativeNumber(123)).toBeTruthy();
             expect(isNonNegativeNumber(3.14)).toBeTruthy();
-            expect(isNonNegativeNumber(Infinity)).toBeTruthy();
         });
 
-        it("should return false for negative numbers", async ({
+        it("should return false for negative and infinite numbers", async ({
             task,
             annotate,
         }) => {
@@ -677,6 +676,7 @@ describe("typeGuards", () => {
 
             expect(isNonNegativeNumber(-1)).toBeFalsy();
             expect(isNonNegativeNumber(-123)).toBeFalsy();
+            expect(isNonNegativeNumber(Infinity)).toBeFalsy();
             expect(isNonNegativeNumber(-Infinity)).toBeFalsy();
         });
 

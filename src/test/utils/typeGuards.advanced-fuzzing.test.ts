@@ -264,6 +264,7 @@ describe("type Guards Advanced Fuzzing Tests", () => {
                 const isExpectedResult =
                     typeof value === "number" &&
                     !Number.isNaN(value) &&
+                    Number.isFinite(value) &&
                     value >= 0;
 
                 expect(isResult).toBe(isExpectedResult);

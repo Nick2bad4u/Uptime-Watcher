@@ -217,7 +217,7 @@ export function isFunction(
  *   zero.
  */
 export function isNonNegativeNumber(value: unknown): value is number {
-    return isNumber(value) && !Number.isNaN(value) && value >= 0;
+    return isFiniteNumber(value) && value >= 0;
 }
 
 /**
