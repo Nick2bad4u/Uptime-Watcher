@@ -183,6 +183,10 @@ describe(HttpJsonMonitor, () => {
         expect(result.status).toBe("up");
         expect(result.details).toContain("matched expected value");
         expect(result.responseTime).toBe(180);
+        expect(axiosGetMock).toHaveBeenCalledWith(
+            "https://example.com/health",
+            expect.not.objectContaining({ responseType: "stream" })
+        );
     });
 
     it("returns degraded when the JSON path is missing", async () => {

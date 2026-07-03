@@ -178,6 +178,10 @@ describe(HttpKeywordMonitor, () => {
             expect.any(Function),
             undefined
         );
+        expect(axiosGetMock).toHaveBeenCalledWith(
+            "https://example.com/health",
+            expect.not.objectContaining({ responseType: "stream" })
+        );
         expect(withOperationalHooksMock).toHaveBeenCalled();
     });
 

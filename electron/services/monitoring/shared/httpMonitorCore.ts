@@ -325,7 +325,6 @@ export function createHttpMonitorService<
 
             const response = await this.axiosInstance.get(url, {
                 ...(signal && { signal }),
-                responseType: "stream",
                 timeout,
                 ...(!shouldFollowRedirects && { maxRedirects: 0 }),
             });
