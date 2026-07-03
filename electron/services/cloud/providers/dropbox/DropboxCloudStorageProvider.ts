@@ -4,9 +4,9 @@ import {
     assertCloudObjectKey,
     normalizeProviderObjectKey,
 } from "@shared/utils/cloudKeyNormalization";
-import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { Dropbox, DropboxResponseError } from "dropbox";
 import { objectValues } from "ts-extras";
@@ -267,7 +267,7 @@ export class DropboxCloudStorageProvider
             operationName: "users/get_current_account",
         }).catch((error: unknown) => {
             const described = describeDropboxSdkErrorRich(error);
-            const detail = described ?? ensureError(error).message;
+            const detail = described ?? getUserFacingErrorDetail(error);
             throw new CloudProviderOperationError(
                 `Dropbox get-account-label failed: ${detail}`,
                 {
@@ -308,7 +308,7 @@ export class DropboxCloudStorageProvider
                     }
 
                     const described = describeDropboxSdkErrorRich(error);
-                    const detail = described ?? ensureError(error).message;
+                    const detail = described ?? getUserFacingErrorDetail(error);
                     throw new CloudProviderOperationError(
                         `Dropbox listObjects failed: ${detail}`,
                         {
@@ -488,7 +488,7 @@ export class DropboxCloudStorageProvider
             }
 
             const described = describeDropboxSdkErrorRich(error);
-            const detail = described ?? ensureError(error).message;
+            const detail = described ?? getUserFacingErrorDetail(error);
             throw new CloudProviderOperationError(
                 `Dropbox upload failed: ${detail}`,
                 {
@@ -562,7 +562,7 @@ export class DropboxCloudStorageProvider
             }
 
             const described = describeDropboxSdkErrorRich(error);
-            const detail = described ?? ensureError(error).message;
+            const detail = described ?? getUserFacingErrorDetail(error);
             throw new CloudProviderOperationError(
                 `Dropbox download failed: ${detail}`,
                 {
@@ -596,7 +596,7 @@ export class DropboxCloudStorageProvider
             }
 
             const described = describeDropboxSdkErrorRich(error);
-            const detail = described ?? ensureError(error).message;
+            const detail = described ?? getUserFacingErrorDetail(error);
             throw new CloudProviderOperationError(
                 `Dropbox delete failed: ${detail}`,
                 {
