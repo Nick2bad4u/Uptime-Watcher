@@ -184,7 +184,46 @@ describe(GoogleDriveCloudStorageProvider, () => {
         ]);
     });
 
+    it("falls back for impossible Drive list modified times", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    files: [
+                        {
+                            id: "file-id",
+                            modifiedTime: "2026-02-30T00:00:00.000Z",
+                            name: "bad-date.txt",
+                            size: "3",
+                        },
+                    ],
+                    nextPageToken: null,
+                },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(provider.listObjects("")).resolves.toEqual([
+            {
+                key: "bad-date.txt",
+                lastModifiedAt: 0,
+                sizeBytes: 3,
+            },
+        ]);
+    });
+
     it("falls back to local upload metadata when Drive returns invalid metadata", async () => {
+        const fallback = new Date("2026-07-03T09:20:00.000Z");
+        vi.useFakeTimers();
+
         const tokenManager = {
             isConnected: vi.fn().mockResolvedValue(true),
         };
@@ -214,16 +253,22 @@ describe(GoogleDriveCloudStorageProvider, () => {
             tokenManager: tokenManager as never,
         });
 
-        const result = await provider.uploadObject({
-            buffer: Buffer.from("payload"),
-            key: "sync/bad-meta.txt",
-            overwrite: true,
-        });
+        let result: Awaited<ReturnType<typeof provider.uploadObject>>;
+        try {
+            vi.setSystemTime(fallback);
+            result = await provider.uploadObject({
+                buffer: Buffer.from("payload"),
+                key: "sync/bad-meta.txt",
+                overwrite: true,
+            });
+        } finally {
+            vi.useRealTimers();
+        }
 
-        expect(Number.isFinite(result.lastModifiedAt)).toBeTruthy();
         expect(result).toEqual(
             expect.objectContaining({
                 key: "sync/bad-meta.txt",
+                lastModifiedAt: fallback.getTime(),
                 sizeBytes: 7,
             })
         );

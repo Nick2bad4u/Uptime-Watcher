@@ -10,6 +10,7 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import {
     arrayAt,
     arrayJoin,
@@ -85,8 +86,8 @@ function parseDriveTimestamp(
         return fallback;
     }
 
-    const parsed = Date.parse(value);
-    return isFiniteNumber(parsed) ? parsed : fallback;
+    const parsed = safeParseIsoTimestamp(value);
+    return parsed.success ? Date.parse(parsed.data) : fallback;
 }
 
 function parseDriveSizeBytes(
