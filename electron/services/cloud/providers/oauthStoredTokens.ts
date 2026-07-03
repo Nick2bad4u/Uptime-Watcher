@@ -12,11 +12,15 @@ import type { UnknownRecord } from "type-fest";
 
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 import type { SecretStore } from "../secrets/SecretStore";
 
 /** Logger surface used by this module. */
 export type OAuthStoredTokensLogger = Pick<Logger, "warn">;
+
+/** Maximum stored OAuth token JSON size accepted before clearing. */
+export const MAX_STORED_OAUTH_TOKEN_JSON_BYTES: number = 64 * 1024;
 
 /** Arguments for {@link readStoredJsonSecret}. */
 export interface ReadStoredJsonSecretArgs<T> {
@@ -51,6 +55,28 @@ export async function readStoredJsonSecret<T>(
 ): Promise<T | undefined> {
     const raw = await args.secretStore.getSecret(args.storageKey);
     if (!raw) {
+        return undefined;
+    }
+
+    if (getUtfByteLength(raw) > MAX_STORED_OAUTH_TOKEN_JSON_BYTES) {
+        args.logger.warn(
+            `${args.logPrefix} Stored tokens exceeded maximum size; clearing`,
+            {
+                maxBytes: MAX_STORED_OAUTH_TOKEN_JSON_BYTES,
+                storageKey: args.storageKey,
+            }
+        );
+        try {
+            await args.clear();
+        } catch (error) {
+            args.logger.warn(
+                `${args.logPrefix} Failed to clear oversized stored tokens`,
+                {
+                    message: getUserFacingErrorDetail(error),
+                    storageKey: args.storageKey,
+                }
+            );
+        }
         return undefined;
     }
 
