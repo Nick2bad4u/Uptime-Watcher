@@ -26,6 +26,7 @@ import type {
 } from "type-fest";
 
 import { siteSchema } from "@shared/validation/siteSchemas";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { isEmpty, objectValues, safeCastTo } from "ts-extras";
 import * as z from "zod";
 
@@ -86,7 +87,7 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
         busId: z.string().trim().min(1),
         correlationId: correlationIdSchema,
         eventName: z.string().trim().min(1),
-        timestamp: z.int().nonnegative(),
+        timestamp: epochMsSchema,
     })
     .strict();
 
@@ -116,7 +117,7 @@ const baseEventDataSchema = z
     .object({
         _meta: eventMetadataSchema.optional(),
         _originalMeta: eventMetadataSchema.optional(),
-        timestamp: z.int().nonnegative(),
+        timestamp: epochMsSchema,
     })
     .strict();
 

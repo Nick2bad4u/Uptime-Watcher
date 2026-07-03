@@ -1,3 +1,4 @@
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
 
 /**
@@ -48,7 +49,6 @@ export interface CloudBackupMigrationResult {
 export type CloudBackupMigrationTarget = "encrypted" | "plaintext";
 
 const cloudBackupMigrationTargetSchema = z.enum(["plaintext", "encrypted"]);
-const epochMsSchema = z.int().nonnegative();
 
 const cloudBackupMigrationRequestInternalSchema: z.ZodType<CloudBackupMigrationRequest> =
     z

@@ -10,6 +10,7 @@
 import type { Site } from "@shared/types";
 
 import { siteSchema } from "@shared/validation/siteSchemas";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
 
 /**
@@ -178,7 +179,7 @@ const stateSyncStatusSummaryInternalSchema: z.ZodType<{
     synchronized: boolean;
 }> = z
     .object({
-        lastSyncAt: z.int().nonnegative().nullable(),
+        lastSyncAt: epochMsSchema.nullable(),
         siteCount: z.int().nonnegative(),
         source: stateSyncSourceSchema,
         synchronized: z.boolean(),
@@ -203,7 +204,7 @@ const stateSyncFullSyncResultInternalSchema: z.ZodType<{
     synchronized: boolean;
 }> = z
     .object({
-        completedAt: z.int().nonnegative(),
+        completedAt: epochMsSchema,
         revision: z.int().nonnegative(),
         siteCount: z.int().nonnegative(),
         sites: stateSyncSitesSchema,
