@@ -101,6 +101,24 @@ describe("timeout Utilities", () => {
             expect(clampTimeoutMs(-5000)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
         });
 
+        it("should clamp non-finite values to the minimum", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: timeoutUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(clampTimeoutMs(Number.NaN)).toBe(
+                TIMEOUT_CONSTRAINTS_MS.MIN
+            );
+            expect(clampTimeoutMs(Infinity)).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
+            expect(clampTimeoutMs(Number.NEGATIVE_INFINITY)).toBe(
+                TIMEOUT_CONSTRAINTS_MS.MIN
+            );
+        });
+
         it("should handle fractional values", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: timeoutUtils", "component");
@@ -181,6 +199,26 @@ describe("timeout Utilities", () => {
 
             expect(clampTimeoutSeconds(0)).toBe(TIMEOUT_CONSTRAINTS.MIN);
             expect(clampTimeoutSeconds(-5)).toBe(TIMEOUT_CONSTRAINTS.MIN);
+        });
+
+        it("should clamp non-finite values to the minimum", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: timeoutUtils", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(clampTimeoutSeconds(Number.NaN)).toBe(
+                TIMEOUT_CONSTRAINTS.MIN
+            );
+            expect(clampTimeoutSeconds(Infinity)).toBe(
+                TIMEOUT_CONSTRAINTS.MIN
+            );
+            expect(clampTimeoutSeconds(Number.NEGATIVE_INFINITY)).toBe(
+                TIMEOUT_CONSTRAINTS.MIN
+            );
         });
 
         it("should handle fractional values", async ({ annotate, task }) => {
@@ -683,19 +721,8 @@ describe("timeout Utilities", () => {
             ])("should handle special numeric values safely", (input) => {
                 const result = clampTimeoutMs(input);
 
-                // Property: Should handle special values gracefully
-                // NaN with Math.max/min returns NaN, which is the actual behavior
-                if (Number.isNaN(input)) {
-                    expect(Number.isNaN(result)).toBe(true);
-                }
-                // Infinity should clamp to max
-                if (input === Infinity) {
-                    expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MAX);
-                }
-                // -Infinity should clamp to min
-                if (input === -Infinity) {
-                    expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
-                }
+                // Property: special values should still clamp to a valid timeout.
+                expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
             });
         });
 

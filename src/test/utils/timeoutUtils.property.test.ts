@@ -148,8 +148,7 @@ describe("timeoutUtils Property-Based Tests", () => {
 
             const result = clampTimeoutMs(specialValue);
 
-            // For NaN, Math.max/min behavior is to return NaN, but we want to verify behavior
-            expect(Number.isFinite(result) || Number.isNaN(result)).toBe(true);
+            expect(result).toBe(TIMEOUT_CONSTRAINTS_MS.MIN);
         });
     });
 
@@ -196,17 +195,26 @@ describe("timeoutUtils Property-Based Tests", () => {
         test.prop([fc.double()])(
             "should always return a value within valid range",
             (anyTimeout) => {
-                // Skip NaN and Infinity cases for this test
-                fc.pre(
-                    !Number.isNaN(anyTimeout) && Number.isFinite(anyTimeout)
-                );
-
                 const result = clampTimeoutSeconds(anyTimeout);
 
                 expect(result).toBeGreaterThanOrEqual(TIMEOUT_CONSTRAINTS.MIN);
                 expect(result).toBeLessThanOrEqual(TIMEOUT_CONSTRAINTS.MAX);
             }
         );
+
+        test.prop([
+            fc.oneof(
+                fc.constant(NaN),
+                fc.constant(Infinity),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])("should handle special numeric values", (specialValue) => {
+            expect(() => clampTimeoutSeconds(specialValue)).not.toThrow();
+
+            const result = clampTimeoutSeconds(specialValue);
+
+            expect(result).toBe(TIMEOUT_CONSTRAINTS.MIN);
+        });
     });
 
     describe(timeoutMsToSeconds, () => {

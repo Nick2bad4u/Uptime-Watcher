@@ -41,6 +41,10 @@ import {
  * @public
  */
 export function clampTimeoutMs(timeoutMs: number): number {
+    if (!isFiniteNumber(timeoutMs)) {
+        return TIMEOUT_CONSTRAINTS_MS.MIN;
+    }
+
     return Math.max(
         TIMEOUT_CONSTRAINTS_MS.MIN,
         Math.min(TIMEOUT_CONSTRAINTS_MS.MAX, timeoutMs)
@@ -68,6 +72,10 @@ export function clampTimeoutMs(timeoutMs: number): number {
  * @public
  */
 export function clampTimeoutSeconds(timeoutSeconds: number): number {
+    if (!isFiniteNumber(timeoutSeconds)) {
+        return TIMEOUT_CONSTRAINTS.MIN;
+    }
+
     return Math.max(
         TIMEOUT_CONSTRAINTS.MIN,
         Math.min(TIMEOUT_CONSTRAINTS.MAX, timeoutSeconds)
@@ -129,6 +137,7 @@ export function getTimeoutSeconds(monitorTimeout?: number): number {
  */
 export function isValidTimeoutMs(timeoutMs: number): boolean {
     return (
+        isFiniteNumber(timeoutMs) &&
         timeoutMs >= TIMEOUT_CONSTRAINTS_MS.MIN &&
         timeoutMs <= TIMEOUT_CONSTRAINTS_MS.MAX
     );
@@ -155,7 +164,7 @@ export function isValidTimeoutMs(timeoutMs: number): boolean {
  * @public
  */
 export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
-    if (Number.isNaN(timeoutSeconds)) {
+    if (!isFiniteNumber(timeoutSeconds)) {
         return false;
     }
     return (
