@@ -238,6 +238,22 @@ describe("monitoring Data Validation", () => {
                 "Invalid uptime value received",
                 { uptime: "undefined" }
             );
+
+            vi.clearAllMocks();
+
+            expect(parseUptimeValue("Infinity")).toBe(0);
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "Infinity" }
+            );
+
+            vi.clearAllMocks();
+
+            expect(parseUptimeValue("-Infinity")).toBe(0);
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Invalid uptime value received",
+                { uptime: "-Infinity" }
+            );
         });
 
         it("should handle edge cases", async ({ annotate, task }) => {

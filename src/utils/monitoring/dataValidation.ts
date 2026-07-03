@@ -58,7 +58,7 @@ export const parseUptimeValue = (uptimeString: string): number => {
     const parsed = Number.parseFloat(cleanedUptime);
 
     // Validate the parsed value is a valid number and within expected range
-    if (Number.isNaN(parsed)) {
+    if (!Number.isFinite(parsed)) {
         logger.warn("Invalid uptime value received", { uptime: uptimeString });
         return 0;
     }
