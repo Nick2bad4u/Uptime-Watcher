@@ -68,6 +68,65 @@ function getOwnDataCause(error: Error):
     return { found: true, value: descriptor.value };
 }
 
+function isNativeErrorStringGetter(
+    value: unknown
+): value is (this: Error) => unknown {
+    if (typeof value !== "function") {
+        return false;
+    }
+
+    const functionToString: unknown = Object.getOwnPropertyDescriptor(
+        Function.prototype,
+        "toString"
+    )?.value;
+
+    if (typeof functionToString !== "function") {
+        return false;
+    }
+
+    const source: unknown = Reflect.apply(functionToString, value, []);
+
+    return typeof source === "string" && source.includes("[native code]");
+}
+
+function getStringDataProperty(
+    error: Error,
+    key: "message" | "name" | "stack"
+): string | undefined {
+    let current: object | null = error;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, key);
+
+        if (descriptor) {
+            if ("value" in descriptor) {
+                const value: unknown = descriptor.value;
+                return typeof value === "string" ? value : undefined;
+            }
+
+            const getter: unknown = Reflect.get(descriptor, "get");
+            if (key === "stack" && isNativeErrorStringGetter(getter)) {
+                try {
+                    const value: unknown = Reflect.apply(getter, error, []);
+                    return typeof value === "string" ? value : undefined;
+                } catch {
+                    return undefined;
+                }
+            }
+
+            return undefined;
+        }
+
+        const prototype: unknown = Object.getPrototypeOf(current);
+        current =
+            typeof prototype === "object" && prototype !== null
+                ? prototype
+                : null;
+    }
+
+    return undefined;
+}
+
 function safeSerializeErrorInternal(
     error: Error,
     depth: number
@@ -82,11 +141,14 @@ function safeSerializeErrorInternal(
         return safeNormalizeLogValue(cause);
     };
     const ownCause = getOwnDataCause(error);
+    const message = getStringDataProperty(error, "message") ?? "";
+    const name = getStringDataProperty(error, "name");
+    const stack = getStringDataProperty(error, "stack");
 
     return {
-        message: safeNormalizeLogString(error.message),
-        name: safeNormalizeLogString(error.name),
-        ...(error.stack && { stack: safeNormalizeLogString(error.stack) }),
+        message: safeNormalizeLogString(message),
+        ...(name && { name: safeNormalizeLogString(name) }),
+        ...(stack && { stack: safeNormalizeLogString(stack) }),
         ...(ownCause.found && { cause: safeSerializeCause(ownCause.value) }),
     } satisfies SerializedError;
 }

@@ -97,6 +97,32 @@ describe(serializeError, () => {
         expect(serialized).not.toHaveProperty("cause");
         expect(getterCalls).toBe(0);
     });
+
+    it("does not invoke Error core field accessors while serializing errors", () => {
+        let getterCalls = 0;
+        const error = new Error("fallback");
+        for (const key of [
+            "message",
+            "name",
+            "stack",
+        ] as const) {
+            Object.defineProperty(error, key, {
+                configurable: true,
+                enumerable: key === "message",
+                get: () => {
+                    getterCalls += 1;
+                    return `accessor ${key}`;
+                },
+            });
+        }
+
+        const serialized = serializeError(error);
+
+        expect(serialized).toStrictEqual({
+            message: "",
+        });
+        expect(getterCalls).toBe(0);
+    });
 });
 
 describe(buildLogArguments, () => {
