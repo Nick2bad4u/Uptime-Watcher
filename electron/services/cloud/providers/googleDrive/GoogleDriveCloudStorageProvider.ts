@@ -14,6 +14,7 @@ import {
     arrayAt,
     arrayJoin,
     isEmpty,
+    isFinite as isFiniteNumber,
     objectHasIn,
     safeCastTo,
     stringSplit,
@@ -74,6 +75,26 @@ function normalizeDriveNameSegment(candidate: string): null | string {
     });
 
     return normalized.length > 0 ? normalized : null;
+}
+
+function parseDriveTimestamp(
+    value: string | undefined,
+    fallback: number
+): number {
+    if (!value) {
+        return fallback;
+    }
+
+    const parsed = Date.parse(value);
+    return isFiniteNumber(parsed) ? parsed : fallback;
+}
+
+function parseDriveSizeBytes(
+    value: number | string | undefined,
+    fallback: number
+): number {
+    const parsed = Number(value ?? fallback);
+    return isFiniteNumber(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
 function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
@@ -363,11 +384,15 @@ export class GoogleDriveCloudStorageProvider
 
             const parsedMetadata = parseGoogleDriveFileMetadata(metadata.data);
 
-            const modifiedAt = parsedMetadata.modifiedTime
-                ? new Date(parsedMetadata.modifiedTime).getTime()
-                : Date.now();
+            const modifiedAt = parseDriveTimestamp(
+                parsedMetadata.modifiedTime,
+                Date.now()
+            );
 
-            const sizeFromApi = Number(parsedMetadata.size ?? 0);
+            const sizeFromApi = parseDriveSizeBytes(
+                parsedMetadata.size,
+                args.buffer.length
+            );
             const sizeBytes =
                 sizeFromApi > 0 ? sizeFromApi : args.buffer.length;
 
@@ -586,10 +611,8 @@ export class GoogleDriveCloudStorageProvider
             }
 
             const key = normalizeKey(`${prefix}${safeSegment}`);
-            const sizeBytes = Number(file.size ?? 0);
-            const lastModifiedAt = file.modifiedTime
-                ? new Date(file.modifiedTime).getTime()
-                : 0;
+            const sizeBytes = parseDriveSizeBytes(file.size, 0);
+            const lastModifiedAt = parseDriveTimestamp(file.modifiedTime, 0);
 
             entries.push({ key, lastModifiedAt, sizeBytes });
         };

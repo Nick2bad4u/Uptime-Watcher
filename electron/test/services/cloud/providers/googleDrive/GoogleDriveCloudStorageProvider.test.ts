@@ -148,6 +148,87 @@ describe(GoogleDriveCloudStorageProvider, () => {
         }
     });
 
+    it("normalizes invalid Drive list metadata to finite object values", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    files: [
+                        {
+                            id: "file-id",
+                            modifiedTime: "not-a-date",
+                            name: "bad-meta.txt",
+                            size: "not-a-size",
+                        },
+                    ],
+                    nextPageToken: null,
+                },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(provider.listObjects("")).resolves.toEqual([
+            {
+                key: "bad-meta.txt",
+                lastModifiedAt: 0,
+                sizeBytes: 0,
+            },
+        ]);
+    });
+
+    it("falls back to local upload metadata when Drive returns invalid metadata", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "sync-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [], nextPageToken: null },
+            });
+
+        googleDriveClientMocks.driveStub.files.create.mockResolvedValueOnce({
+            data: { id: "created-file-id" },
+        });
+        googleDriveClientMocks.driveStub.files.get.mockResolvedValueOnce({
+            data: {
+                modifiedTime: "not-a-date",
+                size: "Infinity",
+            },
+        });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        const result = await provider.uploadObject({
+            buffer: Buffer.from("payload"),
+            key: "sync/bad-meta.txt",
+            overwrite: true,
+        });
+
+        expect(Number.isFinite(result.lastModifiedAt)).toBeTruthy();
+        expect(result).toEqual(
+            expect.objectContaining({
+                key: "sync/bad-meta.txt",
+                sizeBytes: 7,
+            })
+        );
+    });
+
     it("does not treat a same-name folder as an existing upload target", async () => {
         const tokenManager = {
             isConnected: vi.fn().mockResolvedValue(true),
