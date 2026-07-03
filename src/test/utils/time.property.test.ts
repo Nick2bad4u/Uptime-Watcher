@@ -466,16 +466,13 @@ describe("time Utils Property-Based Tests", () => {
     });
 
     describe("edge cases and robustness", () => {
-        fcTest.prop([fc.double({ max: 1000, min: -1000, noNaN: true })])(
-            "should handle negative durations gracefully",
-            (ms) => {
-                const negativeMs = -Math.abs(ms);
-
-                expect(formatDuration(negativeMs)).toBe("N/A");
-                expect(formatIntervalDuration(negativeMs)).toBe("N/A");
-                expect(formatResponseDuration(negativeMs)).toBe("N/A");
-            }
-        );
+        fcTest.prop([
+            fc.double({ max: -Number.MIN_VALUE, min: -1000, noNaN: true }),
+        ])("should handle negative durations gracefully", (negativeMs) => {
+            expect(formatDuration(negativeMs)).toBe("N/A");
+            expect(formatIntervalDuration(negativeMs)).toBe("N/A");
+            expect(formatResponseDuration(negativeMs)).toBe("N/A");
+        });
 
         fcTest.prop([
             fc.oneof(

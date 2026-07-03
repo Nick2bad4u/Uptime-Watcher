@@ -386,9 +386,14 @@ export const normalizeLogValue = (value: unknown): unknown => {
         if (isRecord(candidate)) {
             const sanitizedRecord: UnknownRecord = {};
             for (const [key, entry] of objectEntries(candidate)) {
-                sanitizedRecord[key] = isSecretMetadataKey(key)
-                    ? SECRET_PLACEHOLDER
-                    : normalize(entry);
+                Object.defineProperty(sanitizedRecord, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: isSecretMetadataKey(key)
+                        ? SECRET_PLACEHOLDER
+                        : normalize(entry),
+                    writable: true,
+                });
             }
             return sanitizedRecord;
         }

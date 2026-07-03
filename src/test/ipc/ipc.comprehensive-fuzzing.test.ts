@@ -79,6 +79,10 @@ vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
 }));
 
+vi.mock("../../../electron/electronUtils", () => ({
+    isDev: () => true,
+}));
+
 // Mock dependencies
 vi.mock("../../../electron/utils/logger", () => ({
     logger: {

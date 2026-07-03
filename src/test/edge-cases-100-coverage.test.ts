@@ -18,6 +18,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateUuid } from "../utils/data/generateUuid";
 import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
+const serializedErrorLike = (message: string) =>
+    expect.objectContaining({
+        message,
+        name: "Error",
+        stack: expect.any(String),
+    });
+
 // Mock logger
 vi.mock("../services/logger", () => {
     const mockLogger = {
@@ -201,7 +208,7 @@ describe("100% Coverage Edge Cases", () => {
             expect(result).toBe("fallback");
             expect(console.error).toHaveBeenCalledWith(
                 "test-operation failed",
-                expect.any(Error)
+                serializedErrorLike("Async error")
             );
         });
 
@@ -243,7 +250,12 @@ describe("100% Coverage Edge Cases", () => {
             expect(result).toBe("fallback");
             expect(console.error).toHaveBeenCalledWith(
                 "test-operation failed",
-                expect.any(Error)
+                expect.objectContaining({
+                    cause: "string error",
+                    message: "string error",
+                    name: "Error",
+                    stack: expect.any(String),
+                })
             );
         });
 

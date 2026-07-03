@@ -25,7 +25,14 @@ import * as fc from "fast-check";
 import { arrayAt, objectKeys, objectValues } from "ts-extras";
 import { beforeEach, describe, expect, vi } from "vitest";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+
 import { useErrorStore } from "../../../stores/error/useErrorStore";
+
+const expectedStoredError = (error: string | undefined): string | undefined =>
+    error === undefined || error.trim().length === 0
+        ? error
+        : getUserFacingErrorDetail(error);
 
 // Test utilities for error store state management
 const createTestErrorStore = () => {
@@ -203,7 +210,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.setError(errorMessage);
 
                 // Assert
-                expect(useErrorStore.getState().lastError).toBe(errorMessage);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(errorMessage)
+                );
             }
         );
 
@@ -213,7 +222,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store = createTestErrorStore();
                 // Arrange
                 store.setError(errorMessage);
-                expect(useErrorStore.getState().lastError).toBe(errorMessage);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(errorMessage)
+                );
 
                 // Act
                 store.clearError();
@@ -232,7 +243,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
 
             // Assert - last error should win
             const lastError = arrayAt(errorMessages, -1);
-            expect(useErrorStore.getState().lastError).toBe(lastError);
+            expect(useErrorStore.getState().lastError).toBe(
+                expectedStoredError(lastError)
+            );
         });
 
         fcTest.prop([arbitraries.errorMessage])(
@@ -241,7 +254,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store = createTestErrorStore();
                 // Arrange
                 store.setError(errorMessage);
-                expect(useErrorStore.getState().lastError).toBe(errorMessage);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(errorMessage)
+                );
 
                 // Act
                 store.setError(undefined);
@@ -299,7 +314,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 expect(useErrorStore.getState().isLoading).toBe(loading);
-                expect(useErrorStore.getState().lastError).toBe(errorMessage);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(errorMessage)
+                );
             }
         );
     });
@@ -316,9 +333,11 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 const retrievedError = useErrorStore
                     .getState()
                     .getStoreError(config.store);
-                expect(retrievedError).toBe(config.error ?? undefined);
+                expect(retrievedError).toBe(
+                    expectedStoredError(config.error ?? undefined)
+                );
                 expect(useErrorStore.getState().storeErrors[config.store]).toBe(
-                    config.error ?? undefined
+                    expectedStoredError(config.error ?? undefined)
                 );
             }
         );
@@ -329,7 +348,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store = createTestErrorStore();
                 // Arrange
                 store.setStoreError(storeName, errorMessage);
-                expect(store.getStoreError(storeName)).toBe(errorMessage);
+                expect(store.getStoreError(storeName)).toBe(
+                    expectedStoredError(errorMessage)
+                );
 
                 // Act
                 store.clearStoreError(storeName);
@@ -370,7 +391,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     const retrievedError = useErrorStore
                         .getState()
                         .getStoreError(storeName);
-                    expect(retrievedError).toBe(expectedError);
+                    expect(retrievedError).toBe(
+                        expectedStoredError(expectedError)
+                    );
                 }
             }
         );
@@ -388,7 +411,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert - last error should win
                 const lastError = arrayAt(errorMessages, -1);
-                expect(store.getStoreError(storeName)).toBe(lastError);
+                expect(store.getStoreError(storeName)).toBe(
+                    expectedStoredError(lastError)
+                );
             }
         );
 
@@ -539,7 +564,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 }
 
                 // Verify state is set
-                expect(useErrorStore.getState().lastError).toBe(globalError);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(globalError)
+                );
                 expect(useErrorStore.getState().isLoading).toBe(globalLoading);
 
                 // Act
@@ -600,8 +627,12 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.setLoading(loading);
 
                 // Assert - all state should be consistent
-                expect(useErrorStore.getState().lastError).toBe(globalError);
-                expect(store.getStoreError(storeName)).toBe(storeError);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(globalError)
+                );
+                expect(store.getStoreError(storeName)).toBe(
+                    expectedStoredError(storeError)
+                );
                 expect(store.getOperationLoading(operationName)).toBe(loading);
                 expect(useErrorStore.getState().isLoading).toBe(loading);
             }
@@ -663,7 +694,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 }
 
                 for (const [storeName, expectedError] of expectedStoreErrors) {
-                    expect(store.getStoreError(storeName)).toBe(expectedError);
+                    expect(store.getStoreError(storeName)).toBe(
+                        expectedStoredError(expectedError)
+                    );
                 }
                 for (const [
                     operationName,
@@ -687,7 +720,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
 
             // Assert - final error should be set
             const finalError = arrayAt(errorMessages, -1);
-            expect(useErrorStore.getState().lastError).toBe(finalError);
+            expect(useErrorStore.getState().lastError).toBe(
+                expectedStoredError(finalError)
+            );
         });
 
         fcTest.prop([
@@ -720,7 +755,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 const finalStoreError = arrayAt(storeErrors, -1);
                 const finalLoadingState = arrayAt(loadingStates, -1);
 
-                expect(store.getStoreError(storeName)).toBe(finalStoreError);
+                expect(store.getStoreError(storeName)).toBe(
+                    expectedStoredError(finalStoreError)
+                );
                 expect(store.getOperationLoading(operationName)).toBe(
                     finalLoadingState
                 );
@@ -749,7 +786,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                 store.setError(longError);
 
                 // Assert
-                expect(useErrorStore.getState().lastError).toBe(longError);
+                expect(useErrorStore.getState().lastError).toBe(
+                    expectedStoredError(longError)
+                );
             }
         );
 
@@ -886,7 +925,9 @@ describe("Error Store - Property-Based Fuzzing Tests", () => {
                     const expectedError = expectedFinalState.get(storeName);
 
                     if (expectedFinalState.has(storeName)) {
-                        expect(retrievedError).toBe(expectedError);
+                        expect(retrievedError).toBe(
+                            expectedStoredError(expectedError)
+                        );
                     } else {
                         expect(retrievedError).toBeUndefined();
                     }

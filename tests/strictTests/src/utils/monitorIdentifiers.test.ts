@@ -135,8 +135,11 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
         expect(result).toBe("Resilient Fallback");
         expect(loggerErrorSpy).toHaveBeenCalledTimes(1);
         expect(loggerErrorSpy).toHaveBeenCalledWith(
-            "Generate monitor display identifier failed",
-            expect.any(Error)
+            "Synchronous operation failed",
+            expect.any(Error),
+            {
+                operationName: "Generate monitor display identifier",
+            }
         );
     });
 });

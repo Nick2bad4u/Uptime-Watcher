@@ -26,6 +26,13 @@ import {
 } from "@shared/utils/errorHandling";
 import { describe, expect, it, vi } from "vitest";
 
+const serializedErrorLike = (message: string) =>
+    expect.objectContaining({
+        message,
+        name: "Error",
+        stack: expect.any(String),
+    });
+
 describe("error Handling Utilities - Comprehensive Coverage", () => {
     describe(convertError, () => {
         it("should return same Error instance when passed an Error", async ({
@@ -214,7 +221,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("fallback value");
             expect(consoleSpy).toHaveBeenCalledWith(
                 "test operation failed",
-                expect.any(Error)
+                serializedErrorLike("operation failed")
             );
 
             consoleSpy.mockRestore();
@@ -249,7 +256,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 "test operation failed",
-                expect.any(Error)
+                serializedErrorLike("operation failed")
             );
 
             consoleSpy.mockRestore();
@@ -281,7 +288,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 "test operation failed",
-                expect.any(Error)
+                serializedErrorLike("operation failed")
             );
 
             consoleSpy.mockRestore();
@@ -314,7 +321,12 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
             expect(result).toBe("fallback value");
             expect(consoleSpy).toHaveBeenCalledWith(
                 "test operation failed",
-                expect.any(Error)
+                expect.objectContaining({
+                    cause: "string error",
+                    message: "string error",
+                    name: "Error",
+                    stack: expect.any(String),
+                })
             );
 
             consoleSpy.mockRestore();
@@ -349,7 +361,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
             expect(result).toEqual(complexFallback);
             expect(consoleSpy).toHaveBeenCalledWith(
                 "test operation failed",
-                expect.any(Error)
+                serializedErrorLike("operation failed")
             );
 
             consoleSpy.mockRestore();
