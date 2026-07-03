@@ -7,6 +7,7 @@
  */
 
 import { sleep, sleepUnref } from "@shared/utils/abortUtils";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { arrayAt, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 const RETRY_NON_ERROR_THROWN_MARKER: unique symbol = Symbol(
@@ -20,10 +21,12 @@ const RETRY_NON_ERROR_THROWN_MARKER: unique symbol = Symbol(
 export function isRetryNonErrorThrownError(
     value: unknown
 ): value is Error & { readonly cause: unknown } {
-    return (
-        Error.isError(value) &&
-        Reflect.get(value, RETRY_NON_ERROR_THROWN_MARKER) === true
-    );
+    if (!Error.isError(value)) {
+        return false;
+    }
+
+    const marker = getOwnDataProperty(value, RETRY_NON_ERROR_THROWN_MARKER);
+    return marker.found && marker.value === true;
 }
 
 function wrapNonErrorThrownValue(value: unknown): Error {
