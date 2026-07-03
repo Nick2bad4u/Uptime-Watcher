@@ -21,6 +21,7 @@
 import type { JsonValue as TypeFestJsonValue } from "type-fest";
 
 import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
 
 /**
@@ -112,7 +113,7 @@ const cloudSyncWriteKeyInternalSchema: z.ZodType<CloudSyncWriteKey> = z
     .object({
         deviceId: persistedDeviceIdSchema,
         opId: z.int().nonnegative().max(MAX_SAFE_INT),
-        timestamp: z.int().nonnegative().max(MAX_SAFE_INT),
+        timestamp: epochMsSchema,
     })
     .strict();
 
@@ -162,7 +163,7 @@ const setFieldOperationSchema = z
         entityType: cloudSyncEntityTypeInternalSchema,
         opId: z.int().nonnegative().max(MAX_SAFE_INT),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
-        timestamp: z.int().nonnegative().max(MAX_SAFE_INT),
+        timestamp: epochMsSchema,
     })
     .strict();
 

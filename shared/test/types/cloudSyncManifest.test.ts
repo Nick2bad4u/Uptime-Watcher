@@ -2,8 +2,10 @@ import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_MANIFEST_VERSION,
     createCloudSyncManifestDevices,
+    cloudSyncManifestSchema,
     parseCloudSyncManifest,
 } from "@shared/types/cloudSyncManifest";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 describe("cloudSyncManifest", () => {
@@ -30,6 +32,44 @@ describe("cloudSyncManifest", () => {
         expect(Object.getPrototypeOf(devices)).toBeNull();
         expect(Object.hasOwn(devices, "device-a")).toBeTruthy();
         expect(devices["device-a"]?.lastSeenAt).toBe(10);
+    });
+
+    it("accepts manifest timestamps at the Date upper bound", () => {
+        const parsed = parseCloudSyncManifest({
+            devices: {
+                "device-a": {
+                    compactedUpToOpId: 1,
+                    lastSeenAt: MAX_VALID_DATE_EPOCH_MS,
+                },
+            },
+            lastCompactionAt: MAX_VALID_DATE_EPOCH_MS,
+            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+            resetAt: MAX_VALID_DATE_EPOCH_MS,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(parsed.devices["device-a"]?.lastSeenAt).toBe(
+            MAX_VALID_DATE_EPOCH_MS
+        );
+        expect(parsed.lastCompactionAt).toBe(MAX_VALID_DATE_EPOCH_MS);
+        expect(parsed.resetAt).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
+    it("rejects manifest timestamps outside the Date range", () => {
+        const result = cloudSyncManifestSchema.safeParse({
+            devices: {
+                "device-a": {
+                    compactedUpToOpId: 1,
+                    lastSeenAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                },
+            },
+            lastCompactionAt: MAX_VALID_DATE_EPOCH_MS + 1,
+            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+            resetAt: MAX_VALID_DATE_EPOCH_MS + 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(result.success).toBeFalsy();
     });
 
     it("drops invalid device IDs from the manifest devices map", () => {

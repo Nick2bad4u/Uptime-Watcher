@@ -4,6 +4,7 @@ import {
     parseCloudSyncSnapshot,
 } from "@shared/types/cloudSyncSnapshot";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 function createSnapshotCandidate(): unknown {
@@ -42,6 +43,24 @@ describe(parseCloudSyncSnapshot, () => {
         expect(() =>
             parseCloudSyncSnapshot(createSnapshotCandidate())
         ).not.toThrow();
+    });
+
+    it("accepts createdAt at the Date upper bound", () => {
+        const parsed = parseCloudSyncSnapshot({
+            ...(createSnapshotCandidate() as Record<string, unknown>),
+            createdAt: MAX_VALID_DATE_EPOCH_MS,
+        });
+
+        expect(parsed.createdAt).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
+    it("rejects createdAt outside the Date range", () => {
+        const result = cloudSyncSnapshotSchema.safeParse({
+            ...(createSnapshotCandidate() as Record<string, unknown>),
+            createdAt: MAX_VALID_DATE_EPOCH_MS + 1,
+        });
+
+        expect(result.success).toBeFalsy();
     });
 
     it("rejects snapshot entities whose entityId differs from the map key", () => {

@@ -7,6 +7,7 @@ import {
     MAX_PERSISTED_DEVICE_ID_BYTES,
     getPersistedDeviceIdValidationError,
 } from "@shared/validation/persistedDeviceIdValidation";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 describe("cloudSync", () => {
@@ -95,5 +96,43 @@ describe("cloudSync", () => {
                 timestamp: 1,
             })
         ).toThrow("deviceId must not contain control characters");
+    });
+
+    it("rejects write key timestamps outside the Date range", () => {
+        const result = cloudSyncWriteKeySchema.safeParse({
+            deviceId: "device-1",
+            opId: 1,
+            timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
+        });
+
+        expect(result.success).toBeFalsy();
+    });
+
+    it("accepts operation timestamps at the Date upper bound", () => {
+        const parsed = parseCloudSyncOperation({
+            deviceId: "device-1",
+            entityId: "settings-key",
+            entityType: "settings",
+            kind: "delete-entity",
+            opId: 4,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            timestamp: MAX_VALID_DATE_EPOCH_MS,
+        });
+
+        expect(parsed.timestamp).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
+    it("rejects operation timestamps outside the Date range", () => {
+        expect(() =>
+            parseCloudSyncOperation({
+                deviceId: "device-1",
+                entityId: "settings-key",
+                entityType: "settings",
+                kind: "delete-entity",
+                opId: 5,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
+            })
+        ).toThrow();
     });
 });

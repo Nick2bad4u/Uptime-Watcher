@@ -4,6 +4,7 @@ import {
     parseCloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 function createBaselineCandidate(): Record<string, unknown> {
@@ -46,6 +47,24 @@ describe(parseCloudSyncBaseline, () => {
         expect(baseline.monitors["monitor-1"]?.id).toBe("monitor-1");
         expect(baseline.settings["setting-1"]).toBe("value");
         expect(baseline.sites["site-1"]?.identifier).toBe("site-1");
+    });
+
+    it("accepts createdAt at the Date upper bound", () => {
+        const baseline = parseCloudSyncBaseline({
+            ...createBaselineCandidate(),
+            createdAt: MAX_VALID_DATE_EPOCH_MS,
+        });
+
+        expect(baseline.createdAt).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
+    it("rejects createdAt outside the Date range", () => {
+        const result = cloudSyncBaselineSchema.safeParse({
+            ...createBaselineCandidate(),
+            createdAt: MAX_VALID_DATE_EPOCH_MS + 1,
+        });
+
+        expect(result.success).toBeFalsy();
     });
 
     it("rejects baseline sites whose identifier differs from the map key", () => {

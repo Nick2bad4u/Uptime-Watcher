@@ -10,6 +10,7 @@ import {
     cloudSyncWriteKeySchema,
     jsonValueSchema,
 } from "@shared/types/cloudSync";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
 import * as z from "zod";
 
@@ -90,7 +91,7 @@ export interface CloudSyncSnapshot {
 /** Runtime schema for validating {@link CloudSyncSnapshot}. */
 export const cloudSyncSnapshotSchema: z.ZodType<CloudSyncSnapshot> = z
     .object({
-        createdAt: z.int().nonnegative(),
+        createdAt: epochMsSchema,
         snapshotVersion: z.literal(CLOUD_SYNC_SNAPSHOT_VERSION),
         state: cloudSyncStateSchema,
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),

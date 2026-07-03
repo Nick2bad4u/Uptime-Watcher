@@ -9,6 +9,7 @@ import {
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
 import * as z from "zod";
 
@@ -19,7 +20,7 @@ const MAX_SAFE_INT = Number.MAX_SAFE_INTEGER;
 const deviceCompactionSchema = z
     .object({
         compactedUpToOpId: z.int().min(-1).max(MAX_SAFE_INT),
-        lastSeenAt: z.int().nonnegative().max(MAX_SAFE_INT),
+        lastSeenAt: epochMsSchema,
     })
     .strict();
 
@@ -29,10 +30,10 @@ const cloudSyncManifestInternalSchema = z
         // parseCloudSyncManifest().
         devices: z.record(z.string(), deviceCompactionSchema),
         encryption: cloudEncryptionConfigSchema.optional(),
-        lastCompactionAt: z.int().nonnegative().max(MAX_SAFE_INT).optional(),
+        lastCompactionAt: epochMsSchema.optional(),
         latestSnapshotKey: z.string().min(1).optional(),
         manifestVersion: z.literal(CLOUD_SYNC_MANIFEST_VERSION),
-        resetAt: z.int().nonnegative().max(MAX_SAFE_INT).optional(),
+        resetAt: epochMsSchema.optional(),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
     })
     .strict();

@@ -12,6 +12,7 @@ import {
     cloudSyncSiteConfigSchema,
 } from "@shared/types/cloudSyncDomain";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
 import * as z from "zod";
 
@@ -66,7 +67,7 @@ export function createCloudSyncBaselineSites(
 const cloudSyncBaselineInternalSchema = z
     .object({
         baselineVersion: z.literal(CLOUD_SYNC_BASELINE_VERSION),
-        createdAt: z.int().nonnegative(),
+        createdAt: epochMsSchema,
         monitors: z.record(z.string().min(1), cloudSyncMonitorConfigSchema),
         settings: cloudSyncSettingsConfigSchema,
         sites: z.record(z.string().min(1), cloudSyncSiteConfigSchema),
