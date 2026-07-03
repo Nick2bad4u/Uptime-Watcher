@@ -233,9 +233,11 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
             ...(config.eventEmitter && { eventEmitter: config.eventEmitter }),
         };
 
-        logger.debug(
-            `[Cache:${this.config.name}] Initialized with maxSize=${this.config.maxSize}, ttl=${this.config.ttl}ms`
-        );
+        logger.debug("Cache initialized", {
+            cacheName: this.config.name,
+            maxSize: this.config.maxSize,
+            ttlMs: this.config.ttl,
+        });
     }
 
     /**
@@ -248,15 +250,17 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         const entries = [...items];
 
         if (isEmpty(entries)) {
-            logger.debug(
-                `[Cache:${this.config.name}] Bulk update skipped (no items)`
-            );
+            logger.debug("Cache bulk update skipped", {
+                cacheName: this.config.name,
+                itemCount: 0,
+            });
             return;
         }
 
-        logger.debug(
-            `[Cache:${this.config.name}] Bulk updating ${entries.length} items`
-        );
+        logger.debug("Cache bulk update started", {
+            cacheName: this.config.name,
+            itemCount: entries.length,
+        });
 
         for (const item of entries) {
             this.setEntry(item.key, item.data, item.ttl, {
@@ -313,9 +317,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
 
         if (cleaned > 0) {
             this.updateSize();
-            logger.debug(
-                `[Cache:${this.config.name}] Cleaned up ${cleaned} expired items`
-            );
+            logger.debug("Cache expired items cleaned up", {
+                cacheName: this.config.name,
+                itemCount: cleaned,
+            });
             this.emitEvent("internal:cache:cleanup-completed", {
                 itemCount: cleaned,
             });
@@ -337,9 +342,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         this.cache.clear();
         this.updateSize();
 
-        logger.debug(
-            `[Cache:${this.config.name}] Cleared cache (${size} items)`
-        );
+        logger.debug("Cache cleared", {
+            cacheName: this.config.name,
+            itemCount: size,
+        });
         this.emitEvent("internal:cache:cleared", { itemCount: size });
 
         // Notify callbacks that all items were invalidated
@@ -356,7 +362,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
 
         if (isDeleted) {
             this.updateSize();
-            logger.debug(`[Cache:${this.config.name}] Deleted item: ${key}`);
+            logger.debug("Cache item deleted", {
+                cacheName: this.config.name,
+                key,
+            });
             this.emitEvent("internal:cache:item-deleted", { key });
             this.notifyInvalidation(key);
         }
@@ -405,7 +414,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         entry.hits++;
         this.recordHit();
 
-        logger.debug(`[Cache:${this.config.name}] Cache hit for key: ${key}`);
+        logger.debug("Cache hit", {
+            cacheName: this.config.name,
+            key,
+        });
         return entry.data;
     }
 
@@ -452,7 +464,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         const isDeleted = this.delete(key);
 
         if (isDeleted) {
-            logger.debug(`[Cache:${this.config.name}] Invalidated key: ${key}`);
+            logger.debug("Cache key invalidated", {
+                cacheName: this.config.name,
+                key,
+            });
             this.emitEvent("internal:cache:item-invalidated", { key });
             // Note: notifyInvalidation already called by delete() method
         }
@@ -465,9 +480,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         const { size } = this.cache;
         this.clear();
 
-        logger.debug(
-            `[Cache:${this.config.name}] Invalidated all ${size} items`
-        );
+        logger.debug("Cache invalidated all items", {
+            cacheName: this.config.name,
+            itemCount: size,
+        });
         this.emitEvent("internal:cache:all-invalidated", { itemCount: size });
         this.notifyInvalidation(); // No key = all invalidated
     }
@@ -492,16 +508,16 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         callback: (key?: TKey) => Promisable<void>
     ): () => void {
         this.invalidationCallbacks.add(callback);
-        logger.debug(
-            `[Cache:${this.config.name}] Invalidation callback registered`
-        );
+        logger.debug("Cache invalidation callback registered", {
+            cacheName: this.config.name,
+        });
 
         // Return cleanup function
         return (): void => {
             this.invalidationCallbacks.delete(callback);
-            logger.debug(
-                `[Cache:${this.config.name}] Invalidation callback removed`
-            );
+            logger.debug("Cache invalidation callback removed", {
+                cacheName: this.config.name,
+            });
         };
     }
 
@@ -537,15 +553,13 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
             },
             {
                 onError: (error) => {
-                    logger.error(
-                        `[Cache:${name}] Failed to emit cache event '${eventType}'`,
-                        error
-                    );
+                    const metadata = { cacheName: name, eventType };
+                    logger.error("Cache event emission failed", error, metadata);
                     diagnosticsLogger.error(
-                        `[Cache:${name}] Event emission failure`,
+                        "Cache event emission failure",
                         error,
                         {
-                            eventType,
+                            ...metadata,
                             payload,
                         }
                     );
@@ -624,9 +638,10 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         if (oldestKey) {
             this.cache.delete(oldestKey);
             this.updateSize();
-            logger.debug(
-                `[Cache:${this.config.name}] Evicted LRU item: ${oldestKey}`
-            );
+            logger.debug("Cache LRU item evicted", {
+                cacheName: this.config.name,
+                key: oldestKey,
+            });
             this.emitEvent("internal:cache:item-evicted", {
                 key: oldestKey,
                 reason: "lru",
@@ -651,7 +666,8 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
                 if (isPromiseLike(result)) {
                     fireAndForgetLogged({
                         logger,
-                        message: `[Cache:${this.config.name}] Error in async invalidation callback:`,
+                        loggerArgs: [{ cacheName: this.config.name }],
+                        message: "Cache async invalidation callback failed",
                         task: async () => {
                             await result;
                         },
@@ -659,8 +675,9 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
                 }
             } catch (error) {
                 logger.error(
-                    `[Cache:${this.config.name}] Error in invalidation callback:`,
-                    error
+                    "Cache invalidation callback failed",
+                    error,
+                    { cacheName: this.config.name }
                 );
             }
         }
@@ -731,11 +748,12 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
         this.updateSize();
 
         if (options?.logAction ?? true) {
-            logger.debug(
-                `[Cache:${this.config.name}] Cached item: ${key} (TTL: ${
-                    requestedTTL > 0 ? `${requestedTTL}ms` : "disabled"
-                })`
-            );
+            logger.debug("Cache item stored", {
+                cacheName: this.config.name,
+                isTtlEnabled: requestedTTL > 0,
+                key,
+                ttlMs: requestedTTL,
+            });
         }
 
         if (options?.emitEvent ?? true) {
