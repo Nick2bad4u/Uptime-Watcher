@@ -1,11 +1,13 @@
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isObject } from "@shared/utils/typeGuards";
 import { app } from "electron";
 import sqlite3 from "node-sqlite3-wasm";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
-import { arrayFirst, arrayJoin, objectHasIn } from "ts-extras";
+import { arrayFirst, arrayJoin } from "ts-extras";
 
 import { BACKUP_DB_FILE_NAME } from "../../../../constants";
 import { logger } from "../../../../utils/logger";
@@ -111,14 +113,10 @@ export function readDatabaseSchemaVersionFromFile(filePath: string): number {
         const result: unknown = database.prepare("PRAGMA user_version").get();
 
         if (isObject(result)) {
-            if (!objectHasIn(result, "user_version")) {
-                return 0;
-            }
-
-            const version: unknown = Reflect.get(result, "user_version");
-            if (typeof version === "number") {
-                return version;
-            }
+            const version = getOwnDataProperty(result, "user_version");
+            return version.found && typeof version.value === "number"
+                ? version.value
+                : 0;
         }
 
         return 0;
@@ -137,12 +135,15 @@ function extractPragmaMessages(
 
     const messages: string[] = [];
 
-    for (const row of rows) {
+    const typedRows = castUnchecked<readonly unknown[]>(rows);
+
+    for (const row of typedRows) {
         if (!row || typeof row !== "object") {
             continue;
         }
 
-        const value: unknown = Reflect.get(row, column);
+        const property = getOwnDataProperty(row, column);
+        const value = property.found ? property.value : undefined;
 
         if (typeof value === "string" && value.length > 0) {
             messages.push(value);
