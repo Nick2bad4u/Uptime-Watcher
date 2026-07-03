@@ -296,6 +296,25 @@ describe("historyMapper utilities", () => {
             expect(isValidHistoryRow(invalidRow)).toBeFalsy();
         });
 
+        it("should return false when timestamp is infinite", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidRow: DatabaseHistoryRow = {
+                monitorId: "monitor-123",
+                status: "up",
+                timestamp: Infinity,
+                responseTime: 150,
+            };
+
+            expect(isValidHistoryRow(invalidRow)).toBeFalsy();
+        });
+
         it("should handle optional details field", async ({
             task,
             annotate,
@@ -654,6 +673,31 @@ describe("historyMapper utilities", () => {
                 status: "up",
                 timestamp: NaN,
                 responseTime: NaN,
+            };
+
+            const beforeTime = Date.now();
+            const result = rowToHistoryEntry(row);
+            const afterTime = Date.now();
+
+            expect(result.responseTime).toBe(0);
+            expect(result.timestamp).toBeGreaterThanOrEqual(beforeTime);
+            expect(result.timestamp).toBeLessThanOrEqual(afterTime);
+        });
+
+        it("should default infinite numeric fields to safe fallbacks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const row: DatabaseHistoryRow = {
+                monitorId: "monitor-123",
+                status: "up",
+                timestamp: "Infinity" as any,
+                responseTime: Infinity,
             };
 
             const beforeTime = Date.now();

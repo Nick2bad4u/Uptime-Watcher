@@ -16,7 +16,7 @@ import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import { isDefined } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
 
@@ -61,10 +61,10 @@ export interface HistoryRow {
  * @internal
  */
 function safeNumber(value: unknown, fallback = 0): number {
-    if (typeof value === "number" && !Number.isNaN(value)) return value;
+    if (typeof value === "number" && isFiniteNumber(value)) return value;
     if (typeof value === "string") {
         const parsed = Number(value);
-        if (!Number.isNaN(parsed)) return parsed;
+        if (isFiniteNumber(parsed)) return parsed;
     }
     return fallback;
 }
@@ -156,7 +156,7 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
         (row.status === "up" ||
             row.status === "degraded" ||
             row.status === "down") &&
-        !Number.isNaN(row.timestamp)
+        isFiniteNumber(row.timestamp)
     );
 }
 
