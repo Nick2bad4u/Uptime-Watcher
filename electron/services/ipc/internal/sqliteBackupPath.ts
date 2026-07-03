@@ -2,6 +2,10 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import * as path from "node:path";
 
 const SQLITE_EXTENSION = ".sqlite" as const;
+const SQLITE_COMPATIBLE_EXTENSIONS = new Set([
+    ".db",
+    SQLITE_EXTENSION,
+]);
 const PLAYWRIGHT_BACKUP_DIRECTORY = "playwright-backups" as const;
 
 function normalizeBackupFileName(fileName: string): string {
@@ -46,9 +50,11 @@ export function buildPlaywrightBackupPath(args: {
 }
 
 /**
- * Ensures a SQLite backup file path has a `.sqlite` extension.
+ * Ensures a SQLite backup file path has a SQLite-compatible extension.
  */
 export function ensureSqliteFileExtension(rawPath: string): string {
-    const ext = path.extname(rawPath);
-    return ext.length > 0 ? rawPath : `${rawPath}${SQLITE_EXTENSION}`;
+    const ext = path.extname(rawPath).toLowerCase();
+    return SQLITE_COMPATIBLE_EXTENSIONS.has(ext)
+        ? rawPath
+        : `${rawPath}${SQLITE_EXTENSION}`;
 }

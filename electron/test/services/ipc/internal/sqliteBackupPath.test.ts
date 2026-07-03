@@ -83,6 +83,15 @@ describe("sqliteBackupPath", () => {
 
         it("keeps existing extensions unchanged", () => {
             expect(ensureSqliteFileExtension("backup.db")).toBe("backup.db");
+            expect(ensureSqliteFileExtension("backup.SQLITE")).toBe(
+                "backup.SQLITE"
+            );
+        });
+
+        it("appends .sqlite when a path has a non-SQLite extension", () => {
+            expect(ensureSqliteFileExtension("backup.txt")).toBe(
+                "backup.txt.sqlite"
+            );
         });
     });
 });
