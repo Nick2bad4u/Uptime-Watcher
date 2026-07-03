@@ -88,7 +88,9 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  *
  * const result = await monitor.check(pingMonitorData);
  * if (result.status === "up") {
- *     logger.info(`Ping successful: ${result.responseTime}ms`);
+ *     logger.info("Ping successful", {
+ *         responseTime: result.responseTime,
+ *     });
  * }
  * ```
  *

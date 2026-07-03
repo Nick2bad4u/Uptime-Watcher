@@ -130,7 +130,9 @@ function isDnsAttemptFailedError(
  *
  * const result = await monitor.check(dnsMonitorData);
  * if (result.status === "up") {
- *     logger.info(`DNS resolution successful: ${result.responseTime}ms`);
+ *     logger.info("DNS resolution successful", {
+ *         responseTime: result.responseTime,
+ *     });
  * }
  * ```
  *

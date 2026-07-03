@@ -19,7 +19,7 @@ import type { Simplify, TaggedUnion, UnknownRecord, ValueOf } from "type-fest";
  * ```typescript
  * import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
  *
- * // Instead of: logger.info(`[SiteManager] Initialized with ${count} sites in cache`);
+ * // Instead of building a message string with count embedded:
  * logger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, { count });
  * ```
  *
@@ -561,8 +561,8 @@ export function interpolateLogTemplate(
  *     count: 42,
  * });
  *
- * // Use normally for dynamic content
- * logger.debug(`Processing site ${siteIdentifier} with custom logic`);
+ * // Use normally for dynamic metadata
+ * logger.debug("Processing site with custom logic", { siteIdentifier });
  * ```
  */
 export function createTemplateLogger(baseLogger: Logger): {
