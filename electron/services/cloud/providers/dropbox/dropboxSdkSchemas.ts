@@ -12,7 +12,7 @@ const dropboxFilesUploadResultSchema = z
     .object({
         path_display: z.string().trim().min(1),
         server_modified: z.string().trim().min(1),
-        size: z.number(),
+        size: z.int().nonnegative(),
     })
     .loose();
 
@@ -114,7 +114,7 @@ const dropboxListFolderFileEntrySchema = z
         ".tag": z.literal("file"),
         path_display: z.string().trim().min(1),
         server_modified: z.string().trim().min(1),
-        size: z.number(),
+        size: z.int().nonnegative(),
     })
     .loose();
 
