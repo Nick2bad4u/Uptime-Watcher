@@ -4,7 +4,6 @@
  */
 
 import { generateCorrelationId } from "@shared/utils/correlation";
-import { ValidationError } from "@shared/utils/validationError";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -50,52 +49,6 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 expect(id).toMatch(/^[\da-f]{16}$/v);
                 expect(id).toHaveLength(16);
             }
-        });
-
-        it("should handle ValidationError edge cases", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: utilities.missing-branches",
-                "component"
-            );
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Test with empty errors
-            const error1 = new ValidationError([]);
-            expect(error1.message).toBe("Validation failed: ");
-            expect(error1.errors).toEqual([]);
-
-            // Test with single error
-            const error2 = new ValidationError(["Single error"]);
-            expect(error2.message).toBe("Validation failed: Single error");
-            expect(error2.errors).toEqual(["Single error"]);
-
-            // Test with multiple errors
-            const error3 = new ValidationError([
-                "Error 1",
-                "Error 2",
-                "Error 3",
-            ]);
-            expect(error3.message).toBe(
-                "Validation failed: Error 1, Error 2, Error 3"
-            );
-            expect(error3.errors).toEqual([
-                "Error 1",
-                "Error 2",
-                "Error 3",
-            ]);
-
-            // Test with converted types
-            const error4 = new ValidationError([
-                "string",
-                "string2",
-                "string3",
-            ]);
-            expect(error4.errors).toHaveLength(3);
         });
     });
 

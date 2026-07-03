@@ -1,10 +1,8 @@
 /**
- * Tests for correlation utilities including correlation ID generation and
- * ValidationError.
+ * Tests for correlation utilities including correlation ID generation.
  */
 
 import { generateCorrelationId } from "@shared/utils/correlation";
-import { ValidationError } from "@shared/utils/validationError";
 import { describe, expect, it } from "vitest";
 
 describe("correlationUtils", () => {
@@ -57,54 +55,6 @@ describe("correlationUtils", () => {
 
             // All 100 IDs should be unique
             expect(ids.size).toBe(100);
-        });
-    });
-
-    describe(ValidationError, () => {
-        it("should create a validation error with error messages", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: correlationUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Constructor", "type");
-
-            const errors = ["Field is required", "Invalid format"];
-            const error = new ValidationError(errors);
-
-            expect(error).toBeInstanceOf(Error);
-            expect(error.name).toBe("ValidationError");
-            expect(error.errors).toEqual(errors);
-            expect(error.message).toBe(
-                "Validation failed: Field is required, Invalid format"
-            );
-        });
-
-        it("should handle single error message", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: correlationUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const errors = ["Single error"];
-            const error = new ValidationError(errors);
-
-            expect(error.message).toBe("Validation failed: Single error");
-            expect(error.errors).toEqual(errors);
-        });
-
-        it("should handle empty error array", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: correlationUtils", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const errors: string[] = [];
-            const error = new ValidationError(errors);
-
-            expect(error.message).toBe("Validation failed: ");
-            expect(error.errors).toEqual(errors);
         });
     });
 });

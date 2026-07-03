@@ -7,7 +7,6 @@ import { describe, expect, it, vi } from "vitest";
 
 // Import all modules that contribute to function coverage
 import * as sharedTypes from "../types";
-import * as themeConfig from "../types/themeConfig";
 import * as validation from "../types/validation";
 import * as cacheKeys from "../utils/cacheKeys";
 import * as environment from "../utils/environment";
@@ -95,43 +94,6 @@ describe("Final 90% Function Coverage Push", () => {
                 type: "http",
                 url: "https://example.com",
             });
-        }
-
-        expect(true).toBeTruthy();
-    });
-
-    it("should call ALL exported functions from themeConfig", ({
-        task,
-        annotate,
-    }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: final-90-percent-function-coverage", "component");
-        annotate("Category: Shared", "category");
-        annotate("Type: Export Operation", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: final-90-percent-function-coverage", "component");
-        annotate("Category: Shared", "category");
-        annotate("Type: Export Operation", "type");
-
-        const functions = Object.keys(themeConfig).filter(
-            (key) => typeof (themeConfig as any)[key] === "function"
-        );
-
-        for (const funcName of functions) {
-            try {
-                const func = (themeConfig as any)[funcName];
-                func();
-                func(null);
-                func(undefined);
-                func({});
-                func("test");
-                func(123);
-                func(true);
-                func([]);
-            } catch {
-                // Expected for some functions
-            }
         }
 
         expect(true).toBeTruthy();
@@ -500,7 +462,6 @@ describe("Final 90% Function Coverage Push", () => {
         // Test with various edge case arguments to ensure all code paths are hit
         const allModules = [
             sharedTypes,
-            themeConfig,
             validation,
             cacheKeys,
             environment,

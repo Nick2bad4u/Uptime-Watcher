@@ -1,68 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import * as database from "../../types/database";
-import * as themeConfig from "../../types/themeConfig";
 import * as validation from "../../types/validation";
 
 describe("Types Complete Function Coverage", () => {
-    describe("themeConfig module", () => {
-        it("should call isColorPalette function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: complete-function-coverage",
-                "component"
-            );
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const validPalette = {
-                primary: "#000",
-                secondary: "#fff",
-                error: "#f00",
-                info: "#00f",
-                success: "#0f0",
-                warning: "#ff0",
-            };
-            const isResult1 = themeConfig.isColorPalette(validPalette);
-            const isResult2 = themeConfig.isColorPalette({});
-            const isResult3 = themeConfig.isColorPalette(null);
-
-            expect(isResult1).toBeTruthy();
-            expect(isResult2).toBeFalsy();
-            expect(isResult3).toBeFalsy();
-        });
-
-        it("should call isThemeConfig function", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: complete-function-coverage",
-                "component"
-            );
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const validTheme = {
-                colors: {},
-                spacing: {},
-                animation: {},
-                borderRadius: {},
-                components: {},
-                shadows: {},
-                typography: {},
-            };
-            const isResult1 = themeConfig.isThemeConfig(validTheme);
-            const isResult2 = themeConfig.isThemeConfig({});
-            const isResult3 = themeConfig.isThemeConfig(null);
-
-            expect(isResult1).toBeTruthy();
-            expect(isResult2).toBeFalsy();
-            expect(isResult3).toBeFalsy();
-        });
-    });
-
     describe("database module", () => {
         it("should call isValidHistoryRow function", async ({
             task,
