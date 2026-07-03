@@ -10,6 +10,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../createMonitorConfig";
@@ -271,9 +272,9 @@ export function normalizeTimestampValue(value: unknown): number | undefined {
                 : Math.trunc(numeric * 1000);
         }
 
-        const parsed = Date.parse(trimmed);
-        if (!Number.isNaN(parsed)) {
-            return parsed;
+        const timestampResult = safeParseIsoTimestamp(trimmed);
+        if (timestampResult.success) {
+            return Date.parse(timestampResult.data);
         }
     }
 

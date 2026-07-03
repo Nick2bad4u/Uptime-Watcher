@@ -78,6 +78,33 @@ describe(normalizeTimestampValue, () => {
     it("rejects invalid Date values", () => {
         expect(normalizeTimestampValue(new Date(Number.NaN))).toBeUndefined();
     });
+
+    it("normalizes numeric timestamp strings", () => {
+        expect(normalizeTimestampValue("1735787045")).toBe(1_735_787_045_000);
+        expect(normalizeTimestampValue("1735787045000")).toBe(
+            1_735_787_045_000
+        );
+    });
+
+    it("normalizes strict ISO timestamp strings", () => {
+        expect(normalizeTimestampValue("2025-01-02T03:04:05.000Z")).toBe(
+            1_735_787_045_000
+        );
+        expect(normalizeTimestampValue(" 2025-01-02T03:04:05.000Z ")).toBe(
+            1_735_787_045_000
+        );
+    });
+
+    it("rejects loose or impossible timestamp strings", () => {
+        for (const value of [
+            "",
+            "2025-01-02",
+            "January 2, 2025",
+            "2026-02-30T00:00:00.000Z",
+        ]) {
+            expect(normalizeTimestampValue(value)).toBeUndefined();
+        }
+    });
 });
 
 describe(normalizeResponseTime, () => {
