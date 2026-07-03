@@ -574,6 +574,21 @@ describe("Settings Component", () => {
         expect(mockSitesStore.saveSqliteBackup).toHaveBeenCalled();
     });
 
+    it("should display fallback text for invalid backup summary timestamps", () => {
+        updateSitesStoreMock(sitesStoreState, {
+            lastBackupMetadata: createSerializedBackupResult({
+                metadata: {
+                    createdAt: Number.POSITIVE_INFINITY,
+                },
+            }).metadata,
+        });
+
+        render(<Settings onClose={mockOnClose} />);
+
+        expect(screen.getByText(/Latest backup: N\/A/v)).toBeInTheDocument();
+        expect(screen.queryByText(/Invalid Date/v)).not.toBeInTheDocument();
+    });
+
     it("should handle theme changes", ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: Settings", "component");

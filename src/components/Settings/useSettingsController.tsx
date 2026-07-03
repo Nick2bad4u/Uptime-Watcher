@@ -17,6 +17,7 @@ import { logger } from "../../services/logger";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { isThemeName, type ThemeName } from "../../theme/types";
+import { UiDefaults } from "../../utils/fallbacks";
 import { formatByteSize } from "../../utils/formatting/formatByteSize";
 import { AppIcons } from "../../utils/icons";
 import { waitForAnimation } from "../../utils/time/waitForAnimation";
@@ -95,6 +96,19 @@ export interface SettingsControllerState {
     readonly shellClassName: string;
     readonly showSyncSuccessBanner: boolean;
     readonly subtitle: ReactNode;
+}
+
+function formatBackupSummaryDate(createdAt: number): string {
+    const backupDate = new Date(createdAt);
+
+    if (!Number.isFinite(createdAt) || !Number.isFinite(backupDate.getTime())) {
+        return UiDefaults.notAvailableLabel;
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(backupDate);
 }
 
 /**
@@ -410,13 +424,10 @@ export const useSettingsController = ({
             return null;
         }
 
-        const formattedDate = new Intl.DateTimeFormat(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short",
-        }).format(new Date(lastBackupMetadata.createdAt));
-
         return {
-            formattedDate,
+            formattedDate: formatBackupSummaryDate(
+                lastBackupMetadata.createdAt
+            ),
             formattedSize: formatByteSize(lastBackupMetadata.sizeBytes),
             retentionHintDays: lastBackupMetadata.retentionHintDays,
             schemaVersion: lastBackupMetadata.schemaVersion,
