@@ -149,10 +149,12 @@ describe("historyLimitManager", () => {
                 mockHistoryRepository.pruneAllHistoryInternal
             ).toHaveBeenCalledWith(mockDatabase, limit);
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                `History limit set to ${limit}`
+                "History limit set",
+                { limit }
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                `Pruned history to ${limit} entries per monitor`
+                "History pruned to limit",
+                { limit }
             );
         });
 
@@ -191,7 +193,8 @@ describe("historyLimitManager", () => {
                 mockHistoryRepository.pruneAllHistoryInternal
             ).toHaveBeenCalledWith(mockDatabase, expectedLimit);
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                `History limit set to ${expectedLimit}`
+                "History limit set",
+                { limit: expectedLimit }
             );
         });
 
@@ -230,10 +233,12 @@ describe("historyLimitManager", () => {
                 mockHistoryRepository.pruneAllHistoryInternal
             ).not.toHaveBeenCalled();
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                `History limit set to ${expectedLimit}`
+                "History limit set",
+                { limit: expectedLimit }
             );
             expect(mockLogger.debug).not.toHaveBeenCalledWith(
-                expect.stringContaining("Pruned history")
+                "History pruned to limit",
+                expect.anything()
             );
         });
 
@@ -272,10 +277,12 @@ describe("historyLimitManager", () => {
                 mockHistoryRepository.pruneAllHistoryInternal
             ).not.toHaveBeenCalled();
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                `History limit set to ${expectedLimit}`
+                "History limit set",
+                { limit: expectedLimit }
             );
             expect(mockLogger.debug).not.toHaveBeenCalledWith(
-                expect.stringContaining("Pruned history")
+                "History pruned to limit",
+                expect.anything()
             );
         });
 

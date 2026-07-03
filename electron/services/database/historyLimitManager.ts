@@ -138,9 +138,9 @@ export async function setHistoryLimit(
     );
 
     if (logger) {
-        logger.debug(`History limit set to ${finalLimit}`);
+        logger.debug("History limit set", { limit: finalLimit });
         if (finalLimit > 0) {
-            logger.debug(`Pruned history to ${finalLimit} entries per monitor`);
+            logger.debug("History pruned to limit", { limit: finalLimit });
         }
     }
 }
