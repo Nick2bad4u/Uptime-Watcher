@@ -216,8 +216,9 @@ describe("DynamicField - Comprehensive Coverage", () => {
             // Clear input (empty string case)
             await user.clear(input);
 
-            // Should call onChange with 0 for empty string
-            expect(mockOnChange).toHaveBeenCalledWith(0);
+            // Empty numeric fields must stay empty so required-field
+            // validation can catch them and optional fields can be omitted.
+            expect(mockOnChange).toHaveBeenCalledWith("");
         });
     });
 

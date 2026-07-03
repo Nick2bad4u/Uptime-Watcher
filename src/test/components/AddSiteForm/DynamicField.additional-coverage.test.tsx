@@ -186,11 +186,10 @@ describe("DynamicField - Additional Coverage", () => {
 
             const input = screen.getByLabelText("Port (required)");
 
-            // Clear the input - this should call onChange with 0
+            // Clear the input - this should preserve an empty value.
             await user.clear(input);
 
-            // Should call onChange with 0 for empty input
-            expect(mockOnChange).toHaveBeenCalledWith(0);
+            expect(mockOnChange).toHaveBeenCalledWith("");
         });
 
         it("should handle valid numeric input", async ({ task, annotate }) => {
@@ -236,8 +235,9 @@ describe("DynamicField - Additional Coverage", () => {
             await user.clear(input);
             await user.type(input, "3000");
 
-            // Should call onChange starting with 0 from clear, then for each character typed
-            expect(mockOnChange).toHaveBeenCalledWith(0); // From clear
+            // Should call onChange starting with an empty value from clear,
+            // then for each character typed.
+            expect(mockOnChange).toHaveBeenCalledWith("");
             expect(mockOnChange).toHaveBeenCalledWith(3); // From typing "3"
         });
 
