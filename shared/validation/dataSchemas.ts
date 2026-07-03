@@ -25,11 +25,11 @@ export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabas
         .object({
             appVersion: z.string().trim().min(1),
             checksum: z.string().trim().min(1),
-            createdAt: z.number(),
+            createdAt: z.int().nonnegative(),
             originalPath: z.string().trim().min(1),
-            retentionHintDays: z.number(),
-            schemaVersion: z.number(),
-            sizeBytes: z.number(),
+            retentionHintDays: z.int().nonnegative(),
+            schemaVersion: z.int().nonnegative(),
+            sizeBytes: z.int().nonnegative(),
         })
         .strict();
 
@@ -90,7 +90,7 @@ export const serializedDatabaseRestoreResultSchema: z.ZodType<{
     .object({
         metadata: serializedDatabaseBackupMetadataSchema,
         preRestoreFileName: z.string().trim().min(1).optional(),
-        restoredAt: z.number(),
+        restoredAt: z.int().nonnegative(),
     })
     .strict();
 

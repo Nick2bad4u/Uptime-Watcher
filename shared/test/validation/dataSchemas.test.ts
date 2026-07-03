@@ -75,6 +75,35 @@ describe("dataSchemas", () => {
         expect(parsed.success).toBeTruthy();
     });
 
+    it("rejects serialized backup metadata with invalid numeric invariants", () => {
+        const buffer = new ArrayBuffer(8);
+        const metadata = {
+            appVersion: "1.0.0",
+            checksum: "abc",
+            createdAt: 1,
+            originalPath: "C:/x",
+            retentionHintDays: 30,
+            schemaVersion: 1,
+            sizeBytes: buffer.byteLength,
+        };
+
+        for (const invalidMetadata of [
+            { ...metadata, createdAt: -1 },
+            { ...metadata, retentionHintDays: -1 },
+            { ...metadata, schemaVersion: -1 },
+            { ...metadata, sizeBytes: -1 },
+            { ...metadata, sizeBytes: 1.5 },
+        ]) {
+            const parsed = validateSerializedDatabaseBackupResult({
+                buffer,
+                fileName: "backup.sqlite",
+                metadata: invalidMetadata,
+            });
+
+            expect(parsed.success).toBeFalsy();
+        }
+    });
+
     it("rejects when the buffer is not transferable", () => {
         const parsed = validateSerializedDatabaseRestorePayload({
             buffer: Buffer.from("no"),
@@ -101,6 +130,27 @@ describe("dataSchemas", () => {
         expect(parsed.success).toBeTruthy();
         if (parsed.success) {
             expect(parsed.data.restoredAt).toBe(123);
+        }
+    });
+
+    it("rejects restore results with invalid restoredAt values", () => {
+        const metadata = {
+            appVersion: "1.0.0",
+            checksum: "abc",
+            createdAt: 1,
+            originalPath: "C:/x",
+            retentionHintDays: 30,
+            schemaVersion: 1,
+            sizeBytes: 8,
+        };
+
+        for (const restoredAt of [-1, 1.5]) {
+            const parsed = validateSerializedDatabaseRestoreResult({
+                metadata,
+                restoredAt,
+            });
+
+            expect(parsed.success).toBeFalsy();
         }
     });
 
