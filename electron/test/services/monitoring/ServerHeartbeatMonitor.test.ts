@@ -115,11 +115,13 @@ describe("ServerHeartbeatMonitor service", () => {
     });
 
     it("returns down result when fetching heartbeat fails", async () => {
-        httpGetMock.mockRejectedValue(new Error("Network failure"));
+        const transportError = new Error("Network failure");
+        httpGetMock.mockRejectedValue(transportError);
 
         const result = await service.check(monitor);
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed to fetch heartbeat");
+        expect(transportError.message).toBe("Network failure");
     });
 });

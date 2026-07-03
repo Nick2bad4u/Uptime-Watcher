@@ -41,14 +41,17 @@ import {
  */
 function createInvalidJsonError(url: string, error: unknown): Error {
     const normalized = ensureError(error);
-    normalized.message = `Invalid JSON response from ${url}: ${normalized.message}`;
-    return normalized;
+    return new Error(
+        `Invalid JSON response from ${url}: ${normalized.message}`,
+        { cause: error }
+    );
 }
 
 function createFetchError(url: string, error: unknown): Error {
     const normalized = ensureError(error);
-    normalized.message = `Failed to fetch ${url}: ${normalized.message}`;
-    return normalized;
+    return new Error(`Failed to fetch ${url}: ${normalized.message}`, {
+        cause: error,
+    });
 }
 
 /**
