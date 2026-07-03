@@ -808,6 +808,36 @@ describe(DataBackupService, () => {
                 { force: true }
             );
         });
+
+        it("surfaces rollback failures when replacing an existing backup fails", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            const fileStat = {
+                isFile: () => true,
+                isSymbolicLink: () => false,
+            };
+            const saveError = new Error("rename new backup failed");
+            const rollbackError = new Error("restore previous backup failed");
+
+            mockFsPromises.lstat.mockResolvedValue(fileStat);
+            mockFsPromises.rename
+                .mockResolvedValueOnce(undefined)
+                .mockRejectedValueOnce(saveError)
+                .mockRejectedValueOnce(rollbackError);
+
+            const result =
+                dataBackupService.saveDatabaseBackupToPath(targetPath);
+
+            await expect(result).rejects.toThrow(AggregateError);
+            await expect(result).rejects.toThrow(
+                "Failed to save database backup and restore the previous backup file"
+            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[DataBackupService] Failed to restore previous backup file after save failure",
+                rollbackError,
+                expect.objectContaining({ targetPath })
+            );
+        });
     });
 
     describe("restoreDatabaseBackup", () => {

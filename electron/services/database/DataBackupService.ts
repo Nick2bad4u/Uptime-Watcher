@@ -278,9 +278,50 @@ export class DataBackupService {
             await fs.rename(sourcePath, targetPath);
             await fs.rm(backupPath, { force: true });
         } catch (error) {
-            await fs.rm(targetPath, { force: true }).catch(() => {});
-            await fs.rename(backupPath, targetPath).catch(() => {});
-            await fs.rm(sourcePath, { force: true }).catch(() => {});
+            const rollbackErrors: Error[] = [];
+
+            await fs
+                .rm(targetPath, { force: true })
+                .catch((rollbackError: unknown) => {
+                    const normalized = ensureError(rollbackError);
+                    rollbackErrors.push(normalized);
+                    this.logger.warn(
+                        "[DataBackupService] Failed to remove incomplete backup destination during rollback",
+                        normalized,
+                        { targetPath }
+                    );
+                });
+            await fs
+                .rename(backupPath, targetPath)
+                .catch((rollbackError: unknown) => {
+                    const normalized = ensureError(rollbackError);
+                    rollbackErrors.push(normalized);
+                    this.logger.error(
+                        "[DataBackupService] Failed to restore previous backup file after save failure",
+                        normalized,
+                        { backupPath, targetPath }
+                    );
+                });
+            await fs
+                .rm(sourcePath, { force: true })
+                .catch((rollbackError: unknown) => {
+                    const normalized = ensureError(rollbackError);
+                    rollbackErrors.push(normalized);
+                    this.logger.warn(
+                        "[DataBackupService] Failed to remove temporary backup source during rollback",
+                        normalized,
+                        { sourcePath }
+                    );
+                });
+
+            if (rollbackErrors.length > 0) {
+                throw new AggregateError(
+                    [ensureError(error), ...rollbackErrors],
+                    "Failed to save database backup and restore the previous backup file",
+                    { cause: error }
+                );
+            }
+
             throw error;
         }
     }
