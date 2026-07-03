@@ -52,6 +52,16 @@ export const MAX_IPC_SQLITE_RESTORE_BYTES: number =
     DEFAULT_MAX_BACKUP_SIZE_BYTES;
 
 /**
+ * Maximum UTF-8 byte length accepted for user-visible SQLite restore
+ * filenames transported over IPC.
+ *
+ * @remarks
+ * The filename is used for UI/logging context only, but bounding it consistently
+ * across renderer and main avoids oversized diagnostics payloads.
+ */
+export const MAX_SQLITE_RESTORE_FILE_NAME_BYTES = 512;
+
+/**
  * Maximum size (bytes) accepted for JSON import payloads transported over IPC.
  *
  * @remarks

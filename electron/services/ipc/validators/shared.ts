@@ -1,6 +1,7 @@
 import {
     MAX_IPC_JSON_IMPORT_BYTES,
     MAX_IPC_SQLITE_RESTORE_BYTES,
+    MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
 } from "@shared/constants/backup";
 /**
  * Parameter validators for specific IPC handler groups.
@@ -54,9 +55,6 @@ import { validateRequiredStringPayload } from "./utils/stringPayloadValidation";
  * not the other" surprises.
  */
 const MAX_IMPORT_DATA_PAYLOAD_BYTES: number = MAX_IPC_JSON_IMPORT_BYTES;
-
-/** Maximum byte budget accepted for user-supplied restore filenames. */
-const MAX_RESTORE_FILE_NAME_BYTES = 512;
 
 /** Maximum byte budget accepted for monitor validation payloads over IPC. */
 const MAX_MONITOR_VALIDATION_DATA_BYTES: number = 256 * 1024;
@@ -137,7 +135,7 @@ const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
         if (isDefined(fileNameValue)) {
             errors.push(
                 ...validateRestoreFileNameCandidate(fileNameValue, {
-                    maxBytes: MAX_RESTORE_FILE_NAME_BYTES,
+                    maxBytes: MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
                 })
             );
         }

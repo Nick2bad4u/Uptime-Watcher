@@ -80,7 +80,7 @@ describe("DataService IPC payload budgets", () => {
                 buffer: new ArrayBuffer(11),
                 fileName: "restore.sqlite",
             })
-        ).rejects.toThrow(/too large/v);
+        ).rejects.toThrow(/exceeds maximum IPC transfer size/v);
 
         expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
     });
@@ -92,6 +92,17 @@ describe("DataService IPC payload budgets", () => {
                 fileName: "restore.sqlite",
             })
         ).rejects.toThrow(/ArrayBuffer/v);
+
+        expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
+    });
+
+    it("rejects restore payloads with unsafe filenames before IPC", async () => {
+        await expect(
+            DataService.restoreSqliteBackup({
+                buffer: new ArrayBuffer(8),
+                fileName: "../restore.sqlite",
+            })
+        ).rejects.toThrow(/filename/v);
 
         expect(restoreSqliteBackupMock).not.toHaveBeenCalled();
     });

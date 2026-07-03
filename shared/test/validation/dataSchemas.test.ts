@@ -2,7 +2,11 @@
  * Tests for shared Zod schemas in validation/dataSchemas.
  */
 
-import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
+import {
+    DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
+    MAX_IPC_SQLITE_RESTORE_BYTES,
+    MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
+} from "@shared/constants/backup";
 import {
     validateMonitorTypeConfigArray,
     validateSerializedDatabaseBackupResult,
@@ -133,6 +137,35 @@ describe("dataSchemas", () => {
         });
 
         expect(parsed.success).toBeFalsy();
+    });
+
+    it("validates restore payload buffer and filename invariants", () => {
+        const valid = validateSerializedDatabaseRestorePayload({
+            buffer: new ArrayBuffer(8),
+            fileName: "restore.sqlite",
+        });
+        expect(valid.success).toBeTruthy();
+
+        for (const payload of [
+            { buffer: new ArrayBuffer(0), fileName: "restore.sqlite" },
+            {
+                buffer: new ArrayBuffer(MAX_IPC_SQLITE_RESTORE_BYTES + 1),
+                fileName: "restore.sqlite",
+            },
+            { buffer: new ArrayBuffer(8), fileName: " restore.sqlite" },
+            { buffer: new ArrayBuffer(8), fileName: "restore.sqlite " },
+            { buffer: new ArrayBuffer(8), fileName: "restore\n.sqlite" },
+            { buffer: new ArrayBuffer(8), fileName: "../restore.sqlite" },
+            { buffer: new ArrayBuffer(8), fileName: "." },
+            {
+                buffer: new ArrayBuffer(8),
+                fileName: `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
+            },
+        ]) {
+            expect(
+                validateSerializedDatabaseRestorePayload(payload).success
+            ).toBeFalsy();
+        }
     });
 
     it("validates restore result and returns a discriminated union", () => {

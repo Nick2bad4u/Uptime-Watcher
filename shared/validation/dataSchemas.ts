@@ -6,8 +6,14 @@ import type {
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { UnknownRecord } from "type-fest";
 
-import { DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES } from "@shared/constants/backup";
+import {
+    DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
+    MAX_IPC_SQLITE_RESTORE_BYTES,
+    MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
+} from "@shared/constants/backup";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { safeCastTo } from "ts-extras";
 import * as z from "zod";
@@ -20,6 +26,60 @@ const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     (value): value is ArrayBuffer => value instanceof ArrayBuffer,
     "Expected transferable ArrayBuffer"
 );
+
+const hasAsciiControlCharacter = (value: string): boolean => {
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint <= 0x1f || codePoint === 0x7f)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+const sqliteRestoreFileNameSchema: z.ZodType<string> = z
+    .string()
+    .min(1)
+    .superRefine((fileName, context) => {
+        if (fileName !== fileName.trim()) {
+            context.addIssue({
+                code: "custom",
+                message: "Restore filename must not have leading or trailing whitespace",
+            });
+        }
+
+        if (hasAsciiControlCharacter(fileName)) {
+            context.addIssue({
+                code: "custom",
+                message: "Restore filename must not contain control characters",
+            });
+        }
+
+        if (getUtfByteLength(fileName) > MAX_SQLITE_RESTORE_FILE_NAME_BYTES) {
+            context.addIssue({
+                code: "custom",
+                message: `Restore filename must not exceed ${MAX_SQLITE_RESTORE_FILE_NAME_BYTES} bytes`,
+            });
+        }
+
+        if (fileName === "." || fileName === "..") {
+            context.addIssue({
+                code: "custom",
+                message: "Restore filename must be a valid file name",
+            });
+        }
+
+        if (normalizePathSeparatorsToPosix(fileName).includes("/")) {
+            context.addIssue({
+                code: "custom",
+                message: "Restore filename must not contain path separators",
+            });
+        }
+    });
 
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
@@ -78,8 +138,17 @@ export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
     fileName?: string | undefined;
 }> = z
     .object({
-        buffer: arrayBufferSchema,
-        fileName: z.string().trim().min(1).optional(),
+        buffer: arrayBufferSchema
+            .refine((buffer) => buffer.byteLength > 0, {
+                message: "Restore buffer must not be empty",
+            })
+            .refine(
+                (buffer) => buffer.byteLength <= MAX_IPC_SQLITE_RESTORE_BYTES,
+                {
+                    message: `Restore buffer exceeds maximum IPC transfer size (${MAX_IPC_SQLITE_RESTORE_BYTES} bytes)`,
+                }
+            ),
+        fileName: sqliteRestoreFileNameSchema.optional(),
     })
     .strict();
 

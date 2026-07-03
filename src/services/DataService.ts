@@ -28,6 +28,7 @@ import {
 import {
     validateSerializedDatabaseBackupResult,
     validateSerializedDatabaseBackupSaveResult,
+    validateSerializedDatabaseRestorePayload,
     validateSerializedDatabaseRestoreResult,
 } from "@shared/validation/dataSchemas";
 
@@ -203,17 +204,32 @@ export const DataService: DataServiceContract = {
             // `undefined` value equivalently when displaying restore summaries.
             {
                 try {
-                    assertSqliteRestorePayloadWithinIpcBudget(payload);
+                    const parsedPayload = validateServicePayload(
+                        validateSerializedDatabaseRestorePayload,
+                        payload,
+                        {
+                            operation: "restoreSqliteBackup payload",
+                            serviceName: "DataService",
+                        }
+                    );
+                    const restorePayload: SerializedDatabaseRestorePayload =
+                        parsedPayload.fileName === undefined
+                            ? { buffer: parsedPayload.buffer }
+                            : {
+                                  buffer: parsedPayload.buffer,
+                                  fileName: parsedPayload.fileName,
+                              };
+                    assertSqliteRestorePayloadWithinIpcBudget(restorePayload);
 
                     const response =
-                        await api.data.restoreSqliteBackup(payload);
+                        await api.data.restoreSqliteBackup(restorePayload);
 
                     return validateServicePayload(
                         validateSerializedDatabaseRestoreResult,
                         response,
                         {
                             diagnostics: {
-                                payloadFileName: payload.fileName,
+                                payloadFileName: restorePayload.fileName,
                             },
                             operation: "restoreSqliteBackup",
                             serviceName: "DataService",
