@@ -73,6 +73,8 @@ import type { TypedEventBus } from "../events/TypedEventBus";
 
 import { logger } from "./logger";
 
+const DEFAULT_MAX_ATTEMPTS = 3;
+
 interface OperationalErrorMetadata {
     readonly errorCauseMessage?: string | undefined;
     readonly errorCauseName?: string | undefined;
@@ -184,6 +186,14 @@ const normalizeOperationalContext = (
 export const createOperationalHookContext = (
     context?: OperationalHookContextInput
 ): OperationalHookContext => normalizeOperationalContext(context);
+
+function normalizeMaxAttempts(maxRetries: number | undefined): number {
+    if (!isDefined(maxRetries) || !Number.isFinite(maxRetries)) {
+        return DEFAULT_MAX_ATTEMPTS;
+    }
+
+    return Math.max(1, Math.trunc(maxRetries));
+}
 
 /**
  * Configuration for operational hooks.
@@ -597,11 +607,12 @@ export async function withOperationalHooks<T>(
         emitEvents = true,
         eventEmitter,
         initialDelay = 100,
-        maxRetries = 3,
+        maxRetries: configuredMaxRetries,
         operationName,
         throwOnFailure = true,
     } = config;
 
+    const maxRetries = normalizeMaxAttempts(configuredMaxRetries);
     const context = normalizeOperationalContext(contextInput);
     const operationId = generateOperationId();
     const startTime = Date.now();

@@ -121,6 +121,51 @@ describe("Operational Hooks", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(2);
         });
+        it("should treat non-positive max retries as one total attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const mockOperation = vi.fn().mockResolvedValue("success");
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    emitEvents: false,
+                    maxRetries: 0,
+                    operationName: "zero-max-retries",
+                })
+            ).resolves.toBe("success");
+
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+        });
+        it("should default non-finite max retries before retrying", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const mockOperation = vi
+                .fn()
+                .mockRejectedValue(new Error("Persistent failure"));
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    emitEvents: false,
+                    initialDelay: 0,
+                    maxRetries: Number.POSITIVE_INFINITY,
+                    operationName: "infinite-max-retries",
+                })
+            ).rejects.toThrow("Persistent failure");
+
+            expect(mockOperation).toHaveBeenCalledTimes(3);
+        });
         it("should respect custom failure log level", async ({
             task,
             annotate,
