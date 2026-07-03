@@ -1,5 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
-
 /**
  * Specialized Vitest configuration optimized for zero-coverage detection runs.
  *
@@ -16,6 +14,7 @@
 import {
     defineConfig,
     mergeConfig,
+    type ViteUserConfig,
     type ViteUserConfigFnObject,
 } from "vitest/config";
 
@@ -23,6 +22,43 @@ import baseViteConfig from "../../vite.config";
 
 // Use isolated caches so zero-coverage probes do not contend with the primary Vite/Vitest pipeline.
 const zeroCoverageViteCacheDir = "./.cache/vite-zero-coverage/";
+
+type VitestTestConfig = NonNullable<ViteUserConfig["test"]>;
+type CoverageOptionsWithAll = NonNullable<VitestTestConfig["coverage"]> & {
+    /**
+     * Runtime-supported Vitest coverage option omitted from the published
+     * `CoverageOptions` type in the currently installed Vitest release.
+     */
+    all: boolean;
+};
+
+const zeroCoverageOverrides = {
+    cacheDir: zeroCoverageViteCacheDir,
+    test: {
+        coverage: {
+            all: false,
+            allowExternal: true,
+            clean: true,
+            cleanOnRerun: true,
+            provider: "v8",
+            reporter: ["json"],
+            reportOnFailure: false,
+            reportsDirectory: "./coverage/zero-coverage",
+            skipFull: false,
+            thresholds: {
+                autoUpdate: false,
+                branches: 0,
+                functions: 0,
+                lines: 0,
+                statements: 0,
+            },
+        } as CoverageOptionsWithAll,
+        name: {
+            color: "magenta",
+            label: "ZeroCoverage",
+        },
+    },
+} satisfies ViteUserConfig;
 
 /**
  * Vitest configuration tuned for zero-coverage detection runs.
@@ -49,35 +85,7 @@ const zeroCoverageConfig: ViteUserConfigFnObject = defineConfig((env) =>
 
             return configOrPromise;
         })(),
-        defineConfig({
-            cacheDir: zeroCoverageViteCacheDir,
-            test: {
-                coverage: {
-                    all: false,
-                    allowExternal: true,
-                    clean: true,
-                    cleanOnRerun: true,
-                    provider: "v8",
-                    reporter: ["json"],
-                    reportOnFailure: false,
-                    reportsDirectory: "./coverage/zero-coverage",
-                    skipFull: false,
-                    thresholds: {
-                        autoUpdate: false,
-                        branches: 0,
-                        functions: 0,
-                        lines: 0,
-                        statements: 0,
-                    },
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Coverage config typing omits supported options.
-                } as any,
-                name: {
-                    color: "magenta",
-                    label: "ZeroCoverage",
-                },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Vitest config typing omits supported options.
-            } as any,
-        })
+        zeroCoverageOverrides
     )
 );
 
