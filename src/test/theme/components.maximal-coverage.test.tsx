@@ -1665,6 +1665,45 @@ describe("Theme Components - Complete Coverage", () => {
             const bar = document.querySelector(".themed-mini-chart-bar");
             expect(bar).toBeInTheDocument();
         });
+
+        it("should use fallback text for invalid timestamp labels", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Validation", "type");
+
+            render(<MiniChartBar status="up" timestamp="invalid-timestamp" />);
+
+            const bar = document.querySelector(".themed-mini-chart-bar");
+            expect(bar).toBeInTheDocument();
+            expect(bar?.getAttribute("title")).toContain("at N/A");
+            expect(bar?.getAttribute("title")).not.toContain("Invalid Date");
+        });
+
+        it("should reject impossible ISO timestamp labels", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: components.maximal-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Validation", "type");
+
+            render(
+                <MiniChartBar
+                    status="up"
+                    timestamp="2026-02-30T00:00:00.000Z"
+                />
+            );
+
+            const bar = document.querySelector(".themed-mini-chart-bar");
+            expect(bar).toBeInTheDocument();
+            expect(bar?.getAttribute("title")).toContain("at N/A");
+            expect(bar?.getAttribute("title")).not.toContain("Invalid Date");
+        });
     });
 
     describe("Edge Cases and Integration", () => {

@@ -6,13 +6,34 @@ import type { SiteStatus } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
+import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { memo, useMemo } from "react";
 
+import { UiDefaults } from "../../utils/fallbacks";
 import { formatResponseTime } from "../../utils/time";
 import { useTheme } from "../useTheme";
 
-const formatTimestampLabel = (timestamp: Date | number | string): string =>
-    new Date(timestamp).toLocaleString();
+const formatValidDate = (value: Date): string =>
+    Number.isFinite(value.getTime())
+        ? value.toLocaleString()
+        : UiDefaults.notAvailableLabel;
+
+const formatTimestampLabel = (timestamp: Date | number | string): string => {
+    if (timestamp instanceof Date) {
+        return formatValidDate(timestamp);
+    }
+
+    if (typeof timestamp === "number") {
+        return Number.isFinite(timestamp)
+            ? formatValidDate(new Date(timestamp))
+            : UiDefaults.notAvailableLabel;
+    }
+
+    const parsed = safeParseIsoTimestamp(timestamp);
+    return parsed.success
+        ? formatValidDate(new Date(parsed.data))
+        : UiDefaults.notAvailableLabel;
+};
 
 /**
  * Props for the MiniChartBar component
