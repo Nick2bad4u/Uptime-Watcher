@@ -3,6 +3,12 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
+const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
+    typeof candidate === "number" &&
+    isFiniteNumber(candidate) &&
+    Number.isSafeInteger(candidate) &&
+    candidate >= 0;
+
 /**
  * Builds a normalized {@link StateSyncStatusSummary}.
  */
@@ -12,14 +18,12 @@ export function createStateSyncStatusSummary(args: {
     source: StateSyncStatusSummary["source"];
     synchronized: boolean;
 }): StateSyncStatusSummary {
-    const lastSyncAt =
-        typeof args.lastSyncAt === "number" && isFiniteNumber(args.lastSyncAt)
-            ? args.lastSyncAt
-            : null;
-    const siteCount =
-        typeof args.siteCount === "number" && isFiniteNumber(args.siteCount)
-            ? Math.max(0, Math.trunc(args.siteCount))
-            : 0;
+    const lastSyncAt = isNonNegativeSafeInteger(args.lastSyncAt)
+        ? args.lastSyncAt
+        : null;
+    const siteCount = isNonNegativeSafeInteger(args.siteCount)
+        ? args.siteCount
+        : 0;
 
     return {
         lastSyncAt,
@@ -43,15 +47,14 @@ export function normalizeStateSyncStatusSummary(args: {
         currentStatus.source === STATE_SYNC_SOURCE.DATABASE;
 
     const lastSyncAt = currentStatus.lastSyncAt ?? null;
-    const normalizedCachedSiteCount =
-        typeof cachedSiteCount === "number" && isFiniteNumber(cachedSiteCount)
-            ? Math.max(0, Math.trunc(cachedSiteCount))
-            : 0;
-    const normalizedSiteCount =
-        typeof currentStatus.siteCount === "number" &&
-        isFiniteNumber(currentStatus.siteCount)
-            ? Math.max(0, Math.trunc(currentStatus.siteCount))
-            : normalizedCachedSiteCount;
+    const normalizedCachedSiteCount = isNonNegativeSafeInteger(cachedSiteCount)
+        ? cachedSiteCount
+        : 0;
+    const normalizedSiteCount = isNonNegativeSafeInteger(
+        currentStatus.siteCount
+    )
+        ? currentStatus.siteCount
+        : normalizedCachedSiteCount;
 
     if (hasTrustedDatabaseSummary) {
         return createStateSyncStatusSummary({

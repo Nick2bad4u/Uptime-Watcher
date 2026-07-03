@@ -54,6 +54,12 @@ const isValidStateSyncSource = (
     candidate === STATE_SYNC_SOURCE.IMPORT ||
     candidate === STATE_SYNC_SOURCE.MONITOR_UPDATE;
 
+const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
+    typeof candidate === "number" &&
+    isFiniteNumber(candidate) &&
+    Number.isSafeInteger(candidate) &&
+    candidate >= 0;
+
 const buildIdentifierOnlySites = (
     candidate: unknown
 ): SiteIdentifierSnapshot[] => {
@@ -88,10 +94,8 @@ export function normalizeStateSyncPayload(
             action !== STATE_SYNC_ACTION.DELETE &&
             action !== STATE_SYNC_ACTION.UPDATE) ||
         !isValidStateSyncSource(source) ||
-        typeof timestamp !== "number" ||
-        !isFiniteNumber(timestamp) ||
-        typeof revision !== "number" ||
-        !isFiniteNumber(revision)
+        !isNonNegativeSafeInteger(timestamp) ||
+        !isNonNegativeSafeInteger(revision)
     ) {
         return null;
     }
@@ -104,8 +108,7 @@ export function normalizeStateSyncPayload(
         } = candidate;
 
         if (
-            typeof siteCountCandidate !== "number" ||
-            !isFiniteNumber(siteCountCandidate) ||
+            !isNonNegativeSafeInteger(siteCountCandidate) ||
             !Array.isArray(sitesCandidate)
         ) {
             return null;
@@ -120,7 +123,7 @@ export function normalizeStateSyncPayload(
             action,
             revision,
             // Preserve the declared count even if we drop invalid site entries.
-            siteCount: Math.max(0, Math.trunc(siteCountCandidate)),
+            siteCount: siteCountCandidate,
             sites,
             source,
             timestamp,
