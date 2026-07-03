@@ -29,6 +29,7 @@ export const DEFAULT_OAUTH_LOOPBACK_PORT = 53_682;
 export const DEFAULT_OAUTH_LOOPBACK_PATH = "/oauth2/callback";
 
 const LOOPBACK_HOSTS = ["127.0.0.1", "::1"] as const;
+const MAX_CALLBACK_ERROR_DETAIL_CHARS = 300;
 
 function escapeHtml(value: string): string {
     return value
@@ -37,6 +38,48 @@ function escapeHtml(value: string): string {
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
+}
+
+function removeAsciiControlCharacters(value: string): string {
+    let sanitized = "";
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (
+            codePoint !== undefined &&
+            (codePoint < 0x20 || codePoint === 0x7f)
+        ) {
+            sanitized += " ";
+            continue;
+        }
+
+        sanitized += character;
+    }
+
+    return sanitized;
+}
+
+function normalizeCallbackErrorDetail(args: {
+    readonly error: null | string;
+    readonly errorDescription: null | string;
+}): null | string {
+    const rawDetail = args.errorDescription ?? args.error;
+    if (!rawDetail) {
+        return null;
+    }
+
+    const sanitized = removeAsciiControlCharacters(rawDetail)
+        .replaceAll(/\s+/gu, " ")
+        .trim();
+    const normalized =
+        sanitized.length > 0
+            ? sanitized
+            : (args.error ?? "provider_error").trim();
+
+    if (normalized.length <= MAX_CALLBACK_ERROR_DETAIL_CHARS) {
+        return normalized;
+    }
+
+    return `${normalized.slice(0, MAX_CALLBACK_ERROR_DETAIL_CHARS)}...`;
 }
 
 function assertSafeRedirectHost(redirectHost: string): void {
@@ -308,7 +351,10 @@ export async function startLoopbackOAuthServer(args?: {
                 return;
             }
 
-            const callbackError = parsed.errorDescription ?? parsed.error;
+            const callbackError = normalizeCallbackErrorDetail({
+                error: parsed.error,
+                errorDescription: parsed.errorDescription,
+            });
 
             if (callbackError) {
                 writeHtml(response, {

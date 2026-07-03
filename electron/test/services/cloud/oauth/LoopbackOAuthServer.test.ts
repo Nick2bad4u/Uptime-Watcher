@@ -140,6 +140,38 @@ describe(startLoopbackOAuthServer, () => {
         }
     });
 
+    it("sanitizes provider callback error details before rejecting", async () => {
+        const server = await startLoopbackOAuthServer({
+            port: 0,
+            redirectHost: "127.0.0.1",
+            redirectPath: "/oauth2/callback",
+        });
+
+        try {
+            const callbackUrl = new URL(server.redirectUri);
+            callbackUrl.searchParams.set("state", "expected-state");
+            callbackUrl.searchParams.set("error", "access_denied");
+            callbackUrl.searchParams.set(
+                "error_description",
+                `denied\n${"x".repeat(500)}`
+            );
+
+            const response = await requestUrl(callbackUrl.toString());
+
+            expect(response.statusCode).toBe(400);
+            await expect(
+                server.waitForCallback({
+                    expectedState: "expected-state",
+                    timeoutMs: 1000,
+                })
+            ).rejects.toThrow(
+                /^OAuth callback error: denied x{293}\.\.\.$/u
+            );
+        } finally {
+            await closeServer(server);
+        }
+    });
+
     it("rejects pre-wait callbacks with mismatched state without timing out", async () => {
         const server = await startLoopbackOAuthServer({
             port: 0,
