@@ -14,18 +14,47 @@ const GOOGLE_OAUTH_TOKEN_ENDPOINT =
     "https://oauth2.googleapis.com/token" as const;
 
 const MAX_FALLBACK_BODY_CHARS = 500;
+const MAX_SAFE_DETAIL_CHARS = 500;
+const MIN_PRINTABLE_ASCII_CODE_POINT = 0x20;
+const DELETE_CONTROL_CODE_POINT = 0x7f;
+
+const isAsciiControlCharacter = (value: string): boolean => {
+    const codePoint = value.codePointAt(0);
+    return (
+        codePoint !== undefined &&
+        (codePoint < MIN_PRINTABLE_ASCII_CODE_POINT ||
+            codePoint === DELETE_CONTROL_CODE_POINT)
+    );
+};
+
+const normalizeDetailWhitespace = (value: string): string =>
+    Array.from(value, (character) =>
+        isAsciiControlCharacter(character) ? " " : character
+    )
+        .join("")
+        .replaceAll(/\s+/gu, " ")
+        .trim();
+
+const truncateDetailString = (value: string): string =>
+    value.length <= MAX_SAFE_DETAIL_CHARS
+        ? value
+        : `${value.slice(0, MAX_SAFE_DETAIL_CHARS)}...`;
 
 const toSafeDetailString = (value: unknown): string | undefined => {
     const normalized = normalizeLogValue(value);
-    if (typeof normalized === "string") {
-        return normalized;
+    const detail =
+        typeof normalized === "string"
+            ? normalized
+            : typeof normalized === "number" || typeof normalized === "boolean"
+              ? String(normalized)
+              : undefined;
+
+    if (!detail) {
+        return undefined;
     }
 
-    if (typeof normalized === "number" || typeof normalized === "boolean") {
-        return String(normalized);
-    }
-
-    return undefined;
+    const compacted = normalizeDetailWhitespace(detail);
+    return compacted ? truncateDetailString(compacted) : undefined;
 };
 
 const toTruncatedBodyString = (value: unknown): string | undefined => {

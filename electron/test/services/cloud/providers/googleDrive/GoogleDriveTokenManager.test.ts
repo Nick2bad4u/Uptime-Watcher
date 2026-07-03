@@ -242,4 +242,47 @@ describe(GoogleDriveTokenManager, () => {
         expect(message).not.toContain("SUPER_SECRET_REFRESH_TOKEN");
         expect(message).toContain("refresh_token=[redacted]");
     });
+
+    it("bounds and compacts OAuth refresh error details", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() - 1,
+            refreshToken: "refresh",
+        });
+
+        axiosPost.mockRejectedValueOnce({
+            isAxiosError: true,
+            response: {
+                data: {
+                    error: "invalid_grant",
+                    error_description: `denied\n\t${"x".repeat(700)}`,
+                },
+                status: 400,
+            },
+        });
+
+        let thrown: unknown;
+        try {
+            await manager.getValidAccessToken();
+        } catch (error) {
+            thrown = error;
+        }
+
+        expect(thrown).toBeInstanceOf(Error);
+        const message = (thrown as Error).message;
+        const messagePrefix = "Google OAuth refresh failed (400): ";
+        expect(message.startsWith(messagePrefix)).toBeTruthy();
+        expect(message).not.toContain("\n");
+        expect(message).not.toContain("\t");
+        expect(message).toContain("invalid_grant (denied ");
+        expect(message.endsWith("...")).toBeTruthy();
+        expect(message.length).toBeLessThanOrEqual(messagePrefix.length + 503);
+    });
 });
