@@ -412,7 +412,7 @@ export class DatabaseService {
         }
 
         const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
-        logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
+        logger.info("[DatabaseService] Initializing SQLite DB", { dbPath });
 
         for (
             let attempt = 1;
