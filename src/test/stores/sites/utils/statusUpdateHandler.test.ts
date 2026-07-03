@@ -831,9 +831,8 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Site nonexistent-site not found in store"
-                )
+                "Status update site not found in store",
+                { siteIdentifier: "nonexistent-site" }
             );
         });
 
@@ -865,7 +864,11 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Monitor nonexistent-monitor not found")
+                "Status update monitor not found in site",
+                {
+                    monitorId: "nonexistent-monitor",
+                    siteIdentifier: "site1",
+                }
             );
         });
 
@@ -894,7 +897,13 @@ describe("StatusUpdateHandler", () => {
 
             await statusChangedCallback(monitorStatusEvent);
             expect(logger.logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Applied incremental status update")
+                "Applied incremental status update",
+                {
+                    monitorId: "monitor1",
+                    previousStatus: "up",
+                    siteIdentifier: "site1",
+                    status: "down",
+                }
             );
         });
 
@@ -915,10 +924,9 @@ describe("StatusUpdateHandler", () => {
             const invalidData = { invalid: "data" };
             await statusChangedCallback(invalidData);
             expect(logger.logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "payload missing enriched monitor/site data; triggering full sync"
-                ),
-                invalidData
+                "[StatusUpdateHandler] Payload missing enriched monitor/site data; triggering full sync",
+                invalidData,
+                { source: "monitor:status-changed" }
             );
         });
 
@@ -1238,10 +1246,9 @@ describe("StatusUpdateHandler", () => {
 
             // Should have logged warning in development mode
             expect(logger.logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "payload missing enriched monitor/site data; triggering full sync"
-                ),
-                invalidEvent
+                "[StatusUpdateHandler] Payload missing enriched monitor/site data; triggering full sync",
+                invalidEvent,
+                { source: "monitor:status-changed" }
             );
         });
 
@@ -1297,7 +1304,13 @@ describe("StatusUpdateHandler", () => {
 
             // Should have logged successful update in development mode
             expect(logger.logger.debug).toHaveBeenCalledWith(
-                expect.stringContaining("Applied incremental status update")
+                "Applied incremental status update",
+                {
+                    monitorId: "monitor1",
+                    previousStatus: "up",
+                    siteIdentifier: "site1",
+                    status: "down",
+                }
             );
         });
 

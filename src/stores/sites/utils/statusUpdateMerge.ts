@@ -75,9 +75,10 @@ export function mergeMonitorStatusChange(
         }
 
         if (!isMonitorFound && isDevelopment()) {
-            logger.debug(
-                `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
-            );
+            logger.debug("Status update monitor not found in site", {
+                monitorId: event.monitorId,
+                siteIdentifier: event.siteIdentifier,
+            });
         }
 
         return {

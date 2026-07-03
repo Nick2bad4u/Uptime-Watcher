@@ -219,7 +219,9 @@ export class StatusUpdateManager {
                 (site) => site.identifier === event.siteIdentifier
             );
             if (!isSiteExists && isDevelopment()) {
-                logger.debug(`Site ${event.siteIdentifier} not found in store`);
+                logger.debug("Status update site not found in store", {
+                    siteIdentifier: event.siteIdentifier,
+                });
             }
 
             // Apply the update using the complete monitor object from the event
@@ -244,9 +246,12 @@ export class StatusUpdateManager {
             }
 
             if (isDevelopment()) {
-                logger.debug(
-                    `Applied incremental status update: site=${event.siteIdentifier}, monitor=${event.monitorId}, ${event.previousStatus} → ${event.status}`
-                );
+                logger.debug("Applied incremental status update", {
+                    monitorId: event.monitorId,
+                    previousStatus: event.previousStatus,
+                    siteIdentifier: event.siteIdentifier,
+                    status: event.status,
+                });
             }
         } catch (error) {
             logger.error(
@@ -265,8 +270,9 @@ export class StatusUpdateManager {
             await this.fullResyncSites();
         } catch (error) {
             logger.error(
-                `[StatusUpdateHandler] Full sync fallback failed (${reason})`,
-                ensureError(error)
+                "[StatusUpdateHandler] Full sync fallback failed",
+                ensureError(error),
+                { reason }
             );
         }
     }
@@ -351,8 +357,9 @@ export class StatusUpdateManager {
                     error
                 );
                 logger.error(
-                    `Failed to register ${scope} listener`,
-                    normalizedError
+                    "Failed to register status update listener",
+                    normalizedError,
+                    { scope }
                 );
                 isEncounteredListenerFailure = true;
                 listenersAttached = 0;
@@ -395,7 +402,8 @@ export class StatusUpdateManager {
             if (this.isMonitorStatusChangedEvent(candidate)) {
                 if (isDevelopment()) {
                     logger.debug(
-                        `[StatusUpdateHandler] Processing status update candidate from ${source}`
+                        "[StatusUpdateHandler] Processing status update candidate",
+                        { source }
                     );
                 }
 
@@ -405,16 +413,18 @@ export class StatusUpdateManager {
 
             if (isDevelopment()) {
                 logger.warn(
-                    `[StatusUpdateHandler] ${source} payload missing enriched monitor/site data; triggering full sync`,
-                    candidate
+                    "[StatusUpdateHandler] Payload missing enriched monitor/site data; triggering full sync",
+                    candidate,
+                    { source }
                 );
             }
 
             await this.attemptFullResync(`${source} invalid payload`);
         } catch (error) {
             logger.error(
-                `[StatusUpdateHandler] ${source} processing failed`,
-                ensureError(error)
+                "[StatusUpdateHandler] Processing failed",
+                ensureError(error),
+                { source }
             );
         }
     }
