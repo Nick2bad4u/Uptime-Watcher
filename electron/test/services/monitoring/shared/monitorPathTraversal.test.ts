@@ -44,4 +44,16 @@ describe(extractMonitorValueAtPath, () => {
             })
         ).toBeUndefined();
     });
+
+    it("rejects malformed dot-separated array indices", () => {
+        const payload = {
+            data: {
+                items: [{ name: "alpha" }, { name: "beta" }],
+            },
+        };
+
+        expect(
+            extractMonitorValueAtPath(payload, "data.items.1a.name")
+        ).toBeUndefined();
+    });
 });

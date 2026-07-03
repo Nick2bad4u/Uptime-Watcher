@@ -17,6 +17,8 @@ const BLOCKED_PATH_SEGMENTS = new Set([
     "prototype",
 ]);
 
+const ARRAY_INDEX_SEGMENT_PATTERN = /^\d+$/u;
+
 /**
  * Safely resolves a dot-separated path against unknown monitor response
  * payloads.
@@ -43,6 +45,10 @@ export function extractMonitorValueAtPath(
 
     for (const segment of segments) {
         if (Array.isArray(current)) {
+            if (!ARRAY_INDEX_SEGMENT_PATTERN.test(segment)) {
+                return undefined;
+            }
+
             const parsedIndex = Number.parseInt(segment, 10);
             if (
                 Number.isNaN(parsedIndex) ||
