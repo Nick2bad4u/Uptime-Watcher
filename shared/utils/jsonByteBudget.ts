@@ -18,6 +18,7 @@ import {
 } from "ts-extras";
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
+const INVALID_DATE_JSON_VALUE = "[Invalid Date]" as const;
 
 interface JsonByteBudgetState {
     bytes: number;
@@ -75,7 +76,7 @@ function addJsonBytesForObject(
     value: object
 ): void {
     if (value instanceof Date) {
-        addBytes(state, getJsonBytesForString(value.toISOString()));
+        addBytes(state, getJsonBytesForDate(value));
         return;
     }
 
@@ -203,6 +204,13 @@ function getJsonBytesForNull(): number {
 
 function getJsonBytesForNumber(value: number): number {
     return getUtfByteLength(String(value));
+}
+
+function getJsonBytesForDate(value: Date): number {
+    const timestamp = value.getTime();
+    return getJsonBytesForString(
+        isFiniteNumber(timestamp) ? value.toISOString() : INVALID_DATE_JSON_VALUE
+    );
 }
 
 function getJsonBytesForString(value: string): number {

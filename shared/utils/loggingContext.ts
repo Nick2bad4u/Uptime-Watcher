@@ -5,6 +5,7 @@ import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import {
     isDefined,
     isEmpty,
+    isFinite as isFiniteNumber,
     objectEntries,
     objectHasIn,
     safeCastTo,
@@ -107,6 +108,7 @@ const SECRET_METADATA_KEYS = new Set([
 ]);
 
 const SECRET_PLACEHOLDER = "[redacted]" as const;
+const INVALID_DATE_PLACEHOLDER = "[Invalid Date]" as const;
 
 const toCanonicalSecretKey = (key: string): string =>
     // Do not use the `v` flag here; it is not available across all Electron
@@ -259,6 +261,13 @@ const maskUrlSecrets = (value: string): string => {
 const normalizeLogString = (value: string): string =>
     maskAuthTokens(maskUrlSecrets(value));
 
+const normalizeLogDate = (value: Date): string => {
+    const timestamp = value.getTime();
+    return isFiniteNumber(timestamp)
+        ? value.toISOString()
+        : INVALID_DATE_PLACEHOLDER;
+};
+
 const computeIdentifierHash = (value: string): string => {
     let hash = 0;
     for (const char of value) {
@@ -288,7 +297,7 @@ function normalizeNonPlainObject(
     | { readonly kind: "none" }
     | { readonly kind: "normalized"; readonly value: unknown } {
     if (candidate instanceof Date) {
-        return { kind: "normalized", value: candidate.toISOString() };
+        return { kind: "normalized", value: normalizeLogDate(candidate) };
     }
 
     if (candidate instanceof URL) {

@@ -119,6 +119,15 @@ describe("logging context helpers", () => {
         expect(normalizeLogValue(date)).toBe("2025-01-02T03:04:05.000Z");
     });
 
+    it("serializes invalid Date values without throwing", () => {
+        const invalidDate = new Date(Number.NaN);
+
+        expect(() => normalizeLogValue({ checkedAt: invalidDate })).not.toThrow();
+        expect(normalizeLogValue({ checkedAt: invalidDate })).toEqual({
+            checkedAt: "[Invalid Date]",
+        });
+    });
+
     it("serializes URL values and redacts secrets", () => {
         const url = new URL("https://user:pass@example.com?token=abc");
         const sanitized = normalizeLogValue(url);
