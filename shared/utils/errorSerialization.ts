@@ -1,6 +1,7 @@
 import type { SerializedError } from "@shared/utils/logger/common";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { serializeError } from "@shared/utils/logger/common";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { objectEntries } from "ts-extras";
@@ -17,7 +18,11 @@ const copyAdditionalProperties = (
 
         if (!isCoreKey) {
             try {
-                Reflect.set(target, key, Reflect.get(source, key));
+                Reflect.set(
+                    target,
+                    key,
+                    normalizeLogValue(Reflect.get(source, key))
+                );
             } catch {
                 Reflect.set(target, key, undefined);
             }
@@ -91,7 +96,9 @@ export const toSerializedError = (error: unknown): ExtendedError => {
     const serialized = serializeError(normalizedError);
 
     if (serialized) {
-        return cloneSerializedError(serialized);
+        const clone = cloneSerializedError(serialized);
+        copyAdditionalProperties(normalizedError, clone);
+        return clone;
     }
 
     return buildFallbackError(normalizedError);
