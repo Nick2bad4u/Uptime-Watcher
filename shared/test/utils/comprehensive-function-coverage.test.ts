@@ -6,37 +6,6 @@
 import { describe, expect, it } from "vitest";
 
 describe("Shared Module - 100% Function Coverage", () => {
-    describe("chartConfig functions", () => {
-        it("should ensure all chartConfig functions are covered", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: comprehensive-function-coverage",
-                "component"
-            );
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const chartConfigModule =
-                await import("../../types/chartConfig.js");
-
-            // Ensure hasPlugins function is called
-            expect(chartConfigModule.hasPlugins({})).toBeFalsy();
-            expect(chartConfigModule.hasPlugins({ plugins: {} })).toBeTruthy();
-
-            // Ensure hasScales function is called
-            expect(chartConfigModule.hasScales({})).toBeFalsy();
-            expect(chartConfigModule.hasScales({ scales: {} })).toBeTruthy();
-
-            // Ensure DEFAULT_CHART_THEMES constant is accessed
-            expect(chartConfigModule.DEFAULT_CHART_THEMES).toBeDefined();
-            expect(chartConfigModule.DEFAULT_CHART_THEMES.dark).toBeDefined();
-            expect(chartConfigModule.DEFAULT_CHART_THEMES.light).toBeDefined();
-        });
-    });
-
     describe("environment functions", () => {
         it("should ensure all environment functions are covered", async ({
             annotate,

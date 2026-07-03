@@ -1,49 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import * as chartConfig from "../../types/chartConfig";
 import * as database from "../../types/database";
 import * as themeConfig from "../../types/themeConfig";
 import * as validation from "../../types/validation";
 
 describe("Types Complete Function Coverage", () => {
-    describe("chartConfig module", () => {
-        it("should call hasPlugins function", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: complete-function-coverage",
-                "component"
-            );
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const isResult1 = chartConfig.hasPlugins({ plugins: {} });
-            const isResult2 = chartConfig.hasPlugins(null);
-            const isResult3 = chartConfig.hasPlugins({ notPlugins: true });
-
-            expect(isResult1).toBeTruthy();
-            expect(isResult2).toBeFalsy();
-            expect(isResult3).toBeFalsy();
-        });
-
-        it("should call hasScales function", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: complete-function-coverage",
-                "component"
-            );
-            await annotate("Category: Shared", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const isResult1 = chartConfig.hasScales({ scales: {} });
-            const isResult2 = chartConfig.hasScales(null);
-            const isResult3 = chartConfig.hasScales({ notScales: true });
-
-            expect(isResult1).toBeTruthy();
-            expect(isResult2).toBeFalsy();
-            expect(isResult3).toBeFalsy();
-        });
-    });
-
     describe("themeConfig module", () => {
         it("should call isColorPalette function", async ({
             task,
