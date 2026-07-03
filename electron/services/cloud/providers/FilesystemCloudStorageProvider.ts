@@ -1,5 +1,7 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- This provider only operates on sandboxed paths under appRoot derived from validated keys. */
 
+import type { Stats } from "node:fs";
+
 import {
     assertCloudObjectKey,
     DEFAULT_MAX_PROVIDER_OBJECT_KEY_BYTES,
@@ -82,6 +84,23 @@ async function assertSafeExistingDirectory(
             `Expected directory but found non-directory entry at '${absolutePath}'`
         );
     }
+}
+
+async function readWritableObjectTargetStat(
+    key: string,
+    targetPath: string
+): Promise<null | Stats> {
+    const stat = await fs.lstat(targetPath).catch(() => null);
+
+    if (stat?.isSymbolicLink()) {
+        throw new Error(`Refusing to write cloud object via symlink: ${key}`);
+    }
+
+    if (stat && !stat.isFile()) {
+        throw new Error(`Filesystem cloud object is not a file: ${key}`);
+    }
+
+    return stat;
 }
 
 /**
@@ -374,13 +393,7 @@ export class FilesystemCloudStorageProvider
             const targetPath = await this.resolveKeyPath(key);
             await this.ensureSafeDirectory(path.dirname(targetPath));
 
-            // Refuse to overwrite/replace symlinks.
-            const targetStat = await fs.lstat(targetPath).catch(() => null);
-            if (targetStat?.isSymbolicLink()) {
-                throw new Error(
-                    `Refusing to write cloud object via symlink: ${key}`
-                );
-            }
+            await readWritableObjectTargetStat(key, targetPath);
 
             tempPath = `${targetPath}.tmp-${randomUUID()}`;
             const backupPath = `${targetPath}.bak-${randomUUID()}`;
@@ -409,10 +422,11 @@ export class FilesystemCloudStorageProvider
                 }
             };
 
-            const isTargetExists = await fs
-                .lstat(targetPath)
-                .then((stat) => stat.isFile() && !stat.isSymbolicLink())
-                .catch(() => false);
+            const latestTargetStat = await readWritableObjectTargetStat(
+                key,
+                targetPath
+            );
+            const isTargetExists = latestTargetStat?.isFile() === true;
 
             if (!isOverwrite && isTargetExists) {
                 throw new CloudProviderOperationError(

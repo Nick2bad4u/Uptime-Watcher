@@ -200,6 +200,33 @@ describe("FilesystemCloudStorageProvider", () => {
         }
     });
 
+    it("rejects non-file upload targets without leaving temp files", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const syncDirectory = path.join(appRoot, "sync");
+        const collidingDirectory = path.join(syncDirectory, "directory.txt");
+
+        await fs.mkdir(collidingDirectory, { recursive: true });
+        await fs.writeFile(path.join(collidingDirectory, "kept.txt"), "kept");
+
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("payload"),
+                key: "sync/directory.txt",
+                overwrite: true,
+            })
+        ).rejects.toThrow(CloudProviderOperationError);
+
+        await expect(
+            fs.readFile(path.join(collidingDirectory, "kept.txt"), "utf8")
+        ).resolves.toBe("kept");
+
+        const syncEntries = await fs.readdir(syncDirectory);
+        expect(
+            syncEntries.filter((entry) => entry.includes(".tmp-"))
+        ).toEqual([]);
+    });
+
     it("refuses to use the app root after it is replaced with a symlink", async () => {
         const provider = new FilesystemCloudStorageProvider({ baseDirectory });
         await provider.uploadObject({
