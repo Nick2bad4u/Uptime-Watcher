@@ -157,4 +157,33 @@ describe(buildPayloadPreview, () => {
         expect(preview).not.toContain("nested");
         expect(getterCalls).toBe(0);
     });
+
+    it("does not invoke Error message, name, or stack accessors while building previews", () => {
+        let getterCalls = 0;
+        const error = new Error("safe");
+
+        for (const key of [
+            "message",
+            "name",
+            "stack",
+        ] as const) {
+            Object.defineProperty(error, key, {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    getterCalls += 1;
+                    return `secret-${key}`;
+                },
+            });
+        }
+
+        const preview = buildPayloadPreview({ error });
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain('"message": ""');
+        expect(preview).not.toContain("secret-message");
+        expect(preview).not.toContain("secret-name");
+        expect(preview).not.toContain("secret-stack");
+        expect(getterCalls).toBe(0);
+    });
 });

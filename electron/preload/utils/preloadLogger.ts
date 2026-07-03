@@ -14,6 +14,10 @@ import type { UnknownArray, UnknownRecord } from "type-fest";
 import { createIpcCorrelationEnvelope } from "@shared/types/ipc";
 import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
+import {
+    getErrorStringProperty,
+    getOwnDataProperty,
+} from "@shared/utils/errorPropertyAccess";
 import { validateVoidIpcResponse } from "@shared/utils/ipcResponse";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import {
@@ -105,23 +109,8 @@ const sanitizePreviewString = (value: string): string => {
     }
 };
 
-function getOwnDataValue(
-    holder: object,
-    key: string
-):
-    | { readonly found: false }
-    | { readonly found: true; readonly value: unknown } {
-    const descriptor = Object.getOwnPropertyDescriptor(holder, key);
-
-    if (!descriptor || !("value" in descriptor)) {
-        return { found: false };
-    }
-
-    return { found: true, value: descriptor.value };
-}
-
 function serializeErrorCause(value: Error, seen: WeakSet<object>): unknown {
-    const cause = getOwnDataValue(value, "cause");
+    const cause = getOwnDataProperty(value, "cause");
 
     return cause.found && isDefined(cause.value)
         ? serializeValue(cause.value, seen)
@@ -141,7 +130,7 @@ function serializeObjectPreview(
             continue;
         }
 
-        const dataValue = getOwnDataValue(value, key);
+        const dataValue = getOwnDataProperty(value, key);
         preview[key] = dataValue.found
             ? serializeValue(dataValue.value, seen)
             : ACCESSOR_PLACEHOLDER;
@@ -243,11 +232,15 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     }
 
     if (Error.isError(value)) {
+        const message = getErrorStringProperty(value, "message") ?? "";
+        const name = getErrorStringProperty(value, "name");
+        const stack = getErrorStringProperty(value, "stack");
+
         return {
             cause: serializeErrorCause(value, seen),
-            message: value.message,
-            name: value.name,
-            stack: value.stack,
+            message,
+            ...(name && { name }),
+            ...(stack && { stack }),
             type: "Error",
         };
     }

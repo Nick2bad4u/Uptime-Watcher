@@ -1,6 +1,10 @@
 import type { UnknownArray, UnknownRecord, Writable } from "type-fest";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
+import {
+    getErrorStringProperty,
+    getOwnDataProperty,
+} from "@shared/utils/errorPropertyAccess";
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import {
     isDefined,
@@ -279,65 +283,6 @@ const computeOptionalIdentifierHash = (
     value: string | undefined
 ): string | undefined => (value ? computeIdentifierHash(value) : undefined);
 
-function isNativeErrorStringGetter(
-    value: unknown
-): value is (this: Error) => unknown {
-    if (typeof value !== "function") {
-        return false;
-    }
-
-    const functionToString: unknown = Object.getOwnPropertyDescriptor(
-        Function.prototype,
-        "toString"
-    )?.value;
-
-    if (typeof functionToString !== "function") {
-        return false;
-    }
-
-    const source: unknown = Reflect.apply(functionToString, value, []);
-
-    return typeof source === "string" && source.includes("[native code]");
-}
-
-function getErrorStringProperty(
-    error: Error,
-    key: "message" | "name" | "stack"
-): string | undefined {
-    let current: object | null = error;
-
-    while (current) {
-        const descriptor = Object.getOwnPropertyDescriptor(current, key);
-
-        if (descriptor) {
-            if ("value" in descriptor) {
-                const value: unknown = descriptor.value;
-                return typeof value === "string" ? value : undefined;
-            }
-
-            const getter: unknown = Reflect.get(descriptor, "get");
-            if (key === "stack" && isNativeErrorStringGetter(getter)) {
-                try {
-                    const value: unknown = Reflect.apply(getter, error, []);
-                    return typeof value === "string" ? value : undefined;
-                } catch {
-                    return undefined;
-                }
-            }
-
-            return undefined;
-        }
-
-        const prototype: unknown = Object.getPrototypeOf(current);
-        current =
-            typeof prototype === "object" && prototype !== null
-                ? prototype
-                : null;
-    }
-
-    return undefined;
-}
-
 const buildBaseLogContext = (
     context: StructuredLogContext | undefined,
     severity: LogSeverity
@@ -365,14 +310,8 @@ function normalizeNonPlainObject(
     }
 
     if (Error.isError(candidate)) {
-        const causeDescriptor = Object.getOwnPropertyDescriptor(
-            candidate,
-            "cause"
-        );
-        const cause =
-            causeDescriptor && "value" in causeDescriptor
-                ? (causeDescriptor.value as unknown)
-                : undefined;
+        const causeDescriptor = getOwnDataProperty(candidate, "cause");
+        const cause = causeDescriptor.found ? causeDescriptor.value : undefined;
 
         const message = getErrorStringProperty(candidate, "message") ?? "";
         const name = getErrorStringProperty(candidate, "name");
