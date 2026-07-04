@@ -146,6 +146,16 @@ function copyWasmFile(sourcePath, targetPath) {
 }
 
 /**
+ * @param {string} firstPath
+ * @param {string} secondPath
+ *
+ * @returns {boolean}
+ */
+function filesMatch(firstPath, secondPath) {
+    return fs.readFileSync(firstPath).equals(fs.readFileSync(secondPath));
+}
+
+/**
  * Keep local WASM copies synchronized without contacting the network.
  *
  * @returns {boolean} True when a local source was found.
@@ -153,6 +163,8 @@ function copyWasmFile(sourcePath, targetPath) {
 function ensureLocalWasmAvailable() {
     if (fs.existsSync(scriptsDest)) {
         if (!fs.existsSync(dest)) {
+            copyWasmFile(scriptsDest, dest);
+        } else if (!filesMatch(scriptsDest, dest)) {
             copyWasmFile(scriptsDest, dest);
         } else {
             console.log(`[wasm-download] WASM file already exists: ${dest}`);
