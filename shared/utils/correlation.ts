@@ -3,11 +3,42 @@ import type { CorrelationId } from "@shared/types/events";
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
 import { arrayJoin, safeCastTo } from "ts-extras";
 
+type GetRandomValues = Crypto["getRandomValues"];
+
+const isGetRandomValues = (value: unknown): value is GetRandomValues =>
+    typeof value === "function";
+
+const getCryptoDataMethod = (
+    cryptoInstance: Crypto,
+    methodName: "getRandomValues"
+): GetRandomValues | undefined => {
+    let current: object | null = cryptoInstance;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, methodName);
+
+        if (descriptor) {
+            const value: unknown = descriptor.value;
+            return "value" in descriptor && isGetRandomValues(value)
+                ? value
+                : undefined;
+        }
+
+        const prototype: unknown = Object.getPrototypeOf(current);
+        current =
+            typeof prototype === "object" && prototype !== null
+                ? prototype
+                : null;
+    }
+
+    return undefined;
+};
+
 const resolveWebCrypto = (): Crypto | null => {
     const candidate = safeCastTo<Crypto | undefined>(
         Reflect.get(globalThis, "crypto")
     );
-    if (candidate && typeof candidate.getRandomValues === "function") {
+    if (candidate && getCryptoDataMethod(candidate, "getRandomValues")) {
         return candidate;
     }
     return null;
@@ -22,7 +53,18 @@ const getRandomBytes = (length: number): Uint8Array => {
     }
 
     const bytes = new Uint8Array(length);
-    cryptoInstance.getRandomValues(bytes);
+    const getRandomValues = getCryptoDataMethod(
+        cryptoInstance,
+        "getRandomValues"
+    );
+
+    if (!getRandomValues) {
+        throw new Error(
+            "Web Crypto API is required to generate correlation IDs"
+        );
+    }
+
+    getRandomValues.call(cryptoInstance, bytes);
     return bytes;
 };
 
