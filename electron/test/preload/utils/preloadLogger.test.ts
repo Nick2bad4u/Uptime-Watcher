@@ -139,6 +139,24 @@ describe(buildPayloadPreview, () => {
         expect(getterCalls).toBe(0);
     });
 
+    it("preserves protected object keys as preview data", () => {
+        const payload = {
+            safe: "visible",
+        };
+        Object.defineProperty(payload, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: "proto-value",
+            writable: true,
+        });
+
+        const preview = buildPayloadPreview(payload);
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain('"__proto__": "proto-value"');
+        expect(preview).toContain('"safe": "visible"');
+    });
+
     it("does not invoke Error cause accessors while building previews", () => {
         let getterCalls = 0;
         const error = new Error("failed");

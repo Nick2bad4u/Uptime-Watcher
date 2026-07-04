@@ -24,6 +24,7 @@ import {
     buildErrorLogArguments,
     buildLogArguments,
 } from "@shared/utils/logger/common";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isObject } from "@shared/utils/typeGuards";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { ipcRenderer } from "electron";
@@ -122,27 +123,39 @@ function serializeObjectPreview(
     seen: WeakSet<object>
 ): UnknownRecord {
     const keys = objectKeys(value);
-    const preview: UnknownRecord = {};
+    const preview = createNullPrototypeObject<UnknownRecord>();
 
     for (const key of keys.slice(0, MAX_PREVIEW_OBJECT_KEYS)) {
-        if (isSensitiveKeyName(key)) {
-            preview[key] = REDACTED_PLACEHOLDER;
-            continue;
-        }
+        const previewValue = (() => {
+            if (isSensitiveKeyName(key)) {
+                return REDACTED_PLACEHOLDER;
+            }
 
-        const dataValue = getOwnDataProperty(value, key);
-        preview[key] = dataValue.found
-            ? serializeValue(dataValue.value, seen)
-            : ACCESSOR_PLACEHOLDER;
+            const dataValue = getOwnDataProperty(value, key);
+            return dataValue.found
+                ? serializeValue(dataValue.value, seen)
+                : ACCESSOR_PLACEHOLDER;
+        })();
+
+        Object.defineProperty(preview, key, {
+            configurable: true,
+            enumerable: true,
+            value: previewValue,
+            writable: true,
+        });
     }
 
     if (keys.length > MAX_PREVIEW_OBJECT_KEYS) {
-        preview["previewTruncatedKeys"] = keys.length - MAX_PREVIEW_OBJECT_KEYS;
+        Object.defineProperty(preview, "previewTruncatedKeys", {
+            configurable: true,
+            enumerable: true,
+            value: keys.length - MAX_PREVIEW_OBJECT_KEYS,
+            writable: true,
+        });
     }
 
     return preview;
 }
-
 function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     if (typeof value === "function") {
         return formatFunctionPlaceholder(value.name || "");

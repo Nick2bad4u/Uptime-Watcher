@@ -14,6 +14,7 @@ import type { UnknownRecord } from "type-fest";
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { arrayIncludes, isDefined, isPresent } from "ts-extras";
 
@@ -89,22 +90,21 @@ const cloneObjectForLogging = (
             }
 
             const entry = descriptor.value as unknown;
-            if (isCloneableValue(entry)) {
-                Reflect.set(
-                    clonedArray,
-                    key,
-                    cloneObjectForLogging(entry, clones, stack)
-                );
-            } else {
-                Reflect.set(clonedArray, key, entry);
-            }
+            Object.defineProperty(clonedArray, key, {
+                configurable: true,
+                enumerable: true,
+                value: isCloneableValue(entry)
+                    ? cloneObjectForLogging(entry, clones, stack)
+                    : entry,
+                writable: true,
+            });
         }
 
         stack.delete(target);
         return clonedArray;
     }
 
-    const clonedObject: UnknownRecord = {};
+    const clonedObject = createNullPrototypeObject<UnknownRecord>();
     clones.set(target, clonedObject);
 
     for (const key of Reflect.ownKeys(value)) {
@@ -117,7 +117,12 @@ const cloneObjectForLogging = (
         const normalizedValue = isCloneableValue(propertyValue)
             ? cloneObjectForLogging(propertyValue, clones, stack)
             : propertyValue;
-        Reflect.set(clonedObject, key, normalizedValue);
+        Object.defineProperty(clonedObject, key, {
+            configurable: true,
+            enumerable: true,
+            value: normalizedValue,
+            writable: true,
+        });
     }
 
     stack.delete(target);

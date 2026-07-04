@@ -456,6 +456,52 @@ describe("middleware.ts", () => {
             expect(getterCalls).toBe(0);
             expect(next).toHaveBeenCalled();
         });
+        it("preserves protected payload keys as own debug data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: middleware", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Regression", "type");
+
+            const payload = {
+                stable: "value",
+            };
+            Object.defineProperty(payload, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: { polluted: true },
+                writable: true,
+            });
+
+            const next = vi.fn();
+            const mw = createDebugMiddleware({ enabled: true, verbose: true });
+            await mw("eventR", asEventPayload(payload), next);
+
+            const debugCall = vi
+                .mocked(logger.debug)
+                .mock.calls.find(
+                    ([message]) =>
+                        typeof message === "string" &&
+                        message.includes("Processing event 'eventR'")
+                );
+            expect(debugCall).toBeDefined();
+
+            const context = debugCall?.[1] as
+                | { readonly data?: unknown; readonly serializedData?: string }
+                | undefined;
+            const data = context?.data as Record<string, unknown> | undefined;
+            const protectedProperty =
+                data && Object.getOwnPropertyDescriptor(data, "__proto__");
+
+            expect(Object.getPrototypeOf(data)).toBeNull();
+            expect(protectedProperty?.value).toEqual({ polluted: true });
+            expect(context?.serializedData).toContain(
+                '"__proto__":{"polluted":true}'
+            );
+            expect(next).toHaveBeenCalled();
+        });
         it("skips logging when not enabled", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: middleware", "component");
