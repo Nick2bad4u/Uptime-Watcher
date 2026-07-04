@@ -547,11 +547,10 @@ describe("theme Merging Property-Based Tests", () => {
         "should handle multiple theme merging operations",
         (baseThemes, overrideThemes) => {
             // Start with first base theme
-            let result = arrayFirst(baseThemes);
+            let result: Theme = arrayFirst(baseThemes)!;
 
             // Apply each override sequentially
             for (const override of overrideThemes) {
-                // @ts-expect-error - Fuzzing test with complex theme type compatibility issues
                 result = deepMergeTheme(result, override as Partial<Theme>);
             }
 
@@ -559,12 +558,12 @@ describe("theme Merging Property-Based Tests", () => {
             expect(result).toHaveProperty("name");
             expect(result).toHaveProperty("isDark");
             expect(result).toHaveProperty("colors");
-            expect(result!.colors).toHaveProperty("background");
-            expect(result!.colors).toHaveProperty("primary");
+            expect(result.colors).toHaveProperty("background");
+            expect(result.colors).toHaveProperty("primary");
 
             // Should maintain structural integrity after multiple merges
-            expect(objectKeys(result!.colors.primary)).toHaveLength(10);
-            expect(objectKeys(result!.colors.status)).toHaveLength(7);
+            expect(objectKeys(result.colors.primary)).toHaveLength(10);
+            expect(objectKeys(result.colors.status)).toHaveLength(7);
         }
     );
 

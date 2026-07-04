@@ -358,10 +358,10 @@ describe("themeManager Property-Based Tests", () => {
     ])(
         "should create custom themes with proper deep merging",
         (baseTheme, overrides) => {
+            const runtimeOverrides = overrides as unknown as Partial<Theme>;
             const customTheme = themeManager.createCustomTheme(
                 baseTheme,
-                // @ts-expect-error - Fuzzing test with intentionally partial theme data for edge case testing
-                overrides
+                runtimeOverrides
             );
 
             // Result should be a complete theme
