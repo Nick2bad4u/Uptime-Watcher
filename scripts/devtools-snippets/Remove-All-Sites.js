@@ -7,7 +7,7 @@
 (async () => {
     console.log("🗑️  Starting to remove all sites...");
 
-    // @ts-expect-error -- For use after application is running
+    // Runtime browser snippet: electronAPI is available after app preload.
     if (!window.electronAPI?.sites?.deleteAllSites) {
         console.error("❌ electronAPI.sites.deleteAllSites not available");
         return;
@@ -26,7 +26,7 @@
     }
 
     try {
-        // @ts-expect-error -- For use after application is running
+        // Runtime browser snippet: electronAPI is available after app preload.
         const deletedCount = await window.electronAPI.sites.deleteAllSites();
         console.log(`✅ Successfully deleted ${deletedCount} site(s)`);
         console.log("🎉 All sites have been removed from the database");

@@ -4,14 +4,14 @@
 (async () => {
     console.log("📋 Fetching all sites...");
 
-    // @ts-expect-error -- For use after application is running
+    // Runtime browser snippet: electronAPI is available after app preload.
     if (!window.electronAPI?.sites?.getSites) {
         console.error("❌ electronAPI.sites.getSites not available");
         return;
     }
 
     try {
-        // @ts-expect-error -- For use after application is running
+        // Runtime browser snippet: electronAPI is available after app preload.
         const sites = await window.electronAPI.sites.getSites();
 
         console.log(`\n📊 Total sites: ${sites.length}\n`);

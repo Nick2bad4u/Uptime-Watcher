@@ -3,7 +3,7 @@
  */
 (async () => {
     console.log("🚀 Adding minimal test sites...");
-    // @ts-expect-error -- For use after application is running
+    // Runtime browser snippet: electronAPI is available after app preload.
     if (!window.electronAPI?.sites?.addSite) {
         console.error("❌ electronAPI.sites.addSite not available");
         return;
@@ -74,7 +74,7 @@
     let count = 0;
     for (const site of sites) {
         try {
-            // @ts-expect-error -- For use after application is running
+            // Runtime browser snippet: electronAPI is available after app preload.
             await window.electronAPI.sites.addSite(site);
             console.log(`✅ Added: ${site.name}`);
             count++;
