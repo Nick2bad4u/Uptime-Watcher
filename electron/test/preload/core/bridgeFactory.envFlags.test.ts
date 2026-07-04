@@ -98,4 +98,33 @@ describe("bridgeFactory env flags", () => {
             channelUnderTest
         );
     });
+
+    it("does not invoke accessor-backed env entries during diagnostics fallback checks", async () => {
+        let nodeEnvAccesses = 0;
+        const env = {
+            VITEST: "true",
+        };
+        Object.defineProperty(env, "NODE_ENV", {
+            configurable: true,
+            enumerable: true,
+            get: () => {
+                nodeEnvAccesses += 1;
+                throw new Error("Unexpected NODE_ENV getter access");
+            },
+        });
+        globalTarget.process = { env } satisfies GlobalProcessSnapshot;
+        vi.resetModules();
+
+        const bridgeFactory =
+            await import("../../../preload/core/bridgeFactory");
+        bridgeFactory.resetDiagnosticsVerificationStateForTesting();
+
+        vi.mocked(ipcRendererMock.invoke).mockResolvedValueOnce({
+            success: true,
+        });
+
+        const invoke = bridgeFactory.createVoidInvoker(channelUnderTest);
+        await expect(invoke()).resolves.toBeUndefined();
+        expect(nodeEnvAccesses).toBe(0);
+    });
 });

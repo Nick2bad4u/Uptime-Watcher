@@ -37,6 +37,7 @@ import {
 } from "@shared/types/preload";
 import { generateCorrelationId } from "@shared/utils/correlation";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import {
     extractIpcResponseData,
     validateVoidIpcResponse,
@@ -233,6 +234,12 @@ export function safeParseNonNegativeIntResult(
 
 const DIAGNOSTICS_CHANNEL = DIAGNOSTICS_CHANNELS.verifyIpcHandler;
 
+const getOwnDataPropertyValue = (holder: object, key: PropertyKey): unknown => {
+    const property = getOwnDataProperty(holder, key);
+
+    return property.found ? property.value : undefined;
+};
+
 const globalProcessCandidate: unknown = Reflect.get(globalThis, "process");
 const globalEnvCandidate: unknown =
     typeof globalProcessCandidate === "object" &&
@@ -264,11 +271,11 @@ function isTruthyEnvFlag(value: unknown): boolean {
 function shouldAllowDiagnosticsFallback(): boolean {
     const vitestFlag: unknown =
         typeof globalEnvCandidate === "object" && globalEnvCandidate !== null
-            ? (Reflect.get(globalEnvCandidate, "VITEST") as unknown)
+            ? getOwnDataPropertyValue(globalEnvCandidate, "VITEST")
             : undefined;
     const nodeEnv: unknown =
         typeof globalEnvCandidate === "object" && globalEnvCandidate !== null
-            ? (Reflect.get(globalEnvCandidate, "NODE_ENV") as unknown)
+            ? getOwnDataPropertyValue(globalEnvCandidate, "NODE_ENV")
             : undefined;
 
     const isTestEnv = isTruthyEnvFlag(vitestFlag) || nodeEnv === "test";
@@ -277,7 +284,7 @@ function shouldAllowDiagnosticsFallback(): boolean {
     }
 
     // Test-only override: allow targeted tests to force fallback off.
-    const overrideFlag: unknown = Reflect.get(
+    const overrideFlag = getOwnDataPropertyValue(
         globalThis,
         "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
     );

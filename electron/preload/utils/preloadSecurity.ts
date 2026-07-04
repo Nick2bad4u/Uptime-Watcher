@@ -1,3 +1,4 @@
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isDefined, objectKeys } from "ts-extras";
 
 interface AutomationProcess {
@@ -13,17 +14,21 @@ const toAutomationProcess = (value: unknown): AutomationProcess | undefined => {
         return undefined;
     }
 
-    const envCandidate: unknown = Reflect.get(value, "env");
-    if (!isObjectLike(envCandidate)) {
+    const envCandidate = getOwnDataProperty(value, "env");
+    if (!envCandidate.found || !isObjectLike(envCandidate.value)) {
         return {};
     }
 
     const env: Record<string, string | undefined> = {};
-    for (const key of objectKeys(envCandidate)) {
-        const entry: unknown = Reflect.get(envCandidate, key);
-        if (typeof entry === "string") {
-            env[key] = entry;
-        } else if (!isDefined(entry)) {
+    for (const key of objectKeys(envCandidate.value)) {
+        const entry = getOwnDataProperty(envCandidate.value, key);
+        if (!entry.found) {
+            continue;
+        }
+
+        if (typeof entry.value === "string") {
+            env[key] = entry.value;
+        } else if (!isDefined(entry.value)) {
             env[key] = undefined;
         }
     }
