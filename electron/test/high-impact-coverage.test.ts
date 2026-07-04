@@ -362,7 +362,6 @@ describe("High-Impact Branch Coverage Tests", () => {
             try {
                 const typeGuardsModule =
                     await import("../../shared/utils/typeGuards.js");
-                // eslint-enable-next-line unicorn/no-keyword-prefix
 
                 if (typeGuardsModule.isError) {
                     // Test Error instances
