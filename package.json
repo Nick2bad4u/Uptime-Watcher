@@ -603,10 +603,7 @@
         "update-node": "winget update OpenJS.NodeJS",
         "update-tsdoc": "npm run tsdoc-update",
         "validate:components": "node scripts/validate-components.mjs",
-        "verify:storybook-tsconfig": "node ./scripts/verify-storybook-tsconfig.mjs",
-        "webhint": "hint http://localhost:3000 --config .hintrc",
-        "webhint:3000": "npm run webhint",
-        "webhint:5173": "hint http://localhost:5173 --config .hintrc"
+        "verify:storybook-tsconfig": "node ./scripts/verify-storybook-tsconfig.mjs"
     },
     "eslintConfig": {
         "extends": "eslint.config.mjs"
@@ -974,7 +971,6 @@
         "gitleaks-config-nick2bad4u": "^1.0.2",
         "globals-vitest": "^4.1.9",
         "gray-matter": "^4.0.3",
-        "hint": "^7.1.13",
         "istanbul-lib-coverage": "^3.2.2",
         "istanbul-lib-report": "^3.0.1",
         "istanbul-reports": "^3.2.0",
