@@ -6,6 +6,18 @@ import type { EnhancedMonitorCheckConfig } from "../services/monitoring/Enhanced
 
 import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
 
+const mockLogger = vi.hoisted(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+}));
+
+vi.mock("../utils/logger", () => ({
+    logger: mockLogger,
+    monitorLogger: mockLogger,
+}));
+
 describe("EnhancedMonitorChecker Targeted Coverage", () => {
     let mockConfig: EnhancedMonitorCheckConfig;
     let checker: EnhancedMonitorChecker;
@@ -338,8 +350,11 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             const saveMethod = (checker as any).saveHistoryEntry.bind(checker);
             await saveMethod(monitor, checkResult);
 
-            // Should not throw, error should be caught and logged
-            expect(true).toBeTruthy(); // Test passes if no error thrown
+            expect(mockConfig.historyRepository.addEntry).toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to save history entry for monitor monitor-1",
+                expect.objectContaining({ message: "DB error" })
+            );
         });
     });
 

@@ -463,11 +463,20 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     newMonitor2,
                 ],
             };
+            const startMonitoringSpy = vi
+                .spyOn(manager, "startMonitoringForSite")
+                .mockResolvedValue(true);
 
             await manager.setupNewMonitors(siteWithNewMonitors, newMonitorIds);
 
-            // The setup should complete without errors
-            expect(true).toBeTruthy(); // Test completed successfully
+            expect(startMonitoringSpy).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-2"
+            );
+            expect(startMonitoringSpy).not.toHaveBeenCalledWith(
+                "site-1",
+                "monitor-3"
+            );
         });
 
         it("should handle empty new monitor IDs array", async () => {

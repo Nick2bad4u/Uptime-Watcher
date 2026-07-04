@@ -528,9 +528,6 @@ describe("TypedEventBus Fuzzing Tests", () => {
                             }
                         }
 
-                        // Should not crash during rapid listener manipulation
-                        expect(true).toBeTruthy();
-
                         // Should still be able to emit events
                         await expect(
                             eventBus.emitTyped("test:simple", {

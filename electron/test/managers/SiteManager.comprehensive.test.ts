@@ -708,10 +708,22 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
-            // This test requires complex mock setup that creates circular dependencies
-            // Note: Simplify SiteManager to improve testability
-            expect.hasAssertions();
-            expect(true).toBeTruthy(); // Placeholder assertion
+            mockSiteRepositoryServiceInstance.getSitesFromDatabase.mockResolvedValue(
+                [mockSite]
+            );
+
+            await siteManager.initialize();
+
+            expect(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).toHaveBeenCalledTimes(1);
+            expect(mockCache.replaceAll).toHaveBeenCalledWith([
+                expect.objectContaining({
+                    data: mockSite,
+                    key: "site-1",
+                }),
+            ]);
+            expect(mockCache.get("site-1")).toEqual(mockSite);
         });
 
         it("should handle initialization errors", async ({
@@ -1008,10 +1020,19 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Caching", "type");
 
-            // This test requires complex mock setup that creates circular dependencies
-            // Note: Simplify SiteManager to improve testability
-            expect.hasAssertions();
-            expect(true).toBeTruthy(); // Placeholder assertion
+            siteManager = new SiteManager(mockDeps);
+            vi.mocked(mockSiteWriterServiceInstance.deleteSite).mockResolvedValue(
+                false
+            );
+
+            const isResult = await siteManager.removeSite("missing-site");
+
+            expect(isResult).toBeFalsy();
+            expect(mockSiteWriterServiceInstance.deleteSite).toHaveBeenCalledWith(
+                mockCache,
+                "missing-site"
+            );
+            expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalled();
         });
 
         it("should handle deletion failure", async ({ task, annotate }) => {
