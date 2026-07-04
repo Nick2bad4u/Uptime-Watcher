@@ -19,6 +19,9 @@ title = "Nick2bad4u shared Gitleaks configuration"
     description = "Allow public OAuth client IDs, token key names, and placeholder secret examples"
     paths = [
         '''^docs/Guides/CLOUD_SYNC_GOOGLE_DRIVE_SETUP\.md$''',
+        '''^docs/docusaurus/docs/documents/docs/Guides/CLOUD_SYNC_GOOGLE_DRIVE_SETUP\.md$''',
+        '''^docs/docusaurus/docs/electron/services/cloud/internal/cloudServiceSettings/variables/DEFAULT_DROPBOX_APP_KEY\.md$''',
+        '''^docs/docusaurus/docs/electron/services/cloud/providers/dropbox/DropboxTokenManager/classes/DropboxTokenManager\.md$''',
         '''^electron/services/cloud/internal/cloudServiceSettings\.ts$''',
         '''^electron/services/cloud/providers/dropbox/DropboxTokenManager\.ts$''',
         '''^shared/test/utils/environment\.comprehensive-coverage\.fuzz\.test\.ts$''',

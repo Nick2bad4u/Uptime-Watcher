@@ -1,7 +1,13 @@
-import type { CorrelationId } from "@shared/types/events";
+import type { Tagged } from "type-fest";
 
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
 import { arrayJoin, safeCastTo } from "ts-extras";
+
+/**
+ * Branded correlation identifier shared by event metadata, IPC diagnostics, and
+ * structured logging.
+ */
+export type CorrelationId = Tagged<string, "correlation-id">;
 
 type GetRandomValues = Crypto["getRandomValues"];
 
