@@ -53,9 +53,6 @@ vi.mock("../../../utils/errorHandling", () => ({
             try {
                 return await fn();
             } catch (error) {
-                // Mock the logging behavior but don't actually log
-                // console.log(`${operationName} failed`, error);
-
                 if (shouldThrow) {
                     throw error;
                 }

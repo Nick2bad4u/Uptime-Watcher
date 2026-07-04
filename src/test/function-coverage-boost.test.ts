@@ -296,8 +296,9 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error: unknown) {
-                // If module doesn't exist or can't be imported, that's fine
-                console.log("Cache module not available for testing:", error);
+                throw new Error("Cache module should be importable", {
+                    cause: error,
+                });
             }
         });
 
@@ -329,10 +330,9 @@ describe("Function Coverage Boost Tests", () => {
                     expect(typeof isResult).toBe("boolean");
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Environment module not available for testing:",
-                    error
-                );
+                throw new Error("Environment module should be importable", {
+                    cause: error,
+                });
             }
         });
 
@@ -365,18 +365,14 @@ describe("Function Coverage Boost Tests", () => {
                                 expect(result).toBeDefined();
                             }
                         } catch {
-                            // Some functions might require specific parameters
-                            console.log(
-                                `Function ${key} requires specific parameters`
-                            );
+                            // Some functions require more specific parameters.
                         }
                     }
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Object safety module not available for testing:",
-                    error
-                );
+                throw new Error("Object safety module should be importable", {
+                    cause: error,
+                });
             }
         });
 
@@ -398,10 +394,9 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Type helpers module not available for testing:",
-                    error
-                );
+                throw new Error("Type helpers module should be importable", {
+                    cause: error,
+                });
             }
         });
 
@@ -433,17 +428,14 @@ describe("Function Coverage Boost Tests", () => {
                             );
                             expect(typeof exportedValue(123)).toBe("boolean");
                         } catch {
-                            console.log(
-                                `Type guard ${key} may require specific parameters`
-                            );
+                            // Some type guards require more specific parameters.
                         }
                     }
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Type guards module not available for testing:",
-                    error
-                );
+                throw new Error("Type guards module should be importable", {
+                    cause: error,
+                });
             }
         });
     });
@@ -595,9 +587,9 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Monitor UI helpers module not available for testing:",
-                    error
+                throw new Error(
+                    "Monitor UI helpers module should be importable",
+                    { cause: error }
                 );
             } finally {
                 vi.doUnmock("../utils/cache");
@@ -661,10 +653,9 @@ describe("Function Coverage Boost Tests", () => {
                     }
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Fallbacks module not available for testing:",
-                    error
-                );
+                throw new Error("Fallbacks module should be importable", {
+                    cause: error,
+                });
             }
         });
 
@@ -700,16 +691,14 @@ describe("Function Coverage Boost Tests", () => {
                             const result = exportedValue(testMonitor);
                             expect(result).toBeDefined();
                         } catch {
-                            console.log(
-                                `Function ${key} requires specific parameters`
-                            );
+                            // Some functions require more specific parameters.
                         }
                     }
                 }
             } catch (error: unknown) {
-                console.log(
-                    "Monitor validation module not available for testing:",
-                    error
+                throw new Error(
+                    "Monitor validation module should be importable",
+                    { cause: error }
                 );
             }
         });
