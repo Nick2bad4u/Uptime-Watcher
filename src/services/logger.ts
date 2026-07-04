@@ -24,6 +24,7 @@ import type {
 import type { RendererLogger } from "electron-log";
 import type { UnknownArray } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import {
     buildErrorLogArguments,
     buildLogArguments,
@@ -124,18 +125,18 @@ function isTransportFor<K extends keyof LogTransports>(
 function getLogTransport<K extends keyof LogTransports>(
     transportName: K
 ): LogTransports[K] | undefined {
-    const { transports } = log;
-    if (!isRecord(transports)) {
+    const transports = getOwnDataProperty(log, "transports");
+    if (!transports.found || !isRecord(transports.value)) {
         return undefined;
     }
 
-    const candidate = transports[transportName];
+    const candidate = getOwnDataProperty(transports.value, transportName);
 
-    if (!isTransportFor(transportName, candidate)) {
+    if (!candidate.found || !isTransportFor(transportName, candidate.value)) {
         return undefined;
     }
 
-    return candidate;
+    return candidate.value;
 }
 
 // Configure electron-log for renderer process The /renderer import is specifically chosen because:
@@ -146,8 +147,11 @@ function getLogTransport<K extends keyof LogTransports>(
 // 'production' in production builds)
 const metaEnv = safeCastTo<{ env?: { MODE?: string } }>(import.meta);
 const isProduction = metaEnv.env?.MODE === "production";
-log.transports.console.level = isProduction ? "info" : "debug";
-log.transports.console.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
+const consoleTransport = getLogTransport("console");
+if (consoleTransport) {
+    consoleTransport.level = isProduction ? "info" : "debug";
+    consoleTransport.format = "[{h}:{i}:{s}.{ms}] [{level}] {text}";
+}
 
 // File logging is handled by the main process via IPC communication
 // Only configure if the transport exists and we're in a proper renderer context
@@ -194,14 +198,16 @@ const noopInvoke = (): void => {
 const getLogInvoke = (
     name: LogMethodName
 ): ((...arguments_: unknown[]) => void) => {
-    const candidate = Reflect.get(log, name);
-    if (isInvoke(candidate)) {
-        return candidate;
+    const candidate = getOwnDataProperty(log, name);
+    if (candidate.found && isInvoke(candidate.value)) {
+        return candidate.value;
     }
 
     // Some builds of electron-log/renderer may not expose silly/verbose.
-    const fallback = Reflect.get(log, "debug");
-    return isInvoke(fallback) ? fallback : noopInvoke;
+    const fallback = getOwnDataProperty(log, "debug");
+    return fallback.found && isInvoke(fallback.value)
+        ? fallback.value
+        : noopInvoke;
 };
 
 type ExtractLogContextLevel = Parameters<typeof extractLogContext>[1];
