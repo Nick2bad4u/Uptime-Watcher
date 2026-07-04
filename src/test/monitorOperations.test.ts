@@ -564,6 +564,35 @@ describe("monitorOperations", () => {
             expect(result.type).toBe("http");
         });
 
+        it("should not invoke accessor-backed monitor input fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            let urlAccesses = 0;
+            const monitor = {
+                type: "http" as const,
+            };
+            Object.defineProperty(monitor, "url", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    urlAccesses += 1;
+                    throw new Error("Unexpected monitor url getter access");
+                },
+            });
+
+            const result = normalizeMonitor(monitor);
+
+            expect(result.type).toBe("http");
+            expect(result.url).toBe("https://example.com");
+            expect(urlAccesses).toBe(0);
+        });
+
         it("should preserve existing history", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");

@@ -9,8 +9,6 @@
  * @internal
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
@@ -21,18 +19,14 @@ import {
     type Monitor,
     type MonitorType,
 } from "@shared/types";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { validateMonitorType as isValidMonitorType } from "@shared/utils/validation";
 import {
     isNonEmptyString,
     isValidPort,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import {
-    isFinite as isFiniteNumber,
-    objectEntries,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { isFinite as isFiniteNumber, safeCastTo, setHas } from "ts-extras";
 
 /**
  * Baseline defaults applied to every monitor regardless of type.
@@ -179,6 +173,14 @@ function resolveMonitorTypeOrDefault(type: unknown): MonitorType {
     return DEFAULT_MONITOR_TYPE;
 }
 
+function getMonitorOwnDataValue(
+    monitor: Partial<Monitor>,
+    key: PropertyKey
+): unknown {
+    const property = getOwnDataProperty(monitor, key);
+    return property.found ? property.value : undefined;
+}
+
 /**
  * Gets the allowed fields for a specific monitor type.
  */
@@ -294,15 +296,28 @@ function filterMonitorFieldsByType(
 ): Partial<Monitor> {
     const allowedFields = getAllowedFieldsForMonitorType(type);
     const filtered: Partial<Monitor> = {};
-    const filteredRecord = safeCastTo<UnknownRecord>(filtered);
 
-    // Only include fields that are allowed for this monitor type. We keep
-    // the external signature strongly typed while using a local record cast
-    // to perform dynamic key assignment.
-    for (const [key, value] of objectEntries(monitor)) {
-        if (setHas<string, string>(allowedFields, key)) {
-            filteredRecord[key] = value;
+    // Only include allowed own enumerable data fields. Accessors are skipped so
+    // malformed monitor payloads cannot run code during normalization.
+    for (const key of Reflect.ownKeys(monitor)) {
+        if (
+            typeof key !== "string" ||
+            !setHas<string, string>(allowedFields, key)
+        ) {
+            continue;
         }
+
+        const descriptor = Object.getOwnPropertyDescriptor(monitor, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(filtered, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value,
+            writable: true,
+        });
     }
 
     return filtered;
@@ -688,7 +703,9 @@ function applyTypeSpecificDefaults(
  */
 export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
     validateMonitorInput(monitor);
-    const finalizedType = resolveMonitorTypeOrDefault(monitor.type);
+    const finalizedType = resolveMonitorTypeOrDefault(
+        getMonitorOwnDataValue(monitor, "type")
+    );
 
     // Filter the monitor data to only include fields appropriate for this type
     const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);
