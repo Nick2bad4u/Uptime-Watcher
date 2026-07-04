@@ -159,10 +159,13 @@ export const useSettingsStore: UseBoundStore<
                 return {
                     ...currentState,
                     ...base,
-                    settings: normalizeAppSettings({
-                        ...currentState.settings,
-                        ...persistedSettings,
-                    }),
+                    settings: normalizeAppSettings(
+                        {
+                            ...currentState.settings,
+                            ...persistedSettings,
+                        },
+                        currentState.settings
+                    ),
                 };
             },
             // Re-state required fields explicitly for exactOptionalPropertyTypes.

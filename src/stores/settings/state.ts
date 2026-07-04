@@ -14,6 +14,7 @@ import type { AppSettings } from "../types";
 import type { SettingsStore } from "./types";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
+import { isThemeName } from "../../theme/types";
 import { logStoreAction } from "../utils";
 
 const DEFAULT_SETTINGS_HISTORY_LIMIT = DEFAULT_HISTORY_LIMIT;
@@ -72,6 +73,32 @@ const clampInAppAlertVolume = (
     return numeric;
 };
 
+const normalizeBooleanSetting = (value: unknown, fallback: boolean): boolean =>
+    typeof value === "boolean" ? value : fallback;
+
+const normalizeHistoryLimitSetting = (
+    value: unknown,
+    fallback: number
+): number =>
+    typeof value === "number" && isFiniteNumber(value) ? value : fallback;
+
+const normalizeMutedSiteIdentifiers = (
+    value: unknown,
+    fallback: string[]
+): string[] =>
+    value === undefined || value === fallback
+        ? fallback
+        : Array.isArray(value) &&
+            value.every((entry) => typeof entry === "string")
+          ? [...value]
+          : fallback;
+
+const normalizeThemeSetting = (
+    value: unknown,
+    fallback: AppSettings["theme"]
+): AppSettings["theme"] =>
+    typeof value === "string" && isThemeName(value) ? value : fallback;
+
 /**
  * Normalizes persisted or partial settings objects into a complete
  * {@link AppSettings} structure.
@@ -85,19 +112,54 @@ const clampInAppAlertVolume = (
  * @returns A fully normalized settings object.
  */
 export const normalizeAppSettings = (
-    candidate: Partial<AppSettings> = {}
+    candidate: Partial<AppSettings> = {},
+    fallback: AppSettings = defaultSettings
 ): AppSettings => {
     const rest = candidate;
 
     const merged: AppSettings = safeCastTo({
         ...defaultSettings,
+        ...fallback,
         ...rest,
     });
 
+    merged.autoStart = normalizeBooleanSetting(
+        rest.autoStart,
+        fallback.autoStart
+    );
+    merged.historyLimit = normalizeHistoryLimitSetting(
+        rest.historyLimit,
+        fallback.historyLimit
+    );
+    merged.inAppAlertsEnabled = normalizeBooleanSetting(
+        rest.inAppAlertsEnabled,
+        fallback.inAppAlertsEnabled
+    );
+    merged.inAppAlertsSoundEnabled = normalizeBooleanSetting(
+        rest.inAppAlertsSoundEnabled,
+        fallback.inAppAlertsSoundEnabled
+    );
     merged.inAppAlertVolume = clampInAppAlertVolume(
         rest.inAppAlertVolume,
-        merged.inAppAlertVolume
+        fallback.inAppAlertVolume
     );
+    merged.minimizeToTray = normalizeBooleanSetting(
+        rest.minimizeToTray,
+        fallback.minimizeToTray
+    );
+    merged.mutedSiteNotificationIdentifiers = normalizeMutedSiteIdentifiers(
+        rest.mutedSiteNotificationIdentifiers,
+        fallback.mutedSiteNotificationIdentifiers
+    );
+    merged.systemNotificationsEnabled = normalizeBooleanSetting(
+        rest.systemNotificationsEnabled,
+        fallback.systemNotificationsEnabled
+    );
+    merged.systemNotificationsSoundEnabled = normalizeBooleanSetting(
+        rest.systemNotificationsSoundEnabled,
+        fallback.systemNotificationsSoundEnabled
+    );
+    merged.theme = normalizeThemeSetting(rest.theme, fallback.theme);
 
     return merged;
 };
@@ -124,10 +186,13 @@ export const createSettingsStateSlice = (
             newSettings,
         });
         setState((state) => ({
-            settings: normalizeAppSettings({
-                ...state.settings,
-                ...newSettings,
-            }),
+            settings: normalizeAppSettings(
+                {
+                    ...state.settings,
+                    ...newSettings,
+                },
+                state.settings
+            ),
         }));
     },
 });

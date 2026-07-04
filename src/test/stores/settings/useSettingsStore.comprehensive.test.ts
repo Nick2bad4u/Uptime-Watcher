@@ -5,7 +5,7 @@
 import { fc, test } from "@fast-check/vitest";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
-import { arrayAt, isInteger, objectEntries } from "ts-extras";
+import { arrayAt, isInteger, objectEntries, safeCastTo } from "ts-extras";
 import {
     afterAll,
     afterEach,
@@ -230,6 +230,47 @@ describe(useSettingsStore, () => {
     });
 
     describe("Settings Operations", () => {
+        it("should preserve fallback values when normalizing invalid runtime settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Validation", "type");
+
+            const fallback = createSettings({
+                autoStart: true,
+                historyLimit: 321,
+                inAppAlertsEnabled: false,
+                inAppAlertsSoundEnabled: true,
+                inAppAlertVolume: 0.4,
+                minimizeToTray: false,
+                mutedSiteNotificationIdentifiers: ["site-1"],
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
+                theme: "dark",
+            });
+
+            const normalized = normalizeAppSettings(
+                safeCastTo<Partial<AppSettings>>({
+                    autoStart: "yes",
+                    historyLimit: Number.POSITIVE_INFINITY,
+                    inAppAlertsEnabled: "false",
+                    inAppAlertsSoundEnabled: 1,
+                    inAppAlertVolume: "loud",
+                    minimizeToTray: null,
+                    mutedSiteNotificationIdentifiers: ["site-2", 42],
+                    systemNotificationsEnabled: "true",
+                    systemNotificationsSoundEnabled: {},
+                    theme: "solarized",
+                }),
+                fallback
+            );
+
+            expect(normalized).toEqual(fallback);
+        });
+
         it("should update settings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
@@ -250,6 +291,47 @@ describe(useSettingsStore, () => {
                 result.current.settings.systemNotificationsEnabled
             ).toBeTruthy();
             expect(result.current.settings.historyLimit).toBe(500); // Unchanged - using correct DEFAULT_HISTORY_LIMIT
+        });
+
+        it("should ignore invalid known setting updates at runtime", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Validation", "type");
+
+            const { result } = renderHook(() => useSettingsStore());
+
+            act(() => {
+                result.current.updateSettings({
+                    historyLimit: 750,
+                    mutedSiteNotificationIdentifiers: ["site-1"],
+                    systemNotificationsEnabled: true,
+                    theme: "dark",
+                });
+            });
+
+            act(() => {
+                result.current.updateSettings(
+                    safeCastTo<Partial<AppSettings>>({
+                        historyLimit: "many",
+                        mutedSiteNotificationIdentifiers: "site-2",
+                        systemNotificationsEnabled: "yes",
+                        theme: "solarized",
+                    })
+                );
+            });
+
+            expect(result.current.settings.historyLimit).toBe(750);
+            expect(
+                result.current.settings.mutedSiteNotificationIdentifiers
+            ).toEqual(["site-1"]);
+            expect(
+                result.current.settings.systemNotificationsEnabled
+            ).toBeTruthy();
+            expect(result.current.settings.theme).toBe("dark");
         });
 
         it("should update individual settings", async ({ task, annotate }) => {

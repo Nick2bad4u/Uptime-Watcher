@@ -102,10 +102,13 @@ export const createSettingsOperationsSlice = (
                             );
 
                             setState({
-                                settings: normalizeAppSettings({
-                                    ...currentSettings,
-                                    historyLimit: event.limit,
-                                }),
+                                settings: normalizeAppSettings(
+                                    {
+                                        ...currentSettings,
+                                        historyLimit: event.limit,
+                                    },
+                                    currentSettings
+                                ),
                             });
                         }
                     );
@@ -146,10 +149,13 @@ export const createSettingsOperationsSlice = (
                         const historyLimit =
                             await SettingsService.getHistoryLimit();
                         const currentSettings = getState().settings;
-                        const updatedSettings = normalizeAppSettings({
-                            ...currentSettings,
-                            historyLimit,
-                        });
+                        const updatedSettings = normalizeAppSettings(
+                            {
+                                ...currentSettings,
+                                historyLimit,
+                            },
+                            currentSettings
+                        );
 
                         setState({ settings: updatedSettings });
 
@@ -173,9 +179,12 @@ export const createSettingsOperationsSlice = (
                 return result;
             } catch (error) {
                 const currentSettings = getState().settings;
-                const fallbackSettings = normalizeAppSettings({
-                    ...currentSettings,
-                });
+                const fallbackSettings = normalizeAppSettings(
+                    {
+                        ...currentSettings,
+                    },
+                    currentSettings
+                );
 
                 setState({ settings: fallbackSettings });
 
@@ -289,10 +298,13 @@ export const createSettingsOperationsSlice = (
                     const historyLimit =
                         await SettingsService.getHistoryLimit();
                     const currentSettings = getState().settings;
-                    const updatedSettings = normalizeAppSettings({
-                        ...currentSettings,
-                        historyLimit,
-                    });
+                    const updatedSettings = normalizeAppSettings(
+                        {
+                            ...currentSettings,
+                            historyLimit,
+                        },
+                        currentSettings
+                    );
 
                     setState({ settings: updatedSettings });
 
