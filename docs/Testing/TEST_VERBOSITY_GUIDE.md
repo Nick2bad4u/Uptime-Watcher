@@ -27,7 +27,6 @@ We've created multiple variants of each test script to provide different levels 
 - `npm run test:electron` - Run Electron tests with standard verbosity
 - `npm run test:shared` - Run shared component tests with standard verbosity
 - `npm run test:all` - Run all tests with standard verbosity
-- `npm run test:docs` - Run documentation downloader tests with standard verbosity
 
 ## Verbosity Levels
 
@@ -39,7 +38,6 @@ Uses `--silent` flag to suppress most output except results.
 - `npm run test:electron:quiet`
 - `npm run test:shared:quiet`
 - `npm run test:all:quiet`
-- `npm run test:docs:quiet`
 
 **Best for:** CI/CD pipelines, quick checks when you only care about pass/fail
 
@@ -51,7 +49,6 @@ Uses `--reporter=dot` to show progress as dots (one dot per test).
 - `npm run test:electron:minimal`
 - `npm run test:shared:minimal`
 - `npm run test:all:minimal`
-- `npm run test:docs:minimal`
 
 **Best for:** Local development when you want minimal visual feedback
 
@@ -63,7 +60,6 @@ Uses `--reporter=default` for balanced output showing file names and basic resul
 - `npm run test:electron` (baseline)
 - `npm run test:shared` (baseline)
 - `npm run test:all` (baseline)
-- `npm run test:docs` (baseline)
 
 **Best for:** General development work, debugging test failures
 
@@ -75,7 +71,6 @@ Uses `--reporter=verbose` to show full test hierarchy and individual test names.
 - `npm run test:electron:verbose`
 - `npm run test:shared:verbose`
 - `npm run test:all:verbose`
-- `npm run test:docs:verbose`
 
 **Best for:** Understanding test structure, detailed debugging
 
@@ -87,7 +82,6 @@ Uses `--reporter=verbose --no-truncate` for complete output with no truncation.
 - `npm run test:electron:detailed`
 - `npm run test:shared:detailed`
 - `npm run test:all:detailed`
-- `npm run test:docs:detailed`
 
 **Best for:** Deep debugging, full error analysis
 
@@ -104,19 +98,9 @@ Coverage tests also support verbosity levels (renderer suite by default):
 For full coverage, pair renderer coverage with `npm run test:electron:coverage`
 and `npm run test:shared:coverage`; merge reports if you need a combined view.
 
-## Special Documentation Downloader Tests
-
-The documentation downloader has its own dedicated test scripts:
-
-- `npm run test:docs` - Standard verbosity
-- `npm run test:docs:quiet` - Minimal output
-- `npm run test:docs:minimal` - Dot progress
-- `npm run test:docs:verbose` - Full test hierarchy
-- `npm run test:docs:detailed` - Maximum detail
-
 ## Example Output Comparison
 
-### Minimal (`test:docs:minimal`)
+### Minimal (`test:minimal`)
 
 ```text
 ········································································
@@ -124,18 +108,18 @@ The documentation downloader has its own dedicated test scripts:
       Tests  72 passed (72)
 ```
 
-### Default (`test:docs`)
+### Default (`test`)
 
 ```text
- ✓ scripts/tests/integration/cli-integration.test.mjs (25 tests) 1616ms
- ✓ scripts/tests/unit/language-support.test.mjs (38 tests) 2ms
- ✓ scripts/tests/unit/platform-presets.test.mjs (9 tests) 2ms
+ ✓ src/test/main.comprehensive.test.tsx (25 tests) 1616ms
+ ✓ shared/test/validation/schemas.test.ts (38 tests) 2ms
+ ✓ electron/test/services/ServiceContainer.core-services.test.ts (9 tests) 2ms
 
  Test Files  3 passed (3)
       Tests  72 passed (72)
 ```
 
-### Verbose (`test:docs:verbose`)
+### Verbose (`test:verbose`)
 
 Shows complete test hierarchy with all individual test names and timings.
 
