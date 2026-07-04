@@ -19,8 +19,6 @@ import electron from "vite-plugin-electron";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 
-import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
-
 const formatUnknownError = (error: unknown): string => {
     if (typeof error === "string") {
         return error;
@@ -63,6 +61,15 @@ const dirname = (() => {
     }
 })();
 const VITE_BUILD_TARGET = "esnext";
+
+const getConfigEnvironmentVariable = (key: string): string | undefined => {
+    try {
+        const value = process.env[key];
+        return typeof value === "string" ? value : undefined;
+    } catch {
+        return undefined;
+    }
+};
 
 const vitestDefaultExclude = [
     "**/node_modules/**",
@@ -177,7 +184,7 @@ const getWasmSourcePath = (): string => {
 
 const viteConfig: UserConfigFnObject = ({ command, mode }) => {
     // Prefer Vite's provided mode over raw NODE_ENV for consistency.
-    const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
+    const codecovToken = getConfigEnvironmentVariable("CODECOV_TOKEN");
     const isTestMode = mode === "test";
     const isDev = mode === "development";
     const isBuild = command === "build";

@@ -461,13 +461,15 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
+            const originalTheme = useSettingsStore.getState().settings.theme;
+
             // TypeScript would prevent this, but testing runtime behavior
             useSettingsStore.getState().updateSettings({
                 theme: "invalid-theme" as never,
             });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.theme).toBe("invalid-theme");
+            expect(state.settings.theme).toBe(originalTheme);
         });
 
         it("should handle negative historyLimit", async ({
