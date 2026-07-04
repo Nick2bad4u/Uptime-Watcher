@@ -37,7 +37,6 @@ const knipConfig: KnipConfig = {
         "serve",
         "shellcheck",
         "sloc",
-        "ts-node",
         "tsg",
         "winget",
         "yamllint",

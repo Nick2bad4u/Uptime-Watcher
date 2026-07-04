@@ -51,8 +51,6 @@
         "analyze:ipc": "tsx scripts/analyze-ipc-channels.ts",
         "bench": "vitest bench --run",
         "bench:compare": "vitest bench --run --compare",
-        "bench:tsnode": "ts-node ./benchmarks/eventSystem.bench.ts",
-        "bench:tsnode:loader": "node --loader ts-node/esm ./benchmarks/eventSystem.bench.ts",
         "bench:ui": "vitest bench --ui",
         "bench:watch": "vitest bench",
         "build": "npm run build:electron-vite",

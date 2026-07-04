@@ -75,9 +75,5 @@
         "../../src/**/*.mts",
         "../../src/**/*.cts",
         "../../src/**/*.tsx"
-    ],
-    "ts-node": {
-        "esm": true,
-        "experimentalSpecifierResolution": "node"
-    }
+    ]
 }

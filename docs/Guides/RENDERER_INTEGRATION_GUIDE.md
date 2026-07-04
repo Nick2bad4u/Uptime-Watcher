@@ -151,7 +151,7 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 
 - **Drift detection**: `npm run check:ipc` compares generated artifacts with the canonical schema. Required in CI. See the [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md) guide for full instructions.
 - **Artifact regeneration**: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (documented in [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md)).
-- **Benchmarks**: When tweaking event payloads, run `npm run bench:tsnode` to ensure typed event bus throughput remains acceptable.
+- **Benchmarks**: When tweaking event payloads, run `npm run bench` to ensure typed event bus throughput remains acceptable.
 
 ---
 

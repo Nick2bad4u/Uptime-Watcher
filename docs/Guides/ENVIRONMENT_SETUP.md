@@ -301,7 +301,6 @@ npm install -g @commitlint/cli
 npm install -g eslint
 npm install -g prettier
 npm install -g typescript
-npm install -g ts-node
 npm install -g nodemon
 ```
 
