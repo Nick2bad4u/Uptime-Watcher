@@ -29,7 +29,6 @@ const knipConfig: KnipConfig = {
         "grype",
         "hint",
         "markdownlint",
-        "npm-check",
         "open-cli",
         "powershell",
         "repomix",

@@ -119,7 +119,6 @@
         "debug:renderer": "npm run debug:vite",
         "debug:transform": "vite --debug plugin-transform",
         "debug:vite": "vite --debug",
-        "dep:check": "npm-check",
         "dep:update": "npm-check-updates -u && npm install",
         "deps:check:no-force": "npm install --force=false --dry-run --no-audit --no-fund",
         "detect-secrets": "detect-secrets scan",

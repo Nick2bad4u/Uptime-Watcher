@@ -341,7 +341,7 @@ Watch console for warmup effectiveness and transform times.
 3. **Keep dependencies up to date**:
 
    ```bash
-   npm run dep:check
+   npm run lint:deps
    npm run dep:update
    ```
 

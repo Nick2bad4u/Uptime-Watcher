@@ -490,7 +490,7 @@ npm run format                 # Format code with Prettier
 
 # Utility commands
 npm run clean                  # Clean build directories
-npm run dep:check              # Check for outdated dependencies
+npm run lint:deps              # Check dependency and unused-code hygiene
 npm run dep:update             # Update dependencies
 ```
 
