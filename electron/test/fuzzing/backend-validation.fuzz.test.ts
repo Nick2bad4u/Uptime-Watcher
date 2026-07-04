@@ -17,9 +17,6 @@
  *
  * @packageDocumentation
  */
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Testing Requirement */
-/* eslint-disable no-script-url, prefer-template, unicorn/prefer-string-replace-all, arrow-body-style, unicorn/numeric-separators-style -- Testing malicious patterns and security vulnerabilities */
-
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
@@ -80,9 +77,9 @@ describe("Backend Validation Fuzzing Tests", () => {
                         url: fc.oneof(
                             fc.webUrl(),
                             fc.string(),
-                            fc.string().map((s) => "javascript:" + s), // XSS attempt
-                            fc.string().map((s) => "data:" + s), // Data URL
-                            fc.string().map((s) => "file://" + s), // File access attempt
+                            fc.string().map((s) => `javascript:${s}`), // XSS attempt
+                            fc.string().map((s) => `data:${s}`), // Data URL
+                            fc.string().map((s) => `file://${s}`), // File access attempt
                             fc.constant(null),
                             fc.constant(undefined)
                         ),
@@ -90,8 +87,7 @@ describe("Backend Validation Fuzzing Tests", () => {
                     (monitorData: any) => {
                         // Property: validation should never throw
                         expect(() => {
-                            const hasRequiredFields = (data: any): boolean => {
-                                return (
+                            const hasRequiredFields = (data: any): boolean => (
                                     data &&
                                     typeof data === "object" &&
                                     typeof data.id === "string" &&
@@ -104,7 +100,6 @@ describe("Backend Validation Fuzzing Tests", () => {
                                         "tcp",
                                     ].includes(data.type.toLowerCase())
                                 );
-                            };
 
                             const isResult = hasRequiredFields(monitorData);
                             expect(typeof isResult).toBe("boolean");
@@ -121,13 +116,13 @@ describe("Backend Validation Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.webUrl(),
-                        fc.string().map((s) => "javascript:" + s),
-                        fc.string().map((s) => "data:text/html," + s),
-                        fc.string().map((s) => "file:///" + s),
-                        fc.string().map((s) => "vbscript:" + s),
-                        fc.string().map((s) => s + "/../../../etc/passwd"),
-                        fc.string().map((s) => s + "\0"),
-                        fc.string().map((s) => s.repeat(10000)),
+                        fc.string().map((s) => `javascript:${s}`),
+                        fc.string().map((s) => `data:text/html,${s}`),
+                        fc.string().map((s) => `file:///${s}`),
+                        fc.string().map((s) => `vbscript:${s}`),
+                        fc.string().map((s) => `${s}/../../../etc/passwd`),
+                        fc.string().map((s) => `${s}\0`),
+                        fc.string().map((s) => s.repeat(10_000)),
                         fc.string(),
                         fc.constant(""),
                         fc.constant(null),
@@ -147,7 +142,7 @@ describe("Backend Validation Fuzzing Tests", () => {
                                 }
 
                                 // Remove null bytes
-                                const cleaned = inputUrl.replace(/\0/gv, "");
+                                const cleaned = inputUrl.replaceAll("\u{0}", "");
 
                                 // Check for dangerous schemes
                                 const dangerousSchemes =
@@ -195,9 +190,9 @@ describe("Backend Validation Fuzzing Tests", () => {
                         fc.ipV4(),
                         fc.ipV6(),
                         fc.string(),
-                        fc.string().map((s) => s + "'DROP TABLE sites;--"),
-                        fc.string().map((s) => s + "\0"),
-                        fc.string().map((s) => s + "/../../../etc/passwd"),
+                        fc.string().map((s) => `${s}'DROP TABLE sites;--`),
+                        fc.string().map((s) => `${s}\0`),
+                        fc.string().map((s) => `${s}/../../../etc/passwd`),
                         fc.string().map((s) => s.repeat(1000)),
                         fc.constant(""),
                         fc.constant(null),
@@ -218,8 +213,8 @@ describe("Backend Validation Fuzzing Tests", () => {
 
                                 // Remove dangerous characters
                                 const cleaned = inputHost
-                                    .replace(/\0/gv, "")
-                                    .replace(/\.\./gv, "");
+                                    .replaceAll("\u{0}", "")
+                                    .replaceAll("..", "");
 
                                 // Check for SQL injection patterns
                                 const sqlPatterns =
@@ -293,7 +288,7 @@ describe("Backend Validation Fuzzing Tests", () => {
                                 return (
                                     Number.isInteger(port) &&
                                     port >= 1 &&
-                                    port <= 65535
+                                    port <= 65_535
                                 );
                             };
 
@@ -327,15 +322,15 @@ describe("Backend Validation Fuzzing Tests", () => {
                 fc.property(
                     fc.oneof(
                         fc.string(),
-                        fc.string().map((s) => s + "'; DROP TABLE sites; --"),
-                        fc.string().map((s) => s + "' OR '1'='1"),
-                        fc.string().map((s) => s + "; DELETE FROM monitors"),
+                        fc.string().map((s) => `${s}'; DROP TABLE sites; --`),
+                        fc.string().map((s) => `${s}' OR '1'='1`),
+                        fc.string().map((s) => `${s}; DELETE FROM monitors`),
                         fc
                             .string()
-                            .map((s) => s + "' UNION SELECT * FROM users"),
-                        fc.string().map((s) => s + "'; INSERT INTO"),
-                        fc.string().map((s) => s + '"; UPDATE'),
-                        fc.string().map((s) => s + "/*comment*/"),
+                            .map((s) => `${s}' UNION SELECT * FROM users`),
+                        fc.string().map((s) => `${s}'; INSERT INTO`),
+                        fc.string().map((s) => `${s}"; UPDATE`),
+                        fc.string().map((s) => `${s}/*comment*/`),
                         fc.string()
                     ),
                     (input: string) => {
