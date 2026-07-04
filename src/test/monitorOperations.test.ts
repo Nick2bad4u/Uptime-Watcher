@@ -1055,8 +1055,10 @@ describe("monitorOperations", () => {
             });
 
             const result = updateMonitorInSite(mockSite, "monitor-1", updates);
+            const firstMonitor = arrayFirst(result.monitors);
 
-            expect(arrayFirst(result.monitors).status).toBe("up");
+            expect(firstMonitor).toBeDefined();
+            expect(firstMonitor?.status).toBe("up");
             expect(statusAccesses).toBe(0);
         });
 

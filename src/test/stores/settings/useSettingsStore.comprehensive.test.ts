@@ -5,7 +5,7 @@
 import { fc, test } from "@fast-check/vitest";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
-import { arrayAt, isInteger, objectEntries, safeCastTo } from "ts-extras";
+import { arrayAt, isInteger, objectEntries } from "ts-extras";
 import {
     afterAll,
     afterEach,
@@ -28,6 +28,10 @@ import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 // Import mocked modules to get references
 import { logStoreAction } from "../../../stores/utils";
 import { installElectronApiMock } from "../../utils/electronApiMock";
+
+function toRuntimeSettingsPatch(value: unknown): Partial<AppSettings> {
+    return value as Partial<AppSettings>;
+}
 
 // Mock the bridge readiness helper to avoid polling delays in tests
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -252,19 +256,21 @@ describe(useSettingsStore, () => {
                 theme: "dark",
             });
 
+            const invalidRuntimeSettings: unknown = {
+                autoStart: "yes",
+                historyLimit: Number.POSITIVE_INFINITY,
+                inAppAlertsEnabled: "false",
+                inAppAlertsSoundEnabled: 1,
+                inAppAlertVolume: "loud",
+                minimizeToTray: null,
+                mutedSiteNotificationIdentifiers: ["site-2", 42],
+                systemNotificationsEnabled: "true",
+                systemNotificationsSoundEnabled: {},
+                theme: "solarized",
+            };
+
             const normalized = normalizeAppSettings(
-                safeCastTo<Partial<AppSettings>>({
-                    autoStart: "yes",
-                    historyLimit: Number.POSITIVE_INFINITY,
-                    inAppAlertsEnabled: "false",
-                    inAppAlertsSoundEnabled: 1,
-                    inAppAlertVolume: "loud",
-                    minimizeToTray: null,
-                    mutedSiteNotificationIdentifiers: ["site-2", 42],
-                    systemNotificationsEnabled: "true",
-                    systemNotificationsSoundEnabled: {},
-                    theme: "solarized",
-                }),
+                toRuntimeSettingsPatch(invalidRuntimeSettings),
                 fallback
             );
 
@@ -314,13 +320,15 @@ describe(useSettingsStore, () => {
             });
 
             act(() => {
+                const invalidRuntimeUpdate: unknown = {
+                    historyLimit: "many",
+                    mutedSiteNotificationIdentifiers: "site-2",
+                    systemNotificationsEnabled: "yes",
+                    theme: "solarized",
+                };
+
                 result.current.updateSettings(
-                    safeCastTo<Partial<AppSettings>>({
-                        historyLimit: "many",
-                        mutedSiteNotificationIdentifiers: "site-2",
-                        systemNotificationsEnabled: "yes",
-                        theme: "solarized",
-                    })
+                    toRuntimeSettingsPatch(invalidRuntimeUpdate)
                 );
             });
 

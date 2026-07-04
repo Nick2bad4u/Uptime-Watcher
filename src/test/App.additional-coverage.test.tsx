@@ -209,30 +209,30 @@ const mockSettingsStoreState = {
     updateSettings: vi.fn(),
 };
 
-const mockMonitorTypes: MonitorTypeConfig[] = [
-    {
-        description: "HTTP endpoint monitoring",
-        displayName: "HTTP",
-        fields: [
-            {
-                label: "URL",
-                name: "url",
-                required: true,
-                type: "url",
-            },
-        ],
-        type: "http",
-        version: "1.0.0",
-    },
-];
+const mockHttpMonitorType: MonitorTypeConfig = {
+    description: "HTTP endpoint monitoring",
+    displayName: "HTTP",
+    fields: [
+        {
+            label: "URL",
+            name: "url",
+            required: true,
+            type: "url",
+        },
+    ],
+    type: "http",
+    version: "1.0.0",
+};
+
+const mockMonitorTypes: MonitorTypeConfig[] = [mockHttpMonitorType];
 
 const mockMonitorTypesStoreState: MonitorTypesStore = {
     fieldConfigs: {
-        http: mockMonitorTypes[0].fields,
+        http: mockHttpMonitorType.fields,
     },
     formatMonitorDetail: vi.fn(async (_type, details) => details),
     formatMonitorTitleSuffix: vi.fn(async (_type, monitor) => monitor.id),
-    getFieldConfig: vi.fn(
+    getFieldConfig: vi.fn<MonitorTypesStore["getFieldConfig"]>(
         (type) => mockMonitorTypesStoreState.fieldConfigs[type]
     ),
     isLoaded: true,
@@ -545,9 +545,9 @@ describe("App Additional Coverage Tests", () => {
 
         objectAssign(mockMonitorTypesStoreState, {
             fieldConfigs: {
-                http: mockMonitorTypes[0].fields,
+                http: mockHttpMonitorType.fields,
             },
-            getFieldConfig: vi.fn(
+            getFieldConfig: vi.fn<MonitorTypesStore["getFieldConfig"]>(
                 (type) => mockMonitorTypesStoreState.fieldConfigs[type]
             ),
             isLoaded: true,
