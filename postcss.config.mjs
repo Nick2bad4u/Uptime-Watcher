@@ -48,11 +48,14 @@
  * @typedef {import("postcss").Message} Message
  */
 
-const isProduction = process.env["NODE_ENV"] === "production";
+const runtimeEnv = globalThis.process.env;
+const readPostcssEnv = (key) => runtimeEnv[key];
+
+const isProduction = readPostcssEnv("NODE_ENV") === "production";
 const enableDuplicateSelectorCombine =
-    process.env["ENABLE_POSTCSS_DUPLICATE_COMBINE"] === "true";
+    readPostcssEnv("ENABLE_POSTCSS_DUPLICATE_COMBINE") === "true";
 const enableMediaQuerySort =
-    process.env["ENABLE_POSTCSS_SORT_MEDIA_QUERIES"] === "true";
+    readPostcssEnv("ENABLE_POSTCSS_SORT_MEDIA_QUERIES") === "true";
 const disableOldColorFormatsKey = ["lega", "cy"].join("");
 
 export default {
