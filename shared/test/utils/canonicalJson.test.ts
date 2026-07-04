@@ -38,4 +38,41 @@ describe(createCanonicalJsonValue, () => {
             '{"a":{"b":2,"c":[{"x":1,"y":2},{"a":2,"b":1}],"d":4},"z":1}'
         );
     });
+
+    it("preserves prototype-named keys as canonical JSON data", () => {
+        const value = Object.create(null) as Record<string, unknown>;
+        Object.defineProperty(value, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: {
+                z: 1,
+                a: 2,
+            },
+            writable: true,
+        });
+        Object.defineProperty(value, "constructor", {
+            configurable: true,
+            enumerable: true,
+            value: {
+                prototype: "data",
+            },
+            writable: true,
+        });
+
+        const canonical = createCanonicalJsonValue(value);
+
+        expect(Object.getPrototypeOf(canonical)).toBeNull();
+        expect(
+            Object.getOwnPropertyDescriptor(canonical, "__proto__")
+        ).toMatchObject({
+            enumerable: true,
+            value: {
+                a: 2,
+                z: 1,
+            },
+        });
+        expect(stringifyJsonValueStable(value)).toBe(
+            '{"__proto__":{"a":2,"z":1},"constructor":{"prototype":"data"}}'
+        );
+    });
 });

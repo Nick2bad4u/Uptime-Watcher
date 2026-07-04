@@ -8,6 +8,8 @@
 import type { JsonValue } from "@shared/types/cloudSync";
 import type { JsonObject } from "type-fest";
 
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { objectEntries } from "ts-extras";
 
 /**
@@ -22,11 +24,16 @@ export function createCanonicalJsonValue(value: JsonValue): JsonValue {
         const entries = objectEntries(value).toSorted(([a], [b]) =>
             a.localeCompare(b)
         );
-        const result: JsonObject = {};
+        const result = createNullPrototypeObject<JsonObject>();
         for (const [key, entryValue] of entries) {
-            result[key] = createCanonicalJsonValue(entryValue);
+            Object.defineProperty(result, key, {
+                configurable: true,
+                enumerable: true,
+                value: createCanonicalJsonValue(entryValue),
+                writable: true,
+            });
         }
-        return result;
+        return castUnchecked<JsonValue>(result);
     }
 
     return value;
