@@ -1,3 +1,5 @@
+import type { HttpRateLimiterConfig } from "@shared/utils/httpRateLimiter";
+
 import { HttpRateLimiter } from "@shared/utils/httpRateLimiter";
 import { describe, expect, it, vi } from "vitest";
 
@@ -15,6 +17,40 @@ describe("HttpRateLimiter abort support", () => {
         ).resolves.toBe("ok");
 
         expect(operation).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not invoke config accessors while normalizing options", async () => {
+        let getterCalls = 0;
+        const config = {
+            maxConcurrent: 1,
+            minIntervalMs: 0,
+        } satisfies Partial<HttpRateLimiterConfig> as HttpRateLimiterConfig &
+            Record<string, unknown>;
+
+        Object.defineProperty(config, "maxWaitMs", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("maxWaitMs getter should not run");
+            },
+        });
+        Object.defineProperty(config, "unexpected", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("unexpected getter should not run");
+            },
+        });
+
+        const operation = vi.fn(async () => "ok");
+        const limiter = new HttpRateLimiter(config);
+
+        await expect(
+            limiter.schedule("https://example.com/status", operation)
+        ).resolves.toBe("ok");
+
+        expect(operation).toHaveBeenCalledTimes(1);
+        expect(getterCalls).toBe(0);
     });
 
     it("rejects without invoking the operation when aborted while waiting for a slot", async () => {

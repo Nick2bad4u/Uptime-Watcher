@@ -5,6 +5,24 @@ const DEFAULT_MAX_CONCURRENT = 1;
 const DEFAULT_MAX_WAIT_MS = 30_000;
 const DEFAULT_MIN_INTERVAL_MS = 0;
 
+type OnMaxWaitExceeded = NonNullable<
+    HttpRateLimiterConfig["onMaxWaitExceeded"]
+>;
+type ToKey = NonNullable<HttpRateLimiterConfig["toKey"]>;
+
+function readOwnDataProperty(source: object, key: PropertyKey): unknown {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+}
+
+function isOnMaxWaitExceeded(value: unknown): value is OnMaxWaitExceeded {
+    return typeof value === "function";
+}
+
+function isToKey(value: unknown): value is ToKey {
+    return typeof value === "function";
+}
+
 function assertNotAborted(signal: AbortSignal | undefined): void {
     if (!signal?.aborted) {
         return;
@@ -29,6 +47,18 @@ function normalizePositiveInteger(value: number, fallback: number): number {
     }
 
     return Math.trunc(value);
+}
+
+function numberConfigValue(
+    config: HttpRateLimiterConfig,
+    key: keyof Pick<
+        HttpRateLimiterConfig,
+        "maxConcurrent" | "maxWaitMs" | "minIntervalMs"
+    >,
+    fallback: number
+): number {
+    const value = readOwnDataProperty(config, key);
+    return typeof value === "number" ? value : fallback;
 }
 
 /**
@@ -150,21 +180,49 @@ export class HttpRateLimiter {
     }
 
     public constructor(config: HttpRateLimiterConfig) {
+        const maxConcurrent = numberConfigValue(
+            config,
+            "maxConcurrent",
+            DEFAULT_MAX_CONCURRENT
+        );
+        const minIntervalMs = numberConfigValue(
+            config,
+            "minIntervalMs",
+            DEFAULT_MIN_INTERVAL_MS
+        );
+        const maxWaitMs = numberConfigValue(
+            config,
+            "maxWaitMs",
+            DEFAULT_MAX_WAIT_MS
+        );
+        const onMaxWaitExceededCandidate = readOwnDataProperty(
+            config,
+            "onMaxWaitExceeded"
+        );
+        const toKeyCandidate = readOwnDataProperty(config, "toKey");
+        const onMaxWaitExceeded = isOnMaxWaitExceeded(
+            onMaxWaitExceededCandidate
+        )
+            ? onMaxWaitExceededCandidate
+            : undefined;
+        const toKey = isToKey(toKeyCandidate) ? toKeyCandidate : undefined;
+
         this.maxWaitMs = normalizeNonNegativeInteger(
-            config.maxWaitMs ?? DEFAULT_MAX_WAIT_MS,
+            maxWaitMs,
             DEFAULT_MAX_WAIT_MS
         );
         this.config = {
-            ...config,
             maxConcurrent: normalizePositiveInteger(
-                config.maxConcurrent,
+                maxConcurrent,
                 DEFAULT_MAX_CONCURRENT
             ),
             maxWaitMs: this.maxWaitMs,
             minIntervalMs: normalizeNonNegativeInteger(
-                config.minIntervalMs,
+                minIntervalMs,
                 DEFAULT_MIN_INTERVAL_MS
             ),
+            ...(onMaxWaitExceeded && { onMaxWaitExceeded }),
+            ...(toKey && { toKey }),
         };
     }
 
