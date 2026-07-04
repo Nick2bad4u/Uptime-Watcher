@@ -974,6 +974,7 @@
         "fast-check": "^4.7.0",
         "fs-extra": "^11.3.4",
         "git-cliff": "^2.13.1",
+        "git-cz": "^4.9.0",
         "gitleaks-config-nick2bad4u": "^1.0.2",
         "globals-vitest": "^4.1.9",
         "gray-matter": "^4.0.3",

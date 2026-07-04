@@ -26,7 +26,6 @@ const knipConfig: KnipConfig = {
     ],
     ignoreBinaries: [
         "gitleaks",
-        "git-cz",
         "grype",
         "hint",
         "markdownlint",
