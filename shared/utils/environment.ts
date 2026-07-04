@@ -88,17 +88,26 @@ const getProcessSnapshot = (): ProcessSnapshot | undefined => {
     }
 };
 
+const isProcessEnvRecord = (
+    value: unknown
+): value is Record<string, string | undefined> =>
+    typeof value === "object" && value !== null;
+
+const isProcessVersionsRecord = (
+    value: unknown
+): value is NonNullable<ProcessSnapshot["versions"]> =>
+    typeof value === "object" && value !== null;
+
 const getProcessEnv = (): Record<string, string | undefined> | undefined => {
     const snapshot = getProcessSnapshot();
     if (!snapshot) {
         return undefined;
     }
 
-    try {
-        return snapshot.env ?? undefined;
-    } catch {
-        return undefined;
-    }
+    const property = getOwnDataProperty(snapshot, "env");
+    return property.found && isProcessEnvRecord(property.value)
+        ? property.value
+        : undefined;
 };
 
 const getProcessVersions = (): ProcessSnapshot["versions"] | undefined => {
@@ -107,11 +116,10 @@ const getProcessVersions = (): ProcessSnapshot["versions"] | undefined => {
         return undefined;
     }
 
-    try {
-        return snapshot.versions ?? undefined;
-    } catch {
-        return undefined;
-    }
+    const property = getOwnDataProperty(snapshot, "versions");
+    return property.found && isProcessVersionsRecord(property.value)
+        ? property.value
+        : undefined;
 };
 
 const hasProcessSnapshot = (): boolean => isDefined(getProcessSnapshot());
@@ -269,8 +277,17 @@ export function isBrowserEnvironment(): boolean {
  * Detects whether Node.js runtime APIs are available.
  */
 export function isNodeEnvironment(): boolean {
-    const nodeVersion = getProcessVersions()?.node;
-    return typeof nodeVersion === "string" && nodeVersion.length > 0;
+    const versions = getProcessVersions();
+    if (!versions) {
+        return false;
+    }
+
+    const nodeVersion = getOwnDataProperty(versions, "node");
+    return (
+        nodeVersion.found &&
+        typeof nodeVersion.value === "string" &&
+        nodeVersion.value.length > 0
+    );
 }
 
 /**

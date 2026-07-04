@@ -263,6 +263,32 @@ describe("Environment Detection Utilities", () => {
             expect(envModule.getEnvVar("NODE_ENV")).toBeUndefined();
             expect(accessCount).toBe(0);
         });
+
+        it("should not invoke accessor-backed process env snapshots", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            let accessCount = 0;
+            const snapshot = {} as ProcessSnapshot;
+            Object.defineProperty(snapshot, "env", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    accessCount += 1;
+                    throw new Error("Unexpected env getter access");
+                },
+            });
+
+            const envModule = applyProcessSnapshot(snapshot);
+
+            expect(envModule.getEnvVar("NODE_ENV")).toBeUndefined();
+            expect(accessCount).toBe(0);
+        });
     });
 
     describe("getEnvSummary", () => {
@@ -626,6 +652,60 @@ describe("Environment Detection Utilities", () => {
             });
 
             expect(envModule.isNodeEnvironment()).toBeFalsy();
+        });
+
+        it("should not invoke accessor-backed process versions snapshots", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            let versionsAccessCount = 0;
+            const snapshot = {} as ProcessSnapshot;
+            Object.defineProperty(snapshot, "versions", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    versionsAccessCount += 1;
+                    throw new Error("Unexpected versions getter access");
+                },
+            });
+
+            const envModule = applyProcessSnapshot(snapshot);
+
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
+            expect(versionsAccessCount).toBe(0);
+        });
+
+        it("should not invoke accessor-backed node version entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            let nodeAccessCount = 0;
+            const versions = {};
+            Object.defineProperty(versions, "node", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    nodeAccessCount += 1;
+                    throw new Error("Unexpected node getter access");
+                },
+            });
+
+            const envModule = applyProcessSnapshot({
+                versions: versions as ProcessSnapshot["versions"],
+            });
+
+            expect(envModule.isNodeEnvironment()).toBeFalsy();
+            expect(nodeAccessCount).toBe(0);
         });
 
         it("should return false when process.versions.node is empty string", async ({
