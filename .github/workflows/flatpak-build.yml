@@ -156,15 +156,7 @@ jobs:
                     ls -la dist || true
                     exit 1
                   fi
-                  if [ ! -f "dist/node-sqlite3-wasm.wasm" ] && [ ! -f "dist/node-sqlite3-wasm.wasm" ]; then
-                    # check typical wasm locations
-                    echo "Warning: node-sqlite3-wasm.wasm not found in dist"
-                    ls -la dist || true
-                    exit 1
-                  fi
-              env:
-                  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-                  GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+                  npm run sqlite:verify-wasm
 
             - name: "Build Flatpak"
               run: |
