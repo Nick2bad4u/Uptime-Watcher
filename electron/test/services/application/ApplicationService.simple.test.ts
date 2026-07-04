@@ -5,6 +5,69 @@
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const serviceContainerMocks = vi.hoisted(() => {
+    const autoUpdater = {
+        checkForUpdates: vi.fn(async () => undefined),
+        initialize: vi.fn(),
+        setStatusCallback: vi.fn(),
+    };
+    const databaseService = {
+        close: vi.fn(),
+    };
+    const initializedDatabaseService = {
+        close: vi.fn(),
+    };
+    const ipcService = {
+        cleanup: vi.fn(),
+    };
+    const orchestrator = {
+        stopMonitoring: vi.fn(async () => undefined),
+    };
+    const rendererEventBridge = {
+        sendStateSyncEvent: vi.fn(),
+        sendToRenderers: vi.fn(),
+    };
+    const windowService = {
+        closeAllWindows: vi.fn(),
+        closeMainWindow: vi.fn(),
+        createMainWindow: vi.fn(),
+        getAllWindows: vi.fn(() => []),
+        getMainWindow: vi.fn(),
+        hideWindow: vi.fn(),
+        showWindow: vi.fn(),
+    };
+    const serviceContainer = {
+        getAutoUpdaterService: vi.fn(() => autoUpdater),
+        getDatabaseService: vi.fn(() => databaseService),
+        getInitializedServices: vi.fn(() => [
+            {
+                name: "DatabaseService",
+                service: initializedDatabaseService,
+            },
+        ]),
+        getIpcService: vi.fn(() => ipcService),
+        getNotificationService: vi.fn(() => ({
+            notifyMonitorDown: vi.fn(),
+            notifyMonitorUp: vi.fn(),
+        })),
+        getRendererEventBridge: vi.fn(() => rendererEventBridge),
+        getUptimeOrchestrator: vi.fn(() => orchestrator),
+        getWindowService: vi.fn(() => windowService),
+        initialize: vi.fn(async () => undefined),
+    };
+
+    return {
+        autoUpdater,
+        databaseService,
+        initializedDatabaseService,
+        ipcService,
+        orchestrator,
+        rendererEventBridge,
+        serviceContainer,
+        windowService,
+    };
+});
+
 // Mock external dependencies
 vi.mock("../../../utils/logger", () => ({
     logger: {
@@ -24,6 +87,7 @@ vi.mock("../../../utils/logger", () => ({
 vi.mock("electron", () => ({
     app: {
         isReady: vi.fn(() => false),
+        off: vi.fn(),
         on: vi.fn(),
         setUserTasks: vi.fn(),
         setAppUserModelId: vi.fn(),
@@ -64,21 +128,9 @@ vi.mock("node:path", () => ({
     ),
 }));
 
-vi.mock("../../ServiceContainer", () => ({
+vi.mock("../../../services/ServiceContainer", () => ({
     ServiceContainer: {
-        getInstance: vi.fn(() => ({
-            getWindowService: vi.fn(() => ({
-                createMainWindow: vi.fn(),
-                getMainWindow: vi.fn(),
-                closeAllWindows: vi.fn(),
-                showWindow: vi.fn(),
-                hideWindow: vi.fn(),
-            })),
-            getUptimeOrchestrator: vi.fn(() => ({
-                startup: vi.fn(),
-                shutdown: vi.fn(),
-            })),
-        })),
+        getInstance: vi.fn(() => serviceContainerMocks.serviceContainer),
     },
 }));
 
@@ -121,14 +173,29 @@ describe("ApplicationService Coverage Tests", () => {
         const { ApplicationService } =
             await import("../../../services/application/ApplicationService");
 
-        try {
-            const service = new ApplicationService();
-            await service.cleanup();
-            expect(true).toBeTruthy(); // Test passes if no error thrown
-        } catch (error) {
-            // Cleanup operations might fail in test environment
-            expect(error).toBeInstanceOf(Error);
-        }
+        const { app } = await import("electron");
+
+        const service = new ApplicationService();
+        await service.cleanup();
+
+        expect(app.off).toHaveBeenCalledWith("ready", expect.any(Function));
+        expect(app.off).toHaveBeenCalledWith(
+            "window-all-closed",
+            expect.any(Function)
+        );
+        expect(app.off).toHaveBeenCalledWith("activate", expect.any(Function));
+        expect(serviceContainerMocks.ipcService.cleanup).toHaveBeenCalledTimes(
+            1
+        );
+        expect(
+            serviceContainerMocks.orchestrator.stopMonitoring
+        ).toHaveBeenCalledTimes(1);
+        expect(
+            serviceContainerMocks.windowService.closeMainWindow
+        ).toHaveBeenCalledTimes(1);
+        expect(
+            serviceContainerMocks.initializedDatabaseService.close
+        ).toHaveBeenCalledTimes(1);
     });
     it("should handle service container integration", async ({
         task,
@@ -204,14 +271,16 @@ describe("ApplicationService Coverage Tests", () => {
         const { ApplicationService } =
             await import("../../../services/application/ApplicationService");
 
-        try {
-            const service = new ApplicationService();
+        const service = new ApplicationService();
 
-            // Try operations that might fail
-            await service.cleanup();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        await service.cleanup();
+
+        expect(serviceContainerMocks.ipcService.cleanup).toHaveBeenCalledTimes(
+            1
+        );
+        expect(
+            serviceContainerMocks.orchestrator.stopMonitoring
+        ).toHaveBeenCalledTimes(1);
     });
     it("should exercise constructor logic", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -242,17 +311,23 @@ describe("ApplicationService Coverage Tests", () => {
         const { ApplicationService } =
             await import("../../../services/application/ApplicationService");
 
-        try {
-            const service = new ApplicationService();
+        const service = new ApplicationService();
 
-            // Test cleanup multiple times to test edge cases
-            await service.cleanup();
-            await service.cleanup(); // Should handle being called twice
+        await service.cleanup();
+        await service.cleanup();
 
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        expect(serviceContainerMocks.ipcService.cleanup).toHaveBeenCalledTimes(
+            2
+        );
+        expect(
+            serviceContainerMocks.orchestrator.stopMonitoring
+        ).toHaveBeenCalledTimes(2);
+        expect(
+            serviceContainerMocks.windowService.closeMainWindow
+        ).toHaveBeenCalledTimes(2);
+        expect(
+            serviceContainerMocks.initializedDatabaseService.close
+        ).toHaveBeenCalledTimes(2);
     });
     it("should handle service coordination", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -263,18 +338,29 @@ describe("ApplicationService Coverage Tests", () => {
         const { ApplicationService } =
             await import("../../../services/application/ApplicationService");
 
-        try {
-            const service = new ApplicationService();
+        const { ServiceContainer } =
+            await import("../../../services/ServiceContainer");
 
-            // Test service coordination
-            expect(service).toBeInstanceOf(ApplicationService);
+        const service = new ApplicationService();
 
-            // Try cleanup to test service interactions
-            await service.cleanup();
+        expect(service).toBeInstanceOf(ApplicationService);
+        expect(ServiceContainer.getInstance).toHaveBeenCalledWith({
+            enableDebugLogging: expect.any(Boolean),
+        });
 
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        await service.cleanup();
+
+        expect(
+            serviceContainerMocks.serviceContainer.getInitializedServices
+        ).toHaveBeenCalledTimes(1);
+        expect(
+            serviceContainerMocks.serviceContainer.getIpcService
+        ).toHaveBeenCalledTimes(1);
+        expect(
+            serviceContainerMocks.serviceContainer.getUptimeOrchestrator
+        ).toHaveBeenCalled();
+        expect(
+            serviceContainerMocks.serviceContainer.getWindowService
+        ).toHaveBeenCalled();
     });
 });
