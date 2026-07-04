@@ -472,6 +472,41 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             );
             expect(Object.hasOwn(receivedData, "_originalMeta")).toBeFalsy();
         });
+        it("should not invoke accessor-backed object fields during clone fallback", async () => {
+            eventBus.onTyped("object-event", mockListener);
+
+            const prototype = { inherited: true };
+            const callback = vi.fn();
+            const getter = vi.fn(() => {
+                throw new Error("Unexpected computed getter access");
+            });
+            const testData = {
+                callback,
+                data: "test",
+                nested: { value: 123 },
+            };
+            Object.setPrototypeOf(testData, prototype);
+            Object.defineProperty(testData, "computed", {
+                configurable: true,
+                enumerable: true,
+                get: getter,
+            });
+
+            await eventBus.emitTyped("object-event", testData as any);
+
+            expect(getter).not.toHaveBeenCalled();
+            const receivedData = mockListener.mock.calls[0]?.[0];
+            expect(Object.getPrototypeOf(receivedData)).toBe(prototype);
+            expect(receivedData).toEqual(
+                expect.objectContaining({
+                    callback,
+                    data: "test",
+                    nested: { value: 123 },
+                    _meta: expect.any(Object),
+                })
+            );
+            expect(Object.hasOwn(receivedData, "computed")).toBeFalsy();
+        });
         it("should handle arrays correctly", async () => {
             eventBus.onTyped("array-event", mockListener);
 
@@ -499,6 +534,38 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             expect(
                 Object.propertyIsEnumerable.call(receivedData, "_meta")
             ).toBeFalsy();
+        });
+        it("should not invoke accessor-backed array entries during clone fallback", async () => {
+            eventBus.onTyped("array-event", mockListener);
+
+            const callback = vi.fn();
+            const getter = vi.fn(() => {
+                throw new Error("Unexpected array entry getter access");
+            });
+            const testArray: unknown[] = [callback];
+            testArray.length = 3;
+            Object.defineProperty(testArray, "1", {
+                configurable: true,
+                enumerable: true,
+                get: getter,
+            });
+            Object.defineProperty(testArray, "2", {
+                configurable: true,
+                enumerable: true,
+                value: 3,
+                writable: true,
+            });
+
+            await eventBus.emitTyped("array-event", testArray as any);
+
+            expect(getter).not.toHaveBeenCalled();
+            const receivedData = mockListener.mock.calls[0]?.[0];
+            expect(Array.isArray(receivedData)).toBeTruthy();
+            expect(receivedData).toHaveLength(3);
+            expect(receivedData[0]).toBe(callback);
+            expect(Object.hasOwn(receivedData, "1")).toBeFalsy();
+            expect(receivedData[2]).toBe(3);
+            expect(receivedData._meta).toEqual(expect.any(Object));
         });
         it("should handle complex objects correctly", async () => {
             eventBus.onTyped("complex-object", mockListener);

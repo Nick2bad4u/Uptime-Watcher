@@ -113,14 +113,31 @@ export const attachOriginalMetadata: <TPayload extends object>(
 export function cloneArrayPayload<TPayload extends ArrayPayload>(
     payload: TPayload
 ): TPayload {
-    const structuredCloneResult = tryStructuredClone(payload);
-    if (isDefined(structuredCloneResult)) {
-        return structuredCloneResult;
+    if (!hasOwnAccessorProperties(payload)) {
+        const structuredCloneResult = tryStructuredClone(payload);
+        if (isDefined(structuredCloneResult)) {
+            return structuredCloneResult;
+        }
     }
 
     // Fall back to manual cloning for non-cloneable payload entries (e.g.
     // functions).
-    return castUnchecked<TPayload>([...payload]);
+    const clone: unknown[] = [];
+    clone.length = payload.length;
+    for (const key of Reflect.ownKeys(payload)) {
+        if (!isArrayIndexKey(key)) {
+            continue;
+        }
+
+        const descriptor = Object.getOwnPropertyDescriptor(payload, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        defineDataProperty(clone, key, descriptor.value);
+    }
+
+    return castUnchecked<TPayload>(clone);
 }
 
 /**
@@ -133,13 +150,67 @@ export function cloneArrayPayload<TPayload extends ArrayPayload>(
 export function cloneObjectPayload<TPayload extends NonArrayObjectPayload>(
     payload: TPayload
 ): TPayload {
-    const structuredCloneResult = tryStructuredClone(payload);
-    if (isDefined(structuredCloneResult)) {
-        return structuredCloneResult;
+    if (!hasOwnAccessorProperties(payload)) {
+        const structuredCloneResult = tryStructuredClone(payload);
+        if (isDefined(structuredCloneResult)) {
+            return structuredCloneResult;
+        }
     }
 
     const prototype = Reflect.getPrototypeOf(payload) ?? Object.prototype;
-    const clone: NonArrayObjectPayload = { ...payload };
-    Reflect.setPrototypeOf(clone, prototype);
+    const clone = castUnchecked<NonArrayObjectPayload>(
+        Object.create(prototype)
+    );
+    for (const key of Reflect.ownKeys(payload)) {
+        const descriptor = Object.getOwnPropertyDescriptor(payload, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        defineDataProperty(clone, key, descriptor.value);
+    }
+
     return castUnchecked<TPayload>(clone);
+}
+
+function hasOwnAccessorProperties(value: object): boolean {
+    for (const key of Reflect.ownKeys(value)) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (
+            descriptor &&
+            ("get" in descriptor || "set" in descriptor) &&
+            !("value" in descriptor)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function defineDataProperty(
+    target: object,
+    key: PropertyKey,
+    value: unknown
+): void {
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
+}
+
+function isArrayIndexKey(key: PropertyKey): key is `${number}` {
+    if (typeof key !== "string" || key.length === 0) {
+        return false;
+    }
+
+    const index = Number(key);
+    return (
+        Number.isInteger(index) &&
+        index >= 0 &&
+        index < 4_294_967_295 &&
+        String(index) === key
+    );
 }
