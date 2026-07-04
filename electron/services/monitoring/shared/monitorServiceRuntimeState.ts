@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
 
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { isDefined } from "ts-extras";
 
 import type { MonitorServiceConfig } from "../types";
@@ -31,10 +32,11 @@ export function createMonitorServiceRuntimeState(args: {
     readonly defaultTimeoutMs: number;
     readonly defaultUserAgent?: string;
 }): MonitorServiceRuntimeState {
+    const configOverrides = safeObjectOmit(args.config, []);
     const config: MonitorServiceConfig = {
         timeout: args.defaultTimeoutMs,
         ...(args.defaultUserAgent && { userAgent: args.defaultUserAgent }),
-        ...args.config,
+        ...configOverrides,
     };
 
     return {
@@ -53,7 +55,11 @@ export function updateMonitorServiceRuntimeState(args: {
     readonly update: Partial<MonitorServiceConfig>;
 }): MonitorServiceRuntimeState {
     // Treat `undefined` as "not provided" (do not overwrite existing config).
-    const update: Partial<MonitorServiceConfig> = { ...args.update };
+    const currentConfig = safeObjectOmit(args.currentConfig, []);
+    const update: Partial<MonitorServiceConfig> = safeObjectOmit(
+        args.update,
+        []
+    );
     if (!isDefined(update.timeout)) {
         delete update.timeout;
     }
@@ -64,7 +70,7 @@ export function updateMonitorServiceRuntimeState(args: {
     const merged: MonitorServiceConfig = {
         timeout: args.defaultTimeoutMs,
         ...(args.defaultUserAgent && { userAgent: args.defaultUserAgent }),
-        ...args.currentConfig,
+        ...currentConfig,
         ...update,
     };
 
