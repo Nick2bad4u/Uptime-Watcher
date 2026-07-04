@@ -1,4 +1,3 @@
-/* eslint-disable */
 // Pause debugger after delay with options for interactive element inspection
 (function () {
     const delayMs = 5000; // milliseconds before debugger pauses

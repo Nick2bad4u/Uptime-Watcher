@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Add Test Sites - Creates one site for each monitor type
  *

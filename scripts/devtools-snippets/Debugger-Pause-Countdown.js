@@ -1,4 +1,3 @@
-/* eslint-disable */
 (function () {
     const delayMs = 5000;
     let remaining = delayMs / 1000;

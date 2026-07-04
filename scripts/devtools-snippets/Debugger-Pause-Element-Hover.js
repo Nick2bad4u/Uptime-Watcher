@@ -1,4 +1,3 @@
-/* eslint-disable */
 (function () {
     const selector = ".your-hover-element"; // Change to your target selector
 

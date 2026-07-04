@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Add Minimal Test Sites - Adds 3 basic sites for quick testing
  */

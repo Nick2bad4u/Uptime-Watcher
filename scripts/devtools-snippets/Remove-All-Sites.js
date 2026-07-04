@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Remove All Sites - Deletes all sites from the database
  *

@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * List All Sites - Displays all sites and their monitors
  */
