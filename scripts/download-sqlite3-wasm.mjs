@@ -25,6 +25,10 @@ const destDir = path.resolve(__dirname, "../dist");
 const dest = path.join(destDir, "node-sqlite3-wasm.wasm");
 const scriptsDir = path.resolve(__dirname, "../assets");
 const scriptsDest = path.join(scriptsDir, "node-sqlite3-wasm.wasm");
+const packageDest = path.resolve(
+    __dirname,
+    "../node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm"
+);
 
 // Ensure dist directory exists
 if (!fs.existsSync(destDir)) {
@@ -130,6 +134,44 @@ function verifyHash(actualHash, expectedHash) {
 function verifyNonPlaceholderHash() {
     // This function is no longer needed since we handle undefined hashes gracefully
     return true;
+}
+
+/**
+ * @param {string} sourcePath
+ * @param {string} targetPath
+ */
+function copyWasmFile(sourcePath, targetPath) {
+    fs.copyFileSync(sourcePath, targetPath);
+    console.log(`[wasm-download] Copied ${sourcePath} to ${targetPath}`);
+}
+
+/**
+ * Keep local WASM copies synchronized without contacting the network.
+ *
+ * @returns {boolean} True when a local source was found.
+ */
+function ensureLocalWasmAvailable() {
+    if (fs.existsSync(scriptsDest)) {
+        if (!fs.existsSync(dest)) {
+            copyWasmFile(scriptsDest, dest);
+        } else {
+            console.log(`[wasm-download] WASM file already exists: ${dest}`);
+        }
+        return true;
+    }
+
+    if (fs.existsSync(dest)) {
+        copyWasmFile(dest, scriptsDest);
+        return true;
+    }
+
+    if (fs.existsSync(packageDest)) {
+        copyWasmFile(packageDest, dest);
+        copyWasmFile(packageDest, scriptsDest);
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -405,20 +447,10 @@ async function main() {
         }
     }
 
-    // Check if files exist and handle accordingly
-    if (fs.existsSync(dest) && !forceDownload && noUpdate) {
-        console.log("WASM file already exists:", dest);
-        // Also check if it exists in scripts and copy if needed
-        if (!fs.existsSync(scriptsDest)) {
-            fs.copyFileSync(dest, scriptsDest);
-            console.log(
-                "Copied existing file to scripts directory:",
-                scriptsDest
-            );
-        } else {
-            console.log(
-                "WASM file also exists in scripts directory:",
-                scriptsDest
+    if (noUpdate && !forceDownload) {
+        if (!ensureLocalWasmAvailable()) {
+            failAndExit(
+                "No local node-sqlite3-wasm.wasm found. Run npm run sqlite:download:force to fetch it explicitly."
             );
         }
         process.exit(0);
