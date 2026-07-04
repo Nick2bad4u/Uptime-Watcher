@@ -1,4 +1,4 @@
-/* eslint-disable array-func/from-map, n/no-process-env  -- Disable specific rules for build configs */
+/* eslint-disable array-func/from-map -- Disable specific rules for build configs */
 /**
  * Vite configuration for the Uptime Watcher Electron application. Configures
  * React frontend build and Electron main/preload process compilation.
@@ -60,10 +60,11 @@ const dirname = (() => {
     }
 })();
 const VITE_BUILD_TARGET = "esnext";
+const runtimeEnv = globalThis.process.env;
 
 const getConfigEnvironmentVariable = (key: string): string | undefined => {
     try {
-        const value = process.env[key];
+        const value = runtimeEnv[key];
         return typeof value === "string" ? value : undefined;
     } catch {
         return undefined;
@@ -886,7 +887,9 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             },
             env: {
                 NODE_ENV: "test",
-                PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
+                PACKAGE_VERSION:
+                    getConfigEnvironmentVariable("PACKAGE_VERSION") ??
+                    "unknown",
             },
             environment: "jsdom", // Default for React components
             // Test file patterns - exclude electron tests as they have their own config
@@ -924,8 +927,8 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             maxWorkers: Math.max(
                 1,
                 Number(
-                    process.env["MAX_THREADS"] ??
-                        (process.env["CI"] ? "1" : "8")
+                    getConfigEnvironmentVariable("MAX_THREADS") ??
+                        (getConfigEnvironmentVariable("CI") ? "1" : "8")
                 )
             ),
             name: {
@@ -995,4 +998,4 @@ const definedViteConfig: UserConfigFnObject = defineConfig(viteConfig);
 
 export default definedViteConfig;
 
-/* eslint-enable array-func/from-map, n/no-process-env -- Re-enable after Vite build config definitions. */
+/* eslint-enable array-func/from-map -- Re-enable after Vite build config definitions. */
