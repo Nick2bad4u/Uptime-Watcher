@@ -26,7 +26,7 @@ default_install_hook_types:
     - "commit-msg"
 
 default_language_version:
-    node: "20.11.0" # LTS version for consistency
+    node: "25.8.1" # Match .node-version/.nvmrc for consistency
 
     python: "python3"
 # Global configuration
@@ -69,7 +69,7 @@ repos:
 
     # Biome for JavaScript/TypeScript formatting and linting
     - hooks:
-          - additional_dependencies: ["@biomejs/biome@1.9.4"]
+          - additional_dependencies: ["@biomejs/biome@2.4.14"]
             args: ["--write", "--unsafe"]
             id: "biome-check"
             name: "🟨 typescript/react · Format, lint & safe fixes"
