@@ -1,5 +1,4 @@
-// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- messy
-/* eslint-disable perfectionist/sort-objects -- messy */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair, perfectionist/sort-objects -- PostCSS plugin order is semantic: imports and Tailwind must run before functional transforms, and optimization/minification plugins must stay last. */
 
 /**
  * PostCSS configuration for the Uptime Watcher application.
