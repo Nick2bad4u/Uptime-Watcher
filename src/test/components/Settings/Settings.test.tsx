@@ -702,7 +702,7 @@ describe("Settings Component", () => {
         expect(container).toBeInTheDocument();
     });
 
-    it("should handle component unmounting during async operations", ({
+    it("should handle component unmounting during async operations", async ({
         task,
         annotate,
     }) => {
@@ -711,24 +711,18 @@ describe("Settings Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: Settings", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
         const { unmount } = render(<Settings onClose={mockOnClose} />);
 
-        // Trigger an async operation
         const syncButton = screen.getByRole("button", {
             name: /refresh history/i,
         });
         fireEvent.click(syncButton);
 
-        // Unmount component
         unmount();
 
-        // Should not throw errors
-        expect(true).toBeTruthy();
+        await waitFor(() => {
+            expect(mockSitesStore.fullResyncSites).toHaveBeenCalledTimes(1);
+        });
     });
 
     it("previews the alert tone when the volume slider changes", async () => {

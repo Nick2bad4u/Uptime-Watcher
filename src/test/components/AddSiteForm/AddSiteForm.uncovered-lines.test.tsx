@@ -149,6 +149,9 @@ const mockCreateSite = vi.fn();
 const mockSetFormError = vi.fn();
 const mockClearError = vi.fn();
 const mockOnSuccess = vi.fn();
+const mockSetHost = vi.fn();
+const mockSetPort = vi.fn();
+const mockSetUrl = vi.fn();
 
 vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => ({
@@ -160,7 +163,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         name: "Mock Site",
         setName: vi.fn(),
         url: "",
-        setUrl: vi.fn(),
+        setUrl: mockSetUrl,
         monitorType: "http",
         setMonitorType: mockSetMonitorType,
         checkIntervalMs: 60_000,
@@ -168,9 +171,9 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         selectedExistingSite: "",
         setSelectedExistingSite: vi.fn(),
         host: "",
-        setHost: vi.fn(),
+        setHost: mockSetHost,
         port: "",
-        setPort: vi.fn(),
+        setPort: mockSetPort,
         siteIdentifier: "",
         description: "",
         setDescription: vi.fn(),
@@ -211,6 +214,7 @@ vi.mock("../../../hooks/useDynamicHelpText", () => ({
 // Mock the component fields to intercept user interactions
 type SelectOption = Readonly<{ label: string; value: string }>;
 type ChangeStringHandler = (nextValue: string) => void;
+type ChangeFieldHandler = (nextValue: number | string) => void;
 
 type SelectFieldMockProperties = Readonly<{
     id: string;
@@ -283,16 +287,28 @@ vi.mock("../../../components/AddSiteForm/TextField", () => ({
 
 type DynamicMonitorFieldsMockProperties = Readonly<{
     monitorType: string;
+    onChange: Readonly<Record<string, ChangeFieldHandler>>;
 }>;
 
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({
     DynamicMonitorFields: ({
         monitorType: _monitorType,
+        onChange,
     }: DynamicMonitorFieldsMockProperties) => (
         <div data-testid="dynamic-monitor-fields">
-            <input data-testid="host" />
-            <input data-testid="port" type="number" />
-            <input data-testid="url" />
+            <input
+                data-testid="host"
+                onChange={(event) => onChange["host"]?.(event.target.value)}
+            />
+            <input
+                data-testid="port"
+                onChange={(event) => onChange["port"]?.(event.target.value)}
+                type="number"
+            />
+            <input
+                data-testid="url"
+                onChange={(event) => onChange["url"]?.(event.target.value)}
+            />
         </div>
     ),
 }));
@@ -498,14 +514,8 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: AddSiteForm.uncovered-lines", "component");
-        annotate("Category: Component", "category");
-        annotate("Type: Business Logic", "type");
-
         render(<AddSiteForm onSuccess={mockOnSuccess} />);
 
-        // Test dynamic field changes for different monitor types
         const hostField = screen.getByTestId("host");
         const portField = screen.getByTestId("port");
         const urlField = screen.getByTestId("url");
@@ -514,10 +524,10 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         fireEvent.change(portField, { target: { value: "8080" } });
         fireEvent.change(urlField, { target: { value: "https://test.com" } });
 
-        // These should trigger the handleDynamicFieldChange methods
         await waitFor(() => {
-            // Verify the handlers were called (through mocked setters)
-            expect(true).toBeTruthy(); // The actual validation depends on mocked setter calls
+            expect(mockSetHost).toHaveBeenCalledWith("test-host");
+            expect(mockSetPort).toHaveBeenCalledWith("8080");
+            expect(mockSetUrl).toHaveBeenCalledWith("https://test.com");
         });
     });
 
