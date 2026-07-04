@@ -15,6 +15,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Promisable } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import {
     isDefined,
     isEmpty,
@@ -474,18 +475,24 @@ export class SiteWriterService {
             async () => {
                 // Validate input
                 const site = this.validateSiteExists(sitesCache, identifier);
+                const sanitizedUpdates = safeObjectOmit(updates, [
+                    "identifier",
+                ]);
 
                 // Create updated site object without updating cache yet
-                const normalizedMonitors = updates.monitors
-                    ? this.normalizeMonitorsForPersistence(updates.monitors, {
-                          existingMonitors: site.monitors,
-                          siteIdentifier: identifier,
-                      })
+                const normalizedMonitors = sanitizedUpdates.monitors
+                    ? this.normalizeMonitorsForPersistence(
+                          sanitizedUpdates.monitors,
+                          {
+                              existingMonitors: site.monitors,
+                              siteIdentifier: identifier,
+                          }
+                      )
                     : site.monitors;
 
                 const updatedSite: Site = {
                     ...site,
-                    ...updates,
+                    ...sanitizedUpdates,
                     monitors: normalizedMonitors,
                 };
 
@@ -494,7 +501,7 @@ export class SiteWriterService {
                     ({ monitorTx, siteTx }) => {
                         siteTx.upsert(updatedSite);
 
-                        if (updates.monitors) {
+                        if (sanitizedUpdates.monitors) {
                             this.updateMonitorsPreservingHistory(
                                 monitorTx,
                                 identifier,

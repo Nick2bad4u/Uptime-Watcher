@@ -636,6 +636,52 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitoring).toBeTruthy();
         });
 
+        it("should ignore accessor-backed and identity update fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const nameGetter = vi.fn(() => {
+                throw new Error("name getter should not run");
+            });
+            const updates: Partial<Site> = { monitoring: true };
+
+            Object.defineProperty(updates, "identifier", {
+                enumerable: true,
+                value: "different-site",
+            });
+            Object.defineProperty(updates, "name", {
+                enumerable: true,
+                get: nameGetter,
+            });
+
+            const result = await siteWriterService.updateSite(
+                mockSitesCache,
+                "test-site",
+                updates
+            );
+
+            const upsertMock = siteAdapter.upsert as MockedFunction<
+                SiteRepositoryTransactionAdapter["upsert"]
+            >;
+            const upsertedSite = upsertMock.mock.calls[0]?.[0] as Site;
+
+            expect(nameGetter).not.toHaveBeenCalled();
+            expect(result.identifier).toBe("test-site");
+            expect(result.name).toBe("Test Site");
+            expect(result.monitoring).toBeTruthy();
+            expect(upsertedSite.identifier).toBe("test-site");
+            expect(upsertedSite.name).toBe("Test Site");
+            expect(upsertedSite.monitoring).toBeTruthy();
+        });
+
         it("should normalize invalid monitor configuration during update", async ({
             task,
             annotate,

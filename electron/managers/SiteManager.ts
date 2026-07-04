@@ -57,6 +57,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { objectKeys } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -611,11 +612,12 @@ export class SiteManager {
         if (!originalSite) {
             throw new Error(`Site with identifier ${identifier} not found`);
         }
+        const sanitizedUpdates = safeObjectOmit(updates, ["identifier"]);
 
         // Validate the merged site data before persisting changes
         const mergedSite = {
             ...originalSite,
-            ...updates,
+            ...sanitizedUpdates,
         };
         await this.validateSite(mergedSite);
 
@@ -626,16 +628,16 @@ export class SiteManager {
         const updatedSite = await this.siteWriterService.updateSite(
             this.sitesCache,
             identifier,
-            updates
+            sanitizedUpdates
         );
 
         // Handle monitoring changes if monitors were updated (replaces
         // orchestrator logic)
-        if (updates.monitors) {
+        if (sanitizedUpdates.monitors) {
             await this.siteWriterService.handleMonitorIntervalChanges(
                 identifier,
                 originalSite,
-                updates.monitors,
+                sanitizedUpdates.monitors,
                 monitoringConfig
             );
 
@@ -643,7 +645,7 @@ export class SiteManager {
             // site behavior
             const newMonitorIds = this.siteWriterService.detectNewMonitors(
                 originalSite.monitors,
-                updates.monitors
+                sanitizedUpdates.monitors
             );
             if (newMonitorIds.length > 0) {
                 await monitoringConfig.setupNewMonitors(
@@ -678,7 +680,7 @@ export class SiteManager {
             previousSite: originalSite,
             site: refreshedSite,
             timestamp,
-            updatedFields: objectKeys(updates),
+            updatedFields: objectKeys(sanitizedUpdates),
         });
 
         return refreshedSite;

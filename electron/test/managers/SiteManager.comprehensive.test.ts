@@ -1104,6 +1104,67 @@ describe("SiteManager - Comprehensive", () => {
             );
         });
 
+        it("should ignore accessor-backed and identity update fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Security", "type");
+
+            const mockCache = siteManager["sitesCache"];
+            const mockSiteWriterService = siteManager["siteWriterService"];
+            const monitorsGetter = vi.fn(() => {
+                throw new Error("monitors getter should not run");
+            });
+            const updates: Partial<Site> = { monitoring: false };
+            const updatedSite = { ...mockSite, monitoring: false };
+
+            Object.defineProperty(updates, "identifier", {
+                enumerable: true,
+                value: "different-site",
+            });
+            Object.defineProperty(updates, "monitors", {
+                enumerable: true,
+                get: monitorsGetter,
+            });
+
+            vi.mocked(mockCache.get)
+                .mockReturnValueOnce(mockSite)
+                .mockReturnValueOnce(updatedSite);
+            vi.mocked(mockSiteWriterService.updateSite).mockResolvedValue(
+                updatedSite
+            );
+            vi.mocked(
+                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            ).mockResolvedValue([updatedSite]);
+
+            const result = await siteManager.updateSite("site-1", updates);
+
+            expect(monitorsGetter).not.toHaveBeenCalled();
+            expect(mockSiteWriterService.updateSite).toHaveBeenCalledWith(
+                mockCache,
+                "site-1",
+                expect.objectContaining({ monitoring: false })
+            );
+            expect(
+                mockSiteWriterService.handleMonitorIntervalChanges
+            ).not.toHaveBeenCalled();
+            expect(result).toEqual(updatedSite);
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:updated",
+                expect.objectContaining({
+                    identifier: "site-1",
+                    site: expect.objectContaining({
+                        identifier: "site-1",
+                        monitoring: false,
+                    }),
+                    updatedFields: ["monitoring"],
+                })
+            );
+        });
+
         it("should handle site not found", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
