@@ -22,7 +22,7 @@ describe("pathGuards (strict coverage)", () => {
             await import("../../../../../../electron/services/window/utils/pathGuards");
 
         const input = "/tmp/SomePath";
-        const expected = path.resolve(input);
+        const expected = path.posix.resolve(input);
 
         expect(normalizePathForComparison(input, "linux")).toBe(expected);
     });

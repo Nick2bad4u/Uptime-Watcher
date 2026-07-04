@@ -257,7 +257,11 @@ describe("monitorManagerEnhancedLifecycle", () => {
             });
 
             expect(harness.logger.info).toHaveBeenCalledWith(
-                "Starting monitoring across 1 sites (enhanced system)"
+                "Starting monitoring across sites",
+                {
+                    mode: "enhanced",
+                    siteCount: 1,
+                }
             );
             expect(harness.logger.warn).toHaveBeenCalledWith(
                 "[MonitorManager] Global monitoring started with partial failures",
@@ -442,9 +446,9 @@ describe("monitorManagerEnhancedLifecycle", () => {
             });
 
             expect(result).toBeFalsy();
-            expect(harness.logger.warn).toHaveBeenCalledWith(
-                "Site not found: missing"
-            );
+            expect(harness.logger.warn).toHaveBeenCalledWith("Site not found", {
+                identifier: "missing",
+            });
         });
 
         it("rejects monitors without valid intervals when monitorId supplied", async () => {
@@ -464,7 +468,11 @@ describe("monitorManagerEnhancedLifecycle", () => {
 
             expect(result).toBeFalsy();
             expect(harness.logger.warn).toHaveBeenCalledWith(
-                "Monitor zeta:broken has no valid check interval set"
+                "Monitor has no valid check interval set",
+                {
+                    identifier: "zeta",
+                    monitorId: "broken",
+                }
             );
             expect(harness.checker.startMonitoring).not.toHaveBeenCalled();
         });
@@ -537,8 +545,13 @@ describe("monitorManagerEnhancedLifecycle", () => {
 
             expect(result).toBeFalsy();
             expect(harness.logger.error).toHaveBeenCalledWith(
-                "Enhanced start failed for iota:explode",
-                failure
+                "Enhanced monitor toggle failed",
+                failure,
+                {
+                    identifier: "iota",
+                    kind: "start",
+                    monitorId: "explode",
+                }
             );
         });
 
@@ -605,9 +618,9 @@ describe("monitorManagerEnhancedLifecycle", () => {
             });
 
             expect(result).toBeFalsy();
-            expect(harness.logger.warn).toHaveBeenCalledWith(
-                "Site not found: missing"
-            );
+            expect(harness.logger.warn).toHaveBeenCalledWith("Site not found", {
+                identifier: "missing",
+            });
         });
 
         it("cleans up monitor state and scheduler when checker confirms stop", async () => {
@@ -678,8 +691,13 @@ describe("monitorManagerEnhancedLifecycle", () => {
 
             expect(result).toBeFalsy();
             expect(harness.logger.error).toHaveBeenCalledWith(
-                "Enhanced stop failed for omicron:errant",
-                error
+                "Enhanced monitor toggle failed",
+                error,
+                {
+                    identifier: "omicron",
+                    kind: "stop",
+                    monitorId: "errant",
+                }
             );
         });
 

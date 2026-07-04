@@ -148,7 +148,8 @@ describe("databaseService strict coverage", () => {
         const logger = getLoggerMock();
 
         expect(logger.info).toHaveBeenCalledWith(
-            `[DatabaseService] Initializing SQLite DB at: ${db!.path}`
+            "[DatabaseService] Initializing SQLite DB",
+            { dbPath: db!.path }
         );
 
         const secondConnection = service.initialize();
@@ -358,7 +359,9 @@ describe("databaseService strict coverage", () => {
             service.executeTransaction(async () => {
                 throw new Error("intermediate failure");
             })
-        ).rejects.toThrow("intermediate failure");
+        ).rejects.toThrow(
+            "[DatabaseService] Transaction failed and rollback failed"
+        );
 
         const logger = getLoggerMock();
 

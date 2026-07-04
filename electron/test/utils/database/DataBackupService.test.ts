@@ -917,17 +917,21 @@ describe(DataBackupService, () => {
                 "/test/userdata",
                 "uptime-watcher.sqlite"
             );
-            expect(mockFsPromises.rename).toHaveBeenCalledWith(
-                `${expectedDbPath}-wal`,
-                expect.stringMatching(
-                    /uptime-watcher\.sqlite\.rollback-\d+-wal$/v
-                )
-            );
-            expect(mockFsPromises.rename).toHaveBeenCalledWith(
-                `${expectedDbPath}-shm`,
-                expect.stringMatching(
-                    /uptime-watcher\.sqlite\.rollback-\d+-shm$/v
-                )
+            expect(mockFsPromises.rename.mock.calls).toEqual(
+                expect.arrayContaining([
+                    [
+                        `${expectedDbPath}-wal`,
+                        expect.stringMatching(
+                            /uptime-watcher\.sqlite\.rollback-[\-0-9a-f]+-wal$/v
+                        ),
+                    ],
+                    [
+                        `${expectedDbPath}-shm`,
+                        expect.stringMatching(
+                            /uptime-watcher\.sqlite\.rollback-[\-0-9a-f]+-shm$/v
+                        ),
+                    ],
+                ])
             );
             expect(mockDatabaseService.initialize).toHaveBeenCalled();
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(

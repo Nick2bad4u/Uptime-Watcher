@@ -36,10 +36,10 @@ describe("monitorFactoryUtils.buildMonitorFactory", () => {
         } catch (error) {
             const normalized = error as Error;
 
-            expect(normalized).toBe(thrownError);
             expect(normalized.message).toBe(
                 "Failed to initialise Ping Monitor: socket timeout"
             );
+            expect(normalized.cause).toBe(thrownError);
         }
     });
 
@@ -59,11 +59,9 @@ describe("monitorFactoryUtils.buildMonitorFactory", () => {
             buildMonitorFactory(() => {
                 throw "boom";
             }, "SSL Monitor")
-        ).toThrow(normalizedError);
+        ).toThrow("Failed to initialise SSL Monitor: string failure");
 
         expect(ensureErrorSpy).toHaveBeenCalledTimes(1);
-        expect(normalizedError.message).toBe(
-            "Failed to initialise SSL Monitor: string failure"
-        );
+        expect(normalizedError.message).toBe("string failure");
     });
 });

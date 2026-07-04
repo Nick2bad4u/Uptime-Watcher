@@ -377,7 +377,7 @@ describe("DatabaseManager - 100% Coverage", () => {
             const mockHistoryLimit = 750;
             (
                 mockSettingsRepository.get as MockedFunction<any>
-            ).mockResolvedValue(mockHistoryLimit);
+            ).mockResolvedValue(String(mockHistoryLimit));
             const mockLoadSites = vi
                 .spyOn(databaseManager as any, "loadSites")
                 .mockResolvedValue(undefined);

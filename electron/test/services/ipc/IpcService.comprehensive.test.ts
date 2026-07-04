@@ -55,6 +55,10 @@ vi.mock("electron", () => ({
     },
 }));
 
+vi.mock("../../../electronUtils", () => ({
+    isDev: vi.fn(() => true),
+}));
+
 // Mock logger
 vi.mock("../../../utils/logger", () => {
     const createLoggerMock = () => ({

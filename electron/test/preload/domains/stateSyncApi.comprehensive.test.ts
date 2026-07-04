@@ -15,6 +15,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { IpcResponse } from "../../../preload/core/bridgeFactory";
 
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     stateSyncApi,
     type StateSyncApiInterface,
@@ -262,7 +264,7 @@ describe("State Sync Domain API", () => {
                         lastSyncAt: fc.option(
                             fc.integer({
                                 min: 0,
-                                max: Number.MAX_SAFE_INTEGER,
+                                max: MAX_VALID_DATE_EPOCH_MS,
                             }),
                             { nil: null }
                         ),
@@ -363,12 +365,19 @@ describe("State Sync Domain API", () => {
                     async (error) => {
                         mockIpcRenderer.invoke.mockRejectedValue(error);
 
-                        await expect(api.getSyncStatus()).rejects.toThrow(
-                            error.message
+                        const expectedDetail = getUserFacingErrorDetail(error);
+
+                        await expect(api.getSyncStatus()).rejects.toMatchObject(
+                            {
+                                message:
+                                    expect.stringContaining(expectedDetail),
+                            }
                         );
-                        await expect(api.requestFullSync()).rejects.toThrow(
-                            error.message
-                        );
+                        await expect(
+                            api.requestFullSync()
+                        ).rejects.toMatchObject({
+                            message: expect.stringContaining(expectedDetail),
+                        });
                     }
                 ),
                 { numRuns: 10 }
