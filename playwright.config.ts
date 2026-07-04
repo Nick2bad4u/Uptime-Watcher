@@ -2,13 +2,17 @@ import type { PlaywrightTestConfig } from "@playwright/test";
 
 import { defineConfig, devices } from "@playwright/test";
 
+const runtimeEnv =
+    typeof globalThis.process === "undefined"
+        ? undefined
+        : globalThis.process.env;
+
 const readEnv = (key: string): string | undefined => {
-    if (typeof process === "undefined") {
+    if (!runtimeEnv) {
         return undefined;
     }
 
-    // eslint-disable-next-line n/no-process-env -- central env accessor
-    return process.env[key];
+    return runtimeEnv[key];
 };
 
 const coerceEnvFlag = (value: string | undefined): boolean => {
