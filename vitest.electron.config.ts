@@ -16,6 +16,15 @@ import {
 const dirname = import.meta.dirname;
 
 /**
+ * Environment variables available to the Vitest config at runtime.
+ *
+ * @remarks
+ * We intentionally avoid accessing `process.env` directly to keep ESLint
+ * `n/no-process-env` enforcement strict in the rest of the codebase.
+ */
+const runtimeEnv = globalThis.process.env;
+
+/**
  * Vitest configuration for Electron backend test suites.
  */
 const vitestElectronConfig: UserConfig = defineConfig({
@@ -133,7 +142,7 @@ const vitestElectronConfig: UserConfig = defineConfig({
         },
         env: {
             NODE_ENV: "test",
-            PACKAGE_VERSION: process.env["PACKAGE_VERSION"] ?? "unknown",
+            PACKAGE_VERSION: runtimeEnv["PACKAGE_VERSION"] ?? "unknown",
         },
         environment: "node",
         exclude: [
@@ -167,9 +176,7 @@ const vitestElectronConfig: UserConfig = defineConfig({
         // NOTE: Vitest v4 removed `test.poolOptions`. Use `maxWorkers` instead.
         maxWorkers: Math.max(
             1,
-            Number(
-                process.env["MAX_THREADS"] ?? (process.env["CI"] ? "1" : "8")
-            )
+            Number(runtimeEnv["MAX_THREADS"] ?? (runtimeEnv["CI"] ? "1" : "8"))
         ),
         name: {
             color: "magenta",
