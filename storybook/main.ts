@@ -14,6 +14,9 @@ import {
     storybookCoverageIncludeGlobs,
 } from "./viteSharedConfig.ts";
 
+const runtimeEnv = globalThis.process.env;
+const readStorybookEnv = (key: string): string | undefined => runtimeEnv[key];
+
 /**
  * Storybook 9 migration reference:
  *
@@ -44,11 +47,12 @@ const coverageOptions: AddonOptionsVite = {
  * UI).
  */
 const isTestMode = (): boolean =>
-    process.env["VITEST"] === "true" ||
-    process.env["NODE_ENV"] === "test" ||
+    readStorybookEnv("VITEST") === "true" ||
+    readStorybookEnv("NODE_ENV") === "test" ||
     process.argv.includes("--test");
 
-const isCoverageMode = (): boolean => process.env["VITE_COVERAGE"] === "true";
+const isCoverageMode = (): boolean =>
+    readStorybookEnv("VITE_COVERAGE") === "true";
 
 /**
  * Primary Storybook configuration for the React/Vite renderer.

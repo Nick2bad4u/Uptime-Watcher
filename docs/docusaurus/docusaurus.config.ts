@@ -6,11 +6,16 @@ import { themes as prismThemes } from "prism-react-renderer";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+const runtimeEnv = globalThis.process.env;
+const readDocusaurusEnv = (key: string): string | undefined => runtimeEnv[key];
+
 const siteUrl =
-    process.env["DOCUSAURUS_SITE_URL"] ?? "https://nick2bad4u.github.io";
-const baseUrl = process.env["DOCUSAURUS_BASE_URL"] ?? "/Uptime-Watcher/";
+    readDocusaurusEnv("DOCUSAURUS_SITE_URL") ??
+    "https://nick2bad4u.github.io";
+const baseUrl =
+    readDocusaurusEnv("DOCUSAURUS_BASE_URL") ?? "/Uptime-Watcher/";
 const enableExperimentalFaster =
-    process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true";
+    readDocusaurusEnv("DOCUSAURUS_ENABLE_EXPERIMENTAL") === "true";
 
 const removeHeadAttrFlagKey: string = [
     "remove",
