@@ -47,7 +47,6 @@
         "../../eslint.config.mjs",
         "../../postcss.config.js",
         "../../tailwind.config.mjs",
-        "**/tailwind.config.mjs**/",
         "**.config.js",
         "**.config.mjs",
         "eslint.config.mjs",
@@ -73,9 +72,7 @@
         "../../storybook/**/*.tsx",
         "../../storybook/vitest.setup.ts",
         "../../vite.config.ts",
-        "../../electron-builder.config.ts",
-        "storybook/viteSharedConfig",
-        "vite/client"
+        "../../electron-builder.config.ts"
     ],
     "references": [
         {
