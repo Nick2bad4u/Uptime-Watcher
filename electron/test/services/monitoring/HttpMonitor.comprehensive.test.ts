@@ -49,6 +49,9 @@ vi.mock("../../../utils/operationalHooks", () => ({
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     createMonitorConfig: vi.fn(),
     createMonitorErrorResult: vi.fn(),
+    normalizeResponseTime: vi.fn((responseTime: unknown) =>
+        typeof responseTime === "number" ? responseTime : 0
+    ),
     validateMonitorUrl: vi.fn(),
 }));
 
@@ -184,6 +187,34 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(result.timeout).toBe(8000);
             expect(result.userAgent).toBe("UptimeWatcher/1.0");
         });
+
+        it("should not invoke accessor-backed constructor config fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            const timeoutGetter = vi.fn(() => {
+                throw new Error("timeout getter should not run");
+            });
+            const config: MonitorServiceConfig = {};
+
+            Object.defineProperty(config, "timeout", {
+                enumerable: true,
+                get: timeoutGetter,
+            });
+
+            const monitor = new HttpMonitor(config);
+
+            expect(timeoutGetter).not.toHaveBeenCalled();
+            expect(monitor.getConfig()).toEqual({
+                timeout: 5000,
+                userAgent: "UptimeWatcher/1.0",
+            });
+        });
     });
 
     describe("getType", () => {
@@ -315,6 +346,42 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                     userAgent: 123 as any,
                 });
             }).toThrow("Invalid userAgent: must be a string");
+        });
+
+        it("should not invoke accessor-backed update config fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            const timeoutGetter = vi.fn(() => {
+                throw new Error("timeout getter should not run");
+            });
+            const userAgentGetter = vi.fn(() => {
+                throw new Error("userAgent getter should not run");
+            });
+            const config: Partial<MonitorServiceConfig> = {};
+
+            Object.defineProperty(config, "timeout", {
+                enumerable: true,
+                get: timeoutGetter,
+            });
+            Object.defineProperty(config, "userAgent", {
+                enumerable: true,
+                get: userAgentGetter,
+            });
+
+            httpMonitor.updateConfig(config);
+
+            expect(timeoutGetter).not.toHaveBeenCalled();
+            expect(userAgentGetter).not.toHaveBeenCalled();
+            expect(httpMonitor.getConfig()).toEqual({
+                timeout: 5000,
+                userAgent: "UptimeWatcher/1.0",
+            });
         });
     });
 

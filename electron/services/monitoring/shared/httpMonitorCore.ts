@@ -20,14 +20,10 @@ import {
 } from "@shared/utils/logTemplates";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import {
-    isDefined,
-    isFinite as isFiniteNumber,
-    objectHasOwn,
-    safeCastTo,
-} from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -365,10 +361,11 @@ export function createHttpMonitorService<
         }
 
         public constructor(config: MonitorServiceConfig = {}) {
+            const configOverrides = safeObjectOmit(config, []);
             const nextConfig: MonitorServiceConfig = {
                 timeout: DEFAULT_REQUEST_TIMEOUT,
                 userAgent: USER_AGENT,
-                ...config,
+                ...configOverrides,
             };
 
             const axiosInstance = createHttpClient({
@@ -389,12 +386,11 @@ export function createHttpMonitorService<
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
             const nextConfig: MonitorServiceConfig = { ...this.config };
-            const remaining = safeCastTo({ ...config });
-            delete remaining.timeout;
-            delete remaining.userAgent;
+            const remaining = safeObjectOmit(config, ["timeout", "userAgent"]);
 
-            if (objectHasOwn(config, "timeout")) {
-                const { timeout } = config;
+            const timeoutProperty = getOwnDataProperty(config, "timeout");
+            if (timeoutProperty.found) {
+                const { value: timeout } = timeoutProperty;
                 if (
                     isDefined(timeout) &&
                     (typeof timeout !== "number" ||
@@ -413,8 +409,9 @@ export function createHttpMonitorService<
                 }
             }
 
-            if (objectHasOwn(config, "userAgent")) {
-                const { userAgent } = config;
+            const userAgentProperty = getOwnDataProperty(config, "userAgent");
+            if (userAgentProperty.found) {
+                const { value: userAgent } = userAgentProperty;
                 if (isDefined(userAgent) && typeof userAgent !== "string") {
                     throw new Error("Invalid userAgent: must be a string");
                 }
