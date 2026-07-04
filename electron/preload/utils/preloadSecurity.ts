@@ -1,4 +1,5 @@
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isDefined, objectKeys } from "ts-extras";
 
 interface AutomationProcess {
@@ -30,7 +31,7 @@ const toAutomationProcess = (value: unknown): AutomationProcess | undefined => {
         return {};
     }
 
-    const env: Record<string, string | undefined> = {};
+    const env = createNullPrototypeObject<Record<string, string | undefined>>();
     for (const key of objectKeys(envCandidate.value)) {
         const entry = getOwnDataProperty(envCandidate.value, key);
         if (!entry.found) {
@@ -38,9 +39,19 @@ const toAutomationProcess = (value: unknown): AutomationProcess | undefined => {
         }
 
         if (typeof entry.value === "string") {
-            env[key] = entry.value;
+            Object.defineProperty(env, key, {
+                configurable: true,
+                enumerable: true,
+                value: entry.value,
+                writable: true,
+            });
         } else if (!isDefined(entry.value)) {
-            env[key] = undefined;
+            Object.defineProperty(env, key, {
+                configurable: true,
+                enumerable: true,
+                value: undefined,
+                writable: true,
+            });
         }
     }
 

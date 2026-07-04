@@ -326,6 +326,38 @@ describe("Environment Detection Utilities", () => {
             });
             expect(accessCount).toBe(0);
         });
+
+        it("should preserve protected keys as own summary data", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            const env = {
+                NORMAL_KEY: "normal-value",
+            } as Record<string, string | undefined>;
+            Object.defineProperty(env, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "proto-value",
+                writable: true,
+            });
+
+            const envModule = applyProcessSnapshot({ env });
+            const summary = envModule.getEnvSummary();
+            const protectedProperty = Object.getOwnPropertyDescriptor(
+                summary,
+                "__proto__"
+            );
+
+            expect(Object.getPrototypeOf(summary)).toBeNull();
+            expect(Object.hasOwn(summary, "__proto__")).toBeTruthy();
+            expect(protectedProperty?.value).toBe("proto-value");
+            expect(summary["NORMAL_KEY"]).toBe("normal-value");
+        });
     });
 
     describe("getNodeEnv", () => {

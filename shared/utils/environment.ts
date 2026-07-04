@@ -24,6 +24,7 @@ import {
 } from "ts-extras";
 
 import { getOwnDataProperty } from "./errorPropertyAccess";
+import { createNullPrototypeObject } from "./objectSafety";
 
 export interface KnownEnvironmentVariables {
     /** Token used by coverage reporting tooling when present. */
@@ -172,11 +173,16 @@ export function getEnvSummary(): Record<string, string> {
         return {};
     }
 
-    const summary: Record<string, string> = {};
+    const summary = createNullPrototypeObject<Record<string, string>>();
     for (const key of objectKeys(env)) {
         const property = getOwnDataProperty(env, key);
         if (property.found && typeof property.value === "string") {
-            summary[key] = property.value;
+            Object.defineProperty(summary, key, {
+                configurable: true,
+                enumerable: true,
+                value: property.value,
+                writable: true,
+            });
         }
     }
 
