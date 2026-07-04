@@ -252,9 +252,6 @@ describe("Complete 100% Coverage - Final Tests", () => {
             // For database validation edge cases
             const isResult2 = RowValidationUtils.isValidTimestamp("NaN");
             expect(isResult2).toBeFalsy();
-
-            // Ensure all edge cases are covered
-            expect(true).toBeTruthy();
         });
     });
 });

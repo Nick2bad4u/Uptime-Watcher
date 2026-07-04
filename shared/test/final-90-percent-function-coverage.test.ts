@@ -96,7 +96,11 @@ describe("Final 90% Function Coverage Push", () => {
             });
         }
 
-        expect(true).toBeTruthy();
+        expect(sharedTypes.isComputedSiteStatus("mixed")).toBeTruthy();
+        expect(sharedTypes.isComputedSiteStatus("up")).toBeFalsy();
+        expect(sharedTypes.isMonitorStatus("up")).toBeTruthy();
+        expect(sharedTypes.isMonitorStatus("mixed")).toBeFalsy();
+        expect(sharedTypes.isSiteStatus("mixed")).toBeTruthy();
     });
 
     it("should call ALL exported functions from validation types", ({
@@ -157,7 +161,21 @@ describe("Final 90% Function Coverage Push", () => {
             validation.isValidationResult(undefined);
         }
 
-        expect(true).toBeTruthy();
+        expect(validation.createSuccessResult({ data: "test" })).toMatchObject(
+            {
+                data: { data: "test" },
+                errors: [],
+                success: true,
+            }
+        );
+        expect(validation.createFailureResult(["error"])).toMatchObject({
+            errors: ["error"],
+            success: false,
+            warnings: [],
+        });
+        expect(
+            validation.isValidationResult({ errors: [], success: true })
+        ).toBeTruthy();
     });
 
     // Helper function for testing module functions to reduce complexity
@@ -290,7 +308,9 @@ describe("Final 90% Function Coverage Push", () => {
             func("Custom error message");
         });
 
-        expect(true).toBeTruthy();
+        expect(stringConversion.safeStringify(undefined)).toBe("");
+        expect(stringConversion.safeStringify(() => {})).toBe("[Function]");
+        expect(environment.isTest()).toBeTruthy();
     });
 
     it("should call ALL exported functions from validation modules", ({
@@ -342,7 +362,15 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBeTruthy();
+        expect(
+            schemas.validateMonitorField(
+                "http",
+                "url",
+                "https://example.com"
+            ).success
+        ).toBeTruthy();
+        expect(validatorUtilsModule.isValidIdentifier("site-1")).toBeTruthy();
+        expect(validatorUtilsModule.isValidIdentifier("bad id")).toBeFalsy();
     });
 
     it("should call remaining utility functions systematically", ({
@@ -430,7 +458,19 @@ describe("Final 90% Function Coverage Push", () => {
             }
         }
 
-        expect(true).toBeTruthy();
+        expect(
+            logTemplates.interpolateLogTemplate(
+                logTemplates.LOG_TEMPLATES.debug
+                    .MONITOR_MANAGER_SETUP_MONITORS,
+                { count: 2, identifier: "site-1" }
+            )
+        ).toBe("[MonitorManager] Setting up 2 new monitors for site: site-1");
+        expect(
+            siteStatus.getSiteDisplayStatus({
+                identifier: "site-1",
+                monitors: [{ monitoring: true, status: "up" }],
+            } as any)
+        ).toBe("up");
     });
 
     it("should ensure complete function coverage with edge cases", async ({
@@ -586,6 +626,5 @@ describe("Final 90% Function Coverage Push", () => {
         consoleWarnSpy.mockRestore();
         consoleErrorSpy.mockRestore();
 
-        expect(true).toBeTruthy();
     });
 });

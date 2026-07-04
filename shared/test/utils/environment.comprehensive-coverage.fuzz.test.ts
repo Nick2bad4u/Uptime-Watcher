@@ -884,8 +884,8 @@ describe("environment comprehensive fuzzing tests", () => {
                 }
             }
 
-            // Test passes if no memory leaks or performance degradation
-            expect(true).toBeTruthy();
+            expect(getNodeEnv()).toBe("test");
+            expect(isTest()).toBeTruthy();
         });
 
         test("handles corrupted global objects gracefully", () => {
@@ -910,16 +910,26 @@ describe("environment comprehensive fuzzing tests", () => {
 
                 // All functions should handle corrupted state gracefully
                 try {
-                    getEnvVar("NODE_ENV");
-                    getEnvironment();
-                    getNodeEnv();
-                    isDevelopment();
-                    isProduction();
-                    isTest();
-                    isNodeEnvironment();
-                    isBrowserEnvironment();
-                    // Test should pass if no exception is thrown
-                    expect(true).toBeTruthy();
+                    const result = {
+                        environment: getEnvironment(),
+                        isBrowser: isBrowserEnvironment(),
+                        isDevelopment: isDevelopment(),
+                        isNode: isNodeEnvironment(),
+                        isProduction: isProduction(),
+                        isTest: isTest(),
+                        nodeEnv: getNodeEnv(),
+                        nodeEnvVar: getEnvVar("NODE_ENV"),
+                    };
+
+                    expect(result).toEqual(
+                        expect.objectContaining({
+                            isBrowser: expect.any(Boolean),
+                            isDevelopment: expect.any(Boolean),
+                            isNode: expect.any(Boolean),
+                            isProduction: expect.any(Boolean),
+                            isTest: expect.any(Boolean),
+                        })
+                    );
                 } catch (error) {
                     // Some corruption scenarios might still throw - that's expected
                     expect(error).toBeDefined();

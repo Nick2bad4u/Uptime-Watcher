@@ -161,9 +161,27 @@ describe("Schemas - Complete Function Coverage", () => {
             schemasModule.validateSiteData(null);
             schemasModule.validateSiteData(undefined);
 
-            // The important thing is that all functions were called and executed
-            // This achieves function coverage regardless of validation results
-            expect(true).toBeTruthy(); // Test passes if we reach here without errors
+            expect(
+                schemasModule.validateMonitorData("http", {
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "asserted-monitor",
+                    monitoring: true,
+                    responseTime: 200,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 30_000,
+                    type: "http",
+                    url: "https://example.com",
+                }).success
+            ).toBeTruthy();
+            expect(
+                schemasModule.validateMonitorData("unknown", {}).success
+            ).toBeFalsy();
+            expect(
+                schemasModule.validateSiteData({ invalid: "site data" })
+                    .success
+            ).toBeFalsy();
         });
 
         it("should exercise additional function paths and error conditions", async ({
@@ -232,8 +250,35 @@ describe("Schemas - Complete Function Coverage", () => {
                 // Expected to throw for unknown fields
             }
 
-            // All functions have been called with various inputs
-            expect(true).toBeTruthy();
+            expect(
+                schemasModule.validateMonitorData("http", {
+                    checkInterval: 1000,
+                    history: "not-array",
+                    id: "",
+                    monitoring: "not-boolean",
+                    responseTime: "not-number",
+                    retryAttempts: -5,
+                    status: "invalid-status",
+                    timeout: -1,
+                    type: "http",
+                    url: "invalid-url",
+                }).success
+            ).toBeFalsy();
+            expect(
+                schemasModule.validateMonitorField(
+                    "http",
+                    "checkInterval",
+                    5000
+                ).success
+            ).toBeTruthy();
+            expect(
+                schemasModule.validateSiteData({
+                    identifier: "",
+                    monitoring: "not-boolean",
+                    monitors: [],
+                    name: "",
+                }).success
+            ).toBeFalsy();
         });
 
         it("should call validation functions with all supported monitor types", async ({
@@ -329,7 +374,20 @@ describe("Schemas - Complete Function Coverage", () => {
                 "192.168.1.1"
             );
 
-            expect(true).toBeTruthy();
+            expect(
+                schemasModule.validateMonitorField(
+                    "http",
+                    "url",
+                    "https://example.com"
+                ).success
+            ).toBeTruthy();
+            expect(
+                schemasModule.validateMonitorField("port", "port", 80).success
+            ).toBeTruthy();
+            expect(
+                schemasModule.validateMonitorField("dns", "recordType", "A")
+                    .success
+            ).toBeTruthy();
         });
     });
 });
