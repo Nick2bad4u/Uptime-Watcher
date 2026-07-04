@@ -331,6 +331,35 @@ describe("monitorFormData functions - Additional Coverage", () => {
             };
             expect(isValidMonitorFormData(data)).toBeFalsy();
         });
+
+        it("should not invoke accessor-backed form fields during validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate(
+                "Component: monitorFormData.additional",
+                "component"
+            );
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Validation", "type");
+
+            let urlAccesses = 0;
+            const data = {
+                type: "http",
+            };
+            Object.defineProperty(data, "url", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    urlAccesses += 1;
+                    throw new Error("Unexpected url getter access");
+                },
+            });
+
+            expect(isValidMonitorFormData(data)).toBeFalsy();
+            expect(urlAccesses).toBe(0);
+        });
     });
 
     describe("safeGetFormProperty - Comprehensive Coverage", () => {
@@ -523,6 +552,35 @@ describe("monitorFormData functions - Additional Coverage", () => {
             expect(data.ssl).toBeTruthy();
             expect(data.tags).toEqual(["api"]);
             expect((data as any).newProp).toBe("newValue");
+        });
+
+        it("should define __proto__ as an own property without changing the prototype", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate(
+                "Component: monitorFormData.additional",
+                "component"
+            );
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Validation", "type");
+
+            const data: Record<string, unknown> = {
+                name: "Test",
+            };
+            const originalPrototype = Object.getPrototypeOf(data);
+            const protoValue = { polluted: true };
+
+            safeSetFormProperty(data, "__proto__", protoValue);
+
+            expect(Object.getPrototypeOf(data)).toBe(originalPrototype);
+            expect(Object.getOwnPropertyDescriptor(data, "__proto__")).toEqual(
+                expect.objectContaining({
+                    enumerable: true,
+                    value: protoValue,
+                })
+            );
         });
     });
 

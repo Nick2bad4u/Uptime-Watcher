@@ -12,6 +12,7 @@ import type { MonitorType } from "@shared/types";
 import type { DnsRecordType } from "@shared/types/schemaTypes";
 import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { safeObjectAccess } from "@shared/utils/objectSafety";
 import { isNonEmptyString } from "@shared/utils/typeGuards";
 import { castUnchecked } from "@shared/utils/typeHelpers";
@@ -22,7 +23,7 @@ import {
     isValidPort,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
-import { isFinite as isFiniteNumber, isInteger, safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber, isInteger } from "ts-extras";
 
 import type { RequireAllOrNoneFields } from "./typeUtils";
 
@@ -40,6 +41,36 @@ const FQDN_VALIDATION_OPTIONS = {
 const WEBSOCKET_URL_VALIDATION_OPTIONS = {
     ...URL_VALIDATION_OPTIONS,
     protocols: ["ws", "wss"],
+};
+
+const getStringFormField = (
+    data: object,
+    fieldName: PropertyKey
+): string | undefined => {
+    const property = getOwnDataProperty(data, fieldName);
+    return property.found && typeof property.value === "string"
+        ? property.value
+        : undefined;
+};
+
+const getNumberFormField = (
+    data: object,
+    fieldName: PropertyKey
+): number | undefined => {
+    const property = getOwnDataProperty(data, fieldName);
+    return property.found && typeof property.value === "number"
+        ? property.value
+        : undefined;
+};
+
+const getNormalizedHostField = (data: object): string => {
+    const hostCandidate = getStringFormField(data, "host");
+    return isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+};
+
+const getMonitorTypeField = (data: object): MonitorType | undefined => {
+    const type = getStringFormField(data, "type");
+    return validateMonitorType(type) ? type : undefined;
 };
 
 /**
@@ -438,12 +469,15 @@ export const createDefaultFormData: CreateDefaultFormData = castUnchecked(
 export function isCdnEdgeConsistencyFormData(
     data: Partial<MonitorFormData>
 ): data is CdnEdgeConsistencyFormData {
+    const baselineUrl = getStringFormField(data, "baselineUrl");
+    const edgeLocations = getStringFormField(data, "edgeLocations");
+
     return (
-        data.type === "cdn-edge-consistency" &&
-        typeof data.baselineUrl === "string" &&
-        isValidUrl(data.baselineUrl.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.edgeLocations === "string" &&
-        data.edgeLocations.trim() !== ""
+        getStringFormField(data, "type") === "cdn-edge-consistency" &&
+        typeof baselineUrl === "string" &&
+        isValidUrl(baselineUrl.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof edgeLocations === "string" &&
+        edgeLocations.trim() !== ""
     );
 }
 
@@ -459,15 +493,15 @@ export function isCdnEdgeConsistencyFormData(
 export function isDnsFormData(
     data: Partial<MonitorFormData>
 ): data is DnsFormData {
-    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
-    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+    const host = getNormalizedHostField(data);
+    const recordType = getStringFormField(data, "recordType");
 
     return (
-        data.type === "dns" &&
+        getStringFormField(data, "type") === "dns" &&
         host.length > 0 &&
         (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
-        typeof data.recordType === "string" &&
-        data.recordType.trim() !== ""
+        typeof recordType === "string" &&
+        recordType.trim() !== ""
     );
 }
 
@@ -483,10 +517,12 @@ export function isDnsFormData(
 export function isHttpFormData(
     data: Partial<MonitorFormData>
 ): data is HttpFormData {
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "http" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS)
+        getStringFormField(data, "type") === "http" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS)
     );
 }
 
@@ -502,14 +538,18 @@ export function isHttpFormData(
 export function isHttpHeaderFormData(
     data: Partial<MonitorFormData>
 ): data is HttpHeaderFormData {
+    const expectedHeaderValue = getStringFormField(data, "expectedHeaderValue");
+    const headerName = getStringFormField(data, "headerName");
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "http-header" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.headerName === "string" &&
-        data.headerName.trim() !== "" &&
-        typeof data.expectedHeaderValue === "string" &&
-        data.expectedHeaderValue.trim() !== ""
+        getStringFormField(data, "type") === "http-header" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof headerName === "string" &&
+        headerName.trim() !== "" &&
+        typeof expectedHeaderValue === "string" &&
+        expectedHeaderValue.trim() !== ""
     );
 }
 
@@ -525,14 +565,18 @@ export function isHttpHeaderFormData(
 export function isHttpJsonFormData(
     data: Partial<MonitorFormData>
 ): data is HttpJsonFormData {
+    const expectedJsonValue = getStringFormField(data, "expectedJsonValue");
+    const jsonPath = getStringFormField(data, "jsonPath");
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "http-json" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.jsonPath === "string" &&
-        data.jsonPath.trim() !== "" &&
-        typeof data.expectedJsonValue === "string" &&
-        data.expectedJsonValue.trim() !== ""
+        getStringFormField(data, "type") === "http-json" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof jsonPath === "string" &&
+        jsonPath.trim() !== "" &&
+        typeof expectedJsonValue === "string" &&
+        expectedJsonValue.trim() !== ""
     );
 }
 
@@ -548,12 +592,15 @@ export function isHttpJsonFormData(
 export function isHttpKeywordFormData(
     data: Partial<MonitorFormData>
 ): data is HttpKeywordFormData {
+    const bodyKeyword = getStringFormField(data, "bodyKeyword");
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "http-keyword" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.bodyKeyword === "string" &&
-        data.bodyKeyword.trim() !== ""
+        getStringFormField(data, "type") === "http-keyword" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof bodyKeyword === "string" &&
+        bodyKeyword.trim() !== ""
     );
 }
 
@@ -569,13 +616,16 @@ export function isHttpKeywordFormData(
 export function isHttpLatencyFormData(
     data: Partial<MonitorFormData>
 ): data is HttpLatencyFormData {
+    const maxResponseTime = getNumberFormField(data, "maxResponseTime");
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "http-latency" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.maxResponseTime === "number" &&
-        isFiniteNumber(data.maxResponseTime) &&
-        data.maxResponseTime > 0
+        getStringFormField(data, "type") === "http-latency" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof maxResponseTime === "number" &&
+        isFiniteNumber(maxResponseTime) &&
+        maxResponseTime > 0
     );
 }
 
@@ -591,14 +641,17 @@ export function isHttpLatencyFormData(
 export function isHttpStatusFormData(
     data: Partial<MonitorFormData>
 ): data is HttpStatusFormData {
+    const expectedStatusCode = getNumberFormField(data, "expectedStatusCode");
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "http-status" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.expectedStatusCode === "number" &&
-        isInteger(data.expectedStatusCode) &&
-        data.expectedStatusCode >= 100 &&
-        data.expectedStatusCode <= 599
+        getStringFormField(data, "type") === "http-status" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof expectedStatusCode === "number" &&
+        isInteger(expectedStatusCode) &&
+        expectedStatusCode >= 100 &&
+        expectedStatusCode <= 599
     );
 }
 
@@ -614,11 +667,10 @@ export function isHttpStatusFormData(
 export function isPingFormData(
     data: Partial<MonitorFormData>
 ): data is PingFormData {
-    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
-    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+    const host = getNormalizedHostField(data);
 
     return (
-        data.type === "ping" &&
+        getStringFormField(data, "type") === "ping" &&
         host.length > 0 &&
         (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS))
     );
@@ -636,15 +688,15 @@ export function isPingFormData(
 export function isPortFormData(
     data: Partial<MonitorFormData>
 ): data is PortFormData {
-    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
-    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+    const host = getNormalizedHostField(data);
+    const port = getNumberFormField(data, "port");
 
     return (
-        data.type === "port" &&
+        getStringFormField(data, "type") === "port" &&
         host.length > 0 &&
         (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
-        typeof data.port === "number" &&
-        isValidPort(data.port)
+        typeof port === "number" &&
+        isValidPort(port)
     );
 }
 
@@ -660,15 +712,26 @@ export function isPortFormData(
 export function isReplicationFormData(
     data: Partial<MonitorFormData>
 ): data is ReplicationFormData {
+    const maxReplicationLagSeconds = getNumberFormField(
+        data,
+        "maxReplicationLagSeconds"
+    );
+    const primaryStatusUrl = getStringFormField(data, "primaryStatusUrl");
+    const replicaStatusUrl = getStringFormField(data, "replicaStatusUrl");
+    const replicationTimestampField = getStringFormField(
+        data,
+        "replicationTimestampField"
+    );
+
     return (
-        data.type === "replication" &&
-        typeof data.primaryStatusUrl === "string" &&
-        isValidUrl(data.primaryStatusUrl.trim(), URL_VALIDATION_OPTIONS) &&
-        typeof data.replicaStatusUrl === "string" &&
-        isValidUrl(data.replicaStatusUrl.trim(), URL_VALIDATION_OPTIONS) &&
-        isNonEmptyString(data.replicationTimestampField) &&
-        typeof data.maxReplicationLagSeconds === "number" &&
-        isFiniteNumber(data.maxReplicationLagSeconds)
+        getStringFormField(data, "type") === "replication" &&
+        typeof primaryStatusUrl === "string" &&
+        isValidUrl(primaryStatusUrl.trim(), URL_VALIDATION_OPTIONS) &&
+        typeof replicaStatusUrl === "string" &&
+        isValidUrl(replicaStatusUrl.trim(), URL_VALIDATION_OPTIONS) &&
+        isNonEmptyString(replicationTimestampField) &&
+        typeof maxReplicationLagSeconds === "number" &&
+        isFiniteNumber(maxReplicationLagSeconds)
     );
 }
 
@@ -685,15 +748,33 @@ export function isReplicationFormData(
 export function isServerHeartbeatFormData(
     data: Partial<MonitorFormData>
 ): data is ServerHeartbeatFormData {
+    const heartbeatExpectedStatus = getStringFormField(
+        data,
+        "heartbeatExpectedStatus"
+    );
+    const heartbeatMaxDriftSeconds = getNumberFormField(
+        data,
+        "heartbeatMaxDriftSeconds"
+    );
+    const heartbeatStatusField = getStringFormField(
+        data,
+        "heartbeatStatusField"
+    );
+    const heartbeatTimestampField = getStringFormField(
+        data,
+        "heartbeatTimestampField"
+    );
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "server-heartbeat" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), URL_VALIDATION_OPTIONS) &&
-        isNonEmptyString(data.heartbeatStatusField) &&
-        isNonEmptyString(data.heartbeatTimestampField) &&
-        isNonEmptyString(data.heartbeatExpectedStatus) &&
-        typeof data.heartbeatMaxDriftSeconds === "number" &&
-        isFiniteNumber(data.heartbeatMaxDriftSeconds)
+        getStringFormField(data, "type") === "server-heartbeat" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), URL_VALIDATION_OPTIONS) &&
+        isNonEmptyString(heartbeatStatusField) &&
+        isNonEmptyString(heartbeatTimestampField) &&
+        isNonEmptyString(heartbeatExpectedStatus) &&
+        typeof heartbeatMaxDriftSeconds === "number" &&
+        isFiniteNumber(heartbeatMaxDriftSeconds)
     );
 }
 
@@ -709,18 +790,22 @@ export function isServerHeartbeatFormData(
 export function isSslFormData(
     data: Partial<MonitorFormData>
 ): data is SslFormData {
-    const hostCandidate = safeCastTo<UnknownRecord>(data)["host"];
-    const host = isNonEmptyString(hostCandidate) ? hostCandidate.trim() : "";
+    const certificateWarningDays = getNumberFormField(
+        data,
+        "certificateWarningDays"
+    );
+    const host = getNormalizedHostField(data);
+    const port = getNumberFormField(data, "port");
 
     return (
-        data.type === "ssl" &&
+        getStringFormField(data, "type") === "ssl" &&
         host.length > 0 &&
         (isValidHost(host) || isValidFQDN(host, FQDN_VALIDATION_OPTIONS)) &&
-        typeof data.port === "number" &&
-        isValidPort(data.port) &&
-        typeof data.certificateWarningDays === "number" &&
-        data.certificateWarningDays >= 1 &&
-        data.certificateWarningDays <= 365
+        typeof port === "number" &&
+        isValidPort(port) &&
+        typeof certificateWarningDays === "number" &&
+        certificateWarningDays >= 1 &&
+        certificateWarningDays <= 365
     );
 }
 
@@ -737,12 +822,15 @@ export function isSslFormData(
 export function isWebsocketKeepaliveFormData(
     data: Partial<MonitorFormData>
 ): data is WebsocketKeepaliveFormData {
+    const maxPongDelayMs = getNumberFormField(data, "maxPongDelayMs");
+    const url = getStringFormField(data, "url");
+
     return (
-        data.type === "websocket-keepalive" &&
-        typeof data.url === "string" &&
-        isValidUrl(data.url.trim(), WEBSOCKET_URL_VALIDATION_OPTIONS) &&
-        typeof data.maxPongDelayMs === "number" &&
-        isFiniteNumber(data.maxPongDelayMs)
+        getStringFormField(data, "type") === "websocket-keepalive" &&
+        typeof url === "string" &&
+        isValidUrl(url.trim(), WEBSOCKET_URL_VALIDATION_OPTIONS) &&
+        typeof maxPongDelayMs === "number" &&
+        isFiniteNumber(maxPongDelayMs)
     );
 }
 
@@ -785,16 +873,14 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
         return false;
     }
 
-    const formData = safeCastTo<{ type?: unknown }>(data);
-
-    if (!validateMonitorType(formData.type)) {
+    const monitorType = getMonitorTypeField(data);
+    if (!monitorType) {
         return false;
     }
 
-    const monitorType = formData.type;
     const validator = FORM_DATA_VALIDATORS[monitorType];
 
-    const typedFormData = safeCastTo<Partial<MonitorFormData>>(data);
+    const typedFormData = castUnchecked<Partial<MonitorFormData>>(data);
     return validator(typedFormData);
 }
 
@@ -831,5 +917,10 @@ export function safeSetFormProperty(
     property: string,
     value: unknown
 ): void {
-    data[property] = value;
+    Object.defineProperty(data, property, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
 }
