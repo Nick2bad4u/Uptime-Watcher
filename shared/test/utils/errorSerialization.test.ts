@@ -61,4 +61,24 @@ describe(toSerializedError, () => {
         expect(getterCalls).toBe(0);
         expect(Object.hasOwn(serialized, "details")).toBeFalsy();
     });
+
+    it("preserves protected custom error properties as own data", () => {
+        const error = new Error("boom");
+        Object.defineProperty(error, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: { polluted: true },
+            writable: true,
+        });
+
+        const serialized = toSerializedError(error);
+        const protectedProperty = Object.getOwnPropertyDescriptor(
+            serialized,
+            "__proto__"
+        );
+
+        expect(serialized).toBeInstanceOf(Error);
+        expect(protectedProperty?.value).toEqual({ polluted: true });
+        expect(Object.getPrototypeOf(serialized)).toBe(Error.prototype);
+    });
 });

@@ -8,6 +8,19 @@ import { objectEntries } from "ts-extras";
 
 type ExtendedError = Error & SerializedError;
 
+const defineAdditionalErrorProperty = (
+    target: ExtendedError,
+    key: PropertyKey,
+    value: unknown
+): void => {
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
+};
+
 const copyAdditionalProperties = (
     source: Error,
     target: ExtendedError
@@ -19,7 +32,7 @@ const copyAdditionalProperties = (
         if (!isCoreKey) {
             const descriptor = Object.getOwnPropertyDescriptor(source, key);
             if (descriptor && "value" in descriptor) {
-                Reflect.set(
+                defineAdditionalErrorProperty(
                     target,
                     key,
                     normalizeLogValue(descriptor.value as unknown)
@@ -57,7 +70,7 @@ const cloneSerializedError = (payload: SerializedError): ExtendedError => {
             key === "message" || key === "name" || key === "stack";
 
         if (!isCoreKey) {
-            Reflect.set(errorInstance, key, value);
+            defineAdditionalErrorProperty(errorInstance, key, value);
         }
     }
 
