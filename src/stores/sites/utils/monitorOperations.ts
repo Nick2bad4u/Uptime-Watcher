@@ -11,7 +11,6 @@
 import { isMonitorStatus, type Monitor, type Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { safeCastTo } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import { normalizeMonitorInternal } from "./monitorOperations.normalize";
@@ -80,6 +79,32 @@ export function createDefaultMonitor(
     return normalizeMonitor(overrides);
 }
 
+function copyMonitorUpdatesWithoutId(
+    updates: Partial<Monitor>
+): Partial<Monitor> {
+    const sanitizedUpdates: Partial<Monitor> = {};
+
+    for (const key of Reflect.ownKeys(updates)) {
+        if (key === "id") {
+            continue;
+        }
+
+        const descriptor = Object.getOwnPropertyDescriptor(updates, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(sanitizedUpdates, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value,
+            writable: true,
+        });
+    }
+
+    return sanitizedUpdates;
+}
+
 /**
  * Removes a monitor from a site.
  *
@@ -144,8 +169,7 @@ export function updateMonitorInSite(
 
             try {
                 // Ignore any id field in updates to preserve original monitor identity.
-                const restUpdates = { ...updates };
-                delete safeCastTo<{ id?: unknown }>(restUpdates).id;
+                const restUpdates = copyMonitorUpdatesWithoutId(updates);
 
                 const merged: Partial<Monitor> = {
                     ...baseline,

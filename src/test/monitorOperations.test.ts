@@ -1034,6 +1034,32 @@ describe("monitorOperations", () => {
             });
         });
 
+        it("should not invoke accessor-backed update fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Update", "type");
+
+            let statusAccesses = 0;
+            const updates = {};
+            Object.defineProperty(updates, "status", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    statusAccesses += 1;
+                    throw new Error("Unexpected update status getter access");
+                },
+            });
+
+            const result = updateMonitorInSite(mockSite, "monitor-1", updates);
+
+            expect(arrayFirst(result.monitors).status).toBe("up");
+            expect(statusAccesses).toBe(0);
+        });
+
         it("should handle empty updates", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorOperations", "component");
