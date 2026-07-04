@@ -1,5 +1,5 @@
 /**
- * Debug test to understand TypedEventBus mocking differences
+ * Verifies ServiceContainer construction with a mocked TypedEventBus.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -46,12 +46,9 @@ const typedEventBusMocks = vi.hoisted(() => {
     };
 });
 
-vi.mock("../events/TypedEventBus", () => {
-    console.log("Mock being applied for ../events/TypedEventBus");
-    return {
-        TypedEventBus: typedEventBusMocks.MockTypedEventBus,
-    };
-});
+vi.mock("../events/TypedEventBus", () => ({
+    TypedEventBus: typedEventBusMocks.MockTypedEventBus,
+}));
 
 // Mock logger
 vi.mock("../../utils/logger", () => ({
@@ -169,12 +166,11 @@ vi.mock("../../UptimeOrchestrator", () => ({
     UptimeOrchestrator: managerMocks.MockUptimeOrchestrator,
 }));
 
-describe("ServiceContainer - Debug Mock Test", () => {
+describe("ServiceContainer - Mocked TypedEventBus", () => {
     let serviceContainer: ServiceContainer;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        console.log("Setting up test...");
     });
 
     afterEach(() => {
@@ -189,12 +185,10 @@ describe("ServiceContainer - Debug Mock Test", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        console.log("Creating ServiceContainer instance...");
         serviceContainer = ServiceContainer.getInstance();
 
         const siteManager = serviceContainer.getSiteManager();
 
-        console.log("SiteManager created successfully:", Boolean(siteManager));
         expect(siteManager).toBeDefined();
     });
 });

@@ -1,5 +1,5 @@
 /**
- * Debug test to understand SiteManager mocking issue
+ * Verifies ServiceContainer SiteManager construction with mocked dependencies.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -111,7 +111,7 @@ vi.mock("../../services/database/DatabaseService", () => ({
     },
 }));
 
-describe("Debug SiteManager Mock", () => {
+describe("ServiceContainer - Mocked SiteManager", () => {
     let container: ServiceContainer;
 
     beforeEach(() => {
@@ -136,22 +136,12 @@ describe("Debug SiteManager Mock", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        console.log("Starting test...");
-
-        // Get SiteManager
         const siteManager = container.getSiteManager();
-        console.log("SiteManager instance:", siteManager);
-        console.log("SiteManager type:", typeof siteManager);
-        console.log("SiteManager methods:", Object.keys(siteManager));
-        console.log("getSitesCache method:", siteManager.getSitesCache);
-        console.log("getSitesCache type:", typeof siteManager.getSitesCache);
 
         expect(siteManager).toBeDefined();
         expect(typeof siteManager.getSitesCache).toBe("function");
 
-        // Try to call getSitesCache
         const cache = siteManager.getSitesCache();
-        console.log("Cache result:", cache);
         expect(cache).toBeDefined();
     });
 });
