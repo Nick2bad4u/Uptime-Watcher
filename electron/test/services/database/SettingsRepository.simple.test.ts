@@ -47,20 +47,29 @@ vi.mock("../../utils/operationalHooks", () => ({
 }));
 
 describe("SettingsRepository Coverage Tests", () => {
+    let mockDb: any;
     let mockDatabaseService: any;
+    let mockStatement: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockStatement = {
+            all: vi.fn(),
+            finalize: vi.fn(),
+            get: vi.fn(),
+            run: vi.fn(),
+        };
+        mockDb = {
+            all: vi.fn(() => []),
+            get: vi.fn(),
+            prepare: vi.fn(() => mockStatement),
+            run: vi.fn(),
+        };
         mockDatabaseService = {
-            getDatabase: vi.fn(() => ({
-                prepare: vi.fn(() => ({
-                    all: vi.fn(),
-                    get: vi.fn(),
-                    run: vi.fn(),
-                    finalize: vi.fn(),
-                })),
-            })),
-            executeTransaction: vi.fn(),
+            getDatabase: vi.fn(() => mockDb),
+            executeTransaction: vi.fn(async (callback: any) =>
+                callback(mockDb)
+            ),
         };
     });
     it("should import the repository without errors", async ({
@@ -103,16 +112,27 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            await repository.get("test-setting");
-            expect(true).toBeTruthy(); // Test passes if no error thrown
-        } catch (error) {
-            // Database operations might fail in test environment
-            expect(error).toBeInstanceOf(Error);
-        }
+        const { rowToSettingValue } =
+            await import(
+                "../../../services/database/utils/mappers/settingsMapper"
+            );
+        vi.mocked(rowToSettingValue).mockReturnValue("test-value");
+        mockDb.get.mockReturnValue({ value: "test-value" });
+
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        const result = await repository.get("test-setting");
+
+        expect(result).toBe("test-value");
+        expect(mockDb.get).toHaveBeenCalledWith(
+            "SELECT value FROM settings WHERE key = ?",
+            ["test-setting"]
+        );
+        expect(rowToSettingValue).toHaveBeenCalledWith({
+            key: "test-setting",
+            value: "test-value",
+        });
     });
     it("should handle set operations", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -123,15 +143,16 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            await repository.set("test-setting", "test-value");
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        await repository.set("test-setting", "test-value");
+
+        expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
+        expect(mockDb.run).toHaveBeenCalledWith(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+            ["test-setting", "test-value"]
+        );
     });
     it("should handle delete operations", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -142,15 +163,16 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            await repository.delete("test-setting");
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        await repository.delete("test-setting");
+
+        expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
+        expect(mockDb.run).toHaveBeenCalledWith(
+            "DELETE FROM settings WHERE key = ?",
+            ["test-setting"]
+        );
     });
     it("should handle getAll operations", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -161,15 +183,28 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            await repository.getAll();
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const { rowsToSettings, settingsToRecord } =
+            await import(
+                "../../../services/database/utils/mappers/settingsMapper"
+            );
+        const databaseRows = [{ key: "theme", value: "dark" }];
+        const settingRows = [{ key: "theme", value: "dark" }];
+        mockDb.all.mockReturnValue(databaseRows);
+        vi.mocked(rowsToSettings).mockReturnValue(settingRows);
+        vi.mocked(settingsToRecord).mockReturnValue({ theme: "dark" });
+
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        const result = await repository.getAll();
+
+        expect(result).toStrictEqual({ theme: "dark" });
+        expect(mockDb.all).toHaveBeenCalledWith(
+            "SELECT * FROM settings",
+            undefined
+        );
+        expect(rowsToSettings).toHaveBeenCalledWith(databaseRows);
+        expect(settingsToRecord).toHaveBeenCalledWith(settingRows);
     });
     it("should handle bulkInsert operations", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -180,18 +215,27 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            await repository.bulkInsert({
-                setting1: "value1",
-                setting2: "value2",
-            });
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        await repository.bulkInsert({
+            setting1: "value1",
+            setting2: "value2",
+        });
+
+        expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
+        expect(mockDb.prepare).toHaveBeenCalledWith(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)"
+        );
+        expect(mockStatement.run).toHaveBeenCalledWith([
+            "setting1",
+            "value1",
+        ]);
+        expect(mockStatement.run).toHaveBeenCalledWith([
+            "setting2",
+            "value2",
+        ]);
+        expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
     });
     it("should handle deleteAll operations", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -202,15 +246,13 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            await repository.deleteAll();
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        await repository.deleteAll();
+
+        expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
+        expect(mockDb.run).toHaveBeenCalledWith("DELETE FROM settings");
     });
     it("should handle error scenarios gracefully", async ({
         task,
@@ -224,17 +266,26 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            // Try operations with invalid data
-            await repository.get("");
-            await repository.set("", "");
-            await repository.delete("");
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+
+        await repository.get("");
+        await repository.set("", "");
+        await repository.delete("");
+
+        expect(mockDb.get).toHaveBeenCalledWith(
+            "SELECT value FROM settings WHERE key = ?",
+            [""]
+        );
+        expect(mockDb.run).toHaveBeenCalledWith(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+            ["", ""]
+        );
+        expect(mockDb.run).toHaveBeenCalledWith(
+            "DELETE FROM settings WHERE key = ?",
+            [""]
+        );
     });
     it("should exercise SQL query building logic", async ({
         task,
@@ -248,19 +299,23 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            // These calls should exercise different SQL query paths
-            await repository.get("test-setting");
-            await repository.getAll();
-            await repository.bulkInsert({ test: "value" });
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
 
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        await repository.get("test-setting");
+        await repository.getAll();
+        await repository.bulkInsert({ test: "value" });
+
+        expect(mockDb.get).toHaveBeenCalledWith(
+            "SELECT value FROM settings WHERE key = ?",
+            ["test-setting"]
+        );
+        expect(mockDb.all).toHaveBeenCalledWith(
+            "SELECT * FROM settings",
+            undefined
+        );
+        expect(mockStatement.run).toHaveBeenCalledWith(["test", "value"]);
     });
     it("should handle mapper integration", async ({ task, annotate }) => {
         await annotate(`Testing: ${task.name}`, "functional");
@@ -271,19 +326,42 @@ describe("SettingsRepository Coverage Tests", () => {
         const { SettingsRepository } =
             await import("../../../services/database/SettingsRepository");
 
-        try {
-            const repository = new SettingsRepository({
-                databaseService: mockDatabaseService,
-            });
-            // Test operations that should use the mapper
-            await repository.set("test-setting", "some-value");
-            await repository.bulkInsert({ bulk1: "value1", bulk2: "value2" });
-            await repository.getAll();
+        const { rowsToSettings, settingsToRecord } =
+            await import(
+                "../../../services/database/utils/mappers/settingsMapper"
+            );
+        mockDb.all.mockReturnValue([
+            { key: "bulk1", value: "value1" },
+            { key: "bulk2", value: "value2" },
+        ]);
+        vi.mocked(rowsToSettings).mockReturnValue([
+            { key: "bulk1", value: "value1" },
+            { key: "bulk2", value: "value2" },
+        ]);
+        vi.mocked(settingsToRecord).mockReturnValue({
+            bulk1: "value1",
+            bulk2: "value2",
+        });
 
-            expect(true).toBeTruthy();
-        } catch (error) {
-            expect(error).toBeInstanceOf(Error);
-        }
+        const repository = new SettingsRepository({
+            databaseService: mockDatabaseService,
+        });
+        await repository.set("test-setting", "some-value");
+        await repository.bulkInsert({ bulk1: "value1", bulk2: "value2" });
+        const result = await repository.getAll();
+
+        expect(mockDb.run).toHaveBeenCalledWith(
+            "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+            ["test-setting", "some-value"]
+        );
+        expect(rowsToSettings).toHaveBeenCalledWith([
+            { key: "bulk1", value: "value1" },
+            { key: "bulk2", value: "value2" },
+        ]);
+        expect(result).toStrictEqual({
+            bulk1: "value1",
+            bulk2: "value2",
+        });
     });
 
     describe("Property-Based SettingsRepository Tests", () => {
