@@ -15,8 +15,6 @@
  * - Performance characteristics under stress
  *
  * @file Advanced fuzzing tests for type guards and validation utilities
- *
- * @ts-expect-error Complex fuzzing tests with intentional type mismatches - exact type safety deferred for validation testing
  */
 
 import { fc, test as fcTest } from "@fast-check/vitest";

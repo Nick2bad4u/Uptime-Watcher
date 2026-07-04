@@ -20,8 +20,6 @@
  *   management
  *
  * @author AI Assistant
- *
- * @ts-expect-error Complex fuzzing tests with Site object type compatibility - exact type safety deferred for test coverage
  */
 
 import { test as fcTest } from "@fast-check/vitest";

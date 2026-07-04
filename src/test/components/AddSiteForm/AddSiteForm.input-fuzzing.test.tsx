@@ -19,8 +19,6 @@
  * - Port validation (range checking, type coercion issues)
  * - Record type validation for DNS monitors
  * - Form submission with malicious or edge case combinations
- *
- * @ts-expect-error Complex fuzzing tests with dynamic DOM queries - exact type safety deferred for test coverage
  */
 
 import type { MonitorType, Site } from "@shared/types";
