@@ -1,5 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This hook has multiple unrelated eslint rules that cannot be properly paired */
-
 import { useEffect, useState } from "react";
 
 /**

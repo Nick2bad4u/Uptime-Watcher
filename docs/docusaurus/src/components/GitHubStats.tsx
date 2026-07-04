@@ -1,5 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This file contains multiple unrelated eslint rules that cannot be properly paired */
-
 import type { ReactNode } from "react";
 
 import Link from "@docusaurus/Link";
