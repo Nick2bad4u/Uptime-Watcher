@@ -41,7 +41,6 @@ const knipConfig: KnipConfig = {
         "sloc",
         "ts-node",
         "tsg",
-        "typesync",
         "winget",
         "yamllint",
     ],
