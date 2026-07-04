@@ -32,7 +32,10 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
         // Verify line 141 was hit - console.error should be called
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "Failed to test operation",
-            expect.any(Error)
+            expect.objectContaining({
+                message: "Test error",
+                name: "Error",
+            })
         );
 
         consoleErrorSpy.mockRestore();
@@ -80,7 +83,10 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
                 operationName
                     ? `Failed to ${operationName}`
                     : "Async operation failed",
-                expect.any(Error)
+                expect.objectContaining({
+                    message: errorMessage,
+                    name: "Error",
+                })
             );
 
             consoleErrorSpy.mockRestore();
@@ -111,7 +117,10 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
             // Verify the specific message format for line 141
             expect(consoleErrorSpy).toHaveBeenCalledWith(
                 `Failed to ${operationName}`,
-                expect.any(Error)
+                expect.objectContaining({
+                    message: errorMessage,
+                    name: "Error",
+                })
             );
 
             consoleErrorSpy.mockRestore();
@@ -138,7 +147,10 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
         // Verify line 141 console.error call with default message
         expect(consoleErrorSpy).toHaveBeenCalledWith(
             "Async operation failed",
-            expect.any(Error)
+            expect.objectContaining({
+                message: "Test error",
+                name: "Error",
+            })
         );
 
         consoleErrorSpy.mockRestore();
@@ -208,7 +220,10 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
                     : "Async operation failed";
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
                     expectedMessage,
-                    expect.any(Error)
+                    expect.objectContaining({
+                        message: errorMessage,
+                        name: "Error",
+                    })
                 );
 
                 consoleErrorSpy.mockRestore();

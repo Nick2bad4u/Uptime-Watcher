@@ -35,6 +35,7 @@ import {
     siteSchema,
     validateSiteData,
 } from "../../validation/siteSchemas";
+import { MAX_VALID_DATE_EPOCH_MS } from "../../validation/timestampSchemas";
 import { isValidHost, isValidUrl } from "../../validation/validatorUtils";
 
 const MAX_MONITOR_CHECK_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
@@ -55,7 +56,7 @@ const statusHistoryEntryArbitrary = fc.record({
     details: fc.option(fc.string({ maxLength: 64 }), { nil: undefined }),
     responseTime: fc.integer({ min: -1, max: MAX_TIMEOUT_MS }),
     status: historyStatusArbitrary,
-    timestamp: fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER }),
+    timestamp: fc.integer({ min: 0, max: MAX_VALID_DATE_EPOCH_MS }),
 });
 
 const historyArbitrary = fc.array(statusHistoryEntryArbitrary, {
@@ -121,7 +122,7 @@ const baseMonitorArbitrary = fc.record({
 
 const httpUrlArbitrary = fc
     .webUrl()
-    .filter((url) => url.startsWith("https://") || url.startsWith("https://"))
+    .filter((url) => url.startsWith("http://") || url.startsWith("https://"))
     .filter((url) =>
         isValidUrl(url, {
             allowSingleQuotes: true,

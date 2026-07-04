@@ -161,7 +161,10 @@ describe("Fixed Coverage Tests", () => {
             expect(consoleWarnSpy).toHaveBeenCalledWith(
                 "Store operation failed for:",
                 "clear loading state in finally block",
-                expect.any(Error)
+                expect.objectContaining({
+                    message: "setLoading failed in finally",
+                    name: "Error",
+                })
             );
             expect(consoleErrorSpy).not.toHaveBeenCalled();
 

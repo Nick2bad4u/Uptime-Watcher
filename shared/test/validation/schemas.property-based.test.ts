@@ -7,6 +7,7 @@ import {
     httpMonitorSchema,
 } from "../../validation/monitorSchemas";
 import { MONITOR_ID_MAX_LENGTH } from "../../validation/monitorFieldConstants";
+import { MAX_VALID_DATE_EPOCH_MS } from "../../validation/timestampSchemas";
 
 /**
  * Custom fast-check arbitraries for Zod schemas Replacing zod-fast-check due to
@@ -25,14 +26,9 @@ const baseMonitorArbitrary = fc.record({
     history: fc.array(
         fc.record({
             details: fc.option(fc.string(), { nil: undefined }),
-            responseTime: fc.float({
-                min: 0,
-                max: 99_999,
-                noNaN: true,
-                noDefaultInfinity: true,
-            }),
+            responseTime: fc.integer({ min: 0, max: 99_999 }),
             status: fc.constantFrom("up", "down"),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
+            timestamp: fc.integer({ min: 0, max: MAX_VALID_DATE_EPOCH_MS }),
         })
     ),
     id: validIdentifierArbitrary,
@@ -60,14 +56,9 @@ const httpMonitorArbitrary = fc.record({
     history: fc.array(
         fc.record({
             details: fc.option(fc.string(), { nil: undefined }),
-            responseTime: fc.float({
-                min: 0,
-                max: 99_999,
-                noNaN: true,
-                noDefaultInfinity: true,
-            }),
+            responseTime: fc.integer({ min: 0, max: 99_999 }),
             status: fc.constantFrom("up", "down"),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
+            timestamp: fc.integer({ min: 0, max: MAX_VALID_DATE_EPOCH_MS }),
         })
     ),
     id: validIdentifierArbitrary,
