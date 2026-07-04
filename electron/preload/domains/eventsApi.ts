@@ -76,6 +76,7 @@ export type EventsApi = EventsDomainBridge;
 
 type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
+type EventPayloadMapper<TPayload> = (payload: unknown) => TPayload | undefined;
 
 const RENDERER_EVENT_CHANNEL_VALUES = safeCastTo<
     readonly RendererEventChannel[]
@@ -327,11 +328,11 @@ const isHistoryLimitUpdatedEventDataPayload = (
 
 const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);
 
-const isSiteAddedEventDataPayload = (
+const mapSiteAddedEventDataPayload = (
     payload: unknown
-): payload is SiteAddedEventDataPayload => {
+): SiteAddedEventDataPayload | undefined => {
     if (!isUnknownRecord(payload)) {
-        return false;
+        return undefined;
     }
 
     const record = payload;
@@ -339,21 +340,28 @@ const isSiteAddedEventDataPayload = (
     const parsedSite = validateSiteSnapshot(site);
 
     if (!parsedSite.success) {
-        return false;
+        return undefined;
     }
 
     if (!isSiteAddedSource(source)) {
-        return false;
+        return undefined;
     }
 
     if (!hasFiniteTimestamp(timestamp)) {
-        return false;
+        return undefined;
     }
 
-    Object.assign(record, { site: parsedSite.data });
-
-    return true;
+    return {
+        site: parsedSite.data,
+        source,
+        timestamp,
+    };
 };
+
+const isSiteAddedEventDataPayload = (
+    payload: unknown
+): payload is SiteAddedEventDataPayload =>
+    mapSiteAddedEventDataPayload(payload) !== undefined;
 
 const isSiteRemovedEventDataPayload = (
     payload: unknown
@@ -375,45 +383,60 @@ const isSiteRemovedEventDataPayload = (
     return hasFiniteTimestamp(timestamp);
 };
 
-const isSiteUpdatedEventDataPayload = (
+const mapSiteUpdatedEventDataPayload = (
     payload: unknown
-): payload is SiteUpdatedEventDataPayload => {
+): SiteUpdatedEventDataPayload | undefined => {
     if (!isUnknownRecord(payload)) {
-        return false;
+        return undefined;
     }
 
     const record = payload;
-    const { previousSite, site, timestamp, updatedFields } = record;
+    const {
+        previousSite,
+        site,
+        timestamp,
+        updatedFields: updatedFieldsCandidate,
+    } = record;
     const parsedCurrentSite = validateSiteSnapshot(site);
     const parsedPreviousSite = validateSiteSnapshot(previousSite);
 
     if (!parsedCurrentSite.success || !parsedPreviousSite.success) {
-        return false;
+        return undefined;
     }
 
     if (!hasFiniteTimestamp(timestamp)) {
-        return false;
+        return undefined;
     }
 
-    if (!Array.isArray(updatedFields)) {
-        return false;
+    if (!Array.isArray(updatedFieldsCandidate)) {
+        return undefined;
     }
 
-    if (updatedFields.some((field) => typeof field !== "string")) {
-        return false;
+    const updatedFields = updatedFieldsCandidate.filter(
+        (field): field is string => typeof field === "string"
+    );
+
+    if (updatedFields.length !== updatedFieldsCandidate.length) {
+        return undefined;
     }
 
-    Object.assign(record, {
+    return {
         previousSite: parsedPreviousSite.data,
         site: parsedCurrentSite.data,
-    });
-
-    return true;
+        timestamp,
+        updatedFields: [...updatedFields],
+    };
 };
 
-interface GuardSubscriptionOptions {
+const isSiteUpdatedEventDataPayload = (
+    payload: unknown
+): payload is SiteUpdatedEventDataPayload =>
+    mapSiteUpdatedEventDataPayload(payload) !== undefined;
+
+interface GuardSubscriptionOptions<TPayload> {
     readonly domain?: string;
     readonly guardName?: string;
+    readonly mapPayload?: EventPayloadMapper<TPayload>;
 }
 
 const subscribeWithGuard = <TPayload>(
@@ -421,11 +444,20 @@ const subscribeWithGuard = <TPayload>(
     channel: RendererEventChannel,
     guard: EventGuard<TPayload>,
     callback: (payload: TPayload) => void,
-    options: GuardSubscriptionOptions = {}
+    options: GuardSubscriptionOptions<TPayload> = {}
 ): (() => void) =>
     manager.on((...args: unknown[]) => {
         const [payload] = args;
-        if (!guard(payload)) {
+        const mappedPayload = options.mapPayload
+            ? options.mapPayload(payload)
+            : undefined;
+        const validatedPayload = options.mapPayload
+            ? mappedPayload
+            : guard(payload)
+              ? payload
+              : undefined;
+
+        if (validatedPayload === undefined) {
             const guardName =
                 options.guardName ??
                 (guard.name.length > 0 ? guard.name : "anonymous");
@@ -459,7 +491,7 @@ const subscribeWithGuard = <TPayload>(
             void reportPreloadGuardFailure(guardFailureContext);
             return;
         }
-        callback(payload);
+        callback(safeCastTo<TPayload>(validatedPayload));
     });
 
 /**
@@ -638,6 +670,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteAddedEventDataPayload",
+                    mapPayload: mapSiteAddedEventDataPayload,
                 }
             ),
         onSiteRemoved: (
@@ -662,6 +695,7 @@ export function createEventsApi(): EventsApi {
                 callback,
                 {
                     guardName: "isSiteUpdatedEventDataPayload",
+                    mapPayload: mapSiteUpdatedEventDataPayload,
                 }
             ),
         onStateSyncEvent: (

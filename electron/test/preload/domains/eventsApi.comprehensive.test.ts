@@ -616,6 +616,41 @@ describe("Events Domain API", () => {
             expect(typeof cleanup).toBe("function");
         });
 
+        it("should normalize site added payloads without assigning to the original payload", () => {
+            const callback = vi.fn();
+            const site = createSiteFixture();
+            const timestamp = Date.now();
+            let siteSetterCalls = 0;
+            const payload = {
+                source: "user" as const,
+                timestamp,
+            } as Record<string, unknown>;
+
+            Object.defineProperty(payload, "site", {
+                configurable: true,
+                enumerable: true,
+                get: () => site,
+                set() {
+                    siteSetterCalls += 1;
+                    throw new Error("site setter should not run");
+                },
+            });
+
+            eventsApi.onSiteAdded(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            const received = callback.mock.calls[0]?.[0];
+            expect(siteSetterCalls).toBe(0);
+            expect(received).not.toBe(payload);
+            expect(received).toEqual({
+                site,
+                source: "user",
+                timestamp,
+            });
+        });
+
         it("should reject malformed site added payloads", () => {
             const callback = vi.fn();
 
@@ -719,6 +754,53 @@ describe("Events Domain API", () => {
 
             expect(callback).toHaveBeenCalledWith(payload);
             expect(typeof cleanup).toBe("function");
+        });
+
+        it("should normalize site updated payloads without assigning to the original payload", () => {
+            const callback = vi.fn();
+            const previousSite = createSiteFixture({ name: "Old" });
+            const site = createSiteFixture({ name: "New" });
+            const timestamp = Date.now();
+            let setterCalls = 0;
+            const payload = {
+                timestamp,
+                updatedFields: ["name"],
+            } as Record<string, unknown>;
+
+            Object.defineProperty(payload, "previousSite", {
+                configurable: true,
+                enumerable: true,
+                get: () => previousSite,
+                set() {
+                    setterCalls += 1;
+                    throw new Error("previousSite setter should not run");
+                },
+            });
+            Object.defineProperty(payload, "site", {
+                configurable: true,
+                enumerable: true,
+                get: () => site,
+                set() {
+                    setterCalls += 1;
+                    throw new Error("site setter should not run");
+                },
+            });
+
+            eventsApi.onSiteUpdated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            const received = callback.mock.calls[0]?.[0];
+            expect(setterCalls).toBe(0);
+            expect(received).not.toBe(payload);
+            expect(received).toEqual({
+                previousSite,
+                site,
+                timestamp,
+                updatedFields: ["name"],
+            });
+            expect(received.updatedFields).not.toBe(payload["updatedFields"]);
         });
 
         it("should reject malformed site updated payloads", () => {
@@ -865,8 +947,8 @@ describe("Events Domain API", () => {
                 "pending",
                 "up",
             ] as const;
-            const MIN_ISO_TIMESTAMP_MS = -8_640_000_000_000_000 + 1;
-            const MAX_ISO_TIMESTAMP_MS = 8_640_000_000_000_000 - 1;
+            const MIN_ISO_TIMESTAMP_DATE = new Date(0);
+            const MAX_ISO_TIMESTAMP_DATE = new Date("9999-12-31T23:59:59.999Z");
             const nonWhitespaceString = (constraints?: {
                 readonly maxLength?: number;
                 readonly minLength?: number;
@@ -926,7 +1008,10 @@ describe("Events Domain API", () => {
                         nil: undefined,
                     }),
                     fc.constantFrom(...statusValues),
-                    fc.date()
+                    fc.date({
+                        max: MAX_ISO_TIMESTAMP_DATE,
+                        min: MIN_ISO_TIMESTAMP_DATE,
+                    })
                 )
                 .map(
                     ([
@@ -938,17 +1023,6 @@ describe("Events Domain API", () => {
                         status,
                         timestampValue,
                     ]) => {
-                        const normalizedTime = (() => {
-                            const time = timestampValue.getTime();
-                            if (Number.isNaN(time)) {
-                                return 0;
-                            }
-                            return Math.max(
-                                MIN_ISO_TIMESTAMP_MS,
-                                Math.min(MAX_ISO_TIMESTAMP_MS, time)
-                            );
-                        })();
-
                         const site = createSiteFixture({
                             identifier: siteOverrides.identifier,
                             monitoring: siteOverrides.monitoring,
@@ -967,7 +1041,7 @@ describe("Events Domain API", () => {
                             site,
                             siteIdentifier: site.identifier,
                             status,
-                            timestamp: new Date(normalizedTime).toISOString(),
+                            timestamp: timestampValue.toISOString(),
                         } satisfies MonitorStatusChangedEventData;
                     }
                 );
