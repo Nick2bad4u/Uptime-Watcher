@@ -23,7 +23,6 @@ const knipConfig: KnipConfig = {
         "docs/docusaurus/typedoc-plugins/prefixDocLinks.mjs",
         "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.d.mts",
         "docs/docusaurus/typedoc-plugins/prefixDocLinksCore.d.mts",
-        "scripts/**",
     ],
     ignoreBinaries: [
         "gitleaks",
