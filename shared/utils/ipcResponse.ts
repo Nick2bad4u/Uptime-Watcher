@@ -78,6 +78,28 @@ const normalizeFailureMessage = (response: IpcResponse): string => {
         : "IPC operation failed";
 };
 
+const getOwnDataProperty = (source: object, key: PropertyKey): unknown => {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+};
+
+const readParseOption = <T>(
+    options: ExtractIpcResponseDataOptions<T>
+): ((data: unknown) => T) | undefined => {
+    const value = getOwnDataProperty(options, "parse");
+    return typeof value === "function"
+        ? castUnchecked<(data: unknown) => T>(value)
+        : undefined;
+};
+
+const readRequireDataOption = <T>(
+    options: ExtractIpcResponseDataOptions<T>,
+    fallback: boolean
+): boolean => {
+    const value = getOwnDataProperty(options, "requireData");
+    return typeof value === "boolean" ? value : fallback;
+};
+
 /**
  * Extracts `data` from a successful {@link IpcResponse} envelope.
  *
@@ -102,13 +124,13 @@ export function extractIpcResponseData<T>(
         throw new Error(normalizeFailureMessage(response));
     }
 
-    const { requireData = true } = options;
+    const requireData = readRequireDataOption(options, true);
     if (requireData && !isDefined(response.data)) {
         throw new Error("IPC response missing data field");
     }
 
     const rawData = response.data;
-    const { parse } = options;
+    const parse = readParseOption(options);
     return parse ? parse(rawData) : castUnchecked<T>(rawData);
 }
 
@@ -134,10 +156,12 @@ export function safeExtractIpcResponseData<T>(
     options: ExtractIpcResponseDataOptions<T> = {}
 ): T {
     try {
-        return extractIpcResponseData<T>(response, {
-            requireData: false,
-            ...options,
-        });
+        const requireData = readRequireDataOption(options, false);
+        const parse = readParseOption(options);
+        return extractIpcResponseData<T>(
+            response,
+            parse ? { parse, requireData } : { requireData }
+        );
     } catch {
         return fallback;
     }
