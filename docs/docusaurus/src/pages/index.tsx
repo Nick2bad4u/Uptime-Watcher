@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { JSX, MouseEvent } from "react";
 
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
@@ -10,15 +10,55 @@ import clsx from "clsx";
 
 import styles from "./index.module.css";
 
+const buttonFeedbackTimers = new WeakMap<
+    HTMLButtonElement,
+    ReturnType<typeof setTimeout>
+>();
+
+/**
+ * Shows temporary button text and restores the original label afterward.
+ *
+ * @param button - Button element receiving feedback
+ * @param temporaryText - Short-lived feedback text
+ * @param durationMs - Duration before restoring the original text
+ */
+function showTemporaryButtonText(
+    button: HTMLButtonElement,
+    temporaryText: string,
+    durationMs = 1000
+): void {
+    const originalText = button.textContent;
+    const existingTimer = buttonFeedbackTimers.get(button);
+    if (existingTimer) {
+        clearTimeout(existingTimer);
+    }
+
+    button.textContent = temporaryText;
+    const timer = setTimeout(() => {
+        button.textContent = originalText;
+        buttonFeedbackTimers.delete(button);
+    }, durationMs);
+
+    buttonFeedbackTimers.set(button, timer);
+}
+
+/**
+ * Returns the active button when button-scoped feedback is available.
+ *
+ * @returns Active button element, or undefined when focus is elsewhere
+ */
+function getActiveButton(): HTMLButtonElement | undefined {
+    const { activeElement } = document;
+    return activeElement instanceof HTMLButtonElement
+        ? activeElement
+        : undefined;
+}
+
 /**
  * Copies code to clipboard with fallback support.
  */
-const handleCopyCode = (() => {
-    // Module-scoped variable to track the feedback timer for proper cleanup
-    let feedbackTimer: null | ReturnType<typeof setTimeout> = null;
-
-    return async (): Promise<void> => {
-        const code = `{
+const handleCopyCode = async (): Promise<void> => {
+    const code = `{
   "name": "uptime-watcher",
   "version": "12.5.0",
   "description": "Desktop uptime monitoring",
@@ -37,70 +77,76 @@ const handleCopyCode = (() => {
   "license": "Unlicense"
 }`;
 
-        // Try modern clipboard API first (browser environment only)
-        if (
-            typeof window !== "undefined" &&
-            "navigator" in globalThis &&
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Browser API access requires runtime checks
-            navigator.clipboard
-        ) {
-            try {
-                await navigator.clipboard.writeText(code);
-                // Simple feedback
-                const button = document.activeElement;
-                if (button && button instanceof HTMLButtonElement) {
-                    const originalText = button.textContent;
-                    button.textContent = "Copied!";
-
-                    // Clear any existing feedback timer
-                    if (feedbackTimer) {
-                        clearTimeout(feedbackTimer);
-                    }
-
-                    feedbackTimer = setTimeout(() => {
-                        button.textContent = originalText;
-                        feedbackTimer = null;
-                    }, 1000);
-                }
-                return;
-            } catch {
-                // Fall through to the older method
-            }
-        }
-
-        // Fallback for older browsers or when navigator is not available
-        const textArea = document.createElement("textarea");
-        textArea.value = code;
-        document.body.append(textArea);
-        textArea.select();
+    // Try modern clipboard API first (browser environment only)
+    if (
+        typeof window !== "undefined" &&
+        "navigator" in globalThis &&
+        "clipboard" in globalThis.navigator
+    ) {
         try {
-            document.execCommand("copy");
+            await globalThis.navigator.clipboard.writeText(code);
+            const button = getActiveButton();
+            if (button) {
+                showTemporaryButtonText(button, "Copied!");
+            }
+            return;
         } catch {
-            console.warn("Copy to clipboard not supported");
+            // Fall through to the older method
         }
+    }
+
+    // Fallback for older browsers or when navigator is not available
+    const textArea = document.createElement("textarea");
+    textArea.value = code;
+    document.body.append(textArea);
+    textArea.select();
+    try {
+        const copySucceeded = document.execCommand("copy");
+        const button = getActiveButton();
+        if (button) {
+            showTemporaryButtonText(
+                button,
+                copySucceeded ? "Copied!" : "Unavailable"
+            );
+        }
+    } catch {
+        const button = getActiveButton();
+        if (button) {
+            showTemporaryButtonText(button, "Unavailable");
+        }
+    } finally {
         textArea.remove();
-    };
-})();
+    }
+};
+
+/**
+ * Copies the sample package code and absorbs unexpected browser errors.
+ */
+async function copyCodeAndReport(): Promise<void> {
+    try {
+        await handleCopyCode();
+    } catch {
+        const button = getActiveButton();
+        if (button) {
+            showTemporaryButtonText(button, "Unavailable");
+        }
+    }
+}
 
 /**
  * Wrapper for handleCopyCode to handle the async function in onClick.
  */
 const handleCopyCodeClick = (): void => {
-    // eslint-disable-next-line promise/prefer-await-to-then -- Using Promise.then for error handling pattern in this context
-    void handleCopyCode().catch((error: unknown) => {
-        console.error("Failed to copy code:", error);
-    });
+    void copyCodeAndReport();
 };
 
 /**
  * Handles demo button click with feedback message.
+ *
+ * @param event - Demo button click event
  */
-const handleDemoButtonClick = (): void => {
-    // Show a simple demo message
-    // eslint-disable-next-line no-alert -- Alert is acceptable for user feedback in documentation context
-    alert(
-        "🎯 Demo Feature!\n\nThis is just a UI demonstration. The Add Site button is not functional in the documentation."
-    );
+const handleDemoButtonClick = (event: MouseEvent<HTMLButtonElement>): void => {
+    showTemporaryButtonText(event.currentTarget, "Demo only");
 };
 
 /**
@@ -397,15 +443,14 @@ const HomepageHeader = (): JSX.Element => (
                                         📋 Copy
                                     </button>
 
-                                    {/* eslint-disable-next-line @docusaurus/no-html-links -- External GitHub link requires standard HTML anchor */}
-                                    <a
+                                    <Link
                                         className={styles.viewButton}
                                         href="https://github.com/Nick2bad4u/Uptime-Watcher/blob/main/package.json"
                                         rel="noopener noreferrer"
                                         target="_blank"
                                     >
                                         🔗 View Full
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
 
