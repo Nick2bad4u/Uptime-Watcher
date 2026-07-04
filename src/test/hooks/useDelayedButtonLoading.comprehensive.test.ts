@@ -417,20 +417,21 @@ describe(useDelayedButtonLoading, () => {
             await annotate("Type: Event Processing", "type");
 
             // Arrange
-            const { rerender } = renderHook(
+            const { result, rerender } = renderHook(
                 ({ isLoading }) => useDelayedButtonLoading(isLoading),
                 {
                     initialProps: { isLoading: false },
                 }
             );
+            const initialTimerCount = vi.getTimerCount();
 
             // Act - Multiple rerenders with same props
             rerender({ isLoading: false });
             rerender({ isLoading: false });
             rerender({ isLoading: false });
 
-            // Assert - Should not cause issues (verified by not throwing)
-            expect(true).toBeTruthy();
+            expect(result.current).toBe(false);
+            expect(vi.getTimerCount()).toBe(initialTimerCount);
         });
 
         it("should handle prop changes without memory leaks", async ({

@@ -189,39 +189,26 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const props = createProps();
+        const props = createProps({
+            url: "https://example.com",
+        });
 
         const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
         const thumbnail = screen.getByRole("link");
 
-        // Trigger hover to create timeout and portal
-        act(() => {
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseenter", { bubbles: true })
-            );
-        });
+        // Trigger leave to create a pending timeout that unmount cleanup clears.
+        fireEvent.mouseEnter(thumbnail);
+        fireEvent.mouseLeave(thumbnail);
 
-        // Advance time to allow state changes
-        act(() => {
-            vi.advanceTimersByTime(100);
-        });
-
-        // The component should now be in hover state with portal
-        expect(
-            screen.getByText(`Preview: ${props.siteName}`)
-        ).toBeInTheDocument();
+        expect(vi.getTimerCount()).toBeGreaterThan(0);
 
         // Unmount component to trigger cleanup useEffect
         act(() => {
             unmount();
         });
 
-        // The cleanup should have handled:
-        // - Clearing timeout if it exists (lines 60-61)
-        // - Removing portal if it exists (lines 67-68)
-
-        expect(true).toBeTruthy(); // If we get here without errors, cleanup worked
+        expect(screen.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("should handle hover timeout creation and cleanup", ({
@@ -238,24 +225,26 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const props = createProps();
+        const props = createProps({
+            url: "https://example.com",
+        });
+        const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
         render(<ScreenshotThumbnail {...props} />);
 
         const thumbnail = screen.getByRole("link");
+        const initialTimerCount = vi.getTimerCount();
 
         // Test the timeout creation path
-        act(() => {
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseenter", { bubbles: true })
-            );
+        fireEvent.mouseEnter(thumbnail);
+        fireEvent.mouseLeave(thumbnail);
 
-            // This should create a timeout (stored in hoverTimeoutRef.current)
-            // When component unmounts, it should clear this timeout (lines 60-61)
-        });
+        expect(vi.getTimerCount()).toBeGreaterThan(initialTimerCount);
 
-        // Verify timeout was created by checking if hover behavior works
-        expect(thumbnail).toBeInTheDocument();
+        fireEvent.mouseEnter(thumbnail);
+
+        expect(clearTimeoutSpy).toHaveBeenCalled();
+        expect(vi.getTimerCount()).toBe(initialTimerCount);
     });
 
     it("should handle portal cleanup on unmount", ({ task, annotate }) => {
@@ -269,17 +258,17 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const props = createProps();
+        const props = createProps({
+            url: "https://example.com",
+        });
 
         const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
         const thumbnail = screen.getByRole("link");
 
         // Trigger hover to potentially create portal
+        fireEvent.mouseEnter(thumbnail);
         act(() => {
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseenter", { bubbles: true })
-            );
             vi.advanceTimersByTime(500); // Advance past hover delay
         });
 
@@ -288,9 +277,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
             unmount();
         });
 
-        // The cleanup should have run without throwing errors (this tests the cleanup path)
-        // The component's useEffect cleanup is designed to handle its own portal references
-        expect(true).toBeTruthy(); // If we get here, cleanup worked correctly
+        expect(screen.queryByRole("link")).not.toBeInTheDocument();
     });
 
     it("should handle click event and log user action", async ({
@@ -324,6 +311,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Type: Business Logic", "type");
 
         const props = defaultProps; // Use consistent props
+        const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
         render(<ScreenshotThumbnail {...props} />);
 
@@ -336,24 +324,19 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // Rapid hover/unhover to test timeout handling
-        act(() => {
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseenter", { bubbles: true })
-            );
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseleave", { bubbles: true })
-            );
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseenter", { bubbles: true })
-            );
-            thumbnail.dispatchEvent(
-                new MouseEvent("mouseleave", { bubbles: true })
-            );
+        fireEvent.mouseEnter(thumbnail);
+        fireEvent.mouseLeave(thumbnail);
+        fireEvent.mouseEnter(thumbnail);
+        fireEvent.mouseLeave(thumbnail);
 
+        act(() => {
             // Advance timers to trigger any pending timeouts
             vi.advanceTimersByTime(1000);
         });
 
-        expect(thumbnail).toBeInTheDocument();
+        expect(clearTimeoutSpy).toHaveBeenCalled();
+        expect(
+            screen.queryByAltText(`Large screenshot of ${props.siteName}`)
+        ).not.toBeInTheDocument();
     });
 });
