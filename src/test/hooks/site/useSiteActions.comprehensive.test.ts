@@ -1,35 +1,47 @@
-import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useSiteActions } from "../../../hooks/site/useSiteActions";
 import { createMockMonitor, createMockSite } from "../../utils/mockFactories";
 
-// Mock dependencies - define all mocks inline to avoid hoisting issues
+const sitesStoreMocks = vi.hoisted(() => ({
+    checkSiteNow: vi.fn(),
+    setSelectedMonitorId: vi.fn(),
+    startSiteMonitoring: vi.fn(),
+    startSiteMonitorMonitoring: vi.fn(),
+    stopSiteMonitoring: vi.fn(),
+    stopSiteMonitorMonitoring: vi.fn(),
+}));
+
+const uiStoreMocks = vi.hoisted(() => ({
+    selectSite: vi.fn(),
+    setShowSiteDetails: vi.fn(),
+}));
+
+const loggerMocks = vi.hoisted(() => ({
+    siteError: vi.fn(),
+    userAction: vi.fn(),
+}));
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        checkSiteNow: vi.fn(),
-        setSelectedMonitorId: vi.fn(),
-        startSiteMonitoring: vi.fn(),
-        startSiteMonitorMonitoring: vi.fn(),
-        stopSiteMonitoring: vi.fn(),
-        stopSiteMonitorMonitoring: vi.fn(),
-    })),
+    useSitesStore: vi.fn((selector?: (state: typeof sitesStoreMocks) => unknown) =>
+        typeof selector === "function" ? selector(sitesStoreMocks) : sitesStoreMocks
+    ),
 }));
 
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: vi.fn(() => ({
-        selectSite: vi.fn(),
-        setShowSiteDetails: vi.fn(),
-    })),
+    useUIStore: vi.fn((selector?: (state: typeof uiStoreMocks) => unknown) =>
+        typeof selector === "function" ? selector(uiStoreMocks) : uiStoreMocks
+    ),
 }));
 
 vi.mock("../../../services/logger", () => ({
     logger: {
         site: {
-            error: vi.fn(),
+            error: loggerMocks.siteError,
         },
         user: {
-            action: vi.fn(),
+            action: loggerMocks.userAction,
         },
     },
 }));
@@ -40,10 +52,11 @@ const mockMonitor = createMockMonitor();
 describe("useSiteActions Hook", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-    });
-
-    afterEach(() => {
-        vi.restoreAllMocks();
+        sitesStoreMocks.checkSiteNow.mockResolvedValue(undefined);
+        sitesStoreMocks.startSiteMonitoring.mockResolvedValue(undefined);
+        sitesStoreMocks.startSiteMonitorMonitoring.mockResolvedValue(undefined);
+        sitesStoreMocks.stopSiteMonitoring.mockResolvedValue(undefined);
+        sitesStoreMocks.stopSiteMonitorMonitoring.mockResolvedValue(undefined);
     });
 
     describe("Basic Functionality", () => {
@@ -111,8 +124,20 @@ describe("useSiteActions Hook", () => {
                 result.current.handleStartMonitoring();
             });
 
-            // Should call the action without throwing
-            expect(true).toBeTruthy();
+            expect(
+                sitesStoreMocks.startSiteMonitorMonitoring
+            ).toHaveBeenCalledWith(mockSite.identifier, mockMonitor.id);
+            await waitFor(() => {
+                expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                    "Started site monitoring",
+                    {
+                        monitorId: mockMonitor.id,
+                        monitorType: mockMonitor.type,
+                        siteIdentifier: mockSite.identifier,
+                        siteName: mockSite.name,
+                    }
+                );
+            });
         });
 
         it("should handle start monitoring without monitor", async ({
@@ -132,8 +157,16 @@ describe("useSiteActions Hook", () => {
                 result.current.handleStartMonitoring();
             });
 
-            // Should handle gracefully
-            expect(true).toBeTruthy();
+            expect(
+                sitesStoreMocks.startSiteMonitorMonitoring
+            ).not.toHaveBeenCalled();
+            expect(loggerMocks.siteError).toHaveBeenCalledWith(
+                mockSite.identifier,
+                expect.objectContaining({
+                    message:
+                        "Attempted to start monitoring without valid monitor",
+                })
+            );
         });
 
         it("should handle start site monitoring", async ({
@@ -153,8 +186,19 @@ describe("useSiteActions Hook", () => {
                 result.current.handleStartSiteMonitoring();
             });
 
-            // Should call the action without throwing
-            expect(true).toBeTruthy();
+            expect(sitesStoreMocks.startSiteMonitoring).toHaveBeenCalledWith(
+                mockSite.identifier
+            );
+            await waitFor(() => {
+                expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                    "Started site-wide monitoring",
+                    {
+                        monitorsCount: mockSite.monitors.length,
+                        siteIdentifier: mockSite.identifier,
+                        siteName: mockSite.name,
+                    }
+                );
+            });
         });
     });
 
@@ -176,8 +220,20 @@ describe("useSiteActions Hook", () => {
                 result.current.handleStopMonitoring();
             });
 
-            // Should call the action without throwing
-            expect(true).toBeTruthy();
+            expect(
+                sitesStoreMocks.stopSiteMonitorMonitoring
+            ).toHaveBeenCalledWith(mockSite.identifier, mockMonitor.id);
+            await waitFor(() => {
+                expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                    "Stopped site monitoring",
+                    {
+                        monitorId: mockMonitor.id,
+                        monitorType: mockMonitor.type,
+                        siteIdentifier: mockSite.identifier,
+                        siteName: mockSite.name,
+                    }
+                );
+            });
         });
 
         it("should handle stop monitoring with disabled monitoring", async ({
@@ -199,8 +255,9 @@ describe("useSiteActions Hook", () => {
                 result.current.handleStopMonitoring();
             });
 
-            // Should handle gracefully
-            expect(true).toBeTruthy();
+            expect(
+                sitesStoreMocks.stopSiteMonitorMonitoring
+            ).toHaveBeenCalledWith(disabledSite.identifier, mockMonitor.id);
         });
 
         it("should handle stop site monitoring", async ({ task, annotate }) => {
@@ -217,8 +274,19 @@ describe("useSiteActions Hook", () => {
                 result.current.handleStopSiteMonitoring();
             });
 
-            // Should call the action without throwing
-            expect(true).toBeTruthy();
+            expect(sitesStoreMocks.stopSiteMonitoring).toHaveBeenCalledWith(
+                mockSite.identifier
+            );
+            await waitFor(() => {
+                expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                    "Stopped site-wide monitoring",
+                    {
+                        monitorsCount: mockSite.monitors.length,
+                        siteIdentifier: mockSite.identifier,
+                        siteName: mockSite.name,
+                    }
+                );
+            });
         });
     });
 
@@ -237,8 +305,12 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCardClick();
             });
 
-            // Should call the action without throwing
-            expect(true).toBeTruthy();
+            expect(uiStoreMocks.selectSite).toHaveBeenCalledWith(mockSite);
+            expect(sitesStoreMocks.setSelectedMonitorId).toHaveBeenCalledWith(
+                mockSite.identifier,
+                mockMonitor.id
+            );
+            expect(uiStoreMocks.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
 
         it("should handle card click without monitor", async ({
@@ -258,8 +330,11 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCardClick();
             });
 
-            // Should handle gracefully
-            expect(true).toBeTruthy();
+            expect(uiStoreMocks.selectSite).toHaveBeenCalledWith(mockSite);
+            expect(
+                sitesStoreMocks.setSelectedMonitorId
+            ).not.toHaveBeenCalled();
+            expect(uiStoreMocks.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
     });
 
@@ -278,8 +353,20 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCheckNow();
             });
 
-            // Should call the action without throwing
-            expect(true).toBeTruthy();
+            expect(sitesStoreMocks.checkSiteNow).toHaveBeenCalledWith(
+                mockSite.identifier,
+                mockMonitor.id
+            );
+            await waitFor(() => {
+                expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                    "Manual site check completed successfully",
+                    {
+                        monitorId: mockMonitor.id,
+                        siteIdentifier: mockSite.identifier,
+                        siteName: mockSite.name,
+                    }
+                );
+            });
         });
 
         it("should handle check now with different monitor types", async ({
@@ -302,8 +389,19 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCheckNow();
             });
 
-            // Should handle different configurations
-            expect(true).toBeTruthy();
+            expect(sitesStoreMocks.checkSiteNow).toHaveBeenCalledWith(
+                httpsSite.identifier,
+                httpMonitor.id
+            );
+            expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                "Manual site check initiated",
+                {
+                    monitorId: httpMonitor.id,
+                    monitorType: "http",
+                    siteIdentifier: httpsSite.identifier,
+                    siteName: "HTTPS Site",
+                }
+            );
         });
     });
 
@@ -314,21 +412,24 @@ describe("useSiteActions Hook", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Error Handling", "type");
 
+            const operationError = new Error("operation failed");
+            sitesStoreMocks.startSiteMonitorMonitoring.mockRejectedValueOnce(
+                operationError
+            );
             const { result } = renderHook(() =>
                 useSiteActions(mockSite, mockMonitor)
             );
 
-            // Should not throw even if underlying services fail
             await act(async () => {
                 result.current.handleStartMonitoring();
-                result.current.handleStopMonitoring();
-                result.current.handleStartSiteMonitoring();
-                result.current.handleStopSiteMonitoring();
-                result.current.handleCardClick();
-                result.current.handleCheckNow();
             });
 
-            expect(true).toBeTruthy();
+            await waitFor(() => {
+                expect(loggerMocks.siteError).toHaveBeenCalledWith(
+                    mockSite.identifier,
+                    operationError
+                );
+            });
         });
 
         it("should handle null/undefined inputs", async ({
@@ -351,7 +452,15 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCheckNow();
             });
 
-            expect(true).toBeTruthy();
+            expect(
+                sitesStoreMocks.startSiteMonitorMonitoring
+            ).not.toHaveBeenCalled();
+            expect(
+                sitesStoreMocks.stopSiteMonitorMonitoring
+            ).not.toHaveBeenCalled();
+            expect(sitesStoreMocks.checkSiteNow).not.toHaveBeenCalled();
+            expect(loggerMocks.siteError).toHaveBeenCalledTimes(3);
+            expect(uiStoreMocks.selectSite).toHaveBeenCalledWith(mockSite);
         });
     });
 
@@ -507,7 +616,16 @@ describe("useSiteActions Hook", () => {
                 }
             });
 
-            expect(true).toBeTruthy();
+            expect(sitesStoreMocks.checkSiteNow).toHaveBeenCalledTimes(10);
+            expect(loggerMocks.userAction).toHaveBeenCalledWith(
+                "Manual site check initiated",
+                {
+                    monitorId: mockMonitor.id,
+                    monitorType: mockMonitor.type,
+                    siteIdentifier: mockSite.identifier,
+                    siteName: mockSite.name,
+                }
+            );
         });
 
         it("should handle concurrent operations", async ({
@@ -529,7 +647,14 @@ describe("useSiteActions Hook", () => {
                 result.current.handleCardClick();
             });
 
-            expect(true).toBeTruthy();
+            expect(
+                sitesStoreMocks.startSiteMonitorMonitoring
+            ).toHaveBeenCalledWith(mockSite.identifier, mockMonitor.id);
+            expect(sitesStoreMocks.checkSiteNow).toHaveBeenCalledWith(
+                mockSite.identifier,
+                mockMonitor.id
+            );
+            expect(uiStoreMocks.selectSite).toHaveBeenCalledWith(mockSite);
         });
     });
 });
