@@ -463,8 +463,9 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
 
         it("should be read-only", () => {
             expect(() => {
-                // @ts-expect-error - Testing readonly behavior
-                LOG_TEMPLATES.debug = {};
+                Object.defineProperty(LOG_TEMPLATES, "debug", {
+                    value: {},
+                });
             }).toThrow();
         });
 
