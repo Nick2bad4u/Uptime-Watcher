@@ -30,7 +30,6 @@ const knipConfig: KnipConfig = {
         "powershell",
         "shellcheck",
         "winget",
-        "yamllint",
     ],
     ignoreDependencies: [
         ".*eslint-formatter-.*",

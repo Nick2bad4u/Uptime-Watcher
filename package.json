@@ -1156,6 +1156,7 @@
         "yaml": "^2.9.0",
         "yaml-eslint-parser": "^2.0.0",
         "yamllint-config-nick2bad4u": "^1.1.0",
+        "yamllint-js": "^0.2.4",
         "yargs": "^18.0.0",
         "zod-fast-check": "^0.10.1"
     },
