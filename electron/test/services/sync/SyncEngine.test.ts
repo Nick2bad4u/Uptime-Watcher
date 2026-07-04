@@ -138,6 +138,7 @@ function canonicalizeSites(sites: Site[]): unknown {
 describe("SyncEngine (ADR-016)", () => {
     it("deletes synced settings whose keys match inherited object properties", async () => {
         const settings = new InMemorySettingsAdapter();
+        await settings.set("__proto__", "old-prototype-value");
         await settings.set("toString", "old-value");
 
         const engine = new SyncEngine({
@@ -145,11 +146,26 @@ describe("SyncEngine (ADR-016)", () => {
             settings,
         });
 
+        const existing = Object.create(null) as Record<string, string>;
+        Object.defineProperty(existing, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: "old-prototype-value",
+            writable: true,
+        });
+        Object.defineProperty(existing, "toString", {
+            configurable: true,
+            enumerable: true,
+            value: "old-value",
+            writable: true,
+        });
+
         await (engine as unknown as SyncEnginePrivateAccess).applySettings(
-            { toString: "old-value" },
+            existing,
             {}
         );
 
+        expect(await settings.get("__proto__")).toBeUndefined();
         expect(await settings.get("toString")).toBeUndefined();
     });
 

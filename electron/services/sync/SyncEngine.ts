@@ -503,10 +503,16 @@ export class SyncEngine {
         existing: Record<string, string>,
         desired: CloudSyncSettingsConfig
     ): Promise<void> {
-        const existingFiltered: Record<string, string> = {};
+        const existingFiltered =
+            createNullPrototypeObject<Record<string, string>>();
         for (const [key, value] of objectEntries(existing)) {
             if (shouldSyncSettingKey(key)) {
-                existingFiltered[key] = value;
+                Object.defineProperty(existingFiltered, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value,
+                    writable: true,
+                });
             }
         }
 
