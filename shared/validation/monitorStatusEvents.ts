@@ -11,6 +11,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { objectHasIn } from "ts-extras";
 
@@ -24,17 +25,7 @@ const stripEventMetadata = (value: UnknownRecord): UnknownRecord => {
         return value;
     }
 
-    const sanitizedRecord: UnknownRecord = { ...value };
-
-    if (objectHasIn(sanitizedRecord, "_meta")) {
-        Reflect.deleteProperty(sanitizedRecord, "_meta");
-    }
-
-    if (objectHasIn(sanitizedRecord, "_originalMeta")) {
-        Reflect.deleteProperty(sanitizedRecord, "_originalMeta");
-    }
-
-    return sanitizedRecord;
+    return safeObjectOmit(value, ["_meta", "_originalMeta"]);
 };
 
 /**

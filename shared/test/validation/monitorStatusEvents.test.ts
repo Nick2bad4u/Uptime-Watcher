@@ -8,7 +8,7 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 function createValidHttpMonitor(partial: Partial<Monitor> = {}): Monitor {
     return {
@@ -60,6 +60,33 @@ describe("monitorStatusEvents", () => {
 
         expect(isMonitorStatusChangedEventData(payload)).toBeTruthy();
         expect(isEnrichedMonitorStatusChangedEventData(payload)).toBeTruthy();
+    });
+
+    it("does not invoke accessor-backed fields while stripping metadata", () => {
+        const monitor = createValidHttpMonitor({ id: "m1" });
+        const site = createSite();
+        const getter = vi.fn(() => {
+            throw new Error("computed getter should not run");
+        });
+
+        const payload = {
+            _meta: { emittedAt: 1 },
+            monitor,
+            monitorId: monitor.id,
+            site,
+            siteIdentifier: site.identifier,
+            responseTime: monitor.responseTime,
+            status: monitor.status,
+            timestamp: new Date("2025-01-01T00:00:00.000Z").toISOString(),
+        };
+
+        Object.defineProperty(payload, "computed", {
+            enumerable: true,
+            get: getter,
+        });
+
+        expect(isMonitorStatusChangedEventData(payload)).toBeTruthy();
+        expect(getter).not.toHaveBeenCalled();
     });
 
     it("returns false when the inner status update validation fails", () => {
