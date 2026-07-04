@@ -246,9 +246,5 @@ describe(ApplicationService, () => {
                 expect(mockApp.quit).not.toHaveBeenCalled();
             }
         });
-        it("BrowserWindow tests disabled - focusing on business logic only", () => {
-            // Following user instruction: "WE DO NOT NEED TO TEST LOGGER/DEV TOOLS IN TESTS"
-            expect(true).toBeTruthy();
-        });
     });
 });

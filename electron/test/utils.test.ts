@@ -88,11 +88,6 @@ describe("Electron Utils", () => {
         expect(app.getPath).toBeDefined();
         expect(app.getPath("userData")).toBe(mockPath);
     });
-    // Add actual utility function tests here when available
-    it("should format response time correctly", () => {
-        // This test is intentionally empty as the function doesn't exist yet
-        expect(true).toBeTruthy();
-    });
 });
 describe("Electron Main Process", () => {
     it("should create browser window", async ({ task, annotate }) => {

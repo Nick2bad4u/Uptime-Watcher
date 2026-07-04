@@ -9,12 +9,23 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { logger } from "../utils/logger";
 
+const logMocks = vi.hoisted(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+}));
+
 // Mock dependencies
 vi.mock("electron", () => ({
     app: {
         isPackaged: false,
         getPath: vi.fn(() => "/mock/path"),
     },
+}));
+
+vi.mock("electron-log/main", () => ({
+    default: logMocks,
 }));
 
 describe("Utility Files - Missing Branch Coverage", () => {
@@ -90,8 +101,36 @@ describe("Utility Files - Missing Branch Coverage", () => {
                 JSON.stringify({ complex: { nested: { object: true } } })
             );
 
-            // All calls should not throw
-            expect(true).toBeTruthy(); // Test passes if no errors thrown
+            expect(logMocks.info).toHaveBeenCalledTimes(7);
+            expect(logMocks.info.mock.calls.map((call) => call[0])).toEqual([
+                "[BACKEND] string message",
+                "[BACKEND] 123",
+                "[BACKEND] true",
+                "[BACKEND] null",
+                "[BACKEND] undefined",
+                '[BACKEND] {"key":"value"}',
+                "[BACKEND] [1,2,3]",
+            ]);
+
+            expect(logMocks.error).toHaveBeenCalledWith(
+                "[BACKEND] Error:",
+                expect.objectContaining({
+                    message: "test error",
+                    name: "Error",
+                    stack: expect.any(String),
+                }),
+                { context: "test" }
+            );
+            expect(logMocks.warn).toHaveBeenCalledWith(
+                "[BACKEND] Warning",
+                "123",
+                "true",
+                "null"
+            );
+            expect(logMocks.debug).toHaveBeenCalledWith(
+                "[BACKEND] Debug",
+                '{"complex":{"nested":{"object":true}}}'
+            );
         });
     });
 
