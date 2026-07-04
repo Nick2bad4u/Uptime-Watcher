@@ -319,8 +319,10 @@ describe("PortMonitor Coverage Tests", () => {
             await annotate("Type: Validation", "type");
 
             portMonitor.updateConfig({ userAgent: "Custom Agent/1.0" });
-            // Should not throw
-            expect(true).toBeTruthy();
+
+            expect(portMonitor.getConfig()).toMatchObject({
+                userAgent: "Custom Agent/1.0",
+            });
         });
 
         it("should handle empty config update", async ({ task, annotate }) => {
@@ -332,9 +334,11 @@ describe("PortMonitor Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Data Update", "type");
 
+            const originalConfig = portMonitor.getConfig();
+
             portMonitor.updateConfig({});
-            // Should not throw for empty config
-            expect(true).toBeTruthy();
+
+            expect(portMonitor.getConfig()).toStrictEqual(originalConfig);
         });
 
         it("should allow updating with empty object", async ({
@@ -349,9 +353,11 @@ describe("PortMonitor Coverage Tests", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
+            const originalConfig = portMonitor.getConfig();
+
             portMonitor.updateConfig({});
-            // Should not throw
-            expect(true).toBeTruthy();
+
+            expect(portMonitor.getConfig()).toStrictEqual(originalConfig);
         });
     });
 
