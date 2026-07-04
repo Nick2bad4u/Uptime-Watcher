@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildStatusSubscriptionFailureSummary } from "../../../../stores/sites/utils/statusUpdateSubscriptionSummary";
+import {
+    buildStatusSubscriptionFailureSummary,
+    FALLBACK_EXPECTED_LISTENERS,
+    resolveExpectedListenerCount,
+} from "../../../../stores/sites/utils/statusUpdateSubscriptionSummary";
 
 describe(buildStatusSubscriptionFailureSummary, () => {
     it("sanitizes renderer-facing subscription errors", () => {
@@ -20,5 +24,33 @@ describe(buildStatusSubscriptionFailureSummary, () => {
         expect(message).toContain("refresh_token=[redacted]&status=failed");
         expect(message.endsWith("...")).toBeTruthy();
         expect(message.length).toBeLessThanOrEqual(1003);
+    });
+
+    it("resolves an own data listener count without invoking accessors", () => {
+        expect(
+            resolveExpectedListenerCount({ EXPECTED_LISTENER_COUNT: 7 })
+        ).toBe(7);
+
+        let accessCount = 0;
+        const accessorBackedConstructor = {};
+        Object.defineProperty(
+            accessorBackedConstructor,
+            "EXPECTED_LISTENER_COUNT",
+            {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    accessCount += 1;
+                    throw new Error(
+                        "Unexpected EXPECTED_LISTENER_COUNT getter access"
+                    );
+                },
+            }
+        );
+
+        expect(resolveExpectedListenerCount(accessorBackedConstructor)).toBe(
+            FALLBACK_EXPECTED_LISTENERS
+        );
+        expect(accessCount).toBe(0);
     });
 });

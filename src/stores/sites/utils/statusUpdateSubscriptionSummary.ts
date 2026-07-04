@@ -1,6 +1,7 @@
 import type { StatusUpdateSubscriptionSummary } from "../baseTypes";
 import type { StatusUpdateManager } from "./statusUpdateHandler";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 /**
@@ -46,13 +47,13 @@ export function resolveExpectedListenerCount(
             StatusUpdateManagerCtor !== null) ||
         typeof StatusUpdateManagerCtor === "function"
     ) {
-        const candidate: unknown = Reflect.get(
+        const candidate = getOwnDataProperty(
             StatusUpdateManagerCtor,
             "EXPECTED_LISTENER_COUNT"
         );
 
-        if (typeof candidate === "number") {
-            return candidate;
+        if (candidate.found && typeof candidate.value === "number") {
+            return candidate.value;
         }
     }
 

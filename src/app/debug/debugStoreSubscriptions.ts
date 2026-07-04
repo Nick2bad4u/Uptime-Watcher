@@ -6,6 +6,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 
 import { logger } from "../../services/logger";
 import { useAlertStore } from "../../stores/alerts/useAlertStore";
@@ -39,8 +40,8 @@ const isUnsubscribeContainer = (
         return false;
     }
 
-    const unsubscribe: unknown = Reflect.get(candidate, "unsubscribe");
-    return typeof unsubscribe === "function";
+    const unsubscribe = getOwnDataProperty(candidate, "unsubscribe");
+    return unsubscribe.found && typeof unsubscribe.value === "function";
 };
 
 const registerSubscription = (args: {
