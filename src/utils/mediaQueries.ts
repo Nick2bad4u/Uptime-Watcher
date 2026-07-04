@@ -8,6 +8,41 @@
 
 const noop = (): void => {};
 
+type MediaQueryListLegacyMethod = (
+    this: MediaQueryList,
+    listener: (event: MediaQueryListEvent) => void
+) => void;
+
+const isMediaQueryListLegacyMethod = (
+    value: unknown
+): value is MediaQueryListLegacyMethod => typeof value === "function";
+
+const getMediaQueryListDataMethod = (
+    mediaQueryList: MediaQueryList,
+    methodName: "addListener" | "removeListener"
+): MediaQueryListLegacyMethod | undefined => {
+    let current: object | null = mediaQueryList;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, methodName);
+
+        if (descriptor) {
+            const value: unknown = descriptor.value;
+            return "value" in descriptor && isMediaQueryListLegacyMethod(value)
+                ? value
+                : undefined;
+        }
+
+        const prototype: unknown = Object.getPrototypeOf(current);
+        current =
+            typeof prototype === "object" && prototype !== null
+                ? prototype
+                : null;
+    }
+
+    return undefined;
+};
+
 /**
  * Returns the current `matches` value for a media query.
  */
@@ -35,14 +70,15 @@ export function subscribeToMediaQueryListChanges(
     }
 
     // Legacy Safari/Chromium implementations.
-    // Use Reflect.get to avoid touching deprecated DOM lib declarations while
-    // still supporting older runtime APIs.
-    const addListenerCandidate = Reflect.get(mediaQueryList, "addListener");
+    const addListenerCandidate = getMediaQueryListDataMethod(
+        mediaQueryList,
+        "addListener"
+    );
 
     if (typeof addListenerCandidate === "function") {
         addListenerCandidate.call(mediaQueryList, handler);
         return () => {
-            const removeListenerCandidate = Reflect.get(
+            const removeListenerCandidate = getMediaQueryListDataMethod(
                 mediaQueryList,
                 "removeListener"
             );
