@@ -1,6 +1,7 @@
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { objectEntries } from "ts-extras";
 
 import type {
@@ -34,11 +35,19 @@ function isStringArray(value: unknown): value is string[] {
 function toStringHeaderRecord(
     headers: object
 ): Record<string, string | string[] | undefined> {
-    const normalizedHeaders: Record<string, string | string[] | undefined> = {};
+    const normalizedHeaders =
+        createNullPrototypeObject<
+            Record<string, string | string[] | undefined>
+        >();
 
     for (const [key, value] of objectEntries(headers)) {
         if (typeof value === "string" || isStringArray(value)) {
-            normalizedHeaders[key] = value;
+            Object.defineProperty(normalizedHeaders, key, {
+                configurable: true,
+                enumerable: true,
+                value,
+                writable: true,
+            });
         }
     }
 

@@ -184,6 +184,33 @@ describe(HttpHeaderMonitor, () => {
         );
     });
 
+    it("matches protected-looking own response header names", async () => {
+        const headers = Object.create(null) as Record<string, string>;
+        Object.defineProperty(headers, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: "Express",
+            writable: true,
+        });
+
+        axiosGetMock.mockResolvedValue({
+            data: "",
+            headers,
+            responseTime: 120,
+            status: 200,
+        });
+
+        const result = await monitorService.check({
+            ...monitor,
+            headerName: "__proto__",
+        });
+
+        expect(result.status).toBe("up");
+        expect(result.details).toContain("matched expected value");
+        expect(Object.hasOwn(headers, "__proto__")).toBe(true);
+        expect(Object.hasOwn({}, "__proto__")).toBe(false);
+    });
+
     it("returns degraded when the header is missing", async () => {
         axiosGetMock.mockResolvedValue({
             data: "",
