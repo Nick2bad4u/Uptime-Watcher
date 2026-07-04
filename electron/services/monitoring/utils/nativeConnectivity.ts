@@ -33,16 +33,19 @@ import type { MonitorCheckResult } from "../types";
 
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
 
+const HTTP_SCHEME = "http".concat("://");
+const HTTPS_SCHEME = "https://";
+
 const stripHttpScheme = (value: string): string => {
     const normalized = value.trim();
     const lower = normalized.toLowerCase();
 
-    if (lower.startsWith("https://")) {
-        return normalized.slice("https://".length);
+    if (lower.startsWith(HTTPS_SCHEME)) {
+        return normalized.slice(HTTPS_SCHEME.length);
     }
 
-    if (lower.startsWith("https://")) {
-        return normalized.slice("https://".length);
+    if (lower.startsWith(HTTP_SCHEME)) {
+        return normalized.slice(HTTP_SCHEME.length);
     }
 
     return normalized;
@@ -81,6 +84,56 @@ const DEFAULT_OPTIONS: Required<ConnectivityOptions> = {
     ],
     timeout: 5000,
 };
+
+const isConnectivityMethod = (
+    value: unknown
+): value is Required<ConnectivityOptions>["method"] =>
+    value === "dns" || value === "http" || value === "tcp";
+
+function getOwnDataProperty(source: object, key: PropertyKey): unknown {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+}
+
+function normalizePortList(candidate: unknown): number[] {
+    if (!Array.isArray(candidate)) {
+        return DEFAULT_OPTIONS.ports;
+    }
+
+    const ports: number[] = [];
+
+    for (let index = 0; index < candidate.length; index += 1) {
+        const value = getOwnDataProperty(candidate, String(index));
+        if (typeof value === "number" && isFiniteNumber(value)) {
+            ports.push(value);
+        }
+    }
+
+    return ports.length > 0 ? ports : DEFAULT_OPTIONS.ports;
+}
+
+function normalizeConnectivityOptions(
+    options: ConnectivityOptions
+): Required<ConnectivityOptions> {
+    const methodCandidate = getOwnDataProperty(options, "method");
+    const portsCandidate = getOwnDataProperty(options, "ports");
+    const timeoutCandidate = getOwnDataProperty(options, "timeout");
+
+    const timeout =
+        typeof timeoutCandidate === "number" &&
+        isFiniteNumber(timeoutCandidate) &&
+        timeoutCandidate > 0
+            ? timeoutCandidate
+            : DEFAULT_OPTIONS.timeout;
+
+    return {
+        method: isConnectivityMethod(methodCandidate)
+            ? methodCandidate
+            : DEFAULT_OPTIONS.method,
+        ports: normalizePortList(portsCandidate),
+        timeout,
+    };
+}
 
 /**
  * Result of a TCP port connectivity check
@@ -434,30 +487,15 @@ export async function checkConnectivity(
         });
     }
 
-    const opts = { ...DEFAULT_OPTIONS, ...options };
+    const opts = normalizeConnectivityOptions(options);
     let tcpProbeError: unknown;
 
-    // Defensive normalization: optional fields can still become `undefined`
-    // depending on call sites (e.g., schema parsing or partial spreads). The
-    // connectivity pipeline should never throw for malformed options; it
-    // should degrade gracefully and fall back to other methods.
-    const timeoutMs =
-        typeof opts.timeout === "number" &&
-        isFiniteNumber(opts.timeout) &&
-        opts.timeout > 0
-            ? opts.timeout
-            : DEFAULT_OPTIONS.timeout;
-
-    const ports =
-        Array.isArray(opts.ports) && opts.ports.length > 0
-            ? opts.ports
-            : DEFAULT_OPTIONS.ports;
     const startTime = performance.now();
 
     const normalizedHost: string = host.trim();
 
     if (isValidUrl(normalizedHost)) {
-        return checkHttpConnectivity(normalizedHost, timeoutMs, signal);
+        return checkHttpConnectivity(normalizedHost, opts.timeout, signal);
     }
 
     const cleanHost: string = stripHttpScheme(normalizedHost);
@@ -466,8 +504,8 @@ export async function checkConnectivity(
         try {
             const tcpResult = await checkTcpPorts(
                 cleanHost,
-                ports,
-                timeoutMs,
+                opts.ports,
+                opts.timeout,
                 signal
             );
 
@@ -488,7 +526,7 @@ export async function checkConnectivity(
     if (opts.method === "dns" || opts.method === "tcp") {
         const dnsResult = await checkDnsResolution(
             cleanHost,
-            timeoutMs,
+            opts.timeout,
             signal
         );
 

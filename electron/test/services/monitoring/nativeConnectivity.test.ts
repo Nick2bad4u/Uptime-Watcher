@@ -24,6 +24,8 @@ import { performance } from "node:perf_hooks";
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { ConnectivityOptions } from "../../../services/monitoring/utils/nativeConnectivity";
+
 import {
     checkConnectivity,
     checkHttpConnectivity,
@@ -234,6 +236,47 @@ describe("Native Connectivity with Degraded State", () => {
             expect(result.details).toBe(
                 "Failed to connect to slow-dns.example.com"
             );
+        });
+        it("should not invoke option accessors while normalizing connectivity checks", async () => {
+            // Arrange
+            mockDns.resolve4.mockResolvedValue(["192.168.1.1"]);
+            let getterCalls = 0;
+            const options = {
+                method: "dns" as const,
+            } as Record<string, unknown>;
+
+            Object.defineProperty(options, "timeout", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("timeout getter should not run");
+                },
+            });
+            Object.defineProperty(options, "ports", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("ports getter should not run");
+                },
+            });
+            Object.defineProperty(options, "unexpected", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("unexpected getter should not run");
+                },
+            });
+
+            // Act
+            const result = await checkConnectivity(
+                "example.com",
+                options as ConnectivityOptions
+            );
+
+            // Assert
+            expect(result.status).toBe("degraded");
+            expect(mockDns.resolve4).toHaveBeenCalledWith("example.com");
+            expect(getterCalls).toBe(0);
         });
     });
     describe("Status validation", () => {
