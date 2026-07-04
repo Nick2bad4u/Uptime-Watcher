@@ -282,8 +282,22 @@ describe(RendererEventBridge, () => {
         process.env[STATE_SYNC_BUDGET_ENV_KEY] = "5000";
 
         const payload = createUpdatePayloadWithHistory(200);
+        const getter = vi.fn(() => {
+            throw new Error("monitor computed getter should not run");
+        });
+        const monitor = payload.delta.updatedSites[0]?.monitors[0];
+        if (!monitor) {
+            throw new Error("Expected monitor in state sync payload");
+        }
+
+        Object.defineProperty(monitor, "computed", {
+            enumerable: true,
+            get: getter,
+        });
+
         bridge.sendStateSyncEvent(payload);
 
+        expect(getter).not.toHaveBeenCalled();
         expect(firstWindow.webContents.send).toHaveBeenCalledTimes(1);
 
         const sentPayload = vi.mocked(firstWindow.webContents.send).mock
@@ -298,6 +312,12 @@ describe(RendererEventBridge, () => {
         expect(
             sentPayload.delta.updatedSites[0]?.monitors[0]?.history.length
         ).toBe(50);
+        expect(
+            Object.hasOwn(
+                sentPayload.delta.updatedSites[0]?.monitors[0] ?? {},
+                "computed"
+            )
+        ).toBeFalsy();
 
         expect(logger.debug).toHaveBeenCalledWith(
             expect.stringContaining(

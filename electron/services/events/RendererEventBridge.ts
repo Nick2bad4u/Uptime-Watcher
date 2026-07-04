@@ -16,6 +16,7 @@ import {
     getJsonByteLengthUpTo,
     isJsonByteBudgetExceeded,
 } from "@shared/utils/jsonByteBudget";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isDefined, objectEntries } from "ts-extras";
 
@@ -89,7 +90,7 @@ const truncateMonitorHistory = (
             : monitor.history.slice(-maxHistoryEntriesPerMonitor);
 
     return {
-        ...monitor,
+        ...safeObjectOmit(monitor, []),
         history: truncatedHistory,
     };
 };
@@ -98,7 +99,7 @@ const truncateSiteHistory = (
     site: Site,
     maxHistoryEntriesPerMonitor: number
 ): Site => ({
-    ...site,
+    ...safeObjectOmit(site, []),
     monitors: site.monitors.map((monitor) =>
         truncateMonitorHistory(monitor, maxHistoryEntriesPerMonitor)
     ),
@@ -108,7 +109,7 @@ const truncateDeltaHistory = (
     delta: SiteSyncDelta,
     maxHistoryEntriesPerMonitor: number
 ): SiteSyncDelta => ({
-    ...delta,
+    ...safeObjectOmit(delta, []),
     addedSites: delta.addedSites.map((site) =>
         truncateSiteHistory(site, maxHistoryEntriesPerMonitor)
     ),
@@ -123,7 +124,7 @@ const compactStateSyncPayload = (
 ): RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC> => {
     if (payload.action === STATE_SYNC_ACTION.BULK_SYNC) {
         return {
-            ...payload,
+            ...safeObjectOmit(payload, []),
             sites: payload.sites.map((site) =>
                 truncateSiteHistory(site, maxHistoryEntriesPerMonitor)
             ),
@@ -132,7 +133,7 @@ const compactStateSyncPayload = (
 
     // For update/delete events, only the delta contains site snapshots.
     return {
-        ...payload,
+        ...safeObjectOmit(payload, []),
         delta: truncateDeltaHistory(payload.delta, maxHistoryEntriesPerMonitor),
     };
 };
