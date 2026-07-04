@@ -154,14 +154,13 @@ vi.mock("../../managers/SiteManager", () => ({
     },
 }));
 
-describe("ServiceContainer - Factory Bypass Test", () => {
+describe("ServiceContainer - monitoring service factory bypass", () => {
     let container: ServiceContainer;
 
     beforeEach(() => {
         vi.clearAllMocks();
         ServiceContainer.resetForTesting();
         container = ServiceContainer.getInstance();
-        console.log("🧪 Factory bypass test setup complete");
     });
 
     afterEach(() => {
@@ -177,14 +176,11 @@ describe("ServiceContainer - Factory Bypass Test", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        console.log("🧪 Testing SiteManager creation");
-
         const siteManager = container.getSiteManager();
-        console.log("🎯 SiteManager created:", Boolean(siteManager));
 
         expect(siteManager).toBeDefined();
-        expect(siteManager.initialize).toBeDefined();
-        expect(siteManager.addSite).toBeDefined();
+        expect(typeof siteManager.initialize).toBe("function");
+        expect(typeof siteManager.addSite).toBe("function");
     });
 
     it("should create MonitorManager successfully without getSitesCache error", async ({
@@ -199,15 +195,11 @@ describe("ServiceContainer - Factory Bypass Test", () => {
         await annotate("Category: Service", "category");
         await annotate("Type: Constructor", "type");
 
-        console.log("🧪 Testing MonitorManager creation with factory bypass");
-
         // First create SiteManager
         const siteManager = container.getSiteManager();
-        console.log("🎯 SiteManager created:", Boolean(siteManager));
 
         // Then create MonitorManager - this should NOT fail because EnhancedMonitoringServiceFactory is mocked
         const monitorManager = container.getMonitorManager();
-        console.log("🎯 MonitorManager created:", Boolean(monitorManager));
 
         expect(siteManager).toBeDefined();
         expect(monitorManager).toBeDefined();
@@ -217,6 +209,6 @@ describe("ServiceContainer - Factory Bypass Test", () => {
             await import("../../services/monitoring/EnhancedMonitoringServiceFactory");
         expect(
             EnhancedMonitoringServiceFactory.createServices
-        ).toHaveBeenCalled();
+        ).toHaveBeenCalledTimes(1);
     });
 });

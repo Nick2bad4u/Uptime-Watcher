@@ -210,11 +210,10 @@ vi.mock("../../UptimeOrchestrator", () => ({
     UptimeOrchestrator: serviceMocks.MockUptimeOrchestrator,
 }));
 
-describe("ServiceContainer - Targeted SiteManager Test", () => {
+describe("ServiceContainer - SiteManager construction", () => {
     beforeEach(() => {
         ServiceContainer.resetForTesting();
         vi.clearAllMocks();
-        console.log("Test setup complete - starting test");
     });
 
     afterEach(() => {
@@ -231,14 +230,11 @@ describe("ServiceContainer - Targeted SiteManager Test", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
-            console.log("Starting SiteManager creation test");
             const container = ServiceContainer.getInstance();
-
-            console.log("About to call getSiteManager()");
             const siteManager = container.getSiteManager();
 
-            console.log("SiteManager created successfully:", siteManager);
             expect(siteManager).toBeDefined();
+            expect(typeof siteManager.getSitesCache).toBe("function");
         });
     });
 });
