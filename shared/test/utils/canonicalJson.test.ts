@@ -2,6 +2,8 @@
  * Tests for canonical JSON helpers used by cloud sync.
  */
 
+import type { JsonValue } from "@shared/types/cloudSync";
+
 import {
     createCanonicalJsonValue,
     stringifyJsonValueStable,
@@ -40,7 +42,8 @@ describe(createCanonicalJsonValue, () => {
     });
 
     it("preserves prototype-named keys as canonical JSON data", () => {
-        const value = Object.create(null) as Record<string, unknown>;
+        const value = Object.create(null) as JsonValue &
+            Record<string, JsonValue>;
         Object.defineProperty(value, "__proto__", {
             configurable: true,
             enumerable: true,

@@ -1,7 +1,14 @@
 import { DropboxTokenManager } from "@electron/services/cloud/providers/dropbox/DropboxTokenManager";
 import { InMemorySecretStore } from "@electron/test/utils/InMemorySecretStore";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+import type { DropboxResponse } from "dropbox";
 import { describe, expect, it, vi } from "vitest";
+
+const createVoidDropboxResponse = (): DropboxResponse<void> => ({
+    headers: {},
+    result: undefined,
+    status: 200,
+});
 
 describe(DropboxTokenManager, () => {
     it("returns stored access token when not expired", async () => {
@@ -239,7 +246,7 @@ describe(DropboxTokenManager, () => {
 
     it("clears stored tokens after successful revoke", async () => {
         const secretStore = new InMemorySecretStore();
-        const authTokenRevoke = vi.fn(async () => undefined);
+        const authTokenRevoke = vi.fn(async () => createVoidDropboxResponse());
 
         const manager = new DropboxTokenManager({
             appKey: "app-key",

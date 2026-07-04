@@ -7,11 +7,21 @@ import type { DatabaseService } from "../../../../services/database/DatabaseServ
 
 import { replaceDatabaseFile } from "../../../../services/database/dataBackupService/replaceDatabaseFile";
 
+type DatabaseConnection = ReturnType<DatabaseService["initialize"]>;
+
+function createMockDatabaseConnection(): DatabaseConnection {
+    return {} as DatabaseConnection;
+}
+
 function createDatabaseService(): DatabaseService {
-    return {
+    const databaseService: Pick<DatabaseService, "close" | "initialize"> = {
         close: vi.fn(),
-        initialize: vi.fn(),
-    } as DatabaseService;
+        initialize: vi.fn<DatabaseService["initialize"]>(
+            createMockDatabaseConnection
+        ),
+    };
+
+    return databaseService as unknown as DatabaseService;
 }
 
 describe(replaceDatabaseFile, () => {
@@ -83,7 +93,7 @@ describe(replaceDatabaseFile, () => {
             .mockImplementationOnce(() => {
                 throw initializeError;
             })
-            .mockImplementationOnce(() => {});
+            .mockImplementationOnce(createMockDatabaseConnection);
 
         await writeFile(sourcePath, "new-db");
         await writeFile(targetPath, "old-db");

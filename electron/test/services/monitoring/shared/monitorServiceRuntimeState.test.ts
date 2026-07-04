@@ -50,9 +50,11 @@ describe("monitorServiceRuntimeState", () => {
         const timeoutGetter = vi.fn(() => {
             throw new Error("timeout getter should not run");
         });
-        const update: Partial<MonitorServiceConfig> = {
-            userAgent: undefined,
-        };
+        const update: Partial<MonitorServiceConfig> = {};
+        Object.defineProperty(update, "userAgent", {
+            enumerable: true,
+            value: undefined,
+        });
 
         Object.defineProperty(update, "timeout", {
             enumerable: true,
@@ -150,16 +152,21 @@ describe("monitorServiceRuntimeState", () => {
     });
 
     it("applies data-backed updates while ignoring undefined fields", () => {
+        const update: Partial<MonitorServiceConfig> = {
+            timeout: 9000,
+        };
+        Object.defineProperty(update, "userAgent", {
+            enumerable: true,
+            value: undefined,
+        });
+
         const state = updateMonitorServiceRuntimeState({
             currentConfig: {
                 timeout: 7000,
                 userAgent: "CurrentAgent/1.0",
             },
             defaultTimeoutMs: 5000,
-            update: {
-                timeout: 9000,
-                userAgent: undefined,
-            },
+            update,
         });
 
         expect(state.config).toEqual({

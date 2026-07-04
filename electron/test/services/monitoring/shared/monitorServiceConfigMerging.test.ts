@@ -64,15 +64,22 @@ describe("monitorServiceConfigMerging", () => {
     });
 
     it("ignores undefined data-backed update fields", () => {
+        const update: Partial<MonitorServiceConfig> = {};
+        Object.defineProperty(update, "timeout", {
+            enumerable: true,
+            value: undefined,
+        });
+        Object.defineProperty(update, "userAgent", {
+            enumerable: true,
+            value: undefined,
+        });
+
         const result = mergeMonitorServiceConfig({
             currentConfig: {
                 timeout: 7000,
                 userAgent: "CurrentAgent/1.0",
             },
-            update: {
-                timeout: undefined,
-                userAgent: undefined,
-            },
+            update,
         });
 
         expect(result).toEqual({
