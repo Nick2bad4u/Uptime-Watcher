@@ -38,6 +38,7 @@ import type { Arrayable } from "type-fest";
 
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { withRetry } from "@shared/utils/retry";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -86,8 +87,28 @@ const getCallableProperty = (
     target: object,
     propertyKey: string
 ): undefined | UnknownMethod => {
-    const candidate = Reflect.get(target, propertyKey) as unknown;
-    return isUnknownMethod(candidate) ? candidate : undefined;
+    let current: object | null = target;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(
+            current,
+            propertyKey
+        );
+
+        if (descriptor) {
+            const candidate: unknown =
+                "value" in descriptor ? descriptor.value : undefined;
+            return isUnknownMethod(candidate) ? candidate : undefined;
+        }
+
+        const prototype: unknown = Object.getPrototypeOf(current);
+        current =
+            typeof prototype === "object" && prototype !== null
+                ? prototype
+                : null;
+    }
+
+    return undefined;
 };
 
 /**
@@ -102,9 +123,13 @@ const resolveCurrentDirectory = (): string => {
     try {
         return path.dirname(fileURLToPath(import.meta.url));
     } catch {
-        const globalFilename = Reflect.get(globalThis, "__filename");
-        if (typeof globalFilename === "string" && globalFilename.length > 0) {
-            return path.dirname(globalFilename);
+        const globalFilename = getOwnDataProperty(globalThis, "__filename");
+        if (
+            globalFilename.found &&
+            typeof globalFilename.value === "string" &&
+            globalFilename.value.length > 0
+        ) {
+            return path.dirname(globalFilename.value);
         }
 
         const [, entryScriptPath] = process.argv;
@@ -132,7 +157,10 @@ const currentDirectory = resolveCurrentDirectory();
  */
 const tryResolveElectronAppPath = (): string | undefined => {
     try {
-        const electronApp = Reflect.get(electron, "app") as unknown;
+        const electronAppProperty = getOwnDataProperty(electron, "app");
+        const electronApp = electronAppProperty.found
+            ? electronAppProperty.value
+            : undefined;
 
         if (!electronApp || typeof electronApp !== "object") {
             return undefined;
