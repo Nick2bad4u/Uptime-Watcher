@@ -30,10 +30,11 @@ import { systemApi } from "./preload/domains/systemApi";
 import {
     deepFreezeInPlace,
     detectPlaywrightAutomation,
+    getPreloadProcessCandidate,
 } from "./preload/utils/preloadSecurity";
 
 const isAutomationFlag = detectPlaywrightAutomation(
-    Reflect.get(globalThis, "process")
+    getPreloadProcessCandidate()
 );
 
 if (isAutomationFlag) {

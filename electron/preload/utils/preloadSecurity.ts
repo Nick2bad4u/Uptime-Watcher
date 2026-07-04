@@ -9,6 +9,17 @@ const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||
     typeof value === "function";
 
+export function getPreloadProcessCandidate(): unknown {
+    // Node/Electron expose `process` through a platform accessor in this
+    // runtime, so the global read is centralized here. Callers must inspect
+    // nested properties with descriptor-safe helpers.
+    try {
+        return Reflect.get(globalThis, "process");
+    } catch {
+        return undefined;
+    }
+}
+
 const toAutomationProcess = (value: unknown): AutomationProcess | undefined => {
     if (!isObjectLike(value)) {
         return undefined;

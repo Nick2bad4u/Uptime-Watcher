@@ -127,4 +127,45 @@ describe("bridgeFactory env flags", () => {
         await expect(invoke()).resolves.toBeUndefined();
         expect(nodeEnvAccesses).toBe(0);
     });
+
+    it("does not invoke accessor-backed process env during diagnostics fallback checks", async () => {
+        let envAccesses = 0;
+        const processCandidate = {};
+        Object.defineProperty(processCandidate, "env", {
+            configurable: true,
+            enumerable: true,
+            get: () => {
+                envAccesses += 1;
+                throw new Error("Unexpected process.env getter access");
+            },
+        });
+        globalTarget.process = processCandidate;
+        vi.resetModules();
+
+        const bridgeFactory =
+            await import("../../../preload/core/bridgeFactory");
+        bridgeFactory.resetDiagnosticsVerificationStateForTesting();
+
+        const handshake: IpcResponse<IpcHandlerVerificationResult> = {
+            success: true,
+            data: {
+                availableChannels: [channelUnderTest],
+                channel: channelUnderTest,
+                registered: true,
+            },
+        };
+
+        vi.mocked(ipcRendererMock.invoke)
+            .mockResolvedValueOnce(handshake)
+            .mockResolvedValueOnce({ success: true });
+
+        const invoke = bridgeFactory.createVoidInvoker(channelUnderTest);
+        await expect(invoke()).resolves.toBeUndefined();
+        expect(envAccesses).toBe(0);
+        expect(ipcRendererMock.invoke).toHaveBeenNthCalledWith(
+            1,
+            DIAGNOSTICS_CHANNELS.verifyIpcHandler,
+            channelUnderTest
+        );
+    });
 });

@@ -59,6 +59,7 @@ import {
     preloadLogger,
     reportPreloadGuardFailure,
 } from "../utils/preloadLogger";
+import { getPreloadProcessCandidate } from "../utils/preloadSecurity";
 
 /**
  * Canonical IPC response shape used by the preload bridge.
@@ -240,11 +241,11 @@ const getOwnDataPropertyValue = (holder: object, key: PropertyKey): unknown => {
     return property.found ? property.value : undefined;
 };
 
-const globalProcessCandidate: unknown = Reflect.get(globalThis, "process");
+const globalProcessCandidate: unknown = getPreloadProcessCandidate();
 const globalEnvCandidate: unknown =
     typeof globalProcessCandidate === "object" &&
     globalProcessCandidate !== null
-        ? (Reflect.get(globalProcessCandidate, "env") as unknown)
+        ? getOwnDataPropertyValue(globalProcessCandidate, "env")
         : undefined;
 
 function isTruthyEnvFlag(value: unknown): boolean {
