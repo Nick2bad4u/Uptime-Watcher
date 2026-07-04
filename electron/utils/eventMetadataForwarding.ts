@@ -6,6 +6,7 @@
 import type { EventMetadata } from "@shared/types/events";
 import type { Except, UnknownArray, UnknownRecord } from "type-fest";
 
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 
 import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
@@ -209,10 +210,11 @@ export function stripForwardedEventMetadata<
     }
 
     // At this point payload is a non-null object. Clone own enumerable data
-    // properties into a plain record while skipping event-bus metadata. This
-    // intentionally ignores accessors so forwarding cannot execute arbitrary
-    // getters while stripping metadata.
-    const clonedPayload = castUnchecked<Record<PropertyKey, unknown>>({});
+    // properties into a null-prototype record while skipping event-bus
+    // metadata. This intentionally ignores accessors so forwarding cannot
+    // execute arbitrary getters while stripping metadata.
+    const clonedPayload =
+        createNullPrototypeObject<Record<PropertyKey, unknown>>();
     for (const key of Reflect.ownKeys(payload)) {
         if (isForwardedMetadataKey(key)) {
             continue;
@@ -223,7 +225,12 @@ export function stripForwardedEventMetadata<
             continue;
         }
 
-        Reflect.set(clonedPayload, key, descriptor.value);
+        Object.defineProperty(clonedPayload, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value,
+            writable: true,
+        });
     }
 
     return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(
