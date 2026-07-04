@@ -223,4 +223,72 @@ describe(applyMonitorStateOperation, () => {
             })
         );
     });
+
+    it("drops reserved prototype keys before mutating cache or persisting changes", async () => {
+        const eventEmitter =
+            createMockEventBus() as unknown as TypedEventBus<UptimeEvents>;
+        const sitesCache =
+            createMockStandardizedCache<Site>() as unknown as StandardizedCache<Site>;
+
+        const monitor = createTestMonitor("m1", {
+            monitoring: false,
+            status: "down",
+        });
+        const originalPrototype = Object.getPrototypeOf(monitor);
+        const site = createTestSite("s1", {
+            monitors: [monitor],
+        });
+
+        const update = vi.fn();
+        const monitorRepository = {
+            createTransactionAdapter: vi.fn().mockReturnValue({ update }),
+        } as unknown as MonitorRepository;
+
+        const databaseService = {
+            executeTransaction: vi
+                .fn()
+                .mockImplementation(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
+        } as unknown as DatabaseService;
+
+        const changes: Partial<Monitor> = { monitoring: true };
+        Object.defineProperty(changes, "__proto__", {
+            enumerable: true,
+            value: { polluted: true },
+        });
+        Object.defineProperty(changes, "constructor", {
+            enumerable: true,
+            value: "unsafe-constructor",
+        });
+        Object.defineProperty(changes, "prototype", {
+            enumerable: true,
+            value: "unsafe-prototype",
+        });
+
+        await applyMonitorStateOperation({
+            changes,
+            dependencies: {
+                databaseService,
+                eventEmitter,
+                monitorRepository,
+                sitesCache,
+            },
+            monitor,
+            newStatus: "up",
+            site,
+        });
+
+        expect(Object.getPrototypeOf(monitor)).toBe(originalPrototype);
+        expect(Object.hasOwn(monitor, "__proto__")).toBe(false);
+        expect(Object.hasOwn(monitor, "constructor")).toBe(false);
+        expect(Object.hasOwn(monitor, "prototype")).toBe(false);
+        expect(monitor.monitoring).toBeTruthy();
+
+        const persistedChanges = update.mock.calls[0]?.[1] as object;
+        expect(Reflect.ownKeys(persistedChanges)).toEqual(["monitoring"]);
+        expect(update).toHaveBeenCalledWith("m1", { monitoring: true });
+    });
 });

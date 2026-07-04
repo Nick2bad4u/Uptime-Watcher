@@ -25,6 +25,29 @@ import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 
+const RESERVED_MONITOR_STATE_CHANGE_KEYS = [
+    "id",
+    "__proto__",
+    "constructor",
+    "prototype",
+] as const;
+
+function applyOwnDataChanges(target: Monitor, changes: object): void {
+    for (const key of Reflect.ownKeys(changes)) {
+        const descriptor = Object.getOwnPropertyDescriptor(changes, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(target, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value as unknown,
+            writable: true,
+        });
+    }
+}
+
 /**
  * Dependencies required to apply and persist monitor state.
  *
@@ -53,10 +76,14 @@ export async function applyMonitorStateOperation(args: {
     const { changes, dependencies, monitor, newStatus, site } = args;
 
     const previousStatus = monitor.status;
-    const sanitizedChanges = safeObjectOmit(changes, ["id"]);
+    const changeRecord = changes as Partial<Monitor> & Record<string, unknown>;
+    const sanitizedChanges = safeObjectOmit(
+        changeRecord,
+        RESERVED_MONITOR_STATE_CHANGE_KEYS
+    );
 
     // Update cached monitor object
-    Object.assign(monitor, sanitizedChanges);
+    applyOwnDataChanges(monitor, sanitizedChanges);
 
     // Update monitor in cached site
     const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
