@@ -6,6 +6,7 @@ import {
     safeJsonParseWithFallback,
     safeJsonStringify,
     safeJsonStringifyWithFallback,
+    tryParseJsonRecord,
 } from "@shared/utils/jsonSafety";
 import { describe, expect, it } from "vitest";
 
@@ -66,6 +67,25 @@ describe("jsonSafety behavior", () => {
             expect(result.data).toEqual(payload);
         });
 
+        it("returns parsed records with null prototypes and data-backed dangerous keys", () => {
+            const result = safeJsonParse(
+                '{"__proto__":{"polluted":true},"constructor":{"name":"evil"},"nested":{"prototype":"data"}}',
+                acceptAnyJsonValue
+            );
+
+            expect(result.success).toBeTruthy();
+            expect(Object.getPrototypeOf(result.data)).toBeNull();
+            expect(
+                Object.getOwnPropertyDescriptor(result.data, "__proto__")
+            ).toMatchObject({
+                enumerable: true,
+                value: { polluted: true },
+            });
+
+            const nested = (result.data as Record<string, unknown>)["nested"];
+            expect(Object.getPrototypeOf(nested)).toBeNull();
+        });
+
         it("returns detailed errors when JSON is invalid", () => {
             const result = safeJsonParse("{invalid", acceptAnyJsonValue);
             expect(result.success).toBeFalsy();
@@ -85,6 +105,23 @@ describe("jsonSafety behavior", () => {
             );
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual(payload);
+        });
+
+        it("normalizes object entries without changing the top-level array", () => {
+            const result = safeJsonParseArray(
+                '[{"__proto__":{"polluted":true}}]',
+                acceptAnyJsonValue
+            );
+
+            expect(result.success).toBeTruthy();
+            expect(Array.isArray(result.data)).toBeTruthy();
+            expect(Object.getPrototypeOf(result.data![0])).toBeNull();
+            expect(
+                Object.getOwnPropertyDescriptor(result.data![0], "__proto__")
+            ).toMatchObject({
+                enumerable: true,
+                value: { polluted: true },
+            });
         });
 
         it("fails gracefully when payload is not an array", () => {
@@ -146,6 +183,24 @@ describe("jsonSafety behavior", () => {
                 fallback
             );
             expect(json).toBe(fallback);
+        });
+    });
+
+    describe(tryParseJsonRecord, () => {
+        it("returns normalized records for successful object parses", () => {
+            const result = tryParseJsonRecord(
+                '{"__proto__":{"polluted":true},"nested":{"value":1}}'
+            );
+
+            expect(result).not.toBeNull();
+            expect(Object.getPrototypeOf(result)).toBeNull();
+            expect(
+                Object.getOwnPropertyDescriptor(result, "__proto__")
+            ).toMatchObject({
+                enumerable: true,
+                value: { polluted: true },
+            });
+            expect(Object.getPrototypeOf(result!["nested"])).toBeNull();
         });
     });
 });

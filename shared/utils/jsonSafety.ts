@@ -9,8 +9,10 @@ import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isObject } from "@shared/utils/typeGuards";
-import { isDefined, isEmpty, objectHasOwn } from "ts-extras";
+import { isDefined, isEmpty, objectEntries, objectHasOwn } from "ts-extras";
 
 /**
  * Result tuple produced by the safe JSON helpers.
@@ -34,6 +36,29 @@ class JsonValidationError extends TypeError {
     }
 }
 
+const cloneParsedJsonData = (value: unknown): unknown => {
+    if (Array.isArray(value)) {
+        return value.map((entry) => cloneParsedJsonData(entry));
+    }
+
+    if (!isObject(value)) {
+        return value;
+    }
+
+    const cloned = createNullPrototypeObject<UnknownRecord>();
+
+    for (const [key, entry] of objectEntries(value)) {
+        Object.defineProperty(cloned, key, {
+            configurable: true,
+            enumerable: true,
+            value: cloneParsedJsonData(entry),
+            writable: true,
+        });
+    }
+
+    return cloned;
+};
+
 /**
  * Attempts to parse a JSON string into a plain object record.
  *
@@ -46,7 +71,9 @@ class JsonValidationError extends TypeError {
 export function tryParseJsonRecord(text: string): null | UnknownRecord {
     try {
         const parsed: unknown = JSON.parse(text);
-        return isObject(parsed) ? parsed : null;
+        return isObject(parsed)
+            ? castUnchecked<UnknownRecord>(cloneParsedJsonData(parsed))
+            : null;
     } catch {
         return null;
     }
@@ -234,7 +261,7 @@ export function safeJsonParse<T extends JsonValue>(
         const parsed: unknown = JSON.parse(json);
 
         if (validator(parsed)) {
-            return parsed;
+            return castUnchecked<T>(cloneParsedJsonData(parsed));
         }
 
         throw new JsonValidationError(
@@ -295,7 +322,7 @@ export function safeJsonParseArray<T extends JsonValue>(
                 );
             }
 
-            typedArray.push(element);
+            typedArray.push(castUnchecked<T>(cloneParsedJsonData(element)));
         }
 
         return typedArray;
