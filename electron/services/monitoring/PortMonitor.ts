@@ -31,8 +31,6 @@ import type { MonitorType, Site } from "@shared/types";
  * @see {@link MonitorServiceConfig} for configuration options
  */
 
-import { isDefined } from "ts-extras";
-
 import type {
     IMonitorService,
     MonitorCheckResult,
@@ -40,6 +38,11 @@ import type {
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
+import {
+    assertPositiveTimeoutConfigUpdate,
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./shared/monitorServiceConfigMerging";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -136,10 +139,10 @@ export class PortMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor
      */
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT, // Use consistent default timeout
-            ...config,
-        };
+        this.config = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+        });
     }
 
     /**
@@ -195,18 +198,13 @@ export class PortMonitor implements IMonitorService {
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
         // Basic validation of config properties - only validate relevant ones
         // for port monitoring
-        if (
-            isDefined(config.timeout) &&
-            (typeof config.timeout !== "number" || config.timeout <= 0)
-        ) {
-            throw new Error("Invalid timeout: must be a positive number");
-        }
+        assertPositiveTimeoutConfigUpdate(config);
 
         // Note: userAgent is not relevant for port monitoring, so we don't validate it This fixes the configuration validation inconsistency identified in the review
 
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeMonitorServiceConfig({
+            currentConfig: this.config,
+            update: config,
+        });
     }
 }

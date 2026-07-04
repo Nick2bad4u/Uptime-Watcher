@@ -15,7 +15,6 @@ import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
 import {
-    isDefined,
     isEmpty,
     isFinite as isFiniteNumber,
     objectKeys,
@@ -32,6 +31,11 @@ import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
+import {
+    assertPositiveTimeoutConfigUpdate,
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./shared/monitorServiceConfigMerging";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -377,10 +381,10 @@ export class SslMonitor implements IMonitorService {
     }
 
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
+        this.config = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+        });
     }
 
     public getType(): MonitorType {
@@ -388,16 +392,11 @@ export class SslMonitor implements IMonitorService {
     }
 
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        if (
-            isDefined(config.timeout) &&
-            (typeof config.timeout !== "number" || config.timeout <= 0)
-        ) {
-            throw new Error("Invalid timeout: must be a positive number");
-        }
+        assertPositiveTimeoutConfigUpdate(config);
 
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeMonitorServiceConfig({
+            currentConfig: this.config,
+            update: config,
+        });
     }
 }

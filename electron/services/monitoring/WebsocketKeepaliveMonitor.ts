@@ -29,6 +29,10 @@ import {
     resolveMonitorNumericOverride,
     resolveRequiredMonitorUrlField,
 } from "./shared/monitorConfigValueResolvers";
+import {
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./shared/monitorServiceConfigMerging";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
@@ -335,10 +339,10 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
     }
 
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
+        this.config = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+        });
     }
 
     public getType(): MonitorType {
@@ -346,9 +350,9 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
     }
 
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeMonitorServiceConfig({
+            currentConfig: this.config,
+            update: config,
+        });
     }
 }

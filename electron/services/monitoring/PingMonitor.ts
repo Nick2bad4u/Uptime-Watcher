@@ -51,6 +51,10 @@ import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { createMonitorConfig } from "./createMonitorConfig";
 // Type guard utilities are available but PingMonitor retains explicit check here
 import {
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./shared/monitorServiceConfigMerging";
+import {
     createMonitorErrorResult,
     validateMonitorHost,
 } from "./shared/monitorServiceHelpers";
@@ -209,10 +213,10 @@ export class PingMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor service
      */
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
+        this.config = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+        });
     }
 
     /**
@@ -257,9 +261,9 @@ export class PingMonitor implements IMonitorService {
      * @param config - Partial configuration to update
      */
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeMonitorServiceConfig({
+            currentConfig: this.config,
+            update: config,
+        });
     }
 }

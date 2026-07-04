@@ -34,6 +34,10 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createTimeoutSignal } from "./shared/abortSignalUtils";
+import {
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./shared/monitorServiceConfigMerging";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
@@ -316,10 +320,10 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
     }
 
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
+        this.config = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+        });
         this.axiosInstance = createHttpClient(this.config);
     }
 
@@ -328,10 +332,10 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
     }
 
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeMonitorServiceConfig({
+            currentConfig: this.config,
+            update: config,
+        });
         this.axiosInstance = createHttpClient(this.config);
     }
 }

@@ -77,6 +77,10 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./shared/monitorServiceConfigMerging";
+import {
     createMonitorConfig,
     createMonitorErrorResult,
     validateMonitorHost,
@@ -427,10 +431,10 @@ export class DnsMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor service
      */
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
+        this.config = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+        });
     }
 
     /**
@@ -472,10 +476,10 @@ export class DnsMonitor implements IMonitorService {
      * @param config - Partial configuration to update
      */
     public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeMonitorServiceConfig({
+            currentConfig: this.config,
+            update: config,
+        });
     }
 
     /**
