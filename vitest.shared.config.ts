@@ -162,7 +162,6 @@ const vitestSharedConfig: UserConfig = defineConfig({
         environment: "node",
         exclude: [
             "**/dist*/**",
-            "**/dist*/**",
             "**/src/**",
             "**/electron/**",
             "**/coverage/**",
