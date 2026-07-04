@@ -24,6 +24,19 @@ export const DEFAULT_MONITOR_PATH_TRAVERSAL_OPTIONS: Readonly<
     blockPrototypeAccess: true,
 };
 
+function getOwnBooleanOption(
+    options: MonitorPathTraversalOptions,
+    key: keyof MonitorPathTraversalOptions,
+    fallback: boolean
+): boolean {
+    const descriptor = Object.getOwnPropertyDescriptor(options, key);
+    return descriptor &&
+        "value" in descriptor &&
+        typeof descriptor.value === "boolean"
+        ? descriptor.value
+        : fallback;
+}
+
 /**
  * Normalizes traversal options using secure defaults.
  */
@@ -31,7 +44,15 @@ export function normalizeMonitorPathTraversalOptions(
     options: MonitorPathTraversalOptions
 ): Readonly<Required<MonitorPathTraversalOptions>> {
     return {
-        ...DEFAULT_MONITOR_PATH_TRAVERSAL_OPTIONS,
-        ...options,
+        allowArrayIndexTokens: getOwnBooleanOption(
+            options,
+            "allowArrayIndexTokens",
+            DEFAULT_MONITOR_PATH_TRAVERSAL_OPTIONS.allowArrayIndexTokens
+        ),
+        blockPrototypeAccess: getOwnBooleanOption(
+            options,
+            "blockPrototypeAccess",
+            DEFAULT_MONITOR_PATH_TRAVERSAL_OPTIONS.blockPrototypeAccess
+        ),
     };
 }

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { MonitorPathTraversalOptions } from "../../../../services/monitoring/shared/monitorPathTraversalOptions";
+
 import { extractMonitorValueAtPath } from "../../../../services/monitoring/shared/monitorPathTraversal";
 
 describe(extractMonitorValueAtPath, () => {
@@ -74,6 +76,35 @@ describe(extractMonitorValueAtPath, () => {
         expect(extractMonitorValueAtPath(payload, "details.status")).toBe(
             undefined
         );
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke accessors while normalizing traversal options", () => {
+        let getterCalls = 0;
+        const payload = {
+            data: {
+                items: [{ name: "alpha" }],
+            },
+        };
+        const options = {
+            blockPrototypeAccess: true,
+        } as Record<string, unknown>;
+
+        Object.defineProperty(options, "allowArrayIndexTokens", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("option getter should not run");
+            },
+        });
+
+        expect(
+            extractMonitorValueAtPath(
+                payload,
+                "data.items[0].name",
+                options as MonitorPathTraversalOptions
+            )
+        ).toBeUndefined();
         expect(getterCalls).toBe(0);
     });
 
