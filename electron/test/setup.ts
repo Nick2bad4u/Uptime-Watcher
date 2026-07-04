@@ -66,8 +66,9 @@ process.on("rejectionHandled", () => {
 // Handle unhandled promise rejections in test environment
 process.on("unhandledRejection", (reason, promise) => {
     // In tests, we expect some unhandled rejections, especially in retry tests
-    // Log them but don't crash the test process
-    console.warn("Unhandled Rejection at:", promise, "reason:", reason);
+    // Silently handle them so they don't crash the test process
+    void promise;
+    void reason;
 });
 
 // Also suppress specific warning types during tests

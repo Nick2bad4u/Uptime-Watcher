@@ -64,9 +64,6 @@ fc.configureGlobal({
 });
 
 beforeAll(async () => {
-    // Global setup that runs once before all tests
-    console.log("🚀 Starting Vitest test suite...");
-
     // Set up global test environment
     process.env["NODE_ENV"] = "test";
     process.env["VITEST"] = "true";
@@ -84,9 +81,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    // Global cleanup that runs once after all tests
-    console.log("✅ Vitest test suite completed.");
-
     // Clean up any global resources
     if (typeof performance !== "undefined" && performance.clearMarks) {
         performance.clearMarks();

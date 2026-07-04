@@ -34,43 +34,31 @@ describe("comprehensive Fast-Check Fuzzing Test Suite", () => {
 
     beforeAll(() => {
         suiteStartTime = performance.now();
-        console.log("🚀 Starting Comprehensive Fast-Check Fuzzing Test Suite");
-        console.log(
-            "📊 This suite will generate extensive property-based tests for 100% coverage"
-        );
     });
 
     afterAll(() => {
         const suiteEndTime = performance.now();
         const totalTime = suiteEndTime - suiteStartTime;
-
-        console.log(`\n${"=".repeat(80)}`);
-        console.log("📈 COMPREHENSIVE FUZZING TEST SUITE RESULTS");
-        console.log("=".repeat(80));
-        console.log(`⏱️  Total execution time: ${Math.round(totalTime)}ms`);
-        console.log(`🧪 Total test suites: ${coverageResults.length}`);
-        console.log(
-            `🔍 Total properties checked: ${coverageResults.reduce((sum, r) => sum + r.propertiesChecked, 0)}`
+        const totalPropertiesChecked = coverageResults.reduce(
+            (sum, result) => sum + result.propertiesChecked,
+            0
         );
-        console.log(
-            `🐛 Total edge cases found: ${coverageResults.reduce((sum, r) => sum + r.edgeCasesFound, 0)}`
+        const totalEdgeCasesFound = coverageResults.reduce(
+            (sum, result) => sum + result.edgeCasesFound,
+            0
         );
 
-        console.log("\n📊 Per-Suite Results:");
+        expect(totalTime).toBeGreaterThanOrEqual(0);
+        expect(coverageResults.length).toBeGreaterThan(0);
+        expect(totalPropertiesChecked).toBeGreaterThan(0);
+        expect(totalEdgeCasesFound).toBeGreaterThanOrEqual(0);
+
         for (const result of coverageResults) {
-            console.log(`  ${result.suite}:`);
-            console.log(
-                `    Tests: ${result.testsRun}, Properties: ${result.propertiesChecked}`
-            );
-            console.log(
-                `    Edge cases: ${result.edgeCasesFound}, Avg time: ${result.performance.avg.toFixed(2)}ms`
-            );
+            expect(result.suite.length).toBeGreaterThan(0);
+            expect(result.testsRun).toBeGreaterThan(0);
+            expect(result.propertiesChecked).toBeGreaterThan(0);
+            expect(result.performance.avg).toBeGreaterThanOrEqual(0);
         }
-
-        console.log(
-            "\n✅ Comprehensive fuzzing test suite completed successfully!"
-        );
-        console.log("🎯 100% Fast-Check property-based test coverage achieved");
     });
 
     describe("fuzzing Test Suite Integration", () => {

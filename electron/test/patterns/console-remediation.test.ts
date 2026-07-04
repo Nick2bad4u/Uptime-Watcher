@@ -273,30 +273,12 @@ describe("Console Statement Remediation", () => {
                 }
             }
 
-            console.log("Console Statement Analysis Results:");
-            console.log("=".repeat(50));
-            console.log(`Total console statements found: ${totalStatements}`);
-            console.log(`  • Legitimate (keep): ${totalLegitimate}`);
-            console.log(`  • Needs replacement: ${totalNeedsReplacement}`);
-            console.log(`  • Test files: ${totalTestFile}`);
-
-            if (analysisResults.length > 0) {
-                console.log(String.raw`\nFiles with console statements:`);
-                for (const {
-                    file,
-                    statements,
-                    categorized,
-                } of analysisResults.slice(0, 10)) {
-                    console.log(String.raw`\n${file}:`);
-                    console.log(
-                        `  Total: ${statements.length}, Needs fix: ${categorized.needsReplacement}, Legitimate: ${categorized.legitimate}`
-                    );
-                }
-            }
-
             // The analysis should complete successfully
             expect(analysisResults.length).toBeGreaterThanOrEqual(0);
             expect(totalStatements).toBeGreaterThanOrEqual(0);
+            expect(totalStatements).toBe(
+                totalLegitimate + totalNeedsReplacement + totalTestFile
+            );
         });
         it("should provide specific replacement recommendations", async ({
             task,
@@ -339,9 +321,6 @@ describe("Console Statement Remediation", () => {
                 }
             }
 
-            console.log(String.raw`\nReplacement Recommendations:`);
-            console.log("=".repeat(50));
-
             if (replacementRecommendations.length > 0) {
                 for (const {
                     file,
@@ -350,19 +329,12 @@ describe("Console Statement Remediation", () => {
                     replacement,
                     reason,
                 } of replacementRecommendations.slice(0, 5)) {
-                    console.log(String.raw`\n${file}:${line}`);
-                    console.log(`  Original: ${original}`);
-                    console.log(`  Replace with: ${replacement}`);
-                    console.log(`  Reason: ${reason}`);
+                    expect(file.length).toBeGreaterThan(0);
+                    expect(line).toBeGreaterThan(0);
+                    expect(original).toContain("console.");
+                    expect(replacement).toContain("logger.");
+                    expect(reason).toContain("Production code");
                 }
-
-                console.log(
-                    String.raw`\n... and ${Math.max(0, replacementRecommendations.length - 5)} more replacements needed.`
-                );
-            } else {
-                console.log(
-                    "No console statements need replacement in analyzed files."
-                );
             }
 
             expect(replacementRecommendations.length).toBeGreaterThanOrEqual(0);
@@ -405,14 +377,11 @@ describe("Console Statement Remediation", () => {
                 },
             ];
 
-            console.log(String.raw`\nLogger Usage Guidelines:`);
-            console.log("=".repeat(40));
-
             for (const { level, usage, example, when } of guidelines) {
-                console.log(String.raw`\n${level.toUpperCase()}:`);
-                console.log(`  Purpose: ${usage}`);
-                console.log(`  Example: ${example}`);
-                console.log(`  Use when: ${when}`);
+                expect(level.length).toBeGreaterThan(0);
+                expect(usage.length).toBeGreaterThan(0);
+                expect(example).toContain("logger.");
+                expect(when.length).toBeGreaterThan(0);
             }
 
             expect(guidelines).toHaveLength(4);
@@ -458,13 +427,11 @@ describe("Console Statement Remediation", () => {
                 },
             ];
 
-            console.log(String.raw`\nConsole Statement Migration Strategy:`);
-            console.log("=".repeat(45));
-
             for (const { step, title, description, action } of migrationSteps) {
-                console.log(String.raw`\n${step}. ${title}`);
-                console.log(`   ${description}`);
-                console.log(`   Action: ${action}`);
+                expect(step).toBeGreaterThan(0);
+                expect(title.length).toBeGreaterThan(0);
+                expect(description.length).toBeGreaterThan(0);
+                expect(action.length).toBeGreaterThan(0);
             }
 
             expect(migrationSteps).toHaveLength(5);
@@ -507,17 +474,14 @@ describe("Console Statement Remediation", () => {
                 },
             ];
 
-            console.log(String.raw`\nAutomated Replacement Patterns:`);
-            console.log("=".repeat(40));
-
             for (const {
                 pattern,
                 replacement,
                 description,
             } of replacementPatterns) {
-                console.log(String.raw`\n${description}:`);
-                console.log(`  Pattern: ${pattern.source}`);
-                console.log(`  Replace: ${replacement}`);
+                expect(description.length).toBeGreaterThan(0);
+                expect(pattern.source).toContain("console");
+                expect(replacement).toContain("logger.");
             }
 
             // Example function to apply replacements (not actually run)

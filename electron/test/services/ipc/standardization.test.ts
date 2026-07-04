@@ -420,10 +420,9 @@ describe("IPC Standardization Concepts", () => {
                 "Error responses must never expose internal system details",
             ];
 
-            console.log(String.raw`\nIPC Standardization Guidelines:`);
-            console.log("=".repeat(40));
             for (const [index, guideline] of guidelines.entries()) {
-                console.log(`${index + 1}. ${guideline}`);
+                expect(index).toBeGreaterThanOrEqual(0);
+                expect(guideline.length).toBeGreaterThan(0);
             }
 
             expect(guidelines).toHaveLength(8);
@@ -516,12 +515,10 @@ registerStandardizedIpcHandler(
                 },
             ];
 
-            console.log(String.raw`\nIPC Testing Patterns:`);
-            console.log("=".repeat(30));
             for (const { name, description, example } of testingApproaches) {
-                console.log(String.raw`\n${name}:`);
-                console.log(`  Description: ${description}`);
-                console.log(`  Example: ${example}`);
+                expect(name.length).toBeGreaterThan(0);
+                expect(description.length).toBeGreaterThan(0);
+                expect(example.length).toBeGreaterThan(0);
             }
 
             expect(testingApproaches).toHaveLength(5);
