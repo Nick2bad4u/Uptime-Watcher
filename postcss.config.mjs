@@ -1,4 +1,4 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair, perfectionist/sort-objects -- PostCSS plugin order is semantic: imports and Tailwind must run before functional transforms, and optimization/minification plugins must stay last. */
+/* eslint-disable perfectionist/sort-objects -- PostCSS plugin order is semantic: imports and Tailwind must run before functional transforms, and optimization/minification plugins must stay last. */
 
 /**
  * PostCSS configuration for the Uptime Watcher application.
@@ -215,3 +215,5 @@ export default {
         }),
     },
 };
+
+/* eslint-enable perfectionist/sort-objects -- Re-enable after the semantic PostCSS plugin ordering. */

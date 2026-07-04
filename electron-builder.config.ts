@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/filename-case, @eslint-community/eslint-comments/disable-enable-pair -- config file is better in this format */
+/* eslint-disable unicorn/filename-case -- electron-builder expects this conventional root config filename. */
 import type { Configuration } from "electron-builder";
 
 /**
@@ -173,3 +173,5 @@ const config: Configuration = {
 };
 
 export default config;
+
+/* eslint-enable unicorn/filename-case -- Re-enable after the electron-builder root config. */

@@ -1,5 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- needed for standalone config */
-
 /**
  * Vitest configuration for linting/tooling tests.
  *

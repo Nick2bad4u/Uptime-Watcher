@@ -1,5 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- needed for standalone config*/
-
 /**
  * Vitest configuration for shared utility tests. Standalone config file that
  * specifically targets shared utilities used by both frontend and backend.
