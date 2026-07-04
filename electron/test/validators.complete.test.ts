@@ -18,7 +18,7 @@ import {
     MONITOR_ID_MAX_LENGTH,
     MONITOR_ID_TOO_LONG_MESSAGE,
 } from "@shared/validation/monitorFieldConstants";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 // Import all exported validator groups (domain modules)
 import { CloudHandlerValidators } from "../services/ipc/validators/cloud";
@@ -1891,9 +1891,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
 
             const objWithFunction = {
                 ...createValidSite(),
-                callback: () => {
-                    console.log("test");
-                },
+                callback: vi.fn(),
             };
             const result = SiteHandlerValidators.addSite([objWithFunction]);
             expect(isValidationFailure(result)).toBeTruthy();
