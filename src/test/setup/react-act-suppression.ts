@@ -18,13 +18,14 @@ const originalConsoleError = console.error;
  * underlying code is correct (uses proper useEffect patterns).
  */
 export function suppressReactActWarnings(): void {
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
         // Suppress act() warnings - these are false positives when mocks fail
         // but the real code uses proper useEffect patterns
+        const message = arrayFirst(args);
         if (
-            typeof arrayFirst(args) === "string" &&
-            arrayFirst(args).includes("Warning: An update to") &&
-            arrayFirst(args).includes("inside a test was not wrapped in act")
+            typeof message === "string" &&
+            message.includes("Warning: An update to") &&
+            message.includes("inside a test was not wrapped in act")
         ) {
             return;
         }

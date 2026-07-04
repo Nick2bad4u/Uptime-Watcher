@@ -876,16 +876,19 @@ describe("useMonitorTypes Hook", () => {
             async (refreshCount) => {
                 // Suppress React act warnings for this property-based test
                 const originalConsoleError = console.error;
-
-                console.error = (message: string, ...args: unknown[]) => {
-                    if (
-                        typeof message === "string" &&
-                        message.includes("act(")
-                    ) {
-                        return; // Suppress act warnings
-                    }
-                    originalConsoleError(message, ...args);
-                };
+                const consoleErrorSpy = vi
+                    .spyOn(console, "error")
+                    .mockImplementation(
+                        (message?: unknown, ...args: unknown[]) => {
+                            if (
+                                typeof message === "string" &&
+                                message.includes("act(")
+                            ) {
+                                return;
+                            }
+                            originalConsoleError(message, ...args);
+                        }
+                    );
 
                 try {
                     // Clear mocks at start of each property test execution
@@ -933,8 +936,7 @@ describe("useMonitorTypes Hook", () => {
                     expect(refreshCount).toBeGreaterThanOrEqual(1);
                     expect(refreshCount).toBeLessThanOrEqual(5);
                 } finally {
-                    // Restore original console.error
-                    console.error = originalConsoleError;
+                    consoleErrorSpy.mockRestore();
                 }
             }
         );

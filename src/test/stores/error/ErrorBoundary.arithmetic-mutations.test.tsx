@@ -87,9 +87,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Category: Error Handling", "category");
         annotate("Type: Arithmetic Operations", "type");
 
-        // Mock console.error to suppress error boundary log output
-        const originalConsoleError = console.error;
-        vi.spyOn(console, "error").mockReturnValue(undefined);
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockReturnValue(undefined);
 
         try {
             // Set component to throw error initially
@@ -126,7 +126,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
             // Verify we're back to normal content (error was cleared)
             expect(screen.queryByText("Error caught:")).not.toBeInTheDocument();
         } finally {
-            console.error = originalConsoleError;
+            consoleErrorSpy.mockRestore();
             isGlobalShouldThrow = true; // Reset for other tests
         }
     });
@@ -144,8 +144,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Category: Error Handling", "category");
         annotate("Type: Arithmetic Operations", "type");
 
-        const originalConsoleError = console.error;
-        vi.spyOn(console, "error").mockReturnValue(undefined);
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockReturnValue(undefined);
 
         try {
             // First mount with error
@@ -192,7 +193,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
                 screen.getAllByText("Normal component content")
             ).toHaveLength(1);
         } finally {
-            console.error = originalConsoleError;
+            consoleErrorSpy.mockRestore();
             isGlobalShouldThrow = true;
         }
     });
@@ -210,8 +211,9 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
         annotate("Category: Error Handling", "category");
         annotate("Type: Arithmetic Operations", "type");
 
-        const originalConsoleError = console.error;
-        vi.spyOn(console, "error").mockReturnValue(undefined);
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockReturnValue(undefined);
 
         try {
             // This test validates that retryCount arithmetic affects the key prop
@@ -260,7 +262,7 @@ describe("ErrorBoundary Arithmetic Mutations", () => {
                 screen.getAllByText("Normal component content")
             ).toHaveLength(1);
         } finally {
-            console.error = originalConsoleError;
+            consoleErrorSpy.mockRestore();
             isGlobalShouldThrow = true;
         }
     });

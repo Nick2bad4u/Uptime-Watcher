@@ -2,7 +2,15 @@
  * @file Simple tests for main.tsx app entry point focusing on coverage
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    type MockInstance,
+    vi,
+} from "vitest";
 
 // Mock structured renderer logger so we can assert initialization errors are logged consistently
 vi.mock("../services/logger", () => {
@@ -61,7 +69,7 @@ vi.mock("../App", () => ({
 vi.mock("../index.css", () => ({}));
 
 describe("main.tsx - Application Entry Point", () => {
-    let originalConsoleError: typeof console.error;
+    let consoleErrorSpy: MockInstance<typeof console.error>;
 
     beforeEach(() => {
         // Reset DOM
@@ -70,13 +78,11 @@ describe("main.tsx - Application Entry Point", () => {
         // Reset mocks
         vi.clearAllMocks();
 
-        // Spy on console.error
-        originalConsoleError = console.error;
-        vi.spyOn(console, "error").mockReturnValue(undefined);
+        consoleErrorSpy = vi.spyOn(console, "error").mockReturnValue(undefined);
     });
 
     afterEach(() => {
-        console.error = originalConsoleError;
+        consoleErrorSpy.mockRestore();
         vi.resetModules();
     });
 
