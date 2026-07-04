@@ -791,6 +791,7 @@ docs/docusaurus/docs/assets
 docs/docusaurus/docs/coverage.svg
 docs/docusaurus/docs/documents
 docs/docusaurus/docs/electron
+docs/docusaurus/docs/hierarchy.md
 docs/docusaurus/docs/index.md
 docs/docusaurus/docs/modules.md
 docs/docusaurus/docs/src
@@ -798,6 +799,8 @@ docs/typedoc.json
 docs/docusaurus/docs/typedoc.json
 docs/docusaurus/docs/typedoc-sidebar.cjs
 docs/docusaurus/docs/_media
+docs/docusaurus/static/img/coverage.json
+docs/docusaurus/static/img/coverage.svg
 docs/docusaurus/static/eslint-inspector/
 docs/docusaurus/static/storybook/
 docs/docusaurus/stylelintcache
@@ -807,8 +810,11 @@ docs/docusaurus/stylelintcache
 **/docs/docusaurus/docs/assets
 **/docs/docusaurus/docs/documents
 **/docs/docusaurus/docs/electron
+**/docs/docusaurus/docs/hierarchy.md
 **/docs/docusaurus/docs/shared
 **/docs/docusaurus/docs/src
+**/docs/docusaurus/static/img/coverage.json
+**/docs/docusaurus/static/img/coverage.svg
 
 # Downloads
 !downloads/

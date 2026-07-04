@@ -50,12 +50,14 @@ docs/docusaurus/docs/coverage.svg
 docs/docusaurus/docs/documents
 docs/docusaurus/docs/documents/ADR-*
 docs/docusaurus/docs/electron
+docs/docusaurus/docs/hierarchy.md
 docs/docusaurus/docs/index.md
 docs/docusaurus/docs/modules.md
 docs/docusaurus/docs/src
 docs/docusaurus/docs/_media
 docs/docusaurus/docs/typedoc.json
 docs/docusaurus/docs/typedoc-sidebar.cjs
+docs/docusaurus/static/img/coverage.svg
 docs/docusaurus/static/eslint-inspector/
 docs/docusaurus/static/stylelint-inspector/
 docs/docusaurus/static/*-inspector/
@@ -68,8 +70,10 @@ docs/typedoc.json
 **/docs/docusaurus/docs/assets
 **/docs/docusaurus/docs/documents
 **/docs/docusaurus/docs/electron
+**/docs/docusaurus/docs/hierarchy.md
 **/docs/docusaurus/docs/shared
 **/docs/docusaurus/docs/src
+**/docs/docusaurus/static/img/coverage.svg
 **/docs/docusaurus/docusaurus.config.ts
 **/docs/docusaurus/sidebars.ts
 **/docs/docusaurus/src/js/modern-enhancements.ts

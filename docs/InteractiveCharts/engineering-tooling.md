@@ -48,7 +48,7 @@ graph TD
         lintCommit["npm run lint:commit"]
         lintComplexity["npm run lint:complexity"]
         lintKnip["npm run knip"]
-        lintDepcheck["npm run lint:unused-deps"]
+        lintDeps["npm run lint:deps"]
     end
 
     subgraph ESLint["ESLint runner"]
@@ -81,7 +81,6 @@ graph TD
         Commitlint["commitlint --config config/linting/commitlint.config.mjs"]
         Complexity["eslint complexity override\n + cognitive-complexity-ts"]
         Knip["knip -- include unused exports"]
-        Depcheck["depcheck --ignores @types/*"]
         Yamllint["yamllint -c .yamllint"]
         Grype["grype . -c config/linting/.grype.yaml"]
     end
@@ -110,7 +109,7 @@ graph TD
     lintCommit --> Commitlint
     lintComplexity --> Complexity
     lintKnip --> Knip
-    lintDepcheck --> Depcheck
+    lintDeps --> Knip
 
     ESLintRunner --> ESLintConfig
     ESLintRunner --> ESLintCache
@@ -124,8 +123,8 @@ graph TD
     classDef runner fill:#312e81,stroke:#1e1b4b,color:#ffffff
     classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
 
-    class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDepcheck cli
-    class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Depcheck,Yamllint,Grype runner
+    class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDeps cli
+    class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Yamllint,Grype runner
     class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsIgnore,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
 ```
 
@@ -315,12 +314,12 @@ graph LR
     docusaurusCheck --> docusaurusBuildCheck["docusaurus check"]
 
     depScan --> grypeScan["grype ."]
-    depScan --> depcheckScan["depcheck"]
+    depScan --> knipScan["knip"]
 
     classDef gate fill:#0f172a,stroke:#0b1120,color:#f8fafc
     classDef child fill:#334155,stroke:#1e293b,color:#f1f5f9
 
     class quality gate
     class lintAll,testAllCoverage,docusaurusCheck,depScan gate
-    class lint,lintRemark,lintMadge,typeCheckAll,knip,frontendCov,electronCov,sharedCov,storybookCov,typedocRefresh,docusaurusBuildCheck,grypeScan,depcheckScan child
+    class lint,lintRemark,lintMadge,typeCheckAll,knip,frontendCov,electronCov,sharedCov,storybookCov,typedocRefresh,docusaurusBuildCheck,grypeScan,knipScan child
 ```

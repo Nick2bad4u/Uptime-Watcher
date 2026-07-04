@@ -13,6 +13,8 @@ dist/
 docs/docusaurus/docs/
 docs/docusaurus/build/
 docs/docusaurus/.docusaurus/
+docs/docusaurus/static/img/coverage.json
+docs/docusaurus/static/img/coverage.svg
 docs/docusaurus/src/**/*.module.css.d.ts
 docs/packages/
 docs/TSDoc/
