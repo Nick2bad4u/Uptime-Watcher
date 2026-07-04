@@ -235,6 +235,71 @@ describe("Environment Detection Utilities", () => {
 
             expect(envModule.getEnvVar("NODE_ENV")).toBe("");
         });
+
+        it("should not invoke accessor-backed environment entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            let accessCount = 0;
+            const env = {};
+            Object.defineProperty(env, "NODE_ENV", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    accessCount += 1;
+                    throw new Error("Unexpected NODE_ENV getter access");
+                },
+            });
+
+            const envModule = applyProcessSnapshot({
+                env: env as Record<string, string | undefined>,
+            });
+
+            expect(envModule.getEnvVar("NODE_ENV")).toBeUndefined();
+            expect(accessCount).toBe(0);
+        });
+    });
+
+    describe("getEnvSummary", () => {
+        it("should include own string data entries and skip accessors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            let accessCount = 0;
+            const env = {
+                CODECOV_TOKEN: "test-token",
+                EMPTY_VALUE: "",
+                IGNORED_UNDEFINED: undefined,
+            };
+            Object.defineProperty(env, "NODE_ENV", {
+                configurable: true,
+                enumerable: true,
+                get: () => {
+                    accessCount += 1;
+                    throw new Error("Unexpected NODE_ENV getter access");
+                },
+            });
+
+            const envModule = applyProcessSnapshot({
+                env: env as Record<string, string | undefined>,
+            });
+
+            expect(envModule.getEnvSummary()).toEqual({
+                CODECOV_TOKEN: "test-token",
+                EMPTY_VALUE: "",
+            });
+            expect(accessCount).toBe(0);
+        });
     });
 
     describe("getNodeEnv", () => {

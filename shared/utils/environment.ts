@@ -19,9 +19,11 @@ import {
     isDefined,
     isFinite as isFiniteNumber,
     isSafeInteger,
-    objectEntries,
+    objectKeys,
     safeCastTo,
 } from "ts-extras";
+
+import { getOwnDataProperty } from "./errorPropertyAccess";
 
 export interface KnownEnvironmentVariables {
     /** Token used by coverage reporting tooling when present. */
@@ -147,12 +149,10 @@ export function getEnvVar(key: string): string | undefined {
         return undefined;
     }
 
-    try {
-        const value = env[key];
-        return typeof value === "string" ? value : undefined;
-    } catch {
-        return undefined;
-    }
+    const property = getOwnDataProperty(env, key);
+    return property.found && typeof property.value === "string"
+        ? property.value
+        : undefined;
 }
 
 /**
@@ -165,9 +165,10 @@ export function getEnvSummary(): Record<string, string> {
     }
 
     const summary: Record<string, string> = {};
-    for (const [key, value] of objectEntries(env)) {
-        if (typeof value === "string") {
-            summary[key] = value;
+    for (const key of objectKeys(env)) {
+        const property = getOwnDataProperty(env, key);
+        if (property.found && typeof property.value === "string") {
+            summary[key] = property.value;
         }
     }
 
