@@ -81,7 +81,7 @@ describe(applyMonitorStateOperation, () => {
         expect(site.monitors[0]?.monitoring).toBeTruthy();
 
         expect(sitesCache.set).toHaveBeenCalledWith("s1", site);
-        expect(update).toHaveBeenCalledWith("m1", changes);
+        expect(update).toHaveBeenCalledWith("m1", { monitoring: true });
 
         expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
             "monitor:status-changed",
@@ -144,6 +144,83 @@ describe(applyMonitorStateOperation, () => {
         expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
             "monitor:status-changed",
             expect.any(Object)
+        );
+    });
+
+    it("ignores accessor-backed and identity state changes", async () => {
+        const eventEmitter =
+            createMockEventBus() as unknown as TypedEventBus<UptimeEvents>;
+        const sitesCache =
+            createMockStandardizedCache<Site>() as unknown as StandardizedCache<Site>;
+
+        const monitor = createTestMonitor("m1", {
+            monitoring: false,
+            responseTime: 123,
+            status: "down",
+        });
+        const site = createTestSite("s1", {
+            monitors: [monitor],
+        });
+
+        const update = vi.fn();
+        const monitorRepository = {
+            createTransactionAdapter: vi.fn().mockReturnValue({ update }),
+        } as unknown as MonitorRepository;
+
+        const databaseService = {
+            executeTransaction: vi
+                .fn()
+                .mockImplementation(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
+        } as unknown as DatabaseService;
+
+        const statusGetter = vi.fn(() => {
+            throw new Error("status getter should not run");
+        });
+        const changes: Partial<Monitor> = { monitoring: true };
+
+        Object.defineProperty(changes, "id", {
+            enumerable: true,
+            value: "different-monitor",
+        });
+        Object.defineProperty(changes, "status", {
+            enumerable: true,
+            get: statusGetter,
+        });
+
+        await applyMonitorStateOperation({
+            changes,
+            dependencies: {
+                databaseService,
+                eventEmitter,
+                monitorRepository,
+                sitesCache,
+            },
+            monitor,
+            newStatus: "up",
+            site,
+        });
+
+        expect(statusGetter).not.toHaveBeenCalled();
+        expect(monitor.id).toBe("m1");
+        expect(monitor.monitoring).toBeTruthy();
+        expect(monitor.status).toBe("down");
+        expect(update).toHaveBeenCalledWith("m1", { monitoring: true });
+        expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+            "monitor:status-changed",
+            expect.objectContaining({
+                monitor: expect.objectContaining({
+                    id: "m1",
+                    monitoring: true,
+                    status: "down",
+                }),
+                monitorId: "m1",
+                previousStatus: "down",
+                status: "up",
+            })
         );
     });
 });

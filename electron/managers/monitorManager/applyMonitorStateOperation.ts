@@ -22,6 +22,7 @@ import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 
 /**
@@ -52,9 +53,10 @@ export async function applyMonitorStateOperation(args: {
     const { changes, dependencies, monitor, newStatus, site } = args;
 
     const previousStatus = monitor.status;
+    const sanitizedChanges = safeObjectOmit(changes, ["id"]);
 
     // Update cached monitor object
-    Object.assign(monitor, changes);
+    Object.assign(monitor, sanitizedChanges);
 
     // Update monitor in cached site
     const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
@@ -72,12 +74,12 @@ export async function applyMonitorStateOperation(args: {
                 const monitorTx =
                     dependencies.monitorRepository.createTransactionAdapter(db);
 
-                monitorTx.update(monitor.id, changes);
+                monitorTx.update(monitor.id, sanitizedChanges);
                 return Promise.resolve();
             }),
         "monitor-manager-apply-state-change",
         dependencies.eventEmitter,
-        { changes, monitorId: monitor.id }
+        { changes: sanitizedChanges, monitorId: monitor.id }
     );
 
     // Emit status-changed event with full payload
