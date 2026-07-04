@@ -1,11 +1,12 @@
 import type { AxiosInstance } from "axios";
 
-import { safeObjectOmit } from "@shared/utils/objectSafety";
-import { isDefined } from "ts-extras";
-
 import type { MonitorServiceConfig } from "../types";
 
 import { createHttpClient } from "../utils/httpClient";
+import {
+    createDefaultMonitorServiceConfig,
+    mergeMonitorServiceConfig,
+} from "./monitorServiceConfigMerging";
 
 /**
  * Runtime state shared by monitor service adapters.
@@ -32,12 +33,13 @@ export function createMonitorServiceRuntimeState(args: {
     readonly defaultTimeoutMs: number;
     readonly defaultUserAgent?: string;
 }): MonitorServiceRuntimeState {
-    const configOverrides = safeObjectOmit(args.config, []);
-    const config: MonitorServiceConfig = {
-        timeout: args.defaultTimeoutMs,
-        ...(args.defaultUserAgent && { userAgent: args.defaultUserAgent }),
-        ...configOverrides,
-    };
+    const config = createDefaultMonitorServiceConfig({
+        defaultTimeoutMs: args.defaultTimeoutMs,
+        ...(args.config && { config: args.config }),
+        ...(args.defaultUserAgent && {
+            defaultUserAgent: args.defaultUserAgent,
+        }),
+    });
 
     return {
         axiosInstance: createHttpClient(config),
@@ -54,25 +56,17 @@ export function updateMonitorServiceRuntimeState(args: {
     readonly defaultUserAgent?: string;
     readonly update: Partial<MonitorServiceConfig>;
 }): MonitorServiceRuntimeState {
-    // Treat `undefined` as "not provided" (do not overwrite existing config).
-    const currentConfig = safeObjectOmit(args.currentConfig, []);
-    const update: Partial<MonitorServiceConfig> = safeObjectOmit(
-        args.update,
-        []
-    );
-    if (!isDefined(update.timeout)) {
-        delete update.timeout;
-    }
-    if (!isDefined(update.userAgent)) {
-        delete update.userAgent;
-    }
-
-    const merged: MonitorServiceConfig = {
-        timeout: args.defaultTimeoutMs,
-        ...(args.defaultUserAgent && { userAgent: args.defaultUserAgent }),
-        ...currentConfig,
-        ...update,
-    };
+    const currentConfig = createDefaultMonitorServiceConfig({
+        config: args.currentConfig,
+        defaultTimeoutMs: args.defaultTimeoutMs,
+        ...(args.defaultUserAgent && {
+            defaultUserAgent: args.defaultUserAgent,
+        }),
+    });
+    const merged = mergeMonitorServiceConfig({
+        currentConfig,
+        update: args.update,
+    });
 
     return {
         axiosInstance: createHttpClient(merged),

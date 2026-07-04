@@ -77,6 +77,78 @@ describe("monitorServiceRuntimeState", () => {
         expect(createHttpClient).toHaveBeenCalledWith(state.config);
     });
 
+    it("drops reserved prototype keys from initial config", () => {
+        const config: Partial<MonitorServiceConfig> = {
+            userAgent: "CustomAgent/1.0",
+        };
+        Object.defineProperty(config, "__proto__", {
+            enumerable: true,
+            value: { polluted: true },
+        });
+        Object.defineProperty(config, "constructor", {
+            enumerable: true,
+            value: "unsafe-constructor",
+        });
+        Object.defineProperty(config, "prototype", {
+            enumerable: true,
+            value: "unsafe-prototype",
+        });
+
+        const state = createMonitorServiceRuntimeState({
+            config,
+            defaultTimeoutMs: 5000,
+            defaultUserAgent: "DefaultAgent/1.0",
+        });
+
+        expect(Object.getPrototypeOf(state.config)).toBe(Object.prototype);
+        expect(Object.hasOwn(state.config, "__proto__")).toBe(false);
+        expect(Object.hasOwn(state.config, "constructor")).toBe(false);
+        expect(Object.hasOwn(state.config, "prototype")).toBe(false);
+        expect(state.config).toEqual({
+            timeout: 5000,
+            userAgent: "CustomAgent/1.0",
+        });
+        expect(createHttpClient).toHaveBeenCalledWith(state.config);
+    });
+
+    it("drops reserved prototype keys from runtime config updates", () => {
+        const update: Partial<MonitorServiceConfig> = {
+            userAgent: "UpdatedAgent/1.0",
+        };
+        Object.defineProperty(update, "__proto__", {
+            enumerable: true,
+            value: { polluted: true },
+        });
+        Object.defineProperty(update, "constructor", {
+            enumerable: true,
+            value: "unsafe-constructor",
+        });
+        Object.defineProperty(update, "prototype", {
+            enumerable: true,
+            value: "unsafe-prototype",
+        });
+
+        const state = updateMonitorServiceRuntimeState({
+            currentConfig: {
+                timeout: 7000,
+                userAgent: "CurrentAgent/1.0",
+            },
+            defaultTimeoutMs: 5000,
+            defaultUserAgent: "DefaultAgent/1.0",
+            update,
+        });
+
+        expect(Object.getPrototypeOf(state.config)).toBe(Object.prototype);
+        expect(Object.hasOwn(state.config, "__proto__")).toBe(false);
+        expect(Object.hasOwn(state.config, "constructor")).toBe(false);
+        expect(Object.hasOwn(state.config, "prototype")).toBe(false);
+        expect(state.config).toEqual({
+            timeout: 7000,
+            userAgent: "UpdatedAgent/1.0",
+        });
+        expect(createHttpClient).toHaveBeenCalledWith(state.config);
+    });
+
     it("applies data-backed updates while ignoring undefined fields", () => {
         const state = updateMonitorServiceRuntimeState({
             currentConfig: {
