@@ -491,7 +491,16 @@ const registerPerformanceMetricHooks = (): void => {
     afterEach(() => {
         const slowOperations = performanceMetrics.filter((m) => m.time > 1000);
         if (slowOperations.length > 0) {
-            console.warn("Slow database operations detected:", slowOperations);
+            process.emitWarning(
+                `Slow database operations detected: ${arrayJoin(
+                    slowOperations.map(
+                        (operation) =>
+                            `${operation.operation}:${operation.time}ms`
+                    ),
+                    ", "
+                )}`,
+                { type: "FuzzPerformanceWarning" }
+            );
         }
     });
 };

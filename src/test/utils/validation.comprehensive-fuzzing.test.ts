@@ -44,8 +44,8 @@ import {
     isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
+import { arrayJoin, isInteger, isSafeInteger } from "ts-extras";
 import { describe, expect, beforeEach, afterEach, it } from "vitest";
-import { isSafeInteger, isInteger } from "ts-extras";
 
 import {
     parseUptimeValue,
@@ -354,12 +354,17 @@ describe("comprehensive Validation Function Fuzzing", () => {
     });
 
     afterEach(() => {
-        // Log any performance issues found during fuzzing
         const slowOperations = performanceMetrics.filter((m) => m.time > 100);
         if (slowOperations.length > 0) {
-            console.warn(
-                "Slow validation operations detected:",
-                slowOperations
+            process.emitWarning(
+                `Slow validation operations detected: ${arrayJoin(
+                    slowOperations.map(
+                        (operation) =>
+                            `${operation.function}:${operation.time}ms`
+                    ),
+                    ", "
+                )}`,
+                { type: "FuzzPerformanceWarning" }
             );
         }
     });

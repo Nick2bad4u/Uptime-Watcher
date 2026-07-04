@@ -92,14 +92,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
         if (Error.isError(error)) return error;
         return new Error(String(error));
     }),
-    withErrorHandling: vi.fn(async (operation) => {
-        try {
-            return await operation();
-        } catch (error: unknown) {
-            console.warn("Mocked error in withErrorHandling:", error);
-            throw error;
-        }
-    }),
+    withErrorHandling: vi.fn(async (operation) => await operation()),
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({

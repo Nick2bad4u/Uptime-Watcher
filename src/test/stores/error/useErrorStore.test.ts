@@ -783,13 +783,8 @@ describe(useErrorStore, () => {
                 result.current.clearAllErrors();
             });
 
-            // Debug: Verify the operation loading is preserved
             const isOperationLoading =
                 result.current.getOperationLoading("fetchSites");
-            console.log(
-                "Operation loading after clearAllErrors:",
-                isOperationLoading
-            );
 
             expect(result.current.lastError).toBeUndefined();
             expect(result.current.storeErrors).toEqual({});

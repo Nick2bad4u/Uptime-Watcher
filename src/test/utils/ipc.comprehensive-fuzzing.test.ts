@@ -19,7 +19,7 @@
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
-import { isEmpty, isInteger, objectKeys } from "ts-extras";
+import { arrayJoin, isEmpty, isInteger, objectKeys } from "ts-extras";
 import { afterEach, beforeEach, describe, expect } from "vitest";
 
 // =============================================================================
@@ -156,10 +156,17 @@ describe("comprehensive IPC Communication Fuzzing", () => {
     });
 
     afterEach(() => {
-        // Log performance issues
         const slowHandlers = performanceMetrics.filter((m) => m.time > 100);
         if (slowHandlers.length > 0) {
-            console.warn("Slow IPC handlers detected:", slowHandlers);
+            process.emitWarning(
+                `Slow IPC handlers detected: ${arrayJoin(
+                    slowHandlers.map(
+                        (handler) => `${handler.handler}:${handler.time}ms`
+                    ),
+                    ", "
+                )}`,
+                { type: "FuzzPerformanceWarning" }
+            );
         }
     });
 

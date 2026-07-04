@@ -224,10 +224,17 @@ describe("comprehensive State Management Fuzzing", () => {
     });
 
     afterEach(() => {
-        // Log performance issues
         const slowActions = performanceMetrics.filter((m) => m.time > 50);
         if (slowActions.length > 0) {
-            console.warn("Slow state actions detected:", slowActions);
+            process.emitWarning(
+                `Slow state actions detected: ${arrayJoin(
+                    slowActions.map(
+                        (action) => `${action.action}:${action.time}ms`
+                    ),
+                    ", "
+                )}`,
+                { type: "FuzzPerformanceWarning" }
+            );
         }
     });
 
