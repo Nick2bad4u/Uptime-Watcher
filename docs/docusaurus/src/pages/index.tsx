@@ -1,5 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This page contains multiple unrelated eslint rules that cannot be properly paired */
-
 import type { JSX } from "react";
 
 import Link from "@docusaurus/Link";
