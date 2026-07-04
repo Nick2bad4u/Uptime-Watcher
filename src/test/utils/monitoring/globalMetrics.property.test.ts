@@ -1,4 +1,3 @@
-/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file tests do not require paired eslint-enable directives. */
 /**
  * Property-based tests for global monitoring metrics aggregation.
  *

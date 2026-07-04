@@ -1,6 +1,3 @@
-/* eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Disable specific rule */
-/* eslint-disable no-script-url -- Fuzzing tests */
-
 /**
  * Working Fast-Check Fuzzing Tests for Validation Utils
  *
@@ -297,6 +294,7 @@ describe("Validation Utils Comprehensive Fuzzing Tests", () => {
     describe("Security Testing", () => {
         fcTest.prop([
             fc.oneof(
+                // eslint-disable-next-line no-script-url -- Intentional malicious protocol fixture for validation fuzzing.
                 fc.constant("javascript:alert('xss')"),
                 fc.constant("<script>alert('xss')</script>"),
                 fc.constant("data:text/html,<script>alert('xss')</script>"),
