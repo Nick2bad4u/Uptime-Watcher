@@ -349,8 +349,10 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
                 await result.current.handleCheckNow();
             });
 
-            // If we get here without errors, the handler executed successfully
-            expect(true).toBeTruthy();
+            expect(mockCheckSiteNow).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
     });
 
@@ -535,6 +537,16 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
+            const mockCheckSiteNow = vi.fn(async () => undefined);
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    checkSiteNow: mockCheckSiteNow,
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                })
+            );
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -544,8 +556,10 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleCheckNow();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockCheckSiteNow).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
 
         it("should handle handleCheckNow when no monitor is selected", async ({
@@ -845,6 +859,16 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Data Update", "type");
 
+            const mockModifySite = vi.fn(async () => undefined);
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    modifySite: mockModifySite,
+                    sites: [mockSite],
+                })
+            );
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -863,8 +887,11 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleSaveName();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockModifySite).toHaveBeenCalledWith("site-1", {
+                name: "Updated Site Name",
+            });
+            expect(result.current.localName).toBe("Test Site");
+            expect(result.current.hasUnsavedChanges).toBeFalsy();
         });
 
         it("should not save site name when no changes are made", async ({
@@ -909,6 +936,16 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
+            const mockRemoveMonitorFromSite = vi.fn(async () => undefined);
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    removeMonitorFromSite: mockRemoveMonitorFromSite,
+                    sites: [mockSite],
+                })
+            );
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -917,8 +954,10 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleRemoveMonitor();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockRemoveMonitorFromSite).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
 
         it("should not remove monitor when user cancels confirmation", async ({
@@ -964,6 +1003,16 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
+            const mockDeleteSite = vi.fn(async () => undefined);
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    deleteSite: mockDeleteSite,
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                })
+            );
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -972,8 +1021,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleRemoveSite();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockDeleteSite).toHaveBeenCalledWith("site-1");
         });
 
         it("should not delete site when user cancels confirmation", async ({
@@ -1021,16 +1069,29 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
+            const mockStartSiteMonitoring = vi.fn(async () => undefined);
+            const siteWithInactiveMonitoring = {
+                ...mockSite,
+                monitoring: false,
+            };
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [siteWithInactiveMonitoring],
+                    startSiteMonitoring: mockStartSiteMonitoring,
+                })
+            );
+
             const { result } = renderHook(() =>
-                useSiteDetails({ site: { ...mockSite, monitoring: false } })
+                useSiteDetails({ site: siteWithInactiveMonitoring })
             );
 
             await act(async () => {
                 await result.current.handleStartSiteMonitoring();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockStartSiteMonitoring).toHaveBeenCalledWith("site-1");
         });
 
         it("should handle start monitoring for specific monitor", async ({
@@ -1048,6 +1109,18 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                     { ...arrayFirst(mockSite.monitors), monitoring: false },
                 ],
             };
+            const mockStartSiteMonitorMonitoring = vi.fn(
+                async () => undefined
+            );
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [siteWithInactiveMonitor],
+                    startSiteMonitorMonitoring:
+                        mockStartSiteMonitorMonitoring,
+                })
+            );
 
             const { result } = renderHook(() =>
                 useSiteDetails({ site: siteWithInactiveMonitor })
@@ -1057,8 +1130,10 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleStartMonitoring();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockStartSiteMonitorMonitoring).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
 
         it("should handle stop monitoring for site", async ({
@@ -1070,6 +1145,16 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
+            const mockStopSiteMonitoring = vi.fn(async () => undefined);
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    stopSiteMonitoring: mockStopSiteMonitoring,
+                })
+            );
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1078,8 +1163,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleStopSiteMonitoring();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockStopSiteMonitoring).toHaveBeenCalledWith("site-1");
         });
 
         it("should handle stop monitoring for specific monitor", async ({
@@ -1091,6 +1175,16 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
+            const mockStopSiteMonitorMonitoring = vi.fn(async () => undefined);
+
+            useSitesStoreMockRef.current!.setState(
+                createSitesStoreMock({
+                    getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                    sites: [mockSite],
+                    stopSiteMonitorMonitoring: mockStopSiteMonitorMonitoring,
+                })
+            );
+
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1099,8 +1193,10 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleStopMonitoring();
             });
 
-            // Test passes if no error is thrown
-            expect(true).toBeTruthy();
+            expect(mockStopSiteMonitorMonitoring).toHaveBeenCalledWith(
+                "site-1",
+                "monitor-1"
+            );
         });
     });
 
