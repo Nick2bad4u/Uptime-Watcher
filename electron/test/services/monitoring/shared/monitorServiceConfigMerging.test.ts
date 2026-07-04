@@ -81,6 +81,74 @@ describe("monitorServiceConfigMerging", () => {
         });
     });
 
+    it("drops reserved prototype keys while creating defaults", () => {
+        const config: Partial<MonitorServiceConfig> = {
+            userAgent: "CustomAgent/1.0",
+        };
+        Object.defineProperty(config, "__proto__", {
+            enumerable: true,
+            value: { polluted: true },
+        });
+        Object.defineProperty(config, "constructor", {
+            enumerable: true,
+            value: "unsafe-constructor",
+        });
+        Object.defineProperty(config, "prototype", {
+            enumerable: true,
+            value: "unsafe-prototype",
+        });
+
+        const result = createDefaultMonitorServiceConfig({
+            config,
+            defaultTimeoutMs: 5000,
+            defaultUserAgent: "DefaultAgent/1.0",
+        });
+
+        expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
+        expect(Object.hasOwn(result, "__proto__")).toBe(false);
+        expect(Object.hasOwn(result, "constructor")).toBe(false);
+        expect(Object.hasOwn(result, "prototype")).toBe(false);
+        expect(result).toEqual({
+            timeout: 5000,
+            userAgent: "CustomAgent/1.0",
+        });
+    });
+
+    it("drops reserved prototype keys while merging updates", () => {
+        const update: Partial<MonitorServiceConfig> = {
+            userAgent: "UpdatedAgent/1.0",
+        };
+        Object.defineProperty(update, "__proto__", {
+            enumerable: true,
+            value: { polluted: true },
+        });
+        Object.defineProperty(update, "constructor", {
+            enumerable: true,
+            value: "unsafe-constructor",
+        });
+        Object.defineProperty(update, "prototype", {
+            enumerable: true,
+            value: "unsafe-prototype",
+        });
+
+        const result = mergeMonitorServiceConfig({
+            currentConfig: {
+                timeout: 7000,
+                userAgent: "CurrentAgent/1.0",
+            },
+            update,
+        });
+
+        expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
+        expect(Object.hasOwn(result, "__proto__")).toBe(false);
+        expect(Object.hasOwn(result, "constructor")).toBe(false);
+        expect(Object.hasOwn(result, "prototype")).toBe(false);
+        expect(result).toEqual({
+            timeout: 7000,
+            userAgent: "UpdatedAgent/1.0",
+        });
+    });
+
     it("validates data-backed timeout updates without invoking accessors", () => {
         const timeoutGetter = vi.fn(() => {
             throw new Error("timeout getter should not run");

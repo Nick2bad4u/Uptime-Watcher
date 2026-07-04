@@ -383,6 +383,49 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
                 userAgent: "UptimeWatcher/1.0",
             });
         });
+
+        it("should drop reserved prototype keys from update config", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            const config: Partial<MonitorServiceConfig> = {
+                userAgent: "ReservedKeySafe/1.0",
+            };
+            Object.defineProperty(config, "__proto__", {
+                enumerable: true,
+                value: { polluted: true },
+            });
+            Object.defineProperty(config, "constructor", {
+                enumerable: true,
+                value: "unsafe-constructor",
+            });
+            Object.defineProperty(config, "prototype", {
+                enumerable: true,
+                value: "unsafe-prototype",
+            });
+
+            httpMonitor.updateConfig(config);
+
+            const internalConfig = (
+                httpMonitor as unknown as { config: object }
+            ).config;
+
+            expect(Object.getPrototypeOf(internalConfig)).toBe(
+                Object.prototype
+            );
+            expect(Object.hasOwn(internalConfig, "__proto__")).toBe(false);
+            expect(Object.hasOwn(internalConfig, "constructor")).toBe(false);
+            expect(Object.hasOwn(internalConfig, "prototype")).toBe(false);
+            expect(httpMonitor.getConfig()).toEqual({
+                timeout: 5000,
+                userAgent: "ReservedKeySafe/1.0",
+            });
+        });
     });
 
     describe("check", () => {

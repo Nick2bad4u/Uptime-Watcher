@@ -57,6 +57,33 @@ import {
 const isCallable = (value: unknown): value is (...args: never[]) => unknown =>
     typeof value === "function";
 
+const RESERVED_HTTP_MONITOR_CONFIG_UPDATE_KEYS = [
+    "timeout",
+    "userAgent",
+    "__proto__",
+    "constructor",
+    "prototype",
+] as const;
+
+function applyOwnConfigData(
+    target: MonitorServiceConfig,
+    source: object
+): void {
+    for (const key of Reflect.ownKeys(source)) {
+        const descriptor = Object.getOwnPropertyDescriptor(source, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(target, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value as unknown,
+            writable: true,
+        });
+    }
+}
+
 declare module "axios" {
     interface AxiosError {
         responseTime?: number;
@@ -386,7 +413,12 @@ export function createHttpMonitorService<
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
             const nextConfig: MonitorServiceConfig = { ...this.config };
-            const remaining = safeObjectOmit(config, ["timeout", "userAgent"]);
+            const configRecord = config as Partial<MonitorServiceConfig> &
+                Record<string, unknown>;
+            const remaining = safeObjectOmit(
+                configRecord,
+                RESERVED_HTTP_MONITOR_CONFIG_UPDATE_KEYS
+            );
 
             const timeoutProperty = getOwnDataProperty(config, "timeout");
             if (timeoutProperty.found) {
@@ -423,7 +455,7 @@ export function createHttpMonitorService<
                 }
             }
 
-            Object.assign(nextConfig, remaining);
+            applyOwnConfigData(nextConfig, remaining);
 
             this.config = nextConfig;
 

@@ -4,6 +4,12 @@ import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
+const RESERVED_MONITOR_SERVICE_CONFIG_KEYS = [
+    "__proto__",
+    "constructor",
+    "prototype",
+] as const;
+
 /**
  * Creates a monitor service config with standard defaults and accessor-safe
  * overrides.
@@ -58,7 +64,12 @@ export function assertPositiveTimeoutConfigUpdate(
 function copyDefinedConfigData(
     config: Partial<MonitorServiceConfig> | undefined
 ): Partial<MonitorServiceConfig> {
-    const copied = safeObjectOmit(config, []);
+    const configRecord = config as
+        (Partial<MonitorServiceConfig> & Record<string, unknown>) | undefined;
+    const copied = safeObjectOmit(
+        configRecord,
+        RESERVED_MONITOR_SERVICE_CONFIG_KEYS
+    );
 
     for (const key of Reflect.ownKeys(copied)) {
         const property = getOwnDataProperty(copied, key);
