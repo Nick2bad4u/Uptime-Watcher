@@ -220,8 +220,9 @@ describe("SiteManager Mock Debug", () => {
         };
 
         // Create SiteManager and test its internals
-        // @ts-expect-error -- mocking private
-        const siteManager = new SiteManager(mockDeps);
+        const siteManager = new SiteManager(
+            mockDeps as unknown as ConstructorParameters<typeof SiteManager>[0]
+        );
 
         // Test that the cache is properly mocked
         const cache = siteManager["sitesCache"];

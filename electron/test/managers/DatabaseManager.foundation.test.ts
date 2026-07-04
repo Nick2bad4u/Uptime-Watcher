@@ -182,9 +182,10 @@ describe("DatabaseManager Foundation Tests", () => {
             clear: vi.fn().mockResolvedValue(undefined),
         };
 
-        // Replace the command executor after construction
-        // @ts-expect-error - overriding private property for testing
-        databaseManager.commandExecutor = smartCommandExecutor;
+        // Replace the command executor after construction.
+        expect(
+            Reflect.set(databaseManager, "commandExecutor", smartCommandExecutor)
+        ).toBeTruthy();
 
         // Create smart site loading orchestrator mock
         const mockSiteLoadingOrchestrator = {
@@ -195,8 +196,13 @@ describe("DatabaseManager Foundation Tests", () => {
             }),
         };
 
-        // @ts-expect-error - overriding private property for testing
-        databaseManager.siteLoadingOrchestrator = mockSiteLoadingOrchestrator;
+        expect(
+            Reflect.set(
+                databaseManager,
+                "siteLoadingOrchestrator",
+                mockSiteLoadingOrchestrator
+            )
+        ).toBeTruthy();
 
         // Ensure the site cache has all required methods
         const siteCache = databaseManager["siteCache"];
