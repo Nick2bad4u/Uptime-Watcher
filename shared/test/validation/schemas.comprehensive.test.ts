@@ -1834,9 +1834,9 @@ describe("Missing Branch Coverage", () => {
                         );
                         expect(result.success).toBeTruthy();
                     } catch (error) {
-                        console.log(
-                            `Field ${fieldName} for type ${monitorType} threw:`,
-                            error
+                        throw new Error(
+                            `Field ${fieldName} for monitor type ${monitorType} failed validation unexpectedly.`,
+                            { cause: error }
                         );
                     }
                 }

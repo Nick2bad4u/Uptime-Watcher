@@ -88,11 +88,16 @@ describe("Schema Property-Based Tests", () => {
                 const result = baseMonitorSchema.safeParse(monitorData);
 
                 if (!result.success) {
-                    console.log(
-                        "Validation failed for:",
-                        JSON.stringify(monitorData, null, 2)
+                    throw new Error(
+                        `Generated base monitor data failed validation: ${JSON.stringify(
+                            {
+                                issues: result.error.issues,
+                                monitorData,
+                            },
+                            null,
+                            2
+                        )}`
                     );
-                    console.log("Validation issues:", result.error.issues);
                 }
 
                 expect(result.success).toBeTruthy();
@@ -107,11 +112,16 @@ describe("Schema Property-Based Tests", () => {
                 const result = httpMonitorSchema.safeParse(monitorData);
 
                 if (!result.success) {
-                    console.log(
-                        "HTTP validation failed for:",
-                        JSON.stringify(monitorData, null, 2)
+                    throw new Error(
+                        `Generated HTTP monitor data failed validation: ${JSON.stringify(
+                            {
+                                issues: result.error.issues,
+                                monitorData,
+                            },
+                            null,
+                            2
+                        )}`
                     );
-                    console.log("HTTP validation issues:", result.error.issues);
                 }
 
                 expect(result.success).toBeTruthy();

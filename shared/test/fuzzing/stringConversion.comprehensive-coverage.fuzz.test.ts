@@ -308,13 +308,7 @@ describe("StringConversion Complete Coverage Fuzzing Tests", () => {
             (value) => {
                 const result = safeStringify(value);
 
-                // Should be safe for console.log
-                expect(() => {
-                    console.log(result);
-                }).not.toThrow();
-
-                // Should not contain dangerous characters for basic HTML display
-                // (though proper HTML escaping would still be needed)
+                // Should produce a concrete string safe for logger/display handoff.
                 expect(typeof result).toBe("string");
 
                 // Should not be the ambiguous [object Object]

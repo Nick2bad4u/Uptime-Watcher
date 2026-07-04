@@ -15,6 +15,16 @@ const FAST_CHECK_SEED_ENV = "FAST_CHECK_SEED" as const;
 /** Name of the environment variable controlling the number of fast-check runs. */
 const FAST_CHECK_NUM_RUNS_ENV = "FAST_CHECK_NUM_RUNS" as const;
 
+function emitInvalidFastCheckEnvWarning(
+    environmentVariableName: string,
+    rawValue: string
+): void {
+    process.emitWarning(
+        `[fast-check] Ignoring invalid ${environmentVariableName} value: ${rawValue}`,
+        { type: "FastCheckConfigWarning" }
+    );
+}
+
 /**
  * Resolved overrides derived from the current process environment.
  */
@@ -46,8 +56,8 @@ export function resolveFastCheckEnvOverrides(
         if (Number.isFinite(parsed) && parsed > 0) {
             numRuns = Math.trunc(parsed);
         } else {
-            console.warn(
-                "[fast-check] Ignoring invalid FAST_CHECK_NUM_RUNS value:",
+            emitInvalidFastCheckEnvWarning(
+                FAST_CHECK_NUM_RUNS_ENV,
                 rawNumRuns
             );
         }
@@ -63,10 +73,7 @@ export function resolveFastCheckEnvOverrides(
             };
         }
 
-        console.warn(
-            "[fast-check] Ignoring invalid FAST_CHECK_SEED value:",
-            rawSeed
-        );
+        emitInvalidFastCheckEnvWarning(FAST_CHECK_SEED_ENV, rawSeed);
     }
 
     return { numRuns };

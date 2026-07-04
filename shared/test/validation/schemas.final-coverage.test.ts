@@ -322,11 +322,10 @@ describe("Validation Schemas - Final Branch Coverage", () => {
                     validValue
                 );
                 if (!validResult.success) {
-                    console.log(
-                        `Failed validation for ${test.type}.${test.field} with value:`,
-                        validValue,
-                        "Errors:",
-                        validResult.errors
+                    throw new Error(
+                        `Expected ${test.type}.${test.field} to accept ${JSON.stringify(
+                            validValue
+                        )}: ${validResult.errors.join("; ")}`
                     );
                 }
                 expect(validResult.success).toBeTruthy();
