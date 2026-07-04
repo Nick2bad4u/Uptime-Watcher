@@ -66,9 +66,9 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
         }
     ): boolean => {
         if (isTransientOutage(result.details)) {
-            // Document and accept as a transient external failure
-            console.warn(
-                `[httpbin transient] ${label} skipped due to ${result.details}`
+            process.emitWarning(
+                `[httpbin transient] ${label} skipped due to ${result.details}`,
+                { type: "HttpbinTransientWarning" }
             );
             // Ensure mapping is consistent for server errors
             expect(result.status).toBe("down");
@@ -94,8 +94,9 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             if (!isTransientOutage(last.details)) return last;
             if (i < attempts - 1) {
                 await new Promise((r) => setTimeout(r, backoffMs * (i + 1)));
-                console.warn(
-                    `[httpbin transient] retrying ${label} due to ${last.details} (attempt ${i + 2}/${attempts})`
+                process.emitWarning(
+                    `[httpbin transient] retrying ${label} due to ${last.details} (attempt ${i + 2}/${attempts})`,
+                    { type: "HttpbinTransientWarning" }
                 );
             }
         }
@@ -174,12 +175,8 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
 
             const result = await checkWithTransientRetry(monitor, "/image", 2);
 
-            // This should currently fail with 406 Not Acceptable
-            // We'll document the expected vs actual behavior
-            console.log(`Image endpoint result:`, result);
-
-            // For now, we expect this to be marked as UP because 406 is not a 5xx error
-            // But the endpoint requires proper Accept headers to return 200
+            // The endpoint can return 406 without an Accept header, but that
+            // still proves the site is responding rather than down.
             if (handleTransientOutage("/image", result)) return;
             if (result.details === "406") {
                 expect(result.status).toBe("up"); // 406 is client error, site is responding
@@ -202,7 +199,6 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 "/image/png",
                 2
             );
-            console.log(`PNG endpoint result:`, result);
 
             // PNG endpoint might be more lenient
             if (handleTransientOutage("/image/png", result)) return;
@@ -254,7 +250,6 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                     `status/${code}`,
                     2
                 );
-                console.log(`Status ${code} result:`, result);
 
                 // We consider 3xx as UP. Axios may follow redirects for some endpoints,
                 // resulting in a final 200 rather than the original 3xx status.
@@ -292,7 +287,6 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                 "redirect/1",
                 3 // More retry attempts for this flaky endpoint
             );
-            console.log(`Redirect result:`, result);
 
             if (handleTransientOutage("redirect/1", result)) return;
             expect(result.status).toBe("up");
@@ -313,7 +307,6 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
             const monitor = createHttpMonitor("https://httpbin.org/delay/2");
 
             const result = await checkWithTransientRetry(monitor, "delay/2", 2);
-            console.log(`Delay result:`, result);
 
             if (handleTransientOutage("delay/2", result)) return;
             expect(result.status).toBe("up");
@@ -363,7 +356,6 @@ describe("HTTP Monitor - httpbin.org Integration Tests", () => {
                     `content${path}`,
                     2
                 );
-                console.log(`${description} result:`, result);
 
                 if (handleTransientOutage(`content${path}`, result)) return;
                 expect(result.status).toBe("up");

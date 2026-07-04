@@ -434,9 +434,6 @@ describe(PingMonitor, () => {
 
             expect(results).toHaveLength(3);
 
-            // Debug: log what we got
-            console.log("Concurrent results:", results);
-
             for (const result of results) {
                 expect(result).toBeDefined();
                 expect(result.status).toBe("up");
