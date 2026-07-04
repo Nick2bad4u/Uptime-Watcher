@@ -3,7 +3,7 @@
  * interfaces for monitoring functionality.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type {
     IMonitorService,
@@ -120,15 +120,12 @@ describe("Monitoring Types", () => {
                     responseTime: 100,
                 }),
                 getType: () => "http",
-                updateConfig: function (
-                    _config: Partial<MonitorServiceConfig>
-                ): void {
-                    throw new Error("Function not implemented.");
-                },
+                updateConfig: vi.fn(),
             };
 
             expect(typeof mockService.check).toBe("function");
             expect(typeof mockService.getType).toBe("function");
+            expect(typeof mockService.updateConfig).toBe("function");
             expect(mockService.getType()).toBe("http");
         });
 
@@ -147,11 +144,7 @@ describe("Monitoring Types", () => {
                     responseTime: 150,
                 }),
                 getType: () => "port",
-                updateConfig: function (
-                    _config: Partial<MonitorServiceConfig>
-                ): void {
-                    throw new Error("Function not implemented.");
-                },
+                updateConfig: vi.fn(),
             };
 
             const mockMonitor = {
@@ -169,6 +162,10 @@ describe("Monitoring Types", () => {
             const result = await mockService.check(mockMonitor);
             expect(result.status).toBe("up");
             expect(result.responseTime).toBe(150);
+            mockService.updateConfig({ timeout: 5000 });
+            expect(mockService.updateConfig).toHaveBeenCalledWith({
+                timeout: 5000,
+            });
         });
     });
 });

@@ -5,7 +5,7 @@
 
 import type { Site } from "@shared/types";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type {
     IMonitorService,
@@ -94,15 +94,12 @@ describe("Monitoring Types", () => {
                     responseTime: 100,
                 }),
                 getType: (): Site["monitors"][0]["type"] => "http",
-                updateConfig: function (
-                    _config: Partial<MonitorServiceConfig>
-                ): void {
-                    throw new Error("Function not implemented.");
-                },
+                updateConfig: vi.fn(),
             };
 
             expect(mockService.getType()).toBe("http");
             expect(typeof mockService.check).toBe("function");
+            expect(typeof mockService.updateConfig).toBe("function");
         });
 
         it("should support HTTP monitor service", async ({
@@ -136,11 +133,7 @@ describe("Monitoring Types", () => {
                     details: monitor.url ?? "No URL provided",
                 }),
                 getType: (): Site["monitors"][0]["type"] => "http",
-                updateConfig: function (
-                    _config: Partial<MonitorServiceConfig>
-                ): void {
-                    throw new Error("Function not implemented.");
-                },
+                updateConfig: vi.fn(),
             };
 
             const result = await httpService.check(mockMonitor);
@@ -148,6 +141,10 @@ describe("Monitoring Types", () => {
             expect(result.responseTime).toBe(150);
             expect(result.details).toBe("https://example.com");
             expect(httpService.getType()).toBe("http");
+            httpService.updateConfig({ timeout: 5000 });
+            expect(httpService.updateConfig).toHaveBeenCalledWith({
+                timeout: 5000,
+            });
         });
 
         it("should support port monitor service", async ({
@@ -184,11 +181,7 @@ describe("Monitoring Types", () => {
                         : "No port provided",
                 }),
                 getType: (): Site["monitors"][0]["type"] => "port",
-                updateConfig: function (
-                    _config: Partial<MonitorServiceConfig>
-                ): void {
-                    throw new Error("Function not implemented.");
-                },
+                updateConfig: vi.fn(),
             };
 
             const result = await portService.check(mockMonitor);
@@ -196,6 +189,10 @@ describe("Monitoring Types", () => {
             expect(result.responseTime).toBe(50);
             expect(result.details).toBe("80");
             expect(portService.getType()).toBe("port");
+            portService.updateConfig({ userAgent: "Test Agent/1.0" });
+            expect(portService.updateConfig).toHaveBeenCalledWith({
+                userAgent: "Test Agent/1.0",
+            });
         });
     });
 

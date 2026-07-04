@@ -28,7 +28,7 @@ class InMemoryProvider implements CloudStorageProvider {
     }
 
     public async downloadBackup(): Promise<never> {
-        throw new Error("not implemented");
+        throw new Error("downloadBackup is not supported by InMemoryProvider");
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
@@ -46,7 +46,7 @@ class InMemoryProvider implements CloudStorageProvider {
     }
 
     public async listBackups(): Promise<never> {
-        throw new Error("not implemented");
+        throw new Error("listBackups is not supported by InMemoryProvider");
     }
 
     public async listObjects(
@@ -72,7 +72,7 @@ class InMemoryProvider implements CloudStorageProvider {
     }
 
     public async uploadBackup(): Promise<never> {
-        throw new Error("not implemented");
+        throw new Error("uploadBackup is not supported by InMemoryProvider");
     }
 
     public async uploadObject(args: {
