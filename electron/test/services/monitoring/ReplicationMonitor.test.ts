@@ -118,6 +118,10 @@ describe("ReplicationMonitor service", () => {
     });
 
     it("returns down when fetching primary status fails", async () => {
+        monitor = createMonitor({
+            primaryStatusUrl:
+                "https://primary.example.com/status?token=primary-secret",
+        });
         httpGetMock.mockImplementation(async (url: string) => {
             if (url.includes("primary")) {
                 throw new Error("Primary unreachable");
@@ -135,9 +139,16 @@ describe("ReplicationMonitor service", () => {
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed to fetch");
+        expect(result.error).toContain("https://primary.example.com/status");
+        expect(result.error).not.toContain("token=");
+        expect(result.error).not.toContain("primary-secret");
     });
 
     it("keeps invalid JSON failures distinct from generic fetch failures", async () => {
+        monitor = createMonitor({
+            primaryStatusUrl:
+                "https://primary.example.com/status?token=primary-json-secret",
+        });
         httpGetMock.mockImplementation(async (url: string) => {
             if (url.includes("primary")) {
                 return {
@@ -159,5 +170,8 @@ describe("ReplicationMonitor service", () => {
         expect(result.status).toBe("down");
         expect(result.error).toContain("Invalid JSON response");
         expect(result.error).not.toContain("Failed to fetch");
+        expect(result.error).toContain("https://primary.example.com/status");
+        expect(result.error).not.toContain("token=");
+        expect(result.error).not.toContain("primary-json-secret");
     });
 });

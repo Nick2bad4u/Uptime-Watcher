@@ -115,6 +115,9 @@ describe("ServerHeartbeatMonitor service", () => {
     });
 
     it("returns down result when fetching heartbeat fails", async () => {
+        monitor = createMonitor({
+            url: "https://api.example.com/heartbeat?token=heartbeat-secret",
+        });
         const transportError = new Error("Network failure");
         httpGetMock.mockRejectedValue(transportError);
 
@@ -122,10 +125,16 @@ describe("ServerHeartbeatMonitor service", () => {
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed to fetch heartbeat");
+        expect(result.error).toContain("https://api.example.com/heartbeat");
+        expect(result.error).not.toContain("token=");
+        expect(result.error).not.toContain("heartbeat-secret");
         expect(transportError.message).toBe("Network failure");
     });
 
     it("keeps invalid JSON failures distinct from generic fetch failures", async () => {
+        monitor = createMonitor({
+            url: "https://api.example.com/heartbeat?token=json-secret",
+        });
         httpGetMock.mockResolvedValue({
             data: "{not-json",
             responseTime: 25,
@@ -136,6 +145,9 @@ describe("ServerHeartbeatMonitor service", () => {
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed to fetch heartbeat");
         expect(result.error).toContain("Invalid JSON response");
+        expect(result.error).toContain("https://api.example.com/heartbeat");
+        expect(result.error).not.toContain("token=");
+        expect(result.error).not.toContain("json-secret");
         expect(result.error).not.toContain(
             "Failed to fetch https://api.example.com/heartbeat"
         );

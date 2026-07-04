@@ -8,6 +8,7 @@ import type { Site } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 
 import type {
     IMonitorService,
@@ -42,9 +43,12 @@ import {
 class InvalidJsonResponseError extends Error {
     public constructor(url: string, error: unknown) {
         const normalized = ensureError(error);
-        super(`Invalid JSON response from ${url}: ${normalized.message}`, {
-            cause: error,
-        });
+        super(
+            `Invalid JSON response from ${getSafeUrlForLogging(url)}: ${normalized.message}`,
+            {
+                cause: error,
+            }
+        );
         this.name = "InvalidJsonResponseError";
     }
 }
@@ -55,9 +59,12 @@ function createInvalidJsonError(url: string, error: unknown): Error {
 
 function createFetchError(url: string, error: unknown): Error {
     const normalized = ensureError(error);
-    return new Error(`Failed to fetch ${url}: ${normalized.message}`, {
-        cause: error,
-    });
+    return new Error(
+        `Failed to fetch ${getSafeUrlForLogging(url)}: ${normalized.message}`,
+        {
+            cause: error,
+        }
+    );
 }
 
 /**
