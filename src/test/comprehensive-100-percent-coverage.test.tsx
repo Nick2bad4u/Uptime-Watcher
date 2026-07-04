@@ -596,9 +596,7 @@ describe("100% Coverage Edge Cases", () => {
                 options: [],
                 isLoading: true,
                 error: undefined,
-                refresh: async function (): Promise<void> {
-                    throw new Error("Function not implemented.");
-                },
+                refresh: vi.fn().mockResolvedValue(undefined),
             });
 
             render(<AddSiteForm />);
