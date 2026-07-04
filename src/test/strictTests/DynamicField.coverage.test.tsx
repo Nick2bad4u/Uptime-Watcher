@@ -2,6 +2,7 @@
  * @file Coverage-focused tests for the `DynamicField` component.
  */
 
+import type { MonitorFieldDefinition } from "@shared/types";
 import type { ReactNode } from "react";
 
 import { render, screen } from "@testing-library/react";
@@ -259,15 +260,16 @@ describe("DynamicField coverage", () => {
     });
 
     it("renders error message for unsupported field types", () => {
+        const unsupportedField = {
+            label: "Unsupported",
+            name: "unsupported",
+            required: false,
+            type: "json",
+        } as unknown as MonitorFieldDefinition;
+
         render(
             <DynamicField
-                field={{
-                    label: "Unsupported",
-                    name: "unsupported",
-                    required: false,
-                    // @ts-expect-error - intentional invalid type for coverage
-                    type: "json",
-                }}
+                field={unsupportedField}
                 onChange={vi.fn()}
                 value="{}"
             />
