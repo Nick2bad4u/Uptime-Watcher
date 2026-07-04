@@ -296,6 +296,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             // dangerous key into the settings table.
             mockRepositories.settings.getAll.mockResolvedValue({
                 ["__proto__"]: "evil",
+                constructor: "unsafe-constructor",
+                prototype: "unsafe-prototype",
                 "ui.theme": "dark",
                 "cloud.dropbox.tokens": "secret",
             });
@@ -325,6 +327,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(
                 (payload as { settings: Record<string, string> }).settings
             ).not.toHaveProperty("cloud.dropbox.tokens");
+            const exportedSettings = (
+                payload as { settings: Record<string, string> }
+            ).settings;
+            expect(Object.hasOwn(exportedSettings, "__proto__")).toBe(false);
+            expect(Object.hasOwn(exportedSettings, "constructor")).toBe(false);
+            expect(Object.hasOwn(exportedSettings, "prototype")).toBe(false);
         });
 
         it("should handle export errors and emit database error event", async ({
@@ -481,6 +489,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 sites: [{ identifier: "test-site", name: "Test Site" }],
                 settings: {
                     theme: "dark",
+                    ["__proto__"]: "evil",
+                    constructor: "unsafe-constructor",
+                    prototype: "unsafe-prototype",
                     "cloud.dropbox.tokens": "ciphertext",
                 },
             };
@@ -503,6 +514,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     theme: "dark",
                 },
             });
+            expect(Object.hasOwn(result.settings, "__proto__")).toBe(false);
+            expect(Object.hasOwn(result.settings, "constructor")).toBe(false);
+            expect(Object.hasOwn(result.settings, "prototype")).toBe(false);
         });
 
         it("should handle parsing failure with invalid JSON", async ({
@@ -713,6 +727,38 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Successfully imported 2 sites and 2 settings"
+            );
+        });
+
+        it("should strip protected settings before persistence", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Import Operation", "category");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+            const mockSettings = {
+                ["__proto__"]: "evil",
+                constructor: "unsafe-constructor",
+                prototype: "unsafe-prototype",
+                theme: "dark",
+                "cloud.dropbox.tokens": "ciphertext",
+            };
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            await service.persistImportedData([], mockSettings);
+
+            expect(
+                mockRepositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDatabase, { theme: "dark" });
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "Successfully imported 0 sites and 1 settings"
             );
         });
 

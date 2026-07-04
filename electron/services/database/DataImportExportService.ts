@@ -160,6 +160,15 @@ export class DataImportExportService {
      */
     private static readonly CLOUD_SETTINGS_PREFIX = "cloud." as const;
 
+    private static isProtectedSettingsKey(key: string): boolean {
+        return (
+            key.startsWith(DataImportExportService.CLOUD_SETTINGS_PREFIX) ||
+            key === "__proto__" ||
+            key === "constructor" ||
+            key === "prototype"
+        );
+    }
+
     private readonly databaseService: DatabaseService;
 
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
@@ -420,7 +429,7 @@ export class DataImportExportService {
         const strippedKeys: string[] = [];
 
         for (const [key, value] of objectEntries(settings)) {
-            if (key.startsWith(DataImportExportService.CLOUD_SETTINGS_PREFIX)) {
+            if (DataImportExportService.isProtectedSettingsKey(key)) {
                 strippedKeys.push(key);
             } else {
                 Object.defineProperty(result, key, {
@@ -434,7 +443,7 @@ export class DataImportExportService {
 
         if (strippedKeys.length > 0) {
             this.logger.info(
-                `[DataImportExportService] Stripped ${strippedKeys.length} cloud settings keys during ${context}`,
+                `[DataImportExportService] Stripped ${strippedKeys.length} protected settings keys during ${context}`,
                 {
                     keysPreview: strippedKeys.slice(0, 5),
                 }
