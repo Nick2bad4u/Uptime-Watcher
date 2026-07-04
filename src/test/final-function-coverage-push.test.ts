@@ -250,11 +250,14 @@ describe("Final Function Coverage Push", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
+        let invokedSharedUtilityFunctions = 0;
+
         // Test environment functions
         const environment = await import("../../shared/utils/environment");
         for (const key of objectKeys(environment)) {
             const fn = (environment as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn("test");
@@ -271,6 +274,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(errorCatalog)) {
             const fn = (errorCatalog as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn("test");
@@ -287,6 +291,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(jsonSafety)) {
             const fn = (jsonSafety as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn('{"test": true}');
@@ -304,6 +309,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(objectSafety)) {
             const fn = (objectSafety as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     if (key === "safeObjectIteration") {
                         // SafeObjectIteration requires a callback function
@@ -333,6 +339,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(safeConversions)) {
             const fn = (safeConversions as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn("123");
@@ -353,6 +360,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(stringConversion)) {
             const fn = (stringConversion as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn("test");
@@ -372,6 +380,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(typeHelpers)) {
             const fn = (typeHelpers as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn("test");
@@ -391,6 +400,7 @@ describe("Final Function Coverage Push", () => {
         for (const key of objectKeys(validatorUtils)) {
             const fn = (validatorUtils as any)[key];
             if (typeof fn === "function") {
+                invokedSharedUtilityFunctions += 1;
                 try {
                     fn();
                     fn("test");
@@ -406,7 +416,6 @@ describe("Final Function Coverage Push", () => {
             }
         }
 
-        // Ensure test passes
-        expect(true).toBeTruthy();
+        expect(invokedSharedUtilityFunctions).toBeGreaterThan(0);
     });
 });
