@@ -27,6 +27,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { sharedFallbackLogger } from "@shared/utils/logger/consoleFallback";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
@@ -238,9 +239,10 @@ export interface ErrorHandlingFrontendStore {
  *
  * @remarks
  * Protects against store operation failures that could interfere with the main
- * operation flow. Uses console logging to avoid dependencies on external
- * loggers in shared utilities. Logs both store operation failures and original
- * error context when provided for comprehensive debugging information.
+ * operation flow. Uses the shared fallback logger to avoid dependencies on
+ * renderer or Electron logger implementations. Logs both store operation
+ * failures and original error context when provided for comprehensive debugging
+ * information.
  *
  * @param storeOperation - Store operation function to execute safely
  * @param operationName - Descriptive name for the operation (used in error
@@ -257,16 +259,14 @@ function safeStoreOperation(
     try {
         storeOperation();
     } catch (error) {
-        // Use basic console for shared utilities to avoid dependencies
-        // This is acceptable in shared utilities that can't import loggers
-        console.warn(
-            "Store operation failed for:",
-            operationName,
+        sharedFallbackLogger.warn(
+            "Store operation failed",
+            { operationName },
             normalizeConsoleLogValue(error)
         );
         if (originalError) {
-            console.error(
-                "Original operation error:",
+            sharedFallbackLogger.error(
+                "Original operation error",
                 normalizeConsoleLogValue(originalError)
             );
         }
@@ -372,14 +372,17 @@ async function handleBackendOperation<T>(
     } catch (error: unknown) {
         const errorMessage = getOperationFailureMessage(operationName);
 
-        // Safely handle logging - fallback to console.error if logger fails
+        // Safely handle logging - fallback to the shared console adapter if logger fails.
         try {
             logger.error(errorMessage, error);
         } catch (error_) {
             const loggingError = ensureError(error_);
-            console.error(errorMessage, normalizeConsoleLogValue(error));
-            console.warn(
-                "Logger error during error handling:",
+            sharedFallbackLogger.error(
+                errorMessage,
+                normalizeConsoleLogValue(error)
+            );
+            sharedFallbackLogger.warn(
+                "Logger error during error handling",
                 normalizeConsoleLogValue(loggingError)
             );
         }
@@ -518,8 +521,7 @@ export async function withUtilityErrorHandling<T>(
     } catch (error) {
         const wrappedError = ensureError(error);
 
-        // Use console logging for shared utilities to avoid dependencies
-        console.error(
+        sharedFallbackLogger.error(
             `${operationName} failed`,
             normalizeConsoleLogValue(wrappedError)
         );

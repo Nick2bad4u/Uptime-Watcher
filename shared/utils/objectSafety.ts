@@ -19,6 +19,7 @@ import {
 } from "ts-extras";
 
 import { getOwnDataProperty } from "./errorPropertyAccess";
+import { sharedFallbackLogger } from "./logger/consoleFallback";
 import { normalizeLogValue } from "./loggingContext";
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
@@ -158,9 +159,10 @@ export function safeObjectIteration(
 ): void {
     const safeContext = normalizeDiagnosticString(context);
     if (!isObject(obj)) {
-        // Use basic console for shared utilities to avoid dependencies
-        // This is acceptable in shared utilities that can't import loggers
-        console.warn(`${safeContext}: Expected object, got ${typeof obj}`);
+        sharedFallbackLogger.warn("Expected object for iteration", {
+            context: safeContext,
+            receivedType: typeof obj,
+        });
         return;
     }
 
@@ -171,11 +173,10 @@ export function safeObjectIteration(
             }
         }
     } catch (error) {
-        // Use basic console for shared utilities to avoid dependencies
-        console.error(
-            "Object iteration failed for context:",
-            safeContext,
-            normalizeDiagnosticValue(error)
+        sharedFallbackLogger.error(
+            "Object iteration failed",
+            normalizeDiagnosticValue(error),
+            { context: safeContext }
         );
     }
 }
