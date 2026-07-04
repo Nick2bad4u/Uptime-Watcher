@@ -11,8 +11,9 @@
 import type { EventMetadata } from "@shared/types/events";
 import type { UnknownArray, UnknownRecord } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { isDefined, objectHasIn } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import { isEventMetadata } from "../eventMetadataGuards";
 import { tryStructuredClone } from "./structuredClone";
@@ -75,11 +76,9 @@ export function getHiddenProperty(
     target: NonArrayObjectPayload,
     key: string | symbol
 ): unknown {
-    if (!objectHasIn(target, key)) {
-        return undefined;
-    }
+    const property = getOwnDataProperty(target, key);
 
-    return Reflect.get(target, key);
+    return property.found ? property.value : undefined;
 }
 
 export const attachMetadata: <TPayload extends object>(

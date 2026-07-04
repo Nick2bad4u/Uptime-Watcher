@@ -442,6 +442,36 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
                 _originalMeta: "existing-meta",
             });
         });
+        it("should not invoke accessor-backed metadata properties", async () => {
+            eventBus.onTyped("object-event", mockListener);
+
+            let metaAccesses = 0;
+            const testData = {
+                data: "test",
+                nested: { value: 123 },
+            };
+            Object.defineProperty(testData, "_meta", {
+                configurable: true,
+                enumerable: false,
+                get: () => {
+                    metaAccesses += 1;
+                    throw new Error("Unexpected _meta getter access");
+                },
+            });
+
+            await eventBus.emitTyped("object-event", testData);
+
+            expect(metaAccesses).toBe(0);
+            const receivedData = mockListener.mock.calls[0]?.[0];
+            expect(receivedData).toEqual(
+                expect.objectContaining({
+                    data: "test",
+                    nested: { value: 123 },
+                    _meta: expect.any(Object),
+                })
+            );
+            expect(Object.hasOwn(receivedData, "_originalMeta")).toBeFalsy();
+        });
         it("should handle arrays correctly", async () => {
             eventBus.onTyped("array-event", mockListener);
 
