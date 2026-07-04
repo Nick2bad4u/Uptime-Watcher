@@ -685,6 +685,59 @@ describe("ServiceContainer - Working Tests", () => {
             expect(getterCalls).toBe(0);
         });
 
+        it("should not invoke accessors while stripping array payload metadata", () => {
+            const forwardedMetadata = {
+                busId: "manager-bus",
+                correlationId: "corr-array-accessor",
+                eventName: "internal:site:added",
+                timestamp: Date.now(),
+            } as const;
+            let getterCalls = 0;
+            const payload = ["placeholder", "safe-value"] as Record<
+                string,
+                unknown
+            > &
+                unknown[];
+
+            payload[FORWARDED_METADATA_PROPERTY_KEY] = forwardedMetadata;
+            Object.defineProperty(payload, "0", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "should-not-run";
+                },
+            });
+
+            const sanitized = invokeStripEventMetadata(
+                "site:added",
+                payload
+            ) as unknown[];
+
+            const firstDescriptor = Object.getOwnPropertyDescriptor(
+                sanitized,
+                "0"
+            );
+            const secondDescriptor = Object.getOwnPropertyDescriptor(
+                sanitized,
+                "1"
+            );
+
+            if (getterCalls !== 0) {
+                throw new Error("Array accessor was invoked while stripping");
+            }
+
+            expect(sanitized === payload).toBeFalsy();
+            expect(sanitized.length).toBe(2);
+            expect(firstDescriptor && "value" in firstDescriptor).toBeTruthy();
+            expect(firstDescriptor?.value).toBeUndefined();
+            expect(
+                secondDescriptor &&
+                    "value" in secondDescriptor &&
+                    secondDescriptor.value === "safe-value"
+            ).toBeTruthy();
+        });
+
         it("should not read inherited metadata when attaching forwarded metadata", () => {
             const forwardedMetadata = {
                 busId: "manager-bus",

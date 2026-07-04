@@ -45,6 +45,39 @@ function isForwardedMetadataKey(key: PropertyKey): boolean {
     );
 }
 
+function cloneArrayPayloadWithoutMetadata(
+    payload: Readonly<UnknownArray>
+): unknown[] {
+    const lengthDescriptor = Object.getOwnPropertyDescriptor(payload, "length");
+    const length =
+        typeof lengthDescriptor?.value === "number" &&
+        Number.isSafeInteger(lengthDescriptor.value) &&
+        lengthDescriptor.value >= 0
+            ? lengthDescriptor.value
+            : 0;
+    const clonedArray = Array.from<unknown>({ length });
+
+    for (const key of Reflect.ownKeys(payload)) {
+        if (key === "length" || isForwardedMetadataKey(key)) {
+            continue;
+        }
+
+        const descriptor = Object.getOwnPropertyDescriptor(payload, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        Object.defineProperty(clonedArray, key, {
+            configurable: true,
+            enumerable: true,
+            value: descriptor.value,
+            writable: true,
+        });
+    }
+
+    return clonedArray;
+}
+
 type StrippedForwardedEventMetadata<TPayload> =
     TPayload extends Readonly<UnknownArray>
         ? TPayload
@@ -162,14 +195,8 @@ export function stripForwardedEventMetadata<
     TPayload extends object | Readonly<UnknownArray>,
 >(payload: TPayload): StrippedForwardedEventMetadata<TPayload> {
     if (Array.isArray(payload)) {
-        const clonedArray = [...payload];
-
-        Reflect.deleteProperty(clonedArray, FORWARDED_METADATA_PROPERTY_KEY);
-        Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_PROPERTY_KEY);
-        Reflect.deleteProperty(clonedArray, ORIGINAL_METADATA_SYMBOL);
-
         return castUnchecked<StrippedForwardedEventMetadata<TPayload>>(
-            clonedArray
+            cloneArrayPayloadWithoutMetadata(payload)
         );
     }
 
