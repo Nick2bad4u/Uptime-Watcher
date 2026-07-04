@@ -18,6 +18,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    EVENT_CATEGORIES,
     getEventPriority,
     isEventOfCategory,
     type UptimeEventName,
@@ -97,10 +98,15 @@ describe(isEventOfCategory, () => {
             "error-handling"
         );
 
-        // @ts-expect-error - intentionally testing unknown event
-        expect(isEventOfCategory("not:an:event", "SITE")).toBeFalsy();
-        // @ts-expect-error - intentionally testing unknown category
-        expect(isEventOfCategory("site:added", "NOT_A_CATEGORY")).toBeFalsy();
+        expect(
+            isEventOfCategory("not:an:event" as unknown as UptimeEventName, "SITE")
+        ).toBeFalsy();
+        expect(
+            isEventOfCategory(
+                "site:added",
+                "NOT_A_CATEGORY" as unknown as keyof typeof EVENT_CATEGORIES
+            )
+        ).toBeFalsy();
     });
 });
 describe(getEventPriority, () => {
@@ -137,7 +143,8 @@ describe(getEventPriority, () => {
             "default-behavior"
         );
 
-        // @ts-expect-error - intentionally testing unknown event
-        expect(getEventPriority("not:an:event")).toBe("MEDIUM");
+        expect(
+            getEventPriority("not:an:event" as unknown as UptimeEventName)
+        ).toBe("MEDIUM");
     });
 });
