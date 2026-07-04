@@ -343,10 +343,10 @@ export class NewMonitor implements IMonitorService {
  private async performCheckOnce(
   monitor: Site["monitors"][0],
   timeout: number,
-  signal?: AbortSignal
- ): Promise<MonitorCheckResult> {
-  const started = performance.now();
-  // TODO: Implement protocol-specific logic
+ signal?: AbortSignal
+): Promise<MonitorCheckResult> {
+ const started = performance.now();
+  // Replace this example branch with the protocol request, handshake, or probe.
   return {
    details: "Example details",
    responseTime: performance.now() - started,
