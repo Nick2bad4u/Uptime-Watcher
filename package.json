@@ -996,6 +996,7 @@
         "npm-package-json-lint-config-nick2bad4u": "^1.0.3",
         "npm-run-all2": "^8.0.4",
         "nyc": "^18.0.0",
+        "open-cli": "^9.0.0",
         "picocolors": "^1.1.1",
         "pkg-types": "^2.3.1",
         "playwright": "^1.59.1",
