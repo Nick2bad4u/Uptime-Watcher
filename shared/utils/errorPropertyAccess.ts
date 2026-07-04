@@ -74,7 +74,14 @@ export function getErrorStringProperty(
                 return typeof value === "string" ? value : undefined;
             }
 
-            const getter: unknown = Reflect.get(descriptor, "get");
+            const getterProperty = Object.getOwnPropertyDescriptor(
+                descriptor,
+                "get"
+            );
+            const getter: unknown =
+                getterProperty && "value" in getterProperty
+                    ? getterProperty.value
+                    : undefined;
             if (key === "stack" && isNativeErrorStringGetter(getter)) {
                 try {
                     const value: unknown = Reflect.apply(getter, error, []);
