@@ -193,17 +193,27 @@ describe("DatabaseService Coverage Tests", () => {
         await annotate("Operation: Initialization", "operation");
         await annotate("Priority: High", "priority");
 
+        vi.resetModules();
+
         const { DatabaseService } =
             await import("../../../services/database/DatabaseService");
+        const schemaModule =
+            await import("../../../services/database/utils/schema/databaseSchema");
+        const { Database } = await import("node-sqlite3-wasm");
 
-        try {
-            const instance = DatabaseService.getInstance();
-            await instance.initialize();
-            expect(true).toBeTruthy(); // Test passes if no error thrown
-        } catch (error) {
-            // Some initialization errors are expected in test environment
-            expect(error).toBeInstanceOf(Error);
-        }
+        const instance = DatabaseService.getInstance();
+        const db = instance.initialize();
+
+        expect(db).toBeDefined();
+        expect(Database).toHaveBeenCalledWith(
+            "/mock/path/uptime-watcher.sqlite"
+        );
+        expect(schemaModule.createDatabaseSchema).toHaveBeenCalledWith(db);
+        expect(
+            schemaModule.synchronizeDatabaseSchemaVersion
+        ).toHaveBeenCalledWith(db);
+
+        instance.close();
     });
     it("should handle database operations", async () => {
         const { DatabaseService } =
@@ -250,20 +260,32 @@ describe("DatabaseService Coverage Tests", () => {
         instance.close();
     });
     it("should handle transaction operations", async () => {
+        vi.resetModules();
+
         const { DatabaseService } =
             await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
 
-        try {
-            const instance = DatabaseService.getInstance();
-            await instance.executeTransaction(() =>
-                // Mock transaction operation
-                Promise.resolve("success")
-            );
-            expect(true).toBeTruthy();
-        } catch (error) {
-            // Transaction might fail in test environment
-            expect(error).toBeInstanceOf(Error);
-        }
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  run: ReturnType<typeof vi.fn>;
+              };
+
+        const operation = vi.fn(async () => "success");
+        await expect(instance.executeTransaction(operation)).resolves.toBe(
+            "success"
+        );
+
+        expect(dbInstance).toBeDefined();
+        expect(operation).toHaveBeenCalledWith(dbInstance);
+        expect(dbInstance?.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+        expect(dbInstance?.run).toHaveBeenCalledWith("COMMIT");
+
+        instance.close();
     });
 
     it("should retry top-level transactions when SQLite is busy", async ({
@@ -422,17 +444,31 @@ describe("DatabaseService Coverage Tests", () => {
     });
 
     it("should handle cleanup operations", async () => {
+        vi.resetModules();
+
         const { DatabaseService } =
             await import("../../../services/database/DatabaseService");
+        const { Database } = await import("node-sqlite3-wasm");
 
-        try {
-            const instance = DatabaseService.getInstance();
-            instance.close();
-            expect(true).toBeTruthy();
-        } catch (error) {
-            // Cleanup might fail if database wasn't initialized
-            expect(error).toBeInstanceOf(Error);
-        }
+        const instance = DatabaseService.getInstance();
+        await instance.initialize();
+
+        const dbInstance = vi.mocked(Database).mock.results.at(-1)?.value as
+            | undefined
+            | {
+                  close: ReturnType<typeof vi.fn>;
+                  get: ReturnType<typeof vi.fn>;
+              };
+
+        instance.close();
+        instance.close();
+
+        expect(dbInstance).toBeDefined();
+        expect(dbInstance?.get).toHaveBeenCalledWith(
+            "PRAGMA wal_checkpoint(TRUNCATE)"
+        );
+        expect(dbInstance?.get).toHaveBeenCalledWith("PRAGMA optimize");
+        expect(dbInstance?.close).toHaveBeenCalledTimes(1);
     });
     it("should have proper constants defined", async () => {
         // This will import the file and exercise any top-level code
