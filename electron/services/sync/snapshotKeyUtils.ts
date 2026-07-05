@@ -20,7 +20,7 @@ import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 
 import { isAsciiDigits } from "./syncEngineUtils";
 
-/** Minimum hex chars used for snapshot nonce suffix. */
+/** Number of lowercase hex chars used for snapshot nonce suffix. */
 export const SNAPSHOT_NONCE_HEX_CHARS = 32 as const;
 
 /**
@@ -32,14 +32,13 @@ export function createSnapshotNonceHex(): string {
 }
 
 function isValidSnapshotNonceHex(raw: string): boolean {
-    const normalized = raw.toLowerCase();
-    if (normalized.length !== SNAPSHOT_NONCE_HEX_CHARS) {
+    if (raw.length !== SNAPSHOT_NONCE_HEX_CHARS) {
         return false;
     }
 
     // Keep this strict: the suffix is an internal nonce used for collision
     // avoidance and should be ASCII hex.
-    for (const char of normalized) {
+    for (const char of raw) {
         const codePoint = char.codePointAt(0);
         if (!isDefined(codePoint)) {
             return false;
