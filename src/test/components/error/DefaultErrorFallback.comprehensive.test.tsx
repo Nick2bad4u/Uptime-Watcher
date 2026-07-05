@@ -13,6 +13,7 @@ import { DefaultErrorFallback } from "../../../components/error/DefaultErrorFall
 // Mock window.location.reload
 const mockReload = vi.fn();
 Object.defineProperty(globalThis, "location", {
+    configurable: true,
     value: {
         reload: mockReload,
     },
@@ -211,6 +212,46 @@ describe(DefaultErrorFallback, () => {
             await user.click(reloadButton);
 
             expect(mockReload).toHaveBeenCalledTimes(1);
+        });
+
+        it("should not throw when location access fails during reload", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DefaultErrorFallback", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            const originalLocationDescriptor =
+                Object.getOwnPropertyDescriptor(globalThis, "location");
+            const locationGetter = vi.fn(() => {
+                throw new Error("location unavailable");
+            });
+
+            try {
+                Object.defineProperty(globalThis, "location", {
+                    configurable: true,
+                    get: locationGetter,
+                });
+
+                const user = userEvent.setup();
+                render(<DefaultErrorFallback onRetry={mockOnRetry} />);
+
+                await expect(
+                    user.click(screen.getByText("Reload Page"))
+                ).resolves.toBeUndefined();
+                expect(locationGetter).toHaveBeenCalledTimes(1);
+                expect(mockReload).not.toHaveBeenCalled();
+            } finally {
+                if (originalLocationDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "location",
+                        originalLocationDescriptor
+                    );
+                }
+            }
         });
 
         it("should have correct button types", ({ task, annotate }) => {

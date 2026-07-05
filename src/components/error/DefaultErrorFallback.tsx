@@ -2,11 +2,35 @@
  * Default fallback component for error boundaries
  */
 
+import {
+    getCallableDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { type FC, useCallback } from "react";
 
 const DEFAULT_ERROR_MESSAGE =
     "An unexpected error occurred while loading this section.";
+
+const reloadCurrentPage = (): void => {
+    const locationProperty = getOwnPropertyValue(globalThis, "location");
+
+    if (!locationProperty.found) {
+        return;
+    }
+
+    const reload = getCallableDataProperty(locationProperty.value, "reload");
+
+    if (!reload) {
+        return;
+    }
+
+    try {
+        Reflect.apply(reload, locationProperty.value, []);
+    } catch {
+        // Error fallbacks should not fail again if the runtime blocks reload.
+    }
+};
 
 /**
  * Default fallback component for error boundary
@@ -21,7 +45,7 @@ export const DefaultErrorFallback: FC<
 > = ({ error, onRetry }) => {
     // UseCallback handler for jsx-no-bind compliance
     const handleReload = useCallback(() => {
-        location.reload();
+        reloadCurrentPage();
     }, []);
 
     // Extract error message logic to avoid complex conditional rendering
