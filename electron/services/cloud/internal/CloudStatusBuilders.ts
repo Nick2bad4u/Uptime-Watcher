@@ -15,6 +15,42 @@ type CloudProviderWithAccountLabel = CloudStorageProvider & {
     readonly getAccountLabel: () => Promise<string>;
 };
 
+const MAX_CLOUD_ACCOUNT_LABEL_CHARS = 320;
+
+function replaceAsciiControlCharacters(value: string): string {
+    let result = "";
+
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        result +=
+            codePoint !== undefined && (codePoint < 0x20 || codePoint === 0x7f)
+                ? " "
+                : character;
+    }
+
+    return result;
+}
+
+function normalizeCloudAccountLabel(
+    accountLabel: string | undefined
+): string | undefined {
+    if (!accountLabel) {
+        return undefined;
+    }
+
+    const compacted = replaceAsciiControlCharacters(accountLabel)
+        .replaceAll(/\s+/gu, " ")
+        .trim();
+
+    if (!compacted) {
+        return undefined;
+    }
+
+    return compacted.length <= MAX_CLOUD_ACCOUNT_LABEL_CHARS
+        ? compacted
+        : `${compacted.slice(0, MAX_CLOUD_ACCOUNT_LABEL_CHARS)}...`;
+}
+
 function hasAccountLabel(
     provider: CloudStorageProvider
 ): provider is CloudProviderWithAccountLabel {
@@ -127,7 +163,9 @@ export async function buildDropboxStatus(args: {
 
     if (provider?.kind === "dropbox" && hasAccountLabel(provider)) {
         try {
-            accountLabel = await provider.getAccountLabel();
+            accountLabel = normalizeCloudAccountLabel(
+                await provider.getAccountLabel()
+            );
             isConnected = true;
         } catch (error) {
             isConnected = false;
@@ -193,6 +231,8 @@ export async function buildGoogleDriveStatus(args: {
     const isEncryptionLocked =
         encryptionMode === "passphrase" && !common.hasLocalEncryptionKey;
 
+    const normalizedAccountLabel = normalizeCloudAccountLabel(accountLabel);
+
     return {
         backupsEnabled: isConnected,
         configured: true,
@@ -205,7 +245,9 @@ export async function buildGoogleDriveStatus(args: {
         provider: "google-drive",
         providerDetails: {
             kind: "google-drive",
-            ...(accountLabel && { accountLabel }),
+            ...(normalizedAccountLabel && {
+                accountLabel: normalizedAccountLabel,
+            }),
         },
         syncEnabled: common.syncEnabled,
     };
