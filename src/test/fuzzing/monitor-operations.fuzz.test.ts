@@ -10,11 +10,21 @@
  * @public
  */
 
-import type { Monitor, MonitorStatus, MonitorType, Site } from "@shared/types";
+import type {
+    Monitor,
+    MonitorStatus,
+    MonitorType,
+    Site,
+    StatusHistoryStatus,
+} from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import { secureRandomFloat } from "@shared/test/testHelpers";
-import { BASE_MONITOR_TYPES } from "@shared/types";
+import {
+    BASE_MONITOR_TYPES,
+    MONITOR_STATUS_VALUES,
+    STATUS_HISTORY_VALUES,
+} from "@shared/types";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import fc from "fast-check";
 import { objectKeys } from "ts-extras";
@@ -35,7 +45,7 @@ const arbitraryMonitorType = (): fc.Arbitrary<MonitorType> =>
     fc.constantFrom(...BASE_MONITOR_TYPES);
 
 const arbitraryMonitorStatus = (): fc.Arbitrary<MonitorStatus> =>
-    fc.constantFrom("up", "down", "pending", "paused");
+    fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES);
 
 const arbitraryUrl = (): fc.Arbitrary<string> =>
     fc.oneof(
@@ -203,7 +213,9 @@ const arbitraryPartialMonitor = (): fc.Arbitrary<Partial<Monitor>> =>
             history: fc.array(
                 fc.record({
                     timestamp: fc.integer(),
-                    status: fc.constantFrom("up", "down"), // StatusHistory only supports "up" | "down"
+                    status: fc.constantFrom<StatusHistoryStatus>(
+                        ...STATUS_HISTORY_VALUES
+                    ),
                     responseTime: fc.integer({ min: 0 }),
                     details: fc.string(),
                 })
@@ -301,12 +313,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                     expect(typeof monitor.retryAttempts).toBe("number");
                     expect(monitor.retryAttempts).toBeGreaterThanOrEqual(0);
                     expect(typeof monitor.monitoring).toBe("boolean");
-                    expect([
-                        "up",
-                        "down",
-                        "pending",
-                        "paused",
-                    ]).toContain(monitor.status);
+                    expect(MONITOR_STATUS_VALUES).toContain(monitor.status);
                     expect(typeof monitor.responseTime).toBe("number");
                     expect(Array.isArray(monitor.history)).toBeTruthy();
                     expect(
@@ -360,12 +367,9 @@ describe("Monitor Operations Fuzzing Tests", () => {
                     expect(normalized.retryAttempts).toBeGreaterThanOrEqual(0);
                     expect(normalized.retryAttempts).toBeLessThanOrEqual(10);
                     expect(typeof normalized.monitoring).toBe("boolean");
-                    expect([
-                        "up",
-                        "down",
-                        "pending",
-                        "paused",
-                    ]).toContain(normalized.status);
+                    expect(MONITOR_STATUS_VALUES).toContain(
+                        normalized.status
+                    );
                     expect(Array.isArray(normalized.history)).toBeTruthy();
                     expect(
                         Array.isArray(normalized.activeOperations)
