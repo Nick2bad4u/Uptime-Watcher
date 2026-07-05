@@ -36,7 +36,7 @@ import type { Promisable } from "type-fest";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
-import { isDefined, isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -120,6 +120,11 @@ const normalizeSiteTableColumnWidths = (
 
     return updated;
 };
+
+const createEmptySiteDetailsTabState = (): Record<
+    string,
+    SiteDetailsTab
+> => ({});
 
 const getDefaultUIPersistedState = (): UIPersistedState => ({
     activeSiteDetailsTab: "site-overview",
@@ -411,7 +416,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             siteCardPresentation: "grid",
             siteDetailsChartTimeRange: "24h",
             siteDetailsHeaderCollapsedState: {},
-            siteDetailsTabState: safeCastTo<Record<string, SiteDetailsTab>>({}),
+            siteDetailsTabState: createEmptySiteDetailsTabState(),
             siteListLayout: "list",
             siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
             surfaceDensity: "compact",
