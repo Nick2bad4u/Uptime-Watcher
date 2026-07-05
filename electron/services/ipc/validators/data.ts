@@ -13,13 +13,14 @@ import { castUnchecked } from "@shared/utils/typeHelpers";
 import {
     formatZodIssues,
     type ZodIssueLike,
+    type ZodIssuePathPart,
 } from "@shared/utils/zodIssueFormatting";
 import {
     validateSerializedDatabaseBackupResult,
     validateSerializedDatabaseBackupSaveResult,
     validateSerializedDatabaseRestoreResult,
 } from "@shared/validation/dataSchemas";
-import { objectHasIn, safeCastTo } from "ts-extras";
+import { objectHasIn } from "ts-extras";
 
 import type { IpcParameterValidator, IpcResultValidator } from "../types";
 
@@ -35,6 +36,35 @@ interface DataHandlerValidatorsInterface {
     importData: IpcParameterValidator;
     restoreSqliteBackup: IpcParameterValidator;
     saveSqliteBackup: IpcParameterValidator;
+}
+
+function isZodIssuePathPart(value: unknown): value is ZodIssuePathPart {
+    return (
+        typeof value === "number" ||
+        typeof value === "string" ||
+        typeof value === "symbol"
+    );
+}
+
+function isZodIssueLike(value: unknown): value is ZodIssueLike {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    const message: unknown = Reflect.get(value, "message");
+    if (typeof message !== "string") {
+        return false;
+    }
+
+    const path: unknown = Reflect.get(value, "path");
+    return (
+        path === undefined ||
+        (Array.isArray(path) && path.every(isZodIssuePathPart))
+    );
+}
+
+function isZodIssueLikeArray(value: unknown): value is readonly ZodIssueLike[] {
+    return Array.isArray(value) && value.every(isZodIssueLike);
 }
 
 /**
@@ -53,12 +83,12 @@ function formatSafeParseError(error: unknown): string[] {
         return ["Invalid response"];
     }
 
-    const { issues } = safeCastTo<{ readonly issues?: unknown }>(error);
-    if (!Array.isArray(issues)) {
+    const issues: unknown = Reflect.get(error, "issues");
+    if (!isZodIssueLikeArray(issues)) {
         return ["Invalid response"];
     }
 
-    return formatZodIssues(safeCastTo<readonly ZodIssueLike[]>(issues));
+    return formatZodIssues(issues);
 }
 
 function getSafeParseError(validation: unknown): unknown {
@@ -70,7 +100,7 @@ function getSafeParseError(validation: unknown): unknown {
         return undefined;
     }
 
-    return safeCastTo<{ readonly error?: unknown }>(validation).error;
+    return Reflect.get(validation, "error");
 }
 
 export const DataHandlerValidators: DataHandlerValidatorsInterface = {
