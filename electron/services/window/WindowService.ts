@@ -693,14 +693,6 @@ export class WindowService {
         try {
             const parsed = new URL(targetUrl);
 
-            // DevTools / extensions may use these schemes.
-            if (
-                parsed.protocol === "devtools:" ||
-                parsed.protocol === "chrome-extension:"
-            ) {
-                return true;
-            }
-
             if (!isDev()) {
                 if (parsed.protocol !== "file:") {
                     return false;
@@ -718,7 +710,15 @@ export class WindowService {
                 WindowService.VITE_SERVER_CONFIG.SERVER_URL
             ).origin;
 
-            return parsed.origin === viteOrigin;
+            if (parsed.origin === viteOrigin) {
+                return true;
+            }
+
+            // DevTools / extensions may use these schemes in development.
+            return (
+                parsed.protocol === "devtools:" ||
+                parsed.protocol === "chrome-extension:"
+            );
         } catch {
             return false;
         }

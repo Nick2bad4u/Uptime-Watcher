@@ -497,6 +497,84 @@ describe(WindowService, () => {
             expect(shell.openExternal).not.toHaveBeenCalled();
         });
 
+        it("blocks chrome-extension navigations in production", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
+            const willNavigateHandler = onCalls.find(
+                ([eventName]) => eventName === "will-navigate"
+            )?.[1];
+
+            expect(willNavigateHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willNavigateHandler?.(
+                event,
+                "chrome-extension://extension-id/index.html"
+            );
+
+            await Promise.resolve();
+
+            expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            expect(shell.openExternal).not.toHaveBeenCalled();
+        });
+
+        it("allows chrome-extension navigations in development", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(true);
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [
+                string,
+                (event: any, url: string) => void,
+            ][];
+            const willNavigateHandler = onCalls.find(
+                ([eventName]) => eventName === "will-navigate"
+            )?.[1];
+
+            expect(willNavigateHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willNavigateHandler?.(
+                event,
+                "chrome-extension://extension-id/index.html"
+            );
+
+            await Promise.resolve();
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(shell.openExternal).not.toHaveBeenCalled();
+        });
+
         it("prevents disallowed will-redirect and opens safe URLs externally", async ({
             task,
             annotate,
