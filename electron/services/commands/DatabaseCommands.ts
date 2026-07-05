@@ -18,6 +18,7 @@ import type { JsonValue } from "type-fest";
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { assertJsonImportPayloadWithinIpcBudget } from "@shared/utils/ipcPayloadBudgets";
 import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -635,21 +636,31 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors.push("Import data cannot be empty");
         }
 
-        const parseResult = safeJsonParse<JsonValue>(
-            this.data,
-            (value): value is JsonValue => isDefined(value)
-        );
+        let isPayloadWithinBudget = true;
+        try {
+            assertJsonImportPayloadWithinIpcBudget(this.data);
+        } catch (error: unknown) {
+            isPayloadWithinBudget = false;
+            errors.push(ensureError(error).message);
+        }
 
-        if (!parseResult.success || !isDefined(parseResult.data)) {
-            errors.push("Import data must be valid JSON");
-        } else {
-            const validation = validateImportData(parseResult.data);
+        if (isPayloadWithinBudget) {
+            const parseResult = safeJsonParse<JsonValue>(
+                this.data,
+                (value): value is JsonValue => isDefined(value)
+            );
 
-            if (!validation.ok) {
-                errors.push(
-                    validation.error.message,
-                    ...validation.error.issues.slice(0, 3)
-                );
+            if (!parseResult.success || !isDefined(parseResult.data)) {
+                errors.push("Import data must be valid JSON");
+            } else {
+                const validation = validateImportData(parseResult.data);
+
+                if (!validation.ok) {
+                    errors.push(
+                        validation.error.message,
+                        ...validation.error.issues.slice(0, 3)
+                    );
+                }
             }
         }
 

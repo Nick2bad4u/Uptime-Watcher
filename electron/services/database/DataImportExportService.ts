@@ -18,6 +18,7 @@ import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
+import { assertJsonImportPayloadWithinIpcBudget } from "@shared/utils/ipcPayloadBudgets";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
@@ -266,6 +267,8 @@ export class DataImportExportService {
         jsonData: string
     ): Promise<{ settings: Record<string, string>; sites: ImportSite[] }> {
         try {
+            assertJsonImportPayloadWithinIpcBudget(jsonData);
+
             const parseResult = safeJsonParse<JsonValue>(
                 jsonData,
                 acceptAnyJsonValue

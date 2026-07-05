@@ -16,7 +16,9 @@ import type { Site } from "@shared/types";
 import type { ImportSite } from "@shared/validation/importExportSchemas";
 import type { Database } from "node-sqlite3-wasm";
 
+import { MAX_IPC_JSON_IMPORT_BYTES } from "@shared/constants/backup";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import {
     beforeEach,
     describe,
@@ -73,6 +75,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+        vi.mocked(getUtfByteLength).mockImplementation((value: string) =>
+            Buffer.byteLength(value, "utf8")
+        );
 
         // Create comprehensive mocks
         mockDatabase = {
@@ -556,6 +561,33 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     details: expect.stringContaining(
                         "Invalid import data format"
                     ),
+                })
+            );
+        });
+
+        it("should reject oversized JSON imports before parsing", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
+            const oversizedJsonData = "x".repeat(MAX_IPC_JSON_IMPORT_BYTES + 1);
+
+            await expect(
+                service.importDataFromJson(oversizedJsonData)
+            ).rejects.toThrow(DataImportExportError);
+
+            expect(safeJsonParse).not.toHaveBeenCalled();
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:error",
+                expect.objectContaining({
+                    operation: "import-data-parse",
+                    details: expect.stringContaining("too large"),
                 })
             );
         });

@@ -6,6 +6,7 @@
 
 import type { Site } from "@shared/types";
 
+import { MAX_IPC_JSON_IMPORT_BYTES } from "@shared/constants/backup";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
@@ -1133,6 +1134,33 @@ describe("DatabaseCommands", () => {
             });
         });
 
+        it("should validate oversized import data as invalid before execution", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            const invalidCommand = new ImportDataCommand({
+                cache: mockCache,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: "x".repeat(MAX_IPC_JSON_IMPORT_BYTES + 1),
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory: mockServiceFactory,
+            });
+
+            const result = await invalidCommand.validate();
+
+            expect(result.isValid).toBe(false);
+            expect(result.errors).toEqual([
+                expect.stringContaining("too large"),
+            ]);
+        });
+
         it("should validate multiple errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: DatabaseCommands", "component");
@@ -1179,7 +1207,7 @@ describe("DatabaseCommands", () => {
                 cache: mockCache,
                 configurationManager:
                     mockConfigurationManager as unknown as ConfigurationManager,
-                data: '{"sites": [], "settings": {}}',
+                data: '{"sites": [{"identifier": ""}], "settings": {}}',
                 eventEmitter:
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                 serviceFactory: mockServiceFactory,
