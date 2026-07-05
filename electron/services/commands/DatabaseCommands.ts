@@ -941,7 +941,7 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
         // Backup current cache state
         this.originalCacheState.clear();
         for (const [key, site] of this.cache.entries()) {
-            this.originalCacheState.set(key, site);
+            this.originalCacheState.set(key, structuredClone(site));
         }
 
         const siteRepositoryService =
@@ -951,10 +951,10 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
         // Atomic cache replacement
         this.cache.clear();
         for (const site of sites) {
-            this.cache.set(site.identifier, site);
+            this.cache.set(site.identifier, structuredClone(site));
         }
 
-        return sites;
+        return sites.map((site) => structuredClone(site));
     }
 
     /**
@@ -971,7 +971,7 @@ export class LoadSitesCommand extends DatabaseCommand<Site[]> {
         // Restore original cache state
         this.cache.clear();
         for (const [key, site] of this.originalCacheState) {
-            this.cache.set(key, site);
+            this.cache.set(key, structuredClone(site));
         }
         await Promise.resolve();
     }

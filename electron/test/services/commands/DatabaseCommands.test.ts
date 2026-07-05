@@ -1373,6 +1373,25 @@ describe("DatabaseCommands", () => {
             );
         });
 
+        it("should cache and return cloned loaded sites", async () => {
+            const loadedSite = createTestSite("loaded-clone");
+            mockSiteRepositoryService.getSitesFromDatabase.mockResolvedValue([
+                loadedSite,
+            ]);
+
+            const result = await command.execute();
+
+            expect(result).toEqual([loadedSite]);
+            expect(result[0]).not.toBe(loadedSite);
+
+            result[0]!.name = "Mutated Result";
+            loadedSite.name = "Mutated Source";
+
+            expect(mockCache.get("loaded-clone")).toEqual({
+                ...createTestSite("loaded-clone"),
+            });
+        });
+
         it("should handle repository service errors", async ({
             task,
             annotate,
@@ -1428,6 +1447,23 @@ describe("DatabaseCommands", () => {
                 "original2",
                 originalSites[1]
             );
+        });
+
+        it("should restore cloned original cache state during rollback", async () => {
+            const originalSite = createTestSite("original-clone");
+            const mockEntries = new Map([
+                [originalSite.identifier, originalSite],
+            ]);
+            mockCache.entries = vi.fn().mockReturnValue(mockEntries.entries());
+
+            await command.execute();
+            originalSite.name = "Mutated Original";
+
+            await command.rollback();
+
+            expect(mockCache.get("original-clone")).toEqual({
+                ...createTestSite("original-clone"),
+            });
         });
 
         it("should handle empty original cache in rollback", async ({
