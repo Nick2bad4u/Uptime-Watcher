@@ -221,6 +221,18 @@ export function isNonNegativeNumber(value: unknown): value is number {
 }
 
 /**
+ * Checks whether a value is a non-negative safe integer.
+ *
+ * @param value - Value to evaluate.
+ *
+ * @returns `true` when the value is a finite safe integer greater than or equal
+ *   to zero.
+ */
+export function isNonNegativeSafeInteger(value: unknown): value is number {
+    return isNonNegativeNumber(value) && Number.isSafeInteger(value);
+}
+
+/**
  * Checks whether a value is an object that is not `null`.
  *
  * @param value - Value to evaluate.

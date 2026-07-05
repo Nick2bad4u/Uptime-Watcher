@@ -17,6 +17,7 @@ import {
     isFiniteNumber,
     isFunction,
     isNonNegativeNumber,
+    isNonNegativeSafeInteger,
     isNonNullObject,
     isNumber,
     isObject,
@@ -702,6 +703,56 @@ describe("typeGuards", () => {
             expect(isNonNegativeNumber(true)).toBeFalsy();
             expect(isNonNegativeNumber(null)).toBeFalsy();
             expect(isNonNegativeNumber(undefined)).toBeFalsy();
+        });
+    });
+
+    describe(isNonNegativeSafeInteger, () => {
+        it("should return true for non-negative safe integers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(isNonNegativeSafeInteger(0)).toBeTruthy();
+            expect(isNonNegativeSafeInteger(123)).toBeTruthy();
+            expect(
+                isNonNegativeSafeInteger(Number.MAX_SAFE_INTEGER)
+            ).toBeTruthy();
+        });
+
+        it("should return false for non-integer, unsafe, or non-finite numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(isNonNegativeSafeInteger(1.5)).toBeFalsy();
+            expect(
+                isNonNegativeSafeInteger(Number.MAX_SAFE_INTEGER + 1)
+            ).toBeFalsy();
+            expect(isNonNegativeSafeInteger(Infinity)).toBeFalsy();
+            expect(isNonNegativeSafeInteger(NaN)).toBeFalsy();
+        });
+
+        it("should return false for negative numbers and non-numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: typeGuards", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(isNonNegativeSafeInteger(-1)).toBeFalsy();
+            expect(isNonNegativeSafeInteger("-1")).toBeFalsy();
+            expect(isNonNegativeSafeInteger(null)).toBeFalsy();
+            expect(isNonNegativeSafeInteger(undefined)).toBeFalsy();
         });
     });
 

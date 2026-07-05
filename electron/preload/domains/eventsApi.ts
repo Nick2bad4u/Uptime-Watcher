@@ -43,6 +43,7 @@ import {
     SITE_ADDED_SOURCES,
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { validateSiteSnapshot } from "@shared/validation/guards";
 import {
     isEnrichedMonitorStatusChangedEventData,
@@ -53,7 +54,7 @@ import {
     siteIdentifierSchema,
     siteNameSchema,
 } from "@shared/validation/siteFieldSchemas";
-import { isDefined, isFinite as isFiniteNumber, objectValues } from "ts-extras";
+import { isDefined, objectValues } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -168,12 +169,6 @@ const isCacheInvalidatedEventDataPayload = (
 
     return true;
 };
-
-const isNonNegativeSafeInteger = (value: unknown): value is number =>
-    typeof value === "number" &&
-    isFiniteNumber(value) &&
-    Number.isSafeInteger(value) &&
-    value >= 0;
 
 const isMonitoringControlEventDataPayload = (
     payload: unknown

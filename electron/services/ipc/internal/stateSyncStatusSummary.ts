@@ -1,14 +1,8 @@
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
-import { isFinite as isFiniteNumber } from "ts-extras";
-
-const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
-    typeof candidate === "number" &&
-    isFiniteNumber(candidate) &&
-    Number.isSafeInteger(candidate) &&
-    candidate >= 0;
 
 const isValidEpochMs = (candidate: unknown): candidate is number =>
     isNonNegativeSafeInteger(candidate) && candidate <= MAX_VALID_DATE_EPOCH_MS;

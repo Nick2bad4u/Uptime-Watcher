@@ -14,10 +14,10 @@ import type {
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
-import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Lightweight, normalized view of the `sites:state-synchronized` event used
@@ -56,12 +56,6 @@ const isValidStateSyncSource = (
     candidate === STATE_SYNC_SOURCE.FRONTEND ||
     candidate === STATE_SYNC_SOURCE.IMPORT ||
     candidate === STATE_SYNC_SOURCE.MONITOR_UPDATE;
-
-const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
-    typeof candidate === "number" &&
-    isFiniteNumber(candidate) &&
-    Number.isSafeInteger(candidate) &&
-    candidate >= 0;
 
 const isValidEpochMs = (candidate: unknown): candidate is number =>
     isNonNegativeSafeInteger(candidate) && candidate <= MAX_VALID_DATE_EPOCH_MS;

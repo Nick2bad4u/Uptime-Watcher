@@ -13,7 +13,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { isFinite as isFiniteNumber } from "ts-extras";
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { DatabaseManager } from "../managers/DatabaseManager";
@@ -22,12 +22,6 @@ import type { OrchestratorEvents } from "../UptimeOrchestrator.types";
 import { DEFAULT_HISTORY_LIMIT } from "../constants";
 import { fireAndForgetLogged } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
-
-const isNonNegativeSafeInteger = (value: unknown): value is number =>
-    typeof value === "number" &&
-    isFiniteNumber(value) &&
-    Number.isSafeInteger(value) &&
-    value >= 0;
 
 /**
  * Options required to construct a {@link HistoryLimitCoordinator} instance.
@@ -178,11 +172,7 @@ export class HistoryLimitCoordinator {
         try {
             const limit = this.databaseManager.getHistoryLimit();
 
-            if (
-                typeof limit === "number" &&
-                isFiniteNumber(limit) &&
-                limit >= 0
-            ) {
+            if (isNonNegativeSafeInteger(limit)) {
                 return limit;
             }
 
