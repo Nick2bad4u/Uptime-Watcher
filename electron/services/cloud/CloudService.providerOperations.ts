@@ -8,11 +8,11 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { promises as fs } from "node:fs";
 import * as path from "node:path";
 
 import type { CloudServiceOperationContext } from "./CloudService.operationContext";
 
+import { ensureDirectoryAndResolveRealPath } from "../../utils/fsSafeOps";
 import { logger } from "../../utils/logger";
 import {
     SECRET_KEY_ENCRYPTION_DERIVED_KEY,
@@ -174,14 +174,11 @@ export async function configureFilesystemProvider(
 
         const { baseDirectory } = config;
         const resolved = path.resolve(baseDirectory);
-
-        await fs.mkdir(resolved, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
-        const stat = await fs.stat(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
-        if (!stat.isDirectory()) {
-            throw new Error("Filesystem base directory must be a directory");
-        }
-
-        const canonical = await fs.realpath(resolved); // eslint-disable-line security/detect-non-literal-fs-filename -- Dynamic but validated path supplied by the user.
+        const canonical = await ensureDirectoryAndResolveRealPath({
+            directoryPath: resolved,
+            notDirectoryMessage:
+                "Filesystem base directory must be a directory",
+        });
 
         const canonicalIssues = validateFilesystemBaseDirectoryCandidate(
             canonical,

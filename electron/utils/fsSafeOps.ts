@@ -3,6 +3,27 @@ import { ensureError } from "@shared/utils/errorHandling";
 import * as fs from "node:fs/promises";
 
 /**
+ * Ensures a validated directory exists and returns its canonical real path.
+ */
+export async function ensureDirectoryAndResolveRealPath(args: {
+    directoryPath: string;
+    notDirectoryMessage: string;
+}): Promise<string> {
+    const { directoryPath, notDirectoryMessage } = args;
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller validates directoryPath before invoking this audited filesystem helper.
+    await fs.mkdir(directoryPath, { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller validates directoryPath before invoking this audited filesystem helper.
+    const stat = await fs.stat(directoryPath);
+    if (!stat.isDirectory()) {
+        throw new Error(notDirectoryMessage);
+    }
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller validates directoryPath before invoking this audited filesystem helper.
+    return fs.realpath(directoryPath);
+}
+
+/**
  * Best-effort file rename that treats a missing source as a no-op.
  */
 export async function renameIfExists(

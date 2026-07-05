@@ -8,18 +8,68 @@ interface MockFileHandle {
 const renameMock =
     vi.fn<(sourcePath: string, targetPath: string) => Promise<void>>();
 
+const mkdirMock =
+    vi.fn<
+        (directoryPath: string, options: { recursive: true }) => Promise<void>
+    >();
+
 const openMock =
     vi.fn<(filePath: string, flags: string) => Promise<MockFileHandle>>();
 
+const realpathMock = vi.fn<(directoryPath: string) => Promise<string>>();
+
+const statMock =
+    vi.fn<(directoryPath: string) => Promise<{ isDirectory: () => boolean }>>();
+
 vi.mock("node:fs/promises", () => ({
+    mkdir: mkdirMock,
     open: openMock,
+    realpath: realpathMock,
     rename: renameMock,
+    stat: statMock,
 }));
 
 describe("fsSafeOps (strict coverage)", () => {
     beforeEach(() => {
         vi.resetModules();
         vi.clearAllMocks();
+    });
+
+    it("ensureDirectoryAndResolveRealPath creates the directory and returns its canonical path", async () => {
+        const { ensureDirectoryAndResolveRealPath } =
+            await import("../../../../electron/utils/fsSafeOps");
+
+        mkdirMock.mockResolvedValueOnce(undefined);
+        statMock.mockResolvedValueOnce({ isDirectory: () => true });
+        realpathMock.mockResolvedValueOnce("/tmp/canonical");
+
+        await expect(
+            ensureDirectoryAndResolveRealPath({
+                directoryPath: "/tmp/input",
+                notDirectoryMessage: "not a directory",
+            })
+        ).resolves.toBe("/tmp/canonical");
+        expect(mkdirMock).toHaveBeenCalledWith("/tmp/input", {
+            recursive: true,
+        });
+        expect(statMock).toHaveBeenCalledWith("/tmp/input");
+        expect(realpathMock).toHaveBeenCalledWith("/tmp/input");
+    });
+
+    it("ensureDirectoryAndResolveRealPath rejects non-directory paths", async () => {
+        const { ensureDirectoryAndResolveRealPath } =
+            await import("../../../../electron/utils/fsSafeOps");
+
+        mkdirMock.mockResolvedValueOnce(undefined);
+        statMock.mockResolvedValueOnce({ isDirectory: () => false });
+
+        await expect(
+            ensureDirectoryAndResolveRealPath({
+                directoryPath: "/tmp/file",
+                notDirectoryMessage: "not a directory",
+            })
+        ).rejects.toThrow("not a directory");
+        expect(realpathMock).not.toHaveBeenCalled();
     });
 
     it("renameIfExists calls fs.rename on success", async () => {
