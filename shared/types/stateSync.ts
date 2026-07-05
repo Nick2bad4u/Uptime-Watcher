@@ -10,6 +10,7 @@
 import type { Site } from "@shared/types";
 
 import { siteSchema } from "@shared/validation/siteSchemas";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
 
@@ -33,7 +34,7 @@ export type SiteIdentifierSnapshot = Pick<Site, "identifier">;
  */
 export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> = z
     .object({
-        identifier: z.string().trim().min(1),
+        identifier: siteIdentifierSchema,
     })
     .strict();
 
@@ -247,7 +248,7 @@ export interface SiteSyncDelta {
 const siteSyncDeltaInternalSchema: z.ZodType<SiteSyncDelta> = z
     .object({
         addedSites: stateSyncSitesSchema,
-        removedSiteIdentifiers: z.array(z.string().trim().min(1)),
+        removedSiteIdentifiers: z.array(siteIdentifierSchema),
         updatedSites: stateSyncSitesSchema,
     })
     .strict();

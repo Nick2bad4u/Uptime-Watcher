@@ -66,13 +66,13 @@ const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
 const isValidEpochMs = (candidate: unknown): candidate is number =>
     isNonNegativeSafeInteger(candidate) && candidate <= MAX_VALID_DATE_EPOCH_MS;
 
-const getOwnTrimmedIdentifier = (candidate: object): string | undefined => {
+const getOwnIdentifier = (candidate: object): string | undefined => {
     const property = getOwnDataProperty(candidate, "identifier");
     if (!property.found || !isNonEmptyString(property.value)) {
         return undefined;
     }
 
-    return property.value.trim();
+    return property.value;
 };
 
 const buildIdentifierOnlySites = (
@@ -84,7 +84,7 @@ const buildIdentifierOnlySites = (
 
     return candidate
         .filter(isRecord)
-        .map(getOwnTrimmedIdentifier)
+        .map(getOwnIdentifier)
         .filter(isNonEmptyString)
         .map((identifier) => ({ identifier }));
 };
@@ -166,8 +166,7 @@ export function normalizeStateSyncPayload(
     const addedSites = buildIdentifierOnlySites(addedSitesCandidate);
     const updatedSites = buildIdentifierOnlySites(updatedSitesCandidate);
     const removedSiteIdentifiers = removedSiteIdentifiersCandidate
-        .filter(isNonEmptyString)
-        .map((identifier) => identifier.trim());
+        .filter(isNonEmptyString);
 
     return {
         action,

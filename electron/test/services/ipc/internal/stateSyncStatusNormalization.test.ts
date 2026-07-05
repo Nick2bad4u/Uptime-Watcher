@@ -26,7 +26,7 @@ describe(normalizeStateSyncPayload, () => {
         });
     });
 
-    it("normalizes only own non-empty site identifiers", () => {
+    it("normalizes only own non-empty site identifiers without trimming", () => {
         const inheritedIdentifier = Object.create({
             identifier: "inherited-site",
         }) as Record<string, unknown>;
@@ -53,7 +53,7 @@ describe(normalizeStateSyncPayload, () => {
             })
         ).toMatchObject({
             siteCount: 5,
-            sites: [{ identifier: "site-a" }],
+            sites: [{ identifier: " site-a " }],
         });
     });
 
@@ -112,7 +112,7 @@ describe(normalizeStateSyncPayload, () => {
         }
     });
 
-    it("normalizes delta identifiers consistently with state-sync schemas", () => {
+    it("preserves exact delta identifiers consistently with state-sync schemas", () => {
         const normalized = normalizeStateSyncPayload({
             action: STATE_SYNC_ACTION.UPDATE,
             delta: {
@@ -132,9 +132,9 @@ describe(normalizeStateSyncPayload, () => {
 
         expect(normalized).toMatchObject({
             delta: {
-                addedSites: [{ identifier: "added-site" }],
-                removedSiteIdentifiers: ["removed-site"],
-                updatedSites: [{ identifier: "updated-site" }],
+                addedSites: [{ identifier: " added-site " }],
+                removedSiteIdentifiers: [" removed-site "],
+                updatedSites: [{ identifier: "\tupdated-site\n" }],
             },
         });
     });
