@@ -223,7 +223,9 @@ describe("Operational Hooks", () => {
                 expect.objectContaining({
                     errorMessage: failure.message,
                     errorName: failure.name,
-                    operationId: expect.any(String),
+                    operationId: expect.stringMatching(
+                        /^op_\d+_[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/v
+                    ),
                 })
             );
             expect(errorSpy).not.toHaveBeenCalled();

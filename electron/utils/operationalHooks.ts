@@ -304,7 +304,7 @@ type ThrowingOperationalHooksConfig<T = unknown> = Omit<
  * Generate a unique operation ID for tracking using node:crypto.
  */
 function generateOperationId(): OperationId {
-    const candidate = `op_${Date.now()}_${randomUUID().slice(0, 8)}`;
+    const candidate = `op_${Date.now()}_${randomUUID()}`;
     return operationIdSchema.parse(candidate);
 }
 
