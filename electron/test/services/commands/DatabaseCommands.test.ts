@@ -7,7 +7,7 @@
 import type { Site } from "@shared/types";
 
 import { MAX_IPC_JSON_IMPORT_BYTES } from "@shared/constants/backup";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type {
@@ -45,6 +45,13 @@ import {
 const createMockServiceFactory = createEnhancedServiceFactory;
 const createMockEventBus = createEnhancedEventBus;
 const createTestSite = createEnhancedTestSite;
+
+type EmitTypedMock = Mock<
+    (
+        eventName: EventKey<UptimeEvents>,
+        data: EventPayload<UptimeEvents, EventKey<UptimeEvents>>
+    ) => Promise<void>
+>;
 
 const createMockCache = () => {
     const cache = new Map<string, Site>();
@@ -1021,7 +1028,8 @@ describe("DatabaseCommands", () => {
             mockSiteRepositoryService.getSitesFromDatabase.mockResolvedValue(
                 importedSites
             );
-            mockEventBus.emitTyped.mockImplementation(async (eventName) => {
+            const emitTypedMock = mockEventBus.emitTyped as EmitTypedMock;
+            emitTypedMock.mockImplementation(async (eventName) => {
                 if (eventName !== "internal:site:added") {
                     return;
                 }
@@ -1036,7 +1044,7 @@ describe("DatabaseCommands", () => {
 
             await command.execute();
 
-            const siteAddedCalls = mockEventBus.emitTyped.mock.calls.filter(
+            const siteAddedCalls = emitTypedMock.mock.calls.filter(
                 ([eventName]) => eventName === "internal:site:added"
             );
 

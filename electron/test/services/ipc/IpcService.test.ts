@@ -539,6 +539,47 @@ describe(IpcService, () => {
                 expect.fail("Handler not found for get-monitor-types");
             }
         });
+        it("should not leak full monitor configs when sanitized configs fail validation", async () => {
+            mockGetAllMonitorTypeConfigs.mockReturnValueOnce([
+                {
+                    type: "http",
+                    displayName: "HTTP Monitor with raw secret-marker",
+                    description: "Monitor HTTP endpoints with token=secret-marker",
+                    version: "1.0.0",
+                    fields: [
+                        {
+                            name: "url",
+                            type: "url",
+                            label: "URL",
+                            required: "yes",
+                            helpText: "secret-marker",
+                            placeholder:
+                                "https://example.com/?token=secret-marker",
+                        },
+                    ],
+                    serviceFactory: vi.fn(),
+                    validationSchema: {},
+                } as any,
+            ]);
+
+            ipcService.setupHandlers();
+
+            const getAllHandler = mockIpcMain.handle.mock.calls.find(
+                (call) => call[0] === "get-monitor-types"
+            )?.[1];
+
+            if (getAllHandler) {
+                const result = await getAllHandler(createTrustedIpcEvent());
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain(
+                    "Invalid monitor type config produced for 'http'"
+                );
+                expect(result.error).toContain("fieldCount=1");
+                expect(result.error).not.toContain("secret-marker");
+            } else {
+                expect.fail("Handler not found for get-monitor-types");
+            }
+        });
     });
     describe("Handler Implementation", () => {
         beforeEach(() => {

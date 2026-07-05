@@ -57,7 +57,7 @@ describe(parseBaseline, () => {
         } finally {
             parseSpy.mockRestore();
             if (original === undefined) {
-                delete process.env.UW_CLOUD_SYNC_MAX_BASELINE_BYTES;
+                Reflect.deleteProperty(process.env, envKey);
             } else {
                 process.env[envKey] = original;
             }

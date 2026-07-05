@@ -32,6 +32,13 @@ type BaseMonitorUiConfig = ReturnType<
     typeof getAllMonitorTypeConfigs
 >[0]["uiConfig"];
 
+const describeMonitorTypeConfigForError = (
+    config: MonitorTypeConfig
+): string =>
+    `type=${config.type}, version=${config.version}, fieldCount=${config.fields.length}, hasUiConfig=${String(
+        isDefined(config.uiConfig)
+    )}`;
+
 const pickOptionalString = (value: unknown): string | undefined =>
     typeof value === "string" ? value : undefined;
 
@@ -282,15 +289,16 @@ const serializeMonitorTypeConfig = (
             "[IpcService] Sanitized monitor type config failed validation",
             undefined,
             {
+                configSummary:
+                    describeMonitorTypeConfigForError(sanitizedConfig),
                 monitorType: baseProperties.type,
-                sanitizedConfig,
             }
         );
 
         throw new Error(
-            `[IpcService] Invalid monitor type config produced for '${baseProperties.type}': ${JSON.stringify(
+            `[IpcService] Invalid monitor type config produced for '${baseProperties.type}' (${describeMonitorTypeConfigForError(
                 sanitizedConfig
-            )}`
+            )})`
         );
     }
 
