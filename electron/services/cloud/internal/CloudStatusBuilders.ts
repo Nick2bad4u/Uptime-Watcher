@@ -8,7 +8,7 @@ import {
     normalizeUserFacingErrorDetail,
 } from "@shared/utils/userFacingErrors";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { objectHasIn, safeCastTo } from "ts-extras";
+import { objectHasIn } from "ts-extras";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
 
@@ -27,11 +27,7 @@ function hasAccountLabel(
         return false;
     }
 
-    const candidate = safeCastTo<
-        CloudStorageProvider & {
-            readonly getAccountLabel?: unknown;
-        }
-    >(provider).getAccountLabel;
+    const candidate: unknown = Reflect.get(provider, "getAccountLabel");
 
     return typeof candidate === "function";
 }
