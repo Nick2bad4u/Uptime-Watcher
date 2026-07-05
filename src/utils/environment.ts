@@ -4,23 +4,18 @@
  * @public
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import { getEnvVar } from "@shared/utils/environment";
-import { safeCastTo } from "ts-extras";
 
 const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
 
 const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iu;
 
-/**
- * Minimal navigator shape used for user-agent probing.
- *
- * @internal
- */
-interface MaybeNavigator {
-    readonly navigator?: Navigator;
-}
+const hasUserAgent = (
+    value: unknown
+): value is { readonly userAgent: string } =>
+    typeof value === "object" &&
+    value !== null &&
+    typeof Reflect.get(value, "userAgent") === "string";
 
 /**
  * Detects Playwright automation environment via env flags, UA hints, or global
@@ -37,18 +32,15 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    const automationNavigator =
-        safeCastTo<MaybeNavigator>(globalThis).navigator;
+    const automationNavigator = Reflect.get(globalThis, "navigator");
     if (
-        automationNavigator &&
+        hasUserAgent(automationNavigator) &&
         PLAYWRIGHT_UA_PATTERN.test(automationNavigator.userAgent)
     ) {
         return true;
     }
 
-    const automationTarget = safeCastTo<UnknownRecord>(globalThis);
-
-    return automationTarget["playwrightAutomation"] === true;
+    return Reflect.get(globalThis, "playwrightAutomation") === true;
 }
 
 /**
@@ -73,7 +65,5 @@ export function readProcessEnv(key: string): string | undefined {
  * @public
  */
 export function setPlaywrightAutomationMarker(): void {
-    const automationTarget = safeCastTo<UnknownRecord>(globalThis);
-
-    automationTarget["playwrightAutomation"] = true;
+    Reflect.set(globalThis, "playwrightAutomation", true);
 }

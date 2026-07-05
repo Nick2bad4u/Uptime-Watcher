@@ -28,5 +28,11 @@ declare global {
          * Secure Electron API exposed through the preload bridge.
          */
         electronAPI: ElectronAPI;
+
+        /**
+         * Automation marker exposed by preload for Playwright-driven renderer
+         * sessions.
+         */
+        playwrightAutomation?: boolean;
     }
 }
