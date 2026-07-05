@@ -80,6 +80,24 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
                     createValueWithThen("not a function")
                 )
             ).toBe(false);
+            let thenAccessCount = 0;
+            const thenableWithAccessor = {};
+            const thenProperty = ["th", "en"].join("");
+            expect(
+                // eslint-disable-next-line unicorn/no-thenable -- Intentional malformed thenable fixture verifies accessor-safe detection.
+                Reflect.defineProperty(thenableWithAccessor, thenProperty, {
+                    configurable: true,
+                    enumerable: true,
+                    get() {
+                        thenAccessCount += 1;
+                        return () => undefined;
+                    },
+                })
+            ).toBeTruthy();
+            expect(helpersModule.isPromiseLike(thenableWithAccessor)).toBe(
+                false
+            );
+            expect(thenAccessCount).toBe(0);
             expect(helpersModule.isPromiseLike(null)).toBe(false);
             expect(helpersModule.isPromiseLike("not promise-like")).toBe(false);
 

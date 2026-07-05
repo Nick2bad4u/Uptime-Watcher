@@ -13,6 +13,8 @@ import type { UnknownRecord } from "type-fest";
 
 import { objectHasIn } from "ts-extras";
 
+import { getCallableDataProperty } from "./errorPropertyAccess";
+
 /**
  * Safely casts IPC response to expected type with basic validation.
  *
@@ -119,8 +121,7 @@ export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
         return false;
     }
 
-    const then: unknown = Reflect.get(value, "then");
-    return typeof then === "function";
+    return getCallableDataProperty(value, "then") !== undefined;
 }
 
 /**
