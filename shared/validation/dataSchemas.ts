@@ -105,13 +105,21 @@ const sqliteResultFileNameSchema: z.ZodType<string> =
 
 const nonEmptyStringSchema: z.ZodType<string> = z.string().trim().min(1);
 
+const exactNonEmptyStringSchema = (label: string): z.ZodType<string> =>
+    z
+        .string()
+        .min(1)
+        .refine((value) => value === value.trim(), {
+            message: `${label} must not have leading or trailing whitespace`,
+        });
+
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
         .object({
-            appVersion: z.string().trim().min(1),
-            checksum: z.string().trim().min(1),
+            appVersion: exactNonEmptyStringSchema("Backup app version"),
+            checksum: exactNonEmptyStringSchema("Backup checksum"),
             createdAt: epochMsSchema,
-            originalPath: z.string().trim().min(1),
+            originalPath: exactNonEmptyStringSchema("Backup original path"),
             retentionHintDays: z.int().nonnegative(),
             schemaVersion: z.int().nonnegative(),
             sizeBytes: z.int().nonnegative(),

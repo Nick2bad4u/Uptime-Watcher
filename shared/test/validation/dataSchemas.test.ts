@@ -110,6 +110,9 @@ describe("dataSchemas", () => {
             { ...metadata, schemaVersion: -1 },
             { ...metadata, sizeBytes: -1 },
             { ...metadata, sizeBytes: 1.5 },
+            { ...metadata, appVersion: " 1.0.0" },
+            { ...metadata, checksum: "abc " },
+            { ...metadata, originalPath: " C:/x" },
         ]) {
             const parsed = validateSerializedDatabaseBackupResult({
                 buffer,
