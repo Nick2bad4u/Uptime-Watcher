@@ -70,6 +70,18 @@ const cloudStatusSummaryInternalSchema = z
                 path: ["providerDetails"],
             });
         }
+
+        if (
+            value.provider !== null &&
+            isDefined(value.providerDetails) &&
+            value.providerDetails.kind !== value.provider
+        ) {
+            ctx.addIssue({
+                code: "custom",
+                message: "providerDetails kind must match provider",
+                path: ["providerDetails", "kind"],
+            });
+        }
     });
 
 export const cloudStatusSummarySchema: z.ZodType<CloudStatusSummary> =

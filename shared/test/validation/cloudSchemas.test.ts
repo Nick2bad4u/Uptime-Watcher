@@ -85,6 +85,46 @@ describe("cloudSchemas", () => {
         expect(parsed.success).toBeFalsy();
     });
 
+    it("rejects providerDetails with a mismatched provider kind", () => {
+        const parsed = validateCloudStatusSummary({
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
+            provider: "dropbox",
+            providerDetails: {
+                accountLabel: "person@example.com",
+                kind: "google-drive",
+            },
+            syncEnabled: true,
+        });
+
+        expect(parsed.success).toBeFalsy();
+    });
+
+    it("accepts providerDetails with a matching provider kind", () => {
+        const parsed = validateCloudStatusSummary({
+            backupsEnabled: true,
+            configured: true,
+            connected: true,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
+            provider: "dropbox",
+            providerDetails: {
+                accountLabel: "person@example.com",
+                kind: "dropbox",
+            },
+            syncEnabled: true,
+        });
+
+        expect(parsed.success).toBeTruthy();
+    });
+
     it("validates CloudSyncResetPreview", () => {
         const parsed = validateCloudSyncResetPreview({
             deviceIds: [],
