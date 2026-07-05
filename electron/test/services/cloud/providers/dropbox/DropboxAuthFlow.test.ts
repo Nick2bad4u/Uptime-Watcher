@@ -223,6 +223,65 @@ describe(DropboxAuthFlow, () => {
         expect(auth.getAccessTokenFromCode).not.toHaveBeenCalled();
     });
 
+    it("does not invoke accessor-backed token response result fields", async () => {
+        let getterCalls = 0;
+        const auth = {
+            setClientId: vi.fn(),
+            getAuthenticationUrl: vi.fn(
+                async (redirectUri: string, state?: string) => {
+                    const url = new URL("https://example.test");
+                    url.searchParams.set("redirect_uri", redirectUri);
+                    url.searchParams.set("state", state ?? "");
+                    return url.toString();
+                }
+            ),
+            getAccessTokenFromCode: vi.fn(async () => {
+                const response = {};
+                Object.defineProperty(response, "result", {
+                    enumerable: true,
+                    get: () => {
+                        getterCalls += 1;
+                        return {
+                            access_token: "access",
+                            expires_in: 3600,
+                            refresh_token: "refresh",
+                        };
+                    },
+                });
+
+                return response;
+            }),
+        };
+
+        openExternalMock.mockImplementation(async (url: string) => {
+            const authorizeUrl = new URL(url);
+            const state = authorizeUrl.searchParams.get("state");
+            const redirectUri = authorizeUrl.searchParams.get("redirect_uri");
+
+            if (redirectUri === null || state === null) {
+                throw new Error(
+                    "Expected redirect_uri and state in authorize URL"
+                );
+            }
+
+            const callbackUrl = new URL(redirectUri);
+            callbackUrl.searchParams.set("code", "auth-code");
+            callbackUrl.searchParams.set("state", state);
+
+            await httpGet(callbackUrl.toString());
+            return true;
+        });
+
+        const flow = new DropboxAuthFlow({
+            appKey: "app-key",
+            authFactory: () => auth,
+            loopbackPort: 0,
+        });
+
+        await expect(flow.connect({ timeoutMs: 5000 })).rejects.toThrow();
+        expect(getterCalls).toBe(0);
+    });
+
     it("rejects when the callback state does not match", async () => {
         const auth = {
             setClientId: vi.fn(),
