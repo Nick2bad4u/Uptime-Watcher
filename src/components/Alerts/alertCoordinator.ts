@@ -1,12 +1,8 @@
 import { isMonitorStatus, type StatusUpdate } from "@shared/types";
+import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import {
-    arrayJoin,
-    isDefined,
-    isFinite as isFiniteNumber,
-    safeCastTo,
-} from "ts-extras";
+import { arrayJoin, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
@@ -116,24 +112,38 @@ const resolveAlertVolume = (candidate: unknown): number => {
     return candidate;
 };
 
+type AudioContextConstructor = Constructor<AudioContext, []>;
+
+const isAudioContextConstructor = (
+    value: unknown
+): value is AudioContextConstructor => typeof value === "function";
+
+const resolveAudioContextConstructor = ():
+    AudioContextConstructor | undefined => {
+    const standardAudioContext: unknown = Reflect.get(
+        globalThis,
+        "AudioContext"
+    );
+    if (isAudioContextConstructor(standardAudioContext)) {
+        return standardAudioContext;
+    }
+
+    const webkitAudioContext: unknown = Reflect.get(
+        globalThis,
+        "webkitAudioContext"
+    );
+    return isAudioContextConstructor(webkitAudioContext)
+        ? webkitAudioContext
+        : undefined;
+};
+
 const ensureAudioContext = (): AudioContext | null => {
     if (audioContextRef.current && audioContextRef.current.state !== "closed") {
         return audioContextRef.current;
     }
 
-    const globalObject = safeCastTo<{
-        AudioContext?: typeof AudioContext;
-        webkitAudioContext?: typeof AudioContext;
-    }>(globalThis);
-
-    let context: AudioContext | null = null;
-
-    if (typeof globalObject.AudioContext === "function") {
-        context = new AudioContext();
-    } else if (typeof globalObject.webkitAudioContext === "function") {
-        const WebkitAudioContext = globalObject.webkitAudioContext;
-        context = new WebkitAudioContext();
-    }
+    const AudioContextCtor = resolveAudioContextConstructor();
+    const context = AudioContextCtor ? new AudioContextCtor() : null;
 
     audioContextRef.current = context;
     return context;
