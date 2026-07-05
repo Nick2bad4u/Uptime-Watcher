@@ -44,6 +44,7 @@ import {
 } from "@shared/utils/ipcResponse";
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
 import { isFinite as isFiniteNumber, isInteger, setHas } from "ts-extras";
@@ -382,6 +383,20 @@ function getInvokeTimeoutMs(channel: string): number {
     }
 }
 
+interface TimerWithUnref {
+    readonly unref: () => void;
+}
+
+function hasTimerUnref(timer: unknown): timer is TimerWithUnref {
+    return isRecord(timer) && typeof timer["unref"] === "function";
+}
+
+function tryUnrefTimer(timer: unknown): void {
+    if (hasTimerUnref(timer)) {
+        timer.unref();
+    }
+}
+
 async function withTimeout<T>(args: {
     readonly onTimeout: () => Error;
     readonly promise: Promise<T>;
@@ -400,6 +415,7 @@ async function withTimeout<T>(args: {
                 timeoutId = setTimeout(() => {
                     resolve({ kind: "timeout" });
                 }, timeoutMs);
+                tryUnrefTimer(timeoutId);
             }),
         ]);
 

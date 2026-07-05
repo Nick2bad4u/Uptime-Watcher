@@ -206,6 +206,72 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             }
         });
 
+        it("unrefs the invoke timeout guard", async () => {
+            const originalSetTimeout = globalThis.setTimeout;
+            const unrefSpies: ReturnType<typeof vi.fn>[] = [];
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+            setTimeoutSpy.mockImplementation(
+                ((...args: Parameters<typeof globalThis.setTimeout>) => {
+                    const handle = originalSetTimeout(
+                        ...args
+                    ) as NodeJS.Timeout;
+                    const originalUnref = handle.unref.bind(handle);
+                    const unrefSpy = vi.fn(() => originalUnref());
+                    handle.unref = unrefSpy;
+                    unrefSpies.push(unrefSpy);
+                    return handle;
+                }) as typeof globalThis.setTimeout
+            );
+
+            let resolveInvoke:
+                | ((response: IpcResponse<string>) => void)
+                | undefined;
+            const invokeResponse = new Promise<IpcResponse<string>>(
+                (resolve) => {
+                    resolveInvoke = resolve;
+                }
+            );
+
+            try {
+                vi.mocked(ipcRenderer.invoke).mockImplementation(
+                    (channel: unknown) => {
+                        if (channel === DIAGNOSTICS_CHANNELS.verifyIpcHandler) {
+                            return Promise.resolve(
+                                createHandshakeSuccess(formatDetailChannel)
+                            );
+                        }
+
+                        return invokeResponse;
+                    }
+                );
+
+                const invoke = createTypedInvoker(formatDetailChannel, {
+                    timeoutMs: 1000,
+                });
+                const promise = invoke("http", "detail");
+
+                for (
+                    let attempts = 0;
+                    attempts < 5 && unrefSpies.length === 0;
+                    attempts += 1
+                ) {
+                    await Promise.resolve();
+                }
+
+                expect(unrefSpies).toHaveLength(1);
+                expect(unrefSpies[0]).toHaveBeenCalledTimes(1);
+
+                resolveInvoke?.({
+                    data: "detail",
+                    success: true,
+                });
+
+                await expect(promise).resolves.toBe("detail");
+            } finally {
+                setTimeoutSpy.mockRestore();
+            }
+        });
+
         it("validates successful responses contain data", async () => {
             const missingDataResponse: IpcResponse = {
                 success: true,
