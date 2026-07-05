@@ -467,7 +467,7 @@ export const createDefaultFormData: CreateDefaultFormData = castUnchecked(
  * @public
  */
 export function isCdnEdgeConsistencyFormData(
-    data: Partial<MonitorFormData>
+    data: object
 ): data is CdnEdgeConsistencyFormData {
     const baselineUrl = getStringFormField(data, "baselineUrl");
     const edgeLocations = getStringFormField(data, "edgeLocations");
@@ -490,9 +490,7 @@ export function isCdnEdgeConsistencyFormData(
  *
  * @public
  */
-export function isDnsFormData(
-    data: Partial<MonitorFormData>
-): data is DnsFormData {
+export function isDnsFormData(data: object): data is DnsFormData {
     const host = getNormalizedHostField(data);
     const recordType = getStringFormField(data, "recordType");
 
@@ -514,9 +512,7 @@ export function isDnsFormData(
  *
  * @public
  */
-export function isHttpFormData(
-    data: Partial<MonitorFormData>
-): data is HttpFormData {
+export function isHttpFormData(data: object): data is HttpFormData {
     const url = getStringFormField(data, "url");
 
     return (
@@ -535,9 +531,7 @@ export function isHttpFormData(
  *
  * @public
  */
-export function isHttpHeaderFormData(
-    data: Partial<MonitorFormData>
-): data is HttpHeaderFormData {
+export function isHttpHeaderFormData(data: object): data is HttpHeaderFormData {
     const expectedHeaderValue = getStringFormField(data, "expectedHeaderValue");
     const headerName = getStringFormField(data, "headerName");
     const url = getStringFormField(data, "url");
@@ -562,9 +556,7 @@ export function isHttpHeaderFormData(
  *
  * @public
  */
-export function isHttpJsonFormData(
-    data: Partial<MonitorFormData>
-): data is HttpJsonFormData {
+export function isHttpJsonFormData(data: object): data is HttpJsonFormData {
     const expectedJsonValue = getStringFormField(data, "expectedJsonValue");
     const jsonPath = getStringFormField(data, "jsonPath");
     const url = getStringFormField(data, "url");
@@ -590,7 +582,7 @@ export function isHttpJsonFormData(
  * @public
  */
 export function isHttpKeywordFormData(
-    data: Partial<MonitorFormData>
+    data: object
 ): data is HttpKeywordFormData {
     const bodyKeyword = getStringFormField(data, "bodyKeyword");
     const url = getStringFormField(data, "url");
@@ -614,7 +606,7 @@ export function isHttpKeywordFormData(
  * @public
  */
 export function isHttpLatencyFormData(
-    data: Partial<MonitorFormData>
+    data: object
 ): data is HttpLatencyFormData {
     const maxResponseTime = getNumberFormField(data, "maxResponseTime");
     const url = getStringFormField(data, "url");
@@ -638,9 +630,7 @@ export function isHttpLatencyFormData(
  *
  * @public
  */
-export function isHttpStatusFormData(
-    data: Partial<MonitorFormData>
-): data is HttpStatusFormData {
+export function isHttpStatusFormData(data: object): data is HttpStatusFormData {
     const expectedStatusCode = getNumberFormField(data, "expectedStatusCode");
     const url = getStringFormField(data, "url");
 
@@ -664,9 +654,7 @@ export function isHttpStatusFormData(
  *
  * @public
  */
-export function isPingFormData(
-    data: Partial<MonitorFormData>
-): data is PingFormData {
+export function isPingFormData(data: object): data is PingFormData {
     const host = getNormalizedHostField(data);
 
     return (
@@ -685,9 +673,7 @@ export function isPingFormData(
  *
  * @public
  */
-export function isPortFormData(
-    data: Partial<MonitorFormData>
-): data is PortFormData {
+export function isPortFormData(data: object): data is PortFormData {
     const host = getNormalizedHostField(data);
     const port = getNumberFormField(data, "port");
 
@@ -710,7 +696,7 @@ export function isPortFormData(
  * @public
  */
 export function isReplicationFormData(
-    data: Partial<MonitorFormData>
+    data: object
 ): data is ReplicationFormData {
     const maxReplicationLagSeconds = getNumberFormField(
         data,
@@ -746,7 +732,7 @@ export function isReplicationFormData(
  * @public
  */
 export function isServerHeartbeatFormData(
-    data: Partial<MonitorFormData>
+    data: object
 ): data is ServerHeartbeatFormData {
     const heartbeatExpectedStatus = getStringFormField(
         data,
@@ -787,9 +773,7 @@ export function isServerHeartbeatFormData(
  *
  * @public
  */
-export function isSslFormData(
-    data: Partial<MonitorFormData>
-): data is SslFormData {
+export function isSslFormData(data: object): data is SslFormData {
     const certificateWarningDays = getNumberFormField(
         data,
         "certificateWarningDays"
@@ -820,7 +804,7 @@ export function isSslFormData(
  * @public
  */
 export function isWebsocketKeepaliveFormData(
-    data: Partial<MonitorFormData>
+    data: object
 ): data is WebsocketKeepaliveFormData {
     const maxPongDelayMs = getNumberFormField(data, "maxPongDelayMs");
     const url = getStringFormField(data, "url");
@@ -880,8 +864,7 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 
     const validator = FORM_DATA_VALIDATORS[monitorType];
 
-    const typedFormData = castUnchecked<Partial<MonitorFormData>>(data);
-    return validator(typedFormData);
+    return validator(data);
 }
 
 /**
