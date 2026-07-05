@@ -21,6 +21,7 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
+import { removePathBestEffort } from "../../../utils/fsSafeOps";
 import { BaseCloudStorageProvider } from "./BaseCloudStorageProvider";
 import { CloudProviderOperationError } from "./cloudProviderErrors";
 
@@ -478,7 +479,7 @@ export class FilesystemCloudStorageProvider
             return await toCloudObjectEntry(key, targetPath);
         } catch (error) {
             if (tempPath) {
-                await fs.rm(tempPath, { force: true }).catch(() => {});
+                await removePathBestEffort(tempPath);
             }
 
             if (error instanceof CloudProviderOperationError) {
