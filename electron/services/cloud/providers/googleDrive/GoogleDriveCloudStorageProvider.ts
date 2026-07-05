@@ -1,5 +1,4 @@
 import type { CloudProviderKind } from "@shared/types/cloud";
-import type { UnknownRecord } from "type-fest";
 
 import {
     assertCloudObjectKey,
@@ -9,14 +8,12 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import {
     arrayAt,
     arrayJoin,
     isEmpty,
     isFinite as isFiniteNumber,
-    objectHasIn,
     stringSplit,
 } from "ts-extras";
 
@@ -102,7 +99,7 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
         return undefined;
     }
 
-    if (!objectHasIn(castUnchecked<UnknownRecord>(error), "response")) {
+    if (!Reflect.has(error, "response")) {
         return undefined;
     }
 
