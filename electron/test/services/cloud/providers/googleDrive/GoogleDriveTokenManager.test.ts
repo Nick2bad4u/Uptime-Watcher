@@ -243,6 +243,41 @@ describe(GoogleDriveTokenManager, () => {
         expect(message).toContain("refresh_token=[redacted]");
     });
 
+    it("redacts secrets from non-Axios OAuth refresh failures", async () => {
+        const secretStore = new InMemorySecretStore();
+        const manager = new GoogleDriveTokenManager({
+            clientId: "client-id",
+            secretStore,
+            storageKey: "cloud.googleDrive.tokens",
+        });
+
+        await manager.setTokens({
+            accessToken: "old-access",
+            expiresAt: Date.now() - 1,
+            refreshToken: "SUPER_SECRET_REFRESH_TOKEN",
+        });
+
+        axiosPost.mockRejectedValueOnce(
+            new Error(
+                "refresh_token=SUPER_SECRET_REFRESH_TOKEN failed\nwith detail"
+            )
+        );
+
+        let thrown: unknown;
+        try {
+            await manager.getValidAccessToken();
+        } catch (error) {
+            thrown = error;
+        }
+
+        expect(thrown).toBeInstanceOf(Error);
+        const message = (thrown as Error).message;
+        expect(message).toMatch(/google oauth refresh failed/i);
+        expect(message).not.toContain("SUPER_SECRET_REFRESH_TOKEN");
+        expect(message).not.toContain("\n");
+        expect(message).toContain("refresh_token=[redacted]");
+    });
+
     it("bounds and compacts OAuth refresh error details", async () => {
         const secretStore = new InMemorySecretStore();
         const manager = new GoogleDriveTokenManager({

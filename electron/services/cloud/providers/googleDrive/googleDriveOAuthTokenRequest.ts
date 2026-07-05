@@ -142,8 +142,9 @@ export async function requestGoogleOAuthToken(
         }
 
         const normalized = ensureError(error);
+        const safeMessage = toSafeDetailString(normalized.message) ?? "Unknown";
         throw new Error(
-            `Google OAuth ${input.operationLabel} failed: ${normalized.message}`,
+            `Google OAuth ${input.operationLabel} failed: ${safeMessage}`,
             {
                 cause: error,
             }
