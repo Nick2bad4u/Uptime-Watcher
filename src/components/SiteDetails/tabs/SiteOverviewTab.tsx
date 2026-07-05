@@ -23,6 +23,7 @@ import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
+import { getMonitorDisplayIdentifier } from "../../../utils/fallbacks";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
 import { useResponseTimeColorFromThemeColors } from "../utils/responseTimeColors";
 
@@ -73,13 +74,7 @@ function getMonitorStatusText(monitor: Monitor): string {
  * Get display text for monitor based on type and available properties
  */
 function getMonitorDisplayText(monitor: Monitor): string {
-    if (monitor.url) {
-        return monitor.url;
-    }
-    if (monitor.host) {
-        return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
-    }
-    return monitor.id;
+    return getMonitorDisplayIdentifier(monitor, monitor.id);
 }
 
 /**

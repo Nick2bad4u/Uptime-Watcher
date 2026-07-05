@@ -234,7 +234,7 @@ describe(SiteCardMonitorList, () => {
             screen.getByText("https://baseline.uptimewatcher.dev")
         ).toBeInTheDocument();
         expect(screen.getByText("monitor.internal")).toBeInTheDocument();
-        expect(screen.getByText("invalid-url")).toBeInTheDocument();
+        expect(screen.getByText("[unparseable-url]")).toBeInTheDocument();
         expect(screen.getByText("DNS")).toBeInTheDocument();
 
         // Response times are rendered without a space before the unit suffix
@@ -303,5 +303,56 @@ describe(SiteCardMonitorList, () => {
         );
 
         expect(screen.getByText("7s ago")).toBeInTheDocument();
+    });
+
+    it("redacts URL secrets from monitor labels", () => {
+        const monitors: Monitor[] = [
+            createMonitor(
+                {
+                    baselineUrl:
+                        "https://baseline.uptimewatcher.dev/status?access_token=baseline-secret#section",
+                    type: "cdn-edge-consistency",
+                },
+                0
+            ),
+            createMonitor(
+                {
+                    primaryStatusUrl:
+                        "https://primary.uptimewatcher.dev/status?refresh_token=replication-secret#section",
+                    replicaStatusUrl:
+                        "https://replica.uptimewatcher.dev/status?refresh_token=replication-secret",
+                    type: "replication",
+                },
+                1
+            ),
+            createMonitor(
+                {
+                    type: "http",
+                    url: "not-a-url?token=raw-secret#fragment",
+                },
+                2
+            ),
+        ];
+
+        render(
+            <SiteCardMonitorList
+                monitors={monitors}
+                selectedMonitorId="monitor-0"
+            />
+        );
+
+        expect(
+            screen.getByText("https://baseline.uptimewatcher.dev/status")
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText("https://primary.uptimewatcher.dev/status")
+        ).toBeInTheDocument();
+        expect(screen.getByText("[unparseable-url]")).toBeInTheDocument();
+        expect(screen.queryByText(/baseline-secret/iu)).not.toBeInTheDocument();
+        expect(
+            screen.queryByText(/replication-secret/iu)
+        ).not.toBeInTheDocument();
+        expect(screen.queryByText(/raw-secret/iu)).not.toBeInTheDocument();
+        expect(screen.queryByText(/fragment/iu)).not.toBeInTheDocument();
     });
 });

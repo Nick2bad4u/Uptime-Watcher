@@ -27,6 +27,7 @@ import {
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
 import { createValidMonitor } from "@shared/test/testHelpers";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -223,7 +224,9 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             // Check individual monitor details
             expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
             expect(screen.getByText("PING Monitor")).toBeInTheDocument();
-            expect(screen.getByText(httpMonitorUrl)).toBeInTheDocument();
+            expect(
+                screen.getByText(getSafeUrlForDisplay(httpMonitorUrl))
+            ).toBeInTheDocument();
             expect(screen.getByText(pingMonitorHost)).toBeInTheDocument(); // Ping monitor display
         });
 
@@ -685,6 +688,41 @@ describe("SiteOverviewTab - Complete Coverage", () => {
 
             // Should fallback to monitor ID
             expect(screen.getByText("monitor-no-url")).toBeInTheDocument();
+        });
+
+        it("should redact URL secrets in monitor display text", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteOverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Privacy", "type");
+
+            const siteWithSensitiveMonitor: Site = {
+                ...mockSite,
+                monitors: [
+                    createValidMonitor({
+                        id: "monitor-with-secret-url",
+                        type: "http",
+                        url: "https://api.example.com/status?refresh_token=display-secret#section",
+                    }),
+                ],
+            };
+
+            render(
+                <SiteOverviewTab
+                    {...defaultProps}
+                    site={siteWithSensitiveMonitor}
+                />
+            );
+
+            expect(
+                screen.getByText("https://api.example.com/status")
+            ).toBeInTheDocument();
+            expect(screen.queryByText(/refresh_token/iu)).not.toBeInTheDocument();
+            expect(screen.queryByText(/display-secret/iu)).not.toBeInTheDocument();
+            expect(screen.queryByText(/section/iu)).not.toBeInTheDocument();
         });
     });
 

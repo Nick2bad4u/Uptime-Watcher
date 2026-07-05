@@ -8,6 +8,7 @@
 
 import type { Monitor, MonitorStatus } from "@shared/types";
 
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { memo, type NamedExoticComponent, useMemo } from "react";
 import { isEmpty } from "ts-extras";
 
@@ -90,7 +91,7 @@ const resolveMonitorLabel = (monitor: Monitor): string => {
         try {
             return new URL(monitor.url).hostname;
         } catch {
-            return monitor.url;
+            return getSafeUrlForDisplay(monitor.url);
         }
     }
 
@@ -99,7 +100,15 @@ const resolveMonitorLabel = (monitor: Monitor): string => {
     }
 
     if (monitor.baselineUrl) {
-        return monitor.baselineUrl;
+        return getSafeUrlForDisplay(monitor.baselineUrl);
+    }
+
+    if (monitor.primaryStatusUrl) {
+        return getSafeUrlForDisplay(monitor.primaryStatusUrl);
+    }
+
+    if (monitor.replicaStatusUrl) {
+        return getSafeUrlForDisplay(monitor.replicaStatusUrl);
     }
 
     return monitor.type.toUpperCase();
