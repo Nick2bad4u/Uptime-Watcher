@@ -607,6 +607,17 @@ export function stringifyBaseline(baseline: CloudSyncBaseline): string {
     return JSON.stringify(baseline, null, 2);
 }
 
+function parseBaselinePayload(raw: string): unknown {
+    try {
+        return JSON.parse(raw);
+    } catch (error) {
+        const resolved = ensureError(error);
+        throw new SyntaxError(`Invalid baseline JSON: ${resolved.message}`, {
+            cause: error,
+        });
+    }
+}
+
 /**
  * Result envelope for parsing a stored baseline.
  */
@@ -630,7 +641,7 @@ export interface ParsedBaselineResult {
 export function parseBaseline(raw: string): ParsedBaselineResult {
     try {
         return {
-            baseline: parseCloudSyncBaseline(JSON.parse(raw)),
+            baseline: parseCloudSyncBaseline(parseBaselinePayload(raw)),
             recovered: false,
         };
     } catch (error) {

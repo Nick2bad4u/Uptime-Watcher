@@ -2,6 +2,7 @@ import type { CloudSyncState } from "@shared/types/cloudSyncState";
 import type { Site } from "@shared/types";
 
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { CLOUD_SYNC_BASELINE_VERSION } from "@shared/types/cloudSyncBaseline";
 import {
     buildCanonicalLocalState,
     buildDesiredMonitorsFromSyncState,
@@ -10,6 +11,7 @@ import {
     buildLocalOperations,
     getMaxOpIdByDevice,
     normalizeCloudSyncState,
+    parseBaseline,
 } from "@electron/services/sync/syncEngineState";
 import { describe, expect, it } from "vitest";
 
@@ -20,6 +22,18 @@ const WRITE = {
     opId: 1,
     timestamp: 1,
 } as const;
+
+describe(parseBaseline, () => {
+    it("recovers malformed stored JSON with baseline JSON context", () => {
+        const result = parseBaseline("{not-json");
+
+        expect(result.recovered).toBe(true);
+        expect(result.error).toContain("Invalid baseline JSON");
+        expect(result.baseline.baselineVersion).toBe(CLOUD_SYNC_BASELINE_VERSION);
+        expect(result.baseline.syncSchemaVersion).toBe(CLOUD_SYNC_SCHEMA_VERSION);
+        expect(Object.getPrototypeOf(result.baseline.sites)).toBeNull();
+    });
+});
 
 describe(normalizeCloudSyncState, () => {
     it("normalizes remote-keyed maps into null-prototype dictionaries", () => {
