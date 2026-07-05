@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Modal } from "../../../../components/common/Modal/Modal";
 
@@ -169,6 +169,70 @@ describe(Modal, () => {
         expect(closeButton).toHaveFocus();
 
         unmount();
+    });
+
+    it("does not throw when focus-trap listener attachment fails", async () => {
+        const addEventListener = vi
+            .spyOn(document, "addEventListener")
+            .mockImplementation(() => {
+                throw new Error("listener unavailable");
+            });
+        const removeEventListener = vi.spyOn(document, "removeEventListener");
+
+        const { unmount } = renderInAppRoot(
+            <Modal
+                isOpen={true}
+                onRequestClose={() => {}}
+                title="Listener failure"
+            >
+                <button type="button">Focusable</button>
+            </Modal>
+        );
+
+        await screen.findByText("Focusable");
+
+        expect(addEventListener).toHaveBeenCalledWith(
+            "keydown",
+            expect.any(Function),
+            { capture: true }
+        );
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+        expect(removeEventListener).not.toHaveBeenCalledWith(
+            "keydown",
+            expect.any(Function),
+            true
+        );
+    });
+
+    it("does not throw when focus-trap listener cleanup fails", async () => {
+        const removeEventListener = vi
+            .spyOn(document, "removeEventListener")
+            .mockImplementationOnce(() => {
+                throw new Error("listener cleanup unavailable");
+            });
+
+        const { unmount } = renderInAppRoot(
+            <Modal
+                isOpen={true}
+                onRequestClose={() => {}}
+                title="Cleanup failure"
+            >
+                <button type="button">Focusable</button>
+            </Modal>
+        );
+
+        await screen.findByText("Focusable");
+
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+        expect(removeEventListener).toHaveBeenCalledWith(
+            "keydown",
+            expect.any(Function),
+            true
+        );
     });
 
     it("Escape closes only the top-most modal", async () => {

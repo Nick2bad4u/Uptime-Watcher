@@ -1,6 +1,7 @@
 import type { EscapeKeyModalConfig } from "@shared/utils/modalHandlers";
 import type { JSX } from "react/jsx-runtime";
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
 import {
     type ReactNode,
@@ -22,6 +23,84 @@ import {
     pushModal,
     releaseBlockingModal,
 } from "./modalStack";
+
+const noop = (): void => {};
+
+type KeyDownListenerMethod = (
+    this: unknown,
+    type: "keydown",
+    listener: EventListenerOrEventListenerObject,
+    options?: AddEventListenerOptions | boolean
+) => void;
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+const isKeyDownListenerMethod = (
+    value: unknown
+): value is KeyDownListenerMethod => typeof value === "function";
+
+function getDocumentKeyDownListenerMethod(
+    holder: unknown,
+    key: "addEventListener" | "removeEventListener"
+): KeyDownListenerMethod | undefined {
+    if (!isObjectLike(holder)) {
+        return undefined;
+    }
+
+    try {
+        const candidate: unknown = Reflect.get(holder, key);
+        return isKeyDownListenerMethod(candidate) ? candidate : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+function addDocumentKeyDownCaptureListener(
+    handler: (event: globalThis.KeyboardEvent) => void
+): () => void {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found) {
+        return noop;
+    }
+
+    const addEventListener = getDocumentKeyDownListenerMethod(
+        documentProperty.value,
+        "addEventListener"
+    );
+    const removeEventListener = getDocumentKeyDownListenerMethod(
+        documentProperty.value,
+        "removeEventListener"
+    );
+
+    if (!addEventListener || !removeEventListener) {
+        return noop;
+    }
+
+    try {
+        Reflect.apply(addEventListener, documentProperty.value, [
+            "keydown",
+            handler,
+            { capture: true },
+        ]);
+    } catch {
+        return noop;
+    }
+
+    return (): void => {
+        try {
+            Reflect.apply(removeEventListener, documentProperty.value, [
+                "keydown",
+                handler,
+                true,
+            ]);
+        } catch {
+            // Focus-trap cleanup is best-effort during renderer teardown.
+        }
+    };
+}
 
 /** Accent styling applied to the modal shell. */
 export type ModalAccent = "danger" | "default" | "success" | "warning";
@@ -463,17 +542,7 @@ export const Modal = ({
                 }
             };
 
-            document.addEventListener("keydown", handleKeyDownCapture, {
-                capture: true,
-            });
-
-            return () => {
-                document.removeEventListener(
-                    "keydown",
-                    handleKeyDownCapture,
-                    true
-                );
-            };
+            return addDocumentKeyDownCaptureListener(handleKeyDownCapture);
         },
         [isOpen, modalId]
     );
