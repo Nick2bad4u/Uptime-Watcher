@@ -118,7 +118,9 @@ describe("ServerHeartbeatMonitor service", () => {
         monitor = createMonitor({
             url: "https://api.example.com/heartbeat?token=heartbeat-secret",
         });
-        const transportError = new Error("Network failure");
+        const transportError = new Error(
+            "Network failure token=transport-secret"
+        );
         httpGetMock.mockRejectedValue(transportError);
 
         const result = await service.check(monitor);
@@ -126,9 +128,12 @@ describe("ServerHeartbeatMonitor service", () => {
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed to fetch heartbeat");
         expect(result.error).toContain("https://api.example.com/heartbeat");
-        expect(result.error).not.toContain("token=");
+        expect(result.error).toContain("token=[redacted]");
         expect(result.error).not.toContain("heartbeat-secret");
-        expect(transportError.message).toBe("Network failure");
+        expect(result.error).not.toContain("transport-secret");
+        expect(result.details).not.toContain("heartbeat-secret");
+        expect(result.details).not.toContain("transport-secret");
+        expect(transportError.message).toContain("transport-secret");
     });
 
     it("keeps invalid JSON failures distinct from generic fetch failures", async () => {

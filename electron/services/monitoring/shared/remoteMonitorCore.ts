@@ -8,6 +8,7 @@ import type { Site } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 
 import type {
@@ -216,9 +217,10 @@ export function createRemoteMonitorService<
                     `[${behavior.scope}] ${operationName} failed`,
                     normalized
                 );
+                const detail = getUserFacingErrorDetail(error);
                 return {
-                    ...createMonitorErrorResult(normalized.message, 0),
-                    details: normalized.message,
+                    ...createMonitorErrorResult(detail, 0),
+                    details: detail,
                 };
             }
         }

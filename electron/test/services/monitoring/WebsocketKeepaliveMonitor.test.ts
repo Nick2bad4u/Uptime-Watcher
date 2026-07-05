@@ -164,17 +164,23 @@ describe("WebsocketKeepaliveMonitor service", () => {
         expect(result.error).toContain("valid ws:// or wss:// URL");
     });
 
-    it("returns down when the socket emits an error", async () => {
+    it("returns down when the socket emits a sanitized error", async () => {
         const monitor = createMonitor();
         const checkPromise = service.check(monitor);
         const socket = socketInstances.at(-1);
         expect(socket).toBeDefined();
 
-        socket!.emit("error", new Error("handshake failed"));
+        socket!.emit(
+            "error",
+            new Error("handshake failed: token=websocket-secret")
+        );
 
         const result = await checkPromise;
         expect(result.status).toBe("down");
         expect(result.details).toContain("handshake failed");
+        expect(result.details).toContain("token=[redacted]");
+        expect(result.details).not.toContain("websocket-secret");
+        expect(result.error).not.toContain("websocket-secret");
     });
 
     it("does not create a socket when the AbortSignal is already aborted", async () => {

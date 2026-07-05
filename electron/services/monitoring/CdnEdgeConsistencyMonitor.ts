@@ -13,6 +13,7 @@ import type { AxiosInstance } from "axios";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
@@ -62,6 +63,13 @@ interface EdgeResult {
 }
 
 const HASH_ALGORITHM = "sha256";
+
+class CdnEdgeConsistencyFailureError extends Error {
+    public constructor(message: string) {
+        super(message);
+        this.name = "CdnEdgeConsistencyFailureError";
+    }
+}
 
 /**
  * CDN edge consistency monitor implementation.
@@ -116,9 +124,13 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                 `[CdnEdgeConsistencyMonitor] Consistency check failed for ${baselineUrl}`,
                 normalized
             );
+            const detail =
+                error instanceof CdnEdgeConsistencyFailureError
+                    ? error.message
+                    : getUserFacingErrorDetail(error);
             return {
-                ...createMonitorErrorResult(normalized.message, 0),
-                details: normalized.message,
+                ...createMonitorErrorResult(detail, 0),
+                details: detail,
             };
         }
     }
@@ -141,7 +153,9 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             const baselineError = Reflect.has(baselineResult, "error")
                 ? baselineResult.error
                 : "Unknown baseline failure";
-            throw new Error(`Baseline request failed: ${baselineError}`);
+            throw new CdnEdgeConsistencyFailureError(
+                `Baseline request failed: ${baselineError}`
+            );
         }
 
         const edgeResults = await Promise.all(
@@ -163,7 +177,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                 ),
                 "; "
             );
-            throw new Error(
+            throw new CdnEdgeConsistencyFailureError(
                 failureSummary.length > 0
                     ? failureSummary
                     : "All edge requests failed"
@@ -267,8 +281,6 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                 success: true,
             };
         } catch (error) {
-            const normalized = ensureError(error);
-
             let responseTime = timeout;
             if (typeof error === "object" && error !== null) {
                 const property = getOwnDataProperty(error, "responseTime");
@@ -282,7 +294,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             }
 
             return {
-                error: normalized.message,
+                error: getUserFacingErrorDetail(error),
                 responseTime,
                 success: false,
             };

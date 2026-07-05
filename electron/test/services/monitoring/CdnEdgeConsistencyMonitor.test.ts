@@ -122,18 +122,23 @@ describe("CdnEdgeConsistencyMonitor service", () => {
                 };
             }
 
-            throw new Error(`Failed request for ${url}`);
+            throw new Error(`Failed request for ${url}?token=edge-secret`);
         });
 
         const result = await service.check(monitor);
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed request");
+        expect(result.error).toContain("token=[redacted]");
+        expect(result.error).not.toContain("edge-secret");
+        expect(result.details).not.toContain("edge-secret");
     });
 
     it("does not invoke responseTime accessors on edge request errors", async () => {
         const baselineBuffer = Buffer.from("baseline-response");
-        const edgeError = new Error("Failed edge request");
+        const edgeError = new Error(
+            "Failed edge request: token=edge-accessor-secret"
+        );
         let accessCount = 0;
 
         Object.defineProperty(edgeError, "responseTime", {
@@ -160,6 +165,9 @@ describe("CdnEdgeConsistencyMonitor service", () => {
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Failed edge request");
+        expect(result.error).toContain("token=[redacted]");
+        expect(result.error).not.toContain("edge-accessor-secret");
+        expect(result.details).not.toContain("edge-accessor-secret");
         expect(accessCount).toBe(0);
     });
 

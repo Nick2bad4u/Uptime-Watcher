@@ -14,6 +14,7 @@ import type { MonitorType, Site } from "@shared/types";
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { getAbortSignalReason } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { performance } from "node:perf_hooks";
 import { WebSocket as NodeWebSocket } from "ws";
 
@@ -100,10 +101,10 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                 };
             }
 
-            const normalized = ensureError(error);
+            const detail = getUserFacingErrorDetail(error);
             return {
-                ...createMonitorErrorResult(normalized.message, 0),
-                details: normalized.message,
+                ...createMonitorErrorResult(detail, 0),
+                details: detail,
             };
         }
     }
