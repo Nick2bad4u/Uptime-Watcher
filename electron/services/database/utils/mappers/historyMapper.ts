@@ -16,6 +16,8 @@ import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
@@ -60,16 +62,31 @@ export interface HistoryRow {
  *
  * @internal
  */
-function safeNumber(value: unknown, fallback = 0): number {
+function parseFiniteNumber(value: unknown): number | undefined {
     if (typeof value === "number" && isFiniteNumber(value)) return value;
     if (typeof value === "string") {
         const trimmed = value.trim();
         if (trimmed.length === 0) {
-            return fallback;
+            return undefined;
         }
 
         const parsed = Number(trimmed);
         if (isFiniteNumber(parsed)) return parsed;
+    }
+    return undefined;
+}
+
+function safeNumber(value: unknown, fallback = 0): number {
+    return parseFiniteNumber(value) ?? fallback;
+}
+
+function safeEpochMs(value: unknown, fallback = Date.now()): number {
+    const parsed = parseFiniteNumber(value);
+    if (
+        isNonNegativeSafeInteger(parsed) &&
+        parsed <= MAX_VALID_DATE_EPOCH_MS
+    ) {
+        return parsed;
     }
     return fallback;
 }
@@ -161,7 +178,8 @@ export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
         (row.status === "up" ||
             row.status === "degraded" ||
             row.status === "down") &&
-        isFiniteNumber(row.timestamp)
+        isNonNegativeSafeInteger(row.timestamp) &&
+        row.timestamp <= MAX_VALID_DATE_EPOCH_MS
     );
 }
 
@@ -198,7 +216,7 @@ export function rowToHistoryEntry(row: DatabaseHistoryRow): StatusHistory {
             }),
             responseTime: safeNumber(row.responseTime, 0),
             status: validateStatus(row.status),
-            timestamp: safeNumber(row.timestamp, Date.now()),
+            timestamp: safeEpochMs(row.timestamp),
         };
     } catch (error: unknown) {
         const normalizedError = ensureError(error);

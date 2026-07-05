@@ -9,6 +9,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -313,6 +314,33 @@ describe("historyMapper utilities", () => {
             };
 
             expect(isValidHistoryRow(invalidRow)).toBeFalsy();
+        });
+
+        it("should reject timestamps outside the epoch millisecond contract", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidTimestamps = [
+                -1,
+                1.5,
+                MAX_VALID_DATE_EPOCH_MS + 1,
+            ];
+
+            for (const timestamp of invalidTimestamps) {
+                const invalidRow: DatabaseHistoryRow = {
+                    monitorId: "monitor-123",
+                    status: "up",
+                    timestamp,
+                    responseTime: 150,
+                };
+
+                expect(isValidHistoryRow(invalidRow)).toBeFalsy();
+            }
         });
 
         it("should handle optional details field", async ({
@@ -639,6 +667,38 @@ describe("historyMapper utilities", () => {
 
             expect(result.timestamp).toBeGreaterThanOrEqual(beforeTime);
             expect(result.timestamp).toBeLessThanOrEqual(afterTime);
+        });
+
+        it("should default structurally invalid timestamps to current time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const invalidTimestamps = [
+                -1,
+                1.5,
+                MAX_VALID_DATE_EPOCH_MS + 1,
+            ];
+
+            for (const timestamp of invalidTimestamps) {
+                const beforeTime = Date.now();
+                const row: DatabaseHistoryRow = {
+                    monitorId: "monitor-123",
+                    status: "up",
+                    timestamp,
+                    responseTime: 150,
+                };
+
+                const result = rowToHistoryEntry(row);
+                const afterTime = Date.now();
+
+                expect(result.timestamp).toBeGreaterThanOrEqual(beforeTime);
+                expect(result.timestamp).toBeLessThanOrEqual(afterTime);
+            }
         });
 
         it("should validate and correct invalid status", async ({
