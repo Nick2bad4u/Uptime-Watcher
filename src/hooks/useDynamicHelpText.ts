@@ -41,6 +41,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { convertError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { useEffect, useMemo, useState } from "react";
 
 import { logger } from "../services/logger";
@@ -121,7 +122,7 @@ export function useDynamicHelpText(
 
                     const errorMessage =
                         wasError && trimmedMessage.length > 0
-                            ? normalizedError.message
+                            ? getUserFacingErrorDetail(caughtError)
                             : "Help text unavailable";
                     setError(errorMessage);
                     setHelpTexts({

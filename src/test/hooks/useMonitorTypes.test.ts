@@ -7,6 +7,7 @@ import type { MonitorTypeOption } from "@shared/types/monitorTypes";
 
 import { fc, test } from "@fast-check/vitest";
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -275,6 +276,36 @@ describe("useMonitorTypes Hook", () => {
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to load monitor types from backend",
                 new Error("[object Object]")
+            );
+        });
+
+        it("should sanitize Error messages before exposing hook state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useMonitorTypes", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Security", "type");
+
+            const error = new Error(
+                "Monitor type fetch failed\r\nAuthorization Bearer monitor-secret"
+            );
+            mockGetMonitorTypeOptions.mockRejectedValue(error);
+
+            const { result } = renderHook(() => useMonitorTypes());
+
+            await waitFor(() => {
+                expect(result.current.isLoading).toBeFalsy();
+            });
+
+            expect(result.current.error).toBe(
+                "Monitor types loading failed: Monitor type fetch failed Authorization [redacted]. Using fallback options."
+            );
+            expect(result.current.error).not.toContain("monitor-secret");
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to load monitor types from backend",
+                error
             );
         });
 
@@ -765,7 +796,7 @@ describe("useMonitorTypes Hook", () => {
             const trimmedMessage = testError.message.trim();
             const fallbackMessage =
                 trimmedMessage.length > 0
-                    ? trimmedMessage
+                    ? getUserFacingErrorDetail(testError)
                     : "Failed to load monitor types";
             const expectedMessage = `Monitor types loading failed: ${fallbackMessage}. Using fallback options.`;
             expect(result.current.error).toBe(expectedMessage);

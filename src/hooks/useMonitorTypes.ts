@@ -43,6 +43,7 @@
 import type { MonitorType } from "@shared/types";
 
 import { convertError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { useCallback, useRef, useState } from "react";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
@@ -113,9 +114,13 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             const { error: normalizedError, wasError } =
                 convertError(loadError);
             const trimmedMessage = normalizedError.message.trim();
+            const userFacingMessage =
+                trimmedMessage.length > 0
+                    ? getUserFacingErrorDetail(loadError)
+                    : undefined;
             const errorMessage =
-                wasError && trimmedMessage.length > 0
-                    ? trimmedMessage
+                wasError && userFacingMessage
+                    ? userFacingMessage
                     : "Failed to load monitor types";
             const contextualError = `Monitor types loading failed: ${errorMessage}. Using fallback options.`;
             setError(contextualError);

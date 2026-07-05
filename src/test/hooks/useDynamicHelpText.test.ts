@@ -153,6 +153,38 @@ describe("useDynamicHelpText Hook", () => {
             );
         });
 
+        it("should sanitize Error messages before exposing hook state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useDynamicHelpText", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Security", "type");
+
+            const error = new Error(
+                "Help lookup failed\r\nAuthorization Bearer help-secret"
+            );
+            vi.mocked(getMonitorHelpTexts).mockRejectedValue(error);
+
+            const { result } = renderHook(() => useDynamicHelpText("http"));
+
+            await waitFor(() => {
+                expect(result.current.isLoading).toBeFalsy();
+            });
+
+            expect(result.current.error).toBe(
+                "Help lookup failed Authorization [redacted]"
+            );
+            expect(result.current.error).not.toContain("help-secret");
+            expect(result.current.primary).toBe(
+                "Help text could not be loaded"
+            );
+            expect(result.current.secondary).toBe(
+                "Please check your connection and try again"
+            );
+        });
+
         it("should handle non-Error objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useDynamicHelpText", "component");
