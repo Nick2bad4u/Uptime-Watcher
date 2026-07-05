@@ -43,9 +43,10 @@ import {
     type EscapeKeyModalConfig,
     useEscapeKeyModalHandler,
 } from "@shared/utils/modalHandlers";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
+import { useDelayedClose } from "../../hooks/ui/useDelayedClose";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import {
@@ -53,7 +54,6 @@ import {
     formatFullTimestamp,
     formatResponseTime,
 } from "../../utils/time";
-import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
@@ -101,15 +101,9 @@ export const SiteDetails = ({
 }: SiteDetailsProperties): JSX.Element | null => {
     const { currentTheme, isDark } = useTheme();
     const { getAvailabilityDescription } = useAvailabilityColors();
-    const [isClosing, setIsClosing] = useState(false);
-
-    const handleClose = useCallback((): void => {
-        setIsClosing(true);
-        void (async (): Promise<void> => {
-            await waitForAnimation();
-            onClose();
-        })();
-    }, [onClose]);
+    const { isClosing, requestClose: handleClose } = useDelayedClose({
+        onClose,
+    });
 
     // Add global escape key handler
     const modalConfigs = useMemo<EscapeKeyModalConfig[]>(

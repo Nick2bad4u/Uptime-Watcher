@@ -12,6 +12,7 @@ import type { AppSettings } from "../../stores/types";
 import type { BackupSummary } from "./sections/BackupSummary";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
+import { useDelayedClose } from "../../hooks/ui/useDelayedClose";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { logger } from "../../services/logger";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
@@ -20,7 +21,6 @@ import { isThemeName, type ThemeName } from "../../theme/types";
 import { UiDefaults } from "../../utils/fallbacks";
 import { formatByteSize } from "../../utils/formatting/formatByteSize";
 import { AppIcons } from "../../utils/icons";
-import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { SettingsAlertVolumeControl } from "./sections/SettingsAlertVolumeControl";
 import { useInAppAlertTonePreview } from "./useInAppAlertTonePreview";
@@ -151,7 +151,9 @@ export const useSettingsController = ({
     } = useSettingsModel();
 
     const [syncSuccess, setSyncSuccess] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);
+    const { isClosing, requestClose: handleClose } = useDelayedClose({
+        onClose,
+    });
     const restoreFileInputRef = useRef<HTMLInputElement | null>(null);
 
     const {
@@ -696,14 +698,8 @@ export const useSettingsController = ({
         [handleRestoreFileChange]
     );
 
-    const handleClose = useCallback(async () => {
-        setIsClosing(true);
-        await waitForAnimation();
-        onClose();
-    }, [onClose]);
-
     const handleCloseButtonClick = useCallback(() => {
-        void handleClose();
+        handleClose();
     }, [handleClose]);
 
     const handleSyncNowClick = useCallback(() => {

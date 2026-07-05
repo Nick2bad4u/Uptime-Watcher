@@ -13,13 +13,13 @@
  * @packageDocumentation
  */
 
-import { memo, type NamedExoticComponent, useCallback, useState } from "react";
+import { memo, type NamedExoticComponent, useCallback } from "react";
 
+import { useDelayedClose } from "../../hooks/ui/useDelayedClose";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
-import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { AddSiteForm } from "./AddSiteForm";
 import "./AddSiteModal.css";
 
@@ -49,15 +49,10 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
         const { isDark } = useTheme();
         const CloseIcon = AppIcons.ui.close;
         const AddIcon = AppIcons.actions.add;
-        const [isClosing, setIsClosing] = useState(false);
-
-        const handleClose = useCallback((): void => {
-            setIsClosing(true);
-            void (async (): Promise<void> => {
-                await waitForAnimation(300);
-                onClose();
-            })();
-        }, [onClose]);
+        const { isClosing, requestClose: handleClose } = useDelayedClose({
+            delayMs: 300,
+            onClose,
+        });
 
         const handleCloseButtonClick = useCallback((): void => {
             handleClose();
