@@ -17,13 +17,14 @@ import {
     getOwnStringDataProperty,
 } from "@shared/utils/errorPropertyAccess";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { isObject } from "@shared/utils/typeGuards";
 import {
     formatZodIssues,
     type ZodIssueLike,
     type ZodIssuePathPart,
 } from "@shared/utils/zodIssueFormatting";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import { arrayJoin } from "ts-extras";
 
 const MAX_RENDERER_SERVICE_DIAGNOSTICS_CHARS = 1000;
 
@@ -42,6 +43,15 @@ const getOwnArrayDataProperty = (
         : undefined;
 };
 
+const isZodIssuePathPart = (value: unknown): value is ZodIssuePathPart => {
+    const valueType = typeof value;
+    return (
+        valueType === "number" ||
+        valueType === "string" ||
+        valueType === "symbol"
+    );
+};
+
 const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
     const normalized: ZodIssueLike[] = [];
 
@@ -55,8 +65,10 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
         if (rawMessage) {
             const rawPath = getOwnDataProperty(issue, "path");
             const path =
-                rawPath.found && Array.isArray(rawPath.value)
-                    ? safeCastTo<readonly ZodIssuePathPart[]>(rawPath.value)
+                rawPath.found &&
+                Array.isArray(rawPath.value) &&
+                rawPath.value.every(isZodIssuePathPart)
+                    ? rawPath.value
                     : undefined;
 
             if (path) {
@@ -138,10 +150,7 @@ const normalizeDiagnostics = (
 
         const compacted = serialized.replaceAll(/\s+/gu, " ");
         const truncated = truncateDiagnostics(compacted);
-        const normalizedRecord =
-            isObject(normalized) && !Array.isArray(normalized)
-                ? safeCastTo<UnknownRecord>(normalized)
-                : undefined;
+        const normalizedRecord = isRecord(normalized) ? normalized : undefined;
 
         return {
             details:
@@ -243,9 +252,7 @@ export function validateServicePayload<T>(
     })();
 
     if (!parsed.success) {
-        const errorForEnsure = safeCastTo<{ readonly error: unknown }>(
-            parsed
-        ).error;
+        const errorForEnsure = parsed.error;
         const rawIssues = getOwnArrayDataProperty(errorForEnsure, "issues");
         const issues = rawIssues ? normalizeZodIssueLikeArray(rawIssues) : [];
 
