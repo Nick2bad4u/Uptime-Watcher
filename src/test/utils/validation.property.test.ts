@@ -26,6 +26,7 @@
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import { MONITOR_STATUS_VALUES, type MonitorStatus } from "@shared/types";
 import { validateMonitorType } from "@shared/utils/validation";
 import { getMonitorValidationErrors } from "@shared/validation/monitorSchemas";
 // Import functions from shared validation utilities
@@ -53,6 +54,9 @@ const MIN_PORT = 1;
 const MAX_PORT = 65_535;
 const MIN_RETRY_ATTEMPTS = 0;
 const MAX_RETRY_ATTEMPTS = 10;
+const validMonitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
 
 describe("validation Utils Property-Based Tests", () => {
     describe("isNonEmptyString function", () => {
@@ -565,12 +569,7 @@ describe("validation Utils Property-Based Tests", () => {
                             max: MAX_RETRY_ATTEMPTS,
                             min: MIN_RETRY_ATTEMPTS,
                         }),
-                        status: fc.constantFrom(
-                            "up",
-                            "down",
-                            "paused",
-                            "pending"
-                        ),
+                        status: validMonitorStatusArbitrary,
                         timeout: fc.integer({
                             max: MAX_TIMEOUT,
                             min: MIN_TIMEOUT,
@@ -616,12 +615,7 @@ describe("validation Utils Property-Based Tests", () => {
                             max: MAX_RETRY_ATTEMPTS,
                             min: MIN_RETRY_ATTEMPTS,
                         }),
-                        status: fc.constantFrom(
-                            "up",
-                            "down",
-                            "paused",
-                            "pending"
-                        ),
+                        status: validMonitorStatusArbitrary,
                         timeout: fc.integer({
                             max: MAX_TIMEOUT,
                             min: MIN_TIMEOUT,
@@ -664,12 +658,7 @@ describe("validation Utils Property-Based Tests", () => {
                             max: MAX_RETRY_ATTEMPTS,
                             min: MIN_RETRY_ATTEMPTS,
                         }),
-                        status: fc.constantFrom(
-                            "up",
-                            "down",
-                            "paused",
-                            "pending"
-                        ),
+                        status: validMonitorStatusArbitrary,
                         timeout: fc.integer({
                             max: MAX_TIMEOUT,
                             min: MIN_TIMEOUT,
@@ -718,12 +707,7 @@ describe("validation Utils Property-Based Tests", () => {
                             max: MAX_RETRY_ATTEMPTS,
                             min: MIN_RETRY_ATTEMPTS,
                         }),
-                        status: fc.constantFrom(
-                            "up",
-                            "down",
-                            "paused",
-                            "pending"
-                        ),
+                        status: validMonitorStatusArbitrary,
                         timeout: fc.integer({
                             max: MAX_TIMEOUT,
                             min: MIN_TIMEOUT,
@@ -841,7 +825,7 @@ describe("validation Utils Property-Based Tests", () => {
                     max: MAX_RETRY_ATTEMPTS,
                     min: MIN_RETRY_ATTEMPTS,
                 }),
-                status: fc.constantFrom("up", "down"),
+                status: validMonitorStatusArbitrary,
                 timeout: fc.integer({ max: MAX_TIMEOUT, min: MIN_TIMEOUT }),
                 type: fc.constant("http"),
                 url: fc.constant("https://example.com"),
@@ -871,7 +855,7 @@ describe("validation Utils Property-Based Tests", () => {
                     max: MAX_RETRY_ATTEMPTS,
                     min: MIN_RETRY_ATTEMPTS,
                 }),
-                status: fc.constantFrom("up", "down"),
+                status: validMonitorStatusArbitrary,
                 timeout: fc.integer({ max: MAX_TIMEOUT, min: MIN_TIMEOUT }),
                 type: fc.constant("port"),
             }),
