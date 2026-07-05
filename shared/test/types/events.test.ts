@@ -58,4 +58,64 @@ describe("events", () => {
 
         expect(parsed.success).toBeTruthy();
     });
+
+    it("rejects state sync event site identifiers with control characters", () => {
+        for (const eventData of [
+            {
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                revision: 1,
+                siteCount: 0,
+                siteIdentifier: "site\n1",
+                sites: [],
+                source: STATE_SYNC_SOURCE.DATABASE,
+                timestamp: 1,
+            },
+            {
+                action: STATE_SYNC_ACTION.UPDATE,
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: [],
+                    updatedSites: [],
+                },
+                revision: 2,
+                siteIdentifier: "site\n2",
+                source: STATE_SYNC_SOURCE.DATABASE,
+                timestamp: 2,
+            },
+            {
+                action: STATE_SYNC_ACTION.DELETE,
+                delta: {
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-3"],
+                    updatedSites: [],
+                },
+                revision: 3,
+                siteIdentifier: "site\n3",
+                source: STATE_SYNC_SOURCE.DATABASE,
+                timestamp: 3,
+            },
+        ]) {
+            const parsed = safeParseStateSyncEventData(eventData);
+
+            expect(parsed.success).toBeFalsy();
+        }
+    });
+
+    it("preserves valid state sync event site identifiers exactly", () => {
+        const parsed = safeParseStateSyncEventData({
+            action: STATE_SYNC_ACTION.UPDATE,
+            delta: {
+                addedSites: [],
+                removedSiteIdentifiers: [],
+                updatedSites: [],
+            },
+            revision: 1,
+            siteIdentifier: " site-a ",
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: 1,
+        });
+
+        expect(parsed.success).toBeTruthy();
+        expect(parsed.data?.siteIdentifier).toBe(" site-a ");
+    });
 });

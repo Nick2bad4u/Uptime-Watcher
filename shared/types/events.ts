@@ -25,6 +25,7 @@ import type {
     ValueOf,
 } from "type-fest";
 
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { siteSchema } from "@shared/validation/siteSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { isEmpty, objectValues } from "ts-extras";
@@ -236,7 +237,7 @@ const bulkStateSyncEventDataSchema = baseEventDataSchema
         action: z.literal(STATE_SYNC_ACTION.BULK_SYNC),
         revision: z.int().nonnegative(),
         siteCount: z.int().nonnegative(),
-        siteIdentifier: z.string().trim().min(1).optional(),
+        siteIdentifier: siteIdentifierSchema.optional(),
         sites: stateSyncSitesArraySchema,
         source: stateSyncSourceSchema,
         truncated: z.boolean().optional(),
@@ -268,7 +269,7 @@ const updateStateSyncEventDataSchema = baseEventDataSchema
         action: z.literal(STATE_SYNC_ACTION.UPDATE),
         delta: siteSyncDeltaSchema,
         revision: z.int().nonnegative(),
-        siteIdentifier: z.string().trim().min(1).optional(),
+        siteIdentifier: siteIdentifierSchema.optional(),
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),
     })
@@ -282,7 +283,7 @@ const deleteStateSyncEventDataSchema = baseEventDataSchema
         action: z.literal(STATE_SYNC_ACTION.DELETE),
         delta: siteSyncDeltaSchema,
         revision: z.int().nonnegative(),
-        siteIdentifier: z.string().trim().min(1).optional(),
+        siteIdentifier: siteIdentifierSchema.optional(),
         source: stateSyncSourceSchema,
         truncated: z.literal(false).optional(),
     })
