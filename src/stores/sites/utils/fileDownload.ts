@@ -30,6 +30,8 @@ const FILE_DOWNLOAD_WARN_LOGGER: BrowserDownloadWarnLogger = {
 };
 
 const DEFAULT_DOWNLOAD_FILE_NAME = "download.bin";
+const DEFAULT_BACKUP_FILE_NAME_PREFIX = "backup";
+const DEFAULT_BACKUP_FILE_NAME_EXTENSION = "sqlite";
 
 const WINDOWS_RESERVED_FILE_NAMES = new Set([
     "aux",
@@ -261,11 +263,14 @@ export function downloadFile(options: FileDownloadOptions): void {
  * @public
  */
 export function generateBackupFileName(
-    prefix = "backup",
-    extension = "sqlite"
+    prefix: string = DEFAULT_BACKUP_FILE_NAME_PREFIX,
+    extension: string = DEFAULT_BACKUP_FILE_NAME_EXTENSION
 ): string {
     const [timestamp] = stringSplit(new Date().toISOString(), "T");
-    return `${prefix}-${timestamp}.${extension}`;
+    const generatedFileName = `${prefix}-${timestamp}.${extension}`;
+    const fallbackFileName = `${DEFAULT_BACKUP_FILE_NAME_PREFIX}-${timestamp}.${DEFAULT_BACKUP_FILE_NAME_EXTENSION}`;
+
+    return normalizeDownloadFileName(generatedFileName, fallbackFileName);
 }
 
 function hasReservedFileNameCharacter(fileName: string): boolean {

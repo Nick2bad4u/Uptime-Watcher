@@ -34,6 +34,8 @@ vi.mock("../../../../services/logger", () => ({
 
 const SAFE_DOWNLOAD_FILE_NAME_CHARACTERS =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _().-";
+const SAFE_BACKUP_FILE_EXTENSION_CHARACTERS =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 
 const isSafeDownloadFileName = (fileName: string): boolean => {
     const trimmedFileName = fileName.trim();
@@ -80,6 +82,26 @@ const safeLongFileNameArbitrary = fc
     })
     .map((characters) => arrayJoin(characters, ""))
     .filter(isSafeDownloadFileName);
+
+const safeBackupPrefixArbitrary = fc
+    .array(fc.constantFrom(...SAFE_DOWNLOAD_FILE_NAME_CHARACTERS), {
+        maxLength: 20,
+        minLength: 0,
+    })
+    .map((characters) => arrayJoin(characters, ""))
+    .filter((prefix) =>
+        isSafeDownloadFileName(`${prefix}-2000-01-01.sqlite`)
+    );
+
+const safeBackupExtensionArbitrary = fc
+    .array(fc.constantFrom(...SAFE_BACKUP_FILE_EXTENSION_CHARACTERS), {
+        maxLength: 10,
+        minLength: 1,
+    })
+    .map((characters) => arrayJoin(characters, ""))
+    .filter((extension) =>
+        isSafeDownloadFileName(`backup-2000-01-01.${extension}`)
+    );
 
 describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
     // Mock DOM APIs
@@ -378,8 +400,8 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
         it("should generate backup filenames with valid inputs", () => {
             fc.assert(
                 fc.property(
-                    fc.option(fc.string({ minLength: 1, maxLength: 20 })),
-                    fc.option(fc.string({ minLength: 1, maxLength: 10 })),
+                    fc.option(safeBackupPrefixArbitrary),
+                    fc.option(safeBackupExtensionArbitrary),
                     (prefix, extension) => {
                         const fileName = generateBackupFileName(
                             prefix ?? undefined,
@@ -390,19 +412,39 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expect(fileName).toMatch(/\d{4}-\d{2}-\d{2}/v);
 
                         // Should use provided prefix or default
-                        const expectedPrefix = prefix || "backup";
+                        const expectedPrefix = prefix ?? "backup";
                         expect(
                             fileName.startsWith(expectedPrefix)
                         ).toBeTruthy();
 
                         // Should use provided extension or default
-                        const expectedExtension = extension || "sqlite";
+                        const expectedExtension = extension ?? "sqlite";
                         expect(
                             fileName.endsWith(`.${expectedExtension}`)
                         ).toBeTruthy();
                     }
                 )
             );
+        });
+
+        it("should fall back when generated backup filenames are unsafe", () => {
+            const unsafeCases = [
+                ["../backup", "sqlite"],
+                [String.raw`..\backup`, "sqlite"],
+                [" backup", "sqlite"],
+                ["backup", ""],
+                ["backup", "db."],
+                ["backup", "db\nsqlite"],
+                ["backup", "db:sqlite"],
+            ] as const;
+
+            for (const [prefix, extension] of unsafeCases) {
+                const fileName = generateBackupFileName(prefix, extension);
+
+                expect(fileName).toMatch(
+                    /^backup-\d{4}-\d{2}-\d{2}\.sqlite$/v
+                );
+            }
         });
 
         it("should generate consistent filename format", () => {

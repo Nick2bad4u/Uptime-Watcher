@@ -10,6 +10,7 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import { test } from "@fast-check/vitest";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import * as fc from "fast-check";
+import { arrayJoin } from "ts-extras";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import {
@@ -69,6 +70,29 @@ const isSafeDownloadFileName = (fileName: string): boolean => {
 const safeFileNameArbitrary = fc
     .string({ maxLength: 100, minLength: 1 })
     .filter(isSafeDownloadFileName);
+
+const SAFE_BACKUP_FILE_NAME_PART_CHARACTERS =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
+
+const safeBackupPrefixArbitrary = fc
+    .array(fc.constantFrom(...SAFE_BACKUP_FILE_NAME_PART_CHARACTERS), {
+        maxLength: 50,
+        minLength: 0,
+    })
+    .map((characters) => arrayJoin(characters, ""))
+    .filter((prefix) =>
+        isSafeDownloadFileName(`${prefix}-2000-01-01.sqlite`)
+    );
+
+const safeBackupExtensionArbitrary = fc
+    .array(fc.constantFrom(...SAFE_BACKUP_FILE_NAME_PART_CHARACTERS), {
+        maxLength: 20,
+        minLength: 1,
+    })
+    .map((characters) => arrayJoin(characters, ""))
+    .filter((extension) =>
+        isSafeDownloadFileName(`backup-2000-01-01.${extension}`)
+    );
 
 describe("file Download Utility", () => {
     let mockAnchor: any;
@@ -573,7 +597,7 @@ describe("file Download Utility", () => {
 
             const result = generateBackupFileName("", "");
 
-            expect(result).toMatch(/^-\d{4}-\d{2}-\d{2}\.$/u);
+            expect(result).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/u);
         });
 
         it("should handle special characters in parameters", async ({
@@ -590,12 +614,29 @@ describe("file Download Utility", () => {
             expect(result).toMatch(/^test-app-\d{4}-\d{2}-\d{2}\.db\.sqlite$/u);
         });
 
+        it.each([
+            ["../backup", "sqlite"],
+            [String.raw`..\backup`, "sqlite"],
+            [" backup", "sqlite"],
+            ["backup", ""],
+            ["backup", "db."],
+            ["backup", "db\nsqlite"],
+            ["backup", "db:sqlite"],
+        ])(
+            "should fall back when generated filename parts are unsafe: %s %s",
+            (prefix, extension) => {
+                const result = generateBackupFileName(prefix, extension);
+
+                expect(result).toMatch(
+                    /^backup-\d{4}-\d{2}-\d{2}\.sqlite$/u
+                );
+            }
+        );
+
         describe("property-based Tests", () => {
             test.prop([
-                fc.string({ maxLength: 50 }).filter((s) => !s.includes("-")),
-                fc
-                    .string({ maxLength: 20 })
-                    .filter((s) => !s.includes(".") && s.length > 0),
+                safeBackupPrefixArbitrary,
+                safeBackupExtensionArbitrary,
             ])(
                 "should generate filename with custom prefix and extension",
                 (prefix, extension) => {
