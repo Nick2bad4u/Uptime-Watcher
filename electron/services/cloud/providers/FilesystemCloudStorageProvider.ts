@@ -14,7 +14,7 @@ import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { isPresent, stringSplit } from "ts-extras";
+import { stringSplit } from "ts-extras";
 
 import type {
     CloudObjectEntry,
@@ -153,6 +153,19 @@ export class FilesystemCloudStorageProvider
         return normalized;
     }
 
+    private static resolvePrefixPath(root: string, prefix: string): string {
+        if (!prefix) {
+            return root;
+        }
+
+        const absolutePath = path.resolve(
+            root,
+            ...stringSplit(prefix, "/").filter(Boolean)
+        );
+        assertSubpath(root, absolutePath);
+        return absolutePath;
+    }
+
     private async getAppRootRealPath(): Promise<string> {
         await this.ensureAppRoot();
         const currentRealPath = await fs.realpath(this.appRoot);
@@ -254,6 +267,26 @@ export class FilesystemCloudStorageProvider
             const root = await this.getAppRootRealPath();
             const normalizedPrefix =
                 FilesystemCloudStorageProvider.normalizePrefix(prefix);
+            const startDirectory = FilesystemCloudStorageProvider.resolvePrefixPath(
+                root,
+                normalizedPrefix
+            );
+            const startStat = await fs.lstat(startDirectory).catch(() => null);
+
+            if (!startStat) {
+                return [];
+            }
+
+            if (startStat.isSymbolicLink()) {
+                throw new Error(
+                    `Refusing to list cloud objects via symlinked prefix: ${normalizedPrefix}`
+                );
+            }
+
+            if (!startStat.isDirectory()) {
+                return [];
+            }
+
             const results: CloudObjectEntry[] = [];
 
             const walk = async (directory: string): Promise<void> => {
@@ -264,39 +297,31 @@ export class FilesystemCloudStorageProvider
                     return;
                 }
 
-                const candidateSubdirs = entries
-                    .filter((entry) => entry.isDirectory())
-                    .map((entry) => path.join(directory, entry.name));
+                for (const entry of entries) {
+                    const absolute = path.join(directory, entry.name);
 
-                const subdirCandidates = await Promise.all(
-                    candidateSubdirs.map(async (absolutePath) => {
+                    if (entry.isDirectory()) {
+                        // eslint-disable-next-line no-await-in-loop -- Filesystem provider listing intentionally stats directories sequentially to bound provider IO.
                         const stat = await fs
-                            .lstat(absolutePath)
+                            .lstat(absolute)
                             .catch(() => null);
 
                         if (!stat) {
-                            return null;
+                            continue;
                         }
 
-                        if (stat.isSymbolicLink()) {
-                            return null;
+                        if (stat.isDirectory() && !stat.isSymbolicLink()) {
+                            // eslint-disable-next-line no-await-in-loop -- Filesystem provider listing intentionally walks sequentially to bound provider IO.
+                            await walk(absolute);
                         }
 
-                        return stat.isDirectory() ? absolutePath : null;
-                    })
-                );
+                        continue;
+                    }
 
-                const subdirs = subdirCandidates.filter(isPresent);
-
-                const filePaths = entries
-                    .filter((entry) => entry.isFile())
-                    .map((entry) => path.join(directory, entry.name));
-
-                const fileEntries = await Promise.all(
-                    filePaths.map(async (absolute) => {
+                    if (entry.isFile()) {
                         const key = toPosixKey(root, absolute);
                         if (!key.startsWith(normalizedPrefix)) {
-                            return null;
+                            continue;
                         }
 
                         // Ensure the derived key is already canonical.
@@ -312,30 +337,27 @@ export class FilesystemCloudStorageProvider
                                     key
                                 );
                             if (normalizedKey !== key) {
-                                return null;
+                                continue;
                             }
                         } catch {
-                            return null;
+                            continue;
                         }
 
                         try {
-                            return await toCloudObjectEntry(key, absolute);
+                            // eslint-disable-next-line no-await-in-loop -- Filesystem provider listing intentionally stats files sequentially to bound provider IO.
+                            const cloudEntry = await toCloudObjectEntry(
+                                key,
+                                absolute
+                            );
+                            results.push(cloudEntry);
                         } catch {
-                            return null;
+                            continue;
                         }
-                    })
-                );
-
-                for (const entry of fileEntries) {
-                    if (entry) {
-                        results.push(entry);
                     }
                 }
-
-                await Promise.all(subdirs.map((dir) => walk(dir)));
             };
 
-            await walk(root);
+            await walk(startDirectory);
 
             results.sort((a, b) => a.key.localeCompare(b.key));
             return results;
