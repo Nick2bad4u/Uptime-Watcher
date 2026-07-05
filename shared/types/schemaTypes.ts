@@ -234,7 +234,7 @@ export type ServerHeartbeatMonitorSchemaType = MonitorSchema<{
  * @public
  */
 export type SiteSchemaType = z.ZodObject<{
-    identifier: z.ZodString;
+    identifier: z.ZodType<string>;
     monitoring: z.ZodBoolean;
     monitors: z.ZodArray<MonitorSchemaType>;
     name: z.ZodString;
@@ -274,7 +274,7 @@ interface BaseMonitorSchemaShape {
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
     history: HistoryArray;
-    id: z.ZodString;
+    id: z.ZodType<string>;
     lastChecked: z.ZodOptional<z.ZodDate>;
     monitoring: z.ZodBoolean;
     responseTime: z.ZodNumber;

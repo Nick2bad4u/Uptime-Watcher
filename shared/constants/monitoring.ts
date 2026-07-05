@@ -24,6 +24,18 @@ export const DEFAULT_MONITOR_CHECK_INTERVAL_MS = 300_000;
 export const MIN_MONITOR_CHECK_INTERVAL_MS = 5000;
 
 /**
+ * Maximum number of edge endpoints a CDN edge consistency monitor may check in
+ * a single run.
+ *
+ * @remarks
+ * Keeps one monitor from launching an unbounded number of parallel HTTP
+ * requests when data is imported, restored, or manually edited outside the UI.
+ *
+ * @public
+ */
+export const MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS = 20;
+
+/**
  * Determines whether a monitor check interval requires remediation.
  *
  * @param interval - The interval value to evaluate.

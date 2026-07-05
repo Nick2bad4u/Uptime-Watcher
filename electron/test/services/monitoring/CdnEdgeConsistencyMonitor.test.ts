@@ -4,6 +4,7 @@
 
 import type { Site } from "@shared/types";
 
+import { MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS } from "@shared/constants/monitoring";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CdnEdgeConsistencyMonitor } from "../../../services/monitoring/CdnEdgeConsistencyMonitor";
@@ -214,5 +215,22 @@ describe("CdnEdgeConsistencyMonitor service", () => {
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Baseline URL");
+    });
+
+    it("rejects excessive edge endpoint lists before making requests", async () => {
+        const edgeLocations = Array.from(
+            { length: MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS + 1 },
+            (_, index) => `https://edge-${index}.example.com/status`
+        ).join("\n");
+
+        monitor = createMonitor({ edgeLocations });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toBe(
+            `CDN edge consistency monitors support up to ${MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS} edge endpoints`
+        );
+        expect(httpGetMock).not.toHaveBeenCalled();
     });
 });

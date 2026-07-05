@@ -12,7 +12,10 @@
 
 import type { BaseMonitorSchemaType } from "@shared/types/schemaTypes";
 
-import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import {
+    MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS,
+    MIN_MONITOR_CHECK_INTERVAL_MS,
+} from "@shared/constants/monitoring";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import {
     arrayIncludes,
@@ -382,7 +385,15 @@ const edgeLocationListSchema = z
         return entries.every((entry) =>
             isUrlWithAllowedProtocols(entry, ["http", "https"])
         );
-    }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines");
+    }, "Edge endpoints must be valid HTTP or HTTPS URLs separated by commas or new lines")
+    .refine((value) => {
+        const entries = value
+            .split(/[\n\r,]+/u)
+            .map((entry) => entry.trim())
+            .filter((entry) => entry.length > 0);
+
+        return entries.length <= MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS;
+    }, `CDN edge consistency monitors support up to ${MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS} edge endpoints`);
 
 /** Creates the shared base monitor schema instance. */
 export function createBaseMonitorSchema(): BaseMonitorSchemaType {

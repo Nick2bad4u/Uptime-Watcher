@@ -34,11 +34,11 @@ type MonitorStatusEnumSchema = z.ZodType<MonitorStatus>;
 type StatusUpdateSchema = z.ZodObject<{
     details: z.ZodOptional<z.ZodString>;
     monitor: MonitorSchemaType;
-    monitorId: z.ZodString;
+    monitorId: z.ZodType<string>;
     previousStatus: z.ZodOptional<MonitorStatusEnumSchema>;
     responseTime: z.ZodOptional<z.ZodNumber>;
     site: SiteSchemaType;
-    siteIdentifier: z.ZodString;
+    siteIdentifier: z.ZodType<string>;
     status: MonitorStatusEnumSchema;
     timestamp: z.ZodType<string>;
 }>;

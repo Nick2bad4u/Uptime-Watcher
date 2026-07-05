@@ -11,6 +11,7 @@
 import type { MonitorType, Site } from "@shared/types";
 import type { AxiosInstance } from "axios";
 
+import { MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS } from "@shared/constants/monitoring";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -308,6 +309,10 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         const edges = parseMonitorUrlList(monitor.edgeLocations ?? "");
         if (isEmpty(edges)) {
             return "At least one edge endpoint is required";
+        }
+
+        if (edges.length > MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS) {
+            return `CDN edge consistency monitors support up to ${MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS} edge endpoints`;
         }
 
         for (const edge of edges) {

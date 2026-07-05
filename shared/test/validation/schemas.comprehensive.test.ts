@@ -5,7 +5,10 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import {
+    MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS,
+    MIN_MONITOR_CHECK_INTERVAL_MS,
+} from "@shared/constants/monitoring";
 import { STATUS_HISTORY_VALUES, STATUS_KIND } from "@shared/types";
 import fc from "fast-check";
 import { describe, expect, it, vi } from "vitest";
@@ -2368,6 +2371,38 @@ describe("cdnEdgeConsistencyMonitorSchema", () => {
         };
 
         expect(() => cdnEdgeConsistencyMonitorSchema.parse(monitor)).toThrow();
+    });
+
+    it("should reject too many CDN edge endpoints", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: schemas", "component");
+        await annotate("Category: Validation", "category");
+        await annotate("Type: Validation", "type");
+
+        const edgeLocations = Array.from(
+            { length: MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS + 1 },
+            (_, index) => `https://edge-${index}.example.com/status`
+        ).join("\n");
+        const monitor = {
+            id: "cdn-monitor",
+            type: "cdn-edge-consistency" as const,
+            baselineUrl: "https://origin.example.com",
+            edgeLocations,
+            checkInterval: 300_000,
+            timeout: 30_000,
+            retryAttempts: 3,
+            monitoring: true,
+            status: "pending" as const,
+            responseTime: -1,
+            history: [],
+        };
+
+        expect(() => cdnEdgeConsistencyMonitorSchema.parse(monitor)).toThrow(
+            `CDN edge consistency monitors support up to ${MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS} edge endpoints`
+        );
     });
 });
 
