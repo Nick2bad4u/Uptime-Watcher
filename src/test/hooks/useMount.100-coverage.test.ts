@@ -77,4 +77,34 @@ describe("useMount - 100% Coverage Tests", () => {
 
         unmount();
     });
+
+    it("logs unmount callback errors without throwing", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMount.100-coverage", "component");
+        await annotate("Category: Hook", "category");
+        await annotate("Type: Error Handling", "type");
+
+        const cleanupError = new Error("Unmount callback error");
+        const mountCallback = vi.fn();
+        const unmountCallback = vi.fn(() => {
+            throw cleanupError;
+        });
+
+        const { unmount } = renderHook(() => {
+            useMount(mountCallback, unmountCallback);
+        });
+
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+
+        expect(unmountCallback).toHaveBeenCalledTimes(1);
+        expect(mockLogger.error).toHaveBeenCalledWith(
+            "Error in useMount cleanup:",
+            cleanupError
+        );
+    });
 });

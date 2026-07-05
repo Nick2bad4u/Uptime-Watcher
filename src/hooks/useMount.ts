@@ -108,7 +108,15 @@ export function useMount(
                 }
 
                 didCleanup = true;
-                unmountCallback?.();
+
+                try {
+                    unmountCallback?.();
+                } catch (error: unknown) {
+                    logger.error(
+                        "Error in useMount cleanup:",
+                        ensureError(error)
+                    );
+                }
             };
         },
         [mountCallback, unmountCallback]
