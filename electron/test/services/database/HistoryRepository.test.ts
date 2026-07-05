@@ -18,6 +18,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { fc } from "@fast-check/vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -52,6 +53,10 @@ describe(HistoryRepository, () => {
         status: "up",
         responseTime: 250,
     };
+
+    const statusHistoryStatusArbitrary = fc.constantFrom<
+        StatusHistory["status"]
+    >(...STATUS_HISTORY_VALUES);
 
     beforeEach(() => {
         // Mock database instance
@@ -726,7 +731,7 @@ describe(HistoryRepository, () => {
                                         min: Date.now() - 86_400_000,
                                         max: Date.now(),
                                     }),
-                                    status: fc.constantFrom("up", "down"),
+                                    status: statusHistoryStatusArbitrary,
                                     responseTime: fc.integer({
                                         min: 0,
                                         max: 10_000,
@@ -877,7 +882,7 @@ describe(HistoryRepository, () => {
                                         min: Date.now() - 604_800_000,
                                         max: Date.now(),
                                     }),
-                                    status: fc.constantFrom("up", "down"),
+                                    status: statusHistoryStatusArbitrary,
                                     responseTime: fc.integer({
                                         min: 0,
                                         max: 30_000,
@@ -1037,7 +1042,7 @@ describe(HistoryRepository, () => {
                                         min: Date.now() - 3_600_000,
                                         max: Date.now(),
                                     }),
-                                    status: fc.constantFrom("up", "down"),
+                                    status: statusHistoryStatusArbitrary,
                                     responseTime: fc.integer({
                                         min: 1,
                                         max: 10_000,
@@ -1075,7 +1080,9 @@ describe(HistoryRepository, () => {
 
                             if (result) {
                                 expect(typeof result.timestamp).toBe("number");
-                                expect(["up", "down"]).toContain(result.status);
+                                expect(STATUS_HISTORY_VALUES).toContain(
+                                    result.status
+                                );
                                 expect(typeof result.responseTime).toBe(
                                     "number"
                                 );
