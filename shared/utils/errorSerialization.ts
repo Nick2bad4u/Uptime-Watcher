@@ -3,10 +3,21 @@ import type { SerializedError } from "@shared/utils/logger/common";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { serializeError } from "@shared/utils/logger/common";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { objectEntries } from "ts-extras";
 
 type ExtendedError = Error & SerializedError;
+
+const isExtendedError = (candidate: unknown): candidate is ExtendedError =>
+    Error.isError(candidate) && typeof candidate.message === "string";
+
+const createExtendedError = (message: string): ExtendedError => {
+    const error = new Error(message);
+    if (!isExtendedError(error)) {
+        throw new TypeError("Failed to create extended error");
+    }
+
+    return error;
+};
 
 const defineAdditionalErrorProperty = (
     target: ExtendedError,
@@ -43,9 +54,7 @@ const copyAdditionalProperties = (
 };
 
 const cloneSerializedError = (payload: SerializedError): ExtendedError => {
-    const errorInstance = castUnchecked<ExtendedError>(
-        new Error(payload.message)
-    );
+    const errorInstance = createExtendedError(payload.message);
 
     if (payload.name) {
         Object.defineProperty(errorInstance, "name", {
@@ -78,7 +87,7 @@ const cloneSerializedError = (payload: SerializedError): ExtendedError => {
 };
 
 const buildFallbackError = (error: Error): ExtendedError => {
-    const fallback = castUnchecked<ExtendedError>(new Error(error.message));
+    const fallback = createExtendedError(error.message);
     Object.defineProperty(fallback, "name", {
         configurable: true,
         enumerable: false,
