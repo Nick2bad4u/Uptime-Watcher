@@ -182,7 +182,7 @@ const resolveBackendHistoryLimit = (
             : DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
     }
 
-    if (typeof rawLimit !== "number" || Number.isNaN(rawLimit)) {
+    if (typeof rawLimit !== "number" || !Number.isFinite(rawLimit)) {
         return DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
     }
 

@@ -416,6 +416,41 @@ describe(HistoryTab, () => {
             ).toHaveLength(5);
         });
 
+        it("should fall back to the default backend cap for non-finite history limits", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: HistoryTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Configuration", "type");
+
+            const settingsStoreState = {
+                settings: { historyLimit: Infinity },
+                exportSettings: vi.fn(),
+                importSettings: vi.fn(),
+                initializeSettings: vi.fn(),
+                updateSettings: vi.fn(),
+            };
+
+            mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+                typeof selector === "function"
+                    ? (
+                          selector as (
+                              state: typeof settingsStoreState
+                          ) => unknown
+                      )(settingsStoreState)
+                    : settingsStoreState
+            );
+
+            const monitor = createMockMonitor(1000);
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
+
+            const select = screen.getByRole("combobox");
+            expect(select).toHaveTextContent("500");
+            expect(select).not.toHaveTextContent("1000");
+        });
+
         it("should handle display limit dropdown changes", async ({
             task,
             annotate,
