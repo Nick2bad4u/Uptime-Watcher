@@ -332,11 +332,7 @@ const isValidHistoryEntryRow = (
 ): row is EnforcedRow<HistoryRow> => {
     const { responseTime, status, timestamp } = row;
 
-    const hasValidStatus =
-        typeof status === "string" &&
-        (status === "up" || status === "down" || status === "degraded");
-
-    if (!hasValidStatus) {
+    if (!RowValidationUtils.isValidStatus(status)) {
         return false;
     }
 

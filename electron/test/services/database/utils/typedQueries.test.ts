@@ -1627,6 +1627,23 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 expect(row).toEqual(historyRow);
             });
 
+            it("should validate degraded history rows", () => {
+                const historyRow: HistoryRow = {
+                    monitorId: "monitor-1",
+                    status: "degraded",
+                    timestamp: Date.now(),
+                };
+                mockGet.mockReturnValue(historyRow);
+
+                const row = queryHistoryRow(
+                    mockDb,
+                    "SELECT * FROM history WHERE monitor_id = ?",
+                    ["monitor-1"]
+                );
+
+                expect(row).toEqual(historyRow);
+            });
+
             it("should reject infinite string history timestamps", () => {
                 mockGet.mockReturnValue({
                     monitorId: "monitor-1",
