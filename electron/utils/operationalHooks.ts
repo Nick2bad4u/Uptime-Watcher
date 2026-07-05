@@ -66,6 +66,7 @@ import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
+import { randomUUID } from "node:crypto";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
 
@@ -300,16 +301,10 @@ type ThrowingOperationalHooksConfig<T = unknown> = Omit<
 };
 
 /**
- * Generate a unique operation ID for tracking using crypto.randomUUID().
+ * Generate a unique operation ID for tracking using node:crypto.
  */
 function generateOperationId(): OperationId {
-    if (typeof crypto.randomUUID !== "function") {
-        throw new TypeError(
-            "crypto.randomUUID is unavailable for operation ID generation"
-        );
-    }
-
-    const candidate = `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+    const candidate = `op_${Date.now()}_${randomUUID().slice(0, 8)}`;
     return operationIdSchema.parse(candidate);
 }
 

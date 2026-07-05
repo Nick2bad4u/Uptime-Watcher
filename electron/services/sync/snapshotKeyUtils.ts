@@ -13,6 +13,7 @@
  * don't drift across transports/migrations/tests.
  */
 
+import { randomUUID } from "node:crypto";
 import { isDefined, isSafeInteger, stringSplit } from "ts-extras";
 
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
@@ -26,12 +27,8 @@ export const SNAPSHOT_NONCE_HEX_CHARS = 32 as const;
  * Returns a nonce suitable for appending to a snapshot key.
  */
 export function createSnapshotNonceHex(): string {
-    if (typeof crypto.randomUUID !== "function") {
-        throw new TypeError("crypto.randomUUID is unavailable");
-    }
-
     // RandomUUID is RFC4122 (hex + dashes). Remove dashes to get 32 hex chars.
-    return crypto.randomUUID().replaceAll("-", "");
+    return randomUUID().replaceAll("-", "");
 }
 
 function isValidSnapshotNonceHex(raw: string): boolean {

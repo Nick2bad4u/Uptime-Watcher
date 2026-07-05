@@ -8,9 +8,53 @@
  * @public
  */
 
+import {
+    getCallableDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
+
 const fallbackSequence: { value: number } = {
     value: 0,
 };
+
+type RandomUuid = () => string;
+type GetRandomValues = (values: Uint32Array) => void;
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+function getCryptoObject(): object | undefined {
+    const property = getOwnPropertyValue(globalThis, "crypto");
+    return property.found && isObjectLike(property.value)
+        ? property.value
+        : undefined;
+}
+
+function getCryptoRandomUuid(cryptoObject: object): RandomUuid | undefined {
+    const candidate = getCallableDataProperty(cryptoObject, "randomUUID");
+    if (!candidate) {
+        return undefined;
+    }
+
+    return () => {
+        const value = Reflect.apply(candidate, cryptoObject, []);
+        return typeof value === "string" ? value : "";
+    };
+}
+
+function getCryptoRandomValues(
+    cryptoObject: object
+): GetRandomValues | undefined {
+    const candidate = getCallableDataProperty(cryptoObject, "getRandomValues");
+    if (!candidate) {
+        return undefined;
+    }
+
+    return (values: Uint32Array): void => {
+        Reflect.apply(candidate, cryptoObject, [values]);
+    };
+}
 
 /**
  * Generate a unique identifier string using crypto.randomUUID.
@@ -32,11 +76,13 @@ const fallbackSequence: { value: number } = {
  * @public
  */
 export function generateUuid(): string {
-    // Check if crypto and randomUUID are available
-    // Use try-catch for runtime environment detection
+    const cryptoObject = getCryptoObject();
+    const randomUuid = cryptoObject
+        ? getCryptoRandomUuid(cryptoObject)
+        : undefined;
     try {
-        if (typeof crypto.randomUUID === "function") {
-            const candidate = crypto.randomUUID();
+        if (randomUuid) {
+            const candidate = randomUuid();
             if (candidate.trim().length > 0) {
                 return candidate;
             }
@@ -85,9 +131,17 @@ function toUint32(value: number): number {
 }
 
 function tryGenerateCryptoFallbackId(): string | undefined {
+    const cryptoObject = getCryptoObject();
+    const getRandomValues = cryptoObject
+        ? getCryptoRandomValues(cryptoObject)
+        : undefined;
+    if (!getRandomValues) {
+        return undefined;
+    }
+
     try {
         const values = new Uint32Array(2);
-        crypto.getRandomValues(values);
+        getRandomValues(values);
         return (
             toBaseThirtySixSixChars(values[0] ?? 0) +
             toBaseThirtySixSixChars(values[1] ?? 0)

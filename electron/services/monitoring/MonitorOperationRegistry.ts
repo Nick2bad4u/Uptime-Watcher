@@ -15,6 +15,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { randomUUID } from "node:crypto";
 
 import { monitorLogger as logger } from "../../utils/logger";
 import { mergeAbortSignals } from "./shared/abortSignalUtils";
@@ -62,6 +63,11 @@ export interface MonitorCheckResult {
     timestamp: Date;
 }
 
+export interface MonitorOperationRegistryOptions {
+    /** UUID generator used for operation IDs. Defaults to node:crypto. */
+    readonly randomUUID?: () => string;
+}
+
 /**
  * Registry for tracking active monitoring operations.
  *
@@ -77,6 +83,12 @@ export class MonitorOperationRegistry {
         string,
         MonitorCheckOperation
     >();
+
+    private readonly randomUUID: () => string;
+
+    public constructor(options: MonitorOperationRegistryOptions = {}) {
+        this.randomUUID = options.randomUUID ?? randomUUID;
+    }
 
     /**
      * Returns whether the registry currently tracks any outstanding operation
@@ -209,7 +221,7 @@ export class MonitorOperationRegistry {
     ): { operationId: string; signal: AbortSignal } {
         let operationId: string | undefined;
         for (let attempt = 0; attempt < 5; attempt++) {
-            const candidate = crypto.randomUUID();
+            const candidate = this.randomUUID();
             if (!this.activeOperations.has(candidate)) {
                 operationId = candidate;
                 break;

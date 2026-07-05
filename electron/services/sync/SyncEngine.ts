@@ -25,6 +25,7 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import { validateSiteData } from "@shared/validation/siteSchemas";
+import { randomUUID } from "node:crypto";
 import {
     isDefined,
     isFinite as isFiniteNumber,
@@ -582,11 +583,7 @@ export class SyncEngine {
             );
         }
 
-        if (typeof crypto.randomUUID !== "function") {
-            throw new TypeError("crypto.randomUUID is unavailable");
-        }
-
-        const deviceId = crypto.randomUUID();
+        const deviceId = randomUUID();
         await this.settings.set(SETTINGS_KEY_DEVICE_ID, deviceId);
         return deviceId;
     }

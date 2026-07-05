@@ -24,6 +24,7 @@ import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
+import { generateUuid } from "../../utils/data/generateUuid";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -284,7 +285,7 @@ export const createSiteOperationsActions = (
                 // Default to HTTP monitor if none provided
                 const defaultMonitor: Partial<Monitor> = {
                     history: [],
-                    id: crypto.randomUUID(),
+                    id: generateUuid(),
                     monitoring: true,
                     status: "pending",
                     type: "http",

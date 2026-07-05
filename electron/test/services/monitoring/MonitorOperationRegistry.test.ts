@@ -52,14 +52,12 @@ describe(MonitorOperationRegistry, () => {
             mockUUIDCounter.value++;
             return `test-uuid-${mockUUIDCounter.value}`;
         });
-        vi.stubGlobal("crypto", {
+        registry = new MonitorOperationRegistry({
             randomUUID: mockRandomUUID,
         });
-        registry = new MonitorOperationRegistry();
     });
 
     afterEach(() => {
-        vi.unstubAllGlobals();
         vi.restoreAllMocks();
     });
 

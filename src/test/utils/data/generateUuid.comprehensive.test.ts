@@ -90,6 +90,51 @@ describe(generateUuid, () => {
                 restore();
             }
         });
+
+        it("should not invoke accessor-backed crypto methods", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.useFakeTimers();
+            vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
+            const now = Date.now();
+            let accessorCalls = 0;
+            const cryptoCandidate = {};
+            Object.defineProperty(cryptoCandidate, "randomUUID", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    accessorCalls += 1;
+                    return () => "hidden";
+                },
+            });
+            Object.defineProperty(cryptoCandidate, "getRandomValues", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    accessorCalls += 1;
+                    return (array: Uint32Array) => array;
+                },
+            });
+
+            const { restore } = installCryptoMock(cryptoCandidate);
+            try {
+                const result = generateUuid();
+
+                expect(accessorCalls).toBe(0);
+                expect(result).toMatch(FALLBACK_ID_REGEX);
+                expect(result).toMatch(
+                    new RegExp(String.raw`^site-[\da-z]{12}-${now}\d{3}$`)
+                );
+            } finally {
+                restore();
+            }
+        });
     });
 
     describe("fallback Behavior", () => {

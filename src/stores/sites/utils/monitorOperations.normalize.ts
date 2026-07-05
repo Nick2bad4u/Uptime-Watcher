@@ -28,6 +28,8 @@ import {
 } from "@shared/validation/validatorUtils";
 import { isFinite as isFiniteNumber, setHas } from "ts-extras";
 
+import { generateUuid } from "../../../utils/data/generateUuid";
+
 /**
  * Baseline defaults applied to every monitor regardless of type.
  */
@@ -711,9 +713,7 @@ export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
 
     // Generate a valid ID - handle empty/blank strings as missing.
     const rawId = filteredMonitor.id;
-    const validId = isNonEmptyString(rawId)
-        ? rawId.trim()
-        : crypto.randomUUID();
+    const validId = isNonEmptyString(rawId) ? rawId.trim() : generateUuid();
 
     const monitorTypeDefaults = getMonitorTypeDefaults(finalizedType);
 
