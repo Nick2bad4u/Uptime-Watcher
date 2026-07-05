@@ -1,6 +1,5 @@
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
 /**
@@ -94,6 +93,5 @@ function tryParseDropboxErrorSummaryFromObject(
             : undefined;
     }
 
-    formatZodIssues(parsed.error.issues);
     return undefined;
 }

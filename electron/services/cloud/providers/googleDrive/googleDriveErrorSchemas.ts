@@ -1,7 +1,6 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
-import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import { arrayFirst, arrayJoin, isFinite as isFiniteNumber } from "ts-extras";
 import * as z from "zod";
 
@@ -121,6 +120,5 @@ function tryParseGoogleApiErrorEnvelope(
         return parsed.data;
     }
 
-    formatZodIssues(parsed.error.issues);
     return null;
 }

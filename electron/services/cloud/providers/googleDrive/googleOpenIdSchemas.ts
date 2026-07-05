@@ -1,4 +1,3 @@
-import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import * as z from "zod";
 
 /**
@@ -34,7 +33,5 @@ export function tryParseGoogleUserInfoResponse(
     }
 
     // Do not throw: caller treats missing/invalid userinfo as "no label".
-    // Still keep this available for debugging by returning null.
-    formatZodIssues(result.error.issues);
     return null;
 }
