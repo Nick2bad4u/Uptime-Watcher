@@ -7,6 +7,8 @@ import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
+const PROTOTYPE_KEY = "__proto__" as const;
+
 function createSnapshotCandidate(): unknown {
     return {
         createdAt: 0,
@@ -52,6 +54,45 @@ describe(parseCloudSyncSnapshot, () => {
         });
 
         expect(parsed.createdAt).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
+    it("preserves prototype-named entity and field keys as own data", () => {
+        const parsed = parseCloudSyncSnapshot(
+            JSON.parse(`{
+                "createdAt": 0,
+                "snapshotVersion": 1,
+                "state": {
+                    "monitor": {},
+                    "settings": {},
+                    "site": {
+                        "__proto__": {
+                            "entityId": "__proto__",
+                            "entityType": "site",
+                            "fields": {
+                                "__proto__": {
+                                    "value": "field-value",
+                                    "write": {
+                                        "deviceId": "device-1",
+                                        "opId": 1,
+                                        "timestamp": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "syncSchemaVersion": 1
+            }`)
+        );
+
+        const site = parsed.state.site[PROTOTYPE_KEY];
+
+        expect(Object.getPrototypeOf(parsed.state.site)).toBeNull();
+        expect(Object.hasOwn(parsed.state.site, PROTOTYPE_KEY)).toBe(true);
+        expect(site?.entityId).toBe(PROTOTYPE_KEY);
+        expect(Object.getPrototypeOf(site?.fields)).toBeNull();
+        expect(Object.hasOwn(site?.fields ?? {}, PROTOTYPE_KEY)).toBe(true);
+        expect(site?.fields[PROTOTYPE_KEY]?.value).toBe("field-value");
     });
 
     it("rejects createdAt outside the Date range", () => {

@@ -10,6 +10,7 @@ import {
     cloudSyncWriteKeySchema,
     jsonValueSchema,
 } from "@shared/types/cloudSync";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
 import * as z from "zod";
@@ -28,20 +29,93 @@ const cloudSyncFieldValueSchema = z
     })
     .strict();
 
+function getEnumerableOwnStringEntries(
+    value: unknown
+): [string, unknown][] | null {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return null;
+    }
+
+    const entries: [string, unknown][] = [];
+    for (const key of Object.keys(value)) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
+        if (descriptor?.enumerable && "value" in descriptor) {
+            entries.push([key, descriptor.value]);
+        }
+    }
+
+    return entries;
+}
+
+function createSafeRecordSchema<T>(
+    valueSchema: z.ZodType<T>
+): z.ZodType<Record<string, T>> {
+    return z
+        .custom<Record<string, unknown>>(
+            (value) => getEnumerableOwnStringEntries(value) !== null,
+            "Expected a record"
+        )
+        .superRefine((value, ctx) => {
+            const entries = getEnumerableOwnStringEntries(value);
+            if (!entries) {
+                return;
+            }
+
+            for (const [key, entry] of entries) {
+                if (key.length === 0) {
+                    ctx.addIssue({
+                        code: "custom",
+                        message: "Record keys must be non-empty strings",
+                        path: [key],
+                    });
+                    continue;
+                }
+
+                const parsed = valueSchema.safeParse(entry);
+                if (!parsed.success) {
+                    for (const issue of parsed.error.issues) {
+                        ctx.addIssue({
+                            code: "custom",
+                            message: issue.message,
+                            path: [
+                                key,
+                                ...issue.path,
+                            ],
+                        });
+                    }
+                }
+            }
+        })
+        .transform((value) => {
+            const result = createNullPrototypeObject<Record<string, T>>();
+            for (const [key, entry] of getEnumerableOwnStringEntries(value) ??
+                []) {
+                Object.defineProperty(result, key, {
+                    configurable: true,
+                    enumerable: true,
+                    value: valueSchema.parse(entry),
+                    writable: true,
+                });
+            }
+
+            return result;
+        });
+}
+
 const cloudSyncEntityStateSchema = z
     .object({
         deleted: cloudSyncWriteKeySchema.optional(),
         entityId: z.string().min(1),
         entityType: cloudSyncEntityTypeSchema,
-        fields: z.record(z.string().min(1), cloudSyncFieldValueSchema),
+        fields: createSafeRecordSchema(cloudSyncFieldValueSchema),
     })
     .strict();
 
 const cloudSyncStateInternalSchema = z
     .object({
-        monitor: z.record(z.string().min(1), cloudSyncEntityStateSchema),
-        settings: z.record(z.string().min(1), cloudSyncEntityStateSchema),
-        site: z.record(z.string().min(1), cloudSyncEntityStateSchema),
+        monitor: createSafeRecordSchema(cloudSyncEntityStateSchema),
+        settings: createSafeRecordSchema(cloudSyncEntityStateSchema),
+        site: createSafeRecordSchema(cloudSyncEntityStateSchema),
     })
     .strict()
     .superRefine((state, ctx) => {
