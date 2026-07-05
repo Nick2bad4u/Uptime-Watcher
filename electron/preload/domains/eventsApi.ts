@@ -336,10 +336,9 @@ const isHistoryLimitUpdatedEventDataPayload = (
 
     const { limit, operation, previousLimit, timestamp } = payload;
 
-    // History limit semantics:
-    // - finite numbers >= 0 are valid
-    // - 0 represents "unlimited" retention (see DEFAULT_HISTORY_LIMIT_RULES)
-    if (typeof limit !== "number" || !isFiniteNumber(limit) || limit < 0) {
+    // History limit event values are emitted after shared normalization:
+    // nonnegative safe integers, with 0 representing unlimited retention.
+    if (!isNonNegativeSafeInteger(limit)) {
         return false;
     }
 
@@ -353,9 +352,7 @@ const isHistoryLimitUpdatedEventDataPayload = (
 
     return !(
         isDefined(previousLimit) &&
-        (typeof previousLimit !== "number" ||
-            !isFiniteNumber(previousLimit) ||
-            previousLimit < 0)
+        !isNonNegativeSafeInteger(previousLimit)
     );
 };
 

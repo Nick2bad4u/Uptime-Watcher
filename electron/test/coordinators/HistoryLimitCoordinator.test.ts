@@ -87,6 +87,28 @@ describe(HistoryLimitCoordinator, () => {
         expect(coordinator.getLastKnownLimit()).toBe(1000);
     });
 
+    it("ignores non-normalized numeric history limits", async () => {
+        const handler = vi.fn();
+        eventBus.on("settings:history-limit-updated", handler);
+
+        for (const invalidLimit of [
+            25.5,
+            Number.POSITIVE_INFINITY,
+            Number.MAX_SAFE_INTEGER + 1,
+        ]) {
+            await eventBus.emitTyped("internal:database:history-limit-updated", {
+                limit: invalidLimit,
+                operation: "history-limit-updated",
+                timestamp: Date.now(),
+            });
+        }
+
+        await flushAsync();
+
+        expect(handler).not.toHaveBeenCalled();
+        expect(coordinator.getLastKnownLimit()).toBe(1000);
+    });
+
     it("stops forwarding after disposal", async () => {
         const handler = vi.fn();
         eventBus.on("settings:history-limit-updated", handler);

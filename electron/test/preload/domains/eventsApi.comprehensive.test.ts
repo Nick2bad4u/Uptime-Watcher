@@ -731,6 +731,46 @@ describe("Events Domain API", () => {
                 })
             );
         });
+
+        it("should reject history limit payloads with non-normalized numeric values", () => {
+            const callback = vi.fn();
+
+            eventsApi.onHistoryLimitUpdated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            const invalidPayloads = [
+                {
+                    limit: 25.5,
+                    operation: "history-limit-updated",
+                    timestamp: Date.now(),
+                },
+                {
+                    limit: Number.MAX_SAFE_INTEGER + 1,
+                    operation: "history-limit-updated",
+                    timestamp: Date.now(),
+                },
+                {
+                    limit: 750,
+                    operation: "history-limit-updated",
+                    previousLimit: 500.5,
+                    timestamp: Date.now(),
+                },
+            ];
+
+            for (const invalidPayload of invalidPayloads) {
+                eventHandler?.({}, invalidPayload);
+            }
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledTimes(3);
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "settings:history-limit-updated",
+                    guard: "isHistoryLimitUpdatedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
     });
 
     describe("onSiteAdded", () => {
