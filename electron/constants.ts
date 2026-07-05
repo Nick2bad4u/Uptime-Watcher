@@ -86,6 +86,18 @@ export const IMPORT_SITE_VALIDATION_CONCURRENCY = 8;
 export const IMPORT_SITE_EVENT_EMIT_CONCURRENCY = 8;
 
 /**
+ * Maximum number of CDN edge endpoint requests to run at once for a single
+ * monitor check.
+ *
+ * @remarks
+ * CDN edge monitors can be configured with several user-provided endpoints.
+ * Bounding per-check network fanout avoids creating a burst of outbound HTTP
+ * requests while still allowing independent edge checks to proceed in
+ * parallel.
+ */
+export const CDN_EDGE_CONSISTENCY_CONCURRENCY = 4;
+
+/**
  * User agent string for HTTP requests.
  *
  * @remarks

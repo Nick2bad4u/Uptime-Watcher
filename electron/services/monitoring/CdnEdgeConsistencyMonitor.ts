@@ -26,7 +26,11 @@ import type {
     MonitorServiceConfig,
 } from "./types";
 
-import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
+import {
+    CDN_EDGE_CONSISTENCY_CONCURRENCY,
+    DEFAULT_REQUEST_TIMEOUT,
+} from "../../constants";
+import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createTimeoutSignal } from "./shared/abortSignalUtils";
@@ -156,12 +160,14 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             );
         }
 
-        const edgeResults = await Promise.all(
-            edgeEndpoints.map(async (endpoint): Promise<EdgeResult> => ({
+        const edgeResults = await mapWithConcurrency({
+            concurrency: CDN_EDGE_CONSISTENCY_CONCURRENCY,
+            items: edgeEndpoints,
+            task: async (endpoint): Promise<EdgeResult> => ({
                 endpoint,
                 result: await this.fetchEndpoint(endpoint, timeout, signal),
-            }))
-        );
+            }),
+        });
 
         const failureResults = edgeResults.filter(
             (entry): entry is EdgeResult & { result: EndpointFailureResult } =>

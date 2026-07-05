@@ -7,6 +7,7 @@ import type { Site } from "@shared/types";
 import { MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS } from "@shared/constants/monitoring";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { CDN_EDGE_CONSISTENCY_CONCURRENCY } from "../../../constants";
 import { CdnEdgeConsistencyMonitor } from "../../../services/monitoring/CdnEdgeConsistencyMonitor";
 
 const httpGetMock = vi.fn();
@@ -78,6 +79,53 @@ describe("CdnEdgeConsistencyMonitor service", () => {
 
         expect(result.status).toBe("up");
         expect(result.details).toContain("match baseline");
+    });
+
+    it("bounds concurrent edge endpoint requests", async () => {
+        const baselineBuffer = Buffer.from("baseline-response");
+        const edgeLocations = Array.from(
+            { length: CDN_EDGE_CONSISTENCY_CONCURRENCY + 3 },
+            (_, index) => `https://edge-${index}.example.com/status`
+        ).join("\n");
+        let activeEdgeRequests = 0;
+        let maxActiveEdgeRequests = 0;
+
+        monitor = createMonitor({ edgeLocations });
+
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url === monitor.baselineUrl) {
+                return {
+                    data: baselineBuffer,
+                    responseTime: 42,
+                    status: 200,
+                };
+            }
+
+            activeEdgeRequests += 1;
+            maxActiveEdgeRequests = Math.max(
+                maxActiveEdgeRequests,
+                activeEdgeRequests
+            );
+
+            await new Promise((resolve) => {
+                setTimeout(resolve, 1);
+            });
+
+            activeEdgeRequests -= 1;
+
+            return {
+                data: baselineBuffer,
+                responseTime: 45,
+                status: 200,
+            };
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("up");
+        expect(maxActiveEdgeRequests).toBeLessThanOrEqual(
+            CDN_EDGE_CONSISTENCY_CONCURRENCY
+        );
     });
 
     it("returns degraded when an edge response differs from the baseline", async () => {
