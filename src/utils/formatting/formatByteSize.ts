@@ -8,11 +8,11 @@
  */
 import { isFinite as isFiniteNumber } from "ts-extras";
 
+import { UiDefaults } from "../fallbacks";
+
 export function formatByteSize(bytes: number): string {
     if (!isFiniteNumber(bytes) || bytes < 0) {
-        // Preserve the historical Settings behavior: surface the raw value when
-        // the input is invalid rather than silently clamping.
-        return `${bytes}`;
+        return UiDefaults.notAvailableLabel;
     }
 
     if (bytes === 0) {

@@ -13,7 +13,7 @@ describe(formatByteSize, () => {
         expect(formatByteSize(0)).toBe("0 B");
     });
 
-    it("preserves negative/invalid inputs as raw string", async ({
+    it("returns fallback for negative/invalid inputs", async ({
         task,
         annotate,
     }) => {
@@ -22,9 +22,10 @@ describe(formatByteSize, () => {
         await annotate("Category: Formatting", "category");
         await annotate("Type: Error Handling", "type");
 
-        expect(formatByteSize(-1)).toBe("-1");
-        expect(formatByteSize(NaN)).toBe("NaN");
-        expect(formatByteSize(Infinity)).toBe("Infinity");
+        expect(formatByteSize(-1)).toBe("N/A");
+        expect(formatByteSize(NaN)).toBe("N/A");
+        expect(formatByteSize(Infinity)).toBe("N/A");
+        expect(formatByteSize(-Infinity)).toBe("N/A");
     });
 
     it("uses IEC units and stable rounding", async ({ task, annotate }) => {
@@ -51,4 +52,15 @@ describe(formatByteSize, () => {
             expect(result).toMatch(/\s(?:B|GB|KB|MB|TB)$/v);
         }
     );
+
+    test.prop([
+        fc.oneof(
+            fc.integer({ max: -1 }),
+            fc.constant(Number.NaN),
+            fc.constant(Number.POSITIVE_INFINITY),
+            fc.constant(Number.NEGATIVE_INFINITY)
+        ),
+    ])("always returns fallback for invalid values", (bytes) => {
+        expect(formatByteSize(bytes)).toBe("N/A");
+    });
 });
