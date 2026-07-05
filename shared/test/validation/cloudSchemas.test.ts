@@ -125,6 +125,46 @@ describe("cloudSchemas", () => {
         expect(parsed.success).toBeTruthy();
     });
 
+    it("accepts an empty filesystem baseDirectory for unconfigured status", () => {
+        const parsed = validateCloudStatusSummary({
+            backupsEnabled: false,
+            configured: false,
+            connected: false,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
+            provider: "filesystem",
+            providerDetails: {
+                baseDirectory: "",
+                kind: "filesystem",
+            },
+            syncEnabled: false,
+        });
+
+        expect(parsed.success).toBeTruthy();
+    });
+
+    it("rejects non-empty invalid filesystem baseDirectory details", () => {
+        const parsed = validateCloudStatusSummary({
+            backupsEnabled: false,
+            configured: false,
+            connected: false,
+            encryptionLocked: false,
+            encryptionMode: "none",
+            lastBackupAt: null,
+            lastSyncAt: null,
+            provider: "filesystem",
+            providerDetails: {
+                baseDirectory: "relative/backups",
+                kind: "filesystem",
+            },
+            syncEnabled: false,
+        });
+
+        expect(parsed.success).toBeFalsy();
+    });
+
     it("validates CloudSyncResetPreview", () => {
         const parsed = validateCloudSyncResetPreview({
             deviceIds: [],

@@ -9,6 +9,7 @@ import {
     type CloudProviderDetails,
     type CloudStatusSummary,
 } from "@shared/types/cloud";
+import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
@@ -26,7 +27,14 @@ const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> =
     z.discriminatedUnion("kind", [
         z
             .object({
-                baseDirectory: z.string().trim().min(1),
+                baseDirectory: z
+                    .string()
+                    .refine(
+                        (baseDirectory) =>
+                            baseDirectory.length === 0 ||
+                            isFilesystemBaseDirectoryValid(baseDirectory),
+                        "Filesystem base directory must be empty or a valid absolute path"
+                    ),
                 kind: z.literal(CLOUD_PROVIDER_KIND.FILESYSTEM),
             })
             .strict(),
