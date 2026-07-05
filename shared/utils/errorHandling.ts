@@ -30,8 +30,7 @@ import type { UnknownRecord } from "type-fest";
 import { sharedFallbackLogger } from "@shared/utils/logger/consoleFallback";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
-import { castUnchecked } from "@shared/utils/typeHelpers";
-import { isDefined, objectHasIn } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 /**
  * Options for constructing an {@link ApplicationError} instance.
@@ -452,11 +451,10 @@ function isFrontendStoreContext(
         return false;
     }
 
-    const candidateRecord = castUnchecked<UnknownRecord>(candidate);
     return (
-        objectHasIn(candidateRecord, "setError") &&
-        objectHasIn(candidateRecord, "clearError") &&
-        objectHasIn(candidateRecord, "setLoading")
+        Reflect.has(candidate, "setError") &&
+        Reflect.has(candidate, "clearError") &&
+        Reflect.has(candidate, "setLoading")
     );
 }
 

@@ -5,12 +5,11 @@ import {
     getErrorStringProperty,
     getOwnDataProperty,
 } from "@shared/utils/errorPropertyAccess";
-import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import {
     isDefined,
     isEmpty,
     isFinite as isFiniteNumber,
-    objectHasIn,
     setHas,
 } from "ts-extras";
 
@@ -478,7 +477,7 @@ export const isStructuredLogContext = (
 ): value is StructuredLogContext =>
     typeof value === "object" &&
     value !== null &&
-    objectHasIn(castUnchecked<UnknownRecord>(value), LOG_CONTEXT_SYMBOL);
+    Reflect.has(value, LOG_CONTEXT_SYMBOL);
 
 export const normalizeLogContext = (
     context: StructuredLogContext | undefined,

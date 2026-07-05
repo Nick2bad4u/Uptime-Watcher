@@ -241,7 +241,7 @@ describe(withErrorHandling, () => {
         expect(store.setError).toHaveBeenCalledWith("frontend fail");
         expect(warnSpy).toHaveBeenCalledTimes(4);
         expect(errorSpy).toHaveBeenCalledWith(
-            "Original operation error:",
+            "[SHARED] Original operation error",
             expect.objectContaining({ message: "frontend fail" })
         );
     });
@@ -272,15 +272,15 @@ describe(withErrorHandling, () => {
         ).rejects.toThrow("[object Object]");
 
         expect(errorSpy).toHaveBeenCalledWith(
-            "Original operation error:",
+            "[SHARED] Original operation error",
             expect.objectContaining({
                 accessToken: "[redacted]",
                 message: "failed Authorization [redacted]",
             })
         );
         expect(warnSpy).toHaveBeenCalledWith(
-            "Store operation failed for:",
-            "set error state",
+            "[SHARED] Store operation failed",
+            expect.objectContaining({ operationName: "set error state" }),
             expect.objectContaining({ message: "set error fail" })
         );
         expect(String(errorSpy.mock.calls)).not.toContain("token-secret");
@@ -335,11 +335,11 @@ describe(withErrorHandling, () => {
         ).rejects.toThrow("operation fail");
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Failed to sync",
+            "[SHARED] Failed to sync",
             expect.objectContaining({ message: "operation fail" })
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-            "Logger error during error handling:",
+            "[SHARED] Logger error during error handling",
             expect.objectContaining({ message: "logger fail" })
         );
     });
@@ -375,14 +375,14 @@ describe(withErrorHandling, () => {
         ).rejects.toMatchObject({ message: "operation failed" });
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Failed to sync",
+            "[SHARED] Failed to sync",
             expect.objectContaining({
                 message: "operation failed",
                 refreshToken: "[redacted]",
             })
         );
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-            "Logger error during error handling:",
+            "[SHARED] Logger error during error handling",
             expect.objectContaining({
                 message: "logger Authorization [redacted]",
             })
@@ -421,7 +421,7 @@ describe(withUtilityErrorHandling, () => {
 
         expect(result).toBe("fallback");
         expect(consoleSpy).toHaveBeenCalledWith(
-            "load data failed",
+            "[SHARED] load data failed",
             expect.objectContaining({ message: "boom" })
         );
     });
@@ -445,7 +445,7 @@ describe(withUtilityErrorHandling, () => {
         ).rejects.toThrow("fatal");
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "dangerous failed",
+            "[SHARED] dangerous failed",
             expect.objectContaining({ message: "fatal" })
         );
     });
@@ -464,7 +464,7 @@ describe(withUtilityErrorHandling, () => {
         ).rejects.toThrow("dangerous failed and no fallback value provided");
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "dangerous failed",
+            "[SHARED] dangerous failed",
             expect.objectContaining({ message: "fatal" })
         );
     });
