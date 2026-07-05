@@ -14,7 +14,6 @@ import {
     objectHasOwn,
     objectKeys,
     objectValues,
-    safeCastTo,
     setHas,
 } from "ts-extras";
 
@@ -215,25 +214,23 @@ function normalizeDiagnosticValue(value: unknown): unknown {
  *
  * @returns New object without the specified keys
  */
-export interface SafeObjectOmit {
-    /**
-     * Omitting keys from a nullish input yields an empty object.
-     */
-    (
-        obj: null | undefined,
-        keys: readonly PropertyKey[]
-    ): Record<string, never>;
+/**
+ * Omitting keys from a nullish input yields an empty object.
+ */
+export function safeObjectOmit(
+    obj: null | undefined,
+    keys: readonly PropertyKey[]
+): Record<string, never>;
 
-    /**
-     * Omits the provided keys from the object.
-     */
-    <T extends object, K extends keyof T>(
-        obj: null | T | undefined,
-        keys: readonly K[]
-    ): Except<T, K>;
-}
+/**
+ * Omits the provided keys from the object.
+ */
+export function safeObjectOmit<T extends object, K extends keyof T>(
+    obj: null | T | undefined,
+    keys: readonly K[]
+): Except<T, K>;
 
-function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
+export function safeObjectOmit<T extends object, K extends PropertyKey>(
     obj: null | T | undefined,
     keys: readonly K[]
 ): Except<T, Extract<K, keyof T>> | Record<string, never> {
@@ -294,9 +291,6 @@ function safeObjectOmitImpl<T extends object, K extends PropertyKey>(
 
     return result;
 }
-
-export const safeObjectOmit: SafeObjectOmit =
-    safeCastTo<SafeObjectOmit>(safeObjectOmitImpl);
 
 /**
  * Create a type-safe subset of an object with only specified keys.
@@ -399,7 +393,7 @@ export function typedObjectEntries<T extends UnknownRecord>(
  * @returns Array of keys with proper typing
  */
 export function typedObjectKeys<T extends UnknownRecord>(obj: T): (keyof T)[] {
-    return safeCastTo<(keyof T)[]>(objectKeys(obj));
+    return castUnchecked<(keyof T)[]>(objectKeys(obj));
 }
 
 /**
