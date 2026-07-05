@@ -218,6 +218,27 @@ describe("MonitoringService", () => {
                 MonitoringService.checkSiteNow("site-abc", "monitor-123")
             ).rejects.toThrow("checkSiteNow returned an invalid status update");
         });
+
+        it("should trim identifiers in invalid status update errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Monitoring", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockElectronAPI.monitoring.checkSiteNow.mockResolvedValueOnce({
+                monitorId: "monitor-123",
+                siteIdentifier: "site-abc",
+                status: "up",
+                timestamp: new Date().toISOString(),
+            });
+
+            await expect(
+                MonitoringService.checkSiteNow(" site-abc ", " monitor-123 ")
+            ).rejects.toThrow("for monitor monitor-123 of site site-abc");
+        });
     });
 
     describe("startMonitoringForMonitor", () => {

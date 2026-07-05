@@ -41,6 +41,7 @@ import type { UnknownRecord } from "type-fest";
 import type * as z from "zod";
 
 import { ApplicationError, ensureError } from "@shared/utils/errorHandling";
+import { isNonEmptyString } from "@shared/utils/typeGuards";
 import { validateStatusUpdate } from "@shared/validation/guards";
 import { isDefined } from "ts-extras";
 
@@ -87,8 +88,8 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
  *   otherwise the provided {@link fallback}.
  */
 const resolveIdentifier = (candidate: unknown, fallback: string): string => {
-    if (typeof candidate === "string" && candidate.trim().length > 0) {
-        return candidate;
+    if (isNonEmptyString(candidate)) {
+        return candidate.trim();
     }
 
     return fallback;
