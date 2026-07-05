@@ -20,7 +20,7 @@ import {
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
-import { arrayIncludes, isDefined, objectValues, safeCastTo } from "ts-extras";
+import { arrayIncludes, isDefined, objectValues } from "ts-extras";
 
 import { calculateSiteSyncDelta } from "./siteSyncDelta";
 import {
@@ -230,7 +230,7 @@ export const isStatusHistoryEntry = (
         return false;
     }
 
-    const { responseTime, status, timestamp } = safeCastTo(value);
+    const { responseTime, status, timestamp } = value;
 
     return (
         isFiniteNumber(responseTime) &&
@@ -273,7 +273,7 @@ export const isMonitorSnapshot = (candidate: unknown): candidate is Monitor => {
         status,
         timeout,
         type,
-    } = safeCastTo(candidate);
+    } = candidate;
 
     return (
         isNonEmptyString(id ?? undefined) &&
@@ -295,7 +295,7 @@ export const isSiteSnapshot = (candidate: unknown): candidate is Site => {
         return false;
     }
 
-    const { identifier, monitoring, monitors, name } = safeCastTo(candidate);
+    const { identifier, monitoring, monitors, name } = candidate;
 
     if (
         !isNonEmptyString(identifier ?? undefined) ||
@@ -404,7 +404,7 @@ export function toMonitorSnapshotOverlay(
         monitoring,
         responseTime,
         status,
-    } = safeCastTo(source);
+    } = source;
 
     // Empty history arrays are treated as "no overlay" so that callers that
     // occasionally omit history (or emit an empty array) do not accidentally
@@ -457,7 +457,7 @@ export function toSiteSnapshotOverlay(
     }
 
     const overlay: Partial<SiteSnapshotOverlay> = {};
-    const { monitoring, monitors } = safeCastTo(source);
+    const { monitoring, monitors } = source;
 
     if (isBoolean(monitoring)) {
         overlay.monitoring = monitoring;
