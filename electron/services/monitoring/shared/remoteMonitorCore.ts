@@ -67,6 +67,22 @@ function createFetchError(url: string, error: unknown): Error {
     );
 }
 
+function parseRemoteEndpointPayload(url: string, data: unknown): unknown {
+    if (typeof data !== "string") {
+        return data;
+    }
+
+    if (data.length === 0) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(data);
+    } catch (parseError) {
+        throw createInvalidJsonError(url, parseError);
+    }
+}
+
 /**
  * JSON payload returned from remote endpoints.
  */
@@ -219,21 +235,7 @@ export function createRemoteMonitorService<
                     signal: combinedSignal,
                     timeout,
                 });
-
-                const rawData: unknown = response.data;
-                let parsed: unknown = rawData;
-
-                if (typeof rawData === "string") {
-                    if (rawData.length === 0) {
-                        parsed = {};
-                    } else {
-                        try {
-                            parsed = JSON.parse(rawData);
-                        } catch (parseError) {
-                            throw createInvalidJsonError(url, parseError);
-                        }
-                    }
-                }
+                const parsed = parseRemoteEndpointPayload(url, response.data);
 
                 return {
                     data: parsed,
