@@ -33,6 +33,7 @@
 import type { Site } from "@shared/types";
 import type { Promisable } from "type-fest";
 
+import { getOwnDataCause } from "@shared/utils/errorPropertyAccess";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
@@ -337,21 +338,6 @@ const getDefaultUIPersistedState = (): UIPersistedState => ({
     surfaceDensity: ENTERPRISE_UI_DEFAULTS.surfaceDensity,
 });
 
-function getOwnDataCause(error: Error):
-    | { readonly found: false }
-    | {
-          readonly found: true;
-          readonly value: unknown;
-      } {
-    const descriptor = Object.getOwnPropertyDescriptor(error, "cause");
-
-    if (!descriptor || !("value" in descriptor)) {
-        return { found: false };
-    }
-
-    return { found: true, value: descriptor.value };
-}
-
 const normalizeUIPersistedState = (
     state: Partial<UIPersistedState>
 ): UIPersistedState => {
@@ -493,13 +479,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         }, errorHandler);
                     } catch (error: unknown) {
                         const normalizedError = ensureError(error);
-                        const ownCause = getOwnDataCause(normalizedError);
                         const underlyingCause =
-                            ownCause.found &&
-                            ownCause.value !== null &&
-                            ownCause.value !== undefined
-                                ? ownCause.value
-                                : normalizedError;
+                            getOwnDataCause(normalizedError) ??
+                            normalizedError;
 
                         // Prefer logging the underlying cause when we wrap an
                         // error for user-facing messaging.

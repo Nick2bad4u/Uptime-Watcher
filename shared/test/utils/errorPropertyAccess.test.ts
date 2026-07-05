@@ -1,4 +1,5 @@
 import {
+    getOwnDataCause,
     getErrorStringProperty,
     getOwnDataProperty,
     getOwnStringDataProperty,
@@ -33,6 +34,27 @@ describe("errorPropertyAccess", () => {
         expect(
             getOwnStringDataProperty({ message: 123 }, "message")
         ).toBeUndefined();
+    });
+
+    it("reads own Error cause data without invoking custom accessors", () => {
+        let getterCalls = 0;
+        const nested = new Error("nested");
+        const errorWithCause = new Error("safe", { cause: nested });
+        const errorWithAccessorCause = new Error("accessor");
+
+        Object.defineProperty(errorWithAccessorCause, "cause", {
+            configurable: true,
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return new Error("hidden");
+            },
+        });
+
+        expect(getOwnDataCause(errorWithCause)).toBe(nested);
+        expect(getOwnDataCause(errorWithAccessorCause)).toBeUndefined();
+        expect(getOwnDataCause(new Error("none"))).toBeUndefined();
+        expect(getterCalls).toBe(0);
     });
 
     it("reads Error string data fields without invoking custom accessors", () => {

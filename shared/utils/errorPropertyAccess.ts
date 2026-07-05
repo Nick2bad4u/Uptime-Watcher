@@ -38,6 +38,12 @@ export function getOwnStringDataProperty(
         : undefined;
 }
 
+export function getOwnDataCause(error: Error): unknown {
+    const property = getOwnDataProperty(error, "cause");
+
+    return property.found ? property.value : undefined;
+}
+
 function isNativeErrorStringGetter(
     value: unknown
 ): value is (this: Error) => unknown {
