@@ -23,12 +23,19 @@
  * @author AI Assistant
  */
 
-import type { Monitor, MonitorStatus, Site } from "@shared/types";
 import type { ReactNode } from "react";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import "@testing-library/jest-dom";
 import { secureRandomFloat } from "@shared/test/testHelpers";
+import {
+    MONITOR_STATUS_VALUES,
+    STATUS_HISTORY_VALUES,
+    type Monitor,
+    type MonitorStatus,
+    type Site,
+    type StatusHistoryStatus,
+} from "@shared/types";
 import { render, screen } from "@testing-library/react";
 import { arrayFirst, arrayJoin } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -267,7 +274,7 @@ const validMonitorArbitrary = fc.record({
     id: cssSafeIdentifierArbitrary({ minLength: 5, maxLength: 15 }),
     type: fc.constantFrom("http", "ping", "port", "dns"),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
     responseTime: fc.integer({ min: 0, max: 10_000 }),
     checkInterval: fc.integer({ min: 1000, max: 300_000 }),
     timeout: fc.integer({ min: 1000, max: 60_000 }),
@@ -275,7 +282,9 @@ const validMonitorArbitrary = fc.record({
     history: fc.uniqueArray(
         fc.record({
             timestamp: fc.integer({ min: 0, max: Date.now() }),
-            status: fc.constantFrom("up", "down"),
+            status: fc.constantFrom<StatusHistoryStatus>(
+                ...STATUS_HISTORY_VALUES
+            ),
             responseTime: fc.integer({ min: 0, max: 10_000 }),
             details: fc.option(fc.string(), { nil: undefined }),
         }),
