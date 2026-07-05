@@ -1,6 +1,7 @@
 import type { StoreApi } from "zustand";
 
 import { safeNumberConversion } from "@shared/utils/safeConversions";
+import { isValidSiteIdentifier } from "@shared/validation/identifierValidation";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
@@ -83,14 +84,20 @@ const normalizeHistoryLimitSetting = (
 ): number =>
     typeof value === "number" && isFiniteNumber(value) ? value : fallback;
 
+const isMutedSiteIdentifierArray = (value: unknown): value is string[] =>
+    Array.isArray(value) &&
+    value.every(
+        (entry) =>
+            typeof entry === "string" && isValidSiteIdentifier(entry)
+    );
+
 const normalizeMutedSiteIdentifiers = (
     value: unknown,
     fallback: string[]
 ): string[] =>
     value === undefined || value === fallback
         ? fallback
-        : Array.isArray(value) &&
-            value.every((entry) => typeof entry === "string")
+        : isMutedSiteIdentifierArray(value)
           ? [...value]
           : fallback;
 

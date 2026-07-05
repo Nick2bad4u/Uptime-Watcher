@@ -277,6 +277,33 @@ describe(useSettingsStore, () => {
             expect(normalized).toEqual(fallback);
         });
 
+        it("should reject invalid muted site identifiers during normalization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Validation", "type");
+
+            const fallback = createSettings({
+                mutedSiteNotificationIdentifiers: ["site-1"],
+            });
+
+            expect(
+                normalizeAppSettings(
+                    {
+                        mutedSiteNotificationIdentifiers: [
+                            "site-2",
+                            "",
+                            "site-\u0000control",
+                        ],
+                    },
+                    fallback
+                ).mutedSiteNotificationIdentifiers
+            ).toEqual(["site-1"]);
+        });
+
         it("should update settings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSettingsStore", "component");
