@@ -34,13 +34,7 @@
  *
  * @internal
  */
-import {
-    arrayIncludes,
-    arrayJoin,
-    objectValues,
-    safeCastTo,
-    stringSplit,
-} from "ts-extras";
+import { arrayIncludes, arrayJoin, objectValues, stringSplit } from "ts-extras";
 
 const CACHE_PREFIXES = {
     CONFIG: "config",
@@ -48,6 +42,8 @@ const CACHE_PREFIXES = {
     SITE: "site",
     VALIDATION: "validation",
 } as const;
+
+const CACHE_PREFIX_VALUES: readonly string[] = objectValues(CACHE_PREFIXES);
 
 /**
  * Separator character for cache key components.
@@ -349,8 +345,7 @@ export function isStandardizedCacheKey(
         return false;
     }
 
-    const validPrefixes = safeCastTo<string[]>(objectValues(CACHE_PREFIXES));
-    return arrayIncludes(validPrefixes, prefix);
+    return arrayIncludes(CACHE_PREFIX_VALUES, prefix);
 }
 
 /**
