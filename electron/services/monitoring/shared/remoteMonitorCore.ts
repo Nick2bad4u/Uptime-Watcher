@@ -21,6 +21,7 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { createTimeoutSignal } from "./abortSignalUtils";
+import { isParseFailure, parseJsonPayload } from "./httpMonitorJsonUtils";
 import {
     buildMonitorExecutionBaseArgsWithOptionalSignal,
     deriveMonitorTiming,
@@ -69,15 +70,12 @@ function createFetchError(url: string, error: unknown): Error {
 }
 
 function parseRemoteEndpointPayload(url: string, data: unknown): unknown {
-    if (typeof data !== "string") {
-        return data;
+    const parsed = parseJsonPayload(data);
+    if (isParseFailure(parsed)) {
+        throw createInvalidJsonError(url, parsed.error);
     }
 
-    try {
-        return JSON.parse(data);
-    } catch (parseError) {
-        throw createInvalidJsonError(url, parseError);
-    }
+    return parsed.payload;
 }
 
 /**

@@ -6,6 +6,7 @@ import type { Site } from "@shared/types";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES } from "../../../services/monitoring/shared/httpMonitorJsonUtils";
 import { ServerHeartbeatMonitor } from "../../../services/monitoring/ServerHeartbeatMonitor";
 
 const httpGetMock = vi.fn();
@@ -168,5 +169,18 @@ describe("ServerHeartbeatMonitor service", () => {
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Invalid JSON response");
+    });
+
+    it("rejects oversized string JSON responses before parsing", async () => {
+        httpGetMock.mockResolvedValue({
+            data: " ".repeat(MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES + 1),
+            responseTime: 25,
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Invalid JSON response");
+        expect(result.error).toContain("exceeds maximum parse size");
     });
 });

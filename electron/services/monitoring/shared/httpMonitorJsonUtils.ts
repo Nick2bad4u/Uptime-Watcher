@@ -1,6 +1,10 @@
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 import { extractMonitorValueAtPath } from "./monitorPathTraversal";
+
+/** Maximum UTF-8 byte budget accepted for monitor JSON payload parsing. */
+export const MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES: number = 1 * 1024 * 1024;
 
 /**
  * Result of attempting to parse a JSON payload.
@@ -55,6 +59,12 @@ function createJsonPayloadParseError(error: unknown): Error {
     );
 }
 
+function createJsonPayloadSizeError(sizeBytes: number): Error {
+    return new RangeError(
+        `HTTP JSON payload exceeds maximum parse size (${sizeBytes} > ${MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES} bytes)`
+    );
+}
+
 /**
  * Parses an HTTP payload into JSON when it is a string.
  *
@@ -70,6 +80,16 @@ export function parseJsonPayload(
     onParseError?: (error: Error) => void
 ): JsonPayloadParseResult {
     if (typeof data === "string") {
+        const sizeBytes = getUtfByteLength(data);
+        if (sizeBytes > MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES) {
+            const sizeError = createJsonPayloadSizeError(sizeBytes);
+            onParseError?.(sizeError);
+            return {
+                error: sizeError,
+                ok: false,
+            };
+        }
+
         try {
             return {
                 ok: true,

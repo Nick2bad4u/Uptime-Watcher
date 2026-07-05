@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
     extractJsonValueAtPath,
+    MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES,
     parseJsonPayload,
 } from "../../../../services/monitoring/shared/httpMonitorJsonUtils";
 
@@ -78,6 +79,24 @@ describe(parseJsonPayload, () => {
             expect(result.error).toBeInstanceOf(SyntaxError);
             expect(result.error.message).toContain(
                 "HTTP JSON payload parsing failed"
+            );
+            expect(onParseError).toHaveBeenCalledWith(result.error);
+        }
+    });
+
+    it("rejects oversized string payloads before JSON parsing", () => {
+        const onParseError = vi.fn();
+
+        const result = parseJsonPayload(
+            " ".repeat(MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES + 1),
+            onParseError
+        );
+
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+            expect(result.error).toBeInstanceOf(RangeError);
+            expect(result.error.message).toContain(
+                "HTTP JSON payload exceeds maximum parse size"
             );
             expect(onParseError).toHaveBeenCalledWith(result.error);
         }
