@@ -54,6 +54,15 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("100.64.0.1")).toBeTruthy();
         });
 
+        it("detects private IPv4 ranges in browser-normalized legacy forms", () => {
+            expect(isPrivateNetworkHostname("0177.0.0.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("0x7f.0.0.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("127.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("10.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("192.168.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("172.16.1")).toBeTruthy();
+        });
+
         it("detects IPv6 link-local and ULA addresses", () => {
             expect(isPrivateNetworkHostname("::1")).toBeTruthy();
             expect(isPrivateNetworkHostname("[::1]")).toBeTruthy();

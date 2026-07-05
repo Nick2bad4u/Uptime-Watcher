@@ -560,6 +560,21 @@ function isPrivateIpv4(hostname: string): boolean {
     return isPrivateIpvFourOctets(octets);
 }
 
+function normalizeHostnameForIpv4Comparison(hostname: string): string {
+    if (hostname.includes(":")) {
+        return hostname;
+    }
+
+    try {
+        return new URL(
+            `//${hostname}`,
+            "https://example.invalid"
+        ).hostname.toLowerCase();
+    } catch {
+        return hostname;
+    }
+}
+
 function parseIpvFourFromMappedIpvSix(mappedHostname: string):
     | [
           number,
@@ -677,7 +692,10 @@ export function isPrivateNetworkHostname(hostname: string): boolean {
         return true;
     }
 
-    if (isPrivateIpv4(withoutIpv6Brackets)) {
+    const ipv4ComparisonHostname =
+        normalizeHostnameForIpv4Comparison(withoutIpv6Brackets);
+
+    if (isPrivateIpv4(ipv4ComparisonHostname)) {
         return true;
     }
 
