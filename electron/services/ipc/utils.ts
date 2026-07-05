@@ -16,6 +16,7 @@ import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
 import { withLogContext } from "@shared/utils/loggingContext";
 import { castUnchecked } from "@shared/utils/typeHelpers";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import * as path from "node:path";
@@ -532,7 +533,12 @@ export function registerStandardizedIpcHandler<
                             severity: "warn",
                         }),
                         {
-                            senderUrl: event.senderFrame?.url,
+                            senderUrl:
+                                typeof event.senderFrame?.url === "string"
+                                    ? getSafeUrlForLogging(
+                                          event.senderFrame.url
+                                      )
+                                    : undefined,
                         }
                     );
 

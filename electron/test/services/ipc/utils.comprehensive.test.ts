@@ -1730,6 +1730,67 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(result.error).toContain("Untrusted IPC sender");
             });
 
+            it("should redact untrusted sender URLs in IPC rejection logs", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Security", "type");
+
+                vi.mocked(isDev).mockReturnValue(false);
+
+                const mockHandler = vi.fn().mockResolvedValue("blocked");
+                const registeredHandlers = new Set<TestChannel>();
+
+                registerStandardizedIpcHandler(
+                    CHANNELS_FOR_TESTS.execution,
+                    mockHandler,
+                    null,
+                    registeredHandlers
+                );
+
+                const handleCall = vi
+                    .mocked(ipcMain.handle)
+                    .mock.calls.find(
+                        (call) => call[0] === CHANNELS_FOR_TESTS.execution
+                    );
+                expect(handleCall).toBeDefined();
+
+                const registeredFunction = handleCall![1];
+                const result = await registeredFunction({
+                    senderFrame: {
+                        isDestroyed: () => false,
+                        url: "https://user:password@evil.example/app?token=secret#fragment",
+                    },
+                } as IpcMainInvokeEvent);
+
+                expect(mockHandler).not.toHaveBeenCalled();
+                expect(result.success).toBeFalsy();
+                expect(logger.warn).toHaveBeenCalledWith(
+                    "[IpcHandler] Rejected IPC invocation from untrusted sender",
+                    expect.any(Object),
+                    expect.objectContaining({
+                        senderUrl: "https://evil.example/app",
+                    })
+                );
+                expect(logger.warn).not.toHaveBeenCalledWith(
+                    expect.any(String),
+                    expect.anything(),
+                    expect.objectContaining({
+                        senderUrl: expect.stringContaining("secret"),
+                    })
+                );
+                expect(logger.warn).not.toHaveBeenCalledWith(
+                    expect.any(String),
+                    expect.anything(),
+                    expect.objectContaining({
+                        senderUrl: expect.stringContaining("password"),
+                    })
+                );
+            });
+
             it("should return an error response when the success payload validator fails", async ({
                 task,
                 annotate,
