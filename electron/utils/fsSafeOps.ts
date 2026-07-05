@@ -2,6 +2,8 @@ import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import * as fs from "node:fs/promises";
 
+type FileSystemEntryStats = Awaited<ReturnType<typeof fs.lstat>>;
+
 /**
  * Ensures a validated directory exists and returns its canonical real path.
  */
@@ -21,6 +23,24 @@ export async function ensureDirectoryAndResolveRealPath(args: {
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller validates directoryPath before invoking this audited filesystem helper.
     return fs.realpath(directoryPath);
+}
+
+/**
+ * Reads filesystem entry metadata, treating a missing path as `null`.
+ */
+export async function lstatIfExists(
+    filePath: string
+): Promise<FileSystemEntryStats | null> {
+    try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller validates filePath before invoking this audited filesystem helper.
+        return await fs.lstat(filePath);
+    } catch (error: unknown) {
+        if (tryGetErrorCode(error) === "ENOENT") {
+            return null;
+        }
+
+        throw ensureError(error);
+    }
 }
 
 /**

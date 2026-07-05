@@ -1,11 +1,14 @@
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
 
-import { syncDirectorySafely, syncFileSafely } from "../../../utils/fsSafeOps";
+import {
+    lstatIfExists,
+    syncDirectorySafely,
+    syncFileSafely,
+} from "../../../utils/fsSafeOps";
 import { resolvePathWithinDirectory } from "./pathWithinDirectory";
 
 /**
@@ -36,16 +39,7 @@ export async function writeFileWithinDirectory(args: {
     let shouldDeleteRollback = false;
 
     try {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- targetPath is sanitized and confined to baseDirectory.
-        const existingTarget = await fs
-            .lstat(targetPath)
-            .catch((error: unknown) => {
-                if (tryGetErrorCode(error) === "ENOENT") {
-                    return null;
-                }
-
-                throw error;
-            });
+        const existingTarget = await lstatIfExists(targetPath);
 
         if (
             existingTarget &&

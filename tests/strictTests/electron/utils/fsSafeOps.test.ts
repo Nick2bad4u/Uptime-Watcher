@@ -8,6 +8,9 @@ interface MockFileHandle {
 const renameMock =
     vi.fn<(sourcePath: string, targetPath: string) => Promise<void>>();
 
+const lstatMock =
+    vi.fn<(filePath: string) => Promise<{ isFile: () => boolean }>>();
+
 const mkdirMock =
     vi.fn<
         (directoryPath: string, options: { recursive: true }) => Promise<void>
@@ -22,6 +25,7 @@ const statMock =
     vi.fn<(directoryPath: string) => Promise<{ isDirectory: () => boolean }>>();
 
 vi.mock("node:fs/promises", () => ({
+    lstat: lstatMock,
     mkdir: mkdirMock,
     open: openMock,
     realpath: realpathMock,
@@ -70,6 +74,39 @@ describe("fsSafeOps (strict coverage)", () => {
             })
         ).rejects.toThrow("not a directory");
         expect(realpathMock).not.toHaveBeenCalled();
+    });
+
+    it("lstatIfExists returns entry metadata when the path exists", async () => {
+        const { lstatIfExists } =
+            await import("../../../../electron/utils/fsSafeOps");
+        const stats = { isFile: () => true };
+
+        lstatMock.mockResolvedValueOnce(stats);
+
+        await expect(lstatIfExists("/tmp/file")).resolves.toBe(stats);
+        expect(lstatMock).toHaveBeenCalledWith("/tmp/file");
+    });
+
+    it("lstatIfExists treats missing paths as null", async () => {
+        const { lstatIfExists } =
+            await import("../../../../electron/utils/fsSafeOps");
+
+        lstatMock.mockRejectedValueOnce(
+            Object.assign(new Error("missing"), { code: "ENOENT" })
+        );
+
+        await expect(lstatIfExists("/tmp/missing")).resolves.toBeNull();
+    });
+
+    it("lstatIfExists rethrows non-ENOENT errors", async () => {
+        const { lstatIfExists } =
+            await import("../../../../electron/utils/fsSafeOps");
+
+        lstatMock.mockRejectedValueOnce(
+            Object.assign(new Error("permission"), { code: "EACCES" })
+        );
+
+        await expect(lstatIfExists("/tmp/file")).rejects.toThrow("permission");
     });
 
     it("renameIfExists calls fs.rename on success", async () => {
