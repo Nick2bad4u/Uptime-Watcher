@@ -234,6 +234,17 @@ export async function runAppBootstrap(
             normalizedError
         );
 
+        try {
+            cleanupAppBootstrap({
+                cleanupRefs: options.cleanupRefs,
+            });
+        } catch (cleanupError) {
+            logger.warn(
+                "[App:init] Failed to cleanup partial initialization",
+                ensureError(cleanupError)
+            );
+        }
+
         useErrorStore
             .getState()
             .setError(
