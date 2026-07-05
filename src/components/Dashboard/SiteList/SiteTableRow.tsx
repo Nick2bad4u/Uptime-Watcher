@@ -167,6 +167,7 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                     : undefined,
             [rowOrder]
         );
+        const uptimeDisplay = isFiniteNumber(uptime) ? `${uptime}%` : "—";
 
         return (
             <tr
@@ -221,7 +222,7 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                     />
                 </td>
                 <td className="site-table__cell site-table__cell--uptime">
-                    <ThemedText size="sm">{uptime}%</ThemedText>
+                    <ThemedText size="sm">{uptimeDisplay}</ThemedText>
                 </td>
                 <td className="site-table__cell site-table__cell--response">
                     <ThemedText size="sm">

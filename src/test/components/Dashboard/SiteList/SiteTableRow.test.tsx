@@ -351,8 +351,8 @@ describe(SiteTableRow, () => {
             { site: latestSite }
         );
 
-        expect(screen.getByText("NaN%")).toBeInTheDocument();
-        expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
+        expect(screen.queryByText("NaN%")).not.toBeInTheDocument();
+        expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
         expect(screen.getByText("1/2")).toBeInTheDocument();
         expect(actionButtonProps).toMatchObject({
             disabled: true,
