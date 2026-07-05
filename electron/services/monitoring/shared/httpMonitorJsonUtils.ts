@@ -45,6 +45,16 @@ export function isParseFailure(
     return !result.ok;
 }
 
+function createJsonPayloadParseError(error: unknown): Error {
+    const normalizedError = ensureError(error);
+    return new SyntaxError(
+        `HTTP JSON payload parsing failed: ${normalizedError.message}`,
+        {
+            cause: error,
+        }
+    );
+}
+
 /**
  * Parses an HTTP payload into JSON when it is a string.
  *
@@ -66,10 +76,10 @@ export function parseJsonPayload(
                 payload: JSON.parse(data),
             };
         } catch (error) {
-            const normalizedError = ensureError(error);
-            onParseError?.(normalizedError);
+            const parseError = createJsonPayloadParseError(error);
+            onParseError?.(parseError);
             return {
-                error: normalizedError,
+                error: parseError,
                 ok: false,
             };
         }
