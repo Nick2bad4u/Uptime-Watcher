@@ -48,6 +48,11 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
+import {
+    siteIdentifierSchema,
+    siteNameSchema,
+} from "@shared/validation/siteFieldSchemas";
 import { isDefined, isFinite as isFiniteNumber, objectValues } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
@@ -273,11 +278,13 @@ const isMonitorCheckCompletedEventDataPayload = (
         return false;
     }
 
-    if (typeof monitorId !== "string" || monitorId.length === 0) {
+    const parsedMonitorId = monitorIdSchema.safeParse(monitorId);
+    if (!parsedMonitorId.success) {
         return false;
     }
 
-    if (typeof siteIdentifier !== "string" || siteIdentifier.length === 0) {
+    const parsedSiteIdentifier = siteIdentifierSchema.safeParse(siteIdentifier);
+    if (!parsedSiteIdentifier.success) {
         return false;
     }
 
@@ -285,7 +292,14 @@ const isMonitorCheckCompletedEventDataPayload = (
         return false;
     }
 
-    return isMonitorStatusChangedEventData(result);
+    if (!isMonitorStatusChangedEventData(result)) {
+        return false;
+    }
+
+    return (
+        parsedMonitorId.data === result.monitorId &&
+        parsedSiteIdentifier.data === result.siteIdentifier
+    );
 };
 
 const isHistoryLimitUpdatedEventDataPayload = (
@@ -370,7 +384,11 @@ const isSiteRemovedEventDataPayload = (
         return false;
     }
 
-    if (typeof siteIdentifier !== "string" || typeof siteName !== "string") {
+    if (!siteIdentifierSchema.safeParse(siteIdentifier).success) {
+        return false;
+    }
+
+    if (!siteNameSchema.safeParse(siteName).success) {
         return false;
     }
 

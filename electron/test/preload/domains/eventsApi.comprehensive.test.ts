@@ -527,6 +527,41 @@ describe("Events Domain API", () => {
                 })
             );
         });
+
+        it("should drop check completion payloads with mismatched top-level identifiers", () => {
+            const callback = vi.fn();
+            const eventData: MonitorCheckCompletedEventData = {
+                checkType: "manual",
+                monitorId: "monitor-other",
+                result: {
+                    details: "Manual verification completed",
+                    monitor: createMonitorFixture(),
+                    monitorId: "monitor-123",
+                    previousStatus: "down",
+                    site: createSiteFixture(),
+                    siteIdentifier: "site-abc",
+                    status: "up",
+                    timestamp: new Date().toISOString(),
+                },
+                siteIdentifier: "site-abc",
+                timestamp: Date.now(),
+            };
+
+            mockIpcRenderer.on.mockClear();
+            eventsApi.onMonitorCheckCompleted(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, eventData);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "monitor:check-completed",
+                    guard: "isMonitorCheckCompletedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
     });
 
     describe("onHistoryLimitUpdated", () => {
@@ -720,6 +755,42 @@ describe("Events Domain API", () => {
                     payloadType: "object",
                 })
             );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "site:removed",
+                    guard: "isSiteRemovedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
+
+        it("should reject site removed payloads with invalid site fields", () => {
+            const callback = vi.fn();
+
+            eventsApi.onSiteRemoved(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.(
+                {},
+                {
+                    cascade: false,
+                    siteIdentifier: "site\nabc",
+                    siteName: "Example",
+                    timestamp: Date.now(),
+                }
+            );
+            eventHandler?.(
+                {},
+                {
+                    cascade: false,
+                    siteIdentifier: "site-abc",
+                    siteName: " ".repeat(3),
+                    timestamp: Date.now(),
+                }
+            );
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledTimes(2);
             expect(guardFailureSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
                     channel: "site:removed",
