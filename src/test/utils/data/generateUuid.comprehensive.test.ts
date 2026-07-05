@@ -91,6 +91,26 @@ describe(generateUuid, () => {
             }
         });
 
+        it("should fall back when crypto.randomUUID returns a malformed UUID", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            const randomUUID = vi.fn().mockReturnValue("not-a-real-uuid");
+            const { restore } = installCryptoMock({ randomUUID });
+
+            try {
+                expect(generateUuid()).toMatch(FALLBACK_ID_REGEX);
+                expect(randomUUID).toHaveBeenCalledTimes(1);
+            } finally {
+                restore();
+            }
+        });
+
         it("should not invoke accessor-backed crypto methods", async ({
             annotate,
             task,

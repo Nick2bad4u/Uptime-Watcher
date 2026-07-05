@@ -265,9 +265,15 @@ describe("UUID Generation", () => {
                 value: {
                     randomUUID: vi
                         .fn()
-                        .mockReturnValueOnce("uuid-1")
-                        .mockReturnValueOnce("uuid-2")
-                        .mockReturnValueOnce("uuid-3"),
+                        .mockReturnValueOnce(
+                            "00000000-0000-4000-8000-000000000001"
+                        )
+                        .mockReturnValueOnce(
+                            "00000000-0000-4000-8000-000000000002"
+                        )
+                        .mockReturnValueOnce(
+                            "00000000-0000-4000-8000-000000000003"
+                        ),
                 },
             });
 
@@ -275,9 +281,9 @@ describe("UUID Generation", () => {
             const uuid2 = generateUuid();
             const uuid3 = generateUuid();
 
-            expect(uuid1).toBe("uuid-1");
-            expect(uuid2).toBe("uuid-2");
-            expect(uuid3).toBe("uuid-3");
+            expect(uuid1).toBe("00000000-0000-4000-8000-000000000001");
+            expect(uuid2).toBe("00000000-0000-4000-8000-000000000002");
+            expect(uuid3).toBe("00000000-0000-4000-8000-000000000003");
             expect(crypto.randomUUID).toHaveBeenCalledTimes(3);
         });
 
@@ -469,7 +475,9 @@ describe("UUID Generation", () => {
             (cryptoAvailable) => {
                 if (cryptoAvailable) {
                     vi.stubGlobal("crypto", {
-                        randomUUID: vi.fn(() => "test-uuid-123"),
+                        randomUUID: vi.fn(
+                            () => "00000000-0000-4000-8000-000000000123"
+                        ),
                     });
                 } else {
                     vi.stubGlobal("crypto", undefined);
@@ -485,7 +493,9 @@ describe("UUID Generation", () => {
                     typeof crypto.randomUUID === "function"
                 ) {
                     // Should use crypto UUID format
-                    expect(uuid).toBe("test-uuid-123");
+                    expect(uuid).toBe(
+                        "00000000-0000-4000-8000-000000000123"
+                    );
                 } else {
                     // Should use fallback format
                     expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);

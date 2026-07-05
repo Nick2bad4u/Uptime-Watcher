@@ -17,6 +17,9 @@ const fallbackSequence: { value: number } = {
     value: 0,
 };
 
+const STANDARD_UUID_PATTERN =
+    /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
+
 type RandomUuid = () => string;
 type GetRandomValues = (values: Uint32Array) => void;
 
@@ -83,7 +86,7 @@ export function generateUuid(): string {
     try {
         if (randomUuid) {
             const candidate = randomUuid();
-            if (candidate.trim().length > 0) {
+            if (STANDARD_UUID_PATTERN.test(candidate)) {
                 return candidate;
             }
         }
