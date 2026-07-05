@@ -7,13 +7,10 @@
  */
 
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
-import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { withLogContext } from "@shared/utils/loggingContext";
-import log from "electron-log/main";
-import { safeCastTo } from "ts-extras";
 
-import * as loggerModule from "../../utils/logger";
+import { diagnosticsLogger as diagnosticsLog } from "../../utils/logger";
 
 /**
  * Snapshot of IPC diagnostics metrics maintained by the main process.
@@ -42,42 +39,6 @@ interface DiagnosticsSnapshotContext {
     readonly channel?: string;
     readonly event: "guard-failure" | "missing" | "success";
 }
-
-const fallbackDiagnosticsLogger: Logger = {
-    debug: (message: string, ...details: unknown[]): void => {
-        log.debug(message, ...details);
-    },
-    error: (message: string, error?: unknown, ...details: unknown[]): void => {
-        log.error(message, error, ...details);
-    },
-    info: (message: string, ...details: unknown[]): void => {
-        log.info(message, ...details);
-    },
-    warn: (message: string, ...details: unknown[]): void => {
-        log.warn(message, ...details);
-    },
-};
-
-function resolveDiagnosticsLogger(): Logger {
-    const moduleWithDiagnostics = safeCastTo<
-        Partial<{
-            diagnosticsLogger: Logger;
-            logger: Logger;
-        }>
-    >(loggerModule);
-
-    if (moduleWithDiagnostics.diagnosticsLogger) {
-        return moduleWithDiagnostics.diagnosticsLogger;
-    }
-
-    if (moduleWithDiagnostics.logger) {
-        return moduleWithDiagnostics.logger;
-    }
-
-    return fallbackDiagnosticsLogger;
-}
-
-const diagnosticsLog: Logger = resolveDiagnosticsLogger();
 
 function logDiagnosticsSnapshot({
     channel,
