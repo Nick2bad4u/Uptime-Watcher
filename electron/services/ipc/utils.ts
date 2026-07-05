@@ -20,7 +20,7 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { arrayJoin, isDefined, safeCastTo, setHas } from "ts-extras";
+import { arrayJoin, isDefined, setHas } from "ts-extras";
 
 import type {
     IpcParameterValidator,
@@ -70,7 +70,7 @@ const PRODUCTION_DIST_DIRECTORY = getProductionDistDirectory(CURRENT_DIRECTORY);
 export type StandardizedIpcRegistrar = <TChannel extends IpcInvokeChannel>(
     channelName: TChannel,
     handler: StrictIpcInvokeHandler<TChannel>,
-    validateParams: IpcParameterValidator,
+    validateParams?: IpcParameterValidator | null,
     validateResult?: IpcResultValidator<IpcInvokeChannelResult<TChannel>> | null
 ) => void;
 
@@ -679,22 +679,20 @@ export function registerStandardizedIpcHandler<
 export function createStandardizedIpcRegistrar(
     registeredHandlers: Set<IpcInvokeChannel>
 ): StandardizedIpcRegistrar {
-    return safeCastTo<StandardizedIpcRegistrar>(
-        <TChannel extends IpcInvokeChannel>(
-            channelName: TChannel,
-            handler: StrictIpcInvokeHandler<TChannel>,
-            validateParams?: IpcParameterValidator | null,
-            validateResult?: IpcResultValidator<
-                IpcInvokeChannelResult<TChannel>
-            > | null
-        ) => {
-            registerStandardizedIpcHandler(
-                channelName,
-                handler,
-                validateParams ?? null,
-                registeredHandlers,
-                validateResult ?? null
-            );
-        }
-    );
+    return (<TChannel extends IpcInvokeChannel>(
+        channelName: TChannel,
+        handler: StrictIpcInvokeHandler<TChannel>,
+        validateParams?: IpcParameterValidator | null,
+        validateResult?: IpcResultValidator<
+            IpcInvokeChannelResult<TChannel>
+        > | null
+    ) => {
+        registerStandardizedIpcHandler(
+            channelName,
+            handler,
+            validateParams ?? null,
+            registeredHandlers,
+            validateResult ?? null
+        );
+    }) satisfies StandardizedIpcRegistrar;
 }
