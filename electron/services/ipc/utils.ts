@@ -194,8 +194,12 @@ export function createErrorResponse(
     error: string,
     metadata?: UnknownRecord
 ): IpcResponse<never> {
+    const normalizedError = error.trim();
     const response: IpcResponse<never> = {
-        error,
+        error:
+            normalizedError.length > 0
+                ? normalizedError
+                : "IPC operation failed",
         success: false,
     };
 

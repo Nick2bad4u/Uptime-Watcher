@@ -875,6 +875,40 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
 
+            it("should trim error response messages", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = createErrorResponse("  Something went wrong  ");
+
+                expect(result).toEqual({
+                    error: "Something went wrong",
+                    success: false,
+                });
+            });
+
+            it("should fallback for blank error response messages", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = createErrorResponse(" ".repeat(3));
+
+                expect(result).toEqual({
+                    error: "IPC operation failed",
+                    success: false,
+                });
+            });
+
             it("should create error response with metadata", async ({
                 task,
                 annotate,
