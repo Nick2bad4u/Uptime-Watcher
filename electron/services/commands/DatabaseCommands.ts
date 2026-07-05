@@ -43,7 +43,10 @@ import type {
 import { parseHistoryLimitSetting } from "../database/utils/historyLimitSettingParser";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
-import { IMPORT_SITE_VALIDATION_CONCURRENCY } from "../../constants";
+import {
+    IMPORT_SITE_EVENT_EMIT_CONCURRENCY,
+    IMPORT_SITE_VALIDATION_CONCURRENCY,
+} from "../../constants";
 import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 import { logger as backendLogger } from "../../utils/logger";
 import {
@@ -589,17 +592,19 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         );
 
         if (newlyImportedSites.length > 0) {
-            await Promise.all(
-                newlyImportedSites.map((site) =>
-                    this.eventEmitter.emitTyped("internal:site:added", {
+            await mapWithConcurrency({
+                concurrency: IMPORT_SITE_EVENT_EMIT_CONCURRENCY,
+                items: newlyImportedSites,
+                task: async (site) => {
+                    await this.eventEmitter.emitTyped("internal:site:added", {
                         identifier: site.identifier,
                         operation: "added",
                         site: structuredClone(site),
                         source: SITE_ADDED_SOURCE.IMPORT,
                         timestamp: Date.now(),
-                    })
-                )
-            );
+                    });
+                },
+            });
         }
 
         await this.emitSuccessEvent("internal:database:data-imported", {

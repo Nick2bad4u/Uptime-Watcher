@@ -75,6 +75,17 @@ export const DATABASE_GRAPH_READ_CONCURRENCY = 8;
 export const IMPORT_SITE_VALIDATION_CONCURRENCY = 8;
 
 /**
+ * Maximum number of imported-site notification events to emit at once.
+ *
+ * @remarks
+ * A large import may add many sites. Emitting all follow-up site-added events
+ * at once can burst IPC/event listeners immediately after persistence, so the
+ * import completion path uses the same bounded worker-pool pattern as other
+ * user-sized import work.
+ */
+export const IMPORT_SITE_EVENT_EMIT_CONCURRENCY = 8;
+
+/**
  * User agent string for HTTP requests.
  *
  * @remarks

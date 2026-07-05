@@ -20,7 +20,10 @@ import type { DatabaseCommandContext } from "../../../services/commands/database
 import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
-import { IMPORT_SITE_VALIDATION_CONCURRENCY } from "../../../constants";
+import {
+    IMPORT_SITE_EVENT_EMIT_CONCURRENCY,
+    IMPORT_SITE_VALIDATION_CONCURRENCY,
+} from "../../../constants";
 import {
     DatabaseCommand,
     DatabaseCommandExecutor,
@@ -992,6 +995,54 @@ describe("DatabaseCommands", () => {
             ).toHaveBeenCalledWith(importedSites, {});
             expect(maxActive).toBeLessThanOrEqual(
                 IMPORT_SITE_VALIDATION_CONCURRENCY
+            );
+        });
+
+        it("should bound concurrent imported site-added events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Performance", "type");
+
+            const importedSites = Array.from(
+                { length: IMPORT_SITE_EVENT_EMIT_CONCURRENCY + 3 },
+                (_, index) => createTestSite(`event-${index}`)
+            );
+            let active = 0;
+            let maxActive = 0;
+
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                settings: {},
+                sites: importedSites,
+            });
+            mockSiteRepositoryService.getSitesFromDatabase.mockResolvedValue(
+                importedSites
+            );
+            mockEventBus.emitTyped.mockImplementation(async (eventName) => {
+                if (eventName !== "internal:site:added") {
+                    return;
+                }
+
+                active += 1;
+                maxActive = Math.max(maxActive, active);
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 1);
+                });
+                active -= 1;
+            });
+
+            await command.execute();
+
+            const siteAddedCalls = mockEventBus.emitTyped.mock.calls.filter(
+                ([eventName]) => eventName === "internal:site:added"
+            );
+
+            expect(siteAddedCalls).toHaveLength(importedSites.length);
+            expect(maxActive).toBeLessThanOrEqual(
+                IMPORT_SITE_EVENT_EMIT_CONCURRENCY
             );
         });
 
