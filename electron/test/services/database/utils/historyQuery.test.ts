@@ -10,6 +10,7 @@ import type { StatusHistory } from "@shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
+import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { fc, test } from "@fast-check/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -35,6 +36,10 @@ vi.mock("../../../../services/database/utils/mappers/historyMapper", () => ({
 // Test constants
 const TEST_TIMESTAMP = 1_680_000_000_000;
 const TEST_TIMESTAMP_2 = 1_680_000_001_000;
+
+const statusHistoryStatusArbitrary = fc.constantFrom<StatusHistory["status"]>(
+    ...STATUS_HISTORY_VALUES
+);
 
 describe("historyQuery utilities", () => {
     let mockDb: Database;
@@ -277,7 +282,7 @@ describe("historyQuery utilities", () => {
                 fc.array(
                     fc.record({
                         timestamp: fc.integer({ min: 0, max: Date.now() }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.integer({ min: 0, max: 60_000 }),
                         details: fc.oneof(
                             fc.string({ maxLength: 200 }),
@@ -381,7 +386,7 @@ describe("historyQuery utilities", () => {
                             min: Date.now() - 1_000_000,
                             max: Date.now(),
                         }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.oneof(
                             fc.integer({ min: 0, max: 100 }),
                             fc.integer({ min: 5000, max: 60_000 })
@@ -425,7 +430,7 @@ describe("historyQuery utilities", () => {
 
                     // Verify all results are valid StatusHistory objects
                     for (const entry of result) {
-                        expect(["up", "down"]).toContain(entry.status);
+                        expect(STATUS_HISTORY_VALUES).toContain(entry.status);
                         expect(typeof entry.timestamp).toBe("number");
                         expect(typeof entry.responseTime).toBe("number");
                     }
@@ -1027,7 +1032,7 @@ describe("historyQuery utilities", () => {
                 fc.string({ minLength: 1, maxLength: 100 }),
                 fc.record({
                     timestamp: fc.integer({ min: 0, max: Date.now() }),
-                    status: fc.constantFrom("up", "down"),
+                    status: statusHistoryStatusArbitrary,
                     responseTime: fc.integer({ min: 0, max: 60_000 }),
                     details: fc.oneof(
                         fc.string({ maxLength: 200 }),
@@ -1072,7 +1077,7 @@ describe("historyQuery utilities", () => {
                     expect(result).toEqual(expectedMappedEntry);
 
                     if (result) {
-                        expect(["up", "down"]).toContain(result.status);
+                        expect(STATUS_HISTORY_VALUES).toContain(result.status);
                         expect(typeof result.timestamp).toBe("number");
                         expect(typeof result.responseTime).toBe("number");
                     }
@@ -1138,7 +1143,7 @@ describe("historyQuery utilities", () => {
                             min: Date.now() - 1_000_000,
                             max: Date.now(),
                         }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.integer({ min: 0, max: 5000 }),
                     }),
                     { minLength: 1, maxLength: 8 }
@@ -1199,7 +1204,7 @@ describe("historyQuery utilities", () => {
                             max: Date.now() + 100_000,
                         })
                     ),
-                    status: fc.constantFrom("up", "down"),
+                    status: statusHistoryStatusArbitrary,
                     responseTime: fc.oneof(
                         fc.integer({ min: 0, max: 0 }),
                         fc.integer({ min: 1, max: 100 }),
