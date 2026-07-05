@@ -605,7 +605,7 @@ export class DataImportExportService {
     }
 
     /**
-     * Import history for created monitors by matching with original monitors.
+     * Import history for created monitors by preserving import order.
      * Private helper method for history data persistence.
      */
     private importHistoryForMonitors(
@@ -613,15 +613,11 @@ export class DataImportExportService {
         createdMonitors: Site["monitors"],
         originalMonitors: Site["monitors"]
     ): void {
-        for (const createdMonitor of createdMonitors) {
-            // Find the original monitor with matching properties to get its
-            // history
-            const originalMonitor = originalMonitors.find(
-                (orig) =>
-                    orig.type === createdMonitor.type &&
-                    orig.url === createdMonitor.url &&
-                    orig.port === createdMonitor.port
-            );
+        for (const [
+            index,
+            createdMonitor,
+        ] of createdMonitors.entries()) {
+            const originalMonitor = originalMonitors[index];
 
             if (
                 originalMonitor?.history &&

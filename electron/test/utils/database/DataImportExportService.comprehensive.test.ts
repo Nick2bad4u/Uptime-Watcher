@@ -1125,6 +1125,82 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
+        it("should preserve history order for duplicate endpoint monitors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Import Operation", "type");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+            const duplicateEndpointMonitors = [
+                {
+                    type: "http" as const,
+                    url: "https://example.com",
+                    history: [
+                        {
+                            status: "up" as const,
+                            timestamp: 1000,
+                            responseTime: 50,
+                        },
+                    ],
+                },
+                {
+                    type: "http" as const,
+                    url: "https://example.com",
+                    history: [
+                        {
+                            status: "down" as const,
+                            timestamp: 2000,
+                            responseTime: 0,
+                        },
+                    ],
+                },
+            ];
+
+            const mockSites: ImportSite[] = [
+                {
+                    identifier: "test-site",
+                    monitors: duplicateEndpointMonitors as any,
+                },
+            ];
+
+            mockRepositories.monitor.createInternal
+                .mockReturnValueOnce("first-monitor-id")
+                .mockReturnValueOnce("second-monitor-id");
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            await service.persistImportedData(mockSites, {});
+
+            expect(
+                mockRepositories.history.addEntryInternal
+            ).toHaveBeenCalledTimes(2);
+            expect(
+                mockRepositories.history.addEntryInternal
+            ).toHaveBeenNthCalledWith(
+                1,
+                mockDatabase,
+                "first-monitor-id",
+                { status: "up", timestamp: 1000, responseTime: 50 },
+                ""
+            );
+            expect(
+                mockRepositories.history.addEntryInternal
+            ).toHaveBeenNthCalledWith(
+                2,
+                mockDatabase,
+                "second-monitor-id",
+                { status: "down", timestamp: 2000, responseTime: 0 },
+                ""
+            );
+        });
+
         it("should handle monitors without IDs during history import", async ({
             task,
             annotate,
