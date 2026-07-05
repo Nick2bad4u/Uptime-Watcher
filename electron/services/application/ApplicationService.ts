@@ -1,5 +1,3 @@
-import type { UnknownRecord } from "type-fest";
-
 import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
@@ -61,7 +59,7 @@ import {
 } from "@shared/utils/logTemplates";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { app } from "electron";
-import { arrayJoin, isEmpty, objectHasIn } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -93,7 +91,7 @@ const hasCloseFunction = (
         return false;
     }
 
-    if (!objectHasIn(castUnchecked<UnknownRecord>(candidate), "close")) {
+    if (!Reflect.has(candidate, "close")) {
         return false;
     }
 
@@ -212,10 +210,7 @@ export class ApplicationService {
             // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
             if (
-                objectHasIn(
-                    castUnchecked<UnknownRecord>(ipcService),
-                    "cleanup"
-                ) &&
+                Reflect.has(ipcService, "cleanup") &&
                 typeof ipcService.cleanup === "function"
             ) {
                 ipcService.cleanup();

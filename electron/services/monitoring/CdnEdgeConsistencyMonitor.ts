@@ -13,16 +13,10 @@ import type { AxiosInstance } from "axios";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
-import {
-    arrayJoin,
-    isEmpty,
-    isFinite as isFiniteNumber,
-    objectHasIn,
-} from "ts-extras";
+import { arrayJoin, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
 import type {
     IMonitorService,
@@ -144,10 +138,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         );
 
         if (!baselineResult.success) {
-            const baselineError = objectHasIn(
-                castUnchecked<Record<PropertyKey, unknown>>(baselineResult),
-                "error"
-            )
+            const baselineError = Reflect.has(baselineResult, "error")
                 ? baselineResult.error
                 : "Unknown baseline failure";
             throw new Error(`Baseline request failed: ${baselineError}`);
