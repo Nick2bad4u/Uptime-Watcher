@@ -5,6 +5,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    getSafeUrlForDisplay,
     getSafeUrlForLogging,
     isAllowedExternalOpenUrl,
     isPrivateNetworkHostname,
@@ -346,6 +347,37 @@ describe("urlSafety", () => {
             expect(
                 getSafeUrlForLogging("file:///C:/Users/Nick/Secrets.txt")
             ).toBe("file:[redacted]");
+        });
+    });
+
+    describe(getSafeUrlForDisplay, () => {
+        it("removes query strings and hashes", () => {
+            expect(
+                getSafeUrlForDisplay(
+                    "https://example.com/path?token=secret#section"
+                )
+            ).toBe("https://example.com/path");
+        });
+
+        it("preserves host-only display without a trailing slash", () => {
+            expect(getSafeUrlForDisplay("https://example.com")).toBe(
+                "https://example.com"
+            );
+        });
+
+        it("preserves explicit root paths", () => {
+            expect(getSafeUrlForDisplay("https://example.com/")).toBe(
+                "https://example.com/"
+            );
+        });
+
+        it("redacts suspicious long path segments", () => {
+            const tokenSegment = "A1".repeat(40);
+            expect(
+                getSafeUrlForDisplay(
+                    `https://example.com/reset/${tokenSegment}`
+                )
+            ).toBe("https://example.com/reset/[redacted]");
         });
     });
 

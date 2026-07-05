@@ -1,6 +1,6 @@
 import type { Monitor, MonitorType } from "@shared/types";
 
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { validateMonitorType } from "@shared/utils/validation";
 import { objectAssign, objectKeys } from "ts-extras";
 
@@ -9,34 +9,6 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
 
 const isMonitorTypeKey = (candidate: string): candidate is MonitorType =>
     validateMonitorType(candidate);
-
-const hasExplicitPath = (url: string): boolean => {
-    const schemeEnd = url.indexOf("://");
-    if (schemeEnd === -1) {
-        return false;
-    }
-
-    let cursor = schemeEnd + 3;
-    while (cursor < url.length) {
-        const char = url[cursor];
-        if (char === "/" || char === "?" || char === "#") {
-            return char === "/";
-        }
-
-        cursor += 1;
-    }
-
-    return false;
-};
-
-const getSafeUrlForDisplay = (url: string): string => {
-    const safeUrl = getSafeUrlForLogging(url);
-    if (!hasExplicitPath(url) && safeUrl.endsWith("/")) {
-        return safeUrl.slice(0, -1);
-    }
-
-    return safeUrl;
-};
 
 const formatUrlSuffix = (url: string | undefined): string =>
     url ? ` (${getSafeUrlForDisplay(url)})` : "";

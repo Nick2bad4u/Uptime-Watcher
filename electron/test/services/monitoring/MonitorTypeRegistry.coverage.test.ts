@@ -177,4 +177,77 @@ describe("MonitorTypeRegistry runtime coverage", () => {
 
         expect(remaining.size).toBe(0);
     });
+
+    it("redacts URL secrets from monitor title suffixes", () => {
+        const urlCases: {
+            readonly expected: string;
+            readonly monitor: Monitor;
+            readonly type: MonitorType;
+        }[] = [
+            {
+                expected: " (https://example.com/status)",
+                monitor: {
+                    ...buildMonitor("http"),
+                    url: "https://example.com/status?token=secret#fragment",
+                },
+                type: "http",
+            },
+            {
+                expected: " (https://origin.example.com/status)",
+                monitor: {
+                    ...buildMonitor("cdn-edge-consistency"),
+                    baselineUrl:
+                        "https://origin.example.com/status?access_token=secret#fragment",
+                },
+                type: "cdn-edge-consistency",
+            },
+            {
+                expected: " (https://primary.example.com/status)",
+                monitor: {
+                    ...buildMonitor("replication"),
+                    primaryStatusUrl:
+                        "https://primary.example.com/status?refresh_token=secret#fragment",
+                },
+                type: "replication",
+            },
+            {
+                expected: " (https://replica.example.com/status)",
+                monitor: {
+                    ...buildMonitor("replication"),
+                    primaryStatusUrl: undefined,
+                    replicaStatusUrl:
+                        "https://replica.example.com/status?refresh_token=secret#fragment",
+                },
+                type: "replication",
+            },
+            {
+                expected: " (https://heartbeat.example.com/status)",
+                monitor: {
+                    ...buildMonitor("server-heartbeat"),
+                    url: "https://heartbeat.example.com/status?api_key=secret#fragment",
+                },
+                type: "server-heartbeat",
+            },
+            {
+                expected: " (wss://socket.example.com/live)",
+                monitor: {
+                    ...buildMonitor("websocket-keepalive"),
+                    url: "wss://socket.example.com/live?token=secret#fragment",
+                },
+                type: "websocket-keepalive",
+            },
+        ];
+
+        for (const { expected, monitor, type } of urlCases) {
+            const suffix =
+                getMonitorTypeConfig(type)?.uiConfig?.formatTitleSuffix?.(
+                    monitor
+                );
+
+            expect(suffix).toBe(expected);
+            expect(suffix).not.toContain("secret");
+            expect(suffix).not.toContain("token");
+            expect(suffix).not.toContain("fragment");
+        }
+    });
 });

@@ -9,7 +9,7 @@ import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
 import { MONITOR_STATUS_VALUES } from "@shared/types";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import * as fc from "fast-check";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { isPresent } from "ts-extras";
@@ -58,34 +58,6 @@ const buildMinimalMonitor = (overrides: Partial<Monitor>): Monitor =>
         type: "http",
         ...overrides,
     }) as Monitor;
-
-const hasExplicitUrlPath = (url: string): boolean => {
-    const schemeEnd = url.indexOf("://");
-    if (schemeEnd === -1) {
-        return false;
-    }
-
-    let cursor = schemeEnd + 3;
-    while (cursor < url.length) {
-        const char = url[cursor];
-        if (char === "/" || char === "?" || char === "#") {
-            return char === "/";
-        }
-
-        cursor += 1;
-    }
-
-    return false;
-};
-
-const getExpectedSafeDisplayIdentifier = (url: string): string => {
-    const safeUrl = getSafeUrlForLogging(url);
-    if (!hasExplicitUrlPath(url) && safeUrl.endsWith("/")) {
-        return safeUrl.slice(0, -1);
-    }
-
-    return safeUrl;
-};
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
@@ -805,7 +777,7 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(getExpectedSafeDisplayIdentifier(url));
+                            ).toBe(getSafeUrlForDisplay(url));
                         }
                     )
                 );
@@ -985,9 +957,7 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(
-                                getExpectedSafeDisplayIdentifier(baselineUrl)
-                            );
+                            ).toBe(getSafeUrlForDisplay(baselineUrl));
                         }
                     )
                 );
@@ -1049,9 +1019,7 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(
-                                getExpectedSafeDisplayIdentifier(primaryUrl)
-                            );
+                            ).toBe(getSafeUrlForDisplay(primaryUrl));
                         }
                     )
                 );
@@ -1081,9 +1049,7 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(
-                                getExpectedSafeDisplayIdentifier(replicaUrl)
-                            );
+                            ).toBe(getSafeUrlForDisplay(replicaUrl));
                         }
                     )
                 );
@@ -1119,9 +1085,7 @@ describe("fallback Utilities", () => {
                                 fallback
                             );
 
-                            expect(result).toBe(
-                                getExpectedSafeDisplayIdentifier(url)
-                            );
+                            expect(result).toBe(getSafeUrlForDisplay(url));
                         }
                     )
                 );
@@ -1379,7 +1343,7 @@ describe("fallback Utilities", () => {
                         fallback
                     );
 
-                    expect(result).toBe(getExpectedSafeDisplayIdentifier(url));
+                    expect(result).toBe(getSafeUrlForDisplay(url));
                 }
             );
 

@@ -104,6 +104,25 @@ function getRedactedPathname(pathname: string): string {
     );
 }
 
+function hasExplicitUrlPath(rawUrl: string): boolean {
+    const schemeEnd = rawUrl.indexOf("://");
+    if (schemeEnd === -1) {
+        return false;
+    }
+
+    let cursor = schemeEnd + 3;
+    while (cursor < rawUrl.length) {
+        const char = rawUrl[cursor];
+        if (char === "/" || char === "?" || char === "#") {
+            return char === "/";
+        }
+
+        cursor += 1;
+    }
+
+    return false;
+}
+
 /**
  * Removes sensitive URL parts so log lines don't leak credentials or tokens.
  *
@@ -141,6 +160,24 @@ export function getSafeUrlForLogging(rawUrl: string): string {
     } catch {
         return "[unparseable-url]";
     }
+}
+
+/**
+ * Returns a sanitized URL string suitable for compact UI labels.
+ *
+ * @remarks
+ * This uses {@link getSafeUrlForLogging} to drop credentials, query strings,
+ * hashes, and suspicious long path segments, then preserves the app's existing
+ * host-only display convention by removing the WHATWG helper slash when the
+ * input URL did not include an explicit path.
+ */
+export function getSafeUrlForDisplay(rawUrl: string): string {
+    const safeUrl = getSafeUrlForLogging(rawUrl);
+    if (!hasExplicitUrlPath(rawUrl) && safeUrl.endsWith("/")) {
+        return safeUrl.slice(0, -1);
+    }
+
+    return safeUrl;
 }
 
 /**

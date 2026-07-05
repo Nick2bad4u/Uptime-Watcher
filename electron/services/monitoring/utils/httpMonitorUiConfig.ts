@@ -4,6 +4,8 @@ import { isDefined } from "ts-extras";
 
 import type { MonitorUIConfig } from "../monitorUiConfig";
 
+import { createUrlTitleSuffixResolver } from "./monitorTitleSuffixResolvers";
+
 /**
  * UI overrides for HTTP/HTTPS-like monitor types.
  */
@@ -15,16 +17,7 @@ export type HttpMonitorUiOverrides = Partial<MonitorUIConfig>;
 export function createUrlSuffixResolver(
     type: string
 ): (monitor: Monitor) => string {
-    return (monitor: Monitor) => {
-        const hasMatchingType = monitor.type === type;
-        const urlValue = monitor.url;
-
-        if (!hasMatchingType || typeof urlValue !== "string") {
-            return "";
-        }
-
-        return urlValue.length > 0 ? ` (${urlValue})` : "";
-    };
+    return createUrlTitleSuffixResolver({ monitorType: type });
 }
 
 /**

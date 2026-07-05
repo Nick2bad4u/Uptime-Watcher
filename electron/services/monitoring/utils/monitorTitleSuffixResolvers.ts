@@ -1,11 +1,27 @@
 import type { Monitor } from "@shared/types";
 
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { isDefined } from "ts-extras";
 
 const wrapSuffix = (value: string): string =>
     value.length > 0 ? ` (${value})` : "";
 
 type MonitorTitleSuffixResolver = (monitor: Monitor) => string;
+type MonitorUrlField =
+    | "baselineUrl"
+    | "primaryStatusUrl"
+    | "replicaStatusUrl"
+    | "url";
+
+const resolveSafeUrlField = (
+    monitor: Monitor,
+    field: MonitorUrlField
+): string => {
+    const rawUrl = monitor[field];
+    return typeof rawUrl === "string" && rawUrl.length > 0
+        ? getSafeUrlForDisplay(rawUrl)
+        : "";
+};
 
 /**
  * Creates a title suffix resolver for host:port monitor types.
@@ -86,6 +102,41 @@ export function createTlsTitleSuffixResolver(args: {
                 typeof monitor.port === "number" ? `:${monitor.port}` : "";
 
             return `${host}${portSuffix}`;
+        },
+    });
+}
+
+/**
+ * Creates a title suffix resolver for monitor types that display one URL field.
+ */
+export function createUrlTitleSuffixResolver(args: {
+    field?: MonitorUrlField;
+    monitorType: string;
+}): (monitor: Monitor) => string {
+    return createMonitorTypeTitleSuffixResolver({
+        monitorType: args.monitorType,
+        resolve: (monitor) => resolveSafeUrlField(monitor, args.field ?? "url"),
+    });
+}
+
+/**
+ * Creates a title suffix resolver using the first populated URL field.
+ */
+export function createFirstUrlTitleSuffixResolver(args: {
+    fields: readonly MonitorUrlField[];
+    monitorType: string;
+}): (monitor: Monitor) => string {
+    return createMonitorTypeTitleSuffixResolver({
+        monitorType: args.monitorType,
+        resolve: (monitor) => {
+            for (const field of args.fields) {
+                const safeUrl = resolveSafeUrlField(monitor, field);
+                if (safeUrl.length > 0) {
+                    return safeUrl;
+                }
+            }
+
+            return "";
         },
     });
 }

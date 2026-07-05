@@ -35,7 +35,7 @@ import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import {
     arrayJoin,
     isDefined,
@@ -225,25 +225,6 @@ export const MonitorDefaults: ReadonlyDeep<{
     timeout: 10_000, // 10 seconds
 } as const;
 
-const hasExplicitUrlPath = (url: string): boolean => {
-    const schemeEnd = url.indexOf("://");
-    if (schemeEnd === -1) {
-        return false;
-    }
-
-    let cursor = schemeEnd + 3;
-    while (cursor < url.length) {
-        const char = url[cursor];
-        if (char === "/" || char === "?" || char === "#") {
-            return char === "/";
-        }
-
-        cursor += 1;
-    }
-
-    return false;
-};
-
 const getSafeUrlForDisplayIdentifier = (
     url: string | undefined
 ): string | undefined => {
@@ -251,12 +232,7 @@ const getSafeUrlForDisplayIdentifier = (
         return undefined;
     }
 
-    const safeUrl = getSafeUrlForLogging(url);
-    if (!hasExplicitUrlPath(url) && safeUrl.endsWith("/")) {
-        return safeUrl.slice(0, -1);
-    }
-
-    return safeUrl;
+    return getSafeUrlForDisplay(url);
 };
 
 /**

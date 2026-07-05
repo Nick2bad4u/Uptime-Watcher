@@ -1,5 +1,3 @@
-import type { Monitor } from "@shared/types";
-
 import { monitorSchemas } from "@shared/validation/monitorSchemas";
 
 import type { BaseMonitorConfig } from "../MonitorTypeRegistry.types";
@@ -12,10 +10,12 @@ import { ReplicationMonitor } from "../ReplicationMonitor";
 import { ServerHeartbeatMonitor } from "../ServerHeartbeatMonitor";
 import { SslMonitor } from "../SslMonitor";
 import {
+    createFirstUrlTitleSuffixResolver,
     createHostPortTitleSuffixResolver,
     createHostTitleSuffixResolver,
     createRecordTypeHostTitleSuffixResolver,
     createTlsTitleSuffixResolver,
+    createUrlTitleSuffixResolver,
 } from "../utils/monitorTitleSuffixResolvers";
 import { WebsocketKeepaliveMonitor } from "../WebsocketKeepaliveMonitor";
 
@@ -296,10 +296,10 @@ export function registerNonHttpMonitorTypes(deps: {
                 showUrl: false,
             },
             formatDetail: (details: string) => details,
-            formatTitleSuffix: (monitor: Monitor) =>
-                monitor.type === "cdn-edge-consistency" && monitor.baselineUrl
-                    ? ` (${monitor.baselineUrl})`
-                    : "",
+            formatTitleSuffix: createUrlTitleSuffixResolver({
+                field: "baselineUrl",
+                monitorType: "cdn-edge-consistency",
+            }),
             helpTexts: {
                 primary:
                     "Compare CDN edge responses against your origin baseline URL.",
@@ -368,10 +368,10 @@ export function registerNonHttpMonitorTypes(deps: {
                 showUrl: true,
             },
             formatDetail: (details: string) => details,
-            formatTitleSuffix: (monitor: Monitor) =>
-                monitor.type === "replication" && monitor.primaryStatusUrl
-                    ? ` (${monitor.primaryStatusUrl})`
-                    : "",
+            formatTitleSuffix: createFirstUrlTitleSuffixResolver({
+                fields: ["primaryStatusUrl", "replicaStatusUrl"],
+                monitorType: "replication",
+            }),
             helpTexts: {
                 primary:
                     "Provide primary and replica status endpoints along with the JSON path of the replication timestamp.",
@@ -449,10 +449,9 @@ export function registerNonHttpMonitorTypes(deps: {
                 showUrl: true,
             },
             formatDetail: (details: string) => details,
-            formatTitleSuffix: (monitor: Monitor) =>
-                monitor.type === "server-heartbeat" && monitor.url
-                    ? ` (${monitor.url})`
-                    : "",
+            formatTitleSuffix: createUrlTitleSuffixResolver({
+                monitorType: "server-heartbeat",
+            }),
             helpTexts: {
                 primary:
                     "Heartbeat monitors ensure the endpoint reports an expected status within the allowed drift window.",
@@ -504,10 +503,9 @@ export function registerNonHttpMonitorTypes(deps: {
                 showUrl: true,
             },
             formatDetail: (details: string) => details,
-            formatTitleSuffix: (monitor: Monitor) =>
-                monitor.type === "websocket-keepalive" && monitor.url
-                    ? ` (${monitor.url})`
-                    : "",
+            formatTitleSuffix: createUrlTitleSuffixResolver({
+                monitorType: "websocket-keepalive",
+            }),
             helpTexts: {
                 primary:
                     "Monitor WebSocket endpoints by ensuring they answer ping frames within the configured delay.",
