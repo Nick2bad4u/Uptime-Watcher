@@ -205,6 +205,7 @@ export class MonitorScheduler {
                 abortController.abort("Monitor job timed out");
                 resolve({ kind: "timeout" });
             }, job.timeoutMs);
+            timeoutRef.handle.unref();
         });
 
         try {

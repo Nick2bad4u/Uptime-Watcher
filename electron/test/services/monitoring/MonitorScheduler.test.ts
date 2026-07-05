@@ -166,6 +166,33 @@ describe(MonitorScheduler, () => {
         expect(job?.timeoutMs).toBe(expectedTimeout);
     });
 
+    it("unrefs scheduled monitor timeout guards and next-run timers", async () => {
+        const originalSetTimeout = globalThis.setTimeout;
+        const unrefSpies: ReturnType<typeof vi.fn>[] = [];
+        const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+        setTimeoutSpy.mockImplementation(
+            ((...args: Parameters<typeof globalThis.setTimeout>) => {
+                const handle = originalSetTimeout(...args) as NodeJS.Timeout;
+                const originalUnref = handle.unref.bind(handle);
+                const unrefSpy = vi.fn(() => originalUnref());
+                handle.unref = unrefSpy;
+                unrefSpies.push(unrefSpy);
+                return handle;
+            }) as typeof globalThis.setTimeout
+        );
+
+        try {
+            scheduler.startMonitor("site-1", createMonitor());
+            await flushAsync();
+
+            expect(unrefSpies).toHaveLength(2);
+            expect(unrefSpies[0]).toHaveBeenCalledTimes(1);
+            expect(unrefSpies[1]).toHaveBeenCalledTimes(1);
+        } finally {
+            setTimeoutSpy.mockRestore();
+        }
+    });
+
     it("pre-empts the scheduled job when performing a manual check and resets backoff", async () => {
         mockCheckCallback = createCheckCallbackMock()
             .mockRejectedValueOnce(new Error("boom"))
