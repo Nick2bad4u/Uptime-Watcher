@@ -29,8 +29,9 @@
  * @packageDocumentation
  */
 
-import type { Monitor } from "@shared/types";
+import type { Monitor, MonitorStatus } from "@shared/types";
 
+import { MONITOR_STATUS_VALUES } from "@shared/types";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
@@ -68,7 +69,7 @@ describe("fallback Utils Property-Based Tests", () => {
             id: fc.string({ minLength: 1, maxLength: 50 }),
             port: fc.option(fc.integer({ min: 1, max: 65_535 })),
             retryAttempts: fc.option(fc.integer({ min: 0, max: 10 })),
-            status: fc.constantFrom("up", "down", "pending", "paused"),
+            status: fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
             timeout: fc.option(fc.integer({ min: 1000, max: 30_000 })), // 1s to 30s
             type: fc.constantFrom("http", "ping", "port", "dns", "ssl", "api"),
             url: fc.option(fc.webUrl()),
