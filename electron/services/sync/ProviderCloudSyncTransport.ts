@@ -129,6 +129,29 @@ function isCloudSyncSizeLimitError(error: unknown): boolean {
     return ensureError(error) instanceof CloudSyncSizeLimitError;
 }
 
+function parseRemoteJson(args: {
+    key: string;
+    kind: CloudSyncCorruptRemoteObjectError["kind"];
+    messagePrefix: string;
+    raw: string;
+}): unknown {
+    const { key, kind, messagePrefix, raw } = args;
+
+    try {
+        return JSON.parse(raw);
+    } catch (error: unknown) {
+        const resolved = ensureError(error);
+        throw new CloudSyncCorruptRemoteObjectError(
+            `${messagePrefix}: ${resolved.message}`,
+            {
+                cause: error,
+                key,
+                kind,
+            }
+        );
+    }
+}
+
 function getSnapshotsPrefix(): string {
     return `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}`;
 }
@@ -236,13 +259,20 @@ function parseNdjsonOperations(args: {
                 );
             }
 
+            const messagePrefix = `Failed to parse cloud sync operation in ${key} at line ${index + 1}`;
+            const parsed = parseRemoteJson({
+                key,
+                kind: "operations",
+                messagePrefix,
+                raw: line,
+            });
+
             try {
-                const parsed: unknown = JSON.parse(line);
                 operations.push(parseCloudSyncOperation(parsed));
             } catch (error: unknown) {
                 const normalized = ensureError(error);
                 throw new CloudSyncCorruptRemoteObjectError(
-                    `Failed to parse cloud sync operation in ${key} at line ${index + 1}: ${normalized.message}`,
+                    `${messagePrefix}: ${normalized.message}`,
                     {
                         cause: error,
                         key,
@@ -511,21 +541,12 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 return null;
             }
 
-            const parsedManifest = ((): unknown => {
-                try {
-                    return JSON.parse(rawOrNull);
-                } catch (error: unknown) {
-                    const resolved = ensureError(error);
-                    throw new CloudSyncCorruptRemoteObjectError(
-                        `Cloud sync manifest contains invalid JSON: ${resolved.message}`,
-                        {
-                            cause: error,
-                            key: MANIFEST_KEY,
-                            kind: "manifest",
-                        }
-                    );
-                }
-            })();
+            const parsedManifest = parseRemoteJson({
+                key: MANIFEST_KEY,
+                kind: "manifest",
+                messagePrefix: "Cloud sync manifest contains invalid JSON",
+                raw: rawOrNull,
+            });
 
             const manifest = parseCloudSyncManifest(parsedManifest);
             validateManifestSnapshotKey(manifest);
@@ -674,21 +695,12 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 }
             })();
 
-            const parsedSnapshot = ((): unknown => {
-                try {
-                    return JSON.parse(raw);
-                } catch (error: unknown) {
-                    const resolved = ensureError(error);
-                    throw new CloudSyncCorruptRemoteObjectError(
-                        `Cloud sync snapshot '${key}' contains invalid JSON: ${resolved.message}`,
-                        {
-                            cause: error,
-                            key,
-                            kind: "snapshot",
-                        }
-                    );
-                }
-            })();
+            const parsedSnapshot = parseRemoteJson({
+                key,
+                kind: "snapshot",
+                messagePrefix: `Cloud sync snapshot '${key}' contains invalid JSON`,
+                raw,
+            });
 
             return parseCloudSyncSnapshot(parsedSnapshot);
         } catch (error) {
