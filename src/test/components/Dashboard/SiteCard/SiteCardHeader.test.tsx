@@ -135,6 +135,27 @@ describe(SiteCardHeader, () => {
         site: { site: baseSite },
     } as const;
 
+    const getFaviconImage = (): HTMLImageElement | null =>
+        document.querySelector<HTMLImageElement>(
+            ".site-card__title-dot-favicon"
+        );
+
+    const createPropsWithMonitorEndpoint = (endpoint: string) => ({
+        ...baseProps,
+        site: {
+            site: {
+                ...baseSite,
+                monitors: [
+                    {
+                        id: "monitor-1",
+                        type: "http",
+                        url: endpoint,
+                    },
+                ] as Site["monitors"],
+            },
+        },
+    });
+
     beforeEach(() => {
         monitorSelectorCalls.length = 0;
         actionButtonCalls.length = 0;
@@ -203,5 +224,38 @@ describe(SiteCardHeader, () => {
         expect(
             baseProps.interactions.onStopSiteMonitoring
         ).toHaveBeenCalledTimes(1);
+    });
+
+    it("uses a redacted public URL for third-party favicon lookup", () => {
+        render(
+            <SiteCardHeader
+                {...createPropsWithMonitorEndpoint(
+                    "https://example.com/path/abcdefghijklmnopqrstuvwxyz123456?token=secret#fragment"
+                )}
+            />
+        );
+
+        const favicon = getFaviconImage();
+        const faviconSrc = favicon?.getAttribute("src") ?? "";
+
+        expect(faviconSrc).toContain("https://api.microlink.io/");
+        expect(faviconSrc).toContain(
+            encodeURIComponent("https://example.com/path/[redacted]")
+        );
+        expect(faviconSrc).not.toContain("token");
+        expect(faviconSrc).not.toContain("secret");
+        expect(faviconSrc).not.toContain("fragment");
+    });
+
+    it.each([
+        "http://localhost:3000/status",
+        "https://192.168.1.10/dashboard",
+        "https://user:pass@example.com/private",
+    ])("does not create third-party favicon URLs for unsafe endpoints: %s", (
+        endpoint
+    ) => {
+        render(<SiteCardHeader {...createPropsWithMonitorEndpoint(endpoint)} />);
+
+        expect(getFaviconImage()).toBeNull();
     });
 });

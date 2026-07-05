@@ -6,6 +6,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { tryGetSafeThirdPartyHttpUrl } from "@shared/utils/urlSafety";
 import {
     type ChangeEvent,
     memo,
@@ -63,7 +64,12 @@ const toFaviconUrl = (endpoint: string | undefined): string | undefined => {
             lookupUrl.protocol = "https:";
         }
 
-        return `https://api.microlink.io/?url=${encodeURIComponent(lookupUrl.href)}&meta=false&embed=logo.url`;
+        const safeThirdPartyUrl = tryGetSafeThirdPartyHttpUrl(lookupUrl.href);
+        if (!safeThirdPartyUrl) {
+            return undefined;
+        }
+
+        return `https://api.microlink.io/?url=${encodeURIComponent(safeThirdPartyUrl)}&meta=false&embed=logo.url`;
     } catch {
         return undefined;
     }
