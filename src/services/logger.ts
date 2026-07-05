@@ -145,8 +145,7 @@ function getLogTransport<K extends keyof LogTransports>(
 // logging 3. Avoids direct file access conflicts that would occur with main
 // process logging Check if we're in production mode (Vite sets MODE to
 // 'production' in production builds)
-const metaEnv = safeCastTo<{ env?: { MODE?: string } }>(import.meta);
-const isProduction = metaEnv.env?.MODE === "production";
+const isProduction = import.meta.env.MODE === "production";
 const consoleTransport = getLogTransport("console");
 if (consoleTransport) {
     consoleTransport.level = isProduction ? "info" : "debug";
