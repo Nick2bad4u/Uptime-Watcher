@@ -2,6 +2,7 @@ import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { stringSplit } from "ts-extras";
 
 import {
@@ -93,7 +94,11 @@ function assertCanonicalBackupFileName(fileName: string): void {
         fileName !== fileName.trim() ||
         normalized !== fileName ||
         basename !== fileName ||
-        basename.length === 0
+        basename.length === 0 ||
+        basename === "." ||
+        basename === ".." ||
+        fileName.includes(":") ||
+        hasAsciiControlCharacters(fileName)
     ) {
         throw new Error(
             "Backup fileName must be a single normalized path segment"

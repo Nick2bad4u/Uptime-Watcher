@@ -17,7 +17,7 @@ describe(downloadBackupWithMetadata, () => {
                 if (requestedKey.endsWith(".metadata.json")) {
                     const entry: CloudBackupEntry = {
                         encrypted: false,
-                        fileName: "backup.sqlite",
+                        fileName: "other.sqlite",
                         key: "backups/other.sqlite",
                         metadata: {
                             appVersion: "1.0.0",
@@ -79,6 +79,10 @@ describe(uploadBackupWithMetadata, () => {
         ["windows path", String.raw`nested\backup.sqlite`],
         ["leading whitespace", " backup.sqlite"],
         ["trailing whitespace", "backup.sqlite "],
+        ["windows drive token", "C:backup.sqlite"],
+        ["control character", "backup\n.sqlite"],
+        ["current directory segment", "."],
+        ["parent directory segment", ".."],
         ["empty name", ""],
     ])(
         "rejects non-canonical backup fileName values from %s before uploading",
