@@ -15,6 +15,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { MonitorCheckContext } from "../checkContext";
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
@@ -67,7 +68,7 @@ export async function runServiceCheckOperation(args: {
             safeError
         );
 
-        const serviceResult = toFailure(safeError.message);
+        const serviceResult = toFailure(getUserFacingErrorDetail(error));
 
         return {
             checkResult: buildStatusUpdateMonitorCheckResult({
