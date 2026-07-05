@@ -4,6 +4,39 @@ const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
 // This call is best-effort UI metadata and should never hang indefinitely.
 const GOOGLE_USERINFO_TIMEOUT_MS = 5000;
+const MAX_GOOGLE_ACCOUNT_LABEL_CHARS = 320;
+
+function replaceAsciiControlCharacters(value: string): string {
+    let result = "";
+
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        result +=
+            codePoint !== undefined && (codePoint < 0x20 || codePoint === 0x7f)
+                ? " "
+                : character;
+    }
+
+    return result;
+}
+
+function normalizeAccountLabel(value: string | undefined): string | undefined {
+    if (!value) {
+        return undefined;
+    }
+
+    const compacted = replaceAsciiControlCharacters(value)
+        .replaceAll(/\s+/gu, " ")
+        .trim();
+
+    if (!compacted) {
+        return undefined;
+    }
+
+    return compacted.length <= MAX_GOOGLE_ACCOUNT_LABEL_CHARS
+        ? compacted
+        : `${compacted.slice(0, MAX_GOOGLE_ACCOUNT_LABEL_CHARS)}...`;
+}
 
 /**
  * Fetches a human-readable account label for the currently authorized Google
@@ -32,12 +65,12 @@ export async function fetchGoogleAccountLabel(
         const candidate: unknown = await response.json();
 
         const parsed = tryParseGoogleUserInfoResponse(candidate);
-        const email = parsed?.email?.trim();
+        const email = normalizeAccountLabel(parsed?.email);
         if (email) {
             return email;
         }
 
-        const name = parsed?.name?.trim();
+        const name = normalizeAccountLabel(parsed?.name);
         if (name) {
             return name;
         }

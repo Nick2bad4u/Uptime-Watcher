@@ -42,6 +42,32 @@ describe(fetchGoogleAccountLabel, () => {
         await expect(fetchGoogleAccountLabel("token")).resolves.toBe("Nick");
     });
 
+    it("compacts account label whitespace and control characters", async () => {
+        const fetchMock = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ email: "  me@example.com\n\t " }),
+        });
+        vi.stubGlobal("fetch", fetchMock);
+
+        await expect(fetchGoogleAccountLabel("token")).resolves.toBe(
+            "me@example.com"
+        );
+    });
+
+    it("bounds oversized account labels", async () => {
+        const fetchMock = vi.fn().mockResolvedValue({
+            ok: true,
+            json: async () => ({ name: "x".repeat(1000) }),
+        });
+        vi.stubGlobal("fetch", fetchMock);
+
+        const label = await fetchGoogleAccountLabel("token");
+
+        expect(label).toBeDefined();
+        expect(label).toHaveLength(323);
+        expect(label?.endsWith("...")).toBeTruthy();
+    });
+
     it("returns undefined on non-ok response", async () => {
         const fetchMock = vi.fn().mockResolvedValue({ ok: false });
         vi.stubGlobal("fetch", fetchMock);
