@@ -439,6 +439,14 @@ describe("time Utils Property-Based Tests", () => {
                 expect(result).toContain(attempts.toString());
             }
         );
+
+        fcTest.prop([
+            fc.constantFrom(Number.NaN, Infinity, Number.NEGATIVE_INFINITY),
+        ])("should return fallback for non-finite values", (attempts) => {
+            const result = formatRetryAttemptsText(attempts);
+
+            expect(result).toBe("N/A");
+        });
     });
 
     describe("tIME_PERIOD_LABELS constants", () => {

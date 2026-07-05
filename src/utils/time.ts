@@ -337,6 +337,10 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
  * @returns Descriptive text explaining retry behavior
  */
 export function formatRetryAttemptsText(attempts: number): string {
+    if (!Number.isFinite(attempts)) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     if (attempts === 0) {
         return "(Retry disabled - immediate failure detection)";
     }

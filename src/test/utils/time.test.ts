@@ -788,6 +788,20 @@ describe("time Utilities", () => {
                 "(Retry 2.7 times before marking down)"
             );
         });
+
+        it("should return fallback for non-finite values", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(formatRetryAttemptsText(Number.NaN)).toBe("N/A");
+            expect(formatRetryAttemptsText(Infinity)).toBe("N/A");
+            expect(formatRetryAttemptsText(-Infinity)).toBe("N/A");
+        });
     });
 
     describe("tIME_PERIOD_LABELS", () => {
