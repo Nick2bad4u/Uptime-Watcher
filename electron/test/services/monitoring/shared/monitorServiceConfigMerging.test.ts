@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
     assertPositiveTimeoutConfigUpdate,
+    copyMonitorServiceConfig,
     createDefaultMonitorServiceConfig,
     mergeMonitorServiceConfig,
 } from "../../../../services/monitoring/shared/monitorServiceConfigMerging";
@@ -159,6 +160,39 @@ describe("monitorServiceConfigMerging", () => {
                 timestamp: 1,
             },
         ]);
+    });
+
+    it("copies mutable config values for public snapshots", () => {
+        const history: MonitorServiceConfig["history"] = [
+            {
+                responseTime: 100,
+                status: "up",
+                timestamp: 1,
+            },
+        ];
+        const lastChecked = new Date("2026-01-01T00:00:00.000Z");
+        const config: MonitorServiceConfig = {
+            history,
+            lastChecked,
+            timeout: 7000,
+        };
+
+        const result = copyMonitorServiceConfig(config);
+
+        history[0].responseTime = 999;
+        lastChecked.setUTCFullYear(2030);
+
+        expect(result).toEqual({
+            history: [
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1,
+                },
+            ],
+            lastChecked: new Date("2026-01-01T00:00:00.000Z"),
+            timeout: 7000,
+        });
     });
 
     it("drops reserved prototype keys while creating defaults", () => {

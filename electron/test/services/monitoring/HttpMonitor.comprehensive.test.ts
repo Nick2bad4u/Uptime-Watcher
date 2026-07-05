@@ -245,7 +245,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             });
         });
 
-        it("should return shallow copy", async ({ task, annotate }) => {
+        it("should return a copy", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");
             await annotate("Category: Service", "category");
@@ -256,6 +256,44 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             expect(config1).not.toBe(config2);
             expect(config1).toEqual(config2);
+        });
+
+        it("should not expose mutable config values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const monitor = new HttpMonitor({
+                history: [
+                    {
+                        responseTime: 100,
+                        status: "up",
+                        timestamp: 1,
+                    },
+                ],
+            });
+            const config = monitor.getConfig();
+
+            config.history?.push({
+                responseTime: 200,
+                status: "down",
+                timestamp: 2,
+            });
+            if (config.history?.[0]) {
+                config.history[0].responseTime = 999;
+            }
+
+            expect(monitor.getConfig().history).toEqual([
+                {
+                    responseTime: 100,
+                    status: "up",
+                    timestamp: 1,
+                },
+            ]);
         });
     });
 

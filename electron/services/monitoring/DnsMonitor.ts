@@ -77,6 +77,7 @@ import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
+    copyMonitorServiceConfig,
     createDefaultMonitorServiceConfig,
     mergeMonitorServiceConfig,
 } from "./shared/monitorServiceConfigMerging";
@@ -441,14 +442,14 @@ export class DnsMonitor implements IMonitorService {
      * Get the current configuration.
      *
      * @remarks
-     * Returns a defensive shallow copy of the current configuration to prevent
+     * Returns a defensive copy of the current configuration to prevent
      * external modification. This ensures configuration immutability and
      * prevents accidental state corruption.
      *
-     * @returns A shallow copy of the current monitor configuration
+     * @returns A copy of the current monitor configuration
      */
     public getConfig(): MonitorServiceConfig {
-        return { ...this.config };
+        return copyMonitorServiceConfig(this.config);
     }
 
     /**

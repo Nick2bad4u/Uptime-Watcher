@@ -40,6 +40,7 @@ import type {
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import {
     assertPositiveTimeoutConfigUpdate,
+    copyMonitorServiceConfig,
     createDefaultMonitorServiceConfig,
     mergeMonitorServiceConfig,
 } from "./shared/monitorServiceConfigMerging";
@@ -149,17 +150,14 @@ export class PortMonitor implements IMonitorService {
      * Get the current configuration.
      *
      * @remarks
-     * Returns a defensive shallow copy of the current configuration to prevent
+     * Returns a defensive copy of the current configuration to prevent
      * external modification. This ensures configuration immutability and
-     * prevents accidental state corruption. Note that this is a shallow copy -
-     * only the top-level properties are copied. If nested objects are added to
-     * MonitorServiceConfig in the future, they would be referenced, not
-     * cloned.
+     * prevents accidental state corruption.
      *
-     * @returns A shallow copy of the current monitor configuration
+     * @returns A copy of the current monitor configuration
      */
     public getConfig(): MonitorServiceConfig {
-        return { ...this.config };
+        return copyMonitorServiceConfig(this.config);
     }
 
     /**

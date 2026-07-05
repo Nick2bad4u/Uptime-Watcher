@@ -48,6 +48,7 @@ import {
     type MonitorByType,
 } from "./monitorCoreHelpers";
 import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
+import { copyMonitorServiceConfig } from "./monitorServiceConfigMerging";
 import {
     createMonitorErrorResult,
     normalizeResponseTime,
@@ -408,7 +409,7 @@ export function createHttpMonitorService<
         }
 
         public getConfig(): MonitorServiceConfig {
-            return { ...this.config };
+            return copyMonitorServiceConfig(this.config);
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {

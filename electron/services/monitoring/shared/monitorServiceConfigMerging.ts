@@ -41,6 +41,16 @@ export function mergeMonitorServiceConfig(args: {
 }
 
 /**
+ * Copies resolved monitor service config for callers that should not receive
+ * mutable references owned by a monitor service instance.
+ */
+export function copyMonitorServiceConfig(
+    config: MonitorServiceConfig
+): MonitorServiceConfig {
+    return copyDefinedConfigData(config);
+}
+
+/**
  * Validates a timeout update when it is supplied as an own data property.
  */
 export function assertPositiveTimeoutConfigUpdate(
