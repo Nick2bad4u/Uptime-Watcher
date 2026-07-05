@@ -23,6 +23,8 @@
  */
 
 import { test as fcTest } from "@fast-check/vitest";
+import type { MonitorStatus, StatusHistoryStatus } from "@shared/types";
+import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "@shared/types";
 import {
     getSafeUrlForLogging,
     validateExternalOpenUrlCandidate,
@@ -36,6 +38,14 @@ import type { ChartTimeRange } from "../../../stores/types";
 
 import { SystemService } from "../../../services/SystemService";
 import { useUIStore } from "../../../stores/ui/useUiStore";
+
+const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
+
+const statusHistoryStatusArbitrary = fc.constantFrom<StatusHistoryStatus>(
+    ...STATUS_HISTORY_VALUES
+);
 
 const mockErrorStore = vi.hoisted(() => ({
     clearStoreError: vi.fn(),
@@ -159,7 +169,7 @@ const arbitraries = {
                     checkInterval: fc.integer({ min: 30_000, max: 3_600_000 }),
                     timeout: fc.integer({ min: 1000, max: 30_000 }),
                     retryAttempts: fc.integer({ min: 0, max: 5 }),
-                    status: fc.constantFrom("down", "paused", "pending", "up"),
+                    status: monitorStatusArbitrary,
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
                     type: fc.constantFrom("http", "ping", "port", "dns", "ssl"),
                     monitoring: fc.boolean(),
@@ -171,7 +181,7 @@ const arbitraries = {
                                     min: 0,
                                     max: Date.now(),
                                 }),
-                                status: fc.constantFrom("up", "down"),
+                                status: statusHistoryStatusArbitrary,
                                 responseTime: fc.integer({
                                     min: 0,
                                     max: 10_000,
@@ -183,7 +193,7 @@ const arbitraries = {
                                     min: 0,
                                     max: Date.now(),
                                 }),
-                                status: fc.constantFrom("up", "down"),
+                                status: statusHistoryStatusArbitrary,
                                 responseTime: fc.integer({
                                     min: 0,
                                     max: 10_000,
@@ -202,7 +212,7 @@ const arbitraries = {
                     checkInterval: fc.integer({ min: 30_000, max: 3_600_000 }),
                     timeout: fc.integer({ min: 1000, max: 30_000 }),
                     retryAttempts: fc.integer({ min: 0, max: 5 }),
-                    status: fc.constantFrom("down", "paused", "pending", "up"),
+                    status: monitorStatusArbitrary,
                     responseTime: fc.integer({ min: 0, max: 10_000 }),
                     type: fc.constantFrom("http", "ping", "port", "dns", "ssl"),
                     monitoring: fc.boolean(),
@@ -214,7 +224,7 @@ const arbitraries = {
                                     min: 0,
                                     max: Date.now(),
                                 }),
-                                status: fc.constantFrom("up", "down"),
+                                status: statusHistoryStatusArbitrary,
                                 responseTime: fc.integer({
                                     min: 0,
                                     max: 10_000,
@@ -226,7 +236,7 @@ const arbitraries = {
                                     min: 0,
                                     max: Date.now(),
                                 }),
-                                status: fc.constantFrom("up", "down"),
+                                status: statusHistoryStatusArbitrary,
                                 responseTime: fc.integer({
                                     min: 0,
                                     max: 10_000,
