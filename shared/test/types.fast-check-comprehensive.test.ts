@@ -40,11 +40,19 @@ import {
     isSiteStatus,
     type Monitor,
     MONITOR_STATUS,
+    MONITOR_STATUS_VALUES,
     type MonitorStatus,
     type MonitorType,
+    SITE_STATUS_VALUES,
     type SiteStatus,
     validateMonitor,
 } from "../types";
+
+const monitorStatusStrings: readonly string[] = MONITOR_STATUS_VALUES;
+const siteStatusStrings: readonly string[] = SITE_STATUS_VALUES;
+const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
 
 const createMonitorSample = (
     overrides: Partial<Monitor> & Pick<Monitor, "id" | "type">
@@ -186,15 +194,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
     });
 
     describe("isMonitorStatus property-based tests", () => {
-        const validMonitorStatuses = [
-            "degraded",
-            "down",
-            "paused",
-            "pending",
-            "up",
-        ] as const;
-
-        test.prop([fc.constantFrom(...validMonitorStatuses)])(
+        test.prop([monitorStatusArbitrary])(
             "should return true for all valid monitor statuses",
             (status: MonitorStatus) => {
                 expect(isMonitorStatus(status)).toBeTruthy();
@@ -204,9 +204,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
         test.prop([
             fc
                 .string()
-                .filter(
-                    (s) => !validMonitorStatuses.includes(s as MonitorStatus)
-                ),
+                .filter((s) => !monitorStatusStrings.includes(s)),
         ])(
             "should return false for invalid monitor statuses",
             (invalidStatus: string) => {
@@ -229,10 +227,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 fc.constant("unknown"),
                 fc
                     .string({ minLength: 1 })
-                    .filter(
-                        (s) =>
-                            !validMonitorStatuses.includes(s as MonitorStatus)
-                    )
+                    .filter((s) => !monitorStatusStrings.includes(s))
             ),
         ])(
             "should return false for computed site statuses and other invalid strings",
@@ -243,17 +238,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
     });
 
     describe("isSiteStatus property-based tests", () => {
-        const validSiteStatuses = [
-            "degraded",
-            "down",
-            "mixed",
-            "paused",
-            "pending",
-            "unknown",
-            "up",
-        ] as const;
-
-        test.prop([fc.constantFrom(...validSiteStatuses)])(
+        test.prop([fc.constantFrom<SiteStatus>(...SITE_STATUS_VALUES)])(
             "should return true for all valid site statuses",
             (status: SiteStatus) => {
                 expect(isSiteStatus(status)).toBeTruthy();
@@ -263,7 +248,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
         test.prop([
             fc
                 .string()
-                .filter((s) => !validSiteStatuses.includes(s as SiteStatus)),
+                .filter((s) => !siteStatusStrings.includes(s)),
         ])(
             "should return false for invalid site statuses",
             (invalidStatus: string) => {
@@ -283,7 +268,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
         test.prop([
             fc
                 .string({ minLength: 1 })
-                .filter((s) => !validSiteStatuses.includes(s as SiteStatus)),
+                .filter((s) => !siteStatusStrings.includes(s)),
         ])(
             "should return false for random invalid strings",
             (invalidStatus: string) => {
@@ -307,7 +292,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.anything().filter((x) => typeof x !== "string"),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -330,7 +315,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                     .filter(
                         (t) => !BASE_MONITOR_TYPES.includes(t as MonitorType)
                     ),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -350,13 +335,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
                 status: fc.string().filter(
-                    (s) =>
-                        ![
-                            "down",
-                            "paused",
-                            "pending",
-                            "up",
-                        ].includes(s)
+                    (s) => !monitorStatusStrings.includes(s)
                 ),
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
@@ -376,7 +355,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.anything().filter((x) => typeof x !== "boolean"),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -395,7 +374,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc
                     .anything()
@@ -416,7 +395,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc
@@ -437,7 +416,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -456,7 +435,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -477,7 +456,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -496,7 +475,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -546,7 +525,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string({ minLength: 1 }),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -616,12 +595,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
 
     describe("Type intersections and edge cases", () => {
         test.prop([
-            fc.oneof(
-                fc.constant("up"),
-                fc.constant("down"),
-                fc.constant("pending"),
-                fc.constant("paused")
-            ),
+            monitorStatusArbitrary,
         ])(
             "should validate that monitor statuses are also site statuses",
             (status: MonitorStatus) => {
@@ -672,7 +646,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string({ minLength: 1 }),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -694,7 +668,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string({ minLength: 1 }),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -715,7 +689,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string({ minLength: 1 }),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -737,7 +711,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string({ minLength: 1 }),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.constantFrom("down", "paused", "pending", "up"),
+                status: monitorStatusArbitrary,
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
