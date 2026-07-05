@@ -604,6 +604,56 @@ describe("useSiteSync", () => {
             expect(cleanupSpy).toHaveBeenCalledTimes(1);
         });
 
+        it("does not let stale cleanup after setup failure release a later subscription", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteSyncActions", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Subscription", "type");
+
+            const retryCleanup = vi.fn();
+            let rejectInitialSetup: ((error: Error) => void) | undefined;
+
+            mockStateSyncService.onStateSyncEvent
+                .mockReturnValueOnce(
+                    new Promise<() => void>((_resolve, reject) => {
+                        rejectInitialSetup = reject;
+                    })
+                )
+                .mockResolvedValueOnce(retryCleanup);
+
+            const staleUnsubscribe = syncActions.subscribeToSyncEvents();
+            const originalActiveUnsubscribe =
+                syncActions.subscribeToSyncEvents();
+
+            rejectInitialSetup?.(new Error("setup failed"));
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(mockStateSyncService.onStateSyncEvent).toHaveBeenCalledTimes(
+                1
+            );
+
+            const retryUnsubscribe = syncActions.subscribeToSyncEvents();
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(mockStateSyncService.onStateSyncEvent).toHaveBeenCalledTimes(
+                2
+            );
+
+            staleUnsubscribe();
+            expect(retryCleanup).not.toHaveBeenCalled();
+
+            retryUnsubscribe();
+            expect(retryCleanup).not.toHaveBeenCalled();
+
+            originalActiveUnsubscribe();
+            expect(retryCleanup).toHaveBeenCalledTimes(1);
+        });
+
         it("should handle bulk-sync events", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteSync", "component");

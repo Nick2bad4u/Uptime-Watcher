@@ -542,7 +542,6 @@ export const createSiteSyncActions = (
                             success: false,
                         });
 
-                        syncEventSubscription.refCount = 0;
                         syncEventSubscription.shouldCleanupOnReady = false;
                     } finally {
                         delete syncEventSubscription.pending;
