@@ -19,6 +19,27 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { EnhancedLifecycleConfig } from "../MonitorManagerEnhancedLifecycle";
 
+type MonitoringAllOperationSummary =
+    | MonitoringStartSummary
+    | MonitoringStopSummary;
+
+/**
+ * Error raised when a global monitoring lifecycle operation returns an
+ * internally inconsistent summary.
+ */
+export class MonitoringAllOperationError extends Error {
+    public readonly summary: MonitoringAllOperationSummary;
+
+    public constructor(
+        message: string,
+        summary: MonitoringAllOperationSummary
+    ) {
+        super(message);
+        this.name = "MonitoringAllOperationError";
+        this.summary = summary;
+    }
+}
+
 /**
  * Starts monitoring across all sites.
  */
@@ -59,12 +80,10 @@ export async function startMonitoringAllOperation(args: {
             summary
         );
 
-        const error = new Error(
-            "Failed to start monitoring: no monitors reported as active"
+        throw new MonitoringAllOperationError(
+            "Failed to start monitoring: no monitors reported as active",
+            summary
         );
-
-        // Attach summary for upstream error handling and diagnostics.
-        throw Object.assign(error, { summary });
     }
 
     if (summary.isMonitoring || summary.alreadyActive) {
@@ -111,11 +130,10 @@ export async function stopMonitoringAllOperation(args: {
             summary
         );
 
-        const error = new Error(
-            "Failed to stop monitoring: one or more monitors remain active"
+        throw new MonitoringAllOperationError(
+            "Failed to stop monitoring: one or more monitors remain active",
+            summary
         );
-
-        throw Object.assign(error, { summary });
     }
 
     await eventEmitter.emitTyped("internal:monitor:stopped", {

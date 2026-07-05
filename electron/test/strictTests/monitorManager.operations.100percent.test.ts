@@ -19,6 +19,7 @@ import {
 import { createMonitorActionDelegate } from "../../managers/monitorManager/createMonitorActionDelegate";
 import { handleScheduledCheckOperation } from "../../managers/monitorManager/handleScheduledCheckOperation";
 import {
+    MonitoringAllOperationError,
     startMonitoringAllOperation,
     stopMonitoringAllOperation,
 } from "../../managers/monitorManager/toggleMonitoringAllOperation";
@@ -589,39 +590,59 @@ describe("monitorManager helper operations", () => {
         warnSpy.mockRestore();
     });
 
-    it("startMonitoringAllOperation throws when monitoring is not active", async () => {
-        await expect(
-            startMonitoringAllOperation({
+    it("startMonitoringAllOperation throws a typed summary error when monitoring is not active", async () => {
+        const summary = {
+            alreadyActive: false,
+            attempted: 1,
+            isMonitoring: false,
+            partialFailures: false,
+        };
+
+        let thrown: unknown;
+        try {
+            await startMonitoringAllOperation({
                 config: {} as unknown as EnhancedLifecycleConfig,
                 eventEmitter:
                     createMockEventBus() as unknown as TypedEventBus<UptimeEvents>,
                 isMonitoring: false,
                 logger: monitorLogger,
-                startAllMonitoringEnhanced: vi.fn().mockResolvedValue({
-                    alreadyActive: false,
-                    attempted: 1,
-                    isMonitoring: false,
-                    partialFailures: false,
-                }),
-            })
-        ).rejects.toThrow(/failed to start monitoring/i);
+                startAllMonitoringEnhanced: vi.fn().mockResolvedValue(summary),
+            });
+        } catch (error: unknown) {
+            thrown = error;
+        }
+
+        expect(thrown).toMatchObject({
+            name: "MonitoringAllOperationError",
+            summary,
+        });
     });
 
-    it("stopMonitoringAllOperation throws when monitoring remains active", async () => {
-        await expect(
-            stopMonitoringAllOperation({
+    it("stopMonitoringAllOperation throws a typed summary error when monitoring remains active", async () => {
+        const summary = {
+            alreadyInactive: false,
+            attempted: 1,
+            isMonitoring: true,
+            partialFailures: false,
+        };
+
+        let thrown: unknown;
+        try {
+            await stopMonitoringAllOperation({
                 config: {} as unknown as EnhancedLifecycleConfig,
                 eventEmitter:
                     createMockEventBus() as unknown as TypedEventBus<UptimeEvents>,
                 logger: monitorLogger,
-                stopAllMonitoringEnhanced: vi.fn().mockResolvedValue({
-                    alreadyInactive: false,
-                    attempted: 1,
-                    isMonitoring: true,
-                    partialFailures: false,
-                }),
-            })
-        ).rejects.toThrow(/failed to stop monitoring/i);
+                stopAllMonitoringEnhanced: vi.fn().mockResolvedValue(summary),
+            });
+        } catch (error: unknown) {
+            thrown = error;
+        }
+
+        expect(thrown).toBeInstanceOf(MonitoringAllOperationError);
+        expect(thrown).toMatchObject({
+            summary,
+        });
     });
 
     it("stopMonitoringAllOperation emits when monitoring is inactive", async () => {

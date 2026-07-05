@@ -299,9 +299,9 @@ export const MonitoringService: MonitoringServiceContract = {
      * @remarks
      * When the backend reports partial failures, a warning is logged but the
      * operation may still be considered successful if `isMonitoring` is `true`.
-     * If `isMonitoring` remains `false`, this method throws an {@link Error}
-     * whose `summary` property contains the {@link MonitoringStartSummary} for
-     * further inspection.
+     * If `isMonitoring` remains `false`, this method throws an
+     * {@link ApplicationError} whose `details.summary` contains the
+     * {@link MonitoringStartSummary} for further inspection.
      *
      * @returns A promise that resolves with a cloned
      *   {@link MonitoringStartSummary} describing the outcome of the global
@@ -419,9 +419,9 @@ export const MonitoringService: MonitoringServiceContract = {
      * @remarks
      * When the backend reports partial failures, a warning is logged but the
      * operation may still be considered successful if `isMonitoring` becomes
-     * `false`. If monitoring remains active, this method throws an {@link Error}
-     * whose `summary` property contains the {@link MonitoringStopSummary} for
-     * further debugging.
+     * `false`. If monitoring remains active, this method throws an
+     * {@link ApplicationError} whose `details.summary` contains the
+     * {@link MonitoringStopSummary} for further debugging.
      *
      * @returns A promise that resolves with a cloned
      *   {@link MonitoringStopSummary} describing the outcome of the global stop
