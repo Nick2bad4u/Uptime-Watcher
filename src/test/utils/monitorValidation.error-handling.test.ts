@@ -1,4 +1,4 @@
-import type { MonitorType } from "@shared/types";
+import { MONITOR_STATUS_VALUES, type MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
@@ -96,7 +96,7 @@ describe("monitorValidation error handling", () => {
             monitoring: fc.boolean(),
             responseTime: fc.integer(),
             retryAttempts: fc.integer({ max: 5, min: 0 }),
-            status: fc.constantFrom("up", "down", "degraded", "pending"),
+            status: fc.constantFrom(...MONITOR_STATUS_VALUES),
             timeout: fc.integer({ max: 60_000, min: 1 }),
         }),
     ])(
