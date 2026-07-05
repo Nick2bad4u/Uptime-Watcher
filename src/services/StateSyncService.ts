@@ -39,6 +39,51 @@ type RecoveryTrigger = "invalid-event" | "revision-gap" | "truncated-event";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
+const MAX_INVALID_EVENT_KEYS_TO_LOG = 10;
+
+interface InvalidEventPayloadSummary {
+    readonly keyCount?: number;
+    readonly keys?: readonly string[];
+    readonly kind: string;
+    readonly length?: number;
+    readonly truncatedKeys?: boolean;
+}
+
+const formatPropertyKeyForLog = (key: PropertyKey): string =>
+    typeof key === "symbol" ? key.toString() : String(key);
+
+const summarizeInvalidEventPayload = (
+    payload: unknown
+): InvalidEventPayloadSummary => {
+    if (Array.isArray(payload)) {
+        return {
+            kind: "array",
+            length: payload.length,
+        };
+    }
+
+    if (payload === null) {
+        return { kind: "null" };
+    }
+
+    if (typeof payload !== "object") {
+        return {
+            kind: typeof payload,
+            ...(typeof payload === "string" && { length: payload.length }),
+        };
+    }
+
+    const keys = Reflect.ownKeys(payload).map(formatPropertyKeyForLog);
+    const loggedKeys = keys.slice(0, MAX_INVALID_EVENT_KEYS_TO_LOG);
+
+    return {
+        keyCount: keys.length,
+        keys: loggedKeys,
+        kind: "object",
+        ...(keys.length > loggedKeys.length && { truncatedKeys: true }),
+    };
+};
+
 const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
     try {
         return getIpcServiceHelpers("StateSyncService", {
@@ -298,7 +343,8 @@ export const StateSyncService: StateSyncServiceContract = {
                             "[StateSyncService] Ignoring invalid state sync event payload",
                             parsedEvent.error,
                             {
-                                rawEvent,
+                                invalidPayload:
+                                    summarizeInvalidEventPayload(rawEvent),
                             }
                         );
 

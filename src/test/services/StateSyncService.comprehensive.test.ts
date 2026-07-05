@@ -187,6 +187,55 @@ describe("StateSyncService", () => {
         );
     });
 
+    it("does not log invalid state sync event payload contents", async () => {
+        const callback = vi.fn();
+        const fullSyncPayload = {
+            completedAt: Date.now(),
+            revision: 10,
+            siteCount: 0,
+            sites: [],
+            source: "database" as const,
+            synchronized: true,
+        };
+        const secretPayload = {
+            Authorization: "Bearer STATE_SYNC_SECRET",
+            refresh_token: "STATE_SYNC_REFRESH_SECRET",
+        };
+
+        mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(
+            fullSyncPayload
+        );
+
+        await StateSyncService.onStateSyncEvent(callback);
+        expect(capturedHandler).toBeTypeOf("function");
+        capturedHandler?.(secretPayload);
+
+        await vi.waitFor(() => {
+            expect(
+                mockElectronAPI.stateSync.requestFullSync
+            ).toHaveBeenCalledTimes(1);
+        });
+
+        expect(mockLogger.error).toHaveBeenCalledWith(
+            "[StateSyncService] Ignoring invalid state sync event payload",
+            expect.anything(),
+            {
+                invalidPayload: {
+                    keyCount: 2,
+                    keys: ["Authorization", "refresh_token"],
+                    kind: "object",
+                },
+            }
+        );
+
+        const serializedErrorCalls = JSON.stringify(mockLogger.error.mock.calls);
+        expect(serializedErrorCalls).not.toContain("STATE_SYNC_SECRET");
+        expect(serializedErrorCalls).not.toContain(
+            "STATE_SYNC_REFRESH_SECRET"
+        );
+        expect(serializedErrorCalls).not.toContain("rawEvent");
+    });
+
     it("recovers via full sync when event is truncated", async () => {
         const callback = vi.fn();
         const fullSyncPayload = {
