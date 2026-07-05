@@ -17,6 +17,12 @@ import {
     handleSQLiteBackupDownload,
 } from "../../../../stores/sites/utils/fileDownload";
 
+const waitForDeferredObjectUrlCleanup = async (): Promise<void> => {
+    await new Promise<void>((resolve) => {
+        globalThis.setTimeout(resolve, 0);
+    });
+};
+
 // Mock logger
 vi.mock("../../../../services/logger", () => ({
     logger: {
@@ -70,18 +76,20 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
         mockURL.createObjectURL.mockReturnValue("blob:mock-url");
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        await waitForDeferredObjectUrlCleanup();
+
         vi.restoreAllMocks();
     });
 
     describe("downloadFile function coverage", () => {
-        it("should successfully download files with valid inputs", () => {
-            fc.assert(
-                fc.property(
+        it("should successfully download files with valid inputs", async () => {
+            await fc.assert(
+                fc.asyncProperty(
                     fc.uint8Array({ minLength: 1, maxLength: 1000 }),
                     fc.string({ minLength: 1, maxLength: 50 }),
                     fc.option(fc.string({ minLength: 1, maxLength: 50 })),
-                    (bufferArray, fileName, mimeType) => {
+                    async (bufferArray, fileName, mimeType) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
                             buffer,
@@ -115,6 +123,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expect(mockAnchor.remove).toHaveBeenCalled();
 
                         // Verify cleanup
+                        await waitForDeferredObjectUrlCleanup();
                         expect(mockURL.revokeObjectURL).toHaveBeenCalledWith(
                             "blob:mock-url"
                         );
@@ -425,6 +434,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         expectBlobCalledWithLength(backupData.length);
                         expect(mockURL.createObjectURL).toHaveBeenCalled();
                         expect(mockAnchor.click).toHaveBeenCalled();
+                        await waitForDeferredObjectUrlCleanup();
                         expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
                 )
@@ -532,6 +542,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                                 // Expected for error scenarios
                             }
 
+                            await waitForDeferredObjectUrlCleanup();
                             expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                         }
                     }

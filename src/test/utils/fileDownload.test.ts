@@ -29,6 +29,12 @@ const originalBlob = Blob;
 const originalDocument = document;
 const originalUrl = URL;
 
+const waitForDeferredObjectUrlCleanup = async (): Promise<void> => {
+    await new Promise<void>((resolve) => {
+        globalThis.setTimeout(resolve, 0);
+    });
+};
+
 describe("file Download Utility", () => {
     let mockAnchor: any;
 
@@ -80,7 +86,9 @@ describe("file Download Utility", () => {
         }) as unknown as typeof Blob;
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+        await waitForDeferredObjectUrlCleanup();
+
         vi.clearAllMocks();
         if (originalBlob) {
             globalThis.Blob = originalBlob;
@@ -116,6 +124,7 @@ describe("file Download Utility", () => {
             const mimeType = "text/plain";
 
             downloadFile({ buffer, fileName, mimeType });
+            await waitForDeferredObjectUrlCleanup();
 
             expect(Blob).toHaveBeenCalledWith([buffer], {
                 type: mimeType,
@@ -333,11 +342,12 @@ describe("file Download Utility", () => {
 
             test.prop([fc.uint8Array({ maxLength: 100, minLength: 1 })])(
                 "should handle various buffer sizes and always create blob URL",
-                (uint8Array) => {
+                async (uint8Array) => {
                     const buffer = uint8Array.buffer;
                     const fileName = "test-file.bin";
 
                     downloadFile({ buffer, fileName });
+                    await waitForDeferredObjectUrlCleanup();
 
                     expect(URL.createObjectURL).toHaveBeenCalled();
                     expect(URL.revokeObjectURL).toHaveBeenCalledWith(
@@ -886,6 +896,7 @@ describe("file Download Utility", () => {
                         .mockResolvedValue(backup);
 
                     await handleSQLiteBackupDownload(mockDownloadFunction);
+                    await waitForDeferredObjectUrlCleanup();
 
                     expectLatestBlobCall(backupData.length);
 
@@ -936,6 +947,7 @@ describe("file Download Utility", () => {
 
             downloadFile({ buffer: buffer1, fileName: "file1.txt" });
             downloadFile({ buffer: buffer2, fileName: "file2.txt" });
+            await waitForDeferredObjectUrlCleanup();
 
             expect(URL.createObjectURL).toHaveBeenCalledTimes(2);
             expect(mockAnchor.click).toHaveBeenCalledTimes(2);

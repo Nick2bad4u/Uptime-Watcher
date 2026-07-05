@@ -113,11 +113,26 @@ export function withObjectUrl(
     run: (objectURL: string) => void
 ): void {
     const objectURL = URL.createObjectURL(blob);
+    let shouldRevokeImmediately = true;
+
     try {
         run(objectURL);
+        shouldRevokeImmediately = false;
     } finally {
-        URL.revokeObjectURL(objectURL);
+        if (shouldRevokeImmediately) {
+            URL.revokeObjectURL(objectURL);
+        } else {
+            scheduleObjectUrlRevoke(objectURL);
+        }
     }
+}
+
+function scheduleObjectUrlRevoke(objectURL: string): void {
+    // Give the browser one turn of the event loop to start resolving the blob
+    // URL for download before revoking it.
+    globalThis.setTimeout(() => {
+        URL.revokeObjectURL(objectURL);
+    }, 0);
 }
 
 function createDownloadAnchor(
