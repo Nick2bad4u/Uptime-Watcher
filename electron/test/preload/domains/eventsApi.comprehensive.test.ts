@@ -388,6 +388,76 @@ describe("Events Domain API", () => {
 
             expect(startCallback).toHaveBeenCalledWith(mockEventData);
         });
+
+        it("should reject monitoring start payloads with invalid counts", () => {
+            const callback = vi.fn();
+
+            eventsApi.onMonitoringStarted(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            const invalidPayloads = [
+                { monitorCount: -1, siteCount: 3, timestamp: Date.now() },
+                { monitorCount: 1.5, siteCount: 3, timestamp: Date.now() },
+                {
+                    monitorCount: Number.POSITIVE_INFINITY,
+                    siteCount: 3,
+                    timestamp: Date.now(),
+                },
+                {
+                    monitorCount: Number.NaN,
+                    siteCount: 3,
+                    timestamp: Date.now(),
+                },
+                { monitorCount: 10, siteCount: -1, timestamp: Date.now() },
+            ];
+
+            for (const invalidPayload of invalidPayloads) {
+                eventHandler?.({}, invalidPayload);
+            }
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledTimes(5);
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "monitoring:started",
+                    guard: "isMonitoringStartedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
+
+        it("should reject monitoring stop payloads with invalid active monitor counts", () => {
+            const callback = vi.fn();
+
+            eventsApi.onMonitoringStopped(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            for (const invalidCount of [
+                -1,
+                1.5,
+                Number.POSITIVE_INFINITY,
+                Number.NaN,
+            ]) {
+                eventHandler?.(
+                    {},
+                    {
+                        activeMonitors: invalidCount,
+                        reason: "user",
+                        timestamp: Date.now(),
+                    }
+                );
+            }
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledTimes(4);
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "monitoring:stopped",
+                    guard: "isMonitoringStoppedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
     });
 
     describe("onMonitorStatusChanged", () => {

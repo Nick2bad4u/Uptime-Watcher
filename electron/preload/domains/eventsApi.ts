@@ -169,6 +169,12 @@ const isCacheInvalidatedEventDataPayload = (
     return true;
 };
 
+const isNonNegativeSafeInteger = (value: unknown): value is number =>
+    typeof value === "number" &&
+    isFiniteNumber(value) &&
+    Number.isSafeInteger(value) &&
+    value >= 0;
+
 const isMonitoringControlEventDataPayload = (
     payload: unknown
 ): payload is MonitoringControlEventData => {
@@ -183,15 +189,18 @@ const isMonitoringControlEventDataPayload = (
         return false;
     }
 
-    if (isDefined(activeMonitors) && typeof activeMonitors !== "number") {
+    if (
+        isDefined(activeMonitors) &&
+        !isNonNegativeSafeInteger(activeMonitors)
+    ) {
         return false;
     }
 
-    if (isDefined(monitorCount) && typeof monitorCount !== "number") {
+    if (isDefined(monitorCount) && !isNonNegativeSafeInteger(monitorCount)) {
         return false;
     }
 
-    if (isDefined(siteCount) && typeof siteCount !== "number") {
+    if (isDefined(siteCount) && !isNonNegativeSafeInteger(siteCount)) {
         return false;
     }
 
@@ -210,8 +219,8 @@ const isMonitoringStartedEventDataPayload = (
     }
 
     return (
-        typeof payload.monitorCount === "number" &&
-        typeof payload.siteCount === "number"
+        isNonNegativeSafeInteger(payload.monitorCount) &&
+        isNonNegativeSafeInteger(payload.siteCount)
     );
 };
 
@@ -223,7 +232,7 @@ const isMonitoringStoppedEventDataPayload = (
     }
 
     if (
-        typeof payload.activeMonitors !== "number" ||
+        !isNonNegativeSafeInteger(payload.activeMonitors) ||
         typeof payload.reason !== "string"
     ) {
         return false;
