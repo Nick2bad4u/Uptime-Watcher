@@ -167,4 +167,68 @@ describe(parseCloudSyncSnapshot, () => {
             })
         );
     });
+
+    it("rejects monitor snapshot entity IDs with control characters", () => {
+        const result = cloudSyncSnapshotSchema.safeParse({
+            createdAt: 0,
+            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+            state: {
+                monitor: {
+                    "monitor\n1": {
+                        entityId: "monitor\n1",
+                        entityType: "monitor",
+                        fields: {},
+                    },
+                },
+                settings: {},
+                site: {},
+            },
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(result.success).toBeFalsy();
+        expect(result.error?.issues).toContainEqual(
+            expect.objectContaining({
+                message: "monitor entityId is invalid",
+                path: [
+                    "state",
+                    "monitor",
+                    "monitor\n1",
+                    "entityId",
+                ],
+            })
+        );
+    });
+
+    it("rejects site snapshot entity IDs with control characters", () => {
+        const result = cloudSyncSnapshotSchema.safeParse({
+            createdAt: 0,
+            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+            state: {
+                monitor: {},
+                settings: {},
+                site: {
+                    "site\n1": {
+                        entityId: "site\n1",
+                        entityType: "site",
+                        fields: {},
+                    },
+                },
+            },
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        });
+
+        expect(result.success).toBeFalsy();
+        expect(result.error?.issues).toContainEqual(
+            expect.objectContaining({
+                message: "site entityId is invalid",
+                path: [
+                    "state",
+                    "site",
+                    "site\n1",
+                    "entityId",
+                ],
+            })
+        );
+    });
 });

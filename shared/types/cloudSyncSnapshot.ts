@@ -10,7 +10,9 @@ import {
     cloudSyncWriteKeySchema,
     jsonValueSchema,
 } from "@shared/types/cloudSync";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
 import * as z from "zod";
@@ -48,6 +50,25 @@ const cloudSyncStateInternalSchema = z
     .superRefine((state, ctx) => {
         for (const entityType of CLOUD_SYNC_STATE_ENTITY_TYPES) {
             for (const [entityId, entity] of objectEntries(state[entityType])) {
+                const idSchema =
+                    entityType === "monitor"
+                        ? monitorIdSchema
+                        : entityType === "site"
+                          ? siteIdentifierSchema
+                          : undefined;
+
+                if (idSchema && !idSchema.safeParse(entityId).success) {
+                    ctx.addIssue({
+                        code: "custom",
+                        message: `${entityType} entityId is invalid`,
+                        path: [
+                            entityType,
+                            entityId,
+                            "entityId",
+                        ],
+                    });
+                }
+
                 if (entity.entityId !== entityId) {
                     ctx.addIssue({
                         code: "custom",
