@@ -70,7 +70,7 @@ vi.mock("../../theme/components/ThemedText", () => ({
  * Helper function to create status history records
  */
 const createStatusHistory = (
-    status: "down" | "up",
+    status: StatusHistory["status"],
     timestamp: number,
     responseTime = 100,
     details?: string
@@ -345,8 +345,9 @@ describe("HistoryChart - Complete Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             const history: StatusHistory[] = [
-                createStatusHistory("up", 1_234_567_891, 250, "Success"), // newer first in input
-                createStatusHistory("down", 1_234_567_890, 0, "Timeout"), // Older second in input
+                createStatusHistory("up", 1_234_567_892, 250, "Success"), // Newest first in input
+                createStatusHistory("degraded", 1_234_567_891, 500, "Slow"),
+                createStatusHistory("down", 1_234_567_890, 0, "Timeout"), // Oldest last in input
             ];
 
             renderWithTheme(
@@ -355,9 +356,8 @@ describe("HistoryChart - Complete Coverage", () => {
 
             const bars = screen.getAllByTestId("mini-chart-bar");
 
-            // Original array: [up@1234567891, down@1234567890] (newest first)
-            // After slice(0, maxItems): [up@1234567891, down@1234567890]
-            // After toReversed(): [down@1234567890, up@1234567891] (oldest first for display)
+            // Original array: [up@1234567892, degraded@1234567891, down@1234567890] (newest first)
+            // After toReversed(): [down@1234567890, degraded@1234567891, up@1234567892] (oldest first)
 
             // Check first bar (down@1234567890 is older, shown first after reversal)
             expect(arrayFirst(bars)).toHaveAttribute("data-status", "down");
@@ -367,10 +367,15 @@ describe("HistoryChart - Complete Coverage", () => {
                 "1234567890"
             );
 
-            // Check second bar (up@1234567891 is newer, shown second after reversal)
-            expect(bars[1]).toHaveAttribute("data-status", "up");
-            expect(bars[1]).toHaveAttribute("data-response-time", "250");
+            // Check second bar (degraded@1234567891 is in the middle)
+            expect(bars[1]).toHaveAttribute("data-status", "degraded");
+            expect(bars[1]).toHaveAttribute("data-response-time", "500");
             expect(bars[1]).toHaveAttribute("data-timestamp", "1234567891");
+
+            // Check third bar (up@1234567892 is newer, shown last)
+            expect(bars[2]).toHaveAttribute("data-status", "up");
+            expect(bars[2]).toHaveAttribute("data-response-time", "250");
+            expect(bars[2]).toHaveAttribute("data-timestamp", "1234567892");
         });
 
         it("should generate unique keys for each MiniChartBar", ({
