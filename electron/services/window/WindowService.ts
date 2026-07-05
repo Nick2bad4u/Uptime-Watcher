@@ -34,7 +34,6 @@
  */
 
 import type { Event, HandlerDetails, WebPreferences } from "electron";
-import type { Arrayable } from "type-fest";
 
 import { getNodeEnv, readBooleanEnv } from "@shared/utils/environment";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
@@ -46,7 +45,7 @@ import * as electron from "electron";
 import { randomInt } from "node:crypto";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { arrayIncludes, objectHasOwn, safeCastTo, setHas } from "ts-extras";
+import { arrayIncludes, objectHasOwn, setHas } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -898,37 +897,26 @@ export class WindowService {
                     // Only documents should receive CSP and related headers.
                     // When Electron provides resourceType, use it to avoid
                     // mutating headers for non-document resources.
+                    const { resourceType } = details;
                     if (
-                        typeof safeCastTo<{ resourceType?: unknown }>(details)
-                            .resourceType === "string"
+                        typeof resourceType === "string" &&
+                        resourceType !== "mainFrame" &&
+                        resourceType !== "subFrame"
                     ) {
-                        const { resourceType } = safeCastTo<{
-                            resourceType: string;
-                        }>(details);
-                        if (
-                            resourceType !== "mainFrame" &&
-                            resourceType !== "subFrame"
-                        ) {
-                            const { responseHeaders } = details;
-                            if (!responseHeaders) {
-                                callback({ cancel: false });
-                                return;
-                            }
-
-                            callback({
-                                cancel: false,
-                                responseHeaders:
-                                    safeCastTo<
-                                        Record<string, Arrayable<string>>
-                                    >(responseHeaders),
-                            });
+                        const { responseHeaders } = details;
+                        if (!responseHeaders) {
+                            callback({ cancel: false });
                             return;
                         }
+
+                        callback({
+                            cancel: false,
+                            responseHeaders,
+                        });
+                        return;
                     }
 
-                    const headers = safeCastTo<
-                        Record<string, Arrayable<string>> | undefined
-                    >(details.responseHeaders);
+                    const { responseHeaders: headers } = details;
 
                     const responseHeaders =
                         applyProductionDocumentSecurityHeaders({
