@@ -859,6 +859,26 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
+            it("rejects restore fileName with a Windows drive prefix", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const payload = {
+                    buffer: new ArrayBuffer(64),
+                    fileName: "C:restore.sqlite",
+                };
+
+                const result = DataHandlerValidators.restoreSqliteBackup([
+                    payload,
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
             it("rejects restore fileName with control characters", async ({
                 task,
                 annotate,

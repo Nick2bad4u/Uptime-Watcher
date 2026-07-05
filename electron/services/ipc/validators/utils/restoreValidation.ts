@@ -113,6 +113,10 @@ export function validateRestoreFileNameCandidate(
         errors.push(`${paramName} must be a valid file name`);
     }
 
+    if (/^[A-Za-z]:/u.test(fileName)) {
+        errors.push(`${paramName} must not be a drive-relative path`);
+    }
+
     // `fileName` is intended for UI/logging only; it should be a base name, not
     // a path.
     if (normalizePathSeparatorsToPosix(fileName).includes("/")) {
