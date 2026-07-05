@@ -6,6 +6,8 @@
  * components and hooks don't need to duplicate compatibility logic.
  */
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
+
 const noop = (): void => {};
 
 type MediaQueryListLegacyMethod = (
@@ -41,6 +43,42 @@ const getMediaQueryListDataMethod = (
     }
 
     return undefined;
+};
+
+type MatchMediaMethod = (query: string) => unknown;
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+const isMatchMediaMethod = (value: unknown): value is MatchMediaMethod =>
+    typeof value === "function";
+
+const isMediaQueryList = (value: unknown): value is MediaQueryList =>
+    isObjectLike(value) && typeof Reflect.get(value, "matches") === "boolean";
+
+const getTrustedGlobalValue = (key: PropertyKey): unknown => {
+    const property = getOwnPropertyValue(globalThis, key);
+    return property.found ? property.value : undefined;
+};
+
+const getMatchMediaMethod = (): MatchMediaMethod | undefined => {
+    const windowCandidate = getTrustedGlobalValue("window");
+    if (!isObjectLike(windowCandidate)) {
+        return undefined;
+    }
+
+    const matchMediaProperty = getOwnPropertyValue(
+        windowCandidate,
+        "matchMedia"
+    );
+    const candidate = matchMediaProperty.found
+        ? matchMediaProperty.value
+        : undefined;
+
+    return isMatchMediaMethod(candidate)
+        ? (query: string) => Reflect.apply(candidate, windowCandidate, [query])
+        : undefined;
 };
 
 /**
@@ -120,16 +158,14 @@ export function subscribeToMediaQueryMatches(
  * not support `matchMedia`.
  */
 export function tryGetMediaQueryList(query: string): MediaQueryList | null {
-    if (typeof window === "undefined") {
-        return null;
-    }
-
-    if (typeof matchMedia !== "function") {
+    const matchMedia = getMatchMediaMethod();
+    if (!matchMedia) {
         return null;
     }
 
     try {
-        return globalThis.matchMedia(query);
+        const mediaQueryList = matchMedia(query);
+        return isMediaQueryList(mediaQueryList) ? mediaQueryList : null;
     } catch {
         return null;
     }

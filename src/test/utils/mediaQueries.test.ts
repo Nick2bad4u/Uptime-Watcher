@@ -26,6 +26,88 @@ describe("mediaQueries utilities", () => {
                 });
             }
         });
+
+        it("supports accessor-backed window matchMedia globals", () => {
+            const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "window"
+            );
+            let accessCount = 0;
+
+            try {
+                Object.defineProperty(globalThis, "window", {
+                    configurable: true,
+                    enumerable: true,
+                    value: Object.defineProperty({}, "matchMedia", {
+                        configurable: true,
+                        enumerable: true,
+                        get() {
+                            accessCount += 1;
+                            return (query: string) =>
+                                ({
+                                    matches: query.includes(
+                                        "prefers-reduced-motion"
+                                    ),
+                                    media: query,
+                                }) as MediaQueryList;
+                        },
+                    }),
+                });
+
+                const result = tryGetMediaQueryList(
+                    "(prefers-reduced-motion: reduce)"
+                );
+
+                expect(accessCount).toBeGreaterThan(0);
+                expect(result?.matches).toBeTruthy();
+                expect(result?.media).toBe("(prefers-reduced-motion: reduce)");
+            } finally {
+                if (originalWindowDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "window",
+                        originalWindowDescriptor
+                    );
+                } else {
+                    Reflect.deleteProperty(globalThis, "window");
+                }
+            }
+        });
+
+        it("returns null when the matchMedia accessor throws", () => {
+            const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "window"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "window", {
+                    configurable: true,
+                    enumerable: true,
+                    value: Object.defineProperty({}, "matchMedia", {
+                        configurable: true,
+                        enumerable: true,
+                        get() {
+                            throw new Error("matchMedia unavailable");
+                        },
+                    }),
+                });
+
+                expect(
+                    tryGetMediaQueryList("(prefers-reduced-motion: reduce)")
+                ).toBeNull();
+            } finally {
+                if (originalWindowDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "window",
+                        originalWindowDescriptor
+                    );
+                } else {
+                    Reflect.deleteProperty(globalThis, "window");
+                }
+            }
+        });
     });
 
     describe(subscribeToMediaQueryListChanges, () => {
