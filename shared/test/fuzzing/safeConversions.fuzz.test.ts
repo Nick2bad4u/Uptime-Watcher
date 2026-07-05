@@ -365,6 +365,20 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeParsePositiveInt("-3")).toBe(1);
             expect(safeParsePositiveInt("invalid")).toBe(1);
         });
+
+        test.prop([
+            fc.oneof(
+                fc.integer({ max: 0 }),
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])(
+            "should fall back when custom default is invalid",
+            (defaultValue) => {
+                expect(safeParsePositiveInt("invalid", defaultValue)).toBe(1);
+            }
+        );
     });
 
     describe(safeParseRetryAttempts, () => {
@@ -400,6 +414,21 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeParseRetryAttempts("15")).toBe(3);
             expect(safeParseRetryAttempts("invalid")).toBe(3);
         });
+
+        test.prop([
+            fc.oneof(
+                fc.integer({ max: -1 }),
+                fc.integer({ min: 11 }),
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])(
+            "should fall back when custom default is invalid",
+            (defaultValue) => {
+                expect(safeParseRetryAttempts("invalid", defaultValue)).toBe(3);
+            }
+        );
     });
 
     describe(safeParseTimeout, () => {

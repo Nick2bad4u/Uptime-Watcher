@@ -285,8 +285,10 @@ export function safeParsePort(
  * @returns Valid positive integer `(> 0)`, or the default value
  */
 export function safeParsePositiveInt(value: unknown, defaultValue = 1): number {
-    const result = safeParseInt(value, defaultValue);
-    return result > 0 && isFiniteNumber(result) ? result : defaultValue;
+    const normalizedDefault =
+        Number.isInteger(defaultValue) && defaultValue > 0 ? defaultValue : 1;
+    const result = safeParseInt(value, normalizedDefault);
+    return result > 0 && isFiniteNumber(result) ? result : normalizedDefault;
 }
 
 /**
@@ -316,8 +318,14 @@ export function safeParseRetryAttempts(
     value: unknown,
     defaultValue = 3
 ): number {
-    const parsed = safeParseInt(value, defaultValue);
-    return parsed >= 0 && parsed <= 10 ? parsed : defaultValue;
+    const normalizedDefault =
+        Number.isInteger(defaultValue) &&
+        defaultValue >= 0 &&
+        defaultValue <= 10
+            ? defaultValue
+            : 3;
+    const parsed = safeParseInt(value, normalizedDefault);
+    return parsed >= 0 && parsed <= 10 ? parsed : normalizedDefault;
 }
 
 /**
