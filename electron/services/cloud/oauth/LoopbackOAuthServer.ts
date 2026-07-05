@@ -177,6 +177,11 @@ export interface LoopbackOAuthServer {
     }) => Promise<LoopbackOAuthCallback>;
 }
 
+interface PendingCallbackError {
+    readonly error: Error;
+    readonly state: null | string;
+}
+
 function writeHtml(
     response: ServerResponse,
     args: { body: string; statusCode: number; title: string }
@@ -300,7 +305,7 @@ export async function startLoopbackOAuthServer(args?: {
     let rejectPromise: ((error: unknown) => void) | null = null;
     let expectedStateValue: null | string = null;
     let pendingCallback: LoopbackOAuthCallback | null = null;
-    let pendingCallbackError: Error | null = null;
+    let pendingCallbackError: PendingCallbackError | null = null;
 
     const callbackPromise = new Promise<LoopbackOAuthCallback>(
         (resolve, reject) => {
@@ -331,6 +336,23 @@ export async function startLoopbackOAuthServer(args?: {
                 return;
             }
 
+            if (
+                expectedStateValue !== null &&
+                parsed.state !== expectedStateValue
+            ) {
+                writeHtml(response, {
+                    body: "OAuth state mismatch. Please retry the authorization flow.",
+                    statusCode: 400,
+                    title: "Authorization failed",
+                });
+
+                if (!isResolved) {
+                    isResolved = true;
+                    rejectPromise?.(new Error("OAuth state mismatch"));
+                }
+                return;
+            }
+
             const callbackError = normalizeCallbackErrorDetail({
                 error: parsed.error,
                 errorDescription: parsed.errorDescription,
@@ -350,7 +372,10 @@ export async function startLoopbackOAuthServer(args?: {
                     isResolved = true;
                     rejectPromise?.(error);
                 } else if (!isResolved) {
-                    pendingCallbackError ??= error;
+                    pendingCallbackError ??= {
+                        error,
+                        state: parsed.state,
+                    };
                 }
                 return;
             }
@@ -372,23 +397,6 @@ export async function startLoopbackOAuthServer(args?: {
                     pendingCallbackError ??= error;
                 }
 
-                return;
-            }
-
-            if (
-                expectedStateValue !== null &&
-                parsed.state !== expectedStateValue
-            ) {
-                writeHtml(response, {
-                    body: "OAuth state mismatch. Please retry the authorization flow.",
-                    statusCode: 400,
-                    title: "Authorization failed",
-                });
-
-                if (!isResolved) {
-                    isResolved = true;
-                    rejectPromise?.(new Error("OAuth state mismatch"));
-                }
                 return;
             }
 
@@ -520,7 +528,11 @@ export async function startLoopbackOAuthServer(args?: {
 
             if (pendingCallbackError && !isResolved) {
                 isResolved = true;
-                rejectPromise?.(pendingCallbackError);
+                rejectPromise?.(
+                    pendingCallbackError.state === expectedStateValue
+                        ? pendingCallbackError.error
+                        : new Error("OAuth state mismatch")
+                );
                 pendingCallbackError = null;
             } else if (
                 pendingCallback?.state === expectedStateValue &&

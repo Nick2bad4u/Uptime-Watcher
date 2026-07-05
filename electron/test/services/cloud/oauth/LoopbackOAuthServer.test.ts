@@ -170,6 +170,61 @@ describe(startLoopbackOAuthServer, () => {
         }
     });
 
+    it("rejects active provider error callbacks with mismatched state as state mismatches", async () => {
+        const server = await startLoopbackOAuthServer({
+            port: 0,
+            redirectHost: "127.0.0.1",
+            redirectPath: "/oauth2/callback",
+        });
+
+        try {
+            const callbackPromise = server.waitForCallback({
+                expectedState: "expected-state",
+                timeoutMs: 1000,
+            });
+
+            const callbackUrl = new URL(server.redirectUri);
+            callbackUrl.searchParams.set("state", "wrong-state");
+            callbackUrl.searchParams.set("error_description", "denied");
+
+            const response = await requestUrl(callbackUrl.toString());
+
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toContain("OAuth state mismatch");
+            await expect(callbackPromise).rejects.toThrow(
+                "OAuth state mismatch"
+            );
+        } finally {
+            await closeServer(server);
+        }
+    });
+
+    it("rejects buffered provider error callbacks with mismatched state as state mismatches", async () => {
+        const server = await startLoopbackOAuthServer({
+            port: 0,
+            redirectHost: "127.0.0.1",
+            redirectPath: "/oauth2/callback",
+        });
+
+        try {
+            const callbackUrl = new URL(server.redirectUri);
+            callbackUrl.searchParams.set("state", "wrong-state");
+            callbackUrl.searchParams.set("error_description", "denied");
+
+            const response = await requestUrl(callbackUrl.toString());
+
+            expect(response.statusCode).toBe(400);
+            await expect(
+                server.waitForCallback({
+                    expectedState: "expected-state",
+                    timeoutMs: 1000,
+                })
+            ).rejects.toThrow("OAuth state mismatch");
+        } finally {
+            await closeServer(server);
+        }
+    });
+
     it("rejects pre-wait callbacks with mismatched state without timing out", async () => {
         const server = await startLoopbackOAuthServer({
             port: 0,
