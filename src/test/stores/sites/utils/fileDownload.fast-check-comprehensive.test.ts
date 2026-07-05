@@ -6,7 +6,8 @@
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { fc } from "@fast-check/vitest";
-import { safeCastTo } from "ts-extras";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+import { arrayJoin, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import the functions to test
@@ -30,6 +31,55 @@ vi.mock("../../../../services/logger", () => ({
         error: vi.fn(),
     },
 }));
+
+const SAFE_DOWNLOAD_FILE_NAME_CHARACTERS =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 _().-";
+
+const isSafeDownloadFileName = (fileName: string): boolean => {
+    const trimmedFileName = fileName.trim();
+    const reservedCharacters = [
+        '"',
+        "*",
+        ":",
+        "<",
+        ">",
+        "?",
+        "|",
+        "/",
+        "\\",
+    ];
+
+    return (
+        trimmedFileName.length > 0 &&
+        trimmedFileName === fileName &&
+        trimmedFileName !== "." &&
+        trimmedFileName !== ".." &&
+        !trimmedFileName.endsWith(".") &&
+        !hasAsciiControlCharacters(trimmedFileName) &&
+        reservedCharacters.every(
+            (character) => !trimmedFileName.includes(character)
+        ) &&
+        !/^(?:aux|com[1-9]|con|lpt[1-9]|nul|prn)(?:\.|$)/iu.test(
+            trimmedFileName
+        )
+    );
+};
+
+const safeFileNameArbitrary = fc
+    .array(fc.constantFrom(...SAFE_DOWNLOAD_FILE_NAME_CHARACTERS), {
+        maxLength: 50,
+        minLength: 1,
+    })
+    .map((characters) => arrayJoin(characters, ""))
+    .filter(isSafeDownloadFileName);
+
+const safeLongFileNameArbitrary = fc
+    .array(fc.constantFrom(...SAFE_DOWNLOAD_FILE_NAME_CHARACTERS), {
+        maxLength: 500,
+        minLength: 100,
+    })
+    .map((characters) => arrayJoin(characters, ""))
+    .filter(isSafeDownloadFileName);
 
 describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
     // Mock DOM APIs
@@ -87,7 +137,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.uint8Array({ minLength: 1, maxLength: 1000 }),
-                    fc.string({ minLength: 1, maxLength: 50 }),
+                    safeFileNameArbitrary,
                     fc.option(fc.string({ minLength: 1, maxLength: 50 })),
                     async (bufferArray, fileName, mimeType) => {
                         const buffer = bufferArray.buffer;
@@ -136,7 +186,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
@@ -161,7 +211,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         // Reset mocks for each property
                         vi.clearAllMocks();
@@ -201,7 +251,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
@@ -229,7 +279,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
@@ -253,7 +303,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
@@ -277,7 +327,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
@@ -302,7 +352,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             fc.assert(
                 fc.property(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
-                    fc.string({ minLength: 1, maxLength: 20 }),
+                    safeFileNameArbitrary,
                     (bufferArray, fileName) => {
                         const buffer = bufferArray.buffer;
                         const options: FileDownloadOptions = {
@@ -590,42 +640,56 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
         it("should handle very long filenames", () => {
             fc.assert(
-                fc.property(
-                    fc.string({ minLength: 100, maxLength: 500 }),
-                    (longFileName) => {
-                        const options: FileDownloadOptions = {
-                            buffer: new ArrayBuffer(10),
-                            fileName: longFileName,
-                        };
+                fc.property(safeLongFileNameArbitrary, (longFileName) => {
+                    const options: FileDownloadOptions = {
+                        buffer: new ArrayBuffer(10),
+                        fileName: longFileName,
+                    };
 
-                        expect(() => {
-                            downloadFile(options);
-                        }).not.toThrow();
-                        expect(mockAnchor.download).toBe(longFileName);
-                    }
-                )
+                    expect(() => {
+                        downloadFile(options);
+                    }).not.toThrow();
+                    expect(mockAnchor.download).toBe(longFileName);
+                })
             );
         });
 
-        it("should handle special characters in filenames", () => {
-            fc.assert(
-                fc.property(
-                    fc
-                        .string({ minLength: 1, maxLength: 50 })
-                        .filter((s) => s.trim().length > 0),
-                    (fileName) => {
-                        const options: FileDownloadOptions = {
-                            buffer: new ArrayBuffer(10),
-                            fileName,
-                        };
+        it("should preserve safe punctuation in filenames", () => {
+            const fileName = "uptime report (final)_v2.1.txt";
+            const options: FileDownloadOptions = {
+                buffer: new ArrayBuffer(10),
+                fileName,
+            };
 
-                        expect(() => {
-                            downloadFile(options);
-                        }).not.toThrow();
-                        expect(mockAnchor.download).toBe(fileName);
-                    }
-                )
-            );
+            expect(() => {
+                downloadFile(options);
+            }).not.toThrow();
+            expect(mockAnchor.download).toBe(fileName);
+        });
+
+        it("should use a safe fallback for unsafe filenames", () => {
+            const unsafeFileNames = [
+                "../secret.txt",
+                String.raw`..\secret.txt`,
+                "AUX",
+                "bad:name.txt",
+                "bad\u0000name.txt",
+                "trailing.",
+            ];
+
+            for (const fileName of unsafeFileNames) {
+                vi.clearAllMocks();
+
+                const options: FileDownloadOptions = {
+                    buffer: new ArrayBuffer(10),
+                    fileName,
+                };
+
+                expect(() => {
+                    downloadFile(options);
+                }).not.toThrow();
+                expect(mockAnchor.download).toBe("download.bin");
+            }
         });
 
         it("should handle missing MIME type correctly", () => {

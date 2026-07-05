@@ -8,6 +8,7 @@
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { test } from "@fast-check/vitest";
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import * as fc from "fast-check";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
@@ -34,6 +35,40 @@ const waitForDeferredObjectUrlCleanup = async (): Promise<void> => {
         globalThis.setTimeout(resolve, 0);
     });
 };
+
+const isSafeDownloadFileName = (fileName: string): boolean => {
+    const trimmedFileName = fileName.trim();
+    const reservedCharacters = [
+        '"',
+        "*",
+        ":",
+        "<",
+        ">",
+        "?",
+        "|",
+        "/",
+        "\\",
+    ];
+
+    return (
+        trimmedFileName.length > 0 &&
+        trimmedFileName === fileName &&
+        trimmedFileName !== "." &&
+        trimmedFileName !== ".." &&
+        !trimmedFileName.endsWith(".") &&
+        !hasAsciiControlCharacters(trimmedFileName) &&
+        reservedCharacters.every(
+            (character) => !trimmedFileName.includes(character)
+        ) &&
+        !/^(?:aux|com[1-9]|con|lpt[1-9]|nul|prn)(?:\.|$)/iu.test(
+            trimmedFileName
+        )
+    );
+};
+
+const safeFileNameArbitrary = fc
+    .string({ maxLength: 100, minLength: 1 })
+    .filter(isSafeDownloadFileName);
 
 describe("file Download Utility", () => {
     let mockAnchor: any;
@@ -156,6 +191,37 @@ describe("file Download Utility", () => {
             expect(Blob).toHaveBeenCalledWith([buffer], {
                 type: "application/octet-stream",
             });
+        });
+
+        it("should fall back when the filename is not a safe file segment", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Input Validation", "type");
+
+            const unsafeFileNames = [
+                "../secret.txt",
+                String.raw`..\secret.txt`,
+                "CON.txt",
+                "report:",
+                "bad\u0000name.txt",
+                ".",
+                "..",
+                "trailing.",
+            ];
+
+            for (const fileName of unsafeFileNames) {
+                vi.clearAllMocks();
+                const buffer = new ArrayBuffer(10);
+
+                downloadFile({ buffer, fileName });
+
+                expect(mockAnchor.download).toBe("download.bin");
+                expect(mockAnchor.click).toHaveBeenCalled();
+            }
         });
 
         it("should handle DOM manipulation errors with fallback", async ({
@@ -297,9 +363,7 @@ describe("file Download Utility", () => {
         describe("property-based Tests", () => {
             test.prop([
                 fc.uint8Array({ maxLength: 1000, minLength: 0 }),
-                fc
-                    .string({ maxLength: 100, minLength: 1 })
-                    .filter((s) => s.trim().length > 0),
+                safeFileNameArbitrary,
                 fc
                     .string({ maxLength: 50, minLength: 1 })
                     .filter((s) => s.includes("/")),
@@ -321,10 +385,7 @@ describe("file Download Utility", () => {
 
             test.prop([
                 fc.uint8Array({ maxLength: 500, minLength: 0 }),
-                fc
-                    .string({ maxLength: 50, minLength: 1 })
-                    .filter((s) => s.trim().length > 0)
-                    .filter((s) => !s.includes("/") && !s.includes("\\")),
+                safeFileNameArbitrary,
             ])(
                 "should use default MIME type when not specified",
                 (uint8Array, fileName) => {
@@ -360,7 +421,7 @@ describe("file Download Utility", () => {
             test.prop([
                 fc
                     .string({ maxLength: 200, minLength: 1 })
-                    .filter((s) => s.trim().length > 0),
+                    .filter(isSafeDownloadFileName),
             ])(
                 "should handle various filename lengths and formats",
                 (fileName) => {

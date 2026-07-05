@@ -29,6 +29,8 @@ const FILE_DOWNLOAD_WARN_LOGGER: BrowserDownloadWarnLogger = {
     },
 };
 
+const DEFAULT_DOWNLOAD_FILE_NAME = "download.bin";
+
 const WINDOWS_RESERVED_FILE_NAMES = new Set([
     "aux",
     "com1",
@@ -203,7 +205,8 @@ function handleDownloadError(
  * @remarks
  * This function creates a Blob from the provided buffer and initiates a
  * download using an anchor element. If the primary method fails, a fallback
- * strategy is attempted.
+ * strategy is attempted. The download filename is constrained to a single safe
+ * filename segment before it is assigned to the browser download attribute.
  *
  * @example
  *
@@ -225,11 +228,15 @@ function handleDownloadError(
  */
 export function downloadFile(options: FileDownloadOptions): void {
     const { buffer, fileName, mimeType = "application/octet-stream" } = options;
+    const normalizedFileName = normalizeDownloadFileName(
+        fileName,
+        DEFAULT_DOWNLOAD_FILE_NAME
+    );
 
     try {
-        createAndTriggerDownload(buffer, fileName, mimeType, true);
+        createAndTriggerDownload(buffer, normalizedFileName, mimeType, true);
     } catch (error) {
-        handleDownloadError(error, buffer, fileName, mimeType);
+        handleDownloadError(error, buffer, normalizedFileName, mimeType);
     }
 }
 
@@ -276,8 +283,10 @@ function isWindowsReservedFileName(fileName: string): boolean {
     return WINDOWS_RESERVED_FILE_NAMES.has((baseName ?? "").toLowerCase());
 }
 
-function normalizeSqliteBackupDownloadFileName(fileName: string): string {
-    const fallbackFileName = generateBackupFileName("uptime-watcher", "db");
+function normalizeDownloadFileName(
+    fileName: string,
+    fallbackFileName: string
+): string {
     const trimmedFileName = fileName.trim();
 
     if (
@@ -334,8 +343,9 @@ export async function handleSQLiteBackupDownload(
         return backupResult;
     }
 
-    const normalizedFileName = normalizeSqliteBackupDownloadFileName(
-        backupResult.fileName
+    const normalizedFileName = normalizeDownloadFileName(
+        backupResult.fileName,
+        generateBackupFileName("uptime-watcher", "db")
     );
 
     // Create blob from the backup data using a fresh typed array view
