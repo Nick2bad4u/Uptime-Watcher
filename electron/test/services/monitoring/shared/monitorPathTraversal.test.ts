@@ -108,6 +108,68 @@ describe(extractMonitorValueAtPath, () => {
         expect(getterCalls).toBe(0);
     });
 
+    it("blocks prototype-related path segments by default", () => {
+        const payload = {
+            safe: Object.defineProperties(
+                {},
+                {
+                    __proto__: {
+                        enumerable: true,
+                        value: "polluted",
+                    },
+                    constructor: {
+                        enumerable: true,
+                        value: {
+                            prototype: "polluted",
+                        },
+                    },
+                    prototype: {
+                        enumerable: true,
+                        value: "polluted",
+                    },
+                }
+            ),
+        };
+
+        expect(extractMonitorValueAtPath(payload, "safe.__proto__")).toBe(
+            undefined
+        );
+        expect(
+            extractMonitorValueAtPath(payload, "safe.constructor.prototype")
+        ).toBeUndefined();
+        expect(extractMonitorValueAtPath(payload, "safe.prototype")).toBe(
+            undefined
+        );
+    });
+
+    it("blocks percent-encoded prototype segments after decoding", () => {
+        const payload = {
+            safe: Object.defineProperty({}, "__proto__", {
+                enumerable: true,
+                value: "polluted",
+            }),
+        };
+
+        expect(
+            extractMonitorValueAtPath(payload, "safe.%5F%5Fproto%5F%5F")
+        ).toBeUndefined();
+    });
+
+    it("can resolve own prototype-named data only when explicitly allowed", () => {
+        const payload = {
+            safe: Object.defineProperty({}, "constructor", {
+                enumerable: true,
+                value: "data",
+            }),
+        };
+
+        expect(
+            extractMonitorValueAtPath(payload, "safe.constructor", {
+                blockPrototypeAccess: false,
+            })
+        ).toBe("data");
+    });
+
     it("resolves values from null-prototype response objects", () => {
         const payload = Object.create(null) as Record<string, unknown>;
         payload["details"] = Object.assign(Object.create(null), {
