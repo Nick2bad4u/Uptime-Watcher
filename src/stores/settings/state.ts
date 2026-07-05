@@ -1,7 +1,7 @@
 import type { StoreApi } from "zustand";
 
 import { safeNumberConversion } from "@shared/utils/safeConversions";
-import { isFinite as isFiniteNumber, safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Basic state slice for the settings store.
@@ -19,6 +19,7 @@ import { logStoreAction } from "../utils";
 
 const DEFAULT_SETTINGS_HISTORY_LIMIT = DEFAULT_HISTORY_LIMIT;
 const DEFAULT_IN_APP_ALERT_VOLUME = 1;
+type AppSettingsCandidate = Partial<Record<keyof AppSettings, unknown>>;
 
 /**
  * Default app settings applied during initialization.
@@ -112,56 +113,47 @@ const normalizeThemeSetting = (
  * @returns A fully normalized settings object.
  */
 export const normalizeAppSettings = (
-    candidate: Partial<AppSettings> = {},
+    candidate: AppSettingsCandidate = {},
     fallback: AppSettings = defaultSettings
 ): AppSettings => {
     const rest = candidate;
 
-    const merged: AppSettings = safeCastTo({
-        ...defaultSettings,
-        ...fallback,
-        ...rest,
-    });
-
-    merged.autoStart = normalizeBooleanSetting(
-        rest.autoStart,
-        fallback.autoStart
-    );
-    merged.historyLimit = normalizeHistoryLimitSetting(
-        rest.historyLimit,
-        fallback.historyLimit
-    );
-    merged.inAppAlertsEnabled = normalizeBooleanSetting(
-        rest.inAppAlertsEnabled,
-        fallback.inAppAlertsEnabled
-    );
-    merged.inAppAlertsSoundEnabled = normalizeBooleanSetting(
-        rest.inAppAlertsSoundEnabled,
-        fallback.inAppAlertsSoundEnabled
-    );
-    merged.inAppAlertVolume = clampInAppAlertVolume(
-        rest.inAppAlertVolume,
-        fallback.inAppAlertVolume
-    );
-    merged.minimizeToTray = normalizeBooleanSetting(
-        rest.minimizeToTray,
-        fallback.minimizeToTray
-    );
-    merged.mutedSiteNotificationIdentifiers = normalizeMutedSiteIdentifiers(
-        rest.mutedSiteNotificationIdentifiers,
-        fallback.mutedSiteNotificationIdentifiers
-    );
-    merged.systemNotificationsEnabled = normalizeBooleanSetting(
-        rest.systemNotificationsEnabled,
-        fallback.systemNotificationsEnabled
-    );
-    merged.systemNotificationsSoundEnabled = normalizeBooleanSetting(
-        rest.systemNotificationsSoundEnabled,
-        fallback.systemNotificationsSoundEnabled
-    );
-    merged.theme = normalizeThemeSetting(rest.theme, fallback.theme);
-
-    return merged;
+    return {
+        autoStart: normalizeBooleanSetting(rest.autoStart, fallback.autoStart),
+        historyLimit: normalizeHistoryLimitSetting(
+            rest.historyLimit,
+            fallback.historyLimit
+        ),
+        inAppAlertsEnabled: normalizeBooleanSetting(
+            rest.inAppAlertsEnabled,
+            fallback.inAppAlertsEnabled
+        ),
+        inAppAlertsSoundEnabled: normalizeBooleanSetting(
+            rest.inAppAlertsSoundEnabled,
+            fallback.inAppAlertsSoundEnabled
+        ),
+        inAppAlertVolume: clampInAppAlertVolume(
+            rest.inAppAlertVolume,
+            fallback.inAppAlertVolume
+        ),
+        minimizeToTray: normalizeBooleanSetting(
+            rest.minimizeToTray,
+            fallback.minimizeToTray
+        ),
+        mutedSiteNotificationIdentifiers: normalizeMutedSiteIdentifiers(
+            rest.mutedSiteNotificationIdentifiers,
+            fallback.mutedSiteNotificationIdentifiers
+        ),
+        systemNotificationsEnabled: normalizeBooleanSetting(
+            rest.systemNotificationsEnabled,
+            fallback.systemNotificationsEnabled
+        ),
+        systemNotificationsSoundEnabled: normalizeBooleanSetting(
+            rest.systemNotificationsSoundEnabled,
+            fallback.systemNotificationsSoundEnabled
+        ),
+        theme: normalizeThemeSetting(rest.theme, fallback.theme),
+    };
 };
 
 /**

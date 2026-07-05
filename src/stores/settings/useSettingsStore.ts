@@ -39,7 +39,6 @@
 import type { Promisable } from "type-fest";
 
 import { isRecord } from "@shared/utils/typeHelpers";
-import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -150,15 +149,13 @@ export const useSettingsStore: UseBoundStore<
                     return currentState;
                 }
 
-                const base = safeCastTo(persistedState);
                 const settingsCandidate = persistedState["settings"];
                 const persistedSettings = isRecord(settingsCandidate)
-                    ? safeCastTo(settingsCandidate)
+                    ? settingsCandidate
                     : {};
 
                 return {
                     ...currentState,
-                    ...base,
                     settings: normalizeAppSettings(
                         {
                             ...currentState.settings,
