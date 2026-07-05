@@ -5,12 +5,16 @@
  * Operations capture thrown errors and expose them as structured metadata so
  * callers never deal with exceptions during normal control flow.
  */
-import type { Jsonifiable, JsonValue, UnknownRecord } from "type-fest";
+import type {
+    Jsonifiable,
+    JsonObject,
+    JsonValue,
+    UnknownRecord,
+} from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isObject } from "@shared/utils/typeGuards";
 import { isDefined, isEmpty, objectEntries, objectHasOwn } from "ts-extras";
 
@@ -36,16 +40,46 @@ class JsonValidationError extends TypeError {
     }
 }
 
-const cloneParsedJsonData = (value: unknown): unknown => {
+const isParsedJsonValue = (value: unknown): value is JsonValue => {
+    if (value === null) {
+        return true;
+    }
+
+    const valueType = typeof value;
+    if (
+        valueType === "boolean" ||
+        valueType === "number" ||
+        valueType === "string"
+    ) {
+        return true;
+    }
+
+    if (Array.isArray(value)) {
+        return value.every(isParsedJsonValue);
+    }
+
+    return (
+        isObject(value) &&
+        objectEntries(value).every(([, entry]) => isParsedJsonValue(entry))
+    );
+};
+
+const isParsedJsonObject = (value: unknown): value is JsonObject =>
+    isObject(value) &&
+    objectEntries(value).every(([, entry]) => isParsedJsonValue(entry));
+
+function cloneParsedJsonData(value: JsonObject): JsonObject;
+function cloneParsedJsonData(value: JsonValue): JsonValue;
+function cloneParsedJsonData(value: JsonValue): JsonValue {
     if (Array.isArray(value)) {
         return value.map((entry) => cloneParsedJsonData(entry));
     }
 
-    if (!isObject(value)) {
+    if (!isParsedJsonObject(value)) {
         return value;
     }
 
-    const cloned = createNullPrototypeObject<UnknownRecord>();
+    const cloned = createNullPrototypeObject<JsonObject>();
 
     for (const [key, entry] of objectEntries(value)) {
         Object.defineProperty(cloned, key, {
@@ -57,7 +91,7 @@ const cloneParsedJsonData = (value: unknown): unknown => {
     }
 
     return cloned;
-};
+}
 
 /**
  * Attempts to parse a JSON string into a plain object record.
@@ -71,9 +105,7 @@ const cloneParsedJsonData = (value: unknown): unknown => {
 export function tryParseJsonRecord(text: string): null | UnknownRecord {
     try {
         const parsed: unknown = JSON.parse(text);
-        return isObject(parsed)
-            ? castUnchecked<UnknownRecord>(cloneParsedJsonData(parsed))
-            : null;
+        return isParsedJsonObject(parsed) ? cloneParsedJsonData(parsed) : null;
     } catch {
         return null;
     }
@@ -261,7 +293,10 @@ export function safeJsonParse<T extends JsonValue>(
         const parsed: unknown = JSON.parse(json);
 
         if (validator(parsed)) {
-            return castUnchecked<T>(cloneParsedJsonData(parsed));
+            const cloned = cloneParsedJsonData(parsed);
+            if (validator(cloned)) {
+                return cloned;
+            }
         }
 
         throw new JsonValidationError(
@@ -322,7 +357,14 @@ export function safeJsonParseArray<T extends JsonValue>(
                 );
             }
 
-            typedArray.push(castUnchecked<T>(cloneParsedJsonData(element)));
+            const cloned = cloneParsedJsonData(element);
+            if (!elementValidator(cloned)) {
+                throw new JsonValidationError(
+                    `Array element at index ${index} does not match expected type after cloning`
+                );
+            }
+
+            typedArray.push(cloned);
         }
 
         return typedArray;
