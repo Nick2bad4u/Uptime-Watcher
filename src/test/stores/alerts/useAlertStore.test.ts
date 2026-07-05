@@ -556,6 +556,35 @@ describe("useAlertStore identifier generation fallbacks", () => {
         }
     });
 
+    it("falls back to getRandomValues when randomUUID returns whitespace", () => {
+        const originalCrypto = crypto;
+        const mockGetRandomValues = vi.fn((buffer: Uint32Array) => {
+            buffer[0] = 101;
+            buffer[1] = 202;
+            return buffer;
+        });
+
+        try {
+            globalThis.crypto = {
+                getRandomValues: mockGetRandomValues,
+                randomUUID: vi.fn(() => " ".repeat(3)),
+            } as unknown as Crypto;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
+            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+        } finally {
+            globalThis.crypto = originalCrypto;
+        }
+    });
+
     it("does not invoke accessor-backed randomUUID properties", () => {
         const originalCrypto = crypto;
         let accessCount = 0;

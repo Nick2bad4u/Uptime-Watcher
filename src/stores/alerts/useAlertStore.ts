@@ -99,7 +99,10 @@ const generateAlertId = (): string => {
     const randomUUID = getAlertRandomUuid(cryptoObject);
     if (randomUUID) {
         try {
-            return randomUUID.call(cryptoObject);
+            const candidate = randomUUID.call(cryptoObject);
+            if (candidate.trim().length > 0) {
+                return candidate;
+            }
         } catch {
             // Fall through to getRandomValues or the deterministic fallback.
         }
