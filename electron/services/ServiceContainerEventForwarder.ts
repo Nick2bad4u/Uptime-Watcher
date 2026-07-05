@@ -14,7 +14,6 @@ import type { EventMetadata } from "@shared/types/events";
 import { eventMetadataSchema } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
 import { castUnchecked } from "@shared/utils/typeHelpers";
-import { safeCastTo } from "ts-extras";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
 
@@ -38,6 +37,14 @@ import {
     type ForwardablePayloadWithMeta,
     toForwardablePayload,
 } from "./ServiceContainer.utils";
+
+function hasEventRegistrationMethod(
+    managerEventBus: TypedEventBus<UptimeEvents>,
+    methodName: "on" | "onTyped"
+): boolean {
+    const candidate: unknown = Reflect.get(managerEventBus, methodName);
+    return typeof candidate === "function";
+}
 
 /**
  * The subset of orchestrator functionality required for event forwarding.
@@ -97,14 +104,9 @@ export class ServiceContainerEventForwarder {
             "system:error",
         ] as const satisfies readonly UptimeEventName[];
 
-        const maybeTypedBus = safeCastTo<{
-            on?: TypedEventBus<UptimeEvents>["on"];
-            onTyped?: TypedEventBus<UptimeEvents>["onTyped"];
-        }>(managerEventBus);
-
-        if (typeof maybeTypedBus.onTyped === "function") {
+        if (hasEventRegistrationMethod(managerEventBus, "onTyped")) {
             for (const eventName of eventsToForward) {
-                maybeTypedBus.onTyped(
+                managerEventBus.onTyped(
                     eventName,
                     (
                         payloadWithMeta: EnhancedEventPayload<
@@ -122,14 +124,14 @@ export class ServiceContainerEventForwarder {
                 );
             }
         } else {
-            for (const eventName of eventsToForward) {
-                const rawOn = safeCastTo<{
-                    on?: TypedEventBus<UptimeEvents>["on"];
-                }>(managerEventBus).on;
+            const hasOnMethod = hasEventRegistrationMethod(
+                managerEventBus,
+                "on"
+            );
 
-                if (typeof rawOn === "function") {
-                    rawOn.call(
-                        managerEventBus,
+            for (const eventName of eventsToForward) {
+                if (hasOnMethod) {
+                    managerEventBus.on(
                         eventName,
                         (
                             payload: ForwardableEventPayload<typeof eventName>
