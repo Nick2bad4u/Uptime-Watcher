@@ -31,7 +31,10 @@ import type {
 import { logger } from "../../utils/logger";
 import { isDev } from "../../electronUtils";
 import { extractIpcCorrelationContext } from "./internal/ipcCorrelationContext";
-import { createSafeErrorMessage } from "./internal/ipcErrorUtils";
+import {
+    createSafeErrorMessage,
+    normalizeIpcErrorMessage,
+} from "./internal/ipcErrorUtils";
 import {
     executeIpcHandler,
     type HandlerExecutionResult,
@@ -194,7 +197,7 @@ export function createErrorResponse(
     error: string,
     metadata?: UnknownRecord
 ): IpcResponse<never> {
-    const normalizedError = error.trim();
+    const normalizedError = normalizeIpcErrorMessage(error).trim();
     const response: IpcResponse<never> = {
         error:
             normalizedError.length > 0

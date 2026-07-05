@@ -909,6 +909,39 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
 
+            it("should redact secret values in error response messages", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Security", "type");
+
+                const result = createErrorResponse(
+                    "Request failed: https://example.com/callback?access_token=SUPER_SECRET&refresh_token=REFRESH_SECRET"
+                );
+
+                expect(result.error).toContain("access_token=[redacted]");
+                expect(result.error).toContain("refresh_token=[redacted]");
+                expect(result.error).not.toContain("SUPER_SECRET");
+                expect(result.error).not.toContain("REFRESH_SECRET");
+            });
+
+            it("should truncate oversized error response messages", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Security", "type");
+
+                const result = createErrorResponse("x".repeat(10_000));
+
+                expect(result.error.length).toBeLessThan(10_000);
+            });
+
             it("should create error response with metadata", async ({
                 task,
                 annotate,
@@ -1339,7 +1372,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const expectedDuration = 50;
                 const startTime = 10_000;
                 const endTime = startTime + expectedDuration;
-                const nowSpy = vi.spyOn(Date, "now");
+                const nowSpy = vi.spyOn(performance, "now");
                 const mockHandler = vi.fn().mockResolvedValue("delayed result");
 
                 try {
@@ -1529,7 +1562,7 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 const expectedDuration = 30;
                 const startTime = 20_000;
                 const endTime = startTime + expectedDuration;
-                const nowSpy = vi.spyOn(Date, "now");
+                const nowSpy = vi.spyOn(performance, "now");
                 const mockHandler = vi.fn().mockResolvedValue("timed result");
                 const mockValidator = vi.fn().mockReturnValue(null);
 
