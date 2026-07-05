@@ -15,14 +15,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import {
-    isDefined,
-    isEmpty,
-    objectEntries,
-    objectFromEntries,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { isDefined, isEmpty, objectEntries, setHas } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
 
@@ -78,6 +71,23 @@ const collectSelectedMonitorEntries = (
     }
 
     return entries;
+};
+
+const omitSelectedMonitorEntryForSite = (
+    selectedMonitorIds: SitesState["selectedMonitorIds"],
+    identifier: Site["identifier"]
+): SitesState["selectedMonitorIds"] => {
+    const remainingMonitorIds: SitesState["selectedMonitorIds"] = {};
+
+    for (const [siteId, monitorId] of collectSelectedMonitorEntries(
+        selectedMonitorIds
+    )) {
+        if (siteId !== identifier) {
+            remainingMonitorIds[siteId] = monitorId;
+        }
+    }
+
+    return remainingMonitorIds;
 };
 
 /**
@@ -378,14 +388,9 @@ export const createSitesStateActions = (
         removeSite: (identifier: Site["identifier"]): void => {
             logStoreAction("SitesStore", "removeSite", { identifier });
             set((state) => {
-                const currentMonitorIds = state.selectedMonitorIds;
-
-                const remainingMonitorIds = safeCastTo(
-                    objectFromEntries(
-                        objectEntries(currentMonitorIds).filter(
-                            ([key]) => key !== identifier
-                        )
-                    )
+                const remainingMonitorIds = omitSelectedMonitorEntryForSite(
+                    state.selectedMonitorIds,
+                    identifier
                 );
                 return {
                     selectedMonitorIds: remainingMonitorIds,
