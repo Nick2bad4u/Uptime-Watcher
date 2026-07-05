@@ -170,6 +170,21 @@ describe("SslMonitor service", () => {
         expect(createMonitorErrorResult).not.toHaveBeenCalled();
     });
 
+    it("trims certificate subjects in result details", async () => {
+        const certificate = createCertificate(
+            new Date(Date.now() + 120 * 86_400_000),
+            {
+                CN: "   uptime.example.com   ",
+            }
+        );
+        mockSuccessfulHandshake(certificate);
+
+        const result = await sslMonitor.check(monitor);
+
+        expect(result.details).toContain("Certificate for uptime.example.com");
+        expect(result.details).not.toContain("   uptime.example.com   ");
+    });
+
     it("marks certificates as degraded when approaching expiry", async () => {
         const certificate = createCertificate(
             new Date(Date.now() + 5 * 86_400_000)

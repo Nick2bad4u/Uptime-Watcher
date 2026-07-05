@@ -364,12 +364,18 @@ export class SslMonitor implements IMonitorService {
             subject.O,
             subject.OU,
         ];
-        const name = candidates.find(
-            (value): value is string =>
-                typeof value === "string" && value.trim().length > 0
-        );
+        for (const value of candidates) {
+            if (typeof value !== "string") {
+                continue;
+            }
 
-        return name ?? "unknown subject";
+            const trimmedValue = value.trim();
+            if (trimmedValue.length > 0) {
+                return trimmedValue;
+            }
+        }
+
+        return "unknown subject";
     }
 
     private formatDate(date: Date): string {
