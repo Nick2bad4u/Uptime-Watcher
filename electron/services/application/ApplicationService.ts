@@ -183,6 +183,19 @@ export class ApplicationService {
                 suppressErrors: true,
             });
 
+            const autoUpdaterServiceEntry = services.find(
+                ({ name }) => name === "AutoUpdaterService"
+            );
+
+            if (autoUpdaterServiceEntry) {
+                const serviceCandidate = autoUpdaterServiceEntry.service;
+                const cleanupAutoUpdater = getCallableDataProperty(
+                    serviceCandidate,
+                    "cleanup"
+                );
+                cleanupAutoUpdater?.call(serviceCandidate);
+            }
+
             // Cleanup IPC handlers
             // NOTE: Currently synchronous, but designed to be
             // future-compatible with async cleanup

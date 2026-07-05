@@ -144,6 +144,7 @@ const mockRendererEventBridge = {
 };
 
 const mockAutoUpdaterService = {
+    cleanup: vi.fn(),
     setStatusCallback: vi.fn(),
     initialize: vi.fn(),
     checkForUpdates: vi.fn(() => Promise.resolve()),
@@ -163,6 +164,7 @@ vi.mock("../../../services/ServiceContainer", () => ({
             { name: "IpcService", service: mockIpcService },
             { name: "WindowService", service: mockWindowService },
             { name: "DatabaseService", service: mockDatabaseService },
+            { name: "AutoUpdaterService", service: mockAutoUpdaterService },
         ]),
         getIpcService: vi.fn(() => mockIpcService),
         getUptimeOrchestrator: vi.fn(() => mockUptimeOrchestrator),
@@ -188,6 +190,7 @@ describe(ApplicationService, () => {
         mockUptimeOrchestrator.removeAllListeners.mockReset();
 
         mockIpcService.cleanup.mockReset();
+        mockAutoUpdaterService.cleanup.mockReset();
         mockWindowService.closeMainWindow.mockReset();
         mockDatabaseService.close.mockReset();
 
@@ -494,6 +497,7 @@ describe(ApplicationService, () => {
             expect(
                 mockServiceContainer.getInitializedServices
             ).toHaveBeenCalledTimes(1);
+            expect(mockAutoUpdaterService.cleanup).toHaveBeenCalledTimes(1);
             expect(mockIpcService.cleanup).toHaveBeenCalledTimes(1);
             expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
                 1
