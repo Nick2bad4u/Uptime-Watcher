@@ -38,10 +38,15 @@ const setupModule = async (overrides: SetupOverrides = {}) => {
     class TestElectronBridgeNotReadyError extends Error {
         public readonly diagnostics: unknown;
 
-        public constructor(message: string, diagnostics?: unknown) {
-            super(message);
+        public constructor(messageOrDiagnostics: unknown, diagnostics?: unknown) {
+            super(
+                typeof messageOrDiagnostics === "string"
+                    ? messageOrDiagnostics
+                    : "Bridge not ready"
+            );
             this.name = "TestElectronBridgeNotReadyError";
-            this.diagnostics = diagnostics;
+            this.diagnostics =
+                diagnostics === undefined ? messageOrDiagnostics : diagnostics;
         }
     }
 
@@ -217,6 +222,85 @@ describe("createIpcServiceHelpers", () => {
         expect(loggerError).toHaveBeenCalledWith(
             "[HistoryService] fetchHistory failed:",
             handlerError
+        );
+    });
+
+    it("wraps handler execution with accessor-backed window globals", async () => {
+        const { module, waitForElectronBridge } = await setupModule();
+        waitForElectronBridge.mockResolvedValueOnce(undefined);
+        const electronAPI = { invoke: vi.fn() };
+        let accessCount = 0;
+
+        vi.stubGlobal(
+            "window",
+            Object.defineProperty({}, "electronAPI", {
+                configurable: true,
+                enumerable: true,
+                value: electronAPI,
+            })
+        );
+        Object.defineProperty(globalThis, "window", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return {
+                    electronAPI,
+                };
+            },
+        });
+
+        const helpers = module.createIpcServiceHelpers("AccessorService");
+        const handler = vi.fn(async (api: typeof window.electronAPI) => api);
+
+        await expect(helpers.wrap("load", handler)()).resolves.toBe(
+            electronAPI
+        );
+
+        expect(accessCount).toBeGreaterThan(0);
+        expect(handler).toHaveBeenCalledWith(electronAPI);
+    });
+
+    it("does not invoke electronAPI accessors while resolving the wrapped handler bridge", async () => {
+        const {
+            TestElectronBridgeNotReadyError,
+            ensureError,
+            loggerError,
+            module,
+            waitForElectronBridge,
+        } = await setupModule();
+        waitForElectronBridge.mockResolvedValueOnce(undefined);
+        let accessCount = 0;
+
+        vi.stubGlobal(
+            "window",
+            Object.defineProperty({}, "electronAPI", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return { invoke: vi.fn() };
+                },
+            })
+        );
+
+        const helpers = module.createIpcServiceHelpers("AccessorService", {
+            bridgeContracts: [{ domain: "sites" }],
+        });
+        const handler = vi.fn(async () => undefined);
+
+        await expect(helpers.wrap("load", handler)()).rejects.toBeInstanceOf(
+            TestElectronBridgeNotReadyError
+        );
+
+        expect(accessCount).toBe(0);
+        expect(handler).not.toHaveBeenCalled();
+        expect(ensureError).toHaveBeenCalledWith(
+            expect.any(TestElectronBridgeNotReadyError)
+        );
+        expect(loggerError).toHaveBeenCalledWith(
+            "[AccessorService] load failed:",
+            expect.any(TestElectronBridgeNotReadyError)
         );
     });
 

@@ -15,7 +15,10 @@
 import type { Except } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import {
+    getOwnDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
 import log from "electron-log/renderer";
 import { isDefined } from "ts-extras";
 
@@ -36,6 +39,15 @@ interface LoggerLike {
     debug?: (message: string, ...details: unknown[]) => void;
     error: (message: string, ...details: unknown[]) => void;
 }
+
+type ElectronApi = typeof window.electronAPI;
+
+const isObjectLike = (candidate: unknown): candidate is object =>
+    (typeof candidate === "object" && candidate !== null) ||
+    typeof candidate === "function";
+
+const isElectronApi = (candidate: unknown): candidate is ElectronApi =>
+    isObjectLike(candidate);
 
 /**
  * Type guard verifying that a candidate matches {@link LoggerLike}.
@@ -60,12 +72,27 @@ const safeGetModuleExport = (
     module: unknown,
     property: PropertyKey
 ): unknown => {
-    if (typeof module !== "object" || module === null) {
+    if (!isObjectLike(module)) {
         return undefined;
     }
 
     const moduleExport = getOwnDataProperty(module, property);
     return moduleExport.found ? moduleExport.value : undefined;
+};
+
+const getCurrentElectronApi = (): ElectronApi | undefined => {
+    const windowProperty = getOwnPropertyValue(globalThis, "window");
+    if (!windowProperty.found || !isObjectLike(windowProperty.value)) {
+        return undefined;
+    }
+
+    const electronApiProperty = getOwnDataProperty(
+        windowProperty.value,
+        "electronAPI"
+    );
+    return electronApiProperty.found && isElectronApi(electronApiProperty.value)
+        ? electronApiProperty.value
+        : undefined;
 };
 
 /**
@@ -186,6 +213,15 @@ export function createIpcServiceHelpers(
         }),
     });
 
+    const buildBridgeUnavailableError = (): ElectronBridgeNotReadyError =>
+        new ElectronBridgeNotReadyError({
+            bridgeAvailable: false,
+            missingDomains:
+                options.bridgeContracts?.map((contract) => contract.domain) ??
+                [],
+            missingMethods: [],
+        });
+
     const ensureInitialized = (): Promise<void> => {
         if (initializationPromise) {
             return initializationPromise;
@@ -237,7 +273,12 @@ export function createIpcServiceHelpers(
             await ensureInitialized();
 
             try {
-                return await handler(window.electronAPI, ...args);
+                const electronApi = getCurrentElectronApi();
+                if (!electronApi) {
+                    throw buildBridgeUnavailableError();
+                }
+
+                return await handler(electronApi, ...args);
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
                 logger.error(
