@@ -133,6 +133,8 @@ export function safeParseCheckInterval(
  * @returns Valid floating-point number or the default value
  */
 export function safeParseFloat(value: unknown, defaultValue = 0): number {
+    const normalizedDefault = isFiniteNumber(defaultValue) ? defaultValue : 0;
+
     // Numbers: preserve as-is, including ±Infinity; NaN is filtered by isNumber
     if (isNumber(value)) {
         return value;
@@ -142,10 +144,10 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
         // ParseFloat accepts e.g. "123.45abc" -> 123.45
         // Reject non-finite results like Infinity/-Infinity from strings
         const parsed = Number.parseFloat(value);
-        return isFiniteNumber(parsed) ? parsed : defaultValue;
+        return isFiniteNumber(parsed) ? parsed : normalizedDefault;
     }
 
-    return defaultValue;
+    return normalizedDefault;
 }
 
 /**
@@ -172,10 +174,14 @@ export function safeParseFloat(value: unknown, defaultValue = 0): number {
  * @returns Valid integer or the default value
  */
 export function safeParseInt(value: unknown, defaultValue = 0): number {
+    const normalizedDefault = isFiniteNumber(defaultValue)
+        ? Math.floor(defaultValue)
+        : 0;
+
     if (isNumber(value)) {
         // Return default value for non-finite numbers (Infinity, -Infinity, NaN)
         if (!isFiniteNumber(value)) {
-            return defaultValue;
+            return normalizedDefault;
         }
         // For finite numeric inputs, apply Math.floor to get integer
         return Math.floor(value);
@@ -183,10 +189,10 @@ export function safeParseInt(value: unknown, defaultValue = 0): number {
 
     if (isString(value)) {
         const parsed = Number.parseInt(value, 10);
-        return Number.isNaN(parsed) ? defaultValue : parsed;
+        return Number.isNaN(parsed) ? normalizedDefault : parsed;
     }
 
-    return defaultValue;
+    return normalizedDefault;
 }
 
 /**
@@ -212,14 +218,18 @@ export function safeParseInt(value: unknown, defaultValue = 0): number {
  * @returns Valid percentage clamped between 0 and 100, or the default value
  */
 export function safeParsePercentage(value: unknown, defaultValue = 0): number {
+    const normalizedDefault = isFiniteNumber(defaultValue)
+        ? Math.max(0, Math.min(100, defaultValue))
+        : 0;
+
     if (isNumber(value)) {
         if (Number.isNaN(value)) {
-            return Math.max(0, Math.min(100, defaultValue));
+            return normalizedDefault;
         }
         if (isInfinite(value)) return value > 0 ? 100 : 0;
         return Math.max(0, Math.min(100, value));
     }
-    const parsed = safeParseFloat(value, defaultValue);
+    const parsed = safeParseFloat(value, normalizedDefault);
     return Math.max(0, Math.min(100, parsed));
 }
 

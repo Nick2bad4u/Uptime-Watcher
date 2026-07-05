@@ -186,6 +186,19 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeParseFloat({})).toBe(0);
             expect(safeParseFloat(null, 1.5)).toBe(1.5);
         });
+
+        test.prop([
+            fc.oneof(
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])(
+            "should fall back when custom default is non-finite",
+            (defaultValue) => {
+                expect(safeParseFloat("invalid", defaultValue)).toBe(0);
+            }
+        );
     });
 
     describe(safeParseInt, () => {
@@ -238,6 +251,23 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeParseInt("invalid")).toBe(0);
             expect(safeParseInt(null, 10)).toBe(10);
         });
+
+        it("should normalize custom defaults to integers", () => {
+            expect(safeParseInt("invalid", 10.9)).toBe(10);
+        });
+
+        test.prop([
+            fc.oneof(
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])(
+            "should fall back when custom default is non-finite",
+            (defaultValue) => {
+                expect(safeParseInt("invalid", defaultValue)).toBe(0);
+            }
+        );
     });
 
     describe(safeParsePercentage, () => {
@@ -280,6 +310,19 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeParsePercentage("-10")).toBe(0);
             expect(safeParsePercentage("invalid")).toBe(0);
         });
+
+        test.prop([
+            fc.oneof(
+                fc.constant(Number.NaN),
+                fc.constant(Number.POSITIVE_INFINITY),
+                fc.constant(Number.NEGATIVE_INFINITY)
+            ),
+        ])(
+            "should fall back when custom default is non-finite",
+            (defaultValue) => {
+                expect(safeParsePercentage("invalid", defaultValue)).toBe(0);
+            }
+        );
     });
 
     describe(safeParsePort, () => {
