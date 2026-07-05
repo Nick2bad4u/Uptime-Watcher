@@ -294,6 +294,7 @@ export async function startLoopbackOAuthServer(args?: {
             ? ([requiresIpv6 ? "::1" : "127.0.0.1"] as const)
             : LOOPBACK_HOSTS;
 
+    let isClosed = false;
     let isResolved = false;
     let resolvePromise: ((value: LoopbackOAuthCallback) => void) | null = null;
     let rejectPromise: ((error: unknown) => void) | null = null;
@@ -485,6 +486,17 @@ export async function startLoopbackOAuthServer(args?: {
 
     return {
         close: async (): Promise<void> => {
+            if (isClosed) {
+                return;
+            }
+
+            isClosed = true;
+
+            if (!isResolved && expectedStateValue !== null) {
+                isResolved = true;
+                rejectPromise?.(new Error("OAuth loopback server closed"));
+            }
+
             await Promise.all(
                 servers.map(async ({ server }) => {
                     if (!server.listening) {
@@ -500,6 +512,10 @@ export async function startLoopbackOAuthServer(args?: {
             expectedState,
             timeoutMs,
         }): Promise<LoopbackOAuthCallback> => {
+            if (isClosed) {
+                throw new Error("OAuth loopback server closed");
+            }
+
             expectedStateValue = expectedState;
 
             if (pendingCallbackError && !isResolved) {

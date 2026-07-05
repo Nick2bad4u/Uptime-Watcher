@@ -196,6 +196,25 @@ describe(startLoopbackOAuthServer, () => {
         }
     });
 
+    it("rejects a pending callback wait when the server is closed", async () => {
+        const server = await startLoopbackOAuthServer({
+            port: 0,
+            redirectHost: "127.0.0.1",
+            redirectPath: "/oauth2/callback",
+        });
+
+        const callbackPromise = server.waitForCallback({
+            expectedState: "expected-state",
+            timeoutMs: 60_000,
+        });
+
+        await closeServer(server);
+
+        await expect(callbackPromise).rejects.toThrow(
+            "OAuth loopback server closed"
+        );
+    });
+
     it("rejects cleanly and closes partial listeners when a port is already in use", async () => {
         const blocker = await listenOnLoopback();
 
