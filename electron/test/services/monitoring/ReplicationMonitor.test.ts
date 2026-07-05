@@ -174,4 +174,27 @@ describe("ReplicationMonitor service", () => {
         expect(result.error).not.toContain("token=");
         expect(result.error).not.toContain("primary-json-secret");
     });
+
+    it("treats empty string responses as invalid JSON", async () => {
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url.includes("primary")) {
+                return {
+                    data: "",
+                    responseTime: 30,
+                };
+            }
+
+            return {
+                data: {
+                    timestamp: Date.now(),
+                },
+                responseTime: 50,
+            };
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Invalid JSON response");
+    });
 });

@@ -157,4 +157,16 @@ describe("ServerHeartbeatMonitor service", () => {
             "Failed to fetch https://api.example.com/heartbeat"
         );
     });
+
+    it("treats empty string responses as invalid JSON", async () => {
+        httpGetMock.mockResolvedValue({
+            data: "",
+            responseTime: 25,
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Invalid JSON response");
+    });
 });

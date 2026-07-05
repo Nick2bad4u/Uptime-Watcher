@@ -73,10 +73,6 @@ function parseRemoteEndpointPayload(url: string, data: unknown): unknown {
         return data;
     }
 
-    if (data.length === 0) {
-        return {};
-    }
-
     try {
         return JSON.parse(data);
     } catch (parseError) {
