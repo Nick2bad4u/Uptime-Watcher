@@ -65,6 +65,16 @@ export const MONITOR_START_CONCURRENCY = 8;
 export const DATABASE_GRAPH_READ_CONCURRENCY = 8;
 
 /**
+ * Maximum number of imported site configurations to validate at once.
+ *
+ * @remarks
+ * Import validation may inspect every monitor on every imported site through
+ * the configuration manager. Bounding this prevents large JSON imports from
+ * launching all validation work at once before the atomic persist step.
+ */
+export const IMPORT_SITE_VALIDATION_CONCURRENCY = 8;
+
+/**
  * User agent string for HTTP requests.
  *
  * @remarks

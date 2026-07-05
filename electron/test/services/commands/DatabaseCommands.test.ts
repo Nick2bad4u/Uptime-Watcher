@@ -20,6 +20,7 @@ import type { DatabaseCommandContext } from "../../../services/commands/database
 import type { DatabaseRestorePayload } from "../../../services/database/utils/backup/databaseBackup";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
+import { IMPORT_SITE_VALIDATION_CONCURRENCY } from "../../../constants";
 import {
     DatabaseCommand,
     DatabaseCommandExecutor,
@@ -941,6 +942,57 @@ describe("DatabaseCommands", () => {
             expect(
                 mockImportExportService.persistImportedData
             ).not.toHaveBeenCalled();
+        });
+
+        it("should bound concurrent imported site validation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Performance", "type");
+
+            const importedSites = Array.from(
+                { length: IMPORT_SITE_VALIDATION_CONCURRENCY + 3 },
+                (_, index) => createTestSite(`import-${index}`)
+            );
+            let active = 0;
+            let maxActive = 0;
+
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                settings: {},
+                sites: importedSites,
+            });
+            mockSiteRepositoryService.getSitesFromDatabase.mockResolvedValue(
+                importedSites
+            );
+            mockConfigurationManager.validateSiteConfiguration.mockImplementation(
+                async () => {
+                    active += 1;
+                    maxActive = Math.max(maxActive, active);
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 1);
+                    });
+                    active -= 1;
+                    return {
+                        errors: [],
+                        success: true,
+                    };
+                }
+            );
+
+            await command.execute();
+
+            expect(
+                mockConfigurationManager.validateSiteConfiguration
+            ).toHaveBeenCalledTimes(importedSites.length);
+            expect(
+                mockImportExportService.persistImportedData
+            ).toHaveBeenCalledWith(importedSites, {});
+            expect(maxActive).toBeLessThanOrEqual(
+                IMPORT_SITE_VALIDATION_CONCURRENCY
+            );
         });
 
         it("should fail when duplicate site identifiers detected", async ({

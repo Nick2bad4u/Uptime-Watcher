@@ -43,6 +43,8 @@ import type {
 import { parseHistoryLimitSetting } from "../database/utils/historyLimitSettingParser";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
+import { IMPORT_SITE_VALIDATION_CONCURRENCY } from "../../constants";
+import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 import { logger as backendLogger } from "../../utils/logger";
 import {
     type DatabaseCommandContext,
@@ -724,11 +726,12 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             return canonicalSites;
         }
 
-        const validationResults = await Promise.all(
-            canonicalSites.map((site) =>
-                configurationManager.validateSiteConfiguration(site)
-            )
-        );
+        const validationResults = await mapWithConcurrency({
+            concurrency: IMPORT_SITE_VALIDATION_CONCURRENCY,
+            items: canonicalSites,
+            task: async (site) =>
+                configurationManager.validateSiteConfiguration(site),
+        });
 
         const invalidSites: {
             errors: readonly string[];
