@@ -5,10 +5,15 @@
 
 // Import types
 import type { Monitor, Site } from "@shared/types";
+import type { ArrayElement } from "type-fest";
 
 import { fc } from "@fast-check/vitest";
 import { secureRandomFloat } from "@shared/test/testHelpers";
-import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
+import {
+    BASE_MONITOR_TYPES,
+    DEFAULT_MONITOR_STATUS,
+    STATUS_HISTORY_VALUES,
+} from "@shared/types";
 import { arrayFirst, safeCastTo } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
@@ -44,6 +49,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
     const retryAttemptsArb = fc.integer({ min: 0, max: 10 });
 
+    const statusHistoryStatusArb = fc.constantFrom<
+        ArrayElement<Monitor["history"]>["status"]
+    >(...STATUS_HISTORY_VALUES);
+
     const httpMonitorArb = fc.record({
         id: monitorIdArb,
         type: fc.constant("http"),
@@ -58,7 +67,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         history: fc.array(
             fc.record({
                 timestamp: fc.date().map((d) => d.getTime()),
-                status: fc.constantFrom("up", "down"),
+                status: statusHistoryStatusArb,
                 responseTime: fc.integer({ min: 0, max: 10_000 }),
             }),
             { maxLength: 10 }
@@ -83,7 +92,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         history: fc.array(
             fc.record({
                 timestamp: fc.date().map((d) => d.getTime()),
-                status: fc.constantFrom("up", "down"),
+                status: statusHistoryStatusArb,
                 responseTime: fc.integer({ min: 0, max: 10_000 }),
             }),
             { maxLength: 10 }
@@ -107,7 +116,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         history: fc.array(
             fc.record({
                 timestamp: fc.date().map((d) => d.getTime()),
-                status: fc.constantFrom("up", "down"),
+                status: statusHistoryStatusArb,
                 responseTime: fc.integer({ min: 0, max: 10_000 }),
             }),
             { maxLength: 10 }
@@ -132,7 +141,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         history: fc.array(
             fc.record({
                 timestamp: fc.date().map((d) => d.getTime()),
-                status: fc.constantFrom("up", "down"),
+                status: statusHistoryStatusArb,
                 responseTime: fc.integer({ min: 0, max: 10_000 }),
             }),
             { maxLength: 10 }
