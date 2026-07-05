@@ -19,6 +19,12 @@
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import {
+    MONITOR_STATUS_VALUES,
+    SITE_STATUS_VALUES,
+    type MonitorStatus,
+    type SiteStatus,
+} from "@shared/types";
+import {
     arrayFirst,
     arrayJoin,
     isEmpty,
@@ -37,7 +43,7 @@ interface MonitorState {
     name: string;
     responseTime: null | number;
     retries: number;
-    status: "down" | "paused" | "pending" | "up";
+    status: MonitorStatus;
     timeout: number;
     type: "dns" | "http" | "ping" | "port";
     updatedAt: Date;
@@ -74,7 +80,7 @@ interface SiteState {
     monitors: number[];
     name: string;
     overallUptime: number;
-    status: "down" | "mixed" | "unknown" | "up";
+    status: SiteStatus;
     updatedAt: Date;
     url: string;
 }
@@ -119,7 +125,7 @@ const monitorStateData = fc.record<MonitorState>({
         fc.constant(null)
     ),
     retries: fc.integer({ max: 5, min: 0 }),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
     timeout: fc.integer({ max: 30_000, min: 1000 }),
     type: fc.constantFrom("http", "ping", "dns", "port"),
     updatedAt: fc.date(),
@@ -141,7 +147,7 @@ const siteStateData = fc.record<SiteState>({
         .string({ maxLength: 255, minLength: 1 })
         .filter((s) => s.trim().length > 0),
     overallUptime: fc.double({ max: 100, min: 0 }),
-    status: fc.constantFrom("up", "down", "mixed", "unknown"),
+    status: fc.constantFrom<SiteStatus>(...SITE_STATUS_VALUES),
     updatedAt: fc.date(),
     url: fc.webUrl(),
 });
@@ -362,7 +368,9 @@ describe("comprehensive State Management Fuzzing", () => {
                             fc.constant(undefined)
                         ),
                         status: fc.oneof(
-                            fc.constantFrom("up", "down", "pending", "paused"),
+                            fc.constantFrom<MonitorStatus>(
+                                ...MONITOR_STATUS_VALUES
+                            ),
                             fc.constant(undefined)
                         ),
                     }),
@@ -378,8 +386,7 @@ describe("comprehensive State Management Fuzzing", () => {
                     updates: {
                         enabled?: boolean | undefined;
                         name?: string | undefined;
-                        status?:
-                            "down" | "paused" | "pending" | "up" | undefined;
+                        status?: MonitorStatus | undefined;
                     };
                 }[]
             ) => {
@@ -428,12 +435,7 @@ describe("comprehensive State Management Fuzzing", () => {
                             updates: {
                                 enabled?: boolean | undefined;
                                 name?: string | undefined;
-                                status?:
-                                    | "down"
-                                    | "paused"
-                                    | "pending"
-                                    | "up"
-                                    | undefined;
+                                status?: MonitorStatus | undefined;
                             };
                         }[]
                     ): {
