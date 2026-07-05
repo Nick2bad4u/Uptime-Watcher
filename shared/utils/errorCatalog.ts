@@ -33,8 +33,7 @@
 import type { ValueOf } from "type-fest";
 
 import { getOwnStringDataProperty } from "@shared/utils/errorPropertyAccess";
-import { castUnchecked } from "@shared/utils/typeHelpers";
-import { arrayIncludes, objectEntries, objectValues } from "ts-extras";
+import { objectEntries } from "ts-extras";
 
 /**
  * Site-related error messages.
@@ -357,6 +356,18 @@ export type ErrorMessage =
     | ValueOf<typeof SYSTEM_ERRORS>
     | ValueOf<typeof VALIDATION_ERRORS>;
 
+const ALL_ERROR_MESSAGES: readonly ErrorMessage[] = [
+    ...Object.values(DATABASE_ERRORS),
+    ...Object.values(IPC_ERRORS),
+    ...Object.values(MONITOR_ERRORS),
+    ...Object.values(NETWORK_ERRORS),
+    ...Object.values(SITE_ERRORS),
+    ...Object.values(SYSTEM_ERRORS),
+    ...Object.values(VALIDATION_ERRORS),
+];
+
+const ERROR_MESSAGE_SET: ReadonlySet<string> = new Set(ALL_ERROR_MESSAGES);
+
 /**
  * Helper function to create parameterized error messages.
  *
@@ -432,14 +443,8 @@ export function formatErrorMessage(
  *
  * @public
  */
-export function isKnownErrorMessage(message: string): message is ErrorMessage {
-    const allMessages = objectValues(ERROR_CATALOG).flatMap((category) =>
-        objectValues(castUnchecked<Record<string, string>>(category)).map(
-            (entry) => castUnchecked<ErrorMessage>(entry)
-        )
-    );
-
-    return arrayIncludes(allMessages, castUnchecked<ErrorMessage>(message));
+export function isKnownErrorMessage(message: unknown): message is ErrorMessage {
+    return typeof message === "string" && ERROR_MESSAGE_SET.has(message);
 }
 
 /**
