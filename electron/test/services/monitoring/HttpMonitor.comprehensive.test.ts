@@ -590,6 +590,60 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             expect(result).toEqual(mockResult);
         });
 
+        it("should normalize retry attempts before configuring operational hooks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: HttpMonitor", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
+                await import("../../../services/monitoring/shared/monitorServiceHelpers")
+            );
+            const { withOperationalHooks: mockWithHooks } = vi.mocked(
+                await import("../../../utils/operationalHooks")
+            );
+
+            validateMonitorUrl.mockReturnValue(null);
+            createMonitorConfig.mockReturnValue({
+                checkInterval: 60_000,
+                retryAttempts: 2.5,
+                timeout: 8000,
+            });
+
+            const mockResult: MonitorCheckResult = {
+                details: "200",
+                responseTime: 150,
+                status: "up",
+            };
+
+            mockWithHooks.mockResolvedValue(mockResult);
+
+            const monitor: Site["monitors"][0] = {
+                checkInterval: 60_000,
+                history: [],
+                id: "test-monitor-normalized-retries",
+                monitoring: true,
+                responseTime: 150,
+                retryAttempts: 3,
+                status: "pending",
+                timeout: 5000,
+                type: "http",
+                url: "https://example.com",
+            };
+
+            await httpMonitor.check(monitor);
+
+            expect(mockWithHooks).toHaveBeenCalledWith(
+                expect.any(Function),
+                expect.objectContaining({
+                    maxRetries: 3,
+                })
+            );
+        });
+
         it("should handle check errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: HttpMonitor", "component");

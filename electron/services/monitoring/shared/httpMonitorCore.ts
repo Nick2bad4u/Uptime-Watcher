@@ -54,6 +54,7 @@ import {
     normalizeResponseTime,
     validateMonitorUrl,
 } from "./monitorServiceHelpers";
+import { createMonitorRetryPlan } from "./monitorRetryUtils";
 
 const isCallable = (value: unknown): value is (...args: never[]) => unknown =>
     typeof value === "function";
@@ -245,7 +246,7 @@ export function createHttpMonitorService<
                     throw createAbortError();
                 }
 
-                const totalAttempts = maxRetries + 1;
+                const { totalAttempts } = createMonitorRetryPlan(maxRetries);
                 const operationName = `${behavior.operationLabel} for ${url}`;
                 const safeUrlForLogging = getSafeUrlForLogging(url);
 
