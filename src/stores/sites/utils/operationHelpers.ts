@@ -9,7 +9,7 @@ import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
@@ -112,13 +112,10 @@ const TELEMETRY_CONFIG_KEYS = [
     "success",
 ] as const;
 
-const isPlainRecord = (value: unknown): value is UnknownRecord =>
-    isSharedRecord(value);
-
 const isTelemetryConfig = (
     value: unknown
 ): value is OperationTelemetryConfig => {
-    if (!isPlainRecord(value)) {
+    if (!isRecord(value)) {
         return false;
     }
 

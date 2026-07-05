@@ -17,9 +17,6 @@ import { objectHasIn } from "ts-extras";
 
 import { validateStatusUpdate } from "./guards";
 
-const isUnknownRecord = (value: unknown): value is UnknownRecord =>
-    isRecord(value);
-
 const stripEventMetadata = (value: UnknownRecord): UnknownRecord => {
     if (!objectHasIn(value, "_meta") && !objectHasIn(value, "_originalMeta")) {
         return value;
@@ -39,7 +36,7 @@ const stripEventMetadata = (value: UnknownRecord): UnknownRecord => {
 export const isMonitorStatusChangedEventData = (
     payload: unknown
 ): payload is MonitorStatusChangedEventData => {
-    if (!isUnknownRecord(payload)) {
+    if (!isRecord(payload)) {
         return false;
     }
 

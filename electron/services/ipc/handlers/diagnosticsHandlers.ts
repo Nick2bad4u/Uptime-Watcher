@@ -14,7 +14,7 @@ import {
     normalizeLogValue,
     withLogContext,
 } from "@shared/utils/loggingContext";
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { isDefined, setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
@@ -42,13 +42,10 @@ import { SystemHandlerValidators } from "../validators/system";
 const shouldExposeChannelInventory = (): boolean =>
     isDev() || readBooleanEnv("VITEST");
 
-const isUnknownRecord = (value: unknown): value is UnknownRecord =>
-    isSharedRecord(value);
-
 const isPreloadGuardDiagnosticsReport = (
     value: unknown
 ): value is PreloadGuardDiagnosticsReport => {
-    if (!isUnknownRecord(value)) {
+    if (!isRecord(value)) {
         return false;
     }
 
@@ -119,7 +116,7 @@ const normalizeDiagnosticsReportPayload = (
     let metadata: undefined | UnknownRecord;
     if (report.metadata) {
         const sanitizedMetadata = normalizeLogValue(report.metadata);
-        if (isUnknownRecord(sanitizedMetadata)) {
+        if (isRecord(sanitizedMetadata)) {
             const serialized = JSON.stringify(sanitizedMetadata);
             if (
                 getUtfByteLength(serialized) <= MAX_DIAGNOSTICS_METADATA_BYTES
