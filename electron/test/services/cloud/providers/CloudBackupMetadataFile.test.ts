@@ -46,7 +46,7 @@ describe("CloudBackupMetadataFile buffer parsing", () => {
                     0xfd,
                 ])
             )
-        ).toThrow();
+        ).toThrow(/Backup metadata file contained invalid UTF-8/iu);
     });
 
     it("throws a contextual error when strict metadata parsing receives invalid JSON", () => {

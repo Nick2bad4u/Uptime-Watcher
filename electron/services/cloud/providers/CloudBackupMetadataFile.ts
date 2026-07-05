@@ -30,7 +30,15 @@ function decodeMetadataBufferStrict(buffer: Buffer): string {
 
     // Buffer#toString("utf8") replaces invalid byte sequences. Provider
     // metadata is integrity-sensitive, so corrupt bytes should stay corrupt.
-    return utfEightDecoder.decode(buffer);
+    try {
+        return utfEightDecoder.decode(buffer);
+    } catch (error: unknown) {
+        const normalized = ensureError(error);
+        throw new TypeError(
+            `Backup metadata file contained invalid UTF-8: ${normalized.message}`,
+            { cause: error }
+        );
+    }
 }
 
 /**
@@ -61,9 +69,10 @@ export function parseCloudBackupMetadataFile(
 export function parseCloudBackupMetadataFileBuffer(
     buffer: Buffer
 ): CloudBackupEntry {
+    const text = decodeMetadataBufferStrict(buffer);
     let parsed: unknown;
     try {
-        parsed = JSON.parse(decodeMetadataBufferStrict(buffer));
+        parsed = JSON.parse(text);
     } catch (error: unknown) {
         const normalized = ensureError(error);
         throw new TypeError(
