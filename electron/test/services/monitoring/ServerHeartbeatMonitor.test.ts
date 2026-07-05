@@ -3,6 +3,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { withOperationalHooks as withOperationalHooksType } from "../../../utils/operationalHooks";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,9 +12,21 @@ import { ServerHeartbeatMonitor } from "../../../services/monitoring/ServerHeart
 
 const httpGetMock = vi.fn();
 
+type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
+
+const operationalHookOptions = vi.hoisted(
+    (): OperationalHookOptions[] => []
+);
+
 vi.mock("../../../utils/operationalHooks", () => ({
-    withOperationalHooks: vi.fn(async (operation: () => Promise<unknown>) =>
-        operation()
+    withOperationalHooks: vi.fn(
+        async (
+            operation: () => Promise<unknown>,
+            options: OperationalHookOptions
+        ) => {
+            operationalHookOptions.push(options);
+            return operation();
+        }
     ),
 }));
 
@@ -52,6 +65,7 @@ describe("ServerHeartbeatMonitor service", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        operationalHookOptions.length = 0;
         httpGetMock.mockReset();
         monitor = createMonitor();
         service = new ServerHeartbeatMonitor();
@@ -157,6 +171,30 @@ describe("ServerHeartbeatMonitor service", () => {
         expect(result.error).not.toContain(
             "Failed to fetch https://api.example.com/heartbeat"
         );
+    });
+
+    it("redacts URL secrets in retry operation names", async () => {
+        monitor = createMonitor({
+            url: "https://api.example.com/heartbeat?token=operation-secret#fragment",
+        });
+        httpGetMock.mockResolvedValue({
+            data: {
+                status: "healthy",
+                timestamp: Date.now(),
+            },
+            responseTime: 25,
+        });
+
+        const result = await service.check(monitor);
+        const operationName = operationalHookOptions.at(-1)?.operationName;
+
+        expect(result.status).toBe("up");
+        expect(operationName).toBe(
+            "Server heartbeat check for https://api.example.com/heartbeat"
+        );
+        expect(operationName).not.toContain("token=");
+        expect(operationName).not.toContain("operation-secret");
+        expect(operationName).not.toContain("fragment");
     });
 
     it("treats empty string responses as invalid JSON", async () => {

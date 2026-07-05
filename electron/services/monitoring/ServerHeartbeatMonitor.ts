@@ -7,6 +7,7 @@ import type { Monitor } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { performance } from "node:perf_hooks";
 import { arrayJoin, isDefined } from "ts-extras";
 
@@ -130,7 +131,8 @@ const behavior: RemoteMonitorBehavior<
         };
     },
     failureLogLevel: "warn",
-    getOperationName: (context) => `Server heartbeat check for ${context.url}`,
+    getOperationName: (context) =>
+        `Server heartbeat check for ${getSafeUrlForLogging(context.url)}`,
     resolveConfiguration: (monitor, serviceConfig) => {
         const urlResult = resolveRequiredMonitorUrlField(
             monitor,

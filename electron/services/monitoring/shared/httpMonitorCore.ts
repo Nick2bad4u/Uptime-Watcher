@@ -247,8 +247,8 @@ export function createHttpMonitorService<
                 }
 
                 const { totalAttempts } = createMonitorRetryPlan(maxRetries);
-                const operationName = `${behavior.operationLabel} for ${url}`;
                 const safeUrlForLogging = getSafeUrlForLogging(url);
+                const operationName = `${behavior.operationLabel} for ${safeUrlForLogging}`;
 
                 const singleCheckParams = {
                     context,

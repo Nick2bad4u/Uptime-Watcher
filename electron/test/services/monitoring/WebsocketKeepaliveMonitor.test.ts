@@ -5,6 +5,7 @@
 
 import type { Site } from "@shared/types";
 import type { EventEmitter as NodeEventEmitter } from "node:events";
+import type { withOperationalHooks as withOperationalHooksType } from "../../../utils/operationalHooks";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -25,6 +26,12 @@ interface CapturedWebSocket extends NodeEventEmitter {
 }
 
 const socketInstances: CapturedWebSocket[] = [];
+
+type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
+
+const operationalHookOptions = vi.hoisted(
+    (): OperationalHookOptions[] => []
+);
 
 vi.mock("ws", async () => {
     const { EventEmitter } = await import("node:events");
@@ -72,8 +79,14 @@ vi.mock("ws", async () => {
 });
 
 vi.mock("../../../utils/operationalHooks", () => ({
-    withOperationalHooks: vi.fn(async (operation: () => Promise<unknown>) =>
-        operation()
+    withOperationalHooks: vi.fn(
+        async (
+            operation: () => Promise<unknown>,
+            options: OperationalHookOptions
+        ) => {
+            operationalHookOptions.push(options);
+            return operation();
+        }
     ),
 }));
 
@@ -102,6 +115,7 @@ describe("WebsocketKeepaliveMonitor service", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        operationalHookOptions.length = 0;
         socketInstances.length = 0;
         service = new WebsocketKeepaliveMonitor();
     });
@@ -216,6 +230,30 @@ describe("WebsocketKeepaliveMonitor service", () => {
         expect(result.details).toContain("token=[redacted]");
         expect(result.details).not.toContain("websocket-secret");
         expect(result.error).not.toContain("websocket-secret");
+    });
+
+    it("redacts URL secrets in retry operation names", async () => {
+        const monitor = createMonitor({
+            url: "wss://socket.example.com/live?token=operation-secret#fragment",
+        });
+        const checkPromise = service.check(monitor);
+        const socket = socketInstances.at(-1);
+        expect(socket).toBeDefined();
+
+        socket!.readyState = socketReadyState.OPEN;
+        socket!.emit("open");
+        socket!.emit("pong");
+
+        const result = await checkPromise;
+        const operationName = operationalHookOptions.at(-1)?.operationName;
+
+        expect(result.status).toBe("up");
+        expect(operationName).toBe(
+            "WebSocket keepalive for wss://socket.example.com/live"
+        );
+        expect(operationName).not.toContain("token=");
+        expect(operationName).not.toContain("operation-secret");
+        expect(operationName).not.toContain("fragment");
     });
 
     it("does not create a socket when the AbortSignal is already aborted", async () => {

@@ -15,6 +15,7 @@ import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { getAbortSignalReason } from "@shared/utils/abortUtils";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { performance } from "node:perf_hooks";
 import { WebSocket as NodeWebSocket } from "ws";
 
@@ -93,7 +94,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                 {
                     failureLogLevel: "warn",
                     maxRetries: totalAttempts,
-                    operationName: `WebSocket keepalive for ${urlCandidate}`,
+                    operationName: `WebSocket keepalive for ${getSafeUrlForLogging(urlCandidate)}`,
                     ...(signal && { signal }),
                 }
             );

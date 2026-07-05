@@ -4,6 +4,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { withOperationalHooks as withOperationalHooksType } from "../../../../utils/operationalHooks";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -20,6 +21,12 @@ const loggerMock = vi.hoisted(() => ({
     warn: vi.fn(),
 }));
 
+type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
+
+const operationalHookOptions = vi.hoisted(
+    (): OperationalHookOptions[] => []
+);
+
 vi.mock("../../../../services/monitoring/utils/httpClient", () => ({
     createHttpClient: vi.fn(() => mockAxiosInstance),
 }));
@@ -34,8 +41,11 @@ vi.mock("../../../../services/monitoring/utils/httpRateLimiter", () => ({
 vi.mock("../../../../utils/operationalHooks", () => ({
     withOperationalHooks: async <T>(
         fn: () => Promise<T>,
-        _options: unknown
-    ): Promise<T> => fn(),
+        options: OperationalHookOptions
+    ): Promise<T> => {
+        operationalHookOptions.push(options);
+        return fn();
+    },
 }));
 
 vi.mock("../../../../electronUtils", () => ({
@@ -49,6 +59,7 @@ vi.mock("../../../../utils/logger", () => ({
 describe("httpMonitorCore safe URL logging", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        operationalHookOptions.length = 0;
 
         mockAxiosInstance.get.mockResolvedValue({
             config: {},
@@ -83,5 +94,30 @@ describe("httpMonitorCore safe URL logging", () => {
         expect(checkingLog).not.toContain("token=secret");
         expect(checkingLog).not.toContain("user:pass");
         expect(checkingLog).not.toContain("#frag");
+    });
+
+    it("redacts query/hash/auth in operation names", async () => {
+        const monitor: Monitor = {
+            checkInterval: 5000,
+            history: [],
+            id: "m1",
+            monitoring: true,
+            responseTime: -1,
+            retryAttempts: 0,
+            status: "pending",
+            timeout: 1000,
+            type: "http",
+            url: "https://user:pass@example.com/path?token=secret#frag",
+        };
+
+        const service = new HttpMonitor({ timeout: 1000 });
+        await service.check(monitor);
+
+        const operationName = operationalHookOptions.at(-1)?.operationName;
+
+        expect(operationName).toBe("HTTP check for https://example.com/path");
+        expect(operationName).not.toContain("token=secret");
+        expect(operationName).not.toContain("user:pass");
+        expect(operationName).not.toContain("#frag");
     });
 });
