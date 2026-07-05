@@ -12,11 +12,22 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { MonitorRepository } from "../database/MonitorRepository";
 import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 
 import { monitorLogger as logger } from "../../utils/logger";
+
+const MAX_SAFE_TIMER_DELAY_MS = 2_147_483_647;
+
+function normalizeTimerDelayMs(timeoutMs: number): number {
+    if (!isFiniteNumber(timeoutMs)) {
+        return 0;
+    }
+
+    return Math.min(Math.max(0, timeoutMs), MAX_SAFE_TIMER_DELAY_MS);
+}
 
 /**
  * Manages timeouts for monitoring operations.
@@ -124,10 +135,11 @@ export class OperationTimeoutManager {
         // Without clearing, the old timer can still fire later and cancel the
         // operation unexpectedly.
         this.clearTimeout(operationId);
+        const delayMs = normalizeTimerDelayMs(timeoutMs);
 
         const timeout = setTimeout(() => {
             void this.handleTimeout(operationId);
-        }, timeoutMs);
+        }, delayMs);
 
         // Avoid keeping the Node/Electron process alive solely because of an operation timeout timer.
         //
@@ -140,7 +152,7 @@ export class OperationTimeoutManager {
         logger.debug(
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.OPERATION_TIMEOUT_SCHEDULED,
-                { operationId, timeoutMs }
+                { operationId, timeoutMs: delayMs }
             )
         );
     }

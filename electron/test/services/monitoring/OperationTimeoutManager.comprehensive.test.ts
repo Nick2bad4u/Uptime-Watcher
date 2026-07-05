@@ -476,20 +476,31 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
             expect(vi.getTimerCount()).toBe(0);
         });
 
-        it("should handle negative timeout", async ({ task, annotate }) => {
+        it("should treat negative timeout as immediate", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
             const operationId = "op-negative";
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
-            // Should still schedule timeout (setTimeout handles negative as 0)
             operationTimeoutManager.scheduleTimeout(operationId, -1000);
+
             expect(vi.getTimerCount()).toBe(1);
+            expect(setTimeoutSpy).toHaveBeenLastCalledWith(
+                expect.any(Function),
+                0
+            );
         });
 
-        it("should handle very large timeout", async ({ task, annotate }) => {
+        it("should clamp oversized timeout to the safe timer maximum", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: OperationTimeoutManager", "component");
             await annotate("Category: Service", "category");
@@ -497,9 +508,36 @@ describe("OperationTimeoutManager - Comprehensive Coverage", () => {
 
             const operationId = "op-large";
             const largeTimeout = Number.MAX_SAFE_INTEGER;
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
             operationTimeoutManager.scheduleTimeout(operationId, largeTimeout);
+
             expect(vi.getTimerCount()).toBe(1);
+            expect(setTimeoutSpy).toHaveBeenLastCalledWith(
+                expect.any(Function),
+                2_147_483_647
+            );
+        });
+
+        it("should treat non-finite timeout as immediate", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: OperationTimeoutManager", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const operationId = "op-infinite";
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+
+            operationTimeoutManager.scheduleTimeout(operationId, Infinity);
+
+            expect(vi.getTimerCount()).toBe(1);
+            expect(setTimeoutSpy).toHaveBeenLastCalledWith(
+                expect.any(Function),
+                0
+            );
         });
 
         it("should handle empty operation ID", async ({ task, annotate }) => {
