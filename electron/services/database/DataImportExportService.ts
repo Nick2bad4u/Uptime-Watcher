@@ -32,7 +32,6 @@ import {
     isFinite as isFiniteNumber,
     objectEntries,
     objectKeys,
-    safeCastTo,
 } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -468,17 +467,15 @@ export class DataImportExportService {
 
             if (monitors.length > 0) {
                 try {
-                    const createdMonitors = monitors.map((monitor) => {
-                        const newId = monitorRepositoryTransaction.create(
-                            identifier,
-                            monitor
-                        );
-
-                        return safeCastTo({
+                    const createdMonitors = monitors.map<Site["monitors"][0]>(
+                        (monitor) => ({
                             ...monitor,
-                            id: newId,
-                        });
-                    });
+                            id: monitorRepositoryTransaction.create(
+                                identifier,
+                                monitor
+                            ),
+                        })
+                    );
 
                     this.importHistoryForMonitors(
                         historyRepositoryTransaction,
