@@ -10,6 +10,7 @@ import type { SettingsRow as DatabaseSettingsRow } from "@shared/types/database"
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
 
@@ -127,9 +128,9 @@ export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
  * @public
  */
 export function rowToSettingValue(
-    row: DatabaseSettingsRow | undefined
+    row: { readonly value?: unknown } | undefined
 ): string | undefined {
-    if (!row?.value) {
+    if (row?.value === null || row?.value === undefined) {
         return undefined;
     }
 
@@ -176,7 +177,7 @@ export function rowToSettingValue(
 export function settingsToRecord(
     settings: SettingRow[]
 ): Record<string, string> {
-    const result: Record<string, string> = {};
+    const result = createNullPrototypeObject<Record<string, string>>();
 
     for (const setting of settings) {
         // Use type-specific validation instead of awkward casting
