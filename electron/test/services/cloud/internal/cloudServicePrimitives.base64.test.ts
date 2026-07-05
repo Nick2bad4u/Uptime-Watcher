@@ -42,6 +42,25 @@ describe("cloudServicePrimitives base64", () => {
         ).toThrow(/multiple of 4/iv);
     });
 
+    it("rejects non-canonical base64 aliases with non-zero padding bits", () => {
+        expect(Buffer.from("AB==", "base64").toString("base64")).toBe("AA==");
+        expect(Buffer.from("AAB=", "base64").toString("base64")).toBe("AAA=");
+
+        expect(() =>
+            decodeCanonicalBase64({
+                label: "example",
+                value: "AB==",
+            })
+        ).toThrow(/not canonical/i);
+
+        expect(() =>
+            decodeCanonicalBase64({
+                label: "example",
+                value: "AAB=",
+            })
+        ).toThrow(/not canonical/i);
+    });
+
     it("decodeStrictBase64 enforces byte length", () => {
         const value = encodeBase64(
             Buffer.from([

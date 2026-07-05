@@ -130,7 +130,13 @@ export function decodeCanonicalBase64(args: {
     value: string;
 }): Buffer {
     assertCanonicalBase64(args);
-    return Buffer.from(args.value, "base64");
+    const buffer = Buffer.from(args.value, "base64");
+
+    if (encodeBase64(buffer) !== args.value) {
+        throw new Error(`Invalid ${args.label}: base64 is not canonical`);
+    }
+
+    return buffer;
 }
 
 /**
