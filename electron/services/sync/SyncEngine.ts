@@ -418,7 +418,8 @@ export class SyncEngine {
             currentSites.map((site) => [site.identifier, site])
         );
 
-        const desiredSitesWithMonitors: Record<string, Site> = {};
+        const desiredSitesWithMonitors =
+            createNullPrototypeObject<Record<string, Site>>();
 
         for (const [identifier, siteConfig] of objectEntries(desiredSites)) {
             const existingMonitors =
@@ -437,12 +438,17 @@ export class SyncEngine {
                 mergedMonitors.push(merged);
             }
 
-            desiredSitesWithMonitors[identifier] = {
-                identifier,
-                monitoring: siteConfig.monitoring,
-                monitors: mergedMonitors,
-                name: siteConfig.name,
-            };
+            Object.defineProperty(desiredSitesWithMonitors, identifier, {
+                configurable: true,
+                enumerable: true,
+                value: {
+                    identifier,
+                    monitoring: siteConfig.monitoring,
+                    monitors: mergedMonitors,
+                    name: siteConfig.name,
+                },
+                writable: true,
+            });
         }
 
         /* eslint-disable no-await-in-loop -- Site lifecycle changes must be applied sequentially to avoid overlapping monitor start/stop operations */

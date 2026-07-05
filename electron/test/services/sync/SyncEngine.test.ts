@@ -84,6 +84,10 @@ class InMemoryOrchestrator {
 }
 
 interface SyncEnginePrivateAccess {
+    applyMergedState: (
+        state: CloudSyncState,
+        existingSettings: Record<string, string>
+    ) => Promise<unknown>;
     applySettings: (
         existing: Record<string, string>,
         desired: Record<string, string>
@@ -136,6 +140,56 @@ function canonicalizeSites(sites: Site[]): unknown {
 }
 
 describe("SyncEngine (ADR-016)", () => {
+    it("applies remote sites whose identifiers match inherited object properties", async () => {
+        const orchestrator = new InMemoryOrchestrator([]);
+        const engine = new SyncEngine({
+            orchestrator,
+            settings: new InMemorySettingsAdapter(),
+        });
+
+        const state = JSON.parse(`{
+            "monitor": {
+                "monitor-1": {
+                    "entityId": "monitor-1",
+                    "entityType": "monitor",
+                    "fields": {
+                        "checkInterval": { "value": 60000, "write": { "deviceId": "remote", "opId": 3, "timestamp": 1 } },
+                        "monitoring": { "value": true, "write": { "deviceId": "remote", "opId": 4, "timestamp": 1 } },
+                        "retryAttempts": { "value": 3, "write": { "deviceId": "remote", "opId": 5, "timestamp": 1 } },
+                        "siteIdentifier": { "value": "__proto__", "write": { "deviceId": "remote", "opId": 6, "timestamp": 1 } },
+                        "timeout": { "value": 10000, "write": { "deviceId": "remote", "opId": 7, "timestamp": 1 } },
+                        "type": { "value": "http", "write": { "deviceId": "remote", "opId": 8, "timestamp": 1 } },
+                        "url": { "value": "https://example.com", "write": { "deviceId": "remote", "opId": 9, "timestamp": 1 } }
+                    }
+                }
+            },
+            "settings": {},
+            "site": {
+                "__proto__": {
+                    "entityId": "__proto__",
+                    "entityType": "site",
+                    "fields": {
+                        "monitoring": { "value": true, "write": { "deviceId": "remote", "opId": 1, "timestamp": 1 } },
+                        "name": { "value": "Prototype site", "write": { "deviceId": "remote", "opId": 2, "timestamp": 1 } }
+                    }
+                }
+            }
+        }`) as CloudSyncState;
+
+        await (engine as unknown as SyncEnginePrivateAccess).applyMergedState(
+            state,
+            {}
+        );
+
+        const sites = await orchestrator.getSites();
+
+        expect(sites).toHaveLength(1);
+        expect(sites[0]?.identifier).toBe("__proto__");
+        expect(sites[0]?.name).toBe("Prototype site");
+        expect(sites[0]?.monitors).toHaveLength(1);
+        expect(sites[0]?.monitors[0]?.id).toBe("monitor-1");
+    });
+
     it("deletes synced settings whose keys match inherited object properties", async () => {
         const settings = new InMemorySettingsAdapter();
         await settings.set("__proto__", "old-prototype-value");
