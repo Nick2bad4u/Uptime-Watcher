@@ -14,7 +14,7 @@ import type { UnknownArray, UnknownRecord } from "type-fest";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { withRetry } from "@shared/utils/retry";
-import { isEmpty, safeCastTo } from "ts-extras";
+import { isEmpty } from "ts-extras";
 
 const DEFAULT_MAX_ATTEMPTS = 50;
 const DEFAULT_BASE_DELAY = 100;
@@ -110,12 +110,8 @@ export class ElectronBridgeNotReadyError extends Error {
 type BridgeRoot = typeof window extends { electronAPI: infer T } ? T : unknown;
 
 const getGlobalWindow = (): unknown => {
-    if (typeof window !== "undefined") {
-        return window;
-    }
-
-    const globalObject = safeCastTo<{ window?: unknown }>(globalThis);
-    return globalObject.window;
+    const property = getOwnDataProperty(globalThis, "window");
+    return property.found ? property.value : undefined;
 };
 
 type ObjectLike =
