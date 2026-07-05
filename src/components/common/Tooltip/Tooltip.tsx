@@ -116,6 +116,13 @@ type WindowListenerMethod = (
     options?: AddEventListenerOptions | boolean
 ) => void;
 
+interface ViewportSize {
+    readonly height: number;
+    readonly width: number;
+}
+
+type ResizeObserverLike = Pick<ResizeObserver, "disconnect" | "observe">;
+
 const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||
     typeof value === "function";
@@ -187,6 +194,148 @@ function addWindowEventListener(
     };
 }
 
+function requestAnimationFrameSafely(
+    callback: FrameRequestCallback
+): null | number {
+    const property = getOwnPropertyValue(globalThis, "requestAnimationFrame");
+
+    if (!property.found || typeof property.value !== "function") {
+        return null;
+    }
+
+    try {
+        const rafId: unknown = Reflect.apply(property.value, globalThis, [
+            callback,
+        ]);
+
+        return typeof rafId === "number" ? rafId : null;
+    } catch {
+        return null;
+    }
+}
+
+function cancelAnimationFrameSafely(handle: number): void {
+    const property = getOwnPropertyValue(globalThis, "cancelAnimationFrame");
+
+    if (!property.found || typeof property.value !== "function") {
+        return;
+    }
+
+    try {
+        Reflect.apply(property.value, globalThis, [handle]);
+    } catch {
+        // Animation-frame cleanup is best-effort during renderer teardown.
+    }
+}
+
+function getViewportSize(): null | ViewportSize {
+    const windowProperty = getOwnPropertyValue(globalThis, "window");
+
+    if (!windowProperty.found || !isObjectLike(windowProperty.value)) {
+        return null;
+    }
+
+    try {
+        const width: unknown = Reflect.get(windowProperty.value, "innerWidth");
+        const height: unknown = Reflect.get(
+            windowProperty.value,
+            "innerHeight"
+        );
+
+        return typeof width === "number" &&
+            Number.isFinite(width) &&
+            typeof height === "number" &&
+            Number.isFinite(height)
+            ? { height, width }
+            : null;
+    } catch {
+        return null;
+    }
+}
+
+function isElementNode(value: unknown): value is Element {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return Reflect.get(value, "nodeType") === 1;
+    } catch {
+        return false;
+    }
+}
+
+function getTooltipPortalContainer(): Element | null {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        return null;
+    }
+
+    try {
+        const body: unknown = Reflect.get(documentProperty.value, "body");
+        return isElementNode(body) ? body : null;
+    } catch {
+        return null;
+    }
+}
+
+function isResizeObserverLike(value: unknown): value is ResizeObserverLike {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return (
+            typeof Reflect.get(value, "disconnect") === "function" &&
+            typeof Reflect.get(value, "observe") === "function"
+        );
+    } catch {
+        return false;
+    }
+}
+
+function createResizeObserver(
+    callback: ResizeObserverCallback
+): null | ResizeObserverLike {
+    const property = getOwnPropertyValue(globalThis, "ResizeObserver");
+
+    if (!property.found || typeof property.value !== "function") {
+        return null;
+    }
+
+    try {
+        const observer: unknown = Reflect.construct(property.value, [callback]);
+        return isResizeObserverLike(observer) ? observer : null;
+    } catch {
+        return null;
+    }
+}
+
+function observeResizeTarget(
+    observer: ResizeObserverLike,
+    target: Element | null
+): void {
+    if (!target) {
+        return;
+    }
+
+    try {
+        observer.observe(target);
+    } catch {
+        // Tooltip repositioning falls back to window events if observation
+        // fails for a detached or otherwise invalid target.
+    }
+}
+
+function disconnectResizeObserver(observer: ResizeObserverLike | null): void {
+    try {
+        observer?.disconnect();
+    } catch {
+        // ResizeObserver cleanup is best-effort during renderer teardown.
+    }
+}
+
 /**
  * Ensures tooltip position switches remain exhaustive.
  */
@@ -223,9 +372,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             visibilityRafRef.current = null;
 
-            if (typeof cancelAnimationFrame === "function") {
-                globalThis.cancelAnimationFrame(rafId);
-            }
+            cancelAnimationFrameSafely(rafId);
         }, []);
 
         const clearTimers = useCallback((): void => {
@@ -250,19 +397,17 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             clearTimers();
 
             const commitVisible = (): void => {
-                if (
-                    typeof window !== "undefined" &&
-                    typeof requestAnimationFrame === "function"
-                ) {
-                    visibilityRafRef.current = globalThis.requestAnimationFrame(
-                        () => {
-                            visibilityRafRef.current = null;
-                            setIsVisible(true);
-                        }
-                    );
-                } else {
+                const rafId = requestAnimationFrameSafely(() => {
+                    visibilityRafRef.current = null;
                     setIsVisible(true);
+                });
+
+                if (rafId === null) {
+                    setIsVisible(true);
+                    return;
                 }
+
+                visibilityRafRef.current = rafId;
             };
 
             showTimerRef.current = setTimeout(() => {
@@ -421,7 +566,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             // rendered by the render-prop).
             const firstChild = containerNode.firstElementChild;
             const triggerNode =
-                firstChild instanceof HTMLElement &&
+                firstChild &&
                 (firstChild.tagName === "BUTTON" ||
                     firstChild.tagName === "INPUT" ||
                     firstChild.tagName === "A")
@@ -496,17 +641,21 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             const baseTop = top;
             const baseLeft = left;
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
+            const viewportSize = getViewportSize();
+
+            if (!viewportSize) {
+                return;
+            }
+
             const clampedLeft = clamp(
                 left,
                 viewportPadding,
-                viewportWidth - tooltipRect.width - viewportPadding
+                viewportSize.width - tooltipRect.width - viewportPadding
             );
             const clampedTop = clamp(
                 top,
                 viewportPadding,
-                viewportHeight - tooltipRect.height - viewportPadding
+                viewportSize.height - tooltipRect.height - viewportPadding
             );
 
             if (position === "left" || position === "right") {
@@ -551,10 +700,14 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 // RequestAnimationFrame batches DOM reads/writes into a single
                 // frame, preventing scroll/resize from triggering multiple
                 // layout recalculations per frame.
-                rafId = globalThis.requestAnimationFrame(() => {
+                rafId = requestAnimationFrameSafely(() => {
                     rafId = null;
                     applyTooltipPosition();
                 });
+
+                if (rafId === null) {
+                    applyTooltipPosition();
+                }
             };
 
             const handleReposition = (): void => {
@@ -578,37 +731,33 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
             const tooltipNode = tooltipRef.current;
             const triggerNode = containerRef.current;
-            let resizeObserver: null | ResizeObserver = null;
+            const resizeObserver = createResizeObserver(() => {
+                scheduleReposition();
+            });
 
-            if (typeof ResizeObserver === "function") {
-                resizeObserver = new ResizeObserver(() => {
-                    scheduleReposition();
-                });
-
-                if (tooltipNode) {
-                    resizeObserver.observe(tooltipNode);
-                }
-
-                if (triggerNode) {
-                    resizeObserver.observe(triggerNode);
-                }
+            if (resizeObserver) {
+                observeResizeTarget(resizeObserver, tooltipNode);
+                observeResizeTarget(resizeObserver, triggerNode);
             }
 
             return (): void => {
                 if (rafId !== null) {
-                    globalThis.cancelAnimationFrame(rafId);
+                    cancelAnimationFrameSafely(rafId);
                 }
 
                 removeResizeListener();
                 removeScrollListener();
 
-                resizeObserver?.disconnect();
+                disconnectResizeObserver(resizeObserver);
             };
         }, [
             applyTooltipPosition,
             disabled,
             shouldRender,
         ]);
+
+        const portalContainer =
+            shouldRender && !disabled ? getTooltipPortalContainer() : null;
 
         return (
             <>
@@ -631,7 +780,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 >
                     {children(triggerProps)}
                 </div>
-                {shouldRender && !disabled
+                {portalContainer
                     ? createPortal(
                           <div
                               className={tooltipClasses}
@@ -644,7 +793,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                               <div className="tooltip__content">{content}</div>
                               <div className="tooltip__arrow" />
                           </div>,
-                          document.body
+                          portalContainer
                       )
                     : null}
             </>

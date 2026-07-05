@@ -255,6 +255,136 @@ describe("Tooltip fast-check coverage", () => {
         }).not.toThrow();
     });
 
+    it("keeps rendering when viewport dimensions are unavailable", async () => {
+        const originalInnerWidth = Object.getOwnPropertyDescriptor(
+            globalThis,
+            "innerWidth"
+        );
+
+        Object.defineProperty(globalThis, "innerWidth", {
+            configurable: true,
+            get() {
+                throw new Error("viewport unavailable");
+            },
+        });
+
+        try {
+            const { unmount } = render(
+                <Tooltip content="Viewport helper" delay={0}>
+                    {(triggerProps) => <span {...triggerProps}>Hover me</span>}
+                </Tooltip>
+            );
+
+            const container = document.querySelector(".tooltip-container")!;
+
+            expect(() => {
+                fireEvent.mouseEnter(container);
+            }).not.toThrow();
+            await waitFor(
+                () => {
+                    expect(document.querySelector(".tooltip")).not.toBeNull();
+                },
+                { timeout: 500 }
+            );
+
+            expect(() => {
+                unmount();
+            }).not.toThrow();
+        } finally {
+            if (originalInnerWidth) {
+                Object.defineProperty(
+                    globalThis,
+                    "innerWidth",
+                    originalInnerWidth
+                );
+            }
+        }
+    });
+
+    it("skips the portal when document body is unavailable", async () => {
+        const { unmount } = render(
+            <Tooltip content="Document helper" delay={0}>
+                {(triggerProps) => <span {...triggerProps}>Hover me</span>}
+            </Tooltip>
+        );
+        const container = document.querySelector(".tooltip-container")!;
+        const originalBody = Object.getOwnPropertyDescriptor(document, "body");
+
+        Object.defineProperty(document, "body", {
+            configurable: true,
+            get() {
+                throw new Error("document body unavailable");
+            },
+        });
+
+        try {
+            expect(() => {
+                fireEvent.mouseEnter(container);
+            }).not.toThrow();
+
+            await act(async () => {
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 0);
+                });
+            });
+        } finally {
+            if (originalBody) {
+                Object.defineProperty(document, "body", originalBody);
+            } else {
+                Reflect.deleteProperty(document, "body");
+            }
+        }
+
+        expect(document.querySelector(".tooltip")).toBeNull();
+        unmount();
+    });
+
+    it("keeps rendering when ResizeObserver construction fails", async () => {
+        const originalResizeObserver = Object.getOwnPropertyDescriptor(
+            globalThis,
+            "ResizeObserver"
+        );
+
+        Object.defineProperty(globalThis, "ResizeObserver", {
+            configurable: true,
+            value: function BrokenResizeObserver() {
+                throw new Error("observer unavailable");
+            },
+        });
+
+        try {
+            const { unmount } = render(
+                <Tooltip content="Observer helper" delay={0}>
+                    {(triggerProps) => <span {...triggerProps}>Hover me</span>}
+                </Tooltip>
+            );
+
+            const container = document.querySelector(".tooltip-container")!;
+
+            expect(() => {
+                fireEvent.mouseEnter(container);
+            }).not.toThrow();
+            await waitFor(
+                () => {
+                    expect(document.querySelector(".tooltip")).not.toBeNull();
+                },
+                { timeout: 500 }
+            );
+
+            expect(() => {
+                unmount();
+            }).not.toThrow();
+        } finally {
+            if (originalResizeObserver) {
+                Object.defineProperty(
+                    globalThis,
+                    "ResizeObserver",
+                    originalResizeObserver
+                );
+            }
+        }
+    });
+
     fcTest.prop(
         [
             cssClassArbitrary,
