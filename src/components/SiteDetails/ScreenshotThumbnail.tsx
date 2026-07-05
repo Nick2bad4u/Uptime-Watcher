@@ -6,6 +6,7 @@
  * React portals for the overlay positioning.
  */
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { tryGetSafeThirdPartyHttpUrl } from "@shared/utils/urlSafety";
 import {
     type JSX,
@@ -22,6 +23,37 @@ import { selectOpenExternal } from "../../stores/ui/selectors";
 import { useUIStore } from "../../stores/ui/useUiStore";
 import { useTheme } from "../../theme/useTheme";
 import { normalizeMonitorExternalUrl } from "../../utils/monitoring/monitorExternalUrl";
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+function isElementNode(value: unknown): value is Element {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return Reflect.get(value, "nodeType") === 1;
+    } catch {
+        return false;
+    }
+}
+
+function getDocumentBodyElement(): Element | null {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        return null;
+    }
+
+    try {
+        const body: unknown = Reflect.get(documentProperty.value, "body");
+        return isElementNode(body) ? body : null;
+    } catch {
+        return null;
+    }
+}
 
 /**
  * Props for the ScreenshotThumbnail component
@@ -53,7 +85,7 @@ export const ScreenshotThumbnail = ({
     url,
 }: ScreenshotThumbnailProperties): JSX.Element => {
     const [hovered, setHovered] = useState(false);
-    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+    const [portalContainer, setPortalContainer] = useState<Element | null>(
         null
     );
     const linkRef = useRef<HTMLAnchorElement>(null);
@@ -66,9 +98,7 @@ export const ScreenshotThumbnail = ({
     // Set portal container after component mounts to avoid SSR issues
     useMount(
         useCallback(function initializePortalContainer() {
-            if (typeof document !== "undefined") {
-                setPortalContainer(document.body);
-            }
+            setPortalContainer(getDocumentBodyElement());
         }, [])
     );
 

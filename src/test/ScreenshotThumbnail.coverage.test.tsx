@@ -280,6 +280,58 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         expect(screen.queryByRole("link")).not.toBeInTheDocument();
     });
 
+    it("should render without a preview portal when document body is unavailable", ({
+        task,
+        annotate,
+    }) => {
+        annotate(`Testing: ${task.name}`, "functional");
+        annotate("Component: ScreenshotThumbnail", "component");
+        annotate("Category: Core", "category");
+        annotate("Type: Error Handling", "type");
+
+        const root = document.createElement("div");
+        document.body.append(root);
+        const originalBody = Object.getOwnPropertyDescriptor(document, "body");
+        let unmount: (() => void) | undefined;
+
+        Object.defineProperty(document, "body", {
+            configurable: true,
+            get() {
+                throw new Error("document body unavailable");
+            },
+        });
+
+        try {
+            const props = createProps({
+                url: "https://example.com",
+            });
+            const view = render(<ScreenshotThumbnail {...props} />, {
+                baseElement: root,
+                container: root,
+            });
+            unmount = view.unmount;
+
+            const thumbnail = root.querySelector("a");
+            if (!thumbnail) {
+                throw new Error("Expected thumbnail link to render");
+            }
+
+            fireEvent.mouseEnter(thumbnail);
+
+            expect(
+                root.querySelector(".site-details-thumbnail-portal-overlay")
+            ).toBeNull();
+        } finally {
+            if (originalBody) {
+                Object.defineProperty(document, "body", originalBody);
+            } else {
+                Reflect.deleteProperty(document, "body");
+            }
+
+            unmount?.();
+        }
+    });
+
     it("should handle click event and log user action", async ({
         task,
         annotate,
