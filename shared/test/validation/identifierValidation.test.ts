@@ -3,6 +3,7 @@ import {
     MONITOR_ID_REQUIRED_MESSAGE,
     MONITOR_ID_TOO_LONG_MESSAGE,
 } from "@shared/validation/monitorFieldConstants";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import {
     assertValidMonitorId,
     assertValidSiteIdentifier,
@@ -23,6 +24,7 @@ describe("repository identifier validation", () => {
 
             expect(() => assertValidMonitorId(monitorId, "test")).not.toThrow();
             expect(isValidMonitorId(monitorId)).toBeTruthy();
+            expect(monitorIdSchema.safeParse(monitorId).success).toBeTruthy();
         });
 
         it("rejects empty monitor IDs", () => {
@@ -50,6 +52,7 @@ describe("repository identifier validation", () => {
                 "[test] Monitor ID contains invalid control characters"
             );
             expect(isValidMonitorId(monitorId)).toBeFalsy();
+            expect(monitorIdSchema.safeParse(monitorId).success).toBeFalsy();
         });
     });
 

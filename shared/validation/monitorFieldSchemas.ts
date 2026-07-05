@@ -1,5 +1,7 @@
 import type * as z from "zod";
 
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
+
 import {
     MONITOR_ID_MAX_LENGTH,
     MONITOR_ID_REQUIRED_MESSAGE,
@@ -15,8 +17,12 @@ import { createNonWhitespaceStringSchema } from "./stringSchemas";
  * boundary validators without pulling in the entire monitor schema graph
  * (useful when tests mock monitorSchemas).
  */
-export const monitorIdSchema: z.ZodString = createNonWhitespaceStringSchema({
-    maxLength: MONITOR_ID_MAX_LENGTH,
-    maxLengthMessage: MONITOR_ID_TOO_LONG_MESSAGE,
-    requiredMessage: MONITOR_ID_REQUIRED_MESSAGE,
-});
+export const monitorIdSchema: z.ZodType<string> =
+    createNonWhitespaceStringSchema({
+        maxLength: MONITOR_ID_MAX_LENGTH,
+        maxLengthMessage: MONITOR_ID_TOO_LONG_MESSAGE,
+        requiredMessage: MONITOR_ID_REQUIRED_MESSAGE,
+    }).refine(
+        (monitorId) => !hasAsciiControlCharacters(monitorId),
+        "Monitor ID must not contain control characters"
+    );
