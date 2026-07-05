@@ -22,7 +22,7 @@ const createDefaultStateSyncStatus = (): StateSyncStatusSummary => ({
 const cloneStateSyncStatusSummary = (
     summary: StateSyncStatusSummary
 ): StateSyncStatusSummary => ({
-    lastSyncAt: summary.lastSyncAt,
+    lastSyncAt: summary.lastSyncAt ?? null,
     siteCount: summary.siteCount,
     source: summary.source,
     synchronized: summary.synchronized,

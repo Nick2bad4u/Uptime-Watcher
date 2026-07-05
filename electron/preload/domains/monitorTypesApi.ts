@@ -154,7 +154,19 @@ function safeParseValidationResult(
     const parsed = validateValidationResult(candidate);
 
     if (parsed.success) {
-        return { data: parsed.data, success: true };
+        const validationResult: ValidationResult = {
+            errors: parsed.data.errors,
+            success: parsed.data.success,
+            ...(parsed.data.data !== undefined && { data: parsed.data.data }),
+            ...(parsed.data.metadata !== undefined && {
+                metadata: parsed.data.metadata,
+            }),
+            ...(parsed.data.warnings !== undefined && {
+                warnings: parsed.data.warnings,
+            }),
+        };
+
+        return { data: validationResult, success: true };
     }
 
     return { error: parsed.error, success: false };

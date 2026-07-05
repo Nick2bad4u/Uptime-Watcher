@@ -394,7 +394,10 @@ export async function startLoopbackOAuthServer(args?: {
                     isResolved = true;
                     rejectPromise?.(error);
                 } else if (!isResolved) {
-                    pendingCallbackError ??= error;
+                    pendingCallbackError ??= {
+                        error,
+                        state: parsed.state,
+                    };
                 }
 
                 return;
