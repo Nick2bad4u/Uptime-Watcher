@@ -18,8 +18,8 @@ import {
     MONITOR_TYPES_CHANNELS,
     type MonitorTypesDomainBridge,
 } from "@shared/types/preload";
-import { isValidationResult } from "@shared/types/validation";
 import { ensureError } from "@shared/utils/errorHandling";
+import { validateValidationResult } from "@shared/validation/dataSchemas";
 
 import {
     createValidatedInvoker,
@@ -151,18 +151,13 @@ function safeParseMonitorTypeConfigs(
 function safeParseValidationResult(
     candidate: unknown
 ): SafeParseLike<ValidationResult> {
-    if (!isValidationResult(candidate)) {
-        return {
-            error: new Error(
-                `Expected ValidationResult response payload, received ${
-                    Array.isArray(candidate) ? "array" : typeof candidate
-                }`
-            ),
-            success: false,
-        };
+    const parsed = validateValidationResult(candidate);
+
+    if (parsed.success) {
+        return { data: parsed.data, success: true };
     }
 
-    return { data: candidate, success: true };
+    return { error: parsed.error, success: false };
 }
 
 const createMonitorTypesApiFallback = (

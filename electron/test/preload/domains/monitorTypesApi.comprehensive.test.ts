@@ -136,6 +136,20 @@ describe("monitorTypesApi", () => {
         );
     });
 
+    it("rejects malformed validation result payloads", async () => {
+        mockIpcRenderer.invoke.mockResolvedValue(
+            createIpcResponse({
+                errors: [],
+                success: true,
+                unexpected: "field",
+            })
+        );
+
+        await expect(
+            api.validateMonitorData("http", { url: "https://example.com" })
+        ).rejects.toThrow(/failed validation/iv);
+    });
+
     describe("getMonitorTypes", () => {
         it("invokes IPC and returns MonitorTypeConfig[]", async () => {
             const configs: MonitorTypeConfig[] = [
