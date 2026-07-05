@@ -29,7 +29,6 @@ import {
     isDefined,
     isPresent,
     isSafeInteger,
-    safeCastTo,
     setHas,
 } from "ts-extras";
 
@@ -882,7 +881,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
         // Only add fields that are specifically defined for this monitor type
         for (const field of monitorTypeConfig.fields) {
             const columnName = toSnakeCase(field.name);
-            const value = row[safeCastTo<keyof MonitorRow>(columnName)];
+            const value = row[columnName];
 
             // Add field if value exists (dynamic fields from monitor type registry)
             if (isDefined(value)) {
