@@ -12,21 +12,14 @@
 
 import type { Except, Promisable } from "type-fest";
 
-import { isDefined, isEmpty, objectHasIn } from "ts-extras";
+import { isPromiseLike } from "@shared/utils/typeHelpers";
+import { isDefined, isEmpty } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { EventPayload, TypedEventBus } from "../../events/TypedEventBus";
 
 import { fireAndForget, fireAndForgetLogged } from "../fireAndForget";
 import { diagnosticsLogger, logger } from "../logger";
-
-const hasThenProperty = (candidate: unknown): candidate is { then: unknown } =>
-    typeof candidate === "object" &&
-    candidate !== null &&
-    objectHasIn(candidate, "then");
-
-const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
-    hasThenProperty(candidate) && typeof candidate.then === "function";
 
 type CacheEventName =
     | "internal:cache:all-invalidated"

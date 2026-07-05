@@ -1,6 +1,7 @@
 import type { Except } from "type-fest";
 
 import { createSingleFlight } from "@shared/utils/singleFlight";
+import { isPromiseLike } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxAuth } from "dropbox";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
@@ -140,7 +141,7 @@ export class DropboxTokenManager {
                 // but the implementation returns a Promise. Treat the return as
                 // unknown and await if it is thenable.
                 const maybePromise = auth.refreshAccessToken();
-                if (isThenable(maybePromise)) {
+                if (isPromiseLike(maybePromise)) {
                     await maybePromise;
                 }
             },
@@ -215,15 +216,6 @@ export class DropboxTokenManager {
             JSON.stringify(parsed)
         );
     }
-}
-
-function isThenable(value: unknown): value is PromiseLike<unknown> {
-    return (
-        typeof value === "object" &&
-        value !== null &&
-        Reflect.has(value, "then") &&
-        typeof Reflect.get(value, "then") === "function"
-    );
 }
 
 function nowEpochMs(): number {

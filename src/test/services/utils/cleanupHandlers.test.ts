@@ -114,6 +114,37 @@ describe(resolveCleanupHandler, () => {
         expect(handlers.handleCleanupError).toHaveBeenCalledTimes(1);
         expect(handlers.handleCleanupError).toHaveBeenCalledWith(error);
     });
+
+    it("reports function thenable cleanup rejections", async () => {
+        const error = new Error("function thenable boom");
+        const then = vi.fn(
+            (
+                _onFulfilled: unknown,
+                onRejected?: (reason: unknown) => unknown
+            ) => {
+                onRejected?.(error);
+            }
+        );
+        const cleanupResult = () => undefined;
+        Reflect.set(cleanupResult, "then", then);
+        const cleanupCandidate = () => cleanupResult;
+
+        const handlers: CleanupResolutionHandlers = {
+            handleCleanupError: vi.fn(),
+            handleInvalidCleanup: vi.fn(() => () => undefined),
+        };
+
+        const cleanup = resolveCleanupHandler(cleanupCandidate, handlers);
+
+        cleanup();
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
+
+        expect(then).toHaveBeenCalledTimes(1);
+        expect(handlers.handleCleanupError).toHaveBeenCalledTimes(1);
+        expect(handlers.handleCleanupError).toHaveBeenCalledWith(error);
+    });
 });
 
 describe(subscribeWithValidatedCleanup, () => {

@@ -11,15 +11,8 @@
  * callers to supply service-specific diagnostics.
  */
 
-/**
- * Context supplied when a preload subscription returns an invalid cleanup
- * candidate.
- *
- * @remarks
- * The {@link CleanupResolutionHandlers.handleInvalidCleanup} hook receives this
- * structure whenever the preload bridge fails to return a callable cleanup
- * function.
- */
+import { isPromiseLike } from "@shared/utils/typeHelpers";
+
 /**
  * Callback contract used when validating cleanup handlers returned from the
  * preload bridge.
@@ -47,6 +40,15 @@ export interface CleanupResolutionHandlers {
     ) => () => void;
 }
 
+/**
+ * Context supplied when a preload subscription returns an invalid cleanup
+ * candidate.
+ *
+ * @remarks
+ * The {@link CleanupResolutionHandlers.handleInvalidCleanup} hook receives this
+ * structure whenever the preload bridge fails to return a callable cleanup
+ * function.
+ */
 export interface CleanupValidationContext {
     /** Type reported by the `typeof` operator for the cleanup candidate. */
     readonly actualType: string;
@@ -68,11 +70,6 @@ export interface CleanupValidationContext {
  */
 const isCleanupFunction = (candidate: unknown): candidate is () => unknown =>
     typeof candidate === "function";
-
-const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
-    typeof candidate === "object" &&
-    candidate !== null &&
-    typeof Reflect.get(candidate, "then") === "function";
 
 /**
  * Normalizes a cleanup candidate into a callable cleanup function.

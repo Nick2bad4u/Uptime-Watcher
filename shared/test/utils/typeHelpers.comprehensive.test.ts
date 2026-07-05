@@ -9,10 +9,23 @@ import { isNumber, isString } from "../../utils/typeGuards";
 import {
     castIpcResponse,
     isArray,
+    isPromiseLike,
     isRecord,
     safePropertyAccess,
     validateAndConvert,
 } from "../../utils/typeHelpers";
+
+const createValueWithThen = (then: unknown): Record<string, unknown> => {
+    const thenable: Record<string, unknown> = {};
+    Reflect.set(thenable, "then", then);
+    return thenable;
+};
+
+const createFunctionWithThen = (then: unknown): (() => undefined) => {
+    const thenable = () => undefined;
+    Reflect.set(thenable, "then", then);
+    return thenable;
+};
 
 describe("Shared Type Helpers", () => {
     describe(castIpcResponse, () => {
@@ -153,6 +166,41 @@ describe("Shared Type Helpers", () => {
             expect(isRecord("string")).toBeFalsy();
             expect(isRecord(123)).toBeFalsy();
             expect(isRecord(undefined)).toBeFalsy();
+        });
+    });
+
+    describe(isPromiseLike, () => {
+        it("should return true for promises and thenables", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: Type Helpers", "component");
+            await annotate("Operation: PromiseLike Type Guard", "operation");
+
+            expect(isPromiseLike(Promise.resolve("value"))).toBeTruthy();
+            expect(
+                isPromiseLike(createValueWithThen(() => undefined))
+            ).toBeTruthy();
+            expect(
+                isPromiseLike(createFunctionWithThen(() => undefined))
+            ).toBeTruthy();
+        });
+
+        it("should return false for non-thenables", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: Type Helpers", "component");
+            await annotate("Operation: PromiseLike Type Guard", "operation");
+
+            expect(
+                isPromiseLike(createValueWithThen("not a function"))
+            ).toBeFalsy();
+            expect(isPromiseLike({})).toBeFalsy();
+            expect(isPromiseLike(null)).toBeFalsy();
+            expect(isPromiseLike("string")).toBeFalsy();
         });
     });
 

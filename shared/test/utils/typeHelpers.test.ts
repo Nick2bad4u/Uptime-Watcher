@@ -14,6 +14,18 @@
 import * as helpersModule from "@shared/utils/typeHelpers";
 import { describe, expect, it } from "vitest";
 
+const createValueWithThen = (then: unknown): Record<string, unknown> => {
+    const thenable: Record<string, unknown> = {};
+    Reflect.set(thenable, "then", then);
+    return thenable;
+};
+
+const createFunctionWithThen = (then: unknown): (() => undefined) => {
+    const thenable = () => undefined;
+    Reflect.set(thenable, "then", then);
+    return thenable;
+};
+
 describe("shared/utils/typeHelpers Function Coverage Validation", () => {
     describe("Function Coverage Validation", () => {
         it("should call all exported functions to ensure 100% function coverage", async ({
@@ -48,6 +60,28 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
             expect(helpersModule.isRecord(null)).toBeFalsy();
             expect(helpersModule.isRecord(undefined)).toBeFalsy();
             expect(helpersModule.isRecord("string")).toBeFalsy();
+
+            // Test isPromiseLike function
+            expect(helpersModule.isPromiseLike(Promise.resolve("value"))).toBe(
+                true
+            );
+            expect(
+                helpersModule.isPromiseLike(
+                    createValueWithThen(() => undefined)
+                )
+            ).toBe(true);
+            expect(
+                helpersModule.isPromiseLike(
+                    createFunctionWithThen(() => undefined)
+                )
+            ).toBe(true);
+            expect(
+                helpersModule.isPromiseLike(
+                    createValueWithThen("not a function")
+                )
+            ).toBe(false);
+            expect(helpersModule.isPromiseLike(null)).toBe(false);
+            expect(helpersModule.isPromiseLike("not promise-like")).toBe(false);
 
             // Test safePropertyAccess function
             const testObj = { prop: "value", nested: { inner: "test" } };

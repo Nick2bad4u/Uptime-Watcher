@@ -11,7 +11,11 @@
 import type { EventMetadata } from "@shared/types/events";
 import type { Except } from "type-fest";
 
-import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
+import {
+    castUnchecked,
+    isPromiseLike as sharedIsPromiseLike,
+    isRecord,
+} from "@shared/utils/typeHelpers";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type {
@@ -106,17 +110,10 @@ export const toForwardablePayload = <EventName extends EventKey<UptimeEvents>>(
  * Determines whether a value is promise-like.
  *
  * @remarks
- * Used by `ServiceContainer` to treat sync and async initialization uniformly
- * without narrowing to actual `Promise` instances.
+ * Compatibility wrapper for `ServiceContainer` imports. The underlying guard is
+ * shared so renderer, Electron, and SDK cleanup paths agree on thenable
+ * shapes.
  */
 export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
-    if (
-        (typeof value !== "object" && typeof value !== "function") ||
-        value === null
-    ) {
-        return false;
-    }
-
-    const then: unknown = Reflect.get(value, "then");
-    return typeof then === "function";
+    return sharedIsPromiseLike(value);
 }

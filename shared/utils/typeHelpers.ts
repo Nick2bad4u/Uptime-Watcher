@@ -104,6 +104,26 @@ export function isRecord(value: unknown): value is UnknownRecord {
 }
 
 /**
+ * Safely checks whether a value follows the PromiseLike contract.
+ *
+ * @remarks
+ * Accepts object and function thenables. This intentionally avoids `instanceof
+ * Promise` so cross-realm promises and SDK-specific thenables are handled
+ * consistently.
+ */
+export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+    if (
+        (typeof value !== "object" && typeof value !== "function") ||
+        value === null
+    ) {
+        return false;
+    }
+
+    const then: unknown = Reflect.get(value, "then");
+    return typeof then === "function";
+}
+
+/**
  * Asserts that a value is record-like (a non-null, non-array object) and
  * returns it as an {@link UnknownRecord}.
  *
