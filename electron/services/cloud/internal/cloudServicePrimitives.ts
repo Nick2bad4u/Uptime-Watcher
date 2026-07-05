@@ -147,6 +147,13 @@ export function decodeStrictBase64(args: {
     label: string;
     value: string;
 }): Buffer {
+    const maxEncodedLength = Math.ceil(args.expectedBytes / 3) * 4;
+    if (args.value.length > maxEncodedLength) {
+        throw new Error(
+            `Invalid ${args.label} length (expected ${args.expectedBytes} bytes)`
+        );
+    }
+
     const buffer = decodeCanonicalBase64({
         label: args.label,
         value: args.value,

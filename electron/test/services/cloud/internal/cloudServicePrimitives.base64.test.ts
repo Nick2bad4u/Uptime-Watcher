@@ -3,7 +3,7 @@ import {
     decodeStrictBase64,
     encodeBase64,
 } from "@electron/services/cloud/internal/cloudServicePrimitives";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 describe("cloudServicePrimitives base64", () => {
     it("decodes canonical base64", () => {
@@ -84,5 +84,24 @@ describe("cloudServicePrimitives base64", () => {
                 value,
             })
         ).toThrow(/expected 4 bytes/i);
+    });
+
+    it("decodeStrictBase64 rejects oversized values before decoding", () => {
+        const oversizedValue = encodeBase64(Buffer.alloc(1024, 1));
+        const fromSpy = vi.spyOn(Buffer, "from");
+
+        try {
+            expect(() =>
+                decodeStrictBase64({
+                    expectedBytes: 16,
+                    label: "salt",
+                    value: oversizedValue,
+                })
+            ).toThrow(/expected 16 bytes/i);
+
+            expect(fromSpy).not.toHaveBeenCalled();
+        } finally {
+            fromSpy.mockRestore();
+        }
     });
 });
