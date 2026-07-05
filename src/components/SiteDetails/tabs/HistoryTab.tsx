@@ -35,6 +35,7 @@ import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
+import { isMonitorStatus } from "@shared/types";
 import {
     memo,
     useCallback,
@@ -49,7 +50,6 @@ import {
     isEmpty,
     isFinite as isFiniteNumber,
     isInteger,
-    safeCastTo,
 } from "ts-extras";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
@@ -651,11 +651,12 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 <ThemedCard icon={historyIcon} title="Check History">
                     <div className="history-tab__list">
                         {filteredHistoryRecords.map((record, index) => {
-                            const rawStatus = safeCastTo<
-                                SiteStatus | undefined
-                            >(record.status);
+                            const statusValue: unknown = record.status;
                             const resolvedStatus: SiteStatus =
-                                rawStatus ?? "unknown";
+                                typeof statusValue === "string" &&
+                                isMonitorStatus(statusValue)
+                                    ? statusValue
+                                    : "unknown";
 
                             const recordIndex = recordIndexByTimestamp.get(
                                 record.timestamp
