@@ -12,7 +12,10 @@
 import type { UnknownArray, UnknownRecord } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import {
+    getOwnDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
 import { withRetry } from "@shared/utils/retry";
 import { isEmpty } from "ts-extras";
 
@@ -110,7 +113,7 @@ export class ElectronBridgeNotReadyError extends Error {
 type BridgeRoot = typeof window extends { electronAPI: infer T } ? T : unknown;
 
 const getGlobalWindow = (): unknown => {
-    const property = getOwnDataProperty(globalThis, "window");
+    const property = getOwnPropertyValue(globalThis, "window");
     return property.found ? property.value : undefined;
 };
 

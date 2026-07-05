@@ -56,6 +56,48 @@ describe(waitForElectronBridge, () => {
         ).resolves.toBeUndefined();
     });
 
+    it("resolves when the global window property is accessor-backed", async () => {
+        const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+            globalThis,
+            "window"
+        );
+        let accessCount = 0;
+
+        try {
+            Object.defineProperty(globalThis, "window", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return {
+                        electronAPI: {
+                            sites: {
+                                getSites: vi.fn(),
+                            },
+                        },
+                    };
+                },
+            });
+
+            await expect(
+                waitForElectronBridge({
+                    contracts: [{ domain: "sites", methods: ["getSites"] }],
+                })
+            ).resolves.toBeUndefined();
+            expect(accessCount).toBeGreaterThan(0);
+        } finally {
+            if (originalWindowDescriptor) {
+                Object.defineProperty(
+                    globalThis,
+                    "window",
+                    originalWindowDescriptor
+                );
+            } else {
+                Reflect.deleteProperty(globalThis, "window");
+            }
+        }
+    });
+
     it("rejects with diagnostics when a domain is missing", async () => {
         const promise = waitForElectronBridge({
             baseDelay: 1,
