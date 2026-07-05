@@ -48,12 +48,7 @@ import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
-import {
-    isDefined,
-    isFinite as isFiniteNumber,
-    objectValues,
-    safeCastTo,
-} from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, objectValues } from "ts-extras";
 
 import { createEventManager } from "../core/bridgeFactory";
 import {
@@ -78,9 +73,8 @@ type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
 type EventPayloadMapper<TPayload> = (payload: unknown) => TPayload | undefined;
 
-const RENDERER_EVENT_CHANNEL_VALUES = safeCastTo<
-    readonly RendererEventChannel[]
->(objectValues(RENDERER_EVENT_CHANNELS));
+const RENDERER_EVENT_CHANNEL_VALUES: readonly RendererEventChannel[] =
+    objectValues(RENDERER_EVENT_CHANNELS);
 
 const isRendererEventChannel = createStringUnionGuard(
     RENDERER_EVENT_CHANNEL_VALUES
@@ -491,7 +485,7 @@ const subscribeWithGuard = <TPayload>(
             void reportPreloadGuardFailure(guardFailureContext);
             return;
         }
-        callback(safeCastTo<TPayload>(validatedPayload));
+        callback(validatedPayload);
     });
 
 /**
