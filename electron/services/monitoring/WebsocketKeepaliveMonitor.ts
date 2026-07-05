@@ -42,6 +42,10 @@ import {
 
 const DEFAULT_PONG_TIMEOUT_MS = 1500;
 
+function unrefTimer(timer: NodeJS.Timeout): void {
+    timer.unref();
+}
+
 /**
  * Monitor service that validates WebSocket connectivity using a ping/pong-style
  * keepalive handshake.
@@ -218,6 +222,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                         `No pong within ${maxPongDelay}ms`
                     );
                 }, maxPongDelay);
+                unrefTimer(pongTimer);
             };
 
             const sendPingSafely = (): void => {
@@ -269,6 +274,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
                     )
                 );
             }, timeout);
+            unrefTimer(handshakeTimer);
 
             if (signal) {
                 const abortHandler = (): void => {

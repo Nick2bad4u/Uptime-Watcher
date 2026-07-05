@@ -142,6 +142,41 @@ describe("WebsocketKeepaliveMonitor service", () => {
         expect(result.error).toContain("No pong");
     });
 
+    it("unrefs handshake and pong timeout guards", async () => {
+        const originalSetTimeout = globalThis.setTimeout;
+        const unrefSpies: ReturnType<typeof vi.fn>[] = [];
+        const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+        setTimeoutSpy.mockImplementation(
+            ((...args: Parameters<typeof globalThis.setTimeout>) => {
+                const handle = originalSetTimeout(...args) as NodeJS.Timeout;
+                const originalUnref = handle.unref.bind(handle);
+                const unrefSpy = vi.fn(() => originalUnref());
+                handle.unref = unrefSpy;
+                unrefSpies.push(unrefSpy);
+                return handle;
+            }) as typeof globalThis.setTimeout
+        );
+
+        try {
+            const monitor = createMonitor();
+            const checkPromise = service.check(monitor);
+            const socket = socketInstances.at(-1);
+            expect(socket).toBeDefined();
+
+            socket!.readyState = socketReadyState.OPEN;
+            socket!.emit("open");
+            socket!.emit("pong");
+
+            const result = await checkPromise;
+            expect(result.status).toBe("up");
+            expect(unrefSpies).toHaveLength(2);
+            expect(unrefSpies[0]).toHaveBeenCalledTimes(1);
+            expect(unrefSpies[1]).toHaveBeenCalledTimes(1);
+        } finally {
+            setTimeoutSpy.mockRestore();
+        }
+    });
+
     it("returns down when the connection closes", async () => {
         const monitor = createMonitor();
         const checkPromise = service.check(monitor);
