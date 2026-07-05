@@ -20,8 +20,6 @@
  * structure whenever the preload bridge fails to return a callable cleanup
  * function.
  */
-import { objectHasIn, safeCastTo } from "ts-extras";
-
 /**
  * Callback contract used when validating cleanup handlers returned from the
  * preload bridge.
@@ -74,8 +72,7 @@ const isCleanupFunction = (candidate: unknown): candidate is () => unknown =>
 const isPromiseLike = (candidate: unknown): candidate is PromiseLike<unknown> =>
     typeof candidate === "object" &&
     candidate !== null &&
-    objectHasIn(candidate, "then") &&
-    typeof safeCastTo(candidate).then === "function";
+    typeof Reflect.get(candidate, "then") === "function";
 
 /**
  * Normalizes a cleanup candidate into a callable cleanup function.

@@ -94,6 +94,26 @@ describe(resolveCleanupHandler, () => {
         expect(handlers.handleCleanupError).toHaveBeenCalledTimes(1);
         expect(handlers.handleCleanupError).toHaveBeenCalledWith(error);
     });
+
+    it("reports async cleanup rejections", async () => {
+        const error = new Error("async boom");
+        const cleanupCandidate = () => Promise.reject(error);
+
+        const handlers: CleanupResolutionHandlers = {
+            handleCleanupError: vi.fn(),
+            handleInvalidCleanup: vi.fn(() => () => undefined),
+        };
+
+        const cleanup = resolveCleanupHandler(cleanupCandidate, handlers);
+
+        cleanup();
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
+
+        expect(handlers.handleCleanupError).toHaveBeenCalledTimes(1);
+        expect(handlers.handleCleanupError).toHaveBeenCalledWith(error);
+    });
 });
 
 describe(subscribeWithValidatedCleanup, () => {
