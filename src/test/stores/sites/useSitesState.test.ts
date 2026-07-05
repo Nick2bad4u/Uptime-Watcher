@@ -450,6 +450,50 @@ describe("useSitesState", () => {
                 );
             }
         });
+
+        it("should ignore and prune optimistic locks that do not match current monitors", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Stale Lock Pruning", "type");
+
+            const staleKey = buildMonitoringLockKey(
+                mockSite.identifier,
+                "monitor-1"
+            );
+            const staleLocks = {
+                [staleKey]: {
+                    expiresAt: Date.now() + 5000,
+                    monitoring: false,
+                },
+            } satisfies SitesState["optimisticMonitoringLocks"];
+
+            mockGet.mockReturnValue(
+                createState({
+                    optimisticMonitoringLocks: staleLocks,
+                    sites: [],
+                })
+            );
+
+            stateActions.setSites([mockSite]);
+
+            const setFunction = mockSet.mock.calls.pop()?.[0];
+            expect(setFunction).toBeDefined();
+
+            if (setFunction) {
+                const result = setFunction(
+                    createState({
+                        optimisticMonitoringLocks: staleLocks,
+                        sites: [],
+                    })
+                );
+
+                expect(arrayFirst(result.sites ?? [])?.monitors[0]?.monitoring)
+                    .toBeTruthy();
+                expect(result.optimisticMonitoringLocks).toEqual({});
+            }
+        });
     });
 
     describe("recordSiteSyncDelta", () => {
@@ -637,6 +681,96 @@ describe("useSitesState", () => {
                     })
                 );
                 expect(result.selectedSiteIdentifier).toBeUndefined();
+            }
+        });
+
+        it("should clear optimistic locks for removed site monitors", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Site Removal Cleanup", "type");
+
+            vi.useFakeTimers();
+            try {
+                const removedKey = buildMonitoringLockKey(
+                    mockSite.identifier,
+                    "monitor-1"
+                );
+                const retainedKey = buildMonitoringLockKey(
+                    "other-site",
+                    "monitor-2"
+                );
+                const lockState = {
+                    [removedKey]: {
+                        expiresAt: Date.now() + 5000,
+                        monitoring: false,
+                    },
+                    [retainedKey]: {
+                        expiresAt: Date.now() + 5000,
+                        monitoring: true,
+                    },
+                } satisfies SitesState["optimisticMonitoringLocks"];
+
+                stateActions.registerOptimisticMonitoringLock(
+                    mockSite.identifier,
+                    ["monitor-1"],
+                    false,
+                    5000
+                );
+                mockSet.mockClear();
+                const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
+
+                try {
+                    stateActions.removeSite(mockSite.identifier);
+
+                    const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
+                    expect(setFunction).toBeDefined();
+
+                    if (setFunction) {
+                        const result = setFunction(
+                            createState({
+                                optimisticMonitoringLocks: lockState,
+                                sites: [
+                                    mockSite,
+                                    {
+                                        identifier: "other-site",
+                                        monitoring: true,
+                                        monitors: [
+                                            {
+                                                checkInterval: 0,
+                                                history: [],
+                                                id: "monitor-2",
+                                                monitoring: true,
+                                                responseTime: 0,
+                                                retryAttempts: 0,
+                                                status: "up",
+                                                timeout: 0,
+                                                type: "http",
+                                            },
+                                        ],
+                                        name: "Other Site",
+                                    },
+                                ],
+                            })
+                        );
+
+                        expect(result.optimisticMonitoringLocks).toEqual({
+                            [retainedKey]: lockState[retainedKey],
+                        });
+                        expect(result.sites).toEqual([
+                            expect.objectContaining({
+                                identifier: "other-site",
+                            }),
+                        ]);
+                    }
+
+                    expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+                } finally {
+                    clearTimeoutSpy.mockRestore();
+                }
+            } finally {
+                vi.useRealTimers();
             }
         });
     });

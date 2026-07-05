@@ -90,6 +90,27 @@ const omitSelectedMonitorEntryForSite = (
     return remainingMonitorIds;
 };
 
+const collectOptimisticLockKeysForSite = (
+    site: Site
+): OptimisticLockKey[] =>
+    site.monitors.map((monitor) =>
+        buildMonitoringLockKey(site.identifier, monitor.id)
+    );
+
+const collectOptimisticLockKeysForSites = (
+    sites: readonly Site[]
+): Set<OptimisticLockKey> => {
+    const keys = new Set<OptimisticLockKey>();
+
+    for (const site of sites) {
+        for (const key of collectOptimisticLockKeysForSite(site)) {
+            keys.add(key);
+        }
+    }
+
+    return keys;
+};
+
 /**
  * Sites state interface for managing site data and selection.
  *
@@ -388,11 +409,35 @@ export const createSitesStateActions = (
         removeSite: (identifier: Site["identifier"]): void => {
             logStoreAction("SitesStore", "removeSite", { identifier });
             set((state) => {
+                const removedSite = state.sites.find(
+                    (site) => site.identifier === identifier
+                );
                 const remainingMonitorIds = omitSelectedMonitorEntryForSite(
                     state.selectedMonitorIds,
                     identifier
                 );
+
+                let optimisticMonitoringLocks =
+                    state.optimisticMonitoringLocks;
+                if (removedSite) {
+                    optimisticMonitoringLocks = {
+                        ...optimisticMonitoringLocks,
+                    };
+                    for (const key of collectOptimisticLockKeysForSite(
+                        removedSite
+                    )) {
+                        const isRemoved = Reflect.deleteProperty(
+                            optimisticMonitoringLocks,
+                            key
+                        );
+                        if (isRemoved) {
+                            cancelLockExpiryTimer(key);
+                        }
+                    }
+                }
+
                 return {
+                    optimisticMonitoringLocks,
                     selectedMonitorIds: remainingMonitorIds,
                     selectedSiteIdentifier:
                         state.selectedSiteIdentifier === identifier
@@ -461,14 +506,23 @@ export const createSitesStateActions = (
 
             logStoreAction("SitesStore", "setSites", { count: sites.length });
 
-            const locks = get().optimisticMonitoringLocks;
+            const currentState = get();
+            const locks = currentState.optimisticMonitoringLocks;
+            const currentValidLockKeys = collectOptimisticLockKeysForSites(
+                currentState.sites
+            );
             const lockEntries = collectActiveLockEntries(locks);
+            const applicableLockKeys = new Set(
+                lockEntries
+                    .filter(([key]) => setHas(currentValidLockKeys, key))
+                    .map(([key]) => key)
+            );
 
             const now = Date.now();
             const expiredLockKeys: OptimisticLockKey[] = [];
             let mutatedSiteCount = 0;
 
-            const normalizedSites = isEmpty(lockEntries)
+            const normalizedSites = applicableLockKeys.size === 0
                 ? sites
                 : sites.map((site) => {
                       let isSiteMutated = false;
@@ -479,7 +533,9 @@ export const createSitesStateActions = (
                               site.identifier,
                               monitor.id
                           );
-                          const lock = locks[lockKey];
+                          const lock = setHas(applicableLockKeys, lockKey)
+                              ? locks[lockKey]
+                              : undefined;
 
                           if (!lock) {
                               normalizedMonitors.push(monitor);
@@ -537,6 +593,9 @@ export const createSitesStateActions = (
                     )
                 );
 
+                const nextValidLockKeys =
+                    collectOptimisticLockKeysForSites(sitesForState);
+
                 const nextSelectedMonitorIds: SitesState["selectedMonitorIds"] =
                     {};
                 for (const [siteId, monitorId] of collectSelectedMonitorEntries(
@@ -558,11 +617,25 @@ export const createSitesStateActions = (
 
                 let optimisticMonitoringLocks =
                     optimisticMonitoringLocksFromState;
-                if (expiredLockKeys.length > 0) {
+                const lockKeysToPrune = new Set<OptimisticLockKey>(
+                    expiredLockKeys
+                );
+                for (const [key] of collectActiveLockEntries(
+                    optimisticMonitoringLocksFromState
+                )) {
+                    if (
+                        !setHas(applicableLockKeys, key) ||
+                        !setHas(nextValidLockKeys, key)
+                    ) {
+                        lockKeysToPrune.add(key);
+                    }
+                }
+
+                if (lockKeysToPrune.size > 0) {
                     optimisticMonitoringLocks = {
                         ...optimisticMonitoringLocks,
                     };
-                    for (const key of expiredLockKeys) {
+                    for (const key of lockKeysToPrune) {
                         const isRemoved = Reflect.deleteProperty(
                             optimisticMonitoringLocks,
                             key
