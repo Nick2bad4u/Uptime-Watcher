@@ -199,7 +199,7 @@ describe(HistoryTab, () => {
             ).toBeInTheDocument();
         });
 
-        it("should display filter buttons for all, up, and down", ({
+        it("should display filter buttons for all history statuses", ({
             task,
             annotate,
         }) => {
@@ -219,6 +219,7 @@ describe(HistoryTab, () => {
                 "All",
                 "Up",
                 "Down",
+                "Degraded",
             ];
             const filterButtons = filterLabels.map((label) =>
                 screen.getByRole("button", { name: label })
@@ -313,6 +314,57 @@ describe(HistoryTab, () => {
             expect(
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(2);
+        });
+
+        it("should filter history to show only 'degraded' status", async () => {
+            const monitor: Monitor = {
+                ...createMockMonitor(0),
+                history: [
+                    {
+                        timestamp: Date.now(),
+                        status: "up",
+                        responseTime: 100,
+                    },
+                    {
+                        timestamp: Date.now() - 60_000,
+                        status: "degraded",
+                        responseTime: 500,
+                    },
+                    {
+                        timestamp: Date.now() - 120_000,
+                        status: "down",
+                        responseTime: 0,
+                    },
+                    {
+                        timestamp: Date.now() - 180_000,
+                        status: "degraded",
+                        responseTime: 750,
+                    },
+                ],
+            };
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
+
+            const user = userEvent.setup();
+
+            const degradedButton = screen.getByRole("button", {
+                name: /^degraded$/iv,
+            });
+            await user.click(degradedButton);
+
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(2);
+            expect(
+                Array.from(
+                    document.querySelectorAll(".themed-text--size-xs")
+                ).some((element) => {
+                    const textContent = element.textContent ?? "";
+                    return (
+                        textContent.includes("2 of 4 records") &&
+                        textContent.includes("degraded filter")
+                    );
+                })
+            ).toBeTruthy();
         });
 
         it("should switch back to all records when 'all' filter is selected", async () => {

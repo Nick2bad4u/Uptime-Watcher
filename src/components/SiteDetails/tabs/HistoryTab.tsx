@@ -4,12 +4,12 @@
  * @remarks
  * Provides comprehensive monitoring history visualization with filtering,
  * pagination, and detailed record display. Shows status changes over time with
- * support for different status types (up, down, all) and configurable history
- * limits from user settings.
+ * support for different status types (up, down, degraded, all) and
+ * configurable history limits from user settings.
  *
  * Features include:
  *
- * - Real-time status filtering (all, up, down)
+ * - Real-time status filtering (all, up, down, degraded)
  * - Configurable history display limits
  * - Detailed record information with response times
  * - Monitor type-specific detail formatting
@@ -24,7 +24,12 @@
  * @public
  */
 
-import type { Monitor, SiteStatus, StatusHistory } from "@shared/types";
+import type {
+    Monitor,
+    SiteStatus,
+    StatusHistory,
+    StatusHistoryStatus,
+} from "@shared/types";
 import type {
     ChangeEvent,
     CSSProperties,
@@ -223,10 +228,11 @@ export interface HistoryTabProperties {
  *
  * @public
  */
-type HistoryFilter = "all" | "down" | "up";
+type HistoryFilter = "all" | StatusHistoryStatus;
 
 const FILTER_LABELS: Record<HistoryFilter, string> = {
     all: "All",
+    degraded: "Degraded",
     down: "Down",
     up: "Up",
 };
@@ -238,6 +244,7 @@ const FILTER_OPTIONS: readonly {
     { value: "all" },
     { status: "up", value: "up" },
     { status: "down", value: "down" },
+    { status: "degraded", value: "degraded" },
 ];
 
 /**
@@ -245,7 +252,7 @@ const FILTER_OPTIONS: readonly {
  *
  * Features:
  *
- * - Filterable history by status (all, up, down)
+ * - Filterable history by status (all, up, down, degraded)
  * - Configurable display limits with pagination
  * - Detailed history records with timestamps and response times
  * - Export functionality for history data
