@@ -20,7 +20,7 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { arrayJoin, isDefined, setHas } from "ts-extras";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import type {
     IpcParameterValidator,
@@ -491,12 +491,7 @@ export function registerStandardizedIpcHandler<
         throw new Error(errorMessage);
     }
 
-    if (
-        setHas<TChannel, TChannel>(
-            castUnchecked<ReadonlySet<TChannel>>(registeredHandlers),
-            channelName
-        )
-    ) {
+    if (registeredHandlers.has(channelName)) {
         const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
 
         logger.error(
