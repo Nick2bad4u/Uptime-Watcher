@@ -23,14 +23,7 @@ import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { validateImportData } from "@shared/validation/importExportSchemas";
 import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
-import {
-    arrayAt,
-    arrayJoin,
-    isDefined,
-    isEmpty,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { arrayAt, arrayJoin, isDefined, isEmpty, setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -292,9 +285,7 @@ export class DatabaseCommandExecutor {
         // either:
         // - completes successfully, or
         // - is rolled back successfully after a failure.
-        this.executedCommands.push(
-            safeCastTo<IDatabaseCommand<unknown>>(command)
-        );
+        this.executedCommands.push(command);
 
         try {
             return await command.execute();
