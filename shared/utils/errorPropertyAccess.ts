@@ -12,7 +12,22 @@ export type OwnDataPropertyResult =
     | { readonly found: false }
     | { readonly found: true; readonly value: unknown };
 
+export type CallableDataProperty = (this: unknown) => unknown;
+
 export type ErrorStringPropertyKey = "message" | "name" | "stack";
+
+function isDescriptorTarget(candidate: unknown): candidate is object {
+    return (
+        (typeof candidate === "object" && candidate !== null) ||
+        typeof candidate === "function"
+    );
+}
+
+function isCallableDataProperty(
+    candidate: unknown
+): candidate is CallableDataProperty {
+    return typeof candidate === "function";
+}
 
 export function getOwnDataProperty(
     holder: object,
@@ -42,6 +57,31 @@ export function getOwnDataCause(error: Error): unknown {
     const property = getOwnDataProperty(error, "cause");
 
     return property.found ? property.value : undefined;
+}
+
+export function getCallableDataProperty(
+    holder: unknown,
+    key: PropertyKey
+): CallableDataProperty | undefined {
+    if (!isDescriptorTarget(holder)) {
+        return undefined;
+    }
+
+    let current: object | null = holder;
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, key);
+
+        if (descriptor) {
+            const value: unknown =
+                "value" in descriptor ? descriptor.value : undefined;
+            return isCallableDataProperty(value) ? value : undefined;
+        }
+
+        const prototype: unknown = Object.getPrototypeOf(current);
+        current = isDescriptorTarget(prototype) ? prototype : null;
+    }
+
+    return undefined;
 }
 
 function isNativeErrorStringGetter(

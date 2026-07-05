@@ -91,6 +91,45 @@ describe(buildDropboxStatus, () => {
         expect(summary.lastError?.endsWith("...")).toBeTruthy();
         expect(summary.lastError?.length).toBeLessThanOrEqual(1003);
     });
+
+    it("does not invoke accessor-backed Dropbox account label methods", async () => {
+        let accessCount = 0;
+        const provider = {
+            deleteObject: vi.fn(),
+            downloadBackup: vi.fn(),
+            downloadObject: vi.fn(),
+            isConnected: vi.fn().mockResolvedValue(false),
+            kind: "dropbox",
+            listBackups: vi.fn(),
+            listObjects: vi.fn(),
+            uploadBackup: vi.fn(),
+            uploadObject: vi.fn(),
+        } as never;
+        Object.defineProperty(provider, "getAccountLabel", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return vi.fn().mockResolvedValue("hidden@example.com");
+            },
+        });
+
+        const summary = await buildDropboxStatus({
+            common: createCommonStatusArgs(),
+            deps: {
+                getEffectiveEncryptionMode: vi.fn(),
+                resolveProviderOrNull: vi.fn().mockResolvedValue(provider),
+            },
+        });
+
+        expect(accessCount).toBe(0);
+        expect(summary.connected).toBeFalsy();
+        expect(summary.providerDetails?.kind).toBe("dropbox");
+        if (summary.providerDetails?.kind !== "dropbox") {
+            throw new Error("Expected Dropbox provider details");
+        }
+        expect(summary.providerDetails.accountLabel).toBeUndefined();
+    });
 });
 
 describe(buildGoogleDriveStatus, () => {

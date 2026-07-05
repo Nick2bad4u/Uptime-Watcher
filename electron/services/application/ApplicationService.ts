@@ -53,6 +53,7 @@ import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
  */
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -74,41 +75,6 @@ import { stripForwardedEventMetadata } from "../../utils/eventMetadataForwarding
 import { fireAndForgetLogged } from "../../utils/fireAndForget";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
-
-type LifecycleMethod = (this: unknown) => void;
-
-const isDescriptorTarget = (candidate: unknown): candidate is object =>
-    (typeof candidate === "object" && candidate !== null) ||
-    typeof candidate === "function";
-
-const isLifecycleMethod = (candidate: unknown): candidate is LifecycleMethod =>
-    typeof candidate === "function";
-
-const getCallableDataProperty = (
-    candidate: unknown,
-    propertyName: PropertyKey
-): LifecycleMethod | undefined => {
-    if (!isDescriptorTarget(candidate)) {
-        return undefined;
-    }
-
-    let current: null | object = candidate;
-    while (current) {
-        const descriptor = Object.getOwnPropertyDescriptor(
-            current,
-            propertyName
-        );
-        if (descriptor) {
-            const value: unknown = descriptor.value;
-            return isLifecycleMethod(value) ? value : undefined;
-        }
-
-        const prototype: unknown = Object.getPrototypeOf(current);
-        current = isDescriptorTarget(prototype) ? prototype : null;
-    }
-
-    return undefined;
-};
 
 /**
  * High-level coordinator responsible for wiring Electron app lifecycle events

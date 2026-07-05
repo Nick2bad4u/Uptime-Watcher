@@ -1,4 +1,5 @@
 import {
+    getCallableDataProperty,
     getOwnDataCause,
     getErrorStringProperty,
     getOwnDataProperty,
@@ -54,6 +55,40 @@ describe("errorPropertyAccess", () => {
         expect(getOwnDataCause(errorWithCause)).toBe(nested);
         expect(getOwnDataCause(errorWithAccessorCause)).toBeUndefined();
         expect(getOwnDataCause(new Error("none"))).toBeUndefined();
+        expect(getterCalls).toBe(0);
+    });
+
+    it("reads callable data properties from instances and prototypes", () => {
+        class ExampleService {
+            public close(): string {
+                return "closed";
+            }
+        }
+
+        const service = new ExampleService();
+        const ownCleanup = { cleanup: () => "cleaned" };
+
+        expect(getCallableDataProperty(ownCleanup, "cleanup")?.call(ownCleanup))
+            .toBe("cleaned");
+        expect(getCallableDataProperty(service, "close")?.call(service)).toBe(
+            "closed"
+        );
+        expect(getCallableDataProperty(service, "missing")).toBeUndefined();
+    });
+
+    it("does not invoke accessors while finding callable properties", () => {
+        let getterCalls = 0;
+        const service = {};
+        Object.defineProperty(service, "cleanup", {
+            configurable: true,
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return () => "hidden";
+            },
+        });
+
+        expect(getCallableDataProperty(service, "cleanup")).toBeUndefined();
         expect(getterCalls).toBe(0);
     });
 

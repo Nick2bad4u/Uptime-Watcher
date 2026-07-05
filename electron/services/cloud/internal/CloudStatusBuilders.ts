@@ -5,6 +5,7 @@ import {
     getUserFacingErrorDetail,
     normalizeUserFacingErrorDetail,
 } from "@shared/utils/userFacingErrors";
+import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
 
 import type { CloudStorageProvider } from "../providers/CloudStorageProvider.types";
@@ -12,7 +13,7 @@ import type { CloudStorageProvider } from "../providers/CloudStorageProvider.typ
 import { FilesystemCloudStorageProvider } from "../providers/FilesystemCloudStorageProvider";
 
 type CloudProviderWithAccountLabel = CloudStorageProvider & {
-    readonly getAccountLabel: () => Promise<string>;
+    readonly getAccountLabel: () => Promise<string | undefined>;
 };
 
 const MAX_CLOUD_ACCOUNT_LABEL_CHARS = 320;
@@ -54,13 +55,7 @@ function normalizeCloudAccountLabel(
 function hasAccountLabel(
     provider: CloudStorageProvider
 ): provider is CloudProviderWithAccountLabel {
-    if (!Reflect.has(provider, "getAccountLabel")) {
-        return false;
-    }
-
-    const candidate: unknown = Reflect.get(provider, "getAccountLabel");
-
-    return typeof candidate === "function";
+    return getCallableDataProperty(provider, "getAccountLabel") !== undefined;
 }
 
 /**
