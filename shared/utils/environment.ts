@@ -20,7 +20,6 @@ import {
     isFinite as isFiniteNumber,
     isSafeInteger,
     objectKeys,
-    safeCastTo,
 } from "ts-extras";
 
 import { getOwnDataProperty } from "./errorPropertyAccess";
@@ -59,10 +58,6 @@ export interface ProcessSnapshot {
           };
 }
 
-interface ProcessSnapshotProvider {
-    process?: ProcessSnapshot;
-}
-
 type ProcessSnapshotOverride = null | ProcessSnapshot | undefined;
 
 const processSnapshotState: {
@@ -70,6 +65,9 @@ const processSnapshotState: {
 } = {
     override: undefined,
 };
+
+const isProcessSnapshot = (value: unknown): value is ProcessSnapshot =>
+    typeof value === "object" && value !== null;
 
 const getProcessSnapshot = (): ProcessSnapshot | undefined => {
     if (isDefined(processSnapshotState.override)) {
@@ -81,9 +79,8 @@ const getProcessSnapshot = (): ProcessSnapshot | undefined => {
     }
 
     try {
-        const candidate =
-            safeCastTo<ProcessSnapshotProvider>(globalThis).process;
-        return candidate ?? undefined;
+        const candidate: unknown = Reflect.get(globalThis, "process");
+        return isProcessSnapshot(candidate) ? candidate : undefined;
     } catch {
         return undefined;
     }

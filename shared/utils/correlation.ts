@@ -1,7 +1,7 @@
 import type { Tagged } from "type-fest";
 
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
-import { arrayJoin, safeCastTo } from "ts-extras";
+import { arrayJoin } from "ts-extras";
 
 /**
  * Branded correlation identifier shared by event metadata, IPC diagnostics, and
@@ -15,7 +15,7 @@ const isGetRandomValues = (value: unknown): value is GetRandomValues =>
     typeof value === "function";
 
 const getCryptoDataMethod = (
-    cryptoInstance: Crypto,
+    cryptoInstance: object,
     methodName: "getRandomValues"
 ): GetRandomValues | undefined => {
     let current: object | null = cryptoInstance;
@@ -40,11 +40,13 @@ const getCryptoDataMethod = (
     return undefined;
 };
 
-const resolveWebCrypto = (): Crypto | null => {
-    const candidate = safeCastTo<Crypto | undefined>(
-        Reflect.get(globalThis, "crypto")
-    );
-    if (candidate && getCryptoDataMethod(candidate, "getRandomValues")) {
+const resolveWebCrypto = (): object | null => {
+    const candidate: unknown = Reflect.get(globalThis, "crypto");
+    if (
+        typeof candidate === "object" &&
+        candidate !== null &&
+        getCryptoDataMethod(candidate, "getRandomValues")
+    ) {
         return candidate;
     }
     return null;
