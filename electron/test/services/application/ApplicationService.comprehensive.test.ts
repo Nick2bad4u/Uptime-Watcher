@@ -641,6 +641,75 @@ describe(ApplicationService, () => {
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
             expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
         });
+
+        it("should not invoke accessor-backed IPC cleanup properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Safe IPC cleanup detection", "feature");
+            await annotate("Priority: Medium", "priority");
+
+            let accessCount = 0;
+            const ipcServiceWithAccessor = {};
+            Object.defineProperty(ipcServiceWithAccessor, "cleanup", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    accessCount += 1;
+                    return vi.fn();
+                },
+            });
+            mockServiceContainer.getIpcService.mockReturnValue(
+                ipcServiceWithAccessor
+            );
+
+            await applicationService.cleanup();
+
+            expect(accessCount).toBe(0);
+            expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalledTimes(
+                1
+            );
+            expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
+        });
+
+        it("should not invoke accessor-backed database close properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: ApplicationService", "component");
+            await annotate("Feature: Safe database cleanup detection", "feature");
+            await annotate("Priority: Medium", "priority");
+
+            let accessCount = 0;
+            const initializedDatabaseServiceWithAccessor = {};
+            Object.defineProperty(
+                initializedDatabaseServiceWithAccessor,
+                "close",
+                {
+                    configurable: true,
+                    enumerable: true,
+                    get() {
+                        accessCount += 1;
+                        return vi.fn();
+                    },
+                }
+            );
+            mockServiceContainer.getInitializedServices.mockReturnValueOnce([
+                {
+                    name: "DatabaseService",
+                    service: initializedDatabaseServiceWithAccessor,
+                },
+            ]);
+
+            await applicationService.cleanup();
+
+            expect(accessCount).toBe(0);
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
+        });
     });
     describe("App Event Handlers", () => {
         beforeEach(() => {

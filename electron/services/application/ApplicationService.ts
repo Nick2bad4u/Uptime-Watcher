@@ -75,27 +75,39 @@ import { fireAndForgetLogged } from "../../utils/fireAndForget";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
-/**
- * Type guard that verifies whether a service-like object exposes a callable
- * {@link close} method suitable for lifecycle cleanup.
- *
- * @param candidate - Arbitrary value to inspect.
- *
- * @returns `true` when the value is an object containing a function-valued
- *   `close` property.
- */
-const hasCloseFunction = (
-    candidate: unknown
-): candidate is { close: () => void } => {
-    if (typeof candidate !== "object" || candidate === null) {
-        return false;
+type LifecycleMethod = (this: unknown) => void;
+
+const isDescriptorTarget = (candidate: unknown): candidate is object =>
+    (typeof candidate === "object" && candidate !== null) ||
+    typeof candidate === "function";
+
+const isLifecycleMethod = (candidate: unknown): candidate is LifecycleMethod =>
+    typeof candidate === "function";
+
+const getCallableDataProperty = (
+    candidate: unknown,
+    propertyName: PropertyKey
+): LifecycleMethod | undefined => {
+    if (!isDescriptorTarget(candidate)) {
+        return undefined;
     }
 
-    if (!Reflect.has(candidate, "close")) {
-        return false;
+    let current: null | object = candidate;
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(
+            current,
+            propertyName
+        );
+        if (descriptor) {
+            const value: unknown = descriptor.value;
+            return isLifecycleMethod(value) ? value : undefined;
+        }
+
+        const prototype: unknown = Object.getPrototypeOf(current);
+        current = isDescriptorTarget(prototype) ? prototype : null;
     }
 
-    return typeof Reflect.get(candidate, "close") === "function";
+    return undefined;
 };
 
 /**
@@ -209,12 +221,8 @@ export class ApplicationService {
             // NOTE: Currently synchronous, but designed to be
             // future-compatible with async cleanup
             const ipcService = this.serviceContainer.getIpcService();
-            if (
-                Reflect.has(ipcService, "cleanup") &&
-                typeof ipcService.cleanup === "function"
-            ) {
-                ipcService.cleanup();
-            }
+            const cleanupIpc = getCallableDataProperty(ipcService, "cleanup");
+            cleanupIpc?.call(ipcService);
 
             // Stop monitoring
             const orchestrator = this.serviceContainer.getUptimeOrchestrator();
@@ -233,8 +241,12 @@ export class ApplicationService {
                 const serviceCandidate = databaseServiceEntry.service;
 
                 try {
-                    if (hasCloseFunction(serviceCandidate)) {
-                        serviceCandidate.close();
+                    const closeDatabase = getCallableDataProperty(
+                        serviceCandidate,
+                        "close"
+                    );
+                    if (closeDatabase) {
+                        closeDatabase.call(serviceCandidate);
                     } else {
                         this.serviceContainer.getDatabaseService().close();
                     }
