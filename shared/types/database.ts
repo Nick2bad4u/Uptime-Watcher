@@ -8,6 +8,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isDefined, objectHasIn, stringSplit } from "ts-extras";
@@ -400,9 +401,10 @@ export function safeGetRowProperty<T>(
         return defaultValue;
     }
 
-    // First check for exact property name match (including properties with dots)
-    if (objectHasIn(row, property) && isDefined(row[property])) {
-        return castUnchecked(row[property]);
+    // First check for exact own data property name match, including keys with dots.
+    const directProperty = getOwnDataProperty(row, property);
+    if (directProperty.found && isDefined(directProperty.value)) {
+        return castUnchecked(directProperty.value);
     }
 
     // Handle nested property access with dot notation
@@ -412,14 +414,14 @@ export function safeGetRowProperty<T>(
         let current: unknown = row;
 
         for (const part of parts) {
-            if (
-                current &&
-                typeof current === "object" &&
-                RowValidationUtils.isValidObject(current) &&
-                objectHasIn(current, part) &&
-                isDefined(current[part])
-            ) {
-                current = current[part];
+            if (RowValidationUtils.isValidObject(current)) {
+                const nestedProperty = getOwnDataProperty(current, part);
+
+                if (!nestedProperty.found || !isDefined(nestedProperty.value)) {
+                    return defaultValue;
+                }
+
+                current = nestedProperty.value;
             } else {
                 return defaultValue;
             }

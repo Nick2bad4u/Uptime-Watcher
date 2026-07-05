@@ -388,6 +388,53 @@ describe("shared/types/database additional function coverage", () => {
             ).toBe("value5");
         });
 
+        it("should ignore inherited and accessor properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: database-additional", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Security", "type");
+
+            const inheritedRow = Object.create({
+                inherited: "prototype value",
+            }) as Record<string, unknown>;
+            expect(
+                safeGetRowProperty(inheritedRow, "inherited", "default")
+            ).toBe("default");
+
+            let getterCalled = false;
+            const accessorRow: Record<string, unknown> = {};
+            Object.defineProperty(accessorRow, "secret", {
+                enumerable: true,
+                get: () => {
+                    getterCalled = true;
+                    return "getter value";
+                },
+            });
+
+            expect(safeGetRowProperty(accessorRow, "secret", "default")).toBe(
+                "default"
+            );
+            expect(getterCalled).toBe(false);
+
+            let nestedGetterCalled = false;
+            const nestedRow = { nested: {} };
+            Object.defineProperty(nestedRow.nested, "secret", {
+                enumerable: true,
+                get: () => {
+                    nestedGetterCalled = true;
+                    return "nested getter value";
+                },
+            });
+
+            expect(
+                safeGetRowProperty(nestedRow, "nested.secret", "default")
+            ).toBe("default");
+            expect(nestedGetterCalled).toBe(false);
+        });
+
         it("should handle circular references gracefully", async ({
             task,
             annotate,
