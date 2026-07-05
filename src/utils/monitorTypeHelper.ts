@@ -13,11 +13,13 @@ import type {
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { isDefined, safeCastTo } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
+
+const EMPTY_MONITOR_TYPE_CONFIGS: MonitorTypeConfig[] = [];
 
 /**
  * Clear the monitor type cache.
@@ -84,7 +86,7 @@ export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
             return useMonitorTypesStore.getState().monitorTypes;
         },
         "Fetch monitor types from backend",
-        safeCastTo<MonitorTypeConfig[]>([])
+        EMPTY_MONITOR_TYPE_CONFIGS
     );
 
     const latestStore = useMonitorTypesStore.getState();
