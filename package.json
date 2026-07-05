@@ -833,7 +833,6 @@
         "cli-table3": "^0.6.5",
         "cognitive-complexity-ts": "^0.8.1",
         "concurrently": "^9.2.3",
-        "cpy-cli": "^7.0.0",
         "cross-env": "^10.1.0",
         "cspell": "^10.0.0",
         "cssnano": "^7.1.8",
