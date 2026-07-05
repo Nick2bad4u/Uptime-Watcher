@@ -119,9 +119,7 @@ describe("fsSafeOps (strict coverage)", () => {
 
         renameMock.mockResolvedValueOnce();
 
-        await expect(
-            renameIfExists("/tmp/a", "/tmp/b")
-        ).resolves.toBe(true);
+        await expect(renameIfExists("/tmp/a", "/tmp/b")).resolves.toBe(true);
         expect(renameMock).toHaveBeenCalledTimes(1);
         expect(renameMock).toHaveBeenCalledWith("/tmp/a", "/tmp/b");
     });
@@ -134,9 +132,7 @@ describe("fsSafeOps (strict coverage)", () => {
             Object.assign(new Error("missing"), { code: "ENOENT" })
         );
 
-        await expect(
-            renameIfExists("/tmp/a", "/tmp/b")
-        ).resolves.toBe(false);
+        await expect(renameIfExists("/tmp/a", "/tmp/b")).resolves.toBe(false);
     });
 
     it("renameIfExists rethrows non-ENOENT errors", async () => {

@@ -47,7 +47,7 @@ export async function lstatIfExists(
  * Best-effort file rename that treats a missing source as a no-op.
  *
  * @returns `true` when the source was renamed, otherwise `false` when the
- * source path did not exist.
+ *   source path did not exist.
  */
 export async function renameIfExists(
     sourcePath: string,

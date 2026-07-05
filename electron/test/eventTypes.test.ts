@@ -99,7 +99,10 @@ describe(isEventOfCategory, () => {
         );
 
         expect(
-            isEventOfCategory("not:an:event" as unknown as UptimeEventName, "SITE")
+            isEventOfCategory(
+                "not:an:event" as unknown as UptimeEventName,
+                "SITE"
+            )
         ).toBeFalsy();
         expect(
             isEventOfCategory(

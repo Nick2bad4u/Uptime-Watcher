@@ -113,9 +113,7 @@ describe("SettingsRepository Coverage Tests", () => {
             await import("../../../services/database/SettingsRepository");
 
         const { rowToSettingValue } =
-            await import(
-                "../../../services/database/utils/mappers/settingsMapper"
-            );
+            await import("../../../services/database/utils/mappers/settingsMapper");
         vi.mocked(rowToSettingValue).mockReturnValue("test-value");
         mockDb.get.mockReturnValue({ value: "test-value" });
 
@@ -184,9 +182,7 @@ describe("SettingsRepository Coverage Tests", () => {
             await import("../../../services/database/SettingsRepository");
 
         const { rowsToSettings, settingsToRecord } =
-            await import(
-                "../../../services/database/utils/mappers/settingsMapper"
-            );
+            await import("../../../services/database/utils/mappers/settingsMapper");
         const databaseRows = [{ key: "theme", value: "dark" }];
         const settingRows = [{ key: "theme", value: "dark" }];
         mockDb.all.mockReturnValue(databaseRows);
@@ -227,14 +223,8 @@ describe("SettingsRepository Coverage Tests", () => {
         expect(mockDb.prepare).toHaveBeenCalledWith(
             "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)"
         );
-        expect(mockStatement.run).toHaveBeenCalledWith([
-            "setting1",
-            "value1",
-        ]);
-        expect(mockStatement.run).toHaveBeenCalledWith([
-            "setting2",
-            "value2",
-        ]);
+        expect(mockStatement.run).toHaveBeenCalledWith(["setting1", "value1"]);
+        expect(mockStatement.run).toHaveBeenCalledWith(["setting2", "value2"]);
         expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
     });
     it("should handle deleteAll operations", async ({ task, annotate }) => {
@@ -327,9 +317,7 @@ describe("SettingsRepository Coverage Tests", () => {
             await import("../../../services/database/SettingsRepository");
 
         const { rowsToSettings, settingsToRecord } =
-            await import(
-                "../../../services/database/utils/mappers/settingsMapper"
-            );
+            await import("../../../services/database/utils/mappers/settingsMapper");
         mockDb.all.mockReturnValue([
             { key: "bulk1", value: "value1" },
             { key: "bulk2", value: "value2" },

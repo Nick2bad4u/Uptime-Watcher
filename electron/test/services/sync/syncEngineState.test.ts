@@ -29,8 +29,12 @@ describe(parseBaseline, () => {
 
         expect(result.recovered).toBe(true);
         expect(result.error).toContain("Invalid baseline JSON");
-        expect(result.baseline.baselineVersion).toBe(CLOUD_SYNC_BASELINE_VERSION);
-        expect(result.baseline.syncSchemaVersion).toBe(CLOUD_SYNC_SCHEMA_VERSION);
+        expect(result.baseline.baselineVersion).toBe(
+            CLOUD_SYNC_BASELINE_VERSION
+        );
+        expect(result.baseline.syncSchemaVersion).toBe(
+            CLOUD_SYNC_SCHEMA_VERSION
+        );
         expect(Object.getPrototypeOf(result.baseline.sites)).toBeNull();
     });
 });

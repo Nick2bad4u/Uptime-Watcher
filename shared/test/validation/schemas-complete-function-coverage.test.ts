@@ -179,8 +179,7 @@ describe("Schemas - Complete Function Coverage", () => {
                 schemasModule.validateMonitorData("unknown", {}).success
             ).toBeFalsy();
             expect(
-                schemasModule.validateSiteData({ invalid: "site data" })
-                    .success
+                schemasModule.validateSiteData({ invalid: "site data" }).success
             ).toBeFalsy();
         });
 

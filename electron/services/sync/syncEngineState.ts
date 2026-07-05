@@ -56,12 +56,7 @@ import {
     isFiniteNumber,
     isNonEmptyString,
 } from "@shared/utils/typeGuards";
-import {
-    isDefined,
-    objectEntries,
-    objectHasOwn,
-    objectKeys,
-} from "ts-extras";
+import { isDefined, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,

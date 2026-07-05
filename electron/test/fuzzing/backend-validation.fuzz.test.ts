@@ -87,19 +87,18 @@ describe("Backend Validation Fuzzing Tests", () => {
                     (monitorData: any) => {
                         // Property: validation should never throw
                         expect(() => {
-                            const hasRequiredFields = (data: any): boolean => (
-                                    data &&
-                                    typeof data === "object" &&
-                                    typeof data.id === "string" &&
-                                    data.id.length > 0 &&
-                                    typeof data.type === "string" &&
-                                    [
-                                        "dns",
-                                        "http",
-                                        "ping",
-                                        "tcp",
-                                    ].includes(data.type.toLowerCase())
-                                );
+                            const hasRequiredFields = (data: any): boolean =>
+                                data &&
+                                typeof data === "object" &&
+                                typeof data.id === "string" &&
+                                data.id.length > 0 &&
+                                typeof data.type === "string" &&
+                                [
+                                    "dns",
+                                    "http",
+                                    "ping",
+                                    "tcp",
+                                ].includes(data.type.toLowerCase());
 
                             const isResult = hasRequiredFields(monitorData);
                             expect(typeof isResult).toBe("boolean");
@@ -142,7 +141,10 @@ describe("Backend Validation Fuzzing Tests", () => {
                                 }
 
                                 // Remove null bytes
-                                const cleaned = inputUrl.replaceAll("\u{0}", "");
+                                const cleaned = inputUrl.replaceAll(
+                                    "\u{0}",
+                                    ""
+                                );
 
                                 // Check for dangerous schemes
                                 const dangerousSchemes =

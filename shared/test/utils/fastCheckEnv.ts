@@ -56,10 +56,7 @@ export function resolveFastCheckEnvOverrides(
         if (Number.isFinite(parsed) && parsed > 0) {
             numRuns = Math.trunc(parsed);
         } else {
-            emitInvalidFastCheckEnvWarning(
-                FAST_CHECK_NUM_RUNS_ENV,
-                rawNumRuns
-            );
+            emitInvalidFastCheckEnvWarning(FAST_CHECK_NUM_RUNS_ENV, rawNumRuns);
         }
     }
 

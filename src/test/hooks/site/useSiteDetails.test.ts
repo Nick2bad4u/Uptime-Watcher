@@ -1109,16 +1109,13 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                     { ...arrayFirst(mockSite.monitors), monitoring: false },
                 ],
             };
-            const mockStartSiteMonitorMonitoring = vi.fn(
-                async () => undefined
-            );
+            const mockStartSiteMonitorMonitoring = vi.fn(async () => undefined);
 
             useSitesStoreMockRef.current!.setState(
                 createSitesStoreMock({
                     getSelectedMonitorId: vi.fn(() => "monitor-1"),
                     sites: [siteWithInactiveMonitor],
-                    startSiteMonitorMonitoring:
-                        mockStartSiteMonitorMonitoring,
+                    startSiteMonitorMonitoring: mockStartSiteMonitorMonitoring,
                 })
             );
 

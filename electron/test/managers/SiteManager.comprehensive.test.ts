@@ -1021,17 +1021,16 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Type: Caching", "type");
 
             siteManager = new SiteManager(mockDeps);
-            vi.mocked(mockSiteWriterServiceInstance.deleteSite).mockResolvedValue(
-                false
-            );
+            vi.mocked(
+                mockSiteWriterServiceInstance.deleteSite
+            ).mockResolvedValue(false);
 
             const isResult = await siteManager.removeSite("missing-site");
 
             expect(isResult).toBeFalsy();
-            expect(mockSiteWriterServiceInstance.deleteSite).toHaveBeenCalledWith(
-                mockCache,
-                "missing-site"
-            );
+            expect(
+                mockSiteWriterServiceInstance.deleteSite
+            ).toHaveBeenCalledWith(mockCache, "missing-site");
             expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalled();
         });
 

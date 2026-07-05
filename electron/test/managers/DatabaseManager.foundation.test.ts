@@ -184,7 +184,11 @@ describe("DatabaseManager Foundation Tests", () => {
 
         // Replace the command executor after construction.
         expect(
-            Reflect.set(databaseManager, "commandExecutor", smartCommandExecutor)
+            Reflect.set(
+                databaseManager,
+                "commandExecutor",
+                smartCommandExecutor
+            )
         ).toBeTruthy();
 
         // Create smart site loading orchestrator mock

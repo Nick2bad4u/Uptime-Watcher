@@ -10,10 +10,8 @@ const runtimeEnv = globalThis.process.env;
 const readDocusaurusEnv = (key: string): string | undefined => runtimeEnv[key];
 
 const siteUrl =
-    readDocusaurusEnv("DOCUSAURUS_SITE_URL") ??
-    "https://nick2bad4u.github.io";
-const baseUrl =
-    readDocusaurusEnv("DOCUSAURUS_BASE_URL") ?? "/Uptime-Watcher/";
+    readDocusaurusEnv("DOCUSAURUS_SITE_URL") ?? "https://nick2bad4u.github.io";
+const baseUrl = readDocusaurusEnv("DOCUSAURUS_BASE_URL") ?? "/Uptime-Watcher/";
 const enableExperimentalFaster =
     readDocusaurusEnv("DOCUSAURUS_ENABLE_EXPERIMENTAL") === "true";
 

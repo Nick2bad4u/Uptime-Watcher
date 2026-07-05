@@ -224,9 +224,9 @@ export class PingMonitor implements IMonitorService {
      * Get the current configuration.
      *
      * @remarks
-     * Returns a defensive copy of the current configuration to prevent
-     * external modification. This ensures configuration immutability and
-     * prevents accidental state corruption.
+     * Returns a defensive copy of the current configuration to prevent external
+     * modification. This ensures configuration immutability and prevents
+     * accidental state corruption.
      *
      * @returns A copy of the current monitor configuration
      */

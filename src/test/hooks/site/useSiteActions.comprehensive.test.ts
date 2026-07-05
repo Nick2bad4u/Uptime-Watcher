@@ -24,8 +24,11 @@ const loggerMocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn((selector?: (state: typeof sitesStoreMocks) => unknown) =>
-        typeof selector === "function" ? selector(sitesStoreMocks) : sitesStoreMocks
+    useSitesStore: vi.fn(
+        (selector?: (state: typeof sitesStoreMocks) => unknown) =>
+            typeof selector === "function"
+                ? selector(sitesStoreMocks)
+                : sitesStoreMocks
     ),
 }));
 
@@ -331,9 +334,7 @@ describe("useSiteActions Hook", () => {
             });
 
             expect(uiStoreMocks.selectSite).toHaveBeenCalledWith(mockSite);
-            expect(
-                sitesStoreMocks.setSelectedMonitorId
-            ).not.toHaveBeenCalled();
+            expect(sitesStoreMocks.setSelectedMonitorId).not.toHaveBeenCalled();
             expect(uiStoreMocks.setShowSiteDetails).toHaveBeenCalledWith(true);
         });
     });

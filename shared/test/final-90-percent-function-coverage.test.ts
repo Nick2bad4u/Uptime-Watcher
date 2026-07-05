@@ -161,13 +161,11 @@ describe("Final 90% Function Coverage Push", () => {
             validation.isValidationResult(undefined);
         }
 
-        expect(validation.createSuccessResult({ data: "test" })).toMatchObject(
-            {
-                data: { data: "test" },
-                errors: [],
-                success: true,
-            }
-        );
+        expect(validation.createSuccessResult({ data: "test" })).toMatchObject({
+            data: { data: "test" },
+            errors: [],
+            success: true,
+        });
         expect(validation.createFailureResult(["error"])).toMatchObject({
             errors: ["error"],
             success: false,
@@ -363,11 +361,8 @@ describe("Final 90% Function Coverage Push", () => {
         }
 
         expect(
-            schemas.validateMonitorField(
-                "http",
-                "url",
-                "https://example.com"
-            ).success
+            schemas.validateMonitorField("http", "url", "https://example.com")
+                .success
         ).toBeTruthy();
         expect(validatorUtilsModule.isValidIdentifier("site-1")).toBeTruthy();
         expect(validatorUtilsModule.isValidIdentifier("bad id")).toBeFalsy();
@@ -460,8 +455,7 @@ describe("Final 90% Function Coverage Push", () => {
 
         expect(
             logTemplates.interpolateLogTemplate(
-                logTemplates.LOG_TEMPLATES.debug
-                    .MONITOR_MANAGER_SETUP_MONITORS,
+                logTemplates.LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS,
                 { count: 2, identifier: "site-1" }
             )
         ).toBe("[MonitorManager] Setting up 2 new monitors for site: site-1");
@@ -625,6 +619,5 @@ describe("Final 90% Function Coverage Push", () => {
 
         consoleWarnSpy.mockRestore();
         consoleErrorSpy.mockRestore();
-
     });
 });
