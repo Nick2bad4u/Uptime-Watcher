@@ -16,8 +16,9 @@ import {
     isMonitorStatus,
     isSiteStatus,
     type Monitor,
+    MONITOR_STATUS_VALUES,
     type MonitorStatus,
-    type SiteStatus,
+    SITE_STATUS_VALUES,
     validateMonitor,
 } from "../types";
 // Import namespace for function coverage validation
@@ -167,15 +168,7 @@ describe(isComputedSiteStatus, () => {
 });
 
 describe(isMonitorStatus, () => {
-    const validStatuses: MonitorStatus[] = [
-        "degraded",
-        "down",
-        "paused",
-        "pending",
-        "up",
-    ];
-
-    for (const status of validStatuses) {
+    for (const status of MONITOR_STATUS_VALUES) {
         it(`should return true for valid status '${status}'`, () => {
             expect(isMonitorStatus(status)).toBeTruthy();
         });
@@ -310,17 +303,7 @@ describe(isMonitorStatus, () => {
 });
 
 describe(isSiteStatus, () => {
-    const validStatuses: SiteStatus[] = [
-        "degraded",
-        "down",
-        "mixed",
-        "paused",
-        "pending",
-        "unknown",
-        "up",
-    ];
-
-    for (const status of validStatuses) {
+    for (const status of SITE_STATUS_VALUES) {
         it(`should return true for valid status '${status}'`, () => {
             expect(isSiteStatus(status)).toBeTruthy();
         });
@@ -442,16 +425,7 @@ describe(isSiteStatus, () => {
         await annotate("Category: Shared", "category");
         await annotate("Type: Monitoring", "type");
 
-        const monitorStatuses = [
-            "down",
-            "paused",
-            "pending",
-            "up",
-        ];
-        const computedStatuses = ["mixed", "unknown"];
-        const allSiteStatuses = [...monitorStatuses, ...computedStatuses];
-
-        for (const status of allSiteStatuses) {
+        for (const status of SITE_STATUS_VALUES) {
             expect(isSiteStatus(status)).toBeTruthy();
         }
     });
