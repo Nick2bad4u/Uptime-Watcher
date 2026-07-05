@@ -26,7 +26,7 @@ import {
     isValidPort,
     safeInteger,
 } from "@shared/validation/validatorUtils";
-import { isFinite as isFiniteNumber, safeCastTo, setHas } from "ts-extras";
+import { isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 /**
  * Baseline defaults applied to every monitor regardless of type.
@@ -388,15 +388,12 @@ function applySslMonitorDefaults(
     monitor: Monitor,
     filteredData: Partial<Monitor>
 ): void {
-    const {
-        certificateWarningDays: warningValue,
-        host: hostValue,
-        port: portValue,
-    } = safeCastTo<{
-        certificateWarningDays?: unknown;
-        host?: unknown;
-        port?: unknown;
-    }>(filteredData);
+    const warningValue = getMonitorOwnDataValue(
+        filteredData,
+        "certificateWarningDays"
+    );
+    const hostValue = getMonitorOwnDataValue(filteredData, "host");
+    const portValue = getMonitorOwnDataValue(filteredData, "port");
 
     monitor.host = isNonEmptyString(hostValue) ? hostValue : "example.com";
     monitor.port = isValidPort(portValue) ? Number(portValue) : 443;
@@ -412,7 +409,7 @@ function applyPingMonitorDefaults(
     monitor: Monitor,
     filteredData: Partial<Monitor>
 ): void {
-    const { host: hostValue } = safeCastTo<{ host?: unknown }>(filteredData);
+    const hostValue = getMonitorOwnDataValue(filteredData, "host");
     monitor.host = isNonEmptyString(hostValue) ? hostValue : "localhost";
 }
 
@@ -420,15 +417,9 @@ function applyDnsMonitorDefaults(
     monitor: Monitor,
     filteredData: Partial<Monitor>
 ): void {
-    const {
-        expectedValue,
-        host: hostValue,
-        recordType: recordTypeValue,
-    } = safeCastTo<{
-        expectedValue?: unknown;
-        host?: unknown;
-        recordType?: unknown;
-    }>(filteredData);
+    const expectedValue = getMonitorOwnDataValue(filteredData, "expectedValue");
+    const hostValue = getMonitorOwnDataValue(filteredData, "host");
+    const recordTypeValue = getMonitorOwnDataValue(filteredData, "recordType");
 
     const recordType: string =
         typeof recordTypeValue === "string" && recordTypeValue
@@ -451,10 +442,11 @@ function applyHttpHeaderMonitorDefaults(
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
-    const { expectedHeaderValue, headerName } = safeCastTo<{
-        expectedHeaderValue?: unknown;
-        headerName?: unknown;
-    }>(filteredData);
+    const expectedHeaderValue = getMonitorOwnDataValue(
+        filteredData,
+        "expectedHeaderValue"
+    );
+    const headerName = getMonitorOwnDataValue(filteredData, "headerName");
 
     monitor.expectedHeaderValue = ensureTrimmedStringOrFallback(
         expectedHeaderValue,
@@ -472,10 +464,11 @@ function applyHttpJsonMonitorDefaults(
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
-    const { expectedJsonValue, jsonPath } = safeCastTo<{
-        expectedJsonValue?: unknown;
-        jsonPath?: unknown;
-    }>(filteredData);
+    const expectedJsonValue = getMonitorOwnDataValue(
+        filteredData,
+        "expectedJsonValue"
+    );
+    const jsonPath = getMonitorOwnDataValue(filteredData, "jsonPath");
 
     monitor.expectedJsonValue = ensureTrimmedStringOrFallback(
         expectedJsonValue,
@@ -493,9 +486,10 @@ function applyHttpLatencyMonitorDefaults(
 ): void {
     applyHttpMonitorDefaults(monitor, filteredData);
 
-    const { maxResponseTime } = safeCastTo<{
-        maxResponseTime?: unknown;
-    }>(filteredData);
+    const maxResponseTime = getMonitorOwnDataValue(
+        filteredData,
+        "maxResponseTime"
+    );
 
     let numericLatency = HTTP_LATENCY_DEFAULT_MAX_RESPONSE_MS;
     if (
@@ -522,9 +516,10 @@ function applyWebsocketKeepaliveMonitorDefaults(
         WEBSOCKET_KEEPALIVE_DEFAULT_URL
     );
 
-    const maxPongDelayValue = safeCastTo<{
-        maxPongDelayMs?: unknown;
-    }>(filteredData).maxPongDelayMs;
+    const maxPongDelayValue = getMonitorOwnDataValue(
+        filteredData,
+        "maxPongDelayMs"
+    );
     let maxPongDelay = WEBSOCKET_KEEPALIVE_DEFAULT_MAX_PONG_MS;
     if (
         typeof maxPongDelayValue === "number" &&
@@ -562,9 +557,10 @@ function applyServerHeartbeatMonitorDefaults(
         SERVER_HEARTBEAT_DEFAULT_EXPECTED_STATUS
     );
 
-    const maxDriftValue = safeCastTo<{
-        heartbeatMaxDriftSeconds?: unknown;
-    }>(filteredData).heartbeatMaxDriftSeconds;
+    const maxDriftValue = getMonitorOwnDataValue(
+        filteredData,
+        "heartbeatMaxDriftSeconds"
+    );
     let maxDrift = SERVER_HEARTBEAT_DEFAULT_MAX_DRIFT_SECONDS;
     if (typeof maxDriftValue === "number" && isFiniteNumber(maxDriftValue)) {
         maxDrift = Math.trunc(maxDriftValue);
@@ -598,9 +594,10 @@ function applyReplicationMonitorDefaults(
         REPLICATION_DEFAULT_TIMESTAMP_FIELD
     );
 
-    const maxLagValue = safeCastTo<{
-        maxReplicationLagSeconds?: unknown;
-    }>(filteredData).maxReplicationLagSeconds;
+    const maxLagValue = getMonitorOwnDataValue(
+        filteredData,
+        "maxReplicationLagSeconds"
+    );
     let maxLagSeconds = REPLICATION_DEFAULT_MAX_LAG_SECONDS;
     if (typeof maxLagValue === "number" && isFiniteNumber(maxLagValue)) {
         maxLagSeconds = Math.trunc(maxLagValue);
