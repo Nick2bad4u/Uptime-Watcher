@@ -345,6 +345,57 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             );
         });
 
+        it("should redact monitor URL secrets in rendered link text", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Privacy", "type");
+
+            const user = userEvent.setup();
+            const sensitiveUrl =
+                "https://secret.example.com/status?refresh_token=header-secret#fragment";
+            const monitorWithSensitiveUrl: Monitor = {
+                ...mockHttpMonitor,
+                id: "sensitive-url-monitor",
+                url: `   ${sensitiveUrl}   `,
+            };
+
+            mockOpenExternal.mockClear();
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    selectedMonitor={monitorWithSensitiveUrl}
+                    site={mockSite}
+                />
+            );
+
+            const link = screen.getByRole("link", {
+                name: "Open https://secret.example.com/status in browser",
+            });
+
+            expect(link).toHaveTextContent("https://secret.example.com/status");
+            expect(link).toHaveAttribute(
+                "href",
+                "https://secret.example.com/status"
+            );
+            expect(link).not.toHaveTextContent("refresh_token");
+            expect(link).not.toHaveTextContent("header-secret");
+            expect(link).not.toHaveTextContent("fragment");
+
+            await user.click(link);
+
+            expect(mockOpenExternal).toHaveBeenCalledWith(sensitiveUrl, {
+                siteName: mockSite.name,
+            });
+        });
+
         it("should suppress link rendering when URL fails validation", ({
             task,
             annotate,

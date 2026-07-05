@@ -9,6 +9,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { MouseEvent, NamedExoticComponent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { memo, useCallback, useMemo } from "react";
 import { isDefined } from "ts-extras";
 
@@ -180,6 +181,7 @@ interface SiteDetailsHeaderModel {
     monitorTypeLabel?: string;
     screenshotUrl: string;
     selectedMonitorUrl: string;
+    selectedMonitorUrlDisplay: string;
 }
 
 function useSiteDetailsHeaderModel(
@@ -260,6 +262,13 @@ function useSiteDetailsHeaderModel(
         () => normalizeMonitorExternalUrl(selectedMonitor?.url),
         [selectedMonitor?.url]
     );
+    const selectedMonitorUrlDisplay = useMemo(
+        () =>
+            selectedMonitorUrl.length > 0
+                ? getSafeUrlForDisplay(selectedMonitorUrl)
+                : "",
+        [selectedMonitorUrl]
+    );
     const hasMonitorData = Boolean(selectedMonitor);
     const hasHttpMonitorUrl =
         selectedMonitor?.type === "http" && selectedMonitorUrl.length > 0;
@@ -273,6 +282,7 @@ function useSiteDetailsHeaderModel(
             monitorState,
             screenshotUrl,
             selectedMonitorUrl,
+            selectedMonitorUrlDisplay,
         };
 
         if (lastCheckExact) {
@@ -293,6 +303,7 @@ function useSiteDetailsHeaderModel(
         monitorTypeLabel,
         screenshotUrl,
         selectedMonitorUrl,
+        selectedMonitorUrlDisplay,
     ]);
 }
 
@@ -336,6 +347,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
             monitorTypeLabel,
             screenshotUrl,
             selectedMonitorUrl,
+            selectedMonitorUrlDisplay,
         } = useSiteDetailsHeaderModel(site, selectedMonitor);
 
         const isMonitorUrlValid = hasHttpMonitorUrl;
@@ -380,15 +392,15 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
 
         const urlElement = shouldShowUrl ? (
             <a
-                aria-label={`Open ${selectedMonitorUrl} in browser`}
+                aria-label={`Open ${selectedMonitorUrlDisplay} in browser`}
                 className="site-details-url truncate"
-                href={selectedMonitorUrl}
+                href={selectedMonitorUrlDisplay}
                 onClick={handleUrlClick}
                 rel="noopener noreferrer"
                 tabIndex={0}
                 target="_blank"
             >
-                {selectedMonitorUrl}
+                {selectedMonitorUrlDisplay}
             </a>
         ) : null;
 
