@@ -5,9 +5,10 @@
  *   utilities used throughout the app.
  */
 
-import type { Monitor } from "@shared/types";
+import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
+import { MONITOR_STATUS_VALUES } from "@shared/types";
 import * as fc from "fast-check";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { isPresent } from "ts-extras";
@@ -1264,7 +1265,9 @@ describe("fallback Utilities", () => {
                     port: fc.option(fc.integer({ min: 1, max: 65_535 })),
                     responseTime: fc.integer({ min: -1, max: 10_000 }),
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: fc.constantFrom<MonitorStatus>(
+                        ...MONITOR_STATUS_VALUES
+                    ),
                     timeout: fc.integer({ min: 1000, max: 60_000 }),
                     type: fc.constant(type),
                     url: fc.option(fc.webUrl()),
@@ -1326,7 +1329,9 @@ describe("fallback Utilities", () => {
                     monitoring: fc.boolean(),
                     responseTime: fc.integer({ min: -1, max: 10_000 }),
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: fc.constantFrom<MonitorStatus>(
+                        ...MONITOR_STATUS_VALUES
+                    ),
                     timeout: fc.integer({ min: 1000, max: 60_000 }),
                     type: fc.constantFrom("http", "port", "ping", "dns"),
                 }) as fc.Arbitrary<Monitor>,
