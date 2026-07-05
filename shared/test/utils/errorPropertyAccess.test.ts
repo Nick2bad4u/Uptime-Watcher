@@ -3,6 +3,7 @@ import {
     getOwnDataCause,
     getErrorStringProperty,
     getOwnDataProperty,
+    getOwnPropertyValue,
     getOwnStringDataProperty,
 } from "@shared/utils/errorPropertyAccess";
 import { describe, expect, it } from "vitest";
@@ -35,6 +36,35 @@ describe("errorPropertyAccess", () => {
         expect(
             getOwnStringDataProperty({ message: 123 }, "message")
         ).toBeUndefined();
+    });
+
+    it("reads own accessor values when explicitly requested", () => {
+        const value = {};
+        Object.defineProperty(value, "runtime", {
+            configurable: true,
+            enumerable: true,
+            get: () => "available",
+        });
+
+        expect(getOwnPropertyValue(value, "runtime")).toEqual({
+            found: true,
+            value: "available",
+        });
+    });
+
+    it("treats throwing own accessors as missing when explicitly requested", () => {
+        const value = {};
+        Object.defineProperty(value, "runtime", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                throw new Error("unavailable");
+            },
+        });
+
+        expect(getOwnPropertyValue(value, "runtime")).toEqual({
+            found: false,
+        });
     });
 
     it("reads own Error cause data without invoking custom accessors", () => {

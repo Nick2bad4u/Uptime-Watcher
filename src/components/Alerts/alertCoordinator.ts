@@ -2,6 +2,7 @@ import { isMonitorStatus, type StatusUpdate } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { arrayJoin, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
@@ -118,20 +119,19 @@ const isAudioContextConstructor = (
     value: unknown
 ): value is AudioContextConstructor => typeof value === "function";
 
+const getGlobalPropertyValue = (key: PropertyKey): unknown => {
+    const property = getOwnPropertyValue(globalThis, key);
+    return property.found ? property.value : undefined;
+};
+
 const resolveAudioContextConstructor = ():
     AudioContextConstructor | undefined => {
-    const standardAudioContext: unknown = Reflect.get(
-        globalThis,
-        "AudioContext"
-    );
+    const standardAudioContext = getGlobalPropertyValue("AudioContext");
     if (isAudioContextConstructor(standardAudioContext)) {
         return standardAudioContext;
     }
 
-    const webkitAudioContext: unknown = Reflect.get(
-        globalThis,
-        "webkitAudioContext"
-    );
+    const webkitAudioContext = getGlobalPropertyValue("webkitAudioContext");
     return isAudioContextConstructor(webkitAudioContext)
         ? webkitAudioContext
         : undefined;

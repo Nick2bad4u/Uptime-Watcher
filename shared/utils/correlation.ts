@@ -1,6 +1,9 @@
 import type { Tagged } from "type-fest";
 
-import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
+import {
+    getCallableDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
 import { arrayJoin } from "ts-extras";
 
@@ -24,7 +27,8 @@ const getCryptoDataMethod = (
 };
 
 const resolveWebCrypto = (): object | null => {
-    const candidate: unknown = Reflect.get(globalThis, "crypto");
+    const property = getOwnPropertyValue(globalThis, "crypto");
+    const candidate = property.found ? property.value : undefined;
     if (
         typeof candidate === "object" &&
         candidate !== null &&

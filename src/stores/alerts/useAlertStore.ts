@@ -10,7 +10,10 @@
 import type { MonitorStatus } from "@shared/types";
 import type { Except } from "type-fest";
 
-import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
+import {
+    getCallableDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
@@ -60,7 +63,8 @@ const isAlertRandomUuid = (value: unknown): value is AlertRandomUuid =>
     typeof value === "function";
 
 const getAlertCrypto = (): AlertCrypto | undefined => {
-    const cryptoCandidate: unknown = Reflect.get(globalThis, "crypto");
+    const property = getOwnPropertyValue(globalThis, "crypto");
+    const cryptoCandidate = property.found ? property.value : undefined;
     return isAlertCrypto(cryptoCandidate) ? cryptoCandidate : undefined;
 };
 

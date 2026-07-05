@@ -5,6 +5,7 @@
  */
 
 import { readProcessEnv as readSharedProcessEnv } from "@shared/utils/environment";
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 
 const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
 
@@ -12,10 +13,20 @@ const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iu;
 
 const hasUserAgent = (
     value: unknown
-): value is { readonly userAgent: string } =>
-    typeof value === "object" &&
-    value !== null &&
-    typeof Reflect.get(value, "userAgent") === "string";
+): value is { readonly userAgent: string } => {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    try {
+        return (
+            typeof (value as { readonly userAgent?: unknown }).userAgent ===
+            "string"
+        );
+    } catch {
+        return false;
+    }
+};
 
 /**
  * Detects Playwright automation environment via env flags, UA hints, or global
@@ -32,7 +43,10 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    const automationNavigator = Reflect.get(globalThis, "navigator");
+    const navigatorProperty = getOwnPropertyValue(globalThis, "navigator");
+    const automationNavigator = navigatorProperty.found
+        ? navigatorProperty.value
+        : undefined;
     if (
         hasUserAgent(automationNavigator) &&
         PLAYWRIGHT_UA_PATTERN.test(automationNavigator.userAgent)
@@ -40,7 +54,11 @@ export function isPlaywrightAutomation(): boolean {
         return true;
     }
 
-    return Reflect.get(globalThis, "playwrightAutomation") === true;
+    const automationMarker = getOwnPropertyValue(
+        globalThis,
+        "playwrightAutomation"
+    );
+    return automationMarker.found && automationMarker.value === true;
 }
 
 /**

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
     extractLogContext,
+    isStructuredLogContext,
+    LOG_CONTEXT_SYMBOL,
     normalizeLogValue,
     withLogContext,
 } from "../../utils/loggingContext";
@@ -22,6 +24,30 @@ describe("logging context helpers", () => {
         expect(context?.correlationId).toHaveLength(16);
         expect(context?.siteHash).toMatch(/^[0-9a-f]{8}$/v);
         expect(remaining).toEqual([extraPayload]);
+    });
+
+    it("requires an own data marker for structured context", () => {
+        const inherited = Object.create(
+            withLogContext({ channel: "inherited" })
+        ) as unknown;
+
+        expect(isStructuredLogContext(inherited)).toBeFalsy();
+    });
+
+    it("does not invoke accessor-backed structured context markers", () => {
+        let getterCalls = 0;
+        const candidate = {};
+        Object.defineProperty(candidate, LOG_CONTEXT_SYMBOL, {
+            configurable: true,
+            enumerable: false,
+            get() {
+                getterCalls += 1;
+                return true;
+            },
+        });
+
+        expect(isStructuredLogContext(candidate)).toBeFalsy();
+        expect(getterCalls).toBe(0);
     });
 
     it("redacts bearer tokens and URL secrets", () => {

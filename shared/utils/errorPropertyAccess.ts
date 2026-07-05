@@ -42,6 +42,43 @@ export function getOwnDataProperty(
     return { found: true, value: descriptor.value };
 }
 
+/**
+ * Reads an own data property or an own accessor property whose getter can be
+ * invoked safely.
+ *
+ * @remarks
+ * Prefer {@link getOwnDataProperty} for untrusted payloads, errors, and
+ * metadata where getters should never run. This helper is for trusted runtime
+ * boundaries such as `globalThis.crypto`, where modern runtimes expose native
+ * capabilities through configurable global accessors.
+ */
+export function getOwnPropertyValue(
+    holder: object,
+    key: PropertyKey
+): OwnDataPropertyResult {
+    const descriptor = Object.getOwnPropertyDescriptor(holder, key);
+
+    if (!descriptor) {
+        return { found: false };
+    }
+
+    if ("value" in descriptor) {
+        return { found: true, value: descriptor.value };
+    }
+
+    const getterProperty = getOwnDataProperty(descriptor, "get");
+    const getter = getterProperty.found ? getterProperty.value : undefined;
+    if (typeof getter !== "function") {
+        return { found: false };
+    }
+
+    try {
+        return { found: true, value: Reflect.apply(getter, holder, []) };
+    } catch {
+        return { found: false };
+    }
+}
+
 export function getOwnStringDataProperty(
     holder: object,
     key: PropertyKey

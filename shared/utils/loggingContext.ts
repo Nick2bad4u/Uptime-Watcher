@@ -474,10 +474,14 @@ export const withLogContext = (
 
 export const isStructuredLogContext = (
     value: unknown
-): value is StructuredLogContext =>
-    typeof value === "object" &&
-    value !== null &&
-    Reflect.has(value, LOG_CONTEXT_SYMBOL);
+): value is StructuredLogContext => {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    const marker = getOwnDataProperty(value, LOG_CONTEXT_SYMBOL);
+    return marker.found && marker.value === true;
+};
 
 export const normalizeLogContext = (
     context: StructuredLogContext | undefined,

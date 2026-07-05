@@ -58,4 +58,18 @@ describe(generateCorrelationId, () => {
         );
         expect(accessCount).toBe(0);
     });
+
+    it("treats throwing global crypto accessors as unavailable", () => {
+        Object.defineProperty(globalThis, "crypto", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                throw new Error("crypto unavailable");
+            },
+        });
+
+        expect(() => generateCorrelationId()).toThrow(
+            "Web Crypto API is required to generate correlation IDs"
+        );
+    });
 });

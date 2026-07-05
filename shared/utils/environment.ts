@@ -22,7 +22,10 @@ import {
     objectKeys,
 } from "ts-extras";
 
-import { getOwnDataProperty } from "./errorPropertyAccess";
+import {
+    getOwnDataProperty,
+    getOwnPropertyValue,
+} from "./errorPropertyAccess";
 import { createNullPrototypeObject } from "./objectSafety";
 
 export interface KnownEnvironmentVariables {
@@ -78,35 +81,10 @@ const getProcessSnapshot = (): ProcessSnapshot | undefined => {
         return undefined;
     }
 
-    const descriptor = Object.getOwnPropertyDescriptor(globalThis, "process");
-    if (!descriptor) {
-        return undefined;
-    }
-
-    let candidate: unknown;
-    if ("value" in descriptor) {
-        candidate = descriptor.value;
-    } else {
-        const getterProperty = Object.getOwnPropertyDescriptor(
-            descriptor,
-            "get"
-        );
-        const getter: unknown =
-            getterProperty && "value" in getterProperty
-                ? getterProperty.value
-                : undefined;
-        if (typeof getter !== "function") {
-            return undefined;
-        }
-
-        try {
-            candidate = Reflect.apply(getter, globalThis, []);
-        } catch {
-            return undefined;
-        }
-    }
-
-    return isProcessSnapshot(candidate) ? candidate : undefined;
+    const property = getOwnPropertyValue(globalThis, "process");
+    return property.found && isProcessSnapshot(property.value)
+        ? property.value
+        : undefined;
 };
 
 const isProcessEnvRecord = (
