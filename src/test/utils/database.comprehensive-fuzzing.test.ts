@@ -17,7 +17,7 @@
  * @packageDocumentation
  */
 
-import type { MonitorType } from "@shared/types";
+import type { MonitorStatus, MonitorType } from "@shared/types";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import {
@@ -25,6 +25,7 @@ import {
     secureRandomFloat,
     secureRandomInt,
 } from "@shared/test/testHelpers";
+import { MONITOR_STATUS_VALUES } from "@shared/types";
 import { arrayJoin, isEmpty, isInteger, safeCastTo } from "ts-extras";
 import { afterEach, beforeEach, describe, expect } from "vitest";
 
@@ -114,7 +115,7 @@ const statusUpdateData = fc.record({
         fc.integer({ max: 30_000, min: 0 }),
         fc.constant(null)
     ),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
     uptime_percentage: fc.double({ max: 100, min: 0 }),
 });
 
@@ -743,13 +744,7 @@ describe("comprehensive Database Operations Fuzzing (Part 1)", () => {
                     }
 
                     // Status enum validation
-                    const validStatuses = [
-                        "up",
-                        "down",
-                        "pending",
-                        "paused",
-                    ];
-                    if (!validStatuses.includes(data.status)) {
+                    if (!MONITOR_STATUS_VALUES.includes(data.status)) {
                         errors.push("Invalid status value");
                     }
 
