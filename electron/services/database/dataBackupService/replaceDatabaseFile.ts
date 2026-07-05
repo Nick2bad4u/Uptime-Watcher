@@ -1,6 +1,5 @@
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
@@ -62,25 +61,17 @@ export async function replaceDatabaseFile(args: {
         await syncFileSafely(incomingPath);
 
         // Move the existing DB out of the way (so rename into place is safe).
-        try {
-            // WAL/SHM sidecars must not follow the restored DB into place.
-            // We relocate them alongside the main DB so rollback restores
-            // the *exact* prior state and we avoid corrupting the restored
-            // DB with a mismatched WAL.
-            await renameIfExists(walPath, rollbackWalPath);
-            await renameIfExists(shmPath, rollbackShmPath);
-            await renameIfExists(journalPath, rollbackJournalPath);
+        // WAL/SHM sidecars must not follow the restored DB into place.
+        // We relocate them alongside the main DB so rollback restores
+        // the *exact* prior state and we avoid corrupting the restored
+        // DB with a mismatched WAL.
+        await renameIfExists(walPath, rollbackWalPath);
+        await renameIfExists(shmPath, rollbackShmPath);
+        await renameIfExists(journalPath, rollbackJournalPath);
 
-            // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath is derived from the trusted DB path with a controlled suffix.
-            await fs.rename(targetPath, rollbackPath);
-            isHadExistingTarget = true;
+        isHadExistingTarget = await renameIfExists(targetPath, rollbackPath);
+        if (isHadExistingTarget) {
             await syncDirectorySafely(targetDir);
-        } catch (error) {
-            if (tryGetErrorCode(error) === "ENOENT") {
-                // No existing file.
-            } else {
-                throw ensureError(error);
-            }
         }
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- incomingPath/targetPath are within app-controlled userData directory.

@@ -56,6 +56,24 @@ describe(replaceDatabaseFile, () => {
         expect(databaseService.initialize).toHaveBeenCalledTimes(1);
     });
 
+    it("places the incoming database when no target database exists", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const databaseService = createDatabaseService();
+
+        await writeFile(sourcePath, "new-db");
+
+        await replaceDatabaseFile({
+            databaseService,
+            sourcePath,
+            targetPath,
+        });
+
+        await expect(readFile(targetPath, "utf8")).resolves.toBe("new-db");
+        expect(databaseService.close).toHaveBeenCalledTimes(1);
+        expect(databaseService.initialize).toHaveBeenCalledTimes(1);
+    });
+
     it("does not clobber stale timestamp-named staging files", async () => {
         const sourcePath = path.join(tempDirectory, "incoming.sqlite");
         const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");

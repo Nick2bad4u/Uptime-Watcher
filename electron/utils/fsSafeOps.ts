@@ -45,17 +45,21 @@ export async function lstatIfExists(
 
 /**
  * Best-effort file rename that treats a missing source as a no-op.
+ *
+ * @returns `true` when the source was renamed, otherwise `false` when the
+ * source path did not exist.
  */
 export async function renameIfExists(
     sourcePath: string,
     targetPath: string
-): Promise<void> {
+): Promise<boolean> {
     try {
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- caller ensures paths are app-controlled.
         await fs.rename(sourcePath, targetPath);
+        return true;
     } catch (error: unknown) {
         if (tryGetErrorCode(error) === "ENOENT") {
-            return;
+            return false;
         }
 
         throw ensureError(error);

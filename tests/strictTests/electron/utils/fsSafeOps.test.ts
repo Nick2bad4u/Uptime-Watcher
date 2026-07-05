@@ -109,7 +109,7 @@ describe("fsSafeOps (strict coverage)", () => {
         await expect(lstatIfExists("/tmp/file")).rejects.toThrow("permission");
     });
 
-    it("renameIfExists calls fs.rename on success", async () => {
+    it("renameIfExists returns true after renaming an existing source", async () => {
         const { renameIfExists } =
             await import("../../../../electron/utils/fsSafeOps");
 
@@ -117,12 +117,12 @@ describe("fsSafeOps (strict coverage)", () => {
 
         await expect(
             renameIfExists("/tmp/a", "/tmp/b")
-        ).resolves.toBeUndefined();
+        ).resolves.toBe(true);
         expect(renameMock).toHaveBeenCalledTimes(1);
         expect(renameMock).toHaveBeenCalledWith("/tmp/a", "/tmp/b");
     });
 
-    it("renameIfExists treats ENOENT as a no-op", async () => {
+    it("renameIfExists returns false when the source is missing", async () => {
         const { renameIfExists } =
             await import("../../../../electron/utils/fsSafeOps");
 
@@ -132,7 +132,7 @@ describe("fsSafeOps (strict coverage)", () => {
 
         await expect(
             renameIfExists("/tmp/a", "/tmp/b")
-        ).resolves.toBeUndefined();
+        ).resolves.toBe(false);
     });
 
     it("renameIfExists rethrows non-ENOENT errors", async () => {
