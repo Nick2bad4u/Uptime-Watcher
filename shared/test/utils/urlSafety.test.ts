@@ -43,6 +43,8 @@ describe("urlSafety", () => {
         });
 
         it("detects private IPv4 ranges", () => {
+            expect(isPrivateNetworkHostname("0.0.0.0")).toBeTruthy();
+            expect(isPrivateNetworkHostname("0.1.2.3")).toBeTruthy();
             expect(isPrivateNetworkHostname("10.0.0.1")).toBeTruthy();
             expect(isPrivateNetworkHostname("127.0.0.1")).toBeTruthy();
             expect(isPrivateNetworkHostname("169.254.10.20")).toBeTruthy();
@@ -350,6 +352,7 @@ describe("urlSafety", () => {
 
         it("returns null for private/local hostnames", () => {
             expect(tryGetSafeThirdPartyHttpUrl("http://localhost")).toBe(null);
+            expect(tryGetSafeThirdPartyHttpUrl("http://0.0.0.0")).toBe(null);
             expect(tryGetSafeThirdPartyHttpUrl("https://192.168.1.1")).toBe(
                 null
             );

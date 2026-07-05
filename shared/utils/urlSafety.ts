@@ -369,6 +369,11 @@ function isPrivateIpvFourOctets(
 ): boolean {
     const [a, b] = octets;
 
+    // 0.0.0.0/8 current network / unspecified addresses
+    if (a === 0) {
+        return true;
+    }
+
     // 10.0.0.0/8
     if (a === 10) {
         return true;
