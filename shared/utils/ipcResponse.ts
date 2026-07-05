@@ -74,7 +74,7 @@ export interface ExtractIpcResponseDataOptions<T = unknown> {
 const normalizeFailureMessage = (response: IpcResponse): string => {
     const candidate = response.error;
     return typeof candidate === "string" && candidate.trim().length > 0
-        ? candidate
+        ? candidate.trim()
         : "IPC operation failed";
 };
 

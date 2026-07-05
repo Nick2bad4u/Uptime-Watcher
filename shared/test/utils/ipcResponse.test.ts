@@ -3,6 +3,7 @@ import type { ExtractIpcResponseDataOptions } from "@shared/utils/ipcResponse";
 import {
     extractIpcResponseData,
     safeExtractIpcResponseData,
+    validateVoidIpcResponse,
 } from "@shared/utils/ipcResponse";
 import { describe, expect, it } from "vitest";
 
@@ -66,5 +67,32 @@ describe("ipcResponse", () => {
         );
 
         expect(result).toBe(42);
+    });
+
+    it("trims failed response messages before throwing", () => {
+        expect(() =>
+            extractIpcResponseData({
+                error: "  backend unavailable  ",
+                success: false,
+            })
+        ).toThrow("backend unavailable");
+    });
+
+    it("trims void failed response messages before throwing", () => {
+        expect(() =>
+            validateVoidIpcResponse({
+                error: "\nlogging failed\t",
+                success: false,
+            })
+        ).toThrow("logging failed");
+    });
+
+    it("uses a stable fallback for blank failed response messages", () => {
+        expect(() =>
+            validateVoidIpcResponse({
+                error: " ".repeat(3),
+                success: false,
+            })
+        ).toThrow("IPC operation failed");
     });
 });
