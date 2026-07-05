@@ -17,7 +17,6 @@ import {
     isEmpty,
     isFinite as isFiniteNumber,
     objectHasIn,
-    safeCastTo,
     stringSplit,
 } from "ts-extras";
 
@@ -107,12 +106,12 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
         return undefined;
     }
 
-    const { response }: { response?: unknown } = safeCastTo(error);
+    const response: unknown = Reflect.get(error, "response");
     if (typeof response !== "object" || response === null) {
         return undefined;
     }
 
-    const { status }: { status?: unknown } = safeCastTo(response);
+    const status: unknown = Reflect.get(response, "status");
     return typeof status === "number" && isFiniteNumber(status)
         ? status
         : undefined;
