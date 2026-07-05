@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const serviceContainerMocks = vi.hoisted(() => {
     const autoUpdater = {
         checkForUpdates: vi.fn(async () => undefined),
+        cleanup: vi.fn(),
         initialize: vi.fn(),
         setStatusCallback: vi.fn(),
     };
@@ -40,6 +41,22 @@ const serviceContainerMocks = vi.hoisted(() => {
         getAutoUpdaterService: vi.fn(() => autoUpdater),
         getDatabaseService: vi.fn(() => databaseService),
         getInitializedServices: vi.fn(() => [
+            {
+                name: "AutoUpdaterService",
+                service: autoUpdater,
+            },
+            {
+                name: "IpcService",
+                service: ipcService,
+            },
+            {
+                name: "UptimeOrchestrator",
+                service: orchestrator,
+            },
+            {
+                name: "WindowService",
+                service: windowService,
+            },
             {
                 name: "DatabaseService",
                 service: initializedDatabaseService,
@@ -355,12 +372,21 @@ describe("ApplicationService Coverage Tests", () => {
         ).toHaveBeenCalledTimes(1);
         expect(
             serviceContainerMocks.serviceContainer.getIpcService
-        ).toHaveBeenCalledTimes(1);
+        ).not.toHaveBeenCalled();
         expect(
             serviceContainerMocks.serviceContainer.getUptimeOrchestrator
-        ).toHaveBeenCalled();
+        ).not.toHaveBeenCalled();
         expect(
             serviceContainerMocks.serviceContainer.getWindowService
-        ).toHaveBeenCalled();
+        ).not.toHaveBeenCalled();
+        expect(serviceContainerMocks.ipcService.cleanup).toHaveBeenCalledTimes(
+            1
+        );
+        expect(
+            serviceContainerMocks.orchestrator.stopMonitoring
+        ).toHaveBeenCalledTimes(1);
+        expect(
+            serviceContainerMocks.windowService.closeMainWindow
+        ).toHaveBeenCalledTimes(1);
     });
 });

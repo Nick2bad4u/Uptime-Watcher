@@ -162,6 +162,10 @@ vi.mock("../../../services/ServiceContainer", () => ({
         initialize: vi.fn(),
         getInitializedServices: vi.fn(() => [
             { name: "IpcService", service: mockIpcService },
+            {
+                name: "UptimeOrchestrator",
+                service: mockUptimeOrchestrator,
+            },
             { name: "WindowService", service: mockWindowService },
             { name: "DatabaseService", service: mockDatabaseService },
             { name: "AutoUpdaterService", service: mockAutoUpdaterService },
@@ -631,9 +635,15 @@ describe(ApplicationService, () => {
 
             // Arrange
             const ipcServiceWithoutCleanup = {};
-            mockServiceContainer.getIpcService.mockReturnValue(
-                ipcServiceWithoutCleanup
-            );
+            mockServiceContainer.getInitializedServices.mockReturnValueOnce([
+                { name: "IpcService", service: ipcServiceWithoutCleanup },
+                {
+                    name: "UptimeOrchestrator",
+                    service: mockUptimeOrchestrator,
+                },
+                { name: "WindowService", service: mockWindowService },
+                { name: "DatabaseService", service: mockDatabaseService },
+            ]);
 
             // Act
             await applicationService.cleanup();
@@ -665,9 +675,15 @@ describe(ApplicationService, () => {
                     return vi.fn();
                 },
             });
-            mockServiceContainer.getIpcService.mockReturnValue(
-                ipcServiceWithAccessor
-            );
+            mockServiceContainer.getInitializedServices.mockReturnValueOnce([
+                { name: "IpcService", service: ipcServiceWithAccessor },
+                {
+                    name: "UptimeOrchestrator",
+                    service: mockUptimeOrchestrator,
+                },
+                { name: "WindowService", service: mockWindowService },
+                { name: "DatabaseService", service: mockDatabaseService },
+            ]);
 
             await applicationService.cleanup();
 

@@ -161,6 +161,11 @@ export class ApplicationService {
 
         try {
             const services = this.serviceContainer.getInitializedServices();
+            const getInitializedService = (
+                serviceName: string
+            ): unknown =>
+                services.find(({ name }) => name === serviceName)?.service;
+
             for (const { name } of services) {
                 logger.debug(
                     interpolateLogTemplate(
@@ -183,41 +188,53 @@ export class ApplicationService {
                 suppressErrors: true,
             });
 
-            const autoUpdaterServiceEntry = services.find(
-                ({ name }) => name === "AutoUpdaterService"
-            );
-
-            if (autoUpdaterServiceEntry) {
-                const serviceCandidate = autoUpdaterServiceEntry.service;
+            const autoUpdaterService =
+                getInitializedService("AutoUpdaterService");
+            if (autoUpdaterService) {
                 const cleanupAutoUpdater = getCallableDataProperty(
-                    serviceCandidate,
+                    autoUpdaterService,
                     "cleanup"
                 );
-                cleanupAutoUpdater?.call(serviceCandidate);
+                cleanupAutoUpdater?.call(autoUpdaterService);
             }
 
             // Cleanup IPC handlers
             // NOTE: Currently synchronous, but designed to be
             // future-compatible with async cleanup
-            const ipcService = this.serviceContainer.getIpcService();
-            const cleanupIpc = getCallableDataProperty(ipcService, "cleanup");
-            cleanupIpc?.call(ipcService);
+            const ipcService = getInitializedService("IpcService");
+            if (ipcService) {
+                const cleanupIpc = getCallableDataProperty(
+                    ipcService,
+                    "cleanup"
+                );
+                cleanupIpc?.call(ipcService);
+            }
 
             // Stop monitoring
-            const orchestrator = this.serviceContainer.getUptimeOrchestrator();
-            await orchestrator.stopMonitoring();
+            const orchestrator = getInitializedService("UptimeOrchestrator");
+            if (orchestrator) {
+                const stopMonitoring = getCallableDataProperty(
+                    orchestrator,
+                    "stopMonitoring"
+                );
+                await stopMonitoring?.call(orchestrator);
+            }
 
             // Close windows
             // NOTE: Currently synchronous, but designed to be
             // future-compatible with async closure
-            this.serviceContainer.getWindowService().closeMainWindow();
+            const windowService = getInitializedService("WindowService");
+            if (windowService) {
+                const closeMainWindow = getCallableDataProperty(
+                    windowService,
+                    "closeMainWindow"
+                );
+                closeMainWindow?.call(windowService);
+            }
 
-            const databaseServiceEntry = services.find(
-                ({ name }) => name === "DatabaseService"
-            );
-
-            if (databaseServiceEntry) {
-                const serviceCandidate = databaseServiceEntry.service;
+            const databaseService = getInitializedService("DatabaseService");
+            if (databaseService) {
+                const serviceCandidate = databaseService;
 
                 try {
                     const closeDatabase = getCallableDataProperty(
