@@ -19,6 +19,15 @@ const createDefaultStateSyncStatus = (): StateSyncStatusSummary => ({
     synchronized: false,
 });
 
+const cloneStateSyncStatusSummary = (
+    summary: StateSyncStatusSummary
+): StateSyncStatusSummary => ({
+    lastSyncAt: summary.lastSyncAt,
+    siteCount: summary.siteCount,
+    source: summary.source,
+    synchronized: summary.synchronized,
+});
+
 /**
  * Tracks IPC-facing state sync status derived from orchestrator events.
  */
@@ -38,7 +47,7 @@ export class StateSyncStatusTracker {
      * Returns the current state sync status snapshot.
      */
     public getStatus(): StateSyncStatusSummary {
-        return this.stateSyncStatus;
+        return cloneStateSyncStatusSummary(this.stateSyncStatus);
     }
 
     /**
@@ -71,7 +80,7 @@ export class StateSyncStatusTracker {
      * Overrides the current state sync status snapshot.
      */
     public setStatus(summary: StateSyncStatusSummary): void {
-        this.stateSyncStatus = summary;
+        this.stateSyncStatus = cloneStateSyncStatusSummary(summary);
     }
 
     private updateStateSyncStatus(
