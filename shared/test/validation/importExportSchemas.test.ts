@@ -32,6 +32,22 @@ describe("importExportSchemas", () => {
         });
     });
 
+    it("accepts empty-site import payloads from fresh app exports", () => {
+        const result = validateImportData({
+            exportedAt: "2026-07-02T00:00:00.000Z",
+            settings: {},
+            sites: [],
+            version: "1.0",
+        });
+
+        expect(result.ok).toBeTruthy();
+        if (!result.ok) {
+            throw new Error("Expected empty-site import payload to pass");
+        }
+
+        expect(result.value.sites).toEqual([]);
+    });
+
     it("rejects blank import setting keys without trimming valid keys", () => {
         const result = validateImportData({
             settings: {
@@ -61,6 +77,22 @@ describe("importExportSchemas", () => {
         expect(result.data.settings).toEqual({
             [paddedSettingKey]: "enabled",
         });
+    });
+
+    it("accepts empty-site export payloads from fresh app state", () => {
+        const result = exportDataSchema.safeParse({
+            exportedAt: "2026-07-02T00:00:00.000Z",
+            settings: {},
+            sites: [],
+            version: "1.0",
+        });
+
+        expect(result.success).toBeTruthy();
+        if (!result.success) {
+            throw new Error("Expected empty-site export payload to pass");
+        }
+
+        expect(result.data.sites).toEqual([]);
     });
 
     it("rejects blank export setting keys", () => {

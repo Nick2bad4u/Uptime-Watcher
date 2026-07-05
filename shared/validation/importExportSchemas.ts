@@ -64,7 +64,7 @@ export const importDataSchema: z.ZodType<ImportData> = z
     .object({
         exportedAt: z.string().trim().optional(),
         settings: z.record(settingKeySchema, z.string().trim()).optional(),
-        sites: z.array(importSiteSchema).min(1),
+        sites: z.array(importSiteSchema),
         version: z.string().trim().optional(),
     })
     .strict();
@@ -83,7 +83,7 @@ export const exportDataSchema: z.ZodType<ExportData> = z
     .object({
         exportedAt: z.string().trim().min(1),
         settings: z.record(settingKeySchema, z.string().trim()).optional(),
-        sites: z.array(siteSchema).min(1),
+        sites: z.array(siteSchema),
         version: importExportVersionSchema,
     })
     .strict();
