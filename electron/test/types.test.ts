@@ -11,6 +11,7 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 
+import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "@shared/types";
 import { describe, expect, it } from "vitest";
 
 describe("Electron Types", () => {
@@ -143,7 +144,7 @@ describe("Electron Types", () => {
             await annotate("Priority: Critical - Status Accuracy", "priority");
             await annotate("Complexity: Low - Simple Enum Check", "complexity");
             await annotate(
-                "Valid Status Values: up, down, pending",
+                `Valid Status Values: ${MONITOR_STATUS_VALUES.join(", ")}`,
                 "valid-values"
             );
             await annotate(
@@ -151,17 +152,11 @@ describe("Electron Types", () => {
                 "purpose"
             );
 
-            const validStatuses = [
-                "up",
-                "down",
-                "pending",
-            ];
-
-            for (const status of validStatuses) {
+            for (const status of MONITOR_STATUS_VALUES) {
                 const monitor: Monitor = {
                     id: "status-test",
                     type: "http",
-                    status: status as Monitor["status"],
+                    status,
                     history: [],
                     checkInterval: 0,
                     monitoring: false,
@@ -170,11 +165,7 @@ describe("Electron Types", () => {
                     timeout: 0,
                 };
 
-                expect([
-                    "up",
-                    "down",
-                    "pending",
-                ]).toContain(monitor.status);
+                expect(MONITOR_STATUS_VALUES).toContain(monitor.status);
             }
         });
     });
@@ -387,22 +378,23 @@ describe("Electron Types", () => {
             );
             await annotate("Priority: Critical - Data Consistency", "priority");
             await annotate("Complexity: Low - Status Enum Check", "complexity");
-            await annotate("Valid Status Values: up, down", "valid-values");
+            await annotate(
+                `Valid Status Values: ${STATUS_HISTORY_VALUES.join(", ")}`,
+                "valid-values"
+            );
             await annotate(
                 "Purpose: Ensure historical status consistency",
                 "purpose"
             );
 
-            const validStatuses = ["up", "down"];
-
-            for (const status of validStatuses) {
+            for (const status of STATUS_HISTORY_VALUES) {
                 const history: StatusHistory = {
                     timestamp: Date.now(),
-                    status: status as StatusHistory["status"],
+                    status,
                     responseTime: 100,
                 };
 
-                expect(["up", "down"]).toContain(history.status);
+                expect(STATUS_HISTORY_VALUES).toContain(history.status);
             }
         });
     });
@@ -736,10 +728,9 @@ describe("Electron Types", () => {
                 history: [],
             });
 
-            // Valid statuses should work
-            expect(() => createMonitorWithStatus("up")).not.toThrow();
-            expect(() => createMonitorWithStatus("down")).not.toThrow();
-            expect(() => createMonitorWithStatus("pending")).not.toThrow();
+            for (const status of MONITOR_STATUS_VALUES) {
+                expect(() => createMonitorWithStatus(status)).not.toThrow();
+            }
         });
 
         it("should validate timestamp as number in StatusHistory", async ({
