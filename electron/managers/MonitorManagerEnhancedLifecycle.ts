@@ -19,7 +19,6 @@ import type {
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { MONITOR_STATUS } from "@shared/types";
-import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -176,15 +175,16 @@ const getMonitorOrWarn = (
     return monitor;
 };
 
+const getMonitorCandidates = (site: Site): readonly (Monitor | undefined)[] =>
+    Array.isArray(site.monitors) ? site.monitors : [];
+
 const getMonitorsWithIds = (
     site: Site,
     options?: { requireMonitoring?: boolean }
 ): readonly (Monitor & { id: string })[] => {
     const { requireMonitoring = false } = options ?? {};
 
-    const rawMonitors = safeCastTo<(Monitor | undefined)[]>(
-        Array.isArray(site.monitors) ? site.monitors : []
-    );
+    const rawMonitors = getMonitorCandidates(site);
 
     return rawMonitors.filter(
         (candidate): candidate is Monitor & { id: string } => {
@@ -246,9 +246,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
     });
 
     await runSequentially(sites, async (site) => {
-        const monitors = safeCastTo<(Site["monitors"][0] | undefined)[]>(
-            Array.isArray(site.monitors) ? site.monitors : []
-        );
+        const monitors = getMonitorCandidates(site);
         const siteStarted: { current: boolean } = { current: false };
 
         await runSequentially(monitors, async (candidate) => {
@@ -395,9 +393,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
     config.logger.info("Stopping all monitoring operations (enhanced system)");
 
     await runSequentially(sites, async (site) => {
-        const monitors = safeCastTo<(Site["monitors"][0] | undefined)[]>(
-            Array.isArray(site.monitors) ? site.monitors : []
-        );
+        const monitors = getMonitorCandidates(site);
 
         await runSequentially(monitors, async (candidate) => {
             if (!candidate) {
