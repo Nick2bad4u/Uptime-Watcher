@@ -150,7 +150,23 @@ const isCacheInvalidatedEventDataPayload = (
         return false;
     }
 
-    return isCacheInvalidationType(type);
+    if (!isCacheInvalidationType(type)) {
+        return false;
+    }
+
+    if (!isDefined(identifier)) {
+        return true;
+    }
+
+    if (type === "site") {
+        return siteIdentifierSchema.safeParse(identifier).success;
+    }
+
+    if (type === "monitor") {
+        return monitorIdSchema.safeParse(identifier).success;
+    }
+
+    return true;
 };
 
 const isMonitoringControlEventDataPayload = (

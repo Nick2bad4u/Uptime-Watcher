@@ -178,6 +178,42 @@ describe("Events Domain API", () => {
             expect(callback).toHaveBeenCalledWith(mockEventData);
         });
 
+        it("should reject targeted cache invalidation payloads with invalid identifiers", () => {
+            const callback = vi.fn();
+
+            eventsApi.onCacheInvalidated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.(
+                {},
+                {
+                    identifier: "site\nabc",
+                    reason: "update",
+                    timestamp: Date.now(),
+                    type: "site",
+                }
+            );
+            eventHandler?.(
+                {},
+                {
+                    identifier: "monitor\nabc",
+                    reason: "update",
+                    timestamp: Date.now(),
+                    type: "monitor",
+                }
+            );
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledTimes(2);
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "cache:invalidated",
+                    guard: "isCacheInvalidatedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
+
         it("should cleanup listener when cleanup function is called", () => {
             const callback = vi.fn();
 
