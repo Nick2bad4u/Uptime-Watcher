@@ -56,6 +56,24 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidHistoryRow(validRow)).toBeTruthy();
         });
+        it("should validate degraded history row status", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const validRow: HistoryRow = {
+                monitorId: "test-monitor",
+                status: "degraded",
+                timestamp: 1_640_995_200_000,
+            };
+
+            expect(isValidHistoryRow(validRow)).toBeTruthy();
+        });
         it("should reject invalid history rows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(

@@ -8,10 +8,11 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { STATUS_HISTORY_VALUES, type StatusHistoryStatus } from "@shared/types";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
-import { isDefined, objectHasIn, stringSplit } from "ts-extras";
+import { arrayIncludes, isDefined, objectHasIn, stringSplit } from "ts-extras";
 
 /**
  * Base interface for all database row types.
@@ -54,9 +55,9 @@ export interface HistoryRow extends BaseRow {
      */
     responseTime?: number;
     /**
-     * The status of the monitor at this point in history ("up" or "down").
+     * The status of the monitor at this point in history.
      */
-    status?: string;
+    status?: StatusHistoryStatus;
     /**
      * The timestamp (epoch milliseconds) when this entry was recorded.
      */
@@ -211,10 +212,10 @@ export const RowValidationUtils = {
         typeof obj === "object" && obj !== null && !Array.isArray(obj),
 
     /**
-     * Validates monitor status value.
+     * Validates history status value.
      */
-    isValidStatus: (value: unknown): value is "down" | "up" =>
-        value === "up" || value === "down",
+    isValidStatus: (value: unknown): value is StatusHistoryStatus =>
+        typeof value === "string" && arrayIncludes(STATUS_HISTORY_VALUES, value),
 
     /**
      * Validates timestamp as an epoch millisecond value representable by Date.

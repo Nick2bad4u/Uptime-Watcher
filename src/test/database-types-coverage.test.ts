@@ -1257,7 +1257,7 @@ describe("Shared Database Types - Complete Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            // Test both valid status values
+            // Test all valid history status values
             const validUpRow = {
                 monitorId: "test",
                 status: "up",
@@ -1271,6 +1271,13 @@ describe("Shared Database Types - Complete Coverage", () => {
                 timestamp: 12_345,
             };
             expect(isValidHistoryRow(validDownRow)).toBeTruthy();
+
+            const validDegradedRow = {
+                monitorId: "test",
+                status: "degraded",
+                timestamp: 12_345,
+            };
+            expect(isValidHistoryRow(validDegradedRow)).toBeTruthy();
 
             // Test invalid status values
             const invalidStatusRow = {
