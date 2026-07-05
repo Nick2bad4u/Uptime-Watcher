@@ -71,9 +71,13 @@ export function createSanitizedFileName(fileName: string): string {
         return candidate;
     }
 
+    if (ext.length >= MAX_FILE_NAME_LENGTH) {
+        return candidate.slice(0, MAX_FILE_NAME_LENGTH);
+    }
+
     const shortenedBase = safeBaseName.slice(
         0,
-        Math.max(1, MAX_FILE_NAME_LENGTH - ext.length)
+        MAX_FILE_NAME_LENGTH - ext.length
     );
 
     return `${shortenedBase}${ext}`;
