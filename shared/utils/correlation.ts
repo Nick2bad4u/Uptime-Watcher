@@ -1,5 +1,6 @@
 import type { Tagged } from "type-fest";
 
+import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isValidLowercaseHexString } from "@shared/validation/validatorUtils";
 import { arrayJoin } from "ts-extras";
 
@@ -18,26 +19,8 @@ const getCryptoDataMethod = (
     cryptoInstance: object,
     methodName: "getRandomValues"
 ): GetRandomValues | undefined => {
-    let current: object | null = cryptoInstance;
-
-    while (current) {
-        const descriptor = Object.getOwnPropertyDescriptor(current, methodName);
-
-        if (descriptor) {
-            const value: unknown = descriptor.value;
-            return "value" in descriptor && isGetRandomValues(value)
-                ? value
-                : undefined;
-        }
-
-        const prototype: unknown = Object.getPrototypeOf(current);
-        current =
-            typeof prototype === "object" && prototype !== null
-                ? prototype
-                : null;
-    }
-
-    return undefined;
+    const candidate = getCallableDataProperty(cryptoInstance, methodName);
+    return isGetRandomValues(candidate) ? candidate : undefined;
 };
 
 const resolveWebCrypto = (): object | null => {

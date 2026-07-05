@@ -10,6 +10,7 @@
 import type { MonitorStatus } from "@shared/types";
 import type { Except } from "type-fest";
 
+import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
@@ -44,12 +45,45 @@ interface AlertCrypto {
     readonly randomUUID?: () => string;
 }
 
+type AlertGetRandomValues = NonNullable<AlertCrypto["getRandomValues"]>;
+
+type AlertRandomUuid = NonNullable<AlertCrypto["randomUUID"]>;
+
 const isAlertCrypto = (value: unknown): value is AlertCrypto =>
     typeof value === "object" && value !== null;
+
+const isAlertGetRandomValues = (
+    value: unknown
+): value is AlertGetRandomValues => typeof value === "function";
+
+const isAlertRandomUuid = (value: unknown): value is AlertRandomUuid =>
+    typeof value === "function";
 
 const getAlertCrypto = (): AlertCrypto | undefined => {
     const cryptoCandidate: unknown = Reflect.get(globalThis, "crypto");
     return isAlertCrypto(cryptoCandidate) ? cryptoCandidate : undefined;
+};
+
+const getAlertRandomUuid = (
+    cryptoObject: AlertCrypto | undefined
+): AlertRandomUuid | undefined => {
+    if (!cryptoObject) {
+        return undefined;
+    }
+
+    const candidate = getCallableDataProperty(cryptoObject, "randomUUID");
+    return isAlertRandomUuid(candidate) ? candidate : undefined;
+};
+
+const getAlertGetRandomValues = (
+    cryptoObject: AlertCrypto | undefined
+): AlertGetRandomValues | undefined => {
+    if (!cryptoObject) {
+        return undefined;
+    }
+
+    const candidate = getCallableDataProperty(cryptoObject, "getRandomValues");
+    return isAlertGetRandomValues(candidate) ? candidate : undefined;
 };
 
 /**
@@ -58,18 +92,20 @@ const getAlertCrypto = (): AlertCrypto | undefined => {
  */
 const generateAlertId = (): string => {
     const cryptoObject = getAlertCrypto();
-    if (typeof cryptoObject?.randomUUID === "function") {
+    const randomUUID = getAlertRandomUuid(cryptoObject);
+    if (randomUUID) {
         try {
-            return cryptoObject.randomUUID();
+            return randomUUID.call(cryptoObject);
         } catch {
             // Fall through to getRandomValues or the deterministic fallback.
         }
     }
 
-    if (typeof cryptoObject?.getRandomValues === "function") {
+    const getRandomValues = getAlertGetRandomValues(cryptoObject);
+    if (getRandomValues) {
         const buffer = new Uint32Array(2);
         try {
-            cryptoObject.getRandomValues(buffer);
+            getRandomValues.call(cryptoObject, buffer);
         } catch {
             return `alert-${Date.now()}-${nextFallbackAlertCounter()}`;
         }

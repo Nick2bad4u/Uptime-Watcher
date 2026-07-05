@@ -556,6 +556,46 @@ describe("useAlertStore identifier generation fallbacks", () => {
         }
     });
 
+    it("does not invoke accessor-backed randomUUID properties", () => {
+        const originalCrypto = crypto;
+        let accessCount = 0;
+        const mockGetRandomValues = vi.fn((buffer: Uint32Array) => {
+            buffer[0] = 7;
+            buffer[1] = 14;
+            return buffer;
+        });
+        const cryptoCandidate = {
+            getRandomValues: mockGetRandomValues,
+        };
+        Object.defineProperty(cryptoCandidate, "randomUUID", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return () => "hidden-alert-id";
+            },
+        });
+
+        try {
+            globalThis.crypto = cryptoCandidate as unknown as Crypto;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(accessCount).toBe(0);
+            expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
+            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+            expect(alert.id).not.toBe("hidden-alert-id");
+        } finally {
+            globalThis.crypto = originalCrypto;
+        }
+    });
+
     it("falls back to Date.now-based identifiers when getRandomValues throws", () => {
         const originalCrypto = crypto;
         const fixedNow = 1_730_000_000_002;
@@ -577,6 +617,42 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(alert.id).toMatch(/^alert-1730{9}2-\d+$/v);
+        } finally {
+            nowSpy.mockRestore();
+            globalThis.crypto = originalCrypto;
+        }
+    });
+
+    it("does not invoke accessor-backed getRandomValues properties", () => {
+        const originalCrypto = crypto;
+        const fixedNow = 1_730_000_000_003;
+        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
+        let accessCount = 0;
+        const cryptoCandidate = {};
+        Object.defineProperty(cryptoCandidate, "getRandomValues", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return () => {
+                    throw new Error("hidden getRandomValues");
+                };
+            },
+        });
+
+        try {
+            globalThis.crypto = cryptoCandidate as unknown as Crypto;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(accessCount).toBe(0);
+            expect(alert.id).toMatch(/^alert-1730{9}3-\d+$/v);
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
