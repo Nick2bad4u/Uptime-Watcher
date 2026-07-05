@@ -1490,6 +1490,31 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
+
+            it("should reject reserved prototype keys in monitor payload", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Security", "type");
+
+                const monitor = Object.create(null) as Record<string, unknown>;
+                monitor["name"] = "Test Monitor";
+                Object.defineProperty(monitor, "__proto__", {
+                    enumerable: true,
+                    value: { polluted: true },
+                });
+
+                const result =
+                    MonitorTypeHandlerValidators.formatMonitorTitleSuffix([
+                        "http",
+                        monitor,
+                    ]);
+
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
         });
 
         describe("getMonitorTypes validator", () => {

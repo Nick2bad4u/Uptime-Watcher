@@ -76,10 +76,13 @@ export function createStringObjectValidator(
             toValidationResult(
                 IpcValidators.requiredString(value, stringParamName)
             ),
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredObject(value, objectParamName)
-            ),
+        (value): ParameterValueValidationResult => {
+            const recordResult = requireRecordParamValue(
+                value,
+                objectParamName
+            );
+            return recordResult.ok ? null : recordResult.error;
+        },
     ]);
 }
 
