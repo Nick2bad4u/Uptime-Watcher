@@ -12,6 +12,7 @@ import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     beforeEach,
     describe,
@@ -1657,6 +1658,32 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                     )
                 ).toThrow(/HistoryRow/v);
             });
+
+            it.each([
+                -1,
+                "-1",
+                1.5,
+                "1.5",
+                MAX_VALID_DATE_EPOCH_MS + 1,
+                String(MAX_VALID_DATE_EPOCH_MS + 1),
+            ])(
+                "should reject history timestamps outside the epoch millisecond contract: %s",
+                (timestamp) => {
+                    mockGet.mockReturnValue({
+                        monitorId: "monitor-1",
+                        status: "up",
+                        timestamp,
+                    });
+
+                    expect(() =>
+                        queryHistoryRow(
+                            mockDb,
+                            "SELECT * FROM history WHERE monitor_id = ?",
+                            ["monitor-1"]
+                        )
+                    ).toThrow(/HistoryRow/v);
+                }
+            );
 
             it.each([
                 Number.NaN,

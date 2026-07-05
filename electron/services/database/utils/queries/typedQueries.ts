@@ -19,6 +19,7 @@ import {
     isValidSettingsRow,
     isValidSiteRow,
     type MonitorRow,
+    RowValidationUtils,
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
@@ -339,7 +340,7 @@ const isValidHistoryEntryRow = (
         return false;
     }
 
-    if (!isFiniteRowNumber(timestamp)) {
+    if (!RowValidationUtils.isValidTimestamp(timestamp)) {
         return false;
     }
 
