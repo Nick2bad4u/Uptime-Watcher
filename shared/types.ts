@@ -11,7 +11,6 @@ import {
     arrayIncludes,
     isDefined,
     isFinite as isFiniteNumber,
-    safeCastTo,
 } from "ts-extras";
 
 export const STATUS_KIND = {
@@ -112,6 +111,9 @@ export const STATUS_HISTORY_VALUES: StatusHistoryTuple = [
     STATUS_KIND.DEGRADED,
 ];
 
+const MONITOR_STATUS_STRING_VALUES: readonly string[] = MONITOR_STATUS_VALUES;
+const SITE_STATUS_STRING_VALUES: readonly string[] = SITE_STATUS_VALUES;
+
 /**
  * Status values captured in historical monitor records.
  *
@@ -163,6 +165,8 @@ export const BASE_MONITOR_TYPES = [
     "ssl",
     "websocket-keepalive",
 ] as const;
+
+const BASE_MONITOR_TYPE_STRING_VALUES: readonly string[] = BASE_MONITOR_TYPES;
 
 /**
  * Interface for monitor status constants.
@@ -551,10 +555,10 @@ export function isComputedSiteStatus(
  *
  * @public
  */
-export function isMonitorStatus(status: string): status is MonitorStatus {
-    return arrayIncludes(
-        safeCastTo<readonly string[]>(MONITOR_STATUS_VALUES),
-        status
+export function isMonitorStatus(status: unknown): status is MonitorStatus {
+    return (
+        typeof status === "string" &&
+        arrayIncludes(MONITOR_STATUS_STRING_VALUES, status)
     );
 }
 
@@ -567,10 +571,10 @@ export function isMonitorStatus(status: string): status is MonitorStatus {
  *
  * @public
  */
-export function isSiteStatus(status: string): status is SiteStatus {
-    return arrayIncludes(
-        safeCastTo<readonly string[]>(SITE_STATUS_VALUES),
-        status
+export function isSiteStatus(status: unknown): status is SiteStatus {
+    return (
+        typeof status === "string" &&
+        arrayIncludes(SITE_STATUS_STRING_VALUES, status)
     );
 }
 
@@ -595,10 +599,7 @@ export function validateMonitor(monitor: unknown): monitor is Monitor {
     return (
         typeof monitor["id"] === "string" &&
         typeof monitor["type"] === "string" &&
-        arrayIncludes(
-            safeCastTo<readonly string[]>(BASE_MONITOR_TYPES),
-            monitor["type"]
-        ) &&
+        arrayIncludes(BASE_MONITOR_TYPE_STRING_VALUES, monitor["type"]) &&
         typeof monitor["status"] === "string" &&
         isMonitorStatus(monitor["status"]) &&
         typeof monitor["monitoring"] === "boolean" &&
