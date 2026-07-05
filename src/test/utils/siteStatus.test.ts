@@ -5,6 +5,7 @@
 import type { MonitorStatus, SiteForStatus, SiteStatus } from "@shared/types";
 
 import { fc, test } from "@fast-check/vitest";
+import { MONITOR_STATUS_VALUES, SITE_STATUS_VALUES } from "@shared/types";
 import {
     calculateSiteMonitoringStatus,
     calculateSiteStatus,
@@ -165,12 +166,10 @@ describe("siteStatus exports", () => {
 
 describe("siteStatus Property-based Tests", () => {
     // Arbitraries for test data generation
-    const monitorStatusArb = safeCastTo<fc.Arbitrary<MonitorStatus>>(
-        fc.constantFrom("up", "down", "pending", "paused")
+    const monitorStatusArb = fc.constantFrom<MonitorStatus>(
+        ...MONITOR_STATUS_VALUES
     );
-    const siteStatusArb = safeCastTo<fc.Arbitrary<SiteStatus>>(
-        fc.constantFrom("up", "down", "pending", "paused", "mixed", "unknown")
-    );
+    const siteStatusArb = fc.constantFrom<SiteStatus>(...SITE_STATUS_VALUES);
 
     const monitorArb = fc.record({
         monitoring: fc.boolean(),
