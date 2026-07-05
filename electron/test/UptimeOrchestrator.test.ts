@@ -22,6 +22,7 @@ import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
 import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator.types";
 
+import { MONITOR_START_CONCURRENCY } from "../constants";
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
 
 // Mock all dependencies with proper typing
@@ -1246,6 +1247,62 @@ describe(UptimeOrchestrator, () => {
             expect(
                 mockMonitorManager.setupSiteForMonitoring
             ).toHaveBeenCalledWith(sites[0]);
+        });
+
+        it("should bound monitoring setup fanout for cache update events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Performance", "type");
+
+            const sites = Array.from(
+                { length: MONITOR_START_CONCURRENCY + 3 },
+                (_, index) =>
+                    ({
+                        identifier: `test-site-${index}`,
+                        monitoring: true,
+                        monitors: [],
+                        name: `Test Site ${index}`,
+                    }) as Site
+            );
+            let active = 0;
+            let completed = 0;
+            let maxActive = 0;
+            const allSetupsCompleted = new Promise<void>((resolve) => {
+                vi.mocked(
+                    mockMonitorManager.setupSiteForMonitoring
+                ).mockImplementation(async () => {
+                    active += 1;
+                    maxActive = Math.max(maxActive, active);
+                    await new Promise((timeoutResolve) => {
+                        setTimeout(timeoutResolve, 1);
+                    });
+                    active -= 1;
+                    completed += 1;
+                    if (completed === sites.length) {
+                        resolve();
+                    }
+                });
+            });
+
+            orchestrator.emitTyped(
+                "internal:database:update-sites-cache-requested",
+                {
+                    operation: "update-sites-cache-requested",
+                    sites,
+                    timestamp: Date.now(),
+                }
+            );
+
+            await allSetupsCompleted;
+
+            expect(
+                mockMonitorManager.setupSiteForMonitoring
+            ).toHaveBeenCalledTimes(sites.length);
+            expect(maxActive).toBeLessThanOrEqual(MONITOR_START_CONCURRENCY);
         });
 
         it("should handle get sites from cache request", async ({

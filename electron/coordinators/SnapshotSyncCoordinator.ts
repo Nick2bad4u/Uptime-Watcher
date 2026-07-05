@@ -19,7 +19,9 @@ import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
 import type { UpdateSitesCacheRequestData } from "../UptimeOrchestrator.types";
 
+import { MONITOR_START_CONCURRENCY } from "../constants";
 import { attachForwardedMetadata } from "../utils/eventMetadataForwarding";
+import { mapWithConcurrency } from "../utils/boundedConcurrency";
 import { fireAndForgetLogged } from "../utils/fireAndForget";
 import { logger } from "../utils/logger";
 
@@ -343,8 +345,10 @@ export class SnapshotSyncCoordinator {
         );
 
         // CRITICAL: Set up monitoring for each loaded site
-        const setupResults = await Promise.allSettled(
-            data.sites.map(async (site) => {
+        const setupResults = await mapWithConcurrency({
+            concurrency: MONITOR_START_CONCURRENCY,
+            items: data.sites,
+            task: async (site) => {
                 try {
                     await this.monitorManager.setupSiteForMonitoring(site);
                     return { site: site.identifier, success: true } as const;
@@ -360,19 +364,17 @@ export class SnapshotSyncCoordinator {
                         success: false,
                     } as const;
                 }
-            })
-        );
+            },
+        });
 
         // Validate that critical sites were set up successfully
-        const successful = setupResults.filter(
-            (result) => result.status === "fulfilled" && result.value.success
-        ).length;
+        const successful = setupResults.filter((result) => result.success)
+            .length;
         const failed = setupResults.length - successful;
 
         if (failed > 0) {
             const criticalFailures = setupResults.filter(
-                (result) =>
-                    result.status === "rejected" || !result.value.success
+                (result) => !result.success
             ).length;
 
             if (criticalFailures > 0) {
