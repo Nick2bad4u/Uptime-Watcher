@@ -3,7 +3,7 @@
  * tests cover app initialization, logging configuration, and cleanup
  */
 
-import type { App } from "electron";
+import type { App, BrowserWindow, WebContents } from "electron";
 
 import { mockConstructableReturnValue } from "@shared/test/helpers/vitestConstructors";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -91,7 +91,26 @@ const mockApp: Partial<App> = {
     on: vi.fn(),
 };
 
-const mockBrowserWindow = vi.fn();
+const mockBrowserWindow = Object.assign(vi.fn(), {
+    fromWebContents: vi.fn(),
+});
+
+type MockFunctionCalls = Readonly<{
+    mock: Readonly<{
+        calls: readonly (readonly unknown[])[];
+    }>;
+}>;
+
+function getRegisteredAppHandler(
+    eventName: string
+): (...args: readonly unknown[]) => void {
+    const calls = (mockApp.on as unknown as MockFunctionCalls).mock.calls;
+    const handler = calls.find((call) => call[0] === eventName)?.[1];
+
+    expect(handler).toEqual(expect.any(Function));
+
+    return handler as (...args: readonly unknown[]) => void;
+}
 
 // Mock electron with both named exports and default export
 vi.mock("electron", () => {
@@ -129,6 +148,7 @@ describe("main.ts - Electron Main Process", () => {
         // Reset mocks to default states
         mockIsDev.mockReturnValue(true);
         (mockApp as any).isPackaged = false;
+        mockBrowserWindow.fromWebContents.mockReturnValue({ id: 456 });
         mockInstallExtension.mockResolvedValue([
             { name: "React Developer Tools" },
             { name: "Redux DevTools" },
@@ -343,6 +363,86 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockApp.on).toHaveBeenCalledWith(
                 "will-quit",
                 expect.any(Function)
+            );
+        });
+        it("should redact URLs from Electron lifecycle logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: main", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Security", "type");
+
+            vi.resetModules();
+            await import("../main");
+
+            const renderProcessGoneHandler = getRegisteredAppHandler(
+                "render-process-gone"
+            );
+            const browserWindowCreatedHandler = getRegisteredAppHandler(
+                "browser-window-created"
+            );
+            const webContents = {
+                getURL: vi.fn(
+                    () =>
+                        "https://user:password@example.com/private?token=secret#hash"
+                ),
+                id: 123,
+            } as unknown as WebContents;
+
+            renderProcessGoneHandler(
+                new Event("render-process-gone"),
+                webContents,
+                { exitCode: 1, reason: "crashed" }
+            );
+
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[Main] Renderer process gone",
+                expect.objectContaining({
+                    url: "https://example.com/private",
+                    webContentsId: 123,
+                    windowId: 456,
+                })
+            );
+
+            const windowHandlers = new Map<string, () => void>();
+            const window = {
+                id: 789,
+                off: vi.fn(),
+                on: vi.fn((eventName: string, handler: () => void) => {
+                    windowHandlers.set(eventName, handler);
+                    return window;
+                }),
+                once: vi.fn(),
+                webContents: {
+                    getURL: vi.fn(
+                        () =>
+                            "https://example.com/dashboard?session=secret#section"
+                    ),
+                },
+            } as unknown as BrowserWindow;
+
+            browserWindowCreatedHandler(
+                new Event("browser-window-created"),
+                window
+            );
+            windowHandlers.get("unresponsive")?.();
+            windowHandlers.get("responsive")?.();
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[Main] BrowserWindow became unresponsive",
+                {
+                    url: "https://example.com/dashboard",
+                    windowId: 789,
+                }
+            );
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                "[Main] BrowserWindow became responsive",
+                {
+                    url: "https://example.com/dashboard",
+                    windowId: 789,
+                }
             );
         });
         it("should only cleanup once when multiple shutdown events occur", async ({

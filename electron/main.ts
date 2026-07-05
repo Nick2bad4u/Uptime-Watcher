@@ -15,6 +15,7 @@ import type { UnknownRecord } from "type-fest";
 import { sleepUnref } from "@shared/utils/abortUtils";
 import { readProcessEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { app, BrowserWindow } from "electron";
 import {
     installExtension,
@@ -513,7 +514,7 @@ class Main {
         logger.error("[Main] Renderer process gone", {
             exitCode: details.exitCode,
             reason: details.reason,
-            url: webContents.getURL(),
+            url: getSafeUrlForLogging(webContents.getURL()),
             webContentsId: webContents.id,
             windowId: ownerWindow?.id,
         });
@@ -540,14 +541,14 @@ class Main {
     ): void => {
         function handleUnresponsive(): void {
             logger.warn("[Main] BrowserWindow became unresponsive", {
-                url: window.webContents.getURL(),
+                url: getSafeUrlForLogging(window.webContents.getURL()),
                 windowId: window.id,
             });
         }
 
         function handleResponsive(): void {
             logger.info("[Main] BrowserWindow became responsive", {
-                url: window.webContents.getURL(),
+                url: getSafeUrlForLogging(window.webContents.getURL()),
                 windowId: window.id,
             });
         }
