@@ -27,7 +27,7 @@ import type {
 
 import { siteSchema } from "@shared/validation/siteSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
-import { isEmpty, objectValues, safeCastTo } from "ts-extras";
+import { isEmpty, objectValues } from "ts-extras";
 import * as z from "zod";
 
 import {
@@ -411,7 +411,7 @@ export type CacheInvalidationType = ValueOf<typeof CACHE_INVALIDATION_TYPE>;
  * @public
  */
 export const CACHE_INVALIDATION_REASON_VALUES: readonly CacheInvalidationReason[] =
-    Object.freeze(safeCastTo(objectValues(CACHE_INVALIDATION_REASON)));
+    Object.freeze(objectValues(CACHE_INVALIDATION_REASON));
 
 /**
  * Canonical list of cache invalidation types.
@@ -419,7 +419,7 @@ export const CACHE_INVALIDATION_REASON_VALUES: readonly CacheInvalidationReason[
  * @public
  */
 export const CACHE_INVALIDATION_TYPE_VALUES: readonly CacheInvalidationType[] =
-    Object.freeze(safeCastTo(objectValues(CACHE_INVALIDATION_TYPE)));
+    Object.freeze(objectValues(CACHE_INVALIDATION_TYPE));
 
 /**
  * Payload for cache invalidation events.
@@ -710,7 +710,7 @@ export type MonitoringControlReason = ValueOf<typeof MONITORING_CONTROL_REASON>;
  * @public
  */
 export const MONITORING_CONTROL_REASON_VALUES: readonly MonitoringControlReason[] =
-    Object.freeze(safeCastTo(objectValues(MONITORING_CONTROL_REASON)));
+    Object.freeze(objectValues(MONITORING_CONTROL_REASON));
 
 /**
  * Payload for monitoring control events (global monitoring start/stop).
@@ -844,7 +844,7 @@ export type UpdateStatus = ValueOf<typeof UPDATE_STATUS>;
  * @public
  */
 export const UPDATE_STATUS_VALUES: readonly UpdateStatus[] = Object.freeze(
-    safeCastTo(objectValues(UPDATE_STATUS))
+    objectValues(UPDATE_STATUS)
 );
 /**
  * Payload for update status change events.
