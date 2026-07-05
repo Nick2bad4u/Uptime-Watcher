@@ -24,13 +24,7 @@ import {
 import log from "electron-log/main";
 import { mkdirSync } from "node:fs";
 import * as path from "node:path";
-import {
-    arrayIncludes,
-    arrayJoin,
-    isEmpty,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { arrayIncludes, arrayJoin, isEmpty, setHas } from "ts-extras";
 
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
@@ -177,10 +171,7 @@ if (isDev()) {
  *
  * @returns Object containing console and file logging levels
  */
-const configureLogging = (): {
-    consoleLevel: ElectronLogLevel;
-    fileLevel: ElectronLogLevel;
-} => {
+const configureLogging = (): LoggingConfiguration => {
     // Check for log level flags in command line arguments
     const args = new Set(process.argv.slice(2));
 
@@ -192,15 +183,12 @@ const configureLogging = (): {
     const isInfoFlag = setHas(args, "--info") || setHas(args, "--log-info");
 
     // Determine log level based on flags and environment
-    return ((): {
-        consoleLevel: ElectronLogLevel;
-        fileLevel: ElectronLogLevel;
-    } => {
+    return ((): LoggingConfiguration => {
         if (isDebugFlag) {
             const configuration = {
-                consoleLevel: safeCastTo<ElectronLogLevel>("debug"),
-                fileLevel: safeCastTo<ElectronLogLevel>("debug"),
-            };
+                consoleLevel: "debug",
+                fileLevel: "debug",
+            } satisfies LoggingConfiguration;
             logger.debug(
                 "[Logging] Debug logging enabled via command line flag",
                 configuration
@@ -209,9 +197,9 @@ const configureLogging = (): {
         }
         if (isProductionFlag) {
             const configuration = {
-                consoleLevel: safeCastTo<ElectronLogLevel>("info"),
-                fileLevel: safeCastTo<ElectronLogLevel>("warn"),
-            };
+                consoleLevel: "info",
+                fileLevel: "warn",
+            } satisfies LoggingConfiguration;
             logger.info(
                 "[Logging] Production logging level enabled via command line flag",
                 configuration
@@ -220,9 +208,9 @@ const configureLogging = (): {
         }
         if (isInfoFlag) {
             const configuration = {
-                consoleLevel: safeCastTo<ElectronLogLevel>("info"),
-                fileLevel: safeCastTo<ElectronLogLevel>("info"),
-            };
+                consoleLevel: "info",
+                fileLevel: "info",
+            } satisfies LoggingConfiguration;
             logger.info(
                 "[Logging] Info logging level enabled via command line flag",
                 configuration
@@ -232,13 +220,9 @@ const configureLogging = (): {
         // Default development behavior
         const isDevMode = !app.isPackaged;
         const configuration = {
-            consoleLevel: safeCastTo<ElectronLogLevel>(
-                isDevMode ? "debug" : "info"
-            ),
-            fileLevel: safeCastTo<ElectronLogLevel>(
-                isDevMode ? "info" : "warn"
-            ),
-        };
+            consoleLevel: isDevMode ? "debug" : "info",
+            fileLevel: isDevMode ? "info" : "warn",
+        } satisfies LoggingConfiguration;
         logger.debug("[Logging] Using default logging configuration", {
             ...configuration,
             isDevMode,
@@ -253,6 +237,11 @@ log.initialize({ preload: true });
 
 type ElectronLogLevel =
     "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+
+interface LoggingConfiguration {
+    readonly consoleLevel: ElectronLogLevel;
+    readonly fileLevel: ElectronLogLevel;
+}
 
 const ELECTRON_LOG_FILE = "uptime-watcher-main.log" as const;
 const LOG_FILE_MAX_SIZE = 1024 ** 2 * 5; // 5MB max file size
