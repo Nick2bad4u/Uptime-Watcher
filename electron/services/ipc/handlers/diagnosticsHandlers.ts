@@ -14,7 +14,9 @@ import {
     normalizeLogValue,
     withLogContext,
 } from "@shared/utils/loggingContext";
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { isRecord } from "@shared/utils/typeHelpers";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isDefined, setHas } from "ts-extras";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
@@ -52,7 +54,8 @@ const isPreloadGuardDiagnosticsReport = (
     return (
         typeof value["channel"] === "string" &&
         typeof value["guard"] === "string" &&
-        typeof value["timestamp"] === "number"
+        isNonNegativeSafeInteger(value["timestamp"]) &&
+        value["timestamp"] <= MAX_VALID_DATE_EPOCH_MS
     );
 };
 

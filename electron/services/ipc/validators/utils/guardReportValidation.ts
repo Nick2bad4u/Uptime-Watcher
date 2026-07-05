@@ -1,5 +1,8 @@
 import type { ParameterValueValidationResult } from "./parameterValidation";
 
+import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
+import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+
 import { IpcValidators } from "../IpcValidators";
 import {
     validateDiagnosticsMetadata,
@@ -10,6 +13,22 @@ import {
     validateOptionalStringPayload,
     validateRequiredStringPayload,
 } from "./stringPayloadValidation";
+
+const validateGuardReportTimestamp = (value: unknown): null | string => {
+    const numberError = IpcValidators.requiredNumber(value, "timestamp");
+    if (numberError) {
+        return numberError;
+    }
+
+    if (
+        !isNonNegativeSafeInteger(value) ||
+        value > MAX_VALID_DATE_EPOCH_MS
+    ) {
+        return "timestamp must be a valid epoch millisecond timestamp";
+    }
+
+    return null;
+};
 
 /**
  * Options for validating preload guard reports.
@@ -49,10 +68,7 @@ export function validateGuardReportPayload(
     }
 
     const { record } = recordResult;
-    const timestampError = IpcValidators.requiredNumber(
-        record["timestamp"],
-        "timestamp"
-    );
+    const timestampError = validateGuardReportTimestamp(record["timestamp"]);
     const errors = [
         ...validateRequiredStringPayload(record["channel"], {
             maxBytes: options.maxChannelBytes,
