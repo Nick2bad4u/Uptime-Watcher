@@ -26,6 +26,37 @@ describe(normalizeStateSyncPayload, () => {
         });
     });
 
+    it("normalizes only own non-empty site identifiers", () => {
+        const inheritedIdentifier = Object.create({
+            identifier: "inherited-site",
+        }) as Record<string, unknown>;
+        const accessorIdentifier = Object.create(null) as Record<
+            string,
+            unknown
+        >;
+        Object.defineProperty(accessorIdentifier, "identifier", {
+            enumerable: true,
+            get: () => "accessor-site",
+        });
+
+        expect(
+            normalizeStateSyncPayload({
+                ...validBulkSyncPayload,
+                siteCount: 5,
+                sites: [
+                    { identifier: " site-a " },
+                    { identifier: " ".repeat(3) },
+                    inheritedIdentifier,
+                    accessorIdentifier,
+                    { identifier: 42 },
+                ],
+            })
+        ).toMatchObject({
+            siteCount: 5,
+            sites: [{ identifier: "site-a" }],
+        });
+    });
+
     it("accepts timestamps at the JavaScript Date upper bound", () => {
         expect(
             normalizeStateSyncPayload({
@@ -79,5 +110,32 @@ describe(normalizeStateSyncPayload, () => {
         ]) {
             expect(normalizeStateSyncPayload(invalidPayload)).toBeNull();
         }
+    });
+
+    it("normalizes delta identifiers consistently with state-sync schemas", () => {
+        const normalized = normalizeStateSyncPayload({
+            action: STATE_SYNC_ACTION.UPDATE,
+            delta: {
+                addedSites: [{ identifier: " added-site " }],
+                removedSiteIdentifiers: [
+                    " removed-site ",
+                    "",
+                    " ".repeat(3),
+                    123,
+                ],
+                updatedSites: [{ identifier: "\tupdated-site\n" }],
+            },
+            revision: 2,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: 1_700_000_000_001,
+        });
+
+        expect(normalized).toMatchObject({
+            delta: {
+                addedSites: [{ identifier: "added-site" }],
+                removedSiteIdentifiers: ["removed-site"],
+                updatedSites: [{ identifier: "updated-site" }],
+            },
+        });
     });
 });

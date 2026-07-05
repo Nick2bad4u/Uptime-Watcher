@@ -13,8 +13,10 @@ import type {
 } from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
@@ -64,6 +66,15 @@ const isNonNegativeSafeInteger = (candidate: unknown): candidate is number =>
 const isValidEpochMs = (candidate: unknown): candidate is number =>
     isNonNegativeSafeInteger(candidate) && candidate <= MAX_VALID_DATE_EPOCH_MS;
 
+const getOwnTrimmedIdentifier = (candidate: object): string | undefined => {
+    const property = getOwnDataProperty(candidate, "identifier");
+    if (!property.found || !isNonEmptyString(property.value)) {
+        return undefined;
+    }
+
+    return property.value.trim();
+};
+
 const buildIdentifierOnlySites = (
     candidate: unknown
 ): SiteIdentifierSnapshot[] => {
@@ -73,10 +84,8 @@ const buildIdentifierOnlySites = (
 
     return candidate
         .filter(isRecord)
-        .map((siteCandidate) => siteCandidate["identifier"])
-        .filter(
-            (identifier): identifier is string => typeof identifier === "string"
-        )
+        .map(getOwnTrimmedIdentifier)
+        .filter(isNonEmptyString)
         .map((identifier) => ({ identifier }));
 };
 
@@ -156,9 +165,9 @@ export function normalizeStateSyncPayload(
 
     const addedSites = buildIdentifierOnlySites(addedSitesCandidate);
     const updatedSites = buildIdentifierOnlySites(updatedSitesCandidate);
-    const removedSiteIdentifiers = removedSiteIdentifiersCandidate.filter(
-        (identifier): identifier is string => typeof identifier === "string"
-    );
+    const removedSiteIdentifiers = removedSiteIdentifiersCandidate
+        .filter(isNonEmptyString)
+        .map((identifier) => identifier.trim());
 
     return {
         action,
