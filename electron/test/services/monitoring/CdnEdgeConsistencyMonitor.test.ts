@@ -183,6 +183,70 @@ describe("CdnEdgeConsistencyMonitor service", () => {
         expect(result.details).not.toContain("edge-secret");
     });
 
+    it("redacts edge endpoint URL secrets from all-failed summaries", async () => {
+        const baselineBuffer = Buffer.from("baseline-response");
+        monitor = createMonitor({
+            edgeLocations:
+                "https://edge-a.example.com/status?token=edge-url-secret\nhttps://edge-b.example.com/status?api_key=edge-api-secret",
+        });
+
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url === monitor.baselineUrl) {
+                return {
+                    data: baselineBuffer,
+                    responseTime: 40,
+                    status: 200,
+                };
+            }
+
+            throw new Error("Failed request");
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("https://edge-a.example.com/status");
+        expect(result.error).toContain("https://edge-b.example.com/status");
+        expect(result.error).not.toContain("token=");
+        expect(result.error).not.toContain("api_key=");
+        expect(result.error).not.toContain("edge-url-secret");
+        expect(result.error).not.toContain("edge-api-secret");
+        expect(result.details).not.toContain("edge-url-secret");
+        expect(result.details).not.toContain("edge-api-secret");
+    });
+
+    it("redacts edge endpoint URL secrets from degraded summaries", async () => {
+        const baselineBuffer = Buffer.from("baseline-response");
+        monitor = createMonitor({
+            edgeLocations:
+                "https://edge-a.example.com/status?token=edge-match-secret\nhttps://edge-b.example.com/status?token=edge-mismatch-secret",
+        });
+
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url === monitor.baselineUrl || url.includes("edge-a")) {
+                return {
+                    data: baselineBuffer,
+                    responseTime: 45,
+                    status: 200,
+                };
+            }
+
+            return {
+                data: Buffer.from("different-response"),
+                responseTime: 50,
+                status: 200,
+            };
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("degraded");
+        expect(result.details).toContain("https://edge-b.example.com/status");
+        expect(result.details).not.toContain("token=");
+        expect(result.details).not.toContain("edge-match-secret");
+        expect(result.details).not.toContain("edge-mismatch-secret");
+    });
+
     it("does not invoke responseTime accessors on edge request errors", async () => {
         const baselineBuffer = Buffer.from("baseline-response");
         const edgeError = new Error(

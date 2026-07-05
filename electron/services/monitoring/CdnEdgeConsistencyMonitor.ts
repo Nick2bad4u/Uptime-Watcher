@@ -14,6 +14,7 @@ import type { AxiosInstance } from "axios";
 import { MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS } from "@shared/constants/monitoring";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
@@ -69,6 +70,9 @@ interface EdgeResult {
 
 const HASH_ALGORITHM = "sha256";
 
+const describeEndpointForMessage = (endpoint: string): string =>
+    getSafeUrlForLogging(endpoint);
+
 class CdnEdgeConsistencyFailureError extends Error {
     public constructor(message: string) {
         super(message);
@@ -101,6 +105,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
 
         const baselineUrl = monitor.baselineUrl?.trim() ?? "";
         const edgeEndpoints = parseMonitorUrlList(monitor.edgeLocations ?? "");
+        const baselineUrlForMessage = describeEndpointForMessage(baselineUrl);
 
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
             timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
@@ -114,19 +119,19 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                         baselineUrl,
                         edgeEndpoints,
                         timeout,
-                        signal
-                    ),
+                    signal
+                ),
                 {
                     failureLogLevel: "warn",
                     maxRetries: totalAttempts,
-                    operationName: `CDN edge consistency check for ${baselineUrl}`,
+                    operationName: `CDN edge consistency check for ${baselineUrlForMessage}`,
                     ...(signal && { signal }),
                 }
             );
         } catch (error) {
             const normalized = ensureError(error);
             logger.warn(
-                `[CdnEdgeConsistencyMonitor] Consistency check failed for ${baselineUrl}`,
+                `[CdnEdgeConsistencyMonitor] Consistency check failed for ${baselineUrlForMessage}`,
                 normalized
             );
             const detail =
@@ -177,7 +182,8 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         if (failureResults.length === edgeEndpoints.length) {
             const failureSummary = arrayJoin(
                 failureResults.map(
-                    (entry) => `${entry.endpoint}: ${entry.result.error}`
+                    (entry) =>
+                        `${describeEndpointForMessage(entry.endpoint)}: ${entry.result.error}`
                 ),
                 "; "
             );
@@ -209,7 +215,9 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
 
         if (mismatchResults.length > 0) {
             const mismatchList = arrayJoin(
-                mismatchResults.map((entry) => entry.endpoint),
+                mismatchResults.map((entry) =>
+                    describeEndpointForMessage(entry.endpoint)
+                ),
                 ", "
             );
             detailSegments.push(
@@ -220,7 +228,8 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         if (failureResults.length > 0) {
             const failureList = arrayJoin(
                 failureResults.map(
-                    (entry) => `${entry.endpoint} (${entry.result.error})`
+                    (entry) =>
+                        `${describeEndpointForMessage(entry.endpoint)} (${entry.result.error})`
                 ),
                 ", "
             );
@@ -233,7 +242,8 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             failureResults.length > 0
                 ? arrayJoin(
                       failureResults.map(
-                          (entry) => `${entry.endpoint}: ${entry.result.error}`
+                          (entry) =>
+                              `${describeEndpointForMessage(entry.endpoint)}: ${entry.result.error}`
                       ),
                       "; "
                   )
@@ -323,7 +333,7 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
 
         for (const edge of edges) {
             if (!isValidUrl(edge)) {
-                return `Invalid edge endpoint URL: ${String(edge)}`;
+                return `Invalid edge endpoint URL: ${describeEndpointForMessage(edge)}`;
             }
         }
 
