@@ -575,6 +575,7 @@ export class WindowService {
                     const timeoutId = setTimeout(() => {
                         controller.abort();
                     }, FETCH_TIMEOUT);
+                    timeoutId.unref();
 
                     try {
                         const response = await fetch(SERVER_URL, {
