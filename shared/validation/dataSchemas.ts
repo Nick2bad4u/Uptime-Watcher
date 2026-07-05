@@ -15,7 +15,6 @@ import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
-import { safeCastTo } from "ts-extras";
 import * as z from "zod";
 
 const anyValueSchema = z.custom<unknown>(() => true, {
@@ -163,17 +162,14 @@ export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
     })
     .strict();
 
-export const serializedDatabaseRestoreResultSchema: z.ZodType<{
-    metadata: z.infer<typeof serializedDatabaseBackupMetadataSchema>;
-    preRestoreFileName?: string | undefined;
-    restoredAt: number;
-}> = z
-    .object({
-        metadata: serializedDatabaseBackupMetadataSchema,
-        preRestoreFileName: sqliteResultFileNameSchema.optional(),
-        restoredAt: epochMsSchema,
-    })
-    .strict();
+export const serializedDatabaseRestoreResultSchema: z.ZodType<SerializedDatabaseRestoreResult> =
+    z
+        .object({
+            metadata: serializedDatabaseBackupMetadataSchema,
+            preRestoreFileName: sqliteResultFileNameSchema.optional(),
+            restoredAt: epochMsSchema,
+        })
+        .strict();
 
 export const monitorTypeConfigSchema: z.ZodType<MonitorTypeConfig> =
     z.custom<MonitorTypeConfig>(
@@ -228,10 +224,7 @@ export const validateSerializedDatabaseRestoreResult = (
 ):
     | { data: SerializedDatabaseRestoreResult; success: true }
     | { error: unknown; success: false } =>
-    safeCastTo<
-        | { data: SerializedDatabaseRestoreResult; success: true }
-        | { error: unknown; success: false }
-    >(serializedDatabaseRestoreResultSchema.safeParse(value));
+    serializedDatabaseRestoreResultSchema.safeParse(value);
 
 export const validateMonitorTypeConfigArray = (
     value: unknown
