@@ -9,6 +9,8 @@ import {
 } from "@shared/utils/errorHandling";
 import { describe, expect, it, vi } from "vitest";
 
+const sharedLogMessage = (message: string) => `[SHARED] ${message}`;
+
 describe("ErrorHandling Fuzzing - Line 141", () => {
     it("should use console.error when logger is invalid - line 141", async () => {
         const consoleErrorSpy = vi
@@ -31,7 +33,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
         // Verify line 141 was hit - console.error should be called
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Failed to test operation",
+            sharedLogMessage("Failed to test operation"),
             expect.objectContaining({
                 message: "Test error",
                 name: "Error",
@@ -80,9 +82,11 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
             // Verify line 141 was hit - console.error should be called instead of logger.error
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                operationName
-                    ? `Failed to ${operationName}`
-                    : "Async operation failed",
+                sharedLogMessage(
+                    operationName
+                        ? `Failed to ${operationName}`
+                        : "Async operation failed"
+                ),
                 expect.objectContaining({
                     message: errorMessage,
                     name: "Error",
@@ -116,7 +120,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
             // Verify the specific message format for line 141
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                `Failed to ${operationName}`,
+                sharedLogMessage(`Failed to ${operationName}`),
                 expect.objectContaining({
                     message: errorMessage,
                     name: "Error",
@@ -146,7 +150,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
         // Verify line 141 console.error call with default message
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Async operation failed",
+            sharedLogMessage("Async operation failed"),
             expect.objectContaining({
                 message: "Test error",
                 name: "Error",
@@ -179,7 +183,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
                 // Should still call console.error regardless of error type
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    "Failed to fuzz test",
+                    sharedLogMessage("Failed to fuzz test"),
                     errorValue
                 );
 
@@ -219,7 +223,7 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
                     ? `Failed to ${invalidOperationName}`
                     : "Async operation failed";
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    expectedMessage,
+                    sharedLogMessage(expectedMessage),
                     expect.objectContaining({
                         message: errorMessage,
                         name: "Error",

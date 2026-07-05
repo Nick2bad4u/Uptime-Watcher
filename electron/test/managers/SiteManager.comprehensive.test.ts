@@ -241,8 +241,8 @@ describe("SiteManager - Comprehensive", () => {
         mockCache.clear.mockImplementation(() => {
             cacheStore.clear();
         });
-        mockCache.getAll.mockReturnValue([...cacheStore.values()]);
-        mockCache.entries.mockReturnValue(cacheStore.entries());
+        mockCache.getAll.mockImplementation(() => [...cacheStore.values()]);
+        mockCache.entries.mockImplementation(() => cacheStore.entries());
         mockCache.bulkUpdate.mockImplementation(
             (items: { data: Site; key: string; ttl?: number }[]) => {
                 for (const item of items) {

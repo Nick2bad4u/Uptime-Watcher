@@ -14,10 +14,12 @@ import {
     withUtilityErrorHandling,
 } from "@shared/utils/errorHandling";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { describe, expect, it, vi } from "vitest";
 
 const sanitizedErrorMessage = (message: string) =>
     expect.objectContaining({ message });
+const sharedLogMessage = (message: string) => `[SHARED] ${message}`;
 
 describe("ErrorHandling fuzzing - line 141", () => {
     it("simple fuzz sanity check", () => {
@@ -49,12 +51,12 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
             // Verify line 141 was hit - console.error should be called
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                "Failed to test operation",
+                sharedLogMessage("Failed to test operation"),
                 sanitizedErrorMessage("Test error")
             );
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Logger error during error handling:",
+                sharedLogMessage("Logger error during error handling"),
                 expect.anything()
             );
 
@@ -105,13 +107,15 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
                 // Verify line 141 was hit - console.error should be called instead of logger.error
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    operationName
-                        ? `Failed to ${operationName}`
-                        : "Async operation failed",
+                    sharedLogMessage(
+                        operationName
+                            ? `Failed to ${operationName}`
+                            : "Async operation failed"
+                    ),
                     sanitizedErrorMessage(errorMessage)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    "Logger error during error handling:",
+                    sharedLogMessage("Logger error during error handling"),
                     expect.anything()
                 );
 
@@ -146,11 +150,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
                 // Verify the specific message format for line 141
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    `Failed to ${operationName}`,
+                    sharedLogMessage(`Failed to ${operationName}`),
                     sanitizedErrorMessage(errorMessage)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    "Logger error during error handling:",
+                    sharedLogMessage("Logger error during error handling"),
                     expect.anything()
                 );
 
@@ -181,11 +185,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
             // Verify line 141 console.error call with default message
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                "Async operation failed",
+                sharedLogMessage("Async operation failed"),
                 sanitizedErrorMessage("Test error")
             );
             expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Logger error during error handling:",
+                sharedLogMessage("Logger error during error handling"),
                 expect.anything()
             );
 
@@ -220,11 +224,11 @@ describe("ErrorHandling fuzzing - line 141", () => {
 
                 // Should still call console.error regardless of error type
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    "Failed to fuzz test",
+                    sharedLogMessage("Failed to fuzz test"),
                     normalizeLogValue(errorValue)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    "Logger error during error handling:",
+                    sharedLogMessage("Logger error during error handling"),
                     expect.anything()
                 );
 
@@ -270,18 +274,18 @@ describe("ErrorHandling fuzzing - line 141", () => {
                         typeof invalidOperationName === "number")
                 ) {
                     expect(consoleErrorSpy).toHaveBeenCalledWith(
-                        `Failed to ${invalidOperationName}`,
+                        sharedLogMessage(`Failed to ${invalidOperationName}`),
                         sanitizedErrorMessage(errorMessage)
                     );
                 } else {
                     expect(consoleErrorSpy).toHaveBeenCalledWith(
-                        "Async operation failed",
+                        sharedLogMessage("Async operation failed"),
                         sanitizedErrorMessage(errorMessage)
                     );
                 }
 
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    "Logger error during error handling:",
+                    sharedLogMessage("Logger error during error handling"),
                     expect.anything()
                 );
 
@@ -383,11 +387,11 @@ describe("withErrorHandling backend fuzz coverage", () => {
                     : "Async operation failed";
 
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    expectedMessage,
+                    sharedLogMessage(expectedMessage),
                     sanitizedErrorMessage(errorMessage)
                 );
                 expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    "Logger error during error handling:",
+                    sharedLogMessage("Logger error during error handling"),
                     sanitizedErrorMessage("logger failure")
                 );
             } finally {
@@ -546,17 +550,16 @@ describe("withErrorHandling frontend fuzz integration", () => {
                 const setErrorCall = store.calls.find(
                     (call) => call.method === "setError"
                 );
-                const expectedMessage = Error.isError(errorValue)
-                    ? errorValue.message
-                    : convertError(errorValue).error.message;
+                const expectedMessage = getUserFacingErrorDetail(errorValue);
                 expect(setErrorCall?.payload).toBe(expectedMessage);
 
                 const originalErrorLog = consoleErrorSpy.mock.calls.find(
-                    (call) => call[0] === "Original operation error:"
+                    (call) =>
+                        call[0] === sharedLogMessage("Original operation error")
                 );
                 if (config.setErrorThrows && Boolean(errorValue)) {
                     expect(originalErrorLog).toEqual([
-                        "Original operation error:",
+                        sharedLogMessage("Original operation error"),
                         normalizeLogValue(errorValue),
                     ]);
                 } else {
@@ -601,12 +604,12 @@ describe("withErrorHandling frontend fuzz integration", () => {
             ).rejects.toBe(originalError);
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Store operation failed for:",
-                "set error state",
+                sharedLogMessage("Store operation failed"),
+                { operationName: "set error state" },
                 sanitizedErrorMessage("set error failure")
             );
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                "Original operation error:",
+                sharedLogMessage("Original operation error"),
                 sanitizedErrorMessage("frontend failure")
             );
         } finally {
@@ -697,7 +700,7 @@ describe("withUtilityErrorHandling fuzz behavior", () => {
             ).rejects.toBe(failingError);
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                "utility op failed",
+                sharedLogMessage("utility op failed"),
                 sanitizedErrorMessage("utility failure")
             );
         } finally {
@@ -722,7 +725,7 @@ describe("withUtilityErrorHandling fuzz behavior", () => {
             ).resolves.toBe("fallback");
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                "utility fallback failed",
+                sharedLogMessage("utility fallback failed"),
                 sanitizedErrorMessage("utility failure")
             );
         } finally {

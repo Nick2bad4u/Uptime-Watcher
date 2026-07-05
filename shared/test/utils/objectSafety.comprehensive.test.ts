@@ -249,19 +249,39 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             expect(mockCallback).not.toHaveBeenCalled();
             expect(consoleSpy).toHaveBeenCalledTimes(5);
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Safe object iteration: Expected object, got object"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Safe object iteration",
+                    receivedType: "object",
+                }
             ); // null
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Safe object iteration: Expected object, got undefined"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Safe object iteration",
+                    receivedType: "undefined",
+                }
             );
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Safe object iteration: Expected object, got string"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Safe object iteration",
+                    receivedType: "string",
+                }
             );
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Safe object iteration: Expected object, got number"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Safe object iteration",
+                    receivedType: "number",
+                }
             );
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Safe object iteration: Expected object, got object"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Safe object iteration",
+                    receivedType: "object",
+                }
             ); // Array
 
             consoleSpy.mockRestore();
@@ -284,7 +304,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             safeObjectIteration(null, mockCallback, "Custom context");
 
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Custom context: Expected object, got object"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Custom context",
+                    receivedType: "object",
+                }
             );
 
             consoleSpy.mockRestore();
@@ -310,9 +334,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
 
             expect(errorCallback).toHaveBeenCalled();
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Object iteration failed for context:",
-                "Safe object iteration",
-                expect.objectContaining({ message: "Callback error" })
+                "[SHARED] Object iteration failed",
+                expect.objectContaining({ message: "Callback error" }),
+                { context: "Safe object iteration" }
             );
 
             consoleSpy.mockRestore();
@@ -343,11 +367,11 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             );
 
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Object iteration failed for context:",
-                "Context access_token=[redacted]",
+                "[SHARED] Object iteration failed",
                 expect.objectContaining({
                     message: "Callback failed Authorization [redacted]",
-                })
+                }),
+                { context: "Context access_token=[redacted]" }
             );
             expect(String(consoleSpy.mock.calls)).not.toContain(
                 "context-secret"
@@ -378,9 +402,9 @@ describe("Object Safety Utilities - Comprehensive Coverage", () => {
             safeObjectIteration(testObj, errorCallback, "Custom error context");
 
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Object iteration failed for context:",
-                "Custom error context",
-                expect.objectContaining({ message: "Callback error" })
+                "[SHARED] Object iteration failed",
+                expect.objectContaining({ message: "Callback error" }),
+                { context: "Custom error context" }
             );
 
             consoleSpy.mockRestore();

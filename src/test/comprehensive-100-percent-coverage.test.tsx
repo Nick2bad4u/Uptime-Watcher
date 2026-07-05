@@ -397,7 +397,7 @@ describe("100% Coverage Edge Cases", () => {
             );
             expect(result).toBe("fallback");
             expect(consoleErrorSpy).toHaveBeenCalledWith(
-                "test-operation failed",
+                "[SHARED] test-operation failed",
                 expect.objectContaining({
                     message: "Async error",
                     name: "Error",

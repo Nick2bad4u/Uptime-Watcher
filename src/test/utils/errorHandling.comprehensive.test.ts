@@ -220,7 +220,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
 
             expect(result).toBe("fallback value");
             expect(consoleSpy).toHaveBeenCalledWith(
-                "test operation failed",
+                "[SHARED] test operation failed",
                 serializedErrorLike("operation failed")
             );
 
@@ -255,7 +255,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
             ).rejects.toThrow("operation failed");
 
             expect(consoleSpy).toHaveBeenCalledWith(
-                "test operation failed",
+                "[SHARED] test operation failed",
                 serializedErrorLike("operation failed")
             );
 
@@ -287,7 +287,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
             );
 
             expect(consoleSpy).toHaveBeenCalledWith(
-                "test operation failed",
+                "[SHARED] test operation failed",
                 serializedErrorLike("operation failed")
             );
 
@@ -320,7 +320,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
 
             expect(result).toBe("fallback value");
             expect(consoleSpy).toHaveBeenCalledWith(
-                "test operation failed",
+                "[SHARED] test operation failed",
                 expect.objectContaining({
                     cause: "string error",
                     message: "string error",
@@ -360,7 +360,7 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
 
             expect(result).toEqual(complexFallback);
             expect(consoleSpy).toHaveBeenCalledWith(
-                "test operation failed",
+                "[SHARED] test operation failed",
                 serializedErrorLike("operation failed")
             );
 

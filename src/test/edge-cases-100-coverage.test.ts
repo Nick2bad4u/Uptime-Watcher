@@ -207,7 +207,7 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(result).toBe("fallback");
             expect(console.error).toHaveBeenCalledWith(
-                "test-operation failed",
+                "[SHARED] test-operation failed",
                 serializedErrorLike("Async error")
             );
         });
@@ -249,7 +249,7 @@ describe("100% Coverage Edge Cases", () => {
 
             expect(result).toBe("fallback");
             expect(console.error).toHaveBeenCalledWith(
-                "test-operation failed",
+                "[SHARED] test-operation failed",
                 expect.objectContaining({
                     cause: "string error",
                     message: "string error",

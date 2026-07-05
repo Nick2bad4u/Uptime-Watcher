@@ -209,7 +209,11 @@ describe("objectSafety comprehensive fuzzing tests", () => {
 
                 expect(callback).not.toHaveBeenCalled();
                 expect(consoleSpy).toHaveBeenCalledWith(
-                    `Safe object iteration: Expected object, got ${typeof nonObject}`
+                    "[SHARED] Expected object for iteration",
+                    {
+                        context: "Safe object iteration",
+                        receivedType: typeof nonObject,
+                    }
                 );
 
                 consoleSpy.mockRestore();
@@ -261,9 +265,9 @@ describe("objectSafety comprehensive fuzzing tests", () => {
 
             expect(errorCallback).toHaveBeenCalled();
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Object iteration failed for context:",
-                "Test context",
-                expect.objectContaining({ message: "Callback error" })
+                "[SHARED] Object iteration failed",
+                expect.objectContaining({ message: "Callback error" }),
+                { context: "Test context" }
             );
 
             consoleSpy.mockRestore();
@@ -277,7 +281,11 @@ describe("objectSafety comprehensive fuzzing tests", () => {
             safeObjectIteration(null, vi.fn(), "Custom context");
 
             expect(consoleSpy).toHaveBeenCalledWith(
-                "Custom context: Expected object, got object"
+                "[SHARED] Expected object for iteration",
+                {
+                    context: "Custom context",
+                    receivedType: "object",
+                }
             );
 
             consoleSpy.mockRestore();

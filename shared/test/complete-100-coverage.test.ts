@@ -220,8 +220,8 @@ describe("Complete 100% Coverage - Final Tests", () => {
             expect(mockStore.setLoading).toHaveBeenNthCalledWith(2, false);
 
             expect(consoleWarnSpy).toHaveBeenCalledWith(
-                "Store operation failed for:",
-                "clear loading state in finally block",
+                "[SHARED] Store operation failed",
+                { operationName: "clear loading state in finally block" },
                 expect.objectContaining({
                     message: "setLoading failed",
                     name: "Error",

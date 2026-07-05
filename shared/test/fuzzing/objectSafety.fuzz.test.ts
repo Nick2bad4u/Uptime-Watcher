@@ -156,7 +156,10 @@ describe("objectSafety.ts fuzzing tests", () => {
 
                 expect(callback).not.toHaveBeenCalled();
                 expect(consoleSpy).toHaveBeenCalledWith(
-                    expect.stringContaining("Expected object, got")
+                    "[SHARED] Expected object for iteration",
+                    expect.objectContaining({
+                        receivedType: typeof nonObject,
+                    })
                 );
 
                 consoleSpy.mockRestore();
@@ -199,9 +202,9 @@ describe("objectSafety.ts fuzzing tests", () => {
                     safeObjectIteration(obj, callback);
                 }).not.toThrow();
                 expect(consoleSpy).toHaveBeenCalledWith(
-                    "Object iteration failed for context:",
-                    "Safe object iteration",
-                    expect.objectContaining({ message: "Callback error" })
+                    "[SHARED] Object iteration failed",
+                    expect.objectContaining({ message: "Callback error" }),
+                    { context: "Safe object iteration" }
                 );
 
                 consoleSpy.mockRestore();
@@ -222,11 +225,14 @@ describe("objectSafety.ts fuzzing tests", () => {
 
                 const expectedContext = normalizeLogValue(context);
                 expect(consoleSpy).toHaveBeenCalledWith(
-                    "Object iteration failed for context:",
-                    typeof expectedContext === "string"
-                        ? expectedContext
-                        : context,
-                    expect.objectContaining({ message: "Test error" })
+                    "[SHARED] Object iteration failed",
+                    expect.objectContaining({ message: "Test error" }),
+                    {
+                        context:
+                            typeof expectedContext === "string"
+                                ? expectedContext
+                                : context,
+                    }
                 );
 
                 consoleSpy.mockRestore();

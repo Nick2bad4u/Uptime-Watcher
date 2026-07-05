@@ -5,6 +5,7 @@
 import type { ReactNode } from "react";
 
 import {
+    act,
     fireEvent,
     render,
     screen,
@@ -88,7 +89,7 @@ describe("AddSiteModal coverage", () => {
         });
     });
 
-    it("invokes close handler for close button and form success", async () => {
+    it("invokes close handler for close button", async () => {
         const onClose = vi.fn();
         render(<AddSiteModal onClose={onClose} />);
 
@@ -96,11 +97,33 @@ describe("AddSiteModal coverage", () => {
         await waitFor(() => {
             expect(onClose).toHaveBeenCalledTimes(1);
         });
+    });
+
+    it("invokes close handler for form success", async () => {
+        const onClose = vi.fn();
+        render(<AddSiteModal onClose={onClose} />);
 
         expect(addSiteFormMock.lastOnSuccess).toBeTypeOf("function");
-        addSiteFormMock.lastOnSuccess?.();
+        act(() => {
+            addSiteFormMock.lastOnSuccess?.();
+        });
         await waitFor(() => {
-            expect(onClose).toHaveBeenCalledTimes(2);
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it("ignores repeated close requests while closing", async () => {
+        const onClose = vi.fn();
+        render(<AddSiteModal onClose={onClose} />);
+
+        fireEvent.click(screen.getByTestId("add-site-modal-close"));
+        expect(addSiteFormMock.lastOnSuccess).toBeTypeOf("function");
+        act(() => {
+            addSiteFormMock.lastOnSuccess?.();
+        });
+
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledTimes(1);
         });
     });
 
