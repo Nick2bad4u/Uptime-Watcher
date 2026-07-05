@@ -286,6 +286,46 @@ describe("file Download Utility", () => {
             }).toThrow();
         });
 
+        it("should classify document access errors during anchor creation", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const buffer = new ArrayBuffer(10);
+            const fileName = "test.txt";
+            const originalDocument = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "document"
+            );
+
+            Object.defineProperty(globalThis, "document", {
+                configurable: true,
+                get() {
+                    throw new Error("document unavailable");
+                },
+            });
+
+            try {
+                expect(() => {
+                    downloadFile({ buffer, fileName });
+                }).toThrow("createElement not available");
+            } finally {
+                if (originalDocument) {
+                    Object.defineProperty(
+                        globalThis,
+                        "document",
+                        originalDocument
+                    );
+                } else {
+                    Reflect.deleteProperty(globalThis, "document");
+                }
+            }
+        });
+
         it("should handle appendChild errors with fallback attempt", async ({
             annotate,
             task,

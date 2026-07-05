@@ -27,18 +27,29 @@ export class FileDownloadDomAttachmentError extends Error {
     }
 }
 
+type DownloadAnchorElement = Pick<
+    HTMLAnchorElement,
+    "click" | "download" | "href" | "remove" | "style"
+>;
+
 const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||
     typeof value === "function";
 
-function getDocumentBody(): object {
+function getDocumentObject(): object {
     const documentProperty = getOwnPropertyValue(globalThis, "document");
 
     if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
         throw new TypeError("Document is unavailable");
     }
 
-    const body: unknown = Reflect.get(documentProperty.value, "body");
+    return documentProperty.value;
+}
+
+function getDocumentBody(): object {
+    const documentObject = getDocumentObject();
+    const body: unknown = Reflect.get(documentObject, "body");
+
     if (!isObjectLike(body)) {
         throw new TypeError("Document body is unavailable");
     }
@@ -46,7 +57,53 @@ function getDocumentBody(): object {
     return body;
 }
 
-function appendAnchorToBody(body: object, anchor: HTMLAnchorElement): void {
+function isDownloadAnchorElement(
+    value: unknown
+): value is DownloadAnchorElement {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return (
+            typeof Reflect.get(value, "click") === "function" &&
+            typeof Reflect.get(value, "remove") === "function" &&
+            isObjectLike(Reflect.get(value, "style"))
+        );
+    } catch {
+        return false;
+    }
+}
+
+function createAnchorElement(): DownloadAnchorElement {
+    try {
+        const documentObject = getDocumentObject();
+        const createElement: unknown = Reflect.get(
+            documentObject,
+            "createElement"
+        );
+
+        if (typeof createElement !== "function") {
+            throw new TypeError("createElement not available");
+        }
+
+        const anchor: unknown = Reflect.apply(createElement, documentObject, [
+            "a",
+        ]);
+
+        if (!isDownloadAnchorElement(anchor)) {
+            throw new TypeError(
+                "createElement did not return a download anchor"
+            );
+        }
+
+        return anchor;
+    } catch (error: unknown) {
+        throw new TypeError("createElement not available", { cause: error });
+    }
+}
+
+function appendAnchorToBody(body: object, anchor: DownloadAnchorElement): void {
     const append: unknown = Reflect.get(body, "append");
 
     if (typeof append !== "function") {
@@ -60,7 +117,7 @@ function appendAnchorToBody(body: object, anchor: HTMLAnchorElement): void {
  * Triggers a programmatic click on a download anchor.
  */
 export function clickDownloadAnchor(args: {
-    anchor: HTMLAnchorElement;
+    anchor: DownloadAnchorElement;
     attachToDom: boolean;
     warnLogger?: BrowserDownloadWarnLogger | undefined;
 }): void {
@@ -167,8 +224,8 @@ function scheduleObjectUrlRevoke(objectURL: string): void {
 function createDownloadAnchor(
     objectURL: string,
     fileName: string
-): HTMLAnchorElement {
-    const anchor = document.createElement("a");
+): DownloadAnchorElement {
+    const anchor = createAnchorElement();
     anchor.href = objectURL;
     anchor.download = fileName;
     return anchor;
