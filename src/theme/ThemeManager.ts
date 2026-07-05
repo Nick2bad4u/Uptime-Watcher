@@ -12,6 +12,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
 import deepEqual from "fast-deep-equal";
 import {
@@ -34,10 +35,50 @@ import { deepMergeTheme } from "./utils/themeMerging";
 
 type CssVariableKey = number | string;
 
+interface ThemeDomTargets {
+    readonly body: Pick<Element, "classList">;
+    readonly root: HTMLElement;
+}
+
 const isCssVariableKey = (value: PropertyKey): value is CssVariableKey =>
     typeof value === "string" || typeof value === "number";
 
+const isThemeClassElement = (
+    value: unknown
+): value is Pick<Element, "classList"> =>
+    isRecord(value) && objectHasIn(value, "classList");
+
+const isThemeDocument = (
+    value: unknown
+): value is Pick<Document, "body" | "documentElement"> =>
+    isRecord(value) &&
+    objectHasIn(value, "body") &&
+    objectHasIn(value, "documentElement");
+
+const isThemeRootElement = (value: unknown): value is HTMLElement =>
+    isThemeClassElement(value) && objectHasIn(value, "style");
+
 const toCssToken = (value: CssVariableKey): string => value.toString();
+
+function getThemeDomTargets(): ThemeDomTargets | undefined {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isThemeDocument(documentProperty.value)) {
+        return undefined;
+    }
+
+    try {
+        const { body, documentElement: root } = documentProperty.value;
+
+        if (!isThemeRootElement(root) || !isThemeClassElement(body)) {
+            return undefined;
+        }
+
+        return { body, root };
+    } catch {
+        return undefined;
+    }
+}
 
 /**
  * Singleton service for managing app themes. Handles theme selection, system
@@ -65,7 +106,9 @@ export class ThemeManager {
      * Apply theme to document - only if different from currently applied theme
      */
     public applyTheme(theme: Theme): void {
-        if (typeof document === "undefined") {
+        const domTargets = getThemeDomTargets();
+
+        if (!domTargets) {
             return;
         }
 
@@ -77,14 +120,14 @@ export class ThemeManager {
             return;
         }
 
-        const root = document.documentElement;
+        const { root } = domTargets;
 
         this.applyColors(root, theme.colors);
         this.applyTypography(root, theme.typography);
         this.applySpacing(root, theme.spacing);
         this.applyShadows(root, theme.shadows);
         this.applyBorderRadius(root, theme.borderRadius);
-        this.applyThemeClasses(theme);
+        this.applyThemeClasses(theme, domTargets);
 
         // Remember the applied theme
         this.currentAppliedTheme = theme;
@@ -414,12 +457,15 @@ export class ThemeManager {
      *
      * @param theme - Theme to apply classes for
      */
-    private applyThemeClasses(theme: Theme): void {
-        if (typeof document === "undefined") {
+    private applyThemeClasses(
+        theme: Theme,
+        domTargets = getThemeDomTargets()
+    ): void {
+        if (!domTargets) {
             return;
         }
 
-        const root = document.documentElement;
+        const { body, root } = domTargets;
         const availableThemes = objectKeys(themes);
         const targetThemeClass = `theme-${theme.name}`;
 
@@ -428,14 +474,14 @@ export class ThemeManager {
             const themeClass = `theme-${themeName}`;
             if (
                 themeClass !== targetThemeClass &&
-                document.body.classList.contains(themeClass)
+                body.classList.contains(themeClass)
             ) {
-                document.body.classList.remove(themeClass);
+                body.classList.remove(themeClass);
             }
         }
 
         // Add current theme class (no-op if already present)
-        document.body.classList.add(targetThemeClass);
+        body.classList.add(targetThemeClass);
 
         // Set dark mode class for Tailwind CSS (optimized to prevent unnecessary changes)
         if (theme.isDark) {

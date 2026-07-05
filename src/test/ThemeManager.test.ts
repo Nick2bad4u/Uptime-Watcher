@@ -51,6 +51,7 @@ describe(ThemeManager, () => {
         };
 
         Object.defineProperty(globalThis, "document", {
+            configurable: true,
             value: {
                 documentElement: mockDocumentElement,
                 body: mockBodyClassList,
@@ -116,6 +117,7 @@ describe(ThemeManager, () => {
             await annotate("Type: Business Logic", "type");
 
             Object.defineProperty(globalThis, "document", {
+                configurable: true,
                 value: undefined,
                 writable: true,
             });
@@ -123,6 +125,44 @@ describe(ThemeManager, () => {
             expect(() => {
                 themeManager.applyTheme(lightTheme);
             }).not.toThrow();
+        });
+
+        it("should handle document accessors that throw", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "document"
+            );
+            const getter = vi.fn(() => {
+                throw new Error("document unavailable");
+            });
+
+            try {
+                Object.defineProperty(globalThis, "document", {
+                    configurable: true,
+                    get: getter,
+                });
+
+                expect(() => {
+                    themeManager.applyTheme(lightTheme);
+                }).not.toThrow();
+                expect(getter).toHaveBeenCalledTimes(1);
+            } finally {
+                if (originalDocumentDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "document",
+                        originalDocumentDescriptor
+                    );
+                }
+            }
         });
     });
 
@@ -285,6 +325,7 @@ describe(ThemeManager, () => {
             const callback = vi.fn();
             const mockMediaQuery = {
                 addEventListener: vi.fn(),
+                matches: false,
                 removeEventListener: vi.fn(),
             };
 
