@@ -52,8 +52,12 @@ import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { ensureError } from "@shared/utils/errorHandling";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import {
+    isBoolean,
+    isFiniteNumber,
+    isNonEmptyString,
+} from "@shared/utils/typeGuards";
+import {
     isDefined,
-    isFinite as isFiniteValue,
     objectEntries,
     objectHasOwn,
     objectKeys,
@@ -151,18 +155,6 @@ function setSiteConfig(
     value: CloudSyncSiteConfig
 ): void {
     setRecordValue(target, key, value);
-}
-
-function isFiniteNumber(value: unknown): value is number {
-    return typeof value === "number" && isFiniteValue(value);
-}
-
-function isBoolean(value: unknown): value is boolean {
-    return typeof value === "boolean";
-}
-
-function isNonEmptyString(value: unknown): value is string {
-    return typeof value === "string" && value.trim().length > 0;
 }
 
 function normalizeCloudSyncFieldValue<
