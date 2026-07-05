@@ -13,6 +13,7 @@ import {
     isNodeEnvironment,
     isProduction,
     isTest,
+    resetProcessSnapshotOverrideForTesting,
 } from "../../utils/environment";
 
 describe("environment utilities - Backend Coverage", () => {
@@ -24,6 +25,7 @@ describe("environment utilities - Backend Coverage", () => {
     });
     afterEach(() => {
         // Restore original environment
+        resetProcessSnapshotOverrideForTesting();
         process.env = originalEnv;
     });
     describe(getEnvironment, () => {
@@ -224,6 +226,44 @@ describe("environment utilities - Backend Coverage", () => {
         });
     });
     describe(isNodeEnvironment, () => {
+        it("should tolerate a throwing global process accessor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment utilities - Backend Coverage",
+                "component"
+            );
+
+            const originalDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "process"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "process", {
+                    configurable: true,
+                    enumerable: false,
+                    get() {
+                        throw new Error("process unavailable");
+                    },
+                });
+
+                expect(isNodeEnvironment()).toBeFalsy();
+                expect(getEnvVar("NODE_ENV")).toBeUndefined();
+            } finally {
+                if (originalDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "process",
+                        originalDescriptor
+                    );
+                } else {
+                    Reflect.deleteProperty(globalThis, "process");
+                }
+            }
+        });
         it("should return true in backend context", async ({
             task,
             annotate,

@@ -78,12 +78,35 @@ const getProcessSnapshot = (): ProcessSnapshot | undefined => {
         return undefined;
     }
 
-    try {
-        const candidate: unknown = Reflect.get(globalThis, "process");
-        return isProcessSnapshot(candidate) ? candidate : undefined;
-    } catch {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, "process");
+    if (!descriptor) {
         return undefined;
     }
+
+    let candidate: unknown;
+    if ("value" in descriptor) {
+        candidate = descriptor.value;
+    } else {
+        const getterProperty = Object.getOwnPropertyDescriptor(
+            descriptor,
+            "get"
+        );
+        const getter: unknown =
+            getterProperty && "value" in getterProperty
+                ? getterProperty.value
+                : undefined;
+        if (typeof getter !== "function") {
+            return undefined;
+        }
+
+        try {
+            candidate = Reflect.apply(getter, globalThis, []);
+        } catch {
+            return undefined;
+        }
+    }
+
+    return isProcessSnapshot(candidate) ? candidate : undefined;
 };
 
 const isProcessEnvRecord = (
