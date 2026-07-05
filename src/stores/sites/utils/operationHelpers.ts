@@ -14,7 +14,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import { objectHasIn, safeCastTo } from "ts-extras";
+import { objectHasIn } from "ts-extras";
 
 import type { SiteOperationsDependencies } from "../types";
 
@@ -25,7 +25,7 @@ import { updateMonitorInSite } from "./monitorOperations";
 
 type OperationStage = "failure" | "pending" | "success";
 
-const SITE_NOT_FOUND_MESSAGE = safeCastTo(ERROR_CATALOG.sites.NOT_FOUND);
+const SITE_NOT_FOUND_MESSAGE = ERROR_CATALOG.sites.NOT_FOUND;
 
 /**
  * Stage-specific telemetry configuration for store operation logging.
@@ -270,10 +270,10 @@ export const getSiteByIdentifier = (
     siteIdentifier: string,
     deps: SiteOperationsDependencies
 ): Site => {
-    const sites = safeCastTo<(null | Site | undefined)[]>(deps.getSites());
+    const sites: readonly (null | Site | undefined)[] = deps.getSites();
     const site = sites.find((s) => s?.identifier === siteIdentifier);
     if (!site) {
-        throw new Error(safeCastTo(ERROR_CATALOG.sites.NOT_FOUND));
+        throw new Error(ERROR_CATALOG.sites.NOT_FOUND);
     }
     return site;
 };
