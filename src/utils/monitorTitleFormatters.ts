@@ -1,5 +1,6 @@
 import type { Monitor, MonitorType } from "@shared/types";
 
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { validateMonitorType } from "@shared/utils/validation";
 import { objectAssign, objectKeys } from "ts-extras";
 
@@ -9,16 +10,47 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
 const isMonitorTypeKey = (candidate: string): candidate is MonitorType =>
     validateMonitorType(candidate);
 
+const hasExplicitPath = (url: string): boolean => {
+    const schemeEnd = url.indexOf("://");
+    if (schemeEnd === -1) {
+        return false;
+    }
+
+    let cursor = schemeEnd + 3;
+    while (cursor < url.length) {
+        const char = url[cursor];
+        if (char === "/" || char === "?" || char === "#") {
+            return char === "/";
+        }
+
+        cursor += 1;
+    }
+
+    return false;
+};
+
+const getSafeUrlForDisplay = (url: string): string => {
+    const safeUrl = getSafeUrlForLogging(url);
+    if (!hasExplicitPath(url) && safeUrl.endsWith("/")) {
+        return safeUrl.slice(0, -1);
+    }
+
+    return safeUrl;
+};
+
+const formatUrlSuffix = (url: string | undefined): string =>
+    url ? ` (${getSafeUrlForDisplay(url)})` : "";
+
 const defaultMonitorTitleSuffixFormatters: Partial<
     Record<MonitorType, TitleSuffixFormatter>
 > = {
     "cdn-edge-consistency": (monitor) => {
         if (monitor.baselineUrl) {
-            return ` (${monitor.baselineUrl})`;
+            return formatUrlSuffix(monitor.baselineUrl);
         }
 
         if (monitor.replicaStatusUrl) {
-            return ` (${monitor.replicaStatusUrl})`;
+            return formatUrlSuffix(monitor.replicaStatusUrl);
         }
 
         return "";
@@ -27,22 +59,22 @@ const defaultMonitorTitleSuffixFormatters: Partial<
         monitor.host && monitor.recordType
             ? ` (${monitor.recordType} ${monitor.host})`
             : "",
-    http: (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
-    "http-header": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
-    "http-json": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
-    "http-keyword": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
-    "http-latency": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    http: (monitor) => formatUrlSuffix(monitor.url),
+    "http-header": (monitor) => formatUrlSuffix(monitor.url),
+    "http-json": (monitor) => formatUrlSuffix(monitor.url),
+    "http-keyword": (monitor) => formatUrlSuffix(monitor.url),
+    "http-latency": (monitor) => formatUrlSuffix(monitor.url),
     "http-status": (monitor) => {
         if (monitor.url) {
-            return ` (${monitor.url})`;
+            return formatUrlSuffix(monitor.url);
         }
 
         if (monitor.primaryStatusUrl) {
-            return ` (${monitor.primaryStatusUrl})`;
+            return formatUrlSuffix(monitor.primaryStatusUrl);
         }
 
         if (monitor.replicaStatusUrl) {
-            return ` (${monitor.replicaStatusUrl})`;
+            return formatUrlSuffix(monitor.replicaStatusUrl);
         }
 
         return "";
@@ -54,16 +86,16 @@ const defaultMonitorTitleSuffixFormatters: Partial<
             : "",
     replication: (monitor) => {
         if (monitor.primaryStatusUrl) {
-            return ` (${monitor.primaryStatusUrl})`;
+            return formatUrlSuffix(monitor.primaryStatusUrl);
         }
 
         if (monitor.replicaStatusUrl) {
-            return ` (${monitor.replicaStatusUrl})`;
+            return formatUrlSuffix(monitor.replicaStatusUrl);
         }
 
         return "";
     },
-    "server-heartbeat": (monitor) => (monitor.url ? ` (${monitor.url})` : ""),
+    "server-heartbeat": (monitor) => formatUrlSuffix(monitor.url),
     ssl: (monitor) => {
         if (!monitor.host) {
             return "";
@@ -76,7 +108,7 @@ const defaultMonitorTitleSuffixFormatters: Partial<
         return ` (${monitor.host})`;
     },
     "websocket-keepalive": (monitor) =>
-        monitor.url ? ` (${monitor.url})` : "",
+        formatUrlSuffix(monitor.url),
 };
 
 const monitorTitleSuffixFormatters: Partial<

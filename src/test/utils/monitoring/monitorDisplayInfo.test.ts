@@ -49,4 +49,21 @@ describe(buildMonitorDisplayInfo, () => {
 
         expect(displayInfo.monitorTypeLabel).toBe("Ping Monitor");
     });
+
+    it("uses redacted URL suffixes for connection info", () => {
+        const monitor = createMockMonitor({
+            type: "http",
+            url: "https://example.com/status?refresh_token=display-secret#section",
+        });
+
+        const displayInfo = buildMonitorDisplayInfo({
+            fallbackIdentifier: "fallback-id",
+            monitor,
+        });
+
+        expect(displayInfo.connectionInfo).toBe("https://example.com/status");
+        expect(displayInfo.connectionInfo).not.toContain("refresh_token");
+        expect(displayInfo.connectionInfo).not.toContain("display-secret");
+        expect(displayInfo.connectionInfo).not.toContain("section");
+    });
 });

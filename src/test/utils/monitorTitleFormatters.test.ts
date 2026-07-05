@@ -86,6 +86,31 @@ describe("monitorTitleFormatters", () => {
                 expect(result).toBe("");
             });
 
+            it("should redact URL secrets in HTTP monitor title suffixes", async ({
+                annotate,
+                task,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Privacy", "type");
+
+                const monitor = createMockMonitor({
+                    type: "http",
+                    url: "https://example.com/status?token=display-secret#fragment",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (https://example.com/status)");
+                expect(result).not.toContain("token=");
+                expect(result).not.toContain("display-secret");
+                expect(result).not.toContain("fragment");
+            });
+
             it("should return empty string for HTTP monitor with null URL", async ({
                 annotate,
                 task,
@@ -151,8 +176,9 @@ describe("monitorTitleFormatters", () => {
                 const result = formatTitleSuffix(monitor);
 
                 expect(result).toBe(
-                    " (https://api.example.com:8080/v1/health?check=true)"
+                    " (https://api.example.com:8080/v1/health)"
                 );
+                expect(result).not.toContain("check=true");
             });
         });
 
