@@ -20,6 +20,7 @@
 
 import type { JsonValue as TypeFestJsonValue } from "type-fest";
 
+import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
@@ -48,7 +49,7 @@ const jsonValueInternalSchema: z.ZodType<JsonValue> = z.lazy(() =>
         z.boolean(),
         z.null(),
         z.array(jsonValueInternalSchema),
-        z.record(z.string(), jsonValueInternalSchema),
+        createOwnDataRecordSchema(jsonValueInternalSchema, z.string()),
     ])
 );
 

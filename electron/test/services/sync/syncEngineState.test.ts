@@ -185,9 +185,21 @@ describe("syncEngineState map builders", () => {
             name: "Prototype site",
         };
 
-        const current = buildCanonicalLocalState([site], {
-            [INHERITED_PROPERTY_NAME]: "setting-value",
+        const settings = Object.create(null) as Record<string, string>;
+        Object.defineProperty(settings, PROTOTYPE_PROPERTY_NAME, {
+            configurable: true,
+            enumerable: true,
+            value: "prototype-setting-value",
+            writable: true,
         });
+        Object.defineProperty(settings, INHERITED_PROPERTY_NAME, {
+            configurable: true,
+            enumerable: true,
+            value: "setting-value",
+            writable: true,
+        });
+
+        const current = buildCanonicalLocalState([site], settings);
 
         expect(Object.getPrototypeOf(current.sites)).toBeNull();
         expect(Object.getPrototypeOf(current.monitors)).toBeNull();
@@ -200,6 +212,12 @@ describe("syncEngineState map builders", () => {
         );
         expect(Object.hasOwn(current.settings, INHERITED_PROPERTY_NAME)).toBe(
             true
+        );
+        expect(Object.hasOwn(current.settings, PROTOTYPE_PROPERTY_NAME)).toBe(
+            true
+        );
+        expect(current.settings[PROTOTYPE_PROPERTY_NAME]).toBe(
+            "prototype-setting-value"
         );
     });
 

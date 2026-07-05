@@ -7,11 +7,11 @@ import {
     type CloudSyncMonitorConfig,
     cloudSyncMonitorConfigSchema,
     type CloudSyncSettingsConfig,
-    cloudSyncSettingsConfigSchema,
     type CloudSyncSiteConfig,
     cloudSyncSiteConfigSchema,
 } from "@shared/types/cloudSyncDomain";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
 import * as z from "zod";
@@ -68,9 +68,9 @@ const cloudSyncBaselineInternalSchema = z
     .object({
         baselineVersion: z.literal(CLOUD_SYNC_BASELINE_VERSION),
         createdAt: epochMsSchema,
-        monitors: z.record(z.string().min(1), cloudSyncMonitorConfigSchema),
-        settings: cloudSyncSettingsConfigSchema,
-        sites: z.record(z.string().min(1), cloudSyncSiteConfigSchema),
+        monitors: createOwnDataRecordSchema(cloudSyncMonitorConfigSchema),
+        settings: createOwnDataRecordSchema(z.string()),
+        sites: createOwnDataRecordSchema(cloudSyncSiteConfigSchema),
         syncSchemaVersion: z.literal(CLOUD_SYNC_SCHEMA_VERSION),
     })
     .strict()

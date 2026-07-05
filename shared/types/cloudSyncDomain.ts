@@ -3,6 +3,7 @@
  */
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
+import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import * as z from "zod";
 
 /**
@@ -101,4 +102,4 @@ export const cloudSyncMonitorConfigSchema: z.ZodType<CloudSyncMonitorConfig> = z
 export type CloudSyncSettingsConfig = Record<string, string>;
 
 export const cloudSyncSettingsConfigSchema: z.ZodType<CloudSyncSettingsConfig> =
-    z.record(z.string().min(1), z.string());
+    createOwnDataRecordSchema(z.string());

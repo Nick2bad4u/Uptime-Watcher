@@ -10,6 +10,8 @@ import {
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
+const PROTOTYPE_KEY = "__proto__" as const;
+
 describe("cloudSync", () => {
     it("preserves leading and trailing whitespace in JSON string values", () => {
         const input = {
@@ -42,10 +44,9 @@ describe("cloudSync", () => {
             opId: 2,
             syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             timestamp: 2,
-            value: {
-                key: 1,
-                " key ": 2,
-            },
+            value: JSON.parse(
+                '{"":0,"key":1," key ":2,"__proto__":{"nested":true}}'
+            ),
         } as const;
 
         const parsed = parseCloudSyncOperation(input);
@@ -58,11 +59,20 @@ describe("cloudSync", () => {
 
             const parsedObject = parsed.value as Record<string, unknown>;
             expect(Object.keys(parsedObject).toSorted()).toEqual([
+                "",
                 " key ",
+                PROTOTYPE_KEY,
                 "key",
             ]);
+            expect(Object.getPrototypeOf(parsedObject)).toBeNull();
+            expect(parsedObject[""]).toBe(0);
             expect(parsedObject[" key "]).toBe(2);
             expect(parsedObject["key"]).toBe(1);
+            expect(
+                (parsedObject[PROTOTYPE_KEY] as Record<string, unknown>)[
+                    "nested"
+                ]
+            ).toBe(true);
         }
     });
 

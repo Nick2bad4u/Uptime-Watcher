@@ -7,6 +7,8 @@ import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
+const PROTOTYPE_KEY = "__proto__" as const;
+
 function createBaselineCandidate(): Record<string, unknown> {
     return {
         baselineVersion: CLOUD_SYNC_BASELINE_VERSION,
@@ -56,6 +58,45 @@ describe(parseCloudSyncBaseline, () => {
         });
 
         expect(baseline.createdAt).toBe(MAX_VALID_DATE_EPOCH_MS);
+    });
+
+    it("preserves prototype-named baseline map keys as own data", () => {
+        const baseline = parseCloudSyncBaseline(
+            JSON.parse(`{
+                "baselineVersion": 1,
+                "createdAt": 0,
+                "monitors": {
+                    "__proto__": {
+                        "checkInterval": 60000,
+                        "id": "__proto__",
+                        "monitoring": true,
+                        "retryAttempts": 3,
+                        "siteIdentifier": "__proto__",
+                        "timeout": 10000,
+                        "type": "http",
+                        "url": "https://example.com"
+                    }
+                },
+                "settings": {
+                    "__proto__": "setting-value"
+                },
+                "sites": {
+                    "__proto__": {
+                        "identifier": "__proto__",
+                        "monitoring": true,
+                        "name": "Prototype site"
+                    }
+                },
+                "syncSchemaVersion": 1
+            }`)
+        );
+
+        expect(Object.hasOwn(baseline.monitors, PROTOTYPE_KEY)).toBe(true);
+        expect(Object.hasOwn(baseline.settings, PROTOTYPE_KEY)).toBe(true);
+        expect(Object.hasOwn(baseline.sites, PROTOTYPE_KEY)).toBe(true);
+        expect(baseline.monitors[PROTOTYPE_KEY]?.id).toBe(PROTOTYPE_KEY);
+        expect(baseline.settings[PROTOTYPE_KEY]).toBe("setting-value");
+        expect(baseline.sites[PROTOTYPE_KEY]?.identifier).toBe(PROTOTYPE_KEY);
     });
 
     it("rejects createdAt outside the Date range", () => {
