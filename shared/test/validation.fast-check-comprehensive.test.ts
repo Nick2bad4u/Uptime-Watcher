@@ -15,6 +15,9 @@ import { fc, it } from "@fast-check/vitest";
 import validator from "validator";
 import { describe, expect } from "vitest";
 
+import type { MonitorStatus, StatusHistoryStatus } from "../types";
+
+import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "../types";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -33,6 +36,14 @@ import {
     isValidUrl,
     safeInteger,
 } from "../validation/validatorUtils";
+
+const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
+
+const statusHistoryStatusArbitrary = fc.constantFrom<StatusHistoryStatus>(
+    ...STATUS_HISTORY_VALUES
+);
 
 describe("Comprehensive Validation Module Fast-Check Tests", () => {
     describe("validatorUtils.ts Functions", () => {
@@ -574,7 +585,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 fc.record({
                     id: fc.string(),
                     type: fc.constantFrom("http", "port", "ping", "dns"),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: monitorStatusArbitrary,
                     monitoring: fc.boolean(),
                     responseTime: fc.integer({ min: -1, max: 10_000 }),
                     checkInterval: fc.integer({ min: 1000, max: 300_000 }),
@@ -582,7 +593,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                     retryAttempts: fc.integer({ min: 0, max: 10 }),
                     history: fc.array(
                         fc.record({
-                            status: fc.constantFrom("up", "down"),
+                            status: statusHistoryStatusArbitrary,
                             timestamp: fc.integer({ min: 0 }),
                             responseTime: fc.integer({ min: 0 }),
                             details: fc.oneof(
@@ -736,12 +747,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                                 "ping",
                                 "dns"
                             ),
-                            status: fc.constantFrom(
-                                "up",
-                                "down",
-                                "pending",
-                                "paused"
-                            ),
+                            status: monitorStatusArbitrary,
                             monitoring: fc.boolean(),
                             responseTime: fc.integer({ min: -1 }),
                             checkInterval: fc.integer({
@@ -752,7 +758,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                             retryAttempts: fc.integer({ min: 0, max: 10 }),
                             history: fc.array(
                                 fc.record({
-                                    status: fc.constantFrom("up", "down"),
+                                    status: statusHistoryStatusArbitrary,
                                     timestamp: fc.integer({ min: 0 }),
                                     responseTime: fc.integer({ min: 0 }),
                                 })
