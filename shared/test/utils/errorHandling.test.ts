@@ -338,5 +338,53 @@ describe("Error Handling Utils", () => {
 
             expect(backendContext.logger.error).not.toHaveBeenCalled();
         });
+
+        it("should not invoke accessor-backed frontend store methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Runtime Guarding", "type");
+
+            let accessCount = 0;
+            const context = {
+                logger: { error: vi.fn() },
+                operationName: "accessor context",
+            };
+
+            for (const methodName of [
+                "clearError",
+                "setError",
+                "setLoading",
+            ] as const) {
+                Object.defineProperty(context, methodName, {
+                    configurable: true,
+                    enumerable: true,
+                    get() {
+                        accessCount += 1;
+                        return vi.fn();
+                    },
+                });
+            }
+
+            const operationError = new Error("operation failed");
+
+            await expect(
+                withErrorHandling(
+                    async () => {
+                        throw operationError;
+                    },
+                    context
+                )
+            ).rejects.toBe(operationError);
+
+            expect(accessCount).toBe(0);
+            expect(context.logger.error).toHaveBeenCalledWith(
+                "Failed to accessor context",
+                operationError
+            );
+        });
     });
 });

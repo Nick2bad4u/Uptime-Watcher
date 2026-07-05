@@ -27,6 +27,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
 import { sharedFallbackLogger } from "@shared/utils/logger/consoleFallback";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
@@ -453,9 +454,9 @@ function isFrontendStoreContext(
     }
 
     return (
-        Reflect.has(candidate, "setError") &&
-        Reflect.has(candidate, "clearError") &&
-        Reflect.has(candidate, "setLoading")
+        getCallableDataProperty(candidate, "setError") !== undefined &&
+        getCallableDataProperty(candidate, "clearError") !== undefined &&
+        getCallableDataProperty(candidate, "setLoading") !== undefined
     );
 }
 
