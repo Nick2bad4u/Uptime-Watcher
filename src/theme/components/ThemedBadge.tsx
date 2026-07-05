@@ -46,7 +46,7 @@ import {
     type ReactNode,
     useMemo,
 } from "react";
-import { arrayJoin, objectHasIn, safeCastTo } from "ts-extras";
+import { arrayJoin } from "ts-extras";
 
 import type { BadgeSize, BadgeVariant } from "./types";
 
@@ -146,7 +146,7 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
                     fontSize: currentTheme.typography.fontSize.xs,
                     padding: `${currentTheme.spacing.xs} ${currentTheme.spacing.sm}`,
                 },
-            } as const;
+            } satisfies Record<BadgeSize, CSSProperties>;
 
             const variantStyles = {
                 error: {
@@ -179,33 +179,12 @@ export const ThemedBadge: NamedExoticComponent<ThemedBadgeProperties> = memo(
                     borderColor: `${currentTheme.colors.warning}40`,
                     color: currentTheme.colors.warning,
                 },
-            } as const;
-
-            // Type-safe style lookup with fallbacks for custom values
-            const getSizeStyle = (sizeKey: BadgeSize): CSSProperties => {
-                if (objectHasIn(sizeStyles, sizeKey)) {
-                    return sizeStyles[
-                        safeCastTo<keyof typeof sizeStyles>(sizeKey)
-                    ];
-                }
-                return sizeStyles.md;
-            };
-
-            const getVariantStyle = (
-                variantKey: BadgeVariant
-            ): CSSProperties => {
-                if (objectHasIn(variantStyles, variantKey)) {
-                    return variantStyles[
-                        safeCastTo<keyof typeof variantStyles>(variantKey)
-                    ];
-                }
-                return variantStyles.primary;
-            };
+            } satisfies Record<BadgeVariant, CSSProperties>;
 
             return {
                 ...badgeStyle,
-                ...getSizeStyle(size),
-                ...getVariantStyle(variant),
+                ...sizeStyles[size],
+                ...variantStyles[variant],
             };
         }, [
             currentTheme.borderRadius.full,

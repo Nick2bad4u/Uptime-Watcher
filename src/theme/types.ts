@@ -6,7 +6,7 @@
  * colors, typography, spacing, and visual effects.
  */
 
-import { arrayIncludes, safeCastTo } from "ts-extras";
+import { arrayIncludes } from "ts-extras";
 
 import type { SystemThemePreference } from "./components/types";
 
@@ -321,9 +321,11 @@ export const THEME_NAMES: readonly ThemeName[] = [
     "system",
 ] as const;
 
+const THEME_NAME_VALUES: readonly string[] = THEME_NAMES;
+
 /**
  * Runtime guard to verify whether an arbitrary string is a supported theme
  * name.
  */
 export const isThemeName = (value: string): value is ThemeName =>
-    arrayIncludes(safeCastTo<readonly string[]>(THEME_NAMES), value);
+    arrayIncludes(THEME_NAME_VALUES, value);
