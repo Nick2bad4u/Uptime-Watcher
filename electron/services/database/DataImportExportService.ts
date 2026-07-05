@@ -314,6 +314,7 @@ export class DataImportExportService {
         const normalizedSites = sites.map((site) =>
             this.normalizeImportSite(site)
         );
+        this.ensureUniqueNormalizedSiteIdentifiers(normalizedSites);
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-table operation
@@ -418,6 +419,20 @@ export class DataImportExportService {
         return this.databaseService.executeTransaction(async (db) =>
             operation(createImportTransactionAdapters(db, this.repositories))
         );
+    }
+
+    private ensureUniqueNormalizedSiteIdentifiers(sites: ImportSite[]): void {
+        const seenIdentifiers = new Set<string>();
+
+        for (const site of sites) {
+            if (seenIdentifiers.has(site.identifier)) {
+                throw new Error(
+                    `Import contains duplicate site identifier after normalization: ${site.identifier}`
+                );
+            }
+
+            seenIdentifiers.add(site.identifier);
+        }
     }
 
     private stripCloudSettings(

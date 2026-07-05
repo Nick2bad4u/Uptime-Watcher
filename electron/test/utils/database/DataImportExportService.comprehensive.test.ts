@@ -762,6 +762,34 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
         });
 
+        it("should reject duplicate site identifiers after import normalization", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Import Operation", "category");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+            const mockSites: ImportSite[] = [
+                { identifier: "site1", name: "First Site" },
+                { identifier: " site1 ", name: "Duplicate Site" },
+            ];
+
+            await expect(
+                service.persistImportedData(mockSites, {})
+            ).rejects.toThrow(
+                "Import contains duplicate site identifier after normalization: site1"
+            );
+
+            expect(withDatabaseOperation).not.toHaveBeenCalled();
+            expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
+            expect(
+                mockRepositories.site.deleteAllInternal
+            ).not.toHaveBeenCalled();
+        });
+
         it("should handle sites without names during persistence", async ({
             task,
             annotate,
