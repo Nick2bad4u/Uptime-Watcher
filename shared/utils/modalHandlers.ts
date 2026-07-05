@@ -10,7 +10,13 @@
  * @packageDocumentation
  */
 
+import {
+    getCallableDataProperty,
+    getOwnPropertyValue,
+} from "./errorPropertyAccess";
 import { type SetStateAction, useCallback, useEffect, useState } from "react";
+
+const noop = (): void => {};
 
 /**
  * Type for a state setter function.
@@ -48,6 +54,49 @@ export interface EscapeKeyModalConfig {
     priority?: number;
 }
 
+function addDocumentKeyDownListener(
+    handler: (event: KeyboardEvent) => void
+): () => void {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found) {
+        return noop;
+    }
+
+    const addEventListener = getCallableDataProperty(
+        documentProperty.value,
+        "addEventListener"
+    );
+    const removeEventListener = getCallableDataProperty(
+        documentProperty.value,
+        "removeEventListener"
+    );
+
+    if (!addEventListener || !removeEventListener) {
+        return noop;
+    }
+
+    try {
+        Reflect.apply(addEventListener, documentProperty.value, [
+            "keydown",
+            handler,
+        ]);
+    } catch {
+        return noop;
+    }
+
+    return (): void => {
+        try {
+            Reflect.apply(removeEventListener, documentProperty.value, [
+                "keydown",
+                handler,
+            ]);
+        } catch {
+            // Listener cleanup must remain best-effort during teardown.
+        }
+    };
+}
+
 /**
  * Sets up escape key handling for multiple modals with priority.
  *
@@ -79,11 +128,7 @@ export function useEscapeKeyModalHandler(
                 }
             };
 
-            document.addEventListener("keydown", handleKeyDown);
-
-            return (): void => {
-                document.removeEventListener("keydown", handleKeyDown);
-            };
+            return addDocumentKeyDownListener(handleKeyDown);
         },
         [modalConfigs]
     );

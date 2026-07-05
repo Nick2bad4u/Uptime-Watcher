@@ -150,6 +150,116 @@ describe("Modal Handler Utilities - Comprehensive Coverage", () => {
             );
         });
 
+        it("should no-op when document access fails during effect setup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: modalHandlers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "document"
+            );
+            const documentGetter = vi.fn(() => {
+                throw new Error("document unavailable");
+            });
+            const modalConfigs: EscapeKeyModalConfig[] = [
+                {
+                    isOpen: true,
+                    onClose: vi.fn(),
+                },
+            ];
+            const nextModalConfigs: EscapeKeyModalConfig[] = [
+                {
+                    isOpen: true,
+                    onClose: vi.fn(),
+                    priority: 1,
+                },
+            ];
+            const { rerender, unmount } = renderHook(
+                ({ configs }) => {
+                    useEscapeKeyModalHandler(configs);
+                },
+                {
+                    initialProps: { configs: modalConfigs },
+                }
+            );
+
+            try {
+                Object.defineProperty(globalThis, "document", {
+                    configurable: true,
+                    get: documentGetter,
+                });
+
+                expect(() => {
+                    rerender({ configs: nextModalConfigs });
+                }).not.toThrow();
+                expect(documentGetter).toHaveBeenCalledTimes(1);
+            } finally {
+                if (originalDocumentDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "document",
+                        originalDocumentDescriptor
+                    );
+                }
+            }
+
+            expect(() => {
+                unmount();
+            }).not.toThrow();
+        });
+
+        it("should no-op when document listener attachment fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: modalHandlers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const originalAddEventListener = Object.getOwnPropertyDescriptor(
+                document,
+                "addEventListener"
+            );
+            const addEventListener = vi.fn(() => {
+                throw new Error("listener unavailable");
+            });
+            const modalConfigs: EscapeKeyModalConfig[] = [
+                {
+                    isOpen: true,
+                    onClose: vi.fn(),
+                },
+            ];
+
+            try {
+                Object.defineProperty(document, "addEventListener", {
+                    configurable: true,
+                    value: addEventListener,
+                });
+
+                const { unmount } = renderHook(() => {
+                    useEscapeKeyModalHandler(modalConfigs);
+                });
+                expect(() => {
+                    unmount();
+                }).not.toThrow();
+                expect(addEventListener).toHaveBeenCalledTimes(1);
+            } finally {
+                if (originalAddEventListener) {
+                    Object.defineProperty(
+                        document,
+                        "addEventListener",
+                        originalAddEventListener
+                    );
+                }
+            }
+        });
+
         it("should close the highest priority open modal on escape", async ({
             task,
             annotate,
