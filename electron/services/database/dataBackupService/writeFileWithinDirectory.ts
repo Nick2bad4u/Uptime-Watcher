@@ -6,6 +6,7 @@ import * as fs from "node:fs/promises";
 
 import {
     lstatIfExists,
+    removePathBestEffort,
     syncDirectorySafely,
     syncFileSafely,
 } from "../../../utils/fsSafeOps";
@@ -68,7 +69,7 @@ export async function writeFileWithinDirectory(args: {
         await syncDirectorySafely(baseDirectory);
     } catch (error) {
         // Best-effort cleanup.
-        await fs.rm(tmpPath, { force: true }).catch(() => {});
+        await removePathBestEffort(tmpPath);
 
         // Best-effort rollback (no-op if rollback doesn't exist).
         if (isRollbackCreated) {
@@ -92,7 +93,7 @@ export async function writeFileWithinDirectory(args: {
         // restoration failed, keep the rollback file as the last known copy of
         // the original target.
         if (shouldDeleteRollback && isRollbackCreated) {
-            await fs.rm(rollbackPath, { force: true }).catch(() => {});
+            await removePathBestEffort(rollbackPath);
         }
     }
 

@@ -9,6 +9,7 @@ import type { DatabaseService } from "../DatabaseService";
 
 import {
     renameIfExists,
+    removePathBestEffort,
     syncDirectorySafely,
     syncFileSafely,
 } from "../../../utils/fsSafeOps";
@@ -140,12 +141,12 @@ export async function replaceDatabaseFile(args: {
 
         throw initError;
     } finally {
-        await fs.rm(incomingPath, { force: true }).catch(() => {});
+        await removePathBestEffort(incomingPath);
         if (!copyError) {
-            await fs.rm(rollbackPath, { force: true }).catch(() => {});
-            await fs.rm(rollbackWalPath, { force: true }).catch(() => {});
-            await fs.rm(rollbackShmPath, { force: true }).catch(() => {});
-            await fs.rm(rollbackJournalPath, { force: true }).catch(() => {});
+            await removePathBestEffort(rollbackPath);
+            await removePathBestEffort(rollbackWalPath);
+            await removePathBestEffort(rollbackShmPath);
+            await removePathBestEffort(rollbackJournalPath);
         }
     }
 

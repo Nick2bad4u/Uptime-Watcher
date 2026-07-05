@@ -67,6 +67,17 @@ export async function renameIfExists(
 }
 
 /**
+ * Best-effort path removal for cleanup code.
+ */
+export async function removePathBestEffort(filePath: string): Promise<void> {
+    try {
+        await fs.rm(filePath, { force: true });
+    } catch {
+        // Best-effort only.
+    }
+}
+
+/**
  * Best-effort `fsync()` for a directory path.
  *
  * @remarks

@@ -8,6 +8,9 @@ interface MockFileHandle {
 const renameMock =
     vi.fn<(sourcePath: string, targetPath: string) => Promise<void>>();
 
+const rmMock =
+    vi.fn<(filePath: string, options: { force: true }) => Promise<void>>();
+
 const lstatMock =
     vi.fn<(filePath: string) => Promise<{ isFile: () => boolean }>>();
 
@@ -30,6 +33,7 @@ vi.mock("node:fs/promises", () => ({
     open: openMock,
     realpath: realpathMock,
     rename: renameMock,
+    rm: rmMock,
     stat: statMock,
 }));
 
@@ -146,6 +150,29 @@ describe("fsSafeOps (strict coverage)", () => {
         await expect(renameIfExists("/tmp/a", "/tmp/b")).rejects.toBeInstanceOf(
             Error
         );
+    });
+
+    it("removePathBestEffort removes a path with force enabled", async () => {
+        const { removePathBestEffort } =
+            await import("../../../../electron/utils/fsSafeOps");
+
+        rmMock.mockResolvedValueOnce(undefined);
+
+        await expect(
+            removePathBestEffort("/tmp/cleanup")
+        ).resolves.toBeUndefined();
+        expect(rmMock).toHaveBeenCalledWith("/tmp/cleanup", { force: true });
+    });
+
+    it("removePathBestEffort swallows removal failures", async () => {
+        const { removePathBestEffort } =
+            await import("../../../../electron/utils/fsSafeOps");
+
+        rmMock.mockRejectedValueOnce(new Error("remove failed"));
+
+        await expect(
+            removePathBestEffort("/tmp/cleanup")
+        ).resolves.toBeUndefined();
     });
 
     it("syncFileSafely syncs and closes on success", async () => {
