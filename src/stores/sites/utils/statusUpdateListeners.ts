@@ -46,6 +46,15 @@ export interface StatusUpdateListenerFactoryDependencies {
     processStatusUpdateCandidate: (candidate: unknown, source: string) => void;
 }
 
+/**
+ * Number of listeners in the canonical status-update listener descriptor set.
+ *
+ * @remarks
+ * Keep this colocated with {@link createStatusUpdateListenerDescriptors} so
+ * subscription health diagnostics cannot drift from the actual listener set.
+ */
+export const STATUS_UPDATE_LISTENER_COUNT = 4;
+
 const safeHandleMonitoringLifecycleEvent = <TEvent>(
     phase: "started" | "stopped",
     handler: (event: TEvent) => void,

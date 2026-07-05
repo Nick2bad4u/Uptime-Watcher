@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
     buildStatusSubscriptionFailureSummary,
-    FALLBACK_EXPECTED_LISTENERS,
     resolveExpectedListenerCount,
 } from "../../../../stores/sites/utils/statusUpdateSubscriptionSummary";
+import { STATUS_UPDATE_LISTENER_COUNT } from "../../../../stores/sites/utils/statusUpdateListeners";
 
 describe(buildStatusSubscriptionFailureSummary, () => {
     it("sanitizes renderer-facing subscription errors", () => {
@@ -49,7 +49,7 @@ describe(buildStatusSubscriptionFailureSummary, () => {
         );
 
         expect(resolveExpectedListenerCount(accessorBackedConstructor)).toBe(
-            FALLBACK_EXPECTED_LISTENERS
+            STATUS_UPDATE_LISTENER_COUNT
         );
         expect(accessCount).toBe(0);
     });

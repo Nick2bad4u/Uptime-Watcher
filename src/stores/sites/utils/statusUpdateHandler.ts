@@ -24,6 +24,7 @@ import { logger } from "../../../services/logger";
 import {
     createInitialListenerStates,
     createStatusUpdateListenerDescriptors,
+    STATUS_UPDATE_LISTENER_COUNT,
     type StatusUpdateListenerDescriptor,
 } from "./statusUpdateListeners";
 import { mergeMonitorStatusChange } from "./statusUpdateMerge";
@@ -122,7 +123,8 @@ export interface StatusUpdateSubscriptionResult {
  */
 export class StatusUpdateManager {
     /** Number of listeners required for a healthy subscription. */
-    public static readonly EXPECTED_LISTENER_COUNT = 4;
+    public static readonly EXPECTED_LISTENER_COUNT: number =
+        STATUS_UPDATE_LISTENER_COUNT;
 
     /**
      * Array of cleanup functions for active event listeners.

@@ -4,12 +4,14 @@ import type { StatusUpdateManager } from "./statusUpdateHandler";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
+import { STATUS_UPDATE_LISTENER_COUNT } from "./statusUpdateListeners";
+
 /**
  * Default listener count used for diagnostics when the underlying
  * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
  * implementation is mocked or unavailable.
  */
-export const FALLBACK_EXPECTED_LISTENERS = 4;
+const FALLBACK_EXPECTED_LISTENERS: number = STATUS_UPDATE_LISTENER_COUNT;
 
 /**
  * Build a normalized failure summary for status update subscriptions.
