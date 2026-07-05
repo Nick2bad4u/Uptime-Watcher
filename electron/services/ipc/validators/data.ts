@@ -7,9 +7,8 @@ import type {
     SerializedDatabaseBackupSaveResult,
     SerializedDatabaseRestoreResult,
 } from "@shared/types/ipc";
-import type { UnknownRecord } from "type-fest";
 
-import { castUnchecked } from "@shared/utils/typeHelpers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import {
     formatZodIssues,
     type ZodIssueLike,
@@ -75,11 +74,11 @@ function isZodIssueLikeArray(value: unknown): value is readonly ZodIssueLike[] {
  * formatting when `error.issues` exists, without using `any`.
  */
 function formatSafeParseError(error: unknown): string[] {
-    if (typeof error !== "object" || error === null) {
+    if (!isRecord(error)) {
         return ["Invalid response"];
     }
 
-    if (!objectHasIn(castUnchecked<UnknownRecord>(error), "issues")) {
+    if (!objectHasIn(error, "issues")) {
         return ["Invalid response"];
     }
 
@@ -92,11 +91,11 @@ function formatSafeParseError(error: unknown): string[] {
 }
 
 function getSafeParseError(validation: unknown): unknown {
-    if (typeof validation !== "object" || validation === null) {
+    if (!isRecord(validation)) {
         return undefined;
     }
 
-    if (!objectHasIn(castUnchecked<UnknownRecord>(validation), "error")) {
+    if (!objectHasIn(validation, "error")) {
         return undefined;
     }
 
