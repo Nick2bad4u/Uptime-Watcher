@@ -153,6 +153,38 @@ describe(NotificationService, () => {
                 restoreRequiresOutage: true,
             });
         });
+
+        it("copies muted site identifiers from update payloads", () => {
+            const mutedSiteNotificationIdentifiers = [sampleSite.identifier];
+
+            service.updateConfig({ mutedSiteNotificationIdentifiers });
+            mutedSiteNotificationIdentifiers.push("site-2");
+
+            service.notifyMonitorDown(
+                { ...sampleSite, identifier: "site-2" },
+                "monitor-1"
+            );
+
+            expect(notificationCtor).toHaveBeenCalled();
+        });
+
+        it("returns muted site identifiers without exposing internal config", () => {
+            service.updateConfig({
+                mutedSiteNotificationIdentifiers: [sampleSite.identifier],
+            });
+
+            const config = service.getConfig();
+            (config.mutedSiteNotificationIdentifiers as string[]).push(
+                "site-2"
+            );
+
+            service.notifyMonitorDown(
+                { ...sampleSite, identifier: "site-2" },
+                "monitor-1"
+            );
+
+            expect(notificationCtor).toHaveBeenCalled();
+        });
     });
 
     describe("per-site mute", () => {

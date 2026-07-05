@@ -143,9 +143,13 @@ export class NotificationService {
     }
 
     public updateConfig(newConfig: Partial<NotificationConfig>): void {
-        const mutedIdentifiers = newConfig.mutedSiteNotificationIdentifiers;
-        if (Array.isArray(mutedIdentifiers)) {
-            this.mutedSites = new Set<string>(mutedIdentifiers);
+        const mutedIdentifiers: NotificationConfig["mutedSiteNotificationIdentifiers"] =
+            newConfig.mutedSiteNotificationIdentifiers;
+        const mutedSiteNotificationIdentifiers =
+            mutedIdentifiers === undefined ? undefined : [...mutedIdentifiers];
+
+        if (mutedSiteNotificationIdentifiers !== undefined) {
+            this.mutedSites = new Set<string>(mutedSiteNotificationIdentifiers);
         }
 
         const downAlertCooldownMs = this.normalizeDownAlertCooldownMs(
@@ -155,12 +159,22 @@ export class NotificationService {
         this.config = {
             ...this.config,
             ...newConfig,
+            ...(mutedSiteNotificationIdentifiers !== undefined && {
+                mutedSiteNotificationIdentifiers,
+            }),
             downAlertCooldownMs,
         };
     }
 
     public getConfig(): NotificationConfig {
-        return { ...this.config };
+        return {
+            ...this.config,
+            ...(this.config.mutedSiteNotificationIdentifiers && {
+                mutedSiteNotificationIdentifiers: [
+                    ...this.config.mutedSiteNotificationIdentifiers,
+                ],
+            }),
+        };
     }
 
     /**
