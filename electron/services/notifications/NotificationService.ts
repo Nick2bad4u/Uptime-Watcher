@@ -2,6 +2,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { Notification } from "electron";
 import { isDefined, isFinite as isFiniteNumber, setHas } from "ts-extras";
@@ -89,6 +90,18 @@ function normalizeNotificationText(args: {
             maxLength: args.maxLength,
         }) ?? args.fallback
     );
+}
+
+function getMonitorUrlLabel(monitor: Monitor): string | undefined {
+    const url =
+        monitor.url ??
+        monitor.baselineUrl ??
+        monitor.primaryStatusUrl ??
+        monitor.replicaStatusUrl;
+
+    return typeof url === "string" && url.length > 0
+        ? getSafeUrlForDisplay(url)
+        : undefined;
 }
 
 /**
@@ -483,7 +496,7 @@ export class NotificationService {
     }
 
     private describeMonitor(monitor: Monitor): string {
-        const label = monitor.url ?? monitor.host ?? monitor.id;
+        const label = getMonitorUrlLabel(monitor) ?? monitor.host ?? monitor.id;
         return `${label} (${monitor.type})`;
     }
 

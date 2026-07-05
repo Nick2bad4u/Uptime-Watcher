@@ -263,7 +263,7 @@ describe(NotificationService, () => {
                 monitors: [
                     {
                         ...sampleMonitor,
-                        url: `https://example.com/check?access_token=monitor-secret-token${"x".repeat(600)}`,
+                        url: "https://example.com/check?access_token=monitor-secret-token#monitor-fragment",
                     },
                 ],
             };
@@ -271,15 +271,58 @@ describe(NotificationService, () => {
             service.notifyMonitorDown(siteWithSensitiveLabel, "monitor-1");
 
             const options = getFirstNotificationOptionsWithBody();
+            const decodedBody = decodeURIComponent(options.body);
 
             expect(options.title).toContain("[redacted]");
             expect(options.title).not.toContain("site-secret-token");
             expect(options.title).not.toMatch(/[\n\r]/u);
             expect(options.title.length).toBeLessThanOrEqual(120);
-            expect(options.body).toContain("[redacted]");
+            expect(decodedBody).toContain("https://example.com/check (http)");
+            expect(options.body).not.toContain("access_token");
             expect(options.body).not.toContain("monitor-secret-token");
+            expect(options.body).not.toContain("monitor-fragment");
             expect(options.body).not.toMatch(/[\n\r]/u);
             expect(options.body.length).toBeLessThanOrEqual(500);
+        });
+
+        it("sanitizes advanced monitor URL labels before composing notification text", () => {
+            const siteWithReplicationMonitor: Site = {
+                ...sampleSite,
+                monitors: [
+                    {
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "replication-monitor",
+                        maxReplicationLagSeconds: 60,
+                        monitoring: true,
+                        primaryStatusUrl:
+                            "https://primary.example.com/status?refresh_token=replication-secret#replication-fragment",
+                        replicaStatusUrl:
+                            "https://replica.example.com/status?refresh_token=replication-secret",
+                        replicationTimestampField: "data.lastApplied",
+                        responseTime: 512,
+                        retryAttempts: 3,
+                        status: "up",
+                        timeout: 30,
+                        type: "replication",
+                    },
+                ],
+            };
+
+            service.notifyMonitorDown(
+                siteWithReplicationMonitor,
+                "replication-monitor"
+            );
+
+            const options = getFirstNotificationOptionsWithBody();
+            const decodedBody = decodeURIComponent(options.body);
+
+            expect(decodedBody).toContain(
+                "https://primary.example.com/status (replication)"
+            );
+            expect(options.body).not.toContain("refresh_token");
+            expect(options.body).not.toContain("replication-secret");
+            expect(options.body).not.toContain("replication-fragment");
         });
     });
 
