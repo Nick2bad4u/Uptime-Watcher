@@ -4,7 +4,7 @@
  * @public
  */
 
-import { getEnvVar } from "@shared/utils/environment";
+import { readProcessEnv as readSharedProcessEnv } from "@shared/utils/environment";
 
 const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
 
@@ -53,7 +53,7 @@ export function isPlaywrightAutomation(): boolean {
  * @public
  */
 export function readProcessEnv(key: string): string | undefined {
-    return getEnvVar(key);
+    return readSharedProcessEnv(key);
 }
 
 /**

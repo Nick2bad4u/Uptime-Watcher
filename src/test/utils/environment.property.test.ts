@@ -136,11 +136,15 @@ describe("environment utilities", () => {
     fcTest.prop<[string, string | undefined]>([
         envKeyArbitrary,
         envValueArbitrary,
-    ])("readProcessEnv reflects provided env values", async (key, value) => {
+    ])("readProcessEnv reflects non-empty env values", async (key, value) => {
         await withSandbox(() => {
             globalTarget.process = { env: { [key]: value } };
 
-            expect(readProcessEnv(key)).toBe(value);
+            expect(readProcessEnv(key)).toBe(
+                typeof value === "string" && value.length > 0
+                    ? value
+                    : undefined
+            );
         });
     });
 
