@@ -97,6 +97,11 @@ const isProcessVersionsRecord = (
 ): value is NonNullable<ProcessSnapshot["versions"]> =>
     typeof value === "object" && value !== null;
 
+const hasDefinedGlobalProperty = (key: PropertyKey): boolean => {
+    const property = getOwnPropertyValue(globalThis, key);
+    return property.found && isDefined(property.value);
+};
+
 const getProcessEnv = (): Record<string, string | undefined> | undefined => {
     const snapshot = getProcessSnapshot();
     if (!snapshot) {
@@ -274,7 +279,10 @@ export function getNodeEnv(): string {
  * Detects whether browser globals are present.
  */
 export function isBrowserEnvironment(): boolean {
-    return isDefined(globalThis.window) && isDefined(globalThis.document);
+    return (
+        hasDefinedGlobalProperty("window") &&
+        hasDefinedGlobalProperty("document")
+    );
 }
 
 /**

@@ -16,6 +16,17 @@ import {
     resetProcessSnapshotOverrideForTesting,
 } from "../../utils/environment";
 
+const restoreGlobalDescriptor = (
+    key: PropertyKey,
+    descriptor: PropertyDescriptor | undefined
+): void => {
+    if (descriptor) {
+        Object.defineProperty(globalThis, key, descriptor);
+    } else {
+        Reflect.deleteProperty(globalThis, key);
+    }
+};
+
 describe("environment utilities - Backend Coverage", () => {
     let originalEnv: Record<string, string | undefined> = {};
 
@@ -194,6 +205,124 @@ describe("environment utilities - Backend Coverage", () => {
         });
     });
     describe(isBrowserEnvironment, () => {
+        it("should tolerate a throwing global window accessor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment utilities - Backend Coverage",
+                "component"
+            );
+
+            const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "window"
+            );
+            const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "document"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "window", {
+                    configurable: true,
+                    enumerable: true,
+                    get() {
+                        throw new Error("window unavailable");
+                    },
+                });
+                Object.defineProperty(globalThis, "document", {
+                    configurable: true,
+                    enumerable: true,
+                    value: {},
+                });
+
+                expect(isBrowserEnvironment()).toBeFalsy();
+            } finally {
+                restoreGlobalDescriptor("window", originalWindowDescriptor);
+                restoreGlobalDescriptor("document", originalDocumentDescriptor);
+            }
+        });
+
+        it("should tolerate a throwing global document accessor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment utilities - Backend Coverage",
+                "component"
+            );
+
+            const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "window"
+            );
+            const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "document"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "window", {
+                    configurable: true,
+                    enumerable: true,
+                    value: {},
+                });
+                Object.defineProperty(globalThis, "document", {
+                    configurable: true,
+                    enumerable: true,
+                    get() {
+                        throw new Error("document unavailable");
+                    },
+                });
+
+                expect(isBrowserEnvironment()).toBeFalsy();
+            } finally {
+                restoreGlobalDescriptor("window", originalWindowDescriptor);
+                restoreGlobalDescriptor("document", originalDocumentDescriptor);
+            }
+        });
+
+        it("should support accessor-backed browser globals", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment utilities - Backend Coverage",
+                "component"
+            );
+
+            const originalWindowDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "window"
+            );
+            const originalDocumentDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "document"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "window", {
+                    configurable: true,
+                    enumerable: true,
+                    get: () => ({}),
+                });
+                Object.defineProperty(globalThis, "document", {
+                    configurable: true,
+                    enumerable: true,
+                    get: () => ({}),
+                });
+
+                expect(isBrowserEnvironment()).toBeTruthy();
+            } finally {
+                restoreGlobalDescriptor("window", originalWindowDescriptor);
+                restoreGlobalDescriptor("document", originalDocumentDescriptor);
+            }
+        });
+
         it("should return false in backend context", async ({
             task,
             annotate,
