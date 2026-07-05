@@ -209,6 +209,50 @@ describe("cloudSchemas", () => {
         }
     });
 
+    it("rejects CloudSyncResetPreview with invalid device identifiers", () => {
+        const basePreview = {
+            deviceIds: ["device-a"],
+            fetchedAt: 1,
+            operationDeviceIds: ["device-a"],
+            operationObjectCount: 1,
+            otherObjectCount: 0,
+            perDevice: [
+                {
+                    deviceId: "device-a",
+                    newestCreatedAtEpochMs: 1,
+                    oldestCreatedAtEpochMs: 1,
+                    operationObjectCount: 1,
+                },
+            ],
+            snapshotObjectCount: 0,
+            syncObjectCount: 1,
+        } as const;
+
+        for (const preview of [
+            {
+                ...basePreview,
+                deviceIds: ["device\n1"],
+            },
+            {
+                ...basePreview,
+                operationDeviceIds: ["device:1"],
+            },
+            {
+                ...basePreview,
+                perDevice: [
+                    {
+                        ...basePreview.perDevice[0],
+                        deviceId: "__proto__",
+                    },
+                ],
+            },
+        ]) {
+            const parsed = validateCloudSyncResetPreview(preview);
+
+            expect(parsed.success).toBeFalsy();
+        }
+    });
+
     it("accepts CloudSyncResetPreview timestamps at the Date upper bound", () => {
         const parsed = validateCloudSyncResetPreview({
             deviceIds: ["device-a"],

@@ -10,6 +10,7 @@ import {
     type CloudStatusSummary,
 } from "@shared/types/cloud";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
+import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
@@ -22,6 +23,16 @@ const cloudProviderKindSchema = z.enum([
 ]);
 
 const cloudEncryptionModeSchema = z.enum(["none", "passphrase"]);
+
+const persistedDeviceIdSchema = z.string().superRefine((candidate, ctx) => {
+    const error = getPersistedDeviceIdValidationError(candidate);
+    if (error !== null) {
+        ctx.addIssue({
+            code: "custom",
+            message: error,
+        });
+    }
+});
 
 const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> =
     z.discriminatedUnion("kind", [
@@ -109,7 +120,7 @@ export const cloudStatusSummarySchema: z.ZodType<CloudStatusSummary> =
 const cloudSyncResetPreviewDeviceSchema: z.ZodType<CloudSyncResetPreviewDevice> =
     z
         .object({
-            deviceId: z.string().trim().min(1),
+            deviceId: persistedDeviceIdSchema,
             newestCreatedAtEpochMs: epochMsSchema.optional(),
             oldestCreatedAtEpochMs: epochMsSchema.optional(),
             operationObjectCount: z.int().nonnegative(),
@@ -119,10 +130,10 @@ const cloudSyncResetPreviewDeviceSchema: z.ZodType<CloudSyncResetPreviewDevice> 
 /** Zod schema for {@link CloudSyncResetPreview}. */
 const cloudSyncResetPreviewInternalSchema = z
     .object({
-        deviceIds: z.array(z.string().trim().min(1)),
+        deviceIds: z.array(persistedDeviceIdSchema),
         fetchedAt: epochMsSchema,
         latestSnapshotKey: z.string().trim().min(1).optional(),
-        operationDeviceIds: z.array(z.string().trim().min(1)),
+        operationDeviceIds: z.array(persistedDeviceIdSchema),
         operationObjectCount: z.int().nonnegative(),
         otherObjectCount: z.int().nonnegative(),
         perDevice: z.array(cloudSyncResetPreviewDeviceSchema),
