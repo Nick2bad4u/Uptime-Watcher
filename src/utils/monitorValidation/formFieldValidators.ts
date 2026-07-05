@@ -69,7 +69,7 @@ export function validateRequiredNumberField<
     value: OptionalMonitorFieldValue<TType, TField>,
     missingMessage: string
 ): string[] {
-    if (typeof value !== "number" || Number.isNaN(value)) {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
         return [missingMessage];
     }
 

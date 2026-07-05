@@ -11,6 +11,10 @@
  * Clamps a numeric volume value into the inclusive interval `[0, 1]`.
  */
 export function clampNormalizedVolume(value: number): number {
+    if (!Number.isFinite(value)) {
+        return 0;
+    }
+
     return Math.min(Math.max(value, 0), 1);
 }
 

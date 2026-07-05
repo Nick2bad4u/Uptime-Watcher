@@ -21,6 +21,14 @@ describe("volumeNormalization", () => {
         expect(clampNormalizedVolume(2)).toBe(1);
     });
 
+    it("normalizes non-finite volumes to muted", () => {
+        expect(clampNormalizedVolume(Number.NaN)).toBe(0);
+        expect(clampNormalizedVolume(Infinity)).toBe(0);
+        expect(clampNormalizedVolume(-Infinity)).toBe(0);
+        expect(convertNormalizedVolumeToSliderPercent(Number.NaN)).toBe(0);
+        expect(convertSliderPercentToNormalizedVolume(Number.NaN)).toBe(0);
+    });
+
     test.prop([fc.double({ noDefaultInfinity: true, noNaN: true })])(
         "always returns a clamped value",
         (value) => {

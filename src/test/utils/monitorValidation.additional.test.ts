@@ -366,6 +366,38 @@ describe("monitorValidation functions - Additional Coverage", () => {
                 )
             ).toBe(true);
         });
+
+        it("should reject port form data with non-finite port values", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: monitorValidation.additional",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            for (const port of [
+                Number.NaN,
+                Infinity,
+                -Infinity,
+            ]) {
+                const result = await validateMonitorFormData("port", {
+                    host: "example.com",
+                    port,
+                    type: "port",
+                });
+
+                expect(result.success).toBe(false);
+                expect(
+                    result.errors.some((error) =>
+                        error.includes("Port is required")
+                    )
+                ).toBe(true);
+            }
+        });
     });
 
     describe("validateMonitorFormData - Ping validation", () => {
