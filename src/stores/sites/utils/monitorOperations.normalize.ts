@@ -31,12 +31,14 @@ import { isFinite as isFiniteNumber, safeCastTo, setHas } from "ts-extras";
 /**
  * Baseline defaults applied to every monitor regardless of type.
  */
-const BASE_MONITOR_DEFAULTS = {
-    activeOperations: safeCastTo<string[]>([]),
-    history: safeCastTo<Monitor["history"]>([]),
+const BASE_MONITOR_DEFAULTS: Pick<Monitor, "responseTime" | "status"> = {
     responseTime: -1,
     status: DEFAULT_MONITOR_STATUS,
-} as const;
+};
+
+const createDefaultActiveOperations = (): string[] => [];
+
+const createDefaultHistory = (): Monitor["history"] => [];
 
 function assertUnreachable(value: never): never {
     throw new Error(`Unhandled monitor type: ${String(value)}`);
@@ -720,7 +722,7 @@ export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
     const baseMonitor: Monitor = {
         activeOperations: Array.isArray(filteredMonitor.activeOperations)
             ? filteredMonitor.activeOperations
-            : BASE_MONITOR_DEFAULTS.activeOperations,
+            : createDefaultActiveOperations(),
         checkInterval: safeInteger(
             filteredMonitor.checkInterval,
             monitorTypeDefaults.checkInterval,
@@ -728,7 +730,7 @@ export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
         ),
         history: Array.isArray(filteredMonitor.history)
             ? filteredMonitor.history
-            : BASE_MONITOR_DEFAULTS.history,
+            : createDefaultHistory(),
         id: validId,
         monitoring: ensureBooleanOrFallback(
             filteredMonitor.monitoring,

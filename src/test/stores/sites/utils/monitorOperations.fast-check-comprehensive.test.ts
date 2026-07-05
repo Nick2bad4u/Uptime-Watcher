@@ -389,6 +389,18 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             expect(normalized.activeOperations).toEqual([]);
         });
 
+        it("should provide fresh default array instances for normalized monitors", () => {
+            const first = normalizeMonitor({});
+            const second = normalizeMonitor({});
+
+            expect(first.history).toEqual([]);
+            expect(second.history).toEqual([]);
+            expect(first.history).not.toBe(second.history);
+            expect(first.activeOperations).toEqual([]);
+            expect(second.activeOperations).toEqual([]);
+            expect(first.activeOperations).not.toBe(second.activeOperations);
+        });
+
         it("should apply type-specific defaults correctly", () => {
             fc.assert(
                 fc.property(monitorTypeArb, (monitorType) => {
