@@ -12,6 +12,7 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 import {
     BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
+    MONITOR_STATUS_VALUES,
     STATUS_HISTORY_VALUES,
 } from "@shared/types";
 import { arrayFirst, safeCastTo } from "ts-extras";
@@ -48,6 +49,8 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
     const checkIntervalArb = fc.integer({ min: 30_000, max: 3_600_000 });
 
     const retryAttemptsArb = fc.integer({ min: 0, max: 10 });
+
+    const monitorStatusStringValues: readonly string[] = MONITOR_STATUS_VALUES;
 
     const statusHistoryStatusArb = fc.constantFrom<
         ArrayElement<Monitor["history"]>["status"]
@@ -186,7 +189,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     fc.string({ minLength: 1, maxLength: 50 })
                 ),
                 status: fc.option(
-                    fc.constantFrom("up", "down", "pending", "paused")
+                    fc.constantFrom<Monitor["status"]>(
+                        ...MONITOR_STATUS_VALUES
+                    )
                 ),
                 monitoring: fc.option(fc.boolean()),
                 responseTime: fc.option(fc.integer({ min: -1, max: 10_000 })),
@@ -363,12 +368,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     expect(typeof normalized.id).toBe("string");
                     expect(normalized.id.length).toBeGreaterThan(0);
                     expect(BASE_MONITOR_TYPES).toContain(normalized.type);
-                    expect([
-                        "up",
-                        "down",
-                        "pending",
-                        "paused",
-                    ]).toContain(normalized.status);
+                    expect(MONITOR_STATUS_VALUES).toContain(normalized.status);
                     expect(typeof normalized.monitoring).toBe("boolean");
                     expect(typeof normalized.responseTime).toBe("number");
                     expect(typeof normalized.timeout).toBe("number");
@@ -782,7 +782,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             fc.assert(
                 fc.property(
                     monitorArb,
-                    fc.constantFrom("up", "down", "pending", "paused"),
+                    fc.constantFrom<Monitor["status"]>(
+                        ...MONITOR_STATUS_VALUES
+                    ),
                     (monitor, newStatus) => {
                         const updated = monitorOperations.updateStatus(
                             monitor,
@@ -800,13 +802,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                 fc.property(
                     monitorArb,
                     fc.string().filter(
-                        (s) =>
-                            ![
-                                "down",
-                                "paused",
-                                "pending",
-                                "up",
-                            ].includes(s)
+                        (s) => !monitorStatusStringValues.includes(s)
                     ),
                     (monitor, invalidStatus) => {
                         expect(() =>
