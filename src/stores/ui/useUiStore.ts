@@ -35,6 +35,7 @@ import type { Promisable } from "type-fest";
 
 import { getOwnDataCause } from "@shared/utils/errorPropertyAccess";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 import {
@@ -166,7 +167,7 @@ const normalizeSiteTableColumnWidths = (
 const createEmptySiteDetailsTabState = (): Record<
     string,
     SiteDetailsTab
-> => ({});
+> => createNullPrototypeObject<Record<string, SiteDetailsTab>>();
 
 function getOwnDataField(source: object, key: keyof UIPersistedState): unknown {
     const descriptor = Object.getOwnPropertyDescriptor(source, key);
@@ -198,10 +199,15 @@ function normalizeBooleanRecord(
         return undefined;
     }
 
-    const normalized: Record<string, boolean> = {};
+    const normalized = createNullPrototypeObject<Record<string, boolean>>();
     for (const [key, candidate] of objectEntries(value)) {
         if (typeof candidate === "boolean") {
-            normalized[key] = candidate;
+            Object.defineProperty(normalized, key, {
+                configurable: true,
+                enumerable: true,
+                value: candidate,
+                writable: true,
+            });
         }
     }
 
@@ -215,10 +221,16 @@ function normalizeSiteDetailsTabRecord(
         return undefined;
     }
 
-    const normalized: Record<string, SiteDetailsTab> = {};
+    const normalized =
+        createNullPrototypeObject<Record<string, SiteDetailsTab>>();
     for (const [key, candidate] of objectEntries(value)) {
         if (isSiteDetailsTab(candidate)) {
-            normalized[key] = candidate;
+            Object.defineProperty(normalized, key, {
+                configurable: true,
+                enumerable: true,
+                value: candidate,
+                writable: true,
+            });
         }
     }
 

@@ -730,6 +730,68 @@ describe(useUIStore, () => {
             });
         });
 
+        it("should preserve prototype-named site keys during migration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Migration", "type");
+
+            const migrate = useUIStore.persist.getOptions().migrate;
+            expect(migrate).toBeTypeOf("function");
+
+            const collapsedState = Object.create(null) as Record<
+                string,
+                boolean
+            >;
+            Object.defineProperty(collapsedState, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: true,
+                writable: true,
+            });
+
+            const tabState = Object.create(null) as Record<string, string>;
+            Object.defineProperty(tabState, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "history",
+                writable: true,
+            });
+
+            const migrated = await migrate?.(
+                {
+                    siteDetailsHeaderCollapsedState: collapsedState,
+                    siteDetailsTabState: tabState,
+                },
+                1
+            );
+            const migratedCollapsedState =
+                migrated?.siteDetailsHeaderCollapsedState ?? {};
+            const migratedTabState = migrated?.siteDetailsTabState ?? {};
+
+            expect(
+                Object.getPrototypeOf(migratedCollapsedState)
+            ).toBeNull();
+            expect(Object.getPrototypeOf(migratedTabState)).toBeNull();
+            expect(
+                Object.hasOwn(migratedCollapsedState, "__proto__")
+            ).toBe(true);
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    migratedCollapsedState,
+                    "__proto__"
+                )?.value
+            ).toBe(true);
+            expect(Object.hasOwn(migratedTabState, "__proto__")).toBe(true);
+            expect(
+                Object.getOwnPropertyDescriptor(migratedTabState, "__proto__")
+                    ?.value
+            ).toBe("history");
+        });
+
         it("should handle multiple layout switches", async ({
             task,
             annotate,
