@@ -536,6 +536,59 @@ describe(WindowService, () => {
             expect(shell.openExternal).not.toHaveBeenCalled();
         });
 
+        it("redacts blocked webview attachment src before logging", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            const window = windowService.createMainWindow();
+
+            const onCalls = vi.mocked(window.webContents.on).mock
+                .calls as unknown as [
+                string,
+                (
+                    event: any,
+                    webPreferences: any,
+                    params: Record<string, string>
+                ) => void,
+            ][];
+            const willAttachWebviewHandler = onCalls.find(
+                ([eventName]) => eventName === "will-attach-webview"
+            )?.[1];
+
+            expect(willAttachWebviewHandler).toBeTypeOf("function");
+
+            const event = {
+                preventDefault: vi.fn(),
+            };
+
+            willAttachWebviewHandler?.(
+                event,
+                {},
+                {
+                    src: "https://user:pass@evil.example/embed?token=secret#fragment",
+                }
+            );
+
+            expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            expect(logger.warn).toHaveBeenCalledWith(
+                "[WindowService] Blocked webview attachment",
+                {
+                    src: "https://evil.example/embed",
+                }
+            );
+            expect(
+                JSON.stringify(vi.mocked(logger.warn).mock.calls)
+            ).not.toContain("secret");
+            expect(
+                JSON.stringify(vi.mocked(logger.warn).mock.calls)
+            ).not.toContain("pass");
+        });
+
         it("allows chrome-extension navigations in development", async ({
             task,
             annotate,

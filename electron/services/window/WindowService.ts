@@ -40,6 +40,7 @@ import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { withRetry } from "@shared/utils/retry";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as electron from "electron";
 import { randomInt } from "node:crypto";
@@ -337,7 +338,10 @@ export class WindowService {
     ): void => {
         event.preventDefault();
         logger.warn("[WindowService] Blocked webview attachment", {
-            src: typeof params["src"] === "string" ? params["src"] : "",
+            src:
+                typeof params["src"] === "string"
+                    ? getSafeUrlForLogging(params["src"])
+                    : "",
         });
     };
 
