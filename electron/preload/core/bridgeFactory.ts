@@ -46,12 +46,7 @@ import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { ipcRenderer } from "electron";
-import {
-    isFinite as isFiniteNumber,
-    isInteger,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { isFinite as isFiniteNumber, isInteger, setHas } from "ts-extras";
 
 import {
     buildPayloadPreview,
@@ -394,23 +389,25 @@ async function withTimeout<T>(args: {
 }): Promise<T> {
     const { onTimeout, promise, timeoutMs } = args;
     let timeoutId: NodeJS.Timeout | undefined;
-    const TIMEOUT = Symbol("timeout");
 
     try {
         const raced = await Promise.race([
-            promise,
-            new Promise<typeof TIMEOUT>((resolve) => {
+            promise.then((value) => ({
+                kind: "value" as const,
+                value,
+            })),
+            new Promise<{ readonly kind: "timeout" }>((resolve) => {
                 timeoutId = setTimeout(() => {
-                    resolve(TIMEOUT);
+                    resolve({ kind: "timeout" });
                 }, timeoutMs);
             }),
         ]);
 
-        if (raced === TIMEOUT) {
+        if (raced.kind === "timeout") {
             throw onTimeout();
         }
 
-        return safeCastTo<T>(raced);
+        return raced.value;
     } finally {
         clearTimeout(timeoutId);
     }
