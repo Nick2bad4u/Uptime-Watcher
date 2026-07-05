@@ -1,4 +1,5 @@
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { arrayFirst, arrayJoin, isFinite as isFiniteNumber } from "ts-extras";
@@ -45,18 +46,28 @@ export function tryDescribeGoogleDriveApiError(
         return fallbackMessage.length > 0 ? fallbackMessage : undefined;
     }
 
-    const responseCandidate = error["response"];
-    const response = isRecord(responseCandidate)
-        ? responseCandidate
-        : undefined;
-
-    const statusCandidate = response?.["status"];
-    const status =
-        typeof statusCandidate === "number" && isFiniteNumber(statusCandidate)
-            ? statusCandidate
+    const responseCandidate = getOwnDataProperty(error, "response");
+    const response =
+        responseCandidate.found && isRecord(responseCandidate.value)
+            ? responseCandidate.value
             : undefined;
 
-    const data = normalizeGoogleApiErrorCandidate(response?.["data"]);
+    const statusCandidate = response
+        ? getOwnDataProperty(response, "status")
+        : undefined;
+    const status =
+        statusCandidate?.found &&
+        typeof statusCandidate.value === "number" &&
+        isFiniteNumber(statusCandidate.value)
+            ? statusCandidate.value
+            : undefined;
+
+    const dataCandidate = response
+        ? getOwnDataProperty(response, "data")
+        : undefined;
+    const data = normalizeGoogleApiErrorCandidate(
+        dataCandidate?.found ? dataCandidate.value : undefined
+    );
 
     const envelope = tryParseGoogleApiErrorEnvelope(data);
     const apiMessage = envelope?.error?.message?.trim();

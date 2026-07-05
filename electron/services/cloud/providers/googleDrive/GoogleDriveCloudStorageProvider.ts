@@ -6,6 +6,7 @@ import {
     normalizeProviderObjectKey,
 } from "@shared/utils/cloudKeyNormalization";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
@@ -99,18 +100,20 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
         return undefined;
     }
 
-    if (!Reflect.has(error, "response")) {
+    const response = getOwnDataProperty(error, "response");
+    if (
+        !response.found ||
+        typeof response.value !== "object" ||
+        response.value === null
+    ) {
         return undefined;
     }
 
-    const response: unknown = Reflect.get(error, "response");
-    if (typeof response !== "object" || response === null) {
-        return undefined;
-    }
-
-    const status: unknown = Reflect.get(response, "status");
-    return typeof status === "number" && isFiniteNumber(status)
-        ? status
+    const status = getOwnDataProperty(response.value, "status");
+    return status.found &&
+        typeof status.value === "number" &&
+        isFiniteNumber(status.value)
+        ? status.value
         : undefined;
 }
 

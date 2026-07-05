@@ -45,4 +45,26 @@ describe(tryDescribeGoogleDriveApiError, () => {
             "429/RESOURCE_EXHAUSTED: Too many requests (reason: rateLimitExceeded)"
         );
     });
+
+    it("does not invoke accessor-backed response fields", () => {
+        let getterCalls = 0;
+        const error = new Error("Request failed");
+        Object.defineProperty(error, "response", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return {
+                    data: {
+                        error: {
+                            message: "hidden",
+                        },
+                    },
+                    status: 404,
+                };
+            },
+        });
+
+        expect(tryDescribeGoogleDriveApiError(error)).toBe("Request failed");
+        expect(getterCalls).toBe(0);
+    });
 });

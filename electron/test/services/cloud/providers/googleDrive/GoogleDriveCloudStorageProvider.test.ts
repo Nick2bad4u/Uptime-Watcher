@@ -369,4 +369,48 @@ describe(GoogleDriveCloudStorageProvider, () => {
             googleDriveClientMocks.driveStub.files.get
         ).not.toHaveBeenCalled();
     });
+
+    it("does not invoke accessor-backed Drive error response fields", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+        let getterCalls = 0;
+        const driveError = new Error("Drive request failed");
+        Object.defineProperty(driveError, "response", {
+            enumerable: true,
+            get: () => {
+                getterCalls += 1;
+                return { status: 404 };
+            },
+        });
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "sync-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "file-id" }], nextPageToken: null },
+            });
+        googleDriveClientMocks.driveStub.files.get.mockRejectedValueOnce(
+            driveError
+        );
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(
+            provider.downloadObject("sync/file.txt")
+        ).rejects.toMatchObject({
+            code: undefined,
+            message: "Failed to download Google Drive object 'sync/file.txt': Drive request failed",
+            operation: "downloadObject",
+            providerKind: "google-drive",
+            target: "sync/file.txt",
+        });
+        expect(getterCalls).toBe(0);
+    });
 });
