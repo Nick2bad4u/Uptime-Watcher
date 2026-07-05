@@ -23,7 +23,10 @@ import {
     initialSitesState,
     type SitesState,
 } from "../../../stores/sites/useSitesState";
-import { buildMonitoringLockKey } from "../../../stores/sites/utils/optimisticMonitoringLock";
+import {
+    buildMonitoringLockKey,
+    isOptimisticLockKey,
+} from "../../../stores/sites/utils/optimisticMonitoringLock";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock logging
@@ -493,6 +496,26 @@ describe("useSitesState", () => {
                     .toBeTruthy();
                 expect(result.optimisticMonitoringLocks).toEqual({});
             }
+        });
+    });
+
+    describe(buildMonitoringLockKey, () => {
+        it("should escape separators inside site and monitor identifiers", async ({
+            annotate,
+        }) => {
+            await annotate("Component: optimisticMonitoringLock", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Identifier Escaping", "type");
+
+            const key = buildMonitoringLockKey(
+                "site::identifier%",
+                "monitor::identifier::"
+            );
+
+            expect(key).toBe(
+                "site%3A%3Aidentifier%25::monitor%3A%3Aidentifier%3A%3A"
+            );
+            expect(isOptimisticLockKey(key)).toBeTruthy();
         });
     });
 

@@ -8,7 +8,13 @@
  * @file Property-based fuzzing tests for Sites Store using fast-check
  */
 
-import type { Monitor, MonitorStatus, Site } from "@shared/types";
+import {
+    MONITOR_STATUS_VALUES,
+    STATUS_HISTORY_VALUES,
+    type Monitor,
+    type MonitorStatus,
+    type Site,
+} from "@shared/types";
 
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
@@ -69,12 +75,7 @@ const createTestSitesStore = () => {
 // Property-based test arbitraries for sites store
 const arbitraries = {
     monitorStatus: safeCastTo<fc.Arbitrary<MonitorStatus>>(
-        fc.constantFrom(
-            "up" as const,
-            "down" as const,
-            "pending" as const,
-            "paused" as const
-        )
+        fc.constantFrom(...MONITOR_STATUS_VALUES)
     ),
 
     monitor: safeCastTo<fc.Arbitrary<Monitor>>(
@@ -89,7 +90,7 @@ const arbitraries = {
             checkInterval: fc.integer({ min: 1000, max: 300_000 }), // 1 second to 5 minutes
             history: fc.array(
                 fc.record({
-                    status: fc.constantFrom("up" as const, "down" as const),
+                    status: fc.constantFrom(...STATUS_HISTORY_VALUES),
                     responseTime: fc.integer({ min: 0, max: 5000 }),
                     timestamp: fc.integer({ min: 0, max: Date.now() }),
                     details: fc.option(fc.string()),
@@ -99,12 +100,7 @@ const arbitraries = {
             monitoring: fc.boolean(),
             responseTime: fc.integer({ min: 0, max: 10_000 }),
             retryAttempts: fc.integer({ min: 0, max: 10 }),
-            status: fc.constantFrom(
-                "up" as const,
-                "down" as const,
-                "pending" as const,
-                "paused" as const
-            ),
+            status: fc.constantFrom(...MONITOR_STATUS_VALUES),
             timeout: fc.integer({ min: 1000, max: 30_000 }), // 1-30 seconds
             // Optional fields
             activeOperations: fc.option(fc.array(fc.string())),
@@ -348,12 +344,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
                 const state = useSitesStore.getState();
                 const addedSite = arrayFirst(state.sites)!;
                 for (const monitor of addedSite.monitors) {
-                    expect([
-                        "up",
-                        "down",
-                        "pending",
-                        "paused",
-                    ]).toContain(monitor.status);
+                    expect(MONITOR_STATUS_VALUES).toContain(monitor.status);
                 }
             }
         );

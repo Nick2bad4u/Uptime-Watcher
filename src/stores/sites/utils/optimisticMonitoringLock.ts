@@ -17,13 +17,15 @@ export interface OptimisticMonitoringLock {
 
 const LOCK_KEY_SEPARATOR = "::";
 
+const encodeLockKeySegment = (value: string): string =>
+    value.replaceAll("%", "%25").replaceAll(":", "%3A");
+
 /**
  * Unique branded key used to reference optimistic monitoring locks.
  *
  * @remarks
- * Combines the site identifier and monitor identifier using a deterministic
- * separator so locks can be stored in simple record maps without accidental
- * collisions.
+ * Combines escaped site and monitor identifiers using a deterministic separator
+ * so locks can be stored in simple record maps without accidental collisions.
  */
 export type OptimisticLockKey = Tagged<
     string,
@@ -61,7 +63,7 @@ export const buildMonitoringLockKey = (
     siteIdentifier: Site["identifier"],
     monitorId: ArrayElement<Site["monitors"]>["id"]
 ): OptimisticLockKey => {
-    const key = `${siteIdentifier}${LOCK_KEY_SEPARATOR}${monitorId}`;
+    const key = `${encodeLockKeySegment(siteIdentifier)}${LOCK_KEY_SEPARATOR}${encodeLockKeySegment(monitorId)}`;
 
     if (!isOptimisticLockKey(key)) {
         throw new Error("Failed to build optimistic monitoring lock key");
