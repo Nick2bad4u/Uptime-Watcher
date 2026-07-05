@@ -4,7 +4,12 @@
  *   Tests the frontend re-export wrapper to ensure coverage
  */
 
-import type { MonitorStatus, SiteStatus } from "@shared/types";
+import {
+    MONITOR_STATUS_VALUES,
+    SITE_STATUS_VALUES,
+    type MonitorStatus,
+    type SiteStatus,
+} from "@shared/types";
 
 import {
     sampleOne,
@@ -175,12 +180,7 @@ describe("frontend siteStatus re-exports", () => {
 
             const result = calculateSiteStatus(site);
 
-            expect([
-                "up",
-                "down",
-                "mixed",
-                "unknown",
-            ]).toContain(result);
+            expect(SITE_STATUS_VALUES).toContain(result);
         });
 
         it("should call re-exported getSiteDisplayStatus", async ({
@@ -228,14 +228,7 @@ describe("frontend siteStatus re-exports", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const statuses: SiteStatus[] = [
-                "up",
-                "down",
-                "mixed",
-                "unknown",
-            ];
-
-            for (const status of statuses) {
+            for (const status of SITE_STATUS_VALUES) {
                 const result = getSiteStatusVariant(status);
 
                 expect(result).toBeTypeOf("string");
@@ -321,14 +314,7 @@ describe("frontend siteStatus re-exports", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitorStatuses = [
-                "down",
-                "paused",
-                "pending",
-                "up",
-            ] as const;
-
-            for (const status of monitorStatuses) {
+            for (const status of MONITOR_STATUS_VALUES) {
                 const site = {
                     id: `test-${status}`,
                     monitors: [{ monitoring: true, status }],
