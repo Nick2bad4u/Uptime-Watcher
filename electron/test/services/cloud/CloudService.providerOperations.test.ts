@@ -405,7 +405,9 @@ describe("CloudService.providerOperations", () => {
                 ({
                     DropboxTokenManager: class {
                         public async revokeStoredTokens(): Promise<void> {
-                            throw new Error("revoke failed");
+                            throw new Error(
+                                "revoke failed refresh_token=VERY_SECRET_TOKEN Authorization: Bearer VERY_SECRET_TOKEN"
+                            );
                         }
                     },
                 }) as never,
@@ -421,9 +423,13 @@ describe("CloudService.providerOperations", () => {
         expect(loggerWarn).toHaveBeenCalledWith(
             "[CloudService] Failed to revoke provider tokens",
             {
-                message: "revoke failed",
+                message:
+                    "revoke failed refresh_token=[redacted] [redacted]",
                 provider: "dropbox",
             }
+        );
+        expect(JSON.stringify(loggerWarn.mock.calls)).not.toContain(
+            "VERY_SECRET_TOKEN"
         );
         await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe("");
         await expect(

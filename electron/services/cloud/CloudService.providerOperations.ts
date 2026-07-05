@@ -4,6 +4,7 @@ import type {
 } from "@shared/types/cloud";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
@@ -35,10 +36,8 @@ import {
 import { deleteProviderSecretsBestEffort } from "./internal/providerSecretCleanup";
 
 function logTokenRevocationFailure(provider: string, error: unknown): void {
-    const resolved = ensureError(error);
-
     logger.warn("[CloudService] Failed to revoke provider tokens", {
-        message: resolved.message,
+        message: getUserFacingErrorDetail(error),
         provider,
     });
 }
