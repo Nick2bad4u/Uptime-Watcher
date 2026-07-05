@@ -448,6 +448,7 @@ if (isDev()) {
                 isReloadInProgress = false;
                 reloadProgressTimer = null;
             }, 500); // 500ms timeout for reload operation
+            reloadProgressTimer.unref();
         }
     };
     /**
@@ -678,6 +679,7 @@ class Main {
         let timeoutId: ReturnType<typeof setTimeout> | undefined;
         const timeout = new Promise<void>((resolve) => {
             timeoutId = setTimeout(resolve, Main.FATAL_SHUTDOWN_TIMEOUT_MS);
+            timeoutId.unref();
         });
 
         try {
