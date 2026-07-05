@@ -9,6 +9,7 @@
  */
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 
 /** Optional warning logger used by download helpers. */
 export interface BrowserDownloadWarnLogger {
@@ -24,6 +25,35 @@ export class FileDownloadDomAttachmentError extends Error {
         super(message, options);
         this.name = "FileDownloadDomAttachmentError";
     }
+}
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+function getDocumentBody(): object {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        throw new TypeError("Document is unavailable");
+    }
+
+    const body: unknown = Reflect.get(documentProperty.value, "body");
+    if (!isObjectLike(body)) {
+        throw new TypeError("Document body is unavailable");
+    }
+
+    return body;
+}
+
+function appendAnchorToBody(body: object, anchor: HTMLAnchorElement): void {
+    const append: unknown = Reflect.get(body, "append");
+
+    if (typeof append !== "function") {
+        throw new TypeError("Document body append is unavailable");
+    }
+
+    Reflect.apply(append, body, [anchor]);
 }
 
 /**
@@ -43,10 +73,9 @@ export function clickDownloadAnchor(args: {
 
     anchor.style.display = "none";
 
-    const { body } = document;
-
     try {
-        body.append(anchor);
+        const body = getDocumentBody();
+        appendAnchorToBody(body, anchor);
     } catch (error: unknown) {
         throw new FileDownloadDomAttachmentError(
             "Failed to attach download anchor to DOM",

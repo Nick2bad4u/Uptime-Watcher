@@ -314,6 +314,32 @@ describe("file Download Utility", () => {
             expect(document.body.append).toHaveBeenCalled();
         });
 
+        it("should handle document body access errors with fallback attempt", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const buffer = new ArrayBuffer(10);
+            const fileName = "test.txt";
+
+            Object.defineProperty(globalThis.document, "body", {
+                configurable: true,
+                get() {
+                    throw new Error("document body unavailable");
+                },
+            });
+
+            expect(() => {
+                downloadFile({ buffer, fileName });
+            }).not.toThrow();
+
+            expect(mockAnchor.click).toHaveBeenCalled();
+        });
+
         it("should clean up object URL even when errors occur", async ({
             annotate,
             task,
