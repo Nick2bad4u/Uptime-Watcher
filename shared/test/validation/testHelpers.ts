@@ -8,6 +8,8 @@
  * required 'history' field.
  */
 
+import type { StatusHistoryStatus } from "../../types";
+
 interface BaseMonitorData {
     checkInterval: number;
     history: any[];
@@ -49,7 +51,7 @@ interface SiteData {
 interface StatusHistoryData {
     details?: string;
     responseTime: number;
-    status: "down" | "up";
+    status: StatusHistoryStatus;
     timestamp: number;
 }
 

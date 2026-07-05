@@ -583,7 +583,10 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             expect(history.details).toBe("Connection timeout");
         });
 
-        it("should handle both status types", async ({ task, annotate }) => {
+        it("should handle all status history types", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: testHelpers", "component");
             await annotate("Category: Validation", "category");
@@ -591,9 +594,13 @@ describe("Test Helpers - Comprehensive Coverage", () => {
 
             const upHistory = createValidStatusHistory({ status: "up" });
             const downHistory = createValidStatusHistory({ status: "down" });
+            const degradedHistory = createValidStatusHistory({
+                status: "degraded",
+            });
 
             expect(upHistory.status).toBe("up");
             expect(downHistory.status).toBe("down");
+            expect(degradedHistory.status).toBe("degraded");
         });
 
         it("should handle various response times", async ({
