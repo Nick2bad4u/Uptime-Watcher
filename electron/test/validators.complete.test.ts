@@ -14,6 +14,7 @@
  */
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
+import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 import {
     MONITOR_ID_MAX_LENGTH,
     MONITOR_ID_TOO_LONG_MESSAGE,
@@ -996,10 +997,13 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
+                const invalidRestoreResult = {
+                    restoredAt: "invalid",
+                } as unknown as SerializedDatabaseRestoreResult;
                 const result =
-                    DataHandlerResultValidators.restoreSqliteBackup({
-                        restoredAt: "invalid",
-                    });
+                    DataHandlerResultValidators.restoreSqliteBackup(
+                        invalidRestoreResult
+                    );
 
                 expect(isValidationFailure(result)).toBeTruthy();
                 expect(result?.some((issue) => issue.includes("restoredAt")))

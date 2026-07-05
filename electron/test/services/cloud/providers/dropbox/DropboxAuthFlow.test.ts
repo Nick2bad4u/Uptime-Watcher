@@ -10,6 +10,7 @@ import {
     DEFAULT_DROPBOX_LOOPBACK_PORT,
     DropboxAuthFlow,
 } from "@electron/services/cloud/providers/dropbox/DropboxAuthFlow";
+import type { DropboxResponse } from "dropbox";
 import * as http from "node:http";
 import * as https from "node:https";
 import { describe, expect, it, vi } from "vitest";
@@ -236,7 +237,11 @@ describe(DropboxAuthFlow, () => {
                 }
             ),
             getAccessTokenFromCode: vi.fn(async () => {
-                const response = {};
+                const response: DropboxResponse<object> = {
+                    headers: {},
+                    result: {},
+                    status: 200,
+                };
                 Object.defineProperty(response, "result", {
                     enumerable: true,
                     get: () => {
