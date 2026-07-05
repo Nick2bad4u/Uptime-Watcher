@@ -34,9 +34,13 @@ import type { Site } from "@shared/types";
 import type { Promisable } from "type-fest";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import {
+    isDefined,
+    isFinite as isFiniteNumber,
+    objectEntries,
+} from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -89,6 +93,43 @@ const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
     "uptime",
 ] as const;
 
+const CHART_TIME_RANGES: readonly ChartTimeRange[] = [
+    "1h",
+    "7d",
+    "24h",
+    "30d",
+];
+const CHART_TIME_RANGE_SET = new Set<string>(CHART_TIME_RANGES);
+
+const INTERFACE_DENSITIES: readonly InterfaceDensity[] = [
+    "comfortable",
+    "compact",
+    "cozy",
+];
+const INTERFACE_DENSITY_SET = new Set<string>(INTERFACE_DENSITIES);
+
+const SITE_CARD_PRESENTATIONS: readonly SiteCardPresentation[] = [
+    "grid",
+    "stacked",
+];
+const SITE_CARD_PRESENTATION_SET = new Set<string>(SITE_CARD_PRESENTATIONS);
+
+const SITE_DETAILS_STATIC_TABS: readonly SiteDetailsTab[] = [
+    "analytics",
+    "history",
+    "monitor-overview",
+    "settings",
+    "site-overview",
+];
+const SITE_DETAILS_STATIC_TAB_SET = new Set<string>(SITE_DETAILS_STATIC_TABS);
+
+const SITE_LIST_LAYOUT_MODES: readonly SiteListLayoutMode[] = [
+    "card-compact",
+    "card-large",
+    "list",
+];
+const SITE_LIST_LAYOUT_MODE_SET = new Set<string>(SITE_LIST_LAYOUT_MODES);
+
 /**
  * Default width allocation (percentages) for list mode columns.
  */
@@ -125,6 +166,163 @@ const createEmptySiteDetailsTabState = (): Record<
     string,
     SiteDetailsTab
 > => ({});
+
+function getOwnDataField(source: object, key: keyof UIPersistedState): unknown {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+}
+
+const isChartTimeRange = (value: unknown): value is ChartTimeRange =>
+    typeof value === "string" && CHART_TIME_RANGE_SET.has(value);
+
+const isInterfaceDensity = (value: unknown): value is InterfaceDensity =>
+    typeof value === "string" && INTERFACE_DENSITY_SET.has(value);
+
+const isSiteCardPresentation = (
+    value: unknown
+): value is SiteCardPresentation =>
+    typeof value === "string" && SITE_CARD_PRESENTATION_SET.has(value);
+
+const isSiteDetailsTab = (value: unknown): value is SiteDetailsTab =>
+    (typeof value === "string" && SITE_DETAILS_STATIC_TAB_SET.has(value)) ||
+    (typeof value === "string" && value.endsWith("-analytics"));
+
+const isSiteListLayoutMode = (value: unknown): value is SiteListLayoutMode =>
+    typeof value === "string" && SITE_LIST_LAYOUT_MODE_SET.has(value);
+
+function normalizeBooleanRecord(
+    value: unknown
+): Record<string, boolean> | undefined {
+    if (!isRecord(value)) {
+        return undefined;
+    }
+
+    const normalized: Record<string, boolean> = {};
+    for (const [key, candidate] of objectEntries(value)) {
+        if (typeof candidate === "boolean") {
+            normalized[key] = candidate;
+        }
+    }
+
+    return normalized;
+}
+
+function normalizeSiteDetailsTabRecord(
+    value: unknown
+): Record<string, SiteDetailsTab> | undefined {
+    if (!isRecord(value)) {
+        return undefined;
+    }
+
+    const normalized: Record<string, SiteDetailsTab> = {};
+    for (const [key, candidate] of objectEntries(value)) {
+        if (isSiteDetailsTab(candidate)) {
+            normalized[key] = candidate;
+        }
+    }
+
+    return normalized;
+}
+
+function normalizePersistedColumnWidths(
+    value: unknown
+): Record<SiteTableColumnKey, number> | undefined {
+    if (!isRecord(value)) {
+        return undefined;
+    }
+
+    const widths: Partial<Record<SiteTableColumnKey, number>> = {};
+    for (const columnKey of SITE_TABLE_COLUMN_KEYS) {
+        const width = value[columnKey];
+        if (typeof width === "number") {
+            widths[columnKey] = width;
+        }
+    }
+
+    return normalizeSiteTableColumnWidths(widths);
+}
+
+function normalizePersistedState(
+    persistedState: unknown
+): Partial<UIPersistedState> {
+    if (!isRecord(persistedState)) {
+        return {};
+    }
+
+    const state: Partial<UIPersistedState> = {};
+    const activeSiteDetailsTab = getOwnDataField(
+        persistedState,
+        "activeSiteDetailsTab"
+    );
+    if (isSiteDetailsTab(activeSiteDetailsTab)) {
+        state.activeSiteDetailsTab = activeSiteDetailsTab;
+    }
+
+    const showAdvancedMetrics = getOwnDataField(
+        persistedState,
+        "showAdvancedMetrics"
+    );
+    if (typeof showAdvancedMetrics === "boolean") {
+        state.showAdvancedMetrics = showAdvancedMetrics;
+    }
+
+    const sidebarCollapsedPreference = getOwnDataField(
+        persistedState,
+        "sidebarCollapsedPreference"
+    );
+    if (typeof sidebarCollapsedPreference === "boolean") {
+        state.sidebarCollapsedPreference = sidebarCollapsedPreference;
+    }
+
+    const siteCardPresentation = getOwnDataField(
+        persistedState,
+        "siteCardPresentation"
+    );
+    if (isSiteCardPresentation(siteCardPresentation)) {
+        state.siteCardPresentation = siteCardPresentation;
+    }
+
+    const siteDetailsChartTimeRange = getOwnDataField(
+        persistedState,
+        "siteDetailsChartTimeRange"
+    );
+    if (isChartTimeRange(siteDetailsChartTimeRange)) {
+        state.siteDetailsChartTimeRange = siteDetailsChartTimeRange;
+    }
+
+    const siteDetailsHeaderCollapsedState = normalizeBooleanRecord(
+        getOwnDataField(persistedState, "siteDetailsHeaderCollapsedState")
+    );
+    if (isDefined(siteDetailsHeaderCollapsedState)) {
+        state.siteDetailsHeaderCollapsedState = siteDetailsHeaderCollapsedState;
+    }
+
+    const siteDetailsTabState = normalizeSiteDetailsTabRecord(
+        getOwnDataField(persistedState, "siteDetailsTabState")
+    );
+    if (isDefined(siteDetailsTabState)) {
+        state.siteDetailsTabState = siteDetailsTabState;
+    }
+
+    const siteListLayout = getOwnDataField(persistedState, "siteListLayout");
+    if (isSiteListLayoutMode(siteListLayout)) {
+        state.siteListLayout = siteListLayout;
+    }
+
+    const siteTableColumnWidths = normalizePersistedColumnWidths(
+        getOwnDataField(persistedState, "siteTableColumnWidths")
+    );
+    if (isDefined(siteTableColumnWidths)) {
+        state.siteTableColumnWidths = siteTableColumnWidths;
+    }
+
+    const surfaceDensity = getOwnDataField(persistedState, "surfaceDensity");
+    if (isInterfaceDensity(surfaceDensity)) {
+        state.surfaceDensity = surfaceDensity;
+    }
+
+    return state;
+}
 
 const getDefaultUIPersistedState = (): UIPersistedState => ({
     activeSiteDetailsTab: "site-overview",
@@ -468,11 +666,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             // keeping transient state (modals, selections) in memory only.
             ...UI_PERSIST_CONFIG,
             migrate: (persistedState: unknown, version: number) => {
-                const state: Partial<UIPersistedState> = isRecord(
-                    persistedState
-                )
-                    ? castUnchecked<Partial<UIPersistedState>>(persistedState)
-                    : {};
+                const state = normalizePersistedState(persistedState);
 
                 if (version < UI_PERSIST_VERSION) {
                     return normalizeUIPersistedState({

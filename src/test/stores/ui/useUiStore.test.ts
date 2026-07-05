@@ -670,6 +670,66 @@ describe(useUIStore, () => {
             });
         });
 
+        it("should ignore invalid persisted UI preferences during migration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Migration", "type");
+
+            const migrate = useUIStore.persist.getOptions().migrate;
+            expect(migrate).toBeTypeOf("function");
+
+            const migrated = await migrate?.(
+                {
+                    activeSiteDetailsTab: "not-a-tab",
+                    showAdvancedMetrics: "true",
+                    sidebarCollapsedPreference: true,
+                    siteCardPresentation: "carousel",
+                    siteDetailsChartTimeRange: "forever",
+                    siteDetailsHeaderCollapsedState: {
+                        ignored: "yes",
+                        siteA: true,
+                    },
+                    siteDetailsTabState: {
+                        siteA: "history",
+                        siteB: "broken",
+                    },
+                    siteListLayout: "masonry",
+                    siteTableColumnWidths: {
+                        response: "wide",
+                        site: 28,
+                        status: 18,
+                    },
+                    surfaceDensity: "dense",
+                },
+                1
+            );
+
+            expect(migrated).toMatchObject({
+                activeSiteDetailsTab: "site-overview",
+                showAdvancedMetrics: false,
+                sidebarCollapsedPreference: true,
+                siteCardPresentation: "grid",
+                siteDetailsChartTimeRange: "24h",
+                siteDetailsHeaderCollapsedState: {
+                    siteA: true,
+                },
+                siteDetailsTabState: {
+                    siteA: "history",
+                },
+                siteListLayout: "list",
+                siteTableColumnWidths: {
+                    response: 12,
+                    site: 28,
+                    status: 18,
+                },
+                surfaceDensity: "compact",
+            });
+        });
+
         it("should handle multiple layout switches", async ({
             task,
             annotate,
