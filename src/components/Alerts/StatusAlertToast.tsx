@@ -7,11 +7,9 @@ import type { JSX } from "react";
 import {
     isMonitorStatus,
     type MonitorStatus,
-    type SiteStatus,
     STATUS_KIND,
 } from "@shared/types";
 import { useCallback, useEffect, useMemo } from "react";
-import { safeCastTo } from "ts-extras";
 
 import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 
@@ -119,10 +117,7 @@ export const StatusAlertToast = ({
             type="button"
         >
             <div className="status-alert__indicator">
-                <StatusIndicator
-                    size="sm"
-                    status={safeCastTo<SiteStatus>(resolvedStatus)}
-                />
+                <StatusIndicator size="sm" status={resolvedStatus} />
             </div>
             <div className="status-alert__content">
                 <header className="status-alert__header">
