@@ -17,7 +17,7 @@ import type { RefObject } from "react";
 import type { UnknownArray } from "type-fest";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
-import { isDefined, setHas } from "ts-extras";
+import { setHas } from "ts-extras";
 
 /**
  * Listener invoked whenever the associated resize observer detects changes that
@@ -280,8 +280,8 @@ export function useOverflowMarquee<
             evaluateOverflow();
 
             const element = containerRef.current;
-            const hasWindow = isDefined(globalThis);
-            const shouldAttachWindowListener = hasWindow && element !== null;
+            const shouldAttachWindowListener =
+                typeof window !== "undefined" && element !== null;
 
             const handleResize = (): void => {
                 evaluateOverflow();
