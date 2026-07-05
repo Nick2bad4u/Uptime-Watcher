@@ -19,6 +19,7 @@ import type {
     TouchEventHandler,
 } from "react";
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import {
     memo,
     useCallback,
@@ -107,6 +108,84 @@ export interface TooltipProperties {
 const noop = (): void => {
     // No-op default for useMount convenience
 };
+
+type WindowListenerMethod = (
+    this: unknown,
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: AddEventListenerOptions | boolean
+) => void;
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+const isWindowListenerMethod = (
+    value: unknown
+): value is WindowListenerMethod => typeof value === "function";
+
+function getWindowListenerMethod(
+    holder: unknown,
+    key: "addEventListener" | "removeEventListener"
+): WindowListenerMethod | undefined {
+    if (!isObjectLike(holder)) {
+        return undefined;
+    }
+
+    try {
+        const candidate: unknown = Reflect.get(holder, key);
+        return isWindowListenerMethod(candidate) ? candidate : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+function addWindowEventListener(
+    type: string,
+    handler: EventListener,
+    options?: AddEventListenerOptions | boolean
+): () => void {
+    const windowProperty = getOwnPropertyValue(globalThis, "window");
+
+    if (!windowProperty.found) {
+        return noop;
+    }
+
+    const addEventListener = getWindowListenerMethod(
+        windowProperty.value,
+        "addEventListener"
+    );
+    const removeEventListener = getWindowListenerMethod(
+        windowProperty.value,
+        "removeEventListener"
+    );
+
+    if (!addEventListener || !removeEventListener) {
+        return noop;
+    }
+
+    try {
+        Reflect.apply(addEventListener, windowProperty.value, [
+            type,
+            handler,
+            options,
+        ]);
+    } catch {
+        return noop;
+    }
+
+    return (): void => {
+        try {
+            Reflect.apply(removeEventListener, windowProperty.value, [
+                type,
+                handler,
+                options,
+            ]);
+        } catch {
+            // Tooltip reposition listener cleanup is best-effort.
+        }
+    };
+}
 
 /**
  * Ensures tooltip position switches remain exhaustive.
@@ -487,8 +566,11 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 passive: true,
             } as const;
 
-            window.addEventListener("resize", handleReposition);
-            window.addEventListener(
+            const removeResizeListener = addWindowEventListener(
+                "resize",
+                handleReposition
+            );
+            const removeScrollListener = addWindowEventListener(
                 "scroll",
                 handleReposition,
                 scrollListenerOptions
@@ -517,12 +599,8 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                     globalThis.cancelAnimationFrame(rafId);
                 }
 
-                window.removeEventListener("resize", handleReposition);
-                window.removeEventListener(
-                    "scroll",
-                    handleReposition,
-                    scrollListenerOptions
-                );
+                removeResizeListener();
+                removeScrollListener();
 
                 resizeObserver?.disconnect();
             };

@@ -202,6 +202,59 @@ describe("Tooltip fast-check coverage", () => {
         cancelAnimationFrameSpy.mockRestore();
     });
 
+    it("keeps rendering when reposition listener setup fails", async () => {
+        vi.spyOn(globalThis, "addEventListener").mockImplementation(() => {
+            throw new Error("listener unavailable");
+        });
+
+        const { unmount } = render(
+            <Tooltip content="Listener setup helper" delay={0}>
+                {(triggerProps) => <span {...triggerProps}>Hover me</span>}
+            </Tooltip>
+        );
+
+        const container = document.querySelector(".tooltip-container")!;
+
+        expect(() => {
+            fireEvent.mouseEnter(container);
+        }).not.toThrow();
+        await waitFor(
+            () => {
+                expect(document.querySelector(".tooltip")).not.toBeNull();
+            },
+            { timeout: 500 }
+        );
+
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+    });
+
+    it("keeps unmounting when reposition listener cleanup fails", async () => {
+        vi.spyOn(globalThis, "removeEventListener").mockImplementation(() => {
+            throw new Error("listener cleanup unavailable");
+        });
+
+        const { unmount } = render(
+            <Tooltip content="Listener cleanup helper" delay={0}>
+                {(triggerProps) => <span {...triggerProps}>Hover me</span>}
+            </Tooltip>
+        );
+
+        const container = document.querySelector(".tooltip-container")!;
+        fireEvent.mouseEnter(container);
+        await waitFor(
+            () => {
+                expect(document.querySelector(".tooltip")).not.toBeNull();
+            },
+            { timeout: 500 }
+        );
+
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+    });
+
     fcTest.prop(
         [
             cssClassArbitrary,
