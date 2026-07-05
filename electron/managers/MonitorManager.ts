@@ -139,7 +139,7 @@ export class MonitorManager {
     private readonly dependencies: MonitorManagerDependencies;
 
     /** Enhanced monitoring services that coordinate stateful operations. */
-    private readonly enhancedMonitoringServices!: EnhancedMonitoringServices;
+    private readonly enhancedMonitoringServices: EnhancedMonitoringServices;
 
     /** Typed event bus used for monitor event emission. */
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
