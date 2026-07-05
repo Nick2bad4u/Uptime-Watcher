@@ -4,7 +4,6 @@ import type {
     SiteSchemaType,
 } from "@shared/types/schemaTypes";
 
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import * as z from "zod";
 
 import { monitorIdSchema } from "./monitorFieldSchemas";
@@ -112,7 +111,7 @@ export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
 // The runtime schema is the source of truth; we cast the type for ergonomic, stable typing across IPC boundaries.
 
 export const typedStatusUpdateSchema: z.ZodType<StatusUpdate> =
-    castUnchecked(statusUpdateSchema);
+    statusUpdateSchema;
 
 /**
  * Compile-time assertion verifying {@link statusUpdateSchema} alignment with the
