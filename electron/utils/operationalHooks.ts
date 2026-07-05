@@ -66,7 +66,6 @@ import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
 
@@ -289,6 +288,13 @@ export interface OperationalHooksConfig<T = unknown> {
     throwOnFailure?: boolean;
 }
 
+type ThrowingOperationalHooksConfig<T = unknown> = Omit<
+    OperationalHooksConfig<T>,
+    "throwOnFailure"
+> & {
+    throwOnFailure?: true;
+};
+
 /**
  * Generate a unique operation ID for tracking using crypto.randomUUID().
  */
@@ -379,7 +385,7 @@ async function handleFailure<T>(
     context: OperationalHookContext,
     throwOnFailure = true,
     logLevel: OperationalLogLevel = "error"
-): Promise<T> {
+): Promise<T | null> {
     const { emitEvents, eventEmitter, onFailure } = config;
     const duration = Date.now() - startTime;
 
@@ -468,7 +474,7 @@ async function handleFailure<T>(
         throw error;
     }
 
-    return castUnchecked<T>(null);
+    return null;
 }
 
 /**
@@ -595,8 +601,16 @@ async function handleSuccess<T>(
  */
 export async function withOperationalHooks<T>(
     operation: () => Promise<T>,
+    config: ThrowingOperationalHooksConfig<T>
+): Promise<T>;
+export async function withOperationalHooks<T>(
+    operation: () => Promise<T>,
     config: OperationalHooksConfig<T>
-): Promise<T> {
+): Promise<T | null>;
+export async function withOperationalHooks<T>(
+    operation: () => Promise<T>,
+    config: OperationalHooksConfig<T>
+): Promise<T | null> {
     const {
         backoff = "exponential",
         context: contextInput,
