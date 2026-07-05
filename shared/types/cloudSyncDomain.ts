@@ -3,7 +3,9 @@
  */
 
 import { BASE_MONITOR_TYPES } from "@shared/types";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import * as z from "zod";
 
 /**
@@ -17,7 +19,7 @@ export interface CloudSyncSiteConfig {
 
 export const cloudSyncSiteConfigSchema: z.ZodType<CloudSyncSiteConfig> = z
     .object({
-        identifier: z.string().min(1),
+        identifier: siteIdentifierSchema,
         monitoring: z.boolean(),
         name: z.string().min(1),
     })
@@ -77,7 +79,7 @@ export const cloudSyncMonitorConfigSchema: z.ZodType<CloudSyncMonitorConfig> = z
         heartbeatStatusField: z.string().min(1).optional(),
         heartbeatTimestampField: z.string().min(1).optional(),
         host: z.string().min(1).optional(),
-        id: z.string().min(1),
+        id: monitorIdSchema,
         jsonPath: z.string().min(1).optional(),
         maxPongDelayMs: z.int().nonnegative().optional(),
         maxReplicationLagSeconds: z.int().nonnegative().optional(),
@@ -89,7 +91,7 @@ export const cloudSyncMonitorConfigSchema: z.ZodType<CloudSyncMonitorConfig> = z
         replicaStatusUrl: z.string().min(1).optional(),
         replicationTimestampField: z.string().min(1).optional(),
         retryAttempts: z.int().nonnegative(),
-        siteIdentifier: z.string().min(1),
+        siteIdentifier: siteIdentifierSchema,
         timeout: z.int().nonnegative(),
         type: z.enum(BASE_MONITOR_TYPES),
         url: z.string().min(1).optional(),

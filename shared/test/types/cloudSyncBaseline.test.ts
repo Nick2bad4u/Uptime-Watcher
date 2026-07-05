@@ -162,4 +162,39 @@ describe(parseCloudSyncBaseline, () => {
             })
         );
     });
+
+    it("rejects baseline site identifiers with control characters", () => {
+        const result = cloudSyncBaselineSchema.safeParse({
+            ...createBaselineCandidate(),
+            sites: {
+                "site\n1": {
+                    identifier: "site\n1",
+                    monitoring: true,
+                    name: "Example",
+                },
+            },
+        });
+
+        expect(result.success).toBeFalsy();
+    });
+
+    it("rejects baseline monitor identifiers with control characters", () => {
+        const result = cloudSyncBaselineSchema.safeParse({
+            ...createBaselineCandidate(),
+            monitors: {
+                "monitor\n1": {
+                    checkInterval: 60_000,
+                    id: "monitor\n1",
+                    monitoring: true,
+                    retryAttempts: 3,
+                    siteIdentifier: "site-1",
+                    timeout: 10_000,
+                    type: "http",
+                    url: "https://example.com",
+                },
+            },
+        });
+
+        expect(result.success).toBeFalsy();
+    });
 });
