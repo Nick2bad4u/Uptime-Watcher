@@ -390,6 +390,38 @@ describe("ServiceContainer - Working Tests", () => {
             expect(container).toBeDefined();
             expect(() => container.getSiteManager()).not.toThrow();
         });
+
+        it("should not invoke accessor-backed event registration methods", () => {
+            const { eventForwarder } = container as unknown as {
+                eventForwarder: {
+                    setupEventForwarding: (
+                        managerEventBus: unknown,
+                        managerName: string
+                    ) => void;
+                };
+            };
+            let accessCount = 0;
+            const managerEventBus = {};
+
+            for (const methodName of ["onTyped", "on"] as const) {
+                Object.defineProperty(managerEventBus, methodName, {
+                    configurable: true,
+                    enumerable: true,
+                    get() {
+                        accessCount += 1;
+                        return vi.fn();
+                    },
+                });
+            }
+
+            expect(() => {
+                eventForwarder.setupEventForwarding(
+                    managerEventBus,
+                    "AccessorManager"
+                );
+            }).not.toThrow();
+            expect(accessCount).toBe(0);
+        });
     });
 
     describe("Metadata forwarding preservation", () => {

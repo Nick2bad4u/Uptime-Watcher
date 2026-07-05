@@ -13,6 +13,7 @@ import type { EventMetadata } from "@shared/types/events";
 
 import { eventMetadataSchema } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getCallableDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 
 import type { UptimeEventName, UptimeEvents } from "../events/eventTypes";
@@ -42,8 +43,7 @@ function hasEventRegistrationMethod(
     managerEventBus: TypedEventBus<UptimeEvents>,
     methodName: "on" | "onTyped"
 ): boolean {
-    const candidate: unknown = Reflect.get(managerEventBus, methodName);
-    return typeof candidate === "function";
+    return getCallableDataProperty(managerEventBus, methodName) !== undefined;
 }
 
 /**
