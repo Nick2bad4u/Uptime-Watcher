@@ -9,13 +9,7 @@
 import type { ArrayValues } from "type-fest";
 
 import { useCallback } from "react";
-import {
-    isDefined,
-    objectHasIn,
-    objectKeys,
-    safeCastTo,
-    setHas,
-} from "ts-extras";
+import { isDefined, objectHasIn, objectKeys, setHas } from "ts-extras";
 
 import type { AppSettings } from "../../stores/types";
 
@@ -77,7 +71,7 @@ export function useSettingsChangeHandlers(args: {
             );
 
             // Create a safe update object with validated keys
-            const nextSettings = safeCastTo<Partial<AppSettings>>({});
+            const nextSettings: Partial<AppSettings> = {};
 
             // Log and apply changes for allowed keys
             for (const allowedKey of ALLOWED_SETTINGS_KEY_LIST) {
