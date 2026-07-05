@@ -88,6 +88,79 @@ describe("monitorServiceConfigMerging", () => {
         });
     });
 
+    it("copies mutable config values while creating defaults", () => {
+        const history: MonitorServiceConfig["history"] = [
+            {
+                responseTime: 100,
+                status: "up",
+                timestamp: 1,
+            },
+        ];
+        const lastChecked = new Date("2026-01-01T00:00:00.000Z");
+
+        const result = createDefaultMonitorServiceConfig({
+            config: {
+                activeOperations: ["operation-1"],
+                history,
+                lastChecked,
+            },
+            defaultTimeoutMs: 5000,
+        });
+
+        history.push({
+            responseTime: 200,
+            status: "down",
+            timestamp: 2,
+        });
+        history[0].responseTime = 999;
+        lastChecked.setUTCFullYear(2030);
+
+        expect(result.history).toEqual([
+            {
+                responseTime: 100,
+                status: "up",
+                timestamp: 1,
+            },
+        ]);
+        expect(result.lastChecked).toEqual(
+            new Date("2026-01-01T00:00:00.000Z")
+        );
+    });
+
+    it("copies mutable config values while merging updates", () => {
+        const activeOperations = ["operation-1"];
+        const history: MonitorServiceConfig["history"] = [
+            {
+                responseTime: 100,
+                status: "up",
+                timestamp: 1,
+            },
+        ];
+
+        const result = mergeMonitorServiceConfig({
+            currentConfig: {
+                activeOperations,
+                history,
+                timeout: 7000,
+            },
+            update: {
+                timeout: 8000,
+            },
+        });
+
+        activeOperations.push("operation-2");
+        history[0].status = "down";
+
+        expect(result.activeOperations).toEqual(["operation-1"]);
+        expect(result.history).toEqual([
+            {
+                responseTime: 100,
+                status: "up",
+                timestamp: 1,
+            },
+        ]);
+    });
+
     it("drops reserved prototype keys while creating defaults", () => {
         const config: Partial<MonitorServiceConfig> = {
             userAgent: "CustomAgent/1.0",

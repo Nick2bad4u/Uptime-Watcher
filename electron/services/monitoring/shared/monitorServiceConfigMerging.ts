@@ -2,6 +2,7 @@ import type { MonitorServiceConfig } from "../types";
 
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
+import { isArray, isRecord } from "@shared/utils/typeHelpers";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 const RESERVED_MONITOR_SERVICE_CONFIG_KEYS = [
@@ -75,8 +76,42 @@ function copyDefinedConfigData(
         const property = getOwnDataProperty(copied, key);
         if (property.found && !isDefined(property.value)) {
             Reflect.deleteProperty(copied, key);
+            continue;
+        }
+
+        if (property.found) {
+            Object.defineProperty(copied, key, {
+                configurable: true,
+                enumerable: true,
+                value: cloneConfigDataValue(property.value),
+                writable: true,
+            });
         }
     }
 
     return copied;
+}
+
+function cloneConfigArrayItem(value: unknown): unknown {
+    if (value instanceof Date) {
+        return new Date(value);
+    }
+
+    if (isRecord(value)) {
+        return safeObjectOmit(value, []);
+    }
+
+    return value;
+}
+
+function cloneConfigDataValue(value: unknown): unknown {
+    if (value instanceof Date) {
+        return new Date(value);
+    }
+
+    if (isArray(value)) {
+        return value.map(cloneConfigArrayItem);
+    }
+
+    return value;
 }
