@@ -5,6 +5,8 @@ import type {
 
 import * as z from "zod";
 
+import { siteIdentifierSchema } from "./siteFieldSchemas";
+
 /**
  * Canonical schema for notification preference updates exchanged over IPC.
  */
@@ -12,7 +14,7 @@ export const notificationPreferenceUpdateSchema: z.ZodType<NotificationPreferenc
     z
         .object({
             mutedSiteNotificationIdentifiers: z
-                .array(z.string().trim().min(1))
+                .array(siteIdentifierSchema)
                 .max(1000)
                 .readonly()
                 .optional(),

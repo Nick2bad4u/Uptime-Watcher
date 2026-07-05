@@ -1,5 +1,6 @@
 import type * as z from "zod";
 
+import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import {
     SITE_IDENTIFIER_MAX_LENGTH,
     SITE_IDENTIFIER_REQUIRED_MESSAGE,
@@ -19,12 +20,15 @@ import { createNonWhitespaceStringSchema } from "./stringSchemas";
  * contexts such as IPC parameter validators and runtime guards without pulling
  * in heavy schema graphs.
  */
-export const siteIdentifierSchema: z.ZodString =
+export const siteIdentifierSchema: z.ZodType<string> =
     createNonWhitespaceStringSchema({
         maxLength: SITE_IDENTIFIER_MAX_LENGTH,
         maxLengthMessage: SITE_IDENTIFIER_TOO_LONG_MESSAGE,
         requiredMessage: SITE_IDENTIFIER_REQUIRED_MESSAGE,
-    });
+    }).refine(
+        (identifier) => !hasAsciiControlCharacters(identifier),
+        "Site identifier must not contain control characters"
+    );
 
 /**
  * Canonical validation schema for a user-visible site name.
