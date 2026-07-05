@@ -9,6 +9,9 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { MONITOR_START_CONCURRENCY } from "../../constants";
+import { mapWithConcurrency } from "../../utils/boundedConcurrency";
+
 /** A monitor + site pair that should have monitoring resumed. */
 export interface MonitorResumptionCandidate {
     readonly monitor: Monitor;
@@ -57,37 +60,38 @@ export async function resumeMonitoringCandidates(args: {
 }): Promise<{ attempted: number; succeeded: number }> {
     const { candidates, logger, startMonitoringForSite } = args;
 
-    const resumePromises = candidates.map(async ({ monitor, site }) => {
-        try {
-            const isSuccess = await startMonitoringForSite(
-                site.identifier,
-                monitor.id
-            );
+    const results = await mapWithConcurrency({
+        concurrency: MONITOR_START_CONCURRENCY,
+        items: candidates,
+        task: async ({ monitor, site }) => {
+            try {
+                const isSuccess = await startMonitoringForSite(
+                    site.identifier,
+                    monitor.id
+                );
 
-            if (isSuccess) {
-                logger.debug(
-                    `[MonitoringLifecycleCoordinator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                if (isSuccess) {
+                    logger.debug(
+                        `[MonitoringLifecycleCoordinator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                    );
+                } else {
+                    logger.warn(
+                        `[MonitoringLifecycleCoordinator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
+                    );
+                }
+
+                return isSuccess;
+            } catch (error) {
+                logger.error(
+                    `[MonitoringLifecycleCoordinator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
+                    error
                 );
-            } else {
-                logger.warn(
-                    `[MonitoringLifecycleCoordinator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
-                );
+                return false;
             }
-
-            return isSuccess;
-        } catch (error) {
-            logger.error(
-                `[MonitoringLifecycleCoordinator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
-                error
-            );
-            return false;
         }
     });
 
-    const results = await Promise.allSettled(resumePromises);
-    const succeeded = results.filter(
-        (result) => result.status === "fulfilled" && result.value
-    ).length;
+    const succeeded = results.filter(Boolean).length;
 
     return {
         attempted: candidates.length,

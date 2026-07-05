@@ -17,7 +17,9 @@ import {
 } from "@shared/utils/logTemplates";
 import { isEmpty } from "ts-extras";
 
+import { MONITOR_START_CONCURRENCY } from "../../constants";
 import { isDev } from "../../electronUtils";
+import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 
 /**
  * Auto-starts eligible monitors for a site that has just been loaded.
@@ -72,39 +74,41 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
         )
     );
 
-    // Start only monitors that have monitoring enabled (respecting individual
-    // monitor states) - run in parallel for better performance.
-    const startPromises = site.monitors.map(async (monitor) => {
-        if (monitor.id && monitor.monitoring) {
-            await startMonitoringForSite(site.identifier, monitor.id);
+    // Start only monitors that have monitoring enabled while bounding fanout
+    // for large imported/restored site definitions.
+    await mapWithConcurrency({
+        concurrency: MONITOR_START_CONCURRENCY,
+        items: site.monitors,
+        task: async (monitor) => {
+            if (monitor.id && monitor.monitoring) {
+                await startMonitoringForSite(site.identifier, monitor.id);
 
-            if (isDev()) {
-                logger.debug(
-                    `[MonitorManager] Auto-started monitoring for monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
-                );
+                if (isDev()) {
+                    logger.debug(
+                        `[MonitorManager] Auto-started monitoring for monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
+                    );
+                }
+                return;
             }
-            return;
-        }
 
-        if (monitor.id && !monitor.monitoring) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL,
-                    {
-                        monitorId: monitor.id,
-                    }
-                )
+            if (monitor.id && !monitor.monitoring) {
+                logger.debug(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL,
+                        {
+                            monitorId: monitor.id,
+                        }
+                    )
+                );
+                return;
+            }
+
+            // Monitor has no valid ID or is in an unknown state
+            logger.warn(
+                "[MonitorManager] Skipping monitor without valid ID or in unknown state"
             );
-            return;
-        }
-
-        // Monitor has no valid ID or is in an unknown state
-        logger.warn(
-            "[MonitorManager] Skipping monitor without valid ID or in unknown state"
-        );
+        },
     });
-
-    await Promise.all(startPromises);
 
     logger.info(
         interpolateLogTemplate(
@@ -133,32 +137,33 @@ export async function autoStartNewMonitorsOperation(args: {
     const { logger, newMonitors, siteIdentifier, startMonitoringForSite } =
         args;
 
-    // Start new monitors in parallel for better performance
-    const startPromises = newMonitors.map(async (monitor) => {
-        if (monitor.id && monitor.monitoring) {
-            await startMonitoringForSite(siteIdentifier, monitor.id);
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED,
-                    {
-                        monitorId: monitor.id,
-                    }
-                )
-            );
-            return;
-        }
+    await mapWithConcurrency({
+        concurrency: MONITOR_START_CONCURRENCY,
+        items: newMonitors,
+        task: async (monitor) => {
+            if (monitor.id && monitor.monitoring) {
+                await startMonitoringForSite(siteIdentifier, monitor.id);
+                logger.debug(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED,
+                        {
+                            monitorId: monitor.id,
+                        }
+                    )
+                );
+                return;
+            }
 
-        if (monitor.id && !monitor.monitoring) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_NEW_INDIVIDUAL,
-                    {
-                        monitorId: monitor.id,
-                    }
-                )
-            );
-        }
+            if (monitor.id && !monitor.monitoring) {
+                logger.debug(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_NEW_INDIVIDUAL,
+                        {
+                            monitorId: monitor.id,
+                        }
+                    )
+                );
+            }
+        },
     });
-
-    await Promise.all(startPromises);
 }

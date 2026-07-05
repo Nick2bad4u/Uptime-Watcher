@@ -44,6 +44,16 @@ export const DEFAULT_REQUEST_TIMEOUT = 10_000;
 export const DEFAULT_CHECK_INTERVAL = 300_000;
 
 /**
+ * Maximum number of monitor start/setup operations to run at once.
+ *
+ * @remarks
+ * Startup, import, and persistent-resume flows can operate on user-sized site
+ * collections. Bounding fanout prevents local scheduler/database work from
+ * spiking during app initialization while still allowing useful parallelism.
+ */
+export const MONITOR_START_CONCURRENCY = 8;
+
+/**
  * User agent string for HTTP requests.
  *
  * @remarks

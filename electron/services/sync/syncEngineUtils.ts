@@ -12,6 +12,8 @@ import {
 } from "@shared/validation/persistedDeviceIdValidation";
 import { isDefined } from "ts-extras";
 
+import { mapWithConcurrency as mapWithConcurrencyImpl } from "../../utils/boundedConcurrency";
+
 /**
  * Returns true when the string contains only ASCII digits.
  *
@@ -83,56 +85,17 @@ export function isValidPersistedDeviceId(candidate: string): boolean {
     return impl(candidate);
 }
 
-interface MapWithConcurrencyResultSlot<R> {
-    readonly value: R;
-}
-
-function assertAllResultsCompleted<R>(
-    results: (MapWithConcurrencyResultSlot<R> | undefined)[],
-    message: string
-): asserts results is MapWithConcurrencyResultSlot<R>[] {
-    if (results.some((result) => !isDefined(result))) {
-        throw new Error(message);
-    }
-}
-
 /**
  * Maps items with bounded concurrency while preserving input order.
+ *
+ * @remarks
+ * Kept on this module's public surface for existing sync callers while the
+ * implementation lives in the neutral Electron utility layer.
  */
 export async function mapWithConcurrency<T, R>(args: {
-    concurrency: number;
-    items: readonly T[];
-    task: (item: T) => Promise<R>;
+    readonly concurrency: number;
+    readonly items: readonly T[];
+    readonly task: (item: T) => Promise<R>;
 }): Promise<R[]> {
-    const { concurrency, items, task } = args;
-    const workerCount = Math.max(1, Math.min(concurrency, items.length));
-
-    const results = Array.from(
-        { length: items.length },
-        (): MapWithConcurrencyResultSlot<R> | undefined => undefined
-    );
-    let index = 0;
-
-    const workers = Array.from({ length: workerCount }, async () => {
-        while (true) {
-            const currentIndex = index;
-            index += 1;
-
-            const item = items[currentIndex];
-            if (!isDefined(item)) {
-                break;
-            }
-
-            // eslint-disable-next-line no-await-in-loop -- Worker loop performs bounded sequential IO.
-            results[currentIndex] = { value: await task(item) };
-        }
-    });
-
-    await Promise.all(workers);
-
-    assertAllResultsCompleted(
-        results,
-        "mapWithConcurrency: internal error (missing result)"
-    );
-    return results.map((result) => result.value);
+    return mapWithConcurrencyImpl(args);
 }
