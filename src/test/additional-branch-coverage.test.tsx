@@ -159,6 +159,31 @@ describe("Additional Branch Coverage Tests", () => {
             expect(screen.getByText("Test Setting")).toBeInTheDocument();
         });
 
+        it("should render control callbacks", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: additional-branch-coverage", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Business Logic", "type");
+
+            render(
+                <ThemeProvider>
+                    <SettingItem
+                        control={() => (
+                            <div data-testid="setting-control-callback">
+                                Callback Control
+                            </div>
+                        )}
+                        title="Callback Setting"
+                    />
+                </ThemeProvider>
+            );
+
+            expect(
+                screen.getByTestId("setting-control-callback")
+            ).toHaveTextContent("Callback Control");
+            expect(screen.getByText("Callback Setting")).toBeInTheDocument();
+        });
+
         it("should render description when provided", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: additional-branch-coverage", "component");
