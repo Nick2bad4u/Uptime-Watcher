@@ -8,11 +8,36 @@ import * as path from "node:path";
 import type { DatabaseService } from "../DatabaseService";
 
 import {
+    lstatIfExists,
     renameIfExists,
     removePathBestEffort,
     syncDirectorySafely,
     syncFileSafely,
 } from "../../../utils/fsSafeOps";
+
+async function assertReplaceableFilePath(args: {
+    filePath: string;
+    label: string;
+    required?: boolean;
+}): Promise<void> {
+    const stat = await lstatIfExists(args.filePath);
+
+    if (!stat) {
+        if (args.required === true) {
+            throw new Error(
+                `[DataBackupService] Missing database replacement ${args.label}: ${args.filePath}`
+            );
+        }
+
+        return;
+    }
+
+    if (stat.isSymbolicLink() || !stat.isFile()) {
+        throw new Error(
+            `[DataBackupService] Refusing to replace database with non-file ${args.label}: ${args.filePath}`
+        );
+    }
+}
 
 /**
  * Replaces the primary database file with another file on disk.
@@ -28,8 +53,6 @@ export async function replaceDatabaseFile(args: {
     readonly targetPath: string;
 }): Promise<void> {
     const { databaseService, logger, sourcePath, targetPath } = args;
-
-    databaseService.close();
 
     const targetDir = path.dirname(targetPath);
     const baseName = path.basename(targetPath);
@@ -49,6 +72,30 @@ export async function replaceDatabaseFile(args: {
     const walPath = `${targetPath}-wal`;
     const shmPath = `${targetPath}-shm`;
     const journalPath = `${targetPath}-journal`;
+
+    await assertReplaceableFilePath({
+        filePath: sourcePath,
+        label: "source file",
+        required: true,
+    });
+    await assertReplaceableFilePath({
+        filePath: targetPath,
+        label: "target file",
+    });
+    await assertReplaceableFilePath({
+        filePath: walPath,
+        label: "WAL sidecar",
+    });
+    await assertReplaceableFilePath({
+        filePath: shmPath,
+        label: "SHM sidecar",
+    });
+    await assertReplaceableFilePath({
+        filePath: journalPath,
+        label: "journal sidecar",
+    });
+
+    databaseService.close();
 
     let isHadExistingTarget = false;
     let copyError: Error | undefined;

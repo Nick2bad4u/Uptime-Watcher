@@ -1,4 +1,11 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+    mkdtemp,
+    mkdir,
+    readFile,
+    rm,
+    symlink,
+    writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -127,5 +134,89 @@ describe(replaceDatabaseFile, () => {
         await expect(readFile(targetPath, "utf8")).resolves.toBe("old-db");
         expect(databaseService.close).toHaveBeenCalledTimes(1);
         expect(databaseService.initialize).toHaveBeenCalledTimes(2);
+    });
+
+    it("refuses to replace an existing target directory", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const databaseService = createDatabaseService();
+
+        await writeFile(sourcePath, "new-db");
+        await mkdir(targetPath);
+        await writeFile(path.join(targetPath, "kept.txt"), "old-db");
+
+        await expect(
+            replaceDatabaseFile({
+                databaseService,
+                sourcePath,
+                targetPath,
+            })
+        ).rejects.toThrow("Refusing to replace database with non-file target");
+
+        await expect(
+            readFile(path.join(targetPath, "kept.txt"), "utf8")
+        ).resolves.toBe("old-db");
+        expect(databaseService.close).not.toHaveBeenCalled();
+        expect(databaseService.initialize).not.toHaveBeenCalled();
+    });
+
+    it("refuses to replace an existing symlink target", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const outsidePath = path.join(tempDirectory, "outside.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const databaseService = createDatabaseService();
+
+        await writeFile(sourcePath, "new-db");
+        await writeFile(outsidePath, "outside-db");
+
+        try {
+            await symlink(outsidePath, targetPath);
+        } catch (error: unknown) {
+            const errorCode = (error as NodeJS.ErrnoException).code;
+            if (errorCode === "EPERM" || errorCode === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        await expect(
+            replaceDatabaseFile({
+                databaseService,
+                sourcePath,
+                targetPath,
+            })
+        ).rejects.toThrow("Refusing to replace database with non-file target");
+
+        await expect(readFile(outsidePath, "utf8")).resolves.toBe("outside-db");
+        expect(databaseService.close).not.toHaveBeenCalled();
+        expect(databaseService.initialize).not.toHaveBeenCalled();
+    });
+
+    it("refuses to relocate non-file sidecars", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const walPath = `${targetPath}-wal`;
+        const databaseService = createDatabaseService();
+
+        await writeFile(sourcePath, "new-db");
+        await writeFile(targetPath, "old-db");
+        await mkdir(walPath);
+        await writeFile(path.join(walPath, "kept.txt"), "wal-data");
+
+        await expect(
+            replaceDatabaseFile({
+                databaseService,
+                sourcePath,
+                targetPath,
+            })
+        ).rejects.toThrow("Refusing to replace database with non-file WAL");
+
+        await expect(readFile(targetPath, "utf8")).resolves.toBe("old-db");
+        await expect(
+            readFile(path.join(walPath, "kept.txt"), "utf8")
+        ).resolves.toBe("wal-data");
+        expect(databaseService.close).not.toHaveBeenCalled();
+        expect(databaseService.initialize).not.toHaveBeenCalled();
     });
 });
