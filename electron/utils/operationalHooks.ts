@@ -76,6 +76,10 @@ import { logger } from "./logger";
 
 const DEFAULT_MAX_ATTEMPTS = 3;
 
+function getElapsedDurationMs(startTime: number): number {
+    return Math.max(0, Math.round(performance.now() - startTime));
+}
+
 interface OperationalErrorMetadata {
     readonly errorCauseMessage?: string | undefined;
     readonly errorCauseName?: string | undefined;
@@ -387,7 +391,7 @@ async function handleFailure<T>(
     logLevel: OperationalLogLevel = "error"
 ): Promise<T | null> {
     const { emitEvents, eventEmitter, onFailure } = config;
-    const duration = Date.now() - startTime;
+    const duration = getElapsedDurationMs(startTime);
 
     if (onFailure) {
         try {
@@ -549,7 +553,7 @@ async function handleSuccess<T>(
     context: OperationalHookContext
 ): Promise<T> {
     const { emitEvents, eventEmitter, onSuccess } = config;
-    const duration = Date.now() - startTime;
+    const duration = getElapsedDurationMs(startTime);
 
     // Call success callback
     if (onSuccess) {
@@ -625,11 +629,17 @@ export async function withOperationalHooks<T>(
     const maxRetries = normalizeMaxAttempts(configuredMaxRetries);
     const context = normalizeOperationalContext(contextInput);
     const operationId = generateOperationId();
-    const startTime = Date.now();
+    const startTimestamp = Date.now();
+    const startTime = performance.now();
 
     // Emit operation start event
     if (emitEvents && eventEmitter) {
-        await emitStartEvent(eventEmitter, operationName, startTime, context);
+        await emitStartEvent(
+            eventEmitter,
+            operationName,
+            startTimestamp,
+            context
+        );
     }
 
     let lastError: Error | null = null;

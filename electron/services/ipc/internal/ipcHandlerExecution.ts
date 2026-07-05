@@ -14,6 +14,10 @@ import { logger } from "../../../utils/logger";
 import { normalizeIpcErrorMessage } from "./ipcErrorUtils";
 import { shouldLogHandler } from "./ipcLogging";
 
+function getElapsedDurationMs(startTime: number): number {
+    return Math.max(0, Math.round(performance.now() - startTime));
+}
+
 /** Options that influence IPC handler execution. */
 export interface IpcHandlerExecutionOptions {
     readonly correlationId?: CorrelationId;
@@ -46,7 +50,7 @@ export async function executeIpcHandler<T>(
     handler: () => Promisable<T>,
     options?: IpcHandlerExecutionOptions
 ): Promise<HandlerExecutionResult<T>> {
-    const startTime = Date.now();
+    const startTime = performance.now();
     const isLogStart = shouldLogHandler(channelName);
     const correlationId = options?.correlationId ?? generateCorrelationId();
     const startMetadata = options?.metadata;
@@ -71,7 +75,7 @@ export async function executeIpcHandler<T>(
 
     try {
         const value = await handler();
-        const duration = Date.now() - startTime;
+        const duration = getElapsedDurationMs(startTime);
 
         if (isLogStart) {
             logger.debug(
@@ -95,7 +99,7 @@ export async function executeIpcHandler<T>(
             value,
         };
     } catch (error) {
-        const duration = Date.now() - startTime;
+        const duration = getElapsedDurationMs(startTime);
         const rawErrorMessage = getUserFacingErrorDetail(error);
         const errorMessage = normalizeIpcErrorMessage(rawErrorMessage);
 

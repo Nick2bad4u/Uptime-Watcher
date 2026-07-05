@@ -36,21 +36,21 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
         vi.useRealTimers();
     });
 
-    describe("withIpcHandler duration calculation (Line 234: Date.now() - startTime)", () => {
+    describe("withIpcHandler duration calculation", () => {
         it("should calculate duration correctly for successful operations", async () => {
             const handler = vi.fn().mockResolvedValue("test-result");
 
             const startTime = 1000;
             const endTime = 1750;
-            vi.setSystemTime(startTime);
+            vi.spyOn(performance, "now")
+                .mockReturnValueOnce(startTime)
+                .mockReturnValueOnce(endTime);
 
-            const resultPromise = withIpcHandler("test-channel", handler);
-
-            vi.setSystemTime(endTime);
-            const result = await resultPromise;
+            const result = await withIpcHandler("test-channel", handler);
 
             // Verify the result includes the correct duration (750ms)
             expect(result).toEqual({
@@ -71,12 +71,11 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
 
             const startTime = 2000;
             const endTime = 2500;
-            vi.setSystemTime(startTime);
+            vi.spyOn(performance, "now")
+                .mockReturnValueOnce(startTime)
+                .mockReturnValueOnce(endTime);
 
-            const resultPromise = withIpcHandler("test-channel", handler);
-
-            vi.setSystemTime(endTime);
-            const result = await resultPromise;
+            const result = await withIpcHandler("test-channel", handler);
 
             // Verify the error result includes the correct duration (500ms)
             expect(result).toEqual({
@@ -91,26 +90,40 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
             // If mutation (Date.now() + startTime) was applied, we'd get 4500ms instead of 500ms
             expect(result.metadata?.["duration"]).not.toBe(4500);
         });
+
+        it("uses monotonic time when the wall clock moves backward", async () => {
+            const handler = vi.fn().mockResolvedValue("test-result");
+
+            vi.spyOn(Date, "now")
+                .mockReturnValueOnce(10_000)
+                .mockReturnValueOnce(9000);
+            vi.spyOn(performance, "now")
+                .mockReturnValueOnce(100)
+                .mockReturnValueOnce(175);
+
+            const result = await withIpcHandler("test-channel", handler);
+
+            expect(result.metadata?.["duration"]).toBe(75);
+        });
     });
 
-    describe("withIpcHandlerValidation duration calculations (Lines 315, 326)", () => {
+    describe("withIpcHandlerValidation duration calculations", () => {
         it("should calculate duration correctly for successful parameterized operations", async () => {
             const handler = vi.fn().mockResolvedValue("param-result");
             const validateParams = vi.fn().mockReturnValue(null); // No validation errors
 
             const startTime = 3000;
             const endTime = 3300;
-            vi.setSystemTime(startTime);
+            vi.spyOn(performance, "now")
+                .mockReturnValueOnce(startTime)
+                .mockReturnValueOnce(endTime);
 
-            const resultPromise = withIpcHandlerValidation(
+            const result = await withIpcHandlerValidation(
                 "param-channel",
                 handler,
                 validateParams,
                 ["param1", "param2"]
             );
-
-            vi.setSystemTime(endTime);
-            const result = await resultPromise;
 
             // Verify the result includes the correct duration (300ms)
             expect(result).toEqual({
@@ -137,17 +150,16 @@ describe("ArithmeticOperator Mutations - electron/services/ipc/utils.ts", () => 
 
             const startTime = 4000;
             const endTime = 4600;
-            vi.setSystemTime(startTime);
+            vi.spyOn(performance, "now")
+                .mockReturnValueOnce(startTime)
+                .mockReturnValueOnce(endTime);
 
-            const resultPromise = withIpcHandlerValidation(
+            const result = await withIpcHandlerValidation(
                 "param-channel",
                 handler,
                 validateParams,
                 ["param1"]
             );
-
-            vi.setSystemTime(endTime);
-            const result = await resultPromise;
 
             // Verify the error result includes the correct duration (600ms)
             expect(result).toEqual({

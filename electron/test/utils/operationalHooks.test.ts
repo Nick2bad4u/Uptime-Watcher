@@ -3,7 +3,7 @@
  */
 
 import { createAbortError } from "@shared/utils/abortError";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -53,6 +53,10 @@ describe(createOperationalHookContext, () => {
 });
 
 describe("Operational Hooks", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     describe(withOperationalHooks, () => {
         it("should successfully execute operation", async ({
             task,
@@ -416,6 +420,43 @@ describe("Operational Hooks", () => {
                 expect.objectContaining({
                     lifecycleStage: "success",
                     operation: "stage-success:completed",
+                })
+            );
+        });
+        it("uses monotonic time for lifecycle durations when the wall clock moves backward", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Observability", "type");
+
+            const eventEmitter = {
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+            } as unknown as TypedEventBus<UptimeEvents>;
+
+            vi.spyOn(Date, "now")
+                .mockReturnValueOnce(50_000)
+                .mockReturnValueOnce(10_000)
+                .mockReturnValueOnce(9000);
+            vi.spyOn(performance, "now")
+                .mockReturnValueOnce(200)
+                .mockReturnValueOnce(245);
+
+            await withOperationalHooks(async () => "telemetry", {
+                emitEvents: true,
+                eventEmitter,
+                maxRetries: 1,
+                operationName: "monotonic-duration",
+            });
+
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    duration: 45,
+                    lifecycleStage: "success",
+                    operation: "monotonic-duration:completed",
                 })
             );
         });
