@@ -25,6 +25,7 @@ import type { SiteRepository } from "../../../services/database/SiteRepository";
 import type { SiteRow } from "../../../services/database/utils/mappers/siteMapper";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
+import { DATABASE_GRAPH_READ_CONCURRENCY } from "../../../constants";
 import { SiteLoadingError } from "../../../services/database/interfaces";
 import {
     SiteLoadingOrchestrator,
@@ -33,6 +34,7 @@ import {
 
 // Mock constants
 vi.mock("../../../constants", () => ({
+    DATABASE_GRAPH_READ_CONCURRENCY: 3,
     DEFAULT_SITE_NAME: "Unknown Site",
 }));
 
@@ -445,6 +447,112 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 monitoring: false,
                 monitors: [{ ...monitors2[0], history: [] }],
             });
+        });
+
+        it("should bound concurrent site graph hydration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Performance", "type");
+
+            const siteRows: SiteRow[] = Array.from(
+                { length: DATABASE_GRAPH_READ_CONCURRENCY + 2 },
+                (_, index) => ({
+                    identifier: `site-${index}`,
+                    monitoring: true,
+                    name: `Site ${index}`,
+                })
+            );
+            let active = 0;
+            let maxActive = 0;
+
+            vi.mocked(mockRepositories.site.findAll).mockResolvedValue(
+                siteRows
+            );
+            vi.mocked(
+                mockRepositories.monitor.findBySiteIdentifier
+            ).mockImplementation(async () => {
+                active += 1;
+                maxActive = Math.max(maxActive, active);
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 1);
+                });
+                active -= 1;
+                return [];
+            });
+
+            const sites = await siteRepositoryService.getSitesFromDatabase();
+
+            expect(sites).toHaveLength(siteRows.length);
+            expect(
+                mockRepositories.monitor.findBySiteIdentifier
+            ).toHaveBeenCalledTimes(siteRows.length);
+            expect(maxActive).toBeLessThanOrEqual(
+                DATABASE_GRAPH_READ_CONCURRENCY
+            );
+        });
+
+        it("should bound concurrent monitor history hydration", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepositoryService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Performance", "type");
+
+            const monitors = Array.from(
+                { length: DATABASE_GRAPH_READ_CONCURRENCY + 2 },
+                (_, index) => ({
+                    checkInterval: 60_000,
+                    history: [],
+                    id: `monitor-${index}`,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    type: "http" as const,
+                    url: `https://site.example/${index}`,
+                })
+            );
+            let active = 0;
+            let maxActive = 0;
+
+            vi.mocked(mockRepositories.site.findAll).mockResolvedValue([
+                {
+                    identifier: "site-1",
+                    monitoring: true,
+                    name: "Site 1",
+                },
+            ]);
+            vi.mocked(
+                mockRepositories.monitor.findBySiteIdentifier
+            ).mockResolvedValue(monitors);
+            vi.mocked(
+                mockRepositories.history.findByMonitorId
+            ).mockImplementation(async () => {
+                active += 1;
+                maxActive = Math.max(maxActive, active);
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 1);
+                });
+                active -= 1;
+                return [];
+            });
+
+            const sites = await siteRepositoryService.getSitesFromDatabase();
+
+            expect(sites[0]?.monitors).toHaveLength(monitors.length);
+            expect(
+                mockRepositories.history.findByMonitorId
+            ).toHaveBeenCalledTimes(monitors.length);
+            expect(maxActive).toBeLessThanOrEqual(
+                DATABASE_GRAPH_READ_CONCURRENCY
+            );
         });
 
         it("should handle sites with no monitors", async ({

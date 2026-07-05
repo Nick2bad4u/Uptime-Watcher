@@ -54,6 +54,17 @@ export const DEFAULT_CHECK_INTERVAL = 300_000;
 export const MONITOR_START_CONCURRENCY = 8;
 
 /**
+ * Maximum number of site/monitor graph read operations to run at once.
+ *
+ * @remarks
+ * Database hydration and JSON export can traverse all stored sites, monitors,
+ * and histories. Bounding independent reads prevents large datasets from
+ * creating a burst of repository calls while still keeping the UI-facing
+ * operations responsive.
+ */
+export const DATABASE_GRAPH_READ_CONCURRENCY = 8;
+
+/**
  * User agent string for HTTP requests.
  *
  * @remarks

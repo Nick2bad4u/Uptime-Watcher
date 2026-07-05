@@ -55,6 +55,8 @@ import type {
     SiteRepositoryTransactionAdapter,
 } from "./SiteRepository";
 
+import { DATABASE_GRAPH_READ_CONCURRENCY } from "../../constants";
+import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
 import { createMonitorConfig } from "../monitoring/createMonitorConfig";
 import { DataImportExportError } from "./interfaces";
@@ -192,15 +194,19 @@ export class DataImportExportService {
             // can recreate a consistent domain graph.
             const siteRows = await this.repositories.site.exportAllRows();
 
-            const sites = await Promise.all(
-                siteRows.map(async (siteRow) => {
+            const sites = await mapWithConcurrency({
+                concurrency: DATABASE_GRAPH_READ_CONCURRENCY,
+                items: siteRows,
+                task: async (siteRow) => {
                     const monitors =
                         await this.repositories.monitor.findBySiteIdentifier(
                             siteRow.identifier
                         );
 
-                    const monitorsWithHistory = await Promise.all(
-                        monitors.map(async (monitor) => {
+                    const monitorsWithHistory = await mapWithConcurrency({
+                        concurrency: DATABASE_GRAPH_READ_CONCURRENCY,
+                        items: monitors,
+                        task: async (monitor) => {
                             if (!monitor.id) {
                                 return monitor;
                             }
@@ -211,8 +217,8 @@ export class DataImportExportService {
                                 );
 
                             return { ...monitor, history };
-                        })
-                    );
+                        },
+                    });
 
                     return {
                         identifier: siteRow.identifier,
@@ -220,8 +226,8 @@ export class DataImportExportService {
                         monitors: monitorsWithHistory,
                         name: siteRow.name ?? DEFAULT_SITE_NAME,
                     } satisfies Site;
-                })
-            );
+                },
+            });
             const rawSettings = await this.repositories.settings.getAll();
             const settings = this.stripCloudSettings(rawSettings, "export");
 

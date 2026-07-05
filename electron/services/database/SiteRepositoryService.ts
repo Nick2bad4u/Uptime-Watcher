@@ -56,7 +56,11 @@ import type { SettingsRepository } from "./SettingsRepository";
 import type { SiteRepository } from "./SiteRepository";
 import type { SiteRow } from "./utils/mappers/siteMapper";
 
-import { DEFAULT_SITE_NAME } from "../../constants";
+import {
+    DATABASE_GRAPH_READ_CONCURRENCY,
+    DEFAULT_SITE_NAME,
+} from "../../constants";
+import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 import { SiteLoadingError } from "./interfaces";
 import { parseHistoryLimitSetting } from "./utils/historyLimitSettingParser";
 
@@ -223,12 +227,12 @@ export class SiteRepositoryService {
         try {
             const siteRows = await this.repositories.site.findAll();
 
-            // Build sites in parallel since each site operation is independent
-            const sitePromises = siteRows.map(async (siteRow) =>
-                this.buildSiteWithMonitorsAndHistory(siteRow)
-            );
-
-            return await Promise.all(sitePromises);
+            return await mapWithConcurrency({
+                concurrency: DATABASE_GRAPH_READ_CONCURRENCY,
+                items: siteRows,
+                task: async (siteRow) =>
+                    this.buildSiteWithMonitorsAndHistory(siteRow),
+            });
         } catch (error) {
             const normalizedError = ensureError(error);
             const message = `Failed to fetch sites from database: ${getUnknownErrorMessage(normalizedError)}`;
@@ -293,9 +297,10 @@ export class SiteRepositoryService {
             siteRow.identifier
         );
 
-        // Load history for all monitors in parallel for better performance
-        const monitorsWithHistory = await Promise.all(
-            monitors.map(async (monitor) => {
+        const monitorsWithHistory = await mapWithConcurrency({
+            concurrency: DATABASE_GRAPH_READ_CONCURRENCY,
+            items: monitors,
+            task: async (monitor) => {
                 if (monitor.id) {
                     const history =
                         await this.repositories.history.findByMonitorId(
@@ -304,8 +309,8 @@ export class SiteRepositoryService {
                     return { ...monitor, history };
                 }
                 return monitor;
-            })
-        );
+            },
+        });
 
         return {
             identifier: siteRow.identifier,

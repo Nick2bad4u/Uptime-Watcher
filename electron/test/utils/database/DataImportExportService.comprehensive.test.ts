@@ -30,6 +30,7 @@ import {
 
 import type { DataImportExportConfig } from "../../../services/database/DataImportExportService";
 
+import { DATABASE_GRAPH_READ_CONCURRENCY } from "../../../constants";
 import { DataImportExportService } from "../../../services/database/DataImportExportService";
 import { DataImportExportError } from "../../../services/database/interfaces";
 
@@ -283,6 +284,119 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             );
             expect(result).toBe('{"exported": true}');
         });
+
+        it("should bound concurrent site graph reads during export", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Performance", "type");
+
+            const { safeJsonStringifyWithFallback } =
+                await import("../../../../shared/utils/jsonSafety");
+            const siteRows = Array.from(
+                { length: DATABASE_GRAPH_READ_CONCURRENCY + 2 },
+                (_, index) => ({
+                    identifier: `site-${index}`,
+                    monitoring: true,
+                    name: `Site ${index}`,
+                })
+            );
+            let active = 0;
+            let maxActive = 0;
+
+            mockRepositories.site.exportAllRows.mockResolvedValue(siteRows);
+            mockRepositories.monitor.findBySiteIdentifier.mockImplementation(
+                async () => {
+                    active += 1;
+                    maxActive = Math.max(maxActive, active);
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 1);
+                    });
+                    active -= 1;
+                    return [];
+                }
+            );
+            (
+                safeJsonStringifyWithFallback as MockedFunction<any>
+            ).mockReturnValue('{"exported": true}');
+
+            await service.exportAllData();
+
+            expect(
+                mockRepositories.monitor.findBySiteIdentifier
+            ).toHaveBeenCalledTimes(siteRows.length);
+            expect(maxActive).toBeLessThanOrEqual(
+                DATABASE_GRAPH_READ_CONCURRENCY
+            );
+        });
+
+        it("should bound concurrent monitor history reads during export", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Performance", "type");
+
+            const { safeJsonStringifyWithFallback } =
+                await import("../../../../shared/utils/jsonSafety");
+            const monitors = Array.from(
+                { length: DATABASE_GRAPH_READ_CONCURRENCY + 2 },
+                (_, index) => ({
+                    checkInterval: 60_000,
+                    history: [],
+                    id: `monitor-${index}`,
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 3,
+                    status: "pending" as const,
+                    timeout: 5000,
+                    type: "http" as const,
+                    url: `https://example.com/${index}`,
+                })
+            );
+            let active = 0;
+            let maxActive = 0;
+
+            mockRepositories.site.exportAllRows.mockResolvedValue([
+                {
+                    identifier: "site-1",
+                    monitoring: true,
+                    name: "Site 1",
+                },
+            ]);
+            mockRepositories.monitor.findBySiteIdentifier.mockResolvedValue(
+                monitors
+            );
+            mockRepositories.history.findByMonitorId.mockImplementation(
+                async () => {
+                    active += 1;
+                    maxActive = Math.max(maxActive, active);
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 1);
+                    });
+                    active -= 1;
+                    return [];
+                }
+            );
+            (
+                safeJsonStringifyWithFallback as MockedFunction<any>
+            ).mockReturnValue('{"exported": true}');
+
+            await service.exportAllData();
+
+            expect(mockRepositories.history.findByMonitorId).toHaveBeenCalledTimes(
+                monitors.length
+            );
+            expect(maxActive).toBeLessThanOrEqual(
+                DATABASE_GRAPH_READ_CONCURRENCY
+            );
+        });
+
         it("should not throw when settings contains '__proto__' key", async ({
             task,
             annotate,
