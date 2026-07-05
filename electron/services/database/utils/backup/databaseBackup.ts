@@ -1,7 +1,7 @@
 import { DEFAULT_MAX_BACKUP_SIZE_BYTES } from "@shared/constants/backup";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
-import { castUnchecked } from "@shared/utils/typeHelpers";
+import { isArray } from "@shared/utils/typeHelpers";
 import { isObject } from "@shared/utils/typeGuards";
 import { app } from "electron";
 import sqlite3 from "node-sqlite3-wasm";
@@ -129,15 +129,13 @@ function extractPragmaMessages(
     rows: unknown,
     column: string
 ): readonly string[] {
-    if (!Array.isArray(rows)) {
+    if (!isArray(rows)) {
         return [];
     }
 
     const messages: string[] = [];
 
-    const typedRows = castUnchecked<readonly unknown[]>(rows);
-
-    for (const row of typedRows) {
+    for (const row of rows) {
         if (!row || typeof row !== "object") {
             continue;
         }

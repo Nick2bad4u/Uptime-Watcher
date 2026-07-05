@@ -9,7 +9,6 @@ import type { JsonValue } from "@shared/types/cloudSync";
 import type { JsonObject } from "type-fest";
 
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { objectEntries } from "ts-extras";
 
 /**
@@ -33,7 +32,7 @@ export function createCanonicalJsonValue(value: JsonValue): JsonValue {
                 writable: true,
             });
         }
-        return castUnchecked<JsonValue>(result);
+        return result;
     }
 
     return value;
