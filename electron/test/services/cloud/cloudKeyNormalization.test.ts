@@ -51,6 +51,44 @@ describe("cloudKeyNormalization", () => {
         );
     });
 
+    it("rejects ASCII control characters in provider object keys", () => {
+        expect(() =>
+            normalizeProviderObjectKey("backups/file\u0000.sqlite")
+        ).toThrow("control characters");
+        expect(() =>
+            normalizeProviderObjectKey("backups/file\n.sqlite")
+        ).toThrow("control characters");
+    });
+
+    it("normalizes provider object keys before object-key assertions", () => {
+        const normalized = normalizeProviderObjectKey(
+            String.raw`  \backups\file.sqlite  `
+        );
+
+        expect(normalized).toBe("backups/file.sqlite");
+        expect(() => {
+            assertCloudObjectKey(normalized);
+        }).not.toThrow();
+    });
+
+    it("keeps empty provider keys invalid for concrete objects", () => {
+        const normalized = normalizeProviderObjectKey("  /  ");
+
+        expect(normalized).toBe("");
+        expect(() => {
+            assertCloudObjectKey(normalized);
+        }).toThrow("cannot be empty");
+    });
+
+    it("keeps prefix-like provider keys invalid for concrete objects", () => {
+        const normalized = normalizeProviderObjectKey("backups/");
+
+        expect(normalized).toBe("backups/");
+        expect(() => {
+            assertCloudObjectKey(normalized);
+        }).toThrow("must not end");
+    });
+
     it("assertCloudObjectKey rejects empty and trailing slash keys", () => {
         expect(() => {
             assertCloudObjectKey("");
