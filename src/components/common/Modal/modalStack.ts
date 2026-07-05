@@ -7,12 +7,18 @@
  * blocking modal closes).
  */
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { arrayAt } from "ts-extras";
 
 interface AppRootInertSnapshot {
     readonly ariaHidden: null | string;
     readonly hadInert: boolean;
 }
+
+type AppRootElement = Pick<
+    HTMLElement,
+    "getAttribute" | "hasAttribute" | "removeAttribute" | "setAttribute"
+>;
 
 const modalStackState: {
     appRootSnapshot: AppRootInertSnapshot | null;
@@ -26,8 +32,53 @@ const modalStackState: {
     nextModalId: 1,
 };
 
-function resolveAppRootElement(): HTMLElement | null {
-    return document.querySelector<HTMLElement>("#root");
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+function isAppRootElement(value: unknown): value is AppRootElement {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return (
+            typeof Reflect.get(value, "getAttribute") === "function" &&
+            typeof Reflect.get(value, "hasAttribute") === "function" &&
+            typeof Reflect.get(value, "removeAttribute") === "function" &&
+            typeof Reflect.get(value, "setAttribute") === "function"
+        );
+    } catch {
+        return false;
+    }
+}
+
+function resolveAppRootElement(): AppRootElement | null {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        return null;
+    }
+
+    try {
+        const querySelector: unknown = Reflect.get(
+            documentProperty.value,
+            "querySelector"
+        );
+
+        if (typeof querySelector !== "function") {
+            return null;
+        }
+
+        const root: unknown = Reflect.apply(
+            querySelector,
+            documentProperty.value,
+            ["#root"]
+        );
+        return isAppRootElement(root) ? root : null;
+    } catch {
+        return null;
+    }
 }
 
 function ensureInertAppliedToAppRoot(): void {

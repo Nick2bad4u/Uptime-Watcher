@@ -235,6 +235,98 @@ describe(Modal, () => {
         );
     });
 
+    it("does not throw when the modal portal body is unavailable", () => {
+        const root = document.createElement("div");
+        root.id = "root";
+        document.body.append(root);
+        const originalBody = Object.getOwnPropertyDescriptor(document, "body");
+
+        Object.defineProperty(document, "body", {
+            configurable: true,
+            get() {
+                throw new Error("document body unavailable");
+            },
+        });
+
+        try {
+            const { unmount } = render(
+                <Modal
+                    isOpen={true}
+                    onRequestClose={() => {}}
+                    title="Missing body"
+                >
+                    <button type="button">Focusable</button>
+                </Modal>,
+                {
+                    baseElement: root,
+                    container: root,
+                }
+            );
+
+            expect(screen.queryByText("Focusable")).not.toBeInTheDocument();
+            expect(() => {
+                unmount();
+            }).not.toThrow();
+        } finally {
+            if (originalBody) {
+                Object.defineProperty(document, "body", originalBody);
+            } else {
+                Reflect.deleteProperty(document, "body");
+            }
+        }
+    });
+
+    it("does not throw when activeElement is unavailable during focus trapping", async () => {
+        const { unmount } = renderInAppRoot(
+            <Modal
+                isOpen={true}
+                onRequestClose={() => {}}
+                title="Active element failure"
+            >
+                <button type="button">Focusable</button>
+            </Modal>
+        );
+
+        await screen.findByText("Focusable");
+
+        const originalActiveElement = Object.getOwnPropertyDescriptor(
+            document,
+            "activeElement"
+        );
+
+        Object.defineProperty(document, "activeElement", {
+            configurable: true,
+            get() {
+                throw new Error("active element unavailable");
+            },
+        });
+
+        try {
+            const event = new KeyboardEvent("keydown", {
+                bubbles: true,
+                cancelable: true,
+                key: "Tab",
+            });
+
+            expect(() => {
+                document.dispatchEvent(event);
+            }).not.toThrow();
+            expect(event.defaultPrevented).toBe(true);
+        } finally {
+            if (originalActiveElement) {
+                Object.defineProperty(
+                    document,
+                    "activeElement",
+                    originalActiveElement
+                );
+            } else {
+                Reflect.deleteProperty(document, "activeElement");
+            }
+        }
+
+        unmount();
+    });
+
     it("Escape closes only the top-most modal", async () => {
         const Harness = () => {
             const [openA, setOpenA] = useState(false);

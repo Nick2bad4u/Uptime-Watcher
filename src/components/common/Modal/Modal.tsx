@@ -37,6 +37,8 @@ const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||
     typeof value === "function";
 
+type FocusRestoreElement = Pick<HTMLElement, "focus" | "isConnected">;
+
 const isKeyDownListenerMethod = (
     value: unknown
 ): value is KeyDownListenerMethod => typeof value === "function";
@@ -100,6 +102,77 @@ function addDocumentKeyDownCaptureListener(
             // Focus-trap cleanup is best-effort during renderer teardown.
         }
     };
+}
+
+function isElementNode(value: unknown): value is Element {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return Reflect.get(value, "nodeType") === 1;
+    } catch {
+        return false;
+    }
+}
+
+function getDocumentBodyElement(): Element | null {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        return null;
+    }
+
+    try {
+        const body: unknown = Reflect.get(documentProperty.value, "body");
+        return isElementNode(body) ? body : null;
+    } catch {
+        return null;
+    }
+}
+
+function getDocumentActiveElement(): Element | null {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        return null;
+    }
+
+    try {
+        const activeElement: unknown = Reflect.get(
+            documentProperty.value,
+            "activeElement"
+        );
+
+        return isElementNode(activeElement) ? activeElement : null;
+    } catch {
+        return null;
+    }
+}
+
+function isFocusRestoreElement(
+    value: unknown
+): value is FocusRestoreElement {
+    if (!isElementNode(value)) {
+        return false;
+    }
+
+    try {
+        return (
+            typeof Reflect.get(value, "focus") === "function" &&
+            typeof Reflect.get(value, "isConnected") === "boolean"
+        );
+    } catch {
+        return false;
+    }
+}
+
+function focusElementSafely(element: FocusRestoreElement): void {
+    try {
+        element.focus();
+    } catch {
+        // Focus restoration is best-effort after modal teardown.
+    }
 }
 
 /** Accent styling applied to the modal shell. */
@@ -411,16 +484,15 @@ export const Modal = ({
         [CloseIcon]
     );
 
-    const portalRoot = useMemo<HTMLElement | null>(() => {
-        if (typeof document === "undefined") {
-            return null;
-        }
-
-        return document.body;
-    }, []);
+    const portalRoot = useMemo<Element | null>(
+        () => getDocumentBodyElement(),
+        []
+    );
 
     const modalRef = useRef<HTMLDialogElement | null>(null);
-    const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+    const previouslyFocusedElementRef = useRef<FocusRestoreElement | null>(
+        null
+    );
 
     const handleCloseTopMost = useCallback((): void => {
         if (!isTopModal(modalId)) {
@@ -459,10 +531,12 @@ export const Modal = ({
                 acquireBlockingModal();
             }
 
-            previouslyFocusedElementRef.current =
-                document.activeElement instanceof HTMLElement
-                    ? document.activeElement
-                    : null;
+            const activeElement = getDocumentActiveElement();
+            previouslyFocusedElementRef.current = isFocusRestoreElement(
+                activeElement
+            )
+                ? activeElement
+                : null;
 
             return () => {
                 popModal(modalId);
@@ -474,7 +548,7 @@ export const Modal = ({
                 const element = previouslyFocusedElementRef.current;
                 if (element?.isConnected) {
                     queueMicrotask(() => {
-                        element.focus();
+                        focusElementSafely(element);
                     });
                 }
             };
@@ -519,10 +593,10 @@ export const Modal = ({
                     return;
                 }
 
-                const active = document.activeElement;
+                const active = getDocumentActiveElement();
 
                 if (
-                    !(active instanceof HTMLElement) ||
+                    !active ||
                     !modalElement.contains(active)
                 ) {
                     event.preventDefault();
