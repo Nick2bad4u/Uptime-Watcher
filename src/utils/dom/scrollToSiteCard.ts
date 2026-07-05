@@ -11,6 +11,8 @@
  * (`[data-testid="site-list"]`) to ensure the correct element is targeted.
  */
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
+
 /**
  * Configuration options for {@link scrollToSiteCard}.
  */
@@ -35,6 +37,22 @@ const DEFAULT_SCROLL_OPTIONS: Required<ScrollToSiteCardOptions> = {
     block: "center",
 };
 
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+function isElementNode(value: unknown): value is Element {
+    if (!isObjectLike(value)) {
+        return false;
+    }
+
+    try {
+        return Reflect.get(value, "nodeType") === 1;
+    } catch {
+        return false;
+    }
+}
+
 const escapeForAttributeSelector = (value: string): string => {
     try {
         return CSS.escape(value);
@@ -46,6 +64,35 @@ const escapeForAttributeSelector = (value: string): string => {
     // This is a fallback when CSS.escape is not available.
     return value.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 };
+
+function queryDocumentSelector(selector: string): Element | null {
+    const documentProperty = getOwnPropertyValue(globalThis, "document");
+
+    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
+        return null;
+    }
+
+    try {
+        const querySelector: unknown = Reflect.get(
+            documentProperty.value,
+            "querySelector"
+        );
+
+        if (typeof querySelector !== "function") {
+            return null;
+        }
+
+        const element: unknown = Reflect.apply(
+            querySelector,
+            documentProperty.value,
+            [selector]
+        );
+
+        return isElementNode(element) ? element : null;
+    } catch {
+        return null;
+    }
+}
 
 /**
  * Scrolls the matching site card / table row into view.
@@ -72,11 +119,7 @@ export function scrollToSiteCard(
         return;
     }
 
-    if (typeof document === "undefined") {
-        return;
-    }
-
-    const container = document.querySelector('[data-testid="site-list"]');
+    const container = queryDocumentSelector('[data-testid="site-list"]');
     if (!container) {
         return;
     }

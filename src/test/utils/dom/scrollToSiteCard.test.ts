@@ -62,4 +62,49 @@ describe(scrollToSiteCard, () => {
             scrollToSiteCard("example.com");
         }).not.toThrow();
     });
+
+    it("is a no-op when document access throws", () => {
+        const originalDocument = Object.getOwnPropertyDescriptor(
+            globalThis,
+            "document"
+        );
+
+        Object.defineProperty(globalThis, "document", {
+            configurable: true,
+            get() {
+                throw new Error("document unavailable");
+            },
+        });
+
+        try {
+            expect(() => {
+                scrollToSiteCard("example.com");
+            }).not.toThrow();
+        } finally {
+            if (originalDocument) {
+                Object.defineProperty(
+                    globalThis,
+                    "document",
+                    originalDocument
+                );
+            } else {
+                Reflect.deleteProperty(globalThis, "document");
+            }
+        }
+    });
+
+    it("is a no-op when document querySelector throws", () => {
+        const querySelectorSpy = vi
+            .spyOn(document, "querySelector")
+            .mockImplementation(() => {
+                throw new Error("query selector unavailable");
+            });
+
+        expect(() => {
+            scrollToSiteCard("example.com");
+        }).not.toThrow();
+        expect(querySelectorSpy).toHaveBeenCalledWith(
+            '[data-testid="site-list"]'
+        );
+    });
 });
