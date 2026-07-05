@@ -7,6 +7,7 @@ import {
     siteNameArbitrary,
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -371,7 +372,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         const thumbnail = screen.getByRole("link", {
             name:
                 trimmedUrl.length > 0
-                    ? `Open ${trimmedUrl} in browser`
+                    ? `Open ${getSafeUrlForDisplay(trimmedUrl)} in browser`
                     : "Open in browser",
         });
 
