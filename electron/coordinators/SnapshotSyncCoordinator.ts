@@ -12,7 +12,6 @@ import {
     mergeMonitorSnapshots,
 } from "@shared/utils/siteSnapshots";
 import { isObject } from "@shared/utils/typeGuards";
-import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { EventKey, EventPayload } from "../events/TypedEventBus";
@@ -77,7 +76,7 @@ export class SnapshotSyncCoordinator {
             return undefined;
         }
 
-        const { monitor } = safeCastTo(resultCandidate);
+        const { monitor } = resultCandidate;
         return isMonitorSnapshot(monitor) ? monitor : undefined;
     }
 
@@ -93,7 +92,7 @@ export class SnapshotSyncCoordinator {
             return undefined;
         }
 
-        const { site } = safeCastTo(resultCandidate);
+        const { site } = resultCandidate;
         return isSiteSnapshot(site) ? site : undefined;
     }
 
