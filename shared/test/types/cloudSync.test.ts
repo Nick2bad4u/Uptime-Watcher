@@ -108,6 +108,36 @@ describe("cloudSync", () => {
         ).toThrow("deviceId must not contain control characters");
     });
 
+    it("rejects monitor operation entity IDs with control characters", () => {
+        expect(() =>
+            parseCloudSyncOperation({
+                deviceId: "device-1",
+                entityId: "monitor\n1",
+                entityType: "monitor",
+                kind: "delete-entity",
+                opId: 4,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                timestamp: 4,
+            })
+        ).toThrow("monitor entityId is invalid");
+    });
+
+    it("rejects site operation entity IDs with control characters", () => {
+        expect(() =>
+            parseCloudSyncOperation({
+                deviceId: "device-1",
+                entityId: "site\n1",
+                entityType: "site",
+                field: "name",
+                kind: "set-field",
+                opId: 5,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                timestamp: 5,
+                value: "Example",
+            })
+        ).toThrow("site entityId is invalid");
+    });
+
     it("rejects write key timestamps outside the Date range", () => {
         const result = cloudSyncWriteKeySchema.safeParse({
             deviceId: "device-1",
@@ -124,7 +154,7 @@ describe("cloudSync", () => {
             entityId: "settings-key",
             entityType: "settings",
             kind: "delete-entity",
-            opId: 4,
+            opId: 6,
             syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             timestamp: MAX_VALID_DATE_EPOCH_MS,
         });
@@ -139,7 +169,7 @@ describe("cloudSync", () => {
                 entityId: "settings-key",
                 entityType: "settings",
                 kind: "delete-entity",
-                opId: 5,
+                opId: 7,
                 syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
                 timestamp: MAX_VALID_DATE_EPOCH_MS + 1,
             })

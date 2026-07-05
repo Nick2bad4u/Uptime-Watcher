@@ -21,7 +21,9 @@
 import type { JsonValue as TypeFestJsonValue } from "type-fest";
 
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
 
@@ -188,7 +190,22 @@ const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> =
     z.discriminatedUnion("kind", [
         deleteEntityOperationSchema,
         setFieldOperationSchemaTyped,
-    ]);
+    ]).superRefine((operation, ctx) => {
+        const idSchema =
+            operation.entityType === "monitor"
+                ? monitorIdSchema
+                : operation.entityType === "site"
+                  ? siteIdentifierSchema
+                  : undefined;
+
+        if (idSchema && !idSchema.safeParse(operation.entityId).success) {
+            ctx.addIssue({
+                code: "custom",
+                message: `${operation.entityType} entityId is invalid`,
+                path: ["entityId"],
+            });
+        }
+    });
 
 /**
  * Zod schema validating {@link CloudSyncOperation}.
