@@ -358,7 +358,7 @@ export class SiteManager {
         const sites = await this.siteRepositoryService.getSitesFromDatabase();
         // Keep cache synchronized with database
         await this.updateSitesCache(sites, "SiteManager.getSites");
-        return sites;
+        return this.getSitesSnapshot();
     }
 
     /**

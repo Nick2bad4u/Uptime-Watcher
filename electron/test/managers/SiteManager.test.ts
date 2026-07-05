@@ -311,6 +311,35 @@ describe(SiteManager, () => {
             expect(result).toEqual(dbSites);
             expect(Array.isArray(result)).toBeTruthy();
         });
+
+        it("returns the sanitized cache snapshot instead of raw repository sites", async () => {
+            const firstSite: Site = {
+                identifier: "site1",
+                monitoring: true,
+                monitors: [],
+                name: "Site 1",
+            };
+            const duplicateSite: Site = {
+                identifier: "site1",
+                monitoring: false,
+                monitors: [],
+                name: "Duplicate Site 1",
+            };
+
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSitesFromDatabase"
+            ).mockResolvedValue([firstSite, duplicateSite]);
+
+            const result = await manager.getSites();
+
+            expect(result).toEqual([firstSite]);
+            expect(result[0]).not.toBe(firstSite);
+
+            result[0]!.name = "Mutated Result";
+
+            expect(manager.getSitesFromCache()).toEqual([firstSite]);
+        });
     });
 
     describe("removeSite", () => {
