@@ -7,7 +7,10 @@
  */
 
 import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
-import { tryGetSafeThirdPartyHttpUrl } from "@shared/utils/urlSafety";
+import {
+    getSafeUrlForDisplay,
+    tryGetSafeThirdPartyHttpUrl,
+} from "@shared/utils/urlSafety";
 import {
     type JSX,
     type MouseEvent,
@@ -117,6 +120,10 @@ export const ScreenshotThumbnail = ({
     // Calculate safe values using useMemo to avoid infinite loops
     const safeUrl = useMemo(() => normalizeMonitorExternalUrl(url), [url]);
     const isUrlValid = safeUrl.length > 0;
+    const safeDisplayUrl = useMemo(
+        () => (isUrlValid ? getSafeUrlForDisplay(safeUrl) : ""),
+        [isUrlValid, safeUrl]
+    );
 
     const screenshotTargetUrl = useMemo((): null | string => {
         if (!isUrlValid) {
@@ -142,8 +149,11 @@ export const ScreenshotThumbnail = ({
     }, [screenshotTargetUrl]);
 
     const ariaLabel = useMemo(
-        () => (isUrlValid ? `Open ${safeUrl} in browser` : "Open in browser"),
-        [isUrlValid, safeUrl]
+        () =>
+            isUrlValid
+                ? `Open ${safeDisplayUrl} in browser`
+                : "Open in browser",
+        [isUrlValid, safeDisplayUrl]
     );
 
     // Memoized style objects to prevent unnecessary re-renders
@@ -262,7 +272,7 @@ export const ScreenshotThumbnail = ({
             <a
                 aria-label={ariaLabel}
                 className="site-details-thumbnail-link"
-                href={isUrlValid ? safeUrl : "#"}
+                href={isUrlValid ? safeDisplayUrl : "#"}
                 onBlur={handleBlur}
                 onClick={handleClick}
                 onFocus={handleFocus}

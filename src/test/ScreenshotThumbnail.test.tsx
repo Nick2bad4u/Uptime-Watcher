@@ -8,6 +8,7 @@ import {
     siteUrlArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
 import {
+    getSafeUrlForDisplay,
     getSafeUrlForLogging,
     isPrivateNetworkHostname,
     tryGetSafeThirdPartyHttpUrl,
@@ -191,7 +192,7 @@ describe(ScreenshotThumbnail, () => {
             const trimmedUrl = defaultProps.url.trim();
             const expectedAriaLabel =
                 trimmedUrl.length > 0
-                    ? `Open ${trimmedUrl} in browser`
+                    ? `Open ${getSafeUrlForDisplay(trimmedUrl)} in browser`
                     : "Open in browser";
             const link = screen.getByRole("link", {
                 name: expectedAriaLabel,
@@ -269,6 +270,46 @@ describe(ScreenshotThumbnail, () => {
                 "https://api.microlink.io/?url=https%3A%2F%2Fexample.com%2Fpath&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto";
             expect(image).toHaveAttribute("src", expectedUrl);
         });
+
+        it("should redact URL secrets from accessible link metadata", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: ScreenshotThumbnail", "component");
+            annotate("Category: Core", "category");
+            annotate("Type: Privacy", "type");
+
+            const user = userEvent.setup();
+            const sensitiveUrl =
+                " https://example.com/status?refresh_token=screenshot-secret#fragment ";
+            const propsWithSensitiveUrl = createThumbnailProps({
+                url: sensitiveUrl,
+            });
+
+            render(<ScreenshotThumbnail {...propsWithSensitiveUrl} />);
+
+            const link = screen.getByRole("link", {
+                name: "Open https://example.com/status in browser",
+            });
+
+            expect(link).toHaveAttribute(
+                "aria-label",
+                "Open https://example.com/status in browser"
+            );
+            const ariaLabel = link.getAttribute("aria-label") ?? "";
+            expect(ariaLabel).not.toContain("refresh_token");
+            expect(ariaLabel).not.toContain("screenshot-secret");
+            expect(ariaLabel).not.toContain("fragment");
+
+            await user.click(link);
+
+            await waitFor(() => {
+                expect(mockSystemService.openExternal).toHaveBeenCalledWith(
+                    sensitiveUrl.trim()
+                );
+            });
+        });
     });
 
     describe("Property-based invariants", () => {
@@ -315,7 +356,7 @@ describe(ScreenshotThumbnail, () => {
                         );
 
                         const expectedAriaLabel = isUrlValid
-                            ? `Open ${trimmedUrl} in browser`
+                            ? `Open ${getSafeUrlForDisplay(trimmedUrl)} in browser`
                             : "Open in browser";
                         const links = screen.queryAllByRole("link");
                         expect(links.length).toBeGreaterThan(0);
@@ -1082,7 +1123,7 @@ describe(ScreenshotThumbnail, () => {
             expect(link).toHaveAttribute(
                 "aria-label",
                 defaultProps.url.trim().length > 0
-                    ? `Open ${defaultProps.url.trim()} in browser`
+                    ? `Open ${getSafeUrlForDisplay(defaultProps.url.trim())} in browser`
                     : "Open in browser"
             );
         });

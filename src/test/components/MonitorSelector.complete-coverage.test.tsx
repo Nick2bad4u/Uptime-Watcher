@@ -781,7 +781,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(arrayFirst(options)).toHaveTextContent("Ping Monitor");
         });
 
-        it("should handle monitors with special characters in URL", ({
+        it("should redact query strings in URL labels", ({
             task,
             annotate,
         }) => {
@@ -810,9 +810,11 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector({ monitors });
 
             const option = screen.getByText(
-                "Website URL: https://example.com/path?param=value&other=test"
+                "Website URL: https://example.com/path"
             );
             expect(option).toBeInTheDocument();
+            expect(screen.queryByText(/param=value/iu)).not.toBeInTheDocument();
+            expect(screen.queryByText(/other=test/iu)).not.toBeInTheDocument();
         });
 
         it("should handle monitors with very high port numbers", ({
