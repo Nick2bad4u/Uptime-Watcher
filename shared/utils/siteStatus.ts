@@ -12,7 +12,15 @@
 import type { SiteForStatus, SiteStatus } from "@shared/types";
 
 import { isMonitorStatus, STATUS_KIND } from "@shared/types";
-import { isEmpty, isPresent, safeCastTo } from "ts-extras";
+import { isEmpty } from "ts-extras";
+
+type SiteStatusMonitor = SiteForStatus["monitors"][number];
+type SiteStatusMonitorInput =
+    null | readonly (null | SiteStatusMonitor | undefined)[] | undefined;
+
+const isSiteStatusMonitor = (
+    monitor: null | SiteStatusMonitor | undefined
+): monitor is SiteStatusMonitor => monitor !== null && monitor !== undefined;
 
 /**
  * Normalizes a site monitors collection by removing nullish entries and
@@ -23,18 +31,13 @@ import { isEmpty, isPresent, safeCastTo } from "ts-extras";
  * @returns A sanitized monitors array safe for downstream calculations.
  */
 const normalizeMonitors = (
-    monitors: null | SiteForStatus["monitors"] | undefined
+    monitors: SiteStatusMonitorInput
 ): SiteForStatus["monitors"] => {
     if (!Array.isArray(monitors)) {
         return [];
     }
 
-    const nullableMonitors =
-        safeCastTo<(null | SiteForStatus["monitors"][number] | undefined)[]>(
-            monitors
-        );
-
-    return nullableMonitors.filter(isPresent);
+    return monitors.filter(isSiteStatusMonitor);
 };
 
 /**
