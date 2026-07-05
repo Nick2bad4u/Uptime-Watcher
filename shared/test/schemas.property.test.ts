@@ -8,7 +8,13 @@ import { fc, test } from "@fast-check/vitest";
 import validator from "validator";
 import { describe, expect } from "vitest";
 
-import { BASE_MONITOR_TYPES } from "../types";
+import type { MonitorStatus, StatusHistoryStatus } from "../types";
+
+import {
+    BASE_MONITOR_TYPES,
+    MONITOR_STATUS_VALUES,
+    STATUS_HISTORY_VALUES,
+} from "../types";
 import {
     baseMonitorSchema,
     dnsMonitorSchema,
@@ -20,6 +26,24 @@ import {
 } from "../validation/monitorSchemas";
 import { siteSchema, validateSiteData } from "../validation/siteSchemas";
 import { MAX_VALID_DATE_EPOCH_MS } from "../validation/timestampSchemas";
+
+const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
+
+const statusHistoryArbitrary = fc.array(
+    fc.record({
+        status: fc.constantFrom<StatusHistoryStatus>(
+            ...STATUS_HISTORY_VALUES
+        ),
+        responseTime: fc.integer({ min: 0, max: 999_999 }),
+        timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
+        details: fc.option(fc.string({ maxLength: 500 }), {
+            nil: undefined,
+        }),
+    }),
+    { maxLength: 100 }
+);
 
 // Custom arbitraries for monitor data generation that match schema constraints
 const baseMonitorArbitrary = fc.record({
@@ -39,22 +63,12 @@ const baseMonitorArbitrary = fc.record({
         "ssl"
     ),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: monitorStatusArbitrary,
     checkInterval: fc.oneof(fc.integer({ min: 5000, max: 2_592_000_000 })),
     timeout: fc.integer({ min: 1000, max: 300_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
     responseTime: fc.integer({ min: -1, max: 999_999 }),
-    history: fc.array(
-        fc.record({
-            status: fc.constantFrom("up", "down"),
-            responseTime: fc.integer({ min: 0, max: 999_999 }),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
-            details: fc.option(fc.string({ maxLength: 500 }), {
-                nil: undefined,
-            }),
-        }),
-        { maxLength: 100 }
-    ),
+    history: statusHistoryArbitrary,
     lastChecked: fc.option(
         fc
             .integer({
@@ -211,22 +225,12 @@ const httpMonitorBaseFields = {
         .string({ minLength: 1, maxLength: 100 })
         .filter((s) => s.trim().length > 0),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: monitorStatusArbitrary,
     checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
     timeout: fc.integer({ min: 1000, max: 300_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
     responseTime: fc.integer({ min: -1, max: 999_999 }),
-    history: fc.array(
-        fc.record({
-            status: fc.constantFrom("up", "down"),
-            responseTime: fc.integer({ min: 0, max: 999_999 }),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
-            details: fc.option(fc.string({ maxLength: 500 }), {
-                nil: undefined,
-            }),
-        }),
-        { maxLength: 100 }
-    ),
+    history: statusHistoryArbitrary,
     lastChecked: fc.option(
         fc
             .integer({
@@ -287,22 +291,12 @@ const portMonitorArbitrary = fc.record({
         .filter((s) => s.trim().length > 0),
     type: fc.constant("port" as const),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: monitorStatusArbitrary,
     checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
     timeout: fc.integer({ min: 1000, max: 300_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
     responseTime: fc.integer({ min: -1, max: 999_999 }),
-    history: fc.array(
-        fc.record({
-            status: fc.constantFrom("up", "down"),
-            responseTime: fc.integer({ min: 0, max: 999_999 }),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
-            details: fc.option(fc.string({ maxLength: 500 }), {
-                nil: undefined,
-            }),
-        }),
-        { maxLength: 100 }
-    ),
+    history: statusHistoryArbitrary,
     lastChecked: fc.option(
         fc
             .integer({
@@ -325,22 +319,12 @@ const sslMonitorArbitrary = fc.record({
         .filter((s) => s.trim().length > 0),
     type: fc.constant("ssl" as const),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: monitorStatusArbitrary,
     checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
     timeout: fc.integer({ min: 1000, max: 300_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
     responseTime: fc.integer({ min: -1, max: 999_999 }),
-    history: fc.array(
-        fc.record({
-            status: fc.constantFrom("up", "down"),
-            responseTime: fc.integer({ min: 0, max: 999_999 }),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
-            details: fc.option(fc.string({ maxLength: 500 }), {
-                nil: undefined,
-            }),
-        }),
-        { maxLength: 100 }
-    ),
+    history: statusHistoryArbitrary,
     lastChecked: fc.option(
         fc
             .integer({
@@ -364,22 +348,12 @@ const pingMonitorArbitrary = fc.record({
         .filter((s) => s.trim().length > 0),
     type: fc.constant("ping" as const),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: monitorStatusArbitrary,
     checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
     timeout: fc.integer({ min: 1000, max: 300_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
     responseTime: fc.integer({ min: -1, max: 999_999 }),
-    history: fc.array(
-        fc.record({
-            status: fc.constantFrom("up", "down"),
-            responseTime: fc.integer({ min: 0, max: 999_999 }),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
-            details: fc.option(fc.string({ maxLength: 500 }), {
-                nil: undefined,
-            }),
-        }),
-        { maxLength: 100 }
-    ),
+    history: statusHistoryArbitrary,
     lastChecked: fc.option(
         fc
             .integer({
@@ -401,22 +375,12 @@ const dnsMonitorArbitrary = fc.record({
         .filter((s) => s.trim().length > 0),
     type: fc.constant("dns" as const),
     monitoring: fc.boolean(),
-    status: fc.constantFrom("up", "down", "pending", "paused"),
+    status: monitorStatusArbitrary,
     checkInterval: fc.integer({ min: 5000, max: 2_592_000_000 }),
     timeout: fc.integer({ min: 1000, max: 300_000 }),
     retryAttempts: fc.integer({ min: 0, max: 10 }),
     responseTime: fc.integer({ min: -1, max: 999_999 }),
-    history: fc.array(
-        fc.record({
-            status: fc.constantFrom("up", "down"),
-            responseTime: fc.integer({ min: 0, max: 999_999 }),
-            timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
-            details: fc.option(fc.string({ maxLength: 500 }), {
-                nil: undefined,
-            }),
-        }),
-        { maxLength: 100 }
-    ),
+    history: statusHistoryArbitrary,
     lastChecked: fc.option(
         fc
             .integer({
@@ -484,10 +448,7 @@ describe("Schema Property-Based Tests", () => {
                     expect(result.data.id).toBeDefined();
                     expect(result.data.type).toBeOneOf([...BASE_MONITOR_TYPES]);
                     expect(result.data.status).toBeOneOf([
-                        "up",
-                        "down",
-                        "pending",
-                        "paused",
+                        ...MONITOR_STATUS_VALUES,
                     ]);
                     expect(result.data.monitoring).toBeTypeOf("boolean");
                     expect(result.data.checkInterval).toBeGreaterThanOrEqual(
