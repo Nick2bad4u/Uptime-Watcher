@@ -171,6 +171,42 @@ describe("CdnEdgeConsistencyMonitor service", () => {
         expect(accessCount).toBe(0);
     });
 
+    it("returns sanitized baseline failure details without probing accessors", async () => {
+        const baselineError = new Error(
+            "Failed baseline request: token=baseline-accessor-secret"
+        );
+        let accessCount = 0;
+
+        Object.defineProperty(baselineError, "responseTime", {
+            enumerable: true,
+            get() {
+                accessCount += 1;
+                return 25;
+            },
+        });
+
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url === monitor.baselineUrl) {
+                throw baselineError;
+            }
+
+            return {
+                data: Buffer.from("edge-response"),
+                responseTime: 45,
+                status: 200,
+            };
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toContain("Baseline request failed");
+        expect(result.error).toContain("token=[redacted]");
+        expect(result.error).not.toContain("baseline-accessor-secret");
+        expect(result.details).not.toContain("baseline-accessor-secret");
+        expect(accessCount).toBe(0);
+    });
+
     it("validates configuration and returns error for missing baseline", async () => {
         monitor = createMonitor({ baselineUrl: "" });
 

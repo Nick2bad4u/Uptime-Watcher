@@ -150,11 +150,8 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         );
 
         if (!baselineResult.success) {
-            const baselineError = Reflect.has(baselineResult, "error")
-                ? baselineResult.error
-                : "Unknown baseline failure";
             throw new CdnEdgeConsistencyFailureError(
-                `Baseline request failed: ${baselineError}`
+                `Baseline request failed: ${baselineResult.error}`
             );
         }
 
