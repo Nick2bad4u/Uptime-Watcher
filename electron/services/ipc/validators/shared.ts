@@ -1,8 +1,6 @@
-import {
-    MAX_IPC_JSON_IMPORT_BYTES,
-    MAX_IPC_SQLITE_RESTORE_BYTES,
-    MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
-} from "@shared/constants/backup";
+import { MAX_IPC_JSON_IMPORT_BYTES } from "@shared/constants/backup";
+import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
+import { validateSerializedDatabaseRestorePayload } from "@shared/validation/dataSchemas";
 /**
  * Parameter validators for specific IPC handler groups.
  *
@@ -16,7 +14,6 @@ import {
  *
  * @see {@link IpcParameterValidator}
  */
-import { isDefined } from "ts-extras";
 
 import type { IpcParameterValidator } from "../types";
 import type { ParameterValueValidationResult } from "./utils/parameterValidation";
@@ -35,11 +32,6 @@ import {
     validateNotifyAppEventPayload,
 } from "./utils/notificationValidation";
 import { createParamValidator } from "./utils/parameterValidation";
-import { requireRecordParamValue } from "./utils/recordValidation";
-import {
-    validateRestoreBufferCandidate,
-    validateRestoreFileNameCandidate,
-} from "./utils/restoreValidation";
 import {
     createSiteIdentifierAndMonitorIdValidator as createSiteIdentifierAndMonitorIdValidatorImpl,
     createSiteIdentifierValidator as createSiteIdentifierValidatorImpl,
@@ -123,30 +115,10 @@ const validateNotifyAppEvent: IpcParameterValidator = createParamValidator(
 
 const validateRestorePayload: IpcParameterValidator = createParamValidator(1, [
     (payload): ParameterValueValidationResult => {
-        const errors: string[] = [];
-
-        const recordResult = requireRecordParamValue(payload, "payload");
-        if (!recordResult.ok) {
-            return recordResult.error;
-        }
-
-        const { record } = recordResult;
-        errors.push(
-            ...validateRestoreBufferCandidate(record["buffer"], {
-                maxBytes: MAX_IPC_SQLITE_RESTORE_BYTES,
-            })
-        );
-
-        const fileNameValue = record["fileName"];
-        if (isDefined(fileNameValue)) {
-            errors.push(
-                ...validateRestoreFileNameCandidate(fileNameValue, {
-                    maxBytes: MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
-                })
-            );
-        }
-
-        return errors.length > 0 ? errors : null;
+        const validation = validateSerializedDatabaseRestorePayload(payload);
+        return validation.success
+            ? null
+            : formatZodIssues(validation.error.issues);
     },
 ]);
 

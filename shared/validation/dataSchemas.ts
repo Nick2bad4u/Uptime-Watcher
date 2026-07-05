@@ -21,10 +21,17 @@ const anyValueSchema = z.custom<unknown>(() => true, {
     error: "Any value",
 });
 
+const FORBIDDEN_RECORD_KEYS = ["__proto__", "constructor", "prototype"] as const;
+
 const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     (value): value is ArrayBuffer => value instanceof ArrayBuffer,
     "Expected transferable ArrayBuffer"
 );
+
+const hasForbiddenRecordKey = (value: unknown): boolean =>
+    typeof value === "object" &&
+    value !== null &&
+    FORBIDDEN_RECORD_KEYS.some((key) => Object.hasOwn(value, key));
 
 const hasAsciiControlCharacter = (value: string): boolean => {
     for (const character of value) {
@@ -72,6 +79,13 @@ const createSqliteFileNameSchema = (label: string): z.ZodType<string> =>
                 context.addIssue({
                     code: "custom",
                     message: `${label} must be a valid file name`,
+                });
+            }
+
+            if (/^[A-Za-z]:/u.test(fileName)) {
+                context.addIssue({
+                    code: "custom",
+                    message: `${label} must not be a drive-relative path`,
                 });
             }
 
@@ -147,20 +161,28 @@ export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
     buffer: ArrayBuffer;
     fileName?: string | undefined;
 }> = z
-    .object({
-        buffer: arrayBufferSchema
-            .refine((buffer) => buffer.byteLength > 0, {
-                message: "Restore buffer must not be empty",
+    .custom<unknown>(
+        (value) => !hasForbiddenRecordKey(value),
+        "Restore payload must not include reserved object keys"
+    )
+    .pipe(
+        z
+            .object({
+                buffer: arrayBufferSchema
+                    .refine((buffer) => buffer.byteLength > 0, {
+                        message: "Restore buffer must not be empty",
+                    })
+                    .refine(
+                        (buffer) =>
+                            buffer.byteLength <= MAX_IPC_SQLITE_RESTORE_BYTES,
+                        {
+                            message: `Restore buffer exceeds maximum IPC transfer size (${MAX_IPC_SQLITE_RESTORE_BYTES} bytes)`,
+                        }
+                    ),
+                fileName: sqliteRestoreFileNameSchema.optional(),
             })
-            .refine(
-                (buffer) => buffer.byteLength <= MAX_IPC_SQLITE_RESTORE_BYTES,
-                {
-                    message: `Restore buffer exceeds maximum IPC transfer size (${MAX_IPC_SQLITE_RESTORE_BYTES} bytes)`,
-                }
-            ),
-        fileName: sqliteRestoreFileNameSchema.optional(),
-    })
-    .strict();
+            .strict()
+    );
 
 export const serializedDatabaseRestoreResultSchema: z.ZodType<SerializedDatabaseRestoreResult> =
     z

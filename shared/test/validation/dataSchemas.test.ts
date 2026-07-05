@@ -157,6 +157,16 @@ describe("dataSchemas", () => {
         });
         expect(valid.success).toBeTruthy();
 
+        const reservedKeyPayload = Object.create(null) as Record<
+            string,
+            unknown
+        >;
+        reservedKeyPayload["buffer"] = new ArrayBuffer(8);
+        Object.defineProperty(reservedKeyPayload, "__proto__", {
+            enumerable: true,
+            value: { polluted: true },
+        });
+
         for (const payload of [
             { buffer: new ArrayBuffer(0), fileName: "restore.sqlite" },
             {
@@ -167,11 +177,13 @@ describe("dataSchemas", () => {
             { buffer: new ArrayBuffer(8), fileName: "restore.sqlite " },
             { buffer: new ArrayBuffer(8), fileName: "restore\n.sqlite" },
             { buffer: new ArrayBuffer(8), fileName: "../restore.sqlite" },
+            { buffer: new ArrayBuffer(8), fileName: "C:restore.sqlite" },
             { buffer: new ArrayBuffer(8), fileName: "." },
             {
                 buffer: new ArrayBuffer(8),
                 fileName: `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
             },
+            reservedKeyPayload,
         ]) {
             expect(
                 validateSerializedDatabaseRestorePayload(payload).success
@@ -256,6 +268,7 @@ describe("dataSchemas", () => {
             "backup.sqlite ",
             "backup\n.sqlite",
             "../backup.sqlite",
+            "C:backup.sqlite",
             ".",
             `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
         ]) {
@@ -284,6 +297,7 @@ describe("dataSchemas", () => {
             "pre-restore.sqlite ",
             "pre-restore\n.sqlite",
             "../pre-restore.sqlite",
+            "C:pre-restore.sqlite",
             ".",
             `${"a".repeat(MAX_SQLITE_RESTORE_FILE_NAME_BYTES + 1)}.sqlite`,
         ]) {
