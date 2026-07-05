@@ -10,10 +10,7 @@
  * @public
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import { useMemo } from "react";
-import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 /**
@@ -128,9 +125,7 @@ const shouldExposeConfirmDialogAutomationHooks =
     typeof window !== "undefined" && import.meta.env.MODE !== "production";
 
 if (shouldExposeConfirmDialogAutomationHooks) {
-    const automationTarget = safeCastTo<UnknownRecord>(globalThis);
-
-    automationTarget["playwrightConfirmDialog"] = {
+    Reflect.set(globalThis, "playwrightConfirmDialog", {
         cancel: (): void => {
             useConfirmDialogStore.getState().cancel();
         },
@@ -145,7 +140,7 @@ if (shouldExposeConfirmDialogAutomationHooks) {
             useConfirmDialogStore.subscribe((state) => {
                 listener(state);
             }),
-    };
+    });
 }
 
 /**
