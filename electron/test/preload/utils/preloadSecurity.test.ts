@@ -1,8 +1,42 @@
 import { describe, expect, it } from "vitest";
 
-import { detectPlaywrightAutomation } from "../../../preload/utils/preloadSecurity";
+import {
+    detectPlaywrightAutomation,
+    getPreloadProcessCandidate,
+} from "../../../preload/utils/preloadSecurity";
 
 describe("preloadSecurity", () => {
+    describe(getPreloadProcessCandidate, () => {
+        it("returns undefined when the global process accessor throws", () => {
+            const originalDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "process"
+            );
+
+            try {
+                Object.defineProperty(globalThis, "process", {
+                    configurable: true,
+                    enumerable: false,
+                    get() {
+                        throw new Error("process unavailable");
+                    },
+                });
+
+                expect(getPreloadProcessCandidate()).toBeUndefined();
+            } finally {
+                if (originalDescriptor) {
+                    Object.defineProperty(
+                        globalThis,
+                        "process",
+                        originalDescriptor
+                    );
+                } else {
+                    Reflect.deleteProperty(globalThis, "process");
+                }
+            }
+        });
+    });
+
     describe(detectPlaywrightAutomation, () => {
         it("detects an own data PLAYWRIGHT_TEST flag", () => {
             expect(

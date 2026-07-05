@@ -1,4 +1,7 @@
-import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import {
+    getOwnDataProperty,
+    getOwnPropertyValue,
+} from "@shared/utils/errorPropertyAccess";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isDefined, objectKeys } from "ts-extras";
 
@@ -14,11 +17,8 @@ export function getPreloadProcessCandidate(): unknown {
     // Node/Electron expose `process` through a platform accessor in this
     // runtime, so the global read is centralized here. Callers must inspect
     // nested properties with descriptor-safe helpers.
-    try {
-        return Reflect.get(globalThis, "process");
-    } catch {
-        return undefined;
-    }
+    const property = getOwnPropertyValue(globalThis, "process");
+    return property.found ? property.value : undefined;
 }
 
 const toAutomationProcess = (value: unknown): AutomationProcess | undefined => {
