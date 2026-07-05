@@ -455,7 +455,7 @@ describe("siteStatus Property-based Tests", () => {
             }
         );
 
-        test.prop([fc.constantFrom("mixed", "paused")])(
+        test.prop([fc.constantFrom("degraded", "mixed", "paused")])(
             "should return warning variant for warning states",
             (status) => {
                 const result = getSiteStatusVariant(status);

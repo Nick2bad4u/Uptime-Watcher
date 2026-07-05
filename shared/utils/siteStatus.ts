@@ -271,8 +271,8 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  * icons). - `"success"`: All monitors are healthy (`"up"`).
  *
  * - `"error"`: All monitors are down or status is unknown (`"down"` or
- *   `"unknown"`). - `"warning"`: Mixed or paused status (`"mixed"` or
- *   `"paused"`).
+ *   `"unknown"`). - `"warning"`: Degraded, mixed, or paused status
+ *   (`"degraded"`, `"mixed"`, or `"paused"`).
  * - `"info"`: Pending status (`"pending"`).
  *
  * @example
