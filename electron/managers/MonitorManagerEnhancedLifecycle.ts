@@ -88,6 +88,12 @@ const getNextToggleStatus = (
     return monitor.monitoring ? monitor.status : MONITOR_STATUS.PENDING;
 };
 
+const isValidCheckInterval = (value: unknown): value is number =>
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    Number.isInteger(value) &&
+    value > 0;
+
 const toggleSingleMonitorEnhanced = async (args: {
     readonly applyMonitorState: EnhancedLifecycleHost["applyMonitorState"];
     readonly config: EnhancedLifecycleConfig;
@@ -275,11 +281,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
                 return;
             }
 
-            if (
-                typeof interval !== "number" ||
-                Number.isNaN(interval) ||
-                interval <= 0
-            ) {
+            if (!isValidCheckInterval(interval)) {
                 skipped += 1;
                 config.logger.warn(
                     "[MonitorManager] Skipping monitor without valid checkInterval during global start",
@@ -582,12 +584,7 @@ const toggleMonitoringForSiteEnhancedFlow = async (params: {
             return false;
         }
 
-        if (
-            kind === "start" &&
-            (typeof monitor.checkInterval !== "number" ||
-                Number.isNaN(monitor.checkInterval) ||
-                monitor.checkInterval <= 0)
-        ) {
+        if (kind === "start" && !isValidCheckInterval(monitor.checkInterval)) {
             config.logger.warn("Monitor has no valid check interval set", {
                 identifier,
                 monitorId,

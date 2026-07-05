@@ -23,6 +23,10 @@ import {
     stopMonitoringAllOperation,
 } from "../../managers/monitorManager/toggleMonitoringAllOperation";
 import { toggleMonitoringForSiteOperation } from "../../managers/monitorManager/toggleMonitoringForSiteOperation";
+import {
+    startAllMonitoringEnhancedFlow,
+    startMonitoringForSiteEnhancedFlow,
+} from "../../managers/MonitorManagerEnhancedLifecycle";
 import { monitorLogger } from "../../utils/logger";
 import {
     createMockEventBus,
@@ -44,6 +48,54 @@ const createSiteWithMonitors = (args: {
         monitoring: args.monitoring,
         monitors,
     });
+};
+
+const createLifecycleHarness = (site: Site) => {
+    const sitesCache =
+        createMockStandardizedCache<Site>() as unknown as StandardizedCache<Site>;
+    sitesCache.set(site.identifier, site);
+
+    const checker = {
+        startMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(true),
+    };
+    const monitorScheduler = {
+        startMonitor: vi.fn().mockReturnValue(true),
+        startSite: vi.fn(),
+        stopMonitor: vi.fn().mockReturnValue(true),
+    };
+    const applyMonitorState = vi.fn().mockResolvedValue(undefined);
+    const runSequentially = async <TItem>(
+        items: readonly TItem[],
+        iterator: (item: TItem) => Promise<void>
+    ): Promise<void> => {
+        for (const item of items) {
+            await iterator(item);
+        }
+    };
+
+    const config = createEnhancedLifecycleConfigOperation({
+        databaseService: {} as unknown as DatabaseService,
+        eventEmitter:
+            createMockEventBus() as unknown as TypedEventBus<UptimeEvents>,
+        logger: monitorLogger,
+        monitorRepository: {} as unknown as MonitorRepository,
+        monitorScheduler: monitorScheduler as unknown as MonitorScheduler,
+        sites: sitesCache,
+    });
+    const host = createEnhancedLifecycleHostOperation({
+        applyMonitorState,
+        runSequentially,
+        services: { checker } as unknown as EnhancedMonitoringServices,
+    });
+
+    return {
+        applyMonitorState,
+        checker,
+        config,
+        host,
+        monitorScheduler,
+    };
 };
 
 describe("monitorManager helper operations", () => {
@@ -141,6 +193,71 @@ describe("monitorManager helper operations", () => {
         await expect(delegate("s1", undefined)).resolves.toBeFalsy();
         expect(action).not.toHaveBeenCalled();
         expect(warnSpy).toHaveBeenCalledTimes(1);
+
+        warnSpy.mockRestore();
+    });
+
+    it("startAllMonitoringEnhancedFlow skips monitors with non-finite check intervals", async () => {
+        const warnSpy = vi
+            .spyOn(monitorLogger, "warn")
+            .mockImplementation(() => undefined);
+
+        const site = createTestSite("s1", {
+            monitors: [
+                createTestMonitor("m1", {
+                    checkInterval: Infinity,
+                }),
+            ],
+        });
+        const { applyMonitorState, checker, config, host, monitorScheduler } =
+            createLifecycleHarness(site);
+
+        const summary = await startAllMonitoringEnhancedFlow({
+            config,
+            host,
+            isMonitoring: false,
+        });
+
+        expect(summary).toMatchObject({
+            attempted: 0,
+            failed: 0,
+            isMonitoring: false,
+            skipped: 1,
+            succeeded: 0,
+        });
+        expect(checker.startMonitoring).not.toHaveBeenCalled();
+        expect(applyMonitorState).not.toHaveBeenCalled();
+        expect(monitorScheduler.startSite).not.toHaveBeenCalled();
+
+        warnSpy.mockRestore();
+    });
+
+    it("startMonitoringForSiteEnhancedFlow rejects fractional check intervals before scheduling", async () => {
+        const warnSpy = vi
+            .spyOn(monitorLogger, "warn")
+            .mockImplementation(() => undefined);
+
+        const site = createTestSite("s1", {
+            monitors: [
+                createTestMonitor("m1", {
+                    checkInterval: 60_000.5,
+                }),
+            ],
+        });
+        const { checker, config, host, monitorScheduler } =
+            createLifecycleHarness(site);
+
+        await expect(
+            startMonitoringForSiteEnhancedFlow({
+                config,
+                host,
+                identifier: "s1",
+                monitorId: "m1",
+            })
+        ).resolves.toBeFalsy();
+
+        expect(checker.startMonitoring).not.toHaveBeenCalled();
+        expect(monitorScheduler.startMonitor).not.toHaveBeenCalled();
 
         warnSpy.mockRestore();
     });
