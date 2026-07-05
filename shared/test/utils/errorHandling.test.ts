@@ -135,8 +135,35 @@ describe("Error Handling Utils", () => {
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(true);
             expect(mockFrontendStore.setLoading).toHaveBeenCalledWith(false);
             expect(mockFrontendStore.setError).toHaveBeenCalledWith(
-                "[object Object]"
+                "Unknown error"
             );
+            expect(operation).toHaveBeenCalledTimes(1);
+        });
+
+        it("should sanitize frontend store error messages", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: errorHandling", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const error = new Error(
+                "Request failed\r\nAuthorization Bearer frontend-secret"
+            );
+            const operation = vi.fn().mockRejectedValue(error);
+
+            await expect(
+                withErrorHandling(operation, mockFrontendStore)
+            ).rejects.toThrow("frontend-secret");
+
+            expect(mockFrontendStore.setError).toHaveBeenCalledWith(
+                "Request failed Authorization [redacted]"
+            );
+            expect(
+                String(vi.mocked(mockFrontendStore.setError).mock.calls)
+            ).not.toContain("frontend-secret");
             expect(operation).toHaveBeenCalledTimes(1);
         });
 

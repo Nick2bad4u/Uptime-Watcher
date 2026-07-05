@@ -10,15 +10,17 @@ import {
     type ErrorHandlingFrontendStore,
     withErrorHandling,
 } from "../../utils/errorHandling";
+import { sharedFallbackLogger } from "../../utils/logger/consoleFallback";
 
 describe("Error Handling Utilities - Comprehensive Coverage", () => {
     let mockStore: ErrorHandlingFrontendStore =
         {} as ErrorHandlingFrontendStore;
     let mockBackendContext: ErrorHandlingBackendContext =
         {} as ErrorHandlingBackendContext;
-    let mockConsole: typeof console = {} as typeof console;
 
     beforeEach(() => {
+        vi.restoreAllMocks();
+
         // Mock frontend store
         mockStore = {
             clearError: vi.fn(),
@@ -34,14 +36,12 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             operationName: "test-operation",
         };
 
-        // Mock console for testing store operations
-        mockConsole = {
-            warn: vi.fn(),
-            error: vi.fn(),
-        } as unknown as typeof console;
-
-        // Replace global console temporarily
-        globalThis.console = mockConsole;
+        vi.spyOn(sharedFallbackLogger, "warn").mockImplementation(() => {
+            /* noop */
+        });
+        vi.spyOn(sharedFallbackLogger, "error").mockImplementation(() => {
+            /* noop */
+        });
     });
 
     describe("Frontend Store Integration", () => {
@@ -104,9 +104,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const result = await withErrorHandling(mockOperation, mockStore);
 
             expect(result).toBe("success");
-            expect(mockConsole.warn).toHaveBeenCalledWith(
-                "Store operation failed for:",
-                "clear error state",
+            expect(sharedFallbackLogger.warn).toHaveBeenCalledWith(
+                "Store operation failed",
+                { operationName: "clear error state" },
                 expect.objectContaining({ message: "Store error" })
             );
         });
@@ -288,13 +288,13 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                 withErrorHandling(mockOperation, mockStore)
             ).rejects.toThrow("Operation error");
 
-            expect(mockConsole.warn).toHaveBeenCalledWith(
-                "Store operation failed for:",
-                "set error state",
+            expect(sharedFallbackLogger.warn).toHaveBeenCalledWith(
+                "Store operation failed",
+                { operationName: "set error state" },
                 expect.objectContaining({ message: "Store setError error" })
             );
-            expect(mockConsole.error).toHaveBeenCalledWith(
-                "Original operation error:",
+            expect(sharedFallbackLogger.error).toHaveBeenCalledWith(
+                "Original operation error",
                 expect.objectContaining({ message: "Operation error" })
             );
         });
@@ -323,9 +323,9 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             const result = await withErrorHandling(mockOperation, mockStore);
 
             expect(result).toBe("success");
-            expect(mockConsole.warn).toHaveBeenCalledWith(
-                "Store operation failed for:",
-                "clear loading state in finally block",
+            expect(sharedFallbackLogger.warn).toHaveBeenCalledWith(
+                "Store operation failed",
+                { operationName: "clear loading state in finally block" },
                 expect.objectContaining({ message: "Finally setLoading error" })
             );
         });
@@ -352,7 +352,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                 message: "[object Object]",
             });
 
-            expect(mockStore.setError).toHaveBeenCalledWith("[object Object]");
+            expect(mockStore.setError).toHaveBeenCalledWith("Complex error");
         });
 
         it("should handle null and undefined errors", async ({
@@ -372,7 +372,7 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
                 message: "null",
             });
 
-            expect(mockStore.setError).toHaveBeenCalledWith("null");
+            expect(mockStore.setError).toHaveBeenCalledWith("Unknown error");
         });
 
         it("should handle number and boolean errors", async ({

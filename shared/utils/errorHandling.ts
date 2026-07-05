@@ -30,6 +30,7 @@ import type { UnknownRecord } from "type-fest";
 import { sharedFallbackLogger } from "@shared/utils/logger/consoleFallback";
 import { normalizeLogValue } from "@shared/utils/loggingContext";
 import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
+import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isDefined } from "ts-extras";
 
 /**
@@ -430,7 +431,7 @@ async function handleFrontendOperation<T>(
         const { error: normalizedError } = convertError(error);
         safeStoreOperation(
             () => {
-                store.setError(normalizedError.message);
+                store.setError(getUserFacingErrorDetail(error));
             },
             "set error state",
             error
