@@ -709,9 +709,11 @@ export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
     // Filter the monitor data to only include fields appropriate for this type
     const filteredMonitor = filterMonitorFieldsByType(monitor, finalizedType);
 
-    // Generate a valid ID - handle empty strings as falsy
+    // Generate a valid ID - handle empty/blank strings as missing.
     const rawId = filteredMonitor.id;
-    const validId = isNonEmptyString(rawId) ? rawId : crypto.randomUUID();
+    const validId = isNonEmptyString(rawId)
+        ? rawId.trim()
+        : crypto.randomUUID();
 
     const monitorTypeDefaults = getMonitorTypeDefaults(finalizedType);
 

@@ -444,7 +444,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             );
         });
 
-        it("should preserve valid ID when provided", () => {
+        it("should normalize valid ID when provided", () => {
             fc.assert(
                 fc.property(
                     fc
@@ -452,7 +452,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         .filter((str) => str.trim().length > 0),
                     (customId) => {
                         const normalized = normalizeMonitor({ id: customId });
-                        expect(normalized.id).toBe(customId);
+                        expect(normalized.id).toBe(customId.trim());
                     }
                 )
             );
