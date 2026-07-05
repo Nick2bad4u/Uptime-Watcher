@@ -16,6 +16,7 @@
 import type { RefObject } from "react";
 import type { UnknownArray } from "type-fest";
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { setHas } from "ts-extras";
 
@@ -24,6 +25,12 @@ import { setHas } from "ts-extras";
  * may affect horizontal overflow.
  */
 type OverflowSubscriber = () => void;
+
+type WindowListenerMethod = (
+    this: unknown,
+    type: string,
+    listener: EventListenerOrEventListenerObject
+) => void;
 
 /**
  * Tracks the shared {@link ResizeObserver} instance and its subscribers for a
@@ -45,6 +52,73 @@ interface ElementObserverRecord {
  * detection.
  */
 const observerRegistry = new WeakMap<HTMLElement, ElementObserverRecord>();
+
+const noop = (): void => {};
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+const isWindowListenerMethod = (
+    value: unknown
+): value is WindowListenerMethod => typeof value === "function";
+
+function getWindowListenerMethod(
+    holder: unknown,
+    key: "addEventListener" | "removeEventListener"
+): WindowListenerMethod | undefined {
+    if (!isObjectLike(holder)) {
+        return undefined;
+    }
+
+    try {
+        const candidate: unknown = Reflect.get(holder, key);
+        return isWindowListenerMethod(candidate) ? candidate : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+function addWindowResizeListener(handler: () => void): () => void {
+    const windowProperty = getOwnPropertyValue(globalThis, "window");
+
+    if (!windowProperty.found) {
+        return noop;
+    }
+
+    const addEventListener = getWindowListenerMethod(
+        windowProperty.value,
+        "addEventListener"
+    );
+    const removeEventListener = getWindowListenerMethod(
+        windowProperty.value,
+        "removeEventListener"
+    );
+
+    if (!addEventListener || !removeEventListener) {
+        return noop;
+    }
+
+    try {
+        Reflect.apply(addEventListener, windowProperty.value, [
+            "resize",
+            handler,
+        ]);
+    } catch {
+        return noop;
+    }
+
+    return (): void => {
+        try {
+            Reflect.apply(removeEventListener, windowProperty.value, [
+                "resize",
+                handler,
+            ]);
+        } catch {
+            // Resize-listener cleanup is best-effort during renderer teardown.
+        }
+    };
+}
 
 /**
  * Schedules callbacks to execute after the current call stack, ensuring cleanup
@@ -280,16 +354,15 @@ export function useOverflowMarquee<
             evaluateOverflow();
 
             const element = containerRef.current;
-            const shouldAttachWindowListener =
-                typeof window !== "undefined" && element !== null;
+            const shouldAttachWindowListener = element !== null;
 
             const handleResize = (): void => {
                 evaluateOverflow();
             };
 
-            if (shouldAttachWindowListener) {
-                window.addEventListener("resize", handleResize);
-            }
+            const removeResizeListener = shouldAttachWindowListener
+                ? addWindowResizeListener(handleResize)
+                : noop;
 
             const supportsResizeObserver =
                 typeof ResizeObserver !== "undefined";
@@ -304,9 +377,7 @@ export function useOverflowMarquee<
             }
 
             return function cleanupOverflowObservation(): void {
-                if (shouldAttachWindowListener) {
-                    window.removeEventListener("resize", handleResize);
-                }
+                removeResizeListener();
 
                 if (!supportsResizeObserver || !element) {
                     return;

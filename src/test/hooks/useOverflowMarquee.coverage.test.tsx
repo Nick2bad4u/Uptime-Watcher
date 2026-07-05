@@ -152,6 +152,62 @@ describe(useOverflowMarquee, () => {
         expect(instance.disconnect).toHaveBeenCalledTimes(1);
     });
 
+    it("no-ops when resize listener attachment fails", async () => {
+        const element = document.createElement("div");
+        setDimensions(element, { clientWidth: 100, scrollWidth: 180 });
+
+        const addEventListenerSpy = vi.spyOn(globalThis, "addEventListener");
+        addEventListenerSpy.mockImplementation(() => {
+            throw new Error("resize listener unavailable");
+        });
+        const removeEventListenerSpy = vi.spyOn(
+            globalThis,
+            "removeEventListener"
+        );
+
+        const { result, unmount } = renderHook(() =>
+            useOverflowMarquee({ ref: { current: element } })
+        );
+
+        await waitFor(() => {
+            expect(result.current.isOverflowing).toBeTruthy();
+        });
+
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+        expect(removeEventListenerSpy).not.toHaveBeenCalled();
+    });
+
+    it("no-ops when resize listener cleanup fails", async () => {
+        const element = document.createElement("div");
+        setDimensions(element, { clientWidth: 100, scrollWidth: 180 });
+
+        const removeEventListenerSpy = vi.spyOn(
+            globalThis,
+            "removeEventListener"
+        );
+        removeEventListenerSpy.mockImplementationOnce(() => {
+            throw new Error("resize cleanup unavailable");
+        });
+
+        const { result, unmount } = renderHook(() =>
+            useOverflowMarquee({ ref: { current: element } })
+        );
+
+        await waitFor(() => {
+            expect(result.current.isOverflowing).toBeTruthy();
+        });
+
+        expect(() => {
+            unmount();
+        }).not.toThrow();
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            "resize",
+            expect.any(Function)
+        );
+    });
+
     it("recomputes overflow when dependencies change", async () => {
         const element = document.createElement("div");
         setDimensions(element, { clientWidth: 220, scrollWidth: 220 });
