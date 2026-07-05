@@ -267,6 +267,59 @@ describe("useBackendFocusSync Hook", () => {
             );
             expect(mockRemoveEventListener).toHaveBeenCalledTimes(1);
         });
+
+        it("should no-op when focus listener attachment fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockAddEventListener.mockImplementationOnce(() => {
+                throw new Error("listener unavailable");
+            });
+
+            const { unmount } = renderHook(() => {
+                useBackendFocusSync(true);
+            });
+
+            expect(mockAddEventListener).toHaveBeenCalledWith(
+                "focus",
+                expect.any(Function)
+            );
+            expect(() => {
+                unmount();
+            }).not.toThrow();
+            expect(mockRemoveEventListener).not.toHaveBeenCalled();
+        });
+
+        it("should no-op when focus listener cleanup fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockRemoveEventListener.mockImplementationOnce(() => {
+                throw new Error("listener cleanup unavailable");
+            });
+
+            const { unmount } = renderHook(() => {
+                useBackendFocusSync(true);
+            });
+
+            expect(() => {
+                unmount();
+            }).not.toThrow();
+            expect(mockRemoveEventListener).toHaveBeenCalledWith(
+                "focus",
+                expect.any(Function)
+            );
+        });
     });
 
     describe("Dynamic enable/disable behavior", () => {

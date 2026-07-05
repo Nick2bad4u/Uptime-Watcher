@@ -12,9 +12,82 @@
  * @public
  */
 
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { useCallback, useEffect } from "react";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
+
+const noop = (): void => {};
+
+type ListenerMethod = (
+    this: unknown,
+    type: string,
+    listener: EventListenerOrEventListenerObject
+) => void;
+
+const isObjectLike = (value: unknown): value is object =>
+    (typeof value === "object" && value !== null) ||
+    typeof value === "function";
+
+const isListenerMethod = (value: unknown): value is ListenerMethod =>
+    typeof value === "function";
+
+function getRuntimeListenerMethod(
+    holder: unknown,
+    key: "addEventListener" | "removeEventListener"
+): ListenerMethod | undefined {
+    if (!isObjectLike(holder)) {
+        return undefined;
+    }
+
+    try {
+        const candidate: unknown = Reflect.get(holder, key);
+        return isListenerMethod(candidate) ? candidate : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+function addWindowFocusListener(handler: () => void): () => void {
+    const windowProperty = getOwnPropertyValue(globalThis, "window");
+
+    if (!windowProperty.found) {
+        return noop;
+    }
+
+    const addEventListener = getRuntimeListenerMethod(
+        windowProperty.value,
+        "addEventListener"
+    );
+    const removeEventListener = getRuntimeListenerMethod(
+        windowProperty.value,
+        "removeEventListener"
+    );
+
+    if (!addEventListener || !removeEventListener) {
+        return noop;
+    }
+
+    try {
+        Reflect.apply(addEventListener, windowProperty.value, [
+            "focus",
+            handler,
+        ]);
+    } catch {
+        return noop;
+    }
+
+    return (): void => {
+        try {
+            Reflect.apply(removeEventListener, windowProperty.value, [
+                "focus",
+                handler,
+            ]);
+        } catch {
+            // Focus-sync teardown is best-effort during renderer shutdown.
+        }
+    };
+}
 
 /**
  * Custom hook that synchronizes app data when the window gains focus.
@@ -50,10 +123,8 @@ export function useBackendFocusSync(enabled = false): void {
 
     useEffect(
         function handleBackendFocusSync(): () => void {
-            if (!enabled || typeof window === "undefined") {
-                return () => {
-                    // No-op: focus sync disabled or window unavailable.
-                };
+            if (!enabled) {
+                return noop;
             }
 
             const handleFocus = (): void => {
@@ -62,14 +133,16 @@ export function useBackendFocusSync(enabled = false): void {
                 // Note: Error handling is managed internally by
                 // fullResyncSites through the store's withErrorHandling
                 // wrapper, so void is safe here
-                void fullResyncSites();
+                void (async (): Promise<void> => {
+                    try {
+                        await fullResyncSites();
+                    } catch {
+                        // Focus sync should not crash the renderer focus handler.
+                    }
+                })();
             };
 
-            window.addEventListener("focus", handleFocus);
-
-            return function cleanup(): void {
-                window.removeEventListener("focus", handleFocus);
-            };
+            return addWindowFocusListener(handleFocus);
         },
         [enabled, fullResyncSites]
     );
