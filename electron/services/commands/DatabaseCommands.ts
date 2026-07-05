@@ -542,7 +542,9 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
     public async execute(): Promise<boolean> {
         // Create backup of current sites
-        this.backupSites = this.cache.getAll();
+        this.backupSites = this.cache
+            .getAll()
+            .map((site) => structuredClone(site));
 
         const dataImportExportService =
             this.serviceFactory.createImportExportService();
@@ -616,7 +618,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         // Restore cache from backup
         this.cache.clear();
         for (const site of this.backupSites) {
-            this.cache.set(site.identifier, site);
+            this.cache.set(site.identifier, structuredClone(site));
         }
         await Promise.resolve();
     }
@@ -804,7 +806,9 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         return {
             identifier: site.identifier.trim(),
             monitoring: site.monitoring ?? true,
-            monitors: Array.isArray(site.monitors) ? site.monitors : [],
+            monitors: Array.isArray(site.monitors)
+                ? structuredClone(site.monitors)
+                : [],
             name: safeName,
         } satisfies Site;
     }

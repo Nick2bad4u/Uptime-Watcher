@@ -1016,6 +1016,36 @@ describe("DatabaseCommands", () => {
             );
         });
 
+        it("should restore cloned original sites during rollback", async () => {
+            const originalSite = createTestSite("original-clone");
+            mockCache.getAll = vi.fn().mockReturnValue([originalSite]);
+
+            await command.execute();
+            originalSite.name = "Mutated Original";
+
+            await command.rollback();
+
+            expect(mockCache.get("original-clone")).toEqual({
+                ...createTestSite("original-clone"),
+            });
+        });
+
+        it("should persist cloned canonical monitor arrays", async () => {
+            const importedSite = createTestSite("import-clone");
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                settings: {},
+                sites: [importedSite],
+            });
+
+            await command.execute();
+
+            const persistedSites = mockImportExportService.persistImportedData
+                .mock.calls[0]?.[0] as Site[];
+            expect(persistedSites).toHaveLength(1);
+            expect(persistedSites[0]?.monitors).toEqual(importedSite.monitors);
+            expect(persistedSites[0]?.monitors).not.toBe(importedSite.monitors);
+        });
+
         it("should validate empty data as invalid", async ({
             task,
             annotate,
