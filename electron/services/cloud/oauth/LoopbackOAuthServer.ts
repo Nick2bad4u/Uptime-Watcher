@@ -92,6 +92,10 @@ async function closeHttpServer(server: Server): Promise<void> {
     });
 }
 
+function unrefTimer(timer: NodeJS.Timeout): void {
+    timer.unref();
+}
+
 async function listenHttpServer(
     server: Server,
     args: { host: string; port: number }
@@ -560,6 +564,7 @@ export async function startLoopbackOAuthServer(args?: {
                 isResolved = true;
                 rejectPromise?.(new Error("OAuth loopback timeout"));
             }, timeoutMs);
+            unrefTimer(timeoutHandle);
 
             try {
                 const callback = await callbackPromise;

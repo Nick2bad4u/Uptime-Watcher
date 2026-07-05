@@ -3,7 +3,7 @@ import {
     type LoopbackOAuthServer,
 } from "@electron/services/cloud/oauth/LoopbackOAuthServer";
 import { createServer, get, type Server } from "node:http";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 async function closeServer(server: LoopbackOAuthServer): Promise<void> {
     await server.close();
@@ -268,6 +268,47 @@ describe(startLoopbackOAuthServer, () => {
         await expect(callbackPromise).rejects.toThrow(
             "OAuth loopback server closed"
         );
+    });
+
+    it("unrefs the callback timeout guard", async () => {
+        const originalSetTimeout = globalThis.setTimeout;
+        const unrefSpies: ReturnType<typeof vi.fn>[] = [];
+        const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+        setTimeoutSpy.mockImplementation(
+            ((...args: Parameters<typeof globalThis.setTimeout>) => {
+                const handle = originalSetTimeout(...args) as NodeJS.Timeout;
+                const originalUnref = handle.unref.bind(handle);
+                const unrefSpy = vi.fn(() => originalUnref());
+                handle.unref = unrefSpy;
+                unrefSpies.push(unrefSpy);
+                return handle;
+            }) as typeof globalThis.setTimeout
+        );
+
+        const server = await startLoopbackOAuthServer({
+            port: 0,
+            redirectHost: "127.0.0.1",
+            redirectPath: "/oauth2/callback",
+        });
+
+        try {
+            const callbackPromise = server.waitForCallback({
+                expectedState: "expected-state",
+                timeoutMs: 60_000,
+            });
+
+            expect(unrefSpies).toHaveLength(1);
+            expect(unrefSpies[0]).toHaveBeenCalledTimes(1);
+
+            await closeServer(server);
+
+            await expect(callbackPromise).rejects.toThrow(
+                "OAuth loopback server closed"
+            );
+        } finally {
+            setTimeoutSpy.mockRestore();
+            await closeServer(server);
+        }
     });
 
     it("rejects cleanly and closes partial listeners when a port is already in use", async () => {
