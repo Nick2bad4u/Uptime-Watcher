@@ -222,7 +222,10 @@ export class MonitorOperationRegistry {
         let operationId: string | undefined;
         for (let attempt = 0; attempt < 5; attempt++) {
             const candidate = this.randomUUID();
-            if (!this.activeOperations.has(candidate)) {
+            if (
+                candidate.trim().length > 0 &&
+                !this.activeOperations.has(candidate)
+            ) {
                 operationId = candidate;
                 break;
             }

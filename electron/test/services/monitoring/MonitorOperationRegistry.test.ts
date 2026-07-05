@@ -137,6 +137,29 @@ describe(MonitorOperationRegistry, () => {
             expect(registry.getOperation(result.operationId)).toBeDefined();
         });
 
+        it("should skip blank generated operation IDs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockRandomUUID
+                .mockReturnValueOnce("")
+                .mockReturnValueOnce(" ".repeat(3))
+                .mockReturnValueOnce("valid-uuid");
+
+            const result = registry.initiateCheck(mockMonitorId);
+
+            expect(result.operationId).toBe("valid-uuid");
+            expect(mockRandomUUID).toHaveBeenCalledTimes(3);
+            expect(registry.getOperation(result.operationId)).toBeDefined();
+            expect(registry.getOperation("")).toBeUndefined();
+            expect(registry.getOperation(" ".repeat(3))).toBeUndefined();
+        });
+
         it("should throw error after multiple failed UUID generation attempts", async ({
             task,
             annotate,
