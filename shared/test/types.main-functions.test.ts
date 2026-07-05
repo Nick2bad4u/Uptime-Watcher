@@ -13,9 +13,14 @@ import {
     isSiteStatus,
     type Monitor,
     MONITOR_STATUS,
-    type MonitorStatus,
+    MONITOR_STATUS_VALUES,
+    SITE_STATUS_VALUES,
     validateMonitor,
 } from "../types";
+
+const COMPUTED_SITE_STATUS_VALUES = SITE_STATUS_VALUES.filter(
+    isComputedSiteStatus
+);
 
 describe("shared/types.ts main functions", () => {
     describe(validateMonitor, () => {
@@ -84,10 +89,9 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isComputedSiteStatus("up")).toBeFalsy();
-            expect(isComputedSiteStatus("down")).toBeFalsy();
-            expect(isComputedSiteStatus("pending")).toBeFalsy();
-            expect(isComputedSiteStatus("paused")).toBeFalsy();
+            for (const status of MONITOR_STATUS_VALUES) {
+                expect(isComputedSiteStatus(status)).toBeFalsy();
+            }
         });
 
         it("should return false for invalid status values", async ({
@@ -132,10 +136,9 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(isMonitorStatus("up")).toBeTruthy();
-            expect(isMonitorStatus("down")).toBeTruthy();
-            expect(isMonitorStatus("pending")).toBeTruthy();
-            expect(isMonitorStatus("paused")).toBeTruthy();
+            for (const status of MONITOR_STATUS_VALUES) {
+                expect(isMonitorStatus(status)).toBeTruthy();
+            }
         });
 
         it("should return false for invalid monitor statuses", async ({
@@ -198,15 +201,9 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Monitor statuses
-            expect(isSiteStatus("up")).toBeTruthy();
-            expect(isSiteStatus("down")).toBeTruthy();
-            expect(isSiteStatus("pending")).toBeTruthy();
-            expect(isSiteStatus("paused")).toBeTruthy();
-
-            // Computed site statuses
-            expect(isSiteStatus("mixed")).toBeTruthy();
-            expect(isSiteStatus("unknown")).toBeTruthy();
+            for (const status of SITE_STATUS_VALUES) {
+                expect(isSiteStatus(status)).toBeTruthy();
+            }
         });
 
         it("should return false for invalid site statuses", async ({
@@ -759,27 +756,18 @@ describe("shared/types.ts function coverage", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Data Retrieval", "type");
 
-            const monitorStatuses: MonitorStatus[] = [
-                "up",
-                "down",
-                "pending",
-                "paused",
-            ];
-            const computedStatuses = ["mixed", "unknown"];
-            const allSiteStatuses = [...monitorStatuses, ...computedStatuses];
-
             // Verify all site statuses are properly defined
-            expect(allSiteStatuses).toHaveLength(6);
+            expect(SITE_STATUS_VALUES).toHaveLength(7);
 
             // Test all monitor statuses
-            for (const status of monitorStatuses) {
+            for (const status of MONITOR_STATUS_VALUES) {
                 expect(isMonitorStatus(status)).toBeTruthy();
                 expect(isSiteStatus(status)).toBeTruthy();
                 expect(isComputedSiteStatus(status)).toBeFalsy();
             }
 
             // Test computed statuses
-            for (const status of computedStatuses) {
+            for (const status of COMPUTED_SITE_STATUS_VALUES) {
                 expect(isComputedSiteStatus(status)).toBeTruthy();
                 expect(isSiteStatus(status)).toBeTruthy();
                 expect(isMonitorStatus(status)).toBeFalsy();
