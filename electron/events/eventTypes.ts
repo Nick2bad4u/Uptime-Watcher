@@ -13,7 +13,7 @@
  * @see {@link UptimeEvents}
  */
 
-import { arrayIncludes, safeCastTo } from "ts-extras";
+import { arrayIncludes, objectHasOwn } from "ts-extras";
 
 /**
  * Comprehensive event map for the Uptime Watcher app.
@@ -450,6 +450,33 @@ export const EVENT_PRIORITIES = {
     ] as const,
 } as const;
 
+type EventCategoryName = keyof typeof EVENT_CATEGORIES;
+type EventNameList = readonly UptimeEventName[];
+type EventPriorityName = keyof typeof EVENT_PRIORITIES;
+
+const EVENT_CATEGORY_LISTS = EVENT_CATEGORIES satisfies Record<
+    EventCategoryName,
+    EventNameList
+>;
+const EVENT_PRIORITY_LISTS = EVENT_PRIORITIES satisfies Record<
+    EventPriorityName,
+    EventNameList
+>;
+
+const EVENT_PRIORITY_ORDER = [
+    "CRITICAL",
+    "HIGH",
+    "LOW",
+    "MEDIUM",
+] as const satisfies readonly EventPriorityName[];
+
+function eventNameListIncludes(
+    events: EventNameList,
+    eventName: UptimeEventName
+): boolean {
+    return arrayIncludes<UptimeEventName, UptimeEventName>(events, eventName);
+}
+
 /**
  * Gets the priority level of an event with type safety.
  *
@@ -478,41 +505,10 @@ export const EVENT_PRIORITIES = {
 export function getEventPriority(
     eventName: UptimeEventName
 ): keyof typeof EVENT_PRIORITIES {
-    const eventNameStr = eventName;
-
-    // Check each priority level using string-based comparison to avoid type
-    // assertion issues
-    if (
-        arrayIncludes<UptimeEventName, UptimeEventName>(
-            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.CRITICAL),
-            eventNameStr
-        )
-    ) {
-        return "CRITICAL";
-    }
-    if (
-        arrayIncludes<UptimeEventName, UptimeEventName>(
-            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.HIGH),
-            eventNameStr
-        )
-    ) {
-        return "HIGH";
-    }
-    if (
-        arrayIncludes<UptimeEventName, UptimeEventName>(
-            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.LOW),
-            eventNameStr
-        )
-    ) {
-        return "LOW";
-    }
-    if (
-        arrayIncludes<UptimeEventName, UptimeEventName>(
-            safeCastTo<readonly UptimeEventName[]>(EVENT_PRIORITIES.MEDIUM),
-            eventNameStr
-        )
-    ) {
-        return "MEDIUM";
+    for (const priority of EVENT_PRIORITY_ORDER) {
+        if (eventNameListIncludes(EVENT_PRIORITY_LISTS[priority], eventName)) {
+            return priority;
+        }
     }
 
     return "MEDIUM"; // Default priority for uncategorized events
@@ -553,116 +549,9 @@ export function isEventOfCategory(
     eventName: UptimeEventName,
     category: keyof typeof EVENT_CATEGORIES
 ): boolean {
-    const eventNameStr = eventName;
-
-    // Type-safe category checking using string-based comparison
-    switch (category) {
-        case "CACHE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.CACHE),
-                eventNameStr
-            );
-        }
-        case "CONFIG": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.CONFIG),
-                eventNameStr
-            );
-        }
-        case "DATABASE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.DATABASE
-                ),
-                eventNameStr
-            );
-        }
-        case "DIAGNOSTICS": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.DIAGNOSTICS
-                ),
-                eventNameStr
-            );
-        }
-        case "INTERNAL_CACHE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.INTERNAL_CACHE
-                ),
-                eventNameStr
-            );
-        }
-        case "INTERNAL_DATABASE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.INTERNAL_DATABASE
-                ),
-                eventNameStr
-            );
-        }
-        case "INTERNAL_MONITOR": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.INTERNAL_MONITOR
-                ),
-                eventNameStr
-            );
-        }
-        case "INTERNAL_SITE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.INTERNAL_SITE
-                ),
-                eventNameStr
-            );
-        }
-        case "MONITOR": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.MONITOR
-                ),
-                eventNameStr
-            );
-        }
-        case "MONITORING": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.MONITORING
-                ),
-                eventNameStr
-            );
-        }
-        case "PERFORMANCE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.PERFORMANCE
-                ),
-                eventNameStr
-            );
-        }
-        case "SETTINGS": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(
-                    EVENT_CATEGORIES.SETTINGS
-                ),
-                eventNameStr
-            );
-        }
-        case "SITE": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.SITE),
-                eventNameStr
-            );
-        }
-        case "SYSTEM": {
-            return arrayIncludes(
-                safeCastTo<readonly UptimeEventName[]>(EVENT_CATEGORIES.SYSTEM),
-                eventNameStr
-            );
-        }
-        default: {
-            return false;
-        }
+    if (!objectHasOwn(EVENT_CATEGORY_LISTS, category)) {
+        return false;
     }
+
+    return eventNameListIncludes(EVENT_CATEGORY_LISTS[category], eventName);
 }
