@@ -4,10 +4,10 @@ import {
 } from "@shared/constants/monitoring";
 import {
     DEFAULT_MONITOR_STATUS,
+    MONITOR_STATUS_VALUES,
     type Monitor,
     type MonitorType,
     type Site,
-    STATUS_KIND,
 } from "@shared/types";
 import { validateMonitor } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -34,15 +34,9 @@ const mockCrypto = {
 
 const DEFAULT_HTTP_TIMEOUT = 30_000;
 
-const MONITOR_STATUS_VALUES = [
-    STATUS_KIND.DEGRADED,
-    STATUS_KIND.DOWN,
-    STATUS_KIND.PAUSED,
-    STATUS_KIND.PENDING,
-    STATUS_KIND.UP,
-] as const;
-
-const validMonitorStatusArbitrary = fc.constantFrom(...MONITOR_STATUS_VALUES);
+const validMonitorStatusArbitrary = fc.constantFrom<Monitor["status"]>(
+    ...MONITOR_STATUS_VALUES
+);
 
 const monitorStatusSet = new Set<string>(MONITOR_STATUS_VALUES);
 
@@ -490,13 +484,7 @@ describe("monitorOperations", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const statusValues = [
-                "down",
-                "pending",
-                "up",
-            ] as const;
-
-            for (const status of statusValues) {
+            for (const status of MONITOR_STATUS_VALUES) {
                 const result = normalizeMonitor({ status });
                 expect(result.status).toBe(status);
             }
