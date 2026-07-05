@@ -7,6 +7,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { fc, test } from "@fast-check/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -68,6 +69,10 @@ describe("History Manipulation Utilities", () => {
         status: "up",
         responseTime: 123,
     };
+
+    const statusHistoryStatusArbitrary = fc.constantFrom<
+        StatusHistory["status"]
+    >(...STATUS_HISTORY_VALUES);
 
     const monitorId = "test-monitor-123";
 
@@ -256,7 +261,7 @@ describe("History Manipulation Utilities", () => {
                         min: 0,
                         max: Date.now() + 1_000_000,
                     }),
-                    status: fc.constantFrom("up", "down"),
+                    status: statusHistoryStatusArbitrary,
                     responseTime: fc.integer({ min: -1, max: 30_000 }),
                 }),
             ])("should handle various history entries", (historyEntry) => {
@@ -318,7 +323,7 @@ describe("History Manipulation Utilities", () => {
                     fc.record({
                         monitorId: fc.string({ minLength: 1, maxLength: 30 }),
                         timestamp: fc.integer({ min: 0, max: Date.now() }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.integer({ min: -1, max: 30_000 }),
                         details: fc.oneof(
                             fc.string({ maxLength: 100 }),
@@ -513,7 +518,7 @@ describe("History Manipulation Utilities", () => {
                 fc.array(
                     fc.record({
                         timestamp: fc.integer({ min: 0, max: Date.now() }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.integer({ min: -1, max: 60_000 }),
                     }),
                     { minLength: 1, maxLength: 20 }
@@ -576,7 +581,7 @@ describe("History Manipulation Utilities", () => {
                                 max: Date.now() + 1_000_000,
                             }) // Future timestamps
                         ),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.oneof(
                             fc.integer({ min: -1, max: 10 }),
                             fc.integer({ min: 30_000, max: 300_000 }) // Very high response times
@@ -624,7 +629,7 @@ describe("History Manipulation Utilities", () => {
                 fc.array(
                     fc.record({
                         timestamp: fc.integer({ min: 0, max: Date.now() }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.integer({ min: 0, max: 5000 }),
                     }),
                     { minLength: 50, maxLength: 200 }
@@ -663,7 +668,7 @@ describe("History Manipulation Utilities", () => {
                 fc.array(
                     fc.record({
                         timestamp: fc.integer({ min: 0, max: Date.now() }),
-                        status: fc.constantFrom("up", "down"),
+                        status: statusHistoryStatusArbitrary,
                         responseTime: fc.integer({ min: 0, max: 10_000 }),
                     }),
                     { minLength: 1, maxLength: 10 }
