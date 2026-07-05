@@ -8,13 +8,13 @@
 
 import type { MonitorType } from "@shared/types";
 
-import { type ComponentProps, type JSX, useMemo } from "react";
-import { safeCastTo } from "ts-extras";
+import { type JSX, useMemo } from "react";
 
 import { ThemedBadge } from "../../../../theme/components/ThemedBadge";
 import { ThemedCard } from "../../../../theme/components/ThemedCard";
 import { ThemedProgress } from "../../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../../theme/components/ThemedText";
+import type { ProgressVariant } from "../../../../theme/components/types";
 import { AppIcons } from "../../../../utils/icons";
 import { ConditionalResponseTime } from "../../../common/MonitorUiComponents";
 
@@ -45,21 +45,13 @@ export interface AnalyticsKeyMetricsGridProperties {
     readonly formatResponseTime: (time: number) => string;
     readonly iconColors: AnalyticsIconColors;
     readonly monitorType: MonitorType;
-    readonly progressVariant: StrictProgressVariant;
+    readonly progressVariant: ProgressVariant;
     readonly totalChecks: number;
     readonly totalDowntime: number;
     readonly upCount: number;
     readonly uptime: string;
     readonly uptimeValue: number;
 }
-
-type BadgeVariant = Exclude<
-    ComponentProps<typeof ThemedBadge>["variant"],
-    undefined
->;
-type ProgressVariant = ComponentProps<typeof ThemedProgress>["variant"];
-
-type StrictProgressVariant = Exclude<ProgressVariant, undefined>;
 
 /**
  * Renders the primary analytics KPIs as a responsive grid.
@@ -102,8 +94,6 @@ export const AnalyticsKeyMetricsGrid = ({
         [DownIcon]
     );
 
-    const badgeVariant = safeCastTo<BadgeVariant>(progressVariant);
-
     return (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <ThemedCard
@@ -120,7 +110,7 @@ export const AnalyticsKeyMetricsGrid = ({
                         value={uptimeValue}
                         variant={progressVariant}
                     />
-                    <ThemedBadge size="sm" variant={badgeVariant}>
+                    <ThemedBadge size="sm" variant={progressVariant}>
                         {uptime}%
                     </ThemedBadge>
                     <ThemedText size="xs" variant="secondary">
