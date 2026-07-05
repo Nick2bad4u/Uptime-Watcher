@@ -472,6 +472,62 @@ describe(ConfigurationManager, () => {
             expect(result2).toEqual(expectedResult);
         });
 
+        it("should validate monitors separately when type-specific fields differ", async () => {
+            const monitor1 = createMockMonitor({
+                expectedStatusCode: 200,
+                type: "http-status",
+            });
+            const monitor2 = createMockMonitor({
+                expectedStatusCode: 500,
+                type: "http-status",
+            });
+            const result1: ValidationResult = { success: true, errors: [] };
+            const result2: ValidationResult = {
+                success: false,
+                errors: ["Expected status code is invalid"],
+            };
+
+            mockMonitorValidator.validateMonitorConfiguration
+                .mockReturnValueOnce(result1)
+                .mockReturnValueOnce(result2);
+
+            await expect(
+                configManager.validateMonitorConfiguration(monitor1)
+            ).resolves.toEqual(result1);
+            await expect(
+                configManager.validateMonitorConfiguration(monitor2)
+            ).resolves.toEqual(result2);
+
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledTimes(2);
+        });
+
+        it("should return cached monitor validation results without exposing cached errors", async () => {
+            const monitor = createMockMonitor();
+            const expectedResult: ValidationResult = {
+                success: false,
+                errors: ["Initial error"],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
+
+            const result1 =
+                await configManager.validateMonitorConfiguration(monitor);
+            (result1.errors as string[]).push("Caller mutation");
+
+            const result2 =
+                await configManager.validateMonitorConfiguration(monitor);
+
+            expect(result2).toEqual(expectedResult);
+            expect(result2.errors).toEqual(["Initial error"]);
+            expect(result2.errors).not.toBe(result1.errors);
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledTimes(1);
+        });
+
         it("should validate different monitors separately", async ({
             task,
             annotate,
@@ -671,6 +727,58 @@ describe(ConfigurationManager, () => {
             ).toHaveBeenCalledTimes(1);
             expect(result1).toEqual(expectedResult);
             expect(result2).toEqual(expectedResult);
+        });
+
+        it("should validate sites separately when monitor content differs", async () => {
+            const site1 = createMockSite({
+                monitors: [createMockMonitor({ expectedStatusCode: 200 })],
+            });
+            const site2 = createMockSite({
+                monitors: [createMockMonitor({ expectedStatusCode: 500 })],
+            });
+            const result1: ValidationResult = { success: true, errors: [] };
+            const result2: ValidationResult = {
+                success: false,
+                errors: ["Monitor 1: Expected status code is invalid"],
+            };
+
+            mockSiteValidator.validateSiteConfiguration
+                .mockReturnValueOnce(result1)
+                .mockReturnValueOnce(result2);
+
+            await expect(
+                configManager.validateSiteConfiguration(site1)
+            ).resolves.toEqual(result1);
+            await expect(
+                configManager.validateSiteConfiguration(site2)
+            ).resolves.toEqual(result2);
+
+            expect(
+                mockSiteValidator.validateSiteConfiguration
+            ).toHaveBeenCalledTimes(2);
+        });
+
+        it("should return cached site validation results without exposing cached errors", async () => {
+            const site = createMockSite();
+            const expectedResult: ValidationResult = {
+                success: false,
+                errors: ["Initial site error"],
+            };
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
+
+            const result1 = await configManager.validateSiteConfiguration(site);
+            (result1.errors as string[]).push("Caller mutation");
+
+            const result2 = await configManager.validateSiteConfiguration(site);
+
+            expect(result2).toEqual(expectedResult);
+            expect(result2.errors).toEqual(["Initial site error"]);
+            expect(result2.errors).not.toBe(result1.errors);
+            expect(
+                mockSiteValidator.validateSiteConfiguration
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should validate different sites separately", async ({

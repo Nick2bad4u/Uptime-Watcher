@@ -58,6 +58,8 @@ import {
 } from "@shared/constants/history";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { CacheKeys } from "@shared/utils/cacheKeys";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { isEmpty } from "ts-extras";
 
 import type { ValidationResult } from "./validators/interfaces";
@@ -88,6 +90,51 @@ export interface HistoryRetentionConfig {
     defaultLimit: HistoryLimitRules["defaultLimit"];
     maxLimit: HistoryLimitRules["maxLimit"];
     minLimit: HistoryLimitRules["minLimit"];
+}
+
+function cloneValidationResult(result: ValidationResult): ValidationResult {
+    return {
+        errors: [...result.errors],
+        success: result.success,
+    };
+}
+
+function normalizeValidationCacheKeyValue(value: unknown): unknown {
+    if (value instanceof Date) {
+        return { $date: value.getTime() };
+    }
+
+    if (Array.isArray(value)) {
+        return value.map(normalizeValidationCacheKeyValue);
+    }
+
+    if (!isRecord(value)) {
+        return value;
+    }
+
+    const normalized: Record<string, unknown> = {};
+
+    for (const key of Object.keys(value).toSorted((a, b) =>
+        a.localeCompare(b)
+    )) {
+        const property = getOwnDataProperty(value, key);
+        if (!property.found) {
+            continue;
+        }
+
+        Object.defineProperty(normalized, key, {
+            configurable: true,
+            enumerable: true,
+            value: normalizeValidationCacheKeyValue(property.value),
+            writable: true,
+        });
+    }
+
+    return normalized;
+}
+
+function createValidationCacheKey(value: unknown): string {
+    return JSON.stringify(normalizeValidationCacheKeyValue(value));
 }
 
 /**
@@ -169,31 +216,15 @@ export class ConfigurationManager {
     public async validateMonitorConfiguration(
         monitor: Site["monitors"][0]
     ): Promise<ValidationResult> {
-        // Create stable cache key using deterministic JSON serialization
-        const monitorForKey = {
-            checkInterval: monitor.checkInterval,
-            host: monitor.host ?? "",
-            id: monitor.id,
-            lastChecked: monitor.lastChecked?.getTime() ?? null,
-            monitoring: monitor.monitoring,
-            port: monitor.port ?? null,
-            responseTime: monitor.responseTime,
-            retryAttempts: monitor.retryAttempts,
-            status: monitor.status,
-            timeout: monitor.timeout,
-            type: monitor.type,
-            url: monitor.url ?? "",
-        };
-
         const cacheKey = CacheKeys.validation.byType(
             "monitor",
-            JSON.stringify(monitorForKey)
+            createValidationCacheKey(monitor)
         );
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
         if (cached) {
-            return cached;
+            return cloneValidationResult(cached);
         }
 
         // Perform validation
@@ -202,9 +233,9 @@ export class ConfigurationManager {
         );
 
         // Cache the result
-        this.validationCache.set(cacheKey, result);
+        this.validationCache.set(cacheKey, cloneValidationResult(result));
 
-        return result;
+        return cloneValidationResult(result);
     }
 
     /**
@@ -222,23 +253,15 @@ export class ConfigurationManager {
     public async validateSiteConfiguration(
         site: Site
     ): Promise<ValidationResult> {
-        // Create stable cache key using deterministic JSON serialization
-        const siteForKey = {
-            identifier: site.identifier,
-            monitorCount: site.monitors.length,
-            monitoring: site.monitoring,
-            name: site.name,
-        };
-
         const cacheKey = CacheKeys.validation.byType(
             "site",
-            JSON.stringify(siteForKey)
+            createValidationCacheKey(site)
         );
 
         // Check cache first
         const cached = this.validationCache.get(cacheKey);
         if (cached) {
-            return cached;
+            return cloneValidationResult(cached);
         }
 
         // Perform validation
@@ -247,9 +270,9 @@ export class ConfigurationManager {
         );
 
         // Cache the result
-        this.validationCache.set(cacheKey, result);
+        this.validationCache.set(cacheKey, cloneValidationResult(result));
 
-        return result;
+        return cloneValidationResult(result);
     }
 
     /**
