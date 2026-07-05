@@ -13,7 +13,7 @@ import {
     normalizeCloudSyncState,
     parseBaseline,
 } from "@electron/services/sync/syncEngineState";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 const PROTOTYPE_PROPERTY_NAME = "__proto__";
 const INHERITED_PROPERTY_NAME = "toString";
@@ -36,6 +36,32 @@ describe(parseBaseline, () => {
             CLOUD_SYNC_SCHEMA_VERSION
         );
         expect(Object.getPrototypeOf(result.baseline.sites)).toBeNull();
+    });
+
+    it("recovers oversized stored baselines before parsing JSON", () => {
+        const envKey = "UW_CLOUD_SYNC_MAX_BASELINE_BYTES" as const;
+        const original = process.env[envKey];
+        const parseSpy = vi.spyOn(JSON, "parse");
+
+        process.env[envKey] = "1";
+
+        try {
+            const result = parseBaseline("{}");
+
+            expect(result.recovered).toBe(true);
+            expect(result.error).toContain("exceeds size limit");
+            expect(parseSpy).not.toHaveBeenCalled();
+            expect(result.baseline.baselineVersion).toBe(
+                CLOUD_SYNC_BASELINE_VERSION
+            );
+        } finally {
+            parseSpy.mockRestore();
+            if (original === undefined) {
+                delete process.env.UW_CLOUD_SYNC_MAX_BASELINE_BYTES;
+            } else {
+                process.env[envKey] = original;
+            }
+        }
     });
 });
 

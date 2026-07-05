@@ -49,6 +49,7 @@ import {
     cloudSyncSiteConfigSchema,
 } from "@shared/types/cloudSyncDomain";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
+import { readNumberEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import {
@@ -56,6 +57,7 @@ import {
     isFiniteNumber,
     isNonEmptyString,
 } from "@shared/utils/typeGuards";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isDefined, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
 
 import {
@@ -65,6 +67,8 @@ import {
 
 // Keep aligned with renderer defaults (src/utils/fallbacks.ts).
 const DEFAULT_RETRY_ATTEMPTS = 3;
+
+const DEFAULT_MAX_BASELINE_BYTES = 25 * 1024 * 1024; // 25 MiB
 
 const SETTINGS_KEY_PREFIX_CLOUD = "cloud." as const;
 
@@ -78,6 +82,13 @@ type CloudSyncEntityStateMap = Record<string, CloudSyncEntityState>;
 type CloudSyncFieldValueMap = Record<string, CloudSyncFieldValue>;
 type CloudSyncMonitorConfigMap = Record<string, CloudSyncMonitorConfig>;
 type CloudSyncSiteConfigMap = Record<string, CloudSyncSiteConfig>;
+
+function getMaxBaselineBytes(): number {
+    return readNumberEnv(
+        "UW_CLOUD_SYNC_MAX_BASELINE_BYTES",
+        DEFAULT_MAX_BASELINE_BYTES
+    );
+}
 
 function createEntityMap(): CloudSyncEntityStateMap {
     return createNullPrototypeObject<CloudSyncEntityStateMap>();
@@ -595,6 +606,14 @@ export function stringifyBaseline(baseline: CloudSyncBaseline): string {
 }
 
 function parseBaselinePayload(raw: string): unknown {
+    const maxBytes = getMaxBaselineBytes();
+    const actualBytes = getUtfByteLength(raw);
+    if (actualBytes > maxBytes) {
+        throw new TypeError(
+            `Cloud sync baseline exceeds size limit of ${maxBytes} bytes. Actual: ${actualBytes} bytes.`
+        );
+    }
+
     try {
         return JSON.parse(raw);
     } catch (error) {
