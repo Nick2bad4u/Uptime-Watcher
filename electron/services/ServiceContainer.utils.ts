@@ -12,7 +12,6 @@ import type { EventMetadata } from "@shared/types/events";
 import type { Except } from "type-fest";
 
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
-import { safeCastTo } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type {
@@ -118,6 +117,6 @@ export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
         return false;
     }
 
-    const { then } = safeCastTo<{ then?: unknown }>(value);
+    const then: unknown = Reflect.get(value, "then");
     return typeof then === "function";
 }

@@ -61,7 +61,7 @@ import {
 } from "@shared/utils/logTemplates";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { app } from "electron";
-import { arrayJoin, isEmpty, objectHasIn, safeCastTo } from "ts-extras";
+import { arrayJoin, isEmpty, objectHasIn } from "ts-extras";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type {
@@ -97,8 +97,7 @@ const hasCloseFunction = (
         return false;
     }
 
-    const closeCandidate: { close?: unknown } = safeCastTo(candidate);
-    return typeof closeCandidate.close === "function";
+    return typeof Reflect.get(candidate, "close") === "function";
 };
 
 /**

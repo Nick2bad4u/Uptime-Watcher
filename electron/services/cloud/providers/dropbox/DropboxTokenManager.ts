@@ -3,7 +3,7 @@ import type { Except, UnknownRecord } from "type-fest";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { Dropbox, DropboxAuth } from "dropbox";
-import { isFinite as isFiniteNumber, objectHasIn, safeCastTo } from "ts-extras";
+import { isFinite as isFiniteNumber, objectHasIn } from "ts-extras";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
@@ -223,7 +223,7 @@ function isThenable(value: unknown): value is PromiseLike<unknown> {
         typeof value === "object" &&
         value !== null &&
         objectHasIn(castUnchecked<UnknownRecord>(value), "then") &&
-        typeof safeCastTo<{ then?: unknown }>(value).then === "function"
+        typeof Reflect.get(value, "then") === "function"
     );
 }
 

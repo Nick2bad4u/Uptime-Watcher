@@ -2,7 +2,6 @@ import { openExternalOrThrow } from "@electron/services/shell/openExternalUtils"
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { DropboxAuth } from "dropbox";
-import { safeCastTo } from "ts-extras";
 import * as z from "zod";
 
 import type { DropboxTokens } from "./DropboxTokens";
@@ -167,9 +166,8 @@ export class DropboxAuthFlow {
             args.code
         );
 
-        const parsed = dropboxTokenExchangeResponseSchema.parse(
-            safeCastTo<{ result?: unknown }>(response).result
-        );
+        const responseResult: unknown = Reflect.get(response, "result");
+        const parsed = dropboxTokenExchangeResponseSchema.parse(responseResult);
 
         return {
             accessToken: parsed.access_token,
