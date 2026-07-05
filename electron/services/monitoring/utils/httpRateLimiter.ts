@@ -10,13 +10,52 @@
 
 import { readNumberEnv } from "@shared/utils/environment";
 import { HttpRateLimiter } from "@shared/utils/httpRateLimiter";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../utils/logger";
 
+const MAX_CONCURRENT_CAP = 64;
+const MAX_WAIT_MS_CAP = 120_000;
+const MIN_INTERVAL_MS_CAP = 60_000;
+
+function normalizePositiveInteger(value: number, fallback: number): number {
+    if (!isFiniteNumber(value) || value <= 0) {
+        return fallback;
+    }
+
+    return Math.trunc(value);
+}
+
+function readBoundedPositiveIntegerEnv(args: {
+    readonly defaultValue: number;
+    readonly key: string;
+    readonly maxValue: number;
+}): number {
+    return Math.min(
+        normalizePositiveInteger(args.maxValue, args.defaultValue),
+        normalizePositiveInteger(
+            readNumberEnv(args.key, args.defaultValue),
+            args.defaultValue
+        )
+    );
+}
+
 const sharedRateLimiter = new HttpRateLimiter({
-    maxConcurrent: readNumberEnv("UW_HTTP_MAX_CONCURRENT", 8),
-    maxWaitMs: readNumberEnv("UW_HTTP_MAX_WAIT_MS", 30_000),
-    minIntervalMs: readNumberEnv("UW_HTTP_MIN_INTERVAL_MS", 200),
+    maxConcurrent: readBoundedPositiveIntegerEnv({
+        defaultValue: 8,
+        key: "UW_HTTP_MAX_CONCURRENT",
+        maxValue: MAX_CONCURRENT_CAP,
+    }),
+    maxWaitMs: readBoundedPositiveIntegerEnv({
+        defaultValue: 30_000,
+        key: "UW_HTTP_MAX_WAIT_MS",
+        maxValue: MAX_WAIT_MS_CAP,
+    }),
+    minIntervalMs: readBoundedPositiveIntegerEnv({
+        defaultValue: 200,
+        key: "UW_HTTP_MIN_INTERVAL_MS",
+        maxValue: MIN_INTERVAL_MS_CAP,
+    }),
     onMaxWaitExceeded: ({
         key,
         waitedMs,
