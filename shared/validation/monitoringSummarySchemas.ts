@@ -27,7 +27,27 @@ const monitoringOperationSummaryInternalSchema = z
         skipped: nonNegativeIntSchema,
         succeeded: nonNegativeIntSchema,
     })
-    .strict();
+    .strict()
+    .superRefine((value, ctx) => {
+        if (value.attempted !== value.succeeded + value.failed) {
+            ctx.addIssue({
+                code: "custom",
+                message: "attempted must equal succeeded plus failed",
+                path: ["attempted"],
+            });
+        }
+
+        if (
+            value.partialFailures !== (value.succeeded > 0 && value.failed > 0)
+        ) {
+            ctx.addIssue({
+                code: "custom",
+                message:
+                    "partialFailures must reflect mixed successes and failures",
+                path: ["partialFailures"],
+            });
+        }
+    });
 
 /** Zod schema for {@link MonitoringOperationSummary}. */
 export const monitoringOperationSummarySchema: z.ZodType<MonitoringOperationSummary> =
