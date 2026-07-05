@@ -9,6 +9,7 @@ import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
 import { MONITOR_STATUS_VALUES } from "@shared/types";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import * as fc from "fast-check";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { isPresent } from "ts-extras";
@@ -57,6 +58,34 @@ const buildMinimalMonitor = (overrides: Partial<Monitor>): Monitor =>
         type: "http",
         ...overrides,
     }) as Monitor;
+
+const hasExplicitUrlPath = (url: string): boolean => {
+    const schemeEnd = url.indexOf("://");
+    if (schemeEnd === -1) {
+        return false;
+    }
+
+    let cursor = schemeEnd + 3;
+    while (cursor < url.length) {
+        const char = url[cursor];
+        if (char === "/" || char === "?" || char === "#") {
+            return char === "/";
+        }
+
+        cursor += 1;
+    }
+
+    return false;
+};
+
+const getExpectedSafeDisplayIdentifier = (url: string): string => {
+    const safeUrl = getSafeUrlForLogging(url);
+    if (!hasExplicitUrlPath(url) && safeUrl.endsWith("/")) {
+        return safeUrl.slice(0, -1);
+    }
+
+    return safeUrl;
+};
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({
@@ -776,7 +805,7 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(url);
+                            ).toBe(getExpectedSafeDisplayIdentifier(url));
                         }
                     )
                 );
@@ -809,6 +838,31 @@ describe("fallback Utilities", () => {
                         }
                     )
                 );
+            });
+
+            it("should redact URL secrets in HTTP monitor identifiers", async ({
+                annotate,
+                task,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: fallbacks", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Privacy", "type");
+
+                const monitor = buildMinimalMonitor({
+                    type: "http",
+                    url: "https://example.com/status?token=display-secret#fragment",
+                });
+
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    "fallback"
+                );
+
+                expect(result).toBe("https://example.com/status");
+                expect(result).not.toContain("token=");
+                expect(result).not.toContain("display-secret");
+                expect(result).not.toContain("fragment");
             });
         });
 
@@ -931,7 +985,9 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(baselineUrl);
+                            ).toBe(
+                                getExpectedSafeDisplayIdentifier(baselineUrl)
+                            );
                         }
                     )
                 );
@@ -993,7 +1049,9 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(primaryUrl);
+                            ).toBe(
+                                getExpectedSafeDisplayIdentifier(primaryUrl)
+                            );
                         }
                     )
                 );
@@ -1023,7 +1081,9 @@ describe("fallback Utilities", () => {
 
                             expect(
                                 getMonitorDisplayIdentifier(monitor, fallback)
-                            ).toBe(replicaUrl);
+                            ).toBe(
+                                getExpectedSafeDisplayIdentifier(replicaUrl)
+                            );
                         }
                     )
                 );
@@ -1059,10 +1119,39 @@ describe("fallback Utilities", () => {
                                 fallback
                             );
 
-                            expect(result).toBe(url);
+                            expect(result).toBe(
+                                getExpectedSafeDisplayIdentifier(url)
+                            );
                         }
                     )
                 );
+            });
+
+            it("should redact URL secrets from generic identifiers", async ({
+                annotate,
+                task,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: fallbacks", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Privacy", "type");
+
+                const monitor = buildMinimalMonitor({
+                    host: undefined,
+                    port: undefined,
+                    type: "port",
+                    url: "https://fallback.example.com/status?refresh_token=generic-secret#section",
+                });
+
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    "fallback"
+                );
+
+                expect(result).toBe("https://fallback.example.com/status");
+                expect(result).not.toContain("refresh_token");
+                expect(result).not.toContain("generic-secret");
+                expect(result).not.toContain("section");
             });
 
             it("should use host from generic identifier", async ({
@@ -1279,13 +1368,18 @@ describe("fallback Utilities", () => {
             ])(
                 "should prefer URL over fallback for HTTP monitors with URL",
                 (monitor, fallback) => {
-                    fc.pre(Boolean(monitor.url));
+                    const { url } = monitor;
+                    fc.pre(typeof url === "string");
+                    if (typeof url !== "string") {
+                        return;
+                    }
+
                     const result = getMonitorDisplayIdentifier(
                         monitor,
                         fallback
                     );
 
-                    expect(result).toBe(monitor.url);
+                    expect(result).toBe(getExpectedSafeDisplayIdentifier(url));
                 }
             );
 

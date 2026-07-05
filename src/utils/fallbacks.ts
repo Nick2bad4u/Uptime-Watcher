@@ -35,6 +35,7 @@ import type { Monitor } from "@shared/types";
 import type { ReadonlyDeep } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import {
     arrayJoin,
     isDefined,
@@ -224,6 +225,40 @@ export const MonitorDefaults: ReadonlyDeep<{
     timeout: 10_000, // 10 seconds
 } as const;
 
+const hasExplicitUrlPath = (url: string): boolean => {
+    const schemeEnd = url.indexOf("://");
+    if (schemeEnd === -1) {
+        return false;
+    }
+
+    let cursor = schemeEnd + 3;
+    while (cursor < url.length) {
+        const char = url[cursor];
+        if (char === "/" || char === "?" || char === "#") {
+            return char === "/";
+        }
+
+        cursor += 1;
+    }
+
+    return false;
+};
+
+const getSafeUrlForDisplayIdentifier = (
+    url: string | undefined
+): string | undefined => {
+    if (!url) {
+        return undefined;
+    }
+
+    const safeUrl = getSafeUrlForLogging(url);
+    if (!hasExplicitUrlPath(url) && safeUrl.endsWith("/")) {
+        return safeUrl.slice(0, -1);
+    }
+
+    return safeUrl;
+};
+
 /**
  * Configuration for monitor display identifier generation.
  *
@@ -239,7 +274,8 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
 >([
     [
         "cdn-edge-consistency",
-        (monitor): string | undefined => monitor.baselineUrl ?? undefined,
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.baselineUrl),
     ],
     [
         "dns",
@@ -253,12 +289,36 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
             return `${monitor.host}${recordType}`;
         },
     ],
-    ["http", (monitor): string | undefined => monitor.url ?? undefined],
-    ["http-header", (monitor): string | undefined => monitor.url ?? undefined],
-    ["http-json", (monitor): string | undefined => monitor.url ?? undefined],
-    ["http-keyword", (monitor): string | undefined => monitor.url ?? undefined],
-    ["http-latency", (monitor): string | undefined => monitor.url ?? undefined],
-    ["http-status", (monitor): string | undefined => monitor.url ?? undefined],
+    [
+        "http",
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
+    ],
+    [
+        "http-header",
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
+    ],
+    [
+        "http-json",
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
+    ],
+    [
+        "http-keyword",
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
+    ],
+    [
+        "http-latency",
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
+    ],
+    [
+        "http-status",
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
+    ],
     ["ping", (monitor): string | undefined => monitor.host ?? undefined],
     [
         "port",
@@ -270,11 +330,13 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     [
         "replication",
         (monitor): string | undefined =>
-            monitor.primaryStatusUrl ?? monitor.replicaStatusUrl ?? undefined,
+            getSafeUrlForDisplayIdentifier(monitor.primaryStatusUrl) ??
+            getSafeUrlForDisplayIdentifier(monitor.replicaStatusUrl),
     ],
     [
         "server-heartbeat",
-        (monitor): string | undefined => monitor.url ?? undefined,
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
     ],
     [
         "ssl",
@@ -288,7 +350,8 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
     ],
     [
         "websocket-keepalive",
-        (monitor): string | undefined => monitor.url ?? undefined,
+        (monitor): string | undefined =>
+            getSafeUrlForDisplayIdentifier(monitor.url),
     ],
 ]);
 
@@ -366,7 +429,7 @@ export function getMonitorDisplayIdentifier(
 function getGenericIdentifier(monitor: Monitor): string | undefined {
     // Check common identifier fields in order of preference
     if (monitor.url) {
-        return monitor.url;
+        return getSafeUrlForDisplayIdentifier(monitor.url);
     }
     if (monitor.host) {
         return monitor.port ? `${monitor.host}:${monitor.port}` : monitor.host;
