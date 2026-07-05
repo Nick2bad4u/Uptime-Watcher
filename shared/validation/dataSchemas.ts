@@ -221,9 +221,7 @@ export const validateSerializedDatabaseRestorePayload = (
 
 export const validateSerializedDatabaseRestoreResult = (
     value: unknown
-):
-    | { data: SerializedDatabaseRestoreResult; success: true }
-    | { error: unknown; success: false } =>
+): ReturnType<typeof serializedDatabaseRestoreResultSchema.safeParse> =>
     serializedDatabaseRestoreResultSchema.safeParse(value);
 
 export const validateMonitorTypeConfigArray = (

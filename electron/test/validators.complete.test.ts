@@ -22,7 +22,10 @@ import { describe, expect, it, vi } from "vitest";
 
 // Import all exported validator groups (domain modules)
 import { CloudHandlerValidators } from "../services/ipc/validators/cloud";
-import { DataHandlerValidators } from "../services/ipc/validators/data";
+import {
+    DataHandlerResultValidators,
+    DataHandlerValidators,
+} from "../services/ipc/validators/data";
 import { MonitoringHandlerValidators } from "../services/ipc/validators/monitoring";
 import { MonitorTypeHandlerValidators } from "../services/ipc/validators/monitorTypes";
 import { SettingsHandlerValidators } from "../services/ipc/validators/settings";
@@ -980,6 +983,27 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 ]);
 
                 expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+
+        describe("restoreSqliteBackup result validator", () => {
+            it("should return formatted issue paths for invalid restore results", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result =
+                    DataHandlerResultValidators.restoreSqliteBackup({
+                        restoredAt: "invalid",
+                    });
+
+                expect(isValidationFailure(result)).toBeTruthy();
+                expect(result?.some((issue) => issue.includes("restoredAt")))
+                    .toBeTruthy();
             });
         });
     });
