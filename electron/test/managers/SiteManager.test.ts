@@ -720,6 +720,56 @@ describe(SiteManager, () => {
             );
         });
     });
+    describe("getSiteWithDetails", () => {
+        it("returns a cloned cached site snapshot", async () => {
+            const site: Site = {
+                identifier: "site-cache",
+                monitoring: true,
+                monitors: [],
+                name: "Cached Site",
+            };
+
+            manager["sitesCache"].set(site.identifier, site);
+
+            const result = await manager.getSiteWithDetails(site.identifier);
+
+            expect(result).toEqual(site);
+            expect(result).not.toBe(site);
+
+            result!.name = "Mutated Result";
+
+            expect(manager["sitesCache"].get(site.identifier)).toEqual(site);
+        });
+
+        it("hydrates cache from a cloned database site snapshot", async () => {
+            const site: Site = {
+                identifier: "site-db",
+                monitoring: true,
+                monitors: [],
+                name: "Database Site",
+            };
+
+            vi.spyOn(
+                manager["siteRepositoryService"],
+                "getSiteFromDatabase"
+            ).mockResolvedValue(site);
+
+            const result = await manager.getSiteWithDetails(site.identifier);
+
+            expect(result).toEqual(site);
+            expect(result).not.toBe(site);
+
+            result!.name = "Mutated Result";
+            site.name = "Mutated Source";
+
+            expect(manager["sitesCache"].get(site.identifier)).toEqual({
+                identifier: "site-db",
+                monitoring: true,
+                monitors: [],
+                name: "Database Site",
+            });
+        });
+    });
     describe("getSiteFromCache", () => {
         it("should return site from cache when it exists", () => {
             const testSite = {

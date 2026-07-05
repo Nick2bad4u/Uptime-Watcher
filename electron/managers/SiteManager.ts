@@ -384,17 +384,17 @@ export class SiteManager {
 
         const cachedSite = this.sitesCache.get(identifier);
         if (cachedSite) {
-            return cachedSite;
+            return structuredClone(cachedSite);
         }
 
         const site =
             await this.siteRepositoryService.getSiteFromDatabase(identifier);
 
         if (site) {
-            this.sitesCache.set(identifier, site);
+            this.sitesCache.set(identifier, structuredClone(site));
         }
 
-        return site;
+        return site ? structuredClone(site) : undefined;
     }
 
     /**
