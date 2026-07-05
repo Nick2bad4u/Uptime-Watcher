@@ -45,7 +45,15 @@ const GOOGLE_DRIVE_LIST_PAGE_SIZE = 1000;
 type DriveListParams = Parameters<GoogleDriveClient["files"]["list"]>[0];
 
 function normalizeKey(key: string): string {
-    return normalizeProviderObjectKey(key);
+    const normalized = normalizeProviderObjectKey(key);
+    assertGoogleDriveKeySegments(normalized);
+    return normalized;
+}
+
+function normalizePrefixKey(prefix: string): string {
+    const normalized = normalizeProviderObjectKey(prefix);
+    assertGoogleDriveKeySegments(normalized, { allowTrailingSlash: true });
+    return normalized;
 }
 
 function normalizeDriveNameSegment(candidate: string): null | string {
@@ -73,6 +81,35 @@ function normalizeDriveNameSegment(candidate: string): null | string {
     });
 
     return normalized.length > 0 ? normalized : null;
+}
+
+function assertGoogleDriveKeySegments(
+    key: string,
+    options: { allowTrailingSlash?: boolean } = {}
+): void {
+    if (key.length === 0) {
+        return;
+    }
+
+    const segments = stringSplit(key, "/");
+    const lastSegmentIndex = segments.length - 1;
+
+    for (const [index, segment] of segments.entries()) {
+        const isAllowedTrailingSlash =
+            options.allowTrailingSlash === true &&
+            index === lastSegmentIndex &&
+            segment.length === 0;
+
+        if (isAllowedTrailingSlash) {
+            continue;
+        }
+
+        if (normalizeDriveNameSegment(segment) !== segment) {
+            throw new Error(
+                "Google Drive cloud key segments must be normalized path segments"
+            );
+        }
+    }
 }
 
 function parseDriveTimestamp(
@@ -118,7 +155,7 @@ function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
 }
 
 function ensureTrailingSlash(prefix: string): string {
-    const normalized = normalizeKey(prefix);
+    const normalized = normalizePrefixKey(prefix);
     if (!normalized) {
         return "";
     }
@@ -439,9 +476,7 @@ export class GoogleDriveCloudStorageProvider
         drive: GoogleDriveClient,
         pathSegments: string[]
     ): Promise<string> {
-        const normalizedSegments = [APP_ROOT_FOLDER_NAME, ...pathSegments]
-            .map((segment) => segment.trim())
-            .filter((segment) => segment.length > 0);
+        const normalizedSegments = [APP_ROOT_FOLDER_NAME, ...pathSegments];
 
         const cacheKey = arrayJoin(normalizedSegments, "/");
         const cached = this.folderCache.get(cacheKey);
@@ -511,9 +546,7 @@ export class GoogleDriveCloudStorageProvider
         drive: GoogleDriveClient,
         pathSegments: string[]
     ): Promise<null | string> {
-        const normalizedSegments = [APP_ROOT_FOLDER_NAME, ...pathSegments]
-            .map((segment) => segment.trim())
-            .filter((segment) => segment.length > 0);
+        const normalizedSegments = [APP_ROOT_FOLDER_NAME, ...pathSegments];
 
         let parentId = "appDataFolder";
 

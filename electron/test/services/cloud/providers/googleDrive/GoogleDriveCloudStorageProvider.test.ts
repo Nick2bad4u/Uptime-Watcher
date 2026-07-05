@@ -107,6 +107,45 @@ describe(GoogleDriveCloudStorageProvider, () => {
         }
     });
 
+    it("rejects non-canonical path segments before Drive access", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(
+            provider.uploadObject({
+                buffer: Buffer.from("payload", "utf8"),
+                key: "sync /state.json",
+            })
+        ).rejects.toThrow(/normalized path segments/iu);
+        await expect(
+            provider.downloadObject("sync/ state.json")
+        ).rejects.toThrow(/normalized path segments/iu);
+        await expect(
+            provider.deleteObject("sync\t/state.json")
+        ).rejects.toThrow(/control characters/iu);
+        await expect(provider.listObjects("sync /")).rejects.toThrow(
+            /normalized path segments/iu
+        );
+
+        expect(
+            googleDriveClientMocks.driveStub.files.list
+        ).not.toHaveBeenCalled();
+        expect(
+            googleDriveClientMocks.driveStub.files.create
+        ).not.toHaveBeenCalled();
+        expect(
+            googleDriveClientMocks.driveStub.files.get
+        ).not.toHaveBeenCalled();
+        expect(
+            googleDriveClientMocks.driveStub.files.delete
+        ).not.toHaveBeenCalled();
+    });
+
     it("throws EEXIST when overwrite is false and object exists", async () => {
         const tokenManager = {
             isConnected: vi.fn().mockResolvedValue(true),
@@ -406,7 +445,8 @@ describe(GoogleDriveCloudStorageProvider, () => {
             provider.downloadObject("sync/file.txt")
         ).rejects.toMatchObject({
             code: undefined,
-            message: "Failed to download Google Drive object 'sync/file.txt': Drive request failed",
+            message:
+                "Failed to download Google Drive object 'sync/file.txt': Drive request failed",
             operation: "downloadObject",
             providerKind: "google-drive",
             target: "sync/file.txt",
