@@ -7,7 +7,7 @@
  * @packageDocumentation
  */
 
-import type { Monitor, MonitorType, Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 import type {
     SerializedDatabaseBackupResult,
     SerializedDatabaseBackupSaveResult,
@@ -18,7 +18,7 @@ import type {
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { isDefined, safeCastTo } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
@@ -282,18 +282,17 @@ export const createSiteOperationsActions = (
             "createSite",
             async () => {
                 // Default to HTTP monitor if none provided
+                const defaultMonitor: Partial<Monitor> = {
+                    history: [],
+                    id: crypto.randomUUID(),
+                    monitoring: true,
+                    status: "pending",
+                    type: "http",
+                };
                 const monitors: Monitor[] = (
                     siteData.monitors && siteData.monitors.length > 0
                         ? siteData.monitors
-                        : [
-                              {
-                                  history: [],
-                                  id: crypto.randomUUID(),
-                                  monitoring: true,
-                                  status: "pending" as const,
-                                  type: safeCastTo<MonitorType>("http"),
-                              },
-                          ]
+                        : [defaultMonitor]
                 ).map((monitor) =>
                     normalizeMonitorOrThrow(
                         monitor,
