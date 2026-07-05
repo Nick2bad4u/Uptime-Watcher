@@ -11,7 +11,6 @@ import type { MonitorStatus } from "@shared/types";
 import type { Except } from "type-fest";
 
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { safeCastTo } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 /** Maximum number of alerts retained in memory. */
@@ -40,14 +39,25 @@ const nextFallbackAlertCounter = (() => {
     };
 })();
 
+interface AlertCrypto {
+    readonly getRandomValues?: (buffer: Uint32Array) => Uint32Array;
+    readonly randomUUID?: () => string;
+}
+
+const isAlertCrypto = (value: unknown): value is AlertCrypto =>
+    typeof value === "object" && value !== null;
+
+const getAlertCrypto = (): AlertCrypto | undefined => {
+    const cryptoCandidate: unknown = Reflect.get(globalThis, "crypto");
+    return isAlertCrypto(cryptoCandidate) ? cryptoCandidate : undefined;
+};
+
 /**
  * Unique identifier generator that leverages the Web Crypto API when available,
  * falling back to a deterministic counter otherwise.
  */
 const generateAlertId = (): string => {
-    const cryptoObject = safeCastTo<
-        (Crypto & { randomUUID?: () => string }) | undefined
-    >(globalThis.crypto);
+    const cryptoObject = getAlertCrypto();
     if (typeof cryptoObject?.randomUUID === "function") {
         try {
             return cryptoObject.randomUUID();
