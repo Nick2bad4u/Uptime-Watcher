@@ -1,4 +1,4 @@
-import { isValidUrl } from "@shared/validation/validatorUtils";
+import { validateExternalOpenUrlCandidate } from "@shared/utils/urlSafety";
 
 /**
  * Normalizes and validates a monitor URL intended for external opening.
@@ -17,9 +17,13 @@ export function normalizeMonitorExternalUrl(value: unknown): string {
         return "";
     }
 
-    return isValidUrl(trimmedUrl, {
-        disallowAuth: true,
-    })
-        ? trimmedUrl
+    const validation = validateExternalOpenUrlCandidate(trimmedUrl);
+    if (!validation.ok) {
+        return "";
+    }
+
+    const protocol = new URL(validation.normalizedUrl).protocol;
+    return protocol === "http:" || protocol === "https:"
+        ? validation.normalizedUrl
         : "";
 }
