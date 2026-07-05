@@ -2,9 +2,10 @@
  * @file Comprehensive tests for monitor title formatter utilities
  */
 
-import type { Monitor } from "@shared/types";
+import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
+import { MONITOR_STATUS_VALUES } from "@shared/types";
 import * as fc from "fast-check";
 import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -15,6 +16,10 @@ import {
     registerTitleSuffixFormatter,
     type TitleSuffixFormatter,
 } from "../../utils/monitorTitleFormatters";
+
+const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
+    ...MONITOR_STATUS_VALUES
+);
 
 /**
  * Mock monitor factory for testing
@@ -1429,7 +1434,7 @@ describe("monitorTitleFormatters", () => {
                     monitoring: fc.boolean(),
                     responseTime: fc.integer({ max: 10_000, min: 0 }),
                     retryAttempts: fc.integer({ max: 10, min: 1 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: monitorStatusArbitrary,
                     timeout: fc.integer({ max: 30_000, min: 1000 }),
                     type: fc.constantFrom("http"),
                     url: fc.webUrl(),
@@ -1454,7 +1459,7 @@ describe("monitorTitleFormatters", () => {
                     port: fc.integer({ max: 65_535, min: 1 }),
                     responseTime: fc.integer({ max: 10_000, min: 0 }),
                     retryAttempts: fc.integer({ max: 10, min: 1 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: monitorStatusArbitrary,
                     timeout: fc.integer({ max: 30_000, min: 1000 }),
                     type: fc.constantFrom("port"),
                 }),
@@ -1486,7 +1491,7 @@ describe("monitorTitleFormatters", () => {
                     ),
                     responseTime: fc.integer({ max: 10_000, min: 0 }),
                     retryAttempts: fc.integer({ max: 10, min: 1 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: monitorStatusArbitrary,
                     timeout: fc.integer({ max: 30_000, min: 1000 }),
                     type: fc.constantFrom("dns"),
                 }),
@@ -1511,7 +1516,7 @@ describe("monitorTitleFormatters", () => {
                     monitoring: fc.boolean(),
                     responseTime: fc.integer({ max: 10_000, min: 0 }),
                     retryAttempts: fc.integer({ max: 10, min: 1 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: monitorStatusArbitrary,
                     timeout: fc.integer({ max: 30_000, min: 1000 }),
                     type: fc.string({ maxLength: 20, minLength: 1 }).filter(
                         (type) =>
@@ -1606,7 +1611,7 @@ describe("monitorTitleFormatters", () => {
                     monitoring: fc.boolean(),
                     responseTime: fc.integer({ max: 10_000, min: 0 }),
                     retryAttempts: fc.integer({ max: 10, min: 1 }),
-                    status: fc.constantFrom("up", "down", "pending", "paused"),
+                    status: monitorStatusArbitrary,
                     timeout: fc.integer({ max: 30_000, min: 1000 }),
                     type: fc.string({ maxLength: 20, minLength: 1 }),
                 }),
