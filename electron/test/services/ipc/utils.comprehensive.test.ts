@@ -939,6 +939,10 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const result = createErrorResponse("x".repeat(10_000));
 
+                if (typeof result.error !== "string") {
+                    throw new TypeError("Expected error response message");
+                }
+
                 expect(result.error.length).toBeLessThan(10_000);
             });
 

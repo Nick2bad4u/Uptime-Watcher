@@ -30,7 +30,7 @@ describe(createInitialListenerStates, () => {
             createInitialListenerStates([
                 {
                     label: "example",
-                    register: async () => vi.fn(),
+                    register: async () => () => {},
                     scope: "example",
                 },
             ])

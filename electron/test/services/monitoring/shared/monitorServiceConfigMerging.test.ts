@@ -9,6 +9,17 @@ import {
     mergeMonitorServiceConfig,
 } from "../../../../services/monitoring/shared/monitorServiceConfigMerging";
 
+function getFirstHistoryEntry(
+    history: NonNullable<MonitorServiceConfig["history"]>
+): NonNullable<MonitorServiceConfig["history"]>[number] {
+    const firstEntry = history[0];
+    if (!firstEntry) {
+        throw new Error("Expected history fixture to contain an entry");
+    }
+
+    return firstEntry;
+}
+
 describe("monitorServiceConfigMerging", () => {
     it("creates defaults without invoking accessor-backed config fields", () => {
         const timeoutGetter = vi.fn(() => {
@@ -113,7 +124,7 @@ describe("monitorServiceConfigMerging", () => {
             status: "down",
             timestamp: 2,
         });
-        history[0].responseTime = 999;
+        getFirstHistoryEntry(history).responseTime = 999;
         lastChecked.setUTCFullYear(2030);
 
         expect(result.history).toEqual([
@@ -150,7 +161,7 @@ describe("monitorServiceConfigMerging", () => {
         });
 
         activeOperations.push("operation-2");
-        history[0].status = "down";
+        getFirstHistoryEntry(history).status = "down";
 
         expect(result.activeOperations).toEqual(["operation-1"]);
         expect(result.history).toEqual([
@@ -179,7 +190,7 @@ describe("monitorServiceConfigMerging", () => {
 
         const result = copyMonitorServiceConfig(config);
 
-        history[0].responseTime = 999;
+        getFirstHistoryEntry(history).responseTime = 999;
         lastChecked.setUTCFullYear(2030);
 
         expect(result).toEqual({

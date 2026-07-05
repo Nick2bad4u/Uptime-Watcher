@@ -1,3 +1,4 @@
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
@@ -34,7 +35,7 @@ describe(StateSyncStatusTracker, () => {
     });
 
     it("copies externally supplied status snapshots", () => {
-        const summary = {
+        const summary: StateSyncStatusSummary = {
             lastSyncAt: 1_700_000_000_000,
             siteCount: 2,
             source: STATE_SYNC_SOURCE.DATABASE,
