@@ -415,7 +415,7 @@ function getMonitorSchema(
  * Error thrown when a monitor field name is not part of the schema for a given
  * monitor type.
  */
-export class MonitorUnknownFieldError extends Error {
+class MonitorUnknownFieldError extends Error {
     public readonly fieldName: string;
 
     public readonly monitorType: string;

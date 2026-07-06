@@ -274,11 +274,11 @@ export const darkTheme: Theme = createTheme({
  * @example
  *
  * ```typescript
- * import { highContrastTheme } from "./themes";
- * themeManager.applyTheme(highContrastTheme);
+ * import { themes } from "./themes";
+ * themeManager.applyTheme(themes["high-contrast"]);
  * ```
  */
-export const highContrastTheme: Theme = createTheme({
+const highContrastTheme: Theme = createTheme({
     borderRadius: {
         full: "9999px",
         lg: "0.75rem",

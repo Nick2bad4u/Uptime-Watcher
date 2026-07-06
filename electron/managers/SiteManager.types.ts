@@ -1,5 +1,3 @@
-/* V8 ignore start */
-
 /**
  * Site manager type contracts extracted from
  * {@link electron/managers/SiteManager#SiteManager}.
@@ -19,9 +17,6 @@ import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { ConfigurationManager } from "./ConfigurationManager";
 import type { SiteManagerRepositories } from "./databaseRepositorySets";
-
-/** @internal Runtime marker to satisfy coverage for the pure type module. */
-export const SITE_MANAGER_TYPES_RUNTIME_MARKER = true as const;
 
 /**
  * Defines the contract for monitoring operations that can be performed in

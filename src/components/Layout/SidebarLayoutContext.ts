@@ -27,7 +27,7 @@ export interface SidebarLayoutContextValue {
  * provider tree. The noop toggle keeps component behaviour predictable during
  * isolated unit tests.
  */
-export const DEFAULT_SIDEBAR_LAYOUT: SidebarLayoutContextValue = Object.freeze({
+const DEFAULT_SIDEBAR_LAYOUT: SidebarLayoutContextValue = Object.freeze({
     isSidebarOpen: true,
     toggleSidebar: () => {
         /* noop fallback */

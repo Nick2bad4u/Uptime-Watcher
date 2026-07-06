@@ -523,7 +523,7 @@ export const isStructuredLogContext = (
     return marker.found && marker.value === true;
 };
 
-export const normalizeLogContext = (
+const normalizeLogContext = (
     context: StructuredLogContext | undefined,
     severity: LogSeverity
 ): SanitizedLogContext => {

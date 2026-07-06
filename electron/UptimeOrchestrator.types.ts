@@ -1,6 +1,3 @@
-/* V8 ignore start */
-
-/** @internal Runtime marker to satisfy coverage for the pure type module. */
 /**
  * Supporting type definitions for
  * {@link electron/UptimeOrchestrator#UptimeOrchestrator}.
@@ -18,8 +15,6 @@ import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
-
-export const UPTIME_ORCHESTRATOR_TYPES_RUNTIME_MARKER = true as const;
 
 /**
  * Payload describing a request to check the active monitoring status for a

@@ -71,7 +71,7 @@ const convertBytesToHex = (bytes: Uint8Array): string => {
     return arrayJoin(hexFragments, "");
 };
 
-export const isCorrelationId = (value: unknown): value is CorrelationId =>
+const isCorrelationId = (value: unknown): value is CorrelationId =>
     isValidLowercaseHexString(value, 16);
 
 export const generateCorrelationId = (): CorrelationId => {

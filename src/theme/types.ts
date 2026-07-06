@@ -313,7 +313,7 @@ export interface ThemeTypography {
 /**
  * List of all supported {@link ThemeName} values at runtime.
  */
-export const THEME_NAMES: readonly ThemeName[] = [
+const THEME_NAMES: readonly ThemeName[] = [
     "custom",
     "dark",
     "high-contrast",
