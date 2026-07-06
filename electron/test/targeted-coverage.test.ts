@@ -48,23 +48,29 @@ describe("Targeted Coverage for Missing Branches", () => {
             // Test with different NODE_ENV values
             const originalEnv = process.env["NODE_ENV"];
 
-            // Test undefined NODE_ENV
-            delete process.env["NODE_ENV"];
-            expect(typeof isDev()).toBe("boolean");
+            try {
+                // Test undefined NODE_ENV
+                delete process.env["NODE_ENV"];
+                expect(typeof isDev()).toBe("boolean");
 
-            // Test empty string NODE_ENV
-            process.env["NODE_ENV"] = "";
-            expect(typeof isDev()).toBe("boolean");
+                // Test empty string NODE_ENV
+                process.env["NODE_ENV"] = "";
+                expect(typeof isDev()).toBe("boolean");
 
-            // Test other values
-            process.env["NODE_ENV"] = "staging";
-            expect(typeof isDev()).toBe("boolean");
+                // Test other values
+                process.env["NODE_ENV"] = "staging";
+                expect(typeof isDev()).toBe("boolean");
 
-            process.env["NODE_ENV"] = "testing";
-            expect(typeof isDev()).toBe("boolean");
-
-            // Restore
-            process.env["NODE_ENV"] = originalEnv;
+                process.env["NODE_ENV"] = "testing";
+                expect(typeof isDev()).toBe("boolean");
+            } finally {
+                // Restore
+                if (originalEnv === undefined) {
+                    delete process.env["NODE_ENV"];
+                } else {
+                    process.env["NODE_ENV"] = originalEnv;
+                }
+            }
         });
     });
     describe("Error Handling Branches", () => {

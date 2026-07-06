@@ -90,16 +90,22 @@ describe("Additional Coverage Tests", () => {
 
             const originalEnv = process.env["NODE_ENV"];
 
-            // Test development environment
-            process.env["NODE_ENV"] = "development";
-            expect(process.env["NODE_ENV"]).toBe("development");
+            try {
+                // Test development environment
+                process.env["NODE_ENV"] = "development";
+                expect(process.env["NODE_ENV"]).toBe("development");
 
-            // Test production environment
-            process.env["NODE_ENV"] = "production";
-            expect(process.env["NODE_ENV"]).toBe("production");
-
-            // Restore original environment
-            process.env["NODE_ENV"] = originalEnv;
+                // Test production environment
+                process.env["NODE_ENV"] = "production";
+                expect(process.env["NODE_ENV"]).toBe("production");
+            } finally {
+                // Restore original environment
+                if (originalEnv === undefined) {
+                    delete process.env["NODE_ENV"];
+                } else {
+                    process.env["NODE_ENV"] = originalEnv;
+                }
+            }
         });
     });
     describe("Mock Coverage", () => {

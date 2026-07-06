@@ -663,12 +663,7 @@ describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
     });
 
     it("rejects oversized snapshots", async () => {
-        const envKey = "UW_CLOUD_SYNC_MAX_SNAPSHOT_BYTES" as const;
-        const original = process.env[envKey];
-
-        process.env[envKey] = "1";
-
-        try {
+        await withEnvVar("UW_CLOUD_SYNC_MAX_SNAPSHOT_BYTES", "1", async () => {
             const provider = createProvider({
                 downloadObject: async () => Buffer.from("{}", "utf8"),
             });
@@ -680,9 +675,7 @@ describe("ProviderCloudSyncTransport.readSnapshot limits/decoding", () => {
                     `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
                 )
             ).rejects.toThrow(/exceeds size limit/i);
-        } finally {
-            process.env[envKey] = original;
-        }
+        });
     });
 });
 
