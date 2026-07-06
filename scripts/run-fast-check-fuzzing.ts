@@ -156,7 +156,7 @@ function parseCliOptions(argv: readonly string[]): CliOptions {
             continue;
         }
 
-        if (/^\d+$/.test(argument) && runs === undefined) {
+        if (/^\d+$/u.test(argument) && runs === undefined) {
             runs = parsePositiveInteger(argument, "runs");
             continue;
         }
@@ -249,13 +249,20 @@ function parsePositiveInteger(value: string, label: string): number {
  * @param label - Name of the option for error reporting.
  */
 function parseInteger(value: string, label: string): number {
-    const parsed = Number.parseInt(value.trim(), 10);
-    if (!Number.isFinite(parsed)) {
+    const trimmed = value.trim();
+    if (!/^[+-]?\d+$/u.test(trimmed)) {
         throw new CliUsageError(
             `${label} must be an integer; received '${value}'.`
         );
     }
-    return Math.trunc(parsed);
+
+    const parsed = Number.parseInt(trimmed, 10);
+    if (!Number.isSafeInteger(parsed)) {
+        throw new CliUsageError(
+            `${label} must be a safe integer; received '${value}'.`
+        );
+    }
+    return parsed;
 }
 
 /**
