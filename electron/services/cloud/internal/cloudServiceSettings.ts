@@ -55,6 +55,21 @@ export function parseBooleanSetting(value: string | undefined): boolean {
     return value === "true";
 }
 
+function isAsciiDigits(value: string): boolean {
+    if (value.length === 0) {
+        return false;
+    }
+
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (!isDefined(codePoint) || codePoint < 48 || codePoint > 57) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 /** Parse a nullable epoch millisecond timestamp stored as a string. */
 export function parseEpochMsSetting(value: string | undefined): null | number {
     if (!isDefined(value)) {
@@ -62,7 +77,7 @@ export function parseEpochMsSetting(value: string | undefined): null | number {
     }
 
     const trimmed = value.trim();
-    if (trimmed.length === 0) {
+    if (!isAsciiDigits(trimmed)) {
         return null;
     }
 
