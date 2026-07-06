@@ -16,6 +16,8 @@ import {
     isNodeEnvironment,
     isProduction,
     isTest,
+    normalizePositiveInteger,
+    readBoundedPositiveIntegerEnv,
     readNumberEnv,
 } from "../../utils/environment";
 
@@ -292,6 +294,106 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
                 expect(readNumberEnv("TEST_LIMIT", 10)).toBe(10);
             }
+        });
+    });
+
+    describe(normalizePositiveInteger, () => {
+        it("should truncate finite positive numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(normalizePositiveInteger(42.9, 10)).toBe(42);
+        });
+
+        it("should return fallback for non-positive and infinite numbers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(normalizePositiveInteger(0, 10)).toBe(10);
+            expect(normalizePositiveInteger(-1, 10)).toBe(10);
+            expect(normalizePositiveInteger(Number.POSITIVE_INFINITY, 10)).toBe(
+                10
+            );
+        });
+    });
+
+    describe(readBoundedPositiveIntegerEnv, () => {
+        it("should read and clamp positive integer environment values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            globalThis.process = {
+                env: { TEST_LIMIT: "50" },
+            } as any;
+
+            expect(
+                readBoundedPositiveIntegerEnv({
+                    defaultValue: 10,
+                    key: "TEST_LIMIT",
+                    maxValue: 25,
+                })
+            ).toBe(25);
+        });
+
+        it("should use fallback when the env value or bound is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: environment-complete-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            globalThis.process = {
+                env: { TEST_LIMIT: "invalid" },
+            } as any;
+
+            expect(
+                readBoundedPositiveIntegerEnv({
+                    defaultValue: 10,
+                    key: "TEST_LIMIT",
+                    maxValue: 25,
+                })
+            ).toBe(10);
+
+            globalThis.process = {
+                env: { TEST_LIMIT: "20" },
+            } as any;
+
+            expect(
+                readBoundedPositiveIntegerEnv({
+                    defaultValue: 10,
+                    key: "TEST_LIMIT",
+                    maxValue: 0,
+                })
+            ).toBe(10);
         });
     });
 

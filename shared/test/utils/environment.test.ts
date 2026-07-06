@@ -30,6 +30,13 @@ describe("Function Coverage Validation", () => {
         expect(typeof environmentModule.isNodeEnvironment).toBe("function");
         expect(typeof environmentModule.isProduction).toBe("function");
         expect(typeof environmentModule.isTest).toBe("function");
+        expect(typeof environmentModule.normalizePositiveInteger).toBe(
+            "function"
+        );
+        expect(typeof environmentModule.readBoundedPositiveIntegerEnv).toBe(
+            "function"
+        );
+        expect(typeof environmentModule.readNumberEnv).toBe("function");
 
         // Call all functions to register coverage
 
@@ -50,6 +57,24 @@ describe("Function Coverage Validation", () => {
 
         const nodeEnv = environmentModule.getNodeEnv();
         expect(typeof nodeEnv).toBe("string");
+
+        const numberValue = environmentModule.readNumberEnv(
+            "UW_UNKNOWN_LIMIT_FOR_TEST",
+            10
+        );
+        expect(numberValue).toBe(10);
+
+        const normalizedPositiveInteger =
+            environmentModule.normalizePositiveInteger(10.5, 1);
+        expect(normalizedPositiveInteger).toBe(10);
+
+        const boundedPositiveInteger =
+            environmentModule.readBoundedPositiveIntegerEnv({
+                defaultValue: 10,
+                key: "UW_UNKNOWN_LIMIT_FOR_TEST",
+                maxValue: 20,
+            });
+        expect(boundedPositiveInteger).toBe(10);
 
         // Test boolean environment checks
         const isBrowser = environmentModule.isBrowserEnvironment();

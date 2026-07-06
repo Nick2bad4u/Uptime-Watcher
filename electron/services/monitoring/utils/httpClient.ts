@@ -14,13 +14,16 @@ import type { AxiosInstance, AxiosRequestConfig } from "axios";
  * @see {@link MonitorServiceConfig}
  */
 
-import { readNumberEnv } from "@shared/utils/environment";
+import {
+    normalizePositiveInteger,
+    readBoundedPositiveIntegerEnv,
+} from "@shared/utils/environment";
 import { ensureRecordLike, isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
 import * as http from "node:http";
 import * as https from "node:https";
-import { isDefined, isFinite as isFiniteNumber, setHas } from "ts-extras";
+import { isDefined, setHas } from "ts-extras";
 
 import type { MonitorServiceConfig } from "../types";
 
@@ -169,28 +172,6 @@ const MAX_BODY_LENGTH_CAP = 1 * 1024 * 1024; // 1MB
 const MAX_AGENT_SOCKETS_CAP = 256;
 const MAX_AGENT_FREE_SOCKETS_CAP = 64;
 const MAX_AGENT_KEEP_ALIVE_MSECS_CAP = 60_000;
-
-function normalizePositiveInteger(value: number, fallback: number): number {
-    if (!isFiniteNumber(value) || value <= 0) {
-        return fallback;
-    }
-
-    return Math.trunc(value);
-}
-
-function readBoundedPositiveIntegerEnv(args: {
-    readonly defaultValue: number;
-    readonly key: string;
-    readonly maxValue: number;
-}): number {
-    return Math.min(
-        normalizePositiveInteger(args.maxValue, args.defaultValue),
-        normalizePositiveInteger(
-            readNumberEnv(args.key, args.defaultValue),
-            args.defaultValue
-        )
-    );
-}
 
 const DEFAULT_MAX_REDIRECTS = readBoundedPositiveIntegerEnv({
     defaultValue: 3,

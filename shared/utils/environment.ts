@@ -46,6 +46,19 @@ export interface KnownEnvironmentVariables {
 }
 
 /**
+ * Options for reading a positive integer environment variable with an upper
+ * bound.
+ */
+export interface BoundedPositiveIntegerEnvOptions {
+    /** Fallback value used when the environment value or bound is invalid. */
+    readonly defaultValue: number;
+    /** Environment variable name to read. */
+    readonly key: string;
+    /** Maximum allowed value before clamping. */
+    readonly maxValue: number;
+}
+
+/**
  * Immutable snapshot of the global process object used for environment
  * detection. Tests can provide synthetic structures via the override helpers.
  */
@@ -263,6 +276,40 @@ export function readNumberEnv(key: string, defaultValue: number): number {
     return isFiniteNumber(parsed) && isSafeInteger(parsed) && parsed > 0
         ? parsed
         : defaultValue;
+}
+
+/**
+ * Normalizes a numeric candidate to a positive integer.
+ *
+ * @remarks
+ * Finite positive values are truncated. Missing, zero, negative, and infinite
+ * values fall back to `fallback`.
+ */
+export function normalizePositiveInteger(
+    value: number,
+    fallback: number
+): number {
+    if (!isFiniteNumber(value) || value <= 0) {
+        return fallback;
+    }
+
+    return Math.trunc(value);
+}
+
+/**
+ * Reads a strict positive integer environment variable and clamps it to a
+ * positive upper bound.
+ */
+export function readBoundedPositiveIntegerEnv(
+    args: BoundedPositiveIntegerEnvOptions
+): number {
+    return Math.min(
+        normalizePositiveInteger(args.maxValue, args.defaultValue),
+        normalizePositiveInteger(
+            readNumberEnv(args.key, args.defaultValue),
+            args.defaultValue
+        )
+    );
 }
 
 /**

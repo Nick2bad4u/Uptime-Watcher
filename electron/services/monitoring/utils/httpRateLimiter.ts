@@ -8,37 +8,14 @@
  * that multiple monitor services can coordinate their traffic shaping.
  */
 
-import { readNumberEnv } from "@shared/utils/environment";
+import { readBoundedPositiveIntegerEnv } from "@shared/utils/environment";
 import { HttpRateLimiter } from "@shared/utils/httpRateLimiter";
-import { isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../utils/logger";
 
 const MAX_CONCURRENT_CAP = 64;
 const MAX_WAIT_MS_CAP = 120_000;
 const MIN_INTERVAL_MS_CAP = 60_000;
-
-function normalizePositiveInteger(value: number, fallback: number): number {
-    if (!isFiniteNumber(value) || value <= 0) {
-        return fallback;
-    }
-
-    return Math.trunc(value);
-}
-
-function readBoundedPositiveIntegerEnv(args: {
-    readonly defaultValue: number;
-    readonly key: string;
-    readonly maxValue: number;
-}): number {
-    return Math.min(
-        normalizePositiveInteger(args.maxValue, args.defaultValue),
-        normalizePositiveInteger(
-            readNumberEnv(args.key, args.defaultValue),
-            args.defaultValue
-        )
-    );
-}
 
 const sharedRateLimiter = new HttpRateLimiter({
     maxConcurrent: readBoundedPositiveIntegerEnv({
