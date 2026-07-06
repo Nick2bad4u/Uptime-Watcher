@@ -203,19 +203,23 @@ function dedupeFiles(files) {
 
 /**
  * Main CLI entrypoint.
+ *
+ * @param {string[]} [args] - Raw command-line arguments.
+ *
+ * @returns {boolean} `true` when the command completes successfully.
  */
-function main() {
+function main(args = process.argv.slice(2)) {
     try {
-        const cliArgs = parseArgs(process.argv.slice(2));
+        const cliArgs = parseArgs(args);
 
         if (cliArgs.help) {
             showHelp();
-            return;
+            return true;
         }
 
         if (cliArgs.targets.length === 0) {
             showHelp();
-            process.exit(1);
+            return false;
         }
 
         /** @type {string[]} */
@@ -230,7 +234,7 @@ function main() {
 
         if (allFiles.length === 0) {
             console.log("No Markdown files matched the given paths/globs.");
-            return;
+            return true;
         }
 
         for (const file of allFiles) {
@@ -240,23 +244,33 @@ function main() {
                 stdio: "inherit",
             });
         }
+        return true;
     } catch (error) {
         console.error(error instanceof Error ? error.message : String(error));
-        process.exit(1);
+        return false;
     }
 }
 
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
-) {
-    main();
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    process.exitCode = main() ? 0 : 1;
 }
 
 export {
     collectMarkdownFilesFromDir,
     dedupeFiles,
+    isDirectRun,
     isSortableMarkdownFile,
+    main,
     parseArgs,
     resolveArgToFiles,
 };

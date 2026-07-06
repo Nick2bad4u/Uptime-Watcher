@@ -361,6 +361,8 @@ function sortFrontmatterFile(filename, options = {}) {
  * Main CLI entrypoint.
  *
  * @param {string[]} [args] - Raw command-line arguments.
+ *
+ * @returns {boolean} `true` when the command completes successfully.
  */
 function main(args = process.argv.slice(2)) {
     try {
@@ -368,12 +370,12 @@ function main(args = process.argv.slice(2)) {
 
         if (options.help) {
             showHelp();
-            return;
+            return true;
         }
 
         if (options.file === null) {
             showHelp();
-            process.exit(1);
+            return false;
         }
 
         const result = sortFrontmatterFile(options.file, {
@@ -382,29 +384,39 @@ function main(args = process.argv.slice(2)) {
 
         if (result.skipped) {
             console.error("No valid frontmatter found in", result.filename);
-            process.exit(1);
+            return false;
         }
 
         if (options.check && result.changed) {
             console.error("Frontmatter is not sorted in", result.filename);
-            process.exit(1);
+            return false;
         }
+        return true;
     } catch (error) {
         console.error(error instanceof Error ? error.message : String(error));
-        process.exit(1);
+        return false;
     }
 }
 
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
-) {
-    main();
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    process.exitCode = main() ? 0 : 1;
 }
 
 export {
+    isDirectRun,
     isRepoPath,
     isSkippedPath,
+    main,
     parseArgs,
     parseKeyBlocks,
     reorderBlocks,
