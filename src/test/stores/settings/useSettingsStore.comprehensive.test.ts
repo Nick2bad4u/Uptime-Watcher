@@ -3,6 +3,7 @@
  */
 
 import { fc, test } from "@fast-check/vitest";
+import { normalizeHistoryLimit } from "@shared/constants/history";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
 import { arrayAt, isInteger, objectEntries } from "ts-extras";
@@ -595,7 +596,7 @@ describe(useSettingsStore, () => {
 
             const { result } = renderHook(() => useSettingsStore());
 
-            // Mock backend to return the same value (no clamping on frontend)
+            // Mock backend to return the same normalized value.
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(50);
 
             // Test update with small value
@@ -603,7 +604,7 @@ describe(useSettingsStore, () => {
                 await result.current.persistHistoryLimit(50);
             });
 
-            expect(result.current.settings.historyLimit).toBe(50); // No clamping in frontend
+            expect(result.current.settings.historyLimit).toBe(50);
 
             // Test large value
             mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
@@ -614,7 +615,43 @@ describe(useSettingsStore, () => {
                 await result.current.persistHistoryLimit(100_000);
             });
 
-            expect(result.current.settings.historyLimit).toBe(100_000); // No clamping in frontend
+            expect(result.current.settings.historyLimit).toBe(100_000);
+        });
+
+        it("should normalize runtime history limit updates with shared rules", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Validation", "type");
+
+            const { result } = renderHook(() => useSettingsStore());
+
+            act(() => {
+                result.current.updateSettings({ historyLimit: 1 });
+            });
+
+            expect(result.current.settings.historyLimit).toBe(
+                normalizeHistoryLimit(1)
+            );
+
+            act(() => {
+                result.current.updateSettings({ historyLimit: -10 });
+            });
+
+            expect(result.current.settings.historyLimit).toBe(
+                normalizeHistoryLimit(-10)
+            );
+
+            act(() => {
+                result.current.updateSettings({ historyLimit: 25.99 });
+            });
+
+            expect(result.current.settings.historyLimit).toBe(
+                normalizeHistoryLimit(25.99)
+            );
         });
 
         it("should handle backend update errors", async ({
@@ -1269,7 +1306,9 @@ describe(useSettingsStore, () => {
                     result.current.updateSettings({ historyLimit });
                 });
 
-                expect(result.current.settings.historyLimit).toBe(historyLimit);
+                expect(result.current.settings.historyLimit).toBe(
+                    normalizeHistoryLimit(historyLimit)
+                );
                 expect(typeof result.current.settings.historyLimit).toBe(
                     "number"
                 );
@@ -1314,7 +1353,14 @@ describe(useSettingsStore, () => {
 
                 // Check that updated fields have new values
                 for (const [key, value] of objectEntries(partialSettings)) {
-                    expect((result.current.settings as any)[key]).toBe(value);
+                    const expectedValue =
+                        key === "historyLimit" && typeof value === "number"
+                            ? normalizeHistoryLimit(value)
+                            : value;
+
+                    expect((result.current.settings as any)[key]).toBe(
+                        expectedValue
+                    );
                 }
 
                 // Check that non-updated fields remain unchanged
