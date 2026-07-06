@@ -11,6 +11,36 @@ const DEFAULT_INITIAL_DELAY_MS = 500;
 const DEFAULT_MAX_DELAY_MS = 10_000;
 const DEFAULT_MAX_ATTEMPTS = 4;
 
+function hasAsciiLetter(value: string): boolean {
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (
+            isDefined(codePoint) &&
+            ((codePoint >= 65 && codePoint <= 90) ||
+                (codePoint >= 97 && codePoint <= 122))
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function isAsciiDigits(value: string): boolean {
+    if (value.length === 0) {
+        return false;
+    }
+
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (!isDefined(codePoint) || codePoint < 48 || codePoint > 57) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 function parseRetryAfterMs(value: unknown): number | undefined {
     if (typeof value !== "string") {
         return undefined;
@@ -22,9 +52,17 @@ function parseRetryAfterMs(value: unknown): number | undefined {
     }
 
     // Retry-After can be either seconds or an HTTP date.
-    const seconds = Number(trimmed);
-    if (isFiniteNumber(seconds) && seconds >= 0) {
-        return Math.round(seconds * 1000);
+    if (isAsciiDigits(trimmed)) {
+        const seconds = Number(trimmed);
+        if (isFiniteNumber(seconds)) {
+            return Math.round(seconds * 1000);
+        }
+
+        return undefined;
+    }
+
+    if (!hasAsciiLetter(trimmed)) {
+        return undefined;
     }
 
     const dateMs = Date.parse(trimmed);

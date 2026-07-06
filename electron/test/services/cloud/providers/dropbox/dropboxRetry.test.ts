@@ -52,6 +52,45 @@ describe(withDropboxRetry, () => {
         vi.useRealTimers();
     });
 
+    it.each([
+        "1e3",
+        "1.5",
+        "+1",
+        "0x10",
+    ])(
+        "ignores malformed numeric Retry-After seconds: %s",
+        async (retryAfter) => {
+            vi.useFakeTimers();
+
+            try {
+                const error = createAxiosError({
+                    headers: { "retry-after": retryAfter },
+                    status: 429,
+                });
+
+                const fn = vi
+                    .fn<() => Promise<string>>()
+                    .mockRejectedValueOnce(error)
+                    .mockResolvedValueOnce("ok");
+
+                const promise = withDropboxRetry({
+                    fn,
+                    operationName: "test",
+                    maxAttempts: 3,
+                    initialDelayMs: 10,
+                    maxDelayMs: 50,
+                });
+
+                await vi.advanceTimersByTimeAsync(100);
+
+                await expect(promise).resolves.toBe("ok");
+                expect(fn).toHaveBeenCalledTimes(2);
+            } finally {
+                vi.useRealTimers();
+            }
+        }
+    );
+
     it("retries on 500 and eventually succeeds", async () => {
         vi.useFakeTimers();
 
