@@ -13,34 +13,51 @@
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 import { minimatch } from "minimatch";
 
-const __filename = import.meta.filename;
 const __dirname = import.meta.dirname;
-
-// ✨ ENHANCEMENT 2: Enhanced CLI argument parsing with validation (moved to top)
+const DEFAULT_PATTERN = "**/*.{test,spec}.{ts,tsx,js,jsx}";
+const VALUE_OPTIONS = new Set([
+    "--pattern",
+    "-p",
+    "--retries",
+    "--timeout",
+]);
 
 /**
- * Get command line argument value.
+ * Read a value for an option that supports either `--flag=value` or `--flag
+ * value`.
  *
- * @param {string} longName - Long form argument name.
- * @param {string} [shortName] - Short form argument name.
+ * @param {string[]} args - Raw command line arguments.
+ * @param {number} index - Current argument index.
  *
- * @returns {string | null} Argument value.
+ * @returns {{ consumed: number; value: string }} Parsed value and number of
+ *   extra arguments consumed.
  */
-function getArgValue(longName, shortName) {
-    const args = process.argv.slice(2);
-    for (let i = 0; i < args.length; i++) {
-        const { inlineValue, option } = splitOptionValue(args[i] ?? "");
-        if (option === longName || (shortName && option === shortName)) {
-            if (inlineValue !== undefined) {
-                return inlineValue;
-            }
-
-            return args[i + 1] || null;
-        }
+function readOptionValue(args, index) {
+    const option = args[index];
+    if (!option) {
+        throw new Error("Missing option name");
     }
-    return null;
+
+    const { inlineValue } = splitOptionValue(option);
+    if (inlineValue !== undefined) {
+        if (!inlineValue) {
+            throw new Error(
+                `Missing value for ${option.slice(0, option.indexOf("="))}`
+            );
+        }
+
+        return { consumed: 0, value: inlineValue };
+    }
+
+    const value = args[index + 1];
+    if (!value || value.startsWith("-")) {
+        throw new Error(`Missing value for ${option}`);
+    }
+
+    return { consumed: 1, value };
 }
 
 /**
@@ -67,7 +84,7 @@ function splitOptionValue(arg) {
  * Parse a bounded integer CLI option without partial string coercion.
  *
  * @param {string} option - Option name for diagnostics.
- * @param {string | null} value - Raw option value.
+ * @param {string | undefined} value - Raw option value.
  * @param {number} defaultValue - Default when the option is omitted.
  * @param {number} min - Inclusive minimum.
  * @param {number} max - Inclusive maximum.
@@ -75,7 +92,7 @@ function splitOptionValue(arg) {
  * @returns {number} Parsed integer.
  */
 function parseBoundedIntegerOption(option, value, defaultValue, min, max) {
-    if (value === null) {
+    if (value === undefined) {
         return defaultValue;
     }
 
@@ -95,64 +112,132 @@ function parseBoundedIntegerOption(option, value, defaultValue, min, max) {
     return parsed;
 }
 
-const args = process.argv.slice(2);
-let options;
-
-try {
-    options = {
-        dryRun: args.includes("--dry-run") || args.includes("-d"),
-        pattern:
-            getArgValue("--pattern", "-p") ||
-            "**/*.{test,spec}.{ts,tsx,js,jsx}",
-        force: args.includes("--force") || args.includes("-f"),
-        help: args.includes("--help") || args.includes("-h"),
-        verbose:
-            args.includes("--verbose") ||
-            args.includes("-v") ||
-            process.env["DEBUG"] === "1",
-        validate: args.includes("--validate"),
-        backup: args.includes("--backup"),
-        parallel: args.includes("--parallel"),
-        retries: parseBoundedIntegerOption(
-            "--retries",
-            getArgValue("--retries"),
-            0,
-            0,
-            5
-        ),
-        timeout: parseBoundedIntegerOption(
-            "--timeout",
-            getArgValue("--timeout"),
-            30_000,
-            1000,
-            300_000
-        ),
+/**
+ * Parse and validate command line arguments.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ *
+ * @returns {{
+ *     backup: boolean;
+ *     dryRun: boolean;
+ *     force: boolean;
+ *     help: boolean;
+ *     parallel: boolean;
+ *     pattern: string;
+ *     retries: number;
+ *     timeout: number;
+ *     validate: boolean;
+ *     verbose: boolean;
+ * }}
+ *   Parsed options.
+ */
+function parseArgs(args) {
+    const parsed = {
+        backup: false,
+        dryRun: false,
+        force: false,
+        help: false,
+        parallel: false,
+        pattern: DEFAULT_PATTERN,
+        retries: 0,
+        timeout: 30_000,
+        validate: false,
+        verbose: process.env["DEBUG"] === "1",
     };
-} catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Error: ${message}`);
-    process.exit(1);
+
+    for (let index = 0; index < args.length; index += 1) {
+        const arg = args[index];
+        if (!arg) {
+            continue;
+        }
+
+        const { option } = splitOptionValue(arg);
+
+        if (VALUE_OPTIONS.has(option)) {
+            const { consumed, value } = readOptionValue(args, index);
+            index += consumed;
+
+            switch (option) {
+                case "--pattern":
+                case "-p": {
+                    parsed.pattern = value;
+                    break;
+                }
+                case "--retries": {
+                    parsed.retries = parseBoundedIntegerOption(
+                        "--retries",
+                        value,
+                        0,
+                        0,
+                        5
+                    );
+                    break;
+                }
+                case "--timeout": {
+                    parsed.timeout = parseBoundedIntegerOption(
+                        "--timeout",
+                        value,
+                        30_000,
+                        1000,
+                        300_000
+                    );
+                    break;
+                }
+            }
+
+            continue;
+        }
+
+        switch (arg) {
+            case "--backup": {
+                parsed.backup = true;
+                break;
+            }
+            case "--dry-run":
+            case "-d": {
+                parsed.dryRun = true;
+                break;
+            }
+            case "--force":
+            case "-f": {
+                parsed.force = true;
+                break;
+            }
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+            case "--parallel": {
+                parsed.parallel = true;
+                break;
+            }
+            case "--validate": {
+                parsed.validate = true;
+                break;
+            }
+            case "--verbose":
+            case "-v": {
+                parsed.verbose = true;
+                break;
+            }
+            default: {
+                throw new Error(`Unknown argument: ${arg}`);
+            }
+        }
+    }
+
+    return parsed;
 }
 
-// Enhanced argument validation
-if (options.retries < 0 || options.retries > 5) {
-    console.error("❌ Error: --retries must be between 0 and 5");
-    process.exit(1);
-}
+let options = parseArgs([]);
 
-if (options.timeout < 1000 || options.timeout > 300_000) {
-    console.error(
-        "❌ Error: --timeout must be between 1000 and 300000 milliseconds"
-    );
-    process.exit(1);
-}
-
-if (options.verbose) {
-    console.log("🔍 Verbose mode enabled");
-    console.log("⚙️  Options:", JSON.stringify(options, null, 2));
-}
-
-if (options.help) {
+/**
+ * Print usage information and exit immediately.
+ *
+ * @returns {void}
+ */
+function showHelp() {
     console.log(`
 🚀 Enhanced Test Metadata Manager for Vitest v2.0.0
 
@@ -198,7 +283,6 @@ FEATURES:
   ✅ Comprehensive CLI options
   ✅ Detailed progress reporting
     `);
-    process.exit(0);
 }
 
 // ✨ ENHANCEMENT 1: Performance monitoring and metrics
@@ -635,6 +719,18 @@ function findTestFiles(dir, pattern, projectRoot) {
  * ✨ Enhanced main execution function with performance reporting.
  */
 function main() {
+    options = parseArgs(process.argv.slice(2));
+
+    if (options.help) {
+        showHelp();
+        return;
+    }
+
+    if (options.verbose) {
+        console.log("🔍 Verbose mode enabled");
+        console.log("⚙️  Options:", JSON.stringify(options, null, 2));
+    }
+
     console.log("🚀 Enhanced Test Metadata Manager v2.0.0");
     console.log(`📁 Pattern: ${options.pattern}`);
     console.log(`🔍 Mode: ${options.dryRun ? "DRY RUN" : "EXECUTE"}`);
@@ -740,12 +836,28 @@ function main() {
     }
 }
 
-// Execute if run directly
-if (
-    import.meta.url === `file://${__filename}` ||
-    import.meta.url.endsWith("enhance-test-metadata.mjs")
-) {
-    main();
+/**
+ * Check whether this module was executed as the CLI entrypoint.
+ *
+ * @returns {boolean} Whether the script is running directly.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(process.argv[1]).href
+    );
+}
+
+if (isDirectInvocation()) {
+    try {
+        main();
+    } catch (error) {
+        console.error(
+            "❌ Error:",
+            error instanceof Error ? error.message : String(error)
+        );
+        process.exit(1);
+    }
 }
 
 export {
