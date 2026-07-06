@@ -10,7 +10,7 @@
 import crypto from "crypto";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -143,23 +143,63 @@ function verifyVersionFile() {
 const bundledFiles = [assetPath, distPath];
 const optionalFiles = [packagePath];
 
-const bundledResults = bundledFiles.map((filePath) => inspectWasm(filePath));
-const optionalResults = optionalFiles
-    .filter((filePath) => fs.existsSync(filePath))
-    .map((filePath) => inspectWasm(filePath));
+/**
+ * @returns {boolean} `true` when required SQLite WASM artifacts are valid.
+ */
+function verifySqliteWasmArtifacts() {
+    const bundledResults = bundledFiles.map((filePath) =>
+        inspectWasm(filePath)
+    );
+    const optionalResults = optionalFiles
+        .filter((filePath) => fs.existsSync(filePath))
+        .map((filePath) => inspectWasm(filePath));
 
-if (optionalResults.length > 0) {
-    reportPass("Optional package WASM copy is present and structurally valid");
+    if (optionalResults.length > 0) {
+        reportPass(
+            "Optional package WASM copy is present and structurally valid"
+        );
+    }
+
+    const bundledFilesValid = bundledResults.every((result) => result !== null);
+    const versionValid = verifyVersionFile();
+    const hashesValid = allHashesMatch(
+        bundledResults.filter((result) => result !== null)
+    );
+
+    if (!bundledFilesValid || !versionValid || !hashesValid) {
+        return false;
+    }
+
+    reportPass("SQLite WASM artifacts are valid");
+    return true;
 }
 
-const bundledFilesValid = bundledResults.every((result) => result !== null);
-const versionValid = verifyVersionFile();
-const hashesValid = allHashesMatch(
-    bundledResults.filter((result) => result !== null)
-);
-
-if (!bundledFilesValid || !versionValid || !hashesValid) {
-    process.exit(1);
+/**
+ * @returns {number} Process exit status.
+ */
+function main() {
+    return verifySqliteWasmArtifacts() ? 0 : 1;
 }
 
-reportPass("SQLite WASM artifacts are valid");
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    process.exitCode = main();
+}
+
+export {
+    allHashesMatch,
+    inspectWasm,
+    isDirectRun,
+    main,
+    verifySqliteWasmArtifacts,
+    verifyVersionFile,
+};

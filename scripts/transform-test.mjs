@@ -8,6 +8,7 @@
 
 import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 import { applyLintCompliantTransforms } from "../playwright/codegen-template.mjs";
 
 /**
@@ -29,12 +30,12 @@ Options:
  *
  * @param {string[]} args - Raw command line arguments.
  *
- * @returns {{ inputFile: string; outputFile: string }} Parsed paths.
+ * @returns {{ inputFile: string; outputFile: string } | null} Parsed paths, or
+ *   `null` when help was requested.
  */
 function parseArgs(args) {
     if (args.includes("--help") || args.includes("-h")) {
-        showHelp();
-        process.exit(0);
+        return null;
     }
 
     if (args.length === 0) {
@@ -76,31 +77,71 @@ function parseArgs(args) {
     };
 }
 
-try {
-    const { inputFile, outputFile } = parseArgs(process.argv.slice(2));
-
-    console.log(`📖 Reading test file: ${inputFile}`);
+/**
+ * Transform a Playwright test file.
+ *
+ * @param {string} inputFile - Absolute input path.
+ * @param {string} outputFile - Absolute output path.
+ *
+ * @returns {void}
+ */
+function transformTest(inputFile, outputFile) {
+    console.log(`Reading test file: ${inputFile}`);
     const originalCode = readFileSync(inputFile, "utf8");
 
-    console.log("🔄 Applying lint-compliant transformations...");
+    console.log("Applying lint-compliant transformations...");
     const transformedCode = applyLintCompliantTransforms(originalCode);
 
-    console.log(`📝 Writing transformed test: ${outputFile}`);
+    console.log(`Writing transformed test: ${outputFile}`);
     writeFileSync(outputFile, transformedCode);
 
-    console.log("✅ Test transformation completed!");
-    console.log("\n🎯 Transformations applied:");
+    console.log("Test transformation completed.");
+    console.log("\nTransformations applied:");
     console.log(
-        "   • Raw locators → Semantic locators (getByRole, getByTestId)"
+        "   - Raw locators -> Semantic locators (getByRole, getByTestId)"
     );
-    console.log('   • Test titles → "should" format');
-    console.log("   • Added describe blocks");
-    console.log("   • Removed networkidle usage");
-    console.log("   • Added comments for problematic selectors");
-} catch (error) {
-    console.error(
-        "❌ Error transforming test:",
-        error instanceof Error ? error.message : String(error)
-    );
-    process.exit(1);
+    console.log('   - Test titles -> "should" format');
+    console.log("   - Added describe blocks");
+    console.log("   - Removed networkidle usage");
+    console.log("   - Added comments for problematic selectors");
 }
+
+/**
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {boolean} `true` when the transform completes or help is shown.
+ */
+function main(args = process.argv.slice(2)) {
+    try {
+        const parsedArgs = parseArgs(args);
+        if (!parsedArgs) {
+            showHelp();
+            return true;
+        }
+
+        transformTest(parsedArgs.inputFile, parsedArgs.outputFile);
+        return true;
+    } catch (error) {
+        console.error(
+            "Error transforming test:",
+            error instanceof Error ? error.message : String(error)
+        );
+        return false;
+    }
+}
+
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    process.exitCode = main() ? 0 : 1;
+}
+
+export { isDirectRun, main, parseArgs, showHelp, transformTest };
