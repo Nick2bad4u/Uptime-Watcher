@@ -22,7 +22,7 @@ import type { JsonValue as TypeFestJsonValue } from "type-fest";
 
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
-import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
+import { persistedDeviceIdSchema } from "@shared/validation/persistedDeviceIdValidation";
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
@@ -82,16 +82,6 @@ const cloudSyncEntityTypeInternalSchema: z.ZodType<CloudSyncEntityType> =
  */
 export const cloudSyncEntityTypeSchema: typeof cloudSyncEntityTypeInternalSchema =
     cloudSyncEntityTypeInternalSchema;
-
-const persistedDeviceIdSchema = z.string().superRefine((candidate, ctx) => {
-    const error = getPersistedDeviceIdValidationError(candidate);
-    if (error !== null) {
-        ctx.addIssue({
-            code: "custom",
-            message: error,
-        });
-    }
-});
 
 /**
  * Common write ordering key.

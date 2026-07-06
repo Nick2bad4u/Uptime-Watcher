@@ -10,7 +10,7 @@ import {
     type CloudStatusSummary,
 } from "@shared/types/cloud";
 import { isFilesystemBaseDirectoryValid } from "@shared/validation/filesystemBaseDirectoryValidation";
-import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
+import { persistedDeviceIdSchema } from "@shared/validation/persistedDeviceIdValidation";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { isDefined } from "ts-extras";
 import * as z from "zod";
@@ -23,16 +23,6 @@ const cloudProviderKindSchema = z.enum([
 ]);
 
 const cloudEncryptionModeSchema = z.enum(["none", "passphrase"]);
-
-const persistedDeviceIdSchema = z.string().superRefine((candidate, ctx) => {
-    const error = getPersistedDeviceIdValidationError(candidate);
-    if (error !== null) {
-        ctx.addIssue({
-            code: "custom",
-            message: error,
-        });
-    }
-});
 
 const cloudProviderDetailsSchema: z.ZodType<CloudProviderDetails> =
     z.discriminatedUnion("kind", [

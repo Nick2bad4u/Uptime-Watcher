@@ -12,6 +12,7 @@
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import * as z from "zod";
 
 /** Maximum byte budget accepted for persisted sync device IDs. */
 export const MAX_PERSISTED_DEVICE_ID_BYTES = 256;
@@ -77,3 +78,18 @@ export function getPersistedDeviceIdValidationError(
 export function isValidPersistedDeviceId(candidate: string): boolean {
     return getPersistedDeviceIdValidationError(candidate) === null;
 }
+
+/**
+ * Zod schema validating device IDs persisted in provider sync keys.
+ */
+export const persistedDeviceIdSchema: z.ZodType<string> = z
+    .string()
+    .superRefine((candidate, ctx) => {
+        const error = getPersistedDeviceIdValidationError(candidate);
+        if (error !== null) {
+            ctx.addIssue({
+                code: "custom",
+                message: error,
+            });
+        }
+    });
