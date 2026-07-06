@@ -10,8 +10,6 @@ const docusaurusWorkspacePath = path.join(
     "docs",
     "docusaurus"
 );
-const configPathFromRepositoryRoot = process.argv[2];
-const additionalArguments = process.argv.slice(3);
 
 const windowsSafePathProblemCharacters = [
     "(",
@@ -21,6 +19,80 @@ const windowsSafePathProblemCharacters = [
     "{",
     "}",
 ];
+
+/**
+ * Print usage information.
+ *
+ * @returns {void}
+ */
+function showHelp() {
+    console.log(`
+Usage: node scripts/run-typedoc-safe.mjs <typedoc-config-path> [...typedocArgs]
+
+Options:
+  --help, -h    Show this help message
+
+Examples:
+  node scripts/run-typedoc-safe.mjs docs/docusaurus/typedoc.config.json
+  node scripts/run-typedoc-safe.mjs docs/docusaurus/typedoc.local.config.json --dryRun
+`);
+}
+
+/**
+ * Resolve and validate CLI arguments for the TypeDoc wrapper.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ *
+ * @returns {{ additionalArguments: string[]; resolvedConfigPath: string }}
+ *   Parsed options.
+ */
+function parseArgs(args) {
+    if (args.includes("--help") || args.includes("-h")) {
+        showHelp();
+        process.exit(0);
+    }
+
+    const [configPathFromRepositoryRoot, ...additionalArguments] = args;
+    if (!configPathFromRepositoryRoot) {
+        throw new Error(
+            "Missing TypeDoc config path. Run with --help for usage."
+        );
+    }
+
+    if (configPathFromRepositoryRoot.startsWith("-")) {
+        throw new Error(
+            "TypeDoc config path must be provided before TypeDoc arguments."
+        );
+    }
+
+    const resolvedConfigPath = path.resolve(
+        repositoryRootPath,
+        configPathFromRepositoryRoot
+    );
+
+    const relativeConfigPath = path.relative(
+        repositoryRootPath,
+        resolvedConfigPath
+    );
+    if (
+        relativeConfigPath === "" ||
+        relativeConfigPath.startsWith("..") ||
+        path.isAbsolute(relativeConfigPath)
+    ) {
+        throw new Error(
+            `TypeDoc config path must stay inside the repository: ${resolvedConfigPath}`
+        );
+    }
+
+    if (!existsSync(resolvedConfigPath)) {
+        throw new Error(`TypeDoc config not found: ${resolvedConfigPath}`);
+    }
+
+    return {
+        additionalArguments,
+        resolvedConfigPath,
+    };
+}
 
 const npmInvocation = (() => {
     const execPathCandidate = process.env["npm_execpath"];
@@ -53,22 +125,18 @@ const npmInvocation = (() => {
     };
 })();
 
-if (!configPathFromRepositoryRoot) {
+let parsedArguments;
+try {
+    parsedArguments = parseArgs(process.argv.slice(2));
+} catch (error) {
     console.error(
-        "Usage: node scripts/run-typedoc-safe.mjs <typedoc-config-path> [...typedocArgs]"
+        "❌ Error:",
+        error instanceof Error ? error.message : String(error)
     );
     process.exit(1);
 }
 
-const resolvedConfigPath = path.resolve(
-    repositoryRootPath,
-    configPathFromRepositoryRoot
-);
-
-if (!existsSync(resolvedConfigPath)) {
-    console.error(`TypeDoc config not found: ${resolvedConfigPath}`);
-    process.exit(1);
-}
+const { additionalArguments, resolvedConfigPath } = parsedArguments;
 
 const requiresWindowsSafePath =
     process.platform === "win32" &&
