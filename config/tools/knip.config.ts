@@ -14,11 +14,6 @@ const knipConfig: KnipConfig = {
     entry: [],
     ignore: [
         "**/test/**",
-        "docs/docusaurus/.docusaurus/**",
-        "docs/docusaurus/build/**",
-        "docs/docusaurus/docs/**",
-        "docs/docusaurus/static/**",
-        "docs/docusaurus/src/css/custom.css",
         "config/linting/plugins/uptime-watcher/_internal/repo-paths.mjs",
         // Benchmarks type-check this shim through config/benchmarks/tsconfig.bench.json;
         // Knip resolves the same alias through the root tsconfig instead.
@@ -32,14 +27,24 @@ const knipConfig: KnipConfig = {
         "config/testing/types/eslint-plugin-*.d.ts",
         "docs/docusaurus/src/components/HomepageFeatures/styles.module.css.d.ts",
         "docs/docusaurus/typedoc-plugins/hashToBangLinks.mjs",
-        "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs",
         "docs/docusaurus/typedoc-plugins/prefixDocLinks.mjs",
         "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.d.mts",
         "docs/docusaurus/typedoc-plugins/prefixDocLinksCore.d.mts",
     ],
+    ignoreBinaries: [
+        // These package scripts intentionally call host-installed tools.
+        "gitleaks",
+        "grype",
+        "powershell",
+        "shellcheck",
+        "winget",
+    ],
     ignoreDependencies: [
         ".*eslint-formatter-.*",
         ".*prettier.*",
+        // Loaded by config/linting/commitlint.config.mjs through commitlint's
+        // extends resolution rather than a normal import.
+        "@commitlint/config-conventional",
         "@easyops-cn/docusaurus-theme-docusaurus-search-local",
         "@eslint.*",
         "@theme/.*",
