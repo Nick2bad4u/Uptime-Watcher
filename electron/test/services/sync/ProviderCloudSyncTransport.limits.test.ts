@@ -7,9 +7,12 @@ import type {
     CloudSyncOperation,
     CloudSyncSetFieldOperation,
 } from "@shared/types/cloudSync";
+import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
+import type { CloudSyncSnapshot } from "@shared/types/cloudSyncSnapshot";
 
 import { ProviderCloudSyncTransport } from "@electron/services/sync/ProviderCloudSyncTransport";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
+import { CLOUD_SYNC_SNAPSHOT_VERSION } from "@shared/types/cloudSyncSnapshot";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
@@ -482,6 +485,85 @@ describe("ProviderCloudSyncTransport.appendOperations upload limits", () => {
                 ).rejects.toThrow(/exceeds size limit/i);
             }
         );
+
+        expect(uploaded).toBeFalsy();
+    });
+
+    it("validates operation payloads before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "x",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.appendOperations("a", [createOperation({ entityId: "" })])
+        ).rejects.toThrow();
+
+        expect(uploaded).toBeFalsy();
+    });
+});
+
+describe("ProviderCloudSyncTransport outbound artifact validation", () => {
+    it("validates manifests before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "manifest.json",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const invalidManifest = {
+            devices: {},
+            manifestVersion: 999,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        } as unknown as CloudSyncManifest;
+
+        await expect(
+            transport.writeManifest(invalidManifest)
+        ).rejects.toThrow();
+
+        expect(uploaded).toBeFalsy();
+    });
+
+    it("validates snapshots before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "snapshot.json",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const invalidSnapshot = {
+            createdAt: MAX_VALID_DATE_EPOCH_MS + 1,
+            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+            state: { monitor: {}, settings: {}, site: {} },
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        } as unknown as CloudSyncSnapshot;
+
+        await expect(
+            transport.writeSnapshot(invalidSnapshot)
+        ).rejects.toThrow();
 
         expect(uploaded).toBeFalsy();
     });

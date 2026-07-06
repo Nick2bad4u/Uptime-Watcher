@@ -211,7 +211,12 @@ function assertSerializedOperationsWithinLimits(args: {
 function serializeOperationsForUpload(
     operations: readonly CloudSyncOperation[]
 ): Buffer {
-    const lines = operations.map((operation) => JSON.stringify(operation));
+    const parsedOperations = operations.map((operation) =>
+        parseCloudSyncOperation(operation)
+    );
+    const lines = parsedOperations.map((operation) =>
+        JSON.stringify(operation)
+    );
     const payload = `${arrayJoin(lines, "\n")}\n`;
     const buffer = encodeUtf8(payload);
 
@@ -732,7 +737,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     }
 
     public async writeManifest(manifest: CloudSyncManifest): Promise<void> {
-        const json = JSON.stringify(manifest, null, 2);
+        const parsedManifest = parseCloudSyncManifest(manifest);
+        const json = JSON.stringify(parsedManifest, null, 2);
         await this.provider.uploadObject({
             buffer: encodeUtf8(json),
             key: MANIFEST_KEY,
@@ -743,7 +749,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
     public async writeSnapshot(
         snapshot: CloudSyncSnapshot
     ): Promise<CloudObjectEntry> {
-        const json = JSON.stringify(snapshot, null, 2);
+        const parsedSnapshot = parseCloudSyncSnapshot(snapshot);
+        const json = JSON.stringify(parsedSnapshot, null, 2);
         return this.provider.uploadObject({
             buffer: encodeUtf8(json),
             key: createSnapshotKey(snapshot.createdAt),
