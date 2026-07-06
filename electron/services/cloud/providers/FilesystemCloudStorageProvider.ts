@@ -269,13 +269,9 @@ export class FilesystemCloudStorageProvider
     }
 
     public async isConnected(): Promise<boolean> {
-        try {
-            await this.ensureAppRoot();
-            const stat = await fs.stat(this.appRoot);
-            return stat.isDirectory();
-        } catch {
-            return false;
-        }
+        await this.ensureAppRoot();
+        const stat = await fs.stat(this.appRoot);
+        return stat.isDirectory();
     }
 
     public async listObjects(prefix: string): Promise<CloudObjectEntry[]> {

@@ -71,6 +71,53 @@ describe("FilesystemCloudStorageProvider", () => {
         expect(downloaded.buffer.toString("utf8")).toBe("hello");
     });
 
+    it("surfaces filesystem availability errors from isConnected", async () => {
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const actualFsPromises =
+            await vi.importActual<typeof import("node:fs/promises")>(
+                "node:fs/promises"
+            );
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:fs/promises", () => ({
+            ...actualFsPromises,
+            mkdir: vi.fn(
+                async (...args: Parameters<typeof actualFsPromises.mkdir>) => {
+                    const [target] = args;
+                    if (path.resolve(String(target)) === appRoot) {
+                        const error = new Error("permission denied");
+                        Object.defineProperty(error, "code", {
+                            configurable: true,
+                            value: "EACCES",
+                        });
+                        throw error;
+                    }
+
+                    return actualFsPromises.mkdir(...args);
+                }
+            ),
+        }));
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            await expect(provider.isConnected()).rejects.toMatchObject({
+                code: "EACCES",
+                message: "permission denied",
+            });
+        } finally {
+            vi.doUnmock("node:fs/promises");
+        }
+    });
+
     it("allows keys with segments that start with '..' but are not traversal", async () => {
         const provider = new FilesystemCloudStorageProvider({ baseDirectory });
 

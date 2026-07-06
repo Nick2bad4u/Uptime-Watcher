@@ -1,9 +1,20 @@
 import {
     buildDropboxStatus,
+    buildFilesystemStatus,
     buildGoogleDriveStatus,
     buildUnconfiguredStatus,
 } from "@electron/services/cloud/internal/CloudStatusBuilders";
 import { describe, expect, it, vi } from "vitest";
+
+const mockFsPromises = vi.hoisted(() => ({
+    mkdir: vi.fn(),
+    stat: vi.fn(),
+}));
+
+vi.mock("node:fs/promises", () => ({
+    default: mockFsPromises,
+    ...mockFsPromises,
+}));
 
 const createCommonStatusArgs = (lastError?: string) => ({
     hasLocalEncryptionKey: true,
@@ -166,6 +177,78 @@ describe(buildGoogleDriveStatus, () => {
         expect(accountLabel?.endsWith("...")).toBeTruthy();
         expect(accountLabel).not.toContain("\n");
         expect(accountLabel).not.toContain("\t");
+    });
+
+    it("sanitizes Google Drive connection probe errors exposed in status summaries", async () => {
+        const provider = {
+            deleteObject: vi.fn(),
+            downloadBackup: vi.fn(),
+            downloadObject: vi.fn(),
+            isConnected: vi
+                .fn()
+                .mockRejectedValue(
+                    new Error(
+                        `access_token=SUPER_SECRET_TOKEN&status=failed\n\t${"z".repeat(1200)}`
+                    )
+                ),
+            kind: "google-drive",
+            listBackups: vi.fn(),
+            listObjects: vi.fn(),
+            uploadBackup: vi.fn(),
+            uploadObject: vi.fn(),
+        } as never;
+        const getEffectiveEncryptionMode = vi.fn();
+
+        const summary = await buildGoogleDriveStatus({
+            accountLabel: undefined,
+            common: createCommonStatusArgs(),
+            deps: {
+                getEffectiveEncryptionMode,
+                resolveProviderOrNull: vi.fn().mockResolvedValue(provider),
+            },
+        });
+
+        expect(summary.connected).toBeFalsy();
+        expect(summary.lastError).toBeDefined();
+        expect(summary.lastError).not.toContain("SUPER_SECRET_TOKEN");
+        expect(summary.lastError).not.toContain("\n");
+        expect(summary.lastError).not.toContain("\t");
+        expect(summary.lastError).toContain(
+            "access_token=[redacted]&status=failed"
+        );
+        expect(summary.lastError?.endsWith("...")).toBeTruthy();
+        expect(summary.lastError?.length).toBeLessThanOrEqual(1003);
+        expect(getEffectiveEncryptionMode).not.toHaveBeenCalled();
+    });
+});
+
+describe(buildFilesystemStatus, () => {
+    it("sanitizes filesystem connection probe errors exposed in status summaries", async () => {
+        mockFsPromises.mkdir.mockRejectedValueOnce(
+            new Error(
+                `refresh_token=SUPER_SECRET_TOKEN&status=failed\n\t${"f".repeat(1200)}`
+            )
+        );
+
+        const summary = await buildFilesystemStatus({
+            baseDirectory: "/tmp/uptime-watcher-cloud",
+            common: createCommonStatusArgs(),
+            deps: {
+                getEffectiveEncryptionMode: vi.fn(),
+                resolveProviderOrNull: vi.fn(),
+            },
+        });
+
+        expect(summary.connected).toBeFalsy();
+        expect(summary.lastError).toBeDefined();
+        expect(summary.lastError).not.toContain("SUPER_SECRET_TOKEN");
+        expect(summary.lastError).not.toContain("\n");
+        expect(summary.lastError).not.toContain("\t");
+        expect(summary.lastError).toContain(
+            "refresh_token=[redacted]&status=failed"
+        );
+        expect(summary.lastError?.endsWith("...")).toBeTruthy();
+        expect(summary.lastError?.length).toBeLessThanOrEqual(1003);
     });
 });
 

@@ -111,6 +111,26 @@ type CloudStatusBuildOverrides = Readonly<{
     providerDetails?: CloudStatusSummary["providerDetails"];
 }>;
 
+type ProviderConnectionStatus = Readonly<{
+    connected: boolean;
+    error?: string;
+}>;
+
+async function readProviderConnectionStatus(
+    provider: CloudStorageProvider
+): Promise<ProviderConnectionStatus> {
+    try {
+        return {
+            connected: await provider.isConnected(),
+        };
+    } catch (error) {
+        return {
+            connected: false,
+            error: getUserFacingErrorDetail(error),
+        };
+    }
+}
+
 const buildCloudStatusSummary = (
     common: CloudStatusCommonArgs,
     overrides: CloudStatusBuildOverrides
@@ -168,7 +188,9 @@ export async function buildDropboxStatus(args: {
         }
     } else if (provider) {
         // Fallback for unexpected provider implementation.
-        isConnected = await provider.isConnected().catch(() => false);
+        const connectionStatus = await readProviderConnectionStatus(provider);
+        isConnected = connectionStatus.connected;
+        connectionError = connectionStatus.error;
     }
 
     const encryptionMode =
@@ -214,9 +236,10 @@ export async function buildGoogleDriveStatus(args: {
     const { accountLabel, common, deps } = args;
 
     const provider = await deps.resolveProviderOrNull();
-    const isConnected = provider
-        ? await provider.isConnected().catch(() => false)
-        : false;
+    const connectionStatus = provider
+        ? await readProviderConnectionStatus(provider)
+        : { connected: false };
+    const isConnected = connectionStatus.connected;
 
     const encryptionMode =
         isConnected && provider
@@ -235,7 +258,7 @@ export async function buildGoogleDriveStatus(args: {
         encryptionLocked: isEncryptionLocked,
         encryptionMode,
         lastBackupAt: common.lastBackupAt,
-        ...buildLastErrorSpread(common.lastError),
+        ...buildLastErrorSpread(common.lastError ?? connectionStatus.error),
         lastSyncAt: common.lastSyncAt,
         provider: "google-drive",
         providerDetails: {
@@ -299,9 +322,10 @@ export async function buildFilesystemStatus(args: {
         // Treat invalid constructor inputs as disconnected.
     }
 
-    const isConnected = provider
-        ? await provider.isConnected().catch(() => false)
-        : false;
+    const connectionStatus = provider
+        ? await readProviderConnectionStatus(provider)
+        : { connected: false };
+    const isConnected = connectionStatus.connected;
 
     const encryptionMode =
         isConnected && provider
@@ -313,6 +337,7 @@ export async function buildFilesystemStatus(args: {
         configured: true,
         connected: isConnected,
         encryptionMode,
+        ...(connectionStatus.error && { lastError: connectionStatus.error }),
         provider: "filesystem",
         providerDetails: {
             baseDirectory,
