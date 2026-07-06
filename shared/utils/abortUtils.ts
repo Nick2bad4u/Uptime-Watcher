@@ -176,6 +176,11 @@ export interface RetryWithAbortOptions {
     signal?: AbortSignal;
 }
 
+type TimeoutSignalSource = Readonly<{
+    cancel: () => void;
+    signal: AbortSignal;
+}>;
+
 /**
  * Creates an {@link AbortSignal} that aborts when any configured source aborts.
  *
@@ -223,7 +228,7 @@ export function createCombinedAbortSignal(
     const createTimeoutSignal = (
         timeout: number,
         timeoutReason?: string
-    ): AbortSignal => {
+    ): TimeoutSignalSource => {
         const controller = new AbortController();
         const resolvedReason =
             timeoutReason ??
@@ -234,25 +239,35 @@ export function createCombinedAbortSignal(
         const timeoutId = setTimeout(() => {
             controller.abort(resolvedReason);
         }, timeout);
+        let isTimeoutActive = true;
 
         // In Node.js / Electron we do not want timeouts to keep the event loop
         // alive by themselves.
         tryUnrefTimer(timeoutId);
 
-        controller.signal.addEventListener(
-            "abort",
-            () => {
-                clearTimeout(timeoutId);
-            },
-            { once: true }
-        );
+        const cancel = (): void => {
+            if (!isTimeoutActive) {
+                return;
+            }
 
-        return controller.signal;
+            isTimeoutActive = false;
+            clearTimeout(timeoutId);
+        };
+
+        controller.signal.addEventListener("abort", cancel, { once: true });
+
+        return {
+            cancel,
+            signal: controller.signal,
+        };
     };
+
+    let timeoutSignalSource: TimeoutSignalSource | undefined;
 
     // Add timeout signal if specified
     if (isDefined(normalizedTimeoutMs)) {
-        signals.push(createTimeoutSignal(normalizedTimeoutMs, reason));
+        timeoutSignalSource = createTimeoutSignal(normalizedTimeoutMs, reason);
+        signals.push(timeoutSignalSource.signal);
     }
 
     // Add additional signals.
@@ -272,7 +287,20 @@ export function createCombinedAbortSignal(
     }
 
     // Combine multiple signals
-    return AbortSignal.any(signals);
+    const combinedSignal = AbortSignal.any(signals);
+    if (timeoutSignalSource) {
+        if (combinedSignal.aborted) {
+            timeoutSignalSource.cancel();
+        } else {
+            combinedSignal.addEventListener(
+                "abort",
+                timeoutSignalSource.cancel,
+                { once: true }
+            );
+        }
+    }
+
+    return combinedSignal;
 }
 
 /**

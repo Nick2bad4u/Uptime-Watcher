@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import {
     createCombinedAbortSignal,
@@ -69,6 +69,11 @@ class SpyAbortSignal {
 }
 
 describe("AbortUtils Function Coverage Tests", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.useRealTimers();
+    });
+
     describe(getAbortSignalReason, () => {
         test("should return native AbortSignal reasons", () => {
             const controller = new AbortController();
@@ -225,6 +230,25 @@ describe("AbortUtils Function Coverage Tests", () => {
                 timeoutMs: 100,
             });
             expect(signal.aborted).toBeFalsy();
+        });
+
+        test("should clear timeout source when another combined signal aborts first", () => {
+            vi.useFakeTimers();
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
+            const controller = new AbortController();
+
+            const signal = createCombinedAbortSignal({
+                additionalSignals: [controller.signal],
+                timeoutMs: 10_000,
+            });
+
+            expect(signal.aborted).toBeFalsy();
+            expect(clearTimeoutSpy).not.toHaveBeenCalled();
+
+            controller.abort(new Error("stop"));
+
+            expect(signal.aborted).toBeTruthy();
+            expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
         });
     });
 
