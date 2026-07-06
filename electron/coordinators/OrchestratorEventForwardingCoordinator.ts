@@ -19,6 +19,7 @@ import type {
 } from "@shared/types";
 
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 
 import type { TypedEventBus } from "../events/TypedEventBus";
 import type { MonitorManager } from "../managers/MonitorManager";
@@ -61,6 +62,24 @@ const determineMonitoringScope = (
     return "site";
 };
 
+const getSafeIdentifier = (
+    identifier: string | undefined
+): string | undefined => getSafeIdentifierForLogging(identifier) ?? identifier;
+
+const buildSafeMonitoringScopeMetadata = (
+    identifier: string,
+    monitorId: string | undefined,
+    scope: MonitoringOperationScope
+): {
+    identifier: string;
+    monitorId?: string;
+    scope: MonitoringOperationScope;
+} => ({
+    identifier: getSafeIdentifier(identifier) ?? identifier,
+    ...(monitorId && { monitorId: getSafeIdentifier(monitorId) ?? monitorId }),
+    scope,
+});
+
 /**
  * Coordinator that registers listeners for internal events and forwards them to
  * renderer consumers.
@@ -90,7 +109,7 @@ export class OrchestratorEventForwardingCoordinator {
                 if (!data.site) {
                     logger.error(
                         "[OrchestratorEventForwardingCoordinator] Received internal:site:added without site payload",
-                        { identifier: data.identifier }
+                        { identifier: getSafeIdentifier(data.identifier) }
                     );
                     return;
                 }
@@ -133,7 +152,7 @@ export class OrchestratorEventForwardingCoordinator {
                 if (!data.site) {
                     logger.warn(
                         "[OrchestratorEventForwardingCoordinator] internal:site:removed emitted without site snapshot; using fallback values",
-                        { siteIdentifier }
+                        { siteIdentifier: getSafeIdentifier(siteIdentifier) }
                     );
                 }
 
@@ -170,7 +189,7 @@ export class OrchestratorEventForwardingCoordinator {
                 if (!data.site) {
                     logger.error(
                         "[OrchestratorEventForwardingCoordinator] Received internal:site:updated without site payload",
-                        { identifier: data.identifier }
+                        { identifier: getSafeIdentifier(data.identifier) }
                     );
                     return;
                 }
@@ -213,7 +232,11 @@ export class OrchestratorEventForwardingCoordinator {
                 if (scope !== "global") {
                     logger.debug(
                         "[OrchestratorEventForwardingCoordinator] Skipping monitoring:started broadcast for scoped operation",
-                        { identifier, monitorId, scope }
+                        buildSafeMonitoringScopeMetadata(
+                            identifier,
+                            monitorId,
+                            scope
+                        )
                     );
                     return;
                 }
@@ -274,7 +297,11 @@ export class OrchestratorEventForwardingCoordinator {
                 if (scope !== "global") {
                     logger.debug(
                         "[OrchestratorEventForwardingCoordinator] Skipping monitoring:stopped broadcast for scoped operation",
-                        { identifier, monitorId, scope }
+                        buildSafeMonitoringScopeMetadata(
+                            identifier,
+                            monitorId,
+                            scope
+                        )
                     );
                     return;
                 }
