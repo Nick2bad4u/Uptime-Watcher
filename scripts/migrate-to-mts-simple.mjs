@@ -11,6 +11,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 /**
  * Configuration.
@@ -21,6 +22,120 @@ const CONFIG = {
     jsExtension: ".mjs",
     createBackups: true,
 };
+
+const REPOSITORY_ROOT = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    ".."
+);
+
+/**
+ * Show command usage.
+ */
+function showHelp() {
+    console.log(`
+TypeScript to .mts Migration Script
+
+Usage: node migrate-to-mts-simple.mjs <file-path> [options]
+
+Options:
+  --dry-run     Preview changes without making them
+  --no-backup   Don't create backup files
+  --help, -h    Show this help
+
+Examples:
+  node migrate-to-mts-simple.mjs ./electron/main.ts
+  node migrate-to-mts-simple.mjs ./test/sample.ts --dry-run
+        `);
+}
+
+/**
+ * Check whether a resolved path stays within the repository.
+ *
+ * @param {string} resolvedPath
+ */
+function isRepositoryPath(resolvedPath) {
+    const relativePath = path.relative(REPOSITORY_ROOT, resolvedPath);
+    return (
+        relativePath === "" ||
+        (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))
+    );
+}
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args
+ */
+function parseArgs(args) {
+    const options = {
+        createBackups: CONFIG.createBackups,
+        filePath: "",
+        help: false,
+        isDryRun: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--dry-run": {
+                options.isDryRun = true;
+                break;
+            }
+
+            case "--no-backup": {
+                options.createBackups = false;
+                break;
+            }
+
+            case "--help":
+            case "-h": {
+                options.help = true;
+                break;
+            }
+
+            default: {
+                if (arg.startsWith("-")) {
+                    throw new Error(`Unknown option: ${arg}`);
+                }
+
+                if (options.filePath !== "") {
+                    throw new Error(`Unexpected extra file path: ${arg}`);
+                }
+
+                options.filePath = arg;
+            }
+        }
+    }
+
+    return options;
+}
+
+/**
+ * Resolve and validate a CLI-provided file path.
+ *
+ * @param {string} filePath
+ */
+function resolveCliFilePath(filePath) {
+    if (filePath === "") {
+        throw new Error("No file path provided");
+    }
+
+    const resolvedPath = path.resolve(filePath);
+
+    if (!isRepositoryPath(resolvedPath)) {
+        throw new Error(`File must be inside the repository: ${filePath}`);
+    }
+
+    if (!fs.existsSync(resolvedPath)) {
+        throw new Error(`File not found: ${filePath}`);
+    }
+
+    const stat = fs.statSync(resolvedPath);
+    if (!stat.isFile()) {
+        throw new Error(`Path is not a file: ${filePath}`);
+    }
+
+    return resolvedPath;
+}
 
 /**
  * Logger with colors.
@@ -118,7 +233,11 @@ function processImports(content) {
  * @param {string} filePath
  * @param isDryRun
  */
-function migrateFile(filePath, isDryRun = false) {
+function migrateFile(
+    filePath,
+    isDryRun = false,
+    createBackups = CONFIG.createBackups
+) {
     try {
         // Validate file
         if (!fs.existsSync(filePath)) {
@@ -148,7 +267,7 @@ function migrateFile(filePath, isDryRun = false) {
         }
 
         // Create backup
-        if (CONFIG.createBackups) {
+        if (createBackups) {
             const backupPath = `${filePath}.backup`;
             fs.copyFileSync(filePath, backupPath);
             log.info(`Backup created: ${backupPath}`);
@@ -183,43 +302,21 @@ function migrateFile(filePath, isDryRun = false) {
  * Main function.
  */
 function main() {
-    const args = process.argv.slice(2);
-
-    if (args.length === 0 || args.includes("--help")) {
-        console.log(`
-TypeScript to .mts Migration Script
-
-Usage: node migrate-to-mts-simple.mjs <file-path> [options]
-
-Options:
-  --dry-run     Preview changes without making them
-  --no-backup   Don't create backup files
-  --help        Show this help
-
-Examples:
-  node migrate-to-mts-simple.mjs ./electron/main.ts
-  node migrate-to-mts-simple.mjs ./test/sample.ts --dry-run
-        `);
-        return;
-    }
-
-    const isDryRun = args.includes("--dry-run");
-    const noBackup = args.includes("--no-backup");
-
-    if (noBackup) {
-        CONFIG.createBackups = false;
-    }
-
-    const filePath = args.find((arg) => !arg.startsWith("--"));
-
-    if (!filePath) {
-        log.error("No file path provided");
-        process.exit(1);
-    }
-
     try {
-        const resolvedPath = path.resolve(filePath);
-        migrateFile(resolvedPath, isDryRun);
+        const options = parseArgs(process.argv.slice(2));
+
+        if (options.help) {
+            showHelp();
+            return;
+        }
+
+        if (options.filePath === "") {
+            showHelp();
+            process.exit(1);
+        }
+
+        const resolvedPath = resolveCliFilePath(options.filePath);
+        migrateFile(resolvedPath, options.isDryRun, options.createBackups);
         log.success("Migration completed!");
     } catch (error) {
         const errorMessage =
@@ -230,8 +327,17 @@ Examples:
 }
 
 // Run if called directly
-if (process.argv[1]?.endsWith("migrate-to-mts-simple.mjs")) {
+if (
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(process.argv[1]).href
+) {
     main();
 }
 
-export { migrateFile, processImports, updateImportPath, isLocalImport };
+export {
+    migrateFile,
+    parseArgs,
+    processImports,
+    updateImportPath,
+    isLocalImport,
+};
