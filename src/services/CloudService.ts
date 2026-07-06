@@ -33,10 +33,22 @@ import type { CloudSyncResetResult } from "@shared/types/cloudSyncReset";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 
+import { safeParseCloudBackupMigrationResult } from "@shared/types/cloudBackupMigration";
 import { ensureError } from "@shared/utils/errorHandling";
+import {
+    validateCloudBackupEntry,
+    validateCloudBackupEntryArray,
+} from "@shared/validation/cloudBackupSchemas";
+import {
+    validateCloudStatusSummary,
+    validateCloudSyncResetPreview,
+    validateCloudSyncResetResult,
+} from "@shared/validation/cloudSchemas";
+import { validateSerializedDatabaseRestoreResult } from "@shared/validation/dataSchemas";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { validateServicePayload } from "./utils/validation";
 
 /**
  * Contract describing the renderer-facing cloud service surface.
@@ -101,57 +113,125 @@ const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
     }
 })();
 
+const parseBackupEntries = (
+    operation: string,
+    value: unknown
+): CloudBackupEntry[] =>
+    validateServicePayload(validateCloudBackupEntryArray, value, {
+        operation,
+        serviceName: "CloudService",
+    });
+
+const parseBackupEntry = (
+    operation: string,
+    value: unknown
+): CloudBackupEntry =>
+    validateServicePayload(validateCloudBackupEntry, value, {
+        operation,
+        serviceName: "CloudService",
+    });
+
+const parseCloudStatus = (
+    operation: string,
+    value: unknown
+): CloudStatusSummary =>
+    validateServicePayload(validateCloudStatusSummary, value, {
+        operation,
+        serviceName: "CloudService",
+    });
+
 /**
  * Service for interacting with cloud providers through Electron IPC.
  *
  * @public
  */
 export const CloudService: CloudServiceContract = {
-    clearEncryptionKey: wrap("clearEncryptionKey", (api) =>
-        api.cloud.clearEncryptionKey()
+    clearEncryptionKey: wrap("clearEncryptionKey", async (api) =>
+        parseCloudStatus(
+            "clearEncryptionKey",
+            await api.cloud.clearEncryptionKey()
+        )
     ),
 
     configureFilesystemProvider: wrap(
         "configureFilesystemProvider",
-        (api, config) => api.cloud.configureFilesystemProvider(config)
+        async (api, config) =>
+            parseCloudStatus(
+                "configureFilesystemProvider",
+                await api.cloud.configureFilesystemProvider(config)
+            )
     ),
 
-    connectDropbox: wrap("connectDropbox", (api) => api.cloud.connectDropbox()),
-
-    connectGoogleDrive: wrap("connectGoogleDrive", (api) =>
-        api.cloud.connectGoogleDrive()
+    connectDropbox: wrap("connectDropbox", async (api) =>
+        parseCloudStatus("connectDropbox", await api.cloud.connectDropbox())
     ),
 
-    deleteBackup: wrap("deleteBackup", (api, key) =>
-        api.cloud.deleteBackup(key)
+    connectGoogleDrive: wrap("connectGoogleDrive", async (api) =>
+        parseCloudStatus(
+            "connectGoogleDrive",
+            await api.cloud.connectGoogleDrive()
+        )
     ),
 
-    disconnect: wrap("disconnect", (api) => api.cloud.disconnect()),
-
-    enableSync: wrap("enableSync", (api, config) =>
-        api.cloud.enableSync(config)
+    deleteBackup: wrap("deleteBackup", async (api, key) =>
+        parseBackupEntries("deleteBackup", await api.cloud.deleteBackup(key))
     ),
 
-    getStatus: wrap("getStatus", (api) => api.cloud.getStatus()),
+    disconnect: wrap("disconnect", async (api) =>
+        parseCloudStatus("disconnect", await api.cloud.disconnect())
+    ),
+
+    enableSync: wrap("enableSync", async (api, config) =>
+        parseCloudStatus("enableSync", await api.cloud.enableSync(config))
+    ),
+
+    getStatus: wrap("getStatus", async (api) =>
+        parseCloudStatus("getStatus", await api.cloud.getStatus())
+    ),
 
     initialize: ensureInitialized,
 
-    listBackups: wrap("listBackups", (api) => api.cloud.listBackups()),
-
-    migrateBackups: wrap("migrateBackups", (api, config) =>
-        api.cloud.migrateBackups(config)
+    listBackups: wrap("listBackups", async (api) =>
+        parseBackupEntries("listBackups", await api.cloud.listBackups())
     ),
 
-    previewResetRemoteSyncState: wrap("previewResetRemoteSyncState", (api) =>
-        api.cloud.previewResetRemoteSyncState()
+    migrateBackups: wrap("migrateBackups", async (api, config) =>
+        validateServicePayload(
+            safeParseCloudBackupMigrationResult,
+            await api.cloud.migrateBackups(config),
+            {
+                operation: "migrateBackups",
+                serviceName: "CloudService",
+            }
+        )
+    ),
+
+    previewResetRemoteSyncState: wrap(
+        "previewResetRemoteSyncState",
+        async (api) =>
+            validateServicePayload(
+                validateCloudSyncResetPreview,
+                await api.cloud.previewResetRemoteSyncState(),
+                {
+                    operation: "previewResetRemoteSyncState",
+                    serviceName: "CloudService",
+                }
+            )
     ),
 
     requestSyncNow: wrap("requestSyncNow", async (api) => {
         await api.cloud.requestSyncNow();
     }),
 
-    resetRemoteSyncState: wrap("resetRemoteSyncState", (api) =>
-        api.cloud.resetRemoteSyncState()
+    resetRemoteSyncState: wrap("resetRemoteSyncState", async (api) =>
+        validateServicePayload(
+            validateCloudSyncResetResult,
+            await api.cloud.resetRemoteSyncState(),
+            {
+                operation: "resetRemoteSyncState",
+                serviceName: "CloudService",
+            }
+        )
     ),
 
     restoreBackup: wrap("restoreBackup", async (api, key) => {
@@ -159,7 +239,14 @@ export const CloudService: CloudServiceContract = {
             throw new TypeError("Backup key must be a non-empty string");
         }
 
-        const result = await api.cloud.restoreBackup(key);
+        const result = validateServicePayload(
+            validateSerializedDatabaseRestoreResult,
+            await api.cloud.restoreBackup(key),
+            {
+                operation: "restoreBackup",
+                serviceName: "CloudService",
+            }
+        );
         logger.info("Cloud backup restore completed", {
             key,
             restoredAt: result.restoredAt,
@@ -178,7 +265,10 @@ export const CloudService: CloudServiceContract = {
             }
 
             // Never log the passphrase.
-            const result = await api.cloud.setEncryptionPassphrase(passphrase);
+            const result = parseCloudStatus(
+                "setEncryptionPassphrase",
+                await api.cloud.setEncryptionPassphrase(passphrase)
+            );
             logger.info("Cloud encryption passphrase updated", {
                 encryptionLocked: result.encryptionLocked,
                 encryptionMode: result.encryptionMode,
@@ -187,7 +277,10 @@ export const CloudService: CloudServiceContract = {
         }
     ),
 
-    uploadLatestBackup: wrap("uploadLatestBackup", (api) =>
-        api.cloud.uploadLatestBackup()
+    uploadLatestBackup: wrap("uploadLatestBackup", async (api) =>
+        parseBackupEntry(
+            "uploadLatestBackup",
+            await api.cloud.uploadLatestBackup()
+        )
     ),
 };

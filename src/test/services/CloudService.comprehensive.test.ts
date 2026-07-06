@@ -178,7 +178,7 @@ describe("CloudService", () => {
         mockElectronAPI.cloud.uploadLatestBackup.mockResolvedValue({
             encrypted: false,
             fileName: "uptime-watcher-backup-1.sqlite",
-            key: "backups/1.sqlite",
+            key: "backups/uptime-watcher-backup-1.sqlite",
             metadata: {
                 appVersion: "test",
                 checksum: "abc",
@@ -224,6 +224,18 @@ describe("CloudService", () => {
         expect(mockElectronAPI.cloud.getStatus).toHaveBeenCalledTimes(1);
     });
 
+    it("rejects invalid status payloads", async () => {
+        mockElectronAPI.cloud.getStatus.mockResolvedValue({
+            provider: "dropbox",
+            configured: true,
+            connected: "yes",
+        });
+
+        await expect(CloudService.getStatus()).rejects.toThrow(
+            "[CloudService] getStatus returned invalid payload"
+        );
+    });
+
     it("disconnects", async () => {
         const status = await CloudService.disconnect();
         expect(status.provider).toBeNull();
@@ -262,9 +274,32 @@ describe("CloudService", () => {
         expect(mockElectronAPI.cloud.listBackups).toHaveBeenCalledTimes(1);
     });
 
+    it("rejects invalid backup list payloads", async () => {
+        mockElectronAPI.cloud.listBackups.mockResolvedValue([
+            {
+                encrypted: false,
+                fileName: "backup.sqlite",
+                key: "not-a-backup-prefix/backup.sqlite",
+                metadata: {
+                    appVersion: "test",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "x",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 1,
+                },
+            },
+        ]);
+
+        await expect(CloudService.listBackups()).rejects.toThrow(
+            "[CloudService] listBackups returned invalid payload"
+        );
+    });
+
     it("uploads latest backup", async () => {
         const entry = await CloudService.uploadLatestBackup();
-        expect(entry.key).toBe("backups/1.sqlite");
+        expect(entry.key).toBe("backups/uptime-watcher-backup-1.sqlite");
         expect(mockElectronAPI.cloud.uploadLatestBackup).toHaveBeenCalledTimes(
             1
         );
@@ -282,6 +317,19 @@ describe("CloudService", () => {
             "backups/1.sqlite"
         );
         expect(mockLogger.info).toHaveBeenCalled();
+    });
+
+    it("rejects invalid restore result payloads", async () => {
+        mockElectronAPI.cloud.restoreBackup.mockResolvedValue({
+            restoredAt: "later",
+            metadata: {},
+        });
+
+        await expect(
+            CloudService.restoreBackup("backups/1.sqlite")
+        ).rejects.toThrow(
+            "[CloudService] restoreBackup returned invalid payload"
+        );
     });
 
     it("rejects empty restore key", async () => {
