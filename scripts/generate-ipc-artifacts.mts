@@ -3,6 +3,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 import prettier from "prettier";
 import type {
     JSDoc,
@@ -29,7 +30,84 @@ interface RendererEventDefinition {
 }
 
 const rootDir = path.resolve(process.cwd());
-const checkMode = process.argv.includes("--check");
+
+/**
+ * Parsed command-line options for IPC artifact generation.
+ *
+ * @internal
+ */
+interface CliOptions {
+    checkMode: boolean;
+    help: boolean;
+}
+
+/**
+ * Error raised for invalid CLI usage.
+ *
+ * @internal
+ */
+class CliUsageError extends Error {
+    public constructor(message: string) {
+        super(message);
+        this.name = "CliUsageError";
+    }
+}
+
+/**
+ * Show command usage.
+ */
+function showHelp(): void {
+    console.log(`
+Generate or check IPC derived artifacts.
+
+Usage: node --experimental-strip-types scripts/generate-ipc-artifacts.mts [--check]
+
+Options:
+  --check      Verify generated artifacts without writing changes.
+  -h, --help   Show this help.
+`);
+}
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param args - Raw command-line arguments.
+ *
+ * @returns Parsed CLI options.
+ */
+function parseArgs(args: string[]): CliOptions {
+    const parsed: CliOptions = {
+        checkMode: false,
+        help: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--check": {
+                parsed.checkMode = true;
+                break;
+            }
+
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+
+            default: {
+                if (arg.startsWith("-")) {
+                    throw new CliUsageError(`Unknown option: ${arg}`);
+                }
+
+                throw new CliUsageError(
+                    `Unexpected positional argument: ${arg}`
+                );
+            }
+        }
+    }
+
+    return parsed;
+}
 
 const project = new Project({
     tsConfigFilePath: path.resolve(rootDir, "tsconfig.json"),
@@ -363,7 +441,8 @@ interface WriteOrCheckResult {
  */
 async function writeOrCheck(
     targetPath: string,
-    content: string
+    content: string,
+    checkMode: boolean
 ): Promise<WriteOrCheckResult> {
     const relativePath = path.relative(rootDir, targetPath);
 
@@ -431,8 +510,15 @@ async function writeOrCheck(
 /**
  * Entrypoint coordinating artifact generation or drift detection.
  */
-async function main(): Promise<void> {
-    const mode = checkMode ? "CHECK" : "GENERATE";
+async function main(
+    options: CliOptions = parseArgs(process.argv.slice(2))
+): Promise<number> {
+    if (options.help) {
+        showHelp();
+        return 0;
+    }
+
+    const mode = options.checkMode ? "CHECK" : "GENERATE";
     console.log(`[ipc-artifacts] Starting IPC artifacts ${mode} mode...`);
     console.log(
         `[ipc-artifacts] Processing renderer events from ${path.relative(rootDir, rendererEventsPath)}`
@@ -452,11 +538,16 @@ async function main(): Promise<void> {
 
     const eventsBridgeResult = await writeOrCheck(
         eventsBridgePath,
-        eventsBridgeContent
+        eventsBridgeContent,
+        options.checkMode
     );
     results.push(eventsBridgeResult);
 
-    const docResult = await writeOrCheck(docPath, docContent);
+    const docResult = await writeOrCheck(
+        docPath,
+        docContent,
+        options.checkMode
+    );
     results.push(docResult);
 
     console.log("");
@@ -469,21 +560,47 @@ async function main(): Promise<void> {
         console.log(
             `[ipc-artifacts] ✓ ${mode} completed successfully. ${successCount}/${results.length} artifacts processed.`
         );
+        return 0;
     } else {
         console.error(
             `[ipc-artifacts] ✗ ${mode} completed with errors. ${successCount} succeeded, ${failureCount} failed.`
         );
-        process.exitCode = 1;
+        return 1;
     }
 }
 
-try {
-    await main();
-} catch (error) {
-    console.error("[ipc-artifacts] ✗ Fatal error during artifact generation:");
-    console.error(error instanceof Error ? error.message : String(error));
-    if (error instanceof Error && error.stack) {
-        console.error("[ipc-artifacts] Stack trace:", error.stack);
-    }
-    process.exitCode = 1;
+/**
+ * Check whether this module is being run as the CLI entrypoint.
+ *
+ * @returns True when invoked directly.
+ */
+function isDirectRun(): boolean {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
 }
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = await main();
+    } catch (error) {
+        if (error instanceof CliUsageError) {
+            console.error(`[ipc-artifacts] ✗ ${error.message}`);
+            process.exitCode = 1;
+        } else {
+            console.error(
+                "[ipc-artifacts] ✗ Fatal error during artifact generation:"
+            );
+            console.error(
+                error instanceof Error ? error.message : String(error)
+            );
+            if (error instanceof Error && error.stack) {
+                console.error("[ipc-artifacts] Stack trace:", error.stack);
+            }
+            process.exitCode = 1;
+        }
+    }
+}
+
+export { main, parseArgs };
