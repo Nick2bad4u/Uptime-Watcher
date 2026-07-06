@@ -35,7 +35,7 @@ import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
 import crypto from "crypto";
-import { pathToFileURL } from "url";
+import { pathToFileURL } from "node:url";
 /** @typedef {import("http")} http */
 /** @typedef {import("https")} https */
 
@@ -85,6 +85,7 @@ const execFileAsync = promisify(execFile);
  * @property {boolean} enableCache - Whether to use caching.
  * @property {boolean} enableParallel - Whether to use parallel processing.
  * @property {boolean} enableValidation - Whether to validate downloads.
+ * @property {boolean} help - Whether help was requested.
  * @property {number} maxRetries - Maximum retry attempts.
  * @property {number} timeout - Request timeout in milliseconds.
  * @property {number} concurrency - Maximum concurrent downloads.
@@ -175,6 +176,7 @@ const CONFIG = {
     enableCache: true,
     enableParallel: true,
     enableValidation: true,
+    help: false,
     maxRetries: 3,
     timeout: 30000,
     concurrency: 5,
@@ -219,8 +221,8 @@ function parseArguments(args = process.argv.slice(2)) {
         switch (option) {
             case "--help":
             case "-h":
-                showHelp();
-                process.exit(0);
+                config.help = true;
+                break;
             case "--cache":
                 config.enableCache = true;
                 break;
@@ -501,9 +503,7 @@ class Logger {
  *
  * @returns {Promise<InitializationResult>}
  */
-async function initialize() {
-    /** @type {DownloadConfig} */
-    const config = parseArguments();
+async function initialize(config = parseArguments()) {
     /** @type {Logger} */
     const logger = new Logger(config.verbose);
 
@@ -1070,12 +1070,22 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 /**
  * Main application entry point.
  *
- * @returns {Promise<void>}
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {Promise<boolean>} Resolves `true` when the command completes
+ *   successfully.
  */
-async function main() {
+async function main(args = process.argv.slice(2)) {
     try {
+        /** @type {DownloadConfig} */
+        const config = parseArguments(args);
+        if (config.help) {
+            showHelp();
+            return true;
+        }
+
         /** @type {InitializationResult} */
-        const { config, logger, paths } = await initialize();
+        const { logger, paths } = await initialize(config);
 
         // Load previous hashes for change detection
         /** @type {HashRecord} */
@@ -1133,6 +1143,7 @@ async function main() {
         await generateReport(results, config, logger, paths, previousHashes);
 
         logger.success(`Download completed successfully!`);
+        return true;
     } catch (error) {
         console.error(
             `❌ Application failed: ${error instanceof Error ? error.message : String(error)}`
@@ -1140,7 +1151,7 @@ async function main() {
         if (process.env["DOC_DOWNLOADER_VERBOSE"]) {
             console.error(error instanceof Error ? error.stack : error);
         }
-        process.exit(1);
+        return false;
     }
 }
 
@@ -1164,21 +1175,40 @@ function getOutputPath(page, config, paths) {
     return path.join(paths.outputDir, fileName);
 }
 
-// Execute main function if this is the main module
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
-) {
-    main().catch(console.error);
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectInvocation()) {
+    main()
+        .then((isSuccess) => {
+            process.exitCode = isSuccess ? 0 : 1;
+        })
+        .catch((error) => {
+            console.error(
+                error instanceof Error ? error.message : String(error)
+            );
+            process.exitCode = 1;
+        });
 }
 
 // Export for testing
 export {
     cleanContent,
+    getOutputPath,
     initialize,
+    isDirectInvocation,
+    main,
     normalizeBaseUrl,
     parseArguments,
     rewriteLinks,
+    showHelp,
     validateContent,
 };
 
