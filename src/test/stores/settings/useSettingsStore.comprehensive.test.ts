@@ -942,9 +942,48 @@ describe(useSettingsStore, () => {
                 "SettingsStore",
                 "updateSettings",
                 {
-                    newSettings: { historyLimit: 500 },
+                    changedFields: ["historyLimit"],
+                    historyLimit: 500,
                 }
             );
+        });
+
+        it("should summarize muted site identifiers in update telemetry", () => {
+            const { result } = renderHook(() => useSettingsStore());
+
+            act(() => {
+                result.current.updateSettings({
+                    mutedSiteNotificationIdentifiers: [
+                        "https://user:pass@example.com/path?access_token=secret#frag",
+                    ],
+                    theme: "dark",
+                });
+            });
+
+            expect(mockLogStoreAction).toHaveBeenCalledWith(
+                "SettingsStore",
+                "updateSettings",
+                {
+                    changedFields: [
+                        "mutedSiteNotificationIdentifiers",
+                        "theme",
+                    ],
+                    mutedSiteNotificationIdentifierCount: 1,
+                    theme: "dark",
+                }
+            );
+
+            const serializedSettingsLogs = JSON.stringify(
+                mockLogStoreAction.mock.calls.filter(
+                    ([storeName, actionName]) =>
+                        storeName === "SettingsStore" &&
+                        actionName === "updateSettings"
+                )
+            );
+            expect(serializedSettingsLogs).not.toContain("access_token");
+            expect(serializedSettingsLogs).not.toContain("secret");
+            expect(serializedSettingsLogs).not.toContain("pass");
+            expect(serializedSettingsLogs).not.toContain("frag");
         });
 
         it("should log initialization actions", async ({ task, annotate }) => {

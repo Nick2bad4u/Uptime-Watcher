@@ -107,6 +107,65 @@ const normalizeThemeSetting = (
 ): AppSettings["theme"] =>
     typeof value === "string" && isThemeName(value) ? value : fallback;
 
+const buildSettingsUpdateTelemetry = (
+    newSettings: Partial<AppSettings>
+): Record<string, unknown> => {
+    const changedFields = Object.keys(newSettings).toSorted((left, right) =>
+        left.localeCompare(right)
+    );
+    const telemetry: Record<string, unknown> = { changedFields };
+
+    if ("autoStart" in newSettings) {
+        telemetry["autoStart"] = newSettings.autoStart;
+    }
+
+    if ("historyLimit" in newSettings) {
+        telemetry["historyLimit"] = newSettings.historyLimit;
+    }
+
+    if ("inAppAlertsEnabled" in newSettings) {
+        telemetry["inAppAlertsEnabled"] = newSettings.inAppAlertsEnabled;
+    }
+
+    if ("inAppAlertsSoundEnabled" in newSettings) {
+        telemetry["inAppAlertsSoundEnabled"] =
+            newSettings.inAppAlertsSoundEnabled;
+    }
+
+    if ("inAppAlertVolume" in newSettings) {
+        telemetry["inAppAlertVolume"] = newSettings.inAppAlertVolume;
+    }
+
+    if ("minimizeToTray" in newSettings) {
+        telemetry["minimizeToTray"] = newSettings.minimizeToTray;
+    }
+
+    if ("mutedSiteNotificationIdentifiers" in newSettings) {
+        const mutedIdentifiers = newSettings.mutedSiteNotificationIdentifiers;
+        telemetry["mutedSiteNotificationIdentifierCount"] = Array.isArray(
+            mutedIdentifiers
+        )
+            ? mutedIdentifiers.length
+            : undefined;
+    }
+
+    if ("systemNotificationsEnabled" in newSettings) {
+        telemetry["systemNotificationsEnabled"] =
+            newSettings.systemNotificationsEnabled;
+    }
+
+    if ("systemNotificationsSoundEnabled" in newSettings) {
+        telemetry["systemNotificationsSoundEnabled"] =
+            newSettings.systemNotificationsSoundEnabled;
+    }
+
+    if ("theme" in newSettings) {
+        telemetry["theme"] = newSettings.theme;
+    }
+
+    return telemetry;
+};
+
 /**
  * Normalizes persisted or partial settings objects into a complete
  * {@link AppSettings} structure.
@@ -181,9 +240,11 @@ export const createSettingsStateSlice = (
 ): Pick<SettingsStore, "settings" | "updateSettings"> => ({
     settings: normalizeAppSettings(),
     updateSettings: (newSettings): void => {
-        logStoreAction("SettingsStore", "updateSettings", {
-            newSettings,
-        });
+        logStoreAction(
+            "SettingsStore",
+            "updateSettings",
+            buildSettingsUpdateTelemetry(newSettings)
+        );
         setState((state) => ({
             settings: normalizeAppSettings(
                 {
