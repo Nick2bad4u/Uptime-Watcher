@@ -7,6 +7,7 @@
 
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 /**
  * Extract test names from a single test file.
@@ -198,6 +199,11 @@ function formatTestNames(testStructures, format = "list") {
  */
 function main() {
     const args = process.argv.slice(2);
+    if (args.includes("--help") || args.includes("-h")) {
+        showUsage();
+        return;
+    }
+
     const format =
         args
             .find((arg) =>
@@ -277,7 +283,7 @@ function main() {
  */
 function showUsage() {
     console.log(`
-Usage: node extract-test-names.js [options]
+Usage: node scripts/extract-test-names.mjs [options]
 
 Options:
   --list    Default format, organized by file with describe and test blocks
@@ -287,21 +293,25 @@ Options:
   --save    Save output to a timestamped file
 
 Examples:
-  node extract-test-names.js --flat
-  node extract-test-names.js --json --save
-  node extract-test-names.js --tree
+  node scripts/extract-test-names.mjs --flat
+  node scripts/extract-test-names.mjs --json --save
+  node scripts/extract-test-names.mjs --tree
 `);
 }
 
-// Show usage if help requested
-if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    showUsage();
-    process.exit(0);
+/**
+ * Check whether this module was executed as the CLI entrypoint.
+ *
+ * @returns {boolean} Whether the script is running directly.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(process.argv[1]).href
+    );
 }
 
-// Run the script
-// Updated to use ES module equivalent for checking if this is the main module (replaces CommonJS require.main === module)
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isDirectInvocation()) {
     main();
 }
 

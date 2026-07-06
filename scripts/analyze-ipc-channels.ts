@@ -2,16 +2,23 @@
  * IPC Channel Analysis Tool for Preload Refactoring
  *
  * @remarks
- * This tool analyzes the existing IpcService.ts to extract all channel
- * definitions and automatically generates domain mappings for the modular
- * preload architecture. It ensures perfect alignment between backend IPC
- * handlers and frontend API methods.
+ * This tool analyzes the domain-specific IPC handler modules to extract all
+ * channel definitions and automatically generates domain mappings for the
+ * modular preload architecture. It keeps backend IPC handlers aligned with
+ * frontend API methods.
  *
  * @packageDocumentation
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    readdirSync,
+    writeFileSync,
+} from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 /**
  * Represents an IPC channel definition extracted from the backend
@@ -31,6 +38,8 @@ export interface IpcChannelDefinition {
     returnType: string;
     /** Original handler method for reference */
     handlerMethod: string;
+    /** Source file where the channel is registered */
+    sourceFile: string;
 }
 
 /**
@@ -41,21 +50,23 @@ export interface DomainChannelMap {
 }
 
 /**
- * Analyzes the IpcService.ts file to extract all channel definitions
+ * Analyzes IPC handler modules to extract all channel definitions.
  */
 export class IpcChannelAnalyzer {
-    private readonly ipcServicePath: string;
-    private readonly sourceCode: string;
+    private readonly channelLookup: Map<string, string>;
+    private readonly handlersDir: string;
+    private readonly projectRoot: string;
 
     constructor(projectRoot: string) {
-        this.ipcServicePath = path.join(
+        this.projectRoot = projectRoot;
+        this.handlersDir = path.join(
             projectRoot,
             "electron",
             "services",
             "ipc",
-            "IpcService.ts"
+            "handlers"
         );
-        this.sourceCode = readFileSync(this.ipcServicePath, "utf8");
+        this.channelLookup = this.loadChannelLookup();
     }
 
     /**
@@ -67,34 +78,106 @@ export class IpcChannelAnalyzer {
     }
 
     /**
-     * Extracts individual channel definitions from
-     * registerStandardizedIpcHandler calls
+     * Extracts individual channel definitions from current handler modules.
      */
     private extractChannelDefinitions(): IpcChannelDefinition[] {
         const channels: IpcChannelDefinition[] = [];
+        const handlerFiles = readdirSync(this.handlersDir)
+            .filter((fileName) => fileName.endsWith(".ts"))
+            .sort((a, b) => a.localeCompare(b));
 
-        // Regex to match registerStandardizedIpcHandler calls
-        const handlerRegex =
-            /registerStandardizedIpcHandler\s*\(\s*["'](?<channelName>[^"']+)["']\s*,\s*(?<handlerCode>[^,]+),\s*(?<validatorCode>[^,]+),/g;
+        for (const fileName of handlerFiles) {
+            const filePath = path.join(this.handlersDir, fileName);
+            const sourceCode = readFileSync(filePath, "utf8");
+            const handlerRegex =
+                /register\s*\(\s*(?<channelExpression>[A-Z_]+_CHANNELS\.[A-Za-z0-9_]+)/gu;
 
-        let match;
-        while ((match = handlerRegex.exec(this.sourceCode)) !== null) {
-            const channelName = match.groups?.channelName ?? "";
-            const handlerCode = match.groups?.handlerCode ?? "";
-            const validatorCode = match.groups?.validatorCode ?? "";
+            let match;
+            while ((match = handlerRegex.exec(sourceCode)) !== null) {
+                const channelExpression = match.groups?.channelExpression ?? "";
+                const channelName =
+                    this.channelLookup.get(channelExpression) ??
+                    channelExpression;
+                const handlerCode = this.extractRegistrationSnippet(
+                    sourceCode,
+                    match.index
+                );
 
-            channels.push({
-                channel: channelName,
-                domain: this.inferDomainFromChannel(channelName),
-                methodName: this.deriveMethodName(channelName),
-                hasParameters: this.detectParameters(handlerCode),
-                validator: this.extractValidatorName(validatorCode),
-                returnType: this.inferReturnType(handlerCode),
-                handlerMethod: handlerCode.trim(),
-            });
+                channels.push({
+                    channel: channelName,
+                    domain: this.inferDomainFromChannel(channelName),
+                    handlerMethod: handlerCode.trim(),
+                    hasParameters: this.detectParameters(handlerCode),
+                    methodName: this.deriveMethodName(channelName),
+                    returnType: this.inferReturnType(handlerCode),
+                    sourceFile: path
+                        .relative(this.projectRoot, filePath)
+                        .replaceAll("\\", "/"),
+                    validator: this.extractValidatorName(handlerCode),
+                });
+            }
         }
 
         return channels;
+    }
+
+    /**
+     * Extract a short registration snippet for report context.
+     */
+    private extractRegistrationSnippet(
+        sourceCode: string,
+        startIndex: number
+    ): string {
+        const nextRegistrationIndex = sourceCode.indexOf(
+            "\n    register(",
+            startIndex + 1
+        );
+        const endIndex =
+            nextRegistrationIndex === -1
+                ? sourceCode.length
+                : nextRegistrationIndex;
+
+        return sourceCode.slice(startIndex, endIndex);
+    }
+
+    /**
+     * Load channel constants from the shared preload contract source.
+     */
+    private loadChannelLookup(): Map<string, string> {
+        const preloadTypesPath = path.join(
+            this.projectRoot,
+            "shared",
+            "types",
+            "preload.ts"
+        );
+        const sourceCode = readFileSync(preloadTypesPath, "utf8");
+        const lookup = new Map<string, string>();
+        const definitionRegex =
+            /const\s+(?<constantName>[A-Z_]+_CHANNELS)_DEFINITION\b[^=]*=\s*\{(?<body>[\s\S]*?)\};/gu;
+
+        let definitionMatch;
+        while ((definitionMatch = definitionRegex.exec(sourceCode)) !== null) {
+            const constantName = definitionMatch.groups?.constantName;
+            const body = definitionMatch.groups?.body;
+            if (!constantName || !body) {
+                continue;
+            }
+
+            const propertyRegex =
+                /(?<propertyName>[A-Za-z0-9_]+)\s*:\s*"(?<channelName>[^"]+)"/gu;
+            let propertyMatch;
+            while ((propertyMatch = propertyRegex.exec(body)) !== null) {
+                const propertyName = propertyMatch.groups?.propertyName;
+                const channelName = propertyMatch.groups?.channelName;
+                if (!propertyName || !channelName) {
+                    continue;
+                }
+
+                lookup.set(`${constantName}.${propertyName}`, channelName);
+            }
+        }
+
+        return lookup;
     }
 
     /**
@@ -122,14 +205,27 @@ export class IpcChannelAnalyzer {
      * Infers the domain from the channel name
      */
     private inferDomainFromChannel(channelName: string): string {
-        // Site-related channels
-        if (channelName.includes("site")) {
-            return "sites";
+        if (channelName.startsWith("cloud-")) {
+            return "cloud";
         }
 
-        // Monitoring-related channels
-        if (channelName.includes("monitor") && !channelName.includes("types")) {
-            return "monitoring";
+        if (channelName.startsWith("diagnostics-")) {
+            return "diagnostics";
+        }
+
+        if (
+            channelName.includes("notification") ||
+            channelName.startsWith("notify-")
+        ) {
+            return "notifications";
+        }
+
+        if (
+            channelName.includes("sync") ||
+            channelName === "get-sync-status" ||
+            channelName === "request-full-sync"
+        ) {
+            return "stateSync";
         }
 
         // Monitor types (registry) channels
@@ -141,21 +237,31 @@ export class IpcChannelAnalyzer {
             return "monitorTypes";
         }
 
+        // Site-related channels
+        if (channelName.includes("site")) {
+            return "sites";
+        }
+
+        // Monitoring-related channels
+        if (channelName.includes("monitor")) {
+            return "monitoring";
+        }
+
+        if (
+            channelName.includes("settings") ||
+            channelName.includes("history")
+        ) {
+            return "settings";
+        }
+
         // Data operations
         if (
             channelName.includes("data") ||
             channelName.includes("export") ||
             channelName.includes("import") ||
-            channelName.includes("backup") ||
-            channelName.includes("history") ||
-            channelName.includes("settings")
+            channelName.includes("backup")
         ) {
             return "data";
-        }
-
-        // State synchronization
-        if (channelName.includes("sync") || channelName.includes("status")) {
-            return "stateSync";
         }
 
         // System operations (default for everything else)
@@ -182,7 +288,11 @@ export class IpcChannelAnalyzer {
      */
     private detectParameters(handlerCode: string): boolean {
         // Look for ...args: unknown[] pattern
-        return handlerCode.includes("...args") || handlerCode.includes("args[");
+        return (
+            handlerCode.includes("...args") ||
+            handlerCode.includes("args[") ||
+            handlerCode.includes("IpcInvokeChannelParams")
+        );
     }
 
     /**
@@ -196,7 +306,7 @@ export class IpcChannelAnalyzer {
 
         // Extract validator function name (e.g., "DataHandlerValidators.exportData")
         const match = validatorCode.match(
-            /(?<validatorClass>[A-Za-z]+)\.(?<validatorMethod>[A-Za-z]+)/
+            /(?<validatorClass>[A-Za-z]+HandlerValidators)\.(?<validatorMethod>[A-Za-z0-9]+)/
         );
         if (match?.groups) {
             return `${match.groups.validatorClass}.${match.groups.validatorMethod}`;
@@ -264,6 +374,7 @@ export class IpcChannelAnalyzer {
 
             for (const channel of channels) {
                 report += `### \`${channel.channel}\`\n`;
+                report += `- **Source**: \`${channel.sourceFile}\`\n`;
                 report += `- **Method**: \`${channel.methodName}\`\n`;
                 report += `- **Parameters**: ${channel.hasParameters ? "Yes" : "No"}\n`;
                 report += `- **Validator**: ${channel.validator || "None"}\n`;
@@ -312,8 +423,20 @@ export function runAnalysis(projectRoot: string): void {
     console.log(`\n${report}`);
 }
 
+/**
+ * Check whether this module was executed as the CLI entrypoint.
+ *
+ * @returns Whether the script is running directly.
+ */
+function isDirectInvocation(): boolean {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(process.argv[1]).href
+    );
+}
+
 // If this file is run directly, execute the analysis
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isDirectInvocation()) {
     const projectRoot = process.cwd();
     runAnalysis(projectRoot);
 }
