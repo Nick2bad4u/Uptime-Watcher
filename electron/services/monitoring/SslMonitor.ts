@@ -13,6 +13,7 @@ import type { Except } from "type-fest";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import { getAbortSignalReason } from "@shared/utils/abortUtils";
+import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
@@ -44,6 +45,20 @@ const MS_IN_DAY = 86_400_000;
 const DEFAULT_WARNING_THRESHOLD_DAYS = 30;
 const MIN_WARNING_THRESHOLD_DAYS = 1;
 const MAX_WARNING_THRESHOLD_DAYS = 365;
+
+class SslCheckError extends Error {
+    public readonly responseTime: number;
+
+    public constructor(
+        message: string,
+        responseTime: number,
+        cause: unknown
+    ) {
+        super(message, { cause });
+        this.name = "SslCheckError";
+        this.responseTime = responseTime;
+    }
+}
 
 /**
  * Monitor service implementation for SSL/TLS certificate checks.
@@ -125,8 +140,13 @@ export class SslMonitor implements IMonitorService {
                 return createMonitorErrorResult("Request canceled", 0);
             }
 
-            const message = getUserFacingErrorDetail(error);
-            return createMonitorErrorResult(message, 0);
+            const normalizedError = ensureError(error);
+            const message = getUserFacingErrorDetail(normalizedError);
+            const responseTime =
+                normalizedError instanceof SslCheckError
+                    ? normalizedError.responseTime
+                    : 0;
+            return createMonitorErrorResult(message, responseTime);
         }
     }
 
@@ -160,9 +180,10 @@ export class SslMonitor implements IMonitorService {
             }
 
             const responseTime = Math.round(performance.now() - start);
-            return createMonitorErrorResult(
+            throw new SslCheckError(
                 getUserFacingErrorDetail(error),
-                responseTime
+                responseTime,
+                error
             );
         }
     }

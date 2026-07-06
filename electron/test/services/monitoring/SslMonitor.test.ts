@@ -223,6 +223,41 @@ describe("SslMonitor service", () => {
         expect(result.status).toBe("down");
     });
 
+    it("retries failed handshakes before returning a successful result", async () => {
+        const certificate = createCertificate(
+            new Date(Date.now() + 120 * 86_400_000)
+        );
+        let attempt = 0;
+        connectMock.mockImplementation(() => {
+            attempt += 1;
+            const socket = new MockTlsSocket(certificate);
+            setImmediate(() => {
+                if (attempt < 3) {
+                    socket.emit("error", new Error(`ECONNRESET ${attempt}`));
+                    return;
+                }
+
+                socket.emit("secureConnect");
+            });
+            return socket;
+        });
+        vi.mocked(createMonitorConfig).mockReturnValue({
+            retryAttempts: 2,
+            timeout: 5000,
+            checkInterval: 30_000,
+        });
+
+        const result = await sslMonitor.check({
+            ...monitor,
+            retryAttempts: 2,
+        });
+
+        expect(result.status).toBe("up");
+        expect(result.details).toContain("valid until");
+        expect(connectMock).toHaveBeenCalledTimes(3);
+        expect(createMonitorErrorResult).not.toHaveBeenCalled();
+    });
+
     it("reports request cancellation when an in-flight handshake is aborted", async () => {
         let socket: MockTlsSocket | undefined;
         connectMock.mockImplementation(() => {
