@@ -6,12 +6,17 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { HistoryRepository } from "./HistoryRepository";
 import type { MonitorRepository } from "./MonitorRepository";
 import type { SettingsRepository } from "./SettingsRepository";
 import type { SiteRepository } from "./SiteRepository";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 // Logger type available for internal use - external consumers should import from ../interfaces
 
@@ -141,7 +146,7 @@ export class SiteNotFoundError extends Error {
      * @param identifier - The site identifier that was not found
      */
     public constructor(identifier: string, options?: ErrorOptions) {
-        super(`Site not found: ${identifier}`, options);
+        super(`Site not found: ${getSafeIdentifier(identifier)}`, options);
         this.name = "SiteNotFoundError";
     }
 }

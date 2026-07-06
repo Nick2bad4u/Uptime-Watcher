@@ -135,4 +135,63 @@ describe("deleteSiteWithAdapters runtime coverage", () => {
         expect(thrown).toBe(failure);
         expect(ensureErrorSpy).toHaveBeenCalledTimes(1);
     });
+
+    it("redacts URL-shaped identifiers from deletion error messages", async () => {
+        const rawIdentifier =
+            "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+        const normalized = new Error(
+            `Failed to delete monitors for site ${rawIdentifier}`
+        );
+        const errorModule = await import(errorUtilsModulePath);
+        vi.spyOn(errorModule, "ensureError").mockReturnValue(normalized);
+        const { adapter: monitorAdapter } = createMonitorAdapter({
+            deleteBySiteIdentifier: vi.fn(() => {
+                throw new Error("raw failure");
+            }),
+        });
+        const { adapter: siteAdapter } = createSiteAdapter();
+        const { deleteSiteWithAdapters } = await import(modulePath);
+
+        expect(() =>
+            deleteSiteWithAdapters({
+                identifier: rawIdentifier,
+                monitorAdapter: monitorAdapter,
+                preloadedMonitors: [] as never,
+                siteAdapter: siteAdapter,
+            })
+        ).toThrow(
+            "Failed to delete monitors for site https://example.com/path: Failed to delete monitors for site https://example.com/path"
+        );
+
+        try {
+            deleteSiteWithAdapters({
+                identifier: rawIdentifier,
+                monitorAdapter: monitorAdapter,
+                preloadedMonitors: [] as never,
+                siteAdapter: siteAdapter,
+            });
+        } catch (error) {
+            const message = String(error);
+            expect(message).not.toContain("site-secret");
+            expect(message).not.toContain("site-token");
+            expect(message).not.toContain("private-site");
+        }
+    });
+});
+
+describe("database error messages", () => {
+    it("redacts URL-shaped identifiers from site-not-found errors", async () => {
+        const { SiteNotFoundError } = await import(
+            "../../../services/database/interfaces"
+        );
+
+        const error = new SiteNotFoundError(
+            "https://user:site-secret@example.com/path?access_token=site-token#private-site"
+        );
+
+        expect(error.message).toBe("Site not found: https://example.com/path");
+        expect(error.message).not.toContain("site-secret");
+        expect(error.message).not.toContain("site-token");
+        expect(error.message).not.toContain("private-site");
+    });
 });

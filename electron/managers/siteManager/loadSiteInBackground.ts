@@ -2,6 +2,7 @@ import type { Site } from "@shared/types";
 import type { ValueOf } from "type-fest";
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -12,6 +13,9 @@ import type { SiteRepositoryService } from "../../services/database/SiteReposito
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 import { logger } from "../../utils/logger";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Dependencies required by {@link loadSiteInBackground}.
@@ -57,10 +61,12 @@ export interface LoadSiteInBackgroundDeps {
 export async function loadSiteInBackground(
     deps: LoadSiteInBackgroundDeps
 ): Promise<void> {
+    const safeIdentifier = getSafeIdentifier(deps.identifier);
+
     try {
         logger.debug(
             interpolateLogTemplate(LOG_TEMPLATES.debug.BACKGROUND_LOAD_START, {
-                identifier: deps.identifier,
+                identifier: safeIdentifier,
             })
         );
 
@@ -89,7 +95,7 @@ export async function loadSiteInBackground(
             logger.debug(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.debug.BACKGROUND_LOAD_COMPLETE,
-                    { identifier: deps.identifier }
+                    { identifier: safeIdentifier }
                 )
             );
 
@@ -100,7 +106,7 @@ export async function loadSiteInBackground(
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.SITE_BACKGROUND_LOAD_FAILED,
                 {
-                    identifier: deps.identifier,
+                    identifier: safeIdentifier,
                 }
             )
         );
@@ -115,7 +121,7 @@ export async function loadSiteInBackground(
             interpolateLogTemplate(
                 LOG_TEMPLATES.errors.SITE_BACKGROUND_LOAD_FAILED,
                 {
-                    identifier: deps.identifier,
+                    identifier: safeIdentifier,
                 }
             ),
             error

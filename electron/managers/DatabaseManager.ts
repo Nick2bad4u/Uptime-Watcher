@@ -51,6 +51,7 @@ import type { Site } from "@shared/types";
 
 import { normalizeHistoryLimit } from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
     getUserFacingErrorDetail,
@@ -88,6 +89,9 @@ import { SiteLoadingOrchestrator } from "../services/database/SiteRepositoryServ
 import { DatabaseServiceFactory } from "../services/factories/DatabaseServiceFactory";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { monitorLogger } from "../utils/logger";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 function isHistoryRetentionConfig(
     value: unknown
@@ -781,8 +785,9 @@ export class DatabaseManager {
             ): Promise<void> => {
                 // For database loading, we don't need to setup new monitors
                 // This is only used during site updates
+                const safeIdentifier = getSafeIdentifier(site.identifier);
                 monitorLogger.debug(
-                    `[DatabaseManager:${operationId}] setupNewMonitors called for site ${site.identifier} with ${newMonitorIds.length} monitors - no action needed during loading`
+                    `[DatabaseManager:${operationId}] setupNewMonitors called for site ${safeIdentifier} with ${newMonitorIds.length} monitors - no action needed during loading`
                 );
                 return Promise.resolve();
             },

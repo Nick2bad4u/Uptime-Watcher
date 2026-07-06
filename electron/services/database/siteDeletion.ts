@@ -11,10 +11,24 @@
 import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { isDefined } from "ts-extras";
 
 import type { MonitorRepositoryTransactionAdapter } from "./MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "./SiteRepository";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
+
+const redactIdentifierFromMessage = (
+    message: string,
+    identifier: string
+): string => {
+    const safeIdentifier = getSafeIdentifier(identifier);
+    return safeIdentifier === identifier
+        ? message
+        : message.replaceAll(identifier, () => safeIdentifier);
+};
 
 /**
  * Options for performing an atomic site deletion using transaction adapters.
@@ -66,10 +80,15 @@ export class SiteDeletionError extends Error {
             : undefined;
         const causeMessage =
             normalizedCause?.message ?? "Unknown site deletion cause";
+        const safeIdentifier = getSafeIdentifier(identifier);
+        const safeCauseMessage = redactIdentifierFromMessage(
+            causeMessage,
+            identifier
+        );
         const message =
             stage === "monitors"
-                ? `Failed to delete monitors for site ${identifier}: ${causeMessage}`
-                : `Failed to delete site ${identifier}`;
+                ? `Failed to delete monitors for site ${safeIdentifier}: ${safeCauseMessage}`
+                : `Failed to delete site ${safeIdentifier}`;
 
         super(message, {
             cause: normalizedCause,

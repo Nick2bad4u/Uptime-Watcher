@@ -53,6 +53,7 @@ import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -91,6 +92,9 @@ import {
 } from "./siteManager/updateSitesCache";
 import { validateSite as validateSiteHelper } from "./siteManager/validateSite";
 import { SiteManagerStateSync } from "./SiteManagerStateSync";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 const toSerializableErrorContext = (
     error: unknown
@@ -311,8 +315,9 @@ export class SiteManager {
 
         const cachedSite = this.sitesCache.get(createdSite.identifier);
         if (!cachedSite) {
+            const safeIdentifier = getSafeIdentifier(createdSite.identifier);
             logger.warn(
-                `[SiteManager] Cache miss immediately after creating site ${createdSite.identifier}; falling back to creation payload`
+                `[SiteManager] Cache miss immediately after creating site ${safeIdentifier}; falling back to creation payload`
             );
         }
 
@@ -324,7 +329,7 @@ export class SiteManager {
 
         logger.info(
             interpolateLogTemplate(LOG_TEMPLATES.services.SITE_ADDED_SUCCESS, {
-                identifier: sanitizedSite.identifier,
+                identifier: getSafeIdentifier(sanitizedSite.identifier),
                 name: sanitizedSite.name || "unnamed",
                 source,
             })
@@ -379,7 +384,9 @@ export class SiteManager {
         identifier: string
     ): Promise<Site | undefined> {
         if (!identifier || typeof identifier !== "string") {
-            throw new Error(`Invalid site identifier: ${identifier}`);
+            throw new Error(
+                `Invalid site identifier: ${getSafeIdentifier(identifier)}`
+            );
         }
 
         const cachedSite = this.sitesCache.get(identifier);
@@ -556,8 +563,10 @@ export class SiteManager {
         );
 
         if (!hasMonitorToRemove) {
+            const safeMonitorId = getSafeIdentifier(monitorId);
+            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
             throw new Error(
-                `Monitor ${monitorId} not found on site ${siteIdentifier}`
+                `Monitor ${safeMonitorId} not found on site ${safeSiteIdentifier}`
             );
         }
 
@@ -610,7 +619,9 @@ export class SiteManager {
         // Get original site before update for monitoring comparison
         const originalSite = this.sitesCache.get(identifier);
         if (!originalSite) {
-            throw new Error(`Site with identifier ${identifier} not found`);
+            throw new Error(
+                `Site with identifier ${getSafeIdentifier(identifier)} not found`
+            );
         }
         const sanitizedUpdates = safeObjectOmit(updates, ["identifier"]);
 
@@ -669,7 +680,7 @@ export class SiteManager {
         const refreshedSite = this.sitesCache.get(identifier);
         if (!refreshedSite) {
             throw new Error(
-                `Site with identifier ${identifier} not found in cache after refresh`
+                `Site with identifier ${getSafeIdentifier(identifier)} not found in cache after refresh`
             );
         }
 
