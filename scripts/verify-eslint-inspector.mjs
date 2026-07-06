@@ -14,6 +14,7 @@
 
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const rootDir = path.resolve("./");
 const docusaurusDir = path.join(rootDir, "docs", "docusaurus");
@@ -94,6 +95,8 @@ async function verifyConfigFile(filePath) {
 
 /**
  * Main verification function.
+ *
+ * @returns {Promise<boolean>} True when every verification passes.
  */
 async function verifyESLintInspectorDeployment() {
     console.log("🔍 Verifying ESLint Config Inspector deployment...\n");
@@ -216,13 +219,31 @@ async function verifyESLintInspectorDeployment() {
         console.log(
             "\n❌ Some verifications failed. Please address the issues above before deployment."
         );
-        process.exit(1);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Check whether this module is being run as the CLI entrypoint.
+ *
+ * @returns {boolean} True when invoked directly.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await verifyESLintInspectorDeployment()) ? 0 : 1;
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exitCode = 1;
     }
 }
 
-// Run verification if script is executed directly
-if (import.meta.url.startsWith("file://")) {
-    await verifyESLintInspectorDeployment();
-}
-
-export { verifyESLintInspectorDeployment };
+export { isDirectRun, verifyESLintInspectorDeployment };
