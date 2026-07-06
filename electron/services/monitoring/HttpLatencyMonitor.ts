@@ -4,7 +4,6 @@ import type { Monitor } from "@shared/types";
  */
 import type { Constructor } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { MonitorServiceConfig } from "./types";
@@ -81,20 +80,13 @@ type HttpLatencyMonitorConstructor = Constructor<
 >;
 
 const HttpLatencyMonitorBase: HttpLatencyMonitorConstructor =
-    ((): HttpLatencyMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createHttpMonitorService<
-                        "http-latency",
-                        { threshold: number }
-                    >(behavior),
-                "HttpLatencyMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+    buildMonitorFactory(
+        () =>
+            createHttpMonitorService<"http-latency", { threshold: number }>(
+                behavior
+            ),
+        "HttpLatencyMonitor"
+    );
 
 /**
  * HTTP latency monitor service driven by the shared HTTP core.

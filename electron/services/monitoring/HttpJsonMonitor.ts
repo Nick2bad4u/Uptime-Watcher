@@ -1,6 +1,4 @@
 import type { Constructor } from "type-fest";
-
-import { ensureError } from "@shared/utils/errorHandling";
 import { isDefined } from "ts-extras";
 
 import type {
@@ -107,21 +105,13 @@ type HttpJsonMonitorConstructor = Constructor<
     [config?: MonitorServiceConfig]
 >;
 
-const HttpJsonMonitorBase: HttpJsonMonitorConstructor =
-    ((): HttpJsonMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createHttpMonitorService<
-                        "http-json",
-                        HttpJsonMonitorValidationContext
-                    >(HTTP_JSON_MONITOR_BEHAVIOR),
-                "HttpJsonMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+const HttpJsonMonitorBase: HttpJsonMonitorConstructor = buildMonitorFactory(
+    () =>
+        createHttpMonitorService<"http-json", HttpJsonMonitorValidationContext>(
+            HTTP_JSON_MONITOR_BEHAVIOR
+        ),
+    "HttpJsonMonitor"
+);
 
 /**
  * Monitors a JSON response path against an expected stringified value.

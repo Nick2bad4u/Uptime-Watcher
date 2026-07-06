@@ -4,8 +4,6 @@
  */
 
 import type { Constructor } from "type-fest";
-
-import { ensureError } from "@shared/utils/errorHandling";
 import { determineMonitorStatus } from "@shared/utils/httpStatusUtils";
 
 import type { MonitorServiceConfig } from "./types";
@@ -42,16 +40,10 @@ type HttpMonitorConstructor = Constructor<
     [config?: MonitorServiceConfig]
 >;
 
-const HttpMonitorBase: HttpMonitorConstructor = ((): HttpMonitorConstructor => {
-    try {
-        return buildMonitorFactory(
-            () => createHttpMonitorService<"http", undefined>(behavior),
-            "HttpMonitor"
-        );
-    } catch (error) {
-        throw ensureError(error);
-    }
-})();
+const HttpMonitorBase: HttpMonitorConstructor = buildMonitorFactory(
+    () => createHttpMonitorService<"http", undefined>(behavior),
+    "HttpMonitor"
+);
 
 /**
  * HTTP monitor service that performs health checks via the shared core.

@@ -5,7 +5,6 @@
 import type { Monitor } from "@shared/types";
 import type { Constructor } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { isValidInteger } from "@shared/validation/validatorUtils";
 import { isInteger } from "ts-extras";
 
@@ -99,21 +98,13 @@ type HttpStatusMonitorConstructor = Constructor<
     [config?: MonitorServiceConfig]
 >;
 
-const HttpStatusMonitorBase: HttpStatusMonitorConstructor =
-    ((): HttpStatusMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createHttpMonitorService<
-                        "http-status",
-                        { expectedStatus: number }
-                    >(behavior),
-                "HttpStatusMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+const HttpStatusMonitorBase: HttpStatusMonitorConstructor = buildMonitorFactory(
+    () =>
+        createHttpMonitorService<"http-status", { expectedStatus: number }>(
+            behavior
+        ),
+    "HttpStatusMonitor"
+);
 
 /**
  * HTTP status monitor service that validates response codes via the shared

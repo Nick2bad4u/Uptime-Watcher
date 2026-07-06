@@ -1,6 +1,4 @@
 import type { Constructor } from "type-fest";
-
-import { ensureError } from "@shared/utils/errorHandling";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { objectEntries } from "ts-extras";
 
@@ -124,21 +122,14 @@ type HttpHeaderMonitorConstructor = Constructor<
     [config?: MonitorServiceConfig]
 >;
 
-const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor =
-    ((): HttpHeaderMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createHttpMonitorService<
-                        "http-header",
-                        HttpHeaderMonitorValidationContext
-                    >(HTTP_HEADER_MONITOR_BEHAVIOR),
-                "HttpHeaderMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+const HttpHeaderMonitorBase: HttpHeaderMonitorConstructor = buildMonitorFactory(
+    () =>
+        createHttpMonitorService<
+            "http-header",
+            HttpHeaderMonitorValidationContext
+        >(HTTP_HEADER_MONITOR_BEHAVIOR),
+    "HttpHeaderMonitor"
+);
 
 /**
  * Monitors an HTTP response header against an expected normalized value.

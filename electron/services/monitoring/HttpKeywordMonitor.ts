@@ -1,7 +1,5 @@
 import type { Constructor } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
-
 import type {
     HttpMonitorBehavior,
     HttpMonitorServiceInstance,
@@ -53,20 +51,14 @@ type HttpKeywordMonitorConstructor = Constructor<
 >;
 
 const HttpKeywordMonitorBase: HttpKeywordMonitorConstructor =
-    ((): HttpKeywordMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createHttpMonitorService<
-                        "http-keyword",
-                        HttpKeywordMonitorValidationContext
-                    >(HTTP_KEYWORD_MONITOR_BEHAVIOR),
-                "HttpKeywordMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+    buildMonitorFactory(
+        () =>
+            createHttpMonitorService<
+                "http-keyword",
+                HttpKeywordMonitorValidationContext
+            >(HTTP_KEYWORD_MONITOR_BEHAVIOR),
+        "HttpKeywordMonitor"
+    );
 
 /**
  * Monitors whether a configured keyword appears in an HTTP response body.

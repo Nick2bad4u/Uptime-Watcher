@@ -5,7 +5,6 @@ import type { Monitor } from "@shared/types";
  */
 import type { Constructor } from "type-fest";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { performance } from "node:perf_hooks";
 import { isDefined } from "ts-extras";
@@ -207,20 +206,14 @@ type ReplicationMonitorConstructor = Constructor<
 >;
 
 const ReplicationMonitorBase: ReplicationMonitorConstructor =
-    ((): ReplicationMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createRemoteMonitorService<
-                        "replication",
-                        ReplicationMonitorContext
-                    >(behavior),
-                "ReplicationMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+    buildMonitorFactory(
+        () =>
+            createRemoteMonitorService<
+                "replication",
+                ReplicationMonitorContext
+            >(behavior),
+        "ReplicationMonitor"
+    );
 
 /**
  * Replication monitor service built atop the shared remote monitor core.

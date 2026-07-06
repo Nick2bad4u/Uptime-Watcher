@@ -209,20 +209,14 @@ type ServerHeartbeatMonitorConstructor = Constructor<
 >;
 
 const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor =
-    ((): ServerHeartbeatMonitorConstructor => {
-        try {
-            return buildMonitorFactory(
-                () =>
-                    createRemoteMonitorService<
-                        "server-heartbeat",
-                        ServerHeartbeatContext
-                    >(behavior),
-                "ServerHeartbeatMonitor"
-            );
-        } catch (error) {
-            throw ensureError(error);
-        }
-    })();
+    buildMonitorFactory(
+        () =>
+            createRemoteMonitorService<
+                "server-heartbeat",
+                ServerHeartbeatContext
+            >(behavior),
+        "ServerHeartbeatMonitor"
+    );
 
 /**
  * Server heartbeat monitor service built atop the shared remote monitor core.
