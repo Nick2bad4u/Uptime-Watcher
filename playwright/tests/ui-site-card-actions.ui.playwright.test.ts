@@ -29,6 +29,33 @@ function resolveMetricsSummaryLocator(page: Page, site: CreatedSiteResult) {
         : page.getByText(/^Status:/).first();
 }
 
+async function dismissStatusAlerts(page: Page): Promise<void> {
+    const alertEntries = page.getByTestId(/status-alert-/);
+
+    for (let index = 0; index < 5; index += 1) {
+        const alertCount = await alertEntries.count();
+        if (alertCount === 0) {
+            return;
+        }
+
+        const alertEntry = alertEntries.first();
+        const alertId = await alertEntry.getAttribute("data-alert-id");
+        await alertEntry.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+        if (alertId) {
+            await expect(
+                page.getByTestId(`status-alert-${alertId}`)
+            ).toHaveCount(0, { timeout: WAIT_TIMEOUTS.MEDIUM });
+        } else {
+            await expect
+                .poll(async () => alertEntries.count(), {
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                })
+                .toBeLessThan(alertCount);
+        }
+    }
+}
+
 test.describe(
     "site card actions - modern ui",
     {
@@ -62,6 +89,7 @@ test.describe(
             await expect.soft(siteCardLocator).toBeVisible({
                 timeout: WAIT_TIMEOUTS.LONG,
             });
+            await dismissStatusAlerts(page);
         });
 
         test.afterEach(async () => {
