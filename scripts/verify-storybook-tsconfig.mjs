@@ -2,7 +2,7 @@
 // @ts-check
 import { readFile } from "node:fs/promises";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const PROJECT_ROOT = path.resolve(
     fileURLToPath(new URL("..", import.meta.url))
@@ -125,25 +125,38 @@ const main = async () => {
     console.log("Storybook tsconfig include globs verified.");
 };
 
-try {
-    await main();
-} catch (error) {
-    if (error instanceof Error) {
-        const message = error.message.trim();
-        const fallback = error.toString().trim();
-        const finalMessage = message || fallback;
+/**
+ * Check whether this module is being run as the CLI entrypoint.
+ *
+ * @returns {boolean} True when invoked directly.
+ */
+const isDirectRun = () =>
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
 
-        console.error(
-            finalMessage || "Unknown Storybook tsconfig verification error."
-        );
-        if (error.cause) {
-            console.error("Cause:", error.cause);
+if (isDirectRun()) {
+    try {
+        await main();
+    } catch (error) {
+        if (error instanceof Error) {
+            const message = error.message.trim();
+            const fallback = error.toString().trim();
+            const finalMessage = message || fallback;
+
+            console.error(
+                finalMessage || "Unknown Storybook tsconfig verification error."
+            );
+            if (error.cause) {
+                console.error("Cause:", error.cause);
+            }
+        } else {
+            const fallback = String(error).trim();
+            const finalMessage =
+                fallback || "Unknown Storybook tsconfig verification error.";
+            console.error(finalMessage);
         }
-    } else {
-        const fallback = String(error).trim();
-        const finalMessage =
-            fallback || "Unknown Storybook tsconfig verification error.";
-        console.error(finalMessage);
+        process.exitCode = 1;
     }
-    process.exitCode = 1;
 }
+
+export { isDirectRun, main };
