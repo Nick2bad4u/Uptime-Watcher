@@ -6,66 +6,13 @@ import { isPresent, setHas, stringSplit } from "ts-extras";
 import type { CloudObjectEntry } from "./CloudStorageProvider.types";
 
 import { logger } from "../../../utils/logger";
+import { mapWithConcurrency } from "../../../utils/boundedConcurrency";
 import {
     MAX_CLOUD_BACKUP_METADATA_FILE_BYTES,
     tryParseCloudBackupMetadataFileBuffer,
 } from "./CloudBackupMetadataFile";
 
 export const CLOUD_BACKUP_METADATA_READ_CONCURRENCY = 8;
-
-interface ResultSlot<T> {
-    readonly value: T;
-}
-
-function assertCompletedResults<T>(
-    results: (ResultSlot<T> | undefined)[]
-): asserts results is ResultSlot<T>[] {
-    if (results.some((result) => !isPresent(result))) {
-        throw new Error(
-            "cloudBackupListing: internal error (missing metadata result)"
-        );
-    }
-}
-
-async function mapWithBoundedConcurrency<T, R>(args: {
-    readonly concurrency: number;
-    readonly items: readonly T[];
-    readonly task: (item: T) => Promise<R>;
-}): Promise<R[]> {
-    const { concurrency, items, task } = args;
-
-    if (items.length === 0) {
-        return [];
-    }
-
-    const workerCount = Math.max(1, Math.min(concurrency, items.length));
-    const results = Array.from(
-        { length: items.length },
-        (): ResultSlot<R> | undefined => undefined
-    );
-    let nextIndex = 0;
-
-    const workers = Array.from({ length: workerCount }, async () => {
-        while (nextIndex < items.length) {
-            const currentIndex = nextIndex;
-            nextIndex += 1;
-
-            const item = items[currentIndex];
-            if (!isPresent(item)) {
-                throw new Error(
-                    "cloudBackupListing: internal error (missing metadata object)"
-                );
-            }
-
-            // eslint-disable-next-line no-await-in-loop -- Worker loop performs bounded provider IO.
-            results[currentIndex] = { value: await task(item) };
-        }
-    });
-
-    await Promise.all(workers);
-    assertCompletedResults(results);
-    return results.map((result) => result.value);
-}
 
 /**
  * Lists backups by discovering metadata objects and hydrating them.
@@ -90,7 +37,7 @@ export async function listBackupsFromMetadataObjects(args: {
         entry.key.endsWith(".metadata.json")
     );
 
-    const entries = await mapWithBoundedConcurrency({
+    const entries = await mapWithConcurrency({
         concurrency: CLOUD_BACKUP_METADATA_READ_CONCURRENCY,
         items: metadataObjects,
         task: async (metadataObject): Promise<CloudBackupEntry | null> => {
