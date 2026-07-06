@@ -188,6 +188,14 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
     const isTestMode = mode === "test";
     const isDev = mode === "development";
     const isBuild = command === "build";
+    const isCi =
+        getConfigEnvironmentVariable("CI") === "true" ||
+        getConfigEnvironmentVariable("GITHUB_ACTIONS") === "true";
+    const shouldUploadCodecovBundle =
+        isBuild &&
+        Boolean(codecovToken) &&
+        (isCi ||
+            getConfigEnvironmentVariable("CODECOV_BUNDLE_ANALYSIS") === "true");
     const wasmSourcePath = getWasmSourcePath();
 
     // `vite-plugin-static-copy` can optionally set up chokidar watchers (via its
@@ -203,8 +211,9 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
         base: "./", // Ensures relative asset paths for Electron
         build: {
             assetsDir: "assets",
-            // Increase chunk size warning limit to account for intentional larger vendor chunks
-            chunkSizeWarningLimit: 1000, // Increase from default 500KB to 1MB for vendor chunks
+            // Keep the default warning useful while allowing one intentionally
+            // larger renderer entry chunk after vendor code is split out.
+            chunkSizeWarningLimit: 1000,
             copyPublicDir: true, // Copy public assets to dist
             cssCodeSplit: true, // Enable CSS code splitting
             emptyOutDir: true, // Clean output before build
@@ -215,20 +224,34 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
             reportCompressedSize: true, // Report gzip/brotli sizes
             rolldownOptions: {
                 output: {
-                    // Manual chunk splitting to optimize bundle sizes and improve caching
-                    // manualChunks: {
-                    //     // React core ecosystem kept together to avoid empty single-module chunks
-                    //     "react-vendor": ["react", "react-dom"],
-                    //     // UI and icon libraries - separate chunk for visual components
-                    //     "ui-vendor": ["react-icons"],
-                    //     // Utility libraries - separate chunk for utilities and validation
-                    //     "utils-vendor": [
-                    //         "axios",
-                    //         "validator",
-                    //         "zod",
-                    //         "zustand",
-                    //     ],
-                    // },
+                    // Keep stable vendor groups on Rolldown's current
+                    // code-splitting API. This avoids deprecated manualChunks
+                    // and stops the Electron renderer from shipping as one
+                    // oversized cache-hostile application chunk.
+                    codeSplitting: {
+                        groups: [
+                            {
+                                name: "react-vendor",
+                                priority: 40,
+                                test: /[\\/]node_modules[\\/](?:react|react-dom)[\\/]/u,
+                            },
+                            {
+                                name: "charts-vendor",
+                                priority: 30,
+                                test: /[\\/]node_modules[\\/](?:chart\.js|chartjs-adapter-date-fns|chartjs-plugin-zoom|date-fns|react-chartjs-2)[\\/]/u,
+                            },
+                            {
+                                name: "ui-vendor",
+                                priority: 20,
+                                test: /[\\/]node_modules[\\/](?:react-icons)[\\/]/u,
+                            },
+                            {
+                                name: "runtime-vendor",
+                                priority: 10,
+                                test: /[\\/]node_modules[\\/](?:axios|fast-deep-equal|ts-extras|validator|zod|zustand)[\\/]/u,
+                            },
+                        ],
+                    },
                 },
             },
             sourcemap: true, // Recommended for Electron debugging
@@ -385,7 +408,7 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                             rolldownOptions: {
                                 output: {
                                     // Ensure preload scripts are not code-split for nodeIntegration: false compatibility
-                                    inlineDynamicImports: true,
+                                    codeSplitting: false,
                                     sourcemapExcludeSources: true,
                                 },
                             },
@@ -627,16 +650,16 @@ const viteConfig: UserConfigFnObject = ({ command, mode }) => {
                       }
                     : {}),
             }),
-            // Codecov bundle upload is build-only; exclude from `vite serve` to
-            // reduce memory usage and startup time.
-            ...(isBuild
+            // Codecov bundle upload is CI-only by default. A local shell may
+            // have CODECOV_TOKEN set, but local bundle uploads still cannot
+            // reliably resolve repository metadata and add noisy 404 warnings.
+            // Set CODECOV_BUNDLE_ANALYSIS=true for an explicit local upload.
+            ...(shouldUploadCodecovBundle && codecovToken
                 ? [
                       codecovVitePlugin({
                           bundleName: "uptime-watcher",
-                          enableBundleAnalysis: Boolean(codecovToken),
-                          ...(codecovToken
-                              ? { uploadToken: codecovToken }
-                              : {}),
+                          enableBundleAnalysis: true,
+                          uploadToken: codecovToken,
                           telemetry: false, // Disable telemetry for faster builds
                       }),
                   ]
