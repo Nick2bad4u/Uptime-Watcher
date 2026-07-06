@@ -7,6 +7,7 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
+import { applyDefaultIntervalsOperation } from "../../managers/monitorManager/applyDefaultIntervalsOperation";
 import { checkSiteManuallyOperation } from "../../managers/monitorManager/checkSiteManuallyOperation";
 import { setupIndividualNewMonitorsOperation } from "../../managers/monitorManager/setupIndividualNewMonitorsOperation";
 import { setupNewMonitorsOperation } from "../../managers/monitorManager/setupNewMonitorsOperation";
@@ -35,6 +36,64 @@ describe("monitorManager additional operations", () => {
         "https://monitor.example/check?token=monitor-token#private-monitor";
     const rawSiteIdentifier =
         "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+
+    describe(applyDefaultIntervalsOperation, () => {
+        it("redacts URL-shaped identifiers in default-interval diagnostics", async () => {
+            const debug = vi.fn();
+            const info = vi.fn();
+            const update = vi.fn();
+            const db = {};
+            const site = createTestSite(rawSiteIdentifier, {
+                monitors: [
+                    createTestMonitor(rawMonitorId, {
+                        checkInterval: 0,
+                    }),
+                ],
+            });
+
+            await applyDefaultIntervalsOperation({
+                defaultCheckIntervalMs: 60_000,
+                dependencies: {
+                    databaseService: {
+                        executeTransaction: vi.fn(async (callback) =>
+                            callback(db as never)
+                        ),
+                    } as never,
+                    logger: {
+                        debug,
+                        info,
+                    } as unknown as Logger,
+                    monitorRepository: {
+                        createTransactionAdapter: vi.fn(() => ({
+                            update,
+                        })),
+                    } as never,
+                    sitesCache: {
+                        set: vi.fn(),
+                    } as unknown as StandardizedCache<Site>,
+                },
+                shouldApplyDefaultInterval: vi.fn().mockReturnValue(true),
+                site,
+            });
+
+            expect(update).toHaveBeenCalledWith(rawMonitorId, {
+                checkInterval: 60_000,
+            });
+
+            const logPayload = JSON.stringify([
+                debug.mock.calls,
+                info.mock.calls,
+            ]);
+
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
+        });
+    });
 
     describe(setupIndividualNewMonitorsOperation, () => {
         it("applies the default interval and auto-starts monitors when site monitoring is enabled", async () => {
