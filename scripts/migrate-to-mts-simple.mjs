@@ -355,16 +355,3 @@ function isDirectInvocation() {
 if (isDirectInvocation()) {
     process.exitCode = main() ? 0 : 1;
 }
-
-export {
-    isDirectInvocation,
-    isLocalImport,
-    isRepositoryPath,
-    main,
-    migrateFile,
-    parseArgs,
-    processImports,
-    resolveCliFilePath,
-    showHelp,
-    updateImportPath,
-};
