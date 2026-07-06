@@ -33,7 +33,7 @@
                 if (monitor.url) console.log(`         URL: ${monitor.url}`);
                 if (monitor.host)
                     console.log(
-                        `         Host: ${monitor.host}${monitor.port ? ":" + monitor.port : ""}`
+                        `         Host: ${monitor.host}${monitor.port ? `:${monitor.port}` : ""}`
                     );
             });
             console.log("");

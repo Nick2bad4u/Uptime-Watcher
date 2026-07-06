@@ -79,7 +79,10 @@ function forcePushSubtree() {
         return splitResult.status ?? 1;
     }
 
-    const splitCommit = splitResult.stdout.trim();
+    const splitCommit =
+        typeof splitResult.stdout === "string"
+            ? splitResult.stdout.trim()
+            : splitResult.stdout.toString("utf8").trim();
     if (!/^[\da-f]{40}$/iu.test(splitCommit)) {
         console.error(
             `git subtree split returned an unexpected commit id: ${splitCommit}`

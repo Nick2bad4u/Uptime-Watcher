@@ -70,7 +70,9 @@ if (warmupFiles.length > 0) {
     Object.entries(categories).forEach(([category, files]) => {
         if (files.length > 0) {
             console.log(`  ${category} (${files.length} files):`);
-            files.forEach((file) => console.log(`    - ${file}`));
+            files.forEach((file) => {
+                console.log(`    - ${file}`);
+            });
         }
     });
 }

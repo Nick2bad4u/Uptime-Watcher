@@ -556,7 +556,9 @@ function displayMaintenanceReport(report) {
         console.log(
             `📅 Updated last_reviewed dates (${report.updatedFiles.length}):`
         );
-        report.updatedFiles.forEach((file) => console.log(`   - ${file}`));
+        report.updatedFiles.forEach((file) => {
+            console.log(`   - ${file}`);
+        });
         console.log();
     }
 
@@ -564,19 +566,25 @@ function displayMaintenanceReport(report) {
         console.log(
             `📋 Generated table of contents (${report.tocGenerated.length}):`
         );
-        report.tocGenerated.forEach((file) => console.log(`   - ${file}`));
+        report.tocGenerated.forEach((file) => {
+            console.log(`   - ${file}`);
+        });
         console.log();
     }
 
     if (report.linksFixed.length > 0) {
         console.log(`🔗 Fixed links (${report.linksFixed.length}):`);
-        report.linksFixed.forEach((file) => console.log(`   - ${file}`));
+        report.linksFixed.forEach((file) => {
+            console.log(`   - ${file}`);
+        });
         console.log();
     }
 
     if (report.warnings.length > 0) {
         console.log(`⚠️  Warnings (${report.warnings.length}):`);
-        report.warnings.forEach((warning) => console.log(`   - ${warning}`));
+        report.warnings.forEach((warning) => {
+            console.log(`   - ${warning}`);
+        });
         console.log();
     }
 

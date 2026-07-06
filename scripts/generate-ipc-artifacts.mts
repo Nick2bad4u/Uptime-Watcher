@@ -12,8 +12,8 @@ import type {
 import {
     Node,
     Project,
-    PropertyAssignment,
-    PropertySignature,
+    type PropertyAssignment,
+    type PropertySignature,
     SyntaxKind,
 } from "ts-morph";
 

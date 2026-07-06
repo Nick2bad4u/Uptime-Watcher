@@ -400,7 +400,7 @@ function showHelp() {
     try {
         /** @type {number} */
         const fd = process.stdout.fd;
-        fsSync.writeFileSync(fd, msg + "\n");
+        fsSync.writeFileSync(fd, `${msg}\n`);
     } catch {
         console.log(msg);
     }
@@ -607,7 +607,7 @@ function rewriteLinks(content, baseUrl, logger) {
 
             try {
                 /** @type {string} */
-                const absUrl = new URL(relPath, baseUrl + "/").toString();
+                const absUrl = new URL(relPath, `${baseUrl}/`).toString();
                 linkCount++;
                 return `(${absUrl})`;
             } catch (error) {
@@ -870,7 +870,7 @@ async function downloadFile(task, config, logger, _paths, previousHashes) {
             );
             if (attempt < config.maxRetries) {
                 /** @type {number} */
-                const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+                const delay = Math.min(1000 * 2 ** (attempt - 1), 10000);
                 logger.debug(`Retrying in ${delay}ms...`);
                 await new Promise((r) => setTimeout(r, delay));
             }
@@ -1006,7 +1006,9 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
     if (failed.length > 0) {
         logger.warn(`Failed downloads:`);
-        failed.forEach((f) => logger.warn(`  - ${f.page}: ${f.error}`));
+        failed.forEach((f) => {
+            logger.warn(`  - ${f.page}: ${f.error}`);
+        });
     }
 
     // Update hashes file

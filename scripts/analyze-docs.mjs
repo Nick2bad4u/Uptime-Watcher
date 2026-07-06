@@ -308,15 +308,17 @@ function displayReport(stats) {
         console.log(
             `   Missing frontmatter (${stats.missingFrontmatter.length}):`
         );
-        stats.missingFrontmatter.forEach((file) =>
-            console.log(`     - ${file}`)
-        );
+        stats.missingFrontmatter.forEach((file) => {
+            console.log(`     - ${file}`);
+        });
         console.log();
     }
 
     if (stats.outdatedDocs.length > 0) {
         console.log(`   Outdated docs (${stats.outdatedDocs.length}):`);
-        stats.outdatedDocs.forEach((file) => console.log(`     - ${file}`));
+        stats.outdatedDocs.forEach((file) => {
+            console.log(`     - ${file}`);
+        });
         console.log();
     }
 
@@ -324,7 +326,9 @@ function displayReport(stats) {
         console.log(
             `   Missing table of contents (${stats.missingTOC.length}):`
         );
-        stats.missingTOC.forEach((file) => console.log(`     - ${file}`));
+        stats.missingTOC.forEach((file) => {
+            console.log(`     - ${file}`);
+        });
         console.log();
     }
 
@@ -333,7 +337,9 @@ function displayReport(stats) {
         console.log(`   Broken internal links:`);
         Object.entries(stats.brokenLinks).forEach(([file, links]) => {
             console.log(`     ${file}:`);
-            links.forEach((link) => console.log(`       - ${link}`));
+            links.forEach((link) => {
+                console.log(`       - ${link}`);
+            });
         });
         console.log();
     }
