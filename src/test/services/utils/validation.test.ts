@@ -112,6 +112,64 @@ describe(validateServicePayload, () => {
         }
     });
 
+    it("redacts secrets from invalid payload issue messages", () => {
+        const validator = (_value: unknown) => ({
+            success: false as const,
+            error: {
+                issues: [
+                    {
+                        path: ["token"],
+                        message:
+                            "request failed access_token=SUPER_SECRET refresh_token: OTHER_SECRET",
+                    },
+                ],
+            },
+        });
+
+        try {
+            validateServicePayload(validator, "x", {
+                serviceName: "TestService",
+                operation: "invalid",
+            });
+            throw new Error("Expected validateServicePayload to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(Error);
+
+            const thrown = error as Error & { details?: UnknownRecord };
+            const issues = String(thrown.details?.["issues"]);
+            expect(thrown.message).toContain("access_token=[redacted]");
+            expect(thrown.message).toContain("refresh_token: [redacted]");
+            expect(thrown.message).not.toContain("SUPER_SECRET");
+            expect(thrown.message).not.toContain("OTHER_SECRET");
+            expect(issues).not.toContain("SUPER_SECRET");
+            expect(issues).not.toContain("OTHER_SECRET");
+        }
+    });
+
+    it("redacts secrets from fallback validation error messages", () => {
+        const validator = (_value: unknown) => ({
+            success: false as const,
+            error: new Error("fallback token=SUPER_SECRET"),
+        });
+
+        try {
+            validateServicePayload(validator, "x", {
+                serviceName: "TestService",
+                operation: "invalid",
+            });
+            throw new Error("Expected validateServicePayload to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(Error);
+
+            const thrown = error as Error & { details?: UnknownRecord };
+            expect(thrown.message).toContain("token=[redacted]");
+            expect(thrown.message).not.toContain("SUPER_SECRET");
+            expect(thrown.details?.["issues"]).toBe(
+                "fallback token=[redacted]"
+            );
+        }
+    });
+
     it("does not invoke accessor-backed validation issue arrays", () => {
         let getterCalls = 0;
         const validationError = {

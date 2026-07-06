@@ -52,6 +52,18 @@ const isZodIssuePathPart = (value: unknown): value is ZodIssuePathPart => {
     );
 };
 
+const normalizeValidationMessage = (value: string): string => {
+    const normalized = normalizeLogValue(value);
+    return typeof normalized === "string" ? normalized : value;
+};
+
+const normalizeValidationMessageOrUndefined = (
+    value: string
+): string | undefined => {
+    const trimmed = normalizeValidationMessage(value).trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+};
+
 const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
     const normalized: ZodIssueLike[] = [];
 
@@ -63,6 +75,7 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
         const rawMessage = getOwnStringDataProperty(issue, "message");
 
         if (rawMessage) {
+            const message = normalizeValidationMessage(rawMessage);
             const rawPath = getOwnDataProperty(issue, "path");
             const path =
                 rawPath.found &&
@@ -72,9 +85,9 @@ const normalizeZodIssueLikeArray = (issues: unknown[]): ZodIssueLike[] => {
                     : undefined;
 
             if (path) {
-                normalized.push({ message: rawMessage, path });
+                normalized.push({ message, path });
             } else {
-                normalized.push({ message: rawMessage });
+                normalized.push({ message });
             }
         }
     }
@@ -174,23 +187,20 @@ const describeValidationFailureReason = (
     cause: unknown
 ): string | undefined => {
     if (typeof cause === "string") {
-        const trimmed = cause.trim();
-        return trimmed.length > 0 ? trimmed : undefined;
+        return normalizeValidationMessageOrUndefined(cause);
     }
 
     if (Error.isError(cause)) {
         const message = getOwnStringDataProperty(cause, "message");
         if (message) {
-            const trimmed = message.trim();
-            return trimmed.length > 0 ? trimmed : undefined;
+            return normalizeValidationMessageOrUndefined(message);
         }
     }
 
     if (isObject(cause)) {
         const messageCandidate = getOwnStringDataProperty(cause, "message");
         if (messageCandidate) {
-            const trimmed = messageCandidate.trim();
-            return trimmed.length > 0 ? trimmed : undefined;
+            return normalizeValidationMessageOrUndefined(messageCandidate);
         }
     }
 
