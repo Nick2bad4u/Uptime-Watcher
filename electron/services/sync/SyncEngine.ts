@@ -28,7 +28,6 @@ import { validateSiteData } from "@shared/validation/siteSchemas";
 import { randomUUID } from "node:crypto";
 import {
     isDefined,
-    isFinite as isFiniteNumber,
     isSafeInteger,
     objectEntries,
     objectHasOwn,
@@ -57,6 +56,7 @@ import {
     stringifyBaseline,
 } from "./syncEngineState";
 import {
+    isAsciiDigits,
     isValidPersistedDeviceId,
     mapWithConcurrency,
 } from "./syncEngineUtils";
@@ -596,8 +596,13 @@ export class SyncEngine {
 
     private async getNextOpId(): Promise<number> {
         const raw = await this.settings.get(SETTINGS_KEY_NEXT_OP_ID);
-        const value = raw ? Number(raw) : 0;
-        return isFiniteNumber(value) && value >= 0 ? value : 0;
+        const normalized = raw?.trim();
+        if (!normalized || !isAsciiDigits(normalized)) {
+            return 0;
+        }
+
+        const value = Number.parseInt(normalized, 10);
+        return isSafeInteger(value) ? value : 0;
     }
 
     private async getBaseline(): Promise<CloudSyncBaseline> {

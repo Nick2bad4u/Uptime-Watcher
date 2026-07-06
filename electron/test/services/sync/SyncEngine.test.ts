@@ -96,6 +96,7 @@ interface SyncEnginePrivateAccess {
         localSites: Site[];
         state: CloudSyncState;
     }) => CloudSyncState;
+    getNextOpId: () => Promise<number>;
 }
 
 function createMonitor(args: {
@@ -1061,6 +1062,27 @@ describe("SyncEngine (ADR-016)", () => {
             );
         } finally {
             await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
+    it("rejects non-decimal persisted nextOpId values", async () => {
+        const settings = new InMemorySettingsAdapter();
+        const engine = new SyncEngine({
+            orchestrator: new InMemoryOrchestrator([]),
+            settings,
+        }) as unknown as SyncEnginePrivateAccess;
+
+        await settings.set("cloud.sync.nextOpId", "42");
+        await expect(engine.getNextOpId()).resolves.toBe(42);
+
+        for (const value of [
+            "1e3",
+            "0x10",
+            "1.5",
+            "-1",
+        ]) {
+            await settings.set("cloud.sync.nextOpId", value);
+            await expect(engine.getNextOpId()).resolves.toBe(0);
         }
     });
 
