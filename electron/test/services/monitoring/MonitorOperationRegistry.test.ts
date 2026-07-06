@@ -90,6 +90,33 @@ describe(MonitorOperationRegistry, () => {
             expect(operation?.initiatedAt).toBeInstanceOf(Date);
         });
 
+        it("redacts URL-shaped monitor identifiers in initiation logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Logging", "type");
+
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
+
+            const result = registry.initiateCheck(rawMonitorId);
+
+            expect(registry.getOperation(result.operationId)?.monitorId).toBe(
+                rawMonitorId
+            );
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.debug).mock.calls
+            );
+
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        });
+
         it("should generate unique operation IDs for multiple operations", async ({
             task,
             annotate,

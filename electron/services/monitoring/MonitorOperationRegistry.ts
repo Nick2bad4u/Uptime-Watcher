@@ -15,10 +15,14 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { randomUUID } from "node:crypto";
 
 import { monitorLogger as logger } from "../../utils/logger";
 import { mergeAbortSignals } from "./shared/abortSignalUtils";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Interface for monitor check operations.
@@ -141,10 +145,11 @@ export class MonitorOperationRegistry {
         }
 
         if (cancelledCount > 0) {
+            const safeMonitorId = getSafeIdentifier(monitorId);
             logger.debug(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.debug.OPERATION_CANCELLED,
-                    { count: cancelledCount, monitorId }
+                    { count: cancelledCount, monitorId: safeMonitorId }
                 )
             );
         }
@@ -167,7 +172,7 @@ export class MonitorOperationRegistry {
                 interpolateLogTemplate(
                     LOG_TEMPLATES.debug.OPERATION_COMPLETED,
                     {
-                        monitorId: operation.monitorId,
+                        monitorId: getSafeIdentifier(operation.monitorId),
                         operationId,
                     }
                 )
@@ -259,8 +264,9 @@ export class MonitorOperationRegistry {
         };
 
         this.activeOperations.set(operationId, operation);
+        const safeMonitorId = getSafeIdentifier(monitorId);
         logger.debug(
-            `Initiated operation ${operationId} for monitor ${monitorId}`
+            `Initiated operation ${operationId} for monitor ${safeMonitorId}`
         );
 
         return { operationId, signal };
