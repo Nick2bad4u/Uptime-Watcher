@@ -1,26 +1,27 @@
 ---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
-doc_title: "Documentation Style Guide"
-summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
+doc_title: "Docusaurus Remote Backup Setup"
+summary: "How to configure and use the Docusaurus subtree backup remote for the standalone documentation repository."
 created: "2025-11-23"
 last_reviewed: "2025-12-16"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
- - "uptime-watcher"
- - "documentation"
- - "docusaurus"
- - "markdown"
+- "uptime-watcher"
+- "documentation"
+- "docusaurus"
+- "backup"
 topics:
- - "documentation"
+- "documentation"
+- "deployment"
 ---
 
-# Git Subtree Setup Instructions
+# Docusaurus Remote Backup Setup
 
 ## What's been done
 
 1. ✅ Updated `docs/docusaurus/package.json` to point to the correct repository URL: `https://github.com/Nick2bad4u/Uptime-Watcher-Docusaurus.git`
-2. ✅ Your root `package.json` already has the git subtree commands configured:
+2. ✅ Your root `package.json` has cross-platform git subtree backup commands configured:
    - `npm run docs:backup` - Push docs/docusaurus to the separate repository
    - `npm run docs:backup:force` - Force push (use with caution)
 
@@ -62,7 +63,8 @@ npm run docs:backup
 
 ## How it works
 
-- The `docs:backup` command uses `git subtree push` to push only the `docs/docusaurus` folder to the separate repository
+- The `docs:backup` command uses `scripts/push-docusaurus-subtree.mjs` to run `git subtree push` for only the `docs/docusaurus` folder
+- The `docs:backup:force` command uses the same helper to split the subtree and force-push the resulting commit without shell-specific command substitution
 - This keeps your documentation in sync with a standalone repository that can be deployed independently
 - The main repository stays clean and the docs can have their own deployment pipeline
 
