@@ -16,6 +16,7 @@
  * @tags ["test", "monitoring", "port", "error-handling"]
  */
 
+import { createAbortError } from "@shared/utils/abortError";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PortCheckErrorResult } from "../../../../services/monitoring/utils/portErrorHandling";
@@ -366,6 +367,29 @@ describe("Port Error Handling", () => {
         });
 
         describe("Standard Error input", () => {
+            it("should normalize abort errors as request cancellation", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: portErrorHandling", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = handlePortCheckError(
+                    createAbortError(),
+                    "localhost",
+                    3000
+                );
+
+                expect(result).toEqual({
+                    details: "3000",
+                    error: "Request canceled",
+                    responseTime: 0,
+                    status: "down",
+                });
+            });
+
             it("should handle standard Error with -1 response time", async ({
                 task,
                 annotate,

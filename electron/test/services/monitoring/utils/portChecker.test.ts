@@ -228,6 +228,46 @@ describe(performSinglePortCheck, () => {
     });
 
     describe("Failed port checks", () => {
+        it("should reject without probing when signal is already aborted", async () => {
+            const abortController = new AbortController();
+            abortController.abort("stop");
+
+            await expect(
+                performSinglePortCheck(
+                    "aborted.example.com",
+                    80,
+                    1000,
+                    abortController.signal
+                )
+            ).rejects.toMatchObject({
+                name: "AbortError",
+            });
+            expect(isPortReachable).not.toHaveBeenCalled();
+        });
+
+        it("should reject when signal aborts during the port check", async () => {
+            const abortController = new AbortController();
+            vi.mocked(isPortReachable).mockReturnValue(
+                new Promise(() => undefined)
+            );
+
+            const resultPromise = performSinglePortCheck(
+                "pending.example.com",
+                443,
+                5000,
+                abortController.signal
+            );
+            abortController.abort("stop");
+
+            await expect(resultPromise).rejects.toMatchObject({
+                name: "AbortError",
+            });
+            expect(isPortReachable).toHaveBeenCalledWith(443, {
+                host: "pending.example.com",
+                timeout: 5000,
+            });
+        });
+
         it("should throw PortCheckError when port is not reachable", async ({
             task,
             annotate,

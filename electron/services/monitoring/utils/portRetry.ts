@@ -108,13 +108,16 @@ export async function performPortCheckWithRetry(
               }
             : baseConfig;
 
-        return await withOperationalHooks(
-            () => performSinglePortCheck(host, port, timeout),
-            {
-                ...config,
-                ...(signal && { signal }),
-            }
-        );
+        const performCheck = signal
+            ? (): Promise<MonitorCheckResult> =>
+                  performSinglePortCheck(host, port, timeout, signal)
+            : (): Promise<MonitorCheckResult> =>
+                  performSinglePortCheck(host, port, timeout);
+
+        return await withOperationalHooks(performCheck, {
+            ...config,
+            ...(signal && { signal }),
+        });
     } catch (error) {
         // Standardize error result for frontend consumption
         return handlePortCheckError(error, host, port);

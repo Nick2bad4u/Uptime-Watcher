@@ -196,6 +196,39 @@ describe(performPortCheckWithRetry, () => {
                 timeout
             );
         });
+
+        it("should forward AbortSignal to operational hooks and port checks", async () => {
+            const host = "abortable.host";
+            const port = 443;
+            const timeout = 2000;
+            const abortController = new AbortController();
+
+            await performPortCheckWithRetry(
+                host,
+                port,
+                timeout,
+                1,
+                abortController.signal
+            );
+
+            expect(withOperationalHooks).toHaveBeenCalledWith(
+                expect.any(Function),
+                expect.objectContaining({
+                    signal: abortController.signal,
+                })
+            );
+
+            const hookFunction =
+                vi.mocked(withOperationalHooks).mock.calls[0]![0];
+            await hookFunction();
+
+            expect(performSinglePortCheck).toHaveBeenCalledWith(
+                host,
+                port,
+                timeout,
+                abortController.signal
+            );
+        });
     });
 
     describe("Development mode behavior", () => {
