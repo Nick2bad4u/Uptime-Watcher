@@ -6,6 +6,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { isDefined } from "ts-extras";
 
@@ -13,18 +14,7 @@ import type { SitesTelemetryPayload } from "./operationHelpers";
 
 export const safeTextForTelemetry = (
     value: string | undefined
-): string | undefined => {
-    const trimmed = value?.trim();
-    if (!trimmed) {
-        return undefined;
-    }
-
-    if (URL.canParse(trimmed)) {
-        return getSafeUrlForLogging(trimmed);
-    }
-
-    return trimmed;
-};
+): string | undefined => getSafeIdentifierForLogging(value);
 
 export const safeMonitorUrlForTelemetry = (
     url: Monitor["url"] | undefined

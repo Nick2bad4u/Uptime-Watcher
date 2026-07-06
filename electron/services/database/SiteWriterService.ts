@@ -15,6 +15,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Promisable } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { safeObjectOmit } from "@shared/utils/objectSafety";
 import {
     isDefined,
@@ -240,9 +241,13 @@ export class SiteWriterService {
         sitesCache: StandardizedCache<Site>,
         identifier: string
     ): Promise<boolean> {
+        const safeIdentifier = getSafeIdentifierForLogging(identifier);
+
         return withDatabaseOperation(
             async () => {
-                this.logger.info("Removing site", { identifier });
+                this.logger.info("Removing site", {
+                    identifier: safeIdentifier,
+                });
 
                 // Use executeTransaction for atomic multi-table deletion and capture result
                 const deletionResult = await this.withSiteMonitorTransaction(
@@ -264,22 +269,22 @@ export class SiteWriterService {
                     this.logger.info(
                         "Site removed successfully from database",
                         {
-                            identifier,
+                            identifier: safeIdentifier,
                         }
                     );
                     this.logger.debug("Monitors removed for site", {
-                        identifier,
+                        identifier: safeIdentifier,
                         monitorCount: deletionResult.monitorCount,
                     });
                 } else {
                     this.logger.warn("Site not found in database for removal", {
-                        identifier,
+                        identifier: safeIdentifier,
                     });
                 }
 
                 if (isRemoved) {
                     this.logger.debug("Site removed from cache", {
-                        identifier,
+                        identifier: safeIdentifier,
                     });
                 }
 
@@ -288,7 +293,7 @@ export class SiteWriterService {
             },
             "site-writer-delete",
             undefined,
-            { identifier }
+            { identifier: safeIdentifier }
         );
     }
 
@@ -471,6 +476,8 @@ export class SiteWriterService {
         identifier: string,
         updates: Partial<Site>
     ): Promise<Site> {
+        const safeIdentifier = getSafeIdentifierForLogging(identifier);
+
         return withDatabaseOperation(
             async () => {
                 // Validate input
@@ -514,12 +521,14 @@ export class SiteWriterService {
                 // Update cache only after successful transaction
                 sitesCache.set(identifier, updatedSite);
 
-                this.logger.info("Site updated successfully", { identifier });
+                this.logger.info("Site updated successfully", {
+                    identifier: safeIdentifier,
+                });
                 return updatedSite;
             },
             "site-writer-update",
             undefined,
-            { identifier }
+            { identifier: safeIdentifier }
         );
     }
 

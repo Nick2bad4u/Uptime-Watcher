@@ -12,7 +12,7 @@ import {
     type CacheInvalidatedEventData,
 } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 
 import { EventsService } from "../services/EventsService";
 import { logger } from "../services/logger";
@@ -43,18 +43,7 @@ const SITE_UPDATE_DEBOUNCE_MS = 200;
 
 const safeIdentifierForLogging = (
     identifier: string | undefined
-): string | undefined => {
-    if (identifier === undefined) {
-        return undefined;
-    }
-
-    const trimmed = identifier.trim();
-    if (!trimmed) {
-        return identifier;
-    }
-
-    return URL.canParse(trimmed) ? getSafeUrlForLogging(trimmed) : identifier;
-};
+): string | undefined => getSafeIdentifierForLogging(identifier);
 
 const buildCacheInvalidationLogMetadata = (
     data: CacheInvalidatedEventData

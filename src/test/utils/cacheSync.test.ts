@@ -19,7 +19,7 @@ import {
     type CacheInvalidatedEventData,
 } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { arrayAt, objectAssign, safeCastTo } from "ts-extras";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -313,18 +313,7 @@ const flushAsyncOperations = async (): Promise<void> => {
 
 const safeIdentifierForLogExpectation = (
     identifier: string | undefined
-): string | undefined => {
-    if (identifier === undefined) {
-        return undefined;
-    }
-
-    const trimmed = identifier.trim();
-    if (!trimmed) {
-        return identifier;
-    }
-
-    return URL.canParse(trimmed) ? getSafeUrlForLogging(trimmed) : identifier;
-};
+): string | undefined => getSafeIdentifierForLogging(identifier);
 
 const buildCacheInvalidationLogExpectation = (
     event: CacheInvalidatedEventData
