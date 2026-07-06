@@ -14,7 +14,10 @@ import type { Promisable, UnknownArray, UnknownRecord } from "type-fest";
 
 import { IPC_INVOKE_CHANNEL_PARAM_COUNTS } from "@shared/types/ipc";
 import { ensureError } from "@shared/utils/errorHandling";
-import { withLogContext } from "@shared/utils/loggingContext";
+import {
+    normalizeLogValue,
+    withLogContext,
+} from "@shared/utils/loggingContext";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -161,6 +164,16 @@ function assertChannelParams(
     }
 }
 
+function normalizeIpcResponseMetadata(metadata: UnknownRecord): UnknownRecord {
+    const normalized = normalizeLogValue(metadata);
+
+    return typeof normalized === "object" &&
+        normalized !== null &&
+        !Array.isArray(normalized)
+        ? castUnchecked<UnknownRecord>(normalized)
+        : metadata;
+}
+
 /**
  * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}
  * containing exactly the view's bytes.
@@ -208,7 +221,7 @@ export function createErrorResponse(
     };
 
     if (isDefined(metadata)) {
-        response.metadata = metadata;
+        response.metadata = normalizeIpcResponseMetadata(metadata);
     }
 
     return response;

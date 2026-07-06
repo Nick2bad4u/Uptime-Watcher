@@ -968,6 +968,36 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 });
             });
 
+            it("should redact secret values in error response metadata", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Security", "type");
+
+                const result = createErrorResponse("Error with metadata", {
+                    nested: {
+                        callback:
+                            "https://example.com/callback?access_token=SUPER_SECRET",
+                    },
+                    refreshToken: "REFRESH_SECRET",
+                    validationErrors: [
+                        "refresh_token=VERY_SECRET_REFRESH_TOKEN failed",
+                    ],
+                });
+
+                expect(result.metadata).toEqual({
+                    nested: {
+                        callback:
+                            "https://example.com/callback?access_token=[redacted]",
+                    },
+                    refreshToken: "[redacted]",
+                    validationErrors: ["refresh_token=[redacted]"],
+                });
+            });
+
             it("should create error response with undefined metadata", async ({
                 task,
                 annotate,
