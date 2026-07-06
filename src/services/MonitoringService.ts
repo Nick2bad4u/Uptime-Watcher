@@ -51,7 +51,10 @@ import { isDefined } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
-import { validateServicePayload } from "./utils/validation";
+import {
+    parseServiceBooleanResponse,
+    validateServicePayload,
+} from "./utils/validation";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
@@ -148,27 +151,6 @@ const logInvalidStatusUpdateAndThrow = (
             serviceName: "MonitoringService",
         },
         message: `[MonitoringService] checkSiteNow returned an invalid status update for monitor ${resolvedMonitorId} of site ${resolvedSiteIdentifier}`,
-    });
-};
-
-const parseBooleanResponse = (
-    operation: string,
-    value: unknown,
-    details: UnknownRecord
-): boolean => {
-    if (typeof value === "boolean") {
-        return value;
-    }
-
-    throw new ApplicationError({
-        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
-        details: {
-            ...details,
-            operation,
-            receivedType: typeof value,
-            serviceName: "MonitoringService",
-        },
-        message: `[MonitoringService] ${operation} returned invalid boolean response`,
     });
 };
 
@@ -398,15 +380,18 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const isSuccess = parseBooleanResponse(
+            const isSuccess = parseServiceBooleanResponse(
                 "startMonitoringForMonitor",
                 await api.monitoring.startMonitoringForMonitor(
                     siteIdentifier,
                     monitorId
                 ),
                 {
-                    monitorId,
-                    siteIdentifier,
+                    details: {
+                        monitorId,
+                        siteIdentifier,
+                    },
+                    serviceName: "MonitoringService",
                 }
             );
 
@@ -437,11 +422,14 @@ export const MonitoringService: MonitoringServiceContract = {
     startMonitoringForSite: wrap(
         "startMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
-            const isSuccess = parseBooleanResponse(
+            const isSuccess = parseServiceBooleanResponse(
                 "startMonitoringForSite",
                 await api.monitoring.startMonitoringForSite(siteIdentifier),
                 {
-                    siteIdentifier,
+                    details: {
+                        siteIdentifier,
+                    },
+                    serviceName: "MonitoringService",
                 }
             );
 
@@ -537,15 +525,18 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const isSuccess = parseBooleanResponse(
+            const isSuccess = parseServiceBooleanResponse(
                 "stopMonitoringForMonitor",
                 await api.monitoring.stopMonitoringForMonitor(
                     siteIdentifier,
                     monitorId
                 ),
                 {
-                    monitorId,
-                    siteIdentifier,
+                    details: {
+                        monitorId,
+                        siteIdentifier,
+                    },
+                    serviceName: "MonitoringService",
                 }
             );
 
@@ -576,11 +567,14 @@ export const MonitoringService: MonitoringServiceContract = {
     stopMonitoringForSite: wrap(
         "stopMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
-            const isSuccess = parseBooleanResponse(
+            const isSuccess = parseServiceBooleanResponse(
                 "stopMonitoringForSite",
                 await api.monitoring.stopMonitoringForSite(siteIdentifier),
                 {
-                    siteIdentifier,
+                    details: {
+                        siteIdentifier,
+                    },
+                    serviceName: "MonitoringService",
                 }
             );
 

@@ -20,6 +20,7 @@ import { arrayFirst, arrayJoin, isEmpty, isSafeInteger } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { parseServiceBooleanResponse } from "./utils/validation";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
@@ -86,27 +87,6 @@ const parseDeletedSiteCount = (value: unknown): number => {
             serviceName: "SiteService",
         },
         message: "[SiteService] deleteAllSites returned invalid deletion count",
-    });
-};
-
-const parseBooleanResponse = (
-    operation: string,
-    value: unknown,
-    details: UnknownRecord
-): boolean => {
-    if (typeof value === "boolean") {
-        return value;
-    }
-
-    throw new ApplicationError({
-        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
-        details: {
-            ...details,
-            operation,
-            receivedType: typeof value,
-            serviceName: "SiteService",
-        },
-        message: `[SiteService] ${operation} returned invalid boolean response`,
     });
 };
 
@@ -333,10 +313,10 @@ export const SiteService: SiteServiceContract = {
      *   fails.
      */
     removeSite: wrap("removeSite", async (api, identifier: string) => {
-        const isRemoved = parseBooleanResponse(
+        const isRemoved = parseServiceBooleanResponse(
             "removeSite",
             await api.sites.removeSite(identifier),
-            { identifier }
+            { details: { identifier }, serviceName: "SiteService" }
         );
 
         if (!isRemoved) {

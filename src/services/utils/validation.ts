@@ -288,3 +288,38 @@ export function validateServicePayload<T>(
 
     return parsed.data;
 }
+
+/**
+ * Validates a renderer service response that should be a boolean.
+ *
+ * @param operation - Logical operation name used in diagnostics.
+ * @param value - Raw value returned by the preload bridge.
+ * @param context - Service-specific diagnostics.
+ *
+ * @returns The boolean value when valid.
+ *
+ * @throws {@link ApplicationError} When the response is not a boolean.
+ */
+export function parseServiceBooleanResponse(
+    operation: string,
+    value: unknown,
+    context: {
+        readonly details?: UnknownRecord;
+        readonly serviceName: string;
+    }
+): boolean {
+    if (typeof value === "boolean") {
+        return value;
+    }
+
+    throw new ApplicationError({
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            ...context.details,
+            operation,
+            receivedType: typeof value,
+            serviceName: context.serviceName,
+        },
+        message: `[${context.serviceName}] ${operation} returned invalid boolean response`,
+    });
+}
