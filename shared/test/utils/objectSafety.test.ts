@@ -571,6 +571,38 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             expect(getterCalls).toBe(0);
         });
 
+        it("defines own enumerable data properties without invoking accessors", () => {
+            let getterCalls = 0;
+            const source: Record<PropertyKey, unknown> = {
+                stable: "value",
+            };
+            const target: Record<PropertyKey, unknown> = {};
+
+            Object.defineProperty(source, "computed", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    return "SECRET";
+                },
+            });
+            Object.defineProperty(source, "__proto__", {
+                enumerable: true,
+                value: "pollution-safe",
+            });
+
+            objectSafetyModule.defineOwnEnumerableDataProperties(
+                target,
+                source
+            );
+
+            expect(target["stable"]).toBe("value");
+            expect(Object.hasOwn(target, "computed")).toBeFalsy();
+            expect(Object.hasOwn(target, "__proto__")).toBeTruthy();
+            expect(Reflect.get(target, "__proto__")).toBe("pollution-safe");
+            expect(Object.hasOwn({}, "__proto__")).toBeFalsy();
+            expect(getterCalls).toBe(0);
+        });
+
         it("does not invoke accessors during safeObjectOmit", () => {
             let getterCalls = 0;
             const input = {

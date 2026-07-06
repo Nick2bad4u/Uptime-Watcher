@@ -58,6 +58,29 @@ function getOwnEnumerableDataEntries(obj: object): [PropertyKey, unknown][] {
 }
 
 /**
+ * Defines enumerable own data properties from a source object onto a target.
+ *
+ * @remarks
+ * Accessor properties are intentionally skipped so copying does not invoke
+ * user-defined getters. Properties are defined with standard writable,
+ * enumerable, and configurable descriptors so special keys such as `__proto__`
+ * remain own data properties instead of mutating prototypes.
+ */
+export function defineOwnEnumerableDataProperties(
+    target: object,
+    source: object
+): void {
+    for (const [key, value] of getOwnEnumerableDataEntries(source)) {
+        Object.defineProperty(target, key, {
+            configurable: true,
+            enumerable: true,
+            value,
+            writable: true,
+        });
+    }
+}
+
+/**
  * Creates a frozen shallow copy of own enumerable data properties.
  *
  * @remarks
@@ -72,15 +95,7 @@ export function freezeOwnEnumerableDataProperties(
     obj: object
 ): Readonly<UnknownRecord> {
     const result: UnknownRecord = {};
-
-    for (const [key, value] of getOwnEnumerableDataEntries(obj)) {
-        Object.defineProperty(result, key, {
-            configurable: true,
-            enumerable: true,
-            value,
-            writable: true,
-        });
-    }
+    defineOwnEnumerableDataProperties(result, obj);
 
     return Object.freeze(result);
 }

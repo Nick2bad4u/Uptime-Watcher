@@ -20,7 +20,10 @@ import {
 } from "@shared/utils/logTemplates";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
-import { safeObjectOmit } from "@shared/utils/objectSafety";
+import {
+    defineOwnEnumerableDataProperties,
+    safeObjectOmit,
+} from "@shared/utils/objectSafety";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
@@ -66,25 +69,6 @@ const RESERVED_HTTP_MONITOR_CONFIG_UPDATE_KEYS = [
     "constructor",
     "prototype",
 ] as const;
-
-function applyOwnConfigData(
-    target: MonitorServiceConfig,
-    source: object
-): void {
-    for (const key of Reflect.ownKeys(source)) {
-        const descriptor = Object.getOwnPropertyDescriptor(source, key);
-        if (!descriptor?.enumerable || !("value" in descriptor)) {
-            continue;
-        }
-
-        Object.defineProperty(target, key, {
-            configurable: true,
-            enumerable: true,
-            value: descriptor.value as unknown,
-            writable: true,
-        });
-    }
-}
 
 declare module "axios" {
     interface AxiosError {
@@ -457,7 +441,7 @@ export function createHttpMonitorService<
                 }
             }
 
-            applyOwnConfigData(nextConfig, remaining);
+            defineOwnEnumerableDataProperties(nextConfig, remaining);
 
             this.config = nextConfig;
 
