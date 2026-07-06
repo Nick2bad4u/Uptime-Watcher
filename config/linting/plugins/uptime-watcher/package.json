@@ -57,9 +57,7 @@
         "test:watch": "cd ../../../../ && vitest --config vitest.linting.config.ts"
     },
     "dependencies": {
-        "eslint": "^10.3.0",
-        "ts-extras": "^1.0.0",
-        "type-fest": "^5.6.0"
+        "eslint": "^10.3.0"
     },
     "devDependencies": {
         "@typescript-eslint/parser": "^8.59.1",
