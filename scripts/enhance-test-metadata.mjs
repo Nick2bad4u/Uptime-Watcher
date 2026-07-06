@@ -31,30 +31,108 @@ const __dirname = import.meta.dirname;
 function getArgValue(longName, shortName) {
     const args = process.argv.slice(2);
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === longName || (shortName && args[i] === shortName)) {
+        const { inlineValue, option } = splitOptionValue(args[i] ?? "");
+        if (option === longName || (shortName && option === shortName)) {
+            if (inlineValue !== undefined) {
+                return inlineValue;
+            }
+
             return args[i + 1] || null;
         }
     }
     return null;
 }
 
+/**
+ * Split `--option=value` arguments while preserving space-separated support.
+ *
+ * @param {string} arg - Raw command-line argument.
+ *
+ * @returns {{ inlineValue: string | undefined; option: string }} Parsed option
+ *   name and optional inline value.
+ */
+function splitOptionValue(arg) {
+    const equalsIndex = arg.indexOf("=");
+    if (equalsIndex === -1) {
+        return { inlineValue: undefined, option: arg };
+    }
+
+    return {
+        inlineValue: arg.slice(equalsIndex + 1),
+        option: arg.slice(0, equalsIndex),
+    };
+}
+
+/**
+ * Parse a bounded integer CLI option without partial string coercion.
+ *
+ * @param {string} option - Option name for diagnostics.
+ * @param {string | null} value - Raw option value.
+ * @param {number} defaultValue - Default when the option is omitted.
+ * @param {number} min - Inclusive minimum.
+ * @param {number} max - Inclusive maximum.
+ *
+ * @returns {number} Parsed integer.
+ */
+function parseBoundedIntegerOption(option, value, defaultValue, min, max) {
+    if (value === null) {
+        return defaultValue;
+    }
+
+    if (!/^\d+$/u.test(value)) {
+        throw new Error(
+            `${option} must be an integer between ${min} and ${max}`
+        );
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isSafeInteger(parsed) || parsed < min || parsed > max) {
+        throw new Error(
+            `${option} must be an integer between ${min} and ${max}`
+        );
+    }
+
+    return parsed;
+}
+
 const args = process.argv.slice(2);
-const options = {
-    dryRun: args.includes("--dry-run") || args.includes("-d"),
-    pattern:
-        getArgValue("--pattern", "-p") || "**/*.{test,spec}.{ts,tsx,js,jsx}",
-    force: args.includes("--force") || args.includes("-f"),
-    help: args.includes("--help") || args.includes("-h"),
-    verbose:
-        args.includes("--verbose") ||
-        args.includes("-v") ||
-        process.env["DEBUG"] === "1",
-    validate: args.includes("--validate"),
-    backup: args.includes("--backup"),
-    parallel: args.includes("--parallel"),
-    retries: Number.parseInt(getArgValue("--retries") || "0", 10) || 0,
-    timeout: Number.parseInt(getArgValue("--timeout") || "30000", 10) || 30_000,
-};
+let options;
+
+try {
+    options = {
+        dryRun: args.includes("--dry-run") || args.includes("-d"),
+        pattern:
+            getArgValue("--pattern", "-p") ||
+            "**/*.{test,spec}.{ts,tsx,js,jsx}",
+        force: args.includes("--force") || args.includes("-f"),
+        help: args.includes("--help") || args.includes("-h"),
+        verbose:
+            args.includes("--verbose") ||
+            args.includes("-v") ||
+            process.env["DEBUG"] === "1",
+        validate: args.includes("--validate"),
+        backup: args.includes("--backup"),
+        parallel: args.includes("--parallel"),
+        retries: parseBoundedIntegerOption(
+            "--retries",
+            getArgValue("--retries"),
+            0,
+            0,
+            5
+        ),
+        timeout: parseBoundedIntegerOption(
+            "--timeout",
+            getArgValue("--timeout"),
+            30_000,
+            1000,
+            300_000
+        ),
+    };
+} catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Error: ${message}`);
+    process.exit(1);
+}
 
 // Enhanced argument validation
 if (options.retries < 0 || options.retries > 5) {
