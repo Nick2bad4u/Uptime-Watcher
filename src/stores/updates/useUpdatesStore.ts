@@ -43,6 +43,7 @@ import {
     type UpdateStatusEventData,
 } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeParsePercentage } from "@shared/utils/safeConversions";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
@@ -204,10 +205,11 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
                     set({ updateError });
                 },
                 setUpdateProgress: (progress: number): void => {
+                    const updateProgress = safeParsePercentage(progress);
                     logStoreAction("UpdatesStore", "setUpdateProgress", {
-                        progress,
+                        progress: updateProgress,
                     });
-                    set({ updateProgress: progress });
+                    set({ updateProgress });
                 },
                 subscribeToUpdateStatusEvents: (): (() => void) =>
                     updateStatusEventsSubscription.subscribe(),

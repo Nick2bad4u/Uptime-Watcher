@@ -236,6 +236,55 @@ describe(useUpdatesStore, () => {
                 expect(result.current.updateProgress).toBe(progress);
             }
         });
+
+        it("should clamp progress values to the valid percentage range", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            act(() => {
+                result.current.setUpdateProgress(-25);
+            });
+            expect(result.current.updateProgress).toBe(0);
+
+            act(() => {
+                result.current.setUpdateProgress(125);
+            });
+            expect(result.current.updateProgress).toBe(100);
+        });
+
+        it("should fall back to zero for non-finite progress values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            act(() => {
+                result.current.setUpdateProgress(Number.NaN);
+            });
+            expect(result.current.updateProgress).toBe(0);
+
+            act(() => {
+                result.current.setUpdateProgress(Number.POSITIVE_INFINITY);
+            });
+            expect(result.current.updateProgress).toBe(100);
+
+            act(() => {
+                result.current.setUpdateProgress(Number.NEGATIVE_INFINITY);
+            });
+            expect(result.current.updateProgress).toBe(0);
+        });
     });
 
     describe("update error management", () => {
