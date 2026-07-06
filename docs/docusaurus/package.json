@@ -30,7 +30,7 @@
     "scripts": {
         "build": "npm run generate-docs && npm run --prefix ../.. build:eslint-inspector && npm run build:default",
         "build:default": "docusaurus build",
-        "build:fast": "cross-env DOCUSAURUS_ENABLE_EXPERIMENTAL=true docusaurus build",
+        "build:fast": "node ../../scripts/run-node-cli.mjs DOCUSAURUS_ENABLE_EXPERIMENTAL=true -- docusaurus build",
         "build:local": "npm run generate-docs:local && npm run --prefix ../.. build:eslint-inspector && npm run build:default",
         "clear": "docusaurus clear",
         "css:types": "node -e \"const { run } = require('typed-css-modules/lib/run'); run('src', { pattern: '**/*.module.css' }).catch((error) => { console.error(error); process.exit(1); });\"",
@@ -88,7 +88,6 @@
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
         "clsx": "^2.1.1",
-        "cross-env": "^10.1.0",
         "docusaurus-plugin-copy-page-button": "^0.5.0",
         "docusaurus-plugin-image-zoom": "^3.0.1",
         "docusaurus-plugin-llms": "^0.4.0",

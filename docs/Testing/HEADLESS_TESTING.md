@@ -59,7 +59,7 @@ All Playwright tests run in headless mode by default.
 To see windows during testing (useful for debugging):
 
 ```bash
-HEADLESS=false npx playwright test
+node scripts/run-node-cli.mjs HEADLESS=false -- npx playwright test
 # or
 npx playwright test --headed  # For browser portions only
 ```
@@ -67,7 +67,7 @@ npx playwright test --headed  # For browser portions only
 ### Manual Electron Launch (Headless)
 
 ```bash
-cross-env HEADLESS=true npm run electron-dev
+node scripts/run-node-cli.mjs HEADLESS=true -- npm run electron-dev
 # or (run Vite separately, then launch Electron headless)
 npm run dev
 npm run electron -- --headless

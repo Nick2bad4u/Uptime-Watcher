@@ -400,7 +400,7 @@ This repository already applies a larger heap for production builds via the
 
 ```json
 {
- "build:electron-vite": "cross-env NODE_OPTIONS=--max_old_space_size=16384 tsc --build tsconfig.json && cross-env NODE_OPTIONS=--max_old_space_size=16384 vite build --config ./vite.config.ts"
+ "build:electron-vite": "node scripts/run-node-cli.mjs NODE_OPTIONS=--max_old_space_size=16384 -- tsc --build tsconfig.json && node scripts/run-node-cli.mjs NODE_OPTIONS=--max_old_space_size=16384 -- vite build --config ./vite.config.ts"
 }
 ```
 

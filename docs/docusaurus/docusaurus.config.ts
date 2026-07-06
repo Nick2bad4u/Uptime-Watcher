@@ -198,20 +198,6 @@ const config: Config = {
                 },
             },
         ],
-        // [
-        //     "@grnet/docusaurus-terminology",
-        //     {
-        //         // Directory containing all documentation files to process
-        //         docsDir: "./docs",
-        //         // Path to the glossary file that will be auto-generated
-        //         glossaryFilepath: "./docs/glossary.md",
-        //         // Directory containing term definition files
-        //         termsDir: "./docs/terms",
-        //         // Optional: Custom component paths (uncomment if needed)
-        //         // glossaryComponentPath: "relative/path/to/your/glossary-component",
-        //         // termPreviewComponentPath: "relative/path/to/your/term-preview-component",
-        //     },
-        // ],
         [
             "docusaurus-plugin-llms",
             {
@@ -238,34 +224,6 @@ const config: Config = {
                 title: "Uptime Watcher Documentation",
             },
         ],
-        // Broken with Docusaurs v3/v4
-        // [
-        //     "@grnet/docusaurus-terminology",
-        //     {
-        //         docsDir: "./docs",
-        //         glossaryFilepath: "./docs/glossary.md",
-        //         termsDir: "./docs/terms",
-        //     },
-        // ],
-        // [
-        //     "docusaurus-plugin-typedoc",
-        //     {
-        //         sidebar: {
-        //             autoConfiguration: false,
-        //             pretty: true,
-        //             typescript: true,
-        //             deprecatedItemClassName: "typedoc-sidebar-item-deprecated",
-        //         },
-        //         entryPoints: [
-        //             "../../src/**/*.{ts,mts,cts,tsx,js,jsx}",
-        //             "../../electron/**/*.{ts,mts,cts,tsx,js,jsx}",
-        //             "../../shared/**/*.{ts,mts,cts,tsx,js,jsx}"
-        //         ],
-        //         tsconfig: "tsconfig.typedoc.json",
-        //         plugin: ["typedoc-plugin-markdown"],
-        //         gitRevision: "main",
-        //     },
-        // ],
     ],
 
     presets: [
