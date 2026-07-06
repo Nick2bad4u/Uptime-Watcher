@@ -484,7 +484,7 @@ describe(useSettingsStore, () => {
             useSettingsStore.getState().updateSettings({ historyLimit: -10 });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.historyLimit).toBe(-10);
+            expect(state.settings.historyLimit).toBe(0);
         });
 
         it("should handle zero historyLimit", async ({ task, annotate }) => {

@@ -65,6 +65,20 @@ export const createSettingsOperationsSlice = (
     | "resetSettings"
     | "syncFromBackend"
 > => {
+    const loadBackendHistoryLimit = async (): Promise<void> => {
+        const historyLimit = await SettingsService.getHistoryLimit();
+        const currentSettings = getState().settings;
+        const updatedSettings = normalizeAppSettings(
+            {
+                ...currentSettings,
+                historyLimit,
+            },
+            currentSettings
+        );
+
+        setState({ settings: updatedSettings });
+    };
+
     const ensureHistoryLimitSubscription = async (): Promise<void> => {
         if (historyLimitSubscriptionRef.current) {
             return;
@@ -146,18 +160,7 @@ export const createSettingsOperationsSlice = (
                 // factory as recommended in ADR-003 ("Store Error Handling Contexts").
                 const result = await withErrorHandling(
                     async () => {
-                        const historyLimit =
-                            await SettingsService.getHistoryLimit();
-                        const currentSettings = getState().settings;
-                        const updatedSettings = normalizeAppSettings(
-                            {
-                                ...currentSettings,
-                                historyLimit,
-                            },
-                            currentSettings
-                        );
-
-                        setState({ settings: updatedSettings });
+                        await loadBackendHistoryLimit();
 
                         return {
                             message: "Successfully loaded settings",
@@ -295,18 +298,7 @@ export const createSettingsOperationsSlice = (
         syncFromBackend: async () =>
             withErrorHandling(
                 async () => {
-                    const historyLimit =
-                        await SettingsService.getHistoryLimit();
-                    const currentSettings = getState().settings;
-                    const updatedSettings = normalizeAppSettings(
-                        {
-                            ...currentSettings,
-                            historyLimit,
-                        },
-                        currentSettings
-                    );
-
-                    setState({ settings: updatedSettings });
+                    await loadBackendHistoryLimit();
 
                     await ensureHistoryLimitSubscription();
 
