@@ -87,6 +87,21 @@ function createOperation(
     };
 }
 
+function createSnapshotBuffer(
+    overrides: Partial<CloudSyncSnapshot> = {}
+): Buffer {
+    return Buffer.from(
+        JSON.stringify({
+            createdAt: 1,
+            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+            state: { monitor: {}, settings: {}, site: {} },
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            ...overrides,
+        }),
+        "utf8"
+    );
+}
+
 async function withEnvVar<T>(
     key: string,
     value: string,
@@ -772,16 +787,7 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
 
     it("accepts snapshot keys matching schema version", async () => {
         const provider = createProvider({
-            downloadObject: async () =>
-                Buffer.from(
-                    JSON.stringify({
-                        createdAt: 1,
-                        snapshotVersion: 1,
-                        state: { monitor: {}, settings: {}, site: {} },
-                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-                    }),
-                    "utf8"
-                ),
+            downloadObject: async () => createSnapshotBuffer(),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);
@@ -795,16 +801,7 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
 
     it("accepts snapshot keys with a nonce suffix", async () => {
         const provider = createProvider({
-            downloadObject: async () =>
-                Buffer.from(
-                    JSON.stringify({
-                        createdAt: 1,
-                        snapshotVersion: 1,
-                        state: { monitor: {}, settings: {}, site: {} },
-                        syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-                    }),
-                    "utf8"
-                ),
+            downloadObject: async () => createSnapshotBuffer(),
         });
 
         const transport = ProviderCloudSyncTransport.create(provider);
@@ -814,6 +811,37 @@ describe("ProviderCloudSyncTransport snapshot key validation", () => {
                 `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1-0123456789abcdef0123456789abcdef.json`
             )
         ).resolves.toBeTruthy();
+    });
+
+    it("rejects snapshots whose payload createdAt does not match a legacy key", async () => {
+        const provider = createProvider({
+            downloadObject: async () => createSnapshotBuffer({ createdAt: 2 }),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readSnapshot(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1.json`
+            )
+        ).rejects.toMatchObject({
+            kind: "snapshot",
+            name: "CloudSyncCorruptRemoteObjectError",
+        });
+    });
+
+    it("rejects snapshots whose payload createdAt does not match a nonce-suffixed key", async () => {
+        const provider = createProvider({
+            downloadObject: async () => createSnapshotBuffer({ createdAt: 2 }),
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+
+        await expect(
+            transport.readSnapshot(
+                `sync/snapshots/${CLOUD_SYNC_SCHEMA_VERSION}/1-0123456789abcdef0123456789abcdef.json`
+            )
+        ).rejects.toThrow(/createdAt is inconsistent with key metadata/u);
     });
 
     it("rejects snapshot keys outside the JavaScript Date range", async () => {

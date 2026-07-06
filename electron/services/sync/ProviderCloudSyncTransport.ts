@@ -39,7 +39,10 @@ import {
     assertValidSyncDeviceId,
     isValidOpsObjectKey,
 } from "./providerKeyValidation";
-import { createSnapshotNonceHex } from "./snapshotKeyUtils";
+import {
+    createSnapshotNonceHex,
+    parseSnapshotFileNameMetadata,
+} from "./snapshotKeyUtils";
 import {
     OPS_OBJECT_SUFFIX,
     parseOpsObjectFileNameMetadata,
@@ -312,6 +315,23 @@ function parseOpsKeyExpectations(key: string): {
         deviceId,
         firstOpId: parsed.firstOpId,
         lastOpId: parsed.lastOpId,
+    };
+}
+
+function parseSnapshotKeyExpectations(key: string): {
+    createdAt: number;
+} {
+    // Key is already validated by assertSnapshotKey.
+    const segments = stringSplit(key, "/");
+    const fileName = segments[3] ?? "";
+
+    const parsed = parseSnapshotFileNameMetadata(fileName);
+    if (!parsed) {
+        throw new Error(`Invalid sync snapshot key filename: ${key}`);
+    }
+
+    return {
+        createdAt: parsed.createdAt,
     };
 }
 
@@ -673,6 +693,8 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
     public async readSnapshot(key: string): Promise<CloudSyncSnapshot> {
         assertSnapshotKey(key);
+        const expectations = parseSnapshotKeyExpectations(key);
+
         try {
             const buffer = await this.provider.downloadObject(key);
             const maxBytes = getMaxSnapshotBytes();
@@ -707,7 +729,18 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
                 raw,
             });
 
-            return parseCloudSyncSnapshot(parsedSnapshot);
+            const snapshot = parseCloudSyncSnapshot(parsedSnapshot);
+            if (snapshot.createdAt !== expectations.createdAt) {
+                throw new CloudSyncCorruptRemoteObjectError(
+                    `Cloud sync snapshot '${key}' createdAt is inconsistent with key metadata`,
+                    {
+                        key,
+                        kind: "snapshot",
+                    }
+                );
+            }
+
+            return snapshot;
         } catch (error) {
             if (
                 ensureError(error) instanceof CloudSyncCorruptRemoteObjectError

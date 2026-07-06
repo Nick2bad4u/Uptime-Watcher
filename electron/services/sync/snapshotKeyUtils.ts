@@ -23,6 +23,11 @@ import { isAsciiDigits } from "./syncEngineUtils";
 /** Number of lowercase hex chars used for snapshot nonce suffix. */
 export const SNAPSHOT_NONCE_HEX_CHARS = 32 as const;
 
+/** Metadata encoded in a snapshot filename. */
+export type SnapshotFileNameMetadata = Readonly<{
+    createdAt: number;
+}>;
+
 /**
  * Returns a nonce suitable for appending to a snapshot key.
  */
@@ -58,8 +63,17 @@ function isValidSnapshotNonceHex(raw: string): boolean {
  * Returns true when a snapshot filename matches supported formats.
  */
 export function isValidSnapshotFileName(fileName: string): boolean {
+    return parseSnapshotFileNameMetadata(fileName) !== null;
+}
+
+/**
+ * Parses and validates a supported snapshot filename.
+ */
+export function parseSnapshotFileNameMetadata(
+    fileName: string
+): null | SnapshotFileNameMetadata {
     if (typeof fileName !== "string" || !fileName.endsWith(".json")) {
-        return false;
+        return null;
     }
 
     const stem = fileName.slice(0, -".json".length);
@@ -70,11 +84,11 @@ export function isValidSnapshotFileName(fileName: string): boolean {
     ] = stringSplit(stem, "-");
 
     if (!createdAtRaw || rest.length > 0) {
-        return false;
+        return null;
     }
 
     if (!isAsciiDigits(createdAtRaw)) {
-        return false;
+        return null;
     }
 
     const createdAt = Number(createdAtRaw);
@@ -83,12 +97,12 @@ export function isValidSnapshotFileName(fileName: string): boolean {
         createdAt < 0 ||
         createdAt > MAX_VALID_DATE_EPOCH_MS
     ) {
-        return false;
+        return null;
     }
 
-    if (isDefined(nonceRaw)) {
-        return isValidSnapshotNonceHex(nonceRaw);
+    if (isDefined(nonceRaw) && !isValidSnapshotNonceHex(nonceRaw)) {
+        return null;
     }
 
-    return true;
+    return { createdAt };
 }
