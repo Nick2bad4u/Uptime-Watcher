@@ -44,6 +44,17 @@ const statusHistoryStatusArbitrary = fc.constantFrom<StatusHistory["status"]>(
 describe("historyQuery utilities", () => {
     let mockDb: Database;
     const mockMonitorId = "monitor-123";
+    const rawMonitorId =
+        "https://monitor.example/check?token=monitor-token#private-monitor";
+
+    const expectLogPayloadToRedactRawMonitorId = (): void => {
+        const logPayload = JSON.stringify(vi.mocked(logger.error).mock.calls);
+
+        expect(logPayload).toContain("https://monitor.example/check");
+        expect(logPayload).not.toContain("monitor-token");
+        expect(logPayload).not.toContain("private-monitor");
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -204,6 +215,25 @@ describe("historyQuery utilities", () => {
                 "[HistoryQuery] Failed to fetch history for monitor: monitor-123",
                 dbError
             );
+        });
+
+        it("redacts URL-shaped monitor identifiers in fetch failure logs", () => {
+            const dbError = new Error("Database connection failed");
+            (
+                mockDb.all as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
+                throw dbError;
+            });
+
+            expect(() => findHistoryByMonitorId(mockDb, rawMonitorId)).toThrow(
+                dbError
+            );
+
+            expect(mockDb.all).toHaveBeenCalledWith(
+                "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC",
+                [rawMonitorId]
+            );
+            expectLogPayloadToRedactRawMonitorId();
         });
 
         it("should handle empty monitor ID", async ({ task, annotate }) => {
@@ -632,6 +662,25 @@ describe("historyQuery utilities", () => {
             );
         });
 
+        it("redacts URL-shaped monitor identifiers in count failure logs", () => {
+            const dbError = new Error("Database connection failed");
+            (
+                mockDb.get as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
+                throw dbError;
+            });
+
+            expect(() => getHistoryCount(mockDb, rawMonitorId)).toThrow(
+                dbError
+            );
+
+            expect(mockDb.get).toHaveBeenCalledWith(
+                "SELECT COUNT(*) as count FROM history WHERE monitor_id = ?",
+                [rawMonitorId]
+            );
+            expectLogPayloadToRedactRawMonitorId();
+        });
+
         it("should handle empty monitor ID", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyQuery", "component");
@@ -977,6 +1026,25 @@ describe("historyQuery utilities", () => {
                 "[HistoryQuery] Failed to get latest history entry for monitor: monitor-123",
                 dbError
             );
+        });
+
+        it("redacts URL-shaped monitor identifiers in latest-entry failure logs", () => {
+            const dbError = new Error("Database connection failed");
+            (
+                mockDb.get as unknown as ReturnType<typeof vi.fn>
+            ).mockImplementation(() => {
+                throw dbError;
+            });
+
+            expect(() => getLatestHistoryEntry(mockDb, rawMonitorId)).toThrow(
+                dbError
+            );
+
+            expect(mockDb.get).toHaveBeenCalledWith(
+                "SELECT timestamp, status, responseTime, details FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1",
+                [rawMonitorId]
+            );
+            expectLogPayloadToRedactRawMonitorId();
         });
 
         it("should handle empty monitor ID", async ({ task, annotate }) => {

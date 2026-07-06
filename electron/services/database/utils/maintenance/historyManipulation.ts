@@ -1,6 +1,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -11,6 +12,9 @@ import { isDev } from "../../../../electronUtils";
 import { logger } from "../../../../utils/logger";
 import { queryForIds } from "../queries/typedQueries";
 import { normalizeHistoryPruneLimit } from "./historyPruneLimit";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Utility functions for manipulating monitor history data in the database.
@@ -66,6 +70,8 @@ export function addHistoryEntry(
     entry: StatusHistory,
     details?: string
 ): void {
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         db.run(HISTORY_MANIPULATION_QUERIES.INSERT_ENTRY, [
             monitorId,
@@ -79,14 +85,14 @@ export function addHistoryEntry(
             logger.debug(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.debug.HISTORY_ENTRY_ADDED,
-                    { monitorId, status: entry.status }
+                    { monitorId: safeMonitorId, status: entry.status }
                 )
             );
         }
     } catch (error) {
         logger.error(
             interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_ADD_FAILED, {
-                monitorId,
+                monitorId: safeMonitorId,
             }),
             error
         );
@@ -118,6 +124,8 @@ export function bulkInsertHistory(
         return;
     }
 
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         // Prepare the statement once for better performance
         const stmt = db.prepare(HISTORY_MANIPULATION_QUERIES.INSERT_ENTRY);
@@ -138,7 +146,7 @@ export function bulkInsertHistory(
                     LOG_TEMPLATES.services.HISTORY_BULK_INSERT,
                     {
                         count: historyEntries.length,
-                        monitorId,
+                        monitorId: safeMonitorId,
                     }
                 )
             );
@@ -149,7 +157,7 @@ export function bulkInsertHistory(
         logger.error(
             interpolateLogTemplate(
                 LOG_TEMPLATES.errors.HISTORY_BULK_INSERT_FAILED,
-                { monitorId }
+                { monitorId: safeMonitorId }
             ),
             error
         );
@@ -198,17 +206,19 @@ export function deleteHistoryByMonitorId(
     db: Database,
     monitorId: string
 ): void {
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         db.run(HISTORY_MANIPULATION_QUERIES.DELETE_BY_MONITOR, [monitorId]);
         if (isDev()) {
             logger.debug(
-                `[HistoryManipulation] Deleted history for monitor: ${monitorId}`
+                `[HistoryManipulation] Deleted history for monitor: ${safeMonitorId}`
             );
         }
     } catch (error) {
         logger.error(
             interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, {
-                monitorId,
+                monitorId: safeMonitorId,
             }),
             error
         );
@@ -246,6 +256,8 @@ export function pruneHistoryForMonitor(
         return;
     }
 
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         const excessProbe = queryForIds(
             db,
@@ -264,13 +276,13 @@ export function pruneHistoryForMonitor(
 
         if (isDev()) {
             logger.debug(
-                `[HistoryManipulation] Pruned history entries for monitor: ${monitorId} (limit: ${limit})`
+                `[HistoryManipulation] Pruned history entries for monitor: ${safeMonitorId} (limit: ${limit})`
             );
         }
     } catch (error) {
         logger.error(
             interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_PRUNE_FAILED, {
-                monitorId,
+                monitorId: safeMonitorId,
             }),
             error
         );

@@ -8,6 +8,7 @@ import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
 import { STATUS_HISTORY_VALUES } from "@shared/types";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { fc, test } from "@fast-check/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -75,6 +76,11 @@ describe("History Manipulation Utilities", () => {
     >(...STATUS_HISTORY_VALUES);
 
     const monitorId = "test-monitor-123";
+    const rawMonitorId =
+        "https://monitor.example/check?token=monitor-token#private-monitor";
+
+    const getSafeMonitorId = (identifier: string): string =>
+        getSafeIdentifierForLogging(identifier) ?? identifier;
 
     beforeEach(async () => {
         // Reset all mocks
@@ -98,6 +104,18 @@ describe("History Manipulation Utilities", () => {
             all: vi.fn(),
         } as unknown as Database;
     });
+
+    const expectLogPayloadToRedactRawMonitorId = (): void => {
+        const logPayload = JSON.stringify([
+            ...mockLogger.debug.mock.calls,
+            ...mockLogger.error.mock.calls,
+            ...mockLogger.info.mock.calls,
+        ]);
+
+        expect(logPayload).toContain("https://monitor.example/check");
+        expect(logPayload).not.toContain("monitor-token");
+        expect(logPayload).not.toContain("private-monitor");
+    };
 
     afterEach(() => {
         vi.restoreAllMocks();
@@ -228,6 +246,25 @@ describe("History Manipulation Utilities", () => {
                 "[HistoryManipulation] Failed to add history entry for monitor: test-monitor-123",
                 dbError
             );
+        });
+
+        it("redacts URL-shaped monitor identifiers in diagnostics while preserving insert parameters", () => {
+            mockDb.run = vi.fn();
+            mockIsDev.mockReturnValue(true);
+
+            addHistoryEntry(mockDb, rawMonitorId, sampleStatusHistory);
+
+            expect(mockDb.run).toHaveBeenCalledWith(
+                "INSERT INTO history (monitor_id, timestamp, status, responseTime, details) VALUES (?, ?, ?, ?, ?)",
+                [
+                    rawMonitorId,
+                    sampleStatusHistory.timestamp,
+                    sampleStatusHistory.status,
+                    sampleStatusHistory.responseTime,
+                    null,
+                ]
+            );
+            expectLogPayloadToRedactRawMonitorId();
         });
 
         describe("Property-Based addHistoryEntry Tests", () => {
@@ -512,6 +549,25 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
+        it("redacts URL-shaped monitor identifiers in bulk-insert diagnostics while preserving insert parameters", () => {
+            const mockStmt = {
+                run: vi.fn(),
+                finalize: vi.fn(),
+            };
+            mockDb.prepare = vi.fn().mockReturnValue(mockStmt);
+
+            bulkInsertHistory(mockDb, rawMonitorId, historyEntries);
+
+            expect(mockStmt.run).toHaveBeenNthCalledWith(1, [
+                rawMonitorId,
+                historyEntries[0]?.timestamp,
+                historyEntries[0]?.status,
+                historyEntries[0]?.responseTime,
+                "First entry",
+            ]);
+            expectLogPayloadToRedactRawMonitorId();
+        });
+
         describe("Property-Based bulkInsertHistory Tests", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
@@ -764,6 +820,19 @@ describe("History Manipulation Utilities", () => {
                 dbError
             );
         });
+
+        it("redacts URL-shaped monitor identifiers in delete diagnostics while preserving delete parameters", () => {
+            mockDb.run = vi.fn();
+            mockIsDev.mockReturnValue(true);
+
+            deleteHistoryByMonitorId(mockDb, rawMonitorId);
+
+            expect(mockDb.run).toHaveBeenCalledWith(
+                "DELETE FROM history WHERE monitor_id = ?",
+                [rawMonitorId]
+            );
+            expectLogPayloadToRedactRawMonitorId();
+        });
     });
 
     describe(deleteHistoryByMonitorId, () => {
@@ -874,7 +943,7 @@ describe("History Manipulation Utilities", () => {
                     // Assert
                     if (isDevEnvironment) {
                         expect(mockLogger.debug).toHaveBeenCalledWith(
-                            `[HistoryManipulation] Deleted history for monitor: ${testMonitorId}`
+                            `[HistoryManipulation] Deleted history for monitor: ${getSafeMonitorId(testMonitorId)}`
                         );
                     } else {
                         expect(mockLogger.debug).not.toHaveBeenCalled();
@@ -906,7 +975,7 @@ describe("History Manipulation Utilities", () => {
                     }).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
+                        `[HistoryManipulation] Failed to prune history for monitor: ${getSafeMonitorId(testMonitorId)}`,
                         dbError
                     );
                 }
@@ -1112,6 +1181,25 @@ describe("History Manipulation Utilities", () => {
             );
         });
 
+        it("redacts URL-shaped monitor identifiers in prune diagnostics while preserving query parameters", () => {
+            const excessEntries = [{ id: 1 }];
+            mockDb.all = vi.fn().mockReturnValue(excessEntries);
+            mockDb.run = vi.fn();
+            mockIsDev.mockReturnValue(true);
+
+            pruneHistoryForMonitor(mockDb, rawMonitorId, 5);
+
+            expect(mockDb.all).toHaveBeenCalledWith(
+                "SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT 1 OFFSET ?",
+                [rawMonitorId, 5]
+            );
+            expect(mockDb.run).toHaveBeenCalledWith(
+                "DELETE FROM history WHERE id IN (SELECT id FROM history WHERE monitor_id = ? ORDER BY timestamp DESC LIMIT -1 OFFSET ?)",
+                [rawMonitorId, 5]
+            );
+            expectLogPayloadToRedactRawMonitorId();
+        });
+
         describe("Property-Based pruneHistoryForMonitor Tests", () => {
             test.prop([
                 fc.string({ minLength: 1, maxLength: 50 }),
@@ -1222,7 +1310,7 @@ describe("History Manipulation Utilities", () => {
                     // Assert
                     if (isDevEnvironment) {
                         expect(mockLogger.debug).toHaveBeenCalledWith(
-                            `[HistoryManipulation] Pruned history entries for monitor: ${testMonitorId} (limit: ${limit})`
+                            `[HistoryManipulation] Pruned history entries for monitor: ${getSafeMonitorId(testMonitorId)} (limit: ${limit})`
                         );
                     } else {
                         expect(mockLogger.debug).not.toHaveBeenCalled();
@@ -1255,7 +1343,7 @@ describe("History Manipulation Utilities", () => {
                     }).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
+                        `[HistoryManipulation] Failed to prune history for monitor: ${getSafeMonitorId(testMonitorId)}`,
                         selectError
                     );
                 }
@@ -1291,7 +1379,7 @@ describe("History Manipulation Utilities", () => {
                     }).toThrow(errorMessage);
 
                     expect(mockLogger.error).toHaveBeenCalledWith(
-                        `[HistoryManipulation] Failed to prune history for monitor: ${testMonitorId}`,
+                        `[HistoryManipulation] Failed to prune history for monitor: ${getSafeMonitorId(testMonitorId)}`,
                         deleteError
                     );
                 }

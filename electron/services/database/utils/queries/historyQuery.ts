@@ -2,6 +2,7 @@ import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -15,6 +16,9 @@ import {
     queryHistoryRows,
     TypedQueryRowValidationError,
 } from "./typedQueries";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Utility functions for querying monitor history data from the database.
@@ -71,6 +75,8 @@ export function findHistoryByMonitorId(
     db: Database,
     monitorId: string
 ): StatusHistory[] {
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         const historyRows = queryHistoryRows(
             db,
@@ -82,7 +88,7 @@ export function findHistoryByMonitorId(
     } catch (error) {
         logger.error(
             interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_FETCH_FAILED, {
-                monitorId,
+                monitorId: safeMonitorId,
             }),
             error
         ); /* V8 ignore next */
@@ -110,6 +116,8 @@ export function findHistoryByMonitorId(
  * @internal
  */
 export function getHistoryCount(db: Database, monitorId: string): number {
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         const result = queryForCount(
             db,
@@ -130,14 +138,14 @@ export function getHistoryCount(db: Database, monitorId: string): number {
                     ? logger.warn.bind(logger)
                     : logger.error.bind(logger);
             logWarnOrError(
-                `[HistoryQuery] Invalid count result for monitor: ${monitorId}`,
+                `[HistoryQuery] Invalid count result for monitor: ${safeMonitorId}`,
                 safeError
             );
             return 0;
         }
 
         logger.error(
-            `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
+            `[HistoryQuery] Failed to get history count for monitor: ${safeMonitorId}`,
             safeError
         );
         throw safeError;
@@ -167,6 +175,8 @@ export function getLatestHistoryEntry(
     db: Database,
     monitorId: string
 ): StatusHistory | undefined {
+    const safeMonitorId = getSafeIdentifier(monitorId);
+
     try {
         const row = queryHistoryRow(
             db,
@@ -183,7 +193,7 @@ export function getLatestHistoryEntry(
         logger.error(
             interpolateLogTemplate(
                 LOG_TEMPLATES.errors.HISTORY_LATEST_FETCH_FAILED,
-                { monitorId }
+                { monitorId: safeMonitorId }
             ),
             error
         );
