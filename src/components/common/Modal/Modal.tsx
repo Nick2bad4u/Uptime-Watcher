@@ -14,6 +14,11 @@ import {
 import { createPortal } from "react-dom";
 import { arrayAt, arrayFirst, arrayJoin, isEmpty } from "ts-extras";
 
+import {
+    getGlobalDocumentActiveElement,
+    getGlobalDocumentBodyElement,
+    isGlobalElementNode,
+} from "../../../utils/dom/queryGlobalDocumentSelector";
 import { AppIcons } from "../../../utils/icons";
 import {
     acquireBlockingModal,
@@ -104,54 +109,8 @@ function addDocumentKeyDownCaptureListener(
     };
 }
 
-function isElementNode(value: unknown): value is Element {
-    if (!isObjectLike(value)) {
-        return false;
-    }
-
-    try {
-        return Reflect.get(value, "nodeType") === 1;
-    } catch {
-        return false;
-    }
-}
-
-function getDocumentBodyElement(): Element | null {
-    const documentProperty = getOwnPropertyValue(globalThis, "document");
-
-    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
-        return null;
-    }
-
-    try {
-        const body: unknown = Reflect.get(documentProperty.value, "body");
-        return isElementNode(body) ? body : null;
-    } catch {
-        return null;
-    }
-}
-
-function getDocumentActiveElement(): Element | null {
-    const documentProperty = getOwnPropertyValue(globalThis, "document");
-
-    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
-        return null;
-    }
-
-    try {
-        const activeElement: unknown = Reflect.get(
-            documentProperty.value,
-            "activeElement"
-        );
-
-        return isElementNode(activeElement) ? activeElement : null;
-    } catch {
-        return null;
-    }
-}
-
 function isFocusRestoreElement(value: unknown): value is FocusRestoreElement {
-    if (!isElementNode(value)) {
+    if (!isGlobalElementNode(value)) {
         return false;
     }
 
@@ -483,7 +442,7 @@ export const Modal = ({
     );
 
     const portalRoot = useMemo<Element | null>(
-        () => getDocumentBodyElement(),
+        () => getGlobalDocumentBodyElement(),
         []
     );
 
@@ -529,7 +488,7 @@ export const Modal = ({
                 acquireBlockingModal();
             }
 
-            const activeElement = getDocumentActiveElement();
+            const activeElement = getGlobalDocumentActiveElement();
             previouslyFocusedElementRef.current = isFocusRestoreElement(
                 activeElement
             )
@@ -591,7 +550,7 @@ export const Modal = ({
                     return;
                 }
 
-                const active = getDocumentActiveElement();
+                const active = getGlobalDocumentActiveElement();
 
                 if (!active || !modalElement.contains(active)) {
                     event.preventDefault();

@@ -33,6 +33,7 @@ import { createPortal } from "react-dom";
 import { arrayJoin } from "ts-extras";
 
 import { useMount } from "../../../hooks/useMount";
+import { getGlobalDocumentBodyElement } from "../../../utils/dom/queryGlobalDocumentSelector";
 import "./tooltip.css";
 
 /**
@@ -248,33 +249,6 @@ function getViewportSize(): null | ViewportSize {
             Number.isFinite(height)
             ? { height, width }
             : null;
-    } catch {
-        return null;
-    }
-}
-
-function isElementNode(value: unknown): value is Element {
-    if (!isObjectLike(value)) {
-        return false;
-    }
-
-    try {
-        return Reflect.get(value, "nodeType") === 1;
-    } catch {
-        return false;
-    }
-}
-
-function getTooltipPortalContainer(): Element | null {
-    const documentProperty = getOwnPropertyValue(globalThis, "document");
-
-    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
-        return null;
-    }
-
-    try {
-        const body: unknown = Reflect.get(documentProperty.value, "body");
-        return isElementNode(body) ? body : null;
     } catch {
         return null;
     }
@@ -757,7 +731,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
         ]);
 
         const portalContainer =
-            shouldRender && !disabled ? getTooltipPortalContainer() : null;
+            shouldRender && !disabled ? getGlobalDocumentBodyElement() : null;
 
         return (
             <>
