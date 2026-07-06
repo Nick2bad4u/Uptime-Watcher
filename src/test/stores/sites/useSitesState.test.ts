@@ -27,6 +27,7 @@ import {
     buildMonitoringLockKey,
     isOptimisticLockKey,
 } from "../../../stores/sites/utils/optimisticMonitoringLock";
+import { logStoreAction } from "../../../stores/utils";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock logging
@@ -74,7 +75,19 @@ describe("useSitesState", () => {
         return value;
     };
 
+    const getSitesStoreTelemetry = (actionName: string): unknown[] =>
+        vi
+            .mocked(logStoreAction)
+            .mock.calls.filter(
+                ([storeName, currentActionName]) =>
+                    storeName === "SitesStore" &&
+                    currentActionName === actionName
+            )
+            .map((call) => call[2]);
+
     beforeEach(() => {
+        vi.clearAllMocks();
+
         mockSet = createMockFunction();
         mockGet = createMockFunction();
 
@@ -654,6 +667,53 @@ describe("useSitesState", () => {
                 expect(result.sites).toEqual([mockSite]);
             }
         });
+
+        it("should summarize and redact add-site telemetry", () => {
+            const sensitiveSite: Site = {
+                identifier:
+                    "https://user:pass@site.example.com/path?access_token=site-secret#frag",
+                monitors: [
+                    {
+                        checkInterval: 0,
+                        history: [],
+                        id: "monitor-1",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 0,
+                        type: "http",
+                        url: "https://user:pass@monitor.example.com/health?refresh_token=monitor-secret#hash",
+                    },
+                ],
+                monitoring: true,
+                name: "Sensitive site display name",
+            };
+
+            stateActions.addSite(sensitiveSite);
+
+            const telemetry = getSitesStoreTelemetry("addSite");
+            expect(telemetry).not.toHaveLength(0);
+            expect(telemetry[0]).toMatchObject({
+                monitorCount: 1,
+                monitorTypes: ["http"],
+                monitorUrls: ["https://monitor.example.com/health"],
+                monitoring: true,
+                siteIdentifier: "https://site.example.com/path",
+            });
+
+            const serializedTelemetry = JSON.stringify(telemetry);
+            expect(serializedTelemetry).not.toContain(
+                "Sensitive site display name"
+            );
+            expect(serializedTelemetry).not.toContain("access_token");
+            expect(serializedTelemetry).not.toContain("refresh_token");
+            expect(serializedTelemetry).not.toContain("site-secret");
+            expect(serializedTelemetry).not.toContain("monitor-secret");
+            expect(serializedTelemetry).not.toContain("pass");
+            expect(serializedTelemetry).not.toContain("frag");
+            expect(serializedTelemetry).not.toContain("hash");
+        });
     });
 
     describe("removeSite", () => {
@@ -796,6 +856,24 @@ describe("useSitesState", () => {
                 vi.useRealTimers();
             }
         });
+
+        it("should redact removed site identifier telemetry", () => {
+            stateActions.removeSite(
+                "https://user:pass@remove.example.com/path?token=secret#frag"
+            );
+
+            const telemetry = getSitesStoreTelemetry("removeSite");
+            expect(telemetry).not.toHaveLength(0);
+            expect(telemetry[0]).toMatchObject({
+                siteIdentifier: "https://remove.example.com/path",
+            });
+
+            const serializedTelemetry = JSON.stringify(telemetry);
+            expect(serializedTelemetry).not.toContain("token");
+            expect(serializedTelemetry).not.toContain("secret");
+            expect(serializedTelemetry).not.toContain("pass");
+            expect(serializedTelemetry).not.toContain("frag");
+        });
     });
 
     describe("selectSite", () => {
@@ -878,6 +956,53 @@ describe("useSitesState", () => {
                 );
                 expect(result).toEqual({ selectedSiteIdentifier: undefined });
             }
+        });
+
+        it("should summarize and redact selected site telemetry", () => {
+            const sensitiveSite: Site = {
+                identifier:
+                    "https://user:pass@select.example.com/path?token=secret#frag",
+                monitors: [
+                    {
+                        checkInterval: 0,
+                        history: [],
+                        id: "monitor-1",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 0,
+                        type: "http",
+                        url: "https://user:pass@selected-monitor.example.com/check?api_key=secret#hash",
+                    },
+                ],
+                monitoring: false,
+                name: "Selected sensitive display name",
+            };
+
+            stateActions.selectSite(sensitiveSite);
+
+            const telemetry = getSitesStoreTelemetry("selectSite");
+            expect(telemetry).not.toHaveLength(0);
+            expect(telemetry[0]).toMatchObject({
+                monitorCount: 1,
+                monitorTypes: ["http"],
+                monitorUrls: ["https://selected-monitor.example.com/check"],
+                monitoring: false,
+                selected: true,
+                siteIdentifier: "https://select.example.com/path",
+            });
+
+            const serializedTelemetry = JSON.stringify(telemetry);
+            expect(serializedTelemetry).not.toContain(
+                "Selected sensitive display name"
+            );
+            expect(serializedTelemetry).not.toContain("api_key");
+            expect(serializedTelemetry).not.toContain("token");
+            expect(serializedTelemetry).not.toContain("secret");
+            expect(serializedTelemetry).not.toContain("pass");
+            expect(serializedTelemetry).not.toContain("frag");
+            expect(serializedTelemetry).not.toContain("hash");
         });
     });
 

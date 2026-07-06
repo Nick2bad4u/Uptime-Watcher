@@ -58,6 +58,7 @@ import type {
 
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
+import { buildSiteSelectionTelemetry } from "../sites/utils/siteTelemetry";
 import { createPersistConfig, logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 
@@ -505,7 +506,11 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             },
             selectedSiteIdentifier: undefined,
             selectSite: (site: Site | undefined): void => {
-                logStoreAction("UIStore", "selectSite", { site });
+                logStoreAction(
+                    "UIStore",
+                    "selectSite",
+                    buildSiteSelectionTelemetry(site)
+                );
                 set({
                     selectedSiteIdentifier: site ? site.identifier : undefined,
                 });

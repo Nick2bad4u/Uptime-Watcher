@@ -17,6 +17,7 @@ import {
     DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
     useUIStore,
 } from "../../../stores/ui/useUiStore";
+import { logStoreAction } from "../../../stores/utils";
 
 // Mock the store utils (partial) so createPersistConfig remains available.
 vi.mock("../../../stores/utils", async (importOriginal) => {
@@ -312,6 +313,62 @@ describe(useUIStore, () => {
             expect(
                 result.current.siteDetailsTabState[mockSite.identifier]
             ).toBe("history");
+        });
+
+        it("should summarize and redact selected site telemetry", () => {
+            const sensitiveSite: Site = {
+                identifier:
+                    "https://user:pass@ui.example.com/path?access_token=site-secret#frag",
+                monitoring: true,
+                monitors: [
+                    {
+                        checkInterval: 300,
+                        history: [],
+                        id: "monitor-1",
+                        monitoring: true,
+                        responseTime: 200,
+                        retryAttempts: 3,
+                        status: "up",
+                        timeout: 30,
+                        type: "http",
+                        url: "https://user:pass@monitor.example.com/check?refresh_token=monitor-secret#hash",
+                    },
+                ],
+                name: "Sensitive UI site name",
+            };
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.selectSite(sensitiveSite);
+            });
+
+            const telemetry = vi
+                .mocked(logStoreAction)
+                .mock.calls.filter(
+                    ([storeName, actionName]) =>
+                        storeName === "UIStore" && actionName === "selectSite"
+                )
+                .map((call) => call[2]);
+
+            expect(telemetry).not.toHaveLength(0);
+            expect(telemetry.at(-1)).toMatchObject({
+                monitorCount: 1,
+                monitorTypes: ["http"],
+                monitorUrls: ["https://monitor.example.com/check"],
+                monitoring: true,
+                selected: true,
+                siteIdentifier: "https://ui.example.com/path",
+            });
+
+            const serializedTelemetry = JSON.stringify(telemetry);
+            expect(serializedTelemetry).not.toContain("Sensitive UI site name");
+            expect(serializedTelemetry).not.toContain("access_token");
+            expect(serializedTelemetry).not.toContain("refresh_token");
+            expect(serializedTelemetry).not.toContain("site-secret");
+            expect(serializedTelemetry).not.toContain("monitor-secret");
+            expect(serializedTelemetry).not.toContain("pass");
+            expect(serializedTelemetry).not.toContain("frag");
+            expect(serializedTelemetry).not.toContain("hash");
         });
 
         it("should sync tab from persisted state", async ({

@@ -27,6 +27,11 @@ import {
     type OptimisticLockKey,
     type OptimisticMonitoringLock,
 } from "./utils/optimisticMonitoringLock";
+import {
+    buildSiteSelectionTelemetry,
+    buildSiteTelemetry,
+    safeTextForTelemetry,
+} from "./utils/siteTelemetry";
 
 const lockExpiryTimers = new Map<
     OptimisticLockKey,
@@ -273,7 +278,7 @@ export const createSitesStateActions = (
 
     return {
         addSite: (site: Site): void => {
-            logStoreAction("SitesStore", "addSite", { site });
+            logStoreAction("SitesStore", "addSite", buildSiteTelemetry(site));
             set((state) => ({
                 sites: [...state.sites, site],
                 sitesRevision: state.sitesRevision + 1,
@@ -281,7 +286,7 @@ export const createSitesStateActions = (
         },
         applySiteSnapshot: (site: Site): void => {
             logStoreAction("SitesStore", "applySiteSnapshot", {
-                identifier: site.identifier,
+                siteIdentifier: safeTextForTelemetry(site.identifier),
             });
             set((state) => {
                 const hasSite = state.sites.some(
@@ -407,7 +412,9 @@ export const createSitesStateActions = (
             }
         },
         removeSite: (identifier: Site["identifier"]): void => {
-            logStoreAction("SitesStore", "removeSite", { identifier });
+            logStoreAction("SitesStore", "removeSite", {
+                siteIdentifier: safeTextForTelemetry(identifier),
+            });
             set((state) => {
                 const removedSite = state.sites.find(
                     (site) => site.identifier === identifier
@@ -451,7 +458,11 @@ export const createSitesStateActions = (
             });
         },
         selectSite: (site: Site | undefined): void => {
-            logStoreAction("SitesStore", "selectSite", { site });
+            logStoreAction(
+                "SitesStore",
+                "selectSite",
+                buildSiteSelectionTelemetry(site)
+            );
             set(() => ({
                 selectedSiteIdentifier: site ? site.identifier : undefined,
             }));
@@ -472,7 +483,7 @@ export const createSitesStateActions = (
         ): void => {
             logStoreAction("SitesStore", "setSelectedMonitorId", {
                 monitorId,
-                siteIdentifier,
+                siteIdentifier: safeTextForTelemetry(siteIdentifier),
             });
             set((state) => ({
                 selectedMonitorIds: {

@@ -18,7 +18,6 @@ import type {
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
-import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { isDefined } from "ts-extras";
 
 import type { BaseSiteOperations } from "./baseTypes";
@@ -36,83 +35,18 @@ import {
     withSiteOperation,
     withSiteOperationReturning,
 } from "./utils/operationHelpers";
+import {
+    buildMonitorTelemetry,
+    buildSiteTelemetry,
+    buildSiteUpdateTelemetry,
+    safeTextForTelemetry,
+} from "./utils/siteTelemetry";
 
 type MonitorNumericField = "checkInterval" | "retryAttempts" | "timeout";
 type MonitorNumericUpdateOperationName =
     | "updateMonitorRetryAttempts"
     | "updateMonitorTimeout"
     | "updateSiteCheckInterval";
-
-const safeTextForTelemetry = (value: string | undefined): string | undefined => {
-    const trimmed = value?.trim();
-    if (!trimmed) {
-        return undefined;
-    }
-
-    if (URL.canParse(trimmed)) {
-        return getSafeUrlForLogging(trimmed);
-    }
-
-    return trimmed;
-};
-
-const safeMonitorUrlForTelemetry = (
-    url: Monitor["url"] | undefined
-): string | undefined => {
-    const trimmedUrl = url?.trim();
-    return trimmedUrl ? getSafeUrlForLogging(trimmedUrl) : undefined;
-};
-
-const buildMonitorTelemetry = (
-    monitor: Partial<Monitor>
-): SitesTelemetryPayload => ({
-    ...(isDefined(monitor.id) && { monitorId: monitor.id }),
-    ...(isDefined(monitor.type) && { monitorType: monitor.type }),
-    ...(isDefined(monitor.url) && {
-        monitorUrl: safeMonitorUrlForTelemetry(monitor.url),
-    }),
-});
-
-const buildMonitorListTelemetry = (
-    monitors: readonly Partial<Monitor>[] | undefined
-): SitesTelemetryPayload => {
-    if (!monitors) {
-        return {};
-    }
-
-    const monitorUrls = monitors
-        .map((monitor) => safeMonitorUrlForTelemetry(monitor.url))
-        .filter(isDefined);
-    const monitorTypes = monitors
-        .map((monitor) => monitor.type)
-        .filter(isDefined);
-
-    return {
-        monitorCount: monitors.length,
-        ...(monitorTypes.length > 0 && { monitorTypes }),
-        ...(monitorUrls.length > 0 && { monitorUrls }),
-    };
-};
-
-const buildSiteTelemetry = (siteData: Partial<Site>): SitesTelemetryPayload => ({
-    ...(isDefined(siteData.identifier) && {
-        siteIdentifier: safeTextForTelemetry(siteData.identifier),
-    }),
-    ...(isDefined(siteData.monitoring) && { monitoring: siteData.monitoring }),
-    ...buildMonitorListTelemetry(siteData.monitors),
-});
-
-const buildSiteUpdateTelemetry = (
-    identifier: string,
-    updates: Partial<Site>
-): SitesTelemetryPayload => ({
-    siteIdentifier: safeTextForTelemetry(identifier),
-    updateFields: Object.keys(updates).toSorted((left, right) =>
-        left.localeCompare(right)
-    ),
-    ...(isDefined(updates.monitoring) && { monitoring: updates.monitoring }),
-    ...buildMonitorListTelemetry(updates.monitors),
-});
 
 const updateMonitorNumericField = async (args: {
     deps: SiteOperationsDependencies;
