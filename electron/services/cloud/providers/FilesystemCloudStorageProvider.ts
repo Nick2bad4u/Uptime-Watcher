@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- This provider only operates on sandboxed paths under appRoot derived from validated keys. */
 
-import type { Stats } from "node:fs";
+import type { Dirent } from "node:fs";
 
 import {
     assertCloudObjectKey,
@@ -21,12 +21,14 @@ import type {
     CloudStorageProvider,
 } from "./CloudStorageProvider.types";
 
-import { removePathBestEffort } from "../../../utils/fsSafeOps";
+import { lstatIfExists, removePathBestEffort } from "../../../utils/fsSafeOps";
 import { BaseCloudStorageProvider } from "./BaseCloudStorageProvider";
 import { CloudProviderOperationError } from "./cloudProviderErrors";
 
 const APP_ROOT_DIRECTORY_NAME = "uptime-watcher" as const;
 const BACKUPS_PREFIX = "backups/" as const;
+
+type FileSystemEntryStats = Awaited<ReturnType<typeof fs.lstat>>;
 
 function assertSubpath(root: string, candidate: string): void {
     const normalizedRoot = path.resolve(root);
@@ -90,8 +92,8 @@ async function assertSafeExistingDirectory(
 async function readWritableObjectTargetStat(
     key: string,
     targetPath: string
-): Promise<null | Stats> {
-    const stat = await fs.lstat(targetPath).catch(() => null);
+): Promise<FileSystemEntryStats | null> {
+    const stat = await lstatIfExists(targetPath);
 
     if (stat?.isSymbolicLink()) {
         throw new Error(`Refusing to write cloud object via symlink: ${key}`);
@@ -102,6 +104,20 @@ async function readWritableObjectTargetStat(
     }
 
     return stat;
+}
+
+async function readDirectoryEntriesIfExists(
+    directory: string
+): Promise<Dirent[] | null> {
+    try {
+        return await fs.readdir(directory, { withFileTypes: true });
+    } catch (error: unknown) {
+        if (tryGetErrorCode(error) === "ENOENT") {
+            return null;
+        }
+
+        throw ensureError(error);
+    }
 }
 
 /**
@@ -199,7 +215,7 @@ export class FilesystemCloudStorageProvider
         for (const segment of segments) {
             cursor = path.join(cursor, segment);
             // eslint-disable-next-line no-await-in-loop -- must validate each path component sequentially to avoid TOCTOU issues
-            const stat = await fs.lstat(cursor).catch(() => null);
+            const stat = await lstatIfExists(cursor);
 
             // Component doesn't exist yet (e.g., upload). That is fine.
             if (stat?.isSymbolicLink()) {
@@ -227,7 +243,7 @@ export class FilesystemCloudStorageProvider
             cursor = path.join(cursor, segment);
 
             // eslint-disable-next-line no-await-in-loop -- must create/check each segment sequentially to prevent symlink races
-            const stat = await fs.lstat(cursor).catch(() => null);
+            const stat = await lstatIfExists(cursor);
             if (stat) {
                 // eslint-disable-next-line no-await-in-loop -- each path segment must be verified before proceeding to children
                 await assertSafeExistingDirectory(cursor, segment);
@@ -272,7 +288,7 @@ export class FilesystemCloudStorageProvider
                     root,
                     normalizedPrefix
                 );
-            const startStat = await fs.lstat(startDirectory).catch(() => null);
+            const startStat = await lstatIfExists(startDirectory);
 
             if (!startStat) {
                 return [];
@@ -291,9 +307,7 @@ export class FilesystemCloudStorageProvider
             const results: CloudObjectEntry[] = [];
 
             const walk = async (directory: string): Promise<void> => {
-                const entries = await fs
-                    .readdir(directory, { withFileTypes: true })
-                    .catch(() => null);
+                const entries = await readDirectoryEntriesIfExists(directory);
                 if (!entries) {
                     return;
                 }
@@ -303,7 +317,7 @@ export class FilesystemCloudStorageProvider
 
                     if (entry.isDirectory()) {
                         // eslint-disable-next-line no-await-in-loop -- Filesystem provider listing intentionally stats directories sequentially to bound provider IO.
-                        const stat = await fs.lstat(absolute).catch(() => null);
+                        const stat = await lstatIfExists(absolute);
 
                         if (!stat) {
                             continue;
@@ -530,7 +544,7 @@ export class FilesystemCloudStorageProvider
             await this.ensureAppRoot();
             const absolute = await this.resolveKeyPath(normalizedKey);
 
-            const stat = await fs.lstat(absolute).catch(() => null);
+            const stat = await lstatIfExists(absolute);
             if (!stat) {
                 return;
             }

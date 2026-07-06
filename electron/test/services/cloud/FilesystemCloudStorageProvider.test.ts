@@ -200,6 +200,117 @@ describe("FilesystemCloudStorageProvider", () => {
         }
     });
 
+    it("surfaces non-ENOENT lstat failures when checking upload targets", async () => {
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const targetPath = path.join(appRoot, "sync", "blocked.txt");
+
+        const actualFsPromises =
+            await vi.importActual<typeof import("node:fs/promises")>(
+                "node:fs/promises"
+            );
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:fs/promises", () => ({
+            ...actualFsPromises,
+            lstat: vi.fn(
+                async (...args: Parameters<typeof actualFsPromises.lstat>) => {
+                    const [target] = args;
+                    if (path.resolve(String(target)) === targetPath) {
+                        const error = new Error("permission denied");
+                        Object.defineProperty(error, "code", {
+                            configurable: true,
+                            value: "EACCES",
+                        });
+                        throw error;
+                    }
+
+                    return actualFsPromises.lstat(...args);
+                }
+            ),
+        }));
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            await expect(
+                provider.uploadObject({
+                    buffer: Buffer.from("payload"),
+                    key: "sync/blocked.txt",
+                    overwrite: true,
+                })
+            ).rejects.toMatchObject({
+                code: "EACCES",
+                operation: "uploadObject",
+                providerKind: "filesystem",
+                target: "sync/blocked.txt",
+            });
+        } finally {
+            vi.doUnmock("node:fs/promises");
+        }
+    });
+
+    it("surfaces non-ENOENT readdir failures while listing objects", async () => {
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const syncDirectory = path.join(appRoot, "sync");
+        await fs.mkdir(syncDirectory, { recursive: true });
+
+        const actualFsPromises =
+            await vi.importActual<typeof import("node:fs/promises")>(
+                "node:fs/promises"
+            );
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:fs/promises", () => ({
+            ...actualFsPromises,
+            readdir: vi.fn(
+                async (
+                    ...args: Parameters<typeof actualFsPromises.readdir>
+                ) => {
+                    const [target] = args;
+                    if (path.resolve(String(target)) === syncDirectory) {
+                        const error = new Error("permission denied");
+                        Object.defineProperty(error, "code", {
+                            configurable: true,
+                            value: "EACCES",
+                        });
+                        throw error;
+                    }
+
+                    return actualFsPromises.readdir(...args);
+                }
+            ),
+        }));
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            await expect(provider.listObjects("sync")).rejects.toMatchObject({
+                code: "EACCES",
+                operation: "listObjects",
+                providerKind: "filesystem",
+                target: "sync",
+            });
+        } finally {
+            vi.doUnmock("node:fs/promises");
+        }
+    });
+
     it("surfaces rollback failures when an overwrite upload cannot restore the previous object", async () => {
         const appRoot = path.resolve(baseDirectory, "uptime-watcher");
         const targetPath = path.join(appRoot, "sync", "existing.txt");
