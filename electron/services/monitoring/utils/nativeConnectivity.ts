@@ -90,6 +90,15 @@ const isConnectivityMethod = (
 ): value is Required<ConnectivityOptions>["method"] =>
     value === "dns" || value === "http" || value === "tcp";
 
+function isValidTcpPort(value: unknown): value is number {
+    return (
+        typeof value === "number" &&
+        Number.isInteger(value) &&
+        value >= 1 &&
+        value <= 65_535
+    );
+}
+
 function getOwnDataProperty(source: object, key: PropertyKey): unknown {
     const descriptor = Object.getOwnPropertyDescriptor(source, key);
     return descriptor && "value" in descriptor ? descriptor.value : undefined;
@@ -104,7 +113,7 @@ function normalizePortList(candidate: unknown): number[] {
 
     for (let index = 0; index < candidate.length; index += 1) {
         const value = getOwnDataProperty(candidate, String(index));
-        if (typeof value === "number" && isFiniteNumber(value)) {
+        if (isValidTcpPort(value)) {
             ports.push(value);
         }
     }
@@ -239,7 +248,11 @@ async function checkTcpPort(
         socket.on("timeout", handleTimeout);
         socket.on("error", handleError);
 
-        socket.connect(port, host);
+        try {
+            socket.connect(port, host);
+        } catch {
+            resolveFailure(abortListener);
+        }
     });
 }
 

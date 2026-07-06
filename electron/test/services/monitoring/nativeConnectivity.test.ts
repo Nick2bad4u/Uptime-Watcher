@@ -336,6 +336,51 @@ describe("Native Connectivity with Degraded State", () => {
             expect(mockDns.resolve4).toHaveBeenCalledWith("example.com");
             expect(getterCalls).toBe(0);
         });
+        it("should ignore invalid TCP port overrides and probe valid ports", async () => {
+            // Arrange
+            mockDns.resolve4.mockRejectedValue(new Error("DNS fallback unused"));
+            let connectHandler: (() => void) | undefined;
+            const connectCalls: number[] = [];
+            const mockSocket = {
+                connect: vi.fn((port: number) => {
+                    connectCalls.push(port);
+                    if (port !== 443) {
+                        throw new RangeError(`Invalid port ${port}`);
+                    }
+                    connectHandler?.();
+                }),
+                destroy: vi.fn(),
+                on: vi.fn((event: string, callback: () => void) => {
+                    if (event === "connect") {
+                        connectHandler = callback;
+                    }
+                }),
+                removeAllListeners: vi.fn(),
+                setTimeout: vi.fn(),
+            };
+
+            mockNet.Socket.mockImplementation(function MockSocketInstance() {
+                return mockSocket as unknown as net.Socket;
+            });
+
+            // Act
+            const result = await checkConnectivity("example.com", {
+                method: "tcp",
+                ports: [
+                    0,
+                    -1,
+                    65_536,
+                    12.5,
+                    443,
+                ],
+            });
+
+            // Assert
+            expect(result.status).toBe("up");
+            expect(result.details).toBe("TCP connection successful on port 443");
+            expect(connectCalls).toEqual([443]);
+            expect(mockDns.resolve4).not.toHaveBeenCalled();
+        });
     });
     describe("Status validation", () => {
         it("should only return valid MonitorCheckResult status values", async () => {
