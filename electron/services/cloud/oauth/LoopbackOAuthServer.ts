@@ -318,6 +318,21 @@ export async function startLoopbackOAuthServer(args?: {
         }
     );
 
+    const rejectOrBufferCallbackError = (
+        error: Error,
+        state: null | string
+    ): void => {
+        if (!isResolved && expectedStateValue !== null) {
+            isResolved = true;
+            rejectPromise?.(error);
+        } else if (!isResolved) {
+            pendingCallbackError ??= {
+                error,
+                state,
+            };
+        }
+    };
+
     const servers = listenHosts.map((host) => {
         const server = createServer((request, response) => {
             if (request.method && request.method !== "GET") {
@@ -372,15 +387,7 @@ export async function startLoopbackOAuthServer(args?: {
                 const error = new Error(
                     `OAuth callback error: ${callbackError}`
                 );
-                if (!isResolved && expectedStateValue !== null) {
-                    isResolved = true;
-                    rejectPromise?.(error);
-                } else if (!isResolved) {
-                    pendingCallbackError ??= {
-                        error,
-                        state: parsed.state,
-                    };
-                }
+                rejectOrBufferCallbackError(error, parsed.state);
                 return;
             }
 
@@ -394,15 +401,7 @@ export async function startLoopbackOAuthServer(args?: {
                 const error = new Error(
                     "OAuth callback missing required parameters"
                 );
-                if (!isResolved && expectedStateValue !== null) {
-                    isResolved = true;
-                    rejectPromise?.(error);
-                } else if (!isResolved) {
-                    pendingCallbackError ??= {
-                        error,
-                        state: parsed.state,
-                    };
-                }
+                rejectOrBufferCallbackError(error, parsed.state);
 
                 return;
             }
