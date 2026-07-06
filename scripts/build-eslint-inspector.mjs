@@ -551,38 +551,3 @@ if (isDirectRun()) {
         process.exitCode = 1;
     }
 }
-
-/**
- * Builds the static ESLint Config Inspector site using Nuxt.js and outputs it
- * to the configured directory.
- *
- * @returns {Promise<void>} Resolves when the build completes successfully.
- */
-export { buildESLintInspector };
-
-/**
- * Copies the built ESLint Inspector to the Docusaurus static directory for
- * deployment.
- *
- * @returns {Promise<void>} Resolves when the copy operation completes
- *   successfully.
- */
-export { copyToDocusaurus };
-
-/**
- * Creates an index redirect page for better SEO and usability in the ESLint
- * Inspector deployment.
- *
- * @returns {Promise<void>} Resolves when the redirect page is created.
- */
-export { createIndexRedirect };
-
-/**
- * Fixes absolute asset paths in HTML files to work with subdirectory
- * deployment.
- *
- * @returns {Promise<void>} Resolves when asset paths are fixed.
- */
-export { fixAssetPaths };
-
-export { main, parseArgs };

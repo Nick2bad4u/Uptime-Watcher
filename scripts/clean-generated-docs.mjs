@@ -172,12 +172,3 @@ if (isDirectRun()) {
         process.exitCode = 1;
     }
 }
-
-export {
-    isDirectRun,
-    loadTypedocOutputPaths,
-    main,
-    pathExists,
-    recreatePlaceholders,
-    removeGeneratedTargets,
-};

@@ -800,15 +800,3 @@ if (
 ) {
     process.exitCode = main();
 }
-
-export {
-    analyzeCoverage,
-    csvEscape,
-    deriveLineCoverage,
-    isBranchCovered,
-    main,
-    parseArgs,
-    parseOptionalPositiveInteger,
-    parseOutputFormat,
-    parseRequiredPositiveInteger,
-};
