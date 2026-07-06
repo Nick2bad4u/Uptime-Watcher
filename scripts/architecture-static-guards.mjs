@@ -23,6 +23,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
 
@@ -613,9 +614,9 @@ async function checkInvokeChannelCoverage() {
 }
 
 /**
- * Run all architecture guard checks and exit with a non-zero code on failure.
+ * Run all architecture guard checks.
  *
- * @returns {Promise<void>} Resolves after reporting any violations.
+ * @returns {Promise<boolean>} `true` when all guard checks pass.
  */
 async function main() {
     const electronRoot = path.resolve(ROOT_DIRECTORY, "electron");
@@ -664,20 +665,35 @@ async function main() {
         console.error(
             `\nTotal architecture guard violations: ${errors.length}.`
         );
-        process.exit(1);
+        return false;
     }
 
     console.log(
         "Architecture guard checks passed – IPC and event usage match the expected patterns."
     );
+    return true;
 }
 
-try {
-    await main();
-} catch (error) {
-    console.error(
-        "Architecture guard checks failed due to an unexpected error."
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
     );
-    console.error(error);
-    process.exit(1);
 }
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error(
+            "Architecture guard checks failed due to an unexpected error."
+        );
+        console.error(error);
+        process.exitCode = 1;
+    }
+}
+
+export { isDirectRun, main };
