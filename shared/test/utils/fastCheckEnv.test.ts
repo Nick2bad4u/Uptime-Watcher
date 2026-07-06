@@ -38,12 +38,12 @@ describe(resolveFastCheckEnvOverrides, () => {
     it("uses valid environment overrides", () => {
         expect.assertions(1);
 
-        process.env["FAST_CHECK_NUM_RUNS"] = "50";
-        process.env["FAST_CHECK_SEED"] = "1234";
+        process.env["FAST_CHECK_NUM_RUNS"] = " 50 ";
+        process.env["FAST_CHECK_SEED"] = " -1234 ";
 
         expect(resolveFastCheckEnvOverrides(25)).toEqual({
             numRuns: 50,
-            seed: 1234,
+            seed: -1234,
         });
     });
 
@@ -63,6 +63,38 @@ describe(resolveFastCheckEnvOverrides, () => {
         );
         expect(emitWarningSpy).toHaveBeenCalledWith(
             "[fast-check] Ignoring invalid FAST_CHECK_SEED value: not-a-seed",
+            { type: "FastCheckConfigWarning" }
+        );
+    });
+
+    it("rejects partially parsed numeric environment overrides", () => {
+        expect.assertions(5);
+
+        const emitWarningSpy = vi
+            .spyOn(process, "emitWarning")
+            .mockReturnValue(undefined);
+        process.env["FAST_CHECK_NUM_RUNS"] = "10junk";
+        process.env["FAST_CHECK_SEED"] = "123abc";
+
+        expect(resolveFastCheckEnvOverrides(25)).toEqual({ numRuns: 25 });
+        expect(emitWarningSpy).toHaveBeenCalledWith(
+            "[fast-check] Ignoring invalid FAST_CHECK_NUM_RUNS value: 10junk",
+            { type: "FastCheckConfigWarning" }
+        );
+        expect(emitWarningSpy).toHaveBeenCalledWith(
+            "[fast-check] Ignoring invalid FAST_CHECK_SEED value: 123abc",
+            { type: "FastCheckConfigWarning" }
+        );
+
+        process.env["FAST_CHECK_NUM_RUNS"] = "0";
+        process.env["FAST_CHECK_SEED"] = "+42";
+
+        expect(resolveFastCheckEnvOverrides(25)).toEqual({
+            numRuns: 25,
+            seed: 42,
+        });
+        expect(emitWarningSpy).toHaveBeenCalledWith(
+            "[fast-check] Ignoring invalid FAST_CHECK_NUM_RUNS value: 0",
             { type: "FastCheckConfigWarning" }
         );
     });

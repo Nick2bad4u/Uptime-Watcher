@@ -25,6 +25,45 @@ function emitInvalidFastCheckEnvWarning(
     );
 }
 
+function isAsciiDigit(character: string | undefined): boolean {
+    return (
+        typeof character === "string" &&
+        character.length === 1 &&
+        character >= "0" &&
+        character <= "9"
+    );
+}
+
+function isUnsignedDecimalInteger(value: string): boolean {
+    if (value.length === 0) {
+        return false;
+    }
+
+    for (const character of value) {
+        if (!isAsciiDigit(character)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function isSignedDecimalInteger(value: string): boolean {
+    const startIndex = value.startsWith("+") || value.startsWith("-") ? 1 : 0;
+
+    if (startIndex === value.length) {
+        return false;
+    }
+
+    for (let index = startIndex; index < value.length; index += 1) {
+        if (!isAsciiDigit(value[index])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 /**
  * Resolved overrides derived from the current process environment.
  */
@@ -52,9 +91,17 @@ export function resolveFastCheckEnvOverrides(
     let numRuns = sanitizedDefault;
     const rawNumRuns = process.env[FAST_CHECK_NUM_RUNS_ENV];
     if (typeof rawNumRuns === "string" && rawNumRuns.trim().length > 0) {
-        const parsed = Number.parseInt(rawNumRuns, 10);
-        if (Number.isFinite(parsed) && parsed > 0) {
-            numRuns = Math.trunc(parsed);
+        const trimmedNumRuns = rawNumRuns.trim();
+        if (isUnsignedDecimalInteger(trimmedNumRuns)) {
+            const parsed = Number.parseInt(trimmedNumRuns, 10);
+            if (Number.isSafeInteger(parsed) && parsed > 0) {
+                numRuns = parsed;
+            } else {
+                emitInvalidFastCheckEnvWarning(
+                    FAST_CHECK_NUM_RUNS_ENV,
+                    rawNumRuns
+                );
+            }
         } else {
             emitInvalidFastCheckEnvWarning(FAST_CHECK_NUM_RUNS_ENV, rawNumRuns);
         }
@@ -62,15 +109,20 @@ export function resolveFastCheckEnvOverrides(
 
     const rawSeed = process.env[FAST_CHECK_SEED_ENV];
     if (typeof rawSeed === "string" && rawSeed.trim().length > 0) {
-        const parsedSeed = Number.parseInt(rawSeed, 10);
-        if (Number.isFinite(parsedSeed)) {
-            return {
-                numRuns,
-                seed: Math.trunc(parsedSeed),
-            };
-        }
+        const trimmedSeed = rawSeed.trim();
+        if (isSignedDecimalInteger(trimmedSeed)) {
+            const parsedSeed = Number.parseInt(trimmedSeed, 10);
+            if (Number.isSafeInteger(parsedSeed)) {
+                return {
+                    numRuns,
+                    seed: parsedSeed,
+                };
+            }
 
-        emitInvalidFastCheckEnvWarning(FAST_CHECK_SEED_ENV, rawSeed);
+            emitInvalidFastCheckEnvWarning(FAST_CHECK_SEED_ENV, rawSeed);
+        } else {
+            emitInvalidFastCheckEnvWarning(FAST_CHECK_SEED_ENV, rawSeed);
+        }
     }
 
     return { numRuns };
