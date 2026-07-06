@@ -202,9 +202,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
         );
 
         test.prop([
-            fc
-                .string()
-                .filter((s) => !monitorStatusStrings.includes(s)),
+            fc.string().filter((s) => !monitorStatusStrings.includes(s)),
         ])(
             "should return false for invalid monitor statuses",
             (invalidStatus: string) => {
@@ -245,11 +243,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             }
         );
 
-        test.prop([
-            fc
-                .string()
-                .filter((s) => !siteStatusStrings.includes(s)),
-        ])(
+        test.prop([fc.string().filter((s) => !siteStatusStrings.includes(s))])(
             "should return false for invalid site statuses",
             (invalidStatus: string) => {
                 expect(isSiteStatus(invalidStatus)).toBeFalsy();
@@ -334,9 +328,9 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
             fc.record({
                 id: fc.string(),
                 type: fc.constantFrom(...BASE_MONITOR_TYPES),
-                status: fc.string().filter(
-                    (s) => !monitorStatusStrings.includes(s)
-                ),
+                status: fc
+                    .string()
+                    .filter((s) => !monitorStatusStrings.includes(s)),
                 monitoring: fc.boolean(),
                 responseTime: fc.nat(),
                 checkInterval: fc.nat(),
@@ -594,9 +588,7 @@ describe("Fast-Check Property-Based Tests for shared/types.ts Functions", () => 
     });
 
     describe("Type intersections and edge cases", () => {
-        test.prop([
-            monitorStatusArbitrary,
-        ])(
+        test.prop([monitorStatusArbitrary])(
             "should validate that monitor statuses are also site statuses",
             (status: MonitorStatus) => {
                 expect(isMonitorStatus(status)).toBeTruthy();

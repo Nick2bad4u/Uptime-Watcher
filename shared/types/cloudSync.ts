@@ -186,11 +186,12 @@ const deleteEntityOperationSchema = cloudSyncBaseOperationSchema
     })
     .strict() satisfies z.ZodType<CloudSyncDeleteEntityOperation>;
 
-const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> =
-    z.discriminatedUnion("kind", [
+const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> = z
+    .discriminatedUnion("kind", [
         deleteEntityOperationSchema,
         setFieldOperationSchemaTyped,
-    ]).superRefine((operation, ctx) => {
+    ])
+    .superRefine((operation, ctx) => {
         const idSchema =
             operation.entityType === "monitor"
                 ? monitorIdSchema

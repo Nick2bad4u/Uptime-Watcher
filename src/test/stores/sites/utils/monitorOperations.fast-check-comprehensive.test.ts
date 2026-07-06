@@ -189,9 +189,7 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                     fc.string({ minLength: 1, maxLength: 50 })
                 ),
                 status: fc.option(
-                    fc.constantFrom<Monitor["status"]>(
-                        ...MONITOR_STATUS_VALUES
-                    )
+                    fc.constantFrom<Monitor["status"]>(...MONITOR_STATUS_VALUES)
                 ),
                 monitoring: fc.option(fc.boolean()),
                 responseTime: fc.option(fc.integer({ min: -1, max: 10_000 })),
@@ -801,9 +799,9 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             fc.assert(
                 fc.property(
                     monitorArb,
-                    fc.string().filter(
-                        (s) => !monitorStatusStringValues.includes(s)
-                    ),
+                    fc
+                        .string()
+                        .filter((s) => !monitorStatusStringValues.includes(s)),
                     (monitor, invalidStatus) => {
                         expect(() =>
                             monitorOperations.updateStatus(

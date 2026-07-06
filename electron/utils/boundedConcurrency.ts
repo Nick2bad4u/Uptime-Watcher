@@ -46,7 +46,10 @@ export async function mapWithConcurrency<T, R>(args: {
         return [];
     }
 
-    const workerCount = Math.min(normalizeConcurrency(concurrency), items.length);
+    const workerCount = Math.min(
+        normalizeConcurrency(concurrency),
+        items.length
+    );
     const entries = items.map((item) => ({ item }));
 
     const results = Array.from(

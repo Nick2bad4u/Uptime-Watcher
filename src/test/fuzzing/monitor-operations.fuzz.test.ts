@@ -367,9 +367,7 @@ describe("Monitor Operations Fuzzing Tests", () => {
                     expect(normalized.retryAttempts).toBeGreaterThanOrEqual(0);
                     expect(normalized.retryAttempts).toBeLessThanOrEqual(10);
                     expect(typeof normalized.monitoring).toBe("boolean");
-                    expect(MONITOR_STATUS_VALUES).toContain(
-                        normalized.status
-                    );
+                    expect(MONITOR_STATUS_VALUES).toContain(normalized.status);
                     expect(Array.isArray(normalized.history)).toBeTruthy();
                     expect(
                         Array.isArray(normalized.activeOperations)

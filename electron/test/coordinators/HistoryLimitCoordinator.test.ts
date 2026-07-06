@@ -96,11 +96,14 @@ describe(HistoryLimitCoordinator, () => {
             Number.POSITIVE_INFINITY,
             Number.MAX_SAFE_INTEGER + 1,
         ]) {
-            await eventBus.emitTyped("internal:database:history-limit-updated", {
-                limit: invalidLimit,
-                operation: "history-limit-updated",
-                timestamp: Date.now(),
-            });
+            await eventBus.emitTyped(
+                "internal:database:history-limit-updated",
+                {
+                    limit: invalidLimit,
+                    operation: "history-limit-updated",
+                    timestamp: Date.now(),
+                }
+            );
         }
 
         await flushAsync();

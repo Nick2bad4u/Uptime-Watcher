@@ -22,7 +22,5 @@ export const getSafeIdentifierForLogging = (
         return identifier;
     }
 
-    return URL.canParse(trimmed)
-        ? getSafeUrlForLogging(trimmed)
-        : identifier;
+    return URL.canParse(trimmed) ? getSafeUrlForLogging(trimmed) : identifier;
 };

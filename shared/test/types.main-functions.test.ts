@@ -18,9 +18,8 @@ import {
     validateMonitor,
 } from "../types";
 
-const COMPUTED_SITE_STATUS_VALUES = SITE_STATUS_VALUES.filter(
-    isComputedSiteStatus
-);
+const COMPUTED_SITE_STATUS_VALUES =
+    SITE_STATUS_VALUES.filter(isComputedSiteStatus);
 
 describe("shared/types.ts main functions", () => {
     describe(validateMonitor, () => {

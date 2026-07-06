@@ -4,8 +4,8 @@
  * @remarks
  * Provides comprehensive monitoring history visualization with filtering,
  * pagination, and detailed record display. Shows status changes over time with
- * support for different status types (up, down, degraded, all) and
- * configurable history limits from user settings.
+ * support for different status types (up, down, degraded, all) and configurable
+ * history limits from user settings.
  *
  * Features include:
  *

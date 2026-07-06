@@ -505,8 +505,9 @@ describe("useSitesState", () => {
                     })
                 );
 
-                expect(arrayFirst(result.sites ?? [])?.monitors[0]?.monitoring)
-                    .toBeTruthy();
+                expect(
+                    arrayFirst(result.sites ?? [])?.monitors[0]?.monitoring
+                ).toBeTruthy();
                 expect(result.optimisticMonitoringLocks).toEqual({});
             }
         });

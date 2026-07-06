@@ -544,7 +544,8 @@ describe(IpcService, () => {
                 {
                     type: "http",
                     displayName: "HTTP Monitor with raw secret-marker",
-                    description: "Monitor HTTP endpoints with token=secret-marker",
+                    description:
+                        "Monitor HTTP endpoints with token=secret-marker",
                     version: "1.0.0",
                     fields: [
                         {

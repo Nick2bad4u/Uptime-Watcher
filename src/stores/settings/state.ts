@@ -87,8 +87,7 @@ const normalizeHistoryLimitSetting = (
 const isMutedSiteIdentifierArray = (value: unknown): value is string[] =>
     Array.isArray(value) &&
     value.every(
-        (entry) =>
-            typeof entry === "string" && isValidSiteIdentifier(entry)
+        (entry) => typeof entry === "string" && isValidSiteIdentifier(entry)
     );
 
 const normalizeMutedSiteIdentifiers = (

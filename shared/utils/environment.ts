@@ -22,10 +22,7 @@ import {
     objectKeys,
 } from "ts-extras";
 
-import {
-    getOwnDataProperty,
-    getOwnPropertyValue,
-} from "./errorPropertyAccess";
+import { getOwnDataProperty, getOwnPropertyValue } from "./errorPropertyAccess";
 import { createNullPrototypeObject } from "./objectSafety";
 
 export interface KnownEnvironmentVariables {

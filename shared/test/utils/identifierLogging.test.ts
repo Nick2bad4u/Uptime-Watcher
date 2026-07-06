@@ -10,9 +10,7 @@ describe(getSafeIdentifierForLogging, () => {
     it("preserves undefined and blank identifiers", () => {
         expect(getSafeIdentifierForLogging(undefined)).toBeUndefined();
         expect(getSafeIdentifierForLogging("")).toBe("");
-        expect(getSafeIdentifierForLogging(" ".repeat(3))).toBe(
-            " ".repeat(3)
-        );
+        expect(getSafeIdentifierForLogging(" ".repeat(3))).toBe(" ".repeat(3));
     });
 
     it("redacts URL-shaped identifiers", () => {

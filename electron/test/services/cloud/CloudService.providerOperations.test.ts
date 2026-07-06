@@ -423,8 +423,7 @@ describe("CloudService.providerOperations", () => {
         expect(loggerWarn).toHaveBeenCalledWith(
             "[CloudService] Failed to revoke provider tokens",
             {
-                message:
-                    "revoke failed refresh_token=[redacted] [redacted]",
+                message: "revoke failed refresh_token=[redacted] [redacted]",
                 provider: "dropbox",
             }
         );

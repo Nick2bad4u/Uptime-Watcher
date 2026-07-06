@@ -701,7 +701,10 @@ describe(ApplicationService, () => {
         }) => {
             await annotate(`Testing: ${task.name}`, "unit");
             await annotate("Component: ApplicationService", "component");
-            await annotate("Feature: Safe database cleanup detection", "feature");
+            await annotate(
+                "Feature: Safe database cleanup detection",
+                "feature"
+            );
             await annotate("Priority: Medium", "priority");
 
             let accessCount = 0;

@@ -493,9 +493,7 @@ describe("UUID Generation", () => {
                     typeof crypto.randomUUID === "function"
                 ) {
                     // Should use crypto UUID format
-                    expect(uuid).toBe(
-                        "00000000-0000-4000-8000-000000000123"
-                    );
+                    expect(uuid).toBe("00000000-0000-4000-8000-000000000123");
                 } else {
                     // Should use fallback format
                     expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);

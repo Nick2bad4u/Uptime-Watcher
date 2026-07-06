@@ -40,10 +40,7 @@ describe("mapWithConcurrency()", () => {
 
         await mapWithConcurrency({
             concurrency: Number.NaN,
-            items: [
-                1,
-                2,
-            ],
+            items: [1, 2],
             task: async () => {
                 active += 1;
                 maxActive = Math.max(maxActive, active);

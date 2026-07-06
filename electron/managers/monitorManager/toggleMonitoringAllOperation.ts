@@ -20,8 +20,7 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { EnhancedLifecycleConfig } from "../MonitorManagerEnhancedLifecycle";
 
 type MonitoringAllOperationSummary =
-    | MonitoringStartSummary
-    | MonitoringStopSummary;
+    MonitoringStartSummary | MonitoringStopSummary;
 
 /**
  * Error raised when a global monitoring lifecycle operation returns an

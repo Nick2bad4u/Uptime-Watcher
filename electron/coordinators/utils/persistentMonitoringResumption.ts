@@ -98,7 +98,7 @@ export async function resumeMonitoringCandidates(args: {
                 );
                 return false;
             }
-        }
+        },
     });
 
     const succeeded = results.filter(Boolean).length;

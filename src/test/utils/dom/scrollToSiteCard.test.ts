@@ -82,11 +82,7 @@ describe(scrollToSiteCard, () => {
             }).not.toThrow();
         } finally {
             if (originalDocument) {
-                Object.defineProperty(
-                    globalThis,
-                    "document",
-                    originalDocument
-                );
+                Object.defineProperty(globalThis, "document", originalDocument);
             } else {
                 Reflect.deleteProperty(globalThis, "document");
             }

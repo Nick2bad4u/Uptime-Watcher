@@ -251,11 +251,14 @@ describe(SiteCardHeader, () => {
         "http://localhost:3000/status",
         "https://192.168.1.10/dashboard",
         "https://user:pass@example.com/private",
-    ])("does not create third-party favicon URLs for unsafe endpoints: %s", (
-        endpoint
-    ) => {
-        render(<SiteCardHeader {...createPropsWithMonitorEndpoint(endpoint)} />);
+    ])(
+        "does not create third-party favicon URLs for unsafe endpoints: %s",
+        (endpoint) => {
+            render(
+                <SiteCardHeader {...createPropsWithMonitorEndpoint(endpoint)} />
+            );
 
-        expect(getFaviconImage()).toBeNull();
-    });
+            expect(getFaviconImage()).toBeNull();
+        }
+    );
 });

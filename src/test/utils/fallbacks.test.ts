@@ -826,10 +826,7 @@ describe("fallback Utilities", () => {
                     url: "https://example.com/status?token=display-secret#fragment",
                 });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "fallback"
-                );
+                const result = getMonitorDisplayIdentifier(monitor, "fallback");
 
                 expect(result).toBe("https://example.com/status");
                 expect(result).not.toContain("token=");
@@ -1107,10 +1104,7 @@ describe("fallback Utilities", () => {
                     url: "https://fallback.example.com/status?refresh_token=generic-secret#section",
                 });
 
-                const result = getMonitorDisplayIdentifier(
-                    monitor,
-                    "fallback"
-                );
+                const result = getMonitorDisplayIdentifier(monitor, "fallback");
 
                 expect(result).toBe("https://fallback.example.com/status");
                 expect(result).not.toContain("refresh_token");

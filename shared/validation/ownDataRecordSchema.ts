@@ -24,8 +24,8 @@ function getEnumerableOwnDataEntries(
  *
  * @remarks
  * Zod record parsing can lose special keys such as `__proto__` when cloning
- * into ordinary objects. Cloud sync payloads need those keys to survive as
- * own data properties, because settings keys and entity IDs are user data.
+ * into ordinary objects. Cloud sync payloads need those keys to survive as own
+ * data properties, because settings keys and entity IDs are user data.
  */
 export function createOwnDataRecordSchema<T>(
     valueSchema: z.ZodType<T>,
@@ -60,10 +60,7 @@ export function createOwnDataRecordSchema<T>(
                         ctx.addIssue({
                             code: "custom",
                             message: issue.message,
-                            path: [
-                                key,
-                                ...issue.path,
-                            ],
+                            path: [key, ...issue.path],
                         });
                     }
                 }

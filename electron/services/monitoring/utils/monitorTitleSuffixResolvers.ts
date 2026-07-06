@@ -8,10 +8,7 @@ const wrapSuffix = (value: string): string =>
 
 type MonitorTitleSuffixResolver = (monitor: Monitor) => string;
 type MonitorUrlField =
-    | "baselineUrl"
-    | "primaryStatusUrl"
-    | "replicaStatusUrl"
-    | "url";
+    "baselineUrl" | "primaryStatusUrl" | "replicaStatusUrl" | "url";
 
 const resolveSafeUrlField = (
     monitor: Monitor,

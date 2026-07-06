@@ -10,7 +10,7 @@ import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { isDefined } from "ts-extras";
 
-import type { SitesTelemetryPayload } from "./operationHelpers";
+import type { SitesTelemetryPayload } from "./siteTelemetryTypes";
 
 export const safeTextForTelemetry = (
     value: string | undefined

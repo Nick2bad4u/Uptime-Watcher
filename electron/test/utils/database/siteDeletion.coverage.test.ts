@@ -181,9 +181,8 @@ describe("deleteSiteWithAdapters runtime coverage", () => {
 
 describe("database error messages", () => {
     it("redacts URL-shaped identifiers from site-not-found errors", async () => {
-        const { SiteNotFoundError } = await import(
-            "../../../services/database/interfaces"
-        );
+        const { SiteNotFoundError } =
+            await import("../../../services/database/interfaces");
 
         const error = new SiteNotFoundError(
             "https://user:site-secret@example.com/path?access_token=site-token#private-site"

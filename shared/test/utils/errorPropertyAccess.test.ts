@@ -98,8 +98,9 @@ describe("errorPropertyAccess", () => {
         const service = new ExampleService();
         const ownCleanup = { cleanup: () => "cleaned" };
 
-        expect(getCallableDataProperty(ownCleanup, "cleanup")?.call(ownCleanup))
-            .toBe("cleaned");
+        expect(
+            getCallableDataProperty(ownCleanup, "cleanup")?.call(ownCleanup)
+        ).toBe("cleaned");
         expect(getCallableDataProperty(service, "close")?.call(service)).toBe(
             "closed"
         );

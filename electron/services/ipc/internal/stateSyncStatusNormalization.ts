@@ -159,8 +159,8 @@ export function normalizeStateSyncPayload(
 
     const addedSites = buildIdentifierOnlySites(addedSitesCandidate);
     const updatedSites = buildIdentifierOnlySites(updatedSitesCandidate);
-    const removedSiteIdentifiers = removedSiteIdentifiersCandidate
-        .filter(isNonEmptyString);
+    const removedSiteIdentifiers =
+        removedSiteIdentifiersCandidate.filter(isNonEmptyString);
 
     return {
         action,

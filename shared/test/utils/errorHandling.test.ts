@@ -372,12 +372,9 @@ describe("Error Handling Utils", () => {
             const operationError = new Error("operation failed");
 
             await expect(
-                withErrorHandling(
-                    async () => {
-                        throw operationError;
-                    },
-                    context
-                )
+                withErrorHandling(async () => {
+                    throw operationError;
+                }, context)
             ).rejects.toBe(operationError);
 
             expect(accessCount).toBe(0);

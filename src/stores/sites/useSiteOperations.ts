@@ -30,7 +30,6 @@ import { normalizeMonitor } from "./utils/monitorOperations";
 import {
     applySavedSiteToStore,
     getSiteByIdentifier,
-    type SitesTelemetryPayload,
     updateMonitorAndSave,
     withSiteOperation,
     withSiteOperationReturning,
@@ -41,6 +40,7 @@ import {
     buildSiteUpdateTelemetry,
     safeTextForTelemetry,
 } from "./utils/siteTelemetry";
+import type { SitesTelemetryPayload } from "./utils/siteTelemetryTypes";
 
 type MonitorNumericField = "checkInterval" | "retryAttempts" | "timeout";
 type MonitorNumericUpdateOperationName =

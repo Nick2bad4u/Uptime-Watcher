@@ -67,10 +67,7 @@ export async function runServiceCheckOperation(args: {
         const safeMonitorId =
             getSafeIdentifierForLogging(args.context.monitor.id) ??
             args.context.monitor.id;
-        logger.error(
-            `Monitor check failed for ${safeMonitorId}`,
-            safeError
-        );
+        logger.error(`Monitor check failed for ${safeMonitorId}`, safeError);
 
         const serviceResult = toFailure(getUserFacingErrorDetail(error));
 

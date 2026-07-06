@@ -223,8 +223,10 @@ describe(DefaultErrorFallback, () => {
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
-            const originalLocationDescriptor =
-                Object.getOwnPropertyDescriptor(globalThis, "location");
+            const originalLocationDescriptor = Object.getOwnPropertyDescriptor(
+                globalThis,
+                "location"
+            );
             const locationGetter = vi.fn(() => {
                 throw new Error("location unavailable");
             });

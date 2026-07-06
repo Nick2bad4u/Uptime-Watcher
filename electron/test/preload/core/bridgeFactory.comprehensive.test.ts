@@ -210,22 +210,19 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             const originalSetTimeout = globalThis.setTimeout;
             const unrefSpies: ReturnType<typeof vi.fn>[] = [];
             const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
-            setTimeoutSpy.mockImplementation(
-                ((...args: Parameters<typeof globalThis.setTimeout>) => {
-                    const handle = originalSetTimeout(
-                        ...args
-                    ) as NodeJS.Timeout;
-                    const originalUnref = handle.unref.bind(handle);
-                    const unrefSpy = vi.fn(() => originalUnref());
-                    handle.unref = unrefSpy;
-                    unrefSpies.push(unrefSpy);
-                    return handle;
-                }) as typeof globalThis.setTimeout
-            );
+            setTimeoutSpy.mockImplementation(((
+                ...args: Parameters<typeof globalThis.setTimeout>
+            ) => {
+                const handle = originalSetTimeout(...args) as NodeJS.Timeout;
+                const originalUnref = handle.unref.bind(handle);
+                const unrefSpy = vi.fn(() => originalUnref());
+                handle.unref = unrefSpy;
+                unrefSpies.push(unrefSpy);
+                return handle;
+            }) as typeof globalThis.setTimeout);
 
             let resolveInvoke:
-                | ((response: IpcResponse<string>) => void)
-                | undefined;
+                ((response: IpcResponse<string>) => void) | undefined;
             const invokeResponse = new Promise<IpcResponse<string>>(
                 (resolve) => {
                     resolveInvoke = resolve;

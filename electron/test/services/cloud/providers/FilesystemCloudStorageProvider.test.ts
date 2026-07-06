@@ -10,8 +10,7 @@ describe(FilesystemCloudStorageProvider, () => {
     let baseDirectory: string;
     let provider: FilesystemCloudStorageProvider;
 
-    const getAppRoot = (): string =>
-        path.join(baseDirectory, "uptime-watcher");
+    const getAppRoot = (): string => path.join(baseDirectory, "uptime-watcher");
 
     beforeEach(async () => {
         baseDirectory = await mkdtemp(
@@ -80,10 +79,12 @@ describe(FilesystemCloudStorageProvider, () => {
         const objectDirectory = path.join(getAppRoot(), "sync", "directory");
         await mkdir(objectDirectory, { recursive: true });
 
-        await expect(provider.downloadObject("sync/directory")).rejects.toBeInstanceOf(
-            CloudProviderOperationError
-        );
-        await expect(provider.deleteObject("sync/directory")).rejects.toMatchObject({
+        await expect(
+            provider.downloadObject("sync/directory")
+        ).rejects.toBeInstanceOf(CloudProviderOperationError);
+        await expect(
+            provider.deleteObject("sync/directory")
+        ).rejects.toMatchObject({
             operation: "deleteObject",
             providerKind: "filesystem",
             target: "sync/directory",

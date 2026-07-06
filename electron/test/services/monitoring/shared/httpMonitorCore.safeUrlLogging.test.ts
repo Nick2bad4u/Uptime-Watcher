@@ -23,9 +23,7 @@ const loggerMock = vi.hoisted(() => ({
 
 type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
 
-const operationalHookOptions = vi.hoisted(
-    (): OperationalHookOptions[] => []
-);
+const operationalHookOptions = vi.hoisted((): OperationalHookOptions[] => []);
 
 vi.mock("../../../../services/monitoring/utils/httpClient", () => ({
     createHttpClient: vi.fn(() => mockAxiosInstance),

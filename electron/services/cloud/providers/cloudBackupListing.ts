@@ -165,7 +165,8 @@ export async function listBackupsFromMetadataObjects(args: {
                     return null;
                 }
 
-                const expectedFileName = stringSplit(backupKey, "/").pop() ?? "";
+                const expectedFileName =
+                    stringSplit(backupKey, "/").pop() ?? "";
                 if (
                     expectedFileName.length > 0 &&
                     parsed.fileName !== expectedFileName

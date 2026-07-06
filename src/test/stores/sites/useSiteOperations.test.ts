@@ -417,7 +417,9 @@ describe(createSiteOperationsActions, () => {
             const serializedTelemetry = JSON.stringify(
                 telemetryCalls.map((call) => call[2])
             );
-            expect(serializedTelemetry).not.toContain("Name should not be logged");
+            expect(serializedTelemetry).not.toContain(
+                "Name should not be logged"
+            );
             expect(serializedTelemetry).not.toContain("access_token");
             expect(serializedTelemetry).not.toContain("refresh_token");
             expect(serializedTelemetry).not.toContain("secret");

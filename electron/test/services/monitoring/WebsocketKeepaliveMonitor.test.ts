@@ -29,9 +29,7 @@ const socketInstances: CapturedWebSocket[] = [];
 
 type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
 
-const operationalHookOptions = vi.hoisted(
-    (): OperationalHookOptions[] => []
-);
+const operationalHookOptions = vi.hoisted((): OperationalHookOptions[] => []);
 
 vi.mock("ws", async () => {
     const { EventEmitter } = await import("node:events");
@@ -160,16 +158,16 @@ describe("WebsocketKeepaliveMonitor service", () => {
         const originalSetTimeout = globalThis.setTimeout;
         const unrefSpies: ReturnType<typeof vi.fn>[] = [];
         const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
-        setTimeoutSpy.mockImplementation(
-            ((...args: Parameters<typeof globalThis.setTimeout>) => {
-                const handle = originalSetTimeout(...args) as NodeJS.Timeout;
-                const originalUnref = handle.unref.bind(handle);
-                const unrefSpy = vi.fn(() => originalUnref());
-                handle.unref = unrefSpy;
-                unrefSpies.push(unrefSpy);
-                return handle;
-            }) as typeof globalThis.setTimeout
-        );
+        setTimeoutSpy.mockImplementation(((
+            ...args: Parameters<typeof globalThis.setTimeout>
+        ) => {
+            const handle = originalSetTimeout(...args) as NodeJS.Timeout;
+            const originalUnref = handle.unref.bind(handle);
+            const unrefSpy = vi.fn(() => originalUnref());
+            handle.unref = unrefSpy;
+            unrefSpies.push(unrefSpy);
+            return handle;
+        }) as typeof globalThis.setTimeout);
 
         try {
             const monitor = createMonitor();

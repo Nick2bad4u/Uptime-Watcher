@@ -720,8 +720,12 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             expect(
                 screen.getByText("https://api.example.com/status")
             ).toBeInTheDocument();
-            expect(screen.queryByText(/refresh_token/iu)).not.toBeInTheDocument();
-            expect(screen.queryByText(/display-secret/iu)).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/refresh_token/iu)
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(/display-secret/iu)
+            ).not.toBeInTheDocument();
             expect(screen.queryByText(/section/iu)).not.toBeInTheDocument();
         });
     });

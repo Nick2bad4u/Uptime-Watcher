@@ -228,11 +228,11 @@ describe("StateSyncService", () => {
             }
         );
 
-        const serializedErrorCalls = JSON.stringify(mockLogger.error.mock.calls);
-        expect(serializedErrorCalls).not.toContain("STATE_SYNC_SECRET");
-        expect(serializedErrorCalls).not.toContain(
-            "STATE_SYNC_REFRESH_SECRET"
+        const serializedErrorCalls = JSON.stringify(
+            mockLogger.error.mock.calls
         );
+        expect(serializedErrorCalls).not.toContain("STATE_SYNC_SECRET");
+        expect(serializedErrorCalls).not.toContain("STATE_SYNC_REFRESH_SECRET");
         expect(serializedErrorCalls).not.toContain("rawEvent");
     });
 

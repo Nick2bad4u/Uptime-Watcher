@@ -8,7 +8,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
-import type { SitesTelemetryPayload } from "./operationHelpers";
+import type { SitesTelemetryPayload } from "./siteTelemetryTypes";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
 
 function normalizeStatusUpdateTimestamp(timestamp: string): string {

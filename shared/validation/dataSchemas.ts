@@ -21,7 +21,11 @@ const anyValueSchema = z.custom<unknown>(() => true, {
     error: "Any value",
 });
 
-const FORBIDDEN_RECORD_KEYS = ["__proto__", "constructor", "prototype"] as const;
+const FORBIDDEN_RECORD_KEYS = [
+    "__proto__",
+    "constructor",
+    "prototype",
+] as const;
 
 const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     (value): value is ArrayBuffer => value instanceof ArrayBuffer,

@@ -389,9 +389,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await service.exportAllData();
 
-            expect(mockRepositories.history.findByMonitorId).toHaveBeenCalledTimes(
-                monitors.length
-            );
+            expect(
+                mockRepositories.history.findByMonitorId
+            ).toHaveBeenCalledTimes(monitors.length);
             expect(maxActive).toBeLessThanOrEqual(
                 DATABASE_GRAPH_READ_CONCURRENCY
             );
@@ -942,7 +942,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(message).not.toMatch(/private-site|site-secret|site-token/v);
 
             expect(withDatabaseOperation).not.toHaveBeenCalled();
-            expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
+            expect(
+                mockDatabaseService.executeTransaction
+            ).not.toHaveBeenCalled();
             expect(
                 mockRepositories.site.deleteAllInternal
             ).not.toHaveBeenCalled();

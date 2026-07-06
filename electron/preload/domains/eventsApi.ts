@@ -346,8 +346,7 @@ const isHistoryLimitUpdatedEventDataPayload = (
     }
 
     return !(
-        isDefined(previousLimit) &&
-        !isNonNegativeSafeInteger(previousLimit)
+        isDefined(previousLimit) && !isNonNegativeSafeInteger(previousLimit)
     );
 };
 

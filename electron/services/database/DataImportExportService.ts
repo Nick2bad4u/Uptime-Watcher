@@ -643,18 +643,15 @@ export class DataImportExportService {
     }
 
     /**
-     * Import history for created monitors by preserving import order.
-     * Private helper method for history data persistence.
+     * Import history for created monitors by preserving import order. Private
+     * helper method for history data persistence.
      */
     private importHistoryForMonitors(
         historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
         createdMonitors: Site["monitors"],
         originalMonitors: Site["monitors"]
     ): void {
-        for (const [
-            index,
-            createdMonitor,
-        ] of createdMonitors.entries()) {
+        for (const [index, createdMonitor] of createdMonitors.entries()) {
             const originalMonitor = originalMonitors[index];
 
             if (

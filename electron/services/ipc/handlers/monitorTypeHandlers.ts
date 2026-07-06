@@ -32,9 +32,7 @@ type BaseMonitorUiConfig = ReturnType<
     typeof getAllMonitorTypeConfigs
 >[0]["uiConfig"];
 
-const describeMonitorTypeConfigForError = (
-    config: MonitorTypeConfig
-): string =>
+const describeMonitorTypeConfigForError = (config: MonitorTypeConfig): string =>
     `type=${config.type}, version=${config.version}, fieldCount=${config.fields.length}, hasUiConfig=${String(
         isDefined(config.uiConfig)
     )}`;

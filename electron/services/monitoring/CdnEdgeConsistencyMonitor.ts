@@ -119,8 +119,8 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
                         baselineUrl,
                         edgeEndpoints,
                         timeout,
-                    signal
-                ),
+                        signal
+                    ),
                 {
                     failureLogLevel: "warn",
                     maxRetries: totalAttempts,

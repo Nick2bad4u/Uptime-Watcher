@@ -77,16 +77,13 @@ describe("autoStartMonitoring", () => {
             name: "Site 1",
         };
 
-        await expectBoundedStarts(
-            async (startMonitoringForSite) => {
-                await autoStartMonitoringIfAppropriateOperation({
-                    logger: createLogger(),
-                    site,
-                    startMonitoringForSite,
-                });
-            },
-            monitors.length
-        );
+        await expectBoundedStarts(async (startMonitoringForSite) => {
+            await autoStartMonitoringIfAppropriateOperation({
+                logger: createLogger(),
+                site,
+                startMonitoringForSite,
+            });
+        }, monitors.length);
     });
 
     it("bounds monitor startup fanout for newly added monitors", async () => {
@@ -95,17 +92,14 @@ describe("autoStartMonitoring", () => {
             (_, index) => createMonitor(`monitor-${index}`)
         );
 
-        await expectBoundedStarts(
-            async (startMonitoringForSite) => {
-                await autoStartNewMonitorsOperation({
-                    logger: createLogger(),
-                    newMonitors,
-                    siteIdentifier: "site-1",
-                    startMonitoringForSite,
-                });
-            },
-            newMonitors.length
-        );
+        await expectBoundedStarts(async (startMonitoringForSite) => {
+            await autoStartNewMonitorsOperation({
+                logger: createLogger(),
+                newMonitors,
+                siteIdentifier: "site-1",
+                startMonitoringForSite,
+            });
+        }, newMonitors.length);
     });
 
     it("redacts URL-shaped site identifiers in loaded-site diagnostics", async () => {
@@ -126,9 +120,7 @@ describe("autoStartMonitoring", () => {
 
         expect(startMonitoringForSite).not.toHaveBeenCalled();
 
-        const logPayload = JSON.stringify(
-            vi.mocked(logger.debug).mock.calls
-        );
+        const logPayload = JSON.stringify(vi.mocked(logger.debug).mock.calls);
 
         expect(logPayload).toContain("https://example.com/path");
         expect(logPayload).not.toContain("site-secret");
@@ -150,9 +142,7 @@ describe("autoStartMonitoring", () => {
             startMonitoringForSite: vi.fn(),
         });
 
-        const logPayload = JSON.stringify(
-            vi.mocked(logger.debug).mock.calls
-        );
+        const logPayload = JSON.stringify(vi.mocked(logger.debug).mock.calls);
 
         expect(logPayload).toContain("https://monitor.example/check");
         expect(logPayload).not.toContain("monitor-token");

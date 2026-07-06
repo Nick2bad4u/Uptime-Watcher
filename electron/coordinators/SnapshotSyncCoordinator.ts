@@ -368,8 +368,9 @@ export class SnapshotSyncCoordinator {
         });
 
         // Validate that critical sites were set up successfully
-        const successful = setupResults.filter((result) => result.success)
-            .length;
+        const successful = setupResults.filter(
+            (result) => result.success
+        ).length;
         const failed = setupResults.length - successful;
 
         if (failed > 0) {

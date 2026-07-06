@@ -38,7 +38,10 @@ const setupModule = async (overrides: SetupOverrides = {}) => {
     class TestElectronBridgeNotReadyError extends Error {
         public readonly diagnostics: unknown;
 
-        public constructor(messageOrDiagnostics: unknown, diagnostics?: unknown) {
+        public constructor(
+            messageOrDiagnostics: unknown,
+            diagnostics?: unknown
+        ) {
             super(
                 typeof messageOrDiagnostics === "string"
                     ? messageOrDiagnostics

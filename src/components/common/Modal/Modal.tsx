@@ -150,9 +150,7 @@ function getDocumentActiveElement(): Element | null {
     }
 }
 
-function isFocusRestoreElement(
-    value: unknown
-): value is FocusRestoreElement {
+function isFocusRestoreElement(value: unknown): value is FocusRestoreElement {
     if (!isElementNode(value)) {
         return false;
     }
@@ -595,10 +593,7 @@ export const Modal = ({
 
                 const active = getDocumentActiveElement();
 
-                if (
-                    !active ||
-                    !modalElement.contains(active)
-                ) {
+                if (!active || !modalElement.contains(active)) {
                     event.preventDefault();
                     first.focus();
                     return;

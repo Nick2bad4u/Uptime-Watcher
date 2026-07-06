@@ -47,10 +47,10 @@ export function getOwnDataProperty(
  * invoked safely.
  *
  * @remarks
- * Prefer {@link getOwnDataProperty} for untrusted payloads, errors, and
- * metadata where getters should never run. This helper is for trusted runtime
- * boundaries such as `globalThis.crypto`, where modern runtimes expose native
- * capabilities through configurable global accessors.
+ * Prefer {@link getOwnDataProperty} for untrusted payloads, errors, and metadata
+ * where getters should never run. This helper is for trusted runtime boundaries
+ * such as `globalThis.crypto`, where modern runtimes expose native capabilities
+ * through configurable global accessors.
  */
 export function getOwnPropertyValue(
     holder: object,

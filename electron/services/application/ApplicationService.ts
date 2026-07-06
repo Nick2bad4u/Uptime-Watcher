@@ -161,9 +161,7 @@ export class ApplicationService {
 
         try {
             const services = this.serviceContainer.getInitializedServices();
-            const getInitializedService = (
-                serviceName: string
-            ): unknown =>
+            const getInitializedService = (serviceName: string): unknown =>
                 services.find(({ name }) => name === serviceName)?.service;
 
             for (const { name } of services) {

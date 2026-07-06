@@ -20,10 +20,7 @@ const validateGuardReportTimestamp = (value: unknown): null | string => {
         return numberError;
     }
 
-    if (
-        !isNonNegativeSafeInteger(value) ||
-        value > MAX_VALID_DATE_EPOCH_MS
-    ) {
+    if (!isNonNegativeSafeInteger(value) || value > MAX_VALID_DATE_EPOCH_MS) {
         return "timestamp must be a valid epoch millisecond timestamp";
     }
 

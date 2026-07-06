@@ -33,9 +33,7 @@ const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
 
 const statusHistoryArbitrary = fc.array(
     fc.record({
-        status: fc.constantFrom<StatusHistoryStatus>(
-            ...STATUS_HISTORY_VALUES
-        ),
+        status: fc.constantFrom<StatusHistoryStatus>(...STATUS_HISTORY_VALUES),
         responseTime: fc.integer({ min: 0, max: 999_999 }),
         timestamp: fc.integer({ min: 0, max: Date.now() + 86_400_000 }),
         details: fc.option(fc.string({ maxLength: 500 }), {

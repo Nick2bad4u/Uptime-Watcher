@@ -215,7 +215,8 @@ export const RowValidationUtils = {
      * Validates history status value.
      */
     isValidStatus: (value: unknown): value is StatusHistoryStatus =>
-        typeof value === "string" && arrayIncludes(STATUS_HISTORY_VALUES, value),
+        typeof value === "string" &&
+        arrayIncludes(STATUS_HISTORY_VALUES, value),
 
     /**
      * Validates timestamp as an epoch millisecond value representable by Date.

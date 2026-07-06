@@ -14,6 +14,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 
+import { RowValidationUtils } from "@shared/types/database";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
@@ -82,10 +83,7 @@ function safeNumber(value: unknown, fallback = 0): number {
 
 function safeEpochMs(value: unknown, fallback = Date.now()): number {
     const parsed = parseFiniteNumber(value);
-    if (
-        isNonNegativeSafeInteger(parsed) &&
-        parsed <= MAX_VALID_DATE_EPOCH_MS
-    ) {
+    if (isNonNegativeSafeInteger(parsed) && parsed <= MAX_VALID_DATE_EPOCH_MS) {
         return parsed;
     }
     return fallback;
@@ -170,14 +168,14 @@ export function historyEntryToRow(
  * @public
  */
 export function isValidHistoryRow(row: DatabaseHistoryRow): boolean {
+    const rowStatus: unknown = row.status;
+
     return (
         isDefined(row.monitorId) &&
         isDefined(row.status) &&
         isDefined(row.timestamp) &&
         typeof row.monitorId === "string" &&
-        (row.status === "up" ||
-            row.status === "degraded" ||
-            row.status === "down") &&
+        RowValidationUtils.isValidStatus(rowStatus) &&
         isNonNegativeSafeInteger(row.timestamp) &&
         row.timestamp <= MAX_VALID_DATE_EPOCH_MS
     );

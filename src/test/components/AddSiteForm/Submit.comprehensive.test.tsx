@@ -334,8 +334,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 );
             const formData = (
                 failureLogCall?.[1] as
-                    | { formData?: Record<string, unknown> }
-                    | undefined
+                    { formData?: Record<string, unknown> } | undefined
             )?.formData;
             const serializedFormData = JSON.stringify(formData);
 

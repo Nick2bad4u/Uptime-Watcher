@@ -1006,8 +1006,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
                     );
 
                 expect(isValidationFailure(result)).toBeTruthy();
-                expect(result?.some((issue) => issue.includes("restoredAt")))
-                    .toBeTruthy();
+                expect(
+                    result?.some((issue) => issue.includes("restoredAt"))
+                ).toBeTruthy();
             });
         });
     });

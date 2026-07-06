@@ -267,10 +267,11 @@ export class FilesystemCloudStorageProvider
             const root = await this.getAppRootRealPath();
             const normalizedPrefix =
                 FilesystemCloudStorageProvider.normalizePrefix(prefix);
-            const startDirectory = FilesystemCloudStorageProvider.resolvePrefixPath(
-                root,
-                normalizedPrefix
-            );
+            const startDirectory =
+                FilesystemCloudStorageProvider.resolvePrefixPath(
+                    root,
+                    normalizedPrefix
+                );
             const startStat = await fs.lstat(startDirectory).catch(() => null);
 
             if (!startStat) {
@@ -302,9 +303,7 @@ export class FilesystemCloudStorageProvider
 
                     if (entry.isDirectory()) {
                         // eslint-disable-next-line no-await-in-loop -- Filesystem provider listing intentionally stats directories sequentially to bound provider IO.
-                        const stat = await fs
-                            .lstat(absolute)
-                            .catch(() => null);
+                        const stat = await fs.lstat(absolute).catch(() => null);
 
                         if (!stat) {
                             continue;

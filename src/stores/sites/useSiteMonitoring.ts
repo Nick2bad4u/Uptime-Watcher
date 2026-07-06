@@ -14,9 +14,9 @@ import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { isDefined } from "ts-extras";
 
 import type { SiteMonitoringActions } from "./types";
-import type { SitesTelemetryPayload } from "./utils/operationHelpers";
 import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
 import type { StatusUpdateSnapshotPayload } from "./utils/statusUpdateSnapshot";
+import type { SitesTelemetryPayload } from "./utils/siteTelemetryTypes";
 
 import { logger } from "../../services/logger";
 import { MonitoringService } from "../../services/MonitoringService";

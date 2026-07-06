@@ -95,9 +95,7 @@ const omitSelectedMonitorEntryForSite = (
     return remainingMonitorIds;
 };
 
-const collectOptimisticLockKeysForSite = (
-    site: Site
-): OptimisticLockKey[] =>
+const collectOptimisticLockKeysForSite = (site: Site): OptimisticLockKey[] =>
     site.monitors.map((monitor) =>
         buildMonitoringLockKey(site.identifier, monitor.id)
     );
@@ -424,8 +422,7 @@ export const createSitesStateActions = (
                     identifier
                 );
 
-                let optimisticMonitoringLocks =
-                    state.optimisticMonitoringLocks;
+                let optimisticMonitoringLocks = state.optimisticMonitoringLocks;
                 if (removedSite) {
                     optimisticMonitoringLocks = {
                         ...optimisticMonitoringLocks,
@@ -533,47 +530,50 @@ export const createSitesStateActions = (
             const expiredLockKeys: OptimisticLockKey[] = [];
             let mutatedSiteCount = 0;
 
-            const normalizedSites = applicableLockKeys.size === 0
-                ? sites
-                : sites.map((site) => {
-                      let isSiteMutated = false;
-                      const normalizedMonitors: Monitor[] = [];
+            const normalizedSites =
+                applicableLockKeys.size === 0
+                    ? sites
+                    : sites.map((site) => {
+                          let isSiteMutated = false;
+                          const normalizedMonitors: Monitor[] = [];
 
-                      for (const monitor of site.monitors) {
-                          const lockKey = buildMonitoringLockKey(
-                              site.identifier,
-                              monitor.id
-                          );
-                          const lock = setHas(applicableLockKeys, lockKey)
-                              ? locks[lockKey]
-                              : undefined;
+                          for (const monitor of site.monitors) {
+                              const lockKey = buildMonitoringLockKey(
+                                  site.identifier,
+                                  monitor.id
+                              );
+                              const lock = setHas(applicableLockKeys, lockKey)
+                                  ? locks[lockKey]
+                                  : undefined;
 
-                          if (!lock) {
-                              normalizedMonitors.push(monitor);
-                          } else if (lock.expiresAt <= now) {
-                              expiredLockKeys.push(lockKey);
-                              normalizedMonitors.push(monitor);
-                          } else if (monitor.monitoring === lock.monitoring) {
-                              normalizedMonitors.push(monitor);
-                          } else {
-                              isSiteMutated = true;
-                              normalizedMonitors.push({
-                                  ...monitor,
-                                  monitoring: lock.monitoring,
-                              });
+                              if (!lock) {
+                                  normalizedMonitors.push(monitor);
+                              } else if (lock.expiresAt <= now) {
+                                  expiredLockKeys.push(lockKey);
+                                  normalizedMonitors.push(monitor);
+                              } else if (
+                                  monitor.monitoring === lock.monitoring
+                              ) {
+                                  normalizedMonitors.push(monitor);
+                              } else {
+                                  isSiteMutated = true;
+                                  normalizedMonitors.push({
+                                      ...monitor,
+                                      monitoring: lock.monitoring,
+                                  });
+                              }
                           }
-                      }
 
-                      if (!isSiteMutated) {
-                          return site;
-                      }
+                          if (!isSiteMutated) {
+                              return site;
+                          }
 
-                      mutatedSiteCount += 1;
-                      return {
-                          ...site,
-                          monitors: normalizedMonitors,
-                      } satisfies Site;
-                  });
+                          mutatedSiteCount += 1;
+                          return {
+                              ...site,
+                              monitors: normalizedMonitors,
+                          } satisfies Site;
+                      });
 
             let sitesForState = sites;
             if (mutatedSiteCount > 0) {

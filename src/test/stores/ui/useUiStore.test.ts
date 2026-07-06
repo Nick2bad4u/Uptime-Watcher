@@ -829,13 +829,11 @@ describe(useUIStore, () => {
                 migrated?.siteDetailsHeaderCollapsedState ?? {};
             const migratedTabState = migrated?.siteDetailsTabState ?? {};
 
-            expect(
-                Object.getPrototypeOf(migratedCollapsedState)
-            ).toBeNull();
+            expect(Object.getPrototypeOf(migratedCollapsedState)).toBeNull();
             expect(Object.getPrototypeOf(migratedTabState)).toBeNull();
-            expect(
-                Object.hasOwn(migratedCollapsedState, "__proto__")
-            ).toBe(true);
+            expect(Object.hasOwn(migratedCollapsedState, "__proto__")).toBe(
+                true
+            );
             expect(
                 Object.getOwnPropertyDescriptor(
                     migratedCollapsedState,

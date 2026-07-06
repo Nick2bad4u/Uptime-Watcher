@@ -28,8 +28,8 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
-import type { SitesTelemetryPayload } from "./utils/operationHelpers";
 import type { StatusUpdateSubscriptionResult } from "./utils/statusUpdateHandler";
+import type { SitesTelemetryPayload } from "./utils/siteTelemetryTypes";
 
 import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";

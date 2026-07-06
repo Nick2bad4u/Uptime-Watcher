@@ -134,7 +134,12 @@ describe("MonitorRepository simple orchestration", () => {
         expect(withDatabaseOperationMock).toHaveBeenCalled();
         const deleteCall = withDatabaseOperationMock.mock.calls[0];
         expect(deleteCall).toBeDefined();
-        const [, operationName, , context] = deleteCall!;
+        const [
+            ,
+            operationName,
+            ,
+            context,
+        ] = deleteCall!;
         expect(operationName).toBe("monitor-delete-by-site");
         expect(context).toEqual({
             siteIdentifier: "https://example.com/path",

@@ -165,10 +165,8 @@ const normalizeSiteTableColumnWidths = (
     return updated;
 };
 
-const createEmptySiteDetailsTabState = (): Record<
-    string,
-    SiteDetailsTab
-> => createNullPrototypeObject<Record<string, SiteDetailsTab>>();
+const createEmptySiteDetailsTabState = (): Record<string, SiteDetailsTab> =>
+    createNullPrototypeObject<Record<string, SiteDetailsTab>>();
 
 function getOwnDataField(source: object, key: keyof UIPersistedState): unknown {
     const descriptor = Object.getOwnPropertyDescriptor(source, key);
@@ -493,8 +491,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     } catch (error: unknown) {
                         const normalizedError = ensureError(error);
                         const underlyingCause =
-                            getOwnDataCause(normalizedError) ??
-                            normalizedError;
+                            getOwnDataCause(normalizedError) ?? normalizedError;
 
                         // Prefer logging the underlying cause when we wrap an
                         // error for user-facing messaging.

@@ -89,9 +89,7 @@ const safeBackupPrefixArbitrary = fc
         minLength: 0,
     })
     .map((characters) => arrayJoin(characters, ""))
-    .filter((prefix) =>
-        isSafeDownloadFileName(`${prefix}-2000-01-01.sqlite`)
-    );
+    .filter((prefix) => isSafeDownloadFileName(`${prefix}-2000-01-01.sqlite`));
 
 const safeBackupExtensionArbitrary = fc
     .array(fc.constantFrom(...SAFE_BACKUP_FILE_EXTENSION_CHARACTERS), {
@@ -441,9 +439,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             for (const [prefix, extension] of unsafeCases) {
                 const fileName = generateBackupFileName(prefix, extension);
 
-                expect(fileName).toMatch(
-                    /^backup-\d{4}-\d{2}-\d{2}\.sqlite$/v
-                );
+                expect(fileName).toMatch(/^backup-\d{4}-\d{2}-\d{2}\.sqlite$/v);
             }
         });
 

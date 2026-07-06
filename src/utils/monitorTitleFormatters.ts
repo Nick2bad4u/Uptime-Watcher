@@ -79,8 +79,7 @@ const defaultMonitorTitleSuffixFormatters: Partial<
 
         return ` (${monitor.host})`;
     },
-    "websocket-keepalive": (monitor) =>
-        formatUrlSuffix(monitor.url),
+    "websocket-keepalive": (monitor) => formatUrlSuffix(monitor.url),
 };
 
 const monitorTitleSuffixFormatters: Partial<

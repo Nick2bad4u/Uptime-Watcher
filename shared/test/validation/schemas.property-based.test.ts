@@ -30,9 +30,7 @@ const statusHistoryArbitrary = fc.array(
     fc.record({
         details: fc.option(fc.string(), { nil: undefined }),
         responseTime: fc.integer({ min: 0, max: 99_999 }),
-        status: fc.constantFrom<StatusHistoryStatus>(
-            ...STATUS_HISTORY_VALUES
-        ),
+        status: fc.constantFrom<StatusHistoryStatus>(...STATUS_HISTORY_VALUES),
         timestamp: fc.integer({ min: 0, max: MAX_VALID_DATE_EPOCH_MS }),
     })
 );
