@@ -15,10 +15,14 @@ export function resolvePathWithinDirectory(
 ): string {
     const sanitizedFileName = createSanitizedFileName(fileName);
     const resolvedBase = path.resolve(baseDirectory);
-    const normalizedBase = `${resolvedBase}${path.sep}`;
     const targetPath = path.resolve(resolvedBase, sanitizedFileName);
+    const relativeTarget = path.relative(resolvedBase, targetPath);
 
-    if (!targetPath.startsWith(normalizedBase)) {
+    if (
+        relativeTarget === ".." ||
+        relativeTarget.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(relativeTarget)
+    ) {
         throw new Error(
             `[DataBackupService] Refusing to write outside of ${resolvedBase}`
         );

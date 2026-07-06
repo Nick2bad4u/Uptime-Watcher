@@ -26,6 +26,16 @@ describe("pathGuards", () => {
         ).toBeFalsy();
     });
 
+    it("accepts POSIX child paths whose names start with two dots", () => {
+        expect(
+            isPathWithinDirectory(
+                "/opt/uptime-watcher/dist/..assets/index.html",
+                "/opt/uptime-watcher/dist",
+                "linux"
+            )
+        ).toBeTruthy();
+    });
+
     it("uses Windows separators and case-insensitive comparison for win32", () => {
         expect(
             isPathWithinDirectory(

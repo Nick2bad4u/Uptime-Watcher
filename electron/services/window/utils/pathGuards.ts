@@ -1,6 +1,8 @@
 import * as path from "node:path";
 
 interface PathComparisonModule {
+    readonly isAbsolute: (value: string) => boolean;
+    readonly relative: (from: string, to: string) => string;
     readonly resolve: (value: string) => string;
     readonly sep: string;
 }
@@ -27,16 +29,17 @@ export function isPathWithinDirectory(
     const pathModule = getPathModule(platform);
     const normalizedValue = normalizePathForComparison(value, platform);
     const normalizedDirectory = normalizePathForComparison(directory, platform);
+    const relativeValue = pathModule.relative(
+        normalizedDirectory,
+        normalizedValue
+    );
 
-    if (normalizedValue === normalizedDirectory) {
-        return true;
-    }
-
-    const directoryPrefix = normalizedDirectory.endsWith(pathModule.sep)
-        ? normalizedDirectory
-        : `${normalizedDirectory}${pathModule.sep}`;
-
-    return normalizedValue.startsWith(directoryPrefix);
+    return (
+        relativeValue === "" ||
+        (relativeValue !== ".." &&
+            !relativeValue.startsWith(`..${pathModule.sep}`) &&
+            !pathModule.isAbsolute(relativeValue))
+    );
 }
 
 /**
