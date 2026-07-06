@@ -6,11 +6,10 @@ import type { ReactElement } from "react";
 
 import { useMemo } from "react";
 
-import { ThemedButton } from "../../../theme/components/ThemedButton";
-import { ThemedCard } from "../../../theme/components/ThemedCard";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons, getIconSize } from "../../../utils/icons";
+import { SettingsTabActionCard } from "./SettingsTab.ActionCard";
 
 const DangerZoneIcon = AppIcons.status.downFilled;
 const TrashIcon = AppIcons.actions.remove;
@@ -45,37 +44,26 @@ export const SettingsTabDangerZoneCard = ({
     );
 
     return (
-        <ThemedCard
-            className="border-error/30 bg-error/5 border-2"
-            icon={dangerIcon}
+        <SettingsTabActionCard
+            buttonIcon={trashIcon}
+            buttonLabel="Remove Site"
+            buttonSize="md"
+            buttonVariant="error"
+            cardClassName="border-error/30 bg-error/5 border-2"
+            cardIcon={dangerIcon}
+            contentClassName="site-settings-section"
+            fieldLabel="Remove Site"
+            fieldLabelVariant="error"
+            fieldLabelWeight="medium"
+            isLoading={isLoading}
+            onClick={onRemoveSite}
+            supportingContent={
+                <ThemedText size="xs" variant="tertiary">
+                    This action cannot be undone. All history data for this site
+                    will be lost.
+                </ThemedText>
+            }
             title="Danger Zone"
-        >
-            <div className="site-settings-section">
-                <div className="site-settings-field">
-                    <ThemedText
-                        className="mb-2"
-                        size="sm"
-                        variant="error"
-                        weight="medium"
-                    >
-                        Remove Site
-                    </ThemedText>
-                    <ThemedText className="mb-4" size="xs" variant="tertiary">
-                        This action cannot be undone. All history data for this
-                        site will be lost.
-                    </ThemedText>
-                    <ThemedButton
-                        className="site-settings-field__cta"
-                        icon={trashIcon}
-                        loading={isLoading}
-                        onClick={onRemoveSite}
-                        size="md"
-                        variant="error"
-                    >
-                        Remove Site
-                    </ThemedButton>
-                </div>
-            </div>
-        </ThemedCard>
+        />
     );
 };

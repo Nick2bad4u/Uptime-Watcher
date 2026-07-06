@@ -6,11 +6,9 @@ import type { ReactElement } from "react";
 
 import { useMemo } from "react";
 
-import { ThemedButton } from "../../../theme/components/ThemedButton";
-import { ThemedCard } from "../../../theme/components/ThemedCard";
-import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons, getIconSize } from "../../../utils/icons";
+import { SettingsTabActionCard } from "./SettingsTab.ActionCard";
 import { SiteSettingsHelpText } from "./SiteSettingsHelpText";
 
 const BellIcon = AppIcons.ui.bell;
@@ -49,35 +47,29 @@ export const SettingsTabNotificationsCard = ({
     }, [buttonIconSize, isSiteMuted]);
 
     return (
-        <ThemedCard
-            className="site-settings-section"
-            icon={cardIcon}
-            title="Notifications"
-        >
-            <div className="site-settings-field">
-                <ThemedText className="mb-2" size="sm" variant="secondary">
-                    System notifications
-                </ThemedText>
-                <div className="mb-4">
-                    <SiteSettingsHelpText icon={BellIcon}>
-                        {isSiteMuted
-                            ? "Notifications for this site are muted. This overrides global notification settings."
-                            : "This site follows your global notification settings."}
-                    </SiteSettingsHelpText>
-                </div>
-                <ThemedButton
-                    className="site-settings-field__cta"
-                    icon={toggleIcon}
-                    loading={isLoading}
-                    onClick={onToggleSiteMute}
-                    size="sm"
-                    variant={isSiteMuted ? "secondary" : "primary"}
-                >
+        <SettingsTabActionCard
+            buttonIcon={toggleIcon}
+            buttonLabel={
+                isSiteMuted
+                    ? "Unmute notifications for this site"
+                    : "Mute notifications for this site"
+            }
+            buttonSize="sm"
+            buttonVariant={isSiteMuted ? "secondary" : "primary"}
+            cardClassName="site-settings-section"
+            cardIcon={cardIcon}
+            fieldLabel="System notifications"
+            fieldLabelVariant="secondary"
+            isLoading={isLoading}
+            onClick={onToggleSiteMute}
+            supportingContent={
+                <SiteSettingsHelpText icon={BellIcon}>
                     {isSiteMuted
-                        ? "Unmute notifications for this site"
-                        : "Mute notifications for this site"}
-                </ThemedButton>
-            </div>
-        </ThemedCard>
+                        ? "Notifications for this site are muted. This overrides global notification settings."
+                        : "This site follows your global notification settings."}
+                </SiteSettingsHelpText>
+            }
+            title="Notifications"
+        />
     );
 };
