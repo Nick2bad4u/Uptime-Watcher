@@ -520,6 +520,30 @@ describe("FormFields Components - Complete Coverage", () => {
             expect(screen.getByText("Ping")).toBeInTheDocument();
         });
 
+        it("should ignore duplicate option values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: FormFields", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            render(
+                <SelectField
+                    {...defaultSelectFieldProps}
+                    options={[
+                        { label: "HTTP", value: "http" },
+                        { label: "HTTP Duplicate", value: "http" },
+                        { label: "Port", value: "port" },
+                    ]}
+                />
+            );
+
+            expect(screen.getByText("HTTP")).toBeInTheDocument();
+            expect(
+                screen.queryByText("HTTP Duplicate")
+            ).not.toBeInTheDocument();
+            expect(screen.getByText("Port")).toBeInTheDocument();
+        });
+
         it("should handle option selection", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: FormFields", "component");

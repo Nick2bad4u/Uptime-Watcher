@@ -2,7 +2,10 @@
  * @file Tests for monitorTypeHelper utility functions
  */
 
-import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type {
+    MonitorTypeConfig,
+    MonitorTypeOption,
+} from "@shared/types/monitorTypes";
 
 import { test } from "@fast-check/vitest";
 import {
@@ -164,6 +167,27 @@ describe("monitorTypeHelper", () => {
             version: "1.0.0",
         },
     ];
+
+    const expectedOptionsFor = (
+        configs: readonly MonitorTypeConfig[]
+    ): MonitorTypeOption[] => {
+        const seenTypes = new Set<MonitorType>();
+        const options: MonitorTypeOption[] = [];
+
+        for (const config of configs) {
+            if (seenTypes.has(config.type)) {
+                continue;
+            }
+
+            seenTypes.add(config.type);
+            options.push({
+                label: config.displayName,
+                value: config.type,
+            });
+        }
+
+        return options;
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -592,6 +616,36 @@ describe("monitorTypeHelper", () => {
             ]);
         });
 
+        it("should ignore duplicate monitor type options", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorTypeHelper", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const duplicateTypes: MonitorTypeConfig[] = [
+                arrayFirst(mockMonitorTypes)!,
+                {
+                    ...arrayFirst(mockMonitorTypes)!,
+                    displayName: "Duplicate HTTP Monitor",
+                    version: "1.0.1",
+                },
+                mockMonitorTypes[1]!,
+            ];
+            vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
+                duplicateTypes
+            );
+
+            const result = await getMonitorTypeOptions();
+
+            expect(result).toEqual([
+                { label: "HTTP Monitor", value: "http" },
+                { label: "Ping Monitor", value: "ping" },
+            ]);
+        });
+
         it("should handle monitor types with empty display names", async ({
             annotate,
             task,
@@ -965,20 +1019,9 @@ describe("monitorTypeHelper", () => {
                     );
 
                     const result = await getMonitorTypeOptions();
+                    const expectedOptions = expectedOptionsFor(mockTypes);
 
-                    expect(result).toHaveLength(mockTypes.length);
-
-                    for (const [index, option] of result.entries()) {
-                        const mockType = mockTypes[index];
-                        if (!mockType) {
-                            throw new Error(
-                                `Expected mockType at index ${index} to be defined`
-                            );
-                        }
-
-                        expect(option.label).toBe(mockType.displayName);
-                        expect(option.value).toBe(mockType.type);
-                    }
+                    expect(result).toEqual(expectedOptions);
                 }
             );
 

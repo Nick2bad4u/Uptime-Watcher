@@ -2250,7 +2250,7 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             ).toBeInTheDocument();
         });
 
-        it("should handle large monitor types lists efficiently", ({
+        it("should handle duplicate-heavy monitor type lists efficiently", ({
             task,
             annotate,
         }) => {

@@ -79,6 +79,22 @@ export interface SelectOption {
     value: string;
 }
 
+function getUniqueOptions(options: SelectOption[]): SelectOption[] {
+    const seenValues = new Set<string>();
+    const uniqueOptions: SelectOption[] = [];
+
+    for (const option of options) {
+        if (seenValues.has(option.value)) {
+            continue;
+        }
+
+        seenValues.add(option.value);
+        uniqueOptions.push(option);
+    }
+
+    return uniqueOptions;
+}
+
 /**
  * Select dropdown field component with accessibility, validation, and themed
  * styling.
@@ -125,6 +141,7 @@ const SelectFieldBase = createStringField<
             required = false,
             value,
         } = props;
+        const uniqueOptions = getUniqueOptions(options);
 
         return (
             <ThemedSelect
@@ -137,7 +154,7 @@ const SelectFieldBase = createStringField<
                 value={value}
             >
                 {placeholder ? <option value="">{placeholder}</option> : null}
-                {options.map((option) => (
+                {uniqueOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                         {option.label}
                     </option>

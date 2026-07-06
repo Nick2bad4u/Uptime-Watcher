@@ -143,10 +143,22 @@ export async function getMonitorTypeConfig(
  */
 export async function getMonitorTypeOptions(): Promise<MonitorTypeOption[]> {
     const configs = await getAvailableMonitorTypes();
-    return configs.map((config) => ({
-        label: config.displayName,
-        value: config.type,
-    }));
+    const seenTypes = new Set<MonitorTypeConfig["type"]>();
+    const options: MonitorTypeOption[] = [];
+
+    for (const config of configs) {
+        if (seenTypes.has(config.type)) {
+            continue;
+        }
+
+        seenTypes.add(config.type);
+        options.push({
+            label: config.displayName,
+            value: config.type,
+        });
+    }
+
+    return options;
 }
 
 function isMonitorTypeConfigArray(
