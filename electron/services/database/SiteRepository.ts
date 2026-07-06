@@ -48,6 +48,7 @@ import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import {
     assertValidSiteIdentifier,
@@ -600,19 +601,22 @@ export class SiteRepository {
         try {
             const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
             const isDeleted = result.changes > 0;
+            const safeIdentifier = getSafeIdentifierForLogging(identifier);
 
             if (isDeleted) {
-                logger.debug("[SiteRepository] Deleted site", { identifier });
+                logger.debug("[SiteRepository] Deleted site", {
+                    identifier: safeIdentifier,
+                });
             } else {
                 logger.warn("[SiteRepository] Site not found for deletion", {
-                    identifier,
+                    identifier: safeIdentifier,
                 });
             }
 
             return isDeleted;
         } catch (error) {
             logger.error("[SiteRepository] Failed to delete site", error, {
-                identifier,
+                identifier: getSafeIdentifierForLogging(identifier),
             });
             throw error;
         }

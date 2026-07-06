@@ -43,6 +43,7 @@ import {
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { toSerializedError } from "@shared/utils/errorSerialization";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { isDefined } from "ts-extras";
 
@@ -189,19 +190,23 @@ export class SiteRepositoryService {
     public async getSiteFromDatabase(
         identifier: string
     ): Promise<Site | undefined> {
+        const safeIdentifier = getSafeIdentifierForLogging(identifier);
+
         try {
             const siteRow =
                 await this.repositories.site.findByIdentifier(identifier);
 
             if (!siteRow) {
-                this.logger.debug("Site not found", { identifier });
+                this.logger.debug("Site not found", {
+                    identifier: safeIdentifier,
+                });
                 return undefined;
             }
 
             return await this.buildSiteWithMonitorsAndHistory(siteRow);
         } catch (error) {
             const normalizedError = ensureError(error);
-            const message = `Failed to fetch site ${identifier} from database: ${getUnknownErrorMessage(normalizedError)}`;
+            const message = `Failed to fetch site ${safeIdentifier} from database: ${getUnknownErrorMessage(normalizedError)}`;
             this.logger.error(message, normalizedError);
             throw new SiteLoadingError(message, { cause: normalizedError });
         }
