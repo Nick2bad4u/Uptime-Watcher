@@ -15,19 +15,12 @@ import { stringSplit } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import {
-    type BrowserDownloadWarnLogger,
     FileDownloadDomAttachmentError,
     triggerArrayBufferDownload,
     triggerBlobDownload,
 } from "../../../utils/downloads/browserFileDownload";
 import { parseSerializedDatabaseBackupResult } from "../../../utils/downloads/serializedBackupResult";
 import { isPlaywrightAutomation } from "../../../utils/environment";
-
-const FILE_DOWNLOAD_WARN_LOGGER: BrowserDownloadWarnLogger = {
-    warn: (message, error): void => {
-        logger.warn(message, error);
-    },
-};
 
 const DEFAULT_DOWNLOAD_FILE_NAME = "download.bin";
 const DEFAULT_BACKUP_FILE_NAME_PREFIX = "backup";
@@ -111,7 +104,6 @@ function createAndTriggerDownload(
         buffer,
         fileName,
         mimeType,
-        warnLogger: FILE_DOWNLOAD_WARN_LOGGER,
     });
 }
 
@@ -364,7 +356,6 @@ export async function handleSQLiteBackupDownload(
             attachToDom: false,
             blob,
             fileName: normalizedFileName,
-            warnLogger: FILE_DOWNLOAD_WARN_LOGGER,
         });
     } catch (clickError) {
         const normalizedClickError = Error.isError(clickError)

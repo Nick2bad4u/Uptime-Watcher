@@ -8,14 +8,7 @@
  * @packageDocumentation
  */
 
-import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
-
-/** Optional warning logger used by download helpers. */
-export interface BrowserDownloadWarnLogger {
-    /** Logs a non-fatal warning raised during download triggering. */
-    warn: (message: string, error: Error) => void;
-}
 
 /**
  * Thrown when the download anchor cannot be attached to the DOM.
@@ -119,9 +112,8 @@ function appendAnchorToBody(body: object, anchor: DownloadAnchorElement): void {
 export function clickDownloadAnchor(args: {
     anchor: DownloadAnchorElement;
     attachToDom: boolean;
-    warnLogger?: BrowserDownloadWarnLogger | undefined;
 }): void {
-    const { anchor, attachToDom, warnLogger } = args;
+    const { anchor, attachToDom } = args;
 
     if (!attachToDom) {
         anchor.click();
@@ -142,12 +134,6 @@ export function clickDownloadAnchor(args: {
 
     try {
         anchor.click();
-    } catch (domError) {
-        const error = Error.isError(domError)
-            ? domError
-            : new Error(getUserFacingErrorDetail(domError));
-        warnLogger?.warn("DOM click failed, retrying direct click", error);
-        anchor.click();
     } finally {
         // Best-effort cleanup.
         try {
@@ -166,12 +152,11 @@ export function triggerArrayBufferDownload(args: {
     buffer: ArrayBuffer;
     fileName: string;
     mimeType: string;
-    warnLogger?: BrowserDownloadWarnLogger | undefined;
 }): void {
-    const { attachToDom, buffer, fileName, mimeType, warnLogger } = args;
+    const { attachToDom, buffer, fileName, mimeType } = args;
     const blob = new Blob([buffer], { type: mimeType });
 
-    triggerBlobDownload({ attachToDom, blob, fileName, warnLogger });
+    triggerBlobDownload({ attachToDom, blob, fileName });
 }
 
 /**
@@ -181,13 +166,12 @@ export function triggerBlobDownload(args: {
     attachToDom: boolean;
     blob: Blob;
     fileName: string;
-    warnLogger?: BrowserDownloadWarnLogger | undefined;
 }): void {
-    const { attachToDom, blob, fileName, warnLogger } = args;
+    const { attachToDom, blob, fileName } = args;
 
     withObjectUrl(blob, (objectURL) => {
         const anchor = createDownloadAnchor(objectURL, fileName);
-        clickDownloadAnchor({ anchor, attachToDom, warnLogger });
+        clickDownloadAnchor({ anchor, attachToDom });
     });
 }
 

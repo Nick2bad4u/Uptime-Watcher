@@ -47,6 +47,9 @@ const isSignedDecimalLiteral = (value: string): boolean => {
 
     for (let index = 0; index < value.length; index += 1) {
         const character = value[index];
+        if (character === undefined) {
+            return false;
+        }
 
         if (character === "+" || character === "-") {
             const previousCharacter = index > 0 ? value[index - 1] : undefined;

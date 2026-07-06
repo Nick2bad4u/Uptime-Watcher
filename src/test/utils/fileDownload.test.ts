@@ -424,6 +424,7 @@ describe("file Download Utility", () => {
                 // Expected to fail
             }
 
+            expect(mockAnchor.click).toHaveBeenCalledTimes(1);
             expect(URL.revokeObjectURL).toHaveBeenCalledWith("mock-object-url");
         });
 
