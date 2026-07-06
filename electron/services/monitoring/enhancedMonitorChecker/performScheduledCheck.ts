@@ -12,6 +12,8 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 /**
  * Executes a non-manual (scheduled) monitor check.
  *
@@ -34,8 +36,10 @@ export async function performScheduledCheckOperation(args: {
         args;
 
     if (!monitor.monitoring) {
+        const safeMonitorId =
+            getSafeIdentifierForLogging(monitorId) ?? monitorId;
         logger.debug(
-            `Monitor ${monitorId} is not monitoring, skipping check (manual: false)`
+            `Monitor ${safeMonitorId} is not monitoring, skipping check (manual: false)`
         );
         return undefined;
     }

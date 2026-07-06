@@ -70,8 +70,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const monitor: Monitor = {
-                id: "monitor-1",
+                id: rawMonitorId,
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 300_000,
@@ -322,8 +324,10 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const monitor: Monitor = {
-                id: "monitor-1",
+                id: rawMonitorId,
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 300_000,
@@ -350,9 +354,13 @@ describe("EnhancedMonitorChecker Targeted Coverage", () => {
             const saveMethod = (checker as any).saveHistoryEntry.bind(checker);
             await saveMethod(monitor, checkResult);
 
-            expect(mockConfig.historyRepository.addEntry).toHaveBeenCalled();
+            expect(mockConfig.historyRepository.addEntry).toHaveBeenCalledWith(
+                rawMonitorId,
+                expect.any(Object),
+                undefined
+            );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to save history entry for monitor monitor-1",
+                "Failed to save history entry for monitor https://monitor.example/check",
                 expect.objectContaining({ message: "DB error" })
             );
         });

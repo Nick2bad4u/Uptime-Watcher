@@ -108,11 +108,15 @@ describe("enhancedMonitorChecker helper modules", () => {
 
     describe(performScheduledCheckOperation, () => {
         it("skips when a monitor is not monitoring", async () => {
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const logger = {
                 debug: vi.fn(),
             };
 
-            const monitor = createTestMonitor("m1", { monitoring: false });
+            const monitor = createTestMonitor(rawMonitorId, {
+                monitoring: false,
+            });
             const site = createTestSite("s1", {
                 monitoring: true,
                 monitors: [monitor],
@@ -132,6 +136,10 @@ describe("enhancedMonitorChecker helper modules", () => {
             ).resolves.toBeUndefined();
 
             expect(logger.debug).toHaveBeenCalledTimes(1);
+            const logPayload = JSON.stringify(logger.debug.mock.calls);
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
             expect(performCorrelatedCheck).not.toHaveBeenCalled();
         });
 

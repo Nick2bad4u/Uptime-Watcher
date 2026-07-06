@@ -7,6 +7,14 @@ import type { MonitorStrategyRegistry } from "../../../../services/monitoring/st
 
 import { runServiceCheckOperation } from "../../../../services/monitoring/enhancedMonitorChecker/runServiceCheck";
 
+const mockLogger = vi.hoisted(() => ({
+    error: vi.fn(),
+}));
+
+vi.mock("../../../../utils/logger", () => ({
+    monitorLogger: mockLogger,
+}));
+
 const createMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
     checkInterval: 60_000,
     history: [],
@@ -30,7 +38,9 @@ const createSite = (monitor: Monitor): Site => ({
 
 describe(runServiceCheckOperation, () => {
     it("sanitizes thrown monitor strategy errors before building failure results", async () => {
-        const monitor = createMonitor();
+        const monitor = createMonitor({
+            id: "https://monitor.example/check?token=monitor-token#private-monitor",
+        });
         const context: MonitorCheckContext = {
             monitor,
             site: createSite(monitor),
@@ -64,6 +74,11 @@ describe(runServiceCheckOperation, () => {
         expect(result.checkResult.monitorId).toBe(monitor.id);
         expect(result.checkResult.operationId).toBe("operation-1");
         expect(result.checkResult.status).toBe("down");
+
+        const logPayload = JSON.stringify(mockLogger.error.mock.calls);
+        expect(logPayload).toContain("https://monitor.example/check");
+        expect(logPayload).not.toContain("monitor-token");
+        expect(logPayload).not.toContain("private-monitor");
     });
 
     it("uses the shared fallback for blank thrown monitor strategy messages", async () => {

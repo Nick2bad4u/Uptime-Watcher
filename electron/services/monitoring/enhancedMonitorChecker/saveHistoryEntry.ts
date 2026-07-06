@@ -1,6 +1,8 @@
 import type { Monitor } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 import type { HistoryPruneState } from "./historyPruningState";
@@ -30,6 +32,8 @@ export async function saveMonitorHistoryEntry(args: {
         logger.warn("Cannot save history entry: monitor missing ID");
         return;
     }
+
+    const safeMonitorId = getSafeIdentifierForLogging(monitor.id) ?? monitor.id;
 
     const historyEntry = {
         responseTime: checkResult.responseTime,
@@ -90,7 +94,7 @@ export async function saveMonitorHistoryEntry(args: {
                         historyLimit
                     );
                     logger.debug(
-                        `[EnhancedMonitorChecker] Pruned history for monitor ${monitor.id}: ${currentCount} -> ${historyLimit} entries`
+                        `[EnhancedMonitorChecker] Pruned history for monitor ${safeMonitorId}: ${currentCount} -> ${historyLimit} entries`
                     );
                 }
             } else {
@@ -102,11 +106,11 @@ export async function saveMonitorHistoryEntry(args: {
         }
 
         logger.debug(
-            `Saved history entry for monitor ${monitor.id}: ${checkResult.status}`
+            `Saved history entry for monitor ${safeMonitorId}: ${checkResult.status}`
         );
     } catch (error) {
         logger.error(
-            `Failed to save history entry for monitor ${monitor.id}`,
+            `Failed to save history entry for monitor ${safeMonitorId}`,
             error
         );
         // Don't throw error - history saving failure shouldn't stop monitoring

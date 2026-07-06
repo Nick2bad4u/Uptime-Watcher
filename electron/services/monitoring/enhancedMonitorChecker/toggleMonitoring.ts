@@ -14,10 +14,14 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 
 import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 
 import { monitorLogger as logger } from "../../../utils/logger";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Enables monitoring for a monitor.
@@ -33,6 +37,8 @@ export async function startMonitoringOperation(args: {
     readonly siteIdentifier: string;
 }): Promise<boolean> {
     const { dependencies, monitorId, siteIdentifier } = args;
+    const safeMonitorId = getSafeIdentifier(monitorId);
+    const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
 
     try {
         // Cancel any existing operations for this monitor
@@ -46,8 +52,8 @@ export async function startMonitoringOperation(args: {
 
         logger.info(
             interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STARTED, {
-                monitorId,
-                siteIdentifier,
+                monitorId: safeMonitorId,
+                siteIdentifier: safeSiteIdentifier,
             })
         );
 
@@ -62,7 +68,7 @@ export async function startMonitoringOperation(args: {
         return true;
     } catch (error) {
         logger.error(
-            `Failed to start monitoring for monitor ${monitorId}`,
+            `Failed to start monitoring for monitor ${safeMonitorId}`,
             error
         );
         return false;
@@ -83,6 +89,8 @@ export async function stopMonitoringOperation(args: {
     readonly siteIdentifier: string;
 }): Promise<boolean> {
     const { dependencies, monitorId, siteIdentifier } = args;
+    const safeMonitorId = getSafeIdentifier(monitorId);
+    const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
 
     try {
         // Cancel all active operations for this monitor
@@ -96,8 +104,8 @@ export async function stopMonitoringOperation(args: {
 
         logger.info(
             interpolateLogTemplate(LOG_TEMPLATES.services.MONITOR_STOPPED, {
-                monitorId,
-                siteIdentifier,
+                monitorId: safeMonitorId,
+                siteIdentifier: safeSiteIdentifier,
             })
         );
 
@@ -113,7 +121,7 @@ export async function stopMonitoringOperation(args: {
         return true;
     } catch (error) {
         logger.error(
-            `Failed to stop monitoring for monitor ${monitorId}`,
+            `Failed to stop monitoring for monitor ${safeMonitorId}`,
             error
         );
         return false;

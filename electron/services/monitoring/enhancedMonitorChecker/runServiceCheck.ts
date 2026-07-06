@@ -15,6 +15,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import type { MonitorCheckContext } from "../checkContext";
@@ -63,8 +64,11 @@ export async function runServiceCheckOperation(args: {
         };
     } catch (error) {
         const safeError = ensureError(error);
+        const safeMonitorId =
+            getSafeIdentifierForLogging(args.context.monitor.id) ??
+            args.context.monitor.id;
         logger.error(
-            `Monitor check failed for ${args.context.monitor.id}`,
+            `Monitor check failed for ${safeMonitorId}`,
             safeError
         );
 
