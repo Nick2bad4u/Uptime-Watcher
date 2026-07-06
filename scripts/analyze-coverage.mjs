@@ -83,8 +83,14 @@ const DEFAULTS = {
 // CLI flags
 const noColor = process.argv.includes("--no-color");
 const formatIndex = process.argv.indexOf("--format");
+const inlineFormatArg = process.argv.find((arg) => arg.startsWith("--format="));
 const outputFormat =
-    formatIndex === -1 ? DEFAULTS.defaultFormat : process.argv[formatIndex + 1];
+    formatIndex === -1 && inlineFormatArg === undefined
+        ? DEFAULTS.defaultFormat
+        : parseOutputFormat(
+              inlineFormatArg?.slice("--format=".length) ??
+                  process.argv[formatIndex + 1]
+          );
 const limitArgIndex2 = process.argv.indexOf("--limit");
 const inlineLimitArg = process.argv.find((arg) => arg.startsWith("--limit="));
 const limitOverride =
@@ -95,6 +101,21 @@ const limitOverride =
                   process.argv[limitArgIndex2 + 1],
               "--limit"
           );
+
+/**
+ * Parses an output format option.
+ *
+ * @param {string | undefined} value - Raw format value.
+ *
+ * @returns {"csv" | "json" | "table"} Parsed output format.
+ */
+function parseOutputFormat(value) {
+    if (value === "csv" || value === "json" || value === "table") {
+        return value;
+    }
+
+    throw new Error("--format must be one of: table, csv, json.");
+}
 
 /**
  * Parses an optional positive integer input.
