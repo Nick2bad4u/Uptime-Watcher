@@ -11,6 +11,7 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -22,6 +23,9 @@ import type { MonitorRepository } from "../../services/database/MonitorRepositor
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 import { withDatabaseOperation } from "../../utils/operationalHooks";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Remediation dependencies for {@link applyDefaultIntervalsOperation}.
@@ -54,12 +58,13 @@ export async function applyDefaultIntervalsOperation(args: {
         shouldApplyDefaultInterval,
         site,
     } = args;
+    const safeSiteIdentifier = getSafeIdentifier(site.identifier);
 
     dependencies.logger.debug(
         interpolateLogTemplate(
             LOG_TEMPLATES.debug.MONITOR_MANAGER_INTERVALS_SETTING,
             {
-                identifier: site.identifier,
+                identifier: safeSiteIdentifier,
             }
         )
     );
@@ -74,7 +79,7 @@ export async function applyDefaultIntervalsOperation(args: {
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
                 {
-                    identifier: site.identifier,
+                    identifier: safeSiteIdentifier,
                 }
             )
         );
@@ -97,7 +102,7 @@ export async function applyDefaultIntervalsOperation(args: {
                             LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED,
                             {
                                 interval: defaultCheckIntervalMs / 1000,
-                                monitorId: monitor.id,
+                                monitorId: getSafeIdentifier(monitor.id),
                             }
                         )
                     );
@@ -108,7 +113,7 @@ export async function applyDefaultIntervalsOperation(args: {
         "monitor-manager-apply-default-interval",
         undefined,
         {
-            identifier: site.identifier,
+            identifier: safeSiteIdentifier,
             interval: defaultCheckIntervalMs,
             monitorCount: monitorsNeedingRemediation.length,
         }
@@ -131,7 +136,7 @@ export async function applyDefaultIntervalsOperation(args: {
         interpolateLogTemplate(
             LOG_TEMPLATES.services.MONITOR_MANAGER_APPLYING_INTERVALS,
             {
-                identifier: site.identifier,
+                identifier: safeSiteIdentifier,
             }
         )
     );

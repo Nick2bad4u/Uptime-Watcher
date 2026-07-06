@@ -9,12 +9,16 @@
 
 import type { Site } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
 
 import { logger } from "../../utils/logger";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Applies default intervals and optional auto-start for new monitors.
@@ -47,8 +51,11 @@ export async function setupIndividualNewMonitorsOperation(args: {
         }
 
         monitor.checkInterval = defaultCheckIntervalMs;
+        const safeMonitorId = monitor.id
+            ? getSafeIdentifier(monitor.id)
+            : monitor.id;
         logger.debug(
-            `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${monitor.id}`
+            `[MonitorManager] Applied default interval ${monitor.checkInterval}ms to new monitor: ${safeMonitorId}`
         );
     }
 
@@ -61,7 +68,7 @@ export async function setupIndividualNewMonitorsOperation(args: {
         interpolateLogTemplate(
             LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_AUTO_START,
             {
-                identifier: site.identifier,
+                identifier: getSafeIdentifier(site.identifier),
             }
         )
     );
