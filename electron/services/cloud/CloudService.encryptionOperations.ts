@@ -111,16 +111,18 @@ export async function setEncryptionPassphrase(
                 throw new Error("Incorrect encryption passphrase");
             }
 
-            await persistLocalPassphraseEncryptionState({
-                derivedKey,
-                saltBase64: remoteEncryption.saltBase64,
-                secretStore: ctx.secretStore,
-                settings: ctx.settings,
-            });
+            try {
+                await persistLocalPassphraseEncryptionState({
+                    derivedKey,
+                    saltBase64: remoteEncryption.saltBase64,
+                    secretStore: ctx.secretStore,
+                    settings: ctx.settings,
+                });
 
-            derivedKey.fill(0);
-
-            return ctx.buildStatusSummary();
+                return await ctx.buildStatusSummary();
+            } finally {
+                derivedKey.fill(0);
+            }
         }
 
         const salt = generateEncryptionSalt();
@@ -128,31 +130,35 @@ export async function setEncryptionPassphrase(
             passphrase: trimmedPassphrase,
             salt,
         });
-        const encryptionConfig: CloudEncryptionConfigPassphrase = {
-            configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
-            kdf: "scrypt",
-            keyCheckBase64: createKeyCheckBase64(key),
-            mode: "passphrase",
-            saltBase64: encodeBase64(salt),
-        };
 
-        const nextManifest: CloudSyncManifest = {
-            ...(manifest ?? ProviderCloudSyncTransport.createEmptyManifest()),
-            encryption: encryptionConfig,
-        };
+        try {
+            const encryptionConfig: CloudEncryptionConfigPassphrase = {
+                configVersion: CLOUD_ENCRYPTION_CONFIG_VERSION,
+                kdf: "scrypt",
+                keyCheckBase64: createKeyCheckBase64(key),
+                mode: "passphrase",
+                saltBase64: encodeBase64(salt),
+            };
 
-        await transport.writeManifest(nextManifest);
+            const nextManifest: CloudSyncManifest = {
+                ...(manifest ??
+                    ProviderCloudSyncTransport.createEmptyManifest()),
+                encryption: encryptionConfig,
+            };
 
-        await persistLocalPassphraseEncryptionState({
-            derivedKey: key,
-            saltBase64: encodeBase64(salt),
-            secretStore: ctx.secretStore,
-            settings: ctx.settings,
-        });
+            await transport.writeManifest(nextManifest);
 
-        key.fill(0);
+            await persistLocalPassphraseEncryptionState({
+                derivedKey: key,
+                saltBase64: encodeBase64(salt),
+                secretStore: ctx.secretStore,
+                settings: ctx.settings,
+            });
 
-        return ctx.buildStatusSummary();
+            return await ctx.buildStatusSummary();
+        } finally {
+            key.fill(0);
+        }
     });
 }
 
