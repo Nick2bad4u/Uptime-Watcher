@@ -683,6 +683,13 @@ function isPrivateIpv6(hostname: string): boolean {
         return octets ? isPrivateIpvFourOctets(octets) : false;
     }
 
+    // Treat deprecated IPv4-compatible IPv6 tails as embedded IPv4 addresses.
+    if (normalized.startsWith("::")) {
+        const compatible = normalized.slice("::".length);
+        const octets = parseIpvFourFromMappedIpvSix(compatible);
+        return octets ? isPrivateIpvFourOctets(octets) : false;
+    }
+
     return false;
 }
 

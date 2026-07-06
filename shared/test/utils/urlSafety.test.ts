@@ -88,6 +88,15 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("::ffff:c0a8:1")).toBeTruthy();
         });
 
+        it("detects deprecated IPv4-compatible IPv6 private addresses", () => {
+            expect(isPrivateNetworkHostname("::192.168.1.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[::192.168.1.1]")).toBeTruthy();
+            expect(isPrivateNetworkHostname("::c0a8:101")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[::c0a8:101]")).toBeTruthy();
+            expect(isPrivateNetworkHostname("::7f00:1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("::808:808")).toBeFalsy();
+        });
+
         it("returns false for public-looking hostnames", () => {
             expect(isPrivateNetworkHostname("example.com")).toBeFalsy();
             expect(isPrivateNetworkHostname("8.8.8.8")).toBeFalsy();
@@ -401,6 +410,12 @@ describe("urlSafety", () => {
             expect(
                 tryGetSafeThirdPartyHttpUrl("https://[::ffff:192.168.1.1]")
             ).toBe(null);
+            expect(tryGetSafeThirdPartyHttpUrl("https://[::192.168.1.1]")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://[::c0a8:101]")).toBe(
+                null
+            );
         });
 
         it("returns null for URLs with credentials", () => {
