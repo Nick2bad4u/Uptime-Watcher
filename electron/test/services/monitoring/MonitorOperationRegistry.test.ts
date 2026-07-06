@@ -473,6 +473,33 @@ describe(MonitorOperationRegistry, () => {
             );
         });
 
+        it("redacts URL-shaped monitor identifiers in cancellation logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Logging", "type");
+
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
+
+            const result = registry.initiateCheck(rawMonitorId);
+            vi.mocked(logger.debug).mockClear();
+
+            registry.cancelOperations(rawMonitorId);
+
+            expect(result.signal.aborted).toBeTruthy();
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.debug).mock.calls
+            );
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        });
+
         it("should not affect operations after they are aborted", async ({
             task,
             annotate,
@@ -517,6 +544,33 @@ describe(MonitorOperationRegistry, () => {
             expect(logger.debug).toHaveBeenCalledWith(
                 "Completed operation test-uuid-1 for monitor monitor-123"
             );
+        });
+
+        it("redacts URL-shaped monitor identifiers in completion logs", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: MonitorOperationRegistry", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Logging", "type");
+
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
+
+            const result = registry.initiateCheck(rawMonitorId);
+            vi.mocked(logger.debug).mockClear();
+
+            registry.completeOperation(result.operationId);
+
+            expect(registry.getOperation(result.operationId)).toBeUndefined();
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.debug).mock.calls
+            );
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
         });
 
         it("should not log or error when completing non-existent operation", async ({
