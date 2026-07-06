@@ -80,13 +80,6 @@ test.describe(
                 const submitButton = dialog.getByRole("button", {
                     name: /add site/i,
                 });
-                const nameInput = dialog.getByLabel("Site Name (required)", {
-                    exact: false,
-                });
-                const nameValue = await nameInput.inputValue();
-                console.log(
-                    `[Playwright-Test] Site name field pre-submit: ${nameValue ?? "<empty>"}`
-                );
                 await submitButton.click();
 
                 const validationMessage = page.getByText(

@@ -233,39 +233,30 @@ test.describe(
                 await window.waitForLoadState("domcontentloaded");
 
                 // Check if dev tools can be accessed with timeout
-                try {
-                    const canOpenDevTools = await Promise.race([
-                        electronApp.evaluate(async ({ BrowserWindow }) => {
-                            const windows = BrowserWindow.getAllWindows();
-                            if (windows.length > 0 && windows[0]) {
-                                try {
-                                    // Don't actually open dev tools, just check if we can
-                                    return (
-                                        windows[0].webContents.isDevToolsOpened() !==
-                                        undefined
-                                    );
-                                } catch {
-                                    return false;
-                                }
+                const canOpenDevTools = await Promise.race<boolean>([
+                    electronApp.evaluate(async ({ BrowserWindow }) => {
+                        const windows = BrowserWindow.getAllWindows();
+                        if (windows.length > 0 && windows[0]) {
+                            try {
+                                // Don't actually open dev tools, just check if we can
+                                return (
+                                    windows[0].webContents.isDevToolsOpened() !==
+                                    undefined
+                                );
+                            } catch {
+                                return false;
                             }
-                            return false;
-                        }),
-                        new Promise((_, reject) =>
-                            setTimeout(() => {
-                                reject(new Error("Timeout"));
-                            }, 10_000)
-                        ),
-                    ]);
+                        }
+                        return false;
+                    }),
+                    new Promise<boolean>((_, reject) => {
+                        setTimeout(() => {
+                            reject(new Error("Timeout"));
+                        }, 10_000);
+                    }),
+                ]).catch(() => false);
 
-                    expect.soft(typeof canOpenDevTools).toBe("boolean");
-                    console.log(`Dev tools check result: ${canOpenDevTools}`);
-                } catch (error) {
-                    console.log(
-                        `Dev tools check failed or timed out: ${error}`
-                    );
-                    // Dev tools may not be available in test environment - this is expected
-                }
-
+                expect.soft(typeof canOpenDevTools).toBe("boolean");
                 // Always succeed - dev tools availability is environment dependent
                 expect.soft(electronApp).toBeTruthy();
 

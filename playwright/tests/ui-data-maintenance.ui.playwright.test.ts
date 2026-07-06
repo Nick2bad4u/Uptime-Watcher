@@ -41,13 +41,6 @@ test.describe(
             tagElectronAppCoverage(electronApp, "ui-data-maintenance");
             page = await electronApp.firstWindow();
 
-            page.on("console", (message) => {
-                console.log(`[renderer:${message.type()}] ${message.text()}`);
-            });
-            page.on("pageerror", (error) => {
-                console.error("[renderer:pageerror]", error);
-            });
-
             await resetApplicationState(page);
             await openSettingsModal(page);
         });
