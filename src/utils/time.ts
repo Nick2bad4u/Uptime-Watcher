@@ -110,7 +110,7 @@ const SHORT_DURATION_UNITS: readonly DurationUnitDefinition[] = [
     {
         divisor: 3_600_000,
         suffix: "h",
-        threshold: Infinity,
+        threshold: Number.POSITIVE_INFINITY,
     },
 ] as const satisfies readonly DurationUnitDefinition[];
 

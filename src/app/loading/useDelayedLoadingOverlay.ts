@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { UI_DELAYS } from "../../constants";
 
+const noop = (): void => undefined;
+
 /**
  * Manages the app's delayed loading overlay state.
  *
@@ -27,7 +29,7 @@ export function useDelayedLoadingOverlay(args: {
         function handleDelayedLoadingOverlayEffect(): () => void {
             // Only proceed if app is initialized
             if (!args.isInitialized) {
-                return () => {};
+                return noop;
             }
 
             if (!args.isLoading) {

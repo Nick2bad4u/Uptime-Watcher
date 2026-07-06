@@ -13,7 +13,7 @@ import {
 
 const PREFERS_DARK_MEDIA_QUERY = "(prefers-color-scheme: dark)" as const;
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 /**
  * Returns whether the current environment prefers dark mode.

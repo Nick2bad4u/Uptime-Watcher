@@ -8,7 +8,7 @@
 
 import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 type MediaQueryListLegacyMethod = (
     this: MediaQueryList,

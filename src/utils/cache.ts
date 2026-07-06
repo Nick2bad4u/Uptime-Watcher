@@ -353,7 +353,7 @@ export class TypedCache<K, V> {
         // Enforce max size by removing least recently used entries
         if (!this.cache.has(key) && this.cache.size >= this.maxSize) {
             let lruKey: K | undefined;
-            let oldestAccessTime = Infinity;
+            let oldestAccessTime = Number.POSITIVE_INFINITY;
 
             // Find the least recently used entry (O(n) operation)
             for (const [entryKey, entry] of this.cache) {

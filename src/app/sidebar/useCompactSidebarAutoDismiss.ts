@@ -12,7 +12,7 @@ const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
     ".sidebar-reveal-button",
 ] as const;
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 type ClosestMethod = (this: unknown, selectors: string) => Element | null;
 

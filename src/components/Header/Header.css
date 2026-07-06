@@ -776,7 +776,6 @@
 .header-controls-box:hover,
 .header-controls-box:focus-visible {
     border-color: var(--color-primary-500);
-    background: rgb(37 99 235 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-primary-500) 6%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-primary-500, rgb(37 99 235 / 22%));
 }
@@ -784,7 +783,6 @@
 .health-badge:hover,
 .health-badge:focus-visible {
     border-color: var(--color-success, var(--color-primary-500));
-    background: rgb(16 185 129 / 8%); /* Fallback color */
     background: color-mix(
         in srgb,
         var(--color-success, var(--color-primary-500)) 8%,
@@ -796,7 +794,6 @@
 .status-up-badge:hover,
 .status-up-badge:focus-visible {
     border-color: var(--color-success);
-    background: rgb(30 198 162 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-success) 8%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-shadows-success, rgb(30 198 162 / 22%));
 }
@@ -804,7 +801,6 @@
 .status-degraded-badge:hover,
 .status-degraded-badge:focus-visible {
     border-color: var(--color-status-degraded);
-    background: rgb(245 159 61 / 8%); /* Fallback color */
     background: color-mix(
         in srgb,
         var(--color-status-degraded) 8%,
@@ -817,7 +813,6 @@
 .status-down-badge:hover,
 .status-down-badge:focus-visible {
     border-color: var(--color-error);
-    background: rgb(242 87 107 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-error) 8%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-shadows-error, rgb(242 87 107 / 22%));
 }
@@ -825,7 +820,6 @@
 .status-pending-badge:hover,
 .status-pending-badge:focus-visible {
     border-color: var(--color-warning);
-    background: rgb(244 195 97 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-warning) 8%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-shadows-warning, rgb(244 195 97 / 22%));
 }
@@ -833,7 +827,6 @@
 .status-paused-badge:hover,
 .status-paused-badge:focus-visible {
     border-color: var(--color-status-paused);
-    background: rgb(133 147 181 / 8%); /* Fallback color */
     background: color-mix(in srgb, var(--color-status-paused) 8%, transparent);
     box-shadow: 0 2px 12px 0 var(--color-shadows-paused, rgb(133 147 181 / 22%));
 }
@@ -841,7 +834,6 @@
 .total-sites-badge:hover,
 .total-sites-badge:focus-visible {
     border-color: var(--color-border-primary);
-    background: rgb(95 140 255 / 6%); /* Fallback color */
     background: color-mix(in srgb, var(--color-border-primary) 6%, transparent);
     box-shadow: 0 2px 12px 0
         color-mix(in srgb, var(--color-primary-500) 18%, transparent);

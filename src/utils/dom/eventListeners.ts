@@ -12,7 +12,7 @@ type ListenerMethod = (
     options?: AddEventListenerOptions | boolean
 ) => void;
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||

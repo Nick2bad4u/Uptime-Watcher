@@ -16,7 +16,7 @@ import {
 } from "./errorPropertyAccess";
 import { type SetStateAction, useCallback, useEffect, useState } from "react";
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 /**
  * Type for a state setter function.
