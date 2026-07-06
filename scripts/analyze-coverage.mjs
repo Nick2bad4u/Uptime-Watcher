@@ -69,7 +69,11 @@ const coverageData = JSON.parse(
 const DEFAULTS = {
     coverageRelativePath: path.join("coverage", "coverage-final.json"),
     projectRoot: path.resolve(import.meta.dirname, ".."),
-    fileDisplayLimit: Number(process.env["COVERAGE_FILE_LIMIT"]) || 15,
+    fileDisplayLimit: parseOptionalPositiveInteger(
+        process.env["COVERAGE_FILE_LIMIT"],
+        "COVERAGE_FILE_LIMIT",
+        15
+    ),
     minFileColumnWidth: 30,
     numericColumnWidth: 20,
     truncateFilePath: 80, // Max characters in File column; longer paths will be ellipsized
@@ -82,8 +86,53 @@ const formatIndex = process.argv.indexOf("--format");
 const outputFormat =
     formatIndex === -1 ? DEFAULTS.defaultFormat : process.argv[formatIndex + 1];
 const limitArgIndex2 = process.argv.indexOf("--limit");
+const inlineLimitArg = process.argv.find((arg) => arg.startsWith("--limit="));
 const limitOverride =
-    limitArgIndex2 === -1 ? null : Number(process.argv[limitArgIndex2 + 1]);
+    limitArgIndex2 === -1 && inlineLimitArg === undefined
+        ? null
+        : parseRequiredPositiveInteger(
+              inlineLimitArg?.slice("--limit=".length) ??
+                  process.argv[limitArgIndex2 + 1],
+              "--limit"
+          );
+
+/**
+ * Parses an optional positive integer input.
+ *
+ * @param {string | undefined} value - Raw value.
+ * @param {string} label - Input label for diagnostics.
+ * @param {number} fallback - Fallback when the value is unset or blank.
+ *
+ * @returns {number} Parsed positive integer or fallback.
+ */
+function parseOptionalPositiveInteger(value, label, fallback) {
+    if (value === undefined || value.trim().length === 0) {
+        return fallback;
+    }
+
+    return parseRequiredPositiveInteger(value, label);
+}
+
+/**
+ * Parses a required positive integer without partial string coercion.
+ *
+ * @param {string | undefined} value - Raw value.
+ * @param {string} label - Input label for diagnostics.
+ *
+ * @returns {number} Parsed positive integer.
+ */
+function parseRequiredPositiveInteger(value, label) {
+    if (value === undefined || !/^\d+$/u.test(value.trim())) {
+        throw new Error(`${label} must be a positive integer.`);
+    }
+
+    const parsed = Number.parseInt(value.trim(), 10);
+    if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+        throw new Error(`${label} must be a positive integer.`);
+    }
+
+    return parsed;
+}
 
 // Respect --no-color by overriding color helpers to pass-through
 if (noColor) {
