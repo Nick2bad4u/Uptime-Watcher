@@ -35,7 +35,7 @@ import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
 import crypto from "crypto";
-import { fileURLToPath } from "url";
+import { pathToFileURL } from "url";
 /** @typedef {import("http")} http */
 /** @typedef {import("https")} https */
 
@@ -158,7 +158,7 @@ const CONFIG = {
     // Core configuration
     docName: "Example-Package",
     baseUrl:
-        "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/main ", // or master
+        "https://raw.githubusercontent.com/exampleOrg/exampleRepo/refs/heads/main", // or master
     pages: [
         "examples/example.js",
         "examples/example2.html",
@@ -201,11 +201,11 @@ const CONFIG = {
 /**
  * Parse command line arguments and merge with config.
  *
+ * @param {string[]} args - Raw command-line arguments.
+ *
  * @returns {DownloadConfig} Enhanced configuration.
  */
-function parseArguments() {
-    /** @type {string[]} */
-    const args = process.argv.slice(2);
+function parseArguments(args = process.argv.slice(2)) {
     /** @type {DownloadConfig} */
     const config = { ...CONFIG };
 
@@ -272,14 +272,17 @@ function parseArguments() {
                 i += inlineValue === undefined ? 1 : 0;
                 break;
             case "--base-url":
-                config.baseUrl = parseStringOption(
-                    "--base-url",
-                    inlineValue ?? nextArg
-                ).replace(/\/+$/, ""); // Remove trailing slashes
+                config.baseUrl = normalizeBaseUrl(
+                    parseStringOption("--base-url", inlineValue ?? nextArg)
+                );
                 i += inlineValue === undefined ? 1 : 0;
                 break;
+            default:
+                throw new Error(`Unknown option: ${option}`);
         }
     }
+
+    config.baseUrl = normalizeBaseUrl(config.baseUrl);
 
     return config;
 }
@@ -334,11 +337,23 @@ function parsePositiveIntegerOption(option, value) {
  * @returns {string} Parsed string value.
  */
 function parseStringOption(option, value) {
-    if (!value) {
+    if (!value || value.startsWith("-")) {
         throw new Error(`${option} expects a value`);
     }
 
     return value;
+}
+
+/**
+ * Normalize a base URL supplied by the template or CLI.
+ *
+ * @param {string} value - Raw base URL.
+ *
+ * @returns {string} Base URL without surrounding whitespace or trailing
+ *   slashes.
+ */
+function normalizeBaseUrl(value) {
+    return value.trim().replace(/\/+$/, "");
 }
 
 /**
@@ -1150,11 +1165,10 @@ function getOutputPath(page, config, paths) {
 }
 
 // Execute main function if this is the main module
-/** @type {string} */
-const templateArgvPath = path.resolve(process.argv[1] ?? ".");
-/** @type {string} */
-const templateMetaPath = fileURLToPath(import.meta.url);
-if (templateMetaPath === templateArgvPath) {
+if (
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
     main().catch(console.error);
 }
 
@@ -1162,6 +1176,7 @@ if (templateMetaPath === templateArgvPath) {
 export {
     cleanContent,
     initialize,
+    normalizeBaseUrl,
     parseArguments,
     rewriteLinks,
     validateContent,
