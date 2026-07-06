@@ -13,6 +13,8 @@ import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 
 import type { StatusAlertInput } from "../useAlertStore";
 
+import { buildMonitorDisplayInfo } from "../../../utils/monitoring/monitorDisplayInfo";
+
 /**
  * Derives a human-friendly site name for alert payloads.
  */
@@ -69,14 +71,16 @@ function deriveMonitorName(
         }
     }
 
-    if (isRecord(monitorRecord)) {
-        const monitorType = monitorRecord["type"];
-        if (typeof monitorType === "string" && monitorType.length > 0) {
-            return monitorType;
-        }
+    const { connectionInfo, monitorTypeLabel } = buildMonitorDisplayInfo({
+        fallbackIdentifier: fallbackId,
+        monitor,
+    });
+
+    if (connectionInfo.length > 0) {
+        return `${monitorTypeLabel}: ${connectionInfo}`;
     }
 
-    return fallbackId;
+    return monitorTypeLabel;
 }
 
 /**

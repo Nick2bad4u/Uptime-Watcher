@@ -190,10 +190,49 @@ describe(StatusAlertToaster, () => {
 
         expect(
             screen.getByRole("button", {
-                name: /down for http/iv,
+                name: /down for website url: https:\/\/example\.com/iv,
             })
         ).toBeInTheDocument();
+        expect(
+            screen.getByText("Website URL: https://example.com")
+        ).toBeInTheDocument();
         expect(screen.getByText(statusUpdate.site.name)).toBeInTheDocument();
+    });
+
+    it("redacts URL secrets from generated status alert monitor names", () => {
+        const statusUpdate = createStatusUpdate({
+            monitor: {
+                activeOperations: [],
+                checkInterval: 60_000,
+                history: [],
+                id: "monitor-secret-url",
+                monitoring: true,
+                responseTime: 320,
+                retryAttempts: 0,
+                status: STATUS_KIND.DOWN,
+                timeout: 10_000,
+                type: "http",
+                url: "https://alerts.example.com/status?refresh_token=alert-secret#fragment",
+            },
+            monitorId: "monitor-secret-url",
+        });
+
+        act(() => {
+            enqueueAlertFromStatusUpdate(statusUpdate);
+        });
+
+        render(<StatusAlertToaster />);
+
+        const alert = screen.getByRole("button", {
+            name: /down for website url: https:\/\/alerts\.example\.com\/status/iv,
+        });
+
+        expect(alert).toHaveTextContent(
+            "Website URL: https://alerts.example.com/status"
+        );
+        expect(alert).not.toHaveTextContent("refresh_token");
+        expect(alert).not.toHaveTextContent("alert-secret");
+        expect(alert).not.toHaveTextContent("fragment");
     });
 
     it("does not enqueue alerts when in-app alerts are disabled", () => {
