@@ -177,11 +177,14 @@ export function createSingleExternalOpenUrlValidator(
  */
 export function createClipboardTextValidator(): IpcParameterValidator {
     return createParamValidator(1, [
-        (value): ParameterValueValidationResult =>
-            validateRequiredStringPayload(value, {
+        (value): ParameterValueValidationResult => {
+            const errors = validateRequiredStringPayload(value, {
                 maxBytes: MAX_CLIPBOARD_TEXT_BYTES,
                 maxBytesMessage: `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`,
                 paramName: "text",
-            }),
+            });
+
+            return errors.length > 0 ? errors : null;
+        },
     ]);
 }

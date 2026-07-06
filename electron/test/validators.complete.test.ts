@@ -35,6 +35,8 @@ import { SiteHandlerValidators } from "../services/ipc/validators/sites";
 import { StateSyncHandlerValidators } from "../services/ipc/validators/stateSync";
 import { SystemHandlerValidators } from "../services/ipc/validators/system";
 
+const MAX_CLIPBOARD_TEXT_BYTES = 5 * 1024 * 1024;
+
 /**
  * Helper function to check if validation result indicates success
  */
@@ -1856,6 +1858,54 @@ describe("IPC Validators - Exported Validator Groups", () => {
             await annotate("Type: Error Handling", "type");
 
             const result = SystemHandlerValidators.verifyIpcHandler([123]);
+
+            expect(isValidationFailure(result)).toBeTruthy();
+        });
+
+        it("accepts bounded clipboard text payloads", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            const result = SystemHandlerValidators.writeClipboardText([
+                "x".repeat(MAX_CLIPBOARD_TEXT_BYTES),
+            ]);
+
+            expect(isValidationSuccess(result)).toBeTruthy();
+        });
+
+        it("rejects oversized clipboard text payloads", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const result = SystemHandlerValidators.writeClipboardText([
+                "x".repeat(MAX_CLIPBOARD_TEXT_BYTES + 1),
+            ]);
+
+            expect(result).toContain(
+                `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`
+            );
+        });
+
+        it("rejects non-string clipboard text payloads", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const result = SystemHandlerValidators.writeClipboardText([123]);
 
             expect(isValidationFailure(result)).toBeTruthy();
         });
