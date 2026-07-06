@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-top-level-await -- Script must run in CommonJS context where top-level await is unsupported */
 /**
  * Aggregates Istanbul coverage collected during Playwright runs and enforces
  * thresholds.
@@ -15,9 +14,6 @@ import * as path from "node:path";
 const COVERAGE_ROOT = path.resolve(process.cwd(), "coverage", "playwright");
 const NYC_OUTPUT_DIR = path.join(COVERAGE_ROOT, ".nyc_output");
 const REPORT_DIR = path.join(COVERAGE_ROOT, "reports");
-const THRESHOLD = parseCoverageThreshold(
-    process.env["PLAYWRIGHT_COVERAGE_THRESHOLD"]
-);
 
 /**
  * Parses the configured coverage threshold as a finite percentage.
@@ -74,7 +70,12 @@ async function loadCoverageFragments(): Promise<string[]> {
  *
  * @throws Error when the configured coverage threshold is not met.
  */
-async function mergeCoverage(files: string[]): Promise<void> {
+async function mergeCoverage(
+    files: string[],
+    threshold = parseCoverageThreshold(
+        process.env["PLAYWRIGHT_COVERAGE_THRESHOLD"]
+    )
+): Promise<void> {
     if (files.length === 0) {
         console.warn("⚠️  No Playwright coverage fragments were generated.");
         return;
@@ -116,30 +117,67 @@ async function mergeCoverage(files: string[]): Promise<void> {
     console.log("📈 Playwright coverage summary (pct):", metrics);
 
     for (const [metric, value] of Object.entries(metrics)) {
-        if (value < THRESHOLD) {
+        if (value < threshold) {
             throw new Error(
                 `Coverage threshold not met for ${metric}: ${value.toFixed(
                     2
-                )}% < ${THRESHOLD}%`
+                )}% < ${threshold}%`
             );
         }
     }
 
     console.log(
-        `✅ Playwright coverage meets threshold of ${THRESHOLD}% for all metrics.`
+        `✅ Playwright coverage meets threshold of ${threshold}% for all metrics.`
     );
 }
 
 /**
  * Entry point that orchestrates coverage aggregation and threshold validation.
+ *
+ * @returns Process exit status.
  */
-async function main(): Promise<void> {
-    const files = await loadCoverageFragments();
-    await mergeCoverage(files);
+async function main(): Promise<number> {
+    try {
+        const files = await loadCoverageFragments();
+        await mergeCoverage(files);
+        return 0;
+    } catch (error) {
+        console.error(
+            "❌ Failed to produce Playwright coverage report:",
+            error
+        );
+        return 1;
+    }
 }
 
-main().catch((error) => {
-    console.error("❌ Failed to produce Playwright coverage report:", error);
-    process.exitCode = 1;
-});
-/* eslint-enable unicorn/prefer-top-level-await */
+/**
+ * @returns `true` when this file is the CLI entrypoint.
+ */
+function isDirectInvocation(): boolean {
+    return (
+        typeof process.argv[1] === "string" &&
+        path.basename(process.argv[1]) === "report-playwright-coverage.ts"
+    );
+}
+
+if (isDirectInvocation()) {
+    void main()
+        .then((exitCode) => {
+            process.exitCode = exitCode;
+        })
+        .catch((error: unknown) => {
+            console.error(
+                "❌ Failed to produce Playwright coverage report:",
+                error
+            );
+            process.exitCode = 1;
+        });
+}
+
+export {
+    isDirectInvocation,
+    loadCoverageFragments,
+    main,
+    mergeCoverage,
+    parseCoverageThreshold,
+};

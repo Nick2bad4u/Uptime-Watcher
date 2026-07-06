@@ -315,10 +315,16 @@ function runNpmScript(
 
 /**
  * Entry point for the CLI script.
+ *
+ * @param argv - Raw CLI arguments.
+ *
+ * @returns Process exit status.
  */
-async function main(): Promise<void> {
+async function main(
+    argv: readonly string[] = process.argv.slice(2)
+): Promise<number> {
     try {
-        const options = parseCliOptions(process.argv.slice(2));
+        const options = parseCliOptions(argv);
         const childEnv: MutableProcessEnv = {
             ...process.env,
             FAST_CHECK_NUM_RUNS: String(options.runs),
@@ -345,14 +351,44 @@ async function main(): Promise<void> {
         console.log(
             "\n[fast-check] All requested fuzzing suites completed successfully."
         );
+        return 0;
     } catch (error) {
         if (error instanceof CliUsageError) {
             console.error(`[fast-check] ${error.message}`);
         } else {
             console.error("[fast-check] Unexpected error:", error);
         }
-        process.exitCode = 1;
+        return 1;
     }
 }
 
-void main(); // eslint-disable-line unicorn/prefer-top-level-await -- CommonJS entrypoints cannot use top-level await reliably across tooling
+/**
+ * @returns `true` when this file is the CLI entrypoint.
+ */
+function isDirectInvocation(): boolean {
+    return (
+        typeof process.argv[1] === "string" &&
+        path.basename(process.argv[1]) === "run-fast-check-fuzzing.ts"
+    );
+}
+
+if (isDirectInvocation()) {
+    void main()
+        .then((exitCode) => {
+            process.exitCode = exitCode;
+        })
+        .catch((error: unknown) => {
+            console.error("[fast-check] Unexpected error:", error);
+            process.exitCode = 1;
+        });
+}
+
+export {
+    CliUsageError,
+    isDirectInvocation,
+    main,
+    parseCliOptions,
+    parseInteger,
+    parsePositiveInteger,
+    runNpmScript,
+};
