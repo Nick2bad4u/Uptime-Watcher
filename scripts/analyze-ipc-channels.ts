@@ -92,8 +92,7 @@ export class IpcChannelAnalyzer {
             const handlerRegex =
                 /register\s*\(\s*(?<channelExpression>[A-Z_]+_CHANNELS\.[A-Za-z0-9_]+)/gu;
 
-            let match;
-            while ((match = handlerRegex.exec(sourceCode)) !== null) {
+            for (const match of sourceCode.matchAll(handlerRegex)) {
                 const channelExpression = match.groups?.channelExpression ?? "";
                 const channelName =
                     this.channelLookup.get(channelExpression) ??
@@ -155,8 +154,7 @@ export class IpcChannelAnalyzer {
         const definitionRegex =
             /const\s+(?<constantName>[A-Z_]+_CHANNELS)_DEFINITION\b[^=]*=\s*\{(?<body>[\s\S]*?)\};/gu;
 
-        let definitionMatch;
-        while ((definitionMatch = definitionRegex.exec(sourceCode)) !== null) {
+        for (const definitionMatch of sourceCode.matchAll(definitionRegex)) {
             const constantName = definitionMatch.groups?.constantName;
             const body = definitionMatch.groups?.body;
             if (!constantName || !body) {
@@ -165,8 +163,7 @@ export class IpcChannelAnalyzer {
 
             const propertyRegex =
                 /(?<propertyName>[A-Za-z0-9_]+)\s*:\s*"(?<channelName>[^"]+)"/gu;
-            let propertyMatch;
-            while ((propertyMatch = propertyRegex.exec(body)) !== null) {
+            for (const propertyMatch of body.matchAll(propertyRegex)) {
                 const propertyName = propertyMatch.groups?.propertyName;
                 const channelName = propertyMatch.groups?.channelName;
                 if (!propertyName || !channelName) {

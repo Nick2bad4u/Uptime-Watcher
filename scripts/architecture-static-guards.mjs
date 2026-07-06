@@ -138,9 +138,7 @@ async function loadKnownEventNames() {
 
     for (const content of contentByFile) {
         pattern.lastIndex = 0;
-        let match;
-
-        while ((match = pattern.exec(content)) !== null) {
+        for (const match of content.matchAll(pattern)) {
             const groups = match.groups;
             const name = groups?.["name"];
             if (typeof name === "string") {
@@ -308,8 +306,7 @@ async function checkTypedEventUsage(electronFiles, knownEventNames) {
 
         const content = await readFile(file, "utf8");
 
-        let match;
-        while ((match = pattern.exec(content)) !== null) {
+        for (const match of content.matchAll(pattern)) {
             const groups = match.groups;
             const eventName = groups?.["event"];
             if (typeof eventName !== "string") {

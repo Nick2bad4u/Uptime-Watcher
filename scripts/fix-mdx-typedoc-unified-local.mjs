@@ -25,9 +25,8 @@ function fixFile(filePath) {
      */
     const codeBlocks = [];
     const codeBlockRegex = /```[\w-]*[\S\s]*?```/g;
-    let match;
-    while ((match = codeBlockRegex.exec(content)) !== null) {
-        codeBlocks.push([match.index, codeBlockRegex.lastIndex]);
+    for (const match of content.matchAll(codeBlockRegex)) {
+        codeBlocks.push([match.index, match.index + match[0].length]);
     }
 
     // Replace {anything} outside code blocks

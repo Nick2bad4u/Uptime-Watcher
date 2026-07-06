@@ -385,9 +385,7 @@ async function fixCrossReferences(filePath) {
 
         // Fix relative path references that might be incorrect
         const linkPattern = /\[(?<text>[^\]]+)]\((?<url>[^)]+)\)/g;
-        let match;
-
-        while ((match = linkPattern.exec(content)) !== null) {
+        for (const match of content.matchAll(linkPattern)) {
             const { groups } = match;
             if (!groups) {
                 continue;

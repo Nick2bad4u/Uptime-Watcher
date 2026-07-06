@@ -162,9 +162,7 @@ function calculateComplexity(content) {
 function checkInternalLinks(content, filePath, allFiles) {
     const brokenLinks = [];
     const linkPattern = /\[(?<text>[^\]]+)]\((?<url>[^)]+)\)/g;
-    let match;
-
-    while ((match = linkPattern.exec(content)) !== null) {
+    for (const match of content.matchAll(linkPattern)) {
         const { groups } = match;
         if (!groups) continue;
 

@@ -116,17 +116,15 @@ function extractTestNames(filePath) {
         const describeRegex = /describe\s*\(\s*["'`](?<name>[^"'`]+)["'`]/g;
         const itRegex = /(?:it|test)\s*\(\s*["'`](?<name>[^"'`]+)["'`]/g;
 
-        let match;
-
         // Extract describe blocks
-        while ((match = describeRegex.exec(content)) !== null) {
+        for (const match of content.matchAll(describeRegex)) {
             if (match.groups?.["name"]) {
                 testStructure.describes.push(match.groups["name"]);
             }
         }
 
         // Extract it/test blocks
-        while ((match = itRegex.exec(content)) !== null) {
+        for (const match of content.matchAll(itRegex)) {
             if (match.groups?.["name"]) {
                 testStructure.tests.push(match.groups["name"]);
             }

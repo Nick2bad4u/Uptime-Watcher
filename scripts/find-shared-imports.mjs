@@ -265,12 +265,10 @@ function findSharedImports(filePath) {
     try {
         const content = readFileSync(filePath, "utf8");
         const imports = [];
-        let match;
 
-        // Reset regex
         CONFIG.importPattern.lastIndex = 0;
 
-        while ((match = CONFIG.importPattern.exec(content)) !== null) {
+        for (const match of content.matchAll(CONFIG.importPattern)) {
             const fullMatch = match[0];
             const sharedPath = match.groups?.["sharedPath"] ?? "";
             const lineNumber = content
