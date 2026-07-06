@@ -386,7 +386,7 @@ npm run docusaurus:broken-links
 npm run docs:build -- --verbose
 
 # Clear TypeDoc and Docusaurus caches
-npm run docs:clean
+npm run clean:docs
 cd docs/docusaurus && npm run clear
 
 # Test local development setup
@@ -422,7 +422,7 @@ Available npm scripts for documentation:
 - `docs:build` - Build complete documentation site (TypeDoc + ESLint inspector + Docusaurus)
 - `docs:build:local` - Build with local configuration
 - `docs:preview` - Preview basic docs output using serve
-- `docs:clean` - Remove generated documentation files
+- `clean:docs` - Remove generated documentation files
 
 ### Docusaurus Development Scripts
 

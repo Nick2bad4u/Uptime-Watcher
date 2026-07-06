@@ -102,8 +102,6 @@ npm run test:shared:coverage
 # Storybook component tests
 npm run test:storybook
 npm run test:storybook:coverage
-npm run test:storybook:runner
-npm run test:storybook:runner:coverage
 
 # Playwright / E2E tests
 npm run test:playwright
@@ -121,7 +119,7 @@ npm run test:shared:ui      # Shared tests UI
 Notes:
 
 - `npm run test` runs the frontend Vitest configuration (renderer) only.
-- `npm run test:all` orchestrates the full test matrix across frontend, electron, shared, and Storybook.
+- `npm run test:all` orchestrates the full test matrix across frontend, electron, shared, Storybook, and Playwright.
 
 ### ElectronAPI Mocking Strategy
 

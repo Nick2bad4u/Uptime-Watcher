@@ -23,14 +23,14 @@ This guide explains how to improve Playwright codegen output to align with our l
 
 ```bash
 # After generating a test with codegen, run this to fix common issues:
-npm run fix-codegen <path-to-test-file>
+npm run fix-codegen -- <path-to-test-file>
 ```
 
 ### 2. Generate and fix in one command
 
 ```bash
 # Generate test and auto-fix it
-npx playwright codegen && npm run fix-codegen playwright/tests/your-new-test.test.ts
+npx playwright codegen && npm run fix-codegen -- playwright/tests/your-new-test.test.ts
 ```
 
 ## Manual Improvements

@@ -15,6 +15,27 @@ const buttonFeedbackTimers = new WeakMap<
     ReturnType<typeof setTimeout>
 >();
 
+const PACKAGE_JSON_EXAMPLE = `{
+  "name": "uptime-watcher",
+  "version": "23.8.0",
+  "description": "An Electron app to monitor website uptime status",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "node scripts/run-node-cli.mjs NODE_OPTIONS=--max_old_space_size=8192 -- vite",
+    "electron-dev": "concurrently \\"npm run dev\\" \\"npm run electron -- {args}\\" --",
+    "build": "npm run build:electron-vite",
+    "test": "npm-run-all --sequential --print-name test:frontend test:shared test:electron",
+    "test:all": "npm run test && npm run test:storybook && npm run test:playwright"
+  },
+  "dependencies": {
+    "electron": "^41.5.0",
+    "react": "^19.2.5",
+    "node-sqlite3-wasm": "^0.8.56",
+    "zustand": "^5.0.12"
+  },
+  "license": "UNLICENSED"
+}`;
+
 /**
  * Shows temporary button text and restores the original label afterward.
  *
@@ -58,25 +79,6 @@ function getActiveButton(): HTMLButtonElement | undefined {
  * Copies code to clipboard with fallback support.
  */
 const handleCopyCode = async (): Promise<void> => {
-    const code = `{
-  "name": "uptime-watcher",
-  "version": "12.5.0",
-  "description": "Desktop uptime monitoring",
-  "main": "dist/main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "npm run build:electron-vite",
-    "test": "vitest"
-  },
-  "dependencies": {
-    "electron": "^32.1.2",
-    "react": "^18.3.1",
-    "node-sqlite3-wasm": "^0.8.15",
-    "zustand": "^5.0.0"
-  },
-  "license": "Unlicense"
-}`;
-
     // Try modern clipboard API first (browser environment only)
     if (
         typeof window !== "undefined" &&
@@ -84,7 +86,9 @@ const handleCopyCode = async (): Promise<void> => {
         "clipboard" in globalThis.navigator
     ) {
         try {
-            await globalThis.navigator.clipboard.writeText(code);
+            await globalThis.navigator.clipboard.writeText(
+                PACKAGE_JSON_EXAMPLE
+            );
             const button = getActiveButton();
             if (button) {
                 showTemporaryButtonText(button, "Copied!");
@@ -97,7 +101,7 @@ const handleCopyCode = async (): Promise<void> => {
 
     // Fallback for older browsers or when navigator is not available
     const textArea = document.createElement("textarea");
-    textArea.value = code;
+    textArea.value = PACKAGE_JSON_EXAMPLE;
     document.body.append(textArea);
     textArea.select();
     try {
@@ -455,26 +459,7 @@ const HomepageHeader = (): JSX.Element => (
                             </div>
 
                             <pre className={styles.codeContent}>
-                                {`{
-    "name": "uptime-watcher",
-    "version": "19.0.0",
-    "description": "An Electron app to monitor website uptime status",
-    "main": "dist/main.js",
-    "scripts": {
-        "dev": "vite",
-        "electron-dev": "concurrently "npm run dev" "npm run electron -- {args}" --",
-        "build": "npm run build:electron-vite",
-        "test": "vitest",
-        "test:all": "npm run test && npm run test:storybook && npm run test:storybook:runner"
-    },
-    "dependencies": {
-        "electron": "^39.2.3",
-        "react": "^19.2.0",
-        "node-sqlite3-wasm": "^0.8.51",
-        "zustand": "^5.0.0"
-    },
-    "license": "UNLICENSED"
-}`}
+                                {PACKAGE_JSON_EXAMPLE}
                             </pre>
                         </div>
                     </div>
