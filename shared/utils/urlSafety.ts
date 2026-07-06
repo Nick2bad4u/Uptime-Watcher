@@ -671,6 +671,12 @@ function isPrivateIpv6(hostname: string): boolean {
         return true;
     }
 
+    // Deprecated site-local fec0::/10 (fec0..feff). Although RFC 3879
+    // deprecated this range, treat it as internal for data-leak prevention.
+    if (/^fe[c-f]/u.test(normalized)) {
+        return true;
+    }
+
     // Unique local addresses fc00::/7 (fc.. or fd..)
     if (normalized.startsWith("fc") || normalized.startsWith("fd")) {
         return true;

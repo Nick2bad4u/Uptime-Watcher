@@ -78,6 +78,13 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("fc00::1")).toBeTruthy();
         });
 
+        it("detects deprecated IPv6 site-local addresses", () => {
+            expect(isPrivateNetworkHostname("fec0::1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("[fec0::1]")).toBeTruthy();
+            expect(isPrivateNetworkHostname("fedf::1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("feff::1")).toBeTruthy();
+        });
+
         it("detects IPv4-mapped IPv6 private addresses (dotted and hex)", () => {
             expect(isPrivateNetworkHostname("::ffff:192.168.0.1")).toBeTruthy();
             expect(
@@ -410,6 +417,9 @@ describe("urlSafety", () => {
             expect(
                 tryGetSafeThirdPartyHttpUrl("https://[::ffff:192.168.1.1]")
             ).toBe(null);
+            expect(tryGetSafeThirdPartyHttpUrl("https://[fec0::1]")).toBe(
+                null
+            );
             expect(tryGetSafeThirdPartyHttpUrl("https://[::192.168.1.1]")).toBe(
                 null
             );
