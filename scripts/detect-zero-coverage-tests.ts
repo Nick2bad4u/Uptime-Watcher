@@ -221,14 +221,15 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
 
     for (let index = 0; index < argv.length; index += 1) {
         const token = argv[index];
-        switch (token) {
+        const { inlineValue, option } = splitOptionValue(token ?? "");
+        switch (option) {
             case "--config": {
-                configPath = argv[index + 1] ?? null;
-                index += 1;
+                configPath = inlineValue ?? argv[index + 1] ?? null;
+                index += inlineValue === undefined ? 1 : 0;
                 break;
             }
             case "--pattern": {
-                const patternValue = argv[index + 1];
+                const patternValue = inlineValue ?? argv[index + 1];
                 if (!patternValue) {
                     throw new Error("--pattern expects a value");
                 }
@@ -236,20 +237,15 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
                     escapeRegularExpressionLiteral(patternValue),
                     "iu"
                 );
-                index += 1;
+                index += inlineValue === undefined ? 1 : 0;
                 break;
             }
             case "--max-files": {
-                const rawValue = argv[index + 1];
-                if (!rawValue) {
-                    throw new Error("--max-files expects a numeric value");
-                }
-                const parsed = Number.parseInt(rawValue, 10);
-                if (Number.isNaN(parsed) || parsed <= 0) {
-                    throw new Error("--max-files must be a positive integer");
-                }
-                maxFiles = parsed;
-                index += 1;
+                maxFiles = parsePositiveIntegerOption(
+                    "--max-files",
+                    inlineValue ?? argv[index + 1]
+                );
+                index += inlineValue === undefined ? 1 : 0;
                 break;
             }
             case "--dry-run": {
@@ -261,16 +257,11 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
                 break;
             }
             case "--timeout-ms": {
-                const rawValue = argv[index + 1];
-                if (!rawValue) {
-                    throw new Error("--timeout-ms expects a numeric value");
-                }
-                const parsed = Number.parseInt(rawValue, 10);
-                if (Number.isNaN(parsed) || parsed <= 0) {
-                    throw new Error("--timeout-ms must be a positive integer");
-                }
-                timeoutMs = parsed;
-                index += 1;
+                timeoutMs = parsePositiveIntegerOption(
+                    "--timeout-ms",
+                    inlineValue ?? argv[index + 1]
+                );
+                index += inlineValue === undefined ? 1 : 0;
                 break;
             }
             default: {
@@ -294,6 +285,43 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
         explicitFiles,
         timeoutMs,
     };
+}
+
+/**
+ * Split `--option=value` arguments while preserving space-separated support.
+ */
+function splitOptionValue(token: string): {
+    readonly inlineValue: string | undefined;
+    readonly option: string;
+} {
+    const equalsIndex = token.indexOf("=");
+    if (equalsIndex === -1) {
+        return { inlineValue: undefined, option: token };
+    }
+
+    return {
+        inlineValue: token.slice(equalsIndex + 1),
+        option: token.slice(0, equalsIndex),
+    };
+}
+
+/**
+ * Parse a required positive integer option without partial string coercion.
+ */
+function parsePositiveIntegerOption(
+    option: string,
+    value: string | undefined
+): number {
+    if (!value || !/^\d+$/u.test(value)) {
+        throw new Error(`${option} must be a positive integer`);
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+        throw new Error(`${option} must be a positive integer`);
+    }
+
+    return parsed;
 }
 
 /**
