@@ -893,6 +893,54 @@ describe(DataBackupService, () => {
             );
         });
 
+        it("keeps a saved backup when previous backup cleanup fails", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            const fileStat = {
+                isFile: () => true,
+                isSymbolicLink: () => false,
+            };
+            const cleanupError = new Error("previous backup cleanup failed");
+
+            mockFsPromises.lstat.mockResolvedValue(fileStat);
+            mockFsPromises.rm.mockImplementation(async (filePath) => {
+                if (
+                    typeof filePath === "string" &&
+                    filePath.includes(".bak-")
+                ) {
+                    throw cleanupError;
+                }
+
+                return undefined;
+            });
+
+            await expect(
+                dataBackupService.saveDatabaseBackupToPath(targetPath)
+            ).resolves.toMatchObject({
+                appVersion: "test-version",
+                originalPath: path.basename(targetPath),
+                sizeBytes: 1024,
+            });
+
+            expect(mockFsPromises.rename).toHaveBeenCalledWith(
+                targetPath,
+                expect.stringContaining(`${path.basename(targetPath)}.bak-`)
+            );
+            expect(mockFsPromises.rename).toHaveBeenCalledWith(
+                expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
+                targetPath
+            );
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataBackupService] Failed to remove previous backup file after save",
+                cleanupError,
+                expect.objectContaining({ targetPath })
+            );
+            expect(mockLogger.error).not.toHaveBeenCalledWith(
+                "[DataBackupService] Failed to restore previous backup file after save failure",
+                expect.any(Error),
+                expect.any(Object)
+            );
+        });
+
         it("surfaces rollback failures when replacing an existing backup fails", async () => {
             const targetPath = path.resolve("backup-target.sqlite");
             const fileStat = {
