@@ -8,6 +8,7 @@
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isWindowsReservedFileBasename } from "@shared/utils/fileNameSafety";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
@@ -25,31 +26,6 @@ import { isPlaywrightAutomation } from "../../../utils/environment";
 const DEFAULT_DOWNLOAD_FILE_NAME = "download.bin";
 const DEFAULT_BACKUP_FILE_NAME_PREFIX = "backup";
 const DEFAULT_BACKUP_FILE_NAME_EXTENSION = "sqlite";
-
-const WINDOWS_RESERVED_FILE_NAMES = new Set([
-    "aux",
-    "com1",
-    "com2",
-    "com3",
-    "com4",
-    "com5",
-    "com6",
-    "com7",
-    "com8",
-    "com9",
-    "con",
-    "lpt1",
-    "lpt2",
-    "lpt3",
-    "lpt4",
-    "lpt5",
-    "lpt6",
-    "lpt7",
-    "lpt8",
-    "lpt9",
-    "nul",
-    "prn",
-]);
 
 const WINDOWS_RESERVED_FILE_NAME_CHARACTERS = new Set([
     '"',
@@ -277,7 +253,7 @@ function hasReservedFileNameCharacter(fileName: string): boolean {
 
 function isWindowsReservedFileName(fileName: string): boolean {
     const [baseName] = stringSplit(fileName, ".");
-    return WINDOWS_RESERVED_FILE_NAMES.has((baseName ?? "").toLowerCase());
+    return isWindowsReservedFileBasename(baseName ?? "");
 }
 
 function normalizeDownloadFileName(

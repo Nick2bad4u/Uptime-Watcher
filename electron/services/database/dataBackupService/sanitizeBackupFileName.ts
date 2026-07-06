@@ -1,32 +1,7 @@
+import { isWindowsReservedFileBasename } from "@shared/utils/fileNameSafety";
 import * as path from "node:path";
-import { setHas } from "ts-extras";
 
 const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}\-._]/gu;
-
-const WINDOWS_RESERVED_BASENAMES = new Set([
-    "aux",
-    "com1",
-    "com2",
-    "com3",
-    "com4",
-    "com5",
-    "com6",
-    "com7",
-    "com8",
-    "com9",
-    "con",
-    "lpt1",
-    "lpt2",
-    "lpt3",
-    "lpt4",
-    "lpt5",
-    "lpt6",
-    "lpt7",
-    "lpt8",
-    "lpt9",
-    "nul",
-    "prn",
-]);
 
 /**
  * Produces a filesystem-safe file name.
@@ -58,11 +33,10 @@ export function createSanitizedFileName(fileName: string): string {
 
     const ext = path.extname(trimmed);
     const baseName = path.basename(trimmed, ext);
-    const baseNameLower = baseName.toLowerCase();
 
     // Avoid Windows device names (even when running on non-Windows, a backup
     // can later be downloaded/restored on Windows).
-    const safeBaseName = setHas(WINDOWS_RESERVED_BASENAMES, baseNameLower)
+    const safeBaseName = isWindowsReservedFileBasename(baseName)
         ? `${baseName}_`
         : baseName;
 
