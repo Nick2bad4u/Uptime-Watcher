@@ -67,6 +67,12 @@ export async function downloadBackupWithMetadata(args: {
         );
     }
 
+    if (!entry.encrypted && entry.metadata.sizeBytes !== buffer.byteLength) {
+        throw new Error(
+            `Backup metadata mismatch: expected ${entry.metadata.sizeBytes} bytes but downloaded ${buffer.byteLength} bytes`
+        );
+    }
+
     return {
         buffer,
         entry,
@@ -143,6 +149,12 @@ export async function uploadBackupWithMetadata(args: {
         key: backupKey,
         metadata: args.metadata,
     });
+
+    if (!entry.encrypted && entry.metadata.sizeBytes !== args.buffer.byteLength) {
+        throw new Error(
+            `Backup metadata mismatch: expected ${entry.metadata.sizeBytes} bytes but received ${args.buffer.byteLength} bytes`
+        );
+    }
 
     await args.uploadObject({
         buffer: args.buffer,

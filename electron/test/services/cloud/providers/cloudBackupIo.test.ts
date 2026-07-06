@@ -71,6 +71,76 @@ describe(downloadBackupWithMetadata, () => {
             downloadBackupWithMetadata({ downloadObject, key })
         ).rejects.toThrow(/filename/iv);
     });
+
+    it("throws when plaintext metadata size does not match downloaded bytes", async () => {
+        const key = "backups/backup.sqlite";
+
+        const downloadObject = vi
+            .fn<(key: string) => Promise<Buffer>>()
+            .mockImplementation(async (requestedKey) => {
+                if (requestedKey.endsWith(".metadata.json")) {
+                    const entry: CloudBackupEntry = {
+                        encrypted: false,
+                        fileName: "backup.sqlite",
+                        key,
+                        metadata: {
+                            appVersion: "1.0.0",
+                            checksum: "abc",
+                            createdAt: 1,
+                            originalPath: "backup.sqlite",
+                            retentionHintDays: 30,
+                            schemaVersion: 1,
+                            sizeBytes: 999,
+                        },
+                    };
+                    return Buffer.from(JSON.stringify(entry), "utf8");
+                }
+
+                return Buffer.from("backup", "utf8");
+            });
+
+        await expect(
+            downloadBackupWithMetadata({ downloadObject, key })
+        ).rejects.toThrow(/expected 999 bytes but downloaded 6 bytes/iv);
+    });
+
+    it("allows encrypted metadata size to describe decrypted plaintext bytes", async () => {
+        const key = "backups/backup.sqlite.enc";
+
+        const downloadObject = vi
+            .fn<(key: string) => Promise<Buffer>>()
+            .mockImplementation(async (requestedKey) => {
+                if (requestedKey.endsWith(".metadata.json")) {
+                    const entry: CloudBackupEntry = {
+                        encrypted: true,
+                        fileName: "backup.sqlite.enc",
+                        key,
+                        metadata: {
+                            appVersion: "1.0.0",
+                            checksum: "abc",
+                            createdAt: 1,
+                            originalPath: "backup.sqlite",
+                            retentionHintDays: 30,
+                            schemaVersion: 1,
+                            sizeBytes: 6,
+                        },
+                    };
+                    return Buffer.from(JSON.stringify(entry), "utf8");
+                }
+
+                return Buffer.from("encrypted-payload", "utf8");
+            });
+
+        await expect(
+            downloadBackupWithMetadata({ downloadObject, key })
+        ).resolves.toMatchObject({
+            buffer: Buffer.from("encrypted-payload", "utf8"),
+            entry: {
+                encrypted: true,
+                metadata: { sizeBytes: 6 },
+            },
+        });
+    });
 });
 
 describe(uploadBackupWithMetadata, () => {
@@ -139,6 +209,68 @@ describe(uploadBackupWithMetadata, () => {
         ).rejects.toThrow(/expected format/iv);
 
         expect(uploadObject).not.toHaveBeenCalled();
+    });
+
+    it("rejects plaintext metadata size mismatches before uploading backup bytes", async () => {
+        const uploadObject =
+            vi.fn<(args: { buffer: Buffer; key: string }) => Promise<void>>();
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("backup", "utf8"),
+                encrypted: false,
+                fileName: "backup.sqlite",
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 999,
+                },
+                uploadObject,
+            })
+        ).rejects.toThrow(/expected 999 bytes but received 6 bytes/iv);
+
+        expect(uploadObject).not.toHaveBeenCalled();
+    });
+
+    it("allows encrypted uploads whose metadata size describes plaintext bytes", async () => {
+        const uploadObject = vi
+            .fn<(args: { buffer: Buffer; key: string }) => Promise<void>>()
+            .mockResolvedValue(undefined);
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("encrypted-payload", "utf8"),
+                encrypted: true,
+                fileName: "backup.sqlite.enc",
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 6,
+                },
+                uploadObject,
+            })
+        ).resolves.toMatchObject({
+            encrypted: true,
+            fileName: "backup.sqlite.enc",
+            metadata: { sizeBytes: 6 },
+        });
+
+        expect(uploadObject).toHaveBeenCalledWith(
+            expect.objectContaining({
+                buffer: Buffer.from("encrypted-payload", "utf8"),
+                key: "backups/backup.sqlite.enc",
+            })
+        );
     });
 
     it("attempts to delete the backup when metadata upload fails", async () => {
