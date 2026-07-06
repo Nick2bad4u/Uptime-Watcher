@@ -1,4 +1,4 @@
-import { isDefined, isFinite as isFiniteNumber, isPresent } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Database value conversion utilities. Provides type-safe conversions between
@@ -87,17 +87,17 @@ export function addBooleanField(
  * Provides safe number conversion with explicit handling of edge cases:
  *
  * - Already a finite number: returned as-is (including 0)
- * - Present values: converted using Number() constructor
- * - Non-finite converted values return undefined
- * - Nullish values and empty strings return undefined
+ * - Signed decimal string values are converted after trimming
+ * - Non-finite or non-decimal values return undefined
+ * - Nullish values and blank strings return undefined
  *
  * Note: This function treats 0 as a valid number that should be preserved,
  * unlike some truthy/falsy checks that would convert 0 to undefined.
  *
  * @param value - The value to convert to a number
  *
- * @returns Converted number value, or undefined if conversion fails or value is
- *   nullish
+ * @returns Converted number value, or undefined if conversion fails, would rely
+ *   on object coercion, or the value is nullish
  *
  * @public
  */
@@ -105,11 +105,63 @@ export function safeNumberConvert(value: unknown): number | undefined {
     if (typeof value === "number") {
         return isFiniteNumber(value) ? value : undefined;
     }
-    if (isPresent(value) && value !== "") {
-        const converted = Number(value);
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!isPlainDecimalNumberString(trimmed)) {
+            return undefined;
+        }
+
+        const converted = Number(trimmed);
         return isFiniteNumber(converted) ? converted : undefined;
     }
+
     return undefined;
+}
+
+function isAsciiDigit(character: string | undefined): boolean {
+    return (
+        typeof character === "string" &&
+        character.length === 1 &&
+        character >= "0" &&
+        character <= "9"
+    );
+}
+
+function consumeAsciiDigits(value: string, startIndex: number): number {
+    let index = startIndex;
+
+    while (isAsciiDigit(value[index])) {
+        index += 1;
+    }
+
+    return index;
+}
+
+function isPlainDecimalNumberString(value: string): boolean {
+    if (value.length === 0) {
+        return false;
+    }
+
+    let index = value.startsWith("+") || value.startsWith("-") ? 1 : 0;
+    const integerStartIndex = index;
+
+    index = consumeAsciiDigits(value, index);
+    if (index === integerStartIndex) {
+        return false;
+    }
+
+    if (value[index] === ".") {
+        index += 1;
+        const decimalStartIndex = index;
+        index = consumeAsciiDigits(value, index);
+
+        if (index === decimalStartIndex) {
+            return false;
+        }
+    }
+
+    return index === value.length;
 }
 
 /**

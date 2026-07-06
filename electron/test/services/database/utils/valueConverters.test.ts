@@ -235,6 +235,26 @@ describe("Value Converters Utility", () => {
             expect(updateFields).toEqual(["converted = ?"]);
             expect(updateValues).toEqual([123]);
         });
+        it("should skip malformed string number values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Value Converters Utility", "component");
+
+            const updateFields: string[] = [];
+            const updateValues: DbValue[] = [];
+
+            addNumberField(
+                "converted",
+                "1e3" as any,
+                updateFields,
+                updateValues
+            );
+
+            expect(updateFields).toEqual([]);
+            expect(updateValues).toEqual([]);
+        });
         it("should skip non-finite number values", async ({
             task,
             annotate,
@@ -489,8 +509,8 @@ describe("Value Converters Utility", () => {
             expect(safeNumberConvert("42")).toBe(42);
             expect(safeNumberConvert("0")).toBe(0);
             expect(safeNumberConvert("-10")).toBe(-10);
+            expect(safeNumberConvert("+10")).toBe(10);
             expect(safeNumberConvert("3.14")).toBe(3.14);
-            expect(safeNumberConvert("1e3")).toBe(1000);
         });
         it("should return undefined for invalid string numbers", async ({
             task,
@@ -502,6 +522,8 @@ describe("Value Converters Utility", () => {
             expect(safeNumberConvert("not a number")).toBeUndefined();
             expect(safeNumberConvert("abc123")).toBeUndefined();
             expect(safeNumberConvert("123abc")).toBeUndefined();
+            expect(safeNumberConvert("1.")).toBeUndefined();
+            expect(safeNumberConvert(".5")).toBeUndefined();
         });
         it("should return undefined for null and undefined", async ({
             task,
@@ -522,21 +544,21 @@ describe("Value Converters Utility", () => {
 
             expect(safeNumberConvert("")).toBeUndefined();
         });
-        it("should convert boolean values", async ({ task, annotate }) => {
+        it("should reject boolean values", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            expect(safeNumberConvert(true)).toBe(1);
-            expect(safeNumberConvert(false)).toBe(0);
+            expect(safeNumberConvert(true)).toBeUndefined();
+            expect(safeNumberConvert(false)).toBeUndefined();
         });
-        it("should handle array and object conversions", async ({
+        it("should reject array and object conversions", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            expect(safeNumberConvert([42])).toBe(42);
+            expect(safeNumberConvert([42])).toBeUndefined();
             expect(
                 safeNumberConvert([
                     1,
@@ -545,42 +567,41 @@ describe("Value Converters Utility", () => {
                 ])
             ).toBeUndefined(); // NaN case
             expect(safeNumberConvert({})).toBeUndefined(); // NaN case
-            expect(safeNumberConvert({ valueOf: () => 42 })).toBe(42);
+            expect(safeNumberConvert({ valueOf: () => 42 })).toBeUndefined();
         });
-        it("should handle Date objects", async ({ task, annotate }) => {
+        it("should reject Date objects", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
             const date = new Date("2023-12-25T10:30:00.000Z");
-            const timestamp = date.getTime();
-            expect(safeNumberConvert(date)).toBe(timestamp);
+            expect(safeNumberConvert(date)).toBeUndefined();
         });
         it("should handle whitespace strings", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
             expect(safeNumberConvert("  42  ")).toBe(42);
-            expect(safeNumberConvert(" ".repeat(3))).toBe(0);
-            expect(safeNumberConvert("\t\n\r")).toBe(0);
+            expect(safeNumberConvert(" ".repeat(3))).toBeUndefined();
+            expect(safeNumberConvert("\t\n\r")).toBeUndefined();
         });
-        it("should handle scientific notation", async ({ task, annotate }) => {
+        it("should reject scientific notation", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            expect(safeNumberConvert("1e-3")).toBe(0.001);
-            expect(safeNumberConvert("2.5e2")).toBe(250);
-            expect(safeNumberConvert("-1.5e-2")).toBe(-0.015);
+            expect(safeNumberConvert("1e-3")).toBeUndefined();
+            expect(safeNumberConvert("2.5e2")).toBeUndefined();
+            expect(safeNumberConvert("-1.5e-2")).toBeUndefined();
         });
-        it("should handle hexadecimal and other number formats", async ({
+        it("should reject hexadecimal and other number formats", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
-            expect(safeNumberConvert("0x10")).toBe(16);
-            expect(safeNumberConvert("0b1010")).toBe(10);
-            expect(safeNumberConvert("0o17")).toBe(15);
+            expect(safeNumberConvert("0x10")).toBeUndefined();
+            expect(safeNumberConvert("0b1010")).toBeUndefined();
+            expect(safeNumberConvert("0o17")).toBeUndefined();
         });
     });
     describe("Integration Tests", () => {
