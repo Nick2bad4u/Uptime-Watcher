@@ -8,7 +8,7 @@
  */
 
 import { useMemo } from "react";
-import { create, type StoreApi, type UseBoundStore } from "zustand";
+import { create } from "zustand";
 
 /**
  * Input type displayed by the prompt dialog.
@@ -74,46 +74,37 @@ const selectIsOpen = (state: PromptDialogState): boolean =>
 /**
  * Zustand store holding the active prompt dialog state.
  */
-export const usePromptDialogStore: UseBoundStore<StoreApi<PromptDialogState>> =
-    create<PromptDialogState>((set, get) => {
-        const resolveAndReset = (result: null | string): void => {
-            const { resolve } = get();
-            set({ request: null, resolve: null, value: "" });
-            resolve?.(result);
-        };
+const usePromptDialogStore = create<PromptDialogState>((set, get) => {
+    const resolveAndReset = (result: null | string): void => {
+        const { resolve } = get();
+        set({ request: null, resolve: null, value: "" });
+        resolve?.(result);
+    };
 
-        return {
-            cancel(): void {
-                resolveAndReset(null);
-            },
-            confirm(): void {
-                resolveAndReset(get().value);
-            },
-            open(request, resolver): void {
-                const { request: activeRequest, resolve: activeResolver } =
-                    get();
+    return {
+        cancel(): void {
+            resolveAndReset(null);
+        },
+        confirm(): void {
+            resolveAndReset(get().value);
+        },
+        open(request, resolver): void {
+            const { request: activeRequest, resolve: activeResolver } = get();
 
-                if (activeRequest) {
-                    activeResolver?.(null);
-                }
+            if (activeRequest) {
+                activeResolver?.(null);
+            }
 
-                set({ request, resolve: resolver, value: "" });
-            },
-            request: null,
-            resolve: null,
-            setValue(value: string): void {
-                set({ value });
-            },
-            value: "",
-        };
-    });
-
-/**
- * State shape of the prompt dialog store.
- */
-export type PromptDialogStoreState = ReturnType<
-    typeof usePromptDialogStore.getState
->;
+            set({ request, resolve: resolver, value: "" });
+        },
+        request: null,
+        resolve: null,
+        setValue(value: string): void {
+            set({ value });
+        },
+        value: "",
+    };
+});
 
 /**
  * Controls and state required to render and operate the prompt dialog.

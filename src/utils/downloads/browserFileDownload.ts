@@ -109,7 +109,7 @@ function appendAnchorToBody(body: object, anchor: DownloadAnchorElement): void {
 /**
  * Triggers a programmatic click on a download anchor.
  */
-export function clickDownloadAnchor(args: {
+function clickDownloadAnchor(args: {
     anchor: DownloadAnchorElement;
     attachToDom: boolean;
 }): void {
@@ -178,10 +178,7 @@ export function triggerBlobDownload(args: {
 /**
  * Creates an object URL for the provided blob and guarantees cleanup.
  */
-export function withObjectUrl(
-    blob: Blob,
-    run: (objectURL: string) => void
-): void {
+function withObjectUrl(blob: Blob, run: (objectURL: string) => void): void {
     const objectURL = URL.createObjectURL(blob);
     let shouldRevokeImmediately = true;
 
