@@ -29,6 +29,7 @@ describe("status Utils Property-Based Tests", () => {
      * Custom arbitraries for testing status values
      */
     const knownStatusValues = fc.oneof(
+        fc.constant("degraded"),
         fc.constant("down"),
         fc.constant("mixed"),
         fc.constant("paused"),
@@ -42,6 +43,7 @@ describe("status Utils Property-Based Tests", () => {
         fc.string({ maxLength: 20, minLength: 1 }), // Random strings
         fc.oneof(
             fc.constant("DOWN"), // Uppercase variations
+            fc.constant("Degraded"),
             fc.constant("Up"),
             fc.constant("MiXeD"),
             fc.constant("PENDING")
@@ -64,6 +66,11 @@ describe("status Utils Property-Based Tests", () => {
                 const icon = getStatusIcon(status);
 
                 switch (status) {
+                    case "degraded": {
+                        expect(icon).toBe("⚠️");
+
+                        break;
+                    }
                     case "down": {
                         expect(icon).toBe("❌");
 
@@ -120,6 +127,7 @@ describe("status Utils Property-Based Tests", () => {
             fc.string().filter(
                 (s) =>
                     ![
+                        "degraded",
                         "down",
                         "mixed",
                         "paused",
@@ -153,6 +161,7 @@ describe("status Utils Property-Based Tests", () => {
                 const icon = getStatusIcon(anyStatus);
                 const validIcons = [
                     "❌",
+                    "⚠️",
                     "🔄",
                     "⏸️",
                     "⏳",
@@ -443,6 +452,7 @@ describe("status Utils Property-Based Tests", () => {
                 // Icon should be one of the expected values
                 expect([
                     "❌",
+                    "⚠️",
                     "🔄",
                     "⏸️",
                     "⏳",

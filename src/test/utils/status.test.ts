@@ -627,6 +627,7 @@ describe("status Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const knownStatuses = [
+                "degraded",
                 "down",
                 "mixed",
                 "paused",
@@ -730,6 +731,7 @@ describe("status Utilities", () => {
         describe("getStatusIcon property tests", () => {
             // Known status values for property testing
             const knownStatuses = new Set([
+                "degraded",
                 "down",
                 "mixed",
                 "paused",
@@ -738,6 +740,7 @@ describe("status Utilities", () => {
                 "up",
             ]);
             const statusIcons = {
+                degraded: "⚠️",
                 down: "❌",
                 mixed: "🔄",
                 paused: "⏸️",
@@ -828,6 +831,7 @@ describe("status Utilities", () => {
 
         describe("formatStatusWithIcon property tests", () => {
             const knownStatuses = [
+                "degraded",
                 "down",
                 "mixed",
                 "paused",
@@ -1069,6 +1073,7 @@ describe("status Utilities", () => {
 
         describe("cross-function property tests", () => {
             const knownStatuses = [
+                "degraded",
                 "down",
                 "mixed",
                 "paused",
