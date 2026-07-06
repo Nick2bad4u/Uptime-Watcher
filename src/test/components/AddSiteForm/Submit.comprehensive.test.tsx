@@ -299,6 +299,65 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             expect(properties.onSuccess).not.toHaveBeenCalled();
             expect(validationModule.createMonitorObject).not.toHaveBeenCalled();
         });
+
+        it("should redact URL fields in validation failure logs", async () => {
+            const mockEvent = { preventDefault: vi.fn() } as any;
+            const logger = createMockLogger();
+            const properties = createMockProperties({
+                baselineUrl:
+                    "https://user:pass@baseline.example.com/status?access_token=baseline-secret#baseline-fragment",
+                edgeLocations:
+                    "https://edge-a.example.com/status?token=edge-secret#edge-fragment\nhttps://edge-b.example.com/status?api_key=edge-key",
+                logger,
+                monitorType: "replication",
+                primaryStatusUrl:
+                    "https://primary.example.com/status?refresh_token=primary-secret#primary-fragment",
+                replicaStatusUrl:
+                    "https://replica.example.com/status?refresh_token=replica-secret#replica-fragment",
+                url: "https://form.example.com/status?token=url-secret#url-fragment",
+            });
+
+            applyValidationResult({
+                errors: ["Invalid URL format"],
+                metadata: {},
+                success: false,
+                warnings: [],
+            });
+            applyFieldValidationResult(validationSuccessResult);
+
+            await handleSubmit(mockEvent, properties);
+
+            const failureLogCall = vi
+                .mocked(logger.debug)
+                .mock.calls.find(
+                    ([message]) => message === "Form validation failed"
+                );
+            const formData = (
+                failureLogCall?.[1] as
+                    | { formData?: Record<string, unknown> }
+                    | undefined
+            )?.formData;
+            const serializedFormData = JSON.stringify(formData);
+
+            expect(formData).toMatchObject({
+                baselineUrl: "https://baseline.example.com/status",
+                edgeLocations:
+                    "https://edge-a.example.com/status, https://edge-b.example.com/status",
+                primaryStatusUrl: "https://primary.example.com/status",
+                replicaStatusUrl: "https://replica.example.com/status",
+                url: "https://form.example.com/status",
+            });
+            expect(serializedFormData).not.toContain("access_token");
+            expect(serializedFormData).not.toContain("api_key");
+            expect(serializedFormData).not.toContain("refresh_token");
+            expect(serializedFormData).not.toContain("baseline-secret");
+            expect(serializedFormData).not.toContain("edge-secret");
+            expect(serializedFormData).not.toContain("primary-secret");
+            expect(serializedFormData).not.toContain("replica-secret");
+            expect(serializedFormData).not.toContain("url-secret");
+            expect(serializedFormData).not.toContain("fragment");
+            expect(serializedFormData).not.toContain("user:pass");
+        });
     });
 
     describe("handleSubmit - Existing Site", () => {

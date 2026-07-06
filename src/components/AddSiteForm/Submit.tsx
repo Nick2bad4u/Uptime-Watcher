@@ -8,7 +8,8 @@ import type { Simplify } from "type-fest";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { arrayFirst } from "ts-extras";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
+import { arrayFirst, arrayJoin } from "ts-extras";
 
 import type { Logger } from "../../services/logger";
 import type {
@@ -40,6 +41,29 @@ function withUrlField<TPayload extends object>(
         url,
     };
 }
+
+const URL_LIST_SEPARATOR = /\r?\n|,/u;
+
+const safeUrlForFormLogging = (value: string): string => {
+    const trimmed = safeTrim(value);
+    return trimmed.length > 0 ? getSafeUrlForLogging(trimmed) : "";
+};
+
+const safeUrlListForFormLogging = (value: string): string => {
+    const trimmed = safeTrim(value);
+    if (trimmed.length === 0) {
+        return "";
+    }
+
+    return arrayJoin(
+        trimmed
+            .split(URL_LIST_SEPARATOR)
+            .map((entry) => safeTrim(entry))
+            .filter((entry) => entry.length > 0)
+            .map((entry) => getSafeUrlForLogging(entry)),
+        ", "
+    );
+};
 
 /**
  * Store actions interface for form submission operations.
@@ -389,13 +413,13 @@ export async function handleSubmit(
             errors: validationErrors,
             formData: {
                 addMode,
-                baselineUrl: truncateForLogging(baselineUrl),
+                baselineUrl: safeUrlForFormLogging(baselineUrl),
                 bodyKeyword: truncateForLogging(bodyKeyword),
                 certificateWarningDays: truncateForLogging(
                     certificateWarningDays
                 ),
                 checkIntervalMs,
-                edgeLocations: truncateForLogging(edgeLocations),
+                edgeLocations: safeUrlListForFormLogging(edgeLocations),
                 expectedHeaderValue: truncateForLogging(expectedHeaderValue),
                 expectedJsonValue: truncateForLogging(expectedJsonValue),
                 expectedStatusCode: truncateForLogging(expectedStatusCode),
@@ -407,9 +431,10 @@ export async function handleSubmit(
                 monitorType,
                 name: truncateForLogging(name),
                 port,
-                primaryStatusUrl: truncateForLogging(primaryStatusUrl),
+                primaryStatusUrl: safeUrlForFormLogging(primaryStatusUrl),
                 recordType: truncateForLogging(recordType),
-                url: truncateForLogging(url),
+                replicaStatusUrl: safeUrlForFormLogging(replicaStatusUrl),
+                url: safeUrlForFormLogging(url),
             },
         });
 
