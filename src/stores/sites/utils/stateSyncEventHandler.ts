@@ -59,6 +59,19 @@ const applyDeltaToSites = (
     const seenIdentifiers = new Set<string>();
     const seenIdentifierSet: ReadonlySet<string> = seenIdentifiers;
 
+    const appendIfUnseenAndNotRemoved = (site: Site): void => {
+        const { identifier } = site;
+        if (
+            setHas<string, string>(removedIdentifiers, identifier) ||
+            setHas<string, string>(seenIdentifierSet, identifier)
+        ) {
+            return;
+        }
+
+        nextSites.push(site);
+        seenIdentifiers.add(identifier);
+    };
+
     for (const site of currentSites) {
         const { identifier } = site;
         if (!setHas(removedIdentifiers, identifier)) {
@@ -68,26 +81,12 @@ const applyDeltaToSites = (
     }
 
     for (const site of addedSites) {
-        const { identifier } = site;
-        if (
-            !setHas<string, string>(removedIdentifiers, identifier) &&
-            !setHas<string, string>(seenIdentifierSet, identifier)
-        ) {
-            nextSites.push(site);
-            seenIdentifiers.add(identifier);
-        }
+        appendIfUnseenAndNotRemoved(site);
     }
 
     // Treat unknown updates as upserts.
     for (const site of updatedSites) {
-        const { identifier } = site;
-        if (
-            !setHas<string, string>(removedIdentifiers, identifier) &&
-            !setHas<string, string>(seenIdentifierSet, identifier)
-        ) {
-            nextSites.push(site);
-            seenIdentifiers.add(identifier);
-        }
+        appendIfUnseenAndNotRemoved(site);
     }
 
     const snapshot = deriveSiteSnapshot(nextSites);
