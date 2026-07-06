@@ -4,6 +4,7 @@ import type { Decorator, Preview } from "@storybook/react";
 
 import { useMount } from "@app/hooks/useMount";
 import { themeManager } from "@app/theme/ThemeManager";
+import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { ensureRecordLike } from "@shared/utils/typeHelpers";
 import { withThemeByClassName } from "@storybook/addon-themes";
 import { initialize, mswLoader } from "msw-storybook-addon";
@@ -55,9 +56,13 @@ const readEnvVariable = (
 };
 
 const getProcessEnvRecord = (): Record<string, unknown> | undefined => {
-    const processCandidate = process;
+    const processProperty = getOwnPropertyValue(globalThis, "process");
 
-    const processRecord = ensureRecordLike(processCandidate);
+    if (!processProperty.found) {
+        return undefined;
+    }
+
+    const processRecord = ensureRecordLike(processProperty.value);
 
     if (!processRecord) {
         return undefined;
