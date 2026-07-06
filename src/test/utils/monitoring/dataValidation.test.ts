@@ -216,6 +216,35 @@ describe("monitoring Data Validation", () => {
             );
         });
 
+        it("should reject partially numeric uptime strings", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: dataValidation", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const invalidValues = [
+                "95abc",
+                "95% uptime",
+                "95%%",
+                "%95",
+                "9 5%",
+                "95 %",
+            ];
+
+            for (const uptime of invalidValues) {
+                vi.clearAllMocks();
+
+                expect(parseUptimeValue(uptime)).toBe(0);
+                expect(logger.warn).toHaveBeenCalledWith(
+                    "Invalid uptime value received",
+                    { uptime }
+                );
+            }
+        });
+
         it("should return 0 for NaN values and log warning", async ({
             annotate,
             task,

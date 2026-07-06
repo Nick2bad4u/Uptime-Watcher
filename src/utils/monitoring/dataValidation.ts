@@ -36,6 +36,57 @@ import { validateHttpUrlCandidate } from "@shared/utils/urlSafety";
 
 import { logger } from "../../services/logger";
 
+const isDigit = (character: string): boolean =>
+    character >= "0" && character <= "9";
+
+const isSignedDecimalLiteral = (value: string): boolean => {
+    let hasDigit = false;
+    let hasDecimalPoint = false;
+    let hasExponent = false;
+    let hasExponentDigit = false;
+
+    for (let index = 0; index < value.length; index += 1) {
+        const character = value[index];
+
+        if (character === "+" || character === "-") {
+            const previousCharacter = index > 0 ? value[index - 1] : undefined;
+            if (
+                index !== 0 &&
+                previousCharacter !== "e" &&
+                previousCharacter !== "E"
+            ) {
+                return false;
+            }
+            continue;
+        }
+
+        if (character === ".") {
+            if (hasDecimalPoint || hasExponent) {
+                return false;
+            }
+            hasDecimalPoint = true;
+            continue;
+        }
+
+        if (character === "e" || character === "E") {
+            if (hasExponent || !hasDigit) {
+                return false;
+            }
+            hasExponent = true;
+            continue;
+        }
+
+        if (!isDigit(character)) {
+            return false;
+        }
+
+        hasDigit = true;
+        hasExponentDigit ||= hasExponent;
+    }
+
+    return hasDigit && (!hasExponent || hasExponentDigit);
+};
+
 /**
  * Parse and validate uptime string to number. Handles strings with percent
  * signs and validates the result.
@@ -52,10 +103,22 @@ import { logger } from "../../services/logger";
  * @public
  */
 export const parseUptimeValue = (uptimeString: string): number => {
-    // Remove any percent signs and whitespace
+    const trimmedUptime = uptimeString.trim();
 
-    const cleanedUptime = uptimeString.replaceAll(/[\s%]/gu, "");
-    const parsed = Number.parseFloat(cleanedUptime);
+    const numericUptime = trimmedUptime.endsWith("%")
+        ? trimmedUptime.slice(0, -1)
+        : trimmedUptime;
+
+    if (
+        numericUptime.length === 0 ||
+        numericUptime !== numericUptime.trim() ||
+        !isSignedDecimalLiteral(numericUptime)
+    ) {
+        logger.warn("Invalid uptime value received", { uptime: uptimeString });
+        return 0;
+    }
+
+    const parsed = Number.parseFloat(numericUptime);
 
     // Validate the parsed value is a valid number and within expected range
     if (!Number.isFinite(parsed)) {
