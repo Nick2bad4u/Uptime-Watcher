@@ -10,6 +10,7 @@ import {
 import { normalizeProviderOAuthLoopbackError } from "../../oauth/oauthLoopbackError";
 import { createPkcePair } from "../../oauth/pkce";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
+import { calculateOAuthTokenExpiresAtEpochMs } from "../oauthTokenExpiry";
 import { requestGoogleOAuthToken } from "./googleDriveOAuthTokenRequest";
 
 /**
@@ -123,7 +124,11 @@ export class GoogleDriveAuthFlow {
 
             return {
                 accessToken: token.access_token,
-                expiresAt: now + (token.expires_in ?? 3600) * 1000,
+                expiresAt: calculateOAuthTokenExpiresAtEpochMs({
+                    expiresInSeconds: token.expires_in,
+                    nowEpochMs: now,
+                    providerName: "Google Drive",
+                }),
                 refreshToken: token.refresh_token,
                 ...(token.scope && { scope: token.scope }),
                 ...(token.token_type && { tokenType: token.token_type }),

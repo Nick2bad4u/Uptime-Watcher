@@ -10,6 +10,7 @@ import type { GoogleTokenResponse } from "./googleDriveTokenSchemas";
 
 import { logger } from "../../../../utils/logger";
 import { readStoredJsonSecret } from "../oauthStoredTokens";
+import { calculateOAuthTokenExpiresAtEpochMs } from "../oauthTokenExpiry";
 import { GOOGLE_OAUTH_REQUEST_TIMEOUT_MS } from "./googleDriveOAuthConstants";
 import { requestGoogleOAuthToken } from "./googleDriveOAuthTokenRequest";
 
@@ -163,11 +164,14 @@ export class GoogleDriveTokenManager {
             const nextTokenType = refreshed.token_type ?? tokens.tokenType;
 
             const now = Date.now();
-            const expiresInSeconds = refreshed.expires_in ?? 3600;
 
             await this.setTokens({
                 accessToken: refreshed.access_token,
-                expiresAt: now + expiresInSeconds * 1000,
+                expiresAt: calculateOAuthTokenExpiresAtEpochMs({
+                    expiresInSeconds: refreshed.expires_in,
+                    nowEpochMs: now,
+                    providerName: "Google Drive",
+                }),
                 refreshToken: refreshed.refresh_token ?? tokens.refreshToken,
                 ...(isDefined(nextScope) && { scope: nextScope }),
                 ...(isDefined(nextTokenType) && { tokenType: nextTokenType }),

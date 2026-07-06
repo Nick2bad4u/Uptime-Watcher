@@ -14,6 +14,7 @@ import {
 } from "../../oauth/LoopbackOAuthServer";
 import { normalizeProviderOAuthLoopbackError } from "../../oauth/oauthLoopbackError";
 import { validateOAuthAuthorizeUrl } from "../oauthAuthorizeUrl";
+import { calculateOAuthTokenExpiresAtEpochMs } from "../oauthTokenExpiry";
 
 const DEFAULT_TIMEOUT_MS = 5 * 60_000;
 
@@ -174,7 +175,11 @@ export class DropboxAuthFlow {
 
         return {
             accessToken: parsed.access_token,
-            expiresAtEpochMs: Date.now() + parsed.expires_in * 1000,
+            expiresAtEpochMs: calculateOAuthTokenExpiresAtEpochMs({
+                expiresInSeconds: parsed.expires_in,
+                nowEpochMs: Date.now(),
+                providerName: "Dropbox",
+            }),
             refreshToken: parsed.refresh_token,
         };
     }
