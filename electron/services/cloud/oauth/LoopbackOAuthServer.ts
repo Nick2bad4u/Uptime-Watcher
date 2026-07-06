@@ -14,7 +14,7 @@ import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
  * Must remain stable because some providers require redirect URIs to be
  * registered explicitly.
  */
-export const DEFAULT_OAUTH_LOOPBACK_PORT = 53_682;
+const DEFAULT_OAUTH_LOOPBACK_PORT = 53_682;
 
 /**
  * Default path for all OAuth loopback callbacks.

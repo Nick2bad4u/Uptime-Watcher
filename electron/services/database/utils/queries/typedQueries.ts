@@ -436,22 +436,6 @@ export function querySettingsRows(
 }
 
 /**
- * Convenience helper for querying a single settings row with validation.
- */
-export function querySettingsRow(
-    db: Database,
-    sql: string,
-    params?: DbValue[]
-): null | SettingsRow | undefined {
-    return queryForSingleRecord<SettingsRow>(
-        db,
-        sql,
-        params,
-        SETTINGS_ROW_VALIDATION
-    );
-}
-
-/**
  * Convenience helper for querying multiple site rows with validation.
  */
 export function querySiteRows(

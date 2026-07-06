@@ -189,24 +189,6 @@ export function safeParseStringResult(
 }
 
 /**
- * Runtime validator for numeric IPC responses.
- */
-export function safeParseNumberResult(
-    candidate: unknown
-): SafeParseLike<number> {
-    if (typeof candidate === "number" && isFiniteNumber(candidate)) {
-        return { data: candidate, success: true };
-    }
-
-    return {
-        error: new Error(
-            `Expected finite number response payload, received ${describeCandidateType(candidate)}`
-        ),
-        success: false,
-    };
-}
-
-/**
  * Runtime validator for non-negative integer IPC responses.
  */
 export function safeParseNonNegativeIntResult(

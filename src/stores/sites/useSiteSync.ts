@@ -183,21 +183,6 @@ export interface SiteSyncDependencies {
 }
 
 /**
- * Resets the module-level status update manager singleton.
- *
- * @remarks
- * The sites sync module keeps a lazily-initialized singleton
- * {@link src/stores/sites/utils/statusUpdateHandler#StatusUpdateManager}
- * instance. This helper exists to support deterministic testing and to avoid
- * leaked event subscriptions when modules are reloaded in development.
- *
- * @internal
- */
-export function resetStatusUpdateManagerForTesting(): void {
-    resetStatusUpdateManagerSingleton();
-}
-
-/**
  * Creates site synchronization actions with injected dependencies.
  *
  * @remarks

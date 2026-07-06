@@ -1,5 +1,4 @@
 import { isAsciiDigits as sharedIsAsciiDigits } from "@shared/utils/ascii";
-import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";
 /**
  * Shared SyncEngine utilities.
  *
@@ -24,21 +23,6 @@ import { mapWithConcurrency as mapWithConcurrencyImpl } from "../../utils/bounde
  */
 export function isAsciiDigits(value: string): boolean {
     return sharedIsAsciiDigits(value);
-}
-
-/**
- * Returns true when the string contains ASCII control characters.
- *
- * @remarks
- * Delegates to the shared implementation to prevent validation drift, while
- * keeping this module as the sync-layer public API surface.
- *
- * @param value - String to check.
- *
- * @returns `true` when the string contains ASCII control characters.
- */
-export function hasAsciiControlCharacters(value: string): boolean {
-    return sharedHasAsciiControlCharacters(value);
 }
 
 /**

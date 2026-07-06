@@ -2,13 +2,9 @@ import type { Monitor, MonitorType } from "@shared/types";
 
 import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { validateMonitorType } from "@shared/utils/validation";
-import { objectAssign, objectKeys } from "ts-extras";
 
 /** Function that produces a human-readable suffix for monitor titles. */
 export type TitleSuffixFormatter = (monitor: Monitor) => string;
-
-const isMonitorTypeKey = (candidate: string): candidate is MonitorType =>
-    validateMonitorType(candidate);
 
 const getUrlString = (url: unknown): string => {
     if (
@@ -150,21 +146,4 @@ export function registerTitleSuffixFormatter(
     }
 
     customMonitorTitleSuffixFormatters.set(monitorType, formatter);
-}
-
-/**
- * Restores the formatter registry to the default state.
- */
-export function resetMonitorTitleSuffixFormatters(): void {
-    for (const key of objectKeys(monitorTitleSuffixFormatters)) {
-        if (isMonitorTypeKey(key)) {
-            Reflect.deleteProperty(monitorTitleSuffixFormatters, key);
-        }
-    }
-
-    objectAssign(
-        monitorTitleSuffixFormatters,
-        defaultMonitorTitleSuffixFormatters
-    );
-    customMonitorTitleSuffixFormatters.clear();
 }
