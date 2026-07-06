@@ -18,12 +18,23 @@ import type { SiteDetailsTab } from "../../stores/ui/types";
 import type { ConfirmDialogOptions } from "../ui/useConfirmDialog";
 import type { MonitorEditStateByIdSetter } from "./useSiteDetails.utils";
 
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
+
 import { logger } from "../../services/logger";
 import { timeoutSecondsToMs } from "../../utils/timeoutUtils";
 import {
     applyMonitorEditStateUpdate,
     validateMonitorFieldOrThrow,
 } from "./useSiteDetails.utils";
+
+const getMonitorRemovalLabel = (monitor: Monitor): string => {
+    const url = monitor.url?.trim();
+    if (url) {
+        return getSafeUrlForDisplay(url);
+    }
+
+    return monitor.host ?? monitor.type;
+};
 
 /**
  * Applies a newly selected monitor ID and keeps analytics tabs aligned.
@@ -125,8 +136,7 @@ export async function removeMonitorWithConfirmation(args: {
         return;
     }
 
-    const monitorName =
-        selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
+    const monitorName = getMonitorRemovalLabel(selectedMonitor);
 
     const isConfirmed = await requestConfirmation({
         cancelLabel: "Keep Monitor",

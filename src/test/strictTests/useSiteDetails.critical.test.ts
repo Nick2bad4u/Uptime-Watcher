@@ -168,9 +168,13 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
     });
 
     it("should handle confirmation dialog cancellation for removeMonitor", async () => {
+        const sensitiveMonitor: Monitor = {
+            ...mockMonitor,
+            url: "https://example.com/status?refresh_token=remove-secret#fragment",
+        };
         const siteWithMonitor: Site = {
             ...mockSite,
-            monitors: [mockMonitor],
+            monitors: [sensitiveMonitor],
         };
 
         const mockStore = createMockStore({
@@ -198,9 +202,16 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         expect(confirmMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 message:
-                    'Remove the monitor "https://example.com" from Test Site?',
+                    'Remove the monitor "https://example.com/status" from Test Site?',
                 title: "Remove Monitor",
             })
+        );
+        const confirmationOptions = confirmMock.mock.calls[0]?.[0];
+        expect(confirmationOptions?.details).not.toContain("refresh_token");
+        expect(confirmationOptions?.details).not.toContain("remove-secret");
+        expect(confirmationOptions?.details).not.toContain("fragment");
+        expect(confirmationOptions?.emphasisText).toBe(
+            "https://example.com/status"
         );
     });
 
