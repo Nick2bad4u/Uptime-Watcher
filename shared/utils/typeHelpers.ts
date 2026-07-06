@@ -11,8 +11,6 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { objectHasIn } from "ts-extras";
-
 import { getCallableDataProperty } from "./errorPropertyAccess";
 
 /**
@@ -150,7 +148,8 @@ export function requireRecordLike(
  *
  * @remarks
  * Provides safe property access from unknown objects without type assertions.
- * Returns undefined if object is not an object or property doesn't exist.
+ * Returns undefined if object is not an object or property is not an own
+ * property.
  *
  * @param obj - Unknown object to extract from
  * @param key - Property key to extract
@@ -168,10 +167,7 @@ export function safePropertyAccess(obj: unknown, key: string): unknown {
         return undefined;
     }
 
-    // Intentionally supports inherited properties for record-like objects.
-    // This matches the fuzz-suite contract and keeps the helper convenient
-    // for Date/Error and other non-plain objects treated as record-like.
-    return objectHasIn(obj, key) ? obj[key] : undefined;
+    return Object.hasOwn(obj, key) ? obj[key] : undefined;
 }
 
 /**

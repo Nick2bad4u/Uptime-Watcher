@@ -6,6 +6,7 @@ import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
 import { MONITOR_STATUS_VALUES } from "@shared/types";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import * as fc from "fast-check";
 import { safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -1469,9 +1470,10 @@ describe("monitorTitleFormatters", () => {
                 "should format HTTP monitor titles with valid URLs",
                 (monitor) => {
                     const result = formatTitleSuffix(monitor);
+                    const safeUrl = getSafeUrlForDisplay(monitor.url);
 
-                    expect(result).toBe(` (${monitor.url})`);
-                    expect(result).toContain(monitor.url);
+                    expect(result).toBe(` (${safeUrl})`);
+                    expect(result).toContain(safeUrl);
                 }
             );
 

@@ -271,14 +271,14 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
         });
 
         test.prop([safeDynamicKey])(
-            "should handle inherited properties",
+            "should not expose inherited properties",
             (key) => {
                 const parent = { [key]: "inherited" };
                 const child = Object.create(parent);
                 child.own = "own-property";
 
                 const result = safePropertyAccess(child, key);
-                expect(result).toBe("inherited");
+                expect(result).toBeUndefined();
             }
         );
     });
@@ -414,7 +414,7 @@ describe("TypeHelpers Complete Coverage Fuzzing Tests", () => {
                     const property = safePropertyAccess(casted, propertyKey);
 
                     expect(isRecord(casted)).toBeTruthy();
-                    if (propertyKey in mockResponse) {
+                    if (Object.hasOwn(mockResponse, propertyKey)) {
                         expect(property).toBe(mockResponse[propertyKey]);
                     } else {
                         expect(property).toBeUndefined();

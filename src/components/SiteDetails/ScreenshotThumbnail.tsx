@@ -272,7 +272,7 @@ export const ScreenshotThumbnail = ({
             <a
                 aria-label={ariaLabel}
                 className="site-details-thumbnail-link"
-                href={isUrlValid ? safeDisplayUrl : "#"}
+                href={isUrlValid ? safeUrl : "#"}
                 onBlur={handleBlur}
                 onClick={handleClick}
                 onFocus={handleFocus}

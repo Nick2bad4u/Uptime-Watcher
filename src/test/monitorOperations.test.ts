@@ -27,7 +27,7 @@ import {
 } from "../stores/sites/utils/monitorOperations";
 
 // Mock crypto.randomUUID
-const mockUUID = "mock-uuid-123";
+const mockUUID = "123e4567-e89b-12d3-a456-426614174000";
 const mockCrypto = {
     randomUUID: vi.fn().mockReturnValue(mockUUID),
 };

@@ -10,8 +10,23 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
 const isMonitorTypeKey = (candidate: string): candidate is MonitorType =>
     validateMonitorType(candidate);
 
-const formatUrlSuffix = (url: string | undefined): string =>
-    url ? ` (${getSafeUrlForDisplay(url)})` : "";
+const getUrlString = (url: unknown): string => {
+    if (
+        typeof url === "bigint" ||
+        typeof url === "boolean" ||
+        typeof url === "number" ||
+        typeof url === "string"
+    ) {
+        return url ? String(url) : "";
+    }
+
+    return "";
+};
+
+const formatUrlSuffix = (url: unknown): string => {
+    const urlString = getUrlString(url);
+    return urlString ? ` (${getSafeUrlForDisplay(urlString)})` : "";
+};
 
 const defaultMonitorTitleSuffixFormatters: Partial<
     Record<MonitorType, TitleSuffixFormatter>

@@ -250,6 +250,7 @@ describe("siteStatus Property-based Tests", () => {
                 expect([
                     "up",
                     "down",
+                    "degraded",
                     "pending",
                     "paused",
                     "mixed",
@@ -326,6 +327,7 @@ describe("siteStatus Property-based Tests", () => {
                 expect([
                     "up",
                     "down",
+                    "degraded",
                     "pending",
                     "paused",
                     "mixed",

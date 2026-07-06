@@ -230,7 +230,7 @@ describe("OverviewTab coverage", () => {
             expect.objectContaining({
                 monitorId: "monitor-1",
                 monitorType: "http",
-                monitorUrl: "https://primary.example",
+                monitorUrl: "https://primary.example/",
             })
         );
 

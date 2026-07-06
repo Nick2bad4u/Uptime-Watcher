@@ -32,6 +32,7 @@
 import type { Monitor, MonitorStatus } from "@shared/types";
 
 import { MONITOR_STATUS_VALUES } from "@shared/types";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
@@ -522,7 +523,7 @@ describe("fallback Utils Property-Based Tests", () => {
                             siteFallback
                         );
 
-                        expect(result).toBe(url);
+                        expect(result).toBe(getSafeUrlForDisplay(url));
                     }
                 )
             );
@@ -646,7 +647,7 @@ describe("fallback Utils Property-Based Tests", () => {
                             siteFallback
                         );
 
-                        expect(result).toBe(url);
+                        expect(result).toBe(getSafeUrlForDisplay(url));
                     }
                 )
             );

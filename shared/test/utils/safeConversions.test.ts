@@ -684,29 +684,30 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
 
         test("should handle float parsing consistently", () => {
             fc.assert(
-                fc.property(fc.anything(), fc.float(), (input, defaultVal) => {
-                    const result = safeParseFloat(input, defaultVal);
+                fc.property(
+                    fc.anything(),
+                    fc.float().filter(Number.isFinite),
+                    (input, defaultVal) => {
+                        const result = safeParseFloat(input, defaultVal);
 
-                    expect(typeof result).toBe("number");
+                        expect(typeof result).toBe("number");
 
-                    // Only expect non-NaN result if default value is also non-NaN
-                    if (!Number.isNaN(defaultVal)) {
                         expect(Number.isNaN(result)).toBeFalsy();
-                    }
 
-                    if (typeof input === "number" && !Number.isNaN(input)) {
-                        expect(result).toBe(input);
-                    } else if (typeof input === "string") {
-                        const parsed = Number.parseFloat(input);
-                        if (Number.isNaN(parsed)) {
-                            expect(result).toBe(defaultVal);
+                        if (typeof input === "number" && !Number.isNaN(input)) {
+                            expect(result).toBe(input);
+                        } else if (typeof input === "string") {
+                            const parsed = Number.parseFloat(input);
+                            if (Number.isNaN(parsed)) {
+                                expect(result).toBe(defaultVal);
+                            } else {
+                                expect(result).toBe(parsed);
+                            }
                         } else {
-                            expect(result).toBe(parsed);
+                            expect(result).toBe(defaultVal);
                         }
-                    } else {
-                        expect(result).toBe(defaultVal);
                     }
-                })
+                )
             );
         });
 

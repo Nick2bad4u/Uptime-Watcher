@@ -877,6 +877,10 @@ describe(DataBackupService, () => {
     describe("restoreDatabaseBackup", () => {
         beforeEach(() => {
             mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-restore");
+            mockFsPromises.lstat.mockResolvedValue({
+                isFile: () => true,
+                isSymbolicLink: () => false,
+            });
             mockFsPromises.writeFile.mockResolvedValue(undefined);
             mockFsPromises.copyFile.mockResolvedValue(undefined);
             mockFsPromises.rm.mockResolvedValue(undefined);
@@ -996,6 +1000,10 @@ describe(DataBackupService, () => {
     describe("applyDatabaseBackupResult", () => {
         beforeEach(() => {
             mockFsPromises.mkdtemp.mockResolvedValue("/tmp/mock-apply");
+            mockFsPromises.lstat.mockResolvedValue({
+                isFile: () => true,
+                isSymbolicLink: () => false,
+            });
             mockFsPromises.writeFile.mockResolvedValue(undefined);
             mockFsPromises.copyFile.mockResolvedValue(undefined);
             mockFsPromises.rm.mockResolvedValue(undefined);

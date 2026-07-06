@@ -13,6 +13,7 @@
 import type { Monitor } from "@shared/types";
 
 import { test } from "@fast-check/vitest";
+import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import fc from "fast-check";
 import { beforeEach, describe, expect } from "vitest";
 
@@ -98,8 +99,10 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
                     const result = formatTitleSuffix(monitor);
 
                     if (url) {
-                        expect(result).toBe(` (${url})`);
-                        expect(result).toContain(url);
+                        const safeUrl = getSafeUrlForDisplay(url);
+
+                        expect(result).toBe(` (${safeUrl})`);
+                        expect(result).toContain(safeUrl);
                     } else {
                         expect(result).toBe("");
                     }
@@ -114,7 +117,7 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
 
                     expect(result.startsWith(" (")).toBe(true);
                     expect(result.endsWith(")")).toBe(true);
-                    expect(result).toContain(url);
+                    expect(result).toBe(` (${getSafeUrlForDisplay(url)})`);
                 }
             );
 
@@ -158,9 +161,10 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
                     expect(() => formatTitleSuffix(monitor)).not.toThrow();
 
                     const result = formatTitleSuffix(monitor);
+                    const safeUrl = getSafeUrlForDisplay(String(truthyUrl));
 
-                    expect(result).toBe(` (${truthyUrl})`);
-                    expect(result).toContain(String(truthyUrl));
+                    expect(result).toBe(` (${safeUrl})`);
+                    expect(result).toContain(safeUrl);
                 }
             );
         });
