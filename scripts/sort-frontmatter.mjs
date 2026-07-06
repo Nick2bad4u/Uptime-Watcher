@@ -116,38 +116,43 @@ function parseKeyBlocks(frontmatter) {
  * @returns {string}
  */
 function reorderBlocks(blocks) {
-    /** @type {Map<string, { key: string; lines: string[] }>} */
-    const byKey = new Map();
-    for (const block of blocks) {
-        // Anonymous / weird blocks get a synthetic key and are left at the top
-        if (!block.key) continue;
-        byKey.set(block.key, block);
-    }
+    const orderedBlocks = blocks
+        .map((block, index) => ({ block, index }))
+        .toSorted((left, right) => {
+            if (!left.block.key || !right.block.key) {
+                if (!left.block.key && !right.block.key) {
+                    return left.index - right.index;
+                }
 
-    /** @type {string[]} */
-    const resultLines = [];
+                return left.block.key ? 1 : -1;
+            }
 
-    // 1. Known keys in specified order
-    for (const key of KEY_ORDER) {
-        const block = byKey.get(key);
-        if (block) {
-            resultLines.push(...block.lines);
-            byKey.delete(key);
-        }
-    }
+            const leftKnownIndex = KEY_ORDER.indexOf(left.block.key);
+            const rightKnownIndex = KEY_ORDER.indexOf(right.block.key);
 
-    // 2. Remaining keys in alphabetical order (using toSorted)
-    const remainingKeys = Array.from(byKey.keys()).toSorted((a, b) =>
-        a.localeCompare(b)
-    );
-    for (const key of remainingKeys) {
-        const block = byKey.get(key);
-        if (block) {
-            resultLines.push(...block.lines);
-        }
-    }
+            if (leftKnownIndex !== -1 || rightKnownIndex !== -1) {
+                if (leftKnownIndex === -1) {
+                    return 1;
+                }
 
-    return resultLines.join("\n");
+                if (rightKnownIndex === -1) {
+                    return -1;
+                }
+
+                if (leftKnownIndex !== rightKnownIndex) {
+                    return leftKnownIndex - rightKnownIndex;
+                }
+
+                return left.index - right.index;
+            }
+
+            const keyComparison = left.block.key.localeCompare(right.block.key);
+            return keyComparison === 0
+                ? left.index - right.index
+                : keyComparison;
+        });
+
+    return orderedBlocks.flatMap(({ block }) => block.lines).join("\n");
 }
 
 const filename = process.argv[2];
