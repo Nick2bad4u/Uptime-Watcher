@@ -522,16 +522,21 @@ async function prepareReportDirectory(keepReports: boolean): Promise<string> {
 /**
  * Main entry point coordinating argument parsing, discovery, execution, and
  * reporting.
+ *
+ * @param argv - Raw CLI arguments.
+ *
+ * @returns Process exit status.
  */
-/* eslint-disable-next-line unicorn/prefer-top-level-await */
-void (async () => {
+async function main(
+    argv: readonly string[] = process.argv.slice(2)
+): Promise<number> {
     console.log(`[main] Script started at ${new Date().toISOString()}`);
     let options: CliOptions | null = null;
     let reportDir: string | null = null;
     let exitCode = 0;
     try {
         console.log(`[main] Parsing CLI arguments`);
-        options = parseCliArguments(process.argv.slice(2));
+        options = parseCliArguments(argv);
         console.log(
             `[main] Options parsed: ${JSON.stringify({ ...options, cwd: "[redacted]" })}`
         );
@@ -540,7 +545,7 @@ void (async () => {
         const testFiles = await collectTestFiles(options);
         if (testFiles.length === 0) {
             console.warn("No test files found using the provided filters.");
-            return;
+            return exitCode;
         }
         console.log(`[main] Collected ${testFiles.length} test files`);
 
@@ -549,7 +554,7 @@ void (async () => {
             for (const file of testFiles) {
                 console.log(` - ${path.relative(options.cwd, file)}`);
             }
-            return;
+            return exitCode;
         }
 
         const reportDirectory = await prepareReportDirectory(
@@ -626,8 +631,44 @@ void (async () => {
         if (reportDir && options && !options.keepReports) {
             await rm(reportDir, { recursive: true, force: true });
         }
-        if (exitCode !== 0) {
-            process.exit(exitCode);
-        }
     }
-})();
+
+    return exitCode;
+}
+
+/**
+ * @returns `true` when this file is the CLI entrypoint.
+ */
+function isDirectInvocation(): boolean {
+    return (
+        typeof process.argv[1] === "string" &&
+        path.basename(process.argv[1]) === "detect-zero-coverage-tests.ts"
+    );
+}
+
+if (isDirectInvocation()) {
+    void main()
+        .then((exitCode) => {
+            process.exitCode = exitCode;
+        })
+        .catch((error: unknown) => {
+            console.error(
+                `[main] Script failed: ${error instanceof Error ? (error.stack ?? error.message) : error}`
+            );
+            process.exitCode = 1;
+        });
+}
+
+export {
+    collectTestFiles,
+    escapeRegularExpressionLiteral,
+    evaluateTestFile,
+    getVitestInvocation,
+    isDirectInvocation,
+    main,
+    parseCliArguments,
+    parsePositiveIntegerOption,
+    prepareReportDirectory,
+    runVitestCommand,
+    splitOptionValue,
+};
