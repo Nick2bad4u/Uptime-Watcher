@@ -140,7 +140,7 @@ export interface RemoteMonitorBehavior<
 /**
  * Factory that produces remote monitor services backed by the shared core.
  */
-export function createRemoteMonitorService<
+function createRemoteMonitorService<
     TType extends Site["monitors"][number]["type"],
     TContext,
 >(

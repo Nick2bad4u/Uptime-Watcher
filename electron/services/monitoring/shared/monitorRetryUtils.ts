@@ -52,7 +52,7 @@ export function createMonitorRetryPlan(
  * - Non-finite numbers (NaN/Infinity) are treated as `0`.
  * - Values are truncated and clamped to a minimum of `0`.
  */
-export function normalizeAdditionalRetryAttempts(value: unknown): number {
+function normalizeAdditionalRetryAttempts(value: unknown): number {
     if (typeof value !== "number" || !isFiniteNumber(value)) {
         return 0;
     }
@@ -66,6 +66,6 @@ export function normalizeAdditionalRetryAttempts(value: unknown): number {
  * @remarks
  * Example: `additionalRetries = 3` becomes `totalAttempts = 4`.
  */
-export function toTotalAttempts(additionalRetries: unknown): number {
+function toTotalAttempts(additionalRetries: unknown): number {
     return normalizeAdditionalRetryAttempts(additionalRetries) + 1;
 }

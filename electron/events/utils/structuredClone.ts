@@ -13,7 +13,7 @@ export type StructuredCloneFn = <T>(value: T) => T;
 /**
  * Returns a bound `structuredClone` function when available.
  */
-export const structuredCloneFn: StructuredCloneFn | undefined =
+const structuredCloneFn: StructuredCloneFn | undefined =
     typeof structuredClone === "function"
         ? structuredClone.bind(globalThis)
         : undefined;

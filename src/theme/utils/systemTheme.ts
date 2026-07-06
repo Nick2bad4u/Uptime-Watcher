@@ -11,7 +11,7 @@ import {
     subscribeToMediaQueryMatches,
 } from "../../utils/mediaQueries";
 
-export const PREFERS_DARK_MEDIA_QUERY = "(prefers-color-scheme: dark)" as const;
+const PREFERS_DARK_MEDIA_QUERY = "(prefers-color-scheme: dark)" as const;
 
 const noop = (): void => {};
 

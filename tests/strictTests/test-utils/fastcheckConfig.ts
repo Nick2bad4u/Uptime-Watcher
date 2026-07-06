@@ -17,10 +17,11 @@ import fc from "fast-check";
  * These values are chosen to balance test runtime and coverage in CI. Tests may
  * override them on a per-property basis when necessary.
  */
-export const defaultFastCheckParameters: Readonly<{ numRuns: number }> =
-    Object.freeze({
+const defaultFastCheckParameters: Readonly<{ numRuns: number }> = Object.freeze(
+    {
         numRuns: 200,
-    });
+    }
+);
 
 /**
  * Asserts a fast-check property using the shared defaults, with optional

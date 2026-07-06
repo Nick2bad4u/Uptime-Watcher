@@ -55,9 +55,7 @@ export function reportSubscriptionDiagnostics(
 /**
  * Resolve the site identifier for a status-update payload.
  */
-export function resolveStatusUpdateSiteIdentifier(
-    update: StatusUpdate
-): string {
+function resolveStatusUpdateSiteIdentifier(update: StatusUpdate): string {
     const siteCandidate = isRecord(update) ? update.site : undefined;
     let siteIdentifierFromSite = "";
 

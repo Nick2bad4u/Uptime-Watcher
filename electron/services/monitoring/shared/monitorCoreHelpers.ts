@@ -28,9 +28,7 @@ export type MonitorExecutionBaseArgs<TContext> = Readonly<{
 /**
  * Asserts that the supplied monitor matches the expected type literal.
  */
-export function assertMonitorType<
-    TType extends Site["monitors"][number]["type"],
->(
+function assertMonitorType<TType extends Site["monitors"][number]["type"]>(
     monitor: Site["monitors"][number],
     expectedType: TType,
     scope: string
@@ -43,7 +41,7 @@ export function assertMonitorType<
 /**
  * Creates the base args object passed through monitor core layers.
  */
-export function buildMonitorExecutionBaseArgs<TContext>(args: {
+function buildMonitorExecutionBaseArgs<TContext>(args: {
     context: TContext;
     signal?: AbortSignal;
     timeout: number;

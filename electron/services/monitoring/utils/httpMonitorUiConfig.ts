@@ -14,9 +14,7 @@ export type HttpMonitorUiOverrides = Partial<MonitorUIConfig>;
 /**
  * Creates a title suffix resolver for a monitor type that has a URL.
  */
-export function createUrlSuffixResolver(
-    type: string
-): (monitor: Monitor) => string {
+function createUrlSuffixResolver(type: string): (monitor: Monitor) => string {
     return createUrlTitleSuffixResolver({ monitorType: type });
 }
 

@@ -28,10 +28,7 @@ import {
     collectCoverageFromElectronApp,
     isCoverageEnabled,
 } from "../utils/coverage";
-import {
-    registerApplicationUserDataDirectory,
-    registerPageUserDataDirectory,
-} from "../utils/userDataDirectoryRegistry";
+import { registerPageUserDataDirectory } from "../utils/userDataDirectoryRegistry";
 
 const PLAYWRIGHT_CLOSE_TIMEOUT_MS = 5000;
 const USER_DATA_REMOVAL_RETRY_DELAYS_MS = [
@@ -471,7 +468,6 @@ export async function launchElectronApp(
             .catch(() => undefined);
     };
 
-    registerApplicationUserDataDirectory(app, userDataDir);
     app.on("window", attachWindowMetadata);
 
     const originalFirstWindow = app.firstWindow.bind(app);

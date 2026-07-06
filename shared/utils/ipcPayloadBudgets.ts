@@ -14,24 +14,10 @@
 import type { SerializedDatabaseRestorePayload } from "@shared/types/ipc";
 
 import {
-    MAX_IPC_JSON_EXPORT_BYTES,
     MAX_IPC_JSON_IMPORT_BYTES,
     MAX_IPC_SQLITE_RESTORE_BYTES,
 } from "@shared/constants/backup";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-
-/**
- * Asserts a JSON export string is within the main ᝧ renderer IPC budget.
- */
-export function assertJsonExportPayloadWithinIpcBudget(data: string): void {
-    const bytes = getUtfByteLength(data);
-
-    if (bytes > MAX_IPC_JSON_EXPORT_BYTES) {
-        throw new Error(
-            `Export payload is too large (${bytes} > ${MAX_IPC_JSON_EXPORT_BYTES} bytes). Use SQLite backup/restore for large snapshots.`
-        );
-    }
-}
 
 /**
  * Asserts a JSON import string is within the renderer  main IPC budget.

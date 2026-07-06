@@ -22,30 +22,6 @@ export function createNoParamsValidator(): IpcParameterValidator {
 }
 
 /**
- * Creates validators for handlers expecting a single number parameter.
- */
-export function createSingleNumberValidator(
-    paramName: string
-): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(IpcValidators.requiredNumber(value, paramName)),
-    ]);
-}
-
-/**
- * Creates validators for handlers expecting a single string parameter.
- */
-export function createSingleStringValidator(
-    paramName: string
-): IpcParameterValidator {
-    return createParamValidator(1, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(IpcValidators.requiredString(value, paramName)),
-    ]);
-}
-
-/**
  * Creates validators for handlers expecting a single string parameter with a
  * strict UTF-8 byte budget.
  */
@@ -105,22 +81,6 @@ export function createStringObjectValidator(
             );
             return recordResult.ok ? null : recordResult.error;
         },
-    ]);
-}
-
-/**
- * Creates validators for handlers with a validated first parameter and an
- * unvalidated second parameter.
- */
-export function createStringWithUnvalidatedSecondValidator(
-    firstParamName: string
-): IpcParameterValidator {
-    return createParamValidator(2, [
-        (value): ParameterValueValidationResult =>
-            toValidationResult(
-                IpcValidators.requiredString(value, firstParamName)
-            ),
-        (): ParameterValueValidationResult => null,
     ]);
 }
 

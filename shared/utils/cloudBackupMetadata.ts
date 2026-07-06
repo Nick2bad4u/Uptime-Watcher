@@ -13,7 +13,7 @@ import { arrayAt } from "ts-extras";
  * This avoids leaking local absolute paths into cloud metadata and handles both
  * Windows and POSIX separators.
  */
-export function deriveCloudBackupOriginalPath(fileName: string): string {
+function deriveCloudBackupOriginalPath(fileName: string): string {
     const trimmed = fileName.trim();
     if (!trimmed) {
         return "backup.sqlite";

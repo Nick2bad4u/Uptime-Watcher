@@ -23,7 +23,7 @@ export interface ResponseTimeColorPalette {
  * - 1000ms or less: warning
  * - Greater than 1000ms: error
  */
-export function getResponseTimeColorFromPalette(
+function getResponseTimeColorFromPalette(
     palette: ResponseTimeColorPalette,
     responseTimeMs: number
 ): string {

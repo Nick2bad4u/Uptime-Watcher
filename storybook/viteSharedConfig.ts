@@ -8,17 +8,9 @@ import type { PluginOption, UserConfig } from "vite";
 
 import viteReact from "@vitejs/plugin-react";
 import { mkdir } from "node:fs/promises";
-import { createRequire } from "node:module";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { inspect } from "node:util";
-
-/**
- * Narrow type representing the Babel plugin shape expected by the React plugin.
- */
-export type BabelPlugin =
-    | ((...parameters: readonly unknown[]) => unknown)
-    | Readonly<Record<string, unknown>>;
 
 /**
  * React plugin configuration options used across Storybook tooling.
@@ -85,20 +77,6 @@ const formatUnknownError = (error: unknown): string => {
 const createConfigError = (message: string, error: unknown): Error =>
     new Error(`${message}: ${formatUnknownError(error)}`, { cause: error });
 
-type SafeRequire = (specifier: string) => unknown;
-
-const createSafeRequire = (): SafeRequire => {
-    try {
-        const nodeRequire = createRequire(import.meta.url);
-        return (specifier: string): unknown => nodeRequire(specifier);
-    } catch (error: unknown) {
-        throw createConfigError(
-            "Failed to create Storybook require shim",
-            error
-        );
-    }
-};
-
 const resolveStorybookModuleDirectory = (): string => {
     try {
         if (typeof import.meta.dirname === "string") {
@@ -113,8 +91,6 @@ const resolveStorybookModuleDirectory = (): string => {
         );
     }
 };
-
-const requireModule = createSafeRequire();
 
 /** Directory containing this shared configuration module. */
 const moduleDirectory = resolveStorybookModuleDirectory();
@@ -196,49 +172,7 @@ const storybookResolveExtensions: readonly string[] = Object.freeze([
 ]);
 
 /**
- * Determines whether a value satisfies the {@link BabelPlugin} contract.
- *
- * @param value - Value to inspect.
- *
- * @returns True when the value can be consumed as a Babel plugin.
- */
-const isBabelPlugin = (value: unknown): value is BabelPlugin =>
-    typeof value === "function" ||
-    (typeof value === "object" && value !== null);
-
-/**
- * Loads optional React compiler plugins if they are available.
- *
- * @returns A list containing the compiler plugin when installed, otherwise an
- *   empty array.
- */
-const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
-    try {
-        const pluginModule = requireModule("babel-plugin-react-compiler");
-
-        if (isBabelPlugin(pluginModule)) {
-            return [pluginModule];
-        }
-
-        if (typeof pluginModule === "object" && pluginModule !== null) {
-            const moduleWithDefault = pluginModule as { default?: unknown };
-            const defaultExport = moduleWithDefault.default;
-
-            if (isBabelPlugin(defaultExport)) {
-                return [defaultExport];
-            }
-        }
-    } catch {
-        return [];
-    }
-
-    return [];
-};
-
-/**
- * Creates a React plugin configuration that reuses the shared compiler probes.
- *
- * @returns Configuration object for the React Vite plugin.
+ * Creates the shared React plugin configuration for Storybook Vite builds.
  */
 export const createStorybookReactPluginOptions = (): ReactPluginOptions => ({
     jsxRuntime: "automatic",

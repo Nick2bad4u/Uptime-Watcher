@@ -33,7 +33,7 @@
  */
 
 /** Suffix for required field accessibility labels */
-export const REQUIRED_SUFFIX = " (required)";
+const REQUIRED_SUFFIX = " (required)";
 
 /**
  * Creates an accessible aria-label string, appending a required indicator if

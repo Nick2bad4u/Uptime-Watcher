@@ -53,7 +53,7 @@ export function resolveActiveProviderTab(
 /**
  * Returns the human-facing label for a given tab key.
  */
-export function resolveCloudProviderTabLabel(
+function resolveCloudProviderTabLabel(
     tab: CloudProviderSetupPanelTabKey
 ): string {
     const match = CLOUD_PROVIDER_SETUP_PANEL_TABS.find(

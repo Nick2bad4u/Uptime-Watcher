@@ -16,7 +16,7 @@ export const safeTextForTelemetry = (
     value: string | undefined
 ): string | undefined => getSafeIdentifierForLogging(value);
 
-export const safeMonitorUrlForTelemetry = (
+const safeMonitorUrlForTelemetry = (
     url: Monitor["url"] | undefined
 ): string | undefined => {
     const trimmedUrl = url?.trim();
@@ -33,7 +33,7 @@ export const buildMonitorTelemetry = (
     }),
 });
 
-export const buildMonitorListTelemetry = (
+const buildMonitorListTelemetry = (
     monitors: readonly Partial<Monitor>[] | undefined
 ): SitesTelemetryPayload => {
     if (!monitors) {

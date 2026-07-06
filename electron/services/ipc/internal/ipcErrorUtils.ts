@@ -13,7 +13,7 @@ import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { truncateUtfString } from "../diagnosticsLimits";
 
 /** Maximum bytes allowed for IPC error messages returned to the renderer. */
-export const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
+const MAX_IPC_ERROR_MESSAGE_UTF_BYTES = 4096;
 
 /**
  * Creates a safe error message string for returning to IPC callers.

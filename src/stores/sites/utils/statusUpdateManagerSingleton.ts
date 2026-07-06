@@ -30,7 +30,7 @@ const statusUpdateManagerSingleton: {
 };
 
 /** Dispatches the status update to the latest registered callback (if any). */
-export function dispatchStatusUpdate(update: StatusUpdate): void {
+function dispatchStatusUpdate(update: StatusUpdate): void {
     statusUpdateManagerSingleton.callback?.(update);
 }
 

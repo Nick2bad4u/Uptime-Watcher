@@ -14,7 +14,7 @@ type RequiredRecordResult =
 /**
  * Type guard for the failure branch of {@link RequiredRecordResult}.
  */
-export const isRequiredRecordError = (
+const isRequiredRecordError = (
     result: RequiredRecordResult
 ): result is Extract<RequiredRecordResult, { readonly ok: false }> =>
     !result.ok;
@@ -55,7 +55,7 @@ export function getForbiddenRecordKeyErrors(
 /**
  * Ensures an IPC parameter is a record-like object and rejects reserved keys.
  */
-export function requireRecordParam(
+function requireRecordParam(
     value: unknown,
     paramName: string
 ): RequiredRecordResult {
