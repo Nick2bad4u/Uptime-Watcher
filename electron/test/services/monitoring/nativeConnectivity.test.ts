@@ -153,6 +153,43 @@ describe("Native Connectivity with Degraded State", () => {
             expect(result.details).toBe("HTTP request failed");
             expect(result.error).toBe("Request timeout");
         });
+        it("should propagate caller aborts before starting HTTP requests", async () => {
+            // Arrange
+            const controller = new AbortController();
+            controller.abort("stop");
+
+            // Act / Assert
+            await expect(
+                checkHttpConnectivity(
+                    "https://example.com",
+                    1000,
+                    controller.signal
+                )
+            ).rejects.toMatchObject({
+                name: "AbortError",
+            });
+            expect(mockFetch).not.toHaveBeenCalled();
+        });
+        it("should propagate caller aborts during HTTP requests", async () => {
+            // Arrange
+            const controller = new AbortController();
+            mockFetch.mockImplementation(() => {
+                controller.abort("stop");
+                return Promise.reject(new Error("fetch aborted"));
+            });
+
+            // Act / Assert
+            await expect(
+                checkHttpConnectivity(
+                    "https://example.com",
+                    1000,
+                    controller.signal
+                )
+            ).rejects.toMatchObject({
+                name: "AbortError",
+            });
+            expect(mockFetch).toHaveBeenCalledTimes(1);
+        });
     });
     describe("checkConnectivity with DNS resolution", () => {
         it("should return 'degraded' status when DNS resolves but TCP fails", async () => {

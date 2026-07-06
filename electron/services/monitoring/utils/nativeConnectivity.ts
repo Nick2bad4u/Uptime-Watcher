@@ -368,6 +368,12 @@ export async function checkHttpConnectivity(
     timeout = 5000,
     signal?: AbortSignal
 ): Promise<MonitorCheckResult> {
+    if (signal?.aborted) {
+        throw createAbortError({
+            cause: getAbortSignalReason(signal),
+        });
+    }
+
     const startTime = performance.now();
 
     try {
@@ -403,6 +409,12 @@ export async function checkHttpConnectivity(
             status: "degraded",
         };
     } catch (error) {
+        if (signal?.aborted) {
+            throw createAbortError({
+                cause: getAbortSignalReason(signal),
+            });
+        }
+
         return {
             details: "HTTP request failed",
             error: getUserFacingErrorDetail(error),
