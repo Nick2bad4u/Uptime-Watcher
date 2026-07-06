@@ -15,7 +15,40 @@ import * as path from "node:path";
 const COVERAGE_ROOT = path.resolve(process.cwd(), "coverage", "playwright");
 const NYC_OUTPUT_DIR = path.join(COVERAGE_ROOT, ".nyc_output");
 const REPORT_DIR = path.join(COVERAGE_ROOT, "reports");
-const THRESHOLD = Number(process.env["PLAYWRIGHT_COVERAGE_THRESHOLD"] ?? "100");
+const THRESHOLD = parseCoverageThreshold(
+    process.env["PLAYWRIGHT_COVERAGE_THRESHOLD"]
+);
+
+/**
+ * Parses the configured coverage threshold as a finite percentage.
+ *
+ * @param value - Optional raw environment variable value.
+ *
+ * @returns Percentage threshold in the inclusive range 0-100.
+ *
+ * @throws Error when the environment value is malformed or out of range.
+ */
+function parseCoverageThreshold(value: string | undefined): number {
+    if (value === undefined || value.trim().length === 0) {
+        return 100;
+    }
+
+    const trimmed = value.trim();
+    if (!/^(?:\d+|\d+\.\d+|\.\d+)$/u.test(trimmed)) {
+        throw new Error(
+            "PLAYWRIGHT_COVERAGE_THRESHOLD must be a number from 0 to 100."
+        );
+    }
+
+    const parsed = Number(trimmed);
+    if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+        throw new Error(
+            "PLAYWRIGHT_COVERAGE_THRESHOLD must be a number from 0 to 100."
+        );
+    }
+
+    return parsed;
+}
 
 /**
  * Reads the coverage fragment directory and returns JSON filenames to merge.
