@@ -237,6 +237,27 @@ describe("Native Connectivity with Degraded State", () => {
                 "Failed to connect to slow-dns.example.com"
             );
         });
+        it("should propagate abort while DNS resolution is pending", async () => {
+            // Arrange
+            const controller = new AbortController();
+            mockDns.resolve4.mockReturnValue(new Promise(() => undefined));
+
+            // Act
+            const resultPromise = checkConnectivity(
+                "abort.example.com",
+                {
+                    method: "dns",
+                    timeout: 5000,
+                },
+                controller.signal
+            );
+            controller.abort("stop");
+
+            // Assert
+            await expect(resultPromise).rejects.toMatchObject({
+                name: "AbortError",
+            });
+        });
         it("should not invoke option accessors while normalizing connectivity checks", async () => {
             // Arrange
             mockDns.resolve4.mockResolvedValue(["192.168.1.1"]);

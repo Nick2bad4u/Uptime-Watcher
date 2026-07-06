@@ -261,53 +261,17 @@ async function checkDnsResolution(
     const startTime = performance.now();
 
     const TIMEOUT = Symbol("dns-timeout");
-    const ABORTED = Symbol("dns-aborted");
-
-    const timeoutPromise: Promise<typeof TIMEOUT> = (async (): Promise<
-        typeof TIMEOUT
-    > => {
-        await delay(timeout);
-        return TIMEOUT;
-    })();
-
-    const abortPromise: Promise<typeof ABORTED> | undefined = signal
-        ? new Promise((resolve) => {
-              if (signal.aborted) {
-                  resolve(ABORTED);
-                  return;
-              }
-
-              signal.addEventListener(
-                  "abort",
-                  () => {
-                      resolve(ABORTED);
-                  },
-                  {
-                      once: true,
-                  }
-              );
-          })
-        : undefined;
 
     try {
-        const raceCandidates: Promise<
-            string[] | typeof ABORTED | typeof TIMEOUT
-        >[] = [dns.resolve4(host), timeoutPromise];
+        const timeoutPromise = delay(timeout, TIMEOUT, {
+            ref: false,
+            ...(signal && { signal }),
+        });
 
-        if (abortPromise) {
-            raceCandidates.push(abortPromise);
-        }
-
-        const result = await Promise.race(raceCandidates);
+        const result = await Promise.race([dns.resolve4(host), timeoutPromise]);
 
         if (result === TIMEOUT) {
             throw new Error(`DNS resolution timeout after ${timeout}ms`);
-        }
-
-        if (result === ABORTED) {
-            throw createAbortError({
-                cause: getAbortSignalReason(signal),
-            });
         }
 
         return {
@@ -317,7 +281,9 @@ async function checkDnsResolution(
         };
     } catch (error) {
         if (isAbortError(error)) {
-            throw error;
+            throw createAbortError({
+                cause: getAbortSignalReason(signal),
+            });
         }
         return {
             alive: false,
