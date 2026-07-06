@@ -99,6 +99,22 @@ describe(buildMonitoringLifecycleTelemetry, () => {
         });
     });
 
+    it("omits negative and fractional lifecycle counts", () => {
+        const payload = buildMonitoringLifecycleTelemetry({
+            event: {
+                activeMonitors: -1,
+                monitorCount: 2.5,
+                siteCount: -3,
+                timestamp: 1_719_000_000_000.5,
+            },
+            phase: "started",
+        });
+
+        expect(payload).toEqual({
+            phase: "started",
+        });
+    });
+
     it("keeps finite numeric telemetry fields", () => {
         const payload = buildMonitoringLifecycleTelemetry({
             event: {

@@ -6,7 +6,7 @@ import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Site, StatusUpdate } from "@shared/types";
 
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber, isInteger } from "ts-extras";
 
 import type { SitesTelemetryPayload } from "./siteTelemetryTypes";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
@@ -53,8 +53,11 @@ type MonitoringLifecycleEvent =
     | RendererEventPayloadMap["monitoring:started"]
     | RendererEventPayloadMap["monitoring:stopped"];
 
-function resolveFiniteNumber(value: unknown): number | undefined {
-    return typeof value === "number" && isFiniteNumber(value)
+function resolveNonnegativeInteger(value: unknown): number | undefined {
+    return typeof value === "number" &&
+        isFiniteNumber(value) &&
+        isInteger(value) &&
+        value >= 0
         ? value
         : undefined;
 }
@@ -73,10 +76,10 @@ export function buildMonitoringLifecycleTelemetry(args: {
     const timestampValue = event.timestamp;
     const { activeMonitors, reason } = event;
 
-    const monitorCount = resolveFiniteNumber(monitorCountValue);
-    const siteCount = resolveFiniteNumber(siteCountValue);
-    const timestamp = resolveFiniteNumber(timestampValue);
-    const resolvedActiveMonitors = resolveFiniteNumber(activeMonitors);
+    const monitorCount = resolveNonnegativeInteger(monitorCountValue);
+    const siteCount = resolveNonnegativeInteger(siteCountValue);
+    const timestamp = resolveNonnegativeInteger(timestampValue);
+    const resolvedActiveMonitors = resolveNonnegativeInteger(activeMonitors);
 
     return {
         phase,
