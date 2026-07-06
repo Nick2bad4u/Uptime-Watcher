@@ -14,6 +14,34 @@ import {
     writeFileSync,
 } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const OUTPUT_FORMATS = new Set([
+    "detailed",
+    "json",
+    "simple",
+]);
+
+const SKIPPED_DIRECTORIES = new Set([
+    ".cache",
+    ".git",
+    ".vs",
+    ".vscode",
+    "build",
+    "coverage",
+    "dist",
+    "dist-bench",
+    "dist-configs",
+    "dist-playwright",
+    "html",
+    "node_modules",
+    "playwright-report",
+    "release",
+    "reports",
+    "storybook-static",
+    "temp",
+    "test-results",
+]);
 
 // Configuration
 const CONFIG = {
@@ -27,10 +55,122 @@ const CONFIG = {
         ".jsx",
     ],
     // Pattern to match @shared imports
-    importPattern: /from\s+["']@shared[^"']*["']/g,
+    importPattern: /from\s+["']@shared(?<sharedPath>[^"']*)["']/g,
     // Output format options
     outputFormat: "detailed", // 'simple', 'detailed', 'json'
 };
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{ fail: boolean; format: string; help: boolean; save: boolean }}
+ *   Parsed options.
+ */
+function parseArgs(args) {
+    const options = {
+        fail: false,
+        format: CONFIG.outputFormat,
+        help: false,
+        save: false,
+    };
+
+    for (let index = 0; index < args.length; index++) {
+        const arg = args[index] ?? "";
+        const { inlineValue, option } = splitOptionValue(arg);
+
+        switch (option) {
+            case "--help":
+            case "-h": {
+                options.help = true;
+                break;
+            }
+
+            case "--save": {
+                options.save = true;
+                break;
+            }
+
+            case "--fail": {
+                options.fail = true;
+                break;
+            }
+
+            case "--format": {
+                const value = inlineValue ?? args[index + 1];
+                options.format = parseOutputFormat(value);
+                index += inlineValue === undefined ? 1 : 0;
+                break;
+            }
+
+            default: {
+                throw new Error(`Unknown option: ${option}`);
+            }
+        }
+    }
+
+    return options;
+}
+
+/**
+ * Split `--option=value` arguments while preserving space-separated support.
+ *
+ * @param {string} arg - Raw command-line argument.
+ *
+ * @returns {{ inlineValue: string | undefined; option: string }} Parsed option.
+ */
+function splitOptionValue(arg) {
+    const equalsIndex = arg.indexOf("=");
+    if (equalsIndex === -1) {
+        return { inlineValue: undefined, option: arg };
+    }
+
+    return {
+        inlineValue: arg.slice(equalsIndex + 1),
+        option: arg.slice(0, equalsIndex),
+    };
+}
+
+/**
+ * Parse and validate a requested output format.
+ *
+ * @param {string | undefined} value - Raw output format.
+ *
+ * @returns {string} Valid output format.
+ */
+function parseOutputFormat(value) {
+    if (!value || value.startsWith("-")) {
+        throw new Error("--format expects a value");
+    }
+
+    if (!OUTPUT_FORMATS.has(value)) {
+        throw new Error(`Unsupported output format: ${value}`);
+    }
+
+    return value;
+}
+
+/**
+ * Show CLI usage.
+ */
+function showHelp() {
+    console.log(`
+Usage: node scripts/find-shared-imports.mjs [options]
+
+Options:
+  --help, -h             Show this help message
+  --save                 Save report to shared-imports-report.txt
+  --fail                 Exit with code 1 if @shared imports are found
+  --format <format>      Output format: simple, detailed, json
+  --format=<format>      Output format: simple, detailed, json
+
+Examples:
+  node scripts/find-shared-imports.mjs
+  node scripts/find-shared-imports.mjs --save --format=json
+  node scripts/find-shared-imports.mjs --fail
+`);
+}
 
 /**
  * Get all files recursively from a directory.
@@ -56,15 +196,7 @@ function getFilesRecursively(dir, extensions) {
 
             if (stat.isDirectory()) {
                 // Skip node_modules and other common ignore directories
-                if (
-                    ![
-                        "node_modules",
-                        ".git",
-                        "dist",
-                        "coverage",
-                        "build",
-                    ].includes(item)
-                ) {
+                if (!SKIPPED_DIRECTORIES.has(item)) {
                     traverse(fullPath);
                 }
             } else if (stat.isFile()) {
@@ -138,7 +270,7 @@ function findSharedImports(filePath) {
 
         while ((match = CONFIG.importPattern.exec(content)) !== null) {
             const fullMatch = match[0];
-            const sharedPath = match[1];
+            const sharedPath = match.groups?.["sharedPath"] ?? "";
             const lineNumber = content
                 .slice(0, Math.max(0, match.index))
                 .split("\n").length;
@@ -180,8 +312,12 @@ function findSharedImports(filePath) {
  *     }[];
  * }[]} results
  */
-function formatOutput(results) {
-    switch (CONFIG.outputFormat) {
+function formatOutput(results, format = CONFIG.outputFormat) {
+    if (!OUTPUT_FORMATS.has(format)) {
+        throw new Error(`Unsupported output format: ${format}`);
+    }
+
+    switch (format) {
         case "simple": {
             return formatSimple(results);
         }
@@ -267,7 +403,12 @@ function formatDetailed(results) {
 /**
  * Main execution function.
  */
-function main() {
+function main(options = parseArgs(process.argv.slice(2))) {
+    if (options.help) {
+        showHelp();
+        return;
+    }
+
     console.log("🔍 Scanning for @shared imports...\n");
 
     const results = [];
@@ -298,11 +439,11 @@ function main() {
     console.log(`\n✅ Scan complete. Checked ${results.length} files.\n`);
 
     // Output results
-    const output = formatOutput(results);
+    const output = formatOutput(results, options.format);
     console.log(output);
 
     // Optionally save to file
-    if (process.argv.includes("--save")) {
+    if (options.save) {
         const outputFile = "shared-imports-report.txt";
         writeFileSync(outputFile, output);
         console.log(`📄 Report saved to ${outputFile}`);
@@ -310,38 +451,38 @@ function main() {
 
     // Exit with error code if imports found (useful for CI)
     const hasImports = results.some((r) => r.imports.length > 0);
-    if (hasImports && process.argv.includes("--fail")) {
+    if (hasImports && options.fail) {
         process.exit(1);
     }
 }
 
-// Handle command line arguments
-if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    console.log(`
-Usage: node scripts/find-shared-imports.js [options]
-
-Options:
-  --help, -h     Show this help message
-  --save         Save report to shared-imports-report.txt
-  --fail         Exit with code 1 if @shared imports found (for CI)
-  --format=X     Output format: simple, detailed, json (default: detailed)
-
-Examples:
-  node scripts/find-shared-imports.js
-  node scripts/find-shared-imports.js --save --format=json
-  node scripts/find-shared-imports.js --fail
-`);
-    process.exit(0);
+/**
+ * Check whether this module was executed directly.
+ *
+ * @returns {boolean} Whether this is the CLI entrypoint.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
 }
 
-// Handle format option
-const formatArg = process.argv.find((arg) => arg.startsWith("--format="));
-if (formatArg) {
-    const format = formatArg.split("=")[1];
-    if (format) {
-        CONFIG.outputFormat = format;
+if (isDirectInvocation()) {
+    try {
+        main();
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exit(1);
     }
 }
 
-// Run the script
-main();
+export {
+    calculateRelativePath,
+    findSharedImports,
+    formatOutput,
+    getFilesRecursively,
+    parseArgs,
+    parseOutputFormat,
+    suggestRelativePath,
+};
