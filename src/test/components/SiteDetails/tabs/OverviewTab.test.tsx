@@ -564,6 +564,45 @@ describe(OverviewTab, () => {
             });
         });
 
+        it("should redact monitor URL metadata when removing monitor", () => {
+            const sensitiveMonitor: Monitor = {
+                ...createMockMonitor(),
+                url: "https://overview.example.com/status?refresh_token=overview-secret#fragment",
+            };
+
+            render(
+                <OverviewTab
+                    {...baseProps}
+                    selectedMonitor={sensitiveMonitor}
+                />
+            );
+
+            const removeButton = screen.getByText("Remove Monitor");
+            fireEvent.click(removeButton);
+
+            expect(logger.user.action).toHaveBeenCalledWith(
+                "Monitor removal button clicked from overview tab",
+                expect.objectContaining({
+                    monitorId: sensitiveMonitor.id,
+                    monitorType: sensitiveMonitor.type,
+                    monitorUrl: "https://overview.example.com/status",
+                })
+            );
+
+            const removalLogCall = vi
+                .mocked(logger.user.action)
+                .mock.calls.find(
+                    ([message]) =>
+                        message ===
+                        "Monitor removal button clicked from overview tab"
+                );
+            const serializedMetadata = JSON.stringify(removalLogCall?.[1]);
+
+            expect(serializedMetadata).not.toContain("refresh_token");
+            expect(serializedMetadata).not.toContain("overview-secret");
+            expect(serializedMetadata).not.toContain("fragment");
+        });
+
         it("should handle interval change", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: OverviewTab", "component");

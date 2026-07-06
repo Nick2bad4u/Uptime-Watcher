@@ -8,6 +8,7 @@ import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { useCallback, useMemo } from "react";
 
 import { CHECK_INTERVALS, TIMEOUT_CONSTRAINTS } from "../../../constants";
@@ -56,6 +57,13 @@ const formatIntervalOption = (
         const fallbackLabel = getIntervalLabel(value);
         return { label: fallbackLabel, value };
     }
+};
+
+const safeMonitorUrlForLogging = (
+    url: string | undefined
+): string | undefined => {
+    const trimmedUrl = url?.trim();
+    return trimmedUrl ? getSafeUrlForLogging(trimmedUrl) : undefined;
 };
 
 /**
@@ -200,7 +208,7 @@ export const OverviewTab = ({
         logger.user.action("Monitor removal button clicked from overview tab", {
             monitorId: selectedMonitor.id,
             monitorType: selectedMonitor.type,
-            monitorUrl: selectedMonitor.url,
+            monitorUrl: safeMonitorUrlForLogging(selectedMonitor.url),
         });
         void handleRemoveMonitor();
     }, [
