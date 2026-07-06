@@ -11,6 +11,8 @@ import type { MonitorType, Site } from "@shared/types";
 import type { PeerCertificate } from "node:tls";
 import type { Except } from "type-fest";
 
+import { createAbortError, isAbortError } from "@shared/utils/abortError";
+import { getAbortSignalReason } from "@shared/utils/abortUtils";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import * as tls from "node:tls";
@@ -119,6 +121,10 @@ export class SslMonitor implements IMonitorService {
                 }
             );
         } catch (error) {
+            if (isAbortError(error)) {
+                return createMonitorErrorResult("Request canceled", 0);
+            }
+
             const message = getUserFacingErrorDetail(error);
             return createMonitorErrorResult(message, 0);
         }
@@ -149,6 +155,10 @@ export class SslMonitor implements IMonitorService {
                 responseTime,
             };
         } catch (error) {
+            if (isAbortError(error)) {
+                throw error;
+            }
+
             const responseTime = Math.round(performance.now() - start);
             return createMonitorErrorResult(
                 getUserFacingErrorDetail(error),
@@ -216,7 +226,12 @@ export class SslMonitor implements IMonitorService {
             };
 
             const abortListener = (): void => {
-                handleFailure(new Error("Operation aborted"), abortListener);
+                handleFailure(
+                    createAbortError({
+                        cause: getAbortSignalReason(signal),
+                    }),
+                    abortListener
+                );
             };
 
             const onSecureConnect = (): void => {

@@ -223,6 +223,39 @@ describe("SslMonitor service", () => {
         expect(result.status).toBe("down");
     });
 
+    it("reports request cancellation when an in-flight handshake is aborted", async () => {
+        let socket: MockTlsSocket | undefined;
+        connectMock.mockImplementation(() => {
+            socket = new MockTlsSocket(
+                createCertificate(new Date(Date.now() + 60 * 86_400_000))
+            );
+            return socket;
+        });
+        const abortController = new AbortController();
+
+        const resultPromise = sslMonitor.check(
+            {
+                ...monitor,
+                retryAttempts: 2,
+            },
+            abortController.signal
+        );
+
+        expect(socket).toBeDefined();
+        abortController.abort("Monitor cancelled");
+
+        const result = await resultPromise;
+
+        expect(createMonitorErrorResult).toHaveBeenCalledWith(
+            "Request canceled",
+            0
+        );
+        expect(result.status).toBe("down");
+        expect(result.error).toBe("Request canceled");
+        expect(connectMock).toHaveBeenCalledTimes(1);
+        expect(socket?.destroy).toHaveBeenCalledTimes(1);
+    });
+
     it("treats unauthorized certificates as failure", async () => {
         const certificate = createCertificate(
             new Date(Date.now() + 60 * 86_400_000)
