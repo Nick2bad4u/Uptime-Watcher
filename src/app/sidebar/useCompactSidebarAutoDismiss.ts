@@ -1,9 +1,9 @@
 import type { RefObject } from "react";
 
-import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { useEffect } from "react";
 
 import { SIDEBAR_COLLAPSE_MEDIA_QUERY } from "../../constants/layout";
+import { subscribeToGlobalEvent } from "../../utils/dom/eventListeners";
 import { tryGetMediaQueryList } from "../../utils/mediaQueries";
 
 const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
@@ -14,40 +14,14 @@ const SIDEBAR_DISMISS_INTERACTIVE_SELECTORS = [
 
 const noop = (): void => {};
 
-type ListenerMethod = (
-    this: unknown,
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: AddEventListenerOptions | boolean
-) => void;
-
 type ClosestMethod = (this: unknown, selectors: string) => Element | null;
 
 const isObjectLike = (value: unknown): value is object =>
     (typeof value === "object" && value !== null) ||
     typeof value === "function";
 
-const isListenerMethod = (value: unknown): value is ListenerMethod =>
-    typeof value === "function";
-
 const isClosestMethod = (value: unknown): value is ClosestMethod =>
     typeof value === "function";
-
-function getRuntimeListenerMethod(
-    holder: unknown,
-    key: "addEventListener" | "removeEventListener"
-): ListenerMethod | undefined {
-    if (!isObjectLike(holder)) {
-        return undefined;
-    }
-
-    try {
-        const candidate: unknown = Reflect.get(holder, key);
-        return isListenerMethod(candidate) ? candidate : undefined;
-    } catch {
-        return undefined;
-    }
-}
 
 function getClosestMethod(target: unknown): ClosestMethod | undefined {
     if (!isObjectLike(target)) {
@@ -65,46 +39,13 @@ function getClosestMethod(target: unknown): ClosestMethod | undefined {
 function addDocumentPointerDownListener(
     handler: (event: PointerEvent) => void
 ): () => void {
-    const documentProperty = getOwnPropertyValue(globalThis, "document");
-
-    if (!documentProperty.found) {
-        return noop;
-    }
-
-    const addEventListener = getRuntimeListenerMethod(
-        documentProperty.value,
-        "addEventListener"
+    return subscribeToGlobalEvent(
+        "document",
+        "pointerdown",
+        handler,
+        { capture: true },
+        true
     );
-    const removeEventListener = getRuntimeListenerMethod(
-        documentProperty.value,
-        "removeEventListener"
-    );
-
-    if (!addEventListener || !removeEventListener) {
-        return noop;
-    }
-
-    try {
-        Reflect.apply(addEventListener, documentProperty.value, [
-            "pointerdown",
-            handler,
-            { capture: true },
-        ]);
-    } catch {
-        return noop;
-    }
-
-    return (): void => {
-        try {
-            Reflect.apply(removeEventListener, documentProperty.value, [
-                "pointerdown",
-                handler,
-                true,
-            ]);
-        } catch {
-            // Auto-dismiss listener cleanup is best-effort during teardown.
-        }
-    };
 }
 
 /**
