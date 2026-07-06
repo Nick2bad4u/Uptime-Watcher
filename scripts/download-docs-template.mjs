@@ -212,10 +212,11 @@ function parseArguments() {
     for (let i = 0; i < args.length; i++) {
         /** @type {string} */
         const arg = args[i] ?? "";
+        const { inlineValue, option } = splitOptionValue(arg);
         /** @type {string | undefined} */
         const nextArg = args[i + 1];
 
-        switch (arg) {
+        switch (option) {
             case "--help":
             case "-h":
                 showHelp();
@@ -239,42 +240,105 @@ function parseArguments() {
                 config.enableValidation = false;
                 break;
             case "--retry":
-                if (nextArg && !isNaN(parseInt(nextArg))) {
-                    config.maxRetries = parseInt(nextArg);
-                    i++;
-                }
+                config.maxRetries = parsePositiveIntegerOption(
+                    "--retry",
+                    inlineValue ?? nextArg
+                );
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             case "--force":
                 config.force = true;
                 break;
             case "--timeout":
-                if (nextArg && !isNaN(parseInt(nextArg))) {
-                    config.timeout = parseInt(nextArg) * 1000;
-                    i++;
-                }
+                config.timeout =
+                    parsePositiveIntegerOption(
+                        "--timeout",
+                        inlineValue ?? nextArg
+                    ) * 1000;
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             case "--concurrency":
-                if (nextArg && !isNaN(parseInt(nextArg))) {
-                    config.concurrency = parseInt(nextArg);
-                    i++;
-                }
+                config.concurrency = parsePositiveIntegerOption(
+                    "--concurrency",
+                    inlineValue ?? nextArg
+                );
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             case "--doc-name":
-                if (nextArg) {
-                    config.docName = nextArg;
-                    i++;
-                }
+                config.docName = parseStringOption(
+                    "--doc-name",
+                    inlineValue ?? nextArg
+                );
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             case "--base-url":
-                if (nextArg) {
-                    config.baseUrl = nextArg.replace(/\/+$/, ""); // Remove trailing slashes
-                    i++;
-                }
+                config.baseUrl = parseStringOption(
+                    "--base-url",
+                    inlineValue ?? nextArg
+                ).replace(/\/+$/, ""); // Remove trailing slashes
+                i += inlineValue === undefined ? 1 : 0;
                 break;
         }
     }
 
     return config;
+}
+
+/**
+ * Split `--option=value` arguments without changing space-separated support.
+ *
+ * @param {string} arg - Raw command-line argument.
+ *
+ * @returns {{ inlineValue: string | undefined; option: string }} Option name
+ *   and optional inline value.
+ */
+function splitOptionValue(arg) {
+    const equalsIndex = arg.indexOf("=");
+    if (equalsIndex === -1) {
+        return { inlineValue: undefined, option: arg };
+    }
+
+    return {
+        inlineValue: arg.slice(equalsIndex + 1),
+        option: arg.slice(0, equalsIndex),
+    };
+}
+
+/**
+ * Parse a required positive integer option.
+ *
+ * @param {string} option - Option name for diagnostics.
+ * @param {string | undefined} value - Raw option value.
+ *
+ * @returns {number} Parsed positive integer.
+ */
+function parsePositiveIntegerOption(option, value) {
+    if (!value || !/^\d+$/u.test(value)) {
+        throw new Error(`${option} expects a positive integer value`);
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+        throw new Error(`${option} expects a positive integer value`);
+    }
+
+    return parsed;
+}
+
+/**
+ * Parse a required non-empty string option.
+ *
+ * @param {string} option - Option name for diagnostics.
+ * @param {string | undefined} value - Raw option value.
+ *
+ * @returns {string} Parsed string value.
+ */
+function parseStringOption(option, value) {
+    if (!value) {
+        throw new Error(`${option} expects a value`);
+    }
+
+    return value;
 }
 
 /**
@@ -1095,7 +1159,13 @@ if (templateMetaPath === templateArgvPath) {
 }
 
 // Export for testing
-export { initialize, validateContent, rewriteLinks, cleanContent };
+export {
+    cleanContent,
+    initialize,
+    parseArguments,
+    rewriteLinks,
+    validateContent,
+};
 
 // Specify input format. FORMAT can be:
 

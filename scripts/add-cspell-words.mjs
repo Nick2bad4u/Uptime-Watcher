@@ -103,9 +103,10 @@ function parseArguments() {
     // Parse arguments
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
+        const { inlineValue, option } = splitOptionValue(arg ?? "");
         const nextArg = args[i + 1];
 
-        switch (arg) {
+        switch (option) {
             case "--dry-run":
             case "-d": {
                 config.dryRun = true;
@@ -130,24 +131,27 @@ function parseArguments() {
                 break;
             }
             case "--min-length": {
-                if (nextArg && !Number.isNaN(Number.parseInt(nextArg, 10))) {
-                    config.minWordLength = Number.parseInt(nextArg, 10);
-                    i++;
-                }
+                config.minWordLength = parsePositiveIntegerOption(
+                    "--min-length",
+                    inlineValue ?? nextArg
+                );
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             }
             case "--max-length": {
-                if (nextArg && !Number.isNaN(Number.parseInt(nextArg, 10))) {
-                    config.maxWordLength = Number.parseInt(nextArg, 10);
-                    i++;
-                }
+                config.maxWordLength = parsePositiveIntegerOption(
+                    "--max-length",
+                    inlineValue ?? nextArg
+                );
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             }
             case "--patterns": {
-                if (nextArg) {
-                    config.filePatterns = nextArg.split(",");
-                    i++;
-                }
+                config.filePatterns = parseRequiredStringOption(
+                    "--patterns",
+                    inlineValue ?? nextArg
+                ).split(",");
+                i += inlineValue === undefined ? 1 : 0;
                 break;
             }
             default: {
@@ -172,6 +176,63 @@ function parseArguments() {
     }
 
     return config;
+}
+
+/**
+ * Split `--option=value` arguments while preserving space-separated support.
+ *
+ * @param {string} arg - Raw command-line argument.
+ *
+ * @returns {{ inlineValue: string | undefined; option: string }} Parsed option
+ *   name and optional inline value.
+ */
+function splitOptionValue(arg) {
+    const equalsIndex = arg.indexOf("=");
+    if (equalsIndex === -1) {
+        return { inlineValue: undefined, option: arg };
+    }
+
+    return {
+        inlineValue: arg.slice(equalsIndex + 1),
+        option: arg.slice(0, equalsIndex),
+    };
+}
+
+/**
+ * Parse a required positive integer option.
+ *
+ * @param {string} option - Option name for diagnostics.
+ * @param {string | undefined} value - Raw option value.
+ *
+ * @returns {number} Parsed positive integer.
+ */
+function parsePositiveIntegerOption(option, value) {
+    if (!value || !/^\d+$/u.test(value)) {
+        throw new Error(`${option} expects a positive integer value`);
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+        throw new Error(`${option} expects a positive integer value`);
+    }
+
+    return parsed;
+}
+
+/**
+ * Parse a required string option.
+ *
+ * @param {string} option - Option name for diagnostics.
+ * @param {string | undefined} value - Raw option value.
+ *
+ * @returns {string} Parsed string value.
+ */
+function parseRequiredStringOption(option, value) {
+    if (!value) {
+        throw new Error(`${option} expects a value`);
+    }
+
+    return value;
 }
 
 /**
@@ -530,10 +591,14 @@ async function writeUpdatedWords(
  * @returns {Promise<void>}
  */
 async function main() {
-    const config = parseArguments();
-    const logger = new Logger(config.verbose);
+    let verbose = process.env["CSPELL_VERBOSE"] === "true";
+    let logger = new Logger(verbose);
 
     try {
+        const config = parseArguments();
+        verbose = config.verbose;
+        logger = new Logger(verbose);
+
         logger.info("CSpell Custom Words Manager v2.0.0");
         logger.debug("Configuration:", config);
 
@@ -587,7 +652,7 @@ async function main() {
         const errorMessage =
             error instanceof Error ? error.message : String(error);
         logger.error(`Script failed: ${errorMessage}`);
-        if (config.verbose && error instanceof Error) {
+        if (verbose && error instanceof Error) {
             logger.error(error.stack || "No stack trace available");
         }
         process.exit(1);
@@ -600,5 +665,6 @@ if (import.meta.filename === path.resolve(process.argv[1] || "")) {
         await main();
     } catch (error) {
         console.error(error);
+        process.exit(1);
     }
 }
