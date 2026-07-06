@@ -108,21 +108,15 @@ const isActiveDowntimeWindow = (args: {
 } => isDefined(args.downtimeEnd) && isDefined(args.downtimeStart);
 
 const startOrExtendDowntimeWindow = (args: {
-    downtimeEnd: number | undefined;
+    downtimeStart: number | undefined;
     record: StatusHistory;
 }): {
     downtimeEnd: number;
     downtimeStart: number;
-} =>
-    isDefined(args.downtimeEnd)
-        ? {
-              downtimeEnd: args.downtimeEnd,
-              downtimeStart: args.record.timestamp,
-          }
-        : {
-              downtimeEnd: args.record.timestamp,
-              downtimeStart: args.record.timestamp,
-          };
+} => ({
+    downtimeEnd: args.record.timestamp,
+    downtimeStart: args.downtimeStart ?? args.record.timestamp,
+});
 
 /**
  * Comprehensive analytics data for a site monitor.
@@ -192,37 +186,32 @@ function calculateDowntimePeriods(
     filteredHistory: readonly StatusHistory[]
 ): DowntimePeriod[] {
     const downtimePeriods: DowntimePeriod[] = [];
-    let downtimeEnd: number | undefined; // Most recent "down" timestamp
-    let downtimeStart: number | undefined; // Earliest "down" timestamp in the period
+    let downtimeEnd: number | undefined;
+    let downtimeStart: number | undefined;
 
-    // Process in reverse chronological order (newest to oldest)
-    for (let i = filteredHistory.length - 1; i >= 0; i--) {
-        const record = filteredHistory[i];
-        if (record) {
-            if (record.status === "down") {
-                const {
-                    downtimeEnd: nextDowntimeEnd,
-                    downtimeStart: nextDowntimeStart,
-                } = startOrExtendDowntimeWindow({
-                    downtimeEnd,
-                    record,
-                });
-                downtimeEnd = nextDowntimeEnd;
-                downtimeStart = nextDowntimeStart;
-            } else {
-                const activeDowntimeWindow = { downtimeEnd, downtimeStart };
-                if (isActiveDowntimeWindow(activeDowntimeWindow)) {
-                    downtimePeriods.push(
-                        createDowntimePeriod(
-                            activeDowntimeWindow.downtimeStart,
-                            activeDowntimeWindow.downtimeEnd
-                        )
-                    );
+    for (const record of filteredHistory) {
+        if (record.status === "down") {
+            const {
+                downtimeEnd: nextDowntimeEnd,
+                downtimeStart: nextDowntimeStart,
+            } = startOrExtendDowntimeWindow({
+                downtimeStart,
+                record,
+            });
+            downtimeEnd = nextDowntimeEnd;
+            downtimeStart = nextDowntimeStart;
+        } else {
+            const activeDowntimeWindow = { downtimeEnd, downtimeStart };
+            if (isActiveDowntimeWindow(activeDowntimeWindow)) {
+                downtimePeriods.push(
+                    createDowntimePeriod(
+                        activeDowntimeWindow.downtimeStart,
+                        record.timestamp
+                    )
+                );
 
-                    // Reset for next period
-                    downtimeEnd = undefined;
-                    downtimeStart = undefined;
-                }
+                downtimeEnd = undefined;
+                downtimeStart = undefined;
             }
         }
     }
@@ -405,6 +394,9 @@ export function useSiteAnalytics(
         const history = monitor?.history ?? [];
         // Filter history based on time range
         const filteredHistory = filterHistoryByTimeRange(history, timeRange);
+        const chronologicalHistory = filteredHistory.toSorted(
+            (a, b) => a.timestamp - b.timestamp
+        );
 
         const totalChecks = filteredHistory.length;
         const upCount = filteredHistory.filter((h) => h.status === "up").length;
@@ -424,7 +416,7 @@ export function useSiteAnalytics(
         const responseMetrics = calculateResponseMetrics(filteredHistory);
 
         // Calculate downtime periods
-        const downtimePeriods = calculateDowntimePeriods(filteredHistory);
+        const downtimePeriods = calculateDowntimePeriods(chronologicalHistory);
         const totalDowntime = downtimePeriods.reduce(
             (sum, period) => sum + period.duration,
             0

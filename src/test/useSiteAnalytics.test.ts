@@ -397,10 +397,10 @@ describe(useSiteAnalytics, () => {
             const { result } = renderHook(() =>
                 useSiteAnalytics(monitor, "24h")
             );
-            // Duration should be t1 - t0 (1000ms)
+            // Duration should run from first down to recovery (t2 - t0).
             expect(result.current.downtimePeriods).toHaveLength(1);
             expect(arrayFirst(result.current.downtimePeriods)?.duration).toBe(
-                1000
+                2000
             );
             // Mutated (end + start) would yield ~ t1 + t0 (a huge number, certainly > now)
             expect(
@@ -444,12 +444,12 @@ describe(useSiteAnalytics, () => {
             const { result } = renderHook(() =>
                 useSiteAnalytics(monitor, "24h")
             );
-            // Total downtime = 1000 + 500 = 1500; count=2 -> mttr=750
-            expect(result.current.totalDowntime).toBe(1500);
+            // Total downtime = 2000 + 500 = 2500; count=2 -> mttr=1250
+            expect(result.current.totalDowntime).toBe(2500);
             expect(result.current.incidentCount).toBe(2);
-            expect(result.current.mttr).toBe(750);
-            // Mutation (totalDowntime * count) => 3000; ensure not equal
-            expect(result.current.mttr).not.toBe(3000);
+            expect(result.current.mttr).toBe(1250);
+            // Mutation (totalDowntime * count) => 5000; ensure not equal
+            expect(result.current.mttr).not.toBe(5000);
         });
 
         it("should clamp percentile index (kills arrayLength - 1 -> arrayLength + 1 mutation)", async ({
@@ -638,8 +638,54 @@ describe(useSiteAnalytics, () => {
             );
 
             expect(result.current.incidentCount).toBe(2);
-            expect(result.current.totalDowntime).toBe(0); // Both periods have duration 0
-            expect(result.current.mttr).toBe(0); // 0 / 2
+            expect(result.current.totalDowntime).toBe(2000);
+            expect(result.current.mttr).toBe(1000);
+            expect(result.current.downtimePeriods).toEqual([
+                {
+                    duration: 1000,
+                    end: now - 4000,
+                    start: now - 5000,
+                },
+                {
+                    duration: 1000,
+                    end: now - 1000,
+                    start: now - 2000,
+                },
+            ]);
+        });
+
+        it("should calculate downtime from newest-first history order", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteAnalytics", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const monitor: Monitor = {
+                ...mockMonitorEmpty,
+                history: [
+                    createStatusRecord(now - 1000, "up", 200),
+                    createStatusRecord(now - 2000, "down", 0),
+                    createStatusRecord(now - 3000, "down", 0),
+                    createStatusRecord(now - 4000, "up", 150),
+                ],
+            };
+
+            const { result } = renderHook(() =>
+                useSiteAnalytics(monitor, "24h")
+            );
+
+            expect(result.current.incidentCount).toBe(1);
+            expect(result.current.totalDowntime).toBe(2000);
+            expect(result.current.downtimePeriods).toEqual([
+                {
+                    duration: 2000,
+                    end: now - 1000,
+                    start: now - 3000,
+                },
+            ]);
         });
     });
 
