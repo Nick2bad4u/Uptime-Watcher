@@ -123,6 +123,35 @@ describe("Operational Hooks", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
+        it("should preserve the signal reason when already aborted before the first attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Cancellation", "type");
+
+            const controller = new AbortController();
+            const abortReason = new Error("user stopped operation");
+            controller.abort(abortReason);
+
+            const mockOperation = vi.fn().mockResolvedValue("success");
+
+            await expect(
+                withOperationalHooks(mockOperation, {
+                    emitEvents: false,
+                    maxRetries: 3,
+                    operationName: "already-aborted",
+                    signal: controller.signal,
+                })
+            ).rejects.toMatchObject({
+                cause: abortReason,
+                name: "AbortError",
+            });
+
+            expect(mockOperation).not.toHaveBeenCalled();
+        });
         it("should fail after max retries", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");

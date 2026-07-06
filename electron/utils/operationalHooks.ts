@@ -61,7 +61,7 @@
 import type { Promisable, Tagged, UnknownRecord } from "type-fest";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
-import { sleepUnref } from "@shared/utils/abortUtils";
+import { getAbortSignalReason, sleepUnref } from "@shared/utils/abortUtils";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -644,7 +644,9 @@ export async function withOperationalHooks<T>(
     /* eslint-disable no-await-in-loop -- Retry operations require sequential awaits (attempt ordering, backoff timing, and side-effect semantics). */
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         if (signal?.aborted) {
-            const abortError = createAbortError();
+            const abortError = createAbortError({
+                cause: getAbortSignalReason(signal),
+            });
             return handleFailure(
                 abortError,
                 config,
