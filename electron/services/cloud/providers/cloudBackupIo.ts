@@ -150,7 +150,10 @@ export async function uploadBackupWithMetadata(args: {
         metadata: args.metadata,
     });
 
-    if (!entry.encrypted && entry.metadata.sizeBytes !== args.buffer.byteLength) {
+    if (
+        !entry.encrypted &&
+        entry.metadata.sizeBytes !== args.buffer.byteLength
+    ) {
         throw new Error(
             `Backup metadata mismatch: expected ${entry.metadata.sizeBytes} bytes but received ${args.buffer.byteLength} bytes`
         );

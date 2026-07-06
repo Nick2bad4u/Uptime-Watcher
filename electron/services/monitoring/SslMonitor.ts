@@ -49,11 +49,7 @@ const MAX_WARNING_THRESHOLD_DAYS = 365;
 class SslCheckError extends Error {
     public readonly responseTime: number;
 
-    public constructor(
-        message: string,
-        responseTime: number,
-        cause: unknown
-    ) {
+    public constructor(message: string, responseTime: number, cause: unknown) {
         super(message, { cause });
         this.name = "SslCheckError";
         this.responseTime = responseTime;

@@ -512,7 +512,8 @@ describe(WindowService, () => {
             const window = windowService.createMainWindow();
             await Promise.resolve();
 
-            const loadedFilePath = vi.mocked(window.loadFile).mock.calls[0]?.[0];
+            const loadedFilePath = vi.mocked(window.loadFile).mock
+                .calls[0]?.[0];
             expect(loadedFilePath).toBeTypeOf("string");
 
             const onCalls = vi.mocked(window.webContents.on).mock

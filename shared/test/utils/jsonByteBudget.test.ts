@@ -30,26 +30,22 @@ describe("json byte budget helpers", () => {
 
     it("counts JSON string escaping overhead", () => {
         const payload = {
-            value: "\"\\".repeat(16),
+            value: '"\\'.repeat(16),
         };
         const actualBytes = getJsonUtfByteLength(payload);
 
         expect(getJsonByteLengthUpTo(payload, actualBytes)).toBe(actualBytes);
-        expect(isJsonByteBudgetExceeded(payload, actualBytes - 1)).toBe(
-            true
-        );
+        expect(isJsonByteBudgetExceeded(payload, actualBytes - 1)).toBe(true);
     });
 
     it("counts JSON object key escaping overhead", () => {
         const payload = {
-            "quoted\"\\key": "value",
+            'quoted"\\key': "value",
         };
         const actualBytes = getJsonUtfByteLength(payload);
 
         expect(getJsonByteLengthUpTo(payload, actualBytes)).toBe(actualBytes);
-        expect(isJsonByteBudgetExceeded(payload, actualBytes - 1)).toBe(
-            true
-        );
+        expect(isJsonByteBudgetExceeded(payload, actualBytes - 1)).toBe(true);
     });
 
     it("counts non-finite numbers as JSON null", () => {

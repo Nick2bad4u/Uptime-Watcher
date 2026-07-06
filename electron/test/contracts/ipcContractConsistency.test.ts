@@ -282,7 +282,11 @@ function collectRegistrationValidatorGapsFromFile(
                     registrarIdentifiers.has(callee.text));
 
             if (isStandardRegistration) {
-                const [channelArgument, , validatorArgument] = node.arguments;
+                const [
+                    channelArgument,
+                    ,
+                    validatorArgument,
+                ] = node.arguments;
                 const channelName = channelArgument
                     ? (resolveChannelName(channelArgument) ?? "<unknown>")
                     : "<missing-channel>";

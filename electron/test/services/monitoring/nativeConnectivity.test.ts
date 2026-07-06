@@ -338,7 +338,9 @@ describe("Native Connectivity with Degraded State", () => {
         });
         it("should ignore invalid TCP port overrides and probe valid ports", async () => {
             // Arrange
-            mockDns.resolve4.mockRejectedValue(new Error("DNS fallback unused"));
+            mockDns.resolve4.mockRejectedValue(
+                new Error("DNS fallback unused")
+            );
             let connectHandler: (() => void) | undefined;
             const connectCalls: number[] = [];
             const mockSocket = {
@@ -377,7 +379,9 @@ describe("Native Connectivity with Degraded State", () => {
 
             // Assert
             expect(result.status).toBe("up");
-            expect(result.details).toBe("TCP connection successful on port 443");
+            expect(result.details).toBe(
+                "TCP connection successful on port 443"
+            );
             expect(connectCalls).toEqual([443]);
             expect(mockDns.resolve4).not.toHaveBeenCalled();
         });

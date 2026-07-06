@@ -417,9 +417,7 @@ describe("urlSafety", () => {
             expect(
                 tryGetSafeThirdPartyHttpUrl("https://[::ffff:192.168.1.1]")
             ).toBe(null);
-            expect(tryGetSafeThirdPartyHttpUrl("https://[fec0::1]")).toBe(
-                null
-            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://[fec0::1]")).toBe(null);
             expect(tryGetSafeThirdPartyHttpUrl("https://[::192.168.1.1]")).toBe(
                 null
             );

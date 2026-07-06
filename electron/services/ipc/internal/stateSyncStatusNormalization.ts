@@ -69,10 +69,7 @@ const getOwnIdentifier = (candidate: object): string | undefined => {
     return property.value;
 };
 
-const getOwnValue = (
-    candidate: object,
-    key: PropertyKey
-): unknown => {
+const getOwnValue = (candidate: object, key: PropertyKey): unknown => {
     const property = getOwnDataProperty(candidate, key);
     return property.found ? property.value : undefined;
 };

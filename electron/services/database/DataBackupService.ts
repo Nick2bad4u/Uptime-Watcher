@@ -336,13 +336,15 @@ export class DataBackupService {
             throw error;
         }
 
-        await fs.rm(backupPath, { force: true }).catch((cleanupError: unknown) => {
-            this.logger.warn(
-                "[DataBackupService] Failed to remove previous backup file after save",
-                ensureError(cleanupError),
-                { backupPath, targetPath }
-            );
-        });
+        await fs
+            .rm(backupPath, { force: true })
+            .catch((cleanupError: unknown) => {
+                this.logger.warn(
+                    "[DataBackupService] Failed to remove previous backup file after save",
+                    ensureError(cleanupError),
+                    { backupPath, targetPath }
+                );
+            });
     }
 
     /* eslint-enable security/detect-non-literal-fs-filename -- Re-enable after user-path backup save helpers. */
