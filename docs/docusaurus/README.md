@@ -1,29 +1,30 @@
 # 📚 Uptime Watcher Documentation Site
 
-<div align="center">
-
 [![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus&logoColor=white)](https://docusaurus.io/)
 [![Node.js badge.](https://img.shields.io/badge/Node.js-25.8.1-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
 
 ## 📖 Official documentation website for Uptime Watcher
 
-_Built with Docusaurus - Modern static website generator for technical documentation_
-
-</div>
+Built with Docusaurus, the modern static website generator for technical
+documentation.
 
 ## 🎯 About This Site
 
-This is the **backup documentation repository** for the Uptime Watcher project. The documentation is automatically generated from the main repository and deployed to GitHub Pages at:
+This is the **backup documentation repository** for the Uptime Watcher project.
+The documentation is automatically generated from the main repository and
+deployed to GitHub Pages at:
 
-**🌐 Live site:** [nick2bad4u.github.io/Uptime-Watcher](https://nick2bad4u.github.io/Uptime-Watcher/)
+**🌐 Live site:**
+[nick2bad4u.github.io/Uptime-Watcher](https://nick2bad4u.github.io/Uptime-Watcher/)
 
 ### 📂 Repository Structure
 
 This documentation site is part of the main Uptime Watcher project and serves as:
 
 - **📚 User Documentation**: Installation guides, feature documentation, and tutorials
-- **🔧 Developer Documentation**: Architecture guides, API references, and contribution guidelines
+- **🔧 Developer Documentation**: Architecture guides, API references, and
+  contribution guidelines
 - **📊 Project Resources**: Changelogs, release notes, and project roadmaps
 - **🔄 Backup Repository**: Redundant storage for critical documentation assets
 
@@ -43,13 +44,9 @@ cd docs/docusaurus
 
 # Install dependencies
 npm install
-# or
-yarn install
 
 # Start local development server
 npm start
-# or
-yarn start
 ```
 
 The development server will start at `http://localhost:3000` with hot reload enabled.
@@ -61,19 +58,15 @@ The development server will start at `http://localhost:3000` with hot reload ena
 ```bash
 # Start development server with hot reload
 npm start
-yarn start
 
 # Build for production
 npm run build
-yarn build
 
 # Serve production build locally
 npm run serve
-yarn serve
 
 # Clear cache and build artifacts
 npm run clear
-yarn clear
 ```
 
 ### Deployment
@@ -81,11 +74,9 @@ yarn clear
 ```bash
 # Deploy to GitHub Pages (SSH)
 USE_SSH=true npm run deploy
-USE_SSH=true yarn deploy
 
 # Deploy to GitHub Pages (HTTPS)
 GIT_USER=<Your GitHub username> npm run deploy
-GIT_USER=<Your GitHub username> yarn deploy
 ```
 
 ### Quality & Maintenance
@@ -93,15 +84,15 @@ GIT_USER=<Your GitHub username> yarn deploy
 ```bash
 # Type checking
 npm run typecheck
-yarn typecheck
 
 # Lint documentation files
 npm run lint
-yarn lint
 
 # Format code
 npm run format
-yarn format
+
+# Check formatting/linting without writing changes
+npm run format:check
 ```
 
 ## 📁 Site Architecture
@@ -148,7 +139,8 @@ Documentation is organized using:
 
 Key configuration files:
 
-- **`docusaurus.config.ts`**: Main site configuration, plugins, and theme settings
+- **`docusaurus.config.ts`**: Main site configuration, plugins, and theme
+  settings
 - **`sidebars.ts`**: Navigation structure and sidebar configuration
 - **`package.json`**: Dependencies, scripts, and project metadata
 - **`tsconfig.json`**: TypeScript configuration for type safety
@@ -157,7 +149,8 @@ Key configuration files:
 
 The site build process:
 
-1. **📝 Content Processing**: Markdown files are processed and converted to React components
+1. **📝 Content Processing**: Markdown files are processed and converted to
+   React components
 2. **⚡ Bundling**: Webpack bundles all assets with optimization
 3. **🗂️ Static Generation**: Pre-rendered HTML for fast loading
 4. **🚀 Deployment**: Automated deployment to GitHub Pages via GitHub Actions
@@ -189,10 +182,10 @@ For manual deployments:
 
 ```bash
 # Using SSH (recommended for contributors)
-USE_SSH=true yarn deploy
+USE_SSH=true npm run deploy
 
 # Using HTTPS (requires GitHub token)
-GIT_USER=<username> GITHUB_TOKEN=<token> yarn deploy
+GIT_USER=<username> GITHUB_TOKEN=<token> npm run deploy
 ```
 
 ## 📊 Features
@@ -229,7 +222,8 @@ To contribute to the documentation:
 
 For technical improvements:
 
-1. **🔧 Component Development**: Create reusable React components in `src/components/`
+1. **🔧 Component Development**: Create reusable React components in
+   `src/components/`
 2. **🎨 Styling**: Update global styles in `src/css/`
 3. **⚙️ Configuration**: Modify site configuration in `docusaurus.config.ts`
 4. **🧪 Testing**: Add tests for new functionality
@@ -238,7 +232,7 @@ For technical improvements:
 
 ### Common Issues
 
-**PWA / Service Worker Issues**
+#### PWA / Service Worker Issues
 
 ```bash
 # Enable verbose PWA debug logs during build
@@ -246,7 +240,7 @@ set DOCUSAURUS_PWA_DEBUG=true
 npm run build
 ```
 
-**Build Failures**
+#### Build Failures
 
 ```bash
 # Clear cache and rebuild
@@ -255,7 +249,7 @@ npm install
 npm run build
 ```
 
-**Deployment Issues**
+#### Deployment Issues
 
 ```bash
 # Verify GitHub permissions
@@ -263,7 +257,7 @@ npm run build
 # Review GitHub Actions logs
 ```
 
-**Local Development Issues**
+#### Local Development Issues
 
 ```bash
 # Check Node.js version (25.8.1 recommended; >=24.8.0 required)
@@ -287,14 +281,11 @@ Need help with the documentation site?
 
 ## 📄 License
 
-This documentation site is part of the Uptime Watcher project and is released under the [Unlicense](../../README.md#-license) - Public Domain.
+This documentation site is part of the Uptime Watcher project and is released
+under the [Unlicense](../../README.md#-license) - Public Domain.
 
 ---
 
-<div align="center">
-
 ### 📚 Documentation powered by [Docusaurus](https://docusaurus.io/)
 
-_Last updated: November 2025_
-
-</div>
+Last updated: November 2025
