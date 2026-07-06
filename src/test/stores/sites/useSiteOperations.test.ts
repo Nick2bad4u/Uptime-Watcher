@@ -20,6 +20,7 @@ import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import * as siteOperationHelpers from "../../../stores/sites/utils/operationHelpers";
+import { logStoreAction } from "../../../stores/utils";
 
 // Mock external dependencies
 vi.mock("../../../services/logger");
@@ -244,6 +245,39 @@ describe(createSiteOperationsActions, () => {
                 actions.addMonitorToSite("nonexistent-site", mockMonitor)
             ).rejects.toThrow(ERROR_CATALOG.sites.NOT_FOUND);
         });
+
+        it("should redact monitor URL telemetry when adding a monitor", async () => {
+            const sensitiveMonitor: Monitor = {
+                ...mockMonitor,
+                url: "https://user:pass@example.com/status?access_token=secret#frag",
+            };
+
+            await actions.addMonitorToSite("test-site", sensitiveMonitor);
+
+            const telemetryCalls = vi
+                .mocked(logStoreAction)
+                .mock.calls.filter(
+                    ([storeName, actionName]) =>
+                        storeName === "SitesStore" &&
+                        actionName === "addMonitorToSite"
+                );
+
+            expect(telemetryCalls).not.toHaveLength(0);
+            expect(telemetryCalls[0]?.[2]).toMatchObject({
+                monitorId: sensitiveMonitor.id,
+                monitorType: sensitiveMonitor.type,
+                monitorUrl: "https://example.com/status",
+                siteIdentifier: "test-site",
+            });
+
+            const serializedTelemetry = JSON.stringify(
+                telemetryCalls.map((call) => call[2])
+            );
+            expect(serializedTelemetry).not.toContain("access_token");
+            expect(serializedTelemetry).not.toContain("secret");
+            expect(serializedTelemetry).not.toContain("frag");
+            expect(serializedTelemetry).not.toContain("pass");
+        });
     });
 
     describe("createSite", () => {
@@ -341,6 +375,54 @@ describe(createSiteOperationsActions, () => {
             expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
                 expect.objectContaining(siteData)
             );
+        });
+
+        it("should summarize and redact create-site telemetry", async () => {
+            const siteData = {
+                identifier:
+                    "https://create.example.com/site?access_token=create-secret#frag",
+                monitoring: false,
+                monitors: [
+                    {
+                        ...mockMonitor,
+                        url: "https://user:pass@monitor.example.com/path?refresh_token=monitor-secret#hash",
+                    },
+                ],
+                name: "Name should not be logged",
+            };
+            mockElectronAPI.sites.addSite.mockResolvedValue({
+                ...mockSite,
+                ...siteData,
+            });
+
+            await actions.createSite(siteData);
+
+            const telemetryCalls = vi
+                .mocked(logStoreAction)
+                .mock.calls.filter(
+                    ([storeName, actionName]) =>
+                        storeName === "SitesStore" &&
+                        actionName === "createSite"
+                );
+
+            expect(telemetryCalls).not.toHaveLength(0);
+            expect(telemetryCalls[0]?.[2]).toMatchObject({
+                monitorCount: 1,
+                monitorTypes: ["http"],
+                monitorUrls: ["https://monitor.example.com/path"],
+                monitoring: false,
+                siteIdentifier: "https://create.example.com/site",
+            });
+
+            const serializedTelemetry = JSON.stringify(
+                telemetryCalls.map((call) => call[2])
+            );
+            expect(serializedTelemetry).not.toContain("Name should not be logged");
+            expect(serializedTelemetry).not.toContain("access_token");
+            expect(serializedTelemetry).not.toContain("refresh_token");
+            expect(serializedTelemetry).not.toContain("secret");
+            expect(serializedTelemetry).not.toContain("frag");
+            expect(serializedTelemetry).not.toContain("pass");
         });
 
         it("should merge backend site snapshot when identifier already exists", async ({
@@ -614,6 +696,56 @@ describe(createSiteOperationsActions, () => {
             } finally {
                 applySavedSiteSpy.mockRestore();
             }
+        });
+
+        it("should summarize and redact modify-site telemetry", async () => {
+            const updates: Partial<Site> = {
+                monitors: [
+                    {
+                        ...mockMonitor,
+                        url: "https://user:pass@updated.example.com/path?access_token=update-secret#hash",
+                    },
+                ],
+                name: "Updated name should not be logged",
+            };
+            mockElectronAPI.sites.updateSite.mockResolvedValueOnce({
+                ...mockSite,
+                ...updates,
+            });
+
+            await actions.modifySite(
+                "https://modify.example.com/site?refresh_token=site-secret#frag",
+                updates
+            );
+
+            const telemetryCalls = vi
+                .mocked(logStoreAction)
+                .mock.calls.filter(
+                    ([storeName, actionName]) =>
+                        storeName === "SitesStore" &&
+                        actionName === "modifySite"
+                );
+
+            expect(telemetryCalls).not.toHaveLength(0);
+            expect(telemetryCalls[0]?.[2]).toMatchObject({
+                monitorCount: 1,
+                monitorTypes: ["http"],
+                monitorUrls: ["https://updated.example.com/path"],
+                siteIdentifier: "https://modify.example.com/site",
+                updateFields: ["monitors", "name"],
+            });
+
+            const serializedTelemetry = JSON.stringify(
+                telemetryCalls.map((call) => call[2])
+            );
+            expect(serializedTelemetry).not.toContain(
+                "Updated name should not be logged"
+            );
+            expect(serializedTelemetry).not.toContain("access_token");
+            expect(serializedTelemetry).not.toContain("refresh_token");
+            expect(serializedTelemetry).not.toContain("secret");
+            expect(serializedTelemetry).not.toContain("frag");
+            expect(serializedTelemetry).not.toContain("pass");
         });
     });
 
