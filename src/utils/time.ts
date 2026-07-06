@@ -12,7 +12,7 @@
  * @public
  */
 
-import { arrayAt } from "ts-extras";
+import { arrayAt, isInteger } from "ts-extras";
 
 import type { CHART_TIME_PERIODS } from "../constants";
 
@@ -332,8 +332,8 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
  * Format retry attempts with descriptive text.
  *
  * @remarks
- * Handles edge cases: 0 attempts means no retries (immediate failure), negative
- * values are not expected but will be formatted as-is. The function provides
+ * Handles edge cases: 0 attempts means no retries (immediate failure), and
+ * invalid values return the standard fallback label. The function provides
  * user-friendly text explaining the retry behavior.
  *
  * @param attempts - Number of retry attempts (expected range: 0-10)
@@ -341,7 +341,12 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
  * @returns Descriptive text explaining retry behavior
  */
 export function formatRetryAttemptsText(attempts: number): string {
-    if (!Number.isFinite(attempts)) {
+    if (
+        !Number.isFinite(attempts) ||
+        !isInteger(attempts) ||
+        attempts < 0 ||
+        attempts > 10
+    ) {
         return UiDefaults.notAvailableLabel;
     }
 

@@ -753,38 +753,31 @@ describe("time Utilities", () => {
             );
         });
 
-        it("should handle edge cases", async ({ annotate, task }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Test negative values (not expected but should be handled)
-            expect(formatRetryAttemptsText(-1)).toBe(
-                "(Retry -1 times before marking down)"
-            );
-
-            // Test very large values
-            expect(formatRetryAttemptsText(100)).toBe(
-                "(Retry 100 times before marking down)"
-            );
-        });
-
-        it("should handle decimal values (though not expected in normal use)", async ({
+        it("should return fallback for values outside the retry-attempt range", async ({
             annotate,
             task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            await annotate("Type: Validation", "type");
 
-            expect(formatRetryAttemptsText(1.5)).toBe(
-                "(Retry 1.5 times before marking down)"
-            );
-            expect(formatRetryAttemptsText(2.7)).toBe(
-                "(Retry 2.7 times before marking down)"
-            );
+            expect(formatRetryAttemptsText(-1)).toBe("N/A");
+            expect(formatRetryAttemptsText(11)).toBe("N/A");
+            expect(formatRetryAttemptsText(100)).toBe("N/A");
+        });
+
+        it("should return fallback for decimal values", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: time", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(formatRetryAttemptsText(1.5)).toBe("N/A");
+            expect(formatRetryAttemptsText(2.7)).toBe("N/A");
         });
 
         it("should return fallback for non-finite values", async ({
@@ -1304,7 +1297,7 @@ describe("time Utilities", () => {
                 }
             );
 
-            test.prop([fc.integer({ max: 20, min: 2 })])(
+            test.prop([fc.integer({ max: 10, min: 2 })])(
                 "should use plural 'times' for multiple attempts",
                 (attempts) => {
                     const result = formatRetryAttemptsText(attempts);
@@ -1316,14 +1309,20 @@ describe("time Utilities", () => {
             );
 
             test.prop([fc.integer({ max: -1, min: -10 })])(
-                "should handle negative attempts gracefully",
+                "should return fallback for negative attempts",
                 (attempts) => {
                     const result = formatRetryAttemptsText(attempts);
 
-                    // Property: Should format negative values as-is with plural
-                    expect(result).toBe(
-                        `(Retry ${attempts} times before marking down)`
-                    );
+                    expect(result).toBe("N/A");
+                }
+            );
+
+            test.prop([fc.integer({ max: 100, min: 11 })])(
+                "should return fallback for attempts above the configured range",
+                (attempts) => {
+                    const result = formatRetryAttemptsText(attempts);
+
+                    expect(result).toBe("N/A");
                 }
             );
         });

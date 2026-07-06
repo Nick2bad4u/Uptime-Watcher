@@ -20,6 +20,7 @@
  */
 
 import { fc, test as fcTest } from "@fast-check/vitest";
+import { isInteger } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -440,14 +441,37 @@ describe("time Utils Property-Based Tests", () => {
         );
 
         fcTest.prop([fc.integer({ max: -1, min: -5 })])(
-            "should handle negative values gracefully",
+            "should return fallback for negative values",
             (attempts) => {
                 const result = formatRetryAttemptsText(attempts);
 
-                expect(result).toBeTypeOf("string");
-                expect(result).toContain(attempts.toString());
+                expect(result).toBe("N/A");
             }
         );
+
+        fcTest.prop([fc.integer({ max: 100, min: 11 })])(
+            "should return fallback for values above the configured range",
+            (attempts) => {
+                const result = formatRetryAttemptsText(attempts);
+
+                expect(result).toBe("N/A");
+            }
+        );
+
+        fcTest.prop([
+            fc
+                .double({
+                    max: 10,
+                    min: 0,
+                    noDefaultInfinity: true,
+                    noNaN: true,
+                })
+                .filter((attempts) => !isInteger(attempts)),
+        ])("should return fallback for fractional values", (attempts) => {
+            const result = formatRetryAttemptsText(attempts);
+
+            expect(result).toBe("N/A");
+        });
 
         fcTest.prop([
             fc.constantFrom(Number.NaN, Infinity, Number.NEGATIVE_INFINITY),
