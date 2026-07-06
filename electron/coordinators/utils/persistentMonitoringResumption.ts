@@ -9,6 +9,8 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 import { MONITOR_START_CONCURRENCY } from "../../constants";
 import { mapWithConcurrency } from "../../utils/boundedConcurrency";
 
@@ -25,6 +27,12 @@ export interface MonitoringResumptionLogger {
     readonly info: (message: string) => void;
     readonly warn: (message: string) => void;
 }
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
+
+const getSafeMonitorLabel = (site: Site, monitor: Monitor): string =>
+    `${getSafeIdentifier(site.identifier)}/${getSafeIdentifier(monitor.id)}`;
 
 /**
  * Collects monitors that should have their monitoring resumed.
@@ -64,6 +72,8 @@ export async function resumeMonitoringCandidates(args: {
         concurrency: MONITOR_START_CONCURRENCY,
         items: candidates,
         task: async ({ monitor, site }) => {
+            const safeMonitorLabel = getSafeMonitorLabel(site, monitor);
+
             try {
                 const isSuccess = await startMonitoringForSite(
                     site.identifier,
@@ -72,18 +82,18 @@ export async function resumeMonitoringCandidates(args: {
 
                 if (isSuccess) {
                     logger.debug(
-                        `[MonitoringLifecycleCoordinator] Successfully resumed monitoring for monitor: ${site.identifier}/${monitor.id}`
+                        `[MonitoringLifecycleCoordinator] Successfully resumed monitoring for monitor: ${safeMonitorLabel}`
                     );
                 } else {
                     logger.warn(
-                        `[MonitoringLifecycleCoordinator] Failed to resume monitoring for monitor: ${site.identifier}/${monitor.id}`
+                        `[MonitoringLifecycleCoordinator] Failed to resume monitoring for monitor: ${safeMonitorLabel}`
                     );
                 }
 
                 return isSuccess;
             } catch (error) {
                 logger.error(
-                    `[MonitoringLifecycleCoordinator] Error resuming monitoring for monitor ${site.identifier}/${monitor.id}:`,
+                    `[MonitoringLifecycleCoordinator] Error resuming monitoring for monitor ${safeMonitorLabel}:`,
                     error
                 );
                 return false;

@@ -4,6 +4,7 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { isEmpty } from "ts-extras";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -59,6 +60,10 @@ export class MonitoringLifecycleCoordinator {
     private readonly siteManager: SiteManager;
 
     private readonly emitTyped: EmitTyped;
+
+    private getSafeIdentifier(identifier: string): string {
+        return getSafeIdentifierForLogging(identifier) ?? identifier;
+    }
 
     /** Starts monitoring for all sites. */
     public async startMonitoring(): Promise<MonitoringStartSummary> {
@@ -189,8 +194,9 @@ export class MonitoringLifecycleCoordinator {
             }
         } catch (error) {
             const actionLabel = kind === "start" ? "starting" : "stopping";
+            const safeIdentifier = this.getSafeIdentifier(identifier);
             logger.error(
-                `[UptimeOrchestrator] Error ${actionLabel} monitoring for site ${identifier}:`,
+                `[UptimeOrchestrator] Error ${actionLabel} monitoring for site ${safeIdentifier}:`,
                 error
             );
 
@@ -340,8 +346,11 @@ export class MonitoringLifecycleCoordinator {
                         })
                     );
                 } catch (error) {
+                    const safeIdentifier = this.getSafeIdentifier(
+                        data.identifier
+                    );
                     logger.error(
-                        `[UptimeOrchestrator] Error restarting monitoring for site ${data.identifier}:`,
+                        `[UptimeOrchestrator] Error restarting monitoring for site ${safeIdentifier}:`,
                         error
                     );
                     await this.emitTyped(

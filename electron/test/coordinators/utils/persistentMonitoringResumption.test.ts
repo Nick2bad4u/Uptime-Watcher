@@ -32,6 +32,11 @@ function createSite(identifier: string, monitors: Monitor[]): Site {
 }
 
 describe("persistentMonitoringResumption", () => {
+    const rawMonitorId =
+        "https://monitor.example/check?token=monitor-token#private-monitor";
+    const rawSiteIdentifier =
+        "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+
     it("collects only monitors enabled under enabled sites", () => {
         const enabledSite = createSite("enabled", [
             createMonitor("active"),
@@ -85,5 +90,83 @@ describe("persistentMonitoringResumption", () => {
             succeeded: candidates.length,
         });
         expect(maxActive).toBeLessThanOrEqual(MONITOR_START_CONCURRENCY);
+    });
+
+    it.each([
+        ["debug", true],
+        ["warn", false],
+    ] as const)(
+        "redacts URL-shaped resume %s log identifiers",
+        async (logMethod, isSuccess) => {
+            const logger = {
+                debug: vi.fn(),
+                error: vi.fn(),
+                info: vi.fn(),
+                warn: vi.fn(),
+            };
+
+            const result = await resumeMonitoringCandidates({
+                candidates: [
+                    {
+                        monitor: createMonitor(rawMonitorId),
+                        site: createSite(rawSiteIdentifier, []),
+                    },
+                ],
+                logger,
+                startMonitoringForSite: vi.fn().mockResolvedValue(isSuccess),
+            });
+
+            expect(result).toEqual({
+                attempted: 1,
+                succeeded: isSuccess ? 1 : 0,
+            });
+
+            const logPayload = JSON.stringify(logger[logMethod].mock.calls);
+
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        }
+    );
+
+    it("redacts URL-shaped resume error log identifiers", async () => {
+        const logger = {
+            debug: vi.fn(),
+            error: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+        };
+
+        const result = await resumeMonitoringCandidates({
+            candidates: [
+                {
+                    monitor: createMonitor(rawMonitorId),
+                    site: createSite(rawSiteIdentifier, []),
+                },
+            ],
+            logger,
+            startMonitoringForSite: vi
+                .fn()
+                .mockRejectedValue(new Error("resume failed")),
+        });
+
+        expect(result).toEqual({
+            attempted: 1,
+            succeeded: 0,
+        });
+
+        const logPayload = JSON.stringify(logger.error.mock.calls);
+
+        expect(logPayload).toContain("https://example.com/path");
+        expect(logPayload).toContain("https://monitor.example/check");
+        expect(logPayload).not.toContain("site-secret");
+        expect(logPayload).not.toContain("site-token");
+        expect(logPayload).not.toContain("private-site");
+        expect(logPayload).not.toContain("monitor-token");
+        expect(logPayload).not.toContain("private-monitor");
     });
 });
