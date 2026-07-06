@@ -131,23 +131,42 @@ const collectSecretReplacementsForKey = (args: {
     isBoundaryBeforeKey: (matchIndex: number) => boolean;
     key: string;
     lower: string;
+    value: string;
 }): SecretReplacement[] => {
     const replacements: SecretReplacement[] = [];
-    const needle = `${args.key}=`;
 
     let index = 0;
     while (index < args.lower.length) {
-        const matchIndex = args.lower.indexOf(needle, index);
+        const matchIndex = args.lower.indexOf(args.key, index);
         if (matchIndex === -1) {
             break;
         }
 
-        const valueStart = matchIndex + needle.length;
-        if (args.isBoundaryBeforeKey(matchIndex)) {
+        const keyEnd = matchIndex + args.key.length;
+        let separatorIndex = keyEnd;
+        while (/\s/u.test(args.lower[separatorIndex] ?? "")) {
+            separatorIndex += 1;
+        }
+
+        const separator = args.lower[separatorIndex] ?? "";
+        if (
+            args.isBoundaryBeforeKey(matchIndex) &&
+            (separator === "=" || separator === ":")
+        ) {
+            let valueStart = separatorIndex + 1;
+            while (/\s/u.test(args.lower[valueStart] ?? "")) {
+                valueStart += 1;
+            }
+
             let valueEnd = valueStart;
             while (valueEnd < args.lower.length) {
                 const char = args.lower[valueEnd] ?? "";
-                if (char === "&" || /\s/u.test(char)) {
+                if (
+                    char === "&" ||
+                    char === "," ||
+                    char === ";" ||
+                    /\s/u.test(char)
+                ) {
                     break;
                 }
                 valueEnd += 1;
@@ -155,13 +174,16 @@ const collectSecretReplacementsForKey = (args: {
 
             replacements.push({
                 endIndex: valueEnd,
-                replacement: `${args.key}=${SECRET_PLACEHOLDER}`,
+                replacement: `${args.value.slice(
+                    matchIndex,
+                    valueStart
+                )}${SECRET_PLACEHOLDER}`,
                 startIndex: matchIndex,
             });
 
             index = valueEnd;
         } else {
-            index = valueStart;
+            index = keyEnd;
         }
     }
 
@@ -178,9 +200,9 @@ const collectSecretReplacements = (value: string): SecretReplacement[] => {
         }
 
         const previousChar = lower[matchIndex - 1] ?? "";
-        // Only treat `key=` patterns as secret-bearing when they appear at a
-        // boundary (i.e., not in the middle of another identifier). This
-        // prevents substring matches such as `token=` inside `access_token=`.
+        // Only treat key/value patterns as secret-bearing when they appear at
+        // a boundary, not in the middle of another identifier. This prevents
+        // substring matches such as `token=` inside `access_token=`.
         return !/[0-9_a-z]/u.test(previousChar);
     };
 
@@ -190,6 +212,7 @@ const collectSecretReplacements = (value: string): SecretReplacement[] => {
                 isBoundaryBeforeKey,
                 key,
                 lower,
+                value,
             })
         );
     }

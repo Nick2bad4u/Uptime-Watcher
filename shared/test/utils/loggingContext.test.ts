@@ -74,6 +74,20 @@ describe("logging context helpers", () => {
         expect(sanitizedString).toContain("refresh_token=[redacted]");
     });
 
+    it("redacts colon-separated secrets in free-form log strings", () => {
+        const sanitized = normalizeLogValue(
+            "OAuth failed: access_token: abc123, refresh_token : def456; tokenizer: safe"
+        );
+
+        expect(typeof sanitized).toBe("string");
+        const sanitizedString = sanitized as string;
+        expect(sanitizedString).not.toContain("abc123");
+        expect(sanitizedString).not.toContain("def456");
+        expect(sanitizedString).toContain("access_token: [redacted]");
+        expect(sanitizedString).toContain("refresh_token : [redacted]");
+        expect(sanitizedString).toContain("tokenizer: safe");
+    });
+
     it("redacts secrets in object metadata fields", () => {
         const input = {
             access_token: "abc",
