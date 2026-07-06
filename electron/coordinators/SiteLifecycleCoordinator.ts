@@ -7,6 +7,8 @@ import type { MonitorManager } from "../managers/MonitorManager";
 import type { SiteManager } from "../managers/SiteManager";
 import type { ContextualErrorFactory } from "../orchestrator/utils/contextualErrorFactory";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 import { logger } from "../utils/logger";
 
 /**
@@ -36,6 +38,17 @@ export class SiteLifecycleCoordinator {
 
     private readonly createContextualError: ContextualErrorFactory;
 
+    private getSafeIdentifier(identifier: string): string {
+        return getSafeIdentifierForLogging(identifier) ?? identifier;
+    }
+
+    private getSafeMonitorLabel(
+        siteIdentifier: string,
+        monitorId: string
+    ): string {
+        return `${this.getSafeIdentifier(siteIdentifier)}/${this.getSafeIdentifier(monitorId)}`;
+    }
+
     public async addSite(siteData: Site): Promise<Site> {
         let site: Site | undefined;
 
@@ -44,15 +57,23 @@ export class SiteLifecycleCoordinator {
             await this.monitorManager.setupSiteForMonitoring(site);
             return site;
         } catch (error) {
+            const safeSiteDataIdentifier = this.getSafeIdentifier(
+                siteData.identifier
+            );
+
             if (site) {
+                const safeSiteIdentifier = this.getSafeIdentifier(
+                    site.identifier
+                );
+
                 try {
                     await this.siteManager.removeSite(site.identifier);
                     logger.info(
-                        `[SiteLifecycleCoordinator] Cleaned up site ${site.identifier} after monitoring setup failure`
+                        `[SiteLifecycleCoordinator] Cleaned up site ${safeSiteIdentifier} after monitoring setup failure`
                     );
                 } catch (cleanupError) {
                     logger.error(
-                        `[SiteLifecycleCoordinator] Failed to cleanup site ${site.identifier}:`,
+                        `[SiteLifecycleCoordinator] Failed to cleanup site ${safeSiteIdentifier}:`,
                         cleanupError
                     );
                 }
@@ -63,9 +84,9 @@ export class SiteLifecycleCoordinator {
                 code: "ORCHESTRATOR_ADD_SITE_FAILED",
                 details: {
                     monitorCount: siteData.monitors.length,
-                    siteIdentifier: siteData.identifier,
+                    siteIdentifier: safeSiteDataIdentifier,
                 },
-                message: `Failed to add site ${siteData.identifier}`,
+                message: `Failed to add site ${safeSiteDataIdentifier}`,
                 operation: "orchestrator.addSite",
             });
         }
@@ -76,6 +97,12 @@ export class SiteLifecycleCoordinator {
         monitorId: string
     ): Promise<Site> {
         let isMonitoringStopped = false;
+        const safeMonitorLabel = this.getSafeMonitorLabel(
+            siteIdentifier,
+            monitorId
+        );
+        const safeSiteIdentifier = this.getSafeIdentifier(siteIdentifier);
+        const safeMonitorId = this.getSafeIdentifier(monitorId);
 
         try {
             // Phase 1: Stop monitoring immediately (reversible)
@@ -90,7 +117,7 @@ export class SiteLifecycleCoordinator {
             // record should still be removed.
             if (!isMonitoringStopped) {
                 logger.warn(
-                    `[SiteLifecycleCoordinator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
+                    `[SiteLifecycleCoordinator] Failed to stop monitoring for ${safeMonitorLabel}, but continuing with database removal`
                 );
             }
 
@@ -106,7 +133,7 @@ export class SiteLifecycleCoordinator {
             // If database removal failed after monitoring was stopped, attempt compensation
             if (isMonitoringStopped) {
                 logger.warn(
-                    `[SiteLifecycleCoordinator] Database removal failed for ${siteIdentifier}/${monitorId}, attempting to restart monitoring`
+                    `[SiteLifecycleCoordinator] Database removal failed for ${safeMonitorLabel}, attempting to restart monitoring`
                 );
                 try {
                     await this.monitorManager.startMonitoringForSite(
@@ -114,13 +141,13 @@ export class SiteLifecycleCoordinator {
                         monitorId
                     );
                     logger.info(
-                        `[SiteLifecycleCoordinator] Successfully restarted monitoring for ${siteIdentifier}/${monitorId} after failed removal`
+                        `[SiteLifecycleCoordinator] Successfully restarted monitoring for ${safeMonitorLabel} after failed removal`
                     );
                 } catch (restartError) {
                     // This is a critical inconsistency - monitor stopped but
                     // database record exists
                     const criticalError = new Error(
-                        `Critical state inconsistency: Monitor ${siteIdentifier}/${monitorId} stopped but database removal failed and restart failed`
+                        `Critical state inconsistency: Monitor ${safeMonitorLabel} stopped but database removal failed and restart failed`
                     );
                     logger.error(
                         `[SiteLifecycleCoordinator] ${criticalError.message}:`,
@@ -144,17 +171,18 @@ export class SiteLifecycleCoordinator {
                 cause: failureCause,
                 code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
                 details: {
-                    monitorId,
+                    monitorId: safeMonitorId,
                     monitoringStopped: isMonitoringStopped,
-                    siteIdentifier,
+                    siteIdentifier: safeSiteIdentifier,
                 },
-                message: `Failed to remove monitor ${siteIdentifier}/${monitorId}`,
+                message: `Failed to remove monitor ${safeMonitorLabel}`,
                 operation: "orchestrator.removeMonitor",
             });
         }
     }
 
     public async removeSite(identifier: string): Promise<boolean> {
+        const safeIdentifier = this.getSafeIdentifier(identifier);
         const siteSnapshot = this.siteManager.getSiteFromCache(identifier);
         const activeMonitorIds = siteSnapshot
             ? siteSnapshot.monitors
@@ -166,7 +194,7 @@ export class SiteLifecycleCoordinator {
 
         if (!siteSnapshot) {
             logger.debug(
-                `[SiteLifecycleCoordinator] removeSite(${identifier}) invoked for site missing from cache`
+                `[SiteLifecycleCoordinator] removeSite(${safeIdentifier}) invoked for site missing from cache`
             );
         }
 
@@ -179,7 +207,7 @@ export class SiteLifecycleCoordinator {
 
             if (!isMonitoringStopped) {
                 logger.warn(
-                    `[SiteLifecycleCoordinator] Aborting removal of ${identifier} because monitoring could not be stopped`
+                    `[SiteLifecycleCoordinator] Aborting removal of ${safeIdentifier} because monitoring could not be stopped`
                 );
                 return false;
             }
@@ -191,12 +219,12 @@ export class SiteLifecycleCoordinator {
             }
 
             logger.warn(
-                `[SiteLifecycleCoordinator] Site ${identifier} deletion failed after monitoring shutdown; attempting compensation`
+                `[SiteLifecycleCoordinator] Site ${safeIdentifier} deletion failed after monitoring shutdown; attempting compensation`
             );
 
             if (isEmpty(activeMonitorIds)) {
                 logger.info(
-                    `[SiteLifecycleCoordinator] No active monitors recorded for ${identifier}; skipping restart after failed removal`
+                    `[SiteLifecycleCoordinator] No active monitors recorded for ${safeIdentifier}; skipping restart after failed removal`
                 );
                 return false;
             }
@@ -210,8 +238,9 @@ export class SiteLifecycleCoordinator {
                     );
 
                 if (!isRestartSucceeded) {
+                    const safeMonitorId = this.getSafeIdentifier(monitorId);
                     const criticalError = new Error(
-                        `Critical state inconsistency: Monitoring stopped for ${identifier} (monitor ${monitorId}) but restart failed after deletion failure`
+                        `Critical state inconsistency: Monitoring stopped for ${safeIdentifier} (monitor ${safeMonitorId}) but restart failed after deletion failure`
                     );
                     logger.error(
                         `[SiteLifecycleCoordinator] ${criticalError.message}`
@@ -235,12 +264,14 @@ export class SiteLifecycleCoordinator {
                 cause: error,
                 code: "ORCHESTRATOR_REMOVE_SITE_FAILED",
                 details: {
-                    activeMonitorIds,
+                    activeMonitorIds: activeMonitorIds.map((monitorId) =>
+                        this.getSafeIdentifier(monitorId)
+                    ),
                     monitoringStopped: isMonitoringStopped,
-                    siteIdentifier: identifier,
+                    siteIdentifier: safeIdentifier,
                     siteRemoved: isSiteRemoved,
                 },
-                message: `Failed to remove site ${identifier}`,
+                message: `Failed to remove site ${safeIdentifier}`,
                 operation: "orchestrator.removeSite",
             });
         }
