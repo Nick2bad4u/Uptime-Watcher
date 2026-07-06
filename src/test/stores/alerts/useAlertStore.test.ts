@@ -15,7 +15,7 @@ import {
 } from "@shared/test/arbitraries/siteArbitraries";
 import { STATUS_KIND } from "@shared/types";
 import fc from "fast-check";
-import { arrayAt, arrayFirst } from "ts-extras";
+import { arrayAt, arrayFirst, arrayJoin } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -269,6 +269,34 @@ describe(useAlertStore, () => {
         expect(toast.message).toContain("[redacted]");
         expect(toast.message).not.toContain("uptime-secret-token");
         expect(toast.message).not.toMatch(/[\n\r]/u);
+    });
+
+    it("sanitizes status alert display fields", () => {
+        const alert = useAlertStore.getState().enqueueAlert({
+            monitorId: "monitor-42\nrefresh_token=monitor-display-secret",
+            monitorName:
+                "https://alerts.example.com/status?access_token=monitor-name-secret#fragment",
+            siteIdentifier: "site-alpha\r\naccess_token=site-identifier-secret",
+            siteName: "Alpha Site Authorization Bearer site-name-secret",
+            status: STATUS_KIND.DOWN,
+        });
+
+        const displayValues = [
+            alert.monitorId,
+            alert.monitorName,
+            alert.siteIdentifier,
+            alert.siteName,
+        ];
+        const displayText = arrayJoin(displayValues, " ");
+
+        expect(displayText).toContain("[redacted]");
+        expect(displayText).not.toContain("monitor-display-secret");
+        expect(displayText).not.toContain("monitor-name-secret");
+        expect(displayText).not.toContain("site-identifier-secret");
+        expect(displayText).not.toContain("site-name-secret");
+        for (const value of displayValues) {
+            expect(value).not.toMatch(/[\n\r]/u);
+        }
     });
 
     it("trims the toast queue to the maximum length", () => {

@@ -31,6 +31,9 @@ const isFiniteNonNegativeNumber = (value: unknown): value is number =>
 const isFinitePositiveNumber = (value: unknown): value is number =>
     typeof value === "number" && Number.isFinite(value) && value > 0;
 
+const normalizeAlertDisplayText = (value: string, fallback: string): string =>
+    normalizeUserFacingErrorDetail(value) ?? fallback;
+
 /**
  * Generates monotonically increasing fallback counters without using top-level
  * mutable state.
@@ -245,6 +248,19 @@ export const useAlertStore: AlertStoreHook = create<AlertStore>()((set) => ({
         const alert: StatusAlert = {
             ...input,
             id: input.id ?? generateAlertId(),
+            monitorId: normalizeAlertDisplayText(
+                input.monitorId,
+                "unknown-monitor"
+            ),
+            monitorName: normalizeAlertDisplayText(
+                input.monitorName,
+                "Unknown Monitor"
+            ),
+            siteIdentifier: normalizeAlertDisplayText(
+                input.siteIdentifier,
+                "unknown-site"
+            ),
+            siteName: normalizeAlertDisplayText(input.siteName, "Unknown Site"),
             timestamp: normalizedTimestamp,
         } satisfies StatusAlert;
 
