@@ -18,12 +18,6 @@ codecov:
         wait_for_ci: true
     require_ci_to_pass: true
     slug: "Nick2bad4u/Uptime-Watcher"
-    ui:
-        hide_complexity: false # Show complexity metrics
-        hide_contextual: false # Show contextual info in UI
-        hide_density: false # Show density graphs
-        hide_search: false # Enable search functionality
-        hide_sunburst: false # Show sunburst for visual coverage
 comment:
     behavior: "default"
     hide_project_coverage: false
@@ -36,7 +30,7 @@ component_management:
     default_rules:
         statuses:
             - branches:
-                  - "!main"
+                  - !!str "!main"
               target: "auto"
               threshold: "2%"
               type: "project"
