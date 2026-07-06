@@ -144,8 +144,8 @@ class GoogleDriveHttpClient {
         this.tokenManager = tokenManager;
         this.uploadApi = axios.create({
             baseURL: DRIVE_UPLOAD_BASE_URL,
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity,
+            maxBodyLength: Number.POSITIVE_INFINITY,
+            maxContentLength: Number.POSITIVE_INFINITY,
             timeout: GOOGLE_DRIVE_REQUEST_TIMEOUT_MS,
         });
 

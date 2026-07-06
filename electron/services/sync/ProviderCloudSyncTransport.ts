@@ -458,7 +458,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
         const createdAt = createdAtCandidate;
 
-        let minOpId = Infinity;
+        let minOpId = Number.POSITIVE_INFINITY;
         let maxOpId = Number.NEGATIVE_INFINITY;
         for (const op of operations) {
             if (op.deviceId !== deviceId) {
@@ -658,7 +658,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
             );
         }
 
-        let actualMinOpId = Infinity;
+        let actualMinOpId = Number.POSITIVE_INFINITY;
         let actualMaxOpId = Number.NEGATIVE_INFINITY;
         for (const op of operations) {
             if (op.deviceId !== expectations.deviceId) {

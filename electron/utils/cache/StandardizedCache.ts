@@ -621,7 +621,7 @@ export class StandardizedCache<TValue = unknown, TKey extends string = string> {
      */
     private evictLRU(): void {
         let oldestKey: TKey | undefined;
-        let oldestTime = Infinity;
+        let oldestTime = Number.POSITIVE_INFINITY;
 
         for (const [key, entry] of this.cache) {
             if (entry.timestamp >= oldestTime) {
