@@ -223,6 +223,83 @@ describe(GoogleDriveCloudStorageProvider, () => {
         ]);
     });
 
+    it.each([
+        "1e3",
+        "1.5",
+        "+1",
+        "0x10",
+    ])("falls back for malformed Drive list size strings: %s", async (size) => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    files: [
+                        {
+                            id: "file-id",
+                            modifiedTime: "2026-07-03T00:00:00.000Z",
+                            name: "bad-size.txt",
+                            size,
+                        },
+                    ],
+                    nextPageToken: null,
+                },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(provider.listObjects("")).resolves.toEqual([
+            {
+                key: "bad-size.txt",
+                lastModifiedAt: 1_783_036_800_000,
+                sizeBytes: 0,
+            },
+        ]);
+    });
+
+    it("falls back for fractional Drive list size numbers", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    files: [
+                        {
+                            id: "file-id",
+                            modifiedTime: "2026-07-03T00:00:00.000Z",
+                            name: "fractional-size.txt",
+                            size: 1.5,
+                        },
+                    ],
+                    nextPageToken: null,
+                },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        await expect(provider.listObjects("")).resolves.toEqual([
+            {
+                key: "fractional-size.txt",
+                lastModifiedAt: 1_783_036_800_000,
+                sizeBytes: 0,
+            },
+        ]);
+    });
+
     it("falls back for impossible Drive list modified times", async () => {
         const tokenManager = {
             isConnected: vi.fn().mockResolvedValue(true),

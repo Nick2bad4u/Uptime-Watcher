@@ -124,12 +124,44 @@ function parseDriveTimestamp(
     return parsed.success ? Date.parse(parsed.data) : fallback;
 }
 
+function isAsciiDigits(value: string): boolean {
+    if (value.length === 0) {
+        return false;
+    }
+
+    for (const character of value) {
+        const codePoint = character.codePointAt(0);
+        if (typeof codePoint !== "number" || codePoint < 48 || codePoint > 57) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function isValidDriveSizeNumber(value: number): boolean {
+    return Number.isSafeInteger(value) && value >= 0;
+}
+
 function parseDriveSizeBytes(
     value: number | string | undefined,
     fallback: number
 ): number {
-    const parsed = Number(value ?? fallback);
-    return isFiniteNumber(parsed) && parsed >= 0 ? parsed : fallback;
+    if (typeof value === "number") {
+        return isValidDriveSizeNumber(value) ? value : fallback;
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!isAsciiDigits(trimmed)) {
+            return fallback;
+        }
+
+        const parsed = Number(trimmed);
+        return isValidDriveSizeNumber(parsed) ? parsed : fallback;
+    }
+
+    return fallback;
 }
 
 function tryGetGoogleDriveHttpStatus(error: unknown): number | undefined {
