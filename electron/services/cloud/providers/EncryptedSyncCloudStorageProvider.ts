@@ -1,6 +1,7 @@
 import type { CloudBackupEntry, CloudProviderKind } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import { normalizeProviderObjectKey } from "@shared/utils/cloudKeyNormalization";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -149,9 +150,11 @@ export class EncryptedSyncCloudStorageProvider implements CloudStorageProvider {
 }
 
 function shouldEncryptSyncObject(key: string): boolean {
-    if (key === MANIFEST_KEY) {
+    const normalizedKey = normalizeProviderObjectKey(key);
+
+    if (normalizedKey === MANIFEST_KEY) {
         return false;
     }
 
-    return key.startsWith(SYNC_PREFIX);
+    return normalizedKey.startsWith(SYNC_PREFIX);
 }

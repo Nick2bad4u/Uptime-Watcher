@@ -12,6 +12,7 @@ import {
 } from "@electron/services/cloud/crypto/cloudCrypto";
 import { CloudProviderOperationError } from "@electron/services/cloud/providers/cloudProviderErrors";
 import { EncryptedSyncCloudStorageProvider } from "@electron/services/cloud/providers/EncryptedSyncCloudStorageProvider";
+import { normalizeProviderObjectKey } from "@shared/utils/cloudKeyNormalization";
 import { describe, expect, it } from "vitest";
 
 class InMemoryProvider implements CloudStorageProvider {
@@ -20,7 +21,7 @@ class InMemoryProvider implements CloudStorageProvider {
     public readonly objects = new Map<string, Buffer>();
 
     public async deleteObject(key: string): Promise<void> {
-        this.objects.delete(key);
+        this.objects.delete(normalizeProviderObjectKey(key));
     }
 
     public async downloadBackup(
@@ -46,7 +47,7 @@ class InMemoryProvider implements CloudStorageProvider {
     }
 
     public async downloadObject(key: string): Promise<Buffer> {
-        const buffer = this.objects.get(key);
+        const buffer = this.objects.get(normalizeProviderObjectKey(key));
         if (!buffer) {
             const error = new Error("not found") as Error & { code: string };
             error.code = "ENOENT";
@@ -98,12 +99,13 @@ class InMemoryProvider implements CloudStorageProvider {
         key: string;
         overwrite?: boolean;
     }): Promise<CloudObjectEntry> {
-        if (!args.overwrite && this.objects.has(args.key)) {
+        const key = normalizeProviderObjectKey(args.key);
+        if (!args.overwrite && this.objects.has(key)) {
             throw new Error("exists");
         }
-        this.objects.set(args.key, args.buffer);
+        this.objects.set(key, args.buffer);
         return {
-            key: args.key,
+            key,
             lastModifiedAt: 0,
             sizeBytes: args.buffer.length,
         };
@@ -131,6 +133,31 @@ describe(EncryptedSyncCloudStorageProvider, () => {
         expect(isEncryptedPayload(stored!)).toBeTruthy();
 
         const read = await provider.downloadObject("sync/snapshots/1/123.json");
+        expect(read.toString("utf8")).toBe("hello");
+    });
+
+    it("encrypts sync uploads after provider-key normalization", async () => {
+        const inner = new InMemoryProvider();
+        const key = await derivePassphraseKey({
+            passphrase: "secret",
+            salt: generateEncryptionSalt(),
+        });
+
+        const provider = new EncryptedSyncCloudStorageProvider({ inner, key });
+
+        await provider.uploadObject({
+            buffer: Buffer.from("hello", "utf8"),
+            key: "  /sync/snapshots/1/normalized.json  ",
+            overwrite: true,
+        });
+
+        const stored = inner.objects.get("sync/snapshots/1/normalized.json");
+        expect(stored).toBeDefined();
+        expect(isEncryptedPayload(stored!)).toBeTruthy();
+
+        const read = await provider.downloadObject(
+            "sync/snapshots/1/normalized.json"
+        );
         expect(read.toString("utf8")).toBe("hello");
     });
 
