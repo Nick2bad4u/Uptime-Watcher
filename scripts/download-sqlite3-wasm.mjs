@@ -8,10 +8,10 @@
 
 // @ts-check
 
-import * as fs from "fs";
-import https from "https";
-import path from "path";
-import crypto from "crypto";
+import crypto from "node:crypto";
+import * as fs from "node:fs";
+import https from "node:https";
+import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);

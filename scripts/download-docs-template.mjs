@@ -29,12 +29,12 @@
  * @requires pandoc (installed globally)
  */
 
-import { execFile } from "child_process";
-import { promisify } from "util";
-import fs from "fs/promises";
-import fsSync from "fs";
-import path from "path";
-import crypto from "crypto";
+import { execFile } from "node:child_process";
+import crypto from "node:crypto";
+import fsSync from "node:fs";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { promisify } from "node:util";
 import { pathToFileURL } from "node:url";
 /** @typedef {import("http")} http */
 /** @typedef {import("https")} https */
