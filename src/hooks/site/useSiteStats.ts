@@ -7,8 +7,9 @@
 
 import type { StatusHistory } from "@shared/types";
 
+import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { useMemo } from "react";
-import { isEmpty, isFinite as isFiniteNumber } from "ts-extras";
+import { arrayIncludes, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
 /**
  * Interface for site statistics data
@@ -31,6 +32,16 @@ export interface SiteStats {
     checkCount: number;
     /** Uptime percentage as integer (0-100) */
     uptime: number;
+}
+
+function isStatsHistoryRecord(record: StatusHistory): boolean {
+    return (
+        arrayIncludes(STATUS_HISTORY_VALUES, record.status) &&
+        isFiniteNumber(record.timestamp) &&
+        isFiniteNumber(new Date(record.timestamp).getTime()) &&
+        isFiniteNumber(record.responseTime) &&
+        record.responseTime >= -1
+    );
 }
 
 /**
@@ -73,10 +84,12 @@ export interface SiteStats {
  *
  * @see {@link SiteStats} for the complete interface specification.
  */
-export function useSiteStats(history: StatusHistory[]): SiteStats {
+export function useSiteStats(history: readonly StatusHistory[]): SiteStats {
     // Memoize the calculations to avoid recalculating on every render
     return useMemo(() => {
-        if (isEmpty(history)) {
+        const validHistory = history.filter(isStatsHistoryRecord);
+
+        if (isEmpty(validHistory)) {
             return {
                 averageResponseTime: 0,
                 checkCount: 0,
@@ -84,17 +97,17 @@ export function useSiteStats(history: StatusHistory[]): SiteStats {
             };
         }
 
-        const checkCount = history.length;
+        const checkCount = validHistory.length;
 
         // Calculate uptime percentage
-        const upCount = history.filter(
+        const upCount = validHistory.filter(
             (record) => record.status === "up"
         ).length;
 
         const uptime = Math.round((upCount / checkCount) * 100);
 
         // Calculate average response time (only for successful "up" checks)
-        const upRecordsWithResponseTime = history.filter(
+        const upRecordsWithResponseTime = validHistory.filter(
             (record) =>
                 record.status === "up" &&
                 typeof record.responseTime === "number" &&

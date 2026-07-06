@@ -23,6 +23,52 @@ describe("useSiteStats Edge Cases", () => {
             expect(result.current.checkCount).toBe(0);
             expect(result.current.uptime).toBe(0);
         });
+
+        it("should ignore malformed history records when calculating stats", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteStatsEdgeCases", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const validUpRecord: StatusHistory = {
+                responseTime: 100,
+                status: "up",
+                timestamp: 1_640_995_200_000,
+            };
+            const validSentinelRecord: StatusHistory = {
+                responseTime: -1,
+                status: "down",
+                timestamp: 1_640_991_600_000,
+            };
+            const history = [
+                validUpRecord,
+                validSentinelRecord,
+                {
+                    responseTime: 200,
+                    status: "unknown",
+                    timestamp: 1_640_988_000_000,
+                },
+                {
+                    responseTime: -2,
+                    status: "up",
+                    timestamp: 1_640_984_400_000,
+                },
+                {
+                    responseTime: 150,
+                    status: "up",
+                    timestamp: Number.POSITIVE_INFINITY,
+                },
+            ] as unknown as StatusHistory[];
+
+            const { result } = renderHook(() => useSiteStats(history));
+
+            expect(result.current.averageResponseTime).toBe(100);
+            expect(result.current.checkCount).toBe(2);
+            expect(result.current.uptime).toBe(50);
+        });
     });
 
     describe("averageResponseTime calculation - line 47 coverage", () => {
