@@ -6,6 +6,7 @@ import type { Monitor } from "@shared/types";
 import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isValidInteger } from "@shared/validation/validatorUtils";
 import { isInteger } from "ts-extras";
 
 import type { MonitorServiceConfig } from "./types";
@@ -24,6 +25,28 @@ import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
  * @internal
  */
 type HttpStatusMonitorConfig = Monitor & { type: "http-status" };
+
+function resolveExpectedStatusCode(value: unknown): number | undefined {
+    if (typeof value === "number") {
+        return isInteger(value) ? value : undefined;
+    }
+
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (
+            trimmed.startsWith("+") ||
+            trimmed.startsWith("-") ||
+            !isValidInteger(trimmed)
+        ) {
+            return undefined;
+        }
+
+        const parsed = Number.parseInt(trimmed, 10);
+        return Number.isSafeInteger(parsed) ? parsed : undefined;
+    }
+
+    return undefined;
+}
 
 const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
     {
@@ -46,10 +69,12 @@ const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
         scope: "HttpStatusMonitor",
         type: "http-status",
         validateMonitorSpecifics: (monitor: HttpStatusMonitorConfig) => {
-            const expectedStatus = Number(monitor.expectedStatusCode);
+            const expectedStatus = resolveExpectedStatusCode(
+                monitor.expectedStatusCode
+            );
 
             if (
-                !isInteger(expectedStatus) ||
+                typeof expectedStatus !== "number" ||
                 expectedStatus < 100 ||
                 expectedStatus > 599
             ) {

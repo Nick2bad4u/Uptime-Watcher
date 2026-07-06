@@ -180,6 +180,20 @@ describe(HttpStatusMonitor, () => {
         );
     });
 
+    it("accepts trimmed decimal string expected status codes", async () => {
+        monitor.expectedStatusCode = " 204 " as never;
+        axiosGetMock.mockResolvedValue({
+            data: "no content",
+            responseTime: 75,
+            status: 204,
+        });
+
+        const result = await monitorService.check(monitor);
+
+        expect(result.status).toBe("up");
+        expect(result.details).toBe("HTTP 204");
+    });
+
     it("returns canceled error result when aborted while waiting in the rate limiter", async () => {
         const abortError = new Error("Operation was aborted");
         abortError.name = "AbortError";
@@ -239,6 +253,32 @@ describe(HttpStatusMonitor, () => {
         );
         expect(scheduleMock).not.toHaveBeenCalled();
     });
+
+    it.each([
+        "2e2",
+        "0xC8",
+        "200.5",
+        "+200",
+        "200junk",
+    ])(
+        "returns error result for malformed string expected status code: %s",
+        async (expectedStatusCode) => {
+            monitor.expectedStatusCode = expectedStatusCode as never;
+
+            const result = await monitorService.check(monitor);
+
+            expect(result).toEqual({
+                details: "Invalid status",
+                responseTime: 0,
+                status: "down",
+            });
+            expect(createMonitorErrorResultMock).toHaveBeenCalledWith(
+                "Monitor missing or invalid expected status code",
+                0
+            );
+            expect(scheduleMock).not.toHaveBeenCalled();
+        }
+    );
 
     it("delegates to handleCheckError when the HTTP request fails", async () => {
         const error = new Error("Network error");
