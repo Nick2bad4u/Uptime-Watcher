@@ -11,7 +11,7 @@
  * (`[data-testid="site-list"]`) to ensure the correct element is targeted.
  */
 
-import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
+import { queryGlobalDocumentSelector } from "./queryGlobalDocumentSelector";
 
 /**
  * Configuration options for {@link scrollToSiteCard}.
@@ -65,35 +65,6 @@ const escapeForAttributeSelector = (value: string): string => {
     return value.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 };
 
-function queryDocumentSelector(selector: string): Element | null {
-    const documentProperty = getOwnPropertyValue(globalThis, "document");
-
-    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
-        return null;
-    }
-
-    try {
-        const querySelector: unknown = Reflect.get(
-            documentProperty.value,
-            "querySelector"
-        );
-
-        if (typeof querySelector !== "function") {
-            return null;
-        }
-
-        const element: unknown = Reflect.apply(
-            querySelector,
-            documentProperty.value,
-            [selector]
-        );
-
-        return isElementNode(element) ? element : null;
-    } catch {
-        return null;
-    }
-}
-
 /**
  * Scrolls the matching site card / table row into view.
  *
@@ -119,7 +90,8 @@ export function scrollToSiteCard(
         return;
     }
 
-    const container = queryDocumentSelector('[data-testid="site-list"]');
+    const candidate = queryGlobalDocumentSelector('[data-testid="site-list"]');
+    const container = isElementNode(candidate) ? candidate : null;
     if (!container) {
         return;
     }

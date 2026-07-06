@@ -7,8 +7,9 @@
  * blocking modal closes).
  */
 
-import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 import { arrayAt } from "ts-extras";
+
+import { queryGlobalDocumentSelector } from "../../../utils/dom/queryGlobalDocumentSelector";
 
 interface AppRootInertSnapshot {
     readonly ariaHidden: null | string;
@@ -54,31 +55,8 @@ function isAppRootElement(value: unknown): value is AppRootElement {
 }
 
 function resolveAppRootElement(): AppRootElement | null {
-    const documentProperty = getOwnPropertyValue(globalThis, "document");
-
-    if (!documentProperty.found || !isObjectLike(documentProperty.value)) {
-        return null;
-    }
-
-    try {
-        const querySelector: unknown = Reflect.get(
-            documentProperty.value,
-            "querySelector"
-        );
-
-        if (typeof querySelector !== "function") {
-            return null;
-        }
-
-        const root: unknown = Reflect.apply(
-            querySelector,
-            documentProperty.value,
-            ["#root"]
-        );
-        return isAppRootElement(root) ? root : null;
-    } catch {
-        return null;
-    }
+    const root = queryGlobalDocumentSelector("#root");
+    return isAppRootElement(root) ? root : null;
 }
 
 function ensureInertAppliedToAppRoot(): void {
