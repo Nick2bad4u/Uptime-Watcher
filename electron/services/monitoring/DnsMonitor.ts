@@ -42,7 +42,7 @@
  * @see {@link performDnsCheckWithRetry} - Core DNS checking functionality
  */
 
-import type { MonitorType, Site } from "@shared/types";
+import type { Site } from "@shared/types";
 
 import { createAbortError, isAbortError } from "@shared/utils/abortError";
 import {
@@ -67,20 +67,12 @@ import {
     resolveTxt,
 } from "node:dns/promises";
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorServiceConfig,
-} from "./types";
+import type { MonitorCheckResult, MonitorServiceConfig } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT, RETRY_BACKOFF } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
+import { ConfigurableMonitorServiceBase } from "./shared/configurableMonitorServiceBase";
 import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
-import {
-    copyMonitorServiceConfig,
-    createDefaultMonitorServiceConfig,
-    mergeMonitorServiceConfig,
-} from "./shared/monitorServiceConfigMerging";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -146,9 +138,7 @@ function isDnsAttemptFailedError(
  *
  * @public
  */
-export class DnsMonitor implements IMonitorService {
-    private config: MonitorServiceConfig;
-
+export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
     /**
      * Performs a DNS resolution check on the specified monitor.
      *
@@ -432,54 +422,10 @@ export class DnsMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor service
      */
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = createDefaultMonitorServiceConfig({
+        super({
             config,
             defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
-        });
-    }
-
-    /**
-     * Get the current configuration.
-     *
-     * @remarks
-     * Returns a defensive copy of the current configuration to prevent external
-     * modification. This ensures configuration immutability and prevents
-     * accidental state corruption.
-     *
-     * @returns A copy of the current monitor configuration
-     */
-    public getConfig(): MonitorServiceConfig {
-        return copyMonitorServiceConfig(this.config);
-    }
-
-    /**
-     * Get the monitor type this service handles.
-     *
-     * @remarks
-     * Returns the string identifier used to route monitoring requests to this
-     * service implementation. Uses the {@link MonitorType} union type for type
-     * safety and consistency across the app.
-     *
-     * @returns The monitor type identifier
-     */
-    public getType(): MonitorType {
-        return "dns";
-    }
-
-    /**
-     * Update the configuration for this monitor service.
-     *
-     * @remarks
-     * Merges the provided configuration with the existing configuration. Only
-     * specified properties are updated; undefined properties are ignored. Used
-     * for runtime configuration updates without service recreation.
-     *
-     * @param config - Partial configuration to update
-     */
-    public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        this.config = mergeMonitorServiceConfig({
-            currentConfig: this.config,
-            update: config,
+            type: "dns",
         });
     }
 

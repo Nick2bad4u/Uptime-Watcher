@@ -38,23 +38,14 @@
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
  */
 
-import type { MonitorType, Site } from "@shared/types";
+import type { Site } from "@shared/types";
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorServiceConfig,
-} from "./types";
+import type { MonitorCheckResult, MonitorServiceConfig } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { createMonitorConfig } from "./createMonitorConfig";
-// Type guard utilities are available but PingMonitor retains explicit check here
-import {
-    copyMonitorServiceConfig,
-    createDefaultMonitorServiceConfig,
-    mergeMonitorServiceConfig,
-} from "./shared/monitorServiceConfigMerging";
+import { ConfigurableMonitorServiceBase } from "./shared/configurableMonitorServiceBase";
 import {
     createMonitorErrorResult,
     validateMonitorHost,
@@ -101,9 +92,7 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  *
  * @public
  */
-export class PingMonitor implements IMonitorService {
-    private config: MonitorServiceConfig;
-
+export class PingMonitor extends ConfigurableMonitorServiceBase<"ping"> {
     /**
      * Performs a ping connectivity check on the specified monitor.
      *
@@ -214,54 +203,10 @@ export class PingMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor service
      */
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = createDefaultMonitorServiceConfig({
+        super({
             config,
             defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
-        });
-    }
-
-    /**
-     * Get the current configuration.
-     *
-     * @remarks
-     * Returns a defensive copy of the current configuration to prevent external
-     * modification. This ensures configuration immutability and prevents
-     * accidental state corruption.
-     *
-     * @returns A copy of the current monitor configuration
-     */
-    public getConfig(): MonitorServiceConfig {
-        return copyMonitorServiceConfig(this.config);
-    }
-
-    /**
-     * Get the monitor type this service handles.
-     *
-     * @remarks
-     * Returns the string identifier used to route monitoring requests to this
-     * service implementation. Uses the {@link MonitorType} union type for type
-     * safety and consistency across the app.
-     *
-     * @returns The monitor type identifier
-     */
-    public getType(): MonitorType {
-        return "ping";
-    }
-
-    /**
-     * Update the configuration for this monitor service.
-     *
-     * @remarks
-     * Merges the provided configuration with the existing configuration. Only
-     * specified properties are updated; undefined properties are ignored. Used
-     * for runtime configuration updates without service recreation.
-     *
-     * @param config - Partial configuration to update
-     */
-    public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        this.config = mergeMonitorServiceConfig({
-            currentConfig: this.config,
-            update: config,
+            type: "ping",
         });
     }
 }

@@ -1,4 +1,4 @@
-import type { MonitorType, Site } from "@shared/types";
+import type { Site } from "@shared/types";
 /**
  * TCP port monitoring service for network connectivity health checks.
  *
@@ -31,19 +31,11 @@ import type { MonitorType, Site } from "@shared/types";
  * @see {@link MonitorServiceConfig} for configuration options
  */
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorServiceConfig,
-} from "./types";
+import type { MonitorCheckResult, MonitorServiceConfig } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import {
-    assertPositiveTimeoutConfigUpdate,
-    copyMonitorServiceConfig,
-    createDefaultMonitorServiceConfig,
-    mergeMonitorServiceConfig,
-} from "./shared/monitorServiceConfigMerging";
+import { ConfigurableMonitorServiceBase } from "./shared/configurableMonitorServiceBase";
+import { assertPositiveTimeoutConfigUpdate } from "./shared/monitorServiceConfigMerging";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
@@ -62,9 +54,7 @@ import { performPortCheckWithRetry } from "./utils/portRetry";
  * The service automatically handles different types of network failures and
  * provides detailed error reporting for troubleshooting connectivity issues.
  */
-export class PortMonitor implements IMonitorService {
-    private config: MonitorServiceConfig;
-
+export class PortMonitor extends ConfigurableMonitorServiceBase<"port"> {
     /**
      * Perform a port connectivity check on the given monitor.
      *
@@ -140,69 +130,16 @@ export class PortMonitor implements IMonitorService {
      * @param config - Configuration options for the monitor
      */
     public constructor(config: MonitorServiceConfig = {}) {
-        this.config = createDefaultMonitorServiceConfig({
+        super({
             config,
             defaultTimeoutMs: DEFAULT_REQUEST_TIMEOUT,
+            type: "port",
         });
     }
 
-    /**
-     * Get the current configuration.
-     *
-     * @remarks
-     * Returns a defensive copy of the current configuration to prevent external
-     * modification. This ensures configuration immutability and prevents
-     * accidental state corruption.
-     *
-     * @returns A copy of the current monitor configuration
-     */
-    public getConfig(): MonitorServiceConfig {
-        return copyMonitorServiceConfig(this.config);
-    }
-
-    /**
-     * Get the monitor type this service handles.
-     *
-     * @remarks
-     * Returns the string identifier used to route monitoring requests to this
-     * service implementation. Uses the {@link MonitorType} union type for type
-     * safety and consistency across the app.
-     *
-     * @returns The monitor type identifier
-     */
-    public getType(): MonitorType {
-        return "port";
-    }
-
-    /**
-     * Update the configuration for this monitor.
-     *
-     * @remarks
-     * Updates the monitor's configuration by performing a shallow merge of the
-     * provided partial configuration with existing settings. This allows
-     * dynamic reconfiguration of timeout values and other parameters without
-     * recreating the monitor instance.
-     *
-     * The merge is shallow - nested objects are not deeply merged. Only
-     * validates that provided values are of correct types but does not validate
-     * ranges or other business logic constraints.
-     *
-     * Note: Only validates port-relevant configuration properties.
-     *
-     * @param config - Partial configuration to merge with existing settings
-     *
-     * @throws {@link Error} If config contains invalid property types
-     */
-    public updateConfig(config: Partial<MonitorServiceConfig>): void {
-        // Basic validation of config properties - only validate relevant ones
-        // for port monitoring
+    protected override validateConfigUpdate(
+        config: Partial<MonitorServiceConfig>
+    ): void {
         assertPositiveTimeoutConfigUpdate(config);
-
-        // Note: userAgent is not relevant for port monitoring, so we don't validate it This fixes the configuration validation inconsistency identified in the review
-
-        this.config = mergeMonitorServiceConfig({
-            currentConfig: this.config,
-            update: config,
-        });
     }
 }
