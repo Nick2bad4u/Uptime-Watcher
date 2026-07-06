@@ -122,7 +122,7 @@ const moduleDirectory = resolveStorybookModuleDirectory();
 /**
  * Absolute path to the repository root used by Storybook tooling.
  */
-export const storybookProjectRoot: string = path.resolve(moduleDirectory, "..");
+const storybookProjectRoot: string = path.resolve(moduleDirectory, "..");
 
 /**
  * Directory where Storybook coverage artifacts are stored.
@@ -160,7 +160,7 @@ export const storybookCoverageExcludeGlobs: readonly string[] = Object.freeze([
 /**
  * Default dependency optimization include list shared by Storybook tooling.
  */
-export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
+const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "@storybook/addon-a11y",
     "@storybook/addon-coverage",
     "@storybook/addon-designs",
@@ -183,7 +183,7 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "zod",
 ]);
 
-export const storybookResolveExtensions: readonly string[] = Object.freeze([
+const storybookResolveExtensions: readonly string[] = Object.freeze([
     ".mjs",
     ".js",
     ".mts",
@@ -212,7 +212,7 @@ const isBabelPlugin = (value: unknown): value is BabelPlugin =>
  * @returns A list containing the compiler plugin when installed, otherwise an
  *   empty array.
  */
-export const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
+const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
     try {
         const pluginModule = requireModule("babel-plugin-react-compiler");
 

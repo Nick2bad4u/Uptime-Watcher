@@ -724,22 +724,10 @@ const electronAPIMockDefinition = {
 
 const electronAPIMock: ElectronAPI = electronAPIMockDefinition;
 
-export { electronAPIMock };
-
-export const electronMockState: ElectronMockState = mockState;
-
-export const setMockSites = (sites: Site[]): void => {
-    mockState.sites = clone(sites);
-};
-
 export const setMockMonitorTypes = (
     monitorTypes: MonitorTypeConfig[]
 ): void => {
     mockState.monitorTypes = clone(monitorTypes);
-};
-
-export const setMockHistoryLimit = (historyLimit: number): void => {
-    mockState.historyLimit = normalizeLimit(historyLimit);
 };
 
 export const installElectronAPIMock = (): ElectronAPI => {
