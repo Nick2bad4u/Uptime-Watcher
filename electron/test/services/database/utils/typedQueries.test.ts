@@ -1644,6 +1644,24 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 expect(row).toEqual(historyRow);
             });
 
+            it("should validate finite decimal string history response times", () => {
+                const historyRow: HistoryRow = {
+                    monitorId: "monitor-1",
+                    responseTime: "123.45",
+                    status: "up",
+                    timestamp: Date.now(),
+                };
+                mockGet.mockReturnValue(historyRow);
+
+                const row = queryHistoryRow(
+                    mockDb,
+                    "SELECT * FROM history WHERE monitor_id = ?",
+                    ["monitor-1"]
+                );
+
+                expect(row).toEqual(historyRow);
+            });
+
             it("should reject infinite string history timestamps", () => {
                 mockGet.mockReturnValue({
                     monitorId: "monitor-1",
@@ -1726,22 +1744,32 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 }
             );
 
-            it("should reject infinite string history response times", () => {
-                mockGet.mockReturnValue({
-                    monitorId: "monitor-1",
-                    responseTime: "Infinity",
-                    status: "up",
-                    timestamp: Date.now(),
-                });
+            it.each([
+                "Infinity",
+                "+Infinity",
+                "-Infinity",
+                "1e3",
+                "0x10",
+                "0b10",
+            ])(
+                "should reject non-decimal string history response times: %s",
+                (responseTime) => {
+                    mockGet.mockReturnValue({
+                        monitorId: "monitor-1",
+                        responseTime,
+                        status: "up",
+                        timestamp: Date.now(),
+                    });
 
-                expect(() =>
-                    queryHistoryRow(
-                        mockDb,
-                        "SELECT * FROM history WHERE monitor_id = ?",
-                        ["monitor-1"]
-                    )
-                ).toThrow(/HistoryRow/v);
-            });
+                    expect(() =>
+                        queryHistoryRow(
+                            mockDb,
+                            "SELECT * FROM history WHERE monitor_id = ?",
+                            ["monitor-1"]
+                        )
+                    ).toThrow(/HistoryRow/v);
+                }
+            );
         });
         describe("Type Interfaces", () => {
             it("should export CountResult interface", async ({

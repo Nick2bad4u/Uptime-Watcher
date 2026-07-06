@@ -23,6 +23,7 @@ import {
     type SettingsRow,
     type SiteRow,
 } from "@shared/types/database";
+import { isValidNumeric } from "@shared/validation/validatorUtils";
 import {
     castUnchecked,
     isRecord as isSharedRecord,
@@ -321,7 +322,12 @@ function isFiniteRowNumber(value: unknown): boolean {
 
     if (typeof value === "string") {
         const trimmed = value.trim();
-        return trimmed.length > 0 && isFiniteNumber(Number(trimmed));
+        return (
+            isValidNumeric(trimmed) &&
+            !trimmed.includes("e") &&
+            !trimmed.includes("E") &&
+            isFiniteNumber(Number(trimmed))
+        );
     }
 
     return false;
