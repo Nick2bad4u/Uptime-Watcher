@@ -409,15 +409,25 @@ function isExecutedDirectly(moduleUrl) {
     return moduleUrl === normalizedEntryUrl;
 }
 
-// Run analysis if called directly
-if (isExecutedDirectly(import.meta.url)) {
+/**
+ * Run the documentation analysis CLI.
+ *
+ * @returns {Promise<boolean>} `true` when analysis completes successfully.
+ */
+async function main() {
     try {
         const stats = await analyzeDocumentation();
         displayReport(stats);
+        return true;
     } catch (error) {
         console.error("❌ Analysis failed:", error);
-        process.exit(1);
+        return false;
     }
 }
 
-export { analyzeDocumentation, displayReport };
+// Run analysis if called directly
+if (isExecutedDirectly(import.meta.url)) {
+    process.exitCode = (await main()) ? 0 : 1;
+}
+
+export { analyzeDocumentation, displayReport, isExecutedDirectly, main };

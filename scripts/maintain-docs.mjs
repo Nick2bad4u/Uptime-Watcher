@@ -612,15 +612,25 @@ function isExecutedDirectly(moduleUrl) {
     return moduleUrl === normalizedEntryUrl;
 }
 
-// Run maintenance if called directly
-if (isExecutedDirectly(import.meta.url)) {
+/**
+ * Run the documentation maintenance CLI.
+ *
+ * @returns {Promise<boolean>} `true` when maintenance completes successfully.
+ */
+async function main() {
     try {
         const report = await maintainDocs();
         displayMaintenanceReport(report);
+        return true;
     } catch (error) {
         console.error("❌ Maintenance failed:", error);
-        process.exit(1);
+        return false;
     }
 }
 
-export { maintainDocs, displayMaintenanceReport };
+// Run maintenance if called directly
+if (isExecutedDirectly(import.meta.url)) {
+    process.exitCode = (await main()) ? 0 : 1;
+}
+
+export { displayMaintenanceReport, isExecutedDirectly, main, maintainDocs };
