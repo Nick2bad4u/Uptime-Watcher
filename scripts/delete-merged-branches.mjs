@@ -17,8 +17,69 @@ const protectedBranches = new Set([
     "master",
 ]);
 
-const arguments_ = new Set(process.argv.slice(2));
-const isDryRun = arguments_.has("--dry-run");
+/**
+ * Print usage information and exit immediately.
+ *
+ * @returns {void}
+ */
+function showHelp() {
+    console.log(`
+Usage: node scripts/delete-merged-branches.mjs [options]
+
+Options:
+  --dry-run    List eligible merged local branches without deleting them
+  --help, -h   Show this help message
+`);
+}
+
+/**
+ * Parse command line arguments.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ *
+ * @returns {{ dryRun: boolean; help: boolean }} Parsed options.
+ */
+function parseArgs(args) {
+    const options = {
+        dryRun: false,
+        help: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--dry-run": {
+                options.dryRun = true;
+                break;
+            }
+            case "--help":
+            case "-h": {
+                options.help = true;
+                break;
+            }
+            default: {
+                throw new Error(`Unknown argument: ${arg}`);
+            }
+        }
+    }
+
+    return options;
+}
+
+let options;
+try {
+    options = parseArgs(process.argv.slice(2));
+} catch (error) {
+    console.error(
+        "❌ Error:",
+        error instanceof Error ? error.message : String(error)
+    );
+    process.exit(1);
+}
+
+if (options.help) {
+    showHelp();
+    process.exit(0);
+}
 
 const runGit = (args, options = {}) => {
     const result = spawnSync("git", args, {
@@ -53,7 +114,7 @@ if (mergedBranches.length === 0) {
     process.exit(0);
 }
 
-if (isDryRun) {
+if (options.dryRun) {
     console.log("Merged local branches eligible for deletion:");
     for (const branch of mergedBranches) {
         console.log(`- ${branch}`);
