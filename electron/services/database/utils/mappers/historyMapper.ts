@@ -19,10 +19,10 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
-import { isValidNumeric } from "@shared/validation/validatorUtils";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
+import { safeNumberConvert } from "../converters/valueConverters";
 
 /**
  * Represents a single row in the monitor history database table.
@@ -66,16 +66,7 @@ export interface HistoryRow {
  */
 function parseFiniteNumber(value: unknown): number | undefined {
     if (typeof value === "number" && isFiniteNumber(value)) return value;
-    if (typeof value === "string") {
-        const trimmed = value.trim();
-        if (!isValidNumeric(trimmed)) {
-            return undefined;
-        }
-
-        const parsed = Number(trimmed);
-        if (isFiniteNumber(parsed)) return parsed;
-    }
-    return undefined;
+    return safeNumberConvert(value);
 }
 
 function safeNumber(value: unknown, fallback = 0): number {

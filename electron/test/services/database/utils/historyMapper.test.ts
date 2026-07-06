@@ -603,7 +603,7 @@ describe("historyMapper utilities", () => {
             expect(result.responseTime).toBe(0);
         });
 
-        it("should default non-decimal string responseTime to 0", async ({
+        it("should default non-decimal string responseTime values to 0", async ({
             task,
             annotate,
         }) => {
@@ -612,16 +612,22 @@ describe("historyMapper utilities", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const row: DatabaseHistoryRow = {
-                monitorId: "monitor-123",
-                status: "up",
-                timestamp: TEST_TIMESTAMP,
-                responseTime: "0x10" as any,
-            };
+            for (const responseTime of [
+                "1e3",
+                "0x10",
+                "0b10",
+            ]) {
+                const row: DatabaseHistoryRow = {
+                    monitorId: "monitor-123",
+                    status: "up",
+                    timestamp: TEST_TIMESTAMP,
+                    responseTime: responseTime as any,
+                };
 
-            const result = rowToHistoryEntry(row);
+                const result = rowToHistoryEntry(row);
 
-            expect(result.responseTime).toBe(0);
+                expect(result.responseTime).toBe(0);
+            }
         });
 
         it("should handle string timestamp", async ({ task, annotate }) => {
@@ -642,7 +648,7 @@ describe("historyMapper utilities", () => {
             expect(result.timestamp).toBe(TEST_TIMESTAMP);
         });
 
-        it("should default non-decimal string timestamp to current time", async ({
+        it("should default non-decimal string timestamp values to current time", async ({
             task,
             annotate,
         }) => {
@@ -651,19 +657,25 @@ describe("historyMapper utilities", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const beforeTime = Date.now();
-            const row: DatabaseHistoryRow = {
-                monitorId: "monitor-123",
-                status: "up",
-                timestamp: "0x10" as any,
-                responseTime: 150,
-            };
+            for (const timestamp of [
+                "1e3",
+                "0x10",
+                "0b10",
+            ]) {
+                const beforeTime = Date.now();
+                const row: DatabaseHistoryRow = {
+                    monitorId: "monitor-123",
+                    status: "up",
+                    timestamp: timestamp as any,
+                    responseTime: 150,
+                };
 
-            const result = rowToHistoryEntry(row);
-            const afterTime = Date.now();
+                const result = rowToHistoryEntry(row);
+                const afterTime = Date.now();
 
-            expect(result.timestamp).toBeGreaterThanOrEqual(beforeTime);
-            expect(result.timestamp).toBeLessThanOrEqual(afterTime);
+                expect(result.timestamp).toBeGreaterThanOrEqual(beforeTime);
+                expect(result.timestamp).toBeLessThanOrEqual(afterTime);
+            }
         });
 
         it("should default blank string timestamp to current time", async ({
