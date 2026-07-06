@@ -36,10 +36,14 @@
  * @public
  */
 
-import type { UpdateStatusEventData } from "@shared/types/events";
 import type { Merge, Promisable } from "type-fest";
 
+import {
+    UPDATE_STATUS_VALUES,
+    type UpdateStatusEventData,
+} from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
@@ -99,6 +103,11 @@ const UPDATES_PERSIST_CONFIG = createPersistConfig<
 >("updates", (state) => ({
     updateStatus: state.updateStatus,
 }));
+
+const UPDATE_STATUS_VALUE_SET = new Set<string>(UPDATE_STATUS_VALUES);
+
+const isUpdateStatus = (value: unknown): value is UpdateStatus =>
+    typeof value === "string" && UPDATE_STATUS_VALUE_SET.has(value);
 
 const normalizeUpdateError = (error: string | undefined): string | undefined =>
     error === undefined ? undefined : getUserFacingErrorDetail(error);
@@ -211,6 +220,18 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
         },
         {
             ...UPDATES_PERSIST_CONFIG,
+            merge: (persistedState, currentState) => {
+                if (!isRecord(persistedState)) {
+                    return currentState;
+                }
+
+                const updateStatus = persistedState["updateStatus"];
+
+                return {
+                    ...currentState,
+                    ...(isUpdateStatus(updateStatus) && { updateStatus }),
+                };
+            },
             // Re-state required fields explicitly for exactOptionalPropertyTypes.
             name: UPDATES_PERSIST_CONFIG.name,
         }
