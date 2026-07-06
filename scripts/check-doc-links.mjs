@@ -11,6 +11,8 @@
 
 import { readdir, readFile, stat } from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
 const DOCS_DIRECTORIES = [
@@ -199,7 +201,7 @@ async function checkFile(markdownPath, issues) {
 /**
  * Scan documentation markdown files for broken local links.
  *
- * @returns {Promise<void>} Resolves after reporting any link issues.
+ * @returns {Promise<boolean>} True when no broken links are found.
  */
 async function main() {
     /**
@@ -223,18 +225,35 @@ async function main() {
         console.error(
             `\nTotal broken links: ${issues.length}. Please fix the links above.`
         );
-        process.exit(1);
+        return false;
     }
 
     console.log("Documentation link check passed – no broken links found.");
+    return true;
 }
 
-try {
-    await main();
-} catch (error) {
-    console.error(
-        "Documentation link check failed due to an unexpected error."
+/**
+ * Check whether this module is being run as the CLI entrypoint.
+ *
+ * @returns {boolean} True when invoked directly.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
     );
-    console.error(error);
-    process.exit(1);
 }
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error(
+            "Documentation link check failed due to an unexpected error."
+        );
+        console.error(error);
+        process.exitCode = 1;
+    }
+}
+
+export { isDirectRun, main };
