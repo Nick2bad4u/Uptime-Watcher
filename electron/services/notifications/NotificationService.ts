@@ -2,6 +2,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { AppNotificationRequest } from "@shared/types/notifications";
 
 import { generateCorrelationId } from "@shared/utils/correlation";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { Notification } from "electron";
@@ -103,6 +104,9 @@ function getMonitorUrlLabel(monitor: Monitor): string | undefined {
         ? getSafeUrlForDisplay(url)
         : undefined;
 }
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Central notification orchestrator that enforces throttling and ordering rules
@@ -207,18 +211,27 @@ export class NotificationService {
         status: "down" | "up";
     }): boolean {
         const stateKey = this.getStateKey(args.siteIdentifier, args.monitorId);
+        const safeStateKey = this.getSafeStateKey(
+            args.siteIdentifier,
+            args.monitorId
+        );
 
         if (this.isSiteMuted(args.siteIdentifier)) {
             logger.debug(
                 LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
                 args.status,
-                stateKey,
+                safeStateKey,
                 "site muted"
             );
             return false;
         }
 
-        return this.shouldDispatchForStatus(stateKey, args.status, args.now);
+        return this.shouldDispatchForStatus(
+            stateKey,
+            safeStateKey,
+            args.status,
+            args.now
+        );
     }
 
     public notifyMonitorDown(site: Site, monitorId: string): void {
@@ -362,7 +375,7 @@ export class NotificationService {
                 status === "down"
                     ? LOG_TEMPLATES.errors.NOTIFY_DOWN_MONITOR_NOT_FOUND
                     : LOG_TEMPLATES.errors.NOTIFY_UP_MONITOR_NOT_FOUND,
-                monitorId
+                getSafeIdentifier(monitorId)
             );
         }
 
@@ -373,8 +386,13 @@ export class NotificationService {
         return `${siteIdentifier}|${monitorId}`;
     }
 
+    private getSafeStateKey(siteIdentifier: string, monitorId: string): string {
+        return `${getSafeIdentifier(siteIdentifier)}|${getSafeIdentifier(monitorId)}`;
+    }
+
     private shouldDispatchForStatus(
         stateKey: string,
+        safeStateKey: string,
         nextStatus: MonitorStatusKind,
         now: number
     ): boolean {
@@ -390,7 +408,7 @@ export class NotificationService {
                 logger.debug(
                     LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
                     "down",
-                    stateKey,
+                    safeStateKey,
                     `cooldown (${remaining}ms remaining)`
                 );
                 return false;
@@ -409,7 +427,7 @@ export class NotificationService {
             logger.debug(
                 LOG_TEMPLATES.warnings.NOTIFY_SUPPRESSED,
                 "up",
-                stateKey,
+                safeStateKey,
                 "no prior outage notification"
             );
             return false;
@@ -470,11 +488,11 @@ export class NotificationService {
         notification.show();
 
         logger.info(
-            `[NotificationService] Dispatched ${context.status} notification for ${context.site.identifier}|${context.monitor.id}`,
+            `[NotificationService] Dispatched ${context.status} notification for ${this.getSafeStateKey(context.site.identifier, context.monitor.id)}`,
             {
-                monitorId: context.monitor.id,
+                monitorId: getSafeIdentifier(context.monitor.id),
                 responseTime: context.responseTime,
-                siteIdentifier: context.site.identifier,
+                siteIdentifier: getSafeIdentifier(context.site.identifier),
                 status: context.status,
             }
         );

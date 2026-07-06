@@ -115,7 +115,8 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitorId = "monitor-123";
+            const monitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const details = "Test details";
 
             await historyRepository.addEntry(
@@ -140,7 +141,8 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitorId = "monitor-123";
+            const monitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
 
             await historyRepository.addEntry(monitorId, mockStatusHistory);
 
@@ -159,7 +161,8 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitorId = "monitor-123";
+            const monitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const details = "Test details";
 
             historyRepository.addEntryInternal(
@@ -184,7 +187,8 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitorId = "monitor-123";
+            const monitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const historyEntries = [
                 { ...mockStatusHistory, details: "Entry 1" },
                 { ...mockStatusHistory, details: "Entry 2" },
@@ -209,8 +213,13 @@ describe(HistoryRepository, () => {
             expect(mockStatement.run).toHaveBeenCalledTimes(2);
             expect(mockStatement.finalize).toHaveBeenCalledTimes(1);
             expect(logger.logger.info).toHaveBeenCalledWith(
-                `[HistoryRepository] Bulk inserted 2 history entries for monitor: ${monitorId}`
+                "[HistoryRepository] Bulk inserted 2 history entries for monitor: https://monitor.example/check"
             );
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.logger.info).mock.calls
+            );
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
         });
         it("should handle empty array", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -637,7 +646,8 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitorId = "monitor-123";
+            const monitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const limit = 100;
 
             await historyRepository.pruneHistory(monitorId, limit);
@@ -655,7 +665,8 @@ describe(HistoryRepository, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const monitorId = "monitor-123";
+            const monitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
             const limit = 100;
 
             historyRepository.pruneHistoryInternal(
@@ -668,8 +679,13 @@ describe(HistoryRepository, () => {
                 historyManipulation.pruneHistoryForMonitor
             ).toHaveBeenCalledWith(mockDatabase, monitorId, limit);
             expect(logger.logger.debug).toHaveBeenCalledWith(
-                "[HistoryRepository] Pruned history for monitor monitor-123 (limit: 100) (internal)"
+                "[HistoryRepository] Pruned history for monitor https://monitor.example/check (limit: 100) (internal)"
             );
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.logger.debug).mock.calls
+            );
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
         });
         it("should not prune with zero limit", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

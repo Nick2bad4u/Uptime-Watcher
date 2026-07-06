@@ -58,6 +58,7 @@ import {
     isValidMonitorId,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { arrayJoin, isEmpty, objectHasIn } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
@@ -85,6 +86,9 @@ import {
     generateSqlParameters,
     mapMonitorToRow,
 } from "./utils/schema/dynamicSchema";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Repository dependencies for managing monitor data persistence.
@@ -243,13 +247,16 @@ export class MonitorRepository {
                 });
 
                 logger.info(
-                    `[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${siteIdentifier}`
+                    `[MonitorRepository] Bulk created ${monitors.length} monitors for site: ${getSafeIdentifier(siteIdentifier)}`
                 );
                 return createdMonitors;
             },
             "monitor-bulk-create",
             undefined,
-            { count: monitors.length, siteIdentifier }
+            {
+                count: monitors.length,
+                siteIdentifier: getSafeIdentifier(siteIdentifier),
+            }
         );
     }
 
@@ -316,7 +323,10 @@ export class MonitorRepository {
                 ),
             "monitor-create",
             undefined,
-            { siteIdentifier, type: monitor.type }
+            {
+                siteIdentifier: getSafeIdentifier(siteIdentifier),
+                type: monitor.type,
+            }
         );
     }
 
@@ -350,13 +360,15 @@ export class MonitorRepository {
 
                     if (isResult) {
                         if (isDev()) {
+                            const safeMonitorId = getSafeIdentifier(monitorId);
                             logger.debug(
-                                `[MonitorRepository] Deleted monitor with id: ${monitorId}`
+                                `[MonitorRepository] Deleted monitor with id: ${safeMonitorId}`
                             );
                         }
                     } else {
+                        const safeMonitorId = getSafeIdentifier(monitorId);
                         logger.warn(
-                            `[MonitorRepository] Monitor not found for deletion: ${monitorId}`
+                            `[MonitorRepository] Monitor not found for deletion: ${safeMonitorId}`
                         );
                     }
 
@@ -364,7 +376,7 @@ export class MonitorRepository {
                 }),
             "monitor-delete",
             undefined,
-            { monitorId }
+            { monitorId: getSafeIdentifier(monitorId) }
         );
     }
 
@@ -427,7 +439,10 @@ export class MonitorRepository {
                     if (isDev()) {
                         logger.debug(
                             "[MonitorRepository] Deleted all monitors for site",
-                            { siteIdentifier }
+                            {
+                                siteIdentifier:
+                                    getSafeIdentifier(siteIdentifier),
+                            }
                         );
                     }
 
@@ -435,7 +450,7 @@ export class MonitorRepository {
                 }),
             "monitor-delete-by-site",
             undefined,
-            { siteIdentifier }
+            { siteIdentifier: getSafeIdentifier(siteIdentifier) }
         );
     }
 
@@ -740,8 +755,9 @@ export class MonitorRepository {
         );
 
         if (typeof monitor.id !== "string") {
+            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
             throw new TypeError(
-                `Monitor ID is required for stable persistence (site ${siteIdentifier})`
+                `Monitor ID is required for stable persistence (site ${safeSiteIdentifier})`
             );
         }
 
@@ -767,14 +783,17 @@ export class MonitorRepository {
             typeof insertResult.id !== "string" ||
             insertResult.id.length === 0
         ) {
+            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
             throw new Error(
-                `Failed to create monitor for site ${siteIdentifier}: invalid or missing ID in database response`
+                `Failed to create monitor for site ${safeSiteIdentifier}: invalid or missing ID in database response`
             );
         }
 
         if (isDev()) {
+            const safeMonitorId = getSafeIdentifier(insertResult.id);
+            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
             logger.debug(
-                `[MonitorRepository] Created monitor with id: ${insertResult.id} for site: ${siteIdentifier} (internal)`
+                `[MonitorRepository] Created monitor with id: ${safeMonitorId} for site: ${safeSiteIdentifier} (internal)`
             );
         }
 
@@ -880,8 +899,9 @@ export class MonitorRepository {
         }
 
         if (isDev()) {
+            const safeMonitorId = getSafeIdentifier(monitorId);
             logger.debug(
-                `[MonitorRepository] updateInternal called with monitorId: ${monitorId}, monitor:`,
+                `[MonitorRepository] updateInternal called with monitorId: ${safeMonitorId}, monitor:`,
                 monitor
             );
         }
@@ -899,8 +919,9 @@ export class MonitorRepository {
 
         if (isEmpty(updateFields)) {
             if (isDev()) {
+                const safeMonitorId = getSafeIdentifier(monitorId);
                 logger.debug(
-                    `[MonitorRepository] No fields to update for monitor: ${monitorId} (internal)`
+                    `[MonitorRepository] No fields to update for monitor: ${safeMonitorId} (internal)`
                 );
             }
             return;

@@ -126,15 +126,24 @@ describe("MonitorRepository simple orchestration", () => {
             )
             .mockReturnValue(undefined);
 
-        await repository.deleteBySiteIdentifier("site-007");
+        const rawSiteIdentifier =
+            "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+
+        await repository.deleteBySiteIdentifier(rawSiteIdentifier);
 
         expect(withDatabaseOperationMock).toHaveBeenCalled();
         const deleteCall = withDatabaseOperationMock.mock.calls[0];
         expect(deleteCall).toBeDefined();
-        const [, operationName] = deleteCall!;
+        const [, operationName, , context] = deleteCall!;
         expect(operationName).toBe("monitor-delete-by-site");
+        expect(context).toEqual({
+            siteIdentifier: "https://example.com/path",
+        });
         expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
-        expect(deleteInternalSpy).toHaveBeenCalledWith(mockDb, "site-007");
+        expect(deleteInternalSpy).toHaveBeenCalledWith(
+            mockDb,
+            rawSiteIdentifier
+        );
     });
 
     it("propagates transactional failures when deleting by site", async () => {

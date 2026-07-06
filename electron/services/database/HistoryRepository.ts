@@ -40,6 +40,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { isEmpty } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
@@ -60,6 +61,9 @@ import {
     getLatestHistoryEntry,
 } from "./utils/queries/historyQuery";
 import { queryForIds } from "./utils/queries/typedQueries";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Dependencies required to construct a {@link HistoryRepository}.
@@ -251,7 +255,7 @@ export class HistoryRepository {
                         }
 
                         logger.info(
-                            `[HistoryRepository] Bulk inserted ${historyEntries.length} history entries for monitor: ${monitorId}`
+                            `[HistoryRepository] Bulk inserted ${historyEntries.length} history entries for monitor: ${getSafeIdentifier(monitorId)}`
                         );
                     } finally {
                         stmt.finalize();
@@ -261,7 +265,10 @@ export class HistoryRepository {
                 }),
             "history-bulk-insert",
             undefined,
-            { count: historyEntries.length, monitorId }
+            {
+                count: historyEntries.length,
+                monitorId: getSafeIdentifier(monitorId),
+            }
         );
     }
 
@@ -642,7 +649,7 @@ export class HistoryRepository {
 
         if (isDev()) {
             logger.debug(
-                `[HistoryRepository] Pruned history for monitor ${monitorId} (limit: ${normalizedLimit}) (internal)`
+                `[HistoryRepository] Pruned history for monitor ${getSafeIdentifier(monitorId)} (limit: ${normalizedLimit}) (internal)`
             );
         }
     }

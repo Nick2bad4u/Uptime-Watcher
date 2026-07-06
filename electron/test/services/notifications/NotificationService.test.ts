@@ -73,6 +73,29 @@ const sampleSite: Site = {
     ],
 };
 
+const rawMonitorId =
+    "https://monitor.example/check?token=monitor-token#private-monitor";
+const rawSiteIdentifier =
+    "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+
+const createSensitiveSite = (): Site => ({
+    ...sampleSite,
+    identifier: rawSiteIdentifier,
+    monitors: (() => {
+        const [monitor] = sampleSite.monitors;
+        if (!monitor) {
+            throw new Error("Expected sample site to include a monitor");
+        }
+
+        return [
+            {
+                ...monitor,
+                id: rawMonitorId,
+            },
+        ];
+    })(),
+});
+
 function isMockNotificationOptions(
     value: unknown
 ): value is MockNotificationOptions {
@@ -207,6 +230,28 @@ describe(NotificationService, () => {
 
             expect(notificationCtor).not.toHaveBeenCalled();
         });
+
+        it("redacts URL-shaped identifiers in muted-site suppression logs", () => {
+            const site = createSensitiveSite();
+            service.updateConfig({
+                mutedSiteNotificationIdentifiers: [rawSiteIdentifier],
+            });
+
+            service.notifyMonitorDown(site, rawMonitorId);
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.debug).mock.calls
+            );
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        });
     });
 
     describe("down notifications", () => {
@@ -249,6 +294,31 @@ describe(NotificationService, () => {
             notificationCtor.mockClear();
             service.notifyMonitorDown(sampleSite, "monitor-1");
             expect(notificationCtor).not.toHaveBeenCalled();
+        });
+
+        it("redacts URL-shaped identifiers in cooldown suppression logs", () => {
+            vi.useFakeTimers();
+            const site = createSensitiveSite();
+
+            service.notifyMonitorDown(site, rawMonitorId);
+            expect(notificationCtor).toHaveBeenCalledTimes(1);
+
+            vi.mocked(logger.debug).mockClear();
+            notificationCtor.mockClear();
+            service.notifyMonitorDown(site, rawMonitorId);
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.debug).mock.calls
+            );
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
         });
 
         it("sanitizes user-configured monitor notification text", () => {
@@ -362,6 +432,28 @@ describe(NotificationService, () => {
 
             expect(notificationCtor).not.toHaveBeenCalled();
         });
+
+        it("redacts URL-shaped identifiers in no-prior-outage suppression logs", () => {
+            service.updateConfig({ restoreRequiresOutage: true });
+            notificationCtor.mockClear();
+            vi.mocked(logger.debug).mockClear();
+
+            const freshService = new NotificationService();
+            freshService.notifyMonitorUp(createSensitiveSite(), rawMonitorId);
+
+            expect(notificationCtor).not.toHaveBeenCalled();
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.debug).mock.calls
+            );
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        });
     });
 
     it("handles unsupported notification platforms", () => {
@@ -372,12 +464,16 @@ describe(NotificationService, () => {
         expect(notificationCtor).not.toHaveBeenCalled();
     });
 
-    it("logs error when monitor missing", () => {
+    it("redacts URL-shaped monitor identifiers when monitor missing", () => {
         const errorSpy = vi.spyOn(logger, "error");
 
-        service.notifyMonitorDown(sampleSite, "missing");
+        service.notifyMonitorDown(sampleSite, rawMonitorId);
 
         expect(errorSpy).toHaveBeenCalled();
+        const logPayload = JSON.stringify(errorSpy.mock.calls);
+        expect(logPayload).toContain("https://monitor.example/check");
+        expect(logPayload).not.toContain("monitor-token");
+        expect(logPayload).not.toContain("private-monitor");
         expect(notificationCtor).not.toHaveBeenCalled();
     });
 
@@ -402,6 +498,36 @@ describe(NotificationService, () => {
     });
 
     describe("notification:sent diagnostics event", () => {
+        it("redacts URL-shaped identifiers in dispatch logs while preserving emitted diagnostics", async () => {
+            const emitTyped = vi.fn().mockResolvedValue(undefined);
+            const serviceWithEvents = new NotificationService({ emitTyped });
+            const site = createSensitiveSite();
+
+            serviceWithEvents.notifyMonitorDown(site, rawMonitorId);
+
+            await Promise.resolve();
+
+            expect(emitTyped).toHaveBeenCalledWith(
+                "notification:sent",
+                expect.objectContaining({
+                    monitorId: rawMonitorId,
+                    siteIdentifier: rawSiteIdentifier,
+                    status: "down",
+                })
+            );
+
+            const logPayload = JSON.stringify(
+                vi.mocked(logger.info).mock.calls
+            );
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        });
+
         it("emits a notification:sent event when a notification is dispatched", async () => {
             const emitTyped = vi.fn().mockResolvedValue(undefined);
             const serviceWithEvents = new NotificationService({ emitTyped });
