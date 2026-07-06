@@ -1,7 +1,8 @@
 import type { Monitor } from "@shared/types";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { isValidInteger } from "@shared/validation/validatorUtils";
+import { isDefined } from "ts-extras";
 
 import {
     DEFAULT_CHECK_INTERVAL,
@@ -88,21 +89,17 @@ export function createMonitorConfig(
 
 function resolveFiniteInteger(source: unknown): number | undefined {
     if (typeof source === "number") {
-        return isFiniteNumber(source) && Number.isInteger(source)
-            ? source
-            : undefined;
+        return Number.isSafeInteger(source) ? source : undefined;
     }
 
     if (typeof source === "string") {
         const trimmed = source.trim();
-        if (trimmed.length === 0) {
+        if (!isValidInteger(trimmed)) {
             return undefined;
         }
 
-        const parsed = Number(trimmed);
-        return isFiniteNumber(parsed) && Number.isInteger(parsed)
-            ? parsed
-            : undefined;
+        const parsed = Number.parseInt(trimmed, 10);
+        return Number.isSafeInteger(parsed) ? parsed : undefined;
     }
 
     return undefined;

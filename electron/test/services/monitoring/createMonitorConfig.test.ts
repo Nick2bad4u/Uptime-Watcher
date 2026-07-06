@@ -23,6 +23,48 @@ describe(createMonitorConfig, () => {
         });
     });
 
+    it("rejects non-decimal integer strings instead of coercing them", () => {
+        expect(
+            createMonitorConfig(
+                {
+                    checkInterval: "1e3" as never,
+                    retryAttempts: "0x2" as never,
+                    timeout: "5_000" as never,
+                },
+                {
+                    checkInterval: 70_000,
+                    retryAttempts: 4,
+                    timeout: 6000,
+                }
+            )
+        ).toEqual({
+            checkInterval: 70_000,
+            retryAttempts: 4,
+            timeout: 6000,
+        });
+    });
+
+    it("rejects unsafe integer monitor values", () => {
+        expect(
+            createMonitorConfig(
+                {
+                    checkInterval: Number.MAX_SAFE_INTEGER + 1,
+                    retryAttempts: Number.MAX_SAFE_INTEGER + 1,
+                    timeout: Number.MAX_SAFE_INTEGER + 1,
+                },
+                {
+                    checkInterval: 70_000,
+                    retryAttempts: 4,
+                    timeout: 6000,
+                }
+            )
+        ).toEqual({
+            checkInterval: 70_000,
+            retryAttempts: 4,
+            timeout: 6000,
+        });
+    });
+
     it("rejects fractional monitor overrides instead of truncating them", () => {
         expect(
             createMonitorConfig(
