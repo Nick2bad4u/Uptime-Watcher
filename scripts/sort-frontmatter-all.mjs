@@ -2,10 +2,142 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 const __dirname = import.meta.dirname;
 const repoRoot = path.resolve(__dirname, "..");
 const sorterPath = path.resolve(repoRoot, "scripts", "sort-frontmatter.mjs");
+const SKIPPED_DIRECTORIES = new Set([
+    ".cache",
+    ".git",
+    ".vs",
+    ".vscode",
+    "build",
+    "coverage",
+    "dist",
+    "dist-bench",
+    "dist-configs",
+    "dist-playwright",
+    "html",
+    "node_modules",
+    "playwright-report",
+    "release",
+    "reports",
+    "storybook-static",
+    "temp",
+    "test-results",
+]);
+
+/**
+ * Show command usage.
+ */
+function showHelp() {
+    console.log(`
+Sort Markdown frontmatter for matched files.
+
+Usage: node scripts/sort-frontmatter-all.mjs <folder-or-glob> [more...]
+
+Examples:
+  node scripts/sort-frontmatter-all.mjs docs
+  node scripts/sort-frontmatter-all.mjs .github/prompts
+  node scripts/sort-frontmatter-all.mjs ".github/*.instructions.md"
+`);
+}
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{ help: boolean; targets: string[] }} Parsed arguments.
+ */
+function parseArgs(args) {
+    const parsed = {
+        help: false,
+        targets: /** @type {string[]} */ ([]),
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+
+            default: {
+                if (arg.startsWith("-")) {
+                    throw new Error(`Unknown option: ${arg}`);
+                }
+
+                parsed.targets.push(arg);
+            }
+        }
+    }
+
+    return parsed;
+}
+
+/**
+ * Check whether a path resolves inside the repository.
+ *
+ * @param {string} resolvedPath
+ *
+ * @returns {boolean}
+ */
+function isRepoPath(resolvedPath) {
+    const relativePath = path.relative(repoRoot, resolvedPath);
+    return (
+        relativePath === "" ||
+        (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))
+    );
+}
+
+/**
+ * Check whether a path is under a generated/cache directory.
+ *
+ * @param {string} resolvedPath
+ *
+ * @returns {boolean}
+ */
+function isSkippedPath(resolvedPath) {
+    const relativePath = path.relative(repoRoot, resolvedPath);
+    return relativePath
+        .split(path.sep)
+        .some((segment) => SKIPPED_DIRECTORIES.has(segment));
+}
+
+/**
+ * Resolve a user-provided target path or glob inside the repository.
+ *
+ * @param {string} rawArg
+ *
+ * @returns {string}
+ */
+function resolveRepoTarget(rawArg) {
+    const resolved = path.resolve(repoRoot, rawArg);
+    if (!isRepoPath(resolved)) {
+        throw new Error(`Target must stay inside the repository: ${rawArg}`);
+    }
+
+    return resolved;
+}
+
+/**
+ * Check whether a file can be processed by the frontmatter sorter.
+ *
+ * @param {string} file
+ *
+ * @returns {boolean}
+ */
+function isSortableMarkdownFile(file) {
+    const resolved = path.resolve(file);
+    return (
+        isRepoPath(resolved) &&
+        !isSkippedPath(resolved) &&
+        path.extname(resolved).toLowerCase() === ".md"
+    );
+}
 
 /**
  * Collect markdown files from a directory (recursive).
@@ -16,7 +148,7 @@ const sorterPath = path.resolve(repoRoot, "scripts", "sort-frontmatter.mjs");
  */
 function collectMarkdownFilesFromDir(dir) {
     const pattern = path.join(dir, "**", "*.md").replaceAll("\\", "/");
-    return fs.globSync(pattern);
+    return fs.globSync(pattern).filter(isSortableMarkdownFile);
 }
 
 /**
@@ -31,20 +163,22 @@ function collectMarkdownFilesFromDir(dir) {
  */
 function resolveArgToFiles(rawArg) {
     // Resolve relative to repo root so usage is consistent
-    const resolved = path.resolve(repoRoot, rawArg);
+    const resolved = resolveRepoTarget(rawArg);
 
     if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
         return collectMarkdownFilesFromDir(resolved);
     }
 
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+        return isSortableMarkdownFile(resolved) ? [resolved] : [];
+    }
+
     // Treat as glob; use the raw argument so user glob syntax is preserved
     // but anchor it at repoRoot.
-    const pattern = path.resolve(repoRoot, rawArg).replaceAll("\\", "/");
+    const pattern = resolved.replaceAll("\\", "/");
     const matches = fs.globSync(pattern);
 
-    return matches.filter((/** @type {string} */ file) =>
-        file.toLowerCase().endsWith(".md")
-    );
+    return matches.filter(isSortableMarkdownFile);
 }
 
 /**
@@ -67,41 +201,62 @@ function dedupeFiles(files) {
     return result;
 }
 
-// --- CLI entrypoint ---
+/**
+ * Main CLI entrypoint.
+ */
+function main() {
+    try {
+        const cliArgs = parseArgs(process.argv.slice(2));
 
-// Arguments after `--` in npm scripts end up here
-const cliArgs = process.argv.slice(2);
+        if (cliArgs.help) {
+            showHelp();
+            return;
+        }
 
-if (cliArgs.length === 0) {
-    console.error(
-        "Usage: node scripts/sort-frontmatter-runner.mjs <folder-or-glob> [more...]"
-    );
-    console.error("Examples:");
-    console.error("  node scripts/sort-frontmatter-runner.mjs .");
-    console.error("  node scripts/sort-frontmatter-runner.mjs .github/prompts");
-    console.error(
-        "  node scripts/sort-frontmatter-runner. mjs .github/*. instructions.md"
-    );
-    process.exit(1);
+        if (cliArgs.targets.length === 0) {
+            showHelp();
+            process.exit(1);
+        }
+
+        /** @type {string[]} */
+        let allFiles = [];
+
+        for (const arg of cliArgs.targets) {
+            const files = resolveArgToFiles(arg);
+            allFiles.push(...files);
+        }
+
+        allFiles = dedupeFiles(allFiles);
+
+        if (allFiles.length === 0) {
+            console.log("No Markdown files matched the given paths/globs.");
+            return;
+        }
+
+        for (const file of allFiles) {
+            const rel = path.relative(repoRoot, file);
+            console.log(`Sorting frontmatter in ${rel}`);
+            execFileSync(process.execPath, [sorterPath, file], {
+                stdio: "inherit",
+            });
+        }
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exit(1);
+    }
 }
 
-/** @type {string[]} */
-let allFiles = [];
-
-for (const arg of cliArgs) {
-    const files = resolveArgToFiles(arg);
-    allFiles.push(...files);
+if (
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
+    main();
 }
 
-allFiles = dedupeFiles(allFiles);
-
-if (allFiles.length === 0) {
-    console.log("No Markdown files matched the given paths/globs.");
-    process.exit(0);
-}
-
-for (const file of allFiles) {
-    const rel = path.relative(repoRoot, file);
-    console.log(`Sorting frontmatter in ${rel}`);
-    execFileSync(process.execPath, [sorterPath, file], { stdio: "inherit" });
-}
+export {
+    collectMarkdownFilesFromDir,
+    dedupeFiles,
+    isSortableMarkdownFile,
+    parseArgs,
+    resolveArgToFiles,
+};
