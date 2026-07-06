@@ -834,6 +834,44 @@ describe("monitorOperations", () => {
                 }).maxReplicationLagSeconds
             ).toBe(10);
         });
+
+        it("should reject non-decimal type-specific threshold strings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: monitorOperations", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            expect(
+                normalizeMonitor({
+                    maxResponseTime: "1e3" as never,
+                    type: "http-latency",
+                }).maxResponseTime
+            ).toBe(2000);
+
+            expect(
+                normalizeMonitor({
+                    maxPongDelayMs: "0x10" as never,
+                    type: "websocket-keepalive",
+                }).maxPongDelayMs
+            ).toBe(1500);
+
+            expect(
+                normalizeMonitor({
+                    heartbeatMaxDriftSeconds: "1e3" as never,
+                    type: "server-heartbeat",
+                }).heartbeatMaxDriftSeconds
+            ).toBe(60);
+
+            expect(
+                normalizeMonitor({
+                    maxReplicationLagSeconds: "0x10" as never,
+                    type: "replication",
+                }).maxReplicationLagSeconds
+            ).toBe(10);
+        });
     });
 
     describe(findMonitorInSite, () => {

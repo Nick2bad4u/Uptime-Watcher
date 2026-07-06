@@ -64,9 +64,15 @@ function ensureTrimmedStringOrFallback(
     return fallback;
 }
 
+const DECIMAL_NUMBER_PATTERN = /^[+-]?(?:\d+|\d+\.\d*|\.\d+)$/u;
+
 function parseFiniteNumberString(value: string): number | undefined {
     const trimmed = value.trim();
     if (trimmed.length === 0) {
+        return undefined;
+    }
+
+    if (!DECIMAL_NUMBER_PATTERN.test(trimmed)) {
         return undefined;
     }
 
