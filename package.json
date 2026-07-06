@@ -355,7 +355,7 @@
         "lint:todos": "leasot 'src/**/*.{js,jsx,ts,tsx}' --reporter markdown",
         "lint:totals": "npm run lint -- -f summary",
         "lint:ts": "cross-env NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache \"**/*.{ts,tsx}\"",
-        "lint:unused": "npm run knip -- --include unlisted,unresolved,duplicates",
+        "lint:unused": "npm run knip -- --include unlisted,unresolved,duplicates --no-config-hints",
         "lint:unused-exports": "ts-unused-exports src/main.tsx",
         "lint:unused-exports:electron": "ts-unused-exports electron/main.ts",
         "lint:vuln": "npm run lint:vulnerability",
