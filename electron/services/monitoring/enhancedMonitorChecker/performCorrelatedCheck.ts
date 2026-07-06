@@ -1,6 +1,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -78,9 +79,9 @@ export async function performCorrelatedCheck(args: {
 
     logger.info(
         interpolateLogTemplate(LOG_TEMPLATES.debug.MONITOR_CHECK_START, {
-            monitorId: monitor.id,
+            monitorId: getSafeIdentifierForLogging(monitor.id),
             operationId,
-            siteIdentifier: site.identifier,
+            siteIdentifier: getSafeIdentifierForLogging(site.identifier),
         })
     );
 
@@ -93,7 +94,9 @@ export async function performCorrelatedCheck(args: {
             return await handleSuccessfulCheck(site, monitor, checkResult);
         }
     } catch (error) {
-        logger.error("Monitor check failed", error, { monitorId });
+        logger.error("Monitor check failed", error, {
+            monitorId: getSafeIdentifierForLogging(monitorId),
+        });
         cleanupOperation(operationId);
     }
 
