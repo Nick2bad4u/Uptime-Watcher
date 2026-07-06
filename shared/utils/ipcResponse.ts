@@ -21,6 +21,11 @@ import type { IpcResponse } from "@shared/types/ipc";
 import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
 import { isDefined } from "ts-extras";
 
+const getOwnDataProperty = (source: object, key: PropertyKey): unknown => {
+    const descriptor = Object.getOwnPropertyDescriptor(source, key);
+    return descriptor && "value" in descriptor ? descriptor.value : undefined;
+};
+
 /**
  * Runtime type guard for {@link IpcResponse} envelopes.
  *
@@ -37,7 +42,7 @@ export function isIpcResponseEnvelope(value: unknown): value is IpcResponse {
         return false;
     }
 
-    return typeof value["success"] === "boolean";
+    return typeof getOwnDataProperty(value, "success") === "boolean";
 }
 
 /**
@@ -72,15 +77,10 @@ export interface ExtractIpcResponseDataOptions<T = unknown> {
 }
 
 const normalizeFailureMessage = (response: IpcResponse): string => {
-    const candidate = response.error;
+    const candidate = getOwnDataProperty(response, "error");
     return typeof candidate === "string" && candidate.trim().length > 0
         ? candidate.trim()
         : "IPC operation failed";
-};
-
-const getOwnDataProperty = (source: object, key: PropertyKey): unknown => {
-    const descriptor = Object.getOwnPropertyDescriptor(source, key);
-    return descriptor && "value" in descriptor ? descriptor.value : undefined;
 };
 
 const readParseOption = <T>(
@@ -120,16 +120,16 @@ export function extractIpcResponseData<T>(
         throw new Error("Invalid IPC response format");
     }
 
-    if (!response.success) {
+    if (getOwnDataProperty(response, "success") !== true) {
         throw new Error(normalizeFailureMessage(response));
     }
 
     const requireData = readRequireDataOption(options, true);
-    if (requireData && !isDefined(response.data)) {
+    const rawData = getOwnDataProperty(response, "data");
+    if (requireData && !isDefined(rawData)) {
         throw new Error("IPC response missing data field");
     }
 
-    const rawData = response.data;
     const parse = readParseOption(options);
     return parse ? parse(rawData) : castUnchecked<T>(rawData);
 }
@@ -142,7 +142,7 @@ export function validateVoidIpcResponse(response: unknown): void {
         throw new Error("Invalid IPC response format");
     }
 
-    if (!response.success) {
+    if (getOwnDataProperty(response, "success") !== true) {
         throw new Error(normalizeFailureMessage(response));
     }
 }

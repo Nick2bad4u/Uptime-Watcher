@@ -22,6 +22,21 @@ const addThrowingOptionGetter = <T>(
     });
 };
 
+const addThrowingGetter = (
+    source: object,
+    key: PropertyKey,
+    onAccess: () => void
+): void => {
+    Object.defineProperty(source, key, {
+        configurable: true,
+        enumerable: true,
+        get() {
+            onAccess();
+            throw new Error(`${String(key)} getter should not run`);
+        },
+    });
+};
+
 describe("ipcResponse", () => {
     it("extracts data without invoking accessor-backed parser options", () => {
         let getterCalls = 0;
@@ -94,5 +109,46 @@ describe("ipcResponse", () => {
                 success: false,
             })
         ).toThrow("IPC operation failed");
+    });
+
+    it("does not invoke accessor-backed success fields", () => {
+        let getterCalls = 0;
+        const response = {};
+        addThrowingGetter(response, "success", () => {
+            getterCalls += 1;
+        });
+
+        expect(() => extractIpcResponseData(response)).toThrow(
+            "Invalid IPC response format"
+        );
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke accessor-backed error fields", () => {
+        let getterCalls = 0;
+        const response = { success: false };
+        addThrowingGetter(response, "error", () => {
+            getterCalls += 1;
+        });
+
+        expect(() => validateVoidIpcResponse(response)).toThrow(
+            "IPC operation failed"
+        );
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke accessor-backed data fields", () => {
+        let getterCalls = 0;
+        const response = { success: true };
+        addThrowingGetter(response, "data", () => {
+            getterCalls += 1;
+        });
+
+        const result = extractIpcResponseData(response, {
+            requireData: false,
+        });
+
+        expect(result).toBeUndefined();
+        expect(getterCalls).toBe(0);
     });
 });
