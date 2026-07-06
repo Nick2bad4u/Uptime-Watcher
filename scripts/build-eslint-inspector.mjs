@@ -12,6 +12,8 @@ import fs from "fs-extra";
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+
 // Configuration - using process.cwd() since we'll run from project root
 const PROJECT_ROOT = process.cwd();
 const DOCUSAURUS_STATIC_DIR = path.join(
@@ -36,13 +38,74 @@ const ESLINT_CONFIG_INSPECTOR_BIN = path.join(
     "bin.mjs"
 );
 
-// Check for local testing flag
-const CREATE_LOCAL_VERSION =
-    process.argv.includes("--local") || process.argv.includes("-l");
+/**
+ * Show command usage.
+ */
+function showHelp() {
+    console.log(`
+Build and deploy the ESLint Config Inspector static output.
 
-console.log("🚀 Building ESLint Config Inspector...");
-if (CREATE_LOCAL_VERSION) {
-    console.log("📍 Local testing version will be created");
+Usage: node scripts/build-eslint-inspector.mjs [--local]
+
+Options:
+  --local, -l   Also create a direct-browser local testing copy.
+  -h, --help    Show this help.
+`);
+}
+
+/**
+ * Error raised for invalid CLI usage.
+ */
+class CliUsageError extends Error {
+    /**
+     * @param {string} message - Usage error message.
+     */
+    constructor(message) {
+        super(message);
+        this.name = "CliUsageError";
+    }
+}
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{ createLocalVersion: boolean; help: boolean }} Parsed options.
+ */
+function parseArgs(args) {
+    const parsed = {
+        createLocalVersion: false,
+        help: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--local":
+            case "-l": {
+                parsed.createLocalVersion = true;
+                break;
+            }
+
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+
+            default: {
+                if (arg.startsWith("-")) {
+                    throw new CliUsageError(`Unknown option: ${arg}`);
+                }
+
+                throw new CliUsageError(
+                    `Unexpected positional argument: ${arg}`
+                );
+            }
+        }
+    }
+
+    return parsed;
 }
 
 /**
@@ -112,7 +175,7 @@ async function buildESLintInspector() {
 /**
  * Copy the built inspector to docusaurus static directory.
  */
-async function copyToDocusaurus() {
+async function copyToDocusaurus(options = { createLocalVersion: false }) {
     try {
         console.log(
             "📁 Copying ESLint Inspector to Docusaurus static directory..."
@@ -142,7 +205,7 @@ async function copyToDocusaurus() {
         }
 
         // Fix asset paths in HTML files as a fallback
-        await fixAssetPaths();
+        await fixAssetPaths(options);
 
         // Clean up the temporary build directory
         await fs.remove(ESLINT_INSPECTOR_OUTPUT_DIR);
@@ -158,7 +221,7 @@ async function copyToDocusaurus() {
 /**
  * Fix absolute asset paths in HTML files to work with subdirectory deployment.
  */
-async function fixAssetPaths() {
+async function fixAssetPaths(options = { createLocalVersion: false }) {
     try {
         console.log("🔧 Fixing asset paths in HTML files...");
 
@@ -222,7 +285,7 @@ async function fixAssetPaths() {
         );
 
         // Create a local testing version with relative paths only if flag is set
-        if (CREATE_LOCAL_VERSION) {
+        if (options.createLocalVersion) {
             await createLocalTestingVersion();
         }
 
@@ -425,12 +488,28 @@ async function createIndexRedirect() {
  *        non-zero code.
  */
 
-// Execute main logic using top-level await
-console.log("🔧 Starting ESLint Config Inspector deployment process...");
+/**
+ * Entrypoint coordinating ESLint Config Inspector deployment.
+ *
+ * @param {{ createLocalVersion: boolean; help: boolean }} [options] - CLI
+ *   options.
+ *
+ * @returns {Promise<number>} Process exit code.
+ */
+async function main(options = parseArgs(process.argv.slice(2))) {
+    if (options.help) {
+        showHelp();
+        return 0;
+    }
 
-try {
+    console.log("🔧 Starting ESLint Config Inspector deployment process...");
+    console.log("🚀 Building ESLint Config Inspector...");
+    if (options.createLocalVersion) {
+        console.log("📍 Local testing version will be created");
+    }
+
     await buildESLintInspector();
-    await copyToDocusaurus();
+    await copyToDocusaurus(options);
     await createIndexRedirect();
 
     console.log(
@@ -440,10 +519,37 @@ try {
     console.log(
         "🌐 Will be accessible at: https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/"
     );
-} catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("💥 Deployment failed:", errorMessage);
-    process.exit(1);
+
+    return 0;
+}
+
+/**
+ * Check whether this module is being run as the CLI entrypoint.
+ *
+ * @returns {boolean} True when invoked directly.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = await main();
+    } catch (error) {
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
+
+        if (error instanceof CliUsageError) {
+            console.error(errorMessage);
+        } else {
+            console.error("💥 Deployment failed:", errorMessage);
+        }
+
+        process.exitCode = 1;
+    }
 }
 
 /**
@@ -478,3 +584,5 @@ export { createIndexRedirect };
  * @returns {Promise<void>} Resolves when asset paths are fixed.
  */
 export { fixAssetPaths };
+
+export { main, parseArgs };
