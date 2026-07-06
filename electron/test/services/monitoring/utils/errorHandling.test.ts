@@ -80,6 +80,40 @@ describe(handleCheckError, () => {
         expect(result.status).toBe(STATUS_KIND.DOWN);
         expect(result.error).toContain("Too many redirects");
     });
+
+    it("preserves own data response times from Axios errors", () => {
+        const url = "https://example.com";
+        const error = new Error("connection refused");
+        (error as unknown as { isAxiosError: boolean }).isAxiosError = true;
+        (error as unknown as { responseTime: number }).responseTime = 42.6;
+        error.name = "AxiosError";
+
+        const result = handleCheckError(error, url, "cid");
+
+        expect(result.status).toBe(STATUS_KIND.DOWN);
+        expect(result.responseTime).toBe(43);
+    });
+
+    it("does not invoke responseTime accessors on Axios-shaped errors", () => {
+        const url = "https://example.com";
+        const error = new Error("connection refused");
+        (error as unknown as { isAxiosError: boolean }).isAxiosError = true;
+        error.name = "AxiosError";
+        let getterCalls = 0;
+        Object.defineProperty(error, "responseTime", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("responseTime getter should not run");
+            },
+        });
+
+        const result = handleCheckError(error, url, "cid");
+
+        expect(result.status).toBe(STATUS_KIND.DOWN);
+        expect(result.responseTime).toBe(0);
+        expect(getterCalls).toBe(0);
+    });
 });
 
 describe("redirect safety errors", () => {

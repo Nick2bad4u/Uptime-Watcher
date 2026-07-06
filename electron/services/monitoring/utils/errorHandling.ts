@@ -17,10 +17,11 @@ import type { UnknownRecord } from "type-fest";
 
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { getUnknownErrorMessage } from "@shared/utils/errorCatalog";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import axios from "axios";
-import { setHas } from "ts-extras";
+import { isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 
@@ -86,6 +87,35 @@ const UNSUPPORTED_REDIRECT_ERROR_MESSAGE = "Redirected to an unsupported URL";
 
 function normalizeErrorCode(error: Error): string | undefined {
     return tryGetErrorCode(error)?.trim().toUpperCase() || undefined;
+}
+
+function getErrorResponseTime(error: unknown): number {
+    if (typeof error !== "object" || error === null) {
+        return 0;
+    }
+
+    const property = getOwnDataProperty(error, "responseTime");
+    const responseTime = property.found ? property.value : undefined;
+
+    return typeof responseTime === "number" && isFiniteNumber(responseTime)
+        ? Math.max(0, Math.round(responseTime))
+        : 0;
+}
+
+function getAxiosResponseStatus(error: AxiosError): number | undefined {
+    const responseProperty = getOwnDataProperty(error, "response");
+    const response = responseProperty.found
+        ? responseProperty.value
+        : undefined;
+
+    if (typeof response !== "object" || response === null) {
+        return undefined;
+    }
+
+    const statusProperty = getOwnDataProperty(response, "status");
+    const status = statusProperty.found ? statusProperty.value : undefined;
+
+    return typeof status === "number" ? status : undefined;
 }
 
 function buildSafeErrorLogData(args: {
@@ -216,7 +246,7 @@ export function handleAxiosError(
     }
 
     if (isDev()) {
-        const httpStatus = error.response?.status;
+        const httpStatus = getAxiosResponseStatus(error);
         const logData = buildSafeErrorLogData({
             ...(correlationId && { correlationId }),
             error,
@@ -285,7 +315,7 @@ export function handleCheckError(
     }
 
     const axiosError = axios.isAxiosError(error) ? error : undefined;
-    const responseTime = axiosError?.responseTime ?? 0;
+    const responseTime = axiosError ? getErrorResponseTime(axiosError) : 0;
 
     if (isCancellationError(error)) {
         if (isDev()) {
