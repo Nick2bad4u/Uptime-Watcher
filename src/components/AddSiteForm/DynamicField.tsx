@@ -54,6 +54,7 @@ import { logger } from "../../services/logger";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { SelectField, type SelectOption } from "./SelectField";
 import { TextField } from "./TextField";
+import { parseOptionalDecimalNumber } from "./utils/valueNormalization";
 
 /**
  * Props for the {@link DynamicField} component.
@@ -136,15 +137,16 @@ export const DynamicField: NamedExoticComponent<DynamicFieldProperties> = memo(
                     return;
                 }
 
-                const numericValue = Number(trimmedValue);
-                if (Number.isFinite(numericValue)) {
-                    handleChange(numericValue);
-                } else {
+                const numericValue = parseOptionalDecimalNumber(trimmedValue);
+                if (numericValue === undefined) {
                     logger.error("Invalid numeric input", {
                         fieldName: field.name,
                         value: val,
                     });
+                    return;
                 }
+
+                handleChange(numericValue);
             },
             [field.name, handleChange]
         );

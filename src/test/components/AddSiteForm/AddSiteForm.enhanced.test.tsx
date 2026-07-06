@@ -953,6 +953,34 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             expect(setCheckIntervalMs).toHaveBeenCalled();
         });
 
+        it("should reject coerced interval values", ({ task, annotate }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: AddSiteForm.enhanced", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            const setCheckIntervalMs = vi.fn();
+            mockUseAddSiteForm.mockReturnValue(
+                createMockFormState({
+                    setCheckIntervalMs,
+                })
+            );
+
+            renderAddSiteForm();
+            const intervalInput = screen.getByRole("combobox", {
+                name: /check interval/i,
+            });
+
+            const coercedOption = document.createElement("option");
+            coercedOption.value = "3e5";
+            coercedOption.textContent = "Coerced 5 minutes";
+            intervalInput.append(coercedOption);
+
+            fireEvent.change(intervalInput, { target: { value: "3e5" } });
+
+            expect(setCheckIntervalMs).not.toHaveBeenCalled();
+        });
+
         it("should handle timeout value changes", async ({
             task,
             annotate,

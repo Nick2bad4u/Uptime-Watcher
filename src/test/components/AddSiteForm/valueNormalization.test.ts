@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    parseOptionalDecimalNumber,
     parseOptionalInteger,
     safeTrim,
     toOptionalString,
@@ -27,6 +28,28 @@ describe("AddSiteForm value normalization", () => {
 
         for (const value of invalidValues) {
             expect(parseOptionalInteger(value)).toBeUndefined();
+        }
+    });
+
+    it("parses plain decimal number strings", () => {
+        expect(parseOptionalDecimalNumber(" 8080 ")).toBe(8080);
+        expect(parseOptionalDecimalNumber("0.5")).toBe(0.5);
+        expect(parseOptionalDecimalNumber(".5")).toBe(0.5);
+        expect(parseOptionalDecimalNumber("-1.25")).toBe(-1.25);
+    });
+
+    it("rejects non-decimal number syntax", () => {
+        const invalidValues = [
+            "0x10",
+            "1e3",
+            "Infinity",
+            "NaN",
+            "1_000",
+            "123abc",
+        ];
+
+        for (const value of invalidValues) {
+            expect(parseOptionalDecimalNumber(value)).toBeUndefined();
         }
     });
 

@@ -276,9 +276,11 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
         const handleCheckIntervalChange = useCallback(
             (value: string) => {
-                const numericValue = Number(value);
-                if (Number.isFinite(numericValue)) {
-                    setCheckIntervalMs(numericValue);
+                const selectedInterval = CHECK_INTERVALS.find(
+                    (interval) => String(interval.value) === value
+                );
+                if (selectedInterval) {
+                    setCheckIntervalMs(selectedInterval.value);
                 } else {
                     logger.error("Invalid check interval value", { value });
                 }

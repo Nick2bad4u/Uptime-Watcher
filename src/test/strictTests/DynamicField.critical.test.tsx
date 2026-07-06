@@ -192,6 +192,53 @@ describe("DynamicField - Comprehensive Coverage", () => {
             );
         });
 
+        it("should reject non-decimal numeric notation", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: DynamicField.comprehensive", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Input Handling", "type");
+
+            const mockField: MonitorFieldDefinition = {
+                name: "port",
+                label: "Port",
+                type: "number",
+                required: true,
+            };
+
+            const mockOnChange = vi.fn();
+            const loggerErrorSpy = vi.fn();
+            mockLogger.error.mockImplementation(loggerErrorSpy);
+
+            renderWithTheme(
+                <DynamicField
+                    field={mockField}
+                    onChange={mockOnChange}
+                    value={0}
+                />
+            );
+
+            const input = screen.getByLabelText("Port (required)");
+            Object.defineProperty(input, "value", {
+                configurable: true,
+                value: "1e3",
+                writable: true,
+            });
+
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+
+            expect(mockOnChange).not.toHaveBeenCalledWith(1000);
+            expect(loggerErrorSpy).toHaveBeenCalledWith(
+                "Invalid numeric input",
+                {
+                    fieldName: "port",
+                    value: "1e3",
+                }
+            );
+        });
+
         it("should handle empty string input for number field", async ({
             task,
             annotate,
