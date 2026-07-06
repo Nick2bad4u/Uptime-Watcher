@@ -12,6 +12,7 @@ import { STATUS_HISTORY_VALUES, type StatusHistoryStatus } from "@shared/types";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+import { isValidInteger } from "@shared/validation/validatorUtils";
 import { arrayIncludes, isDefined, objectHasIn, stringSplit } from "ts-extras";
 
 /**
@@ -231,11 +232,11 @@ export const RowValidationUtils = {
         }
         if (typeof value === "string") {
             const trimmed = value.trim();
-            if (trimmed.length === 0) {
+            if (!isValidInteger(trimmed)) {
                 return false;
             }
 
-            const numValue = Number(trimmed);
+            const numValue = Number.parseInt(trimmed, 10);
             return (
                 Number.isSafeInteger(numValue) &&
                 numValue >= 0 &&
