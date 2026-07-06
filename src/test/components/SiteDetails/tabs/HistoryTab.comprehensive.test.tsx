@@ -548,6 +548,32 @@ describe(HistoryTab, () => {
                 document.querySelectorAll(".themed-status-indicator")
             ).toHaveLength(25);
         });
+
+        it("should ignore coerced display limit dropdown values", () => {
+            const monitor = createMockMonitor(16);
+            render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
+
+            const select = screen.getByRole("combobox");
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(16);
+
+            fireEvent.change(select, { target: { value: "10" } });
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(10);
+
+            const coercedOption = document.createElement("option");
+            coercedOption.value = "0x10";
+            coercedOption.textContent = "Coerced 16";
+            select.append(coercedOption);
+
+            fireEvent.change(select, { target: { value: "0x10" } });
+
+            expect(
+                document.querySelectorAll(".themed-status-indicator")
+            ).toHaveLength(10);
+        });
     });
 
     describe("Data Formatting", () => {

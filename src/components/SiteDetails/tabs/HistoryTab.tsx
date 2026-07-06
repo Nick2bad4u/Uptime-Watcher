@@ -50,12 +50,7 @@ import {
     useRef,
     useState,
 } from "react";
-import {
-    arrayIncludes,
-    isEmpty,
-    isFinite as isFiniteNumber,
-    isInteger,
-} from "ts-extras";
+import { arrayIncludes, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { InterfaceDensity } from "../../../stores/ui/types";
 
@@ -468,12 +463,10 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
         const handleHistoryLimitChange = useCallback(
             (event: ChangeEvent<HTMLSelectElement>) => {
-                const parsedLimit = Number(event.target.value);
                 const selectedLimit =
-                    isInteger(parsedLimit) &&
-                    finalShowOptions.includes(parsedLimit)
-                        ? parsedLimit
-                        : safeHistoryLimit;
+                    finalShowOptions.find(
+                        (option) => String(option) === event.target.value
+                    ) ?? safeHistoryLimit;
                 const newLimit = Math.min(
                     selectedLimit,
                     backendLimit,
