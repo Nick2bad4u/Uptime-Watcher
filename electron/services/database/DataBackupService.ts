@@ -6,6 +6,7 @@ import { toSerializedError } from "@shared/utils/errorSerialization";
 import { createSingleFlight } from "@shared/utils/singleFlight";
 import { app } from "electron";
 import { createHash, randomUUID } from "node:crypto";
+import { constants as fsConstants } from "node:fs";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
@@ -176,7 +177,11 @@ export class DataBackupService {
                         `${path.basename(targetPath)}.tmp-${randomUUID()}`
                     );
 
-                    await fs.copyFile(snapshotPath, tempDestination);
+                    await fs.copyFile(
+                        snapshotPath,
+                        tempDestination,
+                        fsConstants.COPYFILE_EXCL
+                    );
 
                     await this.replaceFileAtomicallyWithBackup({
                         sourcePath: tempDestination,

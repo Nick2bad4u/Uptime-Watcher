@@ -16,6 +16,7 @@
  */
 
 import { app } from "electron";
+import { constants as fsConstants } from "node:fs";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -801,7 +802,8 @@ describe(DataBackupService, () => {
 
             expect(mockFsPromises.copyFile).toHaveBeenCalledWith(
                 path.resolve("/tmp/mock-dir", "backup-snapshot.sqlite"),
-                expect.stringContaining(`${path.basename(targetPath)}.tmp-`)
+                expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
+                fsConstants.COPYFILE_EXCL
             );
             expect(mockFsPromises.rm).toHaveBeenCalledWith(
                 expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
