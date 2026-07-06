@@ -77,8 +77,8 @@ repos:
                     "--write",
                     "--unsafe",
                 ]
-            id: "biome-check"
-            name: "🟨 typescript/react · Format, lint & safe fixes"
+            id: "biome-lint"
+            name: "🟨 typescript/react · Lint & safe fixes"
             types_or: ["ts", "tsx", "js", "jsx", "json", "jsonc"]
 
       repo: "https://github.com/biomejs/pre-commit"
