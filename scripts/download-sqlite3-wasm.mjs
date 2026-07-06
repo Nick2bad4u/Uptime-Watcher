@@ -12,7 +12,7 @@ import * as fs from "fs";
 import https from "https";
 import path from "path";
 import crypto from "crypto";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,16 +30,6 @@ const packageDest = path.resolve(
     "../node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm"
 );
 
-// Ensure dist directory exists
-if (!fs.existsSync(destDir)) {
-    fs.mkdirSync(destDir, { recursive: true });
-}
-
-// Ensure assets directory exists
-if (!fs.existsSync(scriptsDir)) {
-    fs.mkdirSync(scriptsDir, { recursive: true });
-}
-
 // Expected SHA256 of the WASM (update when upstream changes). Allow override via env to facilitate controlled updates.
 // If no hash is provided, we'll download and verify against the upstream hash
 const EXPECTED_SHA256 = process.env["SQLITE3_WASM_SHA256"]?.toLowerCase();
@@ -51,11 +41,6 @@ const MAX_REDIRECTS = 3;
  */
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
-// Check for command line flags
-const forceDownload = process.argv.includes("--force");
-const checkUpdateOnly = process.argv.includes("--check-update");
-const noUpdate = process.argv.includes("--no-update");
-
 /**
  * @property {boolean} hasUpdate - Indicates if an update is available.
  * @property {boolean} updateCheckFailed - Indicates if the update check failed.
@@ -66,6 +51,98 @@ const noUpdate = process.argv.includes("--no-update");
  *
  * @interface UpdateCheckResult
  */
+
+/**
+ * Parse command-line options.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{
+ *     checkUpdateOnly: boolean;
+ *     forceDownload: boolean;
+ *     help: boolean;
+ *     noUpdate: boolean;
+ * }}
+ *   Parsed options.
+ */
+function parseArgs(args) {
+    const options = {
+        checkUpdateOnly: false,
+        forceDownload: false,
+        help: false,
+        noUpdate: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--check-update": {
+                options.checkUpdateOnly = true;
+                break;
+            }
+
+            case "--force": {
+                options.forceDownload = true;
+                break;
+            }
+
+            case "--help":
+            case "-h": {
+                options.help = true;
+                break;
+            }
+
+            case "--no-update": {
+                options.noUpdate = true;
+                break;
+            }
+
+            default: {
+                throw new Error(`Unknown option: ${arg}`);
+            }
+        }
+    }
+
+    if (
+        options.checkUpdateOnly &&
+        (options.forceDownload || options.noUpdate)
+    ) {
+        throw new Error(
+            "--check-update cannot be combined with --force or --no-update"
+        );
+    }
+
+    return options;
+}
+
+/**
+ * Show command usage.
+ */
+function showHelp() {
+    console.log(`
+Download or synchronize the SQLite WASM artifact.
+
+Usage: node scripts/download-sqlite3-wasm.mjs [options]
+
+Options:
+  --check-update  Check upstream version and exit without downloading
+  --force         Remove existing local artifacts and download explicitly
+  --no-update     Synchronize existing local artifacts without network access
+  --help, -h      Show this help
+`);
+}
+
+/**
+ * Ensure output directories exist before file copy or download operations.
+ */
+function ensureArtifactDirectories() {
+    if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+    }
+
+    if (!fs.existsSync(scriptsDir)) {
+        fs.mkdirSync(scriptsDir, { recursive: true });
+    }
+}
 
 /**
  * Normalizes potentially user-controlled values before writing them to logs.
@@ -427,9 +504,16 @@ function download(urlToFetch, destPath, redirectCount = 0) {
  *
  * @returns {Promise<void>} Resolves after completing the workflow.
  */
-async function main() {
+async function main(options = parseArgs(process.argv.slice(2))) {
+    if (options.help) {
+        showHelp();
+        return;
+    }
+
+    ensureArtifactDirectories();
+
     // Handle check-update-only flag (just check, don't download)
-    if (checkUpdateOnly) {
+    if (options.checkUpdateOnly) {
         try {
             const result = await checkForUpdates();
             if (result.updateCheckFailed) {
@@ -459,7 +543,7 @@ async function main() {
         }
     }
 
-    if (noUpdate && !forceDownload) {
+    if (options.noUpdate && !options.forceDownload) {
         if (!ensureLocalWasmAvailable()) {
             failAndExit(
                 "No local node-sqlite3-wasm.wasm found. Run npm run sqlite:download:force to fetch it explicitly."
@@ -469,7 +553,7 @@ async function main() {
     }
 
     // Default behavior: check for updates (unless --no-update is specified)
-    if (!noUpdate && !forceDownload) {
+    if (!options.noUpdate && !options.forceDownload) {
         try {
             const result = await checkForUpdates();
             if (result.hasUpdate || result.updateCheckFailed) {
@@ -527,7 +611,7 @@ async function main() {
     }
 
     // Handle force download
-    if (forceDownload && fs.existsSync(dest)) {
+    if (options.forceDownload && fs.existsSync(dest)) {
         console.log(
             "[wasm-download] Force download requested, removing existing file:",
             dest
@@ -567,10 +651,25 @@ function startDownload() {
     download(url, dest);
 }
 
-// Run the main function
-main().catch((error) => {
-    console.error(
-        `[wasm-download] Unexpected error: ${getSanitizedErrorMessage(error)}`
+/**
+ * Check whether this module was executed directly.
+ *
+ * @returns {boolean} Whether this is the CLI entrypoint.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
     );
-    process.exit(1);
-});
+}
+
+if (isDirectInvocation()) {
+    main().catch((error) => {
+        console.error(
+            `[wasm-download] Unexpected error: ${getSanitizedErrorMessage(error)}`
+        );
+        process.exit(1);
+    });
+}
+
+export { parseArgs, sanitizeForSingleLineLog };
