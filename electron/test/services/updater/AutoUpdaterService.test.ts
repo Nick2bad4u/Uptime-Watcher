@@ -305,12 +305,34 @@ describe(AutoUpdaterService, () => {
         });
     });
     describe("quitAndInstall", () => {
-        it("should call autoUpdater.quitAndInstall", async ({
+        it("should reject installation before an update is downloaded", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: AutoUpdaterService", "component");
+
+            expect(() => {
+                autoUpdaterService.quitAndInstall();
+            }).toThrow(
+                "Cannot install update before an update has been downloaded"
+            );
+
+            expect(logger.warn).toHaveBeenCalledWith(
+                "[AutoUpdaterService] Refusing to install update before download completes"
+            );
+            expect(mockAutoUpdater.quitAndInstall).not.toHaveBeenCalled();
+        });
+
+        it("should call autoUpdater.quitAndInstall after update download", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AutoUpdaterService", "component");
+
+            autoUpdaterService.initialize();
+            getEventHandler("update-downloaded")({ version: "1.0.1" });
 
             autoUpdaterService.quitAndInstall();
 
@@ -318,6 +340,25 @@ describe(AutoUpdaterService, () => {
                 "[AutoUpdaterService] Quitting and installing update"
             );
             expect(mockAutoUpdater.quitAndInstall).toHaveBeenCalled();
+        });
+
+        it("should clear install readiness after an updater error", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: AutoUpdaterService", "component");
+
+            autoUpdaterService.initialize();
+            getEventHandler("update-downloaded")({ version: "1.0.1" });
+            getEventHandler("error")(new Error("Install no longer valid"));
+
+            expect(() => {
+                autoUpdaterService.quitAndInstall();
+            }).toThrow(
+                "Cannot install update before an update has been downloaded"
+            );
+            expect(mockAutoUpdater.quitAndInstall).not.toHaveBeenCalled();
         });
     });
     describe("notifyStatusChange", () => {

@@ -31,6 +31,8 @@ import { logger } from "../../utils/logger";
 export class AutoUpdaterService {
     private isInitialized = false;
 
+    private isUpdateReadyToInstall = false;
+
     /**
      * Optional callback function for update status changes.
      *
@@ -58,6 +60,7 @@ export class AutoUpdaterService {
      */
     private readonly handleCheckingForUpdate = (): void => {
         logger.debug("[AutoUpdaterService] Checking for updates");
+        this.isUpdateReadyToInstall = false;
         this.notifyStatusChange({ status: UPDATE_STATUS.CHECKING });
     };
 
@@ -66,6 +69,7 @@ export class AutoUpdaterService {
      */
     private readonly handleUpdateAvailable = (info: unknown): void => {
         logger.info("[AutoUpdaterService] Update available", info);
+        this.isUpdateReadyToInstall = false;
         this.notifyStatusChange({ status: UPDATE_STATUS.AVAILABLE });
     };
 
@@ -74,6 +78,7 @@ export class AutoUpdaterService {
      */
     private readonly handleUpdateNotAvailable = (info: unknown): void => {
         logger.debug("[AutoUpdaterService] No update available", info);
+        this.isUpdateReadyToInstall = false;
         this.notifyStatusChange({ status: UPDATE_STATUS.IDLE });
     };
 
@@ -92,6 +97,7 @@ export class AutoUpdaterService {
             total: progressObj.total,
             transferred: progressObj.transferred,
         });
+        this.isUpdateReadyToInstall = false;
         this.notifyStatusChange({ status: UPDATE_STATUS.DOWNLOADING });
     };
 
@@ -100,6 +106,7 @@ export class AutoUpdaterService {
      */
     private readonly handleUpdateDownloaded = (info: unknown): void => {
         logger.info("[AutoUpdaterService] Update downloaded", info);
+        this.isUpdateReadyToInstall = true;
         this.notifyStatusChange({ status: UPDATE_STATUS.DOWNLOADED });
     };
 
@@ -108,6 +115,7 @@ export class AutoUpdaterService {
      */
     private readonly handleError = (error: Error): void => {
         logger.error("[AutoUpdaterService] Auto-updater error", error);
+        this.isUpdateReadyToInstall = false;
         this.notifyStatusChange({
             error: getUserFacingErrorDetail(error),
             status: UPDATE_STATUS.ERROR,
@@ -271,6 +279,15 @@ export class AutoUpdaterService {
      * @returns Void - Method does not return as app terminates
      */
     public quitAndInstall(): void {
+        if (!this.isUpdateReadyToInstall) {
+            logger.warn(
+                "[AutoUpdaterService] Refusing to install update before download completes"
+            );
+            throw new Error(
+                "Cannot install update before an update has been downloaded"
+            );
+        }
+
         logger.info("[AutoUpdaterService] Quitting and installing update");
         autoUpdater.quitAndInstall();
     }
