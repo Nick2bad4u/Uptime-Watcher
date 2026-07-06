@@ -8,7 +8,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons, getIconSize } from "../../../utils/icons";
 import { SettingsSection } from "./SettingsSection";
 
-interface MonitoringSectionProperties {
+export interface MonitoringSectionProperties {
     readonly currentHistoryLimit: number;
     readonly icon: IconType;
     readonly isLoading: boolean;

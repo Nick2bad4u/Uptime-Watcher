@@ -11,7 +11,7 @@ import { AppIcons, getIconSize } from "../../../utils/icons";
 import { SettingItem } from "../../shared/SettingItem";
 import { SettingsSection } from "./SettingsSection";
 
-interface ApplicationSectionProperties {
+export interface ApplicationSectionProperties {
     readonly autoStartControl: ReactNode;
     readonly availableThemes: readonly ThemeName[];
     readonly currentThemeName: ThemeName;

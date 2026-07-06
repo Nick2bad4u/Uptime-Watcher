@@ -6,7 +6,7 @@ import { AppIcons, getIconSize } from "../../../utils/icons";
 import { SettingItem } from "../../shared/SettingItem";
 import { SettingsSection } from "./SettingsSection";
 
-interface NotificationSectionProperties {
+export interface NotificationSectionProperties {
     readonly icon: IconType;
     readonly inAppAlertsControl: ReactNode;
     readonly inAppAlertSoundControl: ReactNode;

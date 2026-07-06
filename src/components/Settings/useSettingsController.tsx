@@ -1,5 +1,4 @@
-import type { ChangeEvent, ReactNode, RefObject } from "react";
-import type { IconType } from "react-icons";
+import type { ChangeEvent, ReactNode } from "react";
 
 import { MAX_IPC_SQLITE_RESTORE_BYTES } from "@shared/constants/backup";
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
@@ -9,7 +8,11 @@ import { safeInteger } from "@shared/validation/validatorUtils";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
+import type { ApplicationSectionProperties } from "./sections/ApplicationSection";
 import type { BackupSummary } from "./sections/BackupSummary";
+import type { MaintenanceSectionProperties } from "./sections/MaintenanceSection";
+import type { MonitoringSectionProperties } from "./sections/MonitoringSection";
+import type { NotificationSectionProperties } from "./sections/NotificationSection";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
 import { useDelayedClose } from "../../hooks/ui/useDelayedClose";
@@ -39,15 +42,7 @@ import {
  * @public
  */
 export interface SettingsControllerState {
-    readonly applicationSectionProps: {
-        readonly autoStartControl: ReactNode;
-        readonly availableThemes: readonly ThemeName[];
-        readonly currentThemeName: ThemeName;
-        readonly icon: IconType;
-        readonly isLoading: boolean;
-        readonly minimizeToTrayControl: ReactNode;
-        readonly onThemeChange: (event: ChangeEvent<HTMLSelectElement>) => void;
-    };
+    readonly applicationSectionProps: ApplicationSectionProperties;
     readonly clearError: () => void;
     readonly handleCloseButtonClick: () => void;
     readonly headerBackground: ReactNode;
@@ -56,42 +51,9 @@ export interface SettingsControllerState {
     readonly isDark: boolean;
     readonly isLoading: boolean;
     readonly lastError: null | string;
-    readonly maintenanceSectionProps: {
-        readonly backupSummary: BackupSummary | null;
-        readonly downloadButtonIcon: ReactNode;
-        readonly icon: IconType;
-        readonly isLoading: boolean;
-        readonly onDownloadBackup: () => void;
-        readonly onRefreshHistory: () => void;
-        readonly onResetData: () => void;
-        readonly onRestoreClick: () => void;
-        readonly onRestoreFileChange: (
-            event: ChangeEvent<HTMLInputElement>
-        ) => void;
-        readonly refreshButtonIcon: ReactNode;
-        readonly resetButtonIcon: ReactNode;
-        readonly restoreFileInputRef: RefObject<HTMLInputElement | null>;
-        readonly showButtonLoading: boolean;
-        readonly uploadButtonIcon: ReactNode;
-    };
-    readonly monitoringSectionProps: {
-        readonly currentHistoryLimit: number;
-        readonly icon: IconType;
-        readonly isLoading: boolean;
-        readonly onHistoryLimitChange: (
-            event: ChangeEvent<HTMLSelectElement>
-        ) => void;
-    };
-    readonly notificationSectionProps: {
-        readonly icon: IconType;
-        readonly inAppAlertsControl: ReactNode;
-        readonly inAppAlertSoundControl: ReactNode;
-        readonly inAppAlertVolumeControl: ReactNode;
-        readonly isLoading: boolean;
-        readonly isVolumeControlDisabled: boolean;
-        readonly systemNotificationsControl: ReactNode;
-        readonly systemNotificationSoundControl: ReactNode;
-    };
+    readonly maintenanceSectionProps: MaintenanceSectionProperties;
+    readonly monitoringSectionProps: MonitoringSectionProperties;
+    readonly notificationSectionProps: NotificationSectionProperties;
     readonly overlayClassName: string;
     readonly shellClassName: string;
     readonly showSyncSuccessBanner: boolean;
@@ -543,7 +505,6 @@ export const useSettingsController = ({
             inAppAlertsControl,
             inAppAlertSoundControl,
             inAppAlertVolumeControl,
-            isLoading,
             isVolumeControlDisabled,
             systemNotificationsControl,
             systemNotificationSoundControl,
@@ -552,7 +513,6 @@ export const useSettingsController = ({
             inAppAlertsControl,
             inAppAlertSoundControl,
             inAppAlertVolumeControl,
-            isLoading,
             isVolumeControlDisabled,
             systemNotificationsControl,
             systemNotificationSoundControl,

@@ -9,7 +9,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { SettingsSection } from "./SettingsSection";
 
-interface MaintenanceSectionProperties {
+export interface MaintenanceSectionProperties {
     readonly backupSummary: BackupSummary | null;
     readonly downloadButtonIcon: ReactNode;
     readonly icon: IconType;
