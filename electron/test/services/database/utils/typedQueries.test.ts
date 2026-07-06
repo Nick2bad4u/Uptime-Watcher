@@ -1645,7 +1645,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
             });
 
             it("should validate finite decimal string history response times", () => {
-                const historyRow: HistoryRow = {
+                const historyRow: UnknownRecord = {
                     monitorId: "monitor-1",
                     responseTime: "123.45",
                     status: "up",

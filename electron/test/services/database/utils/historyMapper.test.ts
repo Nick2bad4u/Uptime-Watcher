@@ -767,14 +767,16 @@ describe("historyMapper utilities", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const row: DatabaseHistoryRow = {
+            const row = {
                 monitorId: "monitor-123",
                 status: "invalid",
                 timestamp: TEST_TIMESTAMP,
                 responseTime: 150,
             };
 
-            const result = rowToHistoryEntry(row);
+            const result = rowToHistoryEntry(
+                row as unknown as DatabaseHistoryRow
+            );
 
             expect(result.status).toBe("down");
             expect(logger.warn).toHaveBeenCalledWith(
