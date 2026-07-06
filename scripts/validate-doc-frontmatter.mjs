@@ -21,6 +21,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
 
@@ -476,7 +477,7 @@ async function validateFile(markdownPath, schema) {
 /**
  * Validate docs front matter against the shared JSON schema.
  *
- * @returns {Promise<void>} Resolves after reporting any violations.
+ * @returns {Promise<boolean>} `true` when validation passes.
  */
 async function main() {
     const schemaRaw = await readFile(FRONTMATTER_SCHEMA_PATH, "utf8");
@@ -510,18 +511,35 @@ async function main() {
         console.error(
             `\nTotal front-matter issues: ${errors.length}. Please fix the problems above.`
         );
-        process.exit(1);
+        return false;
     }
 
     console.log(
         "Front-matter validation passed – all docs match the shared schema."
     );
+    return true;
 }
 
-try {
-    await main();
-} catch (error) {
-    console.error("Front-matter validation failed due to an unexpected error.");
-    console.error(error);
-    process.exit(1);
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
 }
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error(
+            "Front-matter validation failed due to an unexpected error."
+        );
+        console.error(error);
+        process.exitCode = 1;
+    }
+}
+
+export { isDirectRun, main };
