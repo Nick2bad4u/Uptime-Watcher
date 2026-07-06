@@ -760,6 +760,26 @@ describe(DataBackupService, () => {
     });
 
     describe("saveDatabaseBackupToPath", () => {
+        it("surfaces destination lstat failures before creating a snapshot", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            const accessError = Object.assign(new Error("permission denied"), {
+                code: "EACCES",
+            });
+            mockFsPromises.lstat.mockRejectedValueOnce(accessError);
+
+            await expect(
+                dataBackupService.saveDatabaseBackupToPath(targetPath)
+            ).rejects.toThrow("permission denied");
+
+            expect(mockFsPromises.mkdir).toHaveBeenCalledWith(
+                path.dirname(targetPath),
+                { recursive: true }
+            );
+            expect(mockFsPromises.mkdtemp).not.toHaveBeenCalled();
+            expect(mockFsPromises.copyFile).not.toHaveBeenCalled();
+            expect(mockFsPromises.rename).not.toHaveBeenCalled();
+        });
+
         it("rejects existing non-file destinations before creating a snapshot", async () => {
             const targetPath = path.resolve("backup-target.sqlite");
             mockFsPromises.lstat.mockResolvedValue({
@@ -805,6 +825,34 @@ describe(DataBackupService, () => {
                 expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
                 fsConstants.COPYFILE_EXCL
             );
+            expect(mockFsPromises.rm).toHaveBeenCalledWith(
+                expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
+                { force: true }
+            );
+        });
+
+        it("surfaces final target lstat failures before replacing the destination", async () => {
+            const targetPath = path.resolve("backup-target.sqlite");
+            const accessError = Object.assign(new Error("permission denied"), {
+                code: "EACCES",
+            });
+
+            mockFsPromises.lstat
+                .mockRejectedValueOnce(
+                    Object.assign(new Error("ENOENT"), { code: "ENOENT" })
+                )
+                .mockRejectedValueOnce(accessError);
+
+            await expect(
+                dataBackupService.saveDatabaseBackupToPath(targetPath)
+            ).rejects.toThrow("permission denied");
+
+            expect(mockFsPromises.copyFile).toHaveBeenCalledWith(
+                path.resolve("/tmp/mock-dir", "backup-snapshot.sqlite"),
+                expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
+                fsConstants.COPYFILE_EXCL
+            );
+            expect(mockFsPromises.rename).not.toHaveBeenCalled();
             expect(mockFsPromises.rm).toHaveBeenCalledWith(
                 expect.stringContaining(`${path.basename(targetPath)}.tmp-`),
                 { force: true }

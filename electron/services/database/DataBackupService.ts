@@ -15,6 +15,7 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "./DatabaseService";
 
 import { DB_FILE_NAME } from "../../constants";
+import { lstatIfExists } from "../../utils/fsSafeOps";
 import {
     buildRestoreMetadata,
     normalizeBackupResultMetadata,
@@ -140,7 +141,7 @@ export class DataBackupService {
                 const directory = path.dirname(targetPath);
                 await fs.mkdir(directory, { recursive: true });
 
-                const existing = await fs.lstat(targetPath).catch(() => null);
+                const existing = await lstatIfExists(targetPath);
                 if (existing?.isSymbolicLink()) {
                     throw new Error(
                         "Refusing to overwrite a symlink path when saving backup"
@@ -263,7 +264,7 @@ export class DataBackupService {
         const { sourcePath, targetPath } = args;
         const backupPath = `${targetPath}.bak-${randomUUID()}`;
 
-        const targetStat = await fs.lstat(targetPath).catch(() => null);
+        const targetStat = await lstatIfExists(targetPath);
         if (targetStat?.isSymbolicLink()) {
             throw new Error(
                 "Refusing to overwrite a symlink path when saving backup"
