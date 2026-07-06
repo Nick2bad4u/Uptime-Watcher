@@ -20,6 +20,15 @@ const rootDir = path.resolve("./");
 const docusaurusDir = path.join(rootDir, "docs", "docusaurus");
 const staticDir = path.join(docusaurusDir, "static", "eslint-inspector");
 const buildDir = path.join(docusaurusDir, "build", "eslint-inspector");
+const expectedInspectorFiles = [
+    "index.html",
+    "200.html",
+    "404.html",
+    "favicon.svg",
+];
+const expectedInspectorHref =
+    "https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/";
+const expectedInspectorLabel = "ESLint Config";
 
 /**
  * Checks if a directory exists and contains expected files.
@@ -63,13 +72,13 @@ async function verifyConfigFile(filePath) {
         // Check for ESLint Inspector link in navbar
         if (filePath.includes("docusaurus.config.ts")) {
             const hasEslintLink =
-                content.includes("ESLint Inspector") &&
-                content.includes("/Uptime-Watcher/eslint-inspector/");
+                content.includes(expectedInspectorLabel) &&
+                content.includes(expectedInspectorHref);
             return {
                 valid: hasEslintLink,
                 content: hasEslintLink
-                    ? "ESLint Inspector navbar link found"
-                    : "ESLint Inspector navbar link missing",
+                    ? "ESLint inspector navbar link found"
+                    : "ESLint inspector navbar link missing",
             };
         }
 
@@ -104,9 +113,7 @@ async function verifyESLintInspectorDeployment() {
     let allChecksPassed = true;
     const checkResults = [];
 
-    // Expected files in static directory
-    const expectedStaticFiles = ["index.html", "redirect.html"];
-    const staticCheck = await checkDirectory(staticDir, expectedStaticFiles);
+    const staticCheck = await checkDirectory(staticDir, expectedInspectorFiles);
 
     console.log("📁 Static Directory Check:");
     if (staticCheck.exists) {
@@ -128,9 +135,7 @@ async function verifyESLintInspectorDeployment() {
         checkResults.push({ name: "Static Directory", passed: false });
     }
 
-    // Expected files in build directory
-    const expectedBuildFiles = ["index.html", "redirect.html"];
-    const buildCheck = await checkDirectory(buildDir, expectedBuildFiles);
+    const buildCheck = await checkDirectory(buildDir, expectedInspectorFiles);
 
     console.log("\n🏗️  Build Directory Check:");
     if (buildCheck.exists) {
