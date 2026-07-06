@@ -47,7 +47,7 @@ describe(useSiteAnalytics, () => {
 
     const createStatusRecord = (
         timestamp: number,
-        status: "down" | "up",
+        status: "degraded" | "down" | "up",
         responseTime: number
     ): StatusHistory => ({
         responseTime,
@@ -919,15 +919,20 @@ describe(useSiteAnalytics, () => {
             expect(result.current.slowestResponse).toBe(0);
         });
 
-        it("should exclude records with invalid timestamps or response times", () => {
+        it("should exclude malformed records without dropping unavailable response checks", () => {
             const validRecord = createStatusRecord(now - 1000, "up", 200);
+            const unavailableResponseRecord = createStatusRecord(
+                now - 3000,
+                "down",
+                -1
+            );
             const malformedHistoryMonitor: Monitor = {
                 ...mockMonitorEmpty,
                 history: [
                     validRecord,
                     createStatusRecord(Number.POSITIVE_INFINITY, "up", 100),
                     createStatusRecord(now - 2000, "up", Number.NaN),
-                    createStatusRecord(now - 3000, "up", -1),
+                    unavailableResponseRecord,
                 ],
             };
 
@@ -935,8 +940,15 @@ describe(useSiteAnalytics, () => {
                 useSiteAnalytics(malformedHistoryMonitor, "24h")
             );
 
-            expect(result.current.filteredHistory).toEqual([validRecord]);
-            expect(result.current.totalChecks).toBe(1);
+            expect(result.current.filteredHistory).toEqual([
+                validRecord,
+                unavailableResponseRecord,
+            ]);
+            expect(result.current.totalChecks).toBe(2);
+            expect(result.current.downCount).toBe(1);
+            expect(result.current.uptime).toBe("50.00");
+            expect(result.current.incidentCount).toBe(1);
+            expect(result.current.totalDowntime).toBe(2000);
             expect(result.current.avgResponseTime).toBe(200);
             expect(result.current.percentileMetrics).toEqual({
                 p50: 200,

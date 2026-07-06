@@ -10,6 +10,7 @@
 
 import type { Monitor, StatusHistory } from "@shared/types";
 
+import { STATUS_HISTORY_VALUES } from "@shared/types";
 import { typedObjectKeys } from "@shared/utils/objectSafety";
 import { useMemo } from "react";
 import {
@@ -95,8 +96,13 @@ function isAnalyticsHistoryRecord(record: StatusHistory): boolean {
     return (
         isValidHistoryTimestamp(record.timestamp) &&
         isFiniteNumber(record.responseTime) &&
-        record.responseTime >= 0
+        record.responseTime >= -1 &&
+        arrayIncludes(STATUS_HISTORY_VALUES, record.status)
     );
+}
+
+function isResponseTimeHistoryRecord(record: StatusHistory): boolean {
+    return isAnalyticsHistoryRecord(record) && record.responseTime >= 0;
 }
 
 const isActiveDowntimeWindow = (args: {
@@ -315,7 +321,7 @@ function filterHistoryByTimeRange(
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
         const sortedHistory = monitor.history
-            .filter(isAnalyticsHistoryRecord)
+            .filter(isResponseTimeHistoryRecord)
             .toSorted((a, b) => a.timestamp - b.timestamp);
 
         const lineChartData = {
@@ -394,6 +400,9 @@ export function useSiteAnalytics(
         const history = monitor?.history ?? [];
         // Filter history based on time range
         const filteredHistory = filterHistoryByTimeRange(history, timeRange);
+        const responseTimeHistory = filteredHistory.filter(
+            isResponseTimeHistoryRecord
+        );
         const chronologicalHistory = filteredHistory.toSorted(
             (a, b) => a.timestamp - b.timestamp
         );
@@ -410,10 +419,11 @@ export function useSiteAnalytics(
         // Basic metrics
         const uptimeRaw = totalChecks > 0 ? (upCount / totalChecks) * 100 : 0;
         const uptime = uptimeRaw.toFixed(2);
-        const avgResponseTime = calculateAverageResponseTime(filteredHistory);
+        const avgResponseTime =
+            calculateAverageResponseTime(responseTimeHistory);
 
         // Performance metrics
-        const responseMetrics = calculateResponseMetrics(filteredHistory);
+        const responseMetrics = calculateResponseMetrics(responseTimeHistory);
 
         // Calculate downtime periods
         const downtimePeriods = calculateDowntimePeriods(chronologicalHistory);
