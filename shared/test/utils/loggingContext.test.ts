@@ -88,6 +88,16 @@ describe("logging context helpers", () => {
         expect(sanitizedString).toContain("tokenizer: safe");
     });
 
+    it("preserves common colon-separated diagnostic labels", () => {
+        const sanitized = normalizeLogValue(
+            "Request failed: state: failed, code: ENOENT, auth: denied"
+        );
+
+        expect(sanitized).toBe(
+            "Request failed: state: failed, code: ENOENT, auth: denied"
+        );
+    });
+
     it("redacts secrets in object metadata fields", () => {
         const input = {
             access_token: "abc",

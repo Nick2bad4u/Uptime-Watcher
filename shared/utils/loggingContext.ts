@@ -76,6 +76,22 @@ const SECRET_QUERY_KEYS = new Set([
     "token",
 ]);
 
+const SECRET_COLON_KEYS = new Set([
+    "access_token",
+    "api_key",
+    "apikey",
+    "auth_token",
+    "client_secret",
+    "code_challenge",
+    "code_verifier",
+    "id_token",
+    "passphrase",
+    "password",
+    "recovery_key",
+    "refresh_token",
+    "token",
+]);
+
 const SECRET_METADATA_KEYS = new Set([
     "accesstoken",
     "apikey",
@@ -151,7 +167,8 @@ const collectSecretReplacementsForKey = (args: {
         const separator = args.lower[separatorIndex] ?? "";
         if (
             args.isBoundaryBeforeKey(matchIndex) &&
-            (separator === "=" || separator === ":")
+            (separator === "=" ||
+                (separator === ":" && setHas(SECRET_COLON_KEYS, args.key)))
         ) {
             let valueStart = separatorIndex + 1;
             while (/\s/u.test(args.lower[valueStart] ?? "")) {
