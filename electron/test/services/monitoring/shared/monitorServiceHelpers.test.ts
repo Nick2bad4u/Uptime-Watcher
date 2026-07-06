@@ -84,6 +84,7 @@ describe(normalizeTimestampValue, () => {
         expect(normalizeTimestampValue("1735787045000")).toBe(
             1_735_787_045_000
         );
+        expect(normalizeTimestampValue("1735787045.5")).toBe(1_735_787_045_500);
     });
 
     it("normalizes strict ISO timestamp strings", () => {
@@ -98,6 +99,10 @@ describe(normalizeTimestampValue, () => {
     it("rejects loose or impossible timestamp strings", () => {
         for (const value of [
             "",
+            "1e3",
+            "0x10",
+            "Infinity",
+            "1735787045junk",
             "2025-01-02",
             "January 2, 2025",
             "2026-02-30T00:00:00.000Z",
