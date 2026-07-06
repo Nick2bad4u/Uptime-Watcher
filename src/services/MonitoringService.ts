@@ -43,10 +43,15 @@ import type * as z from "zod";
 import { ApplicationError, ensureError } from "@shared/utils/errorHandling";
 import { isNonEmptyString } from "@shared/utils/typeGuards";
 import { validateStatusUpdate } from "@shared/validation/guards";
+import {
+    validateMonitoringStartSummary,
+    validateMonitoringStopSummary,
+} from "@shared/validation/monitoringSummarySchemas";
 import { isDefined } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { validateServicePayload } from "./utils/validation";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
@@ -143,6 +148,27 @@ const logInvalidStatusUpdateAndThrow = (
             serviceName: "MonitoringService",
         },
         message: `[MonitoringService] checkSiteNow returned an invalid status update for monitor ${resolvedMonitorId} of site ${resolvedSiteIdentifier}`,
+    });
+};
+
+const parseBooleanResponse = (
+    operation: string,
+    value: unknown,
+    details: UnknownRecord
+): boolean => {
+    if (typeof value === "boolean") {
+        return value;
+    }
+
+    throw new ApplicationError({
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            ...details,
+            operation,
+            receivedType: typeof value,
+            serviceName: "MonitoringService",
+        },
+        message: `[MonitoringService] ${operation} returned invalid boolean response`,
     });
 };
 
@@ -313,7 +339,14 @@ export const MonitoringService: MonitoringServiceContract = {
     startMonitoring: wrap(
         "startMonitoring",
         async (api): Promise<MonitoringStartSummary> => {
-            const summary = await api.monitoring.startMonitoring();
+            const summary = validateServicePayload(
+                validateMonitoringStartSummary,
+                await api.monitoring.startMonitoring(),
+                {
+                    operation: "startMonitoring",
+                    serviceName: "MonitoringService",
+                }
+            );
 
             if (summary.partialFailures) {
                 logger.warn(
@@ -365,9 +398,16 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const isSuccess = await api.monitoring.startMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
+            const isSuccess = parseBooleanResponse(
+                "startMonitoringForMonitor",
+                await api.monitoring.startMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                ),
+                {
+                    monitorId,
+                    siteIdentifier,
+                }
             );
 
             if (!isSuccess) {
@@ -397,8 +437,13 @@ export const MonitoringService: MonitoringServiceContract = {
     startMonitoringForSite: wrap(
         "startMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
-            const isSuccess =
-                await api.monitoring.startMonitoringForSite(siteIdentifier);
+            const isSuccess = parseBooleanResponse(
+                "startMonitoringForSite",
+                await api.monitoring.startMonitoringForSite(siteIdentifier),
+                {
+                    siteIdentifier,
+                }
+            );
 
             if (!isSuccess) {
                 throw new ApplicationError({
@@ -433,7 +478,14 @@ export const MonitoringService: MonitoringServiceContract = {
     stopMonitoring: wrap(
         "stopMonitoring",
         async (api): Promise<MonitoringStopSummary> => {
-            const summary = await api.monitoring.stopMonitoring();
+            const summary = validateServicePayload(
+                validateMonitoringStopSummary,
+                await api.monitoring.stopMonitoring(),
+                {
+                    operation: "stopMonitoring",
+                    serviceName: "MonitoringService",
+                }
+            );
 
             if (summary.partialFailures) {
                 logger.warn(
@@ -485,9 +537,16 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const isSuccess = await api.monitoring.stopMonitoringForMonitor(
-                siteIdentifier,
-                monitorId
+            const isSuccess = parseBooleanResponse(
+                "stopMonitoringForMonitor",
+                await api.monitoring.stopMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                ),
+                {
+                    monitorId,
+                    siteIdentifier,
+                }
             );
 
             if (!isSuccess) {
@@ -517,8 +576,13 @@ export const MonitoringService: MonitoringServiceContract = {
     stopMonitoringForSite: wrap(
         "stopMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
-            const isSuccess =
-                await api.monitoring.stopMonitoringForSite(siteIdentifier);
+            const isSuccess = parseBooleanResponse(
+                "stopMonitoringForSite",
+                await api.monitoring.stopMonitoringForSite(siteIdentifier),
+                {
+                    siteIdentifier,
+                }
+            );
 
             if (!isSuccess) {
                 throw new ApplicationError({

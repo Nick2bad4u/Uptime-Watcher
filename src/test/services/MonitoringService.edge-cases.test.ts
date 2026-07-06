@@ -119,12 +119,12 @@ describe("MonitoringService edge cases", () => {
         const failureSummary: MonitoringStartSummary = {
             alreadyActive: false,
             attempted: 4,
-            failed: 3,
+            failed: 4,
             isMonitoring: false,
             partialFailures: false,
             siteCount: 4,
             skipped: 0,
-            succeeded: 1,
+            succeeded: 0,
         };
         monitoringApi.startMonitoring.mockResolvedValueOnce(failureSummary);
 
@@ -135,13 +135,30 @@ describe("MonitoringService edge cases", () => {
                     summary: failureSummary,
                 }),
                 message:
-                    "[MonitoringService] Failed to start monitoring across all sites: 1/4 monitors activated.",
+                    "[MonitoringService] Failed to start monitoring across all sites: 0/4 monitors activated.",
             }
         );
 
         expect(loggerMock.error).toHaveBeenCalledWith(
             "[MonitoringService] Global monitoring start failed",
             failureSummary
+        );
+    });
+
+    it("rejects malformed startMonitoring summaries", async () => {
+        monitoringApi.startMonitoring.mockResolvedValueOnce({
+            alreadyActive: false,
+            attempted: 2,
+            failed: 1,
+            isMonitoring: true,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 1,
+        });
+
+        await expect(MonitoringService.startMonitoring()).rejects.toThrow(
+            "[MonitoringService] startMonitoring returned invalid payload"
         );
     });
 
@@ -159,6 +176,18 @@ describe("MonitoringService edge cases", () => {
             message:
                 "[MonitoringService] Failed to start monitoring for monitor monitor-y of site site-x: backend returned false",
         });
+    });
+
+    it("rejects malformed startMonitoringForMonitor acknowledgements", async () => {
+        monitoringApi.startMonitoringForMonitor.mockResolvedValueOnce(
+            "true" as unknown as boolean
+        );
+
+        await expect(
+            MonitoringService.startMonitoringForMonitor("site-x", "monitor-y")
+        ).rejects.toThrow(
+            "[MonitoringService] startMonitoringForMonitor returned invalid boolean response"
+        );
     });
 
     it("throws when startMonitoringForSite reports backend failure", async () => {
@@ -202,12 +231,12 @@ describe("MonitoringService edge cases", () => {
         const failureSummary: MonitoringStopSummary = {
             alreadyInactive: false,
             attempted: 3,
-            failed: 1,
+            failed: 3,
             isMonitoring: true,
             partialFailures: false,
             siteCount: 3,
             skipped: 0,
-            succeeded: 2,
+            succeeded: 0,
         };
         monitoringApi.stopMonitoring.mockResolvedValueOnce(failureSummary);
 
@@ -217,12 +246,29 @@ describe("MonitoringService edge cases", () => {
                 summary: failureSummary,
             }),
             message:
-                "[MonitoringService] Failed to stop monitoring across all sites: 1/3 monitors remained active.",
+                "[MonitoringService] Failed to stop monitoring across all sites: 3/3 monitors remained active.",
         });
 
         expect(loggerMock.error).toHaveBeenCalledWith(
             "[MonitoringService] Global monitoring stop failed",
             failureSummary
+        );
+    });
+
+    it("rejects malformed stopMonitoring summaries", async () => {
+        monitoringApi.stopMonitoring.mockResolvedValueOnce({
+            alreadyInactive: false,
+            attempted: 3,
+            failed: 1,
+            isMonitoring: true,
+            partialFailures: false,
+            siteCount: 3,
+            skipped: 0,
+            succeeded: 2,
+        });
+
+        await expect(MonitoringService.stopMonitoring()).rejects.toThrow(
+            "[MonitoringService] stopMonitoring returned invalid payload"
         );
     });
 
@@ -243,6 +289,18 @@ describe("MonitoringService edge cases", () => {
             message:
                 "[MonitoringService] Failed to stop monitoring for monitor monitor-err of site site-err: backend returned false",
         });
+    });
+
+    it("rejects malformed stopMonitoringForSite acknowledgements", async () => {
+        monitoringApi.stopMonitoringForSite.mockResolvedValueOnce(
+            "true" as unknown as boolean
+        );
+
+        await expect(
+            MonitoringService.stopMonitoringForSite("site-stop")
+        ).rejects.toThrow(
+            "[MonitoringService] stopMonitoringForSite returned invalid boolean response"
+        );
     });
 
     it("throws when stopMonitoringForSite reports backend failure", async () => {
