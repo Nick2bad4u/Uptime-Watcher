@@ -100,6 +100,44 @@ export function validateMonitorHost(monitor: Monitor): null | string {
 }
 
 /**
+ * Resolves a validated, trimmed monitor host or a standardized error result.
+ *
+ * @param monitor - Monitor to resolve
+ *
+ * @returns Validated host resolution result
+ */
+export function resolveMonitorHost(monitor: Monitor):
+    | {
+          host: string;
+          ok: true;
+      }
+    | {
+          ok: false;
+          result: MonitorCheckResult;
+      } {
+    const hostError = validateMonitorHost(monitor);
+    if (hostError) {
+        return {
+            ok: false,
+            result: createMonitorErrorResult(hostError, 0),
+        };
+    }
+
+    const rawHost = monitor.host;
+    if (typeof rawHost !== "string") {
+        return {
+            ok: false,
+            result: createMonitorErrorResult("Monitor missing valid host", 0),
+        };
+    }
+
+    return {
+        host: rawHost.trim(),
+        ok: true,
+    };
+}
+
+/**
  * Validate that a monitor has the required host and port properties
  *
  * @param monitor - Monitor to validate

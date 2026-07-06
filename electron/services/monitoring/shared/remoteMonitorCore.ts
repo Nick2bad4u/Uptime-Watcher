@@ -28,6 +28,7 @@ import {
     ensureMonitorType,
     type MonitorByType,
 } from "./monitorCoreHelpers";
+import { buildMonitorFactory } from "./monitorFactoryUtils";
 import { createMonitorRetryPlan } from "./monitorRetryUtils";
 import { MonitorServiceAdapterBase } from "./monitorServiceAdapterBase";
 import {
@@ -93,6 +94,14 @@ export type RemoteMonitorConfigResult<TContext> =
     { context: TContext; kind: "success" } | { kind: "error"; message: string };
 
 /**
+ * Constructor shape returned by remote monitor factories.
+ */
+export type RemoteMonitorServiceConstructor = Constructor<
+    IMonitorService,
+    [config?: MonitorServiceConfig]
+>;
+
+/**
  * Behaviour contract required to integrate a remote monitor with the shared
  * core.
  */
@@ -136,7 +145,7 @@ export function createRemoteMonitorService<
     TContext,
 >(
     behavior: RemoteMonitorBehavior<TType, TContext>
-): Constructor<IMonitorService, [config?: MonitorServiceConfig]> {
+): RemoteMonitorServiceConstructor {
     return class RemoteMonitorServiceAdapter extends MonitorServiceAdapterBase<TType> {
         public async check(
             monitor: Site["monitors"][0],
@@ -273,4 +282,20 @@ export function createRemoteMonitorService<
             this.axiosInstance = state.axiosInstance;
         }
     };
+}
+
+/**
+ * Builds a concrete remote monitor base class with hardened factory error
+ * handling.
+ */
+export function createRemoteMonitorBase<
+    TType extends Site["monitors"][number]["type"],
+    TContext,
+>(
+    behavior: RemoteMonitorBehavior<TType, TContext>
+): RemoteMonitorServiceConstructor {
+    return buildMonitorFactory(
+        () => createRemoteMonitorService<TType, TContext>(behavior),
+        behavior.scope
+    );
 }

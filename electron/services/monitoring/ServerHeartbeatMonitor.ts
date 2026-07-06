@@ -4,30 +4,29 @@
  */
 
 import type { Monitor } from "@shared/types";
-import type { Constructor } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { performance } from "node:perf_hooks";
 import { arrayJoin, isDefined } from "ts-extras";
 
-import type { IMonitorService, MonitorServiceConfig } from "./types";
+import type { MonitorServiceConfig } from "./types";
 
 import {
     resolveMonitorNumericOverride,
     resolveRequiredMonitorStringField,
     resolveRequiredMonitorUrlField,
 } from "./shared/monitorConfigValueResolvers";
-import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
     createMonitorErrorResult,
     extractNestedFieldValue,
     normalizeTimestampValue,
 } from "./shared/monitorServiceHelpers";
 import {
-    createRemoteMonitorService,
+    createRemoteMonitorBase,
     type RemoteEndpointPayload,
     type RemoteMonitorBehavior,
+    type RemoteMonitorServiceConstructor,
 } from "./shared/remoteMonitorCore";
 
 const DEFAULT_MAX_DRIFT_SECONDS = 60;
@@ -203,20 +202,8 @@ const behavior: RemoteMonitorBehavior<
     type: "server-heartbeat",
 };
 
-type ServerHeartbeatMonitorConstructor = Constructor<
-    IMonitorService,
-    [config?: MonitorServiceConfig]
->;
-
-const ServerHeartbeatMonitorBase: ServerHeartbeatMonitorConstructor =
-    buildMonitorFactory(
-        () =>
-            createRemoteMonitorService<
-                "server-heartbeat",
-                ServerHeartbeatContext
-            >(behavior),
-        "ServerHeartbeatMonitor"
-    );
+const ServerHeartbeatMonitorBase: RemoteMonitorServiceConstructor =
+    createRemoteMonitorBase(behavior);
 
 /**
  * Server heartbeat monitor service built atop the shared remote monitor core.

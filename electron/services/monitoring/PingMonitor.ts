@@ -46,10 +46,7 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
 import { createMonitorConfig } from "./createMonitorConfig";
 import { ConfigurableMonitorServiceBase } from "./shared/configurableMonitorServiceBase";
-import {
-    createMonitorErrorResult,
-    validateMonitorHost,
-} from "./shared/monitorServiceHelpers";
+import { resolveMonitorHost } from "./shared/monitorServiceHelpers";
 import { performPingCheckWithRetry } from "./utils/pingRetry";
 
 /**
@@ -138,7 +135,7 @@ export class PingMonitor extends ConfigurableMonitorServiceBase<"ping"> {
      * @throws {@link Error} When monitor validation fails (wrong type or
      *   missing host)
      *
-     * @see {@link validateMonitorHost} - Host validation utility
+     * @see {@link resolveMonitorHost} - Host validation utility
      * @see {@link createMonitorConfig} - Timeout and retry normalization utility
      * @see {@link performPingCheckWithRetry} - Core ping functionality
      */
@@ -152,17 +149,12 @@ export class PingMonitor extends ConfigurableMonitorServiceBase<"ping"> {
             );
         }
 
-        const hostError = validateMonitorHost(monitor);
-        if (hostError) {
-            return createMonitorErrorResult(hostError, 0);
+        const hostResolution = resolveMonitorHost(monitor);
+        if (!hostResolution.ok) {
+            return hostResolution.result;
         }
 
-        // Host is guaranteed to be valid at this point due to validation above
-        if (!monitor.host) {
-            return createMonitorErrorResult("Monitor missing valid host", 0);
-        }
-
-        const host = monitor.host.trim();
+        const { host } = hostResolution;
 
         // Normalize effective config (timeout, retryAttempts, interval)
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {

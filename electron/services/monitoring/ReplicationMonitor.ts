@@ -3,33 +3,28 @@ import type { Monitor } from "@shared/types";
  * Replication monitor service leveraging the shared remote monitor core for
  * request orchestration and retry handling.
  */
-import type { Constructor } from "type-fest";
 
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { performance } from "node:perf_hooks";
 import { isDefined } from "ts-extras";
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorServiceConfig,
-} from "./types";
+import type { MonitorCheckResult, MonitorServiceConfig } from "./types";
 
 import {
     resolveMonitorNumericOverride,
     resolveRequiredMonitorStringField,
     resolveRequiredMonitorUrlField,
 } from "./shared/monitorConfigValueResolvers";
-import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
     createMonitorErrorResult,
     extractNestedFieldValue,
     normalizeTimestampValue,
 } from "./shared/monitorServiceHelpers";
 import {
-    createRemoteMonitorService,
+    createRemoteMonitorBase,
     type RemoteEndpointPayload,
     type RemoteMonitorBehavior,
+    type RemoteMonitorServiceConstructor,
 } from "./shared/remoteMonitorCore";
 
 const MINIMUM_LAG_THRESHOLD_SECONDS = 0;
@@ -200,20 +195,8 @@ const behavior: RemoteMonitorBehavior<
     type: "replication",
 };
 
-type ReplicationMonitorConstructor = Constructor<
-    IMonitorService,
-    [config?: MonitorServiceConfig]
->;
-
-const ReplicationMonitorBase: ReplicationMonitorConstructor =
-    buildMonitorFactory(
-        () =>
-            createRemoteMonitorService<
-                "replication",
-                ReplicationMonitorContext
-            >(behavior),
-        "ReplicationMonitor"
-    );
+const ReplicationMonitorBase: RemoteMonitorServiceConstructor =
+    createRemoteMonitorBase(behavior);
 
 /**
  * Replication monitor service built atop the shared remote monitor core.

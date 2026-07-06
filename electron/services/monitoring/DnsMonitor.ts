@@ -76,7 +76,7 @@ import { createMonitorRetryPlan } from "./shared/monitorRetryUtils";
 import {
     createMonitorConfig,
     createMonitorErrorResult,
-    validateMonitorHost,
+    resolveMonitorHost,
 } from "./shared/monitorServiceHelpers";
 import { parseDnsResolutionResult } from "./utils/dnsRecordParsing";
 
@@ -186,7 +186,7 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
      * @throws {@link Error} When monitor validation fails (wrong type or
      *   missing hostname)
      *
-     * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#validateMonitorHost} - Host validation utility
+     * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#resolveMonitorHost} - Host validation utility
      * @see {@link createMonitorConfig} - Config normalization utility
      * @see {@link performDnsCheckWithRetry} - Core DNS functionality
      */
@@ -200,17 +200,12 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
             );
         }
 
-        const hostError = validateMonitorHost(monitor);
-        if (hostError) {
-            return createMonitorErrorResult(hostError, 0);
+        const hostResolution = resolveMonitorHost(monitor);
+        if (!hostResolution.ok) {
+            return hostResolution.result;
         }
 
-        // Host is guaranteed to be valid at this point due to validation above
-        if (!monitor.host) {
-            return createMonitorErrorResult("Monitor missing valid host", 0);
-        }
-
-        const host = monitor.host.trim();
+        const { host } = hostResolution;
 
         // Validate recordType field
         const recordTypeRaw = monitor.recordType;
