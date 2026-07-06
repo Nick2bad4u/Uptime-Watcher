@@ -9,6 +9,89 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";
 
+const SKIPPED_DIRECTORIES = new Set([
+    ".cache",
+    ".git",
+    ".vs",
+    ".vscode",
+    "build",
+    "coverage",
+    "dist",
+    "dist-bench",
+    "dist-configs",
+    "dist-playwright",
+    "html",
+    "node_modules",
+    "playwright-report",
+    "release",
+    "reports",
+    "storybook-static",
+    "temp",
+    "test-results",
+]);
+
+const OUTPUT_FORMATS = new Set([
+    "flat",
+    "json",
+    "list",
+    "tree",
+]);
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{ format: string; help: boolean; save: boolean }} Parsed options.
+ */
+function parseArgs(args) {
+    const parsed = {
+        format: "list",
+        help: false,
+        save: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+
+            case "--save": {
+                parsed.save = true;
+                break;
+            }
+
+            case "--flat":
+            case "--json":
+            case "--list":
+            case "--tree": {
+                parsed.format = arg.slice(2);
+                break;
+            }
+
+            default: {
+                throw new Error(`Unknown option: ${arg}`);
+            }
+        }
+    }
+
+    return parsed;
+}
+
+/**
+ * Check whether a file name matches the project test file conventions.
+ *
+ * @param {string} fileName - File name to inspect.
+ *
+ * @returns {boolean} Whether the file is a test/bench file.
+ */
+function isTestFileName(fileName) {
+    return /\.(?:test|spec|bench)\.[cm]?[jt]sx?$/u.test(fileName);
+}
+
 /**
  * Extract test names from a single test file.
  *
@@ -79,30 +162,13 @@ function findTestFiles(dirPath, testFiles = []) {
 
             if (entry.isDirectory()) {
                 // Skip node_modules, .git, dist folders, etc.
-                if (
-                    [
-                        "node_modules",
-                        ".git",
-                        "dist",
-                        "dist",
-                        "coverage",
-                        ".vscode",
-                        ".vs",
-                    ].includes(entry.name)
-                ) {
+                if (SKIPPED_DIRECTORIES.has(entry.name)) {
                     continue;
                 }
                 findTestFiles(fullPath, testFiles);
             } else if (
                 entry.isFile() && // Check if it's a test file
-                (entry.name.includes(".test.") ||
-                    entry.name.includes(".spec.") ||
-                    entry.name.endsWith(".test.ts") ||
-                    entry.name.endsWith(".test.js") ||
-                    entry.name.endsWith(".spec.ts") ||
-                    entry.name.endsWith(".spec.js") ||
-                    entry.name.endsWith(".bench.ts") ||
-                    entry.name.endsWith(".bench.js"))
+                isTestFileName(entry.name)
             ) {
                 testFiles.push(fullPath);
             }
@@ -124,6 +190,10 @@ function findTestFiles(dirPath, testFiles = []) {
  * @param {string} format - Output format ('list', 'json', 'tree', 'flat').
  */
 function formatTestNames(testStructures, format = "list") {
+    if (!OUTPUT_FORMATS.has(format)) {
+        throw new Error(`Unsupported output format: ${format}`);
+    }
+
     switch (format) {
         case "json": {
             return JSON.stringify(testStructures, null, 2);
@@ -198,29 +268,18 @@ function formatTestNames(testStructures, format = "list") {
  * Main function.
  */
 function main() {
-    const args = process.argv.slice(2);
-    if (args.includes("--help") || args.includes("-h")) {
-        showUsage();
-        return;
-    }
-
-    const format =
-        args
-            .find((arg) =>
-                [
-                    "--json",
-                    "--tree",
-                    "--flat",
-                    "--list",
-                ].includes(arg)
-            )
-            ?.replace("--", "") || "list";
-    const projectRoot = path.resolve(import.meta.dirname, "..");
-
-    console.log(`Extracting test names from: ${projectRoot}`);
-    console.log(`Output format: ${format}\n`);
-
     try {
+        const options = parseArgs(process.argv.slice(2));
+        if (options.help) {
+            showUsage();
+            return;
+        }
+
+        const projectRoot = path.resolve(import.meta.dirname, "..");
+
+        console.log(`Extracting test names from: ${projectRoot}`);
+        console.log(`Output format: ${options.format}\n`);
+
         // Find all test files
         const testFiles = findTestFiles(projectRoot);
         console.log(`Found ${testFiles.length} test files\n`);
@@ -240,7 +299,7 @@ function main() {
         });
 
         // Output results
-        const output = formatTestNames(testStructures, format);
+        const output = formatTestNames(testStructures, options.format);
         console.log(output);
 
         // Summary
@@ -259,7 +318,7 @@ function main() {
         console.log(`Total test cases: ${totalTests}`);
 
         // Export to file option
-        if (args.includes("--save")) {
+        if (options.save) {
             const outputFile = path.join(
                 projectRoot,
                 `test-names-${Date.now()}.txt`
@@ -307,7 +366,7 @@ Examples:
 function isDirectInvocation() {
     return (
         typeof process.argv[1] === "string" &&
-        import.meta.url === pathToFileURL(process.argv[1]).href
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
     );
 }
 
@@ -315,4 +374,10 @@ if (isDirectInvocation()) {
     main();
 }
 
-export default { extractTestNames, findTestFiles, formatTestNames };
+export default {
+    extractTestNames,
+    findTestFiles,
+    formatTestNames,
+    isTestFileName,
+    parseArgs,
+};
