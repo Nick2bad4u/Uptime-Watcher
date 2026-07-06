@@ -20,6 +20,9 @@ const knipConfig: KnipConfig = {
         "docs/docusaurus/static/**",
         "docs/docusaurus/src/css/custom.css",
         "config/linting/plugins/uptime-watcher/_internal/repo-paths.mjs",
+        // Benchmarks type-check this shim through config/benchmarks/tsconfig.bench.json;
+        // Knip resolves the same alias through the root tsconfig instead.
+        "benchmarks/shared/testHelpers.ts",
         "docs/docusaurus/src/components/HomepageFeatures/styles.module.css.d.ts",
         "docs/docusaurus/typedoc-plugins/hashToBangLinks.mjs",
         "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs",
@@ -69,6 +72,7 @@ const knipConfig: KnipConfig = {
     workspaces: {
         ".": {
             entry: [
+                "benchmarks/**/*.bench.{ts,tsx}",
                 "electron/main.ts",
                 "electron/preload.ts",
                 "scripts/**/*.{cjs,cts,js,json,jsonc,mjs,mts,ts}",
