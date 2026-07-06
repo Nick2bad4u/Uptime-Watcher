@@ -1,5 +1,29 @@
-// Sort-frontmatter.mjs
 import * as fs from "node:fs";
+import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const __dirname = import.meta.dirname;
+const repoRoot = path.resolve(__dirname, "..");
+const SKIPPED_DIRECTORIES = new Set([
+    ".cache",
+    ".git",
+    ".vs",
+    ".vscode",
+    "build",
+    "coverage",
+    "dist",
+    "dist-bench",
+    "dist-configs",
+    "dist-playwright",
+    "html",
+    "node_modules",
+    "playwright-report",
+    "release",
+    "reports",
+    "storybook-static",
+    "temp",
+    "test-results",
+]);
 
 /**
  * Desired key order for your front matter.
@@ -18,6 +42,130 @@ const KEY_ORDER = [
     "tools",
     "applyTo",
 ];
+
+/**
+ * Show command usage.
+ */
+function showHelp() {
+    console.log(`
+Sort Markdown frontmatter for one repository file.
+
+Usage: node scripts/sort-frontmatter.mjs [--check] <file.md>
+
+Options:
+  --check    Report whether the file is sorted without writing changes.
+  -h, --help Show this help.
+`);
+}
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{ check: boolean; file: string | null; help: boolean }} Parsed
+ *   arguments.
+ */
+function parseArgs(args) {
+    const parsed = {
+        check: false,
+        file: /** @type {string | null} */ (null),
+        help: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--check": {
+                parsed.check = true;
+                break;
+            }
+
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+
+            default: {
+                if (arg.startsWith("-")) {
+                    throw new Error(`Unknown option: ${arg}`);
+                }
+
+                if (parsed.file !== null) {
+                    throw new Error(
+                        `Only one Markdown file can be sorted at a time.`
+                    );
+                }
+
+                parsed.file = arg;
+            }
+        }
+    }
+
+    return parsed;
+}
+
+/**
+ * Check whether a path resolves inside the repository.
+ *
+ * @param {string} resolvedPath
+ *
+ * @returns {boolean}
+ */
+function isRepoPath(resolvedPath) {
+    const relativePath = path.relative(repoRoot, resolvedPath);
+    return (
+        relativePath === "" ||
+        (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))
+    );
+}
+
+/**
+ * Check whether a path is under a generated/cache directory.
+ *
+ * @param {string} resolvedPath
+ *
+ * @returns {boolean}
+ */
+function isSkippedPath(resolvedPath) {
+    const relativePath = path.relative(repoRoot, resolvedPath);
+    return relativePath
+        .split(path.sep)
+        .some((segment) => SKIPPED_DIRECTORIES.has(segment));
+}
+
+/**
+ * Resolve a user-provided Markdown file path inside the repository.
+ *
+ * @param {string} rawFile
+ *
+ * @returns {string}
+ */
+function resolveMarkdownFile(rawFile) {
+    const resolved = path.resolve(repoRoot, rawFile);
+
+    if (!isRepoPath(resolved)) {
+        throw new Error(`Target must stay inside the repository: ${rawFile}`);
+    }
+
+    if (isSkippedPath(resolved)) {
+        throw new Error(`Refusing to sort generated/cache path: ${rawFile}`);
+    }
+
+    if (path.extname(resolved).toLowerCase() !== ".md") {
+        throw new Error(`Target must be a Markdown file: ${rawFile}`);
+    }
+
+    if (!fs.existsSync(resolved)) {
+        throw new Error(`File does not exist: ${rawFile}`);
+    }
+
+    if (!fs.statSync(resolved).isFile()) {
+        throw new Error(`Target must be a file: ${rawFile}`);
+    }
+
+    return resolved;
+}
 
 /**
  * Extract frontmatter and body from a Markdown file.
@@ -155,22 +303,113 @@ function reorderBlocks(blocks) {
     return orderedBlocks.flatMap(({ block }) => block.lines).join("\n");
 }
 
-const filename = process.argv[2];
-if (!filename) {
-    console.error("Usage: node sort-frontmatter.mjs <file.md>");
-    process.exit(1);
+/**
+ * Sort frontmatter text for a Markdown file.
+ *
+ * @param {string} fileContent - Current file content.
+ *
+ * @returns {string | null} Sorted content, or null when no frontmatter exists.
+ */
+function sortFrontmatterContent(fileContent) {
+    const split = splitFrontmatter(fileContent);
+
+    if (!split) {
+        return null;
+    }
+
+    const blocks = parseKeyBlocks(split.frontmatter);
+    const reorderedFrontmatter = reorderBlocks(blocks);
+
+    return `---\n${reorderedFrontmatter}\n---\n${split.body}`;
 }
 
-const file = fs.readFileSync(filename, "utf8");
-const split = splitFrontmatter(file);
+/**
+ * Sort one Markdown file's frontmatter.
+ *
+ * @param {string} filename - Markdown file path inside the repository.
+ * @param {{ check?: boolean }} [options] - Sorting options.
+ *
+ * @returns {{ changed: boolean; filename: string; skipped: boolean }} Result.
+ */
+function sortFrontmatterFile(filename, options = {}) {
+    const resolvedFile = resolveMarkdownFile(filename);
+    const file = fs.readFileSync(resolvedFile, "utf8");
+    const out = sortFrontmatterContent(file);
 
-if (!split) {
-    console.error("No valid frontmatter found in", filename);
-    process.exit(1);
+    if (out === null) {
+        return {
+            changed: false,
+            filename: resolvedFile,
+            skipped: true,
+        };
+    }
+
+    const changed = out !== file;
+
+    if (changed && options.check !== true) {
+        fs.writeFileSync(resolvedFile, out);
+    }
+
+    return {
+        changed,
+        filename: resolvedFile,
+        skipped: false,
+    };
 }
 
-const blocks = parseKeyBlocks(split.frontmatter);
-const reorderedFrontmatter = reorderBlocks(blocks);
+/**
+ * Main CLI entrypoint.
+ *
+ * @param {string[]} [args] - Raw command-line arguments.
+ */
+function main(args = process.argv.slice(2)) {
+    try {
+        const options = parseArgs(args);
 
-const out = `---\n${reorderedFrontmatter}\n---\n${split.body}`;
-fs.writeFileSync(filename, out);
+        if (options.help) {
+            showHelp();
+            return;
+        }
+
+        if (options.file === null) {
+            showHelp();
+            process.exit(1);
+        }
+
+        const result = sortFrontmatterFile(options.file, {
+            check: options.check,
+        });
+
+        if (result.skipped) {
+            console.error("No valid frontmatter found in", result.filename);
+            process.exit(1);
+        }
+
+        if (options.check && result.changed) {
+            console.error("Frontmatter is not sorted in", result.filename);
+            process.exit(1);
+        }
+    } catch (error) {
+        console.error(error instanceof Error ? error.message : String(error));
+        process.exit(1);
+    }
+}
+
+if (
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
+    main();
+}
+
+export {
+    isRepoPath,
+    isSkippedPath,
+    parseArgs,
+    parseKeyBlocks,
+    reorderBlocks,
+    resolveMarkdownFile,
+    sortFrontmatterContent,
+    sortFrontmatterFile,
+    splitFrontmatter,
+};
