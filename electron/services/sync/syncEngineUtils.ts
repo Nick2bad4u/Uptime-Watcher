@@ -1,3 +1,4 @@
+import { isAsciiDigits as sharedIsAsciiDigits } from "@shared/utils/ascii";
 import { hasAsciiControlCharacters as sharedHasAsciiControlCharacters } from "@shared/utils/stringSafety";
 /**
  * Shared SyncEngine utilities.
@@ -10,7 +11,6 @@ import {
     getPersistedDeviceIdValidationError as sharedGetPersistedDeviceIdValidationError,
     isValidPersistedDeviceId as sharedIsValidPersistedDeviceId,
 } from "@shared/validation/persistedDeviceIdValidation";
-import { isDefined } from "ts-extras";
 
 import { mapWithConcurrency as mapWithConcurrencyImpl } from "../../utils/boundedConcurrency";
 
@@ -23,18 +23,7 @@ import { mapWithConcurrency as mapWithConcurrencyImpl } from "../../utils/bounde
  * representations to keep provider keys canonical and comparable.
  */
 export function isAsciiDigits(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    for (const char of value) {
-        const codePoint = char.codePointAt(0);
-        if (!isDefined(codePoint) || codePoint < 48 || codePoint > 57) {
-            return false;
-        }
-    }
-
-    return true;
+    return sharedIsAsciiDigits(value);
 }
 
 /**

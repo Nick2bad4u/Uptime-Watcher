@@ -1,45 +1,16 @@
 import { logger } from "@electron/utils/logger";
+import { hasAsciiLetter, isAsciiDigits } from "@shared/utils/ascii";
 import { calculateBackoffDelayMs } from "@shared/utils/backoff";
 import { withRetry } from "@shared/utils/retry";
 import { isRecord, safePropertyAccess } from "@shared/utils/typeHelpers";
 import axios from "axios";
 import { DropboxResponseError } from "dropbox";
 import { randomInt } from "node:crypto";
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 const DEFAULT_INITIAL_DELAY_MS = 500;
 const DEFAULT_MAX_DELAY_MS = 10_000;
 const DEFAULT_MAX_ATTEMPTS = 4;
-
-function hasAsciiLetter(value: string): boolean {
-    for (const character of value) {
-        const codePoint = character.codePointAt(0);
-        if (
-            isDefined(codePoint) &&
-            ((codePoint >= 65 && codePoint <= 90) ||
-                (codePoint >= 97 && codePoint <= 122))
-        ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function isAsciiDigits(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    for (const character of value) {
-        const codePoint = character.codePointAt(0);
-        if (!isDefined(codePoint) || codePoint < 48 || codePoint > 57) {
-            return false;
-        }
-    }
-
-    return true;
-}
 
 function parseRetryAfterMs(value: unknown): number | undefined {
     if (typeof value !== "string") {
@@ -130,7 +101,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
         if (status === 429) {
             return {
                 status,
-                ...(isDefined(retryAfterMs) && { retryAfterMs }),
+                ...(retryAfterMs !== undefined && { retryAfterMs }),
             };
         }
 
@@ -142,7 +113,7 @@ function extractRetryableHttpFailure(error: unknown): null | {
         ) {
             return {
                 status,
-                ...(isDefined(retryAfterMs) && { retryAfterMs }),
+                ...(retryAfterMs !== undefined && { retryAfterMs }),
             };
         }
 
@@ -187,12 +158,12 @@ function extractRetryableHttpFailure(error: unknown): null | {
     ) {
         return {
             status,
-            ...(isDefined(retryAfterMs) && { retryAfterMs }),
+            ...(retryAfterMs !== undefined && { retryAfterMs }),
         };
     }
 
     // Network / transport errors often have no HTTP status.
-    if (!isDefined(status)) {
+    if (status === undefined) {
         return {};
     }
 

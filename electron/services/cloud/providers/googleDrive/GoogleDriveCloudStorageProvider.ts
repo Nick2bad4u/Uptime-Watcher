@@ -8,6 +8,7 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isAsciiDigits } from "@shared/utils/ascii";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import {
@@ -122,21 +123,6 @@ function parseDriveTimestamp(
 
     const parsed = safeParseIsoTimestamp(value);
     return parsed.success ? Date.parse(parsed.data) : fallback;
-}
-
-function isAsciiDigits(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    for (const character of value) {
-        const codePoint = character.codePointAt(0);
-        if (typeof codePoint !== "number" || codePoint < 48 || codePoint > 57) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 function isValidDriveSizeNumber(value: number): boolean {

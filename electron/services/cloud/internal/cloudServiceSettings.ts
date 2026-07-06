@@ -8,6 +8,7 @@
 
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
+import { isAsciiDigits } from "@shared/utils/ascii";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 
@@ -53,21 +54,6 @@ export async function clearLastError(
 /** Parse a boolean stored as a string (currently "true" maps to true). */
 export function parseBooleanSetting(value: string | undefined): boolean {
     return value === "true";
-}
-
-function isAsciiDigits(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    for (const character of value) {
-        const codePoint = character.codePointAt(0);
-        if (!isDefined(codePoint) || codePoint < 48 || codePoint > 57) {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 /** Parse a nullable epoch millisecond timestamp stored as a string. */
