@@ -165,7 +165,7 @@ function addJsonBytesForObject(
             return;
         }
 
-        addBytes(state, getUtfByteLength(key) + 3);
+        addBytes(state, getJsonBytesForObjectKey(key));
         state.stack.push(descriptor.value);
     }
 }
@@ -226,7 +226,7 @@ function getJsonBytesForNull(): number {
 }
 
 function getJsonBytesForNumber(value: number): number {
-    return getUtfByteLength(String(value));
+    return getUtfByteLength(JSON.stringify(value));
 }
 
 function getJsonBytesForDate(value: Date): number {
@@ -239,8 +239,12 @@ function getJsonBytesForDate(value: Date): number {
 }
 
 function getJsonBytesForString(value: string): number {
-    // Quotes + bytes (rough; ignores escaping overhead).
-    return getUtfByteLength(value) + 2;
+    return getUtfByteLength(JSON.stringify(value));
+}
+
+function getJsonBytesForObjectKey(value: string): number {
+    // JSON object entries encode as `"key":value`.
+    return getJsonBytesForString(value) + 1;
 }
 
 function isBudgetExceeded(state: JsonByteBudgetState): boolean {
