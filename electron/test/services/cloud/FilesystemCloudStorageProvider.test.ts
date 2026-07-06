@@ -514,6 +514,52 @@ describe("FilesystemCloudStorageProvider", () => {
         }
     });
 
+    it("refuses to download or delete object symlinks", async () => {
+        const provider = new FilesystemCloudStorageProvider({ baseDirectory });
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const syncDirectory = path.join(appRoot, "sync");
+        const outsideDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-object-link-outside-")
+        );
+        const outsideFile = path.join(outsideDirectory, "outside.txt");
+        const linkPath = path.join(syncDirectory, "link.txt");
+
+        await fs.mkdir(syncDirectory, { recursive: true });
+        await fs.writeFile(outsideFile, "outside");
+
+        try {
+            await fs.symlink(outsideFile, linkPath, "file");
+        } catch (error: unknown) {
+            const code =
+                typeof error === "object" && error !== null && "code" in error
+                    ? String(error.code)
+                    : "";
+
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+
+            if (code === "EPERM" || code === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        try {
+            await expect(
+                provider.downloadObject("sync/link.txt")
+            ).rejects.toThrow(CloudProviderOperationError);
+            await expect(
+                provider.deleteObject("sync/link.txt")
+            ).rejects.toThrow(CloudProviderOperationError);
+            await expect(fs.readFile(outsideFile, "utf8")).resolves.toBe(
+                "outside"
+            );
+        } finally {
+            await fs.rm(linkPath, { force: true });
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+        }
+    });
+
     it("rechecks directories created by a concurrent EEXIST race", async () => {
         const appRoot = path.resolve(baseDirectory, "uptime-watcher");
         const outsideDirectory = await fs.mkdtemp(
