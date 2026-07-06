@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe(fetchGoogleAccountLabel, () => {
     beforeEach(() => {
+        vi.useRealTimers();
         vi.restoreAllMocks();
     });
 
@@ -73,5 +74,28 @@ describe(fetchGoogleAccountLabel, () => {
         vi.stubGlobal("fetch", fetchMock);
 
         await expect(fetchGoogleAccountLabel("token")).resolves.toBeUndefined();
+    });
+
+    it("returns undefined when the userinfo request times out", async () => {
+        vi.useFakeTimers();
+        const fetchMock = vi.fn((_url: string, init?: RequestInit) => {
+            const { signal } = init ?? {};
+            return new Promise((_resolve, reject) => {
+                signal?.addEventListener(
+                    "abort",
+                    () => {
+                        reject(signal.reason);
+                    },
+                    { once: true }
+                );
+            });
+        });
+        vi.stubGlobal("fetch", fetchMock);
+
+        const labelPromise = fetchGoogleAccountLabel("token");
+
+        await vi.advanceTimersByTimeAsync(5000);
+
+        await expect(labelPromise).resolves.toBeUndefined();
     });
 });

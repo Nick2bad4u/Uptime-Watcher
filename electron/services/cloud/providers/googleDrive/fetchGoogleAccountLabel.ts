@@ -1,3 +1,5 @@
+import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
+
 import { tryParseGoogleUserInfoResponse } from "./googleOpenIdSchemas";
 
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
@@ -55,7 +57,9 @@ export async function fetchGoogleAccountLabel(
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-            signal: AbortSignal.timeout(GOOGLE_USERINFO_TIMEOUT_MS),
+            signal: createCombinedAbortSignal({
+                timeoutMs: GOOGLE_USERINFO_TIMEOUT_MS,
+            }),
         });
 
         if (!response.ok) {
