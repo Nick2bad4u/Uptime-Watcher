@@ -5,8 +5,87 @@
  * through the project and renames files.
  */
 
-import { readdirSync, renameSync } from "node:fs";
+import { existsSync, readdirSync, renameSync } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const SKIPPED_DIRECTORIES = new Set([
+    ".cache",
+    ".git",
+    ".vs",
+    ".vscode",
+    "build",
+    "coverage",
+    "dist",
+    "dist-bench",
+    "dist-configs",
+    "dist-playwright",
+    "html",
+    "node_modules",
+    "playwright-report",
+    "release",
+    "reports",
+    "storybook-static",
+    "temp",
+    "test-results",
+]);
+
+/**
+ * Show command usage.
+ */
+function showHelp() {
+    console.log(`
+Convert PascalCase filenames to camelCase.
+
+Usage: node scripts/convert-pascal-to-camel.mjs [options]
+
+Options:
+  --dry-run, -d  Preview renames without changing files (default)
+  --write        Rename files on disk
+  --help, -h     Show this help
+`);
+}
+
+/**
+ * Parse command-line arguments.
+ *
+ * @param {string[]} args - Raw command-line arguments.
+ *
+ * @returns {{ dryRun: boolean; help: boolean }} Parsed options.
+ */
+function parseArgs(args) {
+    const options = {
+        dryRun: true,
+        help: false,
+    };
+
+    for (const arg of args) {
+        switch (arg) {
+            case "--dry-run":
+            case "-d": {
+                options.dryRun = true;
+                break;
+            }
+
+            case "--write": {
+                options.dryRun = false;
+                break;
+            }
+
+            case "--help":
+            case "-h": {
+                options.help = true;
+                break;
+            }
+
+            default: {
+                throw new Error(`Unknown option: ${arg}`);
+            }
+        }
+    }
+
+    return options;
+}
 
 /**
  * Convert PascalCase string to camelCase.
@@ -19,6 +98,12 @@ function pascalToCamelCase(str) {
     // Check if the string starts with an uppercase letter (PascalCase)
     if (str.length === 0 || !/^[A-Z]/.test(str)) {
         return str;
+    }
+
+    const leadingAcronym = /^(?<acronym>[A-Z]+)(?=[A-Z][a-z])/u.exec(str);
+    if (leadingAcronym?.groups?.["acronym"]) {
+        const acronym = leadingAcronym.groups["acronym"];
+        return acronym.toLowerCase() + str.slice(acronym.length);
     }
 
     // Convert first character to lowercase
@@ -36,12 +121,12 @@ function isPascalCase(filename) {
     // Get filename without extension
     const nameWithoutExt = path.parse(filename).name;
 
-    // Check if it starts with uppercase and contains at least one more uppercase letter
-    return (
-        /^[A-Z][a-z]*[A-Z]/.test(nameWithoutExt) ||
-        /^[A-Z]{2}/.test(nameWithoutExt) ||
-        /^[A-Z][a-z]+$/.test(nameWithoutExt)
-    );
+    if (!/^[A-Z][A-Za-z0-9]*$/u.test(nameWithoutExt)) {
+        return false;
+    }
+
+    // All-caps names such as README, SUPPORT, and UNLICENSE are not PascalCase.
+    return /[a-z]/u.test(nameWithoutExt);
 }
 
 /**
@@ -58,16 +143,7 @@ function processDirectory(dirPath, dryRun = false) {
 
         if (entry.isDirectory()) {
             // Skip node_modules, .git, dist folders, etc.
-            if (
-                [
-                    "node_modules",
-                    ".git",
-                    "dist",
-                    "coverage",
-                    ".vscode",
-                    ".vs",
-                ].includes(entry.name)
-            ) {
+            if (SKIPPED_DIRECTORIES.has(entry.name)) {
                 continue;
             }
             processDirectory(fullPath, dryRun);
@@ -78,6 +154,13 @@ function processDirectory(dirPath, dryRun = false) {
             const parsed = path.parse(entry.name);
             const newName = pascalToCamelCase(parsed.name) + parsed.ext;
             const newPath = path.join(dirPath, newName);
+
+            if (existsSync(newPath)) {
+                console.error(
+                    `Skipping rename because target already exists: ${fullPath} → ${newPath}`
+                );
+                continue;
+            }
 
             if (dryRun) {
                 console.log(`Would rename: ${fullPath} → ${newPath}`);
@@ -100,27 +183,31 @@ function processDirectory(dirPath, dryRun = false) {
  * Main function.
  */
 function main() {
-    const args = process.argv.slice(2);
-    const dryRun = args.includes("--dry-run") || args.includes("-d");
-    const projectRoot = path.resolve(import.meta.dirname, "..");
-
-    console.log(
-        `Converting PascalCase filenames to camelCase in: ${projectRoot}`
-    );
-
-    if (dryRun) {
-        console.log("DRY RUN MODE - No files will be actually renamed\n");
-    } else {
-        console.log("LIVE MODE - Files will be renamed\n");
-    }
-
     try {
-        processDirectory(projectRoot, dryRun);
+        const options = parseArgs(process.argv.slice(2));
+        if (options.help) {
+            showHelp();
+            return;
+        }
+
+        const projectRoot = path.resolve(import.meta.dirname, "..");
+
+        console.log(
+            `Converting PascalCase filenames to camelCase in: ${projectRoot}`
+        );
+
+        if (options.dryRun) {
+            console.log("DRY RUN MODE - No files will be actually renamed\n");
+        } else {
+            console.log("LIVE MODE - Files will be renamed\n");
+        }
+
+        processDirectory(projectRoot, options.dryRun);
         console.log("\nConversion complete!");
 
-        if (dryRun) {
+        if (options.dryRun) {
             console.log(
-                "\nTo actually rename files, run: node convert-pascal-to-camel.js"
+                "\nTo actually rename files, run: node scripts/convert-pascal-to-camel.mjs --write"
             );
         }
     } catch (error) {
@@ -133,8 +220,11 @@ function main() {
 }
 
 // Run the script
-if (process.argv[1] === import.meta.filename) {
+if (
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
     main();
 }
 
-export default { pascalToCamelCase, isPascalCase, processDirectory };
+export default { parseArgs, pascalToCamelCase, isPascalCase, processDirectory };
