@@ -112,9 +112,9 @@ function parseArgs(args) {
 }
 
 /**
- * Print usage information and exit immediately.
+ * Print usage information.
  *
- * @returns {never}
+ * @returns {void}
  */
 function showHelp() {
     console.log(`
@@ -132,7 +132,6 @@ Examples:
   node scripts/fix-test-quotes.mjs --dry-run
   node scripts/fix-test-quotes.mjs --pattern "electron/*.test.ts"
 `);
-    process.exit(0);
 }
 
 /**
@@ -290,12 +289,17 @@ function findTestFiles(dir, pattern, rootDir = dir) {
 
 /**
  * Main execution function.
+ *
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {boolean} `true` when the command completes without fatal errors.
  */
-function main() {
-    options = parseArgs(process.argv.slice(2));
+function main(args = process.argv.slice(2)) {
+    options = parseArgs(args);
 
     if (options.help) {
         showHelp();
+        return true;
     }
 
     console.log("🔧 Test Quote Fixer");
@@ -340,6 +344,8 @@ function main() {
             "🔍 This was a dry run. Use without --dry-run to apply changes."
         );
     }
+
+    return errors === 0;
 }
 
 /**
@@ -350,21 +356,30 @@ function main() {
 function isDirectInvocation() {
     return (
         typeof process.argv[1] === "string" &&
-        import.meta.url === pathToFileURL(process.argv[1]).href
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
     );
 }
 
 // Execute if run directly
 if (isDirectInvocation()) {
     try {
-        main();
+        process.exitCode = main() ? 0 : 1;
     } catch (error) {
         console.error(
             "❌ Error:",
             error instanceof Error ? error.message : String(error)
         );
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-export { fixFileQuotes };
+export {
+    findTestFiles,
+    fixFileQuotes,
+    isDirectInvocation,
+    main,
+    matchesPattern,
+    parseArgs,
+    readOptionValue,
+    showHelp,
+};

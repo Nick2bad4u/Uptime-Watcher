@@ -365,12 +365,14 @@ function getCachedMetadata(filePath, testName) {
 function timeOperation(operation, operationName) {
     const start = performance.now();
     try {
+        const result = operation();
         const duration = performance.now() - start;
         perfCounters.processingTimeMs += duration;
+        perfCounters.totalProcessingTime += duration;
         if (process.env["DEBUG"]) {
             console.log(`⏱️  ${operationName}: ${duration.toFixed(2)}ms`);
         }
-        return operation();
+        return result;
     } catch (error) {
         perfCounters.errors++;
         throw error;
@@ -717,13 +719,17 @@ function findTestFiles(dir, pattern, projectRoot) {
 
 /**
  * ✨ Enhanced main execution function with performance reporting.
+ *
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {boolean} `true` when the command completes without fatal errors.
  */
-function main() {
-    options = parseArgs(process.argv.slice(2));
+function main(args = process.argv.slice(2)) {
+    options = parseArgs(args);
 
     if (options.help) {
         showHelp();
-        return;
+        return true;
     }
 
     if (options.verbose) {
@@ -832,8 +838,10 @@ function main() {
     if (errors > 0) {
         console.log("");
         console.log("⚠️  Some files had errors. Check the logs above.");
-        process.exit(1);
+        return false;
     }
+
+    return true;
 }
 
 /**
@@ -844,26 +852,33 @@ function main() {
 function isDirectInvocation() {
     return (
         typeof process.argv[1] === "string" &&
-        import.meta.url === pathToFileURL(process.argv[1]).href
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
     );
 }
 
 if (isDirectInvocation()) {
     try {
-        main();
+        process.exitCode = main() ? 0 : 1;
     } catch (error) {
         console.error(
             "❌ Error:",
             error instanceof Error ? error.message : String(error)
         );
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
 export {
-    processTestFile,
-    generateMetadata,
-    getComponentName,
     getCategory,
+    getComponentName,
     getTestType,
+    generateMetadata,
+    isDirectInvocation,
+    main,
+    parseArgs,
+    processTestFile,
+    readOptionValue,
+    showHelp,
+    splitOptionValue,
+    timeOperation,
 };
