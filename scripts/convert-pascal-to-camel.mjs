@@ -239,15 +239,3 @@ function isDirectInvocation() {
 if (isDirectInvocation()) {
     process.exitCode = main() ? 0 : 1;
 }
-
-export {
-    isDirectInvocation,
-    isPascalCase,
-    main,
-    parseArgs,
-    pascalToCamelCase,
-    processDirectory,
-    showHelp,
-};
-
-export default { parseArgs, pascalToCamelCase, isPascalCase, processDirectory };

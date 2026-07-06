@@ -378,22 +378,3 @@ function isDirectInvocation() {
 if (isDirectInvocation()) {
     process.exitCode = main() ? 0 : 1;
 }
-
-export {
-    extractTestNames,
-    findTestFiles,
-    formatTestNames,
-    isDirectInvocation,
-    isTestFileName,
-    main,
-    parseArgs,
-    showUsage,
-};
-
-export default {
-    extractTestNames,
-    findTestFiles,
-    formatTestNames,
-    isTestFileName,
-    parseArgs,
-};

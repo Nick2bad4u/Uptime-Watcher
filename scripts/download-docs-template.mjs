@@ -1198,20 +1198,6 @@ if (isDirectInvocation()) {
         });
 }
 
-// Export for testing
-export {
-    cleanContent,
-    getOutputPath,
-    initialize,
-    isDirectInvocation,
-    main,
-    normalizeBaseUrl,
-    parseArguments,
-    rewriteLinks,
-    showHelp,
-    validateContent,
-};
-
 // Specify input format. FORMAT can be:
 
 // bibtex (BibTeX bibliography)

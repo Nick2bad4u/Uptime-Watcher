@@ -485,16 +485,3 @@ if (isDirectInvocation()) {
         process.exitCode = 1;
     }
 }
-
-export {
-    calculateRelativePath,
-    findSharedImports,
-    formatOutput,
-    getFilesRecursively,
-    isDirectInvocation,
-    main,
-    parseArgs,
-    parseOutputFormat,
-    showHelp,
-    suggestRelativePath,
-};
