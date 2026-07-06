@@ -15,7 +15,8 @@
  */
 
 import { readFile, writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import * as path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const packageJsonPath = fileURLToPath(
     new URL("../package.json", import.meta.url)
@@ -316,10 +317,9 @@ const validateVersionFiles = async ({ expectedVersion }) => {
     );
 };
 
-const main = async () => {
-    const { checkCurrent, checkOnly, explicitVersion } = parseArguments(
-        process.argv.slice(2)
-    );
+const main = async (argumentList = process.argv.slice(2)) => {
+    const { checkCurrent, checkOnly, explicitVersion } =
+        parseArguments(argumentList);
     const packageJson = await readPackageJson();
     const minimumEngineVersion = resolveMinimumEngineVersion(
         packageJson["engines"]
@@ -343,9 +343,28 @@ const main = async () => {
     console.log(`Synchronized .node-version and .nvmrc to ${preferredVersion}`);
 };
 
-try {
-    await main();
-} catch (error) {
-    console.error("Failed to synchronize Node version files:", error);
-    process.exitCode = 1;
+/**
+ * Check whether this module is being run as the CLI entrypoint.
+ *
+ * @returns {boolean} True when invoked directly.
+ */
+const isDirectRun = () =>
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isDirectRun()) {
+    try {
+        await main();
+    } catch (error) {
+        console.error("Failed to synchronize Node version files:", error);
+        process.exitCode = 1;
+    }
 }
+
+export {
+    isDirectRun,
+    main,
+    normalizeNodeVersion,
+    parseArguments,
+    resolveMinimumEngineVersion,
+};
