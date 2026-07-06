@@ -4,12 +4,13 @@
 
 import type { IpcParameterValidator } from "../types";
 
+import { MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES } from "../diagnosticsLimits";
 import { createPreloadGuardReportValidator } from "./shared";
 import {
     createClipboardTextValidator,
     createNoParamsValidator,
+    createSingleBudgetedStringValidator,
     createSingleExternalOpenUrlValidator,
-    createSingleStringValidator,
 } from "./utils/commonValidators";
 
 /**
@@ -27,6 +28,10 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
     openExternal: createSingleExternalOpenUrlValidator("url"),
     quitAndInstall: createNoParamsValidator(),
     reportPreloadGuard: createPreloadGuardReportValidator(),
-    verifyIpcHandler: createSingleStringValidator("channelName"),
+    verifyIpcHandler: createSingleBudgetedStringValidator(
+        "channelName",
+        MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
+        `channelName must not exceed ${MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES} bytes`
+    ),
     writeClipboardText: createClipboardTextValidator(),
 } as const;

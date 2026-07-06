@@ -46,6 +46,28 @@ export function createSingleStringValidator(
 }
 
 /**
+ * Creates validators for handlers expecting a single string parameter with a
+ * strict UTF-8 byte budget.
+ */
+export function createSingleBudgetedStringValidator(
+    paramName: string,
+    maxBytes: number,
+    maxBytesMessage: string
+): IpcParameterValidator {
+    return createParamValidator(1, [
+        (value): ParameterValueValidationResult => {
+            const errors = validateRequiredStringPayload(value, {
+                maxBytes,
+                maxBytesMessage,
+                paramName,
+            });
+
+            return errors.length > 0 ? errors : null;
+        },
+    ]);
+}
+
+/**
  * Creates validators for handlers expecting two string parameters.
  */
 export function createTwoStringValidator(

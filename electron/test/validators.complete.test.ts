@@ -21,6 +21,7 @@ import {
 } from "@shared/validation/monitorFieldConstants";
 import { describe, expect, it, vi } from "vitest";
 
+import { MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES } from "../services/ipc/diagnosticsLimits";
 // Import all exported validator groups (domain modules)
 import { CloudHandlerValidators } from "../services/ipc/validators/cloud";
 import {
@@ -1764,6 +1765,10 @@ describe("IPC Validators - Exported Validator Groups", () => {
             expect(SystemHandlerValidators).toHaveProperty("openExternal");
             expect(SystemHandlerValidators).toHaveProperty("quitAndInstall");
             expect(SystemHandlerValidators).toHaveProperty(
+                "reportPreloadGuard"
+            );
+            expect(SystemHandlerValidators).toHaveProperty("verifyIpcHandler");
+            expect(SystemHandlerValidators).toHaveProperty(
                 "writeClipboardText"
             );
         });
@@ -1803,6 +1808,54 @@ describe("IPC Validators - Exported Validator Groups", () => {
             const result = SystemHandlerValidators.openExternal([
                 "file:///C:/Windows/System32",
             ]);
+
+            expect(isValidationFailure(result)).toBeTruthy();
+        });
+
+        it("accepts bounded diagnostics handler channel names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Validation", "type");
+
+            const result = SystemHandlerValidators.verifyIpcHandler([
+                "sites-get-sites",
+            ]);
+
+            expect(isValidationSuccess(result)).toBeTruthy();
+        });
+
+        it("rejects oversized diagnostics handler channel names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const result = SystemHandlerValidators.verifyIpcHandler([
+                "x".repeat(MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES + 1),
+            ]);
+
+            expect(result).toContain(
+                `channelName must not exceed ${MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES} bytes`
+            );
+        });
+
+        it("rejects non-string diagnostics handler channel names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const result = SystemHandlerValidators.verifyIpcHandler([123]);
 
             expect(isValidationFailure(result)).toBeTruthy();
         });
