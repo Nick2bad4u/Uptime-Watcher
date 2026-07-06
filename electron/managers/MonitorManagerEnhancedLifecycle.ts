@@ -19,6 +19,7 @@ import type {
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { MONITOR_STATUS } from "@shared/types";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -94,6 +95,9 @@ const isValidCheckInterval = (value: unknown): value is number =>
     Number.isInteger(value) &&
     value > 0;
 
+const safeIdentifierForLog = (identifier: string): string | undefined =>
+    getSafeIdentifierForLogging(identifier);
+
 const toggleSingleMonitorEnhanced = async (args: {
     readonly applyMonitorState: EnhancedLifecycleHost["applyMonitorState"];
     readonly config: EnhancedLifecycleConfig;
@@ -137,9 +141,9 @@ const toggleSingleMonitorEnhanced = async (args: {
     );
 
     config.logger.debug("Monitoring toggled for monitor", {
-        identifier,
+        identifier: safeIdentifierForLog(identifier),
         kind,
-        monitorId,
+        monitorId: safeIdentifierForLog(monitorId),
         mode: "enhanced",
     });
 
@@ -154,7 +158,9 @@ const getSiteOrWarn = (
 ): null | Site => {
     const site = config.sites.get(identifier);
     if (!site) {
-        config.logger.warn("Site not found", { identifier });
+        config.logger.warn("Site not found", {
+            identifier: safeIdentifierForLog(identifier),
+        });
         return null;
     }
 
@@ -172,8 +178,8 @@ const getMonitorOrWarn = (
     );
     if (!monitor) {
         config.logger.warn("Monitor not found in site", {
-            identifier,
-            monitorId,
+            identifier: safeIdentifierForLog(identifier),
+            monitorId: safeIdentifierForLog(monitorId),
         });
         return null;
     }
@@ -253,6 +259,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
 
     await runSequentially(sites, async (site) => {
         const monitors = getMonitorCandidates(site);
+        const safeSiteIdentifier = safeIdentifierForLog(site.identifier);
         const siteStarted: { current: boolean } = { current: false };
 
         await runSequentially(monitors, async (candidate) => {
@@ -261,7 +268,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
                 config.logger.warn(
                     "[MonitorManager] Encountered undefined monitor during global start",
                     {
-                        siteIdentifier: site.identifier,
+                        siteIdentifier: safeSiteIdentifier,
                     }
                 );
                 return;
@@ -275,7 +282,7 @@ export async function startAllMonitoringEnhancedFlow(params: {
                     "[MonitorManager] Skipping monitor without identifier during global start",
                     {
                         monitorType: type,
-                        siteIdentifier: site.identifier,
+                        siteIdentifier: safeSiteIdentifier,
                     }
                 );
                 return;
@@ -286,8 +293,8 @@ export async function startAllMonitoringEnhancedFlow(params: {
                 config.logger.warn(
                     "[MonitorManager] Skipping monitor without valid checkInterval during global start",
                     {
-                        monitorId: id,
-                        siteIdentifier: site.identifier,
+                        monitorId: safeIdentifierForLog(id),
+                        siteIdentifier: safeSiteIdentifier,
                     }
                 );
                 return;
@@ -306,8 +313,8 @@ export async function startAllMonitoringEnhancedFlow(params: {
                     config.logger.warn(
                         "[MonitorManager] Checker declined to start monitor",
                         {
-                            monitorId: id,
-                            siteIdentifier: site.identifier,
+                            monitorId: safeIdentifierForLog(id),
+                            siteIdentifier: safeSiteIdentifier,
                         }
                     );
                     return;
@@ -328,8 +335,8 @@ export async function startAllMonitoringEnhancedFlow(params: {
             } catch (error) {
                 failed += 1;
                 config.logger.error("Failed to start monitor", error, {
-                    monitorId: id,
-                    siteIdentifier: site.identifier,
+                    monitorId: safeIdentifierForLog(id),
+                    siteIdentifier: safeSiteIdentifier,
                 });
             }
         });
@@ -396,6 +403,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
 
     await runSequentially(sites, async (site) => {
         const monitors = getMonitorCandidates(site);
+        const safeSiteIdentifier = safeIdentifierForLog(site.identifier);
 
         await runSequentially(monitors, async (candidate) => {
             if (!candidate) {
@@ -403,7 +411,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
                 config.logger.warn(
                     "[MonitorManager] Encountered undefined monitor during global stop",
                     {
-                        siteIdentifier: site.identifier,
+                        siteIdentifier: safeSiteIdentifier,
                     }
                 );
                 return;
@@ -415,7 +423,7 @@ export async function stopAllMonitoringEnhancedFlow(params: {
                     "[MonitorManager] Skipping monitor without identifier during global stop",
                     {
                         monitorType: candidate.type,
-                        siteIdentifier: site.identifier,
+                        siteIdentifier: safeSiteIdentifier,
                     }
                 );
                 return;
@@ -440,8 +448,8 @@ export async function stopAllMonitoringEnhancedFlow(params: {
                     config.logger.warn(
                         "[MonitorManager] Checker declined to stop monitor",
                         {
-                            monitorId,
-                            siteIdentifier: site.identifier,
+                            monitorId: safeIdentifierForLog(monitorId),
+                            siteIdentifier: safeSiteIdentifier,
                         }
                     );
                     return;
@@ -461,8 +469,8 @@ export async function stopAllMonitoringEnhancedFlow(params: {
             } catch (error) {
                 failed += 1;
                 config.logger.error("Failed to stop monitor", error, {
-                    monitorId,
-                    siteIdentifier: site.identifier,
+                    monitorId: safeIdentifierForLog(monitorId),
+                    siteIdentifier: safeSiteIdentifier,
                 });
             }
         });
@@ -538,8 +546,8 @@ const runEnhancedLifecycleBatch = async <TAcc>(args: {
         } catch (error) {
             config.logger.error("Enhanced monitor action failed", error, {
                 actionLabel,
-                identifier,
-                monitorId: monitorWithId.id,
+                identifier: safeIdentifierForLog(identifier),
+                monitorId: safeIdentifierForLog(monitorWithId.id),
             });
             acc = combine(acc, false);
         }
@@ -586,8 +594,8 @@ const toggleMonitoringForSiteEnhancedFlow = async (params: {
 
         if (kind === "start" && !isValidCheckInterval(monitor.checkInterval)) {
             config.logger.warn("Monitor has no valid check interval set", {
-                identifier,
-                monitorId,
+                identifier: safeIdentifierForLog(identifier),
+                monitorId: safeIdentifierForLog(monitorId),
             });
             return false;
         }
@@ -605,9 +613,9 @@ const toggleMonitoringForSiteEnhancedFlow = async (params: {
             });
         } catch (error) {
             config.logger.error("Enhanced monitor toggle failed", error, {
-                identifier,
+                identifier: safeIdentifierForLog(identifier),
                 kind,
-                monitorId,
+                monitorId: safeIdentifierForLog(monitorId),
             });
             return false;
         }

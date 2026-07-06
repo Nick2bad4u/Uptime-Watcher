@@ -1,6 +1,8 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+
 import type { EnhancedMonitoringDependencies } from "../EnhancedMonitoringDependencies";
 
 /**
@@ -17,7 +19,9 @@ export async function fetchFreshMonitorWithHistory(args: {
     const freshMonitor = await monitorRepository.findByIdentifier(monitorId);
 
     if (!freshMonitor) {
-        logger.warn("Fresh monitor data not found", { monitorId });
+        logger.warn("Fresh monitor data not found", {
+            monitorId: getSafeIdentifierForLogging(monitorId),
+        });
         return undefined;
     }
 
