@@ -661,6 +661,10 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             // Selectively persist stable UI preferences across sessions while
             // keeping transient state (modals, selections) in memory only.
             ...UI_PERSIST_CONFIG,
+            merge: (persistedState, currentState) => ({
+                ...currentState,
+                ...normalizePersistedState(persistedState),
+            }),
             migrate: (persistedState: unknown, version: number) => {
                 const state = normalizePersistedState(persistedState);
 

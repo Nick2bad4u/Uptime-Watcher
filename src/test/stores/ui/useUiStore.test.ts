@@ -787,6 +787,68 @@ describe(useUIStore, () => {
             });
         });
 
+        it("should normalize current-version persisted UI preferences during merge", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Persistence", "type");
+
+            const merge = useUIStore.persist.getOptions().merge;
+            expect(merge).toBeTypeOf("function");
+
+            if (!merge) {
+                throw new TypeError("UI store persist merge is missing");
+            }
+
+            const currentState = useUIStore.getState();
+            const merged = merge(
+                {
+                    activeSiteDetailsTab: "broken-tab",
+                    showAdvancedMetrics: "yes",
+                    showSettings: true,
+                    siteDetailsHeaderCollapsedState: {
+                        ignored: "true",
+                        siteA: true,
+                    },
+                    siteDetailsTabState: {
+                        siteA: "history",
+                        siteB: "unknown",
+                    },
+                    siteListLayout: "masonry",
+                    siteTableColumnWidths: {
+                        response: "wide",
+                        site: 30,
+                        status: 18,
+                    },
+                    surfaceDensity: "cozy",
+                },
+                currentState
+            );
+
+            expect(merged).toMatchObject({
+                activeSiteDetailsTab: currentState.activeSiteDetailsTab,
+                showAdvancedMetrics: currentState.showAdvancedMetrics,
+                showSettings: currentState.showSettings,
+                siteDetailsHeaderCollapsedState: {
+                    siteA: true,
+                },
+                siteDetailsTabState: {
+                    siteA: "history",
+                },
+                siteListLayout: currentState.siteListLayout,
+                siteTableColumnWidths: {
+                    response: 12,
+                    site: 30,
+                    status: 18,
+                },
+                surfaceDensity: "cozy",
+            });
+            expect(merged.selectSite).toBe(currentState.selectSite);
+        });
+
         it("should preserve prototype-named site keys during migration", async ({
             task,
             annotate,
