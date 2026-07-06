@@ -88,9 +88,7 @@ const captureUiState = (): ReturnType<typeof useUIStore.getState> => {
     };
 };
 
-export const setupSiteStoryEnvironment = (
-    sites: readonly Site[]
-): (() => void) => {
+const setupSiteStoryEnvironment = (sites: readonly Site[]): (() => void) => {
     const snapshotSites = captureSitesState();
     const snapshotUI = captureUiState();
 

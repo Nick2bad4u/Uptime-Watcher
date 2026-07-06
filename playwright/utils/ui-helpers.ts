@@ -99,20 +99,6 @@ async function waitForBoundingBoxToSettle(args: {
 }
 
 /**
- * Form selectors for the Add Site form.
- */
-export const FORM_SELECTORS = {
-    SITE_NAME_INPUT:
-        'input[aria-label*="Site Name"], input[id="siteName"], input[placeholder*="Website"]',
-    SITE_URL_INPUT:
-        'input[aria-label*="URL"], input[id="siteUrl"], input[type="url"]',
-    MONITOR_TYPE_SELECT:
-        'select[aria-label*="Monitor Type"], select[id="monitorType"]',
-    SUBMIT_BUTTON:
-        'button[type="submit"], button:has-text("Add Site"), button:has-text("Create")',
-} as const;
-
-/**
  * Declarative description of a dynamic monitor-specific field that must be
  * populated during automated add-site workflows.
  */
@@ -377,24 +363,6 @@ export async function resetApplicationState(page: Page): Promise<void> {
 
     await waitForAppInitialization(page);
     await ensureCleanUIState(page).catch(() => undefined);
-}
-
-/**
- * Waits specifically for the dashboard container to be visible. Call this after
- * waitForAppInitialization if you need the dashboard.
- *
- * @param page - The Playwright page instance
- * @param timeout - Maximum time to wait
- *
- * @returns Promise that resolves when dashboard is visible
- */
-export async function waitForDashboard(
-    page: Page,
-    timeout: number = WAIT_TIMEOUTS.LONG
-): Promise<void> {
-    await expect
-        .soft(page.getByRole("region", { name: /monitoring overview/i }))
-        .toBeVisible({ timeout });
 }
 
 /**
@@ -953,7 +921,7 @@ async function openSiteDetailsViaSidebar(
  * @param siteDetailsModal - Locator scoped to the active site details modal.
  * @param desiredState - Target header state.
  */
-export async function ensureSiteDetailsHeaderState(
+async function ensureSiteDetailsHeaderState(
     siteDetailsModal: Locator,
     desiredState: "collapsed" | "expanded"
 ): Promise<void> {
@@ -1092,32 +1060,6 @@ export async function openSettingsModal(page: Page): Promise<void> {
             return Number.isFinite(opacityValue) && opacityValue >= 0.99;
         },
         { timeout: WAIT_TIMEOUTS.MEDIUM }
-    );
-}
-
-/**
- * Toggles the theme using the theme toggle button.
- *
- * @param page - The Playwright page instance
- */
-export async function toggleTheme(page: Page): Promise<void> {
-    await waitForAppInitialization(page);
-
-    const themeToggle = page.getByRole("button", {
-        name: /switch to (dark|light) theme/i,
-    });
-    await themeToggle.click();
-
-    // Wait for theme change to apply
-    await page.waitForFunction(
-        () => {
-            const body = document.body;
-            return (
-                body.classList.contains("dark") ||
-                body.classList.contains("light")
-            );
-        },
-        { timeout: WAIT_TIMEOUTS.SHORT }
     );
 }
 
@@ -1407,26 +1349,6 @@ async function getMonitorCountFromDom(page: Page): Promise<null | number> {
 
     const match = /tracking\s+(\d+)/iv.exec(labelText);
     return match?.[1] ? Number.parseInt(match[1], 10) : null;
-}
-
-/**
- * Determines the current monitor count using the Electron bridge as the
- * authoritative source with graceful fallback to DOM parsing.
- *
- * @param page - The Playwright page instance whose renderer exposes the UI.
- *
- * @returns Promise resolving to the best-known monitor count.
- */
-export async function getMonitorCount(page: Page): Promise<number> {
-    await waitForAppInitialization(page);
-
-    const electronCount = await getElectronSiteCount(page);
-    if (typeof electronCount === "number") {
-        return electronCount;
-    }
-
-    const domCount = await getMonitorCountFromDom(page);
-    return typeof domCount === "number" ? domCount : 0;
 }
 
 /**
