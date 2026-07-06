@@ -31,6 +31,7 @@ import { execFileSync } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as fsSync from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const __dirname = import.meta.dirname;
 
@@ -87,11 +88,13 @@ const DEFAULT_CONFIG = {
 /**
  * Parse command line arguments and return configuration.
  *
+ * @param {string[]} args - Raw command-line arguments.
+ *
  * @returns {Config} Parsed configuration.
  */
-function parseArguments() {
-    const args = process.argv.slice(2);
+function parseArguments(args = process.argv.slice(2)) {
     const config = { ...DEFAULT_CONFIG };
+    let customWordsFileProvided = false;
 
     // Handle help flag
     if (args.includes("--help") || args.includes("-h")) {
@@ -156,13 +159,19 @@ function parseArguments() {
             }
             default: {
                 // First positional argument is custom words file path
-                if (
-                    arg &&
-                    !arg.startsWith("-") &&
-                    !config.customWordsFile.includes(arg)
-                ) {
+                if (arg && !arg.startsWith("-")) {
+                    if (customWordsFileProvided) {
+                        throw new Error(
+                            `Unexpected extra custom words file path: ${arg}`
+                        );
+                    }
+
                     config.customWordsFile = path.resolve(arg);
+                    customWordsFileProvided = true;
+                    break;
                 }
+
+                throw new Error(`Unknown option: ${arg}`);
             }
         }
     }
@@ -228,7 +237,7 @@ function parsePositiveIntegerOption(option, value) {
  * @returns {string} Parsed string value.
  */
 function parseRequiredStringOption(option, value) {
-    if (!value) {
+    if (!value || value.startsWith("-")) {
         throw new Error(`${option} expects a value`);
     }
 
@@ -660,7 +669,10 @@ async function main() {
 }
 
 // Run the script if executed directly
-if (import.meta.filename === path.resolve(process.argv[1] || "")) {
+if (
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
     try {
         await main();
     } catch (error) {
