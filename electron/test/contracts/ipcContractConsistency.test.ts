@@ -109,6 +109,10 @@ describe("IPC contract consistency", () => {
         expect(missingHandlers).toEqual([]);
         expect(extraneousHandlers).toEqual([]);
     });
+
+    it("ensures every standardized invoke handler registration has a validator", () => {
+        expect(extractRegistrationValidatorGaps()).toEqual([]);
+    });
 });
 
 /**
@@ -117,6 +121,16 @@ describe("IPC contract consistency", () => {
  * @returns Unique channel names that have standardized handlers registered.
  */
 function extractRegisteredChannelNames(): Set<string> {
+    const channels = new Set<string>();
+
+    for (const filePath of getIpcRegistrationSourceFiles()) {
+        collectChannelsFromFile(filePath, channels);
+    }
+
+    return channels;
+}
+
+function getIpcRegistrationSourceFiles(): string[] {
     const ipcServicePath = path.join(
         process.cwd(),
         "electron",
@@ -133,17 +147,160 @@ function extractRegisteredChannelNames(): Set<string> {
         "handlers"
     );
 
-    const handlerFiles = readdirSync(handlersDir)
-        .filter((fileName) => fileName.endsWith(".ts"))
-        .map((fileName) => path.join(handlersDir, fileName));
+    return [
+        ipcServicePath,
+        ...readdirSync(handlersDir)
+            .filter((fileName) => fileName.endsWith(".ts"))
+            .map((fileName) => path.join(handlersDir, fileName)),
+    ];
+}
 
-    const channels = new Set<string>();
+function extractRegistrationValidatorGaps(): string[] {
+    const gaps: string[] = [];
 
-    for (const filePath of [ipcServicePath, ...handlerFiles]) {
-        collectChannelsFromFile(filePath, channels);
+    for (const filePath of getIpcRegistrationSourceFiles()) {
+        collectRegistrationValidatorGapsFromFile(filePath, gaps);
     }
 
-    return channels;
+    return gaps.sort();
+}
+
+function collectRegistrationValidatorGapsFromFile(
+    filePath: string,
+    gaps: string[]
+): void {
+    const source = readFileSync(filePath, "utf8");
+    const sourceFile = ts.createSourceFile(
+        filePath,
+        source,
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS
+    );
+
+    const stringConstants = new Map<string, string>();
+    const registrarIdentifiers = new Set<string>();
+
+    const registerStringConstants = (node: ts.Node): void => {
+        if (ts.isVariableStatement(node)) {
+            for (const declaration of node.declarationList.declarations) {
+                if (
+                    ts.isIdentifier(declaration.name) &&
+                    declaration.initializer &&
+                    (ts.isStringLiteral(declaration.initializer) ||
+                        ts.isNoSubstitutionTemplateLiteral(
+                            declaration.initializer
+                        ))
+                ) {
+                    stringConstants.set(
+                        declaration.name.text,
+                        declaration.initializer.text
+                    );
+                }
+            }
+        }
+
+        ts.forEachChild(node, registerStringConstants);
+    };
+
+    registerStringConstants(sourceFile);
+
+    const collectRegistrarIdentifiers = (node: ts.Node): void => {
+        if (ts.isVariableDeclaration(node)) {
+            const { name, initializer } = node;
+
+            if (
+                ts.isIdentifier(name) &&
+                initializer &&
+                ts.isCallExpression(initializer) &&
+                ts.isIdentifier(initializer.expression) &&
+                initializer.expression.text === "createStandardizedIpcRegistrar"
+            ) {
+                registrarIdentifiers.add(name.text);
+            }
+        }
+
+        ts.forEachChild(node, collectRegistrarIdentifiers);
+    };
+
+    collectRegistrarIdentifiers(sourceFile);
+
+    const resolveChannelName = (
+        expression: ts.Expression
+    ): string | undefined => {
+        if (
+            ts.isStringLiteral(expression) ||
+            ts.isNoSubstitutionTemplateLiteral(expression)
+        ) {
+            return expression.text;
+        }
+
+        if (ts.isPropertyAccessExpression(expression)) {
+            const objectExpression = expression.expression;
+            const propertyName = expression.name.text;
+
+            if (ts.isIdentifier(objectExpression)) {
+                const channelMap = CHANNEL_MAPS[objectExpression.text];
+                const resolved = channelMap?.[propertyName];
+                if (typeof resolved === "string") {
+                    return resolved;
+                }
+            }
+        }
+
+        if (ts.isIdentifier(expression)) {
+            const resolved = stringConstants.get(expression.text);
+            if (resolved) {
+                return resolved;
+            }
+        }
+
+        return undefined;
+    };
+
+    const reportGap = (
+        node: ts.CallExpression,
+        channelName: string,
+        reason: string
+    ): void => {
+        const location = sourceFile.getLineAndCharacterOfPosition(
+            node.getStart(sourceFile)
+        );
+        const relativeFilePath = path.relative(process.cwd(), filePath);
+
+        gaps.push(
+            `${relativeFilePath}:${location.line + 1} ${channelName} ${reason}`
+        );
+    };
+
+    const visit = (node: ts.Node): void => {
+        if (ts.isCallExpression(node)) {
+            const callee = node.expression;
+            const isStandardRegistration =
+                ts.isIdentifier(callee) &&
+                (callee.text === "registerStandardizedIpcHandler" ||
+                    registrarIdentifiers.has(callee.text));
+
+            if (isStandardRegistration) {
+                const [channelArgument, , validatorArgument] = node.arguments;
+                const channelName = channelArgument
+                    ? (resolveChannelName(channelArgument) ?? "<unknown>")
+                    : "<missing-channel>";
+
+                if (!validatorArgument) {
+                    reportGap(node, channelName, "omits validateParams");
+                } else if (
+                    validatorArgument.kind === ts.SyntaxKind.NullKeyword
+                ) {
+                    reportGap(node, channelName, "uses null validateParams");
+                }
+            }
+        }
+
+        ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
 }
 
 function collectChannelsFromFile(
