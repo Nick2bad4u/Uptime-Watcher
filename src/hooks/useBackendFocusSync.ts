@@ -12,7 +12,7 @@
  * @public
  */
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { subscribeToGlobalEvent } from "../utils/dom/eventListeners";
@@ -45,6 +45,8 @@ const noop = (): void => {};
  * @see {@link useSitesStore} for the backing store implementation.
  */
 export function useBackendFocusSync(enabled = false): void {
+    const isFocusSyncInFlightRef = useRef(false);
+
     // Use selector to avoid unnecessary re-renders when other store state
     // changes
     const fullResyncSites = useSitesStore(
@@ -58,6 +60,12 @@ export function useBackendFocusSync(enabled = false): void {
             }
 
             const handleFocus = (): void => {
+                if (isFocusSyncInFlightRef.current) {
+                    return;
+                }
+
+                isFocusSyncInFlightRef.current = true;
+
                 // Use full sync on focus to ensure complete data consistency
                 // since the user may have been away for a while
                 // Note: Error handling is managed internally by
@@ -68,6 +76,8 @@ export function useBackendFocusSync(enabled = false): void {
                         await fullResyncSites();
                     } catch {
                         // Focus sync should not crash the renderer focus handler.
+                    } finally {
+                        isFocusSyncInFlightRef.current = false;
                     }
                 })();
             };

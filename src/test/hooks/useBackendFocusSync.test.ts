@@ -5,7 +5,7 @@
  *   backend focus synchronization hook.
  */
 
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { arrayFirst } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -208,7 +208,7 @@ describe("useBackendFocusSync Hook", () => {
             expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle multiple focus events", async ({
+        it("should ignore focus events while a focus sync is already in flight", async ({
             task,
             annotate,
         }) => {
@@ -216,6 +216,13 @@ describe("useBackendFocusSync Hook", () => {
             await annotate("Component: useBackendFocusSync", "component");
             await annotate("Category: Hook", "category");
             await annotate("Type: Event Processing", "type");
+
+            let resolveSync: (() => void) | undefined;
+            mockfullResyncSites.mockReturnValueOnce(
+                new Promise<void>((resolve) => {
+                    resolveSync = resolve;
+                })
+            );
 
             renderHook(() => {
                 useBackendFocusSync(true);
@@ -225,14 +232,58 @@ describe("useBackendFocusSync Hook", () => {
                 mockAddEventListener.mock.calls
             )?.[1];
 
-            // Simulate multiple focus events
             if (focusHandler) {
                 focusHandler();
                 focusHandler();
                 focusHandler();
             }
 
-            expect(mockfullResyncSites).toHaveBeenCalledTimes(3);
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
+
+            await act(async () => {
+                resolveSync?.();
+            });
+        });
+
+        it("should allow another focus sync after the in-flight sync settles", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useBackendFocusSync", "component");
+            await annotate("Category: Hook", "category");
+            await annotate("Type: Event Processing", "type");
+
+            let resolveFirstSync: (() => void) | undefined;
+            mockfullResyncSites.mockReturnValueOnce(
+                new Promise<void>((resolve) => {
+                    resolveFirstSync = resolve;
+                })
+            );
+
+            renderHook(() => {
+                useBackendFocusSync(true);
+            });
+
+            const focusHandler = arrayFirst(
+                mockAddEventListener.mock.calls
+            )?.[1];
+
+            if (focusHandler) {
+                focusHandler();
+            }
+
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
+
+            await act(async () => {
+                resolveFirstSync?.();
+            });
+
+            if (focusHandler) {
+                focusHandler();
+            }
+
+            expect(mockfullResyncSites).toHaveBeenCalledTimes(2);
         });
 
         it("should remove event listener on unmount", async ({
@@ -731,7 +782,9 @@ describe("useBackendFocusSync Hook", () => {
                 handler1
             );
 
-            // Second instance should still work
+            await Promise.resolve();
+
+            // Second instance should still work after its first focus sync settles.
             handler2();
             expect(mockfullResyncSites).toHaveBeenCalledTimes(3);
 
