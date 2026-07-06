@@ -60,6 +60,11 @@ async function expectBoundedStarts(
 }
 
 describe("autoStartMonitoring", () => {
+    const rawMonitorId =
+        "https://monitor.example/check?token=monitor-token#private-monitor";
+    const rawSiteIdentifier =
+        "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+
     it("bounds monitor startup fanout for loaded sites", async () => {
         const monitors = Array.from(
             { length: MONITOR_START_CONCURRENCY + 3 },
@@ -101,5 +106,56 @@ describe("autoStartMonitoring", () => {
             },
             newMonitors.length
         );
+    });
+
+    it("redacts URL-shaped site identifiers in loaded-site diagnostics", async () => {
+        const logger = createLogger();
+        const site: Site = {
+            identifier: rawSiteIdentifier,
+            monitoring: false,
+            monitors: [],
+            name: "Private Site",
+        };
+        const startMonitoringForSite = vi.fn();
+
+        await autoStartMonitoringIfAppropriateOperation({
+            logger,
+            site,
+            startMonitoringForSite,
+        });
+
+        expect(startMonitoringForSite).not.toHaveBeenCalled();
+
+        const logPayload = JSON.stringify(
+            vi.mocked(logger.debug).mock.calls
+        );
+
+        expect(logPayload).toContain("https://example.com/path");
+        expect(logPayload).not.toContain("site-secret");
+        expect(logPayload).not.toContain("site-token");
+        expect(logPayload).not.toContain("private-site");
+    });
+
+    it("redacts URL-shaped monitor identifiers in new-monitor diagnostics", async () => {
+        const logger = createLogger();
+        const newMonitor = {
+            ...createMonitor(rawMonitorId),
+            monitoring: false,
+        };
+
+        await autoStartNewMonitorsOperation({
+            logger,
+            newMonitors: [newMonitor],
+            siteIdentifier: rawSiteIdentifier,
+            startMonitoringForSite: vi.fn(),
+        });
+
+        const logPayload = JSON.stringify(
+            vi.mocked(logger.debug).mock.calls
+        );
+
+        expect(logPayload).toContain("https://monitor.example/check");
+        expect(logPayload).not.toContain("monitor-token");
+        expect(logPayload).not.toContain("private-monitor");
     });
 });

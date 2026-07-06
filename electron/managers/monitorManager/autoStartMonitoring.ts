@@ -11,6 +11,7 @@
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -20,6 +21,9 @@ import { isEmpty } from "ts-extras";
 import { MONITOR_START_CONCURRENCY } from "../../constants";
 import { isDev } from "../../electronUtils";
 import { mapWithConcurrency } from "../../utils/boundedConcurrency";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Auto-starts eligible monitors for a site that has just been loaded.
@@ -39,15 +43,16 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
     ) => Promise<boolean>;
 }): Promise<void> {
     const { logger, site, startMonitoringForSite } = args;
+    const safeSiteIdentifier = getSafeIdentifier(site.identifier);
 
     logger.debug(
-        `[MonitorManager] Evaluating auto-start for site: ${site.identifier} (site.monitoring: ${site.monitoring})`
+        `[MonitorManager] Evaluating auto-start for site: ${safeSiteIdentifier} (site.monitoring: ${site.monitoring})`
     );
 
     // Site-level monitoring acts as a master switch
     if (!site.monitoring) {
         logger.debug(
-            `[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${site.identifier}`
+            `[MonitorManager] Site monitoring disabled, skipping all monitors for site: ${safeSiteIdentifier}`
         );
         return;
     }
@@ -58,7 +63,7 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.MONITOR_MANAGER_NO_MONITORS_FOUND,
                 {
-                    identifier: site.identifier,
+                    identifier: safeSiteIdentifier,
                 }
             )
         );
@@ -69,7 +74,7 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
         interpolateLogTemplate(
             LOG_TEMPLATES.debug.MONITOR_MANAGER_AUTO_STARTING_SITE,
             {
-                identifier: site.identifier,
+                identifier: safeSiteIdentifier,
             }
         )
     );
@@ -84,8 +89,9 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
                 await startMonitoringForSite(site.identifier, monitor.id);
 
                 if (isDev()) {
+                    const safeMonitorId = getSafeIdentifier(monitor.id);
                     logger.debug(
-                        `[MonitorManager] Auto-started monitoring for monitor ${monitor.id} with interval ${monitor.checkInterval}ms`
+                        `[MonitorManager] Auto-started monitoring for monitor ${safeMonitorId} with interval ${monitor.checkInterval}ms`
                     );
                 }
                 return;
@@ -96,7 +102,7 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
                     interpolateLogTemplate(
                         LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_INDIVIDUAL,
                         {
-                            monitorId: monitor.id,
+                            monitorId: getSafeIdentifier(monitor.id),
                         }
                     )
                 );
@@ -114,7 +120,7 @@ export async function autoStartMonitoringIfAppropriateOperation(args: {
         interpolateLogTemplate(
             LOG_TEMPLATES.services.MONITOR_MANAGER_AUTO_STARTING,
             {
-                identifier: site.identifier,
+                identifier: safeSiteIdentifier,
             }
         )
     );
@@ -147,7 +153,7 @@ export async function autoStartNewMonitorsOperation(args: {
                     interpolateLogTemplate(
                         LOG_TEMPLATES.debug.MONITOR_AUTO_STARTED,
                         {
-                            monitorId: monitor.id,
+                            monitorId: getSafeIdentifier(monitor.id),
                         }
                     )
                 );
@@ -159,7 +165,7 @@ export async function autoStartNewMonitorsOperation(args: {
                     interpolateLogTemplate(
                         LOG_TEMPLATES.debug.MONITOR_MANAGER_SKIP_NEW_INDIVIDUAL,
                         {
-                            monitorId: monitor.id,
+                            monitorId: getSafeIdentifier(monitor.id),
                         }
                     )
                 );

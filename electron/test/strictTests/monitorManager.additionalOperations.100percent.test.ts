@@ -31,6 +31,11 @@ const createStatusUpdate = (args: {
 });
 
 describe("monitorManager additional operations", () => {
+    const rawMonitorId =
+        "https://monitor.example/check?token=monitor-token#private-monitor";
+    const rawSiteIdentifier =
+        "https://user:site-secret@example.com/path?access_token=site-token#private-site";
+
     describe(setupIndividualNewMonitorsOperation, () => {
         it("applies the default interval and auto-starts monitors when site monitoring is enabled", async () => {
             const debugSpy = vi
@@ -96,6 +101,35 @@ describe("monitorManager additional operations", () => {
 
             debugSpy.mockRestore();
         });
+
+        it("redacts URL-shaped identifiers in setup diagnostics", async () => {
+            const debugSpy = vi
+                .spyOn(logger, "debug")
+                .mockImplementation(() => undefined);
+
+            const site = createTestSite(rawSiteIdentifier, {
+                monitoring: false,
+                monitors: [
+                    createTestMonitor(rawMonitorId, { checkInterval: 0 }),
+                ],
+            });
+
+            await setupIndividualNewMonitorsOperation({
+                autoStartNewMonitors: vi.fn(),
+                defaultCheckIntervalMs: 60_000,
+                newMonitors: site.monitors,
+                shouldApplyDefaultInterval: vi.fn().mockReturnValue(true),
+                site,
+            });
+
+            const logPayload = JSON.stringify(debugSpy.mock.calls);
+
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+
+            debugSpy.mockRestore();
+        });
     });
 
     describe(setupNewMonitorsOperation, () => {
@@ -152,6 +186,39 @@ describe("monitorManager additional operations", () => {
                 monitor,
             ]);
             expect(infoSpy).toHaveBeenCalled();
+
+            infoSpy.mockRestore();
+        });
+
+        it("redacts URL-shaped site identifiers in setup summary logs", async () => {
+            const infoSpy = vi
+                .spyOn(logger, "info")
+                .mockImplementation(() => undefined);
+
+            const setupIndividualNewMonitors = vi
+                .fn()
+                .mockResolvedValue(undefined);
+            const site = createTestSite(rawSiteIdentifier, {
+                monitors: [createTestMonitor(rawMonitorId)],
+            });
+
+            await setupNewMonitorsOperation({
+                newMonitorIds: [rawMonitorId],
+                setupIndividualNewMonitors,
+                site,
+            });
+
+            expect(setupIndividualNewMonitors).toHaveBeenCalledWith(
+                site,
+                site.monitors
+            );
+
+            const logPayload = JSON.stringify(infoSpy.mock.calls);
+
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
 
             infoSpy.mockRestore();
         });

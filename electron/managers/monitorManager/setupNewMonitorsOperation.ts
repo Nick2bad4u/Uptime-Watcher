@@ -10,6 +10,7 @@
 
 import type { Site } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -17,6 +18,9 @@ import {
 import { arrayIncludes, isEmpty } from "ts-extras";
 
 import { logger } from "../../utils/logger";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Applies default configuration for monitors newly attached to a site.
@@ -32,13 +36,14 @@ export async function setupNewMonitorsOperation(args: {
     readonly site: Site;
 }): Promise<void> {
     const { newMonitorIds, setupIndividualNewMonitors, site } = args;
+    const safeSiteIdentifier = getSafeIdentifier(site.identifier);
 
     logger.debug(
         interpolateLogTemplate(
             LOG_TEMPLATES.debug.MONITOR_MANAGER_SETUP_MONITORS,
             {
                 count: newMonitorIds.length,
-                identifier: site.identifier,
+                identifier: safeSiteIdentifier,
             }
         )
     );
@@ -52,7 +57,7 @@ export async function setupNewMonitorsOperation(args: {
             interpolateLogTemplate(
                 LOG_TEMPLATES.debug.MONITOR_MANAGER_VALID_MONITORS,
                 {
-                    identifier: site.identifier,
+                    identifier: safeSiteIdentifier,
                 }
             )
         );
@@ -62,6 +67,6 @@ export async function setupNewMonitorsOperation(args: {
     await setupIndividualNewMonitors(site, newMonitors);
 
     logger.info(
-        `[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${site.identifier}`
+        `[MonitorManager] Completed setup for ${newMonitors.length} new monitors in site: ${safeSiteIdentifier}`
     );
 }
