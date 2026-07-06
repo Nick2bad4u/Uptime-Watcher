@@ -3,6 +3,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { withOperationalHooks as withOperationalHooksType } from "../../../utils/operationalHooks";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,9 +11,21 @@ import { ReplicationMonitor } from "../../../services/monitoring/ReplicationMoni
 
 const httpGetMock = vi.fn();
 
+type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
+
+const operationalHookOptions = vi.hoisted(
+    (): OperationalHookOptions[] => []
+);
+
 vi.mock("../../../utils/operationalHooks", () => ({
-    withOperationalHooks: vi.fn(async (operation: () => Promise<unknown>) =>
-        operation()
+    withOperationalHooks: vi.fn(
+        async (
+            operation: () => Promise<unknown>,
+            options: OperationalHookOptions
+        ) => {
+            operationalHookOptions.push(options);
+            return operation();
+        }
     ),
 }));
 
@@ -50,6 +63,7 @@ describe("ReplicationMonitor service", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        operationalHookOptions.length = 0;
         httpGetMock.mockReset();
         monitor = createMonitor();
         service = new ReplicationMonitor();
@@ -173,6 +187,42 @@ describe("ReplicationMonitor service", () => {
         expect(result.error).toContain("https://primary.example.com/status");
         expect(result.error).not.toContain("token=");
         expect(result.error).not.toContain("primary-json-secret");
+    });
+
+    it("redacts primary URL secrets in retry operation names", async () => {
+        const now = Date.now();
+        monitor = createMonitor({
+            primaryStatusUrl:
+                "https://primary.example.com/status?token=operation-secret#fragment",
+        });
+        httpGetMock.mockImplementation(async (url: string) => {
+            if (url.includes("primary")) {
+                return {
+                    data: {
+                        timestamp: now,
+                    },
+                    responseTime: 30,
+                };
+            }
+
+            return {
+                data: {
+                    timestamp: now - 2000,
+                },
+                responseTime: 35,
+            };
+        });
+
+        const result = await service.check(monitor);
+        const operationName = operationalHookOptions.at(-1)?.operationName;
+
+        expect(result.status).toBe("up");
+        expect(operationName).toBe(
+            "Replication lag check for https://primary.example.com/status"
+        );
+        expect(operationName).not.toContain("token=");
+        expect(operationName).not.toContain("operation-secret");
+        expect(operationName).not.toContain("fragment");
     });
 
     it("treats empty string responses as invalid JSON", async () => {
