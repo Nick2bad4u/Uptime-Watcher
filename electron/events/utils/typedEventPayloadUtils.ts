@@ -124,18 +124,7 @@ export function cloneArrayPayload<TPayload extends ArrayPayload>(
     // functions).
     const clone: unknown[] = [];
     clone.length = payload.length;
-    for (const key of Reflect.ownKeys(payload)) {
-        if (!isArrayIndexKey(key)) {
-            continue;
-        }
-
-        const descriptor = Object.getOwnPropertyDescriptor(payload, key);
-        if (!descriptor?.enumerable || !("value" in descriptor)) {
-            continue;
-        }
-
-        defineDataProperty(clone, key, descriptor.value);
-    }
+    copyEnumerableDataProperties(payload, clone, isArrayIndexKey);
 
     return castUnchecked<TPayload>(clone);
 }
@@ -161,14 +150,7 @@ export function cloneObjectPayload<TPayload extends NonArrayObjectPayload>(
     const clone = castUnchecked<NonArrayObjectPayload>(
         Object.create(prototype)
     );
-    for (const key of Reflect.ownKeys(payload)) {
-        const descriptor = Object.getOwnPropertyDescriptor(payload, key);
-        if (!descriptor?.enumerable || !("value" in descriptor)) {
-            continue;
-        }
-
-        defineDataProperty(clone, key, descriptor.value);
-    }
+    copyEnumerableDataProperties(payload, clone);
 
     return castUnchecked<TPayload>(clone);
 }
@@ -199,6 +181,29 @@ function defineDataProperty(
         value,
         writable: true,
     });
+}
+
+function copyEnumerableDataProperties(
+    source: object,
+    target: object,
+    shouldCopyKey: (key: PropertyKey) => boolean = shouldCopyAnyKey
+): void {
+    for (const key of Reflect.ownKeys(source)) {
+        if (!shouldCopyKey(key)) {
+            continue;
+        }
+
+        const descriptor = Object.getOwnPropertyDescriptor(source, key);
+        if (!descriptor?.enumerable || !("value" in descriptor)) {
+            continue;
+        }
+
+        defineDataProperty(target, key, descriptor.value);
+    }
+}
+
+function shouldCopyAnyKey(): true {
+    return true;
 }
 
 function isArrayIndexKey(key: PropertyKey): key is `${number}` {
