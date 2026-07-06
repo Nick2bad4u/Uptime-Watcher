@@ -394,7 +394,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
             <a
                 aria-label={`Open ${selectedMonitorUrlDisplay} in browser`}
                 className="site-details-url truncate"
-                href={selectedMonitorUrlDisplay}
+                href={selectedMonitorUrl}
                 onClick={handleUrlClick}
                 rel="noopener noreferrer"
                 tabIndex={0}

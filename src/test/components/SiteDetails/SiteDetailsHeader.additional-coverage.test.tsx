@@ -383,7 +383,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             expect(link).toHaveTextContent("https://secret.example.com/status");
             expect(link).toHaveAttribute(
                 "href",
-                "https://secret.example.com/status"
+                "https://secret.example.com/status?refresh_token=header-secret#fragment"
             );
             expect(link).not.toHaveTextContent("refresh_token");
             expect(link).not.toHaveTextContent("header-secret");
