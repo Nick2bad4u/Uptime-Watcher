@@ -476,14 +476,17 @@ const subscribeWithGuard = <TPayload>(
 ): (() => void) =>
     manager.on((...args: unknown[]) => {
         const [payload] = args;
-        const mappedPayload = options.mapPayload
-            ? options.mapPayload(payload)
-            : undefined;
-        const validatedPayload = options.mapPayload
-            ? mappedPayload
-            : guard(payload)
-              ? payload
-              : undefined;
+        const validatedPayload = (() => {
+            try {
+                if (options.mapPayload) {
+                    return options.mapPayload(payload);
+                }
+
+                return guard(payload) ? payload : undefined;
+            } catch {
+                return undefined;
+            }
+        })();
 
         if (validatedPayload === undefined) {
             const guardName =

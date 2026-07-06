@@ -1549,6 +1549,44 @@ describe("Events Domain API", () => {
             );
         });
 
+        it("should report guard exceptions as malformed payloads", () => {
+            const callback = vi.fn();
+            const payload = {
+                timestamp: Date.now(),
+                type: "site",
+            } as Record<string, unknown>;
+            Object.defineProperty(payload, "reason", {
+                enumerable: true,
+                get() {
+                    throw new Error("reason getter should be contained");
+                },
+            });
+            buildPayloadPreviewMock.mockReturnValueOnce(undefined);
+
+            eventsApi.onCacheInvalidated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls.at(-1)?.[1];
+            expect(() => {
+                eventHandler?.({}, payload);
+            }).not.toThrow();
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'cache:invalidated'",
+                expect.objectContaining({
+                    guard: "isCacheInvalidatedEventDataPayload",
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "cache:invalidated",
+                    guard: "isCacheInvalidatedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
+
         it("should handle cleanup function called multiple times", () => {
             const callback = vi.fn();
 
