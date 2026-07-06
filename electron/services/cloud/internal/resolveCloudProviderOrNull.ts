@@ -63,9 +63,7 @@ export async function resolveCloudProviderOrNull(args: {
                 tokenStorageKey: keys.dropboxTokens,
             });
 
-            const storedTokens = await tokenManager
-                .getStoredTokens()
-                .catch(() => {});
+            const storedTokens = await tokenManager.getStoredTokens();
 
             if (!storedTokens) {
                 return null;
@@ -112,9 +110,7 @@ export async function resolveCloudProviderOrNull(args: {
                 storageKey: keys.googleDriveTokens,
             });
 
-            const isConnected = await tokenManager
-                .isConnected()
-                .catch(() => false);
+            const isConnected = await tokenManager.isConnected();
             if (!isConnected) {
                 return null;
             }
