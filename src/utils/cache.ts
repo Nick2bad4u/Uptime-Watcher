@@ -274,6 +274,7 @@ export class TypedCache<K, V> {
      * @public
      */
     public delete(key: K): boolean {
+        this.generation += 1;
         return this.cache.delete(key);
     }
 
@@ -350,7 +351,7 @@ export class TypedCache<K, V> {
      */
     public set(key: K, value: V, ttl?: number): void {
         // Enforce max size by removing least recently used entries
-        if (this.cache.size >= this.maxSize) {
+        if (!this.cache.has(key) && this.cache.size >= this.maxSize) {
             let lruKey: K | undefined;
             let oldestAccessTime = Infinity;
 

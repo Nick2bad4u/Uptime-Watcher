@@ -620,6 +620,26 @@ describe("Cache Utilities", () => {
                 expect(cache.get("key1")).toBe("value3");
             });
 
+            it("should update an existing key in a full cache without evicting another entry", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cache", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Caching", "type");
+
+                const cache = new TypedCache<string, string>({ maxSize: 2 });
+                cache.set("key1", "value1");
+                cache.set("key2", "value2");
+
+                cache.set("key1", "updated-value1");
+
+                expect(cache.size).toBe(2);
+                expect(cache.get("key1")).toBe("updated-value1");
+                expect(cache.get("key2")).toBe("value2");
+            });
+
             it("should handle very large cache operations", async ({
                 task,
                 annotate,
@@ -990,6 +1010,34 @@ describe("Cache Utilities", () => {
 
             // The caller still gets the value, but we avoid populating the
             // cache with something that might now be stale.
+            expect(cache.get("key1")).toBeUndefined();
+        });
+
+        it("should not cache values fetched before cache.delete()", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: cache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Invalidation", "type");
+
+            let resolvePromise: ((value: string) => void) | undefined;
+            const deferred = new Promise<string>((resolve) => {
+                resolvePromise = resolve;
+            });
+            mockFetcher.mockReturnValue(deferred);
+
+            const inFlight = getCachedOrFetch(cache, "key1", mockFetcher);
+
+            // Simulate a key-specific invalidation during the fetch.
+            cache.delete("key1");
+
+            resolvePromise?.("fetched-after-delete");
+            await expect(inFlight).resolves.toBe("fetched-after-delete");
+
+            // The caller still gets the value, but the invalidated key should
+            // not be silently repopulated by an older in-flight request.
             expect(cache.get("key1")).toBeUndefined();
         });
     });
