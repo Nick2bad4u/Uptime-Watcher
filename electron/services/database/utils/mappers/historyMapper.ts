@@ -19,6 +19,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
+import { isValidNumeric } from "@shared/validation/validatorUtils";
 import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
@@ -67,7 +68,7 @@ function parseFiniteNumber(value: unknown): number | undefined {
     if (typeof value === "number" && isFiniteNumber(value)) return value;
     if (typeof value === "string") {
         const trimmed = value.trim();
-        if (trimmed.length === 0) {
+        if (!isValidNumeric(trimmed)) {
             return undefined;
         }
 
@@ -82,6 +83,10 @@ function safeNumber(value: unknown, fallback = 0): number {
 }
 
 function safeEpochMs(value: unknown, fallback = Date.now()): number {
+    if (!RowValidationUtils.isValidTimestamp(value)) {
+        return fallback;
+    }
+
     const parsed = parseFiniteNumber(value);
     if (isNonNegativeSafeInteger(parsed) && parsed <= MAX_VALID_DATE_EPOCH_MS) {
         return parsed;

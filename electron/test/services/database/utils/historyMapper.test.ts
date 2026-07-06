@@ -603,6 +603,27 @@ describe("historyMapper utilities", () => {
             expect(result.responseTime).toBe(0);
         });
 
+        it("should default non-decimal string responseTime to 0", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const row: DatabaseHistoryRow = {
+                monitorId: "monitor-123",
+                status: "up",
+                timestamp: TEST_TIMESTAMP,
+                responseTime: "0x10" as any,
+            };
+
+            const result = rowToHistoryEntry(row);
+
+            expect(result.responseTime).toBe(0);
+        });
+
         it("should handle string timestamp", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: historyMapper", "component");
@@ -619,6 +640,30 @@ describe("historyMapper utilities", () => {
             const result = rowToHistoryEntry(row);
 
             expect(result.timestamp).toBe(TEST_TIMESTAMP);
+        });
+
+        it("should default non-decimal string timestamp to current time", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyMapper", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const beforeTime = Date.now();
+            const row: DatabaseHistoryRow = {
+                monitorId: "monitor-123",
+                status: "up",
+                timestamp: "0x10" as any,
+                responseTime: 150,
+            };
+
+            const result = rowToHistoryEntry(row);
+            const afterTime = Date.now();
+
+            expect(result.timestamp).toBeGreaterThanOrEqual(beforeTime);
+            expect(result.timestamp).toBeLessThanOrEqual(afterTime);
         });
 
         it("should default blank string timestamp to current time", async ({
