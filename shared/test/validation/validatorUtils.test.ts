@@ -463,6 +463,7 @@ describe("validatorUtils", () => {
             expect(isValidNumeric("0")).toBeTruthy();
             expect(isValidNumeric("0.5")).toBeTruthy();
             expect(isValidNumeric(".5")).toBeTruthy();
+            expect(isValidNumeric("123.")).toBeTruthy();
         });
 
         it("should return false for non-numeric strings", async ({
@@ -478,6 +479,10 @@ describe("validatorUtils", () => {
             expect(isValidNumeric("")).toBeFalsy();
             expect(isValidNumeric("12abc")).toBeFalsy();
             expect(isValidNumeric("1.2.3")).toBeFalsy();
+            expect(isValidNumeric("e8")).toBeFalsy();
+            expect(isValidNumeric("1e")).toBeFalsy();
+            expect(isValidNumeric("1e+")).toBeFalsy();
+            expect(isValidNumeric("+.")).toBeFalsy();
         });
 
         it("should return false for non-string values", async ({

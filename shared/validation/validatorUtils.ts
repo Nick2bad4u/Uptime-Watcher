@@ -243,19 +243,7 @@ export function isValidNumeric(
         return false;
     }
 
-    // `validator.isFloat` is permissive enough to accept some malformed
-    // scientific-notation strings like "e8". We require a stricter syntactic
-    // form first to avoid treating such values as valid numeric input.
-    //
-    // Supported forms:
-    // - "123"
-    // - "123.45" / "123." / ".5"
-    // - "1e10" / "1E10" / "1.5e-10"
-
-    // eslint-disable-next-line security/detect-unsafe-regex -- Linear-time numeric grammar; intentionally ASCII-only.
-    const numericPattern = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/iu;
-
-    if (!numericPattern.test(value)) {
+    if (!isStrictNumericLiteral(value)) {
         return false;
     }
 
@@ -266,6 +254,59 @@ export function isValidNumeric(
     }
 
     return validator.isFloat(value, options);
+}
+
+function isAsciiDigit(character: string | undefined): boolean {
+    return isDefined(character) && character >= "0" && character <= "9";
+}
+
+function consumeAsciiDigits(value: string, startIndex: number): number {
+    let index = startIndex;
+
+    while (isAsciiDigit(value[index])) {
+        index += 1;
+    }
+
+    return index;
+}
+
+function consumeOptionalSign(value: string, startIndex: number): number {
+    const character = value[startIndex];
+    return character === "+" || character === "-" ? startIndex + 1 : startIndex;
+}
+
+function isStrictNumericLiteral(value: string): boolean {
+    const valueLength = value.length;
+    let index = consumeOptionalSign(value, 0);
+    const integerStartIndex = index;
+
+    index = consumeAsciiDigits(value, index);
+
+    const hasIntegerDigits = index > integerStartIndex;
+    let hasDecimalDigits = false;
+
+    if (value[index] === ".") {
+        index += 1;
+        const decimalStartIndex = index;
+        index = consumeAsciiDigits(value, index);
+        hasDecimalDigits = index > decimalStartIndex;
+    }
+
+    if (!hasIntegerDigits && !hasDecimalDigits) {
+        return false;
+    }
+
+    if (value[index] === "e" || value[index] === "E") {
+        index = consumeOptionalSign(value, index + 1);
+        const exponentStartIndex = index;
+        index = consumeAsciiDigits(value, index);
+
+        if (index === exponentStartIndex) {
+            return false;
+        }
+    }
+
+    return index === valueLength;
 }
 
 /**
