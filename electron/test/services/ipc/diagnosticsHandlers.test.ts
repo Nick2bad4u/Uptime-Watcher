@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
+
 import {
     MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
     MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
@@ -53,17 +55,38 @@ describe("sanitizeDiagnosticsReport", () => {
 
         expect(sanitizedReport.channel).not.toContain("SUPER_SECRET");
         expect(sanitizedReport.channel).not.toContain("\n");
-        expect(sanitizedReport.channel.length).toBeLessThanOrEqual(
+        expect(getUtfByteLength(sanitizedReport.channel)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES
         );
         expect(sanitizedReport.guard).not.toContain("\t");
-        expect(sanitizedReport.guard.length).toBeLessThanOrEqual(
+        expect(getUtfByteLength(sanitizedReport.guard)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_GUARD_BYTES
         );
         expect(sanitizedReport.reason).not.toContain("SUPER_SECRET");
         expect(sanitizedReport.reason).not.toContain("\n");
-        expect(sanitizedReport.reason?.length).toBeLessThanOrEqual(
-            MAX_DIAGNOSTICS_REPORT_REASON_BYTES
+        expect(
+            getUtfByteLength(sanitizedReport.reason ?? "")
+        ).toBeLessThanOrEqual(MAX_DIAGNOSTICS_REPORT_REASON_BYTES);
+    });
+
+    it("bounds multibyte report fields by UTF-8 byte length", () => {
+        const timestamp = Date.now();
+        const { sanitizedReport } =
+            DiagnosticsHandlerTestUtils.normalizeDiagnosticsReportPayload({
+                channel: "監視".repeat(500),
+                guard: "検証".repeat(500),
+                reason: "理由".repeat(500),
+                timestamp,
+            });
+
+        expect(getUtfByteLength(sanitizedReport.channel)).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES
         );
+        expect(getUtfByteLength(sanitizedReport.guard)).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_GUARD_BYTES
+        );
+        expect(
+            getUtfByteLength(sanitizedReport.reason ?? "")
+        ).toBeLessThanOrEqual(MAX_DIAGNOSTICS_REPORT_REASON_BYTES);
     });
 });

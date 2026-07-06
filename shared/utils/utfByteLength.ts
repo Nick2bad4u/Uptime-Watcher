@@ -12,6 +12,28 @@
 const textEncoder =
     typeof TextEncoder === "undefined" ? null : new TextEncoder();
 
+const getManualUtfByteLength = (value: string): number => {
+    let byteLength = 0;
+    for (const char of value) {
+        const codePoint = char.codePointAt(0);
+        if (codePoint === undefined) {
+            continue;
+        }
+
+        if (codePoint <= 0x7f) {
+            byteLength += 1;
+        } else if (codePoint <= 0x07_ff) {
+            byteLength += 2;
+        } else if (codePoint <= 0xff_ff) {
+            byteLength += 3;
+        } else {
+            byteLength += 4;
+        }
+    }
+
+    return byteLength;
+};
+
 /**
  * Returns the UTF-8 encoded byte length of a string.
  */
@@ -29,8 +51,5 @@ export function getUtfByteLength(value: string): number {
         return Buffer.byteLength(value, "utf8");
     }
 
-    // Last-resort approximation for rare environments without TextEncoder or
-    // Buffer. Keeps behavior deterministic but may be imprecise for astral
-    // code points.
-    return value.length * 2;
+    return getManualUtfByteLength(value);
 }

@@ -1,8 +1,5 @@
 import { getUtfByteLength as getSharedUtfByteLength } from "@shared/utils/utfByteLength";
 
-const textEncoder =
-    typeof TextEncoder === "undefined" ? null : new TextEncoder();
-
 export const MAX_DIAGNOSTICS_METADATA_BYTES = 2048;
 export const MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES = 256;
 export const MAX_DIAGNOSTICS_REPORT_GUARD_BYTES = 128;
@@ -26,23 +23,14 @@ export const truncateUtfString = (
         return { truncated: value.length > 0, value: "" };
     }
 
-    if (!textEncoder) {
-        const approxLimit = Math.floor(limit / 2);
-        if (value.length > approxLimit) {
-            return { truncated: true, value: value.slice(0, approxLimit) };
-        }
-        return { truncated: false, value };
-    }
-
-    const encoded = textEncoder.encode(value);
-    if (encoded.length <= limit) {
+    if (getUtfByteLength(value) <= limit) {
         return { truncated: false, value };
     }
 
     let accumulated = 0;
     let result = "";
     for (const char of value) {
-        const charLength = textEncoder.encode(char).length;
+        const charLength = getUtfByteLength(char);
         if (accumulated + charLength > limit) {
             return { truncated: true, value: result };
         }
