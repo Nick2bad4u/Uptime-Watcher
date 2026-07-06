@@ -234,6 +234,7 @@ export function readProcessEnv(key: string): string | undefined {
  *
  * - Missing/invalid: returns `defaultValue`
  * - "true"/"1"/"yes": returns true
+ * - "false"/"0"/"no": returns false
  */
 export function readBooleanEnv(key: string, defaultValue = false): boolean {
     const value = readProcessEnv(key);
@@ -241,14 +242,19 @@ export function readBooleanEnv(key: string, defaultValue = false): boolean {
         return defaultValue;
     }
 
-    switch (value.toLowerCase()) {
+    switch (value.trim().toLowerCase()) {
         case "1":
         case "true":
         case "yes": {
             return true;
         }
-        default: {
+        case "0":
+        case "false":
+        case "no": {
             return false;
+        }
+        default: {
+            return defaultValue;
         }
     }
 }

@@ -429,6 +429,59 @@ describe("Environment Detection Utilities", () => {
         });
     });
 
+    describe("readBooleanEnv", () => {
+        it("should parse explicit true and false environment values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            for (const value of [
+                "1",
+                "true",
+                " yes ",
+            ]) {
+                applyMockProcessSnapshot({ env: { FEATURE_FLAG: value } });
+                expect(envModule.readBooleanEnv("FEATURE_FLAG")).toBeTruthy();
+            }
+
+            for (const value of [
+                "0",
+                "false",
+                " no ",
+            ]) {
+                applyMockProcessSnapshot({ env: { FEATURE_FLAG: value } });
+                expect(
+                    envModule.readBooleanEnv("FEATURE_FLAG", true)
+                ).toBeFalsy();
+            }
+        });
+
+        it("should return the supplied default for missing or invalid values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: environment", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Regression", "type");
+
+            const envModule = ensureEnvironmentModule();
+
+            applyMockProcessSnapshot({ env: {} });
+            expect(envModule.readBooleanEnv("FEATURE_FLAG", true)).toBeTruthy();
+
+            applyMockProcessSnapshot({ env: { FEATURE_FLAG: "maybe" } });
+            expect(envModule.readBooleanEnv("FEATURE_FLAG", true)).toBeTruthy();
+            expect(envModule.readBooleanEnv("FEATURE_FLAG", false)).toBeFalsy();
+        });
+    });
+
     describe("isBrowserEnvironment", () => {
         let originalWindow: any;
         let originalDocument: any;
