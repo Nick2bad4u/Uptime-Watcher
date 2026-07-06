@@ -3,17 +3,20 @@
 
     document.addEventListener("mouseover", function (e) {
         if (!isPaused) {
-            console.log("Hovering over:", e.target);
+            const target = e.target;
+            if (!(target instanceof Element)) {
+                return;
+            }
+
+            console.log("Hovering over:", target);
             console.log("Click the element again to pause debugger...");
 
-            // Runtime browser snippet: event targets are DOM elements in this workflow.
-            e.target.addEventListener(
+            target.addEventListener(
                 "click",
                 function pauseOnClick() {
                     isPaused = true;
                     debugger;
-                    // Runtime browser snippet: event targets are DOM elements in this workflow.
-                    e.target.removeEventListener("click", pauseOnClick);
+                    target.removeEventListener("click", pauseOnClick);
                 },
                 { once: true }
             );
