@@ -1,4 +1,5 @@
 import type { Monitor } from "@shared/types";
+import { isStrictPlainDecimalNumberString } from "@shared/utils/decimalNumberString";
 /**
  * Shared utilities for monitor services to reduce code duplication Contains
  * common patterns used across PingMonitor, PortMonitor, and HttpMonitor
@@ -235,51 +236,6 @@ export function extractNestedFieldValue(
 
 const UNIX_SECONDS_THRESHOLD = 10_000_000_000;
 
-function isAsciiDigit(character: string | undefined): boolean {
-    return (
-        typeof character === "string" &&
-        character.length === 1 &&
-        character >= "0" &&
-        character <= "9"
-    );
-}
-
-function consumeAsciiDigits(value: string, startIndex: number): number {
-    let index = startIndex;
-
-    while (isAsciiDigit(value[index])) {
-        index += 1;
-    }
-
-    return index;
-}
-
-function isPlainDecimalNumberString(value: string): boolean {
-    if (value.length === 0) {
-        return false;
-    }
-
-    let index = value.startsWith("+") || value.startsWith("-") ? 1 : 0;
-    const integerStartIndex = index;
-
-    index = consumeAsciiDigits(value, index);
-    if (index === integerStartIndex) {
-        return false;
-    }
-
-    if (value[index] === ".") {
-        index += 1;
-        const decimalStartIndex = index;
-        index = consumeAsciiDigits(value, index);
-
-        if (index === decimalStartIndex) {
-            return false;
-        }
-    }
-
-    return index === value.length;
-}
-
 /**
  * Normalizes a timestamp-like value into a Unix epoch millisecond value.
  *
@@ -307,7 +263,7 @@ export function normalizeTimestampValue(value: unknown): number | undefined {
             return undefined;
         }
 
-        if (isPlainDecimalNumberString(trimmed)) {
+        if (isStrictPlainDecimalNumberString(trimmed)) {
             const numeric = Number(trimmed);
             return numeric > UNIX_SECONDS_THRESHOLD
                 ? Math.trunc(numeric)
