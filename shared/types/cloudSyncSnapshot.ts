@@ -97,7 +97,7 @@ const cloudSyncStateInternalSchema = z
     });
 
 /** Runtime schema for validating {@link CloudSyncState}. */
-export const cloudSyncStateSchema: z.ZodType<CloudSyncState> =
+const cloudSyncStateSchema: z.ZodType<CloudSyncState> =
     cloudSyncStateInternalSchema;
 
 /**

@@ -201,7 +201,7 @@ const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> = z
 /**
  * Zod schema validating {@link CloudSyncOperation}.
  */
-export const cloudSyncOperationSchema: typeof cloudSyncOperationInternalSchema =
+const cloudSyncOperationSchema: typeof cloudSyncOperationInternalSchema =
     cloudSyncOperationInternalSchema;
 
 /**

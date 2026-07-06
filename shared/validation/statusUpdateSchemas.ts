@@ -15,7 +15,7 @@ import { monitorStatusEnumValues } from "./statusValidationPrimitives";
 /**
  * Schema ensuring that timestamp fields contain ISO 8601 date strings.
  */
-export const isoTimestampSchema: z.ZodType<string> = z
+const isoTimestampSchema: z.ZodType<string> = z
     .string()
     .trim()
     .pipe(
@@ -112,14 +112,3 @@ export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
 
 export const typedStatusUpdateSchema: z.ZodType<StatusUpdate> =
     statusUpdateSchema;
-
-/**
- * Compile-time assertion verifying {@link statusUpdateSchema} alignment with the
- * {@link StatusUpdate} TypeScript interface.
- */
-export type StatusUpdateSchemaConformanceCheck =
-    z.infer<typeof statusUpdateSchema> extends StatusUpdate
-        ? StatusUpdate extends z.infer<typeof statusUpdateSchema>
-            ? true
-            : never
-        : never;

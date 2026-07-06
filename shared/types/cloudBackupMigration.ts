@@ -50,28 +50,6 @@ export type CloudBackupMigrationTarget = "encrypted" | "plaintext";
 
 const cloudBackupMigrationTargetSchema = z.enum(["plaintext", "encrypted"]);
 
-const cloudBackupMigrationRequestInternalSchema: z.ZodType<CloudBackupMigrationRequest> =
-    z
-        .object({
-            deleteSource: z.boolean(),
-            limit: z.int().positive().optional(),
-            target: cloudBackupMigrationTargetSchema,
-        })
-        .strict();
-
-/** Zod schema for {@link CloudBackupMigrationRequest}. */
-export const cloudBackupMigrationRequestSchema: z.ZodType<CloudBackupMigrationRequest> =
-    cloudBackupMigrationRequestInternalSchema;
-
-/**
- * Parses and validates a migration request.
- */
-export function parseCloudBackupMigrationRequest(
-    candidate: unknown
-): CloudBackupMigrationRequest {
-    return cloudBackupMigrationRequestInternalSchema.parse(candidate);
-}
-
 const cloudBackupMigrationFailureSchema: z.ZodType<CloudBackupMigrationFailure> =
     z
         .object({
@@ -93,10 +71,6 @@ const cloudBackupMigrationResultInternalSchema: z.ZodType<CloudBackupMigrationRe
             target: cloudBackupMigrationTargetSchema,
         })
         .strict();
-
-/** Zod schema for {@link CloudBackupMigrationResult}. */
-export const cloudBackupMigrationResultSchema: z.ZodType<CloudBackupMigrationResult> =
-    cloudBackupMigrationResultInternalSchema;
 
 /**
  * Safe parser for {@link CloudBackupMigrationResult}.

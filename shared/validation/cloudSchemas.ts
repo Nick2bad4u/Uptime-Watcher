@@ -93,7 +93,7 @@ const cloudStatusSummaryInternalSchema = z
         }
     });
 
-export const cloudStatusSummarySchema: z.ZodType<CloudStatusSummary> =
+const cloudStatusSummarySchema: z.ZodType<CloudStatusSummary> =
     cloudStatusSummaryInternalSchema.transform((value) => {
         const provider = value.provider ?? null;
 
@@ -133,7 +133,7 @@ const cloudSyncResetPreviewInternalSchema = z
     })
     .strict();
 
-export const cloudSyncResetPreviewSchema: z.ZodType<CloudSyncResetPreview> =
+const cloudSyncResetPreviewSchema: z.ZodType<CloudSyncResetPreview> =
     cloudSyncResetPreviewInternalSchema.transform((value) => ({
         deviceIds: value.deviceIds,
         fetchedAt: value.fetchedAt,
@@ -168,7 +168,7 @@ const cloudSyncResetResultInternalSchema = z
     })
     .strict();
 
-export const cloudSyncResetResultSchema: z.ZodType<CloudSyncResetResult> =
+const cloudSyncResetResultSchema: z.ZodType<CloudSyncResetResult> =
     cloudSyncResetResultInternalSchema.transform((value) => ({
         completedAt: value.completedAt,
         deletedObjects: value.deletedObjects,

@@ -106,16 +106,6 @@ const STATE_SYNC_ACTION_VALUES = [
  */
 export type StateSyncAction = (typeof STATE_SYNC_ACTION_VALUES)[number];
 
-const stateSyncActionInternalSchema: z.ZodType<StateSyncAction> = z.enum(
-    STATE_SYNC_ACTION_VALUES
-);
-
-/**
- * Zod schema describing valid state synchronization lifecycle actions.
- */
-export const stateSyncActionSchema: typeof stateSyncActionInternalSchema =
-    stateSyncActionInternalSchema;
-
 /**
  * Enumerated state synchronization lifecycle actions.
  *
@@ -141,28 +131,6 @@ export const STATE_SYNC_ACTION: StateSyncActionConstants = Object.freeze({
 export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] = Object.freeze([
     ...STATE_SYNC_ACTION_VALUES,
 ]);
-
-/**
- * Type guard ensuring a candidate is a valid {@link StateSyncAction}.
- *
- * @param candidate - Value to check.
- */
-export function isStateSyncAction(
-    candidate: unknown
-): candidate is StateSyncAction {
-    return stateSyncActionSchema.safeParse(candidate).success;
-}
-
-/**
- * Type guard for the bulk-sync action.
- *
- * @param candidate - Value to check.
- */
-export function isBulkStateSyncAction(
-    candidate: unknown
-): candidate is typeof STATE_SYNC_ACTION.BULK_SYNC {
-    return candidate === STATE_SYNC_ACTION.BULK_SYNC;
-}
 
 const siteOutputSchema: z.ZodType<Site> = siteSchema.transform(
     (site): Site => site
@@ -302,19 +270,6 @@ export type StateSyncFullSyncResultParseResult = ReturnType<
 >;
 
 /**
- * Type guard to check if a value is a valid {@link StateSyncStatusSummary}.
- *
- * @param candidate - Value to validate.
- *
- * @returns `true` when the value conforms to the schema.
- */
-export function isStateSyncStatusSummary(
-    candidate: unknown
-): candidate is StateSyncStatusSummary {
-    return stateSyncStatusSummarySchema.safeParse(candidate).success;
-}
-
-/**
  * Parses a candidate into a {@link StateSyncStatusSummary}.
  *
  * @param candidate - Value to parse.
@@ -340,19 +295,6 @@ export function safeParseStateSyncStatusSummary(
     candidate: unknown
 ): StateSyncStatusSummaryParseResult {
     return stateSyncStatusSummarySchema.safeParse(candidate);
-}
-
-/**
- * Type guard to check if a value is a valid {@link StateSyncFullSyncResult}.
- *
- * @param candidate - Value to validate.
- *
- * @returns `true` when the value conforms to the schema.
- */
-export function isStateSyncFullSyncResult(
-    candidate: unknown
-): candidate is StateSyncFullSyncResult {
-    return stateSyncFullSyncResultSchema.safeParse(candidate).success;
 }
 
 /**

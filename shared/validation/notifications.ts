@@ -10,7 +10,7 @@ import { siteIdentifierSchema } from "./siteFieldSchemas";
 /**
  * Canonical schema for notification preference updates exchanged over IPC.
  */
-export const notificationPreferenceUpdateSchema: z.ZodType<NotificationPreferenceUpdate> =
+const notificationPreferenceUpdateSchema: z.ZodType<NotificationPreferenceUpdate> =
     z
         .object({
             mutedSiteNotificationIdentifiers: z
@@ -42,7 +42,7 @@ export const parseNotificationPreferenceUpdate = (
 /**
  * Canonical schema for generic app notification requests exchanged over IPC.
  */
-export const appNotificationRequestSchema: z.ZodType<AppNotificationRequest> = z
+const appNotificationRequestSchema: z.ZodType<AppNotificationRequest> = z
     .object({
         body: z.string().trim().min(1).max(500).optional(),
         title: z.string().trim().min(1).max(120),

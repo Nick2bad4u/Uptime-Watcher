@@ -8,7 +8,6 @@
  */
 
 import type {
-    MonitoringOperationSummary,
     MonitoringStartSummary,
     MonitoringStopSummary,
 } from "@shared/types";
@@ -49,10 +48,6 @@ const monitoringOperationSummaryInternalSchema = z
         }
     });
 
-/** Zod schema for {@link MonitoringOperationSummary}. */
-export const monitoringOperationSummarySchema: z.ZodType<MonitoringOperationSummary> =
-    monitoringOperationSummaryInternalSchema;
-
 const monitoringStartSummaryInternalSchema =
     monitoringOperationSummaryInternalSchema
         .extend({
@@ -61,7 +56,7 @@ const monitoringStartSummaryInternalSchema =
         .strict();
 
 /** Zod schema for {@link MonitoringStartSummary}. */
-export const monitoringStartSummarySchema: z.ZodType<MonitoringStartSummary> =
+const monitoringStartSummarySchema: z.ZodType<MonitoringStartSummary> =
     monitoringStartSummaryInternalSchema;
 
 const monitoringStopSummaryInternalSchema =
@@ -72,16 +67,8 @@ const monitoringStopSummaryInternalSchema =
         .strict();
 
 /** Zod schema for {@link MonitoringStopSummary}. */
-export const monitoringStopSummarySchema: z.ZodType<MonitoringStopSummary> =
+const monitoringStopSummarySchema: z.ZodType<MonitoringStopSummary> =
     monitoringStopSummaryInternalSchema;
-
-/**
- * Validates an unknown payload against {@link MonitoringOperationSummary}.
- */
-export const validateMonitoringOperationSummary = (
-    value: unknown
-): ReturnType<typeof monitoringOperationSummarySchema.safeParse> =>
-    monitoringOperationSummarySchema.safeParse(value);
 
 /**
  * Validates an unknown payload against {@link MonitoringStartSummary}.

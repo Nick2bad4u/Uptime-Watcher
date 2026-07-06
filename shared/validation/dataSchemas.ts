@@ -130,7 +130,7 @@ export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabas
         })
         .strict();
 
-export const serializedDatabaseBackupResultSchema: z.ZodType<{
+const serializedDatabaseBackupResultSchema: z.ZodType<{
     buffer: ArrayBuffer;
     fileName: string;
     metadata: z.infer<typeof serializedDatabaseBackupMetadataSchema>;
@@ -150,7 +150,7 @@ export const serializedDatabaseBackupResultSchema: z.ZodType<{
     })
     .strict();
 
-export const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatabaseBackupSaveResult> =
+const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatabaseBackupSaveResult> =
     z
         .union([
             z
@@ -169,7 +169,7 @@ export const serializedDatabaseBackupSaveResultSchema: z.ZodType<SerializedDatab
         ])
         .readonly();
 
-export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
+const serializedDatabaseRestorePayloadSchema: z.ZodType<{
     buffer: ArrayBuffer;
     fileName?: string | undefined;
 }> = z
@@ -196,7 +196,7 @@ export const serializedDatabaseRestorePayloadSchema: z.ZodType<{
             .strict()
     );
 
-export const serializedDatabaseRestoreResultSchema: z.ZodType<SerializedDatabaseRestoreResult> =
+const serializedDatabaseRestoreResultSchema: z.ZodType<SerializedDatabaseRestoreResult> =
     z
         .object({
             metadata: serializedDatabaseBackupMetadataSchema,
@@ -205,7 +205,7 @@ export const serializedDatabaseRestoreResultSchema: z.ZodType<SerializedDatabase
         })
         .strict();
 
-export const monitorTypeConfigSchema: z.ZodType<MonitorTypeConfig> =
+const monitorTypeConfigSchema: z.ZodType<MonitorTypeConfig> =
     z.custom<MonitorTypeConfig>(
         (value): value is MonitorTypeConfig => isMonitorTypeConfig(value),
         {
@@ -213,11 +213,11 @@ export const monitorTypeConfigSchema: z.ZodType<MonitorTypeConfig> =
         }
     );
 
-export const monitorTypeConfigArraySchema: z.ZodType<MonitorTypeConfig[]> = z
+const monitorTypeConfigArraySchema: z.ZodType<MonitorTypeConfig[]> = z
     .array(monitorTypeConfigSchema)
     .min(0, "Monitor types array may be empty");
 
-export const validationResultSchema: z.ZodType<{
+const validationResultSchema: z.ZodType<{
     data?: unknown;
     errors: string[];
     metadata?: undefined | UnknownRecord;
@@ -243,11 +243,6 @@ export const validateSerializedDatabaseBackupSaveResult = (
 ): ReturnType<typeof serializedDatabaseBackupSaveResultSchema.safeParse> =>
     serializedDatabaseBackupSaveResultSchema.safeParse(value);
 
-export const validateSerializedDatabaseBackupMetadata = (
-    value: unknown
-): ReturnType<typeof serializedDatabaseBackupMetadataSchema.safeParse> =>
-    serializedDatabaseBackupMetadataSchema.safeParse(value);
-
 export const validateSerializedDatabaseRestorePayload = (
     value: unknown
 ): ReturnType<typeof serializedDatabaseRestorePayloadSchema.safeParse> =>
@@ -271,15 +266,3 @@ export const validateValidationResult = (
 /** Shared schema type for database backup metadata. */
 export type SerializedDatabaseBackupMetadataSchema =
     typeof serializedDatabaseBackupMetadataSchema;
-/** Shared schema type for database backup payloads. */
-export type SerializedDatabaseBackupResultSchema =
-    typeof serializedDatabaseBackupResultSchema;
-/** Shared schema type for database backup save results. */
-export type SerializedDatabaseBackupSaveResultSchema =
-    typeof serializedDatabaseBackupSaveResultSchema;
-/** Shared schema type for database restore payloads. */
-export type SerializedDatabaseRestorePayloadSchema =
-    typeof serializedDatabaseRestorePayloadSchema;
-/** Shared schema type for database restore results. */
-export type SerializedDatabaseRestoreResultSchema =
-    typeof serializedDatabaseRestoreResultSchema;

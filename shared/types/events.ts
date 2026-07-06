@@ -69,7 +69,7 @@ export interface EventMetadata {
 /**
  * Validates correlation identifiers used across the event bus.
  */
-export const correlationIdSchema: z.ZodType<CorrelationId> = z
+const correlationIdSchema: z.ZodType<CorrelationId> = z
     .string()
     .trim()
     .min(1)
@@ -314,7 +314,7 @@ const deleteStateSyncEventDataSchema = baseEventDataSchema
 /**
  * Zod schema describing valid {@link StateSyncEventData} payloads.
  */
-export const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
+const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
     z.discriminatedUnion("action", [
         bulkStateSyncEventDataSchema,
         updateStateSyncEventDataSchema,
@@ -339,21 +339,6 @@ export function isStateSyncEventData(
     candidate: unknown
 ): candidate is StateSyncEventData {
     return stateSyncEventDataSchema.safeParse(candidate).success;
-}
-
-/**
- * Parses a candidate into {@link StateSyncEventData}.
- *
- * @param candidate - Value to parse.
- *
- * @returns Parsed event data when successful.
- *
- * @throws {@link z.ZodError} When validation fails.
- */
-export function parseStateSyncEventData(
-    candidate: unknown
-): StateSyncEventData {
-    return stateSyncEventDataSchema.parse(candidate);
 }
 
 /**

@@ -69,10 +69,3 @@ const cloudEncryptionConfigInternalSchema = z.discriminatedUnion("mode", [
 /** Zod schema for {@link CloudEncryptionConfig}. */
 export const cloudEncryptionConfigSchema: z.ZodType<CloudEncryptionConfig> =
     cloudEncryptionConfigInternalSchema;
-
-/** Parses and validates a {@link CloudEncryptionConfig}. */
-export function parseCloudEncryptionConfig(
-    candidate: unknown
-): CloudEncryptionConfig {
-    return cloudEncryptionConfigInternalSchema.parse(candidate);
-}

@@ -13,7 +13,7 @@ import { siteSchema } from "./siteSchemas";
  * @remarks
  * This is used for user-driven JSON import/export flows (not cloud backup).
  */
-export const importExportVersionSchema: z.ZodLiteral<"1.0"> = z.literal("1.0");
+const importExportVersionSchema: z.ZodLiteral<"1.0"> = z.literal("1.0");
 
 /**
  * Type for a site record inside import payloads.
@@ -33,7 +33,7 @@ export interface ImportSite {
  * to bring partial data into the app and let the database layer apply defaults
  * where appropriate.
  */
-export const importSiteSchema: z.ZodType<ImportSite> = z
+const importSiteSchema: z.ZodType<ImportSite> = z
     .object({
         identifier: siteIdentifierSchema,
         monitoring: z.boolean().optional(),
@@ -60,7 +60,7 @@ const settingKeySchema = z.string().refine((key) => key.trim().length > 0, {
     message: "Setting key is required",
 });
 
-export const importDataSchema: z.ZodType<ImportData> = z
+const importDataSchema: z.ZodType<ImportData> = z
     .object({
         exportedAt: z.string().trim().optional(),
         settings: z.record(settingKeySchema, z.string().trim()).optional(),

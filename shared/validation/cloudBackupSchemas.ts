@@ -87,7 +87,7 @@ const cloudBackupKeySchema = z
  * This schema is strict because these files are authored by Uptime Watcher.
  * Treat unknown fields as corruption or incompatible schema changes.
  */
-export const cloudBackupEntrySchema: z.ZodType<CloudBackupEntry> = z
+const cloudBackupEntrySchema: z.ZodType<CloudBackupEntry> = z
     .object({
         encrypted: z.boolean(),
         fileName: cloudBackupFileNameSchema,
@@ -121,8 +121,9 @@ export const validateCloudBackupEntry = (
  * @remarks
  * This is primarily used for IPC response validation in the preload bridge.
  */
-export const cloudBackupEntryArraySchema: z.ZodType<CloudBackupEntry[]> =
-    z.array(cloudBackupEntrySchema);
+const cloudBackupEntryArraySchema: z.ZodType<CloudBackupEntry[]> = z.array(
+    cloudBackupEntrySchema
+);
 
 export const validateCloudBackupEntryArray = (
     value: unknown
