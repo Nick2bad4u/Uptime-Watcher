@@ -206,6 +206,10 @@ export function formatRelativeTimestamp(timestamp: number): string {
     const now = Date.now();
     const diff = now - timestamp;
 
+    if (diff < 0) {
+        return UiDefaults.notAvailableLabel;
+    }
+
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);

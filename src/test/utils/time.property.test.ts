@@ -283,6 +283,15 @@ describe("time Utils Property-Based Tests", () => {
         ])("should return fallback for invalid timestamps", (timestamp) => {
             expect(formatRelativeTimestamp(timestamp)).toBe("N/A");
         });
+
+        fcTest.prop([fc.integer({ max: 86_400, min: 1 })])(
+            "should return fallback for future timestamps",
+            (secondsAhead) => {
+                const timestamp = mockTime + secondsAhead * 1000;
+
+                expect(formatRelativeTimestamp(timestamp)).toBe("N/A");
+            }
+        );
     });
 
     describe("formatResponseDuration function", () => {

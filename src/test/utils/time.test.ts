@@ -415,20 +415,18 @@ describe("time Utilities", () => {
             expect(formatRelativeTimestamp(1_640_995_200_000)).toBe("Just now");
         });
 
-        it("should handle future timestamps gracefully", async ({
+        it("should return fallback for future timestamps", async ({
             annotate,
             task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: time", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
+            await annotate("Type: Validation", "type");
 
             const futureTimestamp = 1_640_995_200_000 + 60_000; // 1 minute in future
-            // Should handle negative differences gracefully (implementation dependent)
-            const result = formatRelativeTimestamp(futureTimestamp);
 
-            expect(result).toBeTypeOf("string");
+            expect(formatRelativeTimestamp(futureTimestamp)).toBe("N/A");
         });
 
         it("should return fallback for invalid timestamps", async ({
