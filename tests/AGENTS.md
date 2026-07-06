@@ -18,14 +18,14 @@ this directory.
 - Use focused assertions that explain the behavior being protected. Avoid broad
   snapshots for values that can be asserted structurally.
 - Keep property-based tests bounded and reproducible. Reuse shared fast-check
-  defaults from `tests/strictTests/test-utils` when working in strict tests.
+  defaults from `tests/strictTests/test-utils/fastcheckConfig.ts` when working
+  in strict tests.
 
 ## Repository Test Areas
 
 - `tests/strictTests/` contains strict and property-based support. Use
-  `tests/strictTests/test-utils/arbitraries.ts` and
   `tests/strictTests/test-utils/fastcheckConfig.ts` before inventing new
-  generators or fast-check parameters.
+  fast-check parameters.
 - `tests/tooling/` contains tests for documentation, scripts, and project
   tooling. Keep these tests independent of generated output unless the test is
   specifically validating a generator.

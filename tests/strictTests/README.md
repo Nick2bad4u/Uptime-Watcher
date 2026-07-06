@@ -22,7 +22,7 @@ folder when you need **extra guarantees** beyond normal unit coverage.
   services.
 - `electron/**` – strict tests targeting Electron main-process code.
 - `test-utils/**` – shared testing utilities for strict suites
-  (fast-check configuration, common arbitraries, etc.).
+  (fast-check configuration and related support).
 
 ## fast-check Utilities
 
@@ -36,19 +36,8 @@ for property-based tests:
   - `assertProperty(property, overrides?)` – thin wrapper around
     `fc.assert` that merges shared defaults with per-test overrides.
 
-- `test-utils/arbitraries.ts` – exports shared, reusable fast-check
-  arbitraries such as:
-
-  - `identifierArb` – non-empty, trimmed identifier strings.
-  - `historyLimitArb` – integer history-limit values.
-  - `nonEmptyNameArb` – user-facing names without leading/trailing
-    whitespace.
-  - `examplesToConstantFrom(examples)` – helper to convert curated example
-    arrays into `fc.constantFrom` arbitraries when upgrading existing
-    example-based tests to property-based suites.
-
-Using these helpers is **optional**; tests may still import and use
-`fast-check` directly when they need custom arbitraries or parameters.
+Tests may still import and use `fast-check` directly when they need custom
+arbitraries.
 
 ## Naming Conventions
 

@@ -23,6 +23,13 @@ const knipConfig: KnipConfig = {
         // Benchmarks type-check this shim through config/benchmarks/tsconfig.bench.json;
         // Knip resolves the same alias through the root tsconfig instead.
         "benchmarks/shared/testHelpers.ts",
+        // Storybook Vitest aliases electron-log/renderer to this file by path.
+        "storybook/shims/electronLogRenderer.stub.ts",
+        // TypeDoc includes these declaration inputs through docs/docusaurus/tsconfig.typedoc.json.
+        "electron/importMeta.node.d.ts",
+        "electron/events/eventTypes.catalogue.*.d.ts",
+        // JS config type-checking maps third-party ESLint plugins to these declaration shims.
+        "config/testing/types/eslint-plugin-*.d.ts",
         "docs/docusaurus/src/components/HomepageFeatures/styles.module.css.d.ts",
         "docs/docusaurus/typedoc-plugins/hashToBangLinks.mjs",
         "docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs",
@@ -73,6 +80,8 @@ const knipConfig: KnipConfig = {
         ".": {
             entry: [
                 "benchmarks/**/*.bench.{ts,tsx}",
+                "config/linting/commitlint.config.mjs",
+                "config/testing/vitest.zero-coverage.config.ts",
                 "electron/main.ts",
                 "electron/preload.ts",
                 "scripts/**/*.{cjs,cts,js,json,jsonc,mjs,mts,ts}",
