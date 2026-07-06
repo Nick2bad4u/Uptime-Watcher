@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import * as path from "node:path";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
@@ -110,6 +110,11 @@ const recreatePlaceholders = async (typedocOutputs) => {
     await writeFile(glossaryPath, glossaryContent);
 };
 
+/**
+ * Remove generated documentation artifacts and recreate required placeholders.
+ *
+ * @returns {Promise<boolean>} `true` when cleanup completes successfully.
+ */
 const main = async () => {
     const typedocOutputs = await loadTypedocOutputPaths();
 
@@ -149,9 +154,30 @@ const main = async () => {
     }
 
     console.log("Generated documentation directories are now clean.");
+    return true;
 };
 
-await main().catch((error) => {
-    console.error("Failed to clean generated documentation:", error);
-    process.exitCode = 1;
-});
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+const isDirectRun = () =>
+    typeof process.argv[1] === "string" &&
+    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error("Failed to clean generated documentation:", error);
+        process.exitCode = 1;
+    }
+}
+
+export {
+    isDirectRun,
+    loadTypedocOutputPaths,
+    main,
+    pathExists,
+    recreatePlaceholders,
+    removeGeneratedTargets,
+};
