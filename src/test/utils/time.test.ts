@@ -671,9 +671,15 @@ describe("time Utilities", () => {
             expect(
                 getIntervalLabel({ label: "Hourly Check", value: 3_600_000 })
             ).toBe("Hourly Check");
+            expect(
+                getIntervalLabel({
+                    label: "  Padded interval label  ",
+                    value: 5000,
+                })
+            ).toBe("Padded interval label");
         });
 
-        it("should fall back to formatIntervalDuration when label is empty", async ({
+        it("should fall back to formatIntervalDuration when label is blank", async ({
             annotate,
             task,
         }) => {
@@ -683,6 +689,9 @@ describe("time Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(getIntervalLabel({ label: "", value: 5000 })).toBe("5s");
+            expect(
+                getIntervalLabel({ label: " ".repeat(3), value: 5000 })
+            ).toBe("5s");
             expect(getIntervalLabel({ value: 60_000 })).toBe("1m");
             expect(getIntervalLabel({ value: 3_600_000 })).toBe("1h");
         });
@@ -1340,13 +1349,15 @@ describe("time Utilities", () => {
 
             test.prop([
                 fc.record({
-                    label: fc.string({ maxLength: 20, minLength: 1 }),
+                    label: fc
+                        .string({ maxLength: 20, minLength: 1 })
+                        .filter((label) => label.trim().length > 0),
                     value: fc.integer({ max: 3_600_000, min: 1000 }),
                 }),
             ])("should return custom label when provided", (interval) => {
                 const result = getIntervalLabel(interval);
 
-                expect(result).toBe(interval.label);
+                expect(result).toBe(interval.label.trim());
             });
 
             test.prop([

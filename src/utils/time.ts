@@ -306,8 +306,11 @@ export function getIntervalLabel(
         return formatIntervalDuration(interval);
     }
 
-    if (interval.label) {
-        return interval.label;
+    if (typeof interval.label === "string") {
+        const trimmedLabel = interval.label.trim();
+        if (trimmedLabel.length > 0) {
+            return trimmedLabel;
+        }
     }
 
     return formatIntervalDuration(interval.value);

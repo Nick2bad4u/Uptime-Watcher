@@ -20,7 +20,7 @@
  */
 
 import { fc, test as fcTest } from "@fast-check/vitest";
-import { isInteger } from "ts-extras";
+import { arrayJoin, isInteger } from "ts-extras";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -390,15 +390,35 @@ describe("time Utils Property-Based Tests", () => {
         );
 
         fcTest.prop([
-            fc.string({ maxLength: 20, minLength: 1 }),
+            fc
+                .string({ maxLength: 20, minLength: 1 })
+                .filter((label) => label.trim().length > 0),
             fc.integer({ max: 60_000, min: 1000 }),
         ])(
-            "should use custom label when provided in interval object",
+            "should use trimmed custom label when provided in interval object",
             (label, value) => {
                 const intervalObj = { label, value };
                 const result = getIntervalLabel(intervalObj);
 
-                expect(result).toBe(label);
+                expect(result).toBe(label.trim());
+            }
+        );
+
+        fcTest.prop([
+            fc
+                .array(fc.constantFrom(" ", "\t", "\n", "\r"), {
+                    maxLength: 20,
+                })
+                .map((characters) => arrayJoin(characters, "")),
+            fc.integer({ max: 60_000, min: 1000 }),
+        ])(
+            "should fallback to formatted duration for blank labels",
+            (label, value) => {
+                const intervalObj = { label, value };
+                const result = getIntervalLabel(intervalObj);
+                const expected = formatIntervalDuration(value);
+
+                expect(result).toBe(expected);
             }
         );
 
