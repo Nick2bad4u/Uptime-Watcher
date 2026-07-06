@@ -186,7 +186,7 @@ function parseArgs(args) {
 }
 
 /**
- * Print usage information and exit immediately.
+ * Print usage information.
  *
  * @returns {void}
  */
@@ -221,7 +221,6 @@ For Electron mode with --inspector:
 
 See docs/PLAYWRIGHT_CODEGEN_GUIDE.md for details.
 `);
-    process.exit(0);
 }
 
 /**
@@ -471,13 +470,16 @@ function assertLocalPlaywrightCli() {
 /**
  * Entrypoint for the Playwright codegen helper.
  *
- * @returns {Promise<void>} Resolves after codegen completes.
+ * @param {string[]} [args] - Raw command-line arguments.
+ *
+ * @returns {Promise<boolean>} `true` when launch setup completes successfully.
  */
-async function main() {
-    const options = parseArgs(process.argv.slice(2));
+async function main(args = process.argv.slice(2)) {
+    const options = parseArgs(args);
 
     if (options.help) {
         showHelp();
+        return true;
     }
 
     // Load custom transformations
@@ -574,20 +576,55 @@ async function main() {
             "❌ Error:",
             error instanceof Error ? error.message : String(error)
         );
-        process.exit(1);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Register CLI-only process signal handlers.
+ *
+ * @returns {void}
+ */
+function registerSignalHandlers() {
+    // Handle Ctrl+C gracefully
+    process.on("SIGINT", () => {
+        console.log("\n👋 Codegen interrupted");
+        process.exit(0);
+    });
+}
+
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    registerSignalHandlers();
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error(
+            "❌ Error:",
+            error instanceof Error ? error.message : String(error)
+        );
+        process.exitCode = 1;
     }
 }
 
-// Handle Ctrl+C gracefully
-process.on("SIGINT", () => {
-    console.log("\n👋 Codegen interrupted");
-    process.exit(0);
-});
-
-await main().catch((error) => {
-    console.error(
-        "❌ Error:",
-        error instanceof Error ? error.message : String(error)
-    );
-    process.exit(1);
-});
+export {
+    buildCodegenCommand,
+    isDirectRun,
+    main,
+    normalizeViewport,
+    parseArgs,
+    readOptionValue,
+    registerSignalHandlers,
+    resolveNpmRunInvocation,
+};
