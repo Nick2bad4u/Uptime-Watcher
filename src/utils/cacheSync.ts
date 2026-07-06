@@ -12,6 +12,7 @@ import {
     type CacheInvalidatedEventData,
 } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 
 import { EventsService } from "../services/EventsService";
 import { logger } from "../services/logger";
@@ -39,6 +40,35 @@ const CACHE_CLEARERS = new Map<string, (identifier?: string) => void>([
 ]);
 
 const SITE_UPDATE_DEBOUNCE_MS = 200;
+
+const safeIdentifierForLogging = (
+    identifier: string | undefined
+): string | undefined => {
+    if (identifier === undefined) {
+        return undefined;
+    }
+
+    const trimmed = identifier.trim();
+    if (!trimmed) {
+        return identifier;
+    }
+
+    return URL.canParse(trimmed) ? getSafeUrlForLogging(trimmed) : identifier;
+};
+
+const buildCacheInvalidationLogMetadata = (
+    data: CacheInvalidatedEventData
+): {
+    identifier?: string | undefined;
+    reason: CacheInvalidatedEventData["reason"];
+    timestamp: CacheInvalidatedEventData["timestamp"];
+    type: CacheInvalidatedEventData["type"];
+} => ({
+    identifier: safeIdentifierForLogging(data.identifier),
+    reason: data.reason,
+    timestamp: data.timestamp,
+    type: data.type,
+});
 
 /**
  * Set up automatic cache synchronization with backend. Listens for cache
@@ -72,7 +102,10 @@ export function setupCacheSync(): () => void {
                 return;
             }
 
-            logger.debug("Received cache invalidation event", data);
+            logger.debug(
+                "Received cache invalidation event",
+                buildCacheInvalidationLogMetadata(data)
+            );
 
             const syncSitesFromBackend = async (
                 context: "all" | "site"
@@ -136,7 +169,9 @@ export function setupCacheSync(): () => void {
                             logger.debug(
                                 "[CacheSync] Skipping duplicate site update resync",
                                 {
-                                    identifier: data.identifier,
+                                    identifier: safeIdentifierForLogging(
+                                        data.identifier
+                                    ),
                                     lastSiteUpdateResyncAt,
                                     reason: data.reason,
                                     timestamp: now,
@@ -226,7 +261,9 @@ function clearAllFrontendCaches(): void {
  * @internal
  */
 function clearMonitorRelatedCaches(identifier?: string): void {
-    logger.debug("[CacheSync] Clearing monitor-related caches", { identifier });
+    logger.debug("[CacheSync] Clearing monitor-related caches", {
+        identifier: safeIdentifierForLogging(identifier),
+    });
 
     // Clear monitor type cache (affects all monitors)
     const monitorTypeClearer = CACHE_CLEARERS.get("monitorType");
@@ -255,7 +292,9 @@ function clearMonitorRelatedCaches(identifier?: string): void {
  * @internal
  */
 function clearSiteRelatedCaches(identifier?: string): void {
-    logger.debug("[CacheSync] Clearing site-related caches", { identifier });
+    logger.debug("[CacheSync] Clearing site-related caches", {
+        identifier: safeIdentifierForLogging(identifier),
+    });
 
     // Future enhancement: Add site-specific cache clearing
     // if (identifier) {

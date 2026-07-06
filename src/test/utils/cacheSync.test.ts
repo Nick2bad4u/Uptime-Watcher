@@ -19,6 +19,7 @@ import {
     type CacheInvalidatedEventData,
 } from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { arrayAt, objectAssign, safeCastTo } from "ts-extras";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -310,6 +311,30 @@ const flushAsyncOperations = async (): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
+const safeIdentifierForLogExpectation = (
+    identifier: string | undefined
+): string | undefined => {
+    if (identifier === undefined) {
+        return undefined;
+    }
+
+    const trimmed = identifier.trim();
+    if (!trimmed) {
+        return identifier;
+    }
+
+    return URL.canParse(trimmed) ? getSafeUrlForLogging(trimmed) : identifier;
+};
+
+const buildCacheInvalidationLogExpectation = (
+    event: CacheInvalidatedEventData
+) => ({
+    identifier: safeIdentifierForLogExpectation(event.identifier),
+    reason: event.reason,
+    timestamp: event.timestamp,
+    type: event.type,
+});
+
 let setupCacheSync: (typeof import("../../utils/cacheSync"))["setupCacheSync"];
 let monitorRefreshSpy!: MockInstance<() => Promise<void>>;
 let sitesResyncSpy!: MockInstance<() => Promise<void>>;
@@ -484,7 +509,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing all frontend caches"
@@ -525,7 +550,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing all frontend caches"
@@ -557,7 +582,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing monitor-related caches",
@@ -591,7 +616,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing monitor-related caches",
@@ -626,7 +651,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing site-related caches",
@@ -637,6 +662,45 @@ describe("cacheSync", () => {
                 // Note: Currently no site-specific cache clearers implemented
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
                 expect(monitorRefreshSpy).not.toHaveBeenCalled();
+            });
+
+            it("should redact URL-like cache invalidation identifiers in logs", async () => {
+                setupCacheSync();
+
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        identifier:
+                            "https://user:pass@example.com/path?access_token=secret#frag",
+                        reason: CACHE_INVALIDATION_REASON.UPDATE,
+                        type: CACHE_INVALIDATION_TYPE.SITE,
+                    }
+                );
+                await flushAsyncOperations();
+
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "Received cache invalidation event",
+                    {
+                        ...buildCacheInvalidationLogExpectation(
+                            dispatchedEvent
+                        ),
+                        identifier: "https://example.com/path",
+                    }
+                );
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "[CacheSync] Clearing site-related caches",
+                    {
+                        identifier: "https://example.com/path",
+                    }
+                );
+
+                const serializedDebugCalls = JSON.stringify(
+                    mockLogger.debug.mock.calls
+                );
+                expect(serializedDebugCalls).not.toContain("access_token");
+                expect(serializedDebugCalls).not.toContain("secret");
+                expect(serializedDebugCalls).not.toContain("pass");
+                expect(serializedDebugCalls).not.toContain("frag");
             });
 
             it("should handle 'site' cache invalidation type without identifier", async ({
@@ -660,7 +724,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing site-related caches",
@@ -726,7 +790,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationEvent
+                    buildCacheInvalidationLogExpectation(invalidationEvent)
                 );
                 expect(mockLogger.warn).toHaveBeenCalledWith(
                     "Unknown cache invalidation type:",
@@ -835,7 +899,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    buildCacheInvalidationLogExpectation(invalidationData)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing monitor-related caches",
@@ -870,7 +934,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    buildCacheInvalidationLogExpectation(invalidationData)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing site-related caches",
@@ -1078,7 +1142,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    buildCacheInvalidationLogExpectation(invalidationData)
                 );
                 expect(mockClearMonitorTypeCache).toHaveBeenCalled();
             });
@@ -1179,7 +1243,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    dispatchedEvent
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
 
                 if (
@@ -1219,7 +1283,11 @@ describe("cacheSync", () => {
                 if (dispatchedEvent.type === CACHE_INVALIDATION_TYPE.MONITOR) {
                     expect(mockLogger.debug).toHaveBeenCalledWith(
                         "[CacheSync] Clearing monitor-related caches",
-                        { identifier: dispatchedEvent.identifier }
+                        {
+                            identifier: safeIdentifierForLogExpectation(
+                                dispatchedEvent.identifier
+                            ),
+                        }
                     );
                     expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 } else if (
@@ -1227,7 +1295,11 @@ describe("cacheSync", () => {
                 ) {
                     expect(mockLogger.debug).toHaveBeenCalledWith(
                         "[CacheSync] Clearing site-related caches",
-                        { identifier: dispatchedEvent.identifier }
+                        {
+                            identifier: safeIdentifierForLogExpectation(
+                                dispatchedEvent.identifier
+                            ),
+                        }
                     );
                 }
             }
@@ -1261,10 +1333,7 @@ describe("cacheSync", () => {
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    expect.objectContaining({
-                        reason: dispatchedEvent.reason,
-                        type: dispatchedEvent.type,
-                    })
+                    buildCacheInvalidationLogExpectation(dispatchedEvent)
                 );
             }
         );
