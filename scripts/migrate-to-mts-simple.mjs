@@ -30,6 +30,8 @@ const REPOSITORY_ROOT = path.resolve(
 
 /**
  * Show command usage.
+ *
+ * @returns {void}
  */
 function showHelp() {
     console.log(`
@@ -231,7 +233,10 @@ function processImports(content) {
  * Migrate a TypeScript file to .mts.
  *
  * @param {string} filePath
- * @param isDryRun
+ * @param {boolean} isDryRun
+ * @param {boolean} createBackups
+ *
+ * @returns {boolean} `true` when migration completes successfully.
  */
 function migrateFile(
     filePath,
@@ -263,7 +268,7 @@ function migrateFile(
                 console.log("\nUpdated content:");
                 console.log(updatedContent);
             }
-            return;
+            return true;
         }
 
         // Create backup
@@ -290,54 +295,76 @@ function migrateFile(
                 `Migrated: ${path.basename(filePath)} → ${path.basename(newFilePath)}`
             );
         }
+        return true;
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : String(error);
         log.error(`Failed to migrate ${filePath}: ${errorMessage}`);
-        throw error;
+        return false;
     }
 }
 
 /**
  * Main function.
+ *
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {boolean} `true` when migration completes successfully.
  */
-function main() {
+function main(args = process.argv.slice(2)) {
     try {
-        const options = parseArgs(process.argv.slice(2));
+        const options = parseArgs(args);
 
         if (options.help) {
             showHelp();
-            return;
+            return true;
         }
 
         if (options.filePath === "") {
             showHelp();
-            process.exit(1);
+            return false;
         }
 
         const resolvedPath = resolveCliFilePath(options.filePath);
-        migrateFile(resolvedPath, options.isDryRun, options.createBackups);
+        if (
+            !migrateFile(resolvedPath, options.isDryRun, options.createBackups)
+        ) {
+            return false;
+        }
+
         log.success("Migration completed!");
+        return true;
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : String(error);
         log.error(errorMessage);
-        process.exit(1);
+        return false;
     }
 }
 
-// Run if called directly
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-    main();
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectInvocation()) {
+    process.exitCode = main() ? 0 : 1;
 }
 
 export {
+    isDirectInvocation,
+    isLocalImport,
+    isRepositoryPath,
+    main,
     migrateFile,
     parseArgs,
     processImports,
+    resolveCliFilePath,
+    showHelp,
     updateImportPath,
-    isLocalImport,
 };
