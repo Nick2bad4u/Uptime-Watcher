@@ -90,7 +90,7 @@ const DEFAULT_CONFIG = {
  *
  * @param {string[]} args - Raw command-line arguments.
  *
- * @returns {Config} Parsed configuration.
+ * @returns {Config | null} Parsed configuration, or `null` when help was shown.
  */
 function parseArguments(args = process.argv.slice(2)) {
     const config = { ...DEFAULT_CONFIG };
@@ -99,8 +99,7 @@ function parseArguments(args = process.argv.slice(2)) {
     // Handle help flag
     if (args.includes("--help") || args.includes("-h")) {
         showHelp();
-
-        process.exit(0);
+        return null;
     }
 
     // Parse arguments
@@ -597,14 +596,20 @@ async function writeUpdatedWords(
 /**
  * Main execution function.
  *
- * @returns {Promise<void>}
+ * @param {string[]} [args] Raw command-line arguments.
+ *
+ * @returns {Promise<boolean>} `true` when the command completes successfully.
  */
-async function main() {
+async function main(args = process.argv.slice(2)) {
     let verbose = process.env["CSPELL_VERBOSE"] === "true";
     let logger = new Logger(verbose);
 
     try {
-        const config = parseArguments();
+        const config = parseArguments(args);
+        if (config === null) {
+            return true;
+        }
+
         verbose = config.verbose;
         logger = new Logger(verbose);
 
@@ -631,7 +636,7 @@ async function main() {
 
         if (newWords.size === 0) {
             logger.success("No new words to add to dictionary");
-            return;
+            return true;
         }
 
         // Interactive confirmation
@@ -639,7 +644,7 @@ async function main() {
             const shouldProceed = await promptForConfirmation(newWords, logger);
             if (!shouldProceed) {
                 logger.info("Operation cancelled by user");
-                return;
+                return true;
             }
         }
 
@@ -657,6 +662,7 @@ async function main() {
         logger.info(
             `Dictionary now contains ${currentWords.size + newWords.size} words`
         );
+        return true;
     } catch (error) {
         const errorMessage =
             error instanceof Error ? error.message : String(error);
@@ -664,19 +670,28 @@ async function main() {
         if (verbose && error instanceof Error) {
             logger.error(error.stack || "No stack trace available");
         }
-        process.exit(1);
+        return false;
     }
 }
 
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
 // Run the script if executed directly
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
-) {
+if (isDirectRun()) {
     try {
-        await main();
+        process.exitCode = (await main()) ? 0 : 1;
     } catch (error) {
         console.error(error);
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
+
+export { isDirectRun, isValidWord, main, parseArguments, processFoundWords };
