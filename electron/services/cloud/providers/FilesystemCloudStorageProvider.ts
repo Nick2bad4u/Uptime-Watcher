@@ -481,7 +481,6 @@ export class FilesystemCloudStorageProvider
             await fs.rename(targetPath, backupPath);
             try {
                 await renameTempToTarget();
-                await fs.rm(backupPath, { force: true });
             } catch (error) {
                 const rollbackErrors: Error[] = [];
 
@@ -506,6 +505,8 @@ export class FilesystemCloudStorageProvider
 
                 throw error;
             }
+
+            await removePathBestEffort(backupPath);
 
             return await toCloudObjectEntry(key, targetPath);
         } catch (error) {

@@ -132,6 +132,65 @@ describe("FilesystemCloudStorageProvider", () => {
         ).resolves.toEqual(Buffer.from("payload"));
     });
 
+    it("keeps overwritten objects when backup cleanup fails", async () => {
+        const actualFsPromises =
+            await vi.importActual<typeof import("node:fs/promises")>(
+                "node:fs/promises"
+            );
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:fs/promises", () => ({
+            ...actualFsPromises,
+            rm: vi.fn(
+                async (...args: Parameters<typeof actualFsPromises.rm>) => {
+                    const [target] = args;
+                    if (
+                        typeof target === "string" &&
+                        target.includes(".bak-")
+                    ) {
+                        throw new Error("backup cleanup failed");
+                    }
+
+                    return actualFsPromises.rm(...args);
+                }
+            ),
+        }));
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            await provider.uploadObject({
+                buffer: Buffer.from("first"),
+                key: "sync/state.json",
+            });
+
+            await expect(
+                provider.uploadObject({
+                    buffer: Buffer.from("second"),
+                    key: "sync/state.json",
+                    overwrite: true,
+                })
+            ).resolves.toMatchObject({
+                key: "sync/state.json",
+                sizeBytes: 6,
+            });
+
+            await expect(
+                provider.downloadObject("sync/state.json")
+            ).resolves.toEqual(Buffer.from("second"));
+        } finally {
+            vi.doUnmock("node:fs/promises");
+        }
+    });
+
     it("normalizes object keys by trimming and stripping leading slashes", async () => {
         const provider = new FilesystemCloudStorageProvider({ baseDirectory });
 
