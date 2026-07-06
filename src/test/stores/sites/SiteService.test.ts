@@ -59,6 +59,7 @@ const mockElectronAPI = {
     },
     sites: {
         addSite: vi.fn(),
+        deleteAllSites: vi.fn(),
         getSites: vi.fn(),
         removeSite: vi.fn(),
         updateSite: vi.fn(),
@@ -218,6 +219,41 @@ describe("SiteService", () => {
 
             await expect(SiteService.getSites()).rejects.toThrow(
                 "Network error"
+            );
+        });
+    });
+
+    describe("deleteAllSites", () => {
+        it("should return the deleted site count", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Deletion", "type");
+
+            mockElectronAPI.sites.deleteAllSites.mockResolvedValueOnce(3);
+
+            await expect(SiteService.deleteAllSites()).resolves.toBe(3);
+            expect(mockElectronAPI.sites.deleteAllSites).toHaveBeenCalledTimes(
+                1
+            );
+        });
+
+        it("should reject invalid deleted site counts", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockElectronAPI.sites.deleteAllSites.mockResolvedValueOnce("3");
+
+            await expect(SiteService.deleteAllSites()).rejects.toThrow(
+                "[SiteService] deleteAllSites returned invalid deletion count"
             );
         });
     });
@@ -449,6 +485,23 @@ describe("SiteService", () => {
 
             await expect(SiteService.removeSite(identifier)).rejects.toThrow(
                 /backend returned false/i
+            );
+        });
+
+        it("should reject invalid removal acknowledgements", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const identifier = "site-to-remove";
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce("true");
+
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                "[SiteService] removeSite returned invalid boolean response"
             );
         });
 

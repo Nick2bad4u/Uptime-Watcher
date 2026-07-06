@@ -16,7 +16,7 @@ import {
     validateSiteSnapshot,
     validateSiteSnapshots,
 } from "@shared/validation/guards";
-import { arrayFirst, arrayJoin, isEmpty } from "ts-extras";
+import { arrayFirst, arrayJoin, isEmpty, isSafeInteger } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -70,6 +70,43 @@ const logInvalidSnapshotAndThrow = (
             issues: error.issues,
         },
         message: `[SiteService] ${thrownMessage}`,
+    });
+};
+
+const parseDeletedSiteCount = (value: unknown): number => {
+    if (typeof value === "number" && isSafeInteger(value) && value >= 0) {
+        return value;
+    }
+
+    throw new ApplicationError({
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            operation: "deleteAllSites",
+            receivedType: typeof value,
+            serviceName: "SiteService",
+        },
+        message: "[SiteService] deleteAllSites returned invalid deletion count",
+    });
+};
+
+const parseBooleanResponse = (
+    operation: string,
+    value: unknown,
+    details: UnknownRecord
+): boolean => {
+    if (typeof value === "boolean") {
+        return value;
+    }
+
+    throw new ApplicationError({
+        code: "RENDERER_SERVICE_INVALID_PAYLOAD",
+        details: {
+            ...details,
+            operation,
+            receivedType: typeof value,
+            serviceName: "SiteService",
+        },
+        message: `[SiteService] ${operation} returned invalid boolean response`,
     });
 };
 
@@ -151,7 +188,7 @@ export const SiteService: SiteServiceContract = {
      * @returns The number of sites removed.
      */
     deleteAllSites: wrap("deleteAllSites", async (api) =>
-        api.sites.deleteAllSites()
+        parseDeletedSiteCount(await api.sites.deleteAllSites())
     ),
 
     /**
@@ -296,7 +333,11 @@ export const SiteService: SiteServiceContract = {
      *   fails.
      */
     removeSite: wrap("removeSite", async (api, identifier: string) => {
-        const isRemoved = await api.sites.removeSite(identifier);
+        const isRemoved = parseBooleanResponse(
+            "removeSite",
+            await api.sites.removeSite(identifier),
+            { identifier }
+        );
 
         if (!isRemoved) {
             throw new ApplicationError({
