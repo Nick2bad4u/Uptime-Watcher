@@ -2,6 +2,7 @@
  * AbortSignal helpers for monitoring.
  */
 
+import { createCombinedAbortSignal } from "@shared/utils/abortUtils";
 import { isFinite as isFiniteNumber } from "ts-extras";
 
 /**
@@ -11,13 +12,10 @@ export function createTimeoutSignal(
     timeoutMs: number,
     signal?: AbortSignal
 ): AbortSignal {
-    const hasTimeout = isFiniteNumber(timeoutMs) && timeoutMs > 0;
-    if (!hasTimeout) {
-        return signal ?? new AbortController().signal;
-    }
-
-    const timeoutSignal = AbortSignal.timeout(timeoutMs);
-    return signal ? AbortSignal.any([timeoutSignal, signal]) : timeoutSignal;
+    return createCombinedAbortSignal({
+        ...(signal && { additionalSignals: [signal] }),
+        timeoutMs,
+    });
 }
 
 /**
@@ -49,17 +47,10 @@ export function mergeAbortSignals(args: {
         return args.baseSignal;
     }
 
-    const signals: AbortSignal[] = [args.baseSignal];
-
-    if (hasAdditionalSignals) {
-        signals.push(...(args.additionalSignals ?? []));
-    }
-
-    if (hasTimeout) {
-        signals.push(AbortSignal.timeout(args.timeoutMs));
-    }
-
-    return AbortSignal.any(signals);
+    return createCombinedAbortSignal({
+        additionalSignals: [args.baseSignal, ...(args.additionalSignals ?? [])],
+        ...(hasTimeout && { timeoutMs: args.timeoutMs }),
+    });
 }
 
 /**

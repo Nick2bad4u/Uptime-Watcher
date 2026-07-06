@@ -29,6 +29,12 @@ describe("abortSignalUtils", () => {
 
             expect(signal).toBe(controller.signal);
         });
+
+        it("normalizes oversized timeout values instead of throwing", () => {
+            expect(() =>
+                createTimeoutSignal(Number.MAX_SAFE_INTEGER)
+            ).not.toThrow();
+        });
     });
 
     describe(mergeAbortSignals, () => {
@@ -64,6 +70,17 @@ describe("abortSignalUtils", () => {
 
             expect(merged.aborted).toBeTruthy();
             expect(merged.reason).toBe("additional");
+        });
+
+        it("normalizes oversized optional timeout values instead of throwing", () => {
+            const baseController = new AbortController();
+
+            expect(() =>
+                mergeAbortSignals({
+                    baseSignal: baseController.signal,
+                    timeoutMs: Number.MAX_SAFE_INTEGER,
+                })
+            ).not.toThrow();
         });
     });
 
