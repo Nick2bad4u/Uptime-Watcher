@@ -292,6 +292,20 @@ describe("status Utils Property-Based Tests", () => {
             );
         });
 
+        it("should ignore leading and trailing delimiters", () => {
+            expect(createStatusIdentifier(" service down")).toBe("serviceDown");
+            expect(createStatusIdentifier("service down ")).toBe("serviceDown");
+            expect(createStatusIdentifier("  service   down  ")).toBe(
+                "serviceDown"
+            );
+            expect(createStatusIdentifier("-network-error-")).toBe(
+                "networkError"
+            );
+            expect(createStatusIdentifier("_monitor_status_")).toBe(
+                "monitorStatus"
+            );
+        });
+
         test.prop([
             fc.string({ minLength: 1 }).filter((s) => !/[\s\-_]/v.test(s)),
         ])("should handle single word inputs correctly", (singleWord) => {

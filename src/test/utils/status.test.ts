@@ -934,7 +934,10 @@ describe("status Utilities", () => {
                     if (s.trim().length === 0) return false;
 
                     // Test that the function would produce valid camelCase
-                    const words = s.toLowerCase().split(/[\s\-_]+/u);
+                    const words = s
+                        .toLowerCase()
+                        .split(/[\s\-_]+/u)
+                        .filter((word) => word.length > 0);
                     const camelCased = arrayJoin(
                         words.map((word, index) =>
                             index === 0
@@ -996,6 +999,21 @@ describe("status Utilities", () => {
                         Math.max(...phrase.split(" ").map((w) => w.length))
                     );
                 }
+            });
+
+            test.prop([
+                fc.constantFrom(
+                    " status check",
+                    "status check ",
+                    "  status   check  ",
+                    "-monitor-down-",
+                    "_service_up_"
+                ),
+            ])("should ignore surrounding delimiters", (phrase) => {
+                const result: StatusIdentifier = createStatusIdentifier(phrase);
+
+                expect(result).toMatch(/^[a-z][\dA-Za-z]*$/u);
+                expect(result).not.toMatch(/[\s\-_]/u);
             });
 
             test.prop([
@@ -1099,7 +1117,10 @@ describe("status Utilities", () => {
                     if (s.trim().length === 0) return false;
 
                     // Test that the function would produce valid camelCase
-                    const words = s.toLowerCase().split(/[\s\-_]+/u);
+                    const words = s
+                        .toLowerCase()
+                        .split(/[\s\-_]+/u)
+                        .filter((word) => word.length > 0);
                     const camelCased = arrayJoin(
                         words.map((word, index) =>
                             index === 0
