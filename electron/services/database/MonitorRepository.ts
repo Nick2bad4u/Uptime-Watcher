@@ -90,6 +90,44 @@ import {
 const getSafeIdentifier = (identifier: string): string =>
     getSafeIdentifierForLogging(identifier) ?? identifier;
 
+interface MonitorInsertResult {
+    readonly id?: unknown;
+}
+
+function buildMonitorInsertSql(): string {
+    const { columns, placeholders } = generateSqlParameters();
+    const quotedColumns = columns.map((column) => escapeSqlIdentifier(column));
+
+    return `INSERT INTO monitors (${arrayJoin(quotedColumns, ", ")}) VALUES (${placeholders}) RETURNING id`;
+}
+
+function insertMonitorAndReturnId(args: {
+    readonly db: Database;
+    readonly invalidResultMessage: string;
+    readonly monitor: Site["monitors"][0];
+    readonly siteIdentifier: string;
+}): string {
+    const parameters = buildMonitorParameters(
+        args.siteIdentifier,
+        args.monitor
+    );
+    const insertResult = insertWithReturning<MonitorInsertResult>(
+        args.db,
+        buildMonitorInsertSql(),
+        parameters
+    );
+
+    if (
+        !objectHasIn(insertResult, "id") ||
+        typeof insertResult.id !== "string" ||
+        insertResult.id.length === 0
+    ) {
+        throw new Error(args.invalidResultMessage);
+    }
+
+    return insertResult.id;
+}
+
 /**
  * Repository dependencies for managing monitor data persistence.
  *
@@ -208,35 +246,13 @@ export class MonitorRepository {
                             "MonitorRepository.bulkCreate"
                         );
 
-                        // Use the same dynamic schema insert strategy as the
-                        // primary create path.
-                        const { columns, placeholders } =
-                            generateSqlParameters();
-                        const parameters = buildMonitorParameters(
-                            siteIdentifier,
-                            monitor
-                        );
-
-                        const quotedColumns = columns.map((column) =>
-                            escapeSqlIdentifier(column)
-                        );
-
-                        const insertSql = `INSERT INTO monitors (${arrayJoin(quotedColumns, ", ")}) VALUES (${placeholders}) RETURNING id`;
-                        const insertResult = insertWithReturning(
+                        insertMonitorAndReturnId({
                             db,
-                            insertSql,
-                            parameters
-                        );
-
-                        if (
-                            !objectHasIn(insertResult, "id") ||
-                            typeof insertResult.id !== "string" ||
-                            insertResult.id.length === 0
-                        ) {
-                            throw new Error(
-                                "Failed to create monitor: invalid or missing ID in database response"
-                            );
-                        }
+                            invalidResultMessage:
+                                "Failed to create monitor: invalid or missing ID in database response",
+                            monitor,
+                            siteIdentifier,
+                        });
 
                         // Keep the caller-provided id stable (UUID). The DB
                         // should echo it back.
@@ -763,41 +779,22 @@ export class MonitorRepository {
 
         assertValidMonitorId(monitor.id, "MonitorRepository.createInternal");
 
-        // Generate dynamic SQL and parameters
-        const { columns, placeholders } = generateSqlParameters();
-        // Type assertion is safe: buildMonitorParameters doesn't use the id
-        // field for INSERT operations
-        const parameters = buildMonitorParameters(siteIdentifier, monitor);
-
-        const quotedColumns = columns.map((column) =>
-            escapeSqlIdentifier(column)
-        );
-
-        const insertSql = `INSERT INTO monitors (${arrayJoin(quotedColumns, ", ")}) VALUES (${placeholders}) RETURNING id`;
-
-        const insertResult = insertWithReturning(db, insertSql, parameters);
-
-        // Validate the returned ID from database
-        if (
-            !objectHasIn(insertResult, "id") ||
-            typeof insertResult.id !== "string" ||
-            insertResult.id.length === 0
-        ) {
-            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
-            throw new Error(
-                `Failed to create monitor for site ${safeSiteIdentifier}: invalid or missing ID in database response`
-            );
-        }
+        const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
+        const monitorId = insertMonitorAndReturnId({
+            db,
+            invalidResultMessage: `Failed to create monitor for site ${safeSiteIdentifier}: invalid or missing ID in database response`,
+            monitor,
+            siteIdentifier,
+        });
 
         if (isDev()) {
-            const safeMonitorId = getSafeIdentifier(insertResult.id);
-            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
+            const safeMonitorId = getSafeIdentifier(monitorId);
             logger.debug(
                 `[MonitorRepository] Created monitor with id: ${safeMonitorId} for site: ${safeSiteIdentifier} (internal)`
             );
         }
 
-        return insertResult.id;
+        return monitorId;
     }
 
     /**
