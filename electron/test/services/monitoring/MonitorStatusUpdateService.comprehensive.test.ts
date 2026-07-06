@@ -11,6 +11,7 @@ import {
     MonitorStatusUpdateService,
     type StatusUpdateMonitorCheckResult,
 } from "../../../services/monitoring/MonitorStatusUpdateService";
+import { monitorLogger } from "../../../utils/logger";
 
 // Mock external dependencies
 vi.mock("../../../utils/logger", () => {
@@ -90,6 +91,10 @@ describe(MonitorStatusUpdateService, () => {
     let mockMonitorRepository: any;
     let mockSitesCache: any;
     let mockTimeoutManager: any;
+    const rawMonitorId =
+        "https://monitor.example/check?token=monitor-token#private-monitor";
+    const rawSiteIdentifier =
+        "https://user:site-secret@example.com/path?access_token=site-token#private-site";
 
     beforeEach(() => {
         // Reset all mocks
@@ -455,6 +460,74 @@ describe(MonitorStatusUpdateService, () => {
             // Assert
             expect(isResult).toBeTruthy(); // Should still complete successfully
             expect(mockSitesCache.set).not.toHaveBeenCalled();
+        });
+
+        it("should redact URL-shaped monitor identifiers in site-cache miss logs", async () => {
+            const testMonitor = createTestMonitor({ id: rawMonitorId });
+            const testResult = createTestResult({ monitorId: rawMonitorId });
+
+            mockOperationRegistry.validateOperation.mockReturnValue(true);
+            mockMonitorRepository.findByIdentifier.mockResolvedValue(
+                testMonitor
+            );
+            mockMonitorRepository.update.mockResolvedValue(undefined);
+            mockSitesCache.getAll.mockReturnValue([]);
+
+            await expect(
+                service.updateMonitorStatus(testResult)
+            ).resolves.toBeTruthy();
+
+            expect(mockMonitorRepository.update).toHaveBeenCalledWith(
+                rawMonitorId,
+                expect.any(Object)
+            );
+
+            const logPayload = JSON.stringify(
+                vi.mocked(monitorLogger.warn).mock.calls
+            );
+
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+        });
+
+        it("should redact URL-shaped identifiers in successful cache refresh logs", async () => {
+            const testMonitor = createTestMonitor({ id: rawMonitorId });
+            const testSite = createTestSite({
+                identifier: rawSiteIdentifier,
+                monitors: [testMonitor],
+            });
+            const testResult = createTestResult({ monitorId: rawMonitorId });
+
+            mockOperationRegistry.validateOperation.mockReturnValue(true);
+            mockMonitorRepository.findByIdentifier.mockResolvedValue(
+                testMonitor
+            );
+            mockMonitorRepository.update.mockResolvedValue(undefined);
+            mockSitesCache.getAll.mockReturnValue([testSite]);
+
+            await expect(
+                service.updateMonitorStatus(testResult)
+            ).resolves.toBeTruthy();
+
+            expect(mockSitesCache.set).toHaveBeenCalledWith(
+                rawSiteIdentifier,
+                expect.objectContaining({
+                    identifier: rawSiteIdentifier,
+                })
+            );
+
+            const logPayload = JSON.stringify(
+                vi.mocked(monitorLogger.debug).mock.calls
+            );
+
+            expect(logPayload).toContain("https://monitor.example/check");
+            expect(logPayload).toContain("https://example.com/path");
+            expect(logPayload).not.toContain("monitor-token");
+            expect(logPayload).not.toContain("private-monitor");
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
         });
 
         it("should handle cache refresh errors gracefully", async ({

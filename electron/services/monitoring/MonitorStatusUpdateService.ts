@@ -12,6 +12,7 @@
 
 import type { Monitor, Site } from "@shared/types";
 
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -23,6 +24,9 @@ import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 import type { OperationTimeoutManager } from "./OperationTimeoutManager";
 
 import { monitorLogger as logger } from "../../utils/logger";
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 /**
  * Unified monitor check result interface for status updates.
@@ -137,11 +141,12 @@ export class MonitorStatusUpdateService {
                 result.monitorId
             );
             if (!monitor) {
+                const safeMonitorId = getSafeIdentifier(result.monitorId);
                 logger.warn(
                     interpolateLogTemplate(
                         LOG_TEMPLATES.warnings.MONITOR_NOT_FOUND_CACHE,
                         {
-                            monitorId: result.monitorId,
+                            monitorId: safeMonitorId,
                         }
                     )
                 );
@@ -150,11 +155,12 @@ export class MonitorStatusUpdateService {
 
             // Only update if monitor is still actively monitoring
             if (!monitor.monitoring) {
+                const safeMonitorId = getSafeIdentifier(result.monitorId);
                 logger.debug(
                     interpolateLogTemplate(
                         LOG_TEMPLATES.warnings.MONITOR_NOT_MONITORING,
                         {
-                            monitorId: result.monitorId,
+                            monitorId: safeMonitorId,
                         }
                     )
                 );
@@ -183,13 +189,15 @@ export class MonitorStatusUpdateService {
             // Refresh the site cache to ensure UI shows updated monitor status
             await this.refreshSiteCacheForMonitor(result.monitorId);
 
+            const safeMonitorId = getSafeIdentifier(result.monitorId);
             logger.debug(
-                `Updated monitor ${result.monitorId} status to ${result.status}`
+                `Updated monitor ${safeMonitorId} status to ${result.status}`
             );
             return true;
         } catch (error) {
+            const safeMonitorId = getSafeIdentifier(result.monitorId);
             logger.error(
-                `Failed to update monitor status for ${result.monitorId}`,
+                `Failed to update monitor status for ${safeMonitorId}`,
                 error
             );
             return false;
@@ -226,6 +234,8 @@ export class MonitorStatusUpdateService {
      * @param monitorId - ID of the monitor whose site cache should be refreshed
      */
     private async refreshSiteCacheForMonitor(monitorId: string): Promise<void> {
+        const safeMonitorId = getSafeIdentifier(monitorId);
+
         try {
             // Find the site containing this monitor
             const sites = this.sites.getAll();
@@ -235,7 +245,7 @@ export class MonitorStatusUpdateService {
 
             if (!site) {
                 logger.warn(
-                    `Site not found for monitor ${monitorId}, cannot refresh cache`
+                    `Site not found for monitor ${safeMonitorId}, cannot refresh cache`
                 );
                 return;
             }
@@ -247,7 +257,7 @@ export class MonitorStatusUpdateService {
                 logger.warn(
                     interpolateLogTemplate(
                         LOG_TEMPLATES.warnings.MONITOR_FRESH_DATA_MISSING,
-                        { monitorId }
+                        { monitorId: safeMonitorId }
                     )
                 );
                 return;
@@ -262,12 +272,13 @@ export class MonitorStatusUpdateService {
             };
 
             this.sites.set(site.identifier, updatedSite);
+            const safeSiteIdentifier = getSafeIdentifier(site.identifier);
             logger.debug(
-                `Refreshed site cache for monitor ${monitorId} in site ${site.identifier}`
+                `Refreshed site cache for monitor ${safeMonitorId} in site ${safeSiteIdentifier}`
             );
         } catch (error) {
             logger.warn(
-                `Failed to refresh site cache for monitor ${monitorId}`,
+                `Failed to refresh site cache for monitor ${safeMonitorId}`,
                 error
             );
             // Don't throw - cache refresh failure shouldn't break monitor
