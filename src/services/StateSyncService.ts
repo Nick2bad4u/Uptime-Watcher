@@ -49,6 +49,14 @@ interface InvalidEventPayloadSummary {
     readonly truncatedKeys?: boolean;
 }
 
+interface PendingRecoveryExpectation {
+    readonly appliedLocally: boolean;
+    readonly expectedRevision: number;
+    readonly expectedTimestamp: number;
+    readonly siteCount: number;
+    readonly source: StateSyncFullSyncResult["source"];
+}
+
 const formatPropertyKeyForLog = (key: PropertyKey): string =>
     typeof key === "symbol" ? key.toString() : String(key);
 
@@ -83,6 +91,17 @@ const summarizeInvalidEventPayload = (
         ...(keys.length > loggedKeys.length && { truncatedKeys: true }),
     };
 };
+
+const isExpectedRecoveryBroadcast = (
+    event: StateSyncEventData,
+    expectation: PendingRecoveryExpectation | null
+): boolean =>
+    expectation !== null &&
+    event.action === STATE_SYNC_ACTION.BULK_SYNC &&
+    event.revision === expectation.expectedRevision &&
+    event.timestamp === expectation.expectedTimestamp &&
+    event.source === expectation.source &&
+    event.siteCount === expectation.siteCount;
 
 const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
     try {
@@ -210,13 +229,8 @@ export const StateSyncService: StateSyncServiceContract = {
         async (api, handler: (event: StateSyncEventData) => void) => {
             let pendingRecovery: null | Promise<void> = null;
             let isSubscriptionActive = true;
-            let pendingRecoveryExpectation: null | {
-                appliedLocally: boolean;
-                expectedRevision: number;
-                expectedTimestamp: number;
-                siteCount: number;
-                source: StateSyncFullSyncResult["source"];
-            } = null;
+            let pendingRecoveryExpectation: null | PendingRecoveryExpectation =
+                null;
             let pendingRecoveryTimer: null | ReturnType<typeof setTimeout> =
                 null;
 
@@ -368,13 +382,13 @@ export const StateSyncService: StateSyncServiceContract = {
                         return;
                     }
 
-                    const expectedRecoveryRevision =
-                        pendingRecoveryExpectation?.expectedRevision;
-                    const isExpectedRecoveryBroadcast =
-                        typeof expectedRecoveryRevision === "number" &&
-                        parsedEvent.data.revision === expectedRecoveryRevision;
+                    const isExpectedRecoveryBroadcastResult =
+                        isExpectedRecoveryBroadcast(
+                            parsedEvent.data,
+                            pendingRecoveryExpectation
+                        );
 
-                    if (!isExpectedRecoveryBroadcast) {
+                    if (!isExpectedRecoveryBroadcastResult) {
                         if (
                             lastSeenRevision !== null &&
                             parsedEvent.data.revision <= lastSeenRevision
@@ -418,7 +432,7 @@ export const StateSyncService: StateSyncServiceContract = {
                         handler(parsedEvent.data);
                     }
 
-                    if (isExpectedRecoveryBroadcast) {
+                    if (isExpectedRecoveryBroadcastResult) {
                         logger.info(
                             "[StateSyncService] Full sync recovery broadcast applied",
                             {

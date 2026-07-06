@@ -481,6 +481,67 @@ describe("StateSyncService", () => {
         }
     });
 
+    it("keeps recovery expectation pending for mismatched same-revision broadcasts", async () => {
+        vi.useFakeTimers();
+
+        try {
+            const callback = vi.fn();
+            const fullSyncPayload = {
+                completedAt: 1_725_000_000_000,
+                revision: 22,
+                siteCount: 0,
+                sites: [],
+                source: "database" as const,
+                synchronized: true,
+            };
+
+            mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(
+                fullSyncPayload
+            );
+
+            await StateSyncService.onStateSyncEvent(callback);
+            expect(capturedHandler).toBeTypeOf("function");
+
+            capturedHandler?.({ invalid: true });
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.stateSync.requestFullSync
+                ).toHaveBeenCalledTimes(1);
+            });
+
+            await vi.waitFor(() => {
+                expect(callback).toHaveBeenCalledTimes(1);
+            });
+
+            capturedHandler?.({
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                revision: fullSyncPayload.revision,
+                siteCount: fullSyncPayload.siteCount,
+                siteIdentifier: "all",
+                sites: [],
+                source: fullSyncPayload.source,
+                timestamp: fullSyncPayload.completedAt + 1,
+            });
+
+            expect(mockLogger.info).not.toHaveBeenCalledWith(
+                "[StateSyncService] Full sync recovery broadcast applied",
+                expect.anything()
+            );
+
+            await vi.advanceTimersByTimeAsync(5000);
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[StateSyncService] Full sync recovery broadcast not received within expected window",
+                expect.objectContaining({
+                    expectedTimestamp: fullSyncPayload.completedAt,
+                })
+            );
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     it("logs recovery failures when full sync throws", async () => {
         const callback = vi.fn();
         const failure = new Error("full sync failed");
