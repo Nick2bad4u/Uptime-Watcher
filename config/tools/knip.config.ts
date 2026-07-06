@@ -58,11 +58,16 @@ const knipConfig: KnipConfig = {
         type: true,
     },
     ignoreIssues: {
+        // These tool configs are loaded by their CLIs from config paths, not
+        // imported by repository source files.
+        "config/linting/commitlint.config.mjs": ["exports"],
         "config/linting/plugins/uptime-watcher/plugin.cjs": ["exports"],
         "config/linting/plugins/uptime-watcher/plugin.d.cts": ["exports"],
         "config/linting/plugins/uptime-watcher/plugin.d.mts": ["exports"],
+        "config/testing/vitest.zero-coverage.config.ts": ["exports"],
         "shared/constants/backup.ts": ["duplicates"],
         "shared/validation/statusUpdateSchemas.ts": ["duplicates"],
+        "vitest.stryker.config.ts": ["exports"],
     },
     includeEntryExports: true,
     project: [],
