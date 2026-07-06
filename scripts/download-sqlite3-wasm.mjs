@@ -12,7 +12,7 @@ import * as fs from "fs";
 import https from "https";
 import path from "path";
 import crypto from "crypto";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -116,6 +116,8 @@ function parseArgs(args) {
 
 /**
  * Show command usage.
+ *
+ * @returns {void}
  */
 function showHelp() {
     console.log(`
@@ -168,13 +170,10 @@ function getSanitizedErrorMessage(error) {
 /**
  * @param {string} message
  *
- * @returns {never}
+ * @returns {Error}
  */
-function failAndExit(message) {
-    console.error(
-        `[wasm-download] ERROR: ${sanitizeForSingleLineLog(message)}`
-    );
-    process.exit(1);
+function createDownloadError(message) {
+    return new Error(sanitizeForSingleLineLog(message));
 }
 
 /**
@@ -397,117 +396,202 @@ async function checkForUpdates() {
 }
 
 /**
- * @param {string} urlToFetch
- * @param {string} destPath
+ * @param {string} urlToFetch - URL to fetch.
+ * @param {string} destPath - Destination path.
  * @param {number} [redirectCount] - Default is `0`.
+ *
+ * @returns {Promise<void>} Resolves after download and synchronization finish.
  */
 function download(urlToFetch, destPath, redirectCount = 0) {
-    if (redirectCount > MAX_REDIRECTS) {
-        failAndExit(`Too many redirects (> ${MAX_REDIRECTS})`);
-    }
-    const req = https.get(urlToFetch, (res) => {
-        if (
-            res.statusCode &&
-            [
-                301,
-                302,
-                303,
-                307,
-                308,
-            ].includes(res.statusCode)
-        ) {
-            const location = res.headers.location;
-            if (!location) {
-                failAndExit("Redirect response missing 'location' header");
-            }
-            return download(location, destPath, redirectCount + 1);
+    return new Promise((resolve, reject) => {
+        if (redirectCount > MAX_REDIRECTS) {
+            reject(
+                createDownloadError(`Too many redirects (> ${MAX_REDIRECTS})`)
+            );
+            return;
         }
 
-        if (res.statusCode !== 200) {
-            failAndExit(`Unexpected status code: ${res.statusCode}`);
-        }
-
-        const hash = crypto.createHash("sha256");
-        let received = 0;
-        const tempPath = `${destPath}.download`;
-        const file = fs.createWriteStream(tempPath, { flags: "w" });
-
-        file.on("error", (err) => failAndExit(`File write error: ${err}`));
-
-        res.on("data", (chunk) => {
-            received += chunk.length;
-            if (received > MAX_SIZE_BYTES) {
-                res.destroy();
-                failAndExit(
-                    `Download exceeded maximum allowed size (${MAX_SIZE_BYTES} bytes)`
-                );
-            }
-            hash.update(chunk);
-        });
-
-        res.pipe(file);
-
-        res.on("end", () => {
-            file.close(() => {
-                const actual = hash.digest("hex").toLowerCase();
-                if (!verifyHash(actual, EXPECTED_SHA256)) {
-                    try {
-                        fs.unlinkSync(tempPath);
-                    } catch {}
-                    failAndExit("Hash verification failed");
-                }
-                fs.renameSync(tempPath, destPath);
-                console.log(
-                    `[wasm-download] Downloaded and saved to ${destPath}`
-                );
-                // Copy to assets
-                fs.copyFile(destPath, scriptsDest, (err) => {
-                    if (err) {
-                        failAndExit(
-                            `Failed to copy to scripts directory: ${err}`
-                        );
-                    }
-                    console.log(
-                        `[wasm-download] Copied to scripts directory: ${scriptsDest}`
+        const req = https.get(urlToFetch, (res) => {
+            if (
+                res.statusCode &&
+                [
+                    301,
+                    302,
+                    303,
+                    307,
+                    308,
+                ].includes(res.statusCode)
+            ) {
+                const location = res.headers.location;
+                if (!location) {
+                    reject(
+                        createDownloadError(
+                            "Redirect response missing 'location' header"
+                        )
                     );
+                    return;
+                }
 
-                    // Save version info after successful download
-                    // Try to get the latest commit hash, but don't fail if we can't
-                    getLatestCommitHash()
-                        .then((version) => {
+                const redirectUrl = new URL(location, urlToFetch).toString();
+                download(redirectUrl, destPath, redirectCount + 1)
+                    .then(resolve)
+                    .catch(reject);
+                return;
+            }
+
+            if (res.statusCode !== 200) {
+                reject(
+                    createDownloadError(
+                        `Unexpected status code: ${res.statusCode}`
+                    )
+                );
+                return;
+            }
+
+            const hash = crypto.createHash("sha256");
+            let received = 0;
+            let settled = false;
+            const tempPath = `${destPath}.download`;
+            const file = fs.createWriteStream(tempPath, { flags: "w" });
+
+            const cleanupTempFile = () => {
+                try {
+                    fs.unlinkSync(tempPath);
+                } catch {
+                    // Best-effort cleanup for partially downloaded artifacts.
+                }
+            };
+
+            /**
+             * @param {unknown} error - Failure reason.
+             *
+             * @returns {void}
+             */
+            const fail = (error) => {
+                if (settled) {
+                    return;
+                }
+
+                settled = true;
+                cleanupTempFile();
+                reject(
+                    error instanceof Error
+                        ? error
+                        : createDownloadError(String(error))
+                );
+            };
+
+            file.on("error", (error) => {
+                fail(createDownloadError(`File write error: ${error.message}`));
+            });
+
+            res.on("error", fail);
+
+            res.on("data", (chunk) => {
+                received += chunk.length;
+                if (received > MAX_SIZE_BYTES) {
+                    res.destroy();
+                    file.destroy();
+                    fail(
+                        createDownloadError(
+                            `Download exceeded maximum allowed size (${MAX_SIZE_BYTES} bytes)`
+                        )
+                    );
+                    return;
+                }
+
+                hash.update(chunk);
+            });
+
+            res.pipe(file);
+
+            res.on("end", () => {
+                file.close(async (closeError) => {
+                    if (settled) {
+                        return;
+                    }
+
+                    if (closeError) {
+                        fail(
+                            createDownloadError(
+                                `File close error: ${closeError.message}`
+                            )
+                        );
+                        return;
+                    }
+
+                    try {
+                        const actual = hash.digest("hex").toLowerCase();
+                        if (!verifyHash(actual, EXPECTED_SHA256)) {
+                            cleanupTempFile();
+                            fail(
+                                createDownloadError("Hash verification failed")
+                            );
+                            return;
+                        }
+
+                        fs.renameSync(tempPath, destPath);
+                        console.log(
+                            `[wasm-download] Downloaded and saved to ${destPath}`
+                        );
+                        fs.copyFileSync(destPath, scriptsDest);
+                        console.log(
+                            `[wasm-download] Copied to scripts directory: ${scriptsDest}`
+                        );
+
+                        try {
+                            const version = await getLatestCommitHash();
                             saveVersion(version);
                             console.log(
                                 `[wasm-download] Success! Downloaded version ${version}`
                             );
-                        })
-                        .catch((err) => {
+                        } catch (error) {
                             console.warn(
-                                `[wasm-download] Warning: Could not save version: ${getSanitizedErrorMessage(err)}`
+                                `[wasm-download] Warning: Could not save version: ${getSanitizedErrorMessage(error)}`
                             );
                             console.log(
                                 `[wasm-download] Success! Download completed but version tracking unavailable`
                             );
-                        })
-                        .finally(() => {
-                            process.exit(0);
-                        });
+                        }
+
+                        settled = true;
+                        resolve();
+                    } catch (error) {
+                        fail(error);
+                    }
                 });
             });
         });
-    });
 
-    req.on("error", (err) => failAndExit(`Network error: ${err}`));
+        req.on("error", (error) => {
+            reject(createDownloadError(`Network error: ${error.message}`));
+        });
+    });
+}
+
+/**
+ * @param {string} message - Error message to log.
+ *
+ * @returns {false}
+ */
+function reportFailure(message) {
+    console.error(
+        `[wasm-download] ERROR: ${sanitizeForSingleLineLog(message)}`
+    );
+    return false;
 }
 
 /**
  * Orchestrate update checks and download the node-sqlite3-wasm binary.
  *
- * @returns {Promise<void>} Resolves after completing the workflow.
+ * @param {ReturnType<typeof parseArgs>} options - Parsed CLI options.
+ *
+ * @returns {Promise<boolean>} Resolves `true` on success.
  */
 async function main(options = parseArgs(process.argv.slice(2))) {
     if (options.help) {
         showHelp();
-        return;
+        return true;
     }
 
     ensureArtifactDirectories();
@@ -517,10 +601,9 @@ async function main(options = parseArgs(process.argv.slice(2))) {
         try {
             const result = await checkForUpdates();
             if (result.updateCheckFailed) {
-                console.error(
-                    `[wasm-download] Error checking for updates: ${result.error ?? "unknown error"}`
+                return reportFailure(
+                    `Error checking for updates: ${result.error ?? "unknown error"}`
                 );
-                process.exit(1);
             }
 
             if (result.hasUpdate) {
@@ -530,26 +613,23 @@ async function main(options = parseArgs(process.argv.slice(2))) {
                 console.log(
                     "[wasm-download] Run without --check-update to download the latest version"
                 );
-                process.exit(0);
+                return true;
             } else {
                 console.log("[wasm-download] No updates available");
-                process.exit(0);
+                return true;
             }
         } catch (error) {
-            console.error(
-                `[wasm-download] Error: ${getSanitizedErrorMessage(error)}`
-            );
-            process.exit(1);
+            return reportFailure(`Error: ${getSanitizedErrorMessage(error)}`);
         }
     }
 
     if (options.noUpdate && !options.forceDownload) {
         if (!ensureLocalWasmAvailable()) {
-            failAndExit(
+            return reportFailure(
                 "No local node-sqlite3-wasm.wasm found. Run npm run sqlite:download:force to fetch it explicitly."
             );
         }
-        process.exit(0);
+        return true;
     }
 
     // Default behavior: check for updates (unless --no-update is specified)
@@ -600,7 +680,7 @@ async function main(options = parseArgs(process.argv.slice(2))) {
                     );
                 }
 
-                process.exit(0);
+                return true;
             }
         } catch (error) {
             console.error(
@@ -626,13 +706,14 @@ async function main(options = parseArgs(process.argv.slice(2))) {
         }
     }
 
-    startDownload();
+    await startDownload();
+    return true;
 }
 
 /**
  * Validate configuration and kick off the download workflow.
  *
- * @returns {void}
+ * @returns {Promise<void>} Resolves when the download finishes.
  */
 function startDownload() {
     verifyNonPlaceholderHash();
@@ -648,7 +729,7 @@ function startDownload() {
             `[wasm-download] No hash verification configured - will accept any valid download`
         );
     }
-    download(url, dest);
+    return download(url, dest);
 }
 
 /**
@@ -664,12 +745,30 @@ function isDirectInvocation() {
 }
 
 if (isDirectInvocation()) {
-    main().catch((error) => {
-        console.error(
-            `[wasm-download] Unexpected error: ${getSanitizedErrorMessage(error)}`
-        );
-        process.exit(1);
-    });
+    main()
+        .then((isSuccess) => {
+            process.exitCode = isSuccess ? 0 : 1;
+        })
+        .catch((error) => {
+            console.error(
+                `[wasm-download] Unexpected error: ${getSanitizedErrorMessage(error)}`
+            );
+            process.exitCode = 1;
+        });
 }
 
-export { parseArgs, sanitizeForSingleLineLog };
+export {
+    checkForUpdates,
+    createDownloadError,
+    download,
+    ensureLocalWasmAvailable,
+    getCurrentVersion,
+    getLatestCommitHash,
+    isDirectInvocation,
+    main,
+    parseArgs,
+    reportFailure,
+    sanitizeForSingleLineLog,
+    startDownload,
+    verifyHash,
+};
