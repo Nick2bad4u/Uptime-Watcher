@@ -14,6 +14,7 @@ import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { toSerializedError } from "@shared/utils/errorSerialization";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
@@ -79,6 +80,9 @@ export interface DataImportExportConfig {
 
 const acceptAnyJsonValue = (value: unknown): value is JsonValue =>
     isDefined(value);
+
+const getSafeIdentifier = (identifier: string): string =>
+    getSafeIdentifierForLogging(identifier) ?? identifier;
 
 type ImportValidationResult = ReturnType<typeof validateImportData>;
 type ImportValidationFailureResult = Extract<
@@ -435,8 +439,9 @@ export class DataImportExportService {
 
         for (const site of sites) {
             if (seenIdentifiers.has(site.identifier)) {
+                const safeIdentifier = getSafeIdentifier(site.identifier);
                 throw new Error(
-                    `Import contains duplicate site identifier after normalization: ${site.identifier}`
+                    `Import contains duplicate site identifier after normalization: ${safeIdentifier}`
                 );
             }
 
@@ -487,6 +492,7 @@ export class DataImportExportService {
     ): void {
         for (const site of sites) {
             const { identifier } = site;
+            const safeIdentifier = getSafeIdentifier(identifier);
             const monitors = Array.isArray(site.monitors) ? site.monitors : [];
 
             if (monitors.length > 0) {
@@ -508,7 +514,7 @@ export class DataImportExportService {
                     );
 
                     this.logger.debug(
-                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${identifier}`
+                        `[DataImportExportService] Imported ${createdMonitors.length} monitors for site: ${safeIdentifier}`
                     );
                 } catch (error) {
                     // This entire import is destructive (deleteAll + bulkInsert).
@@ -516,14 +522,14 @@ export class DataImportExportService {
                     // transaction can rollback and the existing dataset remains
                     // intact.
                     this.logger.error(
-                        `[DataImportExportService] Failed to import monitors for site ${identifier}:`,
+                        `[DataImportExportService] Failed to import monitors for site ${safeIdentifier}:`,
                         error
                     );
 
                     const errorDetail = getUserFacingErrorDetail(error);
 
                     throw new Error(
-                        `Monitor import failed for site '${identifier}': ${errorDetail}`,
+                        `Monitor import failed for site '${safeIdentifier}': ${errorDetail}`,
                         {
                             cause: error,
                         }
@@ -593,11 +599,15 @@ export class DataImportExportService {
             !hasValidInterval &&
             originalInterval !== normalizedMonitor.checkInterval
         ) {
+            const safeMonitorId = getSafeIdentifier(
+                normalizedMonitor.id || "unknown-monitor"
+            );
+            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
             this.logger.warn(
                 "[DataImportExportService] Imported monitor missing valid checkInterval; defaulting to shared default",
                 {
-                    monitorId: normalizedMonitor.id || "unknown-monitor",
-                    siteIdentifier,
+                    monitorId: safeMonitorId,
+                    siteIdentifier: safeSiteIdentifier,
                 }
             );
         } else if (
@@ -607,13 +617,17 @@ export class DataImportExportService {
             originalInterval < MIN_MONITOR_CHECK_INTERVAL_MS &&
             originalInterval !== normalizedMonitor.checkInterval
         ) {
+            const safeMonitorId = getSafeIdentifier(
+                normalizedMonitor.id || "unknown-monitor"
+            );
+            const safeSiteIdentifier = getSafeIdentifier(siteIdentifier);
             this.logger.warn(
                 "[DataImportExportService] Imported monitor checkInterval below minimum; clamping to shared floor",
                 {
                     minimum: MIN_MONITOR_CHECK_INTERVAL_MS,
-                    monitorId: normalizedMonitor.id || "unknown-monitor",
+                    monitorId: safeMonitorId,
                     originalInterval,
-                    siteIdentifier,
+                    siteIdentifier: safeSiteIdentifier,
                 }
             );
         }

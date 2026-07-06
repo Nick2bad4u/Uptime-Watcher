@@ -918,16 +918,28 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const { withDatabaseOperation } =
                 await import("../../../utils/operationalHooks");
+            const rawIdentifier =
+                "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const mockSites: ImportSite[] = [
-                { identifier: "site1", name: "First Site" },
-                { identifier: " site1 ", name: "Duplicate Site" },
+                { identifier: rawIdentifier, name: "First Site" },
+                { identifier: ` ${rawIdentifier} `, name: "Duplicate Site" },
             ];
 
-            await expect(
-                service.persistImportedData(mockSites, {})
-            ).rejects.toThrow(
-                "Import contains duplicate site identifier after normalization: site1"
+            let caughtError: unknown;
+            try {
+                await service.persistImportedData(mockSites, {});
+            } catch (error) {
+                caughtError = error;
+            }
+
+            expect(caughtError).toBeInstanceOf(Error);
+            const message = Error.isError(caughtError)
+                ? caughtError.message
+                : "";
+            expect(message).toContain(
+                "Import contains duplicate site identifier after normalization: https://example.com/path"
             );
+            expect(message).not.toMatch(/private-site|site-secret|site-token/v);
 
             expect(withDatabaseOperation).not.toHaveBeenCalled();
             expect(mockDatabaseService.executeTransaction).not.toHaveBeenCalled();
@@ -977,10 +989,14 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const { withDatabaseOperation } =
                 await import("../../../utils/operationalHooks");
+            const rawMonitorId =
+                "https://monitor.example/check?token=monitor-token#private-monitor";
+            const rawSiteIdentifier =
+                "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const lowIntervalMonitor = {
                 checkInterval: 1000,
                 history: [],
-                id: "monitor-1",
+                id: rawMonitorId,
                 monitoring: true,
                 retryAttempts: 3,
                 timeout: 5000,
@@ -990,7 +1006,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const mockSites: ImportSite[] = [
                 {
-                    identifier: "site-with-low-interval",
+                    identifier: rawSiteIdentifier,
                     monitors: [lowIntervalMonitor as any],
                 },
             ];
@@ -1011,10 +1027,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ] = mockRepositories.monitor.createInternal.mock.calls[0]!;
 
             expect(dbArg).toBe(mockDatabase);
-            expect(siteIdentifier).toBe("site-with-low-interval");
+            expect(siteIdentifier).toBe(rawSiteIdentifier);
             expect(createdMonitor).toEqual(
                 expect.objectContaining({
-                    id: "monitor-1",
+                    id: rawMonitorId,
                     checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
                 })
             );
@@ -1023,11 +1039,18 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "[DataImportExportService] Imported monitor checkInterval below minimum; clamping to shared floor",
                 expect.objectContaining({
                     minimum: MIN_MONITOR_CHECK_INTERVAL_MS,
-                    monitorId: "monitor-1",
+                    monitorId: "https://monitor.example/check",
                     originalInterval: 1000,
-                    siteIdentifier: "site-with-low-interval",
+                    siteIdentifier: "https://example.com/path",
                 })
             );
+
+            const warningPayload = JSON.stringify(mockLogger.warn.mock.calls);
+            expect(warningPayload).not.toContain("monitor-token");
+            expect(warningPayload).not.toContain("private-monitor");
+            expect(warningPayload).not.toContain("site-secret");
+            expect(warningPayload).not.toContain("site-token");
+            expect(warningPayload).not.toContain("private-site");
         });
 
         it("should handle empty sites and settings arrays", async ({
@@ -1072,6 +1095,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const { withDatabaseOperation } =
                 await import("../../../utils/operationalHooks");
+            const rawIdentifier =
+                "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const mockMonitors = [
                 {
                     id: "mon1",
@@ -1096,7 +1121,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const mockSites: ImportSite[] = [
                 {
-                    identifier: "site1",
+                    identifier: rawIdentifier,
                     name: "Site 1",
                     monitors: mockMonitors,
                 },
@@ -1114,7 +1139,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 mockRepositories.monitor.createInternal
             ).toHaveBeenCalledWith(
                 mockDatabase,
-                "site1",
+                rawIdentifier,
                 expect.objectContaining({ id: "mon1" })
             );
             expect(
@@ -1130,8 +1155,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "" // Empty details
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
-                "[DataImportExportService] Imported 1 monitors for site: site1"
+                "[DataImportExportService] Imported 1 monitors for site: https://example.com/path"
             );
+            const logPayload = JSON.stringify(mockLogger.debug.mock.calls);
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
         });
 
         it("should handle sites without monitors gracefully", async ({
@@ -1175,9 +1204,11 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             const { withDatabaseOperation } =
                 await import("../../../utils/operationalHooks");
+            const rawIdentifier =
+                "https://user:site-secret@example.com/path?access_token=site-token#private-site";
             const mockSites: ImportSite[] = [
                 {
-                    identifier: "site1",
+                    identifier: rawIdentifier,
                     monitors: [
                         {
                             id: "mon1",
@@ -1200,7 +1231,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const createError = new Error("Monitor creation failed");
             mockRepositories.monitor.createInternal.mockImplementation(
                 (_db: unknown, siteIdentifier: string) => {
-                    if (siteIdentifier === "site1") {
+                    if (siteIdentifier === rawIdentifier) {
                         throw createError;
                     }
 
@@ -1214,12 +1245,18 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
             await expect(
                 service.persistImportedData(mockSites, {})
-            ).rejects.toThrow(/Monitor import failed for site 'site1'/v);
+            ).rejects.toThrow(
+                /Monitor import failed for site 'https:\/\/example\.com\/path'/v
+            );
 
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "[DataImportExportService] Failed to import monitors for site site1:",
+                "[DataImportExportService] Failed to import monitors for site https://example.com/path:",
                 createError
             );
+            const logPayload = JSON.stringify(mockLogger.error.mock.calls);
+            expect(logPayload).not.toContain("site-secret");
+            expect(logPayload).not.toContain("site-token");
+            expect(logPayload).not.toContain("private-site");
 
             // Fail-fast behavior: we should not attempt to import the second
             // site once a monitor import fails.
