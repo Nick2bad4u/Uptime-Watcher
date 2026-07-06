@@ -12,29 +12,111 @@
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+import { minimatch } from "minimatch";
 
 const __dirname = import.meta.dirname;
+const DEFAULT_PATTERN = "*.test.ts";
+const VALUE_OPTIONS = new Set(["--pattern", "-p"]);
 
-// Command line argument parsing
-const args = process.argv.slice(2);
-const options = {
-    dryRun: args.includes("--dry-run") || args.includes("-d"),
-    pattern: getArgValue("--pattern", "-p") || "*.test.ts",
-    help: args.includes("--help") || args.includes("-h"),
+let options = {
+    dryRun: false,
+    help: false,
+    pattern: DEFAULT_PATTERN,
 };
 
 /**
- * @param {string} longForm
- * @param {string} shortForm
+ * Read a value for an option that supports either `--flag=value` or `--flag
+ * value`.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ * @param {number} index - Current argument index.
+ *
+ * @returns {{ consumed: number; value: string }} Parsed value and number of
+ *   extra arguments consumed.
  */
-function getArgValue(longForm, shortForm) {
-    const index = args.findIndex(
-        (arg) => arg === longForm || arg === shortForm
-    );
-    return index !== -1 && index + 1 < args.length ? args[index + 1] : null;
+function readOptionValue(args, index) {
+    const option = args[index];
+    if (!option) {
+        throw new Error("Missing option name");
+    }
+
+    const equalIndex = option.indexOf("=");
+    if (equalIndex >= 0) {
+        const value = option.slice(equalIndex + 1);
+        if (!value) {
+            throw new Error(`Missing value for ${option.slice(0, equalIndex)}`);
+        }
+
+        return { consumed: 0, value };
+    }
+
+    const value = args[index + 1];
+    if (!value || value.startsWith("-")) {
+        throw new Error(`Missing value for ${option}`);
+    }
+
+    return { consumed: 1, value };
 }
 
-if (options.help) {
+/**
+ * Parse command line arguments.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ *
+ * @returns {{ dryRun: boolean; help: boolean; pattern: string }} Parsed
+ *   options.
+ */
+function parseArgs(args) {
+    const parsed = {
+        dryRun: false,
+        help: false,
+        pattern: DEFAULT_PATTERN,
+    };
+
+    for (let index = 0; index < args.length; index += 1) {
+        const arg = args[index];
+        if (!arg) {
+            continue;
+        }
+
+        const optionName = arg.includes("=")
+            ? arg.slice(0, arg.indexOf("="))
+            : arg;
+
+        if (VALUE_OPTIONS.has(optionName)) {
+            const { consumed, value } = readOptionValue(args, index);
+            index += consumed;
+            parsed.pattern = value;
+            continue;
+        }
+
+        switch (arg) {
+            case "--dry-run":
+            case "-d": {
+                parsed.dryRun = true;
+                break;
+            }
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+            default: {
+                throw new Error(`Unknown argument: ${arg}`);
+            }
+        }
+    }
+
+    return parsed;
+}
+
+/**
+ * Print usage information and exit immediately.
+ *
+ * @returns {never}
+ */
+function showHelp() {
     console.log(`
 Test Quote Fixer for TypeScript Test Files
 
@@ -143,12 +225,32 @@ function fixFileQuotes(filePath) {
 /**
  * Recursively find test files matching the pattern.
  *
+ * @param {string} filePath - File path to test.
+ * @param {string} rootDir - Root directory used to build relative paths.
+ * @param {string} pattern - Glob pattern to match.
+ *
+ * @returns {boolean} Whether the file matches the glob pattern.
+ */
+function matchesPattern(filePath, rootDir, pattern) {
+    const relativePath = path.relative(rootDir, filePath).replaceAll("\\", "/");
+    const normalizedPattern = pattern.replaceAll("\\", "/");
+
+    return minimatch(relativePath, normalizedPattern, {
+        dot: false,
+        matchBase: !normalizedPattern.includes("/"),
+    });
+}
+
+/**
+ * Recursively find test files matching the pattern.
+ *
  * @param {string} dir - Directory to search.
  * @param {string} pattern - File pattern to match.
+ * @param {string} rootDir - Root directory used to build relative paths.
  *
  * @returns {string[]} Array of test file paths.
  */
-function findTestFiles(dir, pattern) {
+function findTestFiles(dir, pattern, rootDir = dir) {
     const files = [];
 
     try {
@@ -167,8 +269,12 @@ function findTestFiles(dir, pattern) {
                     "coverage",
                 ].includes(item)
             ) {
-                files.push(...findTestFiles(itemPath, pattern));
-            } else if (stat.isFile() && item.endsWith(".test.ts")) {
+                files.push(...findTestFiles(itemPath, pattern, rootDir));
+            } else if (
+                stat.isFile() &&
+                item.endsWith(".test.ts") &&
+                matchesPattern(itemPath, rootDir, pattern)
+            ) {
                 files.push(itemPath);
             }
         }
@@ -186,13 +292,19 @@ function findTestFiles(dir, pattern) {
  * Main execution function.
  */
 function main() {
+    options = parseArgs(process.argv.slice(2));
+
+    if (options.help) {
+        showHelp();
+    }
+
     console.log("🔧 Test Quote Fixer");
     console.log(`📁 Pattern: ${options.pattern}`);
     console.log(`🔍 Mode: ${options.dryRun ? "DRY RUN" : "EXECUTE"}`);
     console.log("");
 
     const projectRoot = path.resolve(__dirname, "..");
-    const testFiles = findTestFiles(projectRoot, options.pattern);
+    const testFiles = findTestFiles(projectRoot, options.pattern, projectRoot);
 
     console.log(`📊 Found ${testFiles.length} test files`);
     console.log("");
@@ -230,9 +342,29 @@ function main() {
     }
 }
 
+/**
+ * Check whether this module was executed as the CLI entrypoint.
+ *
+ * @returns {boolean} Whether the script is running directly.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(process.argv[1]).href
+    );
+}
+
 // Execute if run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-    main();
+if (isDirectInvocation()) {
+    try {
+        main();
+    } catch (error) {
+        console.error(
+            "❌ Error:",
+            error instanceof Error ? error.message : String(error)
+        );
+        process.exit(1);
+    }
 }
 
 export { fixFileQuotes };
