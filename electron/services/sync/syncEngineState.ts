@@ -57,6 +57,15 @@ import {
     isFiniteNumber,
     isNonEmptyString,
 } from "@shared/utils/typeGuards";
+import {
+    type CloudSyncEntityStateMap,
+    type CloudSyncFieldValueMap,
+    createCloudSyncEntityStateMap as createEntityMap,
+    createCloudSyncFieldValueMap as createFieldMap,
+    setCloudSyncEntityValue as setEntityValue,
+    setCloudSyncFieldValue as setFieldValue,
+    setCloudSyncRecordValue as setRecordValue,
+} from "@shared/utils/cloudSyncStateMaps";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { isDefined, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
 
@@ -78,8 +87,6 @@ const DEFAULT_WRITE_KEY: CloudSyncWriteKey = {
     timestamp: 0,
 };
 
-type CloudSyncEntityStateMap = Record<string, CloudSyncEntityState>;
-type CloudSyncFieldValueMap = Record<string, CloudSyncFieldValue>;
 type CloudSyncMonitorConfigMap = Record<string, CloudSyncMonitorConfig>;
 type CloudSyncSiteConfigMap = Record<string, CloudSyncSiteConfig>;
 
@@ -88,14 +95,6 @@ function getMaxBaselineBytes(): number {
         "UW_CLOUD_SYNC_MAX_BASELINE_BYTES",
         DEFAULT_MAX_BASELINE_BYTES
     );
-}
-
-function createEntityMap(): CloudSyncEntityStateMap {
-    return createNullPrototypeObject<CloudSyncEntityStateMap>();
-}
-
-function createFieldMap(): CloudSyncFieldValueMap {
-    return createNullPrototypeObject<CloudSyncFieldValueMap>();
 }
 
 function createMonitorConfigMap(): CloudSyncMonitorConfigMap {
@@ -108,35 +107,6 @@ function createSettingsConfigMap(): CloudSyncSettingsConfig {
 
 function createSiteConfigMap(): CloudSyncSiteConfigMap {
     return createNullPrototypeObject<CloudSyncSiteConfigMap>();
-}
-
-function setRecordValue<T>(
-    target: Record<string, T>,
-    key: string,
-    value: T
-): void {
-    Object.defineProperty(target, key, {
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true,
-    });
-}
-
-function setEntityValue(
-    target: CloudSyncEntityStateMap,
-    key: string,
-    value: CloudSyncEntityState
-): void {
-    setRecordValue(target, key, value);
-}
-
-function setFieldValue(
-    target: CloudSyncFieldValueMap,
-    key: string,
-    value: CloudSyncFieldValue
-): void {
-    setRecordValue(target, key, value);
 }
 
 function setMonitorConfig(

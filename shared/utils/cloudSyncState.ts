@@ -9,14 +9,19 @@ import type {
 } from "@shared/types/cloudSync";
 import type {
     CloudSyncEntityState,
-    CloudSyncFieldValue,
     CloudSyncState,
 } from "@shared/types/cloudSyncState";
 import type { Writable } from "type-fest";
 
 import { compareCloudSyncWriteKey } from "@shared/types/cloudSync";
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
-import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import {
+    type CloudSyncEntityStateMap,
+    createCloudSyncEntityStateMap as createEntityMap,
+    createCloudSyncFieldValueMap as createFieldMap,
+    setCloudSyncEntityValue as setEntityValue,
+    setCloudSyncFieldValue as setFieldValue,
+} from "@shared/utils/cloudSyncStateMaps";
 import {
     isDefined,
     objectEntries,
@@ -25,8 +30,6 @@ import {
 } from "ts-extras";
 
 type Mutable<T> = Writable<T>;
-type CloudSyncEntityStateMap = Record<string, CloudSyncEntityState>;
-type CloudSyncFieldValueMap = Record<string, CloudSyncFieldValue>;
 type MutableCloudSyncState = Mutable<
     Record<CloudSyncEntityType, CloudSyncEntityStateMap>
 >;
@@ -160,43 +163,6 @@ function compareOperationsDeterministic(
     });
 
     return compareStrings(leftKey, rightKey);
-}
-
-function createEntityMap(): CloudSyncEntityStateMap {
-    return createNullPrototypeObject<CloudSyncEntityStateMap>();
-}
-
-function createFieldMap(): CloudSyncFieldValueMap {
-    return createNullPrototypeObject<CloudSyncFieldValueMap>();
-}
-
-function setRecordValue<T>(
-    target: Record<string, T>,
-    key: string,
-    value: T
-): void {
-    Object.defineProperty(target, key, {
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true,
-    });
-}
-
-function setEntityValue(
-    target: CloudSyncEntityStateMap,
-    key: string,
-    value: CloudSyncEntityState
-): void {
-    setRecordValue(target, key, value);
-}
-
-function setFieldValue(
-    target: CloudSyncFieldValueMap,
-    key: string,
-    value: CloudSyncFieldValue
-): void {
-    setRecordValue(target, key, value);
 }
 
 function createEmptyState(): MutableCloudSyncState {
