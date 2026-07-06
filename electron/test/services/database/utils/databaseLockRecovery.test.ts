@@ -76,11 +76,15 @@ describe("databaseLockRecovery utilities", () => {
         );
 
         for (const { relocatedPath } of result.relocated) {
+            const relativeRelocatedPath = path.relative(
+                path.join(tempDir, "stale-lock-artifacts"),
+                relocatedPath
+            );
+            expect(relativeRelocatedPath).not.toBe("..");
             expect(
-                relocatedPath.startsWith(
-                    path.join(tempDir, "stale-lock-artifacts")
-                )
-            ).toBeTruthy();
+                relativeRelocatedPath.startsWith(`..${path.sep}`)
+            ).toBeFalsy();
+            expect(path.isAbsolute(relativeRelocatedPath)).toBeFalsy();
             expect(existsSync(relocatedPath)).toBeTruthy();
         }
 

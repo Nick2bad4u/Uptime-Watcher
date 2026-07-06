@@ -32,10 +32,15 @@ const RECOVERY_DIRECTORY_NAME = "stale-lock-artifacts" as const;
 const resolveCandidatePath = (directory: string, candidate: string): string => {
     const resolvedDirectory = path.resolve(directory);
     const resolvedCandidate = path.resolve(candidate);
+    const relativeCandidate = path.relative(
+        resolvedDirectory,
+        resolvedCandidate
+    );
 
     if (
-        resolvedCandidate !== resolvedDirectory &&
-        !resolvedCandidate.startsWith(`${resolvedDirectory}${path.sep}`)
+        relativeCandidate === ".." ||
+        relativeCandidate.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(relativeCandidate)
     ) {
         throw new Error(
             `Candidate path '${resolvedCandidate}' is outside of '${resolvedDirectory}'`
