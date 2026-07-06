@@ -266,13 +266,17 @@ function formatTestNames(testStructures, format = "list") {
 
 /**
  * Main function.
+ *
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {boolean} `true` when extraction completes without a fatal error.
  */
-function main() {
+function main(args = process.argv.slice(2)) {
     try {
-        const options = parseArgs(process.argv.slice(2));
+        const options = parseArgs(args);
         if (options.help) {
             showUsage();
-            return;
+            return true;
         }
 
         const projectRoot = path.resolve(import.meta.dirname, "..");
@@ -326,12 +330,13 @@ function main() {
             writeFileSync(outputFile, output);
             console.log(`\nResults saved to: ${outputFile}`);
         }
+        return true;
     } catch (error) {
         console.error(
             "Error during extraction:",
             error instanceof Error ? error.message : String(error)
         );
-        process.exit(1);
+        return false;
     }
 }
 
@@ -371,8 +376,19 @@ function isDirectInvocation() {
 }
 
 if (isDirectInvocation()) {
-    main();
+    process.exitCode = main() ? 0 : 1;
 }
+
+export {
+    extractTestNames,
+    findTestFiles,
+    formatTestNames,
+    isDirectInvocation,
+    isTestFileName,
+    main,
+    parseArgs,
+    showUsage,
+};
 
 export default {
     extractTestNames,

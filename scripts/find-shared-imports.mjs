@@ -153,6 +153,8 @@ function parseOutputFormat(value) {
 
 /**
  * Show CLI usage.
+ *
+ * @returns {void}
  */
 function showHelp() {
     console.log(`
@@ -402,11 +404,16 @@ function formatDetailed(results) {
 
 /**
  * Main execution function.
+ *
+ * @param {ReturnType<typeof parseArgs>} options - Parsed CLI options.
+ *
+ * @returns {boolean} `true` when the scan completed and did not intentionally
+ *   fail.
  */
 function main(options = parseArgs(process.argv.slice(2))) {
     if (options.help) {
         showHelp();
-        return;
+        return true;
     }
 
     console.log("🔍 Scanning for @shared imports...\n");
@@ -452,8 +459,10 @@ function main(options = parseArgs(process.argv.slice(2))) {
     // Exit with error code if imports found (useful for CI)
     const hasImports = results.some((r) => r.imports.length > 0);
     if (hasImports && options.fail) {
-        process.exit(1);
+        return false;
     }
+
+    return true;
 }
 
 /**
@@ -470,10 +479,10 @@ function isDirectInvocation() {
 
 if (isDirectInvocation()) {
     try {
-        main();
+        process.exitCode = main() ? 0 : 1;
     } catch (error) {
         console.error(error instanceof Error ? error.message : String(error));
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
@@ -482,7 +491,10 @@ export {
     findSharedImports,
     formatOutput,
     getFilesRecursively,
+    isDirectInvocation,
+    main,
     parseArgs,
     parseOutputFormat,
+    showHelp,
     suggestRelativePath,
 };

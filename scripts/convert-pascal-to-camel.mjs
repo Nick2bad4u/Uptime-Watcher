@@ -32,6 +32,8 @@ const SKIPPED_DIRECTORIES = new Set([
 
 /**
  * Show command usage.
+ *
+ * @returns {void}
  */
 function showHelp() {
     console.log(`
@@ -181,13 +183,17 @@ function processDirectory(dirPath, dryRun = false) {
 
 /**
  * Main function.
+ *
+ * @param {string[]} args - CLI arguments.
+ *
+ * @returns {boolean} `true` when conversion completes without a fatal error.
  */
-function main() {
+function main(args = process.argv.slice(2)) {
     try {
-        const options = parseArgs(process.argv.slice(2));
+        const options = parseArgs(args);
         if (options.help) {
             showHelp();
-            return;
+            return true;
         }
 
         const projectRoot = path.resolve(import.meta.dirname, "..");
@@ -210,21 +216,38 @@ function main() {
                 "\nTo actually rename files, run: node scripts/convert-pascal-to-camel.mjs --write"
             );
         }
+        return true;
     } catch (error) {
         console.error(
             "Error during conversion:",
             error instanceof Error ? error.message : String(error)
         );
-        process.exit(1);
+        return false;
     }
 }
 
-// Run the script
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
-) {
-    main();
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectInvocation() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
 }
+
+if (isDirectInvocation()) {
+    process.exitCode = main() ? 0 : 1;
+}
+
+export {
+    isDirectInvocation,
+    isPascalCase,
+    main,
+    parseArgs,
+    pascalToCamelCase,
+    processDirectory,
+    showHelp,
+};
 
 export default { parseArgs, pascalToCamelCase, isPascalCase, processDirectory };
