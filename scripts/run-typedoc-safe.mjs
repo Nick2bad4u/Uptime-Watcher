@@ -3,6 +3,7 @@ import { existsSync, mkdtempSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import * as path from "node:path";
 import process from "node:process";
+import { pathToFileURL } from "node:url";
 
 const repositoryRootPath = path.resolve(import.meta.dirname, "..");
 const docusaurusWorkspacePath = path.join(
@@ -43,13 +44,21 @@ Examples:
  *
  * @param {string[]} args - Raw command line arguments.
  *
- * @returns {{ additionalArguments: string[]; resolvedConfigPath: string }}
+ * @returns {{
+ *     additionalArguments: string[];
+ *     help: boolean;
+ *     resolvedConfigPath: string;
+ * }}
  *   Parsed options.
  */
 function parseArgs(args) {
     if (args.includes("--help") || args.includes("-h")) {
         showHelp();
-        process.exit(0);
+        return {
+            additionalArguments: [],
+            help: true,
+            resolvedConfigPath: "",
+        };
     }
 
     const [configPathFromRepositoryRoot, ...additionalArguments] = args;
@@ -90,11 +99,12 @@ function parseArgs(args) {
 
     return {
         additionalArguments,
+        help: false,
         resolvedConfigPath,
     };
 }
 
-const npmInvocation = (() => {
+function resolveNpmInvocation() {
     const execPathCandidate = process.env["npm_execpath"];
 
     if (typeof execPathCandidate === "string" && execPathCandidate !== "") {
@@ -123,69 +133,105 @@ const npmInvocation = (() => {
         argsPrefix: [],
         command: process.platform === "win32" ? "npm.cmd" : "npm",
     };
-})();
-
-let parsedArguments;
-try {
-    parsedArguments = parseArgs(process.argv.slice(2));
-} catch (error) {
-    console.error(
-        "❌ Error:",
-        error instanceof Error ? error.message : String(error)
-    );
-    process.exit(1);
 }
 
-const { additionalArguments, resolvedConfigPath } = parsedArguments;
-
-const requiresWindowsSafePath =
-    process.platform === "win32" &&
-    windowsSafePathProblemCharacters.some((character) =>
-        repositoryRootPath.includes(character)
-    );
-
-let temporaryDirectoryPath = "";
-let executionRootPath = repositoryRootPath;
-
-try {
-    if (requiresWindowsSafePath) {
-        temporaryDirectoryPath = mkdtempSync(
-            path.join(tmpdir(), "uw-typedoc-")
+/**
+ * Run TypeDoc through npm with a Windows-safe path workaround when needed.
+ *
+ * @param {string[]} [args] - Raw command line arguments.
+ *
+ * @returns {number} Process exit code.
+ */
+function main(args = process.argv.slice(2)) {
+    let parsedArguments;
+    try {
+        parsedArguments = parseArgs(args);
+    } catch (error) {
+        console.error(
+            "❌ Error:",
+            error instanceof Error ? error.message : String(error)
         );
-        executionRootPath = path.join(temporaryDirectoryPath, "repo");
-
-        symlinkSync(repositoryRootPath, executionRootPath, "junction");
-
-        console.warn(
-            `[TypeDoc] Using Windows-safe junction path: ${executionRootPath}`
-        );
+        return 1;
     }
 
-    const result = spawnSync(
-        npmInvocation.command,
-        [
-            ...npmInvocation.argsPrefix,
-            "exec",
-            "--",
-            "typedoc",
-            "--options",
-            path.relative(docusaurusWorkspacePath, resolvedConfigPath),
-            ...additionalArguments,
-        ],
-        {
-            cwd: path.join(executionRootPath, "docs", "docusaurus"),
-            env: process.env,
-            stdio: "inherit",
+    if (parsedArguments.help) {
+        return 0;
+    }
+
+    const { additionalArguments, resolvedConfigPath } = parsedArguments;
+    const npmInvocation = resolveNpmInvocation();
+
+    const requiresWindowsSafePath =
+        process.platform === "win32" &&
+        windowsSafePathProblemCharacters.some((character) =>
+            repositoryRootPath.includes(character)
+        );
+
+    let temporaryDirectoryPath = "";
+    let executionRootPath = repositoryRootPath;
+
+    try {
+        if (requiresWindowsSafePath) {
+            temporaryDirectoryPath = mkdtempSync(
+                path.join(tmpdir(), "uw-typedoc-")
+            );
+            executionRootPath = path.join(temporaryDirectoryPath, "repo");
+
+            symlinkSync(repositoryRootPath, executionRootPath, "junction");
+
+            console.warn(
+                `[TypeDoc] Using Windows-safe junction path: ${executionRootPath}`
+            );
         }
-    );
 
-    if (result.error) {
-        throw result.error;
-    }
+        const result = spawnSync(
+            npmInvocation.command,
+            [
+                ...npmInvocation.argsPrefix,
+                "exec",
+                "--",
+                "typedoc",
+                "--options",
+                path.relative(docusaurusWorkspacePath, resolvedConfigPath),
+                ...additionalArguments,
+            ],
+            {
+                cwd: path.join(executionRootPath, "docs", "docusaurus"),
+                env: process.env,
+                stdio: "inherit",
+            }
+        );
 
-    process.exit(result.status ?? 1);
-} finally {
-    if (temporaryDirectoryPath) {
-        rmSync(temporaryDirectoryPath, { force: true, recursive: true });
+        if (result.error) {
+            throw result.error;
+        }
+
+        return result.status ?? 1;
+    } catch (error) {
+        console.error(
+            "❌ Error:",
+            error instanceof Error ? error.message : String(error)
+        );
+        return 1;
+    } finally {
+        if (temporaryDirectoryPath) {
+            rmSync(temporaryDirectoryPath, { force: true, recursive: true });
+        }
     }
 }
+
+/**
+ * @returns {boolean} `true` when this file is the CLI entrypoint.
+ */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    process.exitCode = main();
+}
+
+export { isDirectRun, main, parseArgs, resolveNpmInvocation };
