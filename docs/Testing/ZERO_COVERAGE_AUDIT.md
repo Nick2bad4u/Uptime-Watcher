@@ -20,8 +20,9 @@ Older test files occasionally survive refactors and end up exercising no executa
 ## Overview
 
 1. The script enumerates candidate test files via `vitest list --filesOnly --json`, which produces a machine-readable array of paths suitable for automation ([Vitest CLI docs](https://vitest.dev/guide/cli.html#list)).
-2. Each file runs through `vitest run <file> --coverage --reporter=json`, and we read the emitted `coverageMap` payload. Vitest v3+ includes the map in the JSON reporter output when coverage is enabled ([Reporter reference](https://vitest.dev/guide/reporters.html#json-reporter)).
-3. Any run whose coverage map is empty or whose statement/branch/function/line counts stay at zero is flagged as a likely orphan.
+2. Automatic discovery keeps runtime `*.test.*` and `*.spec.*` files, removes repeated paths emitted by multi-project Vitest listings, and skips non-test modules such as Storybook CSF story files.
+3. Each file runs through the Vitest project config that owns it, with coverage thresholds disabled for the isolated audit run. The script reads that run's `coverage-final.json` output instead of treating the JSON test reporter payload as coverage data.
+4. Any run whose coverage map is empty or whose statement/branch/function/line counts stay at zero is flagged as a likely orphan.
 
 The process is deterministic, serial, and repeatable. It does not mutate your workspace beyond generating coverage artifacts.
 
@@ -51,6 +52,8 @@ You can also pass explicit file paths instead of relying on discovery:
 ```bash
 npm run test:zero-coverage -- src/features/foo/foo.test.tsx src/utils/bar.test.ts
 ```
+
+Explicit file paths are still de-duplicated, but they are not rejected for falling outside the automatic `*.test.*` / `*.spec.*` discovery pattern. Use that only for intentional one-off probes.
 
 ## Output
 

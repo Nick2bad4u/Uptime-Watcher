@@ -31,6 +31,33 @@ const RETRYABLE_ERROR_PATTERN =
 const MAX_VITEST_ATTEMPTS = 7;
 const BASE_RETRY_DELAY_MS = 250;
 const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+const COVERAGE_FINAL_JSON_FILE_NAME = "coverage-final.json";
+const RUNTIME_TEST_FILE_PATTERN =
+    /(?:^|[/\\])[^/\\]+\.(?:test|spec)\.[cm]?[jt]sx?$/iu;
+const DOCS_TOOLING_SOURCE_GLOB =
+    "docs/docusaurus/typedoc-plugins/**/*.{js,mjs,cjs,ts,mts,cts}";
+const DEFAULT_PROJECT_CONFIG_PATHS = [
+    {
+        configPath: "vitest.docsTooling.config.ts",
+        testFilePattern: /^tests\/tooling\/docs\//u,
+    },
+    {
+        configPath: "vitest.linting.config.ts",
+        testFilePattern: /^config\/linting\/plugins\//u,
+    },
+    {
+        configPath: "vitest.electron.config.ts",
+        testFilePattern: /^(?:electron\/|tests\/strictTests\/electron\/)/u,
+    },
+    {
+        configPath: "vitest.shared.config.ts",
+        testFilePattern: /^(?:shared\/|tests\/strictTests\/shared\/)/u,
+    },
+    {
+        configPath: "vitest.config.ts",
+        testFilePattern: /^(?:src\/|tests\/strictTests\/src\/)/u,
+    },
+] as const;
 
 /**
  * Executes Vitest with automatic retries for transient filesystem issues that
@@ -204,6 +231,99 @@ function escapeRegularExpressionLiteral(value: string): string {
 }
 
 /**
+ * Normalizes file paths for deterministic de-duplication across Vitest
+ * projects, which may report the same test using equivalent path spellings.
+ */
+function normalizeTestFileIdentity(file: string): string {
+    return path.normalize(file).toLocaleLowerCase();
+}
+
+/**
+ * Identifies runtime test files that can produce executable coverage.
+ */
+function isRuntimeTestFile(file: string): boolean {
+    return RUNTIME_TEST_FILE_PATTERN.test(file);
+}
+
+/**
+ * Preserves discovery order while removing repeated files.
+ */
+function deduplicateTestFiles(files: readonly string[]): readonly string[] {
+    const seen = new Set<string>();
+    const uniqueFiles: string[] = [];
+
+    for (const file of files) {
+        const identity = normalizeTestFileIdentity(file);
+        if (seen.has(identity)) {
+            continue;
+        }
+
+        seen.add(identity);
+        uniqueFiles.push(file);
+    }
+
+    return uniqueFiles;
+}
+
+/**
+ * Converts an absolute file path to a stable slash-separated repository path.
+ */
+function toRepositoryRelativePath(cwd: string, file: string): string {
+    return path.relative(cwd, file).replaceAll(path.sep, "/");
+}
+
+/**
+ * Selects the Vitest project config that owns a discovered test file.
+ */
+function resolveEvaluationConfigPath(
+    options: CliOptions,
+    testFile: string
+): string | null {
+    if (options.configPath !== ZERO_COVERAGE_CONFIG_PATH) {
+        return options.configPath;
+    }
+
+    const relativePath = toRepositoryRelativePath(options.cwd, testFile);
+    const projectConfig = DEFAULT_PROJECT_CONFIG_PATHS.find((entry) =>
+        entry.testFilePattern.test(relativePath)
+    );
+
+    return projectConfig?.configPath ?? options.configPath;
+}
+
+/**
+ * Builds CLI coverage overrides for one isolated audit execution.
+ */
+function createCoverageOverrideArguments(
+    options: CliOptions,
+    testFile: string,
+    coverageDirectory: string
+): string[] {
+    const relativePath = toRepositoryRelativePath(options.cwd, testFile);
+    const includeArguments = relativePath.startsWith("tests/tooling/docs/")
+        ? [`--coverage.include=${DOCS_TOOLING_SOURCE_GLOB}`]
+        : [];
+
+    return [
+        "--coverage",
+        "--coverage.enabled=true",
+        "--coverage.all=false",
+        "--coverage.allowExternal=true",
+        "--coverage.clean=true",
+        "--coverage.cleanOnRerun=true",
+        "--coverage.provider=v8",
+        "--coverage.reporter=json",
+        ...includeArguments,
+        `--coverage.reportsDirectory=${coverageDirectory}`,
+        "--coverage.thresholds.autoUpdate=false",
+        "--coverage.thresholds.branches=0",
+        "--coverage.thresholds.functions=0",
+        "--coverage.thresholds.lines=0",
+        "--coverage.thresholds.statements=0",
+    ];
+}
+
+/**
  * Parses incoming CLI arguments into strongly typed options.
  *
  * @param argv - Raw arguments passed to the process after the executable name.
@@ -341,10 +461,11 @@ async function collectTestFiles(
         const resolved = options.explicitFiles.map((file) =>
             path.resolve(options.cwd, file)
         );
+        const uniqueResolved = deduplicateTestFiles(resolved);
         console.log(
-            `[collectTestFiles] Using explicit files: ${resolved.length}`
+            `[collectTestFiles] Using explicit files: ${uniqueResolved.length}`
         );
-        return resolved;
+        return uniqueResolved;
     }
 
     // Check if the config file exists; if not, warn and disable it to prevent hangs
@@ -402,9 +523,13 @@ async function collectTestFiles(
         await rm(listingRoot, { recursive: true, force: true });
     }
 
+    const runtimeTestFiles = candidateFiles.filter(isRuntimeTestFile);
+    const uniqueRuntimeTestFiles = deduplicateTestFiles(runtimeTestFiles);
     const filtered = options.filePattern
-        ? candidateFiles.filter((file) => options.filePattern?.test(file))
-        : candidateFiles;
+        ? uniqueRuntimeTestFiles.filter((file) =>
+              options.filePattern?.test(file)
+          )
+        : uniqueRuntimeTestFiles;
 
     if (options.maxFiles !== null) {
         return filtered.slice(0, options.maxFiles);
@@ -430,17 +555,23 @@ async function evaluateTestFile(
 ): Promise<EvaluationResult> {
     console.log(`[evaluateTestFile] Starting evaluation for ${testFile}`);
     const reportFile = path.join(reportDir, `${randomUUID()}.json`);
+    const coverageDirectory = path.join(reportDir, `${randomUUID()}-coverage`);
+    await mkdir(coverageDirectory, { recursive: true });
     const args = [
         "run",
         testFile,
-        "--coverage",
+        ...createCoverageOverrideArguments(
+            options,
+            testFile,
+            coverageDirectory
+        ),
         "--reporter=json",
         `--outputFile=${reportFile}`,
         "--silent",
     ];
 
     // Check if the config file exists; if not, warn and disable it to prevent hangs
-    let effectiveConfigPath = options.configPath;
+    let effectiveConfigPath = resolveEvaluationConfigPath(options, testFile);
     if (effectiveConfigPath) {
         try {
             await access(effectiveConfigPath);
@@ -458,11 +589,21 @@ async function evaluateTestFile(
 
     await runVitestCommand(options.cwd, args, options.timeoutMs);
 
+    const coverageMapPath = path.join(
+        coverageDirectory,
+        COVERAGE_FINAL_JSON_FILE_NAME
+    );
+    const rawCoverageMap = await readFile(coverageMapPath, "utf8");
+    const coverageMapData = JSON.parse(rawCoverageMap) as CoverageMapData;
     const rawReport = await readFile(reportFile, "utf8");
     const parsedReport = JSON.parse(rawReport) as {
         coverageMap?: CoverageMapData;
     };
-    const coverageMap = createCoverageMap(parsedReport.coverageMap ?? {});
+    const coverageMap = createCoverageMap(
+        Object.keys(coverageMapData).length > 0
+            ? coverageMapData
+            : (parsedReport.coverageMap ?? {})
+    );
 
     const instrumentedFiles = coverageMap.files();
 
@@ -479,6 +620,7 @@ async function evaluateTestFile(
 
     if (!options.keepReports) {
         await rm(reportFile, { force: true });
+        await rm(coverageDirectory, { recursive: true, force: true });
     }
 
     const evaluation = {
