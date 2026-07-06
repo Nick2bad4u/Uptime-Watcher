@@ -10,6 +10,7 @@
 
 import { readFile } from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const ROOT_DIRECTORY = path.resolve(import.meta.dirname, "..");
 
@@ -24,8 +25,6 @@ const SECURITY_DEPENDENCIES = [
     "tailwindcss",
 ];
 
-const errors = [];
-
 async function readText(relativePath) {
     return readFile(path.join(ROOT_DIRECTORY, relativePath), "utf8");
 }
@@ -34,11 +33,11 @@ async function readJson(relativePath) {
     return JSON.parse(await readText(relativePath));
 }
 
-function addError(message) {
+function addError(errors, message) {
     errors.push(message);
 }
 
-function getDependencyRange(packageJson, dependencyName) {
+function getDependencyRange(errors, packageJson, dependencyName) {
     const sections = [
         packageJson.dependencies,
         packageJson.devDependencies,
@@ -51,7 +50,7 @@ function getDependencyRange(packageJson, dependencyName) {
         }
     }
 
-    addError(`package.json is missing dependency '${dependencyName}'.`);
+    addError(errors, `package.json is missing dependency '${dependencyName}'.`);
     return "";
 }
 
@@ -62,15 +61,15 @@ function getDisplayVersion(versionRange) {
     return match?.groups?.version ?? versionRange;
 }
 
-function requireIncludes(fileName, content, expected) {
+function requireIncludes(errors, fileName, content, expected) {
     if (!content.includes(expected)) {
-        addError(`${fileName} is missing expected text: ${expected}`);
+        addError(errors, `${fileName} is missing expected text: ${expected}`);
     }
 }
 
-function requirePattern(fileName, content, pattern, description) {
+function requirePattern(errors, fileName, content, pattern, description) {
     if (!pattern.test(content)) {
-        addError(`${fileName} is missing ${description}.`);
+        addError(errors, `${fileName} is missing ${description}.`);
     }
 }
 
@@ -79,6 +78,7 @@ function escapeRegExp(value) {
 }
 
 async function main() {
+    const errors = [];
     const packageJson = await readJson("package.json");
     const readme = await readText("README.md");
     const contributing = await readText("CONTRIBUTING.md");
@@ -104,25 +104,31 @@ async function main() {
 
     if (nodeVersion !== nvmrcVersion) {
         addError(
+            errors,
             `.node-version (${nodeVersion}) and .nvmrc (${nvmrcVersion}) differ.`
         );
     }
 
     if (typeof packageVersion !== "string" || packageVersion.length === 0) {
-        addError("package.json has no string version.");
+        addError(errors, "package.json has no string version.");
     }
 
     if (npmVersion.length === 0) {
-        addError("package.json packageManager must be an npm@<version> value.");
+        addError(
+            errors,
+            "package.json packageManager must be an npm@<version> value."
+        );
     }
 
     if (packageJson.build !== undefined) {
         addError(
+            errors,
             "package.json#build must stay absent; electron-builder.config.ts is the packaging source of truth."
         );
     }
 
     requireIncludes(
+        errors,
         "electron-builder.config.ts",
         builderConfig,
         "const config: Configuration"
@@ -137,6 +143,7 @@ async function main() {
             !scriptValue.includes("--config electron-builder.config.ts")
         ) {
             addError(
+                errors,
                 `package.json script '${scriptName}' calls electron-builder without --config electron-builder.config.ts.`
             );
         }
@@ -144,76 +151,112 @@ async function main() {
 
     const displayVersions = {
         electron: getDisplayVersion(
-            getDependencyRange(packageJson, "electron")
+            getDependencyRange(errors, packageJson, "electron")
         ),
-        react: getDisplayVersion(getDependencyRange(packageJson, "react")),
+        react: getDisplayVersion(
+            getDependencyRange(errors, packageJson, "react")
+        ),
         typescript: getDisplayVersion(
-            getDependencyRange(packageJson, "typescript")
+            getDependencyRange(errors, packageJson, "typescript")
         ),
-        vite: getDisplayVersion(getDependencyRange(packageJson, "vite")),
+        vite: getDisplayVersion(
+            getDependencyRange(errors, packageJson, "vite")
+        ),
     };
 
-    requireIncludes("README.md", readme, `version-${packageVersion}-blue.svg`);
     requireIncludes(
+        errors,
+        "README.md",
+        readme,
+        `version-${packageVersion}-blue.svg`
+    );
+    requireIncludes(
+        errors,
         "README.md",
         readme,
         `Electron-v${displayVersions.electron}-`
     );
-    requireIncludes("README.md", readme, `React-v${displayVersions.react}-`);
     requireIncludes(
+        errors,
+        "README.md",
+        readme,
+        `React-v${displayVersions.react}-`
+    );
+    requireIncludes(
+        errors,
         "README.md",
         readme,
         `TypeScript-v${displayVersions.typescript}-`
     );
-    requireIncludes("README.md", readme, `React-${displayVersions.react}-`);
     requireIncludes(
+        errors,
+        "README.md",
+        readme,
+        `React-${displayVersions.react}-`
+    );
+    requireIncludes(
+        errors,
         "README.md",
         readme,
         `TypeScript-${displayVersions.typescript}-`
     );
-    requireIncludes("README.md", readme, `Vite-${displayVersions.vite}-`);
     requireIncludes(
+        errors,
+        "README.md",
+        readme,
+        `Vite-${displayVersions.vite}-`
+    );
+    requireIncludes(
+        errors,
         "README.md",
         readme,
         `Electron-${displayVersions.electron}-`
     );
-    requireIncludes("README.md", readme, `Node.js-${nodeVersion}-`);
+    requireIncludes(errors, "README.md", readme, `Node.js-${nodeVersion}-`);
     requireIncludes(
+        errors,
         "README.md",
         readme,
         `<strong>Node.js</strong> | ${nodeVersion} (recommended; ${nodeEngine} required)`
     );
     requireIncludes(
+        errors,
         "README.md",
         readme,
         `<strong>npm</strong>     | ${npmVersion} (from packageManager)`
     );
     requireIncludes(
+        errors,
         "README.md",
         readme,
         `<em>Last updated: June 2026 • Version ${packageVersion}</em>`
     );
     requireIncludes(
+        errors,
         "CONTRIBUTING.md",
         contributing,
         `**Node.js** ${nodeVersion} (recommended; ${nodeEngine} required)`
     );
     requireIncludes(
+        errors,
         "CONTRIBUTING.md",
         contributing,
         `**npm** ${npmVersion} (declared by \`packageManager\`)`
     );
     requireIncludes(
+        errors,
         "docs/docusaurus/README.md",
         docusaurusReadme,
         `Node.js-${nodeVersion}-`
     );
     requireIncludes(
+        errors,
         "docs/docusaurus/README.md",
         docusaurusReadme,
         `**Node.js**: ${nodeVersion} (recommended; ${nodeEngine} required)`
     );
     requireIncludes(
+        errors,
         "docs/docusaurus/README.md",
         docusaurusReadme,
         `**npm**: ${npmVersion} (declared by \`packageManager\`)`
@@ -223,11 +266,13 @@ async function main() {
         ["docs/Guides/ENVIRONMENT_SETUP.md", environmentSetup],
     ]) {
         requireIncludes(
+            errors,
             fileName,
             content,
             `**Node.js**: ${nodeVersion} (recommended; ${nodeEngine} required)`
         );
         requireIncludes(
+            errors,
             fileName,
             content,
             `**npm**: ${npmVersion} (declared by \`packageManager\`)`
@@ -235,8 +280,13 @@ async function main() {
     }
 
     for (const dependencyName of SECURITY_DEPENDENCIES) {
-        const versionRange = getDependencyRange(packageJson, dependencyName);
+        const versionRange = getDependencyRange(
+            errors,
+            packageJson,
+            dependencyName
+        );
         requirePattern(
+            errors,
             "SECURITY.md",
             security,
             new RegExp(
@@ -249,6 +299,7 @@ async function main() {
     }
 
     requirePattern(
+        errors,
         "CHANGELOG.md",
         changelog,
         new RegExp(String.raw`^## \[${escapeRegExp(packageVersion)}\]`, "m"),
@@ -256,17 +307,20 @@ async function main() {
     );
 
     requireIncludes(
+        errors,
         ".github/workflows/Build.yml",
         buildWorkflow,
         "release_version:"
     );
     requireIncludes(
+        errors,
         ".github/workflows/Build.yml",
         buildWorkflow,
         "npm run release:check"
     );
     if (buildWorkflow.includes("npm version --no-git-tag-version")) {
         addError(
+            errors,
             ".github/workflows/Build.yml must not auto-bump package.json during release."
         );
     }
@@ -277,6 +331,7 @@ async function main() {
         )
     ) {
         addError(
+            errors,
             ".github/workflows/codeql.yml still allows incomplete dependency install/build analysis."
         );
     }
@@ -286,13 +341,32 @@ async function main() {
         for (const error of errors) {
             console.error(`- ${error}`);
         }
-        process.exitCode = 1;
-        return;
+        return false;
     }
 
     console.log("Release metadata check passed.");
+    return true;
 }
 
-/* eslint-enable jsdoc/require-jsdoc */
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
 
-await main();
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error(
+            "Release metadata check failed due to an unexpected error."
+        );
+        console.error(error);
+        process.exitCode = 1;
+    }
+}
+
+export { isDirectRun, main };
+
+/* eslint-enable jsdoc/require-jsdoc */

@@ -9,6 +9,7 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const rootDirectory = path.resolve(import.meta.dirname, "..");
 const docsDirectory = path.join(
@@ -22,9 +23,7 @@ const testsDirectory = path.join(
 
 const harnessTests = new Set(["configs", "docs-integrity"]);
 
-const errors = [];
-
-function addError(message) {
+function addError(errors, message) {
     errors.push(message);
 }
 
@@ -50,7 +49,7 @@ async function getRuleTestNames() {
         .toSorted();
 }
 
-async function validateRuleDoc(ruleName) {
+async function validateRuleDoc(ruleName, errors) {
     const relativeDocPath = `config/linting/plugins/uptime-watcher/docs/rules/${ruleName}.md`;
     const content = await readFile(
         path.join(rootDirectory, relativeDocPath),
@@ -58,49 +57,80 @@ async function validateRuleDoc(ruleName) {
     );
 
     if (!content.startsWith("# ")) {
-        addError(`${relativeDocPath} must start with an H1 rule title.`);
+        addError(
+            errors,
+            `${relativeDocPath} must start with an H1 rule title.`
+        );
     }
 
     if (!content.includes("##")) {
         addError(
+            errors,
             `${relativeDocPath} must document rule behavior beyond a title.`
         );
     }
 }
 
-const ruleDocs = await getRuleDocNames();
-const ruleTests = await getRuleTestNames();
-const ruleDocSet = new Set(ruleDocs);
-const ruleTestSet = new Set(ruleTests);
+async function main() {
+    const errors = [];
+    const ruleDocs = await getRuleDocNames();
+    const ruleTests = await getRuleTestNames();
+    const ruleDocSet = new Set(ruleDocs);
+    const ruleTestSet = new Set(ruleTests);
 
-for (const ruleName of ruleDocs) {
-    if (!ruleTestSet.has(ruleName)) {
-        addError(
-            `Missing fixture-backed test for uptime-watcher/${ruleName}. Expected config/linting/plugins/uptime-watcher/test/${ruleName}.test.ts.`
-        );
+    for (const ruleName of ruleDocs) {
+        if (!ruleTestSet.has(ruleName)) {
+            addError(
+                errors,
+                `Missing fixture-backed test for uptime-watcher/${ruleName}. Expected config/linting/plugins/uptime-watcher/test/${ruleName}.test.ts.`
+            );
+        }
+
+        await validateRuleDoc(ruleName, errors);
     }
 
-    await validateRuleDoc(ruleName);
-}
-
-for (const testName of ruleTests) {
-    if (!ruleDocSet.has(testName) && !harnessTests.has(testName)) {
-        addError(
-            `Test ${testName}.test.ts has no matching rule doc. Add a docs/rules/${testName}.md file or list it as a harness test.`
-        );
+    for (const testName of ruleTests) {
+        if (!ruleDocSet.has(testName) && !harnessTests.has(testName)) {
+            addError(
+                errors,
+                `Test ${testName}.test.ts has no matching rule doc. Add a docs/rules/${testName}.md file or list it as a harness test.`
+            );
+        }
     }
-}
 
-if (errors.length > 0) {
-    console.error("Custom ESLint rule docs check failed:");
-    for (const error of errors) {
-        console.error(`- ${error}`);
+    if (errors.length > 0) {
+        console.error("Custom ESLint rule docs check failed:");
+        for (const error of errors) {
+            console.error(`- ${error}`);
+        }
+        return false;
     }
-    process.exitCode = 1;
-} else {
+
     console.log(
         `Custom ESLint rule docs/tests aligned: ${ruleDocs.length} rules, ${harnessTests.size} harness tests.`
     );
+    return true;
 }
+
+function isDirectRun() {
+    return (
+        typeof process.argv[1] === "string" &&
+        import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+    );
+}
+
+if (isDirectRun()) {
+    try {
+        process.exitCode = (await main()) ? 0 : 1;
+    } catch (error) {
+        console.error(
+            "Custom ESLint rule docs check failed due to an unexpected error."
+        );
+        console.error(error);
+        process.exitCode = 1;
+    }
+}
+
+export { isDirectRun, main };
 
 /* eslint-enable jsdoc/require-jsdoc */
