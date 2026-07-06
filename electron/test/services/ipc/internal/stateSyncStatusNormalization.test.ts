@@ -57,6 +57,76 @@ describe(normalizeStateSyncPayload, () => {
         });
     });
 
+    it("does not invoke top-level accessors while normalizing", () => {
+        let getterCalls = 0;
+        const payload = {
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            revision: 1,
+            siteCount: 1,
+            sites: [{ identifier: "site-a" }],
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: 1_700_000_000_000,
+        } as Record<string, unknown>;
+
+        Object.defineProperty(payload, "truncated", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("truncated getter should not run");
+            },
+        });
+
+        expect(normalizeStateSyncPayload(payload)).toMatchObject({
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            truncated: false,
+        });
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke delta or array accessors while normalizing", () => {
+        let getterCalls = 0;
+        const addedSites = [{ identifier: "site-a" }] as unknown[];
+        Object.defineProperty(addedSites, "1", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("site getter should not run");
+            },
+        });
+        addedSites.length = 2;
+
+        const delta = {
+            addedSites,
+            removedSiteIdentifiers: ["site-b"],
+            updatedSites: [],
+        } as Record<string, unknown>;
+
+        Object.defineProperty(delta, "ignoredAccessor", {
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                throw new Error("delta getter should not run");
+            },
+        });
+
+        const normalized = normalizeStateSyncPayload({
+            action: STATE_SYNC_ACTION.UPDATE,
+            delta,
+            revision: 2,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: 1_700_000_000_001,
+        });
+
+        expect(normalized).toMatchObject({
+            delta: {
+                addedSites: [{ identifier: "site-a" }],
+                removedSiteIdentifiers: ["site-b"],
+                updatedSites: [],
+            },
+        });
+        expect(getterCalls).toBe(0);
+    });
+
     it("accepts timestamps at the JavaScript Date upper bound", () => {
         expect(
             normalizeStateSyncPayload({

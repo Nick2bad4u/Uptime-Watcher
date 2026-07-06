@@ -69,6 +69,14 @@ const getOwnIdentifier = (candidate: object): string | undefined => {
     return property.value;
 };
 
+const getOwnValue = (
+    candidate: object,
+    key: PropertyKey
+): unknown => {
+    const property = getOwnDataProperty(candidate, key);
+    return property.found ? property.value : undefined;
+};
+
 const buildIdentifierOnlySites = (
     candidate: unknown
 ): SiteIdentifierSnapshot[] => {
@@ -76,11 +84,36 @@ const buildIdentifierOnlySites = (
         return [];
     }
 
-    return candidate
-        .filter(isRecord)
-        .map(getOwnIdentifier)
-        .filter(isNonEmptyString)
-        .map((identifier) => ({ identifier }));
+    const sites: SiteIdentifierSnapshot[] = [];
+    for (let index = 0; index < candidate.length; index += 1) {
+        const value = getOwnValue(candidate, String(index));
+        if (!isRecord(value)) {
+            continue;
+        }
+
+        const identifier = getOwnIdentifier(value);
+        if (isNonEmptyString(identifier)) {
+            sites.push({ identifier });
+        }
+    }
+
+    return sites;
+};
+
+const buildStringArray = (candidate: unknown): string[] => {
+    if (!Array.isArray(candidate)) {
+        return [];
+    }
+
+    const values: string[] = [];
+    for (let index = 0; index < candidate.length; index += 1) {
+        const value = getOwnValue(candidate, String(index));
+        if (isNonEmptyString(value)) {
+            values.push(value);
+        }
+    }
+
+    return values;
 };
 
 /**
@@ -94,7 +127,10 @@ export function normalizeStateSyncPayload(
         return null;
     }
 
-    const { action, revision, source, timestamp } = candidate;
+    const action = getOwnValue(candidate, "action");
+    const revision = getOwnValue(candidate, "revision");
+    const source = getOwnValue(candidate, "source");
+    const timestamp = getOwnValue(candidate, "timestamp");
 
     if (
         (action !== STATE_SYNC_ACTION.BULK_SYNC &&
@@ -108,11 +144,9 @@ export function normalizeStateSyncPayload(
     }
 
     if (action === STATE_SYNC_ACTION.BULK_SYNC) {
-        const {
-            siteCount: siteCountCandidate,
-            sites: sitesCandidate,
-            truncated,
-        } = candidate;
+        const siteCountCandidate = getOwnValue(candidate, "siteCount");
+        const sitesCandidate = getOwnValue(candidate, "sites");
+        const truncated = getOwnValue(candidate, "truncated");
 
         if (
             !isNonNegativeSafeInteger(siteCountCandidate) ||
@@ -138,16 +172,17 @@ export function normalizeStateSyncPayload(
         };
     }
 
-    const { delta: deltaCandidate } = candidate;
+    const deltaCandidate = getOwnValue(candidate, "delta");
     if (!isRecord(deltaCandidate)) {
         return null;
     }
 
-    const {
-        addedSites: addedSitesCandidate,
-        removedSiteIdentifiers: removedSiteIdentifiersCandidate,
-        updatedSites: updatedSitesCandidate,
-    } = deltaCandidate;
+    const addedSitesCandidate = getOwnValue(deltaCandidate, "addedSites");
+    const removedSiteIdentifiersCandidate = getOwnValue(
+        deltaCandidate,
+        "removedSiteIdentifiers"
+    );
+    const updatedSitesCandidate = getOwnValue(deltaCandidate, "updatedSites");
 
     if (
         !Array.isArray(addedSitesCandidate) ||
@@ -159,8 +194,9 @@ export function normalizeStateSyncPayload(
 
     const addedSites = buildIdentifierOnlySites(addedSitesCandidate);
     const updatedSites = buildIdentifierOnlySites(updatedSitesCandidate);
-    const removedSiteIdentifiers =
-        removedSiteIdentifiersCandidate.filter(isNonEmptyString);
+    const removedSiteIdentifiers = buildStringArray(
+        removedSiteIdentifiersCandidate
+    );
 
     return {
         action,
