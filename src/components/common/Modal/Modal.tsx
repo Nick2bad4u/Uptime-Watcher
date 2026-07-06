@@ -29,7 +29,7 @@ import {
     releaseBlockingModal,
 } from "./modalStack";
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 type KeyDownListenerMethod = (
     this: unknown,
@@ -479,7 +479,7 @@ export const Modal = ({
     useEffect(
         function registerModalInStack(): () => void {
             if (!isOpen) {
-                return () => {};
+                return noop;
             }
 
             pushModal(modalId);
@@ -520,7 +520,7 @@ export const Modal = ({
     useEffect(
         function trapTabKeyWithinModal(): () => void {
             if (!isOpen) {
-                return () => {};
+                return noop;
             }
 
             const handleKeyDownCapture = (event: KeyboardEvent): void => {
@@ -578,16 +578,16 @@ export const Modal = ({
     useEffect(
         function focusInitialElement(): () => void {
             if (!isOpen) {
-                return () => {};
+                return noop;
             }
 
             if (!isTopModal(modalId)) {
-                return () => {};
+                return noop;
             }
 
             const element = modalRef.current;
             if (!element) {
-                return () => {};
+                return noop;
             }
 
             const closeButton = element.querySelector<HTMLElement>(
@@ -597,7 +597,7 @@ export const Modal = ({
 
             (closeButton ?? arrayFirst(focusable) ?? element).focus();
 
-            return () => {};
+            return noop;
         },
         [isOpen, modalId]
     );

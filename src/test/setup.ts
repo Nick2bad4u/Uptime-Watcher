@@ -96,7 +96,7 @@ process.on("unhandledRejection", (reason: unknown) => {
     // For any other unhandled rejections, call original handlers
     for (const handler of originalUnhandledRejection) {
         if (typeof handler === "function") {
-            handler(reason, new Promise(() => {}));
+            handler(reason, new Promise(() => undefined));
         }
     }
 });

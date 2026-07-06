@@ -32,6 +32,8 @@ export const DEFAULT_OAUTH_LOOPBACK_PATH = "/oauth2/callback";
 const LOOPBACK_HOSTS = ["127.0.0.1", "::1"] as const;
 const MAX_CALLBACK_ERROR_DETAIL_CHARS = 300;
 
+const ignoreServerCloseError = (): void => undefined;
+
 function escapeHtml(value: string): string {
     return value
         .replaceAll("&", "&amp;")
@@ -452,18 +454,20 @@ export async function startLoopbackOAuthServer(args?: {
 
                 if (host === "::1" && code === "EADDRNOTAVAIL") {
                     if (requiresIpv6) {
-                        await closeHttpServer(server).catch(() => {});
+                        await closeHttpServer(server).catch(
+                            ignoreServerCloseError
+                        );
                         throw new Error(
                             "IPv6 loopback (::1) is not available but redirectHost is set to [::1]",
                             { cause: error }
                         );
                     }
 
-                    await closeHttpServer(server).catch(() => {});
+                    await closeHttpServer(server).catch(ignoreServerCloseError);
                     return;
                 }
 
-                await closeHttpServer(server).catch(() => {});
+                await closeHttpServer(server).catch(ignoreServerCloseError);
                 throw normalizedError;
             }
         })
@@ -477,7 +481,7 @@ export async function startLoopbackOAuthServer(args?: {
         await Promise.all(
             servers.map(async ({ server }) => {
                 if (server.listening) {
-                    await closeHttpServer(server).catch(() => {});
+                    await closeHttpServer(server).catch(ignoreServerCloseError);
                 }
             })
         );
@@ -517,7 +521,7 @@ export async function startLoopbackOAuthServer(args?: {
                         return;
                     }
 
-                    await closeHttpServer(server).catch(() => {});
+                    await closeHttpServer(server).catch(ignoreServerCloseError);
                 })
             );
         },

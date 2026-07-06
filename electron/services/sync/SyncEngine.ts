@@ -120,7 +120,7 @@ const SETTINGS_KEY_DEVICE_ID = "cloud.sync.deviceId" as const;
 const SETTINGS_KEY_NEXT_OP_ID = "cloud.sync.nextOpId" as const;
 const SETTINGS_KEY_BASELINE = "cloud.sync.baseline.v1" as const;
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 /**
  * Sync engine implementing ADR-016 (operation log + snapshots).

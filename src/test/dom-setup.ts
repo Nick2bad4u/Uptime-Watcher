@@ -226,7 +226,7 @@ beforeAll(() => {
         right: 0,
         x: 0,
         y: 0,
-        toJSON: () => {},
+        toJSON: () => undefined,
     });
 
     // Mock navigator properties

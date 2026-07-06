@@ -75,11 +75,11 @@ export interface SiteMonitoringDependencies {
 const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
     {
         applyStatusUpdate: applyStatusUpdateSnapshot,
-        clearOptimisticMonitoringLocks: () => {},
+        clearOptimisticMonitoringLocks: () => undefined,
         getOptimisticMonitoringLocks: () => ({}),
         getSites: (): Site[] => [],
         monitoringService: MonitoringService,
-        registerMonitoringLock: () => {},
+        registerMonitoringLock: () => undefined,
         setSites: (): void => undefined,
     }
 );
@@ -89,11 +89,11 @@ const OPTIMISTIC_MONITORING_DELAY_MS = 50;
 
 const noopClearOptimisticLocks: NonNullable<
     SiteMonitoringDependencies["clearOptimisticMonitoringLocks"]
-> = () => {};
+> = () => undefined;
 
 const noopRegisterMonitoringLock: NonNullable<
     SiteMonitoringDependencies["registerMonitoringLock"]
-> = () => {};
+> = () => undefined;
 
 /**
  * Prevents unhandled rejection warnings for fire-and-forget store actions while

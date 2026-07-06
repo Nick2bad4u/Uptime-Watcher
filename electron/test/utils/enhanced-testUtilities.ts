@@ -56,7 +56,7 @@ export function createMockStandardizedCache<T>(): Partial<
         cleanup: vi.fn(() => 0),
         invalidate: vi.fn(),
         invalidateAll: vi.fn(),
-        onInvalidation: vi.fn(() => () => {}),
+        onInvalidation: vi.fn(() => () => undefined),
     };
 }
 

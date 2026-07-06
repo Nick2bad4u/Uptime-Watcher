@@ -17,7 +17,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { subscribeToGlobalEvent } from "../utils/dom/eventListeners";
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 /**
  * Custom hook that synchronizes app data when the window gains focus.

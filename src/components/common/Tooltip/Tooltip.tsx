@@ -106,9 +106,7 @@ export interface TooltipProperties {
  *
  * @returns Tooltip wrapper component
  */
-const noop = (): void => {
-    // No-op default for useMount convenience
-};
+const noop = (): void => undefined;
 
 type WindowListenerMethod = (
     this: unknown,
@@ -659,7 +657,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         useLayoutEffect(() => {
             if (!shouldRender || disabled) {
-                return (): void => {};
+                return noop;
             }
 
             applyTooltipPosition();

@@ -48,7 +48,7 @@ interface ElementObserverRecord {
  */
 const observerRegistry = new WeakMap<HTMLElement, ElementObserverRecord>();
 
-const noop = (): void => {};
+const noop = (): void => undefined;
 
 function addWindowResizeListener(handler: () => void): () => void {
     return subscribeToGlobalEvent("window", "resize", handler);
