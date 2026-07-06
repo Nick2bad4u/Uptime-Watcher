@@ -34,18 +34,156 @@ const PLAYWRIGHT_CLI_PATH = path.join(
 /** @type {function(string): string | undefined} */
 let applyLintCompliantTransforms;
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const options = {
-    dev: args.includes("--dev") || !args.includes("--electron"),
-    electron: args.includes("--electron"),
-    inspector: args.includes("--inspector"),
-    viewport:
-        args.find((arg) => arg.startsWith("--viewport="))?.split("=")[1] ||
-        "1280,720",
-    output: args.find((arg) => arg.startsWith("--output="))?.split("=")[1],
-    help: args.includes("--help") || args.includes("-h"),
-};
+const DEFAULT_VIEWPORT = "1280,720";
+const VALUE_OPTIONS = new Set(["--output", "--viewport"]);
+
+/**
+ * Read a value for an option that supports either `--flag=value` or `--flag
+ * value`.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ * @param {number} index - Current argument index.
+ *
+ * @returns {{ consumed: number; value: string }} Parsed value and number of
+ *   extra arguments consumed.
+ */
+function readOptionValue(args, index) {
+    const option = args[index];
+    if (!option) {
+        throw new Error("Missing option name");
+    }
+
+    const equalIndex = option.indexOf("=");
+
+    if (equalIndex >= 0) {
+        const value = option.slice(equalIndex + 1);
+        if (!value) {
+            throw new Error(`Missing value for ${option.slice(0, equalIndex)}`);
+        }
+
+        return { consumed: 0, value };
+    }
+
+    const value = args[index + 1];
+    if (!value || value.startsWith("-")) {
+        throw new Error(`Missing value for ${option}`);
+    }
+
+    return { consumed: 1, value };
+}
+
+/**
+ * Convert the helper's documented viewport syntax to Playwright's CLI syntax.
+ *
+ * @param {string} viewport - Viewport in `widthxheight` or `width,height`
+ *   format.
+ *
+ * @returns {string} Playwright viewport value in `width,height` format.
+ */
+function normalizeViewport(viewport) {
+    const match = /^([1-9]\d*)[x,]([1-9]\d*)$/u.exec(viewport);
+    if (!match) {
+        throw new Error(
+            `Invalid viewport "${viewport}". Use a positive WxH value like 1280x720.`
+        );
+    }
+
+    const width = match[1];
+    const height = match[2];
+    if (!width || !height) {
+        throw new Error(
+            `Invalid viewport "${viewport}". Use a positive WxH value like 1280x720.`
+        );
+    }
+
+    return `${width},${height}`;
+}
+
+/**
+ * Parse and validate command line arguments.
+ *
+ * @param {string[]} args - Raw command line arguments.
+ *
+ * @returns {{
+ *     dev: boolean;
+ *     electron: boolean;
+ *     help: boolean;
+ *     inspector: boolean;
+ *     output?: string;
+ *     viewport: string;
+ * }}
+ *   Parsed options.
+ */
+function parseArgs(args) {
+    /**
+     * @type {{
+     *     electron: boolean;
+     *     help: boolean;
+     *     inspector: boolean;
+     *     output?: string;
+     *     viewport: string;
+     * }}
+     */
+    const parsed = {
+        electron: false,
+        help: false,
+        inspector: false,
+        viewport: DEFAULT_VIEWPORT,
+    };
+    let explicitDev = false;
+
+    for (let index = 0; index < args.length; index += 1) {
+        const arg = args[index];
+        if (!arg) {
+            continue;
+        }
+
+        const optionName = arg.includes("=")
+            ? arg.slice(0, arg.indexOf("="))
+            : arg;
+
+        if (VALUE_OPTIONS.has(optionName)) {
+            const { consumed, value } = readOptionValue(args, index);
+            index += consumed;
+
+            if (optionName === "--viewport") {
+                parsed.viewport = normalizeViewport(value);
+            } else {
+                parsed.output = value;
+            }
+
+            continue;
+        }
+
+        switch (arg) {
+            case "--dev": {
+                explicitDev = true;
+                break;
+            }
+            case "--electron": {
+                parsed.electron = true;
+                break;
+            }
+            case "--help":
+            case "-h": {
+                parsed.help = true;
+                break;
+            }
+            case "--inspector": {
+                parsed.inspector = true;
+                break;
+            }
+            default: {
+                throw new Error(`Unknown argument: ${arg}`);
+            }
+        }
+    }
+
+    return {
+        ...parsed,
+        dev: explicitDev || !parsed.electron,
+    };
+}
 
 /**
  * Print usage information and exit immediately.
@@ -336,6 +474,12 @@ function assertLocalPlaywrightCli() {
  * @returns {Promise<void>} Resolves after codegen completes.
  */
 async function main() {
+    const options = parseArgs(process.argv.slice(2));
+
+    if (options.help) {
+        showHelp();
+    }
+
     // Load custom transformations
     try {
         const templatePath = path.join(
@@ -358,10 +502,6 @@ async function main() {
         );
         /** @param {string} code */
         applyLintCompliantTransforms = (code) => code; // Fallback function
-    }
-
-    if (options.help) {
-        showHelp();
     }
 
     console.log("🎭 Uptime-Watcher Playwright Codegen Helper\n");
@@ -444,4 +584,10 @@ process.on("SIGINT", () => {
     process.exit(0);
 });
 
-await main().catch(console.error);
+await main().catch((error) => {
+    console.error(
+        "❌ Error:",
+        error instanceof Error ? error.message : String(error)
+    );
+    process.exit(1);
+});
