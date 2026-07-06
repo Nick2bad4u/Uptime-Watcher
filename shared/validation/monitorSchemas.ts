@@ -17,7 +17,7 @@ import type {
     WebsocketKeepaliveMonitorSchemaType,
 } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
-import type { Jsonify, UnknownRecord, ValueOf } from "type-fest";
+import type { UnknownRecord, ValueOf } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isRecord } from "@shared/utils/typeHelpers";
@@ -294,72 +294,11 @@ function isKnownMonitorTypeKey(
 export type HttpMonitor = z.infer<typeof httpMonitorSchema>;
 
 /**
- * Type representing a validated HTTP header monitor.
- *
- * @see {@link httpHeaderMonitorSchema}
- */
-export type HttpHeaderMonitor = z.infer<typeof httpHeaderMonitorSchema>;
-
-/**
- * Type representing a validated HTTP keyword monitor.
- *
- * @see {@link httpKeywordMonitorSchema}
- */
-export type HttpKeywordMonitor = z.infer<typeof httpKeywordMonitorSchema>;
-
-/**
- * Type representing a validated HTTP JSON monitor.
- *
- * @see {@link httpJsonMonitorSchema}
- */
-export type HttpJsonMonitor = z.infer<typeof httpJsonMonitorSchema>;
-
-/**
  * Type representing a validated HTTP status monitor.
  *
  * @see {@link httpStatusMonitorSchema}
  */
 export type HttpStatusMonitor = z.infer<typeof httpStatusMonitorSchema>;
-
-/**
- * Type representing a validated HTTP latency monitor.
- *
- * @see {@link httpLatencyMonitorSchema}
- */
-export type HttpLatencyMonitor = z.infer<typeof httpLatencyMonitorSchema>;
-
-/**
- * Type representing a validated CDN edge consistency monitor.
- */
-export type CdnEdgeConsistencyMonitor = z.infer<
-    typeof cdnEdgeConsistencyMonitorSchema
->;
-
-/**
- * Type representing a validated replication monitor.
- */
-export type ReplicationMonitor = z.infer<typeof replicationMonitorSchema>;
-
-/**
- * Type representing a validated server heartbeat monitor.
- */
-export type ServerHeartbeatMonitor = z.infer<
-    typeof serverHeartbeatMonitorSchema
->;
-
-/**
- * Type representing a validated WebSocket keepalive monitor.
- */
-export type WebsocketKeepaliveMonitor = z.infer<
-    typeof websocketKeepaliveMonitorSchema
->;
-
-/**
- * Type representing a validated DNS monitor.
- *
- * @see {@link dnsMonitorSchema}
- */
-export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
 
 /**
  * Type representing a validated monitor (HTTP, HTTP keyword, HTTP status, port,
@@ -368,9 +307,6 @@ export type DnsMonitor = z.infer<typeof dnsMonitorSchema>;
  * @see {@link monitorSchema}
  */
 export type Monitor = z.infer<typeof monitorSchema>;
-
-/** JSON-safe representation of a validated monitor. */
-export type MonitorJson = Jsonify<Monitor>;
 
 /**
  * Type representing a validated ping monitor.

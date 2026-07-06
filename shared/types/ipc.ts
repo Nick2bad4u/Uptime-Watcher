@@ -198,16 +198,6 @@ export const isIpcHandlerVerificationResult = (
 };
 
 /**
- * Supported IPC diagnostics channels constrained by {@link IpcDiagnosticsEvent}.
- */
-export type IpcDiagnosticsChannel = IpcDiagnosticsEvent["channel"];
-
-/**
- * Tagged union describing all diagnostics payloads emitted over IPC.
- */
-export type IpcDiagnosticsEvent = Simplify<ExclusifyUnion<RawDiagnosticsEvent>>;
-
-/**
  * Structured metadata logged when verifying IPC handler registration.
  */
 export interface IpcHandlerVerificationLogMetadata {
@@ -466,18 +456,6 @@ export type PreloadGuardDiagnosticsReport = Simplify<{
     /** Timestamp (milliseconds since Unix epoch) when the guard triggered. */
     timestamp: number;
 }>;
-
-type RawDiagnosticsEvent =
-    | {
-          channel: "diagnostics-report-preload-guard";
-          payload: PreloadGuardDiagnosticsReport;
-          type: "preload-guard";
-      }
-    | {
-          channel: "diagnostics-verify-ipc-handler";
-          payload: IpcHandlerVerificationResult;
-          type: "handler-verification";
-      };
 
 /**
  * Runtime parameter-count mapping for each IPC invoke channel.

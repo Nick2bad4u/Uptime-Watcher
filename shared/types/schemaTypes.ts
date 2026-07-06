@@ -127,14 +127,6 @@ export type HttpStatusMonitorSchemaType = MonitorSchema<{
     url: z.ZodString;
 }>;
 /**
- * Monitor schema identifiers with autocomplete for built-in monitors.
- */
-export type MonitorSchemaIdentifier = LiteralUnion<
-    keyof MonitorSchemas,
-    string
->;
-
-/**
  * Mapping of monitor type identifiers to their corresponding Zod schemas.
  *
  * @public

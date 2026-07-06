@@ -10,13 +10,10 @@
  */
 
 import type {
-    RendererEvent as SharedRendererEvent,
     RendererEventChannel as SharedRendererEventChannel,
     RendererEventPayloadMap as SharedRendererEventPayloadMap,
 } from "@shared/types/events";
 
-/** Renderer event identifiers emitted from the main process. */
-export type RendererEvent = SharedRendererEvent;
 /** IPC channel names used for renderer-directed events. */
 export type RendererEventChannel = SharedRendererEventChannel;
 

@@ -262,7 +262,3 @@ export const validateValidationResult = (
     value: unknown
 ): ReturnType<typeof validationResultSchema.safeParse> =>
     validationResultSchema.safeParse(value);
-
-/** Shared schema type for database backup metadata. */
-export type SerializedDatabaseBackupMetadataSchema =
-    typeof serializedDatabaseBackupMetadataSchema;

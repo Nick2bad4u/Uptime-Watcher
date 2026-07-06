@@ -16,14 +16,7 @@ import type {
     Site,
     StatusUpdate,
 } from "@shared/types";
-import type {
-    Except,
-    ExclusifyUnion,
-    Simplify,
-    Tagged,
-    UnknownRecord,
-    ValueOf,
-} from "type-fest";
+import type { Except, Tagged, UnknownRecord, ValueOf } from "type-fest";
 
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { siteSchema } from "@shared/validation/siteSchemas";
@@ -929,15 +922,3 @@ export interface RendererEventPayloadMap {
  * Union of renderer event channel identifiers.
  */
 export type RendererEventChannel = keyof RendererEventPayloadMap;
-
-type RendererEventDescriptor = {
-    [Channel in RendererEventChannel]: {
-        channel: Channel;
-        payload: RendererEventPayloadMap[Channel];
-    };
-}[RendererEventChannel];
-
-/**
- * Discriminated union describing every renderer event emission.
- */
-export type RendererEvent = Simplify<ExclusifyUnion<RendererEventDescriptor>>;

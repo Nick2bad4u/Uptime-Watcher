@@ -2,10 +2,7 @@ import type { CloudSyncOperation } from "@shared/types/cloudSync";
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncSnapshot } from "@shared/types/cloudSyncSnapshot";
 
-import type {
-    CloudObjectEntry,
-    CloudStorageProvider,
-} from "../cloud/providers/CloudStorageProvider.types";
+import type { CloudObjectEntry } from "../cloud/providers/CloudStorageProvider.types";
 
 /**
  * Provider-backed transport for ADR-016 sync.
@@ -38,12 +35,4 @@ export interface CloudSyncTransport {
 
     /** Writes a snapshot under the standard snapshots prefix. */
     writeSnapshot: (snapshot: CloudSyncSnapshot) => Promise<CloudObjectEntry>;
-}
-
-/**
- * Factory for provider-backed sync transports.
- */
-export interface CloudSyncTransportFactory {
-    /** Creates a transport wrapper for the given provider. */
-    create: (provider: CloudStorageProvider) => CloudSyncTransport;
 }

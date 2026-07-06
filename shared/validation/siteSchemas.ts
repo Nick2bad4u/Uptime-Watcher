@@ -1,6 +1,5 @@
 import type { SiteSchemaType } from "@shared/types/schemaTypes";
 import type { ValidationResult } from "@shared/types/validation";
-import type { Jsonify } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
@@ -32,9 +31,6 @@ export const siteSchema: SiteSchemaType = z
  * @see {@link siteSchema}
  */
 export type Site = z.infer<typeof siteSchema>;
-/** JSON-safe representation of a validated site. */
-export type SiteJson = Jsonify<Site>;
-
 /**
  * Validates site data using the shared Zod schema.
  *
