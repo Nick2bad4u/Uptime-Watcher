@@ -70,7 +70,13 @@ repos:
     # Biome for JavaScript/TypeScript formatting and linting
     - hooks:
           - additional_dependencies: ["@biomejs/biome@2.4.14"]
-            args: ["--write", "--unsafe"]
+            args:
+                [
+                    "--config-path",
+                    "config/linting/biome.json",
+                    "--write",
+                    "--unsafe",
+                ]
             id: "biome-check"
             name: "🟨 typescript/react · Format, lint & safe fixes"
             types_or: ["ts", "tsx", "js", "jsx", "json", "jsonc"]

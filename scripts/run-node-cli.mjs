@@ -5,8 +5,8 @@ import process from "node:process";
 
 const ENV_ASSIGNMENT_PATTERN = /^[A-Z_][A-Z0-9_]*=/u;
 
-if (process.env["NO_COLOR"] && process.env["FORCE_COLOR"]) {
-    delete process.env["FORCE_COLOR"];
+if (process.env.NO_COLOR && process.env.FORCE_COLOR) {
+    Reflect.deleteProperty(process.env, "FORCE_COLOR");
 }
 
 function showUsage() {
@@ -51,14 +51,14 @@ function buildEnvironment(envAssignments, baseEnvironment = process.env) {
 
     for (const [name, value] of Object.entries(envAssignments)) {
         if (value === "") {
-            delete environment[name];
+            Reflect.deleteProperty(environment, name);
         } else {
             environment[name] = value;
         }
     }
 
-    if (environment["NO_COLOR"] && environment["FORCE_COLOR"]) {
-        delete environment["FORCE_COLOR"];
+    if (environment.NO_COLOR && environment.FORCE_COLOR) {
+        Reflect.deleteProperty(environment, "FORCE_COLOR");
     }
 
     return environment;
@@ -89,7 +89,7 @@ function runCommand(command, commandArguments, environment) {
     if (process.platform === "win32") {
         return spawnSync(buildWindowsCommandLine(command, commandArguments), {
             env: environment,
-            shell: process.env["ComSpec"] ?? true,
+            shell: process.env.ComSpec ?? true,
             stdio: "inherit",
             windowsHide: true,
         });

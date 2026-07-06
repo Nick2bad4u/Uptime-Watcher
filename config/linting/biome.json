@@ -27,17 +27,15 @@
         }
     },
     "files": {
-        "experimentalScannerIgnores": [
-            "node_modules",
-            "dist",
-            "coverage",
-            "release",
-            ".git",
-            ".cache",
-            "html"
-        ],
         "ignoreUnknown": false,
         "includes": [
+            "!!**/node_modules",
+            "!!**/dist",
+            "!!**/coverage",
+            "!!**/release",
+            "!!**/.git",
+            "!!**/.cache",
+            "!!**/html",
             "src/**/*",
             "electron/**/*",
             "shared/**/*",
@@ -311,11 +309,12 @@
             }
         }
     ],
-    "root": true,
+    "root": false,
     "vcs": {
         "clientKind": "git",
         "defaultBranch": "main",
         "enabled": true,
+        "root": ".",
         "useIgnoreFile": true
     }
 }
