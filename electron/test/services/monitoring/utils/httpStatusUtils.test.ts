@@ -99,6 +99,7 @@ describe("HTTP Status Utils", () => {
             expect(determineMonitorStatus(503)).toBe("down"); // Service Unavailable
             expect(determineMonitorStatus(504)).toBe("down"); // Gateway Timeout
             expect(determineMonitorStatus(505)).toBe("degraded"); // HTTP Version Not Supported
+            expect(determineMonitorStatus(510)).toBe("degraded"); // Not Extended
             expect(determineMonitorStatus(599)).toBe("down"); // Edge of 5xx range
         });
         it('should return "down" for invalid status codes below 100', async ({
@@ -275,7 +276,9 @@ describe("HTTP Status Utils", () => {
                 ]).toContain(result);
 
                 // Verify the logic holds for each code
-                if (code >= 500 && code < 600) {
+                if (code === 501 || code === 505 || code === 510) {
+                    expect(result).toBe("degraded");
+                } else if (code >= 500 && code < 600) {
                     expect(result).toBe("down");
                 } else if (code >= 100 && code < 600) {
                     expect(result).toBe("up");

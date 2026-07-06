@@ -13,6 +13,12 @@
 
 import { arrayIncludes, isInteger } from "ts-extras";
 
+const DEGRADED_HTTP_STATUS_CODES = [
+    501,
+    505,
+    510,
+] as const;
+
 /**
  * Determines monitor status ("up", "degraded", or "down") from an HTTP status
  * code.
@@ -67,14 +73,7 @@ export function determineMonitorStatus(
 
     // 5xx server errors - distinguish between degraded and down
     if (httpStatus >= 500 && httpStatus < 600) {
-        // These codes indicate server is responding but has issues (degraded)
-        const degradedCodes = [
-            501,
-            505,
-            510,
-        ]; // Not Implemented, HTTP Version Not Supported, Not Extended
-
-        if (arrayIncludes(degradedCodes, httpStatus)) {
+        if (arrayIncludes(DEGRADED_HTTP_STATUS_CODES, httpStatus)) {
             return "degraded";
         }
 
