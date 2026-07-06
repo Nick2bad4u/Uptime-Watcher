@@ -1,11 +1,11 @@
 ---
-schema: "../../config/schemas/doc-frontmatter.schema.json"
-doc_title: "Developer Quick Start Guide"
-summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
-created: "2025-09-22"
-last_reviewed: "2026-01-10"
-doc_category: "guide"
 author: "Nick2bad4u"
+created: "2025-09-22"
+doc_category: "guide"
+doc_title: "Developer Quick Start Guide"
+last_reviewed: "2026-01-10"
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
 tags:
  - "uptime-watcher"
  - "development"
