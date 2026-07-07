@@ -271,12 +271,9 @@ function disableColors() {
  * @returns {Record<string, any>} Parsed coverage data.
  */
 function loadCoverageData(coveragePath) {
-    return /** @type {Record<string, any>} */ (
-        JSON.parse(
-            // eslint-disable-next-line unicorn/prefer-json-parse-buffer
-            fs.readFileSync(coveragePath, "utf8")
-        )
-    );
+    const coverageJson = fs.readFileSync(coveragePath).toString("utf8");
+
+    return /** @type {Record<string, any>} */ (JSON.parse(coverageJson));
 }
 
 /**

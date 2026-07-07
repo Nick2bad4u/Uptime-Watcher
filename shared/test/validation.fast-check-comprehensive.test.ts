@@ -638,8 +638,7 @@ describe("Comprehensive Validation Module Fast-Check Tests", () => {
                 ),
             ])("should validate individual fields", ([type, fieldName]) => {
                 // Generate appropriate values for each field based on field name
-                /* eslint-disable-next-line no-useless-assignment */
-                let value: unknown = null; // Initialize to avoid ESLint rule conflicts
+                let value: unknown;
 
                 switch (fieldName) {
                     case "activeOperations": {

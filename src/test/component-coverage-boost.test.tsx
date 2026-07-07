@@ -7,10 +7,11 @@ import type * as React from "react";
 
 import {
     arrayFirst,
+    arrayJoin,
     arrayIncludes,
     isEmpty,
+    isDefined,
     safeCastTo,
-    arrayJoin,
 } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
@@ -1193,8 +1194,9 @@ describe("Component Coverage Boost", () => {
                     status.charAt(0).toUpperCase() + status.slice(1),
                 getBadgeClasses: (props: StatusBadgeProps) => {
                     const baseClasses = ["status-badge"];
-                    // eslint-disable-next-line unicorn/explicit-length-check
-                    if (props.size) baseClasses.push(`size-${props.size}`);
+                    if (isDefined(props.size)) {
+                        baseClasses.push(`size-${props.size}`);
+                    }
                     baseClasses.push(`status-${props.status}`);
                     return arrayJoin(baseClasses, " ");
                 },

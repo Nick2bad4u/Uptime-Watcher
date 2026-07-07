@@ -298,8 +298,7 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
                 };
 
                 const invalidData = { ...validData };
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete invalidData[fieldToRemove as keyof typeof validData];
+                Reflect.deleteProperty(invalidData, fieldToRemove);
 
                 expect(() => baseMonitorSchema.parse(invalidData)).toThrow();
             }
