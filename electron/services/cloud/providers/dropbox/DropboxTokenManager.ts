@@ -7,6 +7,7 @@ import { isFinite as isFiniteNumber } from "ts-extras";
 
 import type { SecretStore } from "../../secrets/SecretStore";
 
+import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 import { logger } from "../../../../utils/logger";
 import { readStoredJsonSecret } from "../oauthStoredTokens";
 import { withDropboxRetry } from "./dropboxRetry";
@@ -148,14 +149,18 @@ export class DropboxTokenManager {
 
         const accessToken = auth.getAccessToken();
         const expiresAt = auth.getAccessTokenExpiresAt();
+        const expiresAtEpochMs =
+            expiresAt instanceof Date
+                ? getNativeDateEpochMs(expiresAt)
+                : undefined;
 
         if (!accessToken || typeof accessToken !== "string") {
             throw new Error("Dropbox refresh did not return an access token");
         }
 
         if (
-            !(expiresAt instanceof Date) ||
-            !isFiniteNumber(expiresAt.getTime())
+            typeof expiresAtEpochMs !== "number" ||
+            !isFiniteNumber(expiresAtEpochMs)
         ) {
             throw new TypeError(
                 "Dropbox refresh did not return a valid access token expiration"
@@ -171,7 +176,7 @@ export class DropboxTokenManager {
 
         return {
             accessToken,
-            expiresAtEpochMs: expiresAt.getTime(),
+            expiresAtEpochMs,
             refreshToken,
         };
     }
