@@ -1,25 +1,12 @@
 /**
  * @remarks
  * These tests use property-based testing to verify fallback utility functions
- * with comprehensive edge case coverage and randomized inputs. Tests error
- * handling wrappers, type guards, default value management, and display
- * utilities.
+ * with comprehensive edge case coverage and randomized inputs. Tests default
+ * value management and display utilities.
  *
  * Comprehensive Coverage Areas:
  *
- * - Type guards and null checking (isNullOrUndefined, withFallback)
- * - Error handling wrappers (withAsyncErrorHandling, withSyncErrorHandling)
- *   it('should handle unicode strings correctly', () => {
- *   fc.assert(fc.property( fc.string({ unit: 'binary', minLength: 1, maxLength:
- *   200 }), fc.integer({ min: 10, max: 50 }), (unicodeStr, maxLength) => {
- *   const result = truncateForLogging(unicodeStr, maxLength);
- *   expect(result.length).toBeLessThanOrEqual(maxLength); if
- *   (unicodeStr.length
- *
- * > MaxLength) { expect(result.length).toBe(maxLength); } else {
- * > expect(result).toBe(unicodeStr); } } )); });ay utilities
- * > (getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel)
- *
+ * - Display utilities (getMonitorDisplayIdentifier, getMonitorTypeDisplayLabel)
  * - String processing utilities (truncateForLogging)
  * - Edge cases and robustness (null inputs, malformed objects)
  * - Performance and determinism testing
@@ -37,10 +24,6 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 
 import {
-    isNullOrUndefined,
-    withFallback,
-    withAsyncErrorHandling,
-    withSyncErrorHandling,
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
     truncateForLogging,
@@ -104,404 +87,6 @@ describe("fallback Utils Property-Based Tests", () => {
             type: fc.string(),
         })
     );
-
-    // =============================================================================
-    // isNullOrUndefined Function Tests
-    // =============================================================================
-
-    describe("isNullOrUndefined function", () => {
-        it("should return true for null and undefined values", () => {
-            fc.assert(
-                fc.property(
-                    fc.oneof(fc.constant(null), fc.constant(undefined)),
-                    (value) => {
-                        const isResult = isNullOrUndefined(value);
-                        expect(isResult).toBe(true);
-                    }
-                )
-            );
-        });
-
-        it("should return false for all non-null/undefined values", () => {
-            fc.assert(
-                fc.property(
-                    fc.oneof(
-                        fc.string(),
-                        fc.integer(),
-                        fc.boolean(),
-                        fc.float({ noDefaultInfinity: true, noNaN: true }),
-                        fc.array(fc.anything()),
-                        fc.object(),
-                        fc.constant(0),
-                        fc.constant(""),
-                        fc.constant(false)
-                    ),
-                    (value) => {
-                        const isResult = isNullOrUndefined(value);
-                        expect(isResult).toBe(false);
-                    }
-                )
-            );
-        });
-
-        it("should handle edge case falsy values correctly", () => {
-            const falsyValues = [
-                0,
-                "",
-                false,
-                NaN,
-            ];
-            for (const value of falsyValues) {
-                expect(isNullOrUndefined(value)).toBe(false);
-            }
-        });
-    });
-
-    // =============================================================================
-    // withFallback Function Tests
-    // =============================================================================
-
-    describe("withFallback function", () => {
-        it("should return the original value when not null or undefined", () => {
-            fc.assert(
-                fc.property(
-                    fc.oneof(
-                        fc.string(),
-                        fc.integer(),
-                        fc.boolean(),
-                        fc.array(fc.anything())
-                    ),
-                    fc.string(),
-                    (value, fallback) => {
-                        const result = withFallback(value, fallback);
-
-                        expect(result).toBe(value);
-                    }
-                )
-            );
-        });
-
-        it("should return fallback value when input is null or undefined", () => {
-            fc.assert(
-                fc.property(
-                    fc.oneof(fc.constant(null), fc.constant(undefined)),
-                    fc.string(),
-                    (value, fallback) => {
-                        const result = withFallback(value, fallback);
-
-                        expect(result).toBe(fallback);
-                    }
-                )
-            );
-        });
-
-        it("should handle complex fallback objects correctly", () => {
-            fc.assert(
-                fc.property(
-                    fc.oneof(
-                        fc.constant(null),
-                        fc.constant(undefined),
-                        fc.object()
-                    ),
-                    fc.object(),
-                    (value, fallback) => {
-                        const result = withFallback(value, fallback);
-                        if (value === null || value === undefined) {
-                            expect(result).toBe(fallback);
-                        } else {
-                            expect(result).toBe(value);
-                        }
-                    }
-                )
-            );
-        });
-
-        it("should preserve type consistency", () => {
-            fc.assert(
-                fc.property(fc.integer(), (fallback) => {
-                    const result1 = withFallback(42, fallback);
-                    const result2 = withFallback(null, fallback);
-
-                    expect(result1).toBeTypeOf("number");
-                    expect(result2).toBeTypeOf("number");
-                    expect(result1).toBe(42);
-                    expect(result2).toBe(fallback);
-                })
-            );
-        });
-    });
-
-    // =============================================================================
-    // withAsyncErrorHandling Function Tests
-    // =============================================================================
-
-    describe("withAsyncErrorHandling function", () => {
-        it("should return a synchronous function", () => {
-            fc.assert(
-                fc.property(fc.string(), (operationName) => {
-                    const asyncOp = async () => {};
-                    const wrappedFunction = withAsyncErrorHandling(
-                        asyncOp,
-                        operationName
-                    );
-
-                    expect(wrappedFunction).toBeTypeOf("function");
-                    expect(wrappedFunction.constructor.name).toBe("Function"); // Not AsyncFunction
-                })
-            );
-        });
-
-        it("should handle successful async operations without throwing", () => {
-            fc.assert(
-                fc.property(fc.string(), (operationName) => {
-                    const asyncOp = async () => {
-                        // Simulate successful async operation
-                        await new Promise((resolve) => setTimeout(resolve, 1));
-                    };
-
-                    const wrappedFunction = withAsyncErrorHandling(
-                        asyncOp,
-                        operationName
-                    );
-
-                    // Should not throw when executed
-                    expect(() => {
-                        wrappedFunction();
-                    }).not.toThrow();
-                }),
-                { numRuns: 5 }
-            ); // Reduced iterations to minimize async overhead
-        });
-
-        it("should handle failing async operations gracefully", async () => {
-            // Set up a temporary unhandled rejection handler for this test
-            const originalHandler = process.listeners("unhandledRejection");
-            const unhandledRejections: Error[] = [];
-
-            const testHandler = (reason: Error) => {
-                unhandledRejections.push(reason);
-            };
-
-            process.removeAllListeners("unhandledRejection");
-            process.on("unhandledRejection", testHandler);
-
-            try {
-                // Use fewer iterations to reduce unhandled promise rejections
-                fc.assert(
-                    fc.property(
-                        fc.string({ minLength: 1 }), // Ensure non-empty operation names
-                        fc.string(),
-                        (operationName, errorMessage) => {
-                            const failingAsyncOp = async () => {
-                                throw new Error(errorMessage);
-                            };
-
-                            const wrappedFunction = withAsyncErrorHandling(
-                                failingAsyncOp,
-                                operationName
-                            );
-
-                            // Should not throw even when the async operation fails
-                            expect(() => {
-                                wrappedFunction();
-                            }).not.toThrow();
-                        }
-                    ),
-                    { numRuns: 3 }
-                ); // Further reduced to minimize unhandled rejections
-
-                // Allow time for async operations to complete
-                await new Promise((resolve) => setTimeout(resolve, 50));
-
-                // We expect some unhandled rejections due to the nature of withAsyncErrorHandling
-                // when operations fail without fallback values - this is the expected behavior
-                expect(unhandledRejections.length).toBeGreaterThanOrEqual(0);
-            } finally {
-                // Restore original handlers
-                process.removeAllListeners("unhandledRejection");
-                for (const handler of originalHandler) {
-                    process.on(
-                        "unhandledRejection",
-                        handler as (...args: any[]) => void
-                    );
-                }
-            }
-        });
-
-        it("should handle various async operation types", async () => {
-            // Set up a temporary unhandled rejection handler for this test
-            const originalHandler = process.listeners("unhandledRejection");
-            const unhandledRejections: Error[] = [];
-
-            const testHandler = (reason: Error) => {
-                unhandledRejections.push(reason);
-            };
-
-            process.removeAllListeners("unhandledRejection");
-            process.on("unhandledRejection", testHandler);
-
-            try {
-                // Use a smaller set to reduce unhandled promises
-                const operations = [
-                    async () => {
-                        /* Successful operation */
-                    },
-                    async () => {
-                        throw new Error("failure");
-                    },
-                ];
-
-                for (const [index, operation] of operations.entries()) {
-                    const wrappedFunction = withAsyncErrorHandling(
-                        operation,
-                        `operation-${index}`
-                    );
-
-                    expect(() => {
-                        wrappedFunction();
-                    }).not.toThrow();
-                }
-
-                // Allow time for async operations to complete
-                await new Promise((resolve) => setTimeout(resolve, 50));
-
-                // We expect some unhandled rejections from the failing operation
-                expect(unhandledRejections.length).toBeGreaterThanOrEqual(0);
-            } finally {
-                // Restore original handlers
-                process.removeAllListeners("unhandledRejection");
-                for (const handler of originalHandler) {
-                    process.on(
-                        "unhandledRejection",
-                        handler as (...args: any[]) => void
-                    );
-                }
-            }
-        });
-    });
-
-    // =============================================================================
-    // withSyncErrorHandling Function Tests
-    // =============================================================================
-
-    describe("withSyncErrorHandling function", () => {
-        it("should return operation result when successful", () => {
-            fc.assert(
-                fc.property(
-                    fc.oneof(fc.string(), fc.integer(), fc.boolean()),
-                    fc.string(),
-                    (expectedResult, operationName) => {
-                        const operation = () => expectedResult;
-                        const result = withSyncErrorHandling(
-                            operation,
-                            operationName,
-                            "fallback"
-                        );
-
-                        expect(result).toBe(expectedResult);
-                    }
-                )
-            );
-        });
-
-        it("should return fallback value when operation throws", () => {
-            fc.assert(
-                fc.property(
-                    fc.string(),
-                    fc.string(),
-                    fc.string(),
-                    (operationName, errorMessage, fallbackValue) => {
-                        const failingOperation = () => {
-                            throw new Error(errorMessage);
-                        };
-
-                        const result = withSyncErrorHandling(
-                            failingOperation,
-                            operationName,
-                            fallbackValue
-                        );
-
-                        expect(result).toBe(fallbackValue);
-                    }
-                )
-            );
-        });
-
-        it("should handle various error types gracefully", () => {
-            const errorTypes = [
-                () => {
-                    throw new Error("standard error");
-                },
-                () => {
-                    throw new TypeError("type error");
-                },
-                () => {
-                    throw new RangeError("range error");
-                },
-                () => {
-                    throw "string error";
-                },
-                () => {
-                    throw 42;
-                },
-                () => {
-                    throw null;
-                },
-                () => {
-                    throw undefined;
-                },
-                () => {
-                    throw { custom: "object error" };
-                },
-            ];
-
-            for (const [index, errorOperation] of errorTypes.entries()) {
-                const fallback = `fallback-${index}`;
-                const result = withSyncErrorHandling(
-                    errorOperation,
-                    `error-test-${index}`,
-                    fallback
-                );
-
-                expect(result).toBe(fallback);
-            }
-        });
-
-        it("should preserve type consistency between success and fallback", () => {
-            fc.assert(
-                fc.property(
-                    fc.integer(),
-                    fc.integer(),
-                    (successValue, fallbackValue) => {
-                        const successOp = () => successValue;
-                        const failOp = () => {
-                            throw new Error("fail");
-                        };
-
-                        const successResult = withSyncErrorHandling(
-                            successOp,
-                            "success",
-                            fallbackValue
-                        );
-                        const failResult = withSyncErrorHandling(
-                            failOp,
-                            "fail",
-                            fallbackValue
-                        );
-
-                        expect(successResult).toBeTypeOf(typeof fallbackValue);
-                        expect(failResult).toBeTypeOf(typeof fallbackValue);
-                        expect(successResult).toBe(successValue);
-                        expect(failResult).toBe(fallbackValue);
-                    }
-                )
-            );
-        });
-    });
-
-    // =============================================================================
-    // getMonitorDisplayIdentifier Function Tests
-    // =============================================================================
 
     describe("getMonitorDisplayIdentifier function", () => {
         it("should return URL for HTTP monitors when available", () => {
@@ -868,13 +453,10 @@ describe("fallback Utils Property-Based Tests", () => {
     // =============================================================================
 
     describe("edge cases and robustness", () => {
-        it("should handle null and undefined inputs across all functions", () => {
+        it("should handle null and undefined inputs across display functions", () => {
             const nullInputs = [null, undefined];
 
             for (const input of nullInputs) {
-                // These should handle null/undefined gracefully
-                expect(isNullOrUndefined(input)).toBe(true);
-                expect(withFallback(input, "fallback")).toBe("fallback");
                 expect(() =>
                     getMonitorDisplayIdentifier(input as any, "fallback")
                 ).not.toThrow();
@@ -909,8 +491,6 @@ describe("fallback Utils Property-Based Tests", () => {
             const startTime = Date.now();
 
             for (const input of largeInputs) {
-                isNullOrUndefined(input);
-                withFallback(input, "default");
                 getMonitorTypeDisplayLabel(input);
                 truncateForLogging(input, 25);
             }
@@ -972,9 +552,6 @@ describe("fallback Utils Property-Based Tests", () => {
 
                         // Process all monitors and strings
                         const results = {
-                            fallbacks: strings.map((s) =>
-                                withFallback(s, "default")
-                            ),
                             identifiers: monitors.map((m) =>
                                 getMonitorDisplayIdentifier(m, "fallback")
                             ),
@@ -997,8 +574,6 @@ describe("fallback Utils Property-Based Tests", () => {
                         );
                         expect(results.types).toHaveLength(strings.length);
                         expect(results.truncated).toHaveLength(strings.length);
-                        expect(results.fallbacks).toHaveLength(strings.length);
-
                         // All results should be strings
                         for (const result of results.identifiers) {
                             expect(result).toBeTypeOf("string");

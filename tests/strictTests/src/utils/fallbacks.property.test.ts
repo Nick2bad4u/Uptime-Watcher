@@ -2,49 +2,17 @@
  * Property-based tests for core fallback utilities.
  *
  * @remarks
- * These tests focus on cross-cutting invariants for the generic helpers in
- * `src/utils/fallbacks.ts`. They are placed under `tests/strictTests` to
- * provide stronger guarantees than the example-based tests that live next to
- * the implementation.
+ * These tests focus on cross-cutting invariants for the public helpers in
+ * `src/utils/fallbacks.ts`.
  */
 
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
 
-import {
-    isNullOrUndefined,
-    truncateForLogging,
-    withFallback,
-} from "@app/utils/fallbacks";
+import { truncateForLogging } from "@app/utils/fallbacks";
 import { assertProperty } from "../../test-utils/fastcheckConfig";
 
 describe("fallback utilities (property-based)", () => {
-    /**
-     * Property: `withFallback` either returns the original value when it is not
-     * null/undefined, or the fallback when it is null/undefined.
-     */
-    it("withFallback respects null/undefined semantics for arbitrary values", () => {
-        const valueArb = fc.oneof(
-            fc.string(),
-            fc.integer(),
-            fc.boolean(),
-            fc.constant(null),
-            fc.constant(undefined)
-        );
-
-        assertProperty(
-            fc.property(valueArb, fc.string(), (value, fallback) => {
-                const result = withFallback(value, fallback);
-
-                if (isNullOrUndefined(value)) {
-                    expect(result).toBe(fallback);
-                } else {
-                    expect(result).toBe(value);
-                }
-            })
-        );
-    });
-
     /**
      * Property: `truncateForLogging` never increases string length and returns
      * a prefix of the original string.

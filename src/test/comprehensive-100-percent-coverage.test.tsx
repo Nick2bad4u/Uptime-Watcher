@@ -26,7 +26,6 @@ import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { generateUuid } from "../utils/data/generateUuid";
-import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 const buildAddSiteFormState = (
     overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}
@@ -428,33 +427,6 @@ describe("100% Coverage Edge Cases", () => {
             ).rejects.toThrow(
                 "test-operation failed and no fallback value provided"
             );
-        });
-    });
-
-    describe("Fallback Utilities Edge Cases", () => {
-        it("should identify null values", () => {
-            expect(isNullOrUndefined(null)).toBeTruthy();
-        });
-
-        it("should identify undefined values", () => {
-            expect(isNullOrUndefined(undefined)).toBeTruthy();
-        });
-
-        it("should identify non-null/undefined values", () => {
-            expect(isNullOrUndefined("")).toBeFalsy();
-            expect(isNullOrUndefined(0)).toBeFalsy();
-            expect(isNullOrUndefined(false)).toBeFalsy();
-            expect(isNullOrUndefined([])).toBeFalsy();
-            expect(isNullOrUndefined({})).toBeFalsy();
-        });
-
-        it("should handle async error wrapper", () => {
-            const asyncOp = vi.fn().mockResolvedValue(undefined);
-            const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
-
-            expect(typeof wrapper).toBe("function");
-            wrapper();
-            expect(asyncOp).toHaveBeenCalled();
         });
     });
 

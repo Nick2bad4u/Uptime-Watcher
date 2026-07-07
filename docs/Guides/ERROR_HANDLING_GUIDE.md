@@ -54,9 +54,9 @@ At a high level, error handling is layered as follows:
   - Zustand stores use `withErrorHandling()` together with
     `createStoreErrorHandler()` to wire loading/error state into
     `useErrorStore` while keeping store logic free of manual try/catch.
-  - UI helpers in `src/utils/fallbacks.ts` (`withAsyncErrorHandling`,
-    `withSyncErrorHandling`) provide lightweight wrappers for component event
-    handlers that only need logging and a local fallback.
+  - Renderer utilities use `withUtilityErrorHandling()` for local fallback
+    behavior; component events should either delegate to store actions or use a
+    local `try`/`catch` with the centralized logger.
   - Components consume errors from stores and error boundaries instead of
     handling cross-cutting concerns themselves.
 
@@ -294,8 +294,8 @@ convenience reference; see the sections above for detailed examples.
 | Async store operation with loading + error state (renderer)             | `withErrorHandling` + `createStoreErrorHandler`        | Preferred pattern for Zustand stores; wires into `useErrorStore` automatically.       |
 | Shared or backend utility that needs a fallback value                   | `withUtilityErrorHandling`                             | Use when you want to return a fallback instead of throwing in non-critical utilities. |
 | Backend/Electron service operation that logs errors and may rethrow     | `withErrorHandling` with `{ logger, operationName }`   | Centralizes logging and error propagation for services and IPC handlers.              |
-| Simple React event handler that just needs logging (no store wiring)    | `withAsyncErrorHandling` from `src/utils/fallbacks.ts` | Wraps async callbacks to log failures without changing component error state.         |
-| Synchronous operation that should never break the UI and has a fallback | `withSyncErrorHandling` from `src/utils/fallbacks.ts`  | Returns a fallback value on failure and logs with operation name.                     |
+| Simple React event handler that just needs logging (no store wiring)    | Local `try`/`catch` + centralized logger              | Keep handling local when no store or shared utility fallback is involved.            |
+| Synchronous operation that should never break the UI and has a fallback | `withUtilityErrorHandling`                            | Provide a fallback value when failures should not escape the utility boundary.        |
 | One-off utility or script that must always surface failures             | `withUtilityErrorHandling` with `shouldThrow = true`   | Ensures failures are not silently swallowed; combine with logging as needed.          |
 
 ### Enhanced Error Conversion

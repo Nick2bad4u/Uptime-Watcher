@@ -740,7 +740,7 @@ try {
 - **Utilities**: `withUtilityErrorHandling(operation, operationName, fallbackValue, shouldThrow)` for shared and backend helpers that need simple fallback behavior. When `shouldThrow` is `false`, you **must** provide a `fallbackValue`; the helper will return this value on failure instead of rethrowing. When `shouldThrow` is `true`, any provided `fallbackValue` is ignored and the wrapped error is rethrown after being logged via `console.error`.
 - **Database**: `withDatabaseOperation()` for repository and transactional operations.
 - **Frontend stores**: `withErrorHandling()` together with `createStoreErrorHandler()` for Zustand stores so errors and loading state flow through `useErrorStore`.
-- **Frontend UI events**: `withAsyncErrorHandling()` / `withSyncErrorHandling()` (see `src/utils/fallbacks.ts`) for simple React handlers that only need logging and a local fallback.
+- **Frontend UI events**: delegate to store actions when state should change, or use a local `try`/`catch` with the centralized logger for component-only failures.
 - **Backend services**: `withErrorHandling()` with `{ logger, operationName }` for service methods that need standardized logging + rethrow behavior.
 - **IPC handlers (main process)**: `registerStandardizedIpcHandler()` (plus payload validation helpers) so the renderer always receives an `IpcResponse` envelope with a safe message and correlation metadata.
 
@@ -752,14 +752,14 @@ scenarios.
 
 The following table summarizes which helper to use in common scenarios:
 
-| Scenario                                     | Preferred helper                                     | Notes                                                             |
-| -------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
-| Zustand store async action (renderer)        | `withErrorHandling` + `createStoreErrorHandler`      | Manages loading + error state via `useErrorStore`.                |
-| Backend service or IPC handler               | `withErrorHandling` with `{ logger, operationName }` | Logs failures, rethrows original error.                           |
-| IPC handler registration (main)              | `registerStandardizedIpcHandler`                     | Normalizes errors, returns `IpcResponse`, includes metadata.      |
-| Database / long-running repository operation | `withDatabaseOperation` / `withOperationalHooks`     | Adds retry, backoff, and optional event emission.                 |
-| Small shared utility with fallback behaviour | `withUtilityErrorHandling`                           | Provide `fallbackValue` when `shouldThrow` is `false`.            |
-| UI-only event handlers in React components   | `withAsyncErrorHandling` / `withSyncErrorHandling`   | For lightweight logging + local fallback without touching stores. |
+| Scenario                                     | Preferred helper                                     | Notes                                                        |
+| -------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| Zustand store async action (renderer)        | `withErrorHandling` + `createStoreErrorHandler`      | Manages loading + error state via `useErrorStore`.           |
+| Backend service or IPC handler               | `withErrorHandling` with `{ logger, operationName }` | Logs failures, rethrows original error.                      |
+| IPC handler registration (main)              | `registerStandardizedIpcHandler`                     | Normalizes errors, returns `IpcResponse`, includes metadata. |
+| Database / long-running repository operation | `withDatabaseOperation` / `withOperationalHooks`     | Adds retry, backoff, and optional event emission.            |
+| Small shared utility with fallback behaviour | `withUtilityErrorHandling`                           | Provide `fallbackValue` when `shouldThrow` is `false`.       |
+| UI-only event handlers in React components   | Local `try`/`catch` + centralized logger             | For lightweight logging without touching stores.             |
 
 ### 4. Emit Events for Failures
 

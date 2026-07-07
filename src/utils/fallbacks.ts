@@ -2,30 +2,17 @@
  * Centralized fallback and default value utilities for robust error handling.
  *
  * @remarks
- * Provides type-safe fallback handling across the app with consistent error
- * handling, default value management, and UI state recovery patterns. This
- * module ensures the app remains functional even when expected data is missing
- * or invalid.
+ * Provides monitor display fallbacks and UI default values used by renderer
+ * components. Internal helpers keep display formatting resilient when monitor
+ * data is incomplete or malformed.
  *
  * @example
  *
  * ```typescript
- * import {
- *     isNullOrUndefined,
- *     withAsyncErrorHandling,
- *     UiDefaults,
- * } from "./fallbacks";
+ * import { getMonitorTypeDisplayLabel, UiDefaults } from "./fallbacks";
  *
- * // Safe null checking
- * if (isNullOrUndefined(userInput)) {
- *     return UiDefaults.unknownLabel;
- * }
- *
- * // Async event handler with error handling
- * const handleClick = withAsyncErrorHandling(
- *     async () => await saveData(),
- *     "saveData"
- * );
+ * const label = getMonitorTypeDisplayLabel("http-json");
+ * const fallback = UiDefaults.unknownLabel;
  * ```
  *
  * @public
@@ -36,62 +23,9 @@ import type { ReadonlyDeep } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
-import {
-    arrayJoin,
-    isDefined,
-    isPresent,
-    setHas,
-    stringSplit,
-} from "ts-extras";
+import { arrayJoin, isDefined, setHas, stringSplit } from "ts-extras";
 
 import { logger } from "../services/logger";
-
-/**
- * Enhanced null/undefined check utility.
- *
- * @remarks
- * Replaces scattered `value === null || value === undefined` patterns.
- *
- * @param value - Value to check.
- *
- * @returns `true` when the value is `null` or `undefined`; otherwise `false`.
- *
- * @public
- */
-export function isNullOrUndefined(value: unknown): value is null | undefined {
-    return !isPresent(value);
-}
-
-/**
- * Type-safe utility for React async event handlers.
- *
- * @remarks
- * Prevents void return type issues with async operations by returning a
- * synchronous callback that internally awaits the supplied `operation`.
- *
- * @param operation - Async operation to execute.
- * @param operationName - Name for logging purposes.
- *
- * @returns Synchronous callback suitable for React event handlers.
- *
- * @public
- */
-export function withAsyncErrorHandling(
-    operation: () => Promise<void>,
-    operationName: string
-): () => void {
-    return () => {
-        void (async (): Promise<void> => {
-            try {
-                await operation();
-            } catch (error: unknown) {
-                logger.error("Async operation failed", ensureError(error), {
-                    operationName,
-                });
-            }
-        })();
-    };
-}
 
 /**
  * Synchronous error handling wrapper for operations that don't return promises.
@@ -105,10 +39,8 @@ export function withAsyncErrorHandling(
  * @param fallbackValue - Value to return if operation fails.
  *
  * @returns Result of operation or fallback value when an error occurs.
- *
- * @public
  */
-export function withSyncErrorHandling<T>(
+function withSyncErrorHandling<T>(
     operation: () => T,
     operationName: string,
     fallbackValue: T
@@ -176,26 +108,6 @@ export const UiDefaults: ReadonlyDeep<{
     /** Default text for unknown/unspecified values */
     unknownLabel: "Unknown",
 } as const;
-
-/**
- * Get value with fallback, checking for null/undefined.
- *
- * @param value - The value to check for null or undefined.
- * @param fallback - The fallback value to use if value is null or undefined.
- *
- * @returns The original value if not null/undefined; otherwise the fallback.
- *
- * @public
- */
-export function withFallback<T>(
-    value:
-        | null
-        | T
-        | undefined,
-    fallback: T
-): T {
-    return value ?? fallback;
-}
 
 const getSafeUrlForDisplayIdentifier = (
     url: string | undefined

@@ -16,7 +16,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import utilities to test
 import { generateUuid } from "../utils/data/generateUuid";
-import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 const serializedErrorLike = (message: string) =>
     expect.objectContaining({
@@ -290,97 +289,6 @@ describe("100% Coverage Edge Cases", () => {
                 false
             );
             expect(result).toBe(0);
-        });
-    });
-
-    describe("Fallback Utilities Edge Cases", () => {
-        it("should identify null values", () => {
-            expect(isNullOrUndefined(null)).toBeTruthy();
-        });
-
-        it("should identify undefined values", () => {
-            expect(isNullOrUndefined(undefined)).toBeTruthy();
-        });
-
-        it("should identify non-null/undefined values", () => {
-            expect(isNullOrUndefined("")).toBeFalsy();
-            expect(isNullOrUndefined(0)).toBeFalsy();
-            expect(isNullOrUndefined(false)).toBeFalsy();
-            expect(isNullOrUndefined([])).toBeFalsy();
-            expect(isNullOrUndefined({})).toBeFalsy();
-            expect(isNullOrUndefined("test")).toBeFalsy();
-            expect(isNullOrUndefined(1)).toBeFalsy();
-            expect(isNullOrUndefined(true)).toBeFalsy();
-        });
-
-        it("should handle async error wrapper success", async () => {
-            const asyncOp = vi.fn().mockResolvedValue(undefined);
-            const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
-
-            expect(typeof wrapper).toBe("function");
-            await wrapper();
-            expect(asyncOp).toHaveBeenCalled();
-        });
-
-        it("should handle async error wrapper with success case", async () => {
-            const asyncOp = vi.fn().mockResolvedValue(undefined);
-            const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
-
-            expect(typeof wrapper).toBe("function");
-            expect(() => {
-                wrapper();
-            }).not.toThrow();
-
-            // Wait for async operation to complete
-            await new Promise((resolve) => setTimeout(resolve, 10));
-            expect(asyncOp).toHaveBeenCalled();
-        });
-
-        it("should handle multiple async wrapper calls", async () => {
-            const asyncOp = vi.fn().mockResolvedValue(undefined);
-            const wrapper = withAsyncErrorHandling(asyncOp, "test-async");
-
-            await wrapper();
-            await wrapper();
-            await wrapper();
-
-            expect(asyncOp).toHaveBeenCalledTimes(3);
-        });
-    });
-
-    describe("Type Guard Edge Cases", () => {
-        it("should handle various falsy values", () => {
-            const falsyValues = [
-                null,
-                undefined,
-                false,
-                0,
-                "",
-                NaN,
-            ];
-
-            for (const value of falsyValues) {
-                if (value === null || value === undefined) {
-                    expect(isNullOrUndefined(value)).toBeTruthy();
-                } else {
-                    expect(isNullOrUndefined(value)).toBeFalsy();
-                }
-            }
-        });
-
-        it("should handle various truthy values", () => {
-            const truthyValues = [
-                true,
-                1,
-                "test",
-                [],
-                {},
-                Symbol("test"),
-            ];
-
-            for (const value of truthyValues) {
-                expect(isNullOrUndefined(value)).toBeFalsy();
-            }
         });
     });
 
