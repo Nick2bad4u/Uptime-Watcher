@@ -3,9 +3,11 @@ import { objectAssign } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
+import type { SelectorHookMock } from "../utils/createSelectorHookMock";
 import { createSelectorHookMock } from "../utils/createSelectorHookMock";
 import {
     createSitesStoreMock,
+    type SitesStore,
     updateSitesStoreMock,
 } from "../utils/createSitesStoreMock";
 
@@ -168,11 +170,28 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
-(globalThis as any).__useSitesStoreMock_basic__ = useSitesStoreMock;
+interface SitesStoreMockGlobal {
+    __useSitesStoreMock_basic__?: SelectorHookMock<SitesStore>;
+}
+
+const getSitesStoreMockGlobal = (): SitesStoreMockGlobal & typeof globalThis =>
+    globalThis as SitesStoreMockGlobal & typeof globalThis;
+
+getSitesStoreMockGlobal().__useSitesStoreMock_basic__ = useSitesStoreMock;
 
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock_basic__?.(selector, equality),
+    useSitesStore: <Result = SitesStore,>(
+        selector?: (state: SitesStore) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | SitesStore => {
+        const hook = getSitesStoreMockGlobal().__useSitesStoreMock_basic__;
+
+        if (!hook) {
+            throw new Error("Sites store mock global was not initialized.");
+        }
+
+        return hook(selector, equality);
+    },
 }));
 
 const resetSitesStoreState = (): void => {
