@@ -12,7 +12,7 @@ const colorStylesCache = new Map<string, CSSProperties>();
  *
  * @internal
  */
-export function getIconColorClass(color?: string): string | undefined {
+function getIconColorClass(color?: string): string | undefined {
     if (!color) {
         return undefined;
     }

@@ -1,159 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import * as React from "react";
+import { objectEntries } from "ts-extras";
 /**
  * Comprehensive tests for iconUtils functions to achieve complete function
  * coverage
  */
 import { describe, expect, it } from "vitest";
 
-import {
-    getIconColorClass,
-    renderColoredIcon,
-} from "../../../theme/components/iconUtils";
+import { renderColoredIcon } from "../../../theme/components/iconUtils";
 
 describe("iconUtils functions", () => {
-    describe(getIconColorClass, () => {
-        it("should return undefined for no color", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass()).toBeUndefined();
-            expect(getIconColorClass(undefined)).toBeUndefined();
-        });
-
-        it("should return themed-icon--error for danger and error colors", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Error Handling", "type");
-
-            expect(getIconColorClass("danger")).toBe("themed-icon--error");
-            expect(getIconColorClass("error")).toBe("themed-icon--error");
-        });
-
-        it("should return themed-icon--info for info color", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass("info")).toBe("themed-icon--info");
-        });
-
-        it("should return themed-icon--primary for primary color", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass("primary")).toBe("themed-icon--primary");
-        });
-
-        it("should return themed-icon--secondary for secondary color", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass("secondary")).toBe(
-                "themed-icon--secondary"
-            );
-        });
-
-        it("should return themed-icon--success for success color", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass("success")).toBe("themed-icon--success");
-        });
-
-        it("should return themed-icon--warning for warning color", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass("warning")).toBe("themed-icon--warning");
-        });
-
-        it("should return undefined for unknown colors", ({
-            task,
-            annotate,
-        }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: iconUtils", "component");
-            annotate("Category: Component", "category");
-            annotate("Type: Business Logic", "type");
-
-            expect(getIconColorClass("unknown")).toBeUndefined();
-            expect(getIconColorClass("invalid")).toBeUndefined();
-            expect(getIconColorClass("")).toBeUndefined();
-            expect(getIconColorClass("custom")).toBeUndefined();
-        });
-    });
-
     describe(renderColoredIcon, () => {
         it("should return the icon as-is when icon is falsy", ({
             task,
@@ -247,23 +103,27 @@ describe("iconUtils functions", () => {
             annotate("Type: Business Logic", "type");
 
             const icon = <div>test</div>;
-            const colors = [
-                "danger",
-                "error",
-                "info",
-                "primary",
-                "secondary",
-                "success",
-                "warning",
-            ];
+            const colorClassByName = {
+                danger: "themed-icon--error",
+                error: "themed-icon--error",
+                info: "themed-icon--info",
+                primary: "themed-icon--primary",
+                secondary: "themed-icon--secondary",
+                success: "themed-icon--success",
+                warning: "themed-icon--warning",
+            } as const;
 
-            for (const color of colors) {
+            for (const [color, expectedClassName] of objectEntries(
+                colorClassByName
+            )) {
                 const { unmount } = render(
                     renderColoredIcon(icon, color) as React.ReactElement
                 );
                 const iconElement = screen.getByText("test");
                 expect(iconElement.parentElement?.tagName).toBe("SPAN");
-                expect(iconElement.parentElement).toBeTruthy();
+                expect(iconElement.parentElement).toHaveClass(
+                    expectedClassName
+                );
                 unmount();
             }
         });

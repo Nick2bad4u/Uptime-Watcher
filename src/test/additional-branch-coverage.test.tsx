@@ -5,12 +5,13 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
+import { objectEntries } from "ts-extras";
 import { describe, expect, it, vi } from "vitest";
 
 // Import components and utilities needing branch coverage
 import { RadioGroup } from "../components/AddSiteForm/RadioGroup";
 import { SettingItem } from "../components/shared/SettingItem";
-import { getIconColorClass } from "../theme/components/iconUtils";
+import { renderColoredIcon } from "../theme/components/iconUtils";
 import { ThemedBox } from "../theme/components/ThemedBox";
 import { ThemedProgress } from "../theme/components/ThemedProgress";
 import { ThemeProvider } from "../theme/components/ThemeProvider";
@@ -506,7 +507,7 @@ describe("Additional Branch Coverage Tests", () => {
     });
 
     describe("IconUtils Utility Functions", () => {
-        it("should handle getIconColorClass function with all color types", ({
+        it("should render themed class wrappers for all known icon colors", ({
             task,
             annotate,
         }) => {
@@ -520,26 +521,28 @@ describe("Additional Branch Coverage Tests", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Retrieval", "type");
 
-            // Test danger/error color
-            expect(getIconColorClass("danger")).toBe("themed-icon--error");
-            expect(getIconColorClass("error")).toBe("themed-icon--error");
+            const colorClassByName = {
+                danger: "themed-icon--error",
+                error: "themed-icon--error",
+                info: "themed-icon--info",
+                primary: "themed-icon--primary",
+                secondary: "themed-icon--secondary",
+                success: "themed-icon--success",
+                warning: "themed-icon--warning",
+            } as const;
 
-            // Test info color
-            expect(getIconColorClass("info")).toBe("themed-icon--info");
+            for (const [color, expectedClassName] of objectEntries(
+                colorClassByName
+            )) {
+                const { unmount } = render(
+                    <>{renderColoredIcon("branch-icon", color)}</>
+                );
 
-            // Test primary color
-            expect(getIconColorClass("primary")).toBe("themed-icon--primary");
-
-            // Test secondary color
-            expect(getIconColorClass("secondary")).toBe(
-                "themed-icon--secondary"
-            );
-
-            // Test success color
-            expect(getIconColorClass("success")).toBe("themed-icon--success");
-
-            // Test warning color
-            expect(getIconColorClass("warning")).toBe("themed-icon--warning");
+                expect(screen.getByText("branch-icon")).toHaveClass(
+                    expectedClassName
+                );
+                unmount();
+            }
         });
 
         it("should handle undefined color gracefully", ({ task, annotate }) => {
@@ -553,7 +556,9 @@ describe("Additional Branch Coverage Tests", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            expect(getIconColorClass(undefined)).toBeUndefined();
+            expect(renderColoredIcon("branch-icon", undefined)).toBe(
+                "branch-icon"
+            );
         });
 
         it("should handle empty string color", ({ task, annotate }) => {
@@ -567,7 +572,7 @@ describe("Additional Branch Coverage Tests", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            expect(getIconColorClass("")).toBeUndefined();
+            expect(renderColoredIcon("branch-icon", "")).toBe("branch-icon");
         });
 
         it("should handle custom color values", ({ task, annotate }) => {
@@ -581,14 +586,20 @@ describe("Additional Branch Coverage Tests", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // Test hex color
-            expect(getIconColorClass("#ff0000")).toBeUndefined();
+            const customColors = [
+                "#ff0000",
+                "rgb(255, 0, 0)",
+                "unknown",
+            ];
 
-            // Test rgb color
-            expect(getIconColorClass("rgb(255, 0, 0)")).toBeUndefined();
+            for (const color of customColors) {
+                const { unmount } = render(
+                    <>{renderColoredIcon("branch-icon", color)}</>
+                );
 
-            // Test unknown color name
-            expect(getIconColorClass("unknown")).toBeUndefined();
+                expect(screen.getByText("branch-icon").tagName).toBe("SPAN");
+                unmount();
+            }
         });
     });
 
