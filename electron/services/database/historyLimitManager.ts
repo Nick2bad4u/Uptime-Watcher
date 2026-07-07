@@ -73,20 +73,6 @@ interface SetHistoryLimitParams {
 }
 
 /**
- * Get the current history limit.
- *
- * Simple getter function that provides access to the history limit. This
- * indirection enables dependency injection and testability.
- *
- * @param getHistoryLimitFn - Function to retrieve the current history limit
- *
- * @returns The current history limit
- */
-export function getHistoryLimit(getHistoryLimitFn: () => number): number {
-    return getHistoryLimitFn();
-}
-
-/**
  * Set the history retention limit and prune older history entries if needed.
  *
  * Limit behavior:

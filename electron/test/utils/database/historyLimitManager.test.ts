@@ -32,10 +32,7 @@ import type { DatabaseService } from "../../../services/database/DatabaseService
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../../services/database/SettingsRepository";
 
-import {
-    getHistoryLimit,
-    setHistoryLimit,
-} from "../../../services/database/historyLimitManager";
+import { setHistoryLimit } from "../../../services/database/historyLimitManager";
 
 // Mock repositories
 // Mock database
@@ -383,99 +380,6 @@ describe("historyLimitManager", () => {
         });
     });
 
-    describe(getHistoryLimit, () => {
-        it("should return current history limit from callback", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: historyLimitManager", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Configuration", "type");
-
-            const expectedLimit = 250;
-            const getHistoryLimitCallback = vi
-                .fn()
-                .mockReturnValue(expectedLimit);
-
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return zero limit", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: historyLimitManager", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Configuration", "type");
-
-            const expectedLimit = 0;
-            const getHistoryLimitCallback = vi
-                .fn()
-                .mockReturnValue(expectedLimit);
-
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return negative limit if callback returns one", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: historyLimitManager", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Configuration", "type");
-
-            const expectedLimit = -1;
-            const getHistoryLimitCallback = vi
-                .fn()
-                .mockReturnValue(expectedLimit);
-
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
-        });
-
-        it("should return large limit values", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: historyLimitManager", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Configuration", "type");
-
-            const expectedLimit = 999_999;
-            const getHistoryLimitCallback = vi
-                .fn()
-                .mockReturnValue(expectedLimit);
-
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBe(expectedLimit);
-            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
-        });
-
-        it("should work with callback that returns undefined", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: historyLimitManager", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const getHistoryLimitCallback = vi.fn().mockReturnValue(undefined);
-
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBeUndefined();
-            expect(getHistoryLimitCallback).toHaveBeenCalledTimes(1);
-        });
-    });
-
     describe("integration scenarios", () => {
         it("should handle complete workflow with valid limit", async ({
             task,
@@ -487,7 +391,6 @@ describe("historyLimitManager", () => {
             await annotate("Type: Configuration", "type");
 
             const setHistoryLimitCallback = vi.fn();
-            const getHistoryLimitCallback = vi.fn();
             const limit = 150;
 
             // Set the limit
@@ -503,13 +406,6 @@ describe("historyLimitManager", () => {
                 logger: mockLogger,
             });
 
-            // Simulate the internal callback setting the limit
-            getHistoryLimitCallback.mockReturnValue(limit);
-
-            // Get the limit
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBe(limit);
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
             expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
                 mockDatabase,
@@ -531,7 +427,6 @@ describe("historyLimitManager", () => {
             await annotate("Type: Configuration", "type");
 
             const setHistoryLimitCallback = vi.fn();
-            const getHistoryLimitCallback = vi.fn();
             const limit = 3;
             const expectedLimit = DEFAULT_HISTORY_LIMIT_RULES.minLimit;
 
@@ -548,13 +443,6 @@ describe("historyLimitManager", () => {
                 logger: mockLogger,
             });
 
-            // Simulate the internal callback setting the corrected limit
-            getHistoryLimitCallback.mockReturnValue(expectedLimit);
-
-            // Get the limit
-            const result = getHistoryLimit(getHistoryLimitCallback);
-
-            expect(result).toBe(expectedLimit);
             expect(setHistoryLimitCallback).toHaveBeenCalledWith(expectedLimit);
             expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
                 mockDatabase,
