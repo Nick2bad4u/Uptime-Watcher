@@ -229,8 +229,29 @@ const mockElectronAPI = {
     },
 };
 
+type MockElectronAPI = typeof mockElectronAPI;
+
+interface MockWindow {
+    electronAPI?: MockElectronAPI;
+}
+
+const getMockGlobal = (): typeof globalThis & {
+    electronAPI?: MockElectronAPI;
+} => globalThis as typeof globalThis & { electronAPI?: MockElectronAPI };
+
+const getMockWindow = (): MockWindow | undefined => {
+    const windowRef = Reflect.get(globalThis, "window");
+    return windowRef !== undefined && typeof windowRef === "object"
+        ? (windowRef as unknown as MockWindow)
+        : undefined;
+};
+
+const getMockElectronBridge = (): MockElectronAPI | undefined =>
+    getMockWindow()?.electronAPI ?? getMockGlobal().electronAPI;
+
 // Mock the global electronAPI
 Object.defineProperty(globalThis, "window", {
+    configurable: true,
     value: {
         electronAPI: mockElectronAPI,
     },
@@ -272,9 +293,7 @@ describe("useSitesStore Function Coverage Tests", () => {
         // Reset all mocks
         vi.clearAllMocks();
         mockWaitForElectronBridge.mockImplementation(async () => {
-            const electronBridge =
-                (globalThis as any).window?.electronAPI ??
-                (globalThis as any).electronAPI;
+            const electronBridge = getMockElectronBridge();
 
             if (!electronBridge) {
                 throw new MockElectronBridgeNotReadyError({
