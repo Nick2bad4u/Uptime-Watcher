@@ -32,6 +32,14 @@ export interface ParsedDnsRecords {
 
 const isString = (value: unknown): value is string => typeof value === "string";
 
+const formatAnyRecord = (record: object): string => {
+    try {
+        return JSON.stringify(record);
+    } catch {
+        return "[unserializable DNS ANY record]";
+    }
+};
+
 const pickNumber = (
     primary: unknown,
     fallback: unknown
@@ -81,7 +89,7 @@ const parseAnyRecords = (result: unknown): ParsedDnsRecords => {
 
     const anyRecords = result.filter(isRecord);
     return {
-        actualValues: anyRecords.map((record) => JSON.stringify(record)),
+        actualValues: anyRecords.map((record) => formatAnyRecord(record)),
         details: `ANY records (${anyRecords.length} items)`,
         // Preserve legacy behavior: ANY success is based on the raw array size.
         hasRecords: result.length > 0,
