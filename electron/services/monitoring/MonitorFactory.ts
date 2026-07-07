@@ -38,7 +38,7 @@ import {
  * errors. The `configurationError` property should only be included when
  * there's an actual error.
  */
-export interface MonitorServiceResult {
+interface MonitorServiceResult {
     /**
      * Whether configuration was successfully applied (if config was provided)
      */
@@ -55,7 +55,7 @@ export interface MonitorServiceResult {
 /**
  * Error thrown when a monitor service fails to apply configuration updates.
  */
-export class MonitorConfigurationError extends Error {
+class MonitorConfigurationError extends Error {
     /** The monitor type whose configuration failed to apply. */
     public readonly type: MonitorType;
 
@@ -92,10 +92,6 @@ export class MonitorConfigurationError extends Error {
  * ```typescript
  * // Retrieve a monitor service instance for HTTP
  * const httpMonitor = getMonitor("http", { timeout: 5000 });
- * // Update configuration for all monitor services
- * updateMonitorConfig({ timeout: 10000 });
- * // Clear all cached monitor service instances
- * clearMonitorFactoryCache();
  * ```
  *
  * @public
@@ -114,67 +110,12 @@ export class MonitorConfigurationError extends Error {
 const serviceInstances = new Map<string, IMonitorService>();
 
 /**
- * Clears all cached monitor service instances.
- *
- * @remarks
- * Useful for testing, reloading configuration, or resetting the monitor service
- * state. After calling this method, new service instances will be created on
- * demand.
- *
- * @example
- *
- * ```typescript
- * clearMonitorFactoryCache();
- * ```
- *
- * @public
- */
-export function clearMonitorFactoryCache(): void {
-    serviceInstances.clear();
-}
-
-/**
- * Retrieves all available monitor types from the registry.
- *
- * @remarks
- * This method returns all monitor types currently registered in the system,
- * including both built-in and dynamically registered types.
- *
- * @example
- *
- * ```typescript
- * const types = getAvailableMonitorTypes();
- * ```
- *
- * @returns An array of registered monitor type strings.
- *
- * @public
- */
-export function getAvailableMonitorTypes(): readonly string[] {
-    return getRegisteredMonitorTypes();
-}
-
-/**
  * Retrieves the monitor service instance with configuration app status.
  *
  * @remarks
- * Same as {@link getMonitor} but returns detailed result including configuration
- * app status. Use this method when you need to know if configuration was
- * successfully applied.
- *
- * @example
- *
- * ```typescript
- * import { monitorLogger } from "../../utils/logger";
- *
- * const result = getMonitorWithResult("http", { timeout: 5000 });
- * if (!result.configurationApplied && result.configurationError) {
- *     monitorLogger.warn("Monitor configuration failed", {
- *         error: result.configurationError,
- *         monitorType: "http",
- *     });
- * }
- * ```
+ * Internal implementation for {@link getMonitor}. It keeps configuration
+ * application status explicit so the public wrapper can stay small while the
+ * factory still handles cached instances correctly.
  *
  * @param type - The monitor type string. Must be a valid registered type.
  * @param config - Optional monitor configuration to apply to the instance.
@@ -187,9 +128,9 @@ export function getAvailableMonitorTypes(): readonly string[] {
  * @throws {@link Error} If the monitor type is not supported or no service
  *   factory is registered for the type.
  *
- * @public
+ * @internal
  */
-export function getMonitorWithResult(
+function getMonitorWithResult(
     type: string,
     config?: MonitorServiceConfig,
     forceConfigUpdate = false
@@ -293,7 +234,7 @@ export function getMonitorWithResult(
  *
  * @throws {@link Error} If the monitor type is not supported or no service
  *   factory is registered for the type.
- * @throws {@link MonitorConfigurationError} If configuration app fails.
+ * @throws When configuration application fails.
  *
  * @public
  *
@@ -301,7 +242,6 @@ export function getMonitorWithResult(
  * @see {@link MonitorServiceConfig}
  * @see {@link getMonitorServiceFactory}
  * @see {@link isValidMonitorType}
- * @see {@link getMonitorWithResult} for version that returns configuration status
  */
 export function getMonitor(
     type: MonitorType,
@@ -310,45 +250,4 @@ export function getMonitor(
 ): IMonitorService {
     const result = getMonitorWithResult(type, config, forceConfigUpdate);
     return result.instance;
-}
-
-/**
- * Updates configuration for all currently initialized monitor service
- * instances.
- *
- * @remarks
- * -
- *
- * Applies the provided configuration to all cached monitor service instances. -
- * Only affects already-created instances; future instances require explicit
- * config on creation. - Type-specific settings in the config object may be
- * ignored by some monitor types if not applicable. - Errors during config
- * update are logged and do not interrupt updates for other instances.
- *
- * @example
- *
- * ```typescript
- * updateMonitorConfig({ timeout: 10000 });
- * ```
- *
- * @param config - Monitor configuration object containing settings to apply to
- *   all monitor services.
- *
- * @public
- *
- * @see {@link MonitorServiceConfig}
- */
-export function updateMonitorConfig(config: MonitorServiceConfig): void {
-    // Update config for all initialized monitor instances
-    for (const instance of serviceInstances.values()) {
-        try {
-            instance.updateConfig(config);
-        } catch (error: unknown) {
-            // Log and continue; do not throw from config update
-            logger.warn(
-                LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_INSTANCE,
-                ensureError(error)
-            );
-        }
-    }
 }

@@ -1,5 +1,5 @@
 /**
- * @file Fixed tests for MonitorFactory using correct API
+ * @file Tests for the public MonitorFactory API.
  */
 
 import type { Site } from "@shared/types";
@@ -11,87 +11,75 @@ import type {
     MonitorServiceConfig,
 } from "../../../services/monitoring/types";
 
-import {
-    clearMonitorFactoryCache,
-    getAvailableMonitorTypes,
-    getMonitor,
-    getMonitorWithResult,
-    MonitorConfigurationError,
-    updateMonitorConfig,
-} from "../../../services/monitoring/MonitorFactory";
-import * as MonitorTypeRegistry from "../../../services/monitoring/MonitorTypeRegistry";
+const loadMonitorFactory = async (): Promise<
+    typeof import("../../../services/monitoring/MonitorFactory")
+> => {
+    vi.resetModules();
+    return import("../../../services/monitoring/MonitorFactory");
+};
 
-describe("MonitorFactory - Fixed", () => {
+describe("MonitorFactory", () => {
     let mockMonitorConfig: MonitorServiceConfig;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        clearMonitorFactoryCache();
+        vi.doUnmock("../../../services/monitoring/MonitorTypeRegistry");
         mockMonitorConfig = {
             timeout: 5000,
             userAgent: "Test-Agent/1.0",
         };
     });
 
-    describe(getMonitor, () => {
-        it("should get a ping monitor", async ({ task, annotate }) => {
+    describe("getMonitor", () => {
+        it("gets a ping monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Data Retrieval", "type");
 
+            const { getMonitor } = await loadMonitorFactory();
             const monitor = getMonitor("ping", mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });
 
-        it("should get an http monitor", async ({ task, annotate }) => {
+        it("gets an http monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Data Retrieval", "type");
 
+            const { getMonitor } = await loadMonitorFactory();
             const monitor = getMonitor("http", mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });
 
-        it("should get a port monitor", async ({ task, annotate }) => {
+        it("gets a port monitor", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Data Retrieval", "type");
 
+            const { getMonitor } = await loadMonitorFactory();
             const monitor = getMonitor("port", mockMonitorConfig);
             expect(monitor).toBeDefined();
             expect(typeof monitor.check).toBe("function");
         });
 
-        it("should handle invalid monitor type", async ({ task, annotate }) => {
+        it("rejects invalid monitor types", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorFactory", "component");
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
+            const { getMonitor } = await loadMonitorFactory();
             expect(() =>
-                getMonitor("invalid" as any, mockMonitorConfig)
-            ).toThrow();
+                getMonitor("invalid" as never, mockMonitorConfig)
+            ).toThrow(/Unsupported monitor type/v);
         });
 
-        it("should get monitor with configuration", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorFactory", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Retrieval", "type");
-
-            const monitor = getMonitor("ping", mockMonitorConfig);
-            expect(monitor).toBeDefined();
-        });
-
-        it("should throw when configuration update fails", async ({
+        it("throws when configuration update fails", async ({
             task,
             annotate,
         }) => {
@@ -100,8 +88,6 @@ describe("MonitorFactory - Fixed", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const originalGetFactory =
-                MonitorTypeRegistry.getMonitorServiceFactory;
             const failingService: IMonitorService = {
                 check: vi.fn(async () => ({
                     responseTime: 0,
@@ -115,98 +101,45 @@ describe("MonitorFactory - Fixed", () => {
                 }),
             };
 
-            const factorySpy = vi
-                .spyOn(MonitorTypeRegistry, "getMonitorServiceFactory")
-                .mockImplementation((type: string) => {
+            vi.resetModules();
+            const registry =
+                await vi.importActual<
+                    typeof import("../../../services/monitoring/MonitorTypeRegistry")
+                >("../../../services/monitoring/MonitorTypeRegistry");
+
+            vi.doMock("../../../services/monitoring/MonitorTypeRegistry", () => ({
+                ...registry,
+                getMonitorServiceFactory: (type: string) => {
                     if (type === "ping") {
                         return () => failingService;
                     }
 
-                    return originalGetFactory(type);
-                });
+                    return registry.getMonitorServiceFactory(type);
+                },
+            }));
 
-            clearMonitorFactoryCache();
+            const { getMonitor } = await import(
+                "../../../services/monitoring/MonitorFactory"
+            );
 
-            try {
-                expect(() =>
-                    getMonitorWithResult("ping", mockMonitorConfig)
-                ).toThrow(MonitorConfigurationError);
-            } finally {
-                factorySpy.mockRestore();
-                clearMonitorFactoryCache();
-            }
+            expect(() => getMonitor("ping", mockMonitorConfig)).toThrow(
+                /Failed to apply configuration/v
+            );
         });
-    });
 
-    it("should not re-apply config to cached instance unless forced", () => {
-        const first = getMonitorWithResult("http", { timeout: 1000 });
-        expect(first.configurationApplied).toBeTruthy();
+        it("does not re-apply config to cached instances unless forced", async () => {
+            const { getMonitor } = await loadMonitorFactory();
+            const instance = getMonitor("http", { timeout: 1000 });
+            const updateSpy = vi.spyOn(instance, "updateConfig");
+            updateSpy.mockClear();
 
-        const instance = first.instance;
-        const updateSpy = vi.spyOn(instance, "updateConfig");
-        updateSpy.mockClear();
+            const cached = getMonitor("http", { timeout: 2000 });
+            expect(cached).toBe(instance);
+            expect(updateSpy).not.toHaveBeenCalled();
 
-        const second = getMonitorWithResult("http", { timeout: 2000 });
-        expect(second.configurationApplied).toBeFalsy();
-        expect(second.configurationError).toContain("cached instance");
-        expect(updateSpy).not.toHaveBeenCalled();
-
-        const forced = getMonitorWithResult("http", { timeout: 2000 }, true);
-        expect(forced.configurationApplied).toBeTruthy();
-        expect(updateSpy).toHaveBeenCalledTimes(1);
-    });
-
-    describe("getAvailableTypes", () => {
-        it("should return available monitor types", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorFactory", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const types = getAvailableMonitorTypes();
-            expect(types).toContain("ping");
-            expect(types).toContain("http");
-            expect(types).toContain("port");
-        });
-    });
-
-    describe("clearCache", () => {
-        it("should clear monitor cache", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorFactory", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            // Get a monitor to populate cache
-            getMonitor("ping", mockMonitorConfig);
-
-            // Clear cache should not throw
-            expect(() => {
-                clearMonitorFactoryCache();
-            }).not.toThrow();
-        });
-    });
-
-    describe("updateConfig", () => {
-        it("should update config for all monitors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorFactory", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Data Update", "type");
-
-            const newConfig = {
-                timeout: 10_000,
-                userAgent: "Updated-Agent/1.0",
-            };
-            expect(() => {
-                updateMonitorConfig(newConfig);
-            }).not.toThrow();
+            const forced = getMonitor("http", { timeout: 2000 }, true);
+            expect(forced).toBe(instance);
+            expect(updateSpy).toHaveBeenCalledTimes(1);
         });
     });
 });
