@@ -6,17 +6,11 @@
 import type { Monitor, Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
-import {
-    beforeEach,
-    describe,
-    expect,
-    it,
-    vi,
-    type MockInstance,
-} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { objectAssign } from "ts-extras";
 
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
+import type { ElectronAPI } from "../../../types";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import * as siteOperationHelpers from "../../../stores/sites/utils/operationHelpers";
@@ -39,18 +33,25 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn(async (fn, handlers) => {
-        try {
-            return await fn().then((result: any) => {
+    withErrorHandling: vi.fn(
+        async <T>(
+            fn: () => Promise<T>,
+            handlers: {
+                setError?: (error: unknown) => void;
+                setLoading?: (isLoading: boolean) => void;
+            }
+        ) => {
+            try {
+                const result = await fn();
                 handlers.setLoading?.(false);
                 return result;
-            });
-        } catch (error: unknown) {
-            handlers.setError?.(error);
-            handlers.setLoading?.(false);
-            throw error;
+            } catch (error: unknown) {
+                handlers.setError?.(error);
+                handlers.setLoading?.(false);
+                throw error;
+            }
         }
-    }),
+    ),
 }));
 
 vi.mock("../../../stores/sites/utils/fileDownload", () => ({
@@ -86,8 +87,8 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
     })),
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
-        monitors: site.monitors.map((m: any) =>
-            m.id === monitorId ? { ...m, ...updates } : m
+        monitors: site.monitors.map((monitor: Monitor) =>
+            monitor.id === monitorId ? { ...monitor, ...updates } : monitor
         ),
     })),
     validateMonitorExists: vi.fn((site, monitorId) => {
@@ -101,10 +102,8 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
 
 // Access the global electronAPI mock
 const mockElectronAPI = (
-    globalThis as typeof globalThis & { electronAPI: unknown }
-).electronAPI as any;
-const getRestoreMock = (): MockInstance =>
-    mockElectronAPI.data.restoreSqliteBackup;
+    globalThis as typeof globalThis & { electronAPI: ElectronAPI }
+).electronAPI;
 if (!mockElectronAPI.data.restoreSqliteBackup) {
     objectAssign(mockElectronAPI.data, {
         restoreSqliteBackup: vi.fn(async () => ({
@@ -122,6 +121,23 @@ if (!mockElectronAPI.data.restoreSqliteBackup) {
         })),
     });
 }
+const mockDataApi = {
+    downloadSqliteBackup: vi.mocked(mockElectronAPI.data.downloadSqliteBackup),
+    restoreSqliteBackup: vi.mocked(mockElectronAPI.data.restoreSqliteBackup),
+    saveSqliteBackup: vi.mocked(mockElectronAPI.data.saveSqliteBackup),
+};
+const mockMonitoringApi = {
+    stopMonitoringForSite: vi.mocked(
+        mockElectronAPI.monitoring.stopMonitoringForSite
+    ),
+};
+const mockSitesApi = {
+    addSite: vi.mocked(mockElectronAPI.sites.addSite),
+    removeMonitor: vi.mocked(mockElectronAPI.sites.removeMonitor),
+    removeSite: vi.mocked(mockElectronAPI.sites.removeSite),
+    updateSite: vi.mocked(mockElectronAPI.sites.updateSite),
+};
+const getRestoreMock = () => mockDataApi.restoreSqliteBackup;
 
 describe(createSiteOperationsActions, () => {
     let mockDeps: SiteOperationsDependencies;
@@ -132,11 +148,9 @@ describe(createSiteOperationsActions, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-            true
-        );
+        mockMonitoringApi.stopMonitoringForSite.mockResolvedValue(true);
 
-        mockElectronAPI.sites.removeMonitor.mockImplementation(
+        mockSitesApi.removeMonitor.mockImplementation(
             async (siteIdentifier: string, monitorId: string) => {
                 const sitesSnapshot = mockDeps?.getSites?.() ?? [mockSite];
                 const targetSite =
@@ -173,7 +187,7 @@ describe(createSiteOperationsActions, () => {
             name: "Test Site",
         };
 
-        mockElectronAPI.sites.updateSite.mockImplementation(
+        mockSitesApi.updateSite.mockImplementation(
             async (identifier: string, updates: Partial<Site>) => ({
                 ...mockSite,
                 ...updates,
@@ -183,33 +197,27 @@ describe(createSiteOperationsActions, () => {
 
         const dataService = {
             downloadSqliteBackup: vi.fn(async () =>
-                mockElectronAPI.data.downloadSqliteBackup()
+                mockDataApi.downloadSqliteBackup()
             ),
-            saveSqliteBackup: vi.fn(async () =>
-                mockElectronAPI.data.saveSqliteBackup()
-            ),
+            saveSqliteBackup: vi.fn(async () => mockDataApi.saveSqliteBackup()),
             restoreSqliteBackup: vi.fn(async (payload) =>
-                mockElectronAPI.data.restoreSqliteBackup(payload)
+                mockDataApi.restoreSqliteBackup(payload)
             ),
         };
 
         const siteService = {
-            addSite: vi.fn(async (site: Site) =>
-                mockElectronAPI.sites.addSite(site)
-            ),
+            addSite: vi.fn(async (site: Site) => mockSitesApi.addSite(site)),
             getSites: vi.fn(async () => mockElectronAPI.sites.getSites()),
             removeMonitor: vi.fn(
                 async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.sites.removeMonitor(
-                        siteIdentifier,
-                        monitorId
-                    )
+                    mockSitesApi.removeMonitor(siteIdentifier, monitorId)
             ),
             removeSite: vi.fn(async (identifier: string) =>
-                mockElectronAPI.sites.removeSite(identifier)
+                mockSitesApi.removeSite(identifier)
             ),
-            updateSite: vi.fn(async (identifier: string, updates: unknown) =>
-                mockElectronAPI.sites.updateSite(identifier, updates)
+            updateSite: vi.fn(
+                async (identifier: string, updates: Partial<Site>) =>
+                    mockSitesApi.updateSite(identifier, updates)
             ),
         };
 
@@ -244,8 +252,7 @@ describe(createSiteOperationsActions, () => {
                 "test-site",
                 expect.objectContaining({ monitors: expect.any(Array) })
             );
-            const updateCall =
-                mockElectronAPI.sites.updateSite.mock.calls.at(-1);
+            const updateCall = mockSitesApi.updateSite.mock.calls.at(-1);
             const updatedMonitors = updateCall?.[1]?.monitors ?? [];
             expect(updatedMonitors).toHaveLength(2);
             expect(mockDeps.setSites).toHaveBeenCalled();
@@ -318,22 +325,26 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Constructor", "type");
 
-            const newSite = {
+            const newSite: Site = {
                 identifier: "new-site",
                 name: "New Site",
                 monitoring: true,
                 monitors: [
                     {
+                        checkInterval: 60_000,
                         history: [],
                         id: "test-monitor-id",
                         monitoring: true,
+                        responseTime: -1,
+                        retryAttempts: 3,
                         status: "pending" as const,
+                        timeout: 30_000,
                         type: "http" as const,
                     },
                 ],
             };
             // Mock preload API to return extracted Site data directly
-            mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
+            mockSitesApi.addSite.mockResolvedValue(newSite);
 
             await actions.createSite({
                 identifier: "new-site",
@@ -396,7 +407,7 @@ describe(createSiteOperationsActions, () => {
             };
             const newSite = { ...mockSite, ...siteData };
             // Mock preload API to return extracted Site data directly
-            mockElectronAPI.sites.addSite.mockResolvedValue(newSite);
+            mockSitesApi.addSite.mockResolvedValue(newSite);
 
             await actions.createSite(siteData);
 
@@ -418,7 +429,7 @@ describe(createSiteOperationsActions, () => {
                 ],
                 name: "Name should not be logged",
             };
-            mockElectronAPI.sites.addSite.mockResolvedValue({
+            mockSitesApi.addSite.mockResolvedValue({
                 ...mockSite,
                 ...siteData,
             });
@@ -500,7 +511,7 @@ describe(createSiteOperationsActions, () => {
                 })),
             };
 
-            mockElectronAPI.sites.addSite.mockResolvedValueOnce(backendSite);
+            mockSitesApi.addSite.mockResolvedValueOnce(backendSite);
 
             await actions.createSite({
                 identifier: "existing-site",
@@ -527,7 +538,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Deletion", "type");
 
-            mockElectronAPI.sites.removeSite.mockResolvedValue(true);
+            mockSitesApi.removeSite.mockResolvedValue(true);
 
             await actions.deleteSite("test-site");
 
@@ -547,7 +558,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Delete failed");
-            mockElectronAPI.sites.removeSite.mockRejectedValue(error);
+            mockSitesApi.removeSite.mockRejectedValue(error);
 
             await expect(actions.deleteSite("test-site")).rejects.toThrow(
                 "Delete failed"
@@ -564,7 +575,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
+            mockSitesApi.removeSite.mockResolvedValueOnce(false);
 
             await expect(actions.deleteSite("test-site")).rejects.toThrow(
                 "Site removal failed for test-site: Backend returned false"
@@ -645,7 +656,7 @@ describe(createSiteOperationsActions, () => {
                 ...mockSite,
                 name: "Updated Site",
             };
-            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
+            mockSitesApi.updateSite.mockResolvedValueOnce(updatedSite);
 
             const applySavedSiteSpy = vi.spyOn(
                 siteOperationHelpers,
@@ -678,7 +689,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Update failed");
-            mockElectronAPI.sites.updateSite.mockRejectedValue(error);
+            mockSitesApi.updateSite.mockRejectedValue(error);
 
             await expect(
                 actions.modifySite("test-site", { name: "Updated" })
@@ -711,7 +722,7 @@ describe(createSiteOperationsActions, () => {
                     throw duplicateError;
                 });
 
-            mockElectronAPI.sites.updateSite.mockResolvedValueOnce({
+            mockSitesApi.updateSite.mockResolvedValueOnce({
                 ...mockSite,
                 name: "Conflicting",
             });
@@ -738,7 +749,7 @@ describe(createSiteOperationsActions, () => {
                 ],
                 name: "Updated name should not be logged",
             };
-            mockElectronAPI.sites.updateSite.mockResolvedValueOnce({
+            mockSitesApi.updateSite.mockResolvedValueOnce({
                 ...mockSite,
                 ...updates,
             });
@@ -839,7 +850,7 @@ describe(createSiteOperationsActions, () => {
                     },
                 ],
             };
-            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
+            mockSitesApi.updateSite.mockResolvedValue(updatedSite);
 
             await actions.updateMonitorRetryAttempts(
                 "test-site",
@@ -873,7 +884,7 @@ describe(createSiteOperationsActions, () => {
                     },
                 ],
             };
-            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
+            mockSitesApi.updateSite.mockResolvedValue(updatedSite);
 
             await actions.updateMonitorTimeout(
                 "test-site",
@@ -907,7 +918,7 @@ describe(createSiteOperationsActions, () => {
                     },
                 ],
             };
-            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
+            mockSitesApi.updateSite.mockResolvedValue(updatedSite);
 
             await actions.updateSiteCheckInterval(
                 "test-site",
@@ -934,7 +945,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Backup Operation", "type");
 
-            mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
+            mockDataApi.downloadSqliteBackup.mockResolvedValue({
                 buffer: new ArrayBuffer(8),
                 fileName: "backup.sqlite",
                 metadata: {

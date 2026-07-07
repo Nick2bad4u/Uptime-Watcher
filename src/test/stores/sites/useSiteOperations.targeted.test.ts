@@ -3,7 +3,7 @@
  * specific error handling paths and edge cases
  */
 
-import type { Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { arrayAt, arrayFirst } from "ts-extras";
@@ -39,18 +39,25 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn(async (fn, handlers) => {
-        try {
-            return await fn().then((result: any) => {
+    withErrorHandling: vi.fn(
+        async <T>(
+            fn: () => Promise<T>,
+            handlers: {
+                setError?: (error: unknown) => void;
+                setLoading?: (isLoading: boolean) => void;
+            }
+        ) => {
+            try {
+                const result = await fn();
                 handlers.setLoading?.(false);
                 return result;
-            });
-        } catch (error: unknown) {
-            handlers.setError?.(error);
-            handlers.setLoading?.(false);
-            throw error;
+            } catch (error: unknown) {
+                handlers.setError?.(error);
+                handlers.setLoading?.(false);
+                throw error;
+            }
         }
-    }),
+    ),
 }));
 
 vi.mock("../../../stores/sites/utils/fileDownload", () => ({
@@ -66,11 +73,60 @@ vi.mock("../../../utils/safeExtractIpcData", () => ({
     }),
 }));
 
+const createMockElectronAPI = (mockSiteWithMultipleMonitors: Site) => ({
+    data: {
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(1024),
+            fileName: "backup.db",
+            metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "mock-checksum",
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: 1024,
+            },
+        }),
+        restoreSqliteBackup: vi.fn().mockResolvedValue({
+            metadata: {
+                appVersion: "0.0.0-test",
+                checksum: "restore-checksum",
+                createdAt: 0,
+                originalPath: "/tmp/restore.db",
+                retentionHintDays: 30,
+                schemaVersion: 1,
+                sizeBytes: 1024,
+            },
+            preRestoreFileName: "pre-restore.db",
+            restoredAt: 0,
+        }),
+        saveSqliteBackup: vi.fn().mockResolvedValue({
+            canceled: true as const,
+        }),
+    },
+    monitoring: {
+        stopMonitoringForSite: vi.fn().mockResolvedValue(true),
+    },
+    sites: {
+        removeMonitor: vi.fn(
+            async (siteIdentifier: string, monitorId: string) => ({
+                ...mockSiteWithMultipleMonitors,
+                identifier: siteIdentifier,
+                monitors: mockSiteWithMultipleMonitors.monitors.filter(
+                    (monitor: Monitor) => monitor.id !== monitorId
+                ),
+            })
+        ),
+        removeSite: vi.fn().mockResolvedValue(true),
+    },
+});
+
 describe("useSiteOperations - Targeted Coverage", () => {
-    let mockElectronAPI: any;
+    let mockElectronAPI: ReturnType<typeof createMockElectronAPI>;
     let mockSiteDeps: SiteOperationsDependencies;
     let actions: ReturnType<typeof createSiteOperationsActions>;
-    let siteService: any;
+    let siteService: SiteOperationsDependencies["services"]["site"];
 
     // Test site with multiple monitors
     const mockSiteWithMultipleMonitors: Site = {
@@ -117,47 +173,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        mockElectronAPI = {
-            sites: {
-                removeMonitor: vi.fn(
-                    async (siteIdentifier: string, monitorId: string) => ({
-                        ...mockSiteWithMultipleMonitors,
-                        identifier: siteIdentifier,
-                        monitors: mockSiteWithMultipleMonitors.monitors.filter(
-                            (monitor) => monitor.id !== monitorId
-                        ),
-                    })
-                ),
-                removeSite: vi.fn().mockResolvedValue(true),
-            },
-            monitoring: {
-                stopMonitoringForSite: vi.fn().mockResolvedValue(true),
-            },
-            data: {
-                downloadSqliteBackup: vi.fn().mockResolvedValue({
-                    buffer: new ArrayBuffer(1024),
-                    fileName: "backup.db",
-                    metadata: {
-                        appVersion: "0.0.0-test",
-                        checksum: "mock-checksum",
-                        createdAt: 0,
-                        originalPath: "/tmp/backup.db",
-                        retentionHintDays: 30,
-                        schemaVersion: 1,
-                        sizeBytes: 1024,
-                    },
-                }),
-                saveSqliteBackup: vi.fn().mockResolvedValue({
-                    canceled: true as const,
-                }),
-            },
-        };
-
-        // Mock global electronAPI
-        globalThis.window = {
-            ...globalThis,
-            electronAPI: mockElectronAPI,
-        } as any;
+        mockElectronAPI = createMockElectronAPI(mockSiteWithMultipleMonitors);
 
         const getSitesFn = vi.fn(() => [
             mockSiteWithMultipleMonitors,
@@ -279,7 +295,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
 
             // Logger.error should be called and error should be rethrown
-            (logger.error as any).mockClear?.();
+            vi.mocked(logger.error).mockClear();
 
             await expect(actions.downloadSqliteBackup()).rejects.toThrow(
                 "Backup download failed"
@@ -382,7 +398,9 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const removalError = new Error("Monitor removal failed");
-            siteService.removeMonitor.mockRejectedValueOnce(removalError);
+            vi.mocked(siteService.removeMonitor).mockRejectedValueOnce(
+                removalError
+            );
 
             await expect(
                 actions.removeMonitorFromSite(
