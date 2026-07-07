@@ -10,24 +10,17 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { UnknownRecord } from "type-fest";
 
 import { validateMonitorType } from "@shared/utils/validation";
-import {
-    validateMonitorData as sharedValidateMonitorData,
-    validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/monitorSchemas";
-import { isEmpty } from "ts-extras";
+import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/monitorSchemas";
 
 import type {
-    EnhancedValidationResult as EnhancedValidationResultInternal,
     MonitorFieldName,
     OptionalMonitorFieldValue,
     PartialMonitorFormDataByType as PartialMonitorFormDataByTypeInternal,
 } from "./monitorValidation/monitorValidationTypes";
 
-import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { getMonitorFormValidationErrors } from "./monitorValidation/monitorFormValidators";
 import {
     runMonitorValidationOperation,
-    toPartialMonitorFormData,
 } from "./monitorValidation/monitorValidationInternals";
 
 const isKnownMonitorType = (value: string): value is MonitorType =>
@@ -63,7 +56,6 @@ export interface MonitorCreationData
 export type PartialMonitorFormDataByType<TType extends MonitorType> =
     PartialMonitorFormDataByTypeInternal<TType>;
 
-type EnhancedValidationResult = EnhancedValidationResultInternal;
 /**
  * Create monitor object with proper field mapping and type safety.
  *
@@ -91,123 +83,6 @@ export function createMonitorObject<TType extends MonitorType>(
         ...fields,
         type,
     };
-}
-
-/**
- * Validate monitor data using backend registry.
- *
- * @typeParam TType - Monitor type discriminator to validate against.
- *
- * @param type - Monitor type.
- * @param data - Monitor data to validate.
- *
- * @returns Promise resolving to validation result.
- *
- * @public
- */
-export async function validateMonitorData<TType extends MonitorType>(
-    type: TType,
-    data?: PartialMonitorFormDataByType<TType>
-): Promise<ValidationResult> {
-    const basePayload: PartialMonitorFormDataByType<TType> = data ?? {};
-    // Always include the monitor type in the payload so that downstream
-    // validators (monitor types store and backend Zod schemas) receive a
-    // consistent discriminator field alongside the typed argument.
-    const payload: PartialMonitorFormDataByType<TType> & { type: TType } = {
-        ...basePayload,
-        type,
-    };
-    if (!isKnownMonitorType(type)) {
-        return {
-            errors: [`Unsupported monitor type: ${String(type)}`],
-            success: false,
-            warnings: [],
-        };
-    }
-    return runMonitorValidationOperation(
-        "Monitor data validation",
-        {
-            errors: ["Validation failed - unable to connect to backend"],
-            metadata: {},
-            success: false,
-            warnings: [],
-        },
-        async () => {
-            const store = useMonitorTypesStore.getState();
-            return store.validateMonitorData(type, payload);
-        }
-    );
-}
-
-/**
- * Perform client-side validation using shared Zod schemas. Provides immediate
- * feedback without IPC round-trip.
- *
- * @typeParam TType - Monitor type discriminator to validate against.
- *
- * @param type - Monitor type.
- * @param data - Monitor data to validate.
- *
- * @returns Promise resolving to validation result.
- *
- * @public
- */
-export async function validateMonitorDataClientSide<TType extends MonitorType>(
-    type: TType,
-    data: PartialMonitorFormDataByType<TType>
-): Promise<ValidationResult> {
-    return runMonitorValidationOperation(
-        "Client-side monitor data validation",
-        {
-            errors: ["Client-side validation failed"],
-            success: false,
-            warnings: [],
-        },
-        () => {
-            const result = sharedValidateMonitorData(type, data);
-            return {
-                errors: result.errors,
-                success: result.success,
-                warnings: result.warnings ?? [],
-            };
-        }
-    );
-}
-
-/**
- * Validate individual monitor field with improved error filtering.
- *
- * @typeParam TType - Monitor type under validation.
- * @typeParam TField - Field identifier belonging to the monitor form.
- *
- * @param type - Monitor type.
- * @param fieldName - Field name to validate.
- * @param value - Field value.
- *
- * @returns Promise resolving to validation errors (empty when valid).
- *
- * @public
- */
-export async function validateMonitorField<
-    TType extends MonitorType,
-    TField extends MonitorFieldName<TType>,
->(
-    type: TType,
-    fieldName: TField,
-    value: OptionalMonitorFieldValue<TType, TField>
-): Promise<readonly string[]> {
-    return runMonitorValidationOperation(
-        "Field validation",
-        [`Failed to validate field: ${fieldName}`],
-        async () => {
-            const result = await validateMonitorFieldEnhanced(
-                type,
-                fieldName,
-                value
-            );
-            return result.errors;
-        }
-    );
 }
 
 /**
@@ -242,66 +117,6 @@ export async function validateMonitorFieldClientSide<
             warnings: [],
         },
         () => sharedValidateMonitorField(type, fieldName, value)
-    );
-}
-
-/**
- * Enhanced field validation with type information and better error handling.
- *
- * @typeParam TType - Monitor type being validated.
- * @typeParam TField - Field identifier belonging to the monitor form.
- *
- * @param type - Monitor type.
- * @param fieldName - Field name to validate.
- * @param value - Field value.
- *
- * @returns Promise resolving to enhanced validation result.
- *
- * @public
- */
-export async function validateMonitorFieldEnhanced<
-    TType extends MonitorType,
-    TField extends MonitorFieldName<TType>,
->(
-    type: TType,
-    fieldName: TField,
-    value: OptionalMonitorFieldValue<TType, TField>
-): Promise<EnhancedValidationResult> {
-    return runMonitorValidationOperation(
-        "Enhanced field validation",
-        {
-            errors: [`Failed to validate field: ${fieldName}`],
-            fieldName,
-            success: false,
-            validationType: "field" as const,
-            warnings: [],
-        },
-        async () => {
-            const partialPayload = toPartialMonitorFormData(fieldName, value);
-            const result = await validateMonitorData(type, partialPayload);
-
-            const filteredErrors = result.errors.filter((error) =>
-                error.toLowerCase().includes(fieldName.toLowerCase())
-            );
-
-            const finalErrors =
-                result.errors.length > 0 &&
-                isEmpty(filteredErrors) &&
-                !result.success
-                    ? [`Failed to validate field: ${fieldName}`]
-                    : filteredErrors;
-
-            return {
-                errors: finalErrors,
-                fieldName,
-                success: result.success,
-                validationType: "field" as const,
-                warnings:
-                    result.warnings?.filter((warning) =>
-                        warning.toLowerCase().includes(fieldName.toLowerCase())
-                    ) ?? [],
-            };
-        }
     );
 }
 
@@ -352,9 +167,7 @@ export async function validateMonitorFormData<TType extends MonitorType>(
 
             // Form-level validation is intentionally lightweight: it focuses
             // on fields the user can edit in the current form rather than the
-            // full monitor schema used by the backend. Shared Zod schemas are
-            // exercised via validateMonitorDataClientSide and backend
-            // validation flows.
+            // full monitor schema used by the backend.
             if (manualErrors.length > 0) {
                 return {
                     errors: manualErrors,

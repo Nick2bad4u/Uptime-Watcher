@@ -2,30 +2,13 @@ import { MONITOR_STATUS_VALUES, type MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { fc, test as fcTest } from "@fast-check/vitest";
-import {
-    validateMonitorData as sharedValidateMonitorData,
-    validateMonitorField as sharedValidateMonitorField,
-} from "@shared/validation/monitorSchemas";
-import { arrayFirst } from "ts-extras";
+import { validateMonitorField as sharedValidateMonitorField } from "@shared/validation/monitorSchemas";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import {
     createMonitorObject,
-    validateMonitorData,
-    validateMonitorDataClientSide,
-    validateMonitorField,
     validateMonitorFieldClientSide,
-    validateMonitorFieldEnhanced,
 } from "../../utils/monitorValidation";
-
-const monitorTypesStoreGetStateMock = vi.hoisted(() => vi.fn());
-
-vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
-    useMonitorTypesStore: {
-        getState: monitorTypesStoreGetStateMock,
-    },
-}));
 
 vi.mock(
     "@shared/validation/monitorSchemas",
@@ -43,11 +26,7 @@ vi.mock(
     }
 );
 
-type MonitorTypesStoreState = ReturnType<typeof useMonitorTypesStore.getState>;
-
-const mockedMonitorTypesStore = vi.mocked(monitorTypesStoreGetStateMock);
 const mockedSharedSchemas = {
-    validateMonitorData: vi.mocked(sharedValidateMonitorData),
     validateMonitorField: vi.mocked(sharedValidateMonitorField),
 };
 
@@ -61,27 +40,8 @@ const resolveValidationResult = (
     ...overrides,
 });
 
-const createMockMonitorTypesStoreState = (
-    overrides: Partial<MonitorTypesStoreState> = {}
-): MonitorTypesStoreState => ({
-    fieldConfigs: {},
-    formatMonitorDetail: vi.fn(async () => ""),
-    formatMonitorTitleSuffix: vi.fn(async () => ""),
-    getFieldConfig: vi.fn(),
-    isLoaded: true,
-    loadMonitorTypes: vi.fn(async () => undefined),
-    monitorTypes: [],
-    refreshMonitorTypes: vi.fn(async () => undefined),
-    validateMonitorData: vi.fn().mockResolvedValue(resolveValidationResult()),
-    ...overrides,
-});
-
 beforeEach(() => {
     vi.clearAllMocks();
-    mockedMonitorTypesStore.mockReturnValue(createMockMonitorTypesStoreState());
-    mockedSharedSchemas.validateMonitorData.mockReturnValue(
-        resolveValidationResult()
-    );
     mockedSharedSchemas.validateMonitorField.mockReturnValue(
         resolveValidationResult()
     );
@@ -109,130 +69,6 @@ describe("monitorValidation error handling", () => {
             expect(monitor.status).toBe(overrides.status ?? "pending");
         }
     );
-
-    it("returns fallback result when monitor type store is unavailable", async () => {
-        mockedMonitorTypesStore.mockReturnValueOnce(
-            undefined as unknown as MonitorTypesStoreState
-        );
-
-        const result = await validateMonitorData("http", {});
-
-        expect(result.success).toBe(false);
-        expect(arrayFirst(result.errors)).toContain(
-            "Validation failed - unable to connect to backend"
-        );
-    });
-
-    it("surfaces monitor type store validation results", async () => {
-        const expected = resolveValidationResult({ warnings: ["note"] });
-        const validateSpy = vi.fn().mockResolvedValue(expected);
-        mockedMonitorTypesStore.mockReturnValue(
-            createMockMonitorTypesStoreState({
-                validateMonitorData: validateSpy,
-            })
-        );
-
-        const result = await validateMonitorData("ping", { host: "host" });
-
-        expect(validateSpy).toHaveBeenCalledWith("ping", {
-            host: "host",
-            type: "ping",
-        });
-        expect(result).toStrictEqual(expected);
-    });
-
-    it("hydrates client-side validation results", async () => {
-        mockedSharedSchemas.validateMonitorData.mockReturnValueOnce(
-            resolveValidationResult({
-                errors: ["client error"],
-                success: false,
-                warnings: ["warn"],
-            })
-        );
-
-        const result = await validateMonitorDataClientSide("http", {});
-
-        expect(result.success).toBe(false);
-        expect(result.errors).toContain("client error");
-        expect(result.warnings).toContain("warn");
-    });
-
-    it("returns fallback when client-side validation throws", async () => {
-        mockedSharedSchemas.validateMonitorData.mockImplementationOnce(() => {
-            throw new Error("schema offline");
-        });
-
-        const result = await validateMonitorDataClientSide("http", {});
-
-        expect(result.success).toBe(false);
-        expect(arrayFirst(result.errors)).toContain(
-            "Client-side validation failed"
-        );
-    });
-
-    it("filters errors per field when enhancing validation", async () => {
-        const validateSpy = vi.fn().mockResolvedValue(
-            resolveValidationResult({
-                errors: ["url must be https", "host missing"],
-                success: false,
-                warnings: ["url might redirect"],
-            })
-        );
-        mockedMonitorTypesStore.mockReturnValue(
-            createMockMonitorTypesStoreState({
-                validateMonitorData: validateSpy,
-            })
-        );
-
-        const result = await validateMonitorFieldEnhanced(
-            "http",
-            "url",
-            "https://example.com"
-        );
-
-        expect(result.errors).toEqual(["url must be https"]);
-        expect(result.warnings).toEqual(["url might redirect"]);
-    });
-
-    it("falls back to generic error when validation returns unrelated errors", async () => {
-        const validateSpy = vi.fn().mockResolvedValue(
-            resolveValidationResult({
-                errors: ["unexpected issue"],
-                success: false,
-            })
-        );
-        mockedMonitorTypesStore.mockReturnValue(
-            createMockMonitorTypesStoreState({
-                validateMonitorData: validateSpy,
-            })
-        );
-
-        const result = await validateMonitorFieldEnhanced(
-            "http",
-            "url",
-            "value"
-        );
-
-        expect(result.errors).toEqual(["Failed to validate field: url"]);
-    });
-
-    it("returns enhanced errors from validateMonitorField", async () => {
-        const validateSpy = vi.fn().mockResolvedValue(
-            resolveValidationResult({
-                errors: ["host missing"],
-                success: false,
-            })
-        );
-        mockedMonitorTypesStore.mockReturnValue(
-            createMockMonitorTypesStoreState({
-                validateMonitorData: validateSpy,
-            })
-        );
-
-        const errors = await validateMonitorField("ping", "host", "");
-
-        expect(errors).toEqual(["host missing"]);
-    });
 
     it("normalizes client-side field validation results", async () => {
         mockedSharedSchemas.validateMonitorField.mockReturnValueOnce(
