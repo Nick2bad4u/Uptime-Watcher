@@ -236,7 +236,7 @@
     gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem);
 }
 
-.settings-section {
+.settings-modal .settings-section {
     position: relative;
     overflow: visible;
     padding: 1.25rem 1.5rem;
@@ -506,7 +506,7 @@
     line-height: 1.5;
 }
 
-.settings-section__content {
+.settings-modal .settings-section .settings-section__content {
     position: relative;
     z-index: 1;
     display: flex;
@@ -1059,10 +1059,10 @@
 
     .settings-modal .modal-shell__body::before,
     .settings-modal .modal-shell__body::after,
-    .settings-section::before,
-    .settings-section::after,
-    .settings-section__content::before,
-    .settings-modal__header::after {
+    .settings-modal .settings-section::before,
+    .settings-modal .settings-section::after,
+    .settings-modal .settings-section .settings-section__content::before,
+    .settings-modal .settings-modal__header::after {
         display: none;
     }
 }

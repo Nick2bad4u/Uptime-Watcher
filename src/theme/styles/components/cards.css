@@ -324,7 +324,7 @@
     min-inline-size: 0;
 }
 
-.site-card__title-dot {
+.site-card .site-card__title-dot {
     position: relative;
     display: inline-flex;
     overflow: hidden;
@@ -527,25 +527,6 @@
         transform: translateY(-1px);
     }
 
-    &[data-disabled="true"] {
-        box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 4%),
-            0 8px 18px
-                color-mix(in srgb, var(--shadow-base-color) 14%, transparent);
-        cursor: not-allowed;
-        opacity: 0.62;
-        pointer-events: none;
-        transform: none;
-
-        & .monitor-selector__icon {
-            color: color-mix(
-                in srgb,
-                var(--color-primary-400) 38%,
-                rgb(255 255 255) 62%
-            );
-        }
-    }
-
     &.monitor-selector {
         inline-size: clamp(12rem, 24vi, 20rem);
     }
@@ -572,6 +553,25 @@
 
         &.monitor-selector__icon--trailing {
             inset-inline-end: 0.85rem;
+        }
+    }
+
+    &[data-disabled="true"] {
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 4%),
+            0 8px 18px
+                color-mix(in srgb, var(--shadow-base-color) 14%, transparent);
+        cursor: not-allowed;
+        opacity: 0.62;
+        pointer-events: none;
+        transform: none;
+
+        & .monitor-selector__icon {
+            color: color-mix(
+                in srgb,
+                var(--color-primary-400) 38%,
+                rgb(255 255 255) 62%
+            );
         }
     }
 
@@ -1070,14 +1070,6 @@
     grid-template-columns: [metric-grid-start] repeat(auto-fit, [metric-grid-col-start] minmax(var(--site-card-metric-min-width, 9.5rem), 1fr) [metric-grid-col-end]) [metric-grid-end];
 }
 
-.metric-card__tooltip {
-    block-size: 100%;
-
-    & > .metric-card {
-        block-size: 100%;
-    }
-}
-
 .metric-card {
     display: flex;
     flex-direction: column;
@@ -1123,6 +1115,14 @@
         &:hover {
             transform: none;
         }
+    }
+}
+
+.metric-card__tooltip {
+    block-size: 100%;
+
+    & > .metric-card {
+        block-size: 100%;
     }
 }
 

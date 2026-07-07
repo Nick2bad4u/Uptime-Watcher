@@ -246,7 +246,7 @@
     margin-block-end: 1.5rem;
 }
 
-.themed-progress__bar {
+.themed-progress .themed-progress__bar {
     position: relative;
     overflow: hidden;
     border-radius: 9999px;
