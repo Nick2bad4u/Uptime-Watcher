@@ -3,6 +3,7 @@ import type {
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+import type { ElectronAPI } from "../../../types";
 
 import {
     sampleOne,
@@ -87,6 +88,17 @@ const mockElectronAPI = {
 
 let restoreElectronApi: (() => void) | undefined;
 
+const getElectronApiGlobal = (): typeof globalThis & {
+    electronAPI?: ElectronAPI;
+} => globalThis as typeof globalThis & { electronAPI?: ElectronAPI };
+
+const getElectronApiWindow = (): { electronAPI?: ElectronAPI } | undefined => {
+    const windowRef = Reflect.get(globalThis, "window");
+    return windowRef !== undefined && typeof windowRef === "object"
+        ? (windowRef as { electronAPI?: ElectronAPI })
+        : undefined;
+};
+
 const createMonitorFixture = () => ({
     activeOperations: [],
     checkInterval: 60_000,
@@ -130,8 +142,8 @@ describe("MonitoringService", () => {
         mockWaitForElectronBridge.mockReset();
         mockWaitForElectronBridge.mockImplementation(async () => {
             const bridge =
-                (globalThis as any).window?.electronAPI ??
-                (globalThis as any).electronAPI;
+                getElectronApiWindow()?.electronAPI ??
+                getElectronApiGlobal().electronAPI;
 
             if (!bridge) {
                 throw new MockElectronBridgeNotReadyError({
@@ -715,12 +727,15 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalWindowBridge = (globalThis as any).window
-                ?.electronAPI;
-            const originalGlobalBridge = (globalThis as any).electronAPI;
+            const windowBridgeOwner = getElectronApiWindow();
+            const globalBridgeOwner = getElectronApiGlobal();
+            const originalWindowBridge = windowBridgeOwner?.electronAPI;
+            const originalGlobalBridge = globalBridgeOwner.electronAPI;
 
-            Reflect.deleteProperty(globalThis, "electronAPI");
-            Reflect.deleteProperty(globalThis, "electronAPI");
+            if (windowBridgeOwner) {
+                Reflect.deleteProperty(windowBridgeOwner, "electronAPI");
+            }
+            Reflect.deleteProperty(globalBridgeOwner, "electronAPI");
 
             try {
                 await expect(
@@ -730,12 +745,18 @@ describe("MonitoringService", () => {
                     MonitoringService.stopMonitoringForMonitor("test", "test")
                 ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
             } finally {
-                Object.defineProperty(globalThis, "electronAPI", {
+                if (windowBridgeOwner) {
+                    Object.defineProperty(windowBridgeOwner, "electronAPI", {
+                        configurable: true,
+                        value: originalWindowBridge,
+                        writable: true,
+                    });
+                }
+                Object.defineProperty(globalBridgeOwner, "electronAPI", {
                     configurable: true,
-                    value: originalWindowBridge,
+                    value: originalGlobalBridge,
                     writable: true,
                 });
-                (globalThis as any).electronAPI = originalGlobalBridge;
             }
         });
     });
