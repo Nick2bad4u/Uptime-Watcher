@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-    getTrimmedNonEmptyString,
     normalizeHeaderValue,
     resolveHeaderValue,
     resolveRequiredMonitorStringContext,
@@ -41,17 +40,6 @@ describe("httpMonitorStringUtils", () => {
 
         it("returns null when header is missing", () => {
             expect(resolveHeaderValue({}, "x-missing")).toBeNull();
-        });
-    });
-
-    describe(getTrimmedNonEmptyString, () => {
-        it("returns trimmed string values", () => {
-            expect(getTrimmedNonEmptyString("  value  ")).toBe("value");
-        });
-
-        it("returns null for non-string or blank values", () => {
-            expect(getTrimmedNonEmptyString(123)).toBeNull();
-            expect(getTrimmedNonEmptyString(" ".repeat(3))).toBeNull();
         });
     });
 

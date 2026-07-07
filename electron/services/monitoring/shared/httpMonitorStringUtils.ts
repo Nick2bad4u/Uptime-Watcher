@@ -58,7 +58,7 @@ export function resolveHeaderValue(
 /**
  * Returns a trimmed non-empty string or null.
  */
-export function getTrimmedNonEmptyString(value: unknown): null | string {
+function getTrimmedNonEmptyString(value: unknown): null | string {
     if (typeof value !== "string") {
         return null;
     }
