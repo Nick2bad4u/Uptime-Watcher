@@ -42,6 +42,7 @@ import type {
 import type { ValidationResult } from "@shared/types/validation";
 import type { ExclusifyUnion, Simplify, UnknownRecord } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
 
 /**
@@ -84,9 +85,14 @@ export const isIpcCorrelationEnvelope = (
         return false;
     }
 
+    const flagProperty = getOwnDataProperty(value, IPC_CONTEXT_FLAG);
+    const correlationIdProperty = getOwnDataProperty(value, "correlationId");
+
     return (
-        value[IPC_CONTEXT_FLAG] === true &&
-        typeof value["correlationId"] === "string"
+        flagProperty.found &&
+        flagProperty.value === true &&
+        correlationIdProperty.found &&
+        typeof correlationIdProperty.value === "string"
     );
 };
 
@@ -182,17 +188,22 @@ export const isIpcHandlerVerificationResult = (
         return false;
     }
 
-    const { availableChannels, channel, registered } = value;
+    const availableChannels = getOwnDataProperty(value, "availableChannels");
+    const channel = getOwnDataProperty(value, "channel");
+    const registered = getOwnDataProperty(value, "registered");
 
     if (
-        typeof channel !== "string" ||
-        typeof registered !== "boolean" ||
-        !Array.isArray(availableChannels)
+        !availableChannels.found ||
+        !channel.found ||
+        !registered.found ||
+        typeof channel.value !== "string" ||
+        typeof registered.value !== "boolean" ||
+        !Array.isArray(availableChannels.value)
     ) {
         return false;
     }
 
-    return availableChannels.every(
+    return availableChannels.value.every(
         (availableChannel) => typeof availableChannel === "string"
     );
 };
