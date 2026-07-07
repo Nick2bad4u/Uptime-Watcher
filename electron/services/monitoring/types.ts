@@ -41,7 +41,7 @@
  *
  * @see {@link Site} in shared/types for complete interface definition
  */
-import type { Monitor, MonitorType, Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 import type { Except, Simplify, UnknownRecord } from "type-fest";
 
 /**
@@ -156,21 +156,6 @@ export interface MonitorCheckResult {
         | "down"
         | "up";
 }
-
-/**
- * Fully-typed monitor configuration emitted by registry helpers.
- *
- * @remarks
- * Extends {@link MonitorConfigurationInput} with a resolved monitor type to
- * guarantee consumers operate on a strongly typed payload while still allowing
- * optional overrides for the remaining monitor fields.
- */
-export type MonitorConfiguration = Simplify<
-    MonitorConfigurationInput & {
-        /** Discriminant monitor type derived from the registry. */
-        type: MonitorType;
-    }
->;
 
 /**
  * Partial monitor configuration accepted by registry helpers and migrations.
