@@ -74,8 +74,6 @@ describe("bridgeFactory env flags", () => {
         const bridgeFactory =
             await import("../../../preload/core/bridgeFactory");
 
-        bridgeFactory.resetDiagnosticsVerificationStateForTesting();
-
         const handshake: IpcResponse<IpcHandlerVerificationResult> = {
             success: true,
             data: {
@@ -117,8 +115,6 @@ describe("bridgeFactory env flags", () => {
 
         const bridgeFactory =
             await import("../../../preload/core/bridgeFactory");
-        bridgeFactory.resetDiagnosticsVerificationStateForTesting();
-
         vi.mocked(ipcRendererMock.invoke).mockResolvedValueOnce({
             success: true,
         });
@@ -144,8 +140,6 @@ describe("bridgeFactory env flags", () => {
 
         const bridgeFactory =
             await import("../../../preload/core/bridgeFactory");
-        bridgeFactory.resetDiagnosticsVerificationStateForTesting();
-
         const handshake: IpcResponse<IpcHandlerVerificationResult> = {
             success: true,
             data: {

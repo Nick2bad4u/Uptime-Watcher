@@ -8,8 +8,13 @@ import type {
     IpcHandlerVerificationResult,
     IpcInvokeChannel,
     IpcInvokeChannelParams,
+    IpcInvokeChannelResult,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
+import type {
+    IpcResponse,
+    SafeParseLike,
+} from "../../../preload/core/bridgeFactory";
 
 import {
     DATA_CHANNELS,
@@ -22,15 +27,6 @@ import {
 } from "@shared/types/preload";
 import { ipcRenderer } from "electron";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import {
-    createEventManager,
-    createTypedInvoker,
-    createVoidInvoker,
-    IpcError,
-    type IpcResponse,
-    resetDiagnosticsVerificationStateForTesting,
-} from "../../../preload/core/bridgeFactory";
 
 const ipcRendererMock = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -47,6 +43,27 @@ const formatDetailChannel: IpcInvokeChannel =
 const startMonitoringChannel: IpcInvokeChannel =
     MONITORING_CHANNELS.startMonitoring;
 const resetSettingsChannel: IpcInvokeChannel = SETTINGS_CHANNELS.resetSettings;
+
+type BridgeFactoryModule = typeof import("../../../preload/core/bridgeFactory");
+
+let bridgeFactory: BridgeFactoryModule;
+
+function acceptAnyResult<TChannel extends IpcInvokeChannel>(
+    candidate: unknown
+): SafeParseLike<IpcInvokeChannelResult<TChannel>> {
+    return {
+        data: candidate as IpcInvokeChannelResult<TChannel>,
+        success: true,
+    };
+}
+
+function createPassThroughInvoker<TChannel extends IpcInvokeChannel>(
+    channel: TChannel
+): (
+    ...args: IpcInvokeChannelParams<TChannel>
+) => Promise<IpcInvokeChannelResult<TChannel>> {
+    return bridgeFactory.createValidatedInvoker(channel, acceptAnyResult);
+}
 
 function createHandshakeSuccess(
     channel: string,
@@ -77,12 +94,13 @@ function createHandshakeFailure(
 }
 
 describe("bridgeFactory", function describeBridgeFactorySuite() {
-    beforeEach(() => {
+    beforeEach(async () => {
         (globalThis as Record<string, unknown>)[
             "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
         ] = false;
-        resetDiagnosticsVerificationStateForTesting();
         vi.clearAllMocks();
+        vi.resetModules();
+        bridgeFactory = await import("../../../preload/core/bridgeFactory");
     });
 
     afterEach(() => {
@@ -91,7 +109,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         ];
         vi.clearAllMocks();
     });
-    describe("createTypedInvoker", () => {
+    describe("createValidatedInvoker", () => {
         it("invokes IPC with typed parameters and propagates data", async () => {
             const response: IpcResponse<string> = {
                 success: true,
@@ -103,7 +121,10 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(response);
 
-            const invoke = createTypedInvoker(formatDetailChannel);
+            const invoke = bridgeFactory.createValidatedInvoker(
+                formatDetailChannel,
+                bridgeFactory.safeParseStringResult
+            );
             const result = await invoke("http", "status-page");
 
             expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
@@ -135,7 +156,9 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(missingDataResponse);
 
-            const invoke = createTypedInvoker(MONITORING_CHANNELS.checkSiteNow);
+            const invoke = createPassThroughInvoker(
+                MONITORING_CHANNELS.checkSiteNow
+            );
 
             await expect(
                 invoke("site-id", "monitor-id")
@@ -153,9 +176,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(errorResponse);
 
-            const invoke = createTypedInvoker(startMonitoringChannel);
+            const invoke = createPassThroughInvoker(startMonitoringChannel);
 
-            await expect(invoke()).rejects.toBeInstanceOf(IpcError);
+            await expect(invoke()).rejects.toMatchObject({
+                name: "IpcError",
+            });
             await expect(invoke()).rejects.toThrow(
                 "IPC call failed for channel 'start-monitoring'"
             );
@@ -169,7 +194,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockRejectedValueOnce(error);
 
-            const invoke = createTypedInvoker(startMonitoringChannel);
+            const invoke = createPassThroughInvoker(startMonitoringChannel);
             await expect(invoke()).rejects.toMatchObject({
                 message: expect.stringContaining("ipc failure"),
                 channel: startMonitoringChannel,
@@ -183,7 +208,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                     (channel: unknown) => {
                         if (channel === DIAGNOSTICS_CHANNELS.verifyIpcHandler) {
                             return Promise.resolve(
-                                createHandshakeSuccess(formatDetailChannel)
+                                createHandshakeSuccess(resetSettingsChannel)
                             );
                         }
 
@@ -192,14 +217,17 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                     }
                 );
 
-                const invoke = createTypedInvoker(formatDetailChannel, {
-                    timeoutMs: 1000,
-                });
-                const promise = invoke("http", "detail");
+                const invoke = bridgeFactory.createVoidInvoker(
+                    resetSettingsChannel,
+                    {
+                        timeoutMs: 1000,
+                    }
+                );
+                const promise = invoke();
 
                 await vi.advanceTimersByTimeAsync(1001);
                 await expect(promise).rejects.toMatchObject({
-                    channel: formatDetailChannel,
+                    channel: resetSettingsChannel,
                 });
             } finally {
                 vi.useRealTimers();
@@ -221,20 +249,17 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 return handle;
             }) as typeof globalThis.setTimeout);
 
-            let resolveInvoke:
-                ((response: IpcResponse<string>) => void) | undefined;
-            const invokeResponse = new Promise<IpcResponse<string>>(
-                (resolve) => {
-                    resolveInvoke = resolve;
-                }
-            );
+            let resolveInvoke: ((response: IpcResponse) => void) | undefined;
+            const invokeResponse = new Promise<IpcResponse>((resolve) => {
+                resolveInvoke = resolve;
+            });
 
             try {
                 vi.mocked(ipcRenderer.invoke).mockImplementation(
                     (channel: unknown) => {
                         if (channel === DIAGNOSTICS_CHANNELS.verifyIpcHandler) {
                             return Promise.resolve(
-                                createHandshakeSuccess(formatDetailChannel)
+                                createHandshakeSuccess(resetSettingsChannel)
                             );
                         }
 
@@ -242,10 +267,13 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                     }
                 );
 
-                const invoke = createTypedInvoker(formatDetailChannel, {
-                    timeoutMs: 1000,
-                });
-                const promise = invoke("http", "detail");
+                const invoke = bridgeFactory.createVoidInvoker(
+                    resetSettingsChannel,
+                    {
+                        timeoutMs: 1000,
+                    }
+                );
+                const promise = invoke();
 
                 for (
                     let attempts = 0;
@@ -259,11 +287,10 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 expect(unrefSpies[0]).toHaveBeenCalledTimes(1);
 
                 resolveInvoke?.({
-                    data: "detail",
                     success: true,
                 });
 
-                await expect(promise).resolves.toBe("detail");
+                await expect(promise).resolves.toBeUndefined();
             } finally {
                 setTimeoutSpy.mockRestore();
             }
@@ -279,7 +306,10 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(missingDataResponse);
 
-            const invoke = createTypedInvoker(formatDetailChannel);
+            const invoke = bridgeFactory.createValidatedInvoker(
+                formatDetailChannel,
+                bridgeFactory.safeParseStringResult
+            );
 
             await expect(invoke("http", "detail")).rejects.toThrow(
                 "IPC response missing data field"
@@ -294,7 +324,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 createHandshakeFailure(missingChannel)
             );
 
-            const invoke = createTypedInvoker(missingChannel);
+            const invoke = createPassThroughInvoker(missingChannel);
 
             await expect(invoke()).rejects.toMatchObject({
                 message: expect.stringContaining("No handler registered"),
@@ -308,10 +338,15 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
 
         it("rejects oversized invoke arguments before any IPC calls", async () => {
-            const invoke = createTypedInvoker(formatDetailChannel);
+            const invoke = bridgeFactory.createValidatedInvoker(
+                formatDetailChannel,
+                bridgeFactory.safeParseStringResult
+            );
 
             const huge = "a".repeat(6_000_000);
-            await expect(invoke("http", huge)).rejects.toBeInstanceOf(IpcError);
+            await expect(invoke("http", huge)).rejects.toMatchObject({
+                name: "IpcError",
+            });
 
             expect(ipcRenderer.invoke).not.toHaveBeenCalled();
         });
@@ -328,7 +363,10 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(response);
 
-            const invoke = createTypedInvoker(DATA_CHANNELS.importData);
+            const invoke = bridgeFactory.createValidatedInvoker(
+                DATA_CHANNELS.importData,
+                bridgeFactory.safeParseBooleanResult
+            );
             const payload = "a".repeat(6_000_000);
 
             await expect(invoke(payload)).resolves.toBeTruthy();
@@ -343,7 +381,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(response);
 
-            const reset = createVoidInvoker(resetSettingsChannel);
+            const reset = bridgeFactory.createVoidInvoker(resetSettingsChannel);
             await expect(reset()).resolves.toBeUndefined();
             expect(ipcRenderer.invoke).toHaveBeenNthCalledWith(
                 1,
@@ -371,8 +409,10 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 )
                 .mockResolvedValueOnce(response);
 
-            const reset = createVoidInvoker(resetSettingsChannel);
-            await expect(reset()).rejects.toBeInstanceOf(IpcError);
+            const reset = bridgeFactory.createVoidInvoker(resetSettingsChannel);
+            await expect(reset()).rejects.toMatchObject({
+                name: "IpcError",
+            });
         });
 
         it("times out if the invoke never resolves", async () => {
@@ -390,13 +430,18 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                     }
                 );
 
-                const reset = createVoidInvoker(resetSettingsChannel, {
-                    timeoutMs: 1000,
-                });
+                const reset = bridgeFactory.createVoidInvoker(
+                    resetSettingsChannel,
+                    {
+                        timeoutMs: 1000,
+                    }
+                );
                 const promise = reset();
 
                 await vi.advanceTimersByTimeAsync(1001);
-                await expect(promise).rejects.toBeInstanceOf(IpcError);
+                await expect(promise).rejects.toMatchObject({
+                    name: "IpcError",
+                });
             } finally {
                 vi.useRealTimers();
             }
@@ -410,7 +455,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 return ipcRenderer;
             });
 
-            const { on } = createEventManager("sites-updated");
+            const { on } = bridgeFactory.createEventManager("sites-updated");
             const dispose = on(handler);
 
             expect(handler).toHaveBeenCalledWith("payload");
@@ -422,7 +467,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
 
         it("does not register non-function listeners", () => {
-            const { on } = createEventManager("sites-updated");
+            const { on } = bridgeFactory.createEventManager("sites-updated");
 
             const dispose = on(
                 // Renderer code can still call with invalid values at runtime.
@@ -438,7 +483,9 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
     describe("typed channel utility", () => {
         it("enforces parameter tuples at compile time", async () => {
-            const invoke = createTypedInvoker(SITES_CHANNELS.removeMonitor);
+            const invoke = createPassThroughInvoker(
+                SITES_CHANNELS.removeMonitor
+            );
 
             const args: IpcInvokeChannelParams<
                 typeof SITES_CHANNELS.removeMonitor
@@ -481,7 +528,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
 
         it("rejects invalid channel usage", async () => {
-            const invoke = createTypedInvoker(startMonitoringChannel);
+            const invoke = createPassThroughInvoker(startMonitoringChannel);
 
             vi.mocked(ipcRenderer.invoke)
                 .mockResolvedValueOnce(
@@ -496,47 +543,43 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             );
         });
     });
-    describe("IpcError", () => {
-        it("captures channel, original error, and details", () => {
-            const inner = new Error("failure");
-            const details = { context: "test" } as const;
-            const error = new IpcError(
-                "message",
+    describe("IPC error normalization", () => {
+        it("surfaces channel and frozen details for validation failures", async () => {
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(DATA_CHANNELS.exportData)
+                )
+                .mockResolvedValueOnce({
+                    data: 1,
+                    success: true,
+                });
+
+            const invoke = bridgeFactory.createValidatedInvoker(
                 DATA_CHANNELS.exportData,
-                inner,
-                details
+                bridgeFactory.safeParseStringResult,
+                { domain: "test-domain", guardName: "stringResult" }
             );
 
-            expect(error.message).toBe("message");
-            expect(error.channel).toBe(DATA_CHANNELS.exportData);
-            expect(error.originalError).toBe(inner);
-            expect(error.details).toEqual(details);
-            expect(error.details).not.toBe(details);
-            expect(Object.isFrozen(error.details)).toBeTruthy();
-        });
+            let thrownError: unknown;
+            try {
+                await invoke();
+            } catch (error) {
+                thrownError = error;
+            }
 
-        it("does not invoke detail accessors while freezing metadata", () => {
-            let getterCalls = 0;
-            const details = { context: "test" };
-            Object.defineProperty(details, "secret", {
-                enumerable: true,
-                get() {
-                    getterCalls += 1;
-                    throw new Error("detail getter should not run");
+            expect(thrownError).toMatchObject({
+                channel: DATA_CHANNELS.exportData,
+                details: {
+                    domain: "test-domain",
+                    guard: "stringResult",
                 },
+                name: "IpcError",
             });
-
-            const error = new IpcError(
-                "message",
-                DATA_CHANNELS.exportData,
-                undefined,
-                details
-            );
-
-            expect(error.details).toEqual({ context: "test" });
-            expect(Object.hasOwn(error.details ?? {}, "secret")).toBeFalsy();
-            expect(Object.isFrozen(error.details)).toBeTruthy();
-            expect(getterCalls).toBe(0);
+            expect(
+                Object.isFrozen(
+                    (thrownError as { readonly details?: unknown }).details
+                )
+            ).toBeTruthy();
         });
     });
 });

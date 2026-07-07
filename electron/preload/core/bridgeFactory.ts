@@ -275,16 +275,6 @@ const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);
 const pendingVerifications = new Map<string, Promise<void>>();
 
 /**
- * @internal Resets
- * verification caches to support deterministic testing.
- */
-export function resetDiagnosticsVerificationStateForTesting(): void {
-    verifiedChannels.clear();
-    verifiedChannels.add(DIAGNOSTICS_CHANNEL);
-    pendingVerifications.clear();
-}
-
-/**
  * Event callback signature used when registering IPC listeners from the preload
  * bridge.
  */
@@ -296,10 +286,7 @@ export type EventCallback = (...args: unknown[]) => void;
  */
 export type RemoveListener = () => void;
 
-/**
- * Error class for IPC-related errors with enhanced context
- */
-export class IpcError extends Error {
+class IpcError extends Error {
     public readonly originalError: Error | undefined;
 
     public readonly channel: string;
@@ -327,8 +314,7 @@ export class IpcError extends Error {
 }
 
 /**
- * Options for IPC invokers created via {@link createTypedInvoker} and
- * {@link createVoidInvoker}.
+ * Options for IPC invokers created by the preload bridge.
  */
 export interface IpcInvokeOptions {
     /**
@@ -597,7 +583,7 @@ async function invokeWithValidation<T>(
  *
  * @returns A function that safely invokes the IPC channel with validation
  */
-export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
+function createTypedInvoker<TChannel extends IpcInvokeChannel>(
     channel: TChannel,
     options?: IpcInvokeOptions
 ): (
@@ -682,7 +668,7 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
  *
  * 1. Logs a structured warning in preload diagnostics,
  * 2. Forwards a diagnostics report to the main process,
- * 3. Throws an {@link IpcError} so the renderer can surface the failure.
+ * 3. Throws an IPC error so the renderer can surface the failure.
  */
 export function createValidatedInvoker<TChannel extends IpcInvokeChannel>(
     channel: TChannel,
