@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     extractLogContext,
@@ -131,6 +131,44 @@ describe("logging context helpers", () => {
         expect(sanitized).toEqual({
             stable: "value",
         });
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke array map overrides or item accessors", () => {
+        let getterCalls = 0;
+        const map = vi.fn(() => {
+            throw new Error("array map should not run");
+        });
+        const input: unknown[] = ["visible"];
+        Object.defineProperty(input, "map", {
+            configurable: true,
+            value: map,
+        });
+        Object.defineProperty(input, "1", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                return "hidden";
+            },
+        });
+        input[2] = {
+            token: "SECRET",
+            value: "safe",
+        };
+
+        const sanitized = normalizeLogValue(input);
+
+        expect(Array.isArray(sanitized)).toBeTruthy();
+        const sanitizedArray = sanitized as unknown[];
+        expect(sanitizedArray).toHaveLength(3);
+        expect(sanitizedArray[0]).toBe("visible");
+        expect(Object.hasOwn(sanitizedArray, "1")).toBeFalsy();
+        expect(sanitizedArray[2]).toEqual({
+            token: "[redacted]",
+            value: "safe",
+        });
+        expect(map).not.toHaveBeenCalled();
         expect(getterCalls).toBe(0);
     });
 

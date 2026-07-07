@@ -408,6 +408,30 @@ function normalizeNonPlainObject(
     return { kind: "none" };
 }
 
+function normalizeLogArray(
+    candidate: readonly unknown[],
+    normalize: (value: unknown) => unknown
+): unknown[] {
+    const sanitizedArray: unknown[] = [];
+    sanitizedArray.length = candidate.length;
+
+    for (let index = 0; index < candidate.length; index += 1) {
+        const item = getOwnDataProperty(candidate, index);
+        if (!item.found) {
+            continue;
+        }
+
+        Object.defineProperty(sanitizedArray, index, {
+            configurable: true,
+            enumerable: true,
+            value: normalize(item.value),
+            writable: true,
+        });
+    }
+
+    return sanitizedArray;
+}
+
 export const normalizeLogValue = (value: unknown): unknown => {
     const seen = new WeakSet<object>();
 
@@ -430,7 +454,7 @@ export const normalizeLogValue = (value: unknown): unknown => {
         }
 
         if (Array.isArray(candidate)) {
-            return candidate.map((item) => normalize(item));
+            return normalizeLogArray(candidate, normalize);
         }
 
         if (isRecord(candidate)) {
