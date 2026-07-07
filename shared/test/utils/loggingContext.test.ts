@@ -354,6 +354,39 @@ describe("logging context helpers", () => {
         expect(toString).not.toHaveBeenCalled();
     });
 
+    it("does not invoke patched URL prototype toString while masking string URLs", () => {
+        const originalToString = Object.getOwnPropertyDescriptor(
+            URL.prototype,
+            "toString"
+        );
+        const toString = vi.fn(() => {
+            throw new Error("URL prototype toString should not run");
+        });
+        Object.defineProperty(URL.prototype, "toString", {
+            configurable: true,
+            value: toString,
+        });
+
+        try {
+            expect(
+                normalizeLogValue(
+                    "https://user:pass@example.com/callback?token=abc"
+                )
+            ).toBe(
+                "https://%5Bredacted%5D:%5Bredacted%5D@example.com/callback?token=[redacted]"
+            );
+            expect(toString).not.toHaveBeenCalled();
+        } finally {
+            if (originalToString) {
+                Object.defineProperty(
+                    URL.prototype,
+                    "toString",
+                    originalToString
+                );
+            }
+        }
+    });
+
     it("serializes ArrayBuffer metadata to a summary", () => {
         const buffer = new ArrayBuffer(12);
         expect(normalizeLogValue(buffer)).toEqual({

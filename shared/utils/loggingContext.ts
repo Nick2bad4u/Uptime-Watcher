@@ -150,6 +150,26 @@ function getNativePrototypeFunction(
         : undefined;
 }
 
+const DATE_GET_TIME = getNativePrototypeFunction(Date.prototype, "getTime");
+const DATE_TO_ISO_STRING = getNativePrototypeFunction(
+    Date.prototype,
+    "toISOString"
+);
+const URL_TO_STRING = getNativePrototypeFunction(URL.prototype, "toString");
+
+const serializeUrl = (value: URL): string | undefined => {
+    if (!URL_TO_STRING) {
+        return undefined;
+    }
+
+    try {
+        const serialized: unknown = Reflect.apply(URL_TO_STRING, value, []);
+        return typeof serialized === "string" ? serialized : undefined;
+    } catch {
+        return undefined;
+    }
+};
+
 const toCanonicalSecretKey = (key: string): string =>
     // Do not use the `v` flag here; it is not available across all Electron
     // targets we ship. This is an ASCII-only filter, so no Unicode flags are
@@ -316,7 +336,7 @@ const maskUrlSecrets = (value: string): string => {
             }
         }
 
-        return url.toString();
+        return serializeUrl(url) ?? value;
     } catch {
         return value;
     }
@@ -326,22 +346,21 @@ const normalizeLogString = (value: string): string =>
     maskAuthTokens(maskUrlSecrets(value));
 
 const normalizeLogDate = (value: Date): string => {
-    const getTime = getNativePrototypeFunction(Date.prototype, "getTime");
-    const toISOString = getNativePrototypeFunction(
-        Date.prototype,
-        "toISOString"
-    );
-    if (!getTime || !toISOString) {
+    if (!DATE_GET_TIME || !DATE_TO_ISO_STRING) {
         return INVALID_DATE_PLACEHOLDER;
     }
 
     try {
-        const timestamp: unknown = Reflect.apply(getTime, value, []);
+        const timestamp: unknown = Reflect.apply(DATE_GET_TIME, value, []);
         if (typeof timestamp !== "number" || !isFiniteNumber(timestamp)) {
             return INVALID_DATE_PLACEHOLDER;
         }
 
-        const serialized: unknown = Reflect.apply(toISOString, value, []);
+        const serialized: unknown = Reflect.apply(
+            DATE_TO_ISO_STRING,
+            value,
+            []
+        );
         return typeof serialized === "string"
             ? serialized
             : INVALID_DATE_PLACEHOLDER;
@@ -351,19 +370,10 @@ const normalizeLogDate = (value: Date): string => {
 };
 
 const normalizeLogUrl = (value: URL): string => {
-    const toString = getNativePrototypeFunction(URL.prototype, "toString");
-    if (!toString) {
-        return INVALID_URL_PLACEHOLDER;
-    }
-
-    try {
-        const serialized: unknown = Reflect.apply(toString, value, []);
-        return typeof serialized === "string"
-            ? normalizeLogString(serialized)
-            : INVALID_URL_PLACEHOLDER;
-    } catch {
-        return INVALID_URL_PLACEHOLDER;
-    }
+    const serialized = serializeUrl(value);
+    return serialized === undefined
+        ? INVALID_URL_PLACEHOLDER
+        : normalizeLogString(serialized);
 };
 
 const computeIdentifierHash = (value: string): string => {
