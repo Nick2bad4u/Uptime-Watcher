@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import {
-    INVALID_SERIALIZED_BACKUP_DATA_MESSAGE,
-    parseSerializedDatabaseBackupResult,
-} from "../../utils/downloads/serializedBackupResult";
+import { parseSerializedDatabaseBackupResult } from "../../utils/downloads/serializedBackupResult";
 import { createSerializedBackupResult } from "./createSerializedBackupResult";
+
+const INVALID_SERIALIZED_BACKUP_DATA_MESSAGE = "Invalid backup data received";
 
 describe(parseSerializedDatabaseBackupResult, () => {
     it("returns validated backup payloads", () => {

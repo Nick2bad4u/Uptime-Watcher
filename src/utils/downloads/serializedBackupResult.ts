@@ -15,8 +15,7 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import { validateSerializedDatabaseBackupResult } from "@shared/validation/dataSchemas";
 
 /** Canonical error message used when backup payload validation fails. */
-export const INVALID_SERIALIZED_BACKUP_DATA_MESSAGE =
-    "Invalid backup data received";
+const INVALID_SERIALIZED_BACKUP_DATA_MESSAGE = "Invalid backup data received";
 
 /**
  * Parses and validates a serialized SQLite backup payload.
