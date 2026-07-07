@@ -29,6 +29,7 @@ import {
     isCoverageEnabled,
 } from "../utils/coverage";
 import { registerPageUserDataDirectory } from "../utils/userDataDirectoryRegistry";
+import { createStringProcessEnv } from "./processEnv";
 
 const PLAYWRIGHT_CLOSE_TIMEOUT_MS = 5000;
 const USER_DATA_REMOVAL_RETRY_DELAYS_MS = [
@@ -425,15 +426,7 @@ export async function launchElectronApp(
             ...customArgs,
         ],
         env: {
-            ...Object.entries(process.env).reduce<Record<string, string>>(
-                (accumulator, [key, value]) => {
-                    if (typeof value === "string") {
-                        accumulator[key] = value;
-                    }
-                    return accumulator;
-                },
-                {}
-            ),
+            ...createStringProcessEnv(),
             // Don't override NODE_ENV - let it inherit from environment
             // This allows proper development vs production detection
             // Enable headless mode for Electron during testing

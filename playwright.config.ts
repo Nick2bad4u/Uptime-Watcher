@@ -2,6 +2,10 @@ import type { PlaywrightTestConfig } from "@playwright/test";
 
 import { defineConfig, devices } from "@playwright/test";
 
+import { sanitizeProcessEnvInPlace } from "./playwright/fixtures/processEnv";
+
+sanitizeProcessEnvInPlace();
+
 const runtimeEnv =
     typeof globalThis.process === "undefined"
         ? undefined

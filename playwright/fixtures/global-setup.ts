@@ -13,6 +13,8 @@ import type { FullConfig } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import * as path from "node:path";
 
+import { createSanitizedProcessEnv } from "./processEnv";
+
 interface CommandInvocation {
     readonly args: readonly string[];
     readonly command: string;
@@ -98,7 +100,7 @@ async function globalSetup(_config: FullConfig): Promise<void> {
                 stdio: "inherit",
                 cwd: path.resolve(__dirname, "../.."),
                 env: {
-                    ...process.env,
+                    ...createSanitizedProcessEnv(),
                     HEADLESS: "true",
                     // Playwright builds can be memory-intensive (Vite + sourcemaps + stats).
                     // Ensure we have enough heap for CI/local runs.
