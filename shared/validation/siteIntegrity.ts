@@ -76,7 +76,7 @@ export class DuplicateSiteIdentifierError extends Error {
  *
  * @returns Ordered list of duplicate identifier summaries.
  */
-export function collectDuplicateSiteIdentifiers(
+function collectDuplicateSiteIdentifiers(
     sites: readonly Site[]
 ): readonly DuplicateSiteIdentifier[] {
     const counts = new Map<string, number>();

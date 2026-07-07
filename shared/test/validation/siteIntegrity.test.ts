@@ -7,9 +7,9 @@ import type { Site } from "@shared/types";
 import { describe, expect, it } from "vitest";
 
 import {
-    collectDuplicateSiteIdentifiers,
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
+    sanitizeSitesByIdentifier,
 } from "../../validation/siteIntegrity";
 
 const buildSite = (identifier: string, name: string): Site => ({
@@ -20,7 +20,7 @@ const buildSite = (identifier: string, name: string): Site => ({
 });
 
 describe("siteIntegrity", () => {
-    it("collectDuplicateSiteIdentifiers returns sorted duplicate summaries", () => {
+    it("sanitizeSitesByIdentifier returns sorted duplicate summaries", () => {
         const sites: Site[] = [
             buildSite("alpha", "Alpha"),
             buildSite("beta", "Beta"),
@@ -29,11 +29,16 @@ describe("siteIntegrity", () => {
             buildSite("gamma", "Gamma"),
         ];
 
-        const duplicates = collectDuplicateSiteIdentifiers(sites);
+        const { duplicates, sanitizedSites } = sanitizeSitesByIdentifier(sites);
 
         expect(duplicates).toEqual([
             { identifier: "alpha", occurrences: 2 },
             { identifier: "beta", occurrences: 2 },
+        ]);
+        expect(sanitizedSites.map((site) => site.identifier)).toEqual([
+            "alpha",
+            "beta",
+            "gamma",
         ]);
     });
 

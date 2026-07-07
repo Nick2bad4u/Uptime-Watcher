@@ -7,41 +7,12 @@
  */
 
 import { sleep, sleepUnref } from "@shared/utils/abortUtils";
-import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { arrayAt, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
-const RETRY_NON_ERROR_THROWN_MARKER: unique symbol = Symbol(
-    "shared.utils.retry.nonErrorThrown"
-);
-
-/**
- * Returns true when the thrown error is a wrapper created by {@link withRetry}
- * for a non-Error thrown value.
- */
-export function isRetryNonErrorThrownError(
-    value: unknown
-): value is Error & { readonly cause: unknown } {
-    if (!Error.isError(value)) {
-        return false;
-    }
-
-    const marker = getOwnDataProperty(value, RETRY_NON_ERROR_THROWN_MARKER);
-    return marker.found && marker.value === true;
-}
-
 function wrapNonErrorThrownValue(value: unknown): Error {
-    const error = new Error("[withRetry] Operation threw a non-Error value", {
+    return new Error("[withRetry] Operation threw a non-Error value", {
         cause: value,
     });
-
-    Object.defineProperty(error, RETRY_NON_ERROR_THROWN_MARKER, {
-        configurable: false,
-        enumerable: false,
-        value: true,
-        writable: false,
-    });
-
-    return error;
 }
 
 /**

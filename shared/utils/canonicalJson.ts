@@ -14,7 +14,7 @@ import { objectEntries } from "ts-extras";
 /**
  * Returns a JSON value with all object keys sorted recursively.
  */
-export function createCanonicalJsonValue(value: JsonValue): JsonValue {
+function createCanonicalJsonValue(value: JsonValue): JsonValue {
     if (Array.isArray(value)) {
         return value.map((entry) => createCanonicalJsonValue(entry));
     }

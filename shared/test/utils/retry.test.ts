@@ -5,11 +5,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { sleep, sleepUnref } from "../../utils/abortUtils";
-import {
-    isRetryNonErrorThrownError,
-    type RetryOptions,
-    withRetry,
-} from "../../utils/retry";
+import { type RetryOptions, withRetry } from "../../utils/retry";
 
 vi.mock("../../utils/abortUtils", async () => {
     const actual = await vi.importActual<
@@ -187,53 +183,12 @@ describe("shared/utils/retry", () => {
             await withRetry(operation, { maxRetries: 1 });
             throw new Error("expected withRetry to throw");
         } catch (error: unknown) {
-            expect(isRetryNonErrorThrownError(error)).toBeTruthy();
+            expect(error).toBeInstanceOf(Error);
             const wrapped = error as Error & { readonly cause: unknown };
+            expect(wrapped.message).toBe(
+                "[withRetry] Operation threw a non-Error value"
+            );
             expect(wrapped.cause).toBe("nope");
         }
-    });
-
-    it("does not invoke marker accessors while checking wrapped errors", async ({
-        task,
-        annotate,
-    }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: retry", "component");
-        await annotate("Category: Utility", "category");
-        await annotate("Type: Error Handling", "type");
-
-        const operation = vi
-            .fn<() => Promise<never>>()
-            .mockRejectedValue("nope");
-        let wrapped: Error | undefined;
-
-        try {
-            await withRetry(operation, { maxRetries: 1 });
-        } catch (error: unknown) {
-            if (Error.isError(error)) {
-                wrapped = error;
-            }
-        }
-
-        expect(wrapped).toBeDefined();
-        const marker = Object.getOwnPropertySymbols(wrapped!).find(
-            (symbol) =>
-                Object.getOwnPropertyDescriptor(wrapped!, symbol)?.value ===
-                true
-        );
-        expect(marker).toBeDefined();
-
-        const fakeWrapped = new Error("fake wrapped");
-        let accessCount = 0;
-        Object.defineProperty(fakeWrapped, marker!, {
-            enumerable: false,
-            get() {
-                accessCount += 1;
-                return true;
-            },
-        });
-
-        expect(isRetryNonErrorThrownError(fakeWrapped)).toBeFalsy();
-        expect(accessCount).toBe(0);
     });
 });

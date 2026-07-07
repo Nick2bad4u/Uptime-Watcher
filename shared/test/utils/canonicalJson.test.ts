@@ -4,13 +4,10 @@
 
 import type { JsonValue } from "@shared/types/cloudSync";
 
-import {
-    createCanonicalJsonValue,
-    stringifyJsonValueStable,
-} from "@shared/utils/canonicalJson";
+import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { describe, expect, it } from "vitest";
 
-describe(createCanonicalJsonValue, () => {
+describe(stringifyJsonValueStable, () => {
     it("sorts object keys recursively and preserves array ordering", () => {
         const value = {
             z: 1,
@@ -23,18 +20,6 @@ describe(createCanonicalJsonValue, () => {
                 ],
             },
         };
-
-        expect(createCanonicalJsonValue(value)).toEqual({
-            a: {
-                b: 2,
-                c: [
-                    { x: 1, y: 2 },
-                    { a: 2, b: 1 },
-                ],
-                d: 4,
-            },
-            z: 1,
-        });
 
         expect(stringifyJsonValueStable(value)).toBe(
             '{"a":{"b":2,"c":[{"x":1,"y":2},{"a":2,"b":1}],"d":4},"z":1}'
@@ -62,18 +47,6 @@ describe(createCanonicalJsonValue, () => {
             writable: true,
         });
 
-        const canonical = createCanonicalJsonValue(value);
-
-        expect(Object.getPrototypeOf(canonical)).toBeNull();
-        expect(
-            Object.getOwnPropertyDescriptor(canonical, "__proto__")
-        ).toMatchObject({
-            enumerable: true,
-            value: {
-                a: 2,
-                z: 1,
-            },
-        });
         expect(stringifyJsonValueStable(value)).toBe(
             '{"__proto__":{"a":2,"z":1},"constructor":{"prototype":"data"}}'
         );
