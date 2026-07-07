@@ -30,14 +30,30 @@ Object.defineProperty(globalThis, "matchMedia", {
         .mockImplementation((_query: string) => createMockMediaQuery(false)),
 });
 
+const getWindowMatchMedia = (): typeof globalThis.matchMedia | undefined => {
+    const windowRef = Reflect.get(globalThis, "window");
+    if (windowRef === undefined || typeof windowRef !== "object") {
+        return undefined;
+    }
+
+    const matchMediaCandidate = (windowRef as { matchMedia?: unknown })
+        .matchMedia;
+    return typeof matchMediaCandidate === "function"
+        ? (matchMediaCandidate as typeof globalThis.matchMedia)
+        : undefined;
+};
+
+const setMockMatchMediaResult = (mediaQuery: MediaQueryList): void => {
+    vi.mocked(globalThis.matchMedia).mockReturnValue(mediaQuery);
+};
+
 describe("useThemeStyles Hook", () => {
     let mockMediaQuery: ReturnType<typeof createMockMediaQuery>;
     let originalMatchMedia: typeof globalThis.matchMedia;
 
     beforeEach(() => {
         // Save original matchMedia if it exists
-        originalMatchMedia =
-            (globalThis as any).window?.matchMedia || globalThis.matchMedia;
+        originalMatchMedia = getWindowMatchMedia() ?? globalThis.matchMedia;
 
         mockMediaQuery = createMockMediaQuery(false);
         Object.defineProperty(globalThis, "matchMedia", {
@@ -60,7 +76,7 @@ describe("useThemeStyles Hook", () => {
     describe("Light Mode Styles", () => {
         beforeEach(() => {
             mockMediaQuery = createMockMediaQuery(false);
-            (matchMedia as any).mockReturnValue(mockMediaQuery);
+            setMockMatchMediaResult(mockMediaQuery);
         });
 
         it("should return light mode styles when collapsed=false", async ({
@@ -155,7 +171,7 @@ describe("useThemeStyles Hook", () => {
     describe("Dark Mode Styles", () => {
         beforeEach(() => {
             mockMediaQuery = createMockMediaQuery(true);
-            (matchMedia as any).mockReturnValue(mockMediaQuery);
+            setMockMatchMediaResult(mockMediaQuery);
         });
 
         it("should return dark mode styles when collapsed=false", async ({
@@ -257,7 +273,7 @@ describe("useThemeStyles Hook", () => {
 
             // Start with light mode
             mockMediaQuery = createMockMediaQuery(false);
-            (matchMedia as any).mockReturnValue(mockMediaQuery);
+            setMockMatchMediaResult(mockMediaQuery);
 
             const { result } = renderHook(() => useThemeStyles());
 
@@ -299,7 +315,7 @@ describe("useThemeStyles Hook", () => {
 
             // Start with dark mode
             mockMediaQuery = createMockMediaQuery(true);
-            (matchMedia as any).mockReturnValue(mockMediaQuery);
+            setMockMatchMediaResult(mockMediaQuery);
 
             const { result } = renderHook(() => useThemeStyles());
 
@@ -652,7 +668,7 @@ describe("useThemeStyles Hook", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result: undefinedResult } = renderHook(() =>
-                useThemeStyles(undefined as any)
+                useThemeStyles(undefined)
             );
             const { result: nullResult } = renderHook(() =>
                 useThemeStyles(null as any)
