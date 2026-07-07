@@ -568,6 +568,7 @@ describe("shared/utils/objectSafety Function Coverage Validation", () => {
             expect(result[symbolKey]).toBe("symbol-value");
             expect(Object.hasOwn(result, "computed")).toBeFalsy();
             expect(Object.isFrozen(result)).toBeTruthy();
+            expect(Object.getPrototypeOf(result)).toBeNull();
             expect(getterCalls).toBe(0);
         });
 

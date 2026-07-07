@@ -94,7 +94,7 @@ export function defineOwnEnumerableDataProperties(
 export function freezeOwnEnumerableDataProperties(
     obj: object
 ): Readonly<UnknownRecord> {
-    const result: UnknownRecord = {};
+    const result = createNullPrototypeObject<UnknownRecord>();
     defineOwnEnumerableDataProperties(result, obj);
 
     return Object.freeze(result);
