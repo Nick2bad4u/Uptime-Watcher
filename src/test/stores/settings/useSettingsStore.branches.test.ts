@@ -4,7 +4,11 @@
  */
 
 // Import mocked modules to get references
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import {
+    type ErrorHandlingBackendContext,
+    type ErrorHandlingFrontendStore,
+    withErrorHandling,
+} from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -82,6 +86,11 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
 });
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
+const isFrontendErrorHandler = (
+    handler: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
+): handler is ErrorHandlingFrontendStore =>
+    "setLoading" in handler && "clearError" in handler && "setError" in handler;
+
 // Mock the entire electronAPI
 const mockElectronAPI = {
     settings: {
@@ -112,17 +121,30 @@ describe("useSettingsStore Branch Coverage Tests", () => {
 
         // Setup withErrorHandling to execute function properly
         mockWithErrorHandling.mockImplementation(
-            async (fn: any, handlers: any) => {
+            async <T>(
+                fn: () => Promise<T>,
+                handlers:
+                    ErrorHandlingBackendContext | ErrorHandlingFrontendStore
+            ) => {
                 try {
-                    handlers?.setLoading?.(true);
-                    handlers?.clearError?.();
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setLoading(true);
+                        handlers.clearError();
+                    }
+
                     return await fn();
                 } catch (error: unknown) {
-                    handlers?.setLoading?.(false);
-                    handlers?.setError?.(error);
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setLoading(false);
+                        handlers.setError(
+                            Error.isError(error) ? error.message : String(error)
+                        );
+                    }
                     throw error;
                 } finally {
-                    handlers?.setLoading?.(false);
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setLoading(false);
+                    }
                 }
             }
         );

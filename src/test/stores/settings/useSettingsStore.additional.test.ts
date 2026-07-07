@@ -3,9 +3,10 @@
  */
 
 import { renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 vi.mock("../error/useErrorStore", () => ({
     useErrorStore: {
@@ -19,34 +20,42 @@ vi.mock("../error/useErrorStore", () => ({
 
 vi.mock("../utils", () => ({
     logStoreAction: vi.fn(),
-    withErrorHandling: vi.fn(async (fn, errorHandling) => {
-        try {
-            if (errorHandling?.clearError) {
-                errorHandling.clearError();
+    withErrorHandling: vi.fn(
+        async <T>(
+            fn: () => Promise<T>,
+            errorHandling?: {
+                clearError?: () => void;
+                setError?: (error: string) => void;
+                setLoading?: (loading: boolean) => void;
             }
-            if (errorHandling?.setLoading) {
-                errorHandling.setLoading(true);
-            }
+        ) => {
+            try {
+                if (errorHandling?.clearError) {
+                    errorHandling.clearError();
+                }
+                if (errorHandling?.setLoading) {
+                    errorHandling.setLoading(true);
+                }
 
-            return await fn().then((result: any) => {
+                const result = await fn();
                 if (errorHandling?.setLoading) {
                     errorHandling.setLoading(false);
                 }
                 return result;
-            });
-        } catch (error: unknown) {
-            if (errorHandling?.setError) {
-                errorHandling.setError(
-                    Error.isError(error) ? error.message : String(error)
-                );
-            }
-            if (errorHandling?.setLoading) {
-                errorHandling.setLoading(false);
-            }
+            } catch (error: unknown) {
+                if (errorHandling?.setError) {
+                    errorHandling.setError(
+                        Error.isError(error) ? error.message : String(error)
+                    );
+                }
+                if (errorHandling?.setLoading) {
+                    errorHandling.setLoading(false);
+                }
 
-            throw error;
+                throw error;
+            }
         }
-    }),
+    ),
 }));
 
 vi.mock("../../constants", () => ({
@@ -58,20 +67,26 @@ const mockGetHistoryLimit = vi.fn();
 const mockResetSettings = vi.fn();
 const mockUpdateHistoryLimit = vi.fn();
 
-globalThis.window = {
-    ...globalThis,
-    electronAPI: {
-        settings: {
-            getHistoryLimit: mockGetHistoryLimit,
-            resetSettings: mockResetSettings,
-            updateHistoryLimit: mockUpdateHistoryLimit,
-        },
+const mockElectronAPI = {
+    settings: {
+        getHistoryLimit: mockGetHistoryLimit,
+        resetSettings: mockResetSettings,
+        updateHistoryLimit: mockUpdateHistoryLimit,
     },
-} as any;
+};
+
+let restoreElectronApi: (() => void) | undefined;
 
 describe("useSettingsStore - Additional Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            mockElectronAPI,
+            {
+                ensureWindow: true,
+            }
+        ));
 
         localStorage.clear();
         sessionStorage.clear();
@@ -79,6 +94,11 @@ describe("useSettingsStore - Additional Coverage", () => {
         mockGetHistoryLimit.mockResolvedValue(1000);
         mockResetSettings.mockResolvedValue({ success: true });
         mockUpdateHistoryLimit.mockResolvedValue(1000);
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     it("should test basic functionality", async ({ task, annotate }) => {
