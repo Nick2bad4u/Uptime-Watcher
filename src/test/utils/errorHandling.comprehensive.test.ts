@@ -135,7 +135,9 @@ describe("error Handling Utilities - Comprehensive Coverage", () => {
             const result = convertError(objectError);
 
             expect(result.error).toBeInstanceOf(Error);
-            expect(result.error.message).toBe("[object Object]");
+            expect(result.error.message).toBe(
+                '{"code":500,"message":"custom error"}'
+            );
             expect(result.originalType).toBe("object");
             expect(result.wasError).toBe(false);
         });

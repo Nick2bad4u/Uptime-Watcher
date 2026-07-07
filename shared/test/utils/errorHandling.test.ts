@@ -121,7 +121,7 @@ describe("Error Handling Utils", () => {
             const promise = withErrorHandling(operation, mockFrontendStore);
 
             await expect(promise).rejects.toMatchObject({
-                message: "[object Object]",
+                message: '{"custom":"error"}',
             });
 
             await promise.catch((error_: unknown) => {

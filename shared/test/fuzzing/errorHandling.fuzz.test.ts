@@ -648,11 +648,12 @@ describe("convertError and ensureError fuzz coverage", () => {
         expect(result.wasError).toBeFalsy();
     });
 
-    it("should fuzz-handle objects with failing toString and JSON stringify", () => {
+    it("should fuzz-avoid object string coercion during conversion", () => {
+        const toString = vi.fn(() => {
+            throw new Error("toString failure");
+        });
         const problematic: { self?: unknown; toString: () => never } = {
-            toString() {
-                throw new Error("toString failure");
-            },
+            toString,
         };
         problematic.self = problematic;
 
@@ -660,6 +661,7 @@ describe("convertError and ensureError fuzz coverage", () => {
         expect(result.error.message).toBe('{"self":"[Circular]"}');
         expect(result.originalType).toBe("object");
         expect(result.wasError).toBeFalsy();
+        expect(toString).not.toHaveBeenCalled();
     });
 
     it("ensureError should delegate to convertError during fuzzing", () => {

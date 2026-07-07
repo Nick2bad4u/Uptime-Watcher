@@ -348,7 +348,7 @@ describe("100% Coverage Edge Cases", () => {
             const error = { message: "Object error" };
             const result = ensureError(error);
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("[object Object]");
+            expect(result.message).toBe('{"message":"Object error"}');
         });
 
         it("should handle number errors", () => {

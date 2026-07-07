@@ -140,7 +140,7 @@ describe("100% Coverage Edge Cases", () => {
             const error = { message: "Object error" };
             const result = ensureError(error);
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("[object Object]");
+            expect(result.message).toBe('{"message":"Object error"}');
         });
 
         it("should handle number errors", () => {
@@ -171,7 +171,7 @@ describe("100% Coverage Edge Cases", () => {
             ];
             const result = ensureError(error);
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("1,2,3");
+            expect(result.message).toBe("[1,2,3]");
         });
     });
 
@@ -305,12 +305,15 @@ describe("100% Coverage Edge Cases", () => {
                     2,
                     3,
                 ],
-                toString: () => "Custom toString",
+                toString: vi.fn(() => "Custom toString"),
             };
 
             const result = ensureError(complexObject);
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("Custom toString");
+            expect(result.message).toBe(
+                '{"nested":{"deep":{"error":"deeply nested error"}},"array":[1,2,3]}'
+            );
+            expect(complexObject.toString).not.toHaveBeenCalled();
         });
 
         it("should handle functions as errors", () => {
@@ -333,7 +336,7 @@ describe("100% Coverage Edge Cases", () => {
             const regexError = /test-pattern/gi;
             const result = ensureError(regexError);
             expect(result).toBeInstanceOf(Error);
-            expect(result.message).toBe("/test-pattern/gi");
+            expect(result.message).toBe("{}");
         });
     });
 

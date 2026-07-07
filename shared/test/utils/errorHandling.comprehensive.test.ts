@@ -349,7 +349,8 @@ describe("Error Handling Utilities - Comprehensive Coverage", () => {
             await expect(
                 withErrorHandling(mockOperation, mockStore)
             ).rejects.toMatchObject({
-                message: "[object Object]",
+                message:
+                    '{"message":"Complex error","code":500,"details":{"nested":"data"}}',
             });
 
             expect(mockStore.setError).toHaveBeenCalledWith("Complex error");

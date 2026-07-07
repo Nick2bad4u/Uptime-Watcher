@@ -90,6 +90,37 @@ function normalizeErrorMessage(message: string): string {
     return typeof normalized === "string" ? normalized : message;
 }
 
+function stringifyNormalizedErrorValue(value: unknown): string | undefined {
+    try {
+        const serialized = JSON.stringify(normalizeLogValue(value));
+        return typeof serialized === "string" ? serialized : undefined;
+    } catch {
+        return undefined;
+    }
+}
+
+function convertNonErrorMessage(error: unknown): string {
+    if (typeof error === "string") {
+        return normalizeErrorMessage(error);
+    }
+
+    if (
+        error === null ||
+        typeof error === "bigint" ||
+        typeof error === "boolean" ||
+        typeof error === "number" ||
+        typeof error === "symbol" ||
+        error === undefined
+    ) {
+        return String(error);
+    }
+
+    return (
+        stringifyNormalizedErrorValue(error) ??
+        `[unserializable:${typeof error}]`
+    );
+}
+
 function normalizeConsoleLogValue(value: unknown): unknown {
     try {
         return normalizeLogValue(value);
@@ -302,22 +333,7 @@ export function convertError(error: unknown): ErrorConversionResult {
         };
     }
 
-    // Safely convert to string with fallback for problematic objects.
-    const errorMessage = ((): string => {
-        try {
-            return normalizeErrorMessage(String(error));
-        } catch {
-            // Fallback for objects that can't be converted to string
-            try {
-                const serialized = JSON.stringify(normalizeLogValue(error));
-                return typeof serialized === "string"
-                    ? serialized
-                    : "[object cannot be converted to string]";
-            } catch {
-                return "[object cannot be converted to string]";
-            }
-        }
-    })();
+    const errorMessage = convertNonErrorMessage(error);
 
     // Provide fallback for whitespace-only strings (but preserve truly empty strings)
     const normalizedMessage =

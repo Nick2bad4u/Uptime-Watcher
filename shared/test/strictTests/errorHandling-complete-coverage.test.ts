@@ -154,13 +154,14 @@ describe(convertError, () => {
         expect(result.originalType).toBe("string");
     });
 
-    it("falls back when string conversion fails", () => {
+    it("does not invoke object string coercion during conversion", () => {
+        const toString = vi.fn(() => {
+            throw new Error("toString broke");
+        });
         const problematic: Record<string, unknown> & {
             toString: () => never;
         } = {
-            toString: () => {
-                throw new Error("toString broke");
-            },
+            toString,
         };
         problematic["self"] = problematic;
 
@@ -169,6 +170,7 @@ describe(convertError, () => {
         expect(result.error.message).toBe('{"self":"[Circular]"}');
         expect(result.originalType).toBe("object");
         expect(result.wasError).toBeFalsy();
+        expect(toString).not.toHaveBeenCalled();
     });
 
     it("redacts secret-like strings during conversion", () => {
@@ -269,7 +271,9 @@ describe(withErrorHandling, () => {
                     message: "failed Authorization Bearer bearer-secret",
                 };
             }, store)
-        ).rejects.toThrow("[object Object]");
+        ).rejects.toThrow(
+            '{"accessToken":"[redacted]","message":"failed Authorization [redacted]"}'
+        );
 
         expect(errorSpy).toHaveBeenCalledWith(
             "[SHARED] Original operation error",
@@ -283,8 +287,9 @@ describe(withErrorHandling, () => {
             expect.objectContaining({ operationName: "set error state" }),
             expect.objectContaining({ message: "set error fail" })
         );
-        expect(String(errorSpy.mock.calls)).not.toContain("token-secret");
-        expect(String(errorSpy.mock.calls)).not.toContain("bearer-secret");
+        const errorCalls = JSON.stringify(errorSpy.mock.calls);
+        expect(errorCalls).not.toContain("token-secret");
+        expect(errorCalls).not.toContain("bearer-secret");
     });
 
     it("logs backend failures with contextual messaging", async () => {
@@ -387,10 +392,10 @@ describe(withErrorHandling, () => {
                 message: "logger Authorization [redacted]",
             })
         );
-        expect(String(consoleErrorSpy.mock.calls)).not.toContain(
+        expect(JSON.stringify(consoleErrorSpy.mock.calls)).not.toContain(
             "refresh-secret"
         );
-        expect(String(consoleWarnSpy.mock.calls)).not.toContain(
+        expect(JSON.stringify(consoleWarnSpy.mock.calls)).not.toContain(
             "logger-secret"
         );
     });
