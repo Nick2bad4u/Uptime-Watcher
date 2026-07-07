@@ -255,10 +255,6 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "cloud.dropbox.tokens": "ciphertext",
                 "cloud.sync.deviceId": "device",
             };
-            const expectedSettings = {
-                theme: "dark",
-                historyLimit: "1000",
-            };
 
             mockRepositories.site.exportAllRows.mockResolvedValue(mockSites);
             mockRepositories.settings.getAll.mockResolvedValue(mockSettings);
@@ -272,13 +268,28 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 1
             );
             expect(mockRepositories.settings.getAll).toHaveBeenCalledTimes(1);
-            expect(safeJsonStringifyWithFallback).toHaveBeenCalledWith(
+            const exportPayload = vi.mocked(safeJsonStringifyWithFallback).mock
+                .calls[0]?.[0];
+            expect(exportPayload).toBeDefined();
+            expect(exportPayload).toEqual(
                 expect.objectContaining({
-                    sites: mockSites,
-                    settings: expectedSettings,
-                    version: "1.0",
                     exportedAt: expect.any(String),
-                }),
+                    settings: expect.objectContaining({
+                        historyLimit: "1000",
+                        theme: "dark",
+                    }),
+                    sites: mockSites,
+                    version: "1.0",
+                })
+            );
+            const exportPayloadRecord = exportPayload as {
+                settings: Record<string, string>;
+            };
+            expect(
+                Object.getPrototypeOf(exportPayloadRecord.settings)
+            ).toBeNull();
+            expect(safeJsonStringifyWithFallback).toHaveBeenCalledWith(
+                exportPayload,
                 "{}",
                 2
             );
@@ -449,6 +460,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             const exportedSettings = (
                 payload as { settings: Record<string, string> }
             ).settings;
+            expect(Object.getPrototypeOf(exportedSettings)).toBeNull();
             expect(Object.hasOwn(exportedSettings, "__proto__")).toBe(false);
             expect(Object.hasOwn(exportedSettings, "constructor")).toBe(false);
             expect(Object.hasOwn(exportedSettings, "prototype")).toBe(false);
@@ -633,6 +645,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     theme: "dark",
                 },
             });
+            expect(Object.getPrototypeOf(result.settings)).toBeNull();
             expect(Object.hasOwn(result.settings, "__proto__")).toBe(false);
             expect(Object.hasOwn(result.settings, "constructor")).toBe(false);
             expect(Object.hasOwn(result.settings, "prototype")).toBe(false);

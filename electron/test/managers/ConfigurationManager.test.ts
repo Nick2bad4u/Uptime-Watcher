@@ -503,6 +503,44 @@ describe(ConfigurationManager, () => {
             ).toHaveBeenCalledTimes(2);
         });
 
+        it("should validate monitors separately when prototype-named metadata differs", async () => {
+            const monitor1 = createMockMonitor();
+            const monitor2 = createMockMonitor();
+            const result1: ValidationResult = { success: true, errors: [] };
+            const result2: ValidationResult = {
+                success: false,
+                errors: ["Prototype metadata differs"],
+            };
+
+            Object.defineProperty(monitor1, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "first",
+                writable: true,
+            });
+            Object.defineProperty(monitor2, "__proto__", {
+                configurable: true,
+                enumerable: true,
+                value: "second",
+                writable: true,
+            });
+
+            mockMonitorValidator.validateMonitorConfiguration
+                .mockReturnValueOnce(result1)
+                .mockReturnValueOnce(result2);
+
+            await expect(
+                configManager.validateMonitorConfiguration(monitor1)
+            ).resolves.toEqual(result1);
+            await expect(
+                configManager.validateMonitorConfiguration(monitor2)
+            ).resolves.toEqual(result2);
+
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledTimes(2);
+        });
+
         it("should return cached monitor validation results without exposing cached errors", async () => {
             const monitor = createMockMonitor();
             const expectedResult: ValidationResult = {

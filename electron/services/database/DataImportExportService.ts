@@ -19,6 +19,7 @@ import {
     safeJsonParse,
     safeJsonStringifyWithFallback,
 } from "@shared/utils/jsonSafety";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { assertJsonImportPayloadWithinIpcBudget } from "@shared/utils/ipcPayloadBudgets";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
@@ -119,7 +120,7 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
     }
 
     if (typeof value === "object") {
-        const result: Record<string, Jsonifiable> = {};
+        const result = createNullPrototypeObject<Record<string, Jsonifiable>>();
         for (const [key, nested] of objectEntries(value)) {
             Object.defineProperty(result, key, {
                 configurable: true,
@@ -459,7 +460,7 @@ export class DataImportExportService {
             | "import"
             | "persist"
     ): Record<string, string> {
-        const result: Record<string, string> = {};
+        const result = createNullPrototypeObject<Record<string, string>>();
         const strippedKeys: string[] = [];
 
         for (const [key, value] of objectEntries(settings)) {

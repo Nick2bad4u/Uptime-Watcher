@@ -59,6 +59,7 @@ import {
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { isEmpty } from "ts-extras";
 
@@ -112,7 +113,7 @@ function normalizeValidationCacheKeyValue(value: unknown): unknown {
         return value;
     }
 
-    const normalized: Record<string, unknown> = {};
+    const normalized = createNullPrototypeObject<Record<string, unknown>>();
 
     for (const key of Object.keys(value).toSorted((a, b) =>
         a.localeCompare(b)
