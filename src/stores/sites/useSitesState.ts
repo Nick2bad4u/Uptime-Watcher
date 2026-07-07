@@ -15,6 +15,7 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isDefined, isEmpty, objectEntries, setHas } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
@@ -48,6 +49,37 @@ const cancelLockExpiryTimer = (key: OptimisticLockKey): void => {
 
 type OptimisticLockEntry = [OptimisticLockKey, OptimisticMonitoringLock];
 
+const createOptimisticMonitoringLockMap =
+    (): SitesState["optimisticMonitoringLocks"] =>
+        createNullPrototypeObject<SitesState["optimisticMonitoringLocks"]>();
+
+const setOptimisticMonitoringLockEntry = (
+    target: SitesState["optimisticMonitoringLocks"],
+    key: OptimisticLockKey,
+    value: OptimisticMonitoringLock | undefined
+): void => {
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
+};
+
+const cloneOptimisticMonitoringLocks = (
+    locks: SitesState["optimisticMonitoringLocks"]
+): SitesState["optimisticMonitoringLocks"] => {
+    const nextLocks = createOptimisticMonitoringLockMap();
+
+    for (const [key, lock] of objectEntries(locks)) {
+        if (isOptimisticLockKey(key)) {
+            setOptimisticMonitoringLockEntry(nextLocks, key, lock);
+        }
+    }
+
+    return nextLocks;
+};
+
 const collectActiveLockEntries = (
     locks: SitesState["optimisticMonitoringLocks"]
 ): OptimisticLockEntry[] => {
@@ -64,6 +96,22 @@ const collectActiveLockEntries = (
 
 type SelectedMonitorEntry = [Site["identifier"], Monitor["id"]];
 
+const createSelectedMonitorIdMap = (): SitesState["selectedMonitorIds"] =>
+    createNullPrototypeObject<SitesState["selectedMonitorIds"]>();
+
+const setSelectedMonitorIdEntry = (
+    target: SitesState["selectedMonitorIds"],
+    siteIdentifier: Site["identifier"],
+    monitorId: Monitor["id"] | undefined
+): void => {
+    Object.defineProperty(target, siteIdentifier, {
+        configurable: true,
+        enumerable: true,
+        value: monitorId,
+        writable: true,
+    });
+};
+
 const collectSelectedMonitorEntries = (
     selectedMonitorIds: SitesState["selectedMonitorIds"]
 ): SelectedMonitorEntry[] => {
@@ -78,17 +126,31 @@ const collectSelectedMonitorEntries = (
     return entries;
 };
 
+const cloneSelectedMonitorIds = (
+    selectedMonitorIds: SitesState["selectedMonitorIds"]
+): SitesState["selectedMonitorIds"] => {
+    const nextSelectedMonitorIds = createSelectedMonitorIdMap();
+
+    for (const [siteId, monitorId] of collectSelectedMonitorEntries(
+        selectedMonitorIds
+    )) {
+        setSelectedMonitorIdEntry(nextSelectedMonitorIds, siteId, monitorId);
+    }
+
+    return nextSelectedMonitorIds;
+};
+
 const omitSelectedMonitorEntryForSite = (
     selectedMonitorIds: SitesState["selectedMonitorIds"],
     identifier: Site["identifier"]
 ): SitesState["selectedMonitorIds"] => {
-    const remainingMonitorIds: SitesState["selectedMonitorIds"] = {};
+    const remainingMonitorIds = createSelectedMonitorIdMap();
 
     for (const [siteId, monitorId] of collectSelectedMonitorEntries(
         selectedMonitorIds
     )) {
         if (siteId !== identifier) {
-            remainingMonitorIds[siteId] = monitorId;
+            setSelectedMonitorIdEntry(remainingMonitorIds, siteId, monitorId);
         }
     }
 
@@ -261,9 +323,9 @@ export const createSitesStateActions = (
                     return {};
                 }
 
-                const nextLocks = {
-                    ...state.optimisticMonitoringLocks,
-                };
+                const nextLocks = cloneOptimisticMonitoringLocks(
+                    state.optimisticMonitoringLocks
+                );
                 const isRemoved = Reflect.deleteProperty(nextLocks, key);
                 return isRemoved
                     ? { optimisticMonitoringLocks: nextLocks }
@@ -314,9 +376,9 @@ export const createSitesStateActions = (
             }
 
             set((state) => {
-                const currentLocks: SitesState["optimisticMonitoringLocks"] = {
-                    ...state.optimisticMonitoringLocks,
-                };
+                const currentLocks = cloneOptimisticMonitoringLocks(
+                    state.optimisticMonitoringLocks
+                );
                 let isChanged = false;
 
                 for (const monitorId of monitorIds) {
@@ -341,9 +403,8 @@ export const createSitesStateActions = (
                     : {};
             });
         },
-        getOptimisticMonitoringLocks: () => ({
-            ...get().optimisticMonitoringLocks,
-        }),
+        getOptimisticMonitoringLocks: () =>
+            cloneOptimisticMonitoringLocks(get().optimisticMonitoringLocks),
         getSelectedMonitorId: (
             siteIdentifier: Site["identifier"]
         ): Monitor["id"] | undefined => {
@@ -381,20 +442,24 @@ export const createSitesStateActions = (
             const expiresAt = Date.now() + Math.max(durationMs, 0);
 
             set((state) => {
-                const optimisticMonitoringLocks: SitesState["optimisticMonitoringLocks"] =
-                    {
-                        ...state.optimisticMonitoringLocks,
-                    };
+                const optimisticMonitoringLocks =
+                    cloneOptimisticMonitoringLocks(
+                        state.optimisticMonitoringLocks
+                    );
 
                 for (const monitorId of monitorIds) {
                     const key = buildMonitoringLockKey(
                         siteIdentifier,
                         monitorId
                     );
-                    optimisticMonitoringLocks[key] = {
-                        expiresAt,
-                        monitoring,
-                    } satisfies OptimisticMonitoringLock;
+                    setOptimisticMonitoringLockEntry(
+                        optimisticMonitoringLocks,
+                        key,
+                        {
+                            expiresAt,
+                            monitoring,
+                        }
+                    );
                 }
 
                 return { optimisticMonitoringLocks };
@@ -424,9 +489,9 @@ export const createSitesStateActions = (
 
                 let optimisticMonitoringLocks = state.optimisticMonitoringLocks;
                 if (removedSite) {
-                    optimisticMonitoringLocks = {
-                        ...optimisticMonitoringLocks,
-                    };
+                    optimisticMonitoringLocks = cloneOptimisticMonitoringLocks(
+                        optimisticMonitoringLocks
+                    );
                     for (const key of collectOptimisticLockKeysForSite(
                         removedSite
                     )) {
@@ -483,10 +548,17 @@ export const createSitesStateActions = (
                 siteIdentifier: safeTextForTelemetry(siteIdentifier),
             });
             set((state) => ({
-                selectedMonitorIds: {
-                    ...state.selectedMonitorIds,
-                    [siteIdentifier]: monitorId,
-                },
+                selectedMonitorIds: (() => {
+                    const selectedMonitorIds = cloneSelectedMonitorIds(
+                        state.selectedMonitorIds
+                    );
+                    setSelectedMonitorIdEntry(
+                        selectedMonitorIds,
+                        siteIdentifier,
+                        monitorId
+                    );
+                    return selectedMonitorIds;
+                })(),
             }));
         },
         setSites: (sites: Site[]): void => {
@@ -607,8 +679,7 @@ export const createSitesStateActions = (
                 const nextValidLockKeys =
                     collectOptimisticLockKeysForSites(sitesForState);
 
-                const nextSelectedMonitorIds: SitesState["selectedMonitorIds"] =
-                    {};
+                const nextSelectedMonitorIds = createSelectedMonitorIdMap();
                 for (const [siteId, monitorId] of collectSelectedMonitorEntries(
                     selectedMonitorIds
                 )) {
@@ -622,7 +693,11 @@ export const createSitesStateActions = (
                             (monitor) => monitor.id === monitorId
                         )
                     ) {
-                        nextSelectedMonitorIds[siteId] = monitorId;
+                        setSelectedMonitorIdEntry(
+                            nextSelectedMonitorIds,
+                            siteId,
+                            monitorId
+                        );
                     }
                 }
 
@@ -643,9 +718,9 @@ export const createSitesStateActions = (
                 }
 
                 if (lockKeysToPrune.size > 0) {
-                    optimisticMonitoringLocks = {
-                        ...optimisticMonitoringLocks,
-                    };
+                    optimisticMonitoringLocks = cloneOptimisticMonitoringLocks(
+                        optimisticMonitoringLocks
+                    );
                     for (const key of lockKeysToPrune) {
                         const isRemoved = Reflect.deleteProperty(
                             optimisticMonitoringLocks,
@@ -688,8 +763,8 @@ export const createSitesStateActions = (
 export const initialSitesState: SitesState = {
     lastBackupMetadata: undefined,
     lastSyncDelta: undefined,
-    optimisticMonitoringLocks: {},
-    selectedMonitorIds: {},
+    optimisticMonitoringLocks: createOptimisticMonitoringLockMap(),
+    selectedMonitorIds: createSelectedMonitorIdMap(),
     selectedSiteIdentifier: undefined,
     sites: [],
     sitesRevision: 0,

@@ -1375,6 +1375,38 @@ describe("useSitesState", () => {
                 expect(originalIds).not.toHaveProperty("test-site");
             }
         });
+
+        it("should store prototype-named selected monitor site IDs as own entries", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate(
+                "Security: Prototype-named site identifiers remain own data entries",
+                "security"
+            );
+
+            stateActions.setSelectedMonitorId("__proto__", "monitor-1");
+
+            const setFunction = arrayFirst(mockSet.mock.calls)?.[0];
+            expect(setFunction).toBeDefined();
+
+            if (setFunction) {
+                const result = setFunction(createState());
+                const selectedMonitorIds = ensureDefined(
+                    result.selectedMonitorIds,
+                    "Expected selected monitor IDs to be returned"
+                );
+
+                expect(Object.getPrototypeOf(selectedMonitorIds)).toBeNull();
+                expect(Object.hasOwn(selectedMonitorIds, "__proto__")).toBe(
+                    true
+                );
+                expect(Reflect.get(selectedMonitorIds, "__proto__")).toBe(
+                    "monitor-1"
+                );
+                expect(Object.hasOwn({}, "__proto__")).toBe(false);
+            }
+        });
     });
 
     describe("registerOptimisticMonitoringLock", () => {
@@ -1443,6 +1475,50 @@ describe("useSitesState", () => {
 
                 expect(cleanupResult).toEqual({
                     optimisticMonitoringLocks: {},
+                });
+            }
+        });
+
+        it("should store inherited-name optimistic lock keys as own entries", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate(
+                "Security: Inherited-name lock keys remain own data entries",
+                "security"
+            );
+
+            const siteIdentifier = "toString";
+            const monitorId = "monitor-lock";
+            const key = buildMonitoringLockKey(siteIdentifier, monitorId);
+            const expectedExpiresAt = Date.now() + 1000;
+
+            stateActions.registerOptimisticMonitoringLock(
+                siteIdentifier,
+                [monitorId],
+                true,
+                1000
+            );
+
+            const setFunction = mockSet.mock.calls.pop()?.[0];
+            expect(setFunction).toBeDefined();
+
+            if (setFunction) {
+                const result = setFunction(createState());
+                const optimisticMonitoringLocks = ensureDefined(
+                    result.optimisticMonitoringLocks,
+                    "Expected optimistic lock map to be returned"
+                );
+
+                expect(
+                    Object.getPrototypeOf(optimisticMonitoringLocks)
+                ).toBeNull();
+                expect(Object.hasOwn(optimisticMonitoringLocks, key)).toBe(
+                    true
+                );
+                expect(optimisticMonitoringLocks[key]).toEqual({
+                    expiresAt: expectedExpiresAt,
+                    monitoring: true,
                 });
             }
         });
