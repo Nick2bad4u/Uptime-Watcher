@@ -1,6 +1,8 @@
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
     type CloudSyncOperation,
+    type JsonValue,
+    jsonValueSchema,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
 import {
@@ -16,6 +18,7 @@ import {
 import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     arrayJoin,
@@ -140,19 +143,32 @@ function parseRemoteJson(args: {
 }): unknown {
     const { key, kind, messagePrefix, raw } = args;
 
-    try {
-        return JSON.parse(raw);
-    } catch (error: unknown) {
-        const resolved = ensureError(error);
+    const parsed = safeJsonParse(
+        raw,
+        (value): value is JsonValue => jsonValueSchema.safeParse(value).success
+    );
+
+    if (!parsed.success) {
         throw new CloudSyncCorruptRemoteObjectError(
-            `${messagePrefix}: ${resolved.message}`,
+            `${messagePrefix}: ${parsed.error}`,
             {
-                cause: error,
                 key,
                 kind,
             }
         );
     }
+
+    if (parsed.data === undefined) {
+        throw new CloudSyncCorruptRemoteObjectError(
+            `${messagePrefix}: JSON parsing failed: Parsed data is unavailable`,
+            {
+                key,
+                kind,
+            }
+        );
+    }
+
+    return parsed.data;
 }
 
 function getSnapshotsPrefix(): string {

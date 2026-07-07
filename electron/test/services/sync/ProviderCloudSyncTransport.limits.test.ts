@@ -603,6 +603,43 @@ describe("ProviderCloudSyncTransport.readManifest decoding", () => {
         await expect(transport.readManifest()).resolves.toBeNull();
     });
 
+    it("parses inherited-name manifest device keys as own null-prototype entries", async () => {
+        const provider = createProvider({
+            downloadObject: async (key) => {
+                if (key === "manifest.json") {
+                    return Buffer.from(
+                        JSON.stringify({
+                            devices: {
+                                toString: {
+                                    compactedUpToOpId: 7,
+                                    lastSeenAt: 10,
+                                },
+                            },
+                            manifestVersion: 1,
+                            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+                        } satisfies CloudSyncManifest),
+                        "utf8"
+                    );
+                }
+                return Buffer.from("", "utf8");
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const manifest = await transport.readManifest();
+
+        if (manifest === null) {
+            throw new Error("Expected manifest to parse successfully.");
+        }
+
+        expect(Object.getPrototypeOf(manifest.devices)).toBeNull();
+        expect(Object.hasOwn(manifest.devices, "toString")).toBe(true);
+        expect(manifest.devices["toString"]).toEqual({
+            compactedUpToOpId: 7,
+            lastSeenAt: 10,
+        });
+    });
+
     it("treats invalid JSON manifest content as missing", async () => {
         const provider = createProvider({
             downloadObject: async (key) => {
