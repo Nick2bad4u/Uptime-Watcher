@@ -1,4 +1,4 @@
-(function () {
+(() => {
     const selector = ".your-hover-element"; // Change to your target selector
     const delayMs = 5000;
 
@@ -10,9 +10,9 @@
 
     element.addEventListener(
         "mouseenter",
-        function () {
+        () => {
             console.log("Element hovered! Pausing debugger in", delayMs, "ms");
-            setTimeout(function () {
+            setTimeout(() => {
                 // biome-ignore lint/suspicious/noDebugger: DevTools snippet intentionally pauses execution after hover for inspection.
                 debugger;
             }, delayMs);

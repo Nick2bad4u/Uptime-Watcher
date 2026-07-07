@@ -1,7 +1,7 @@
-(function () {
+(() => {
     let isPaused = false;
 
-    document.addEventListener("mouseover", function (e) {
+    document.addEventListener("mouseover", (e) => {
         if (!isPaused) {
             const target = e.target;
             if (!(target instanceof Element)) {
