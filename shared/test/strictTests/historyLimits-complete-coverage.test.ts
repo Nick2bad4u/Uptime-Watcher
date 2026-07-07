@@ -7,7 +7,6 @@
  */
 
 import {
-    DEFAULT_HISTORY_LIMIT,
     DEFAULT_HISTORY_LIMIT_RULES,
     type HistoryLimitRules,
     normalizeHistoryLimit,
@@ -22,14 +21,6 @@ describe("DEFAULT_HISTORY_LIMIT_RULES", () => {
             minLimit: 25,
         });
         expect(Object.isFrozen(DEFAULT_HISTORY_LIMIT_RULES)).toBeTruthy();
-    });
-});
-
-describe("DEFAULT_HISTORY_LIMIT", () => {
-    it("is aligned with the canonical default limit rule", () => {
-        expect(DEFAULT_HISTORY_LIMIT).toBe(
-            DEFAULT_HISTORY_LIMIT_RULES.defaultLimit
-        );
     });
 });
 

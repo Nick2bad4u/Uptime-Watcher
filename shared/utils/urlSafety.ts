@@ -453,7 +453,7 @@ function isPrivateIpvFourOctets(
  * This should be used on both sides of IPC (renderer + main) as defense in
  * depth.
  */
-export function isAllowedExternalOpenUrl(rawUrl: string): boolean {
+function isAllowedExternalOpenUrl(rawUrl: string): boolean {
     if (rawUrl.length === 0) {
         return false;
     }

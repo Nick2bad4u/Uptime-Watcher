@@ -7,7 +7,6 @@ import { describe, expect, it } from "vitest";
 import {
     getSafeUrlForDisplay,
     getSafeUrlForLogging,
-    isAllowedExternalOpenUrl,
     isPrivateNetworkHostname,
     tryGetSafeThirdPartyHttpUrl,
     validateExternalOpenUrlCandidate,
@@ -115,61 +114,6 @@ describe("urlSafety", () => {
         it("treats empty/whitespace as private", () => {
             expect(isPrivateNetworkHostname("")).toBeTruthy();
             expect(isPrivateNetworkHostname(" ".repeat(3))).toBeTruthy();
-        });
-    });
-
-    describe(isAllowedExternalOpenUrl, () => {
-        it("allows http/https and mailto", () => {
-            expect(
-                isAllowedExternalOpenUrl("https://example.com")
-            ).toBeTruthy();
-            expect(
-                isAllowedExternalOpenUrl("https://example.com/path?q=1")
-            ).toBeTruthy();
-            expect(
-                isAllowedExternalOpenUrl("mailto:test@example.com")
-            ).toBeTruthy();
-        });
-
-        it("blocks non-web protocols", () => {
-            expect(
-                isAllowedExternalOpenUrl("file:///C:/Windows/System32")
-            ).toBeFalsy();
-            const scriptUrl = [
-                "java",
-                "script:",
-                "alert(1)",
-            ].join("");
-            expect(isAllowedExternalOpenUrl(scriptUrl)).toBeFalsy();
-            expect(
-                isAllowedExternalOpenUrl(
-                    "data:text/html;base64,PGgxPkhlbGxvPC9oMT4="
-                )
-            ).toBeFalsy();
-            expect(isAllowedExternalOpenUrl("about:blank")).toBeFalsy();
-        });
-
-        it("blocks URLs with credentials", () => {
-            expect(
-                isAllowedExternalOpenUrl("https://user:pass@example.com")
-            ).toBeFalsy();
-            expect(
-                isAllowedExternalOpenUrl("https://user@example.com")
-            ).toBeFalsy();
-        });
-
-        it("blocks URLs containing CR/LF", () => {
-            expect(
-                isAllowedExternalOpenUrl("https://example.com\nInjected")
-            ).toBeFalsy();
-            expect(
-                isAllowedExternalOpenUrl("https://example.com\rInjected")
-            ).toBeFalsy();
-        });
-
-        it("blocks mailto URLs without a valid address", () => {
-            expect(isAllowedExternalOpenUrl("mailto:not-an-email")).toBeFalsy();
-            expect(isAllowedExternalOpenUrl("mailto:")).toBeFalsy();
         });
     });
 

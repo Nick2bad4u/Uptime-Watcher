@@ -60,12 +60,6 @@ export const DEFAULT_HISTORY_LIMIT_RULES: HistoryLimitRules = Object.freeze({
 });
 
 /**
- * Default history retention limit exported for convenience.
- */
-export const DEFAULT_HISTORY_LIMIT: number =
-    DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
-
-/**
  * Computes the effective history limit after applying business rules.
  *
  * @remarks
