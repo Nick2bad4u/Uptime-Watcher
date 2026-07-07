@@ -327,27 +327,25 @@ function createDefaultFormData(data: Partial<FormData>): FormData;
 
 ### CamelCase - Before/After Examples
 
-#### Example 1: Status String Transformation (Real Implementation)
+#### Example 1: Metric Key Transformation
 
 ```typescript
 // ❌ Before - Unsafe string transformation
-function createStatusClass(status: string): string {
- return `status-${status.toLowerCase().replace(/\s+/g, "")}`;
+function createMetricKey(metricName: string): string {
+ return metricName.toLowerCase().replace(/\s+/g, "");
 }
 
 // ✅ After - Type-safe CamelCase transformation
 import type { CamelCase } from "type-fest";
 
 /**
- * Creates type-safe camelCase identifiers from status strings. Uses type-fest's
- * CamelCase utility to generate type-safe identifiers from status strings. This
- * demonstrates the practical usage of type-fest string manipulation utilities
- * for runtime type safety.
+ * Creates type-safe camelCase identifiers from metric labels. Uses type-fest's
+ * CamelCase utility to preserve the transformed identifier type for callers.
  */
-export const createStatusIdentifier = <T extends string>(
- status: T
+export const createMetricKey = <T extends string>(
+ metricName: T
 ): CamelCase<T> => {
- const camelCased = status
+ const camelCased = metricName
   .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
    return index === 0 ? word.toLowerCase() : word.toUpperCase();
   })

@@ -131,7 +131,6 @@ vi.mock("../../utils/status", () => {
     const formatStatusLabel = vi.fn(
         (status: string) => status.charAt(0).toUpperCase() + status.slice(1)
     );
-    const getStatusIcon = vi.fn((status: string) => `icon-${status}`);
     const MockStatusIcon = ({
         color,
         size,
@@ -149,7 +148,6 @@ vi.mock("../../utils/status", () => {
 
     return {
         formatStatusLabel,
-        getStatusIcon,
         getStatusIconComponent,
     };
 });
