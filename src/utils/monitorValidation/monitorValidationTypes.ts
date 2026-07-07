@@ -1,23 +1,6 @@
 import type { MonitorType } from "@shared/types";
-import type { ValidationResult } from "@shared/types/validation";
-import type { Simplify } from "type-fest";
 
 import type { MonitorFormData } from "../../types/monitorFormData";
-
-/**
- * Enhanced validation result with additional type information.
- */
-export type EnhancedValidationResult = Simplify<
-    ValidationResult & {
-        /** Field that was validated (if applicable). */
-        fieldName?: string;
-        /** Type information about the validation. */
-        validationType:
-            | "field"
-            | "full"
-            | "partial";
-    }
->;
 
 /**
  * Extracts the allowed field names for a specific monitor type.
