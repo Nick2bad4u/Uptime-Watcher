@@ -20,6 +20,7 @@ import {
     type MonitorType,
 } from "@shared/types";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 import { validateMonitorType as isValidMonitorType } from "@shared/utils/validation";
 import {
     isNonEmptyString,
@@ -767,7 +768,10 @@ export function normalizeMonitorInternal(monitor: Partial<Monitor>): Monitor {
 
     // Add optional fields that were provided and valid
     if (filteredMonitor.lastChecked instanceof Date) {
-        baseMonitor.lastChecked = filteredMonitor.lastChecked;
+        const epochMs = getNativeDateEpochMs(filteredMonitor.lastChecked);
+        if (epochMs !== undefined) {
+            baseMonitor.lastChecked = new Date(epochMs);
+        }
     }
 
     return baseMonitor;

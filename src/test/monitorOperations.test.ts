@@ -635,6 +635,35 @@ describe("monitorOperations", () => {
                 timeout: 5000,
                 type: "port",
             });
+            expect(result.lastChecked).not.toBe(lastChecked);
+        });
+
+        it("should omit invalid lastChecked dates", () => {
+            const result = normalizeMonitor({
+                lastChecked: new Date(Number.NaN),
+                type: "http",
+            });
+
+            expect(result.lastChecked).toBeUndefined();
+        });
+
+        it("should not invoke shadowed lastChecked Date methods", () => {
+            const lastChecked = new Date("2026-01-01T00:00:00.000Z");
+            const getTime = vi.fn(() => {
+                throw new Error("date getTime should not run");
+            });
+            Object.defineProperty(lastChecked, "getTime", {
+                value: getTime,
+            });
+
+            const result = normalizeMonitor({
+                lastChecked,
+                type: "http",
+            });
+
+            expect(result.lastChecked).toEqual(lastChecked);
+            expect(result.lastChecked).not.toBe(lastChecked);
+            expect(getTime).not.toHaveBeenCalled();
         });
 
         it("should exclude optional fields when undefined", async ({
