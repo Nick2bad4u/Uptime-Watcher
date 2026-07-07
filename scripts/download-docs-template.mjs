@@ -599,7 +599,7 @@ function rewriteLinks(content, baseUrl, logger) {
 
     /** @type {string} */
     const processed = content.replace(
-        /\((\.{1,2}\/[^\)\s]+)\)/g,
+        /\((\.{1,2}\/[^)\s]+)\)/g,
         (match, relPath) => {
             if (relPath.includes("#") || relPath.includes("?")) {
                 return match; // Skip anchors and query params

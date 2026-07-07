@@ -63,8 +63,9 @@ interface StatusHistoryData {
  * @returns Valid monitor object that passes baseMonitorSchema validation
  */
 export function createValidBaseMonitor(
-    overrides: Partial<BaseMonitorData> = {}
+    ...args: [] | [Partial<BaseMonitorData>]
 ): BaseMonitorData {
+    const overrides = args[0] ?? {};
     const result = {
         checkInterval: 30_000,
         history: [], // Required field that was missing in many tests
@@ -80,7 +81,7 @@ export function createValidBaseMonitor(
 
     // Include lastChecked by default only when called with no arguments
     // When called with any arguments (even empty object), don't include unless explicit
-    if (arguments.length === 0) {
+    if (args.length === 0) {
         (result as any).lastChecked = new Date();
     }
 
@@ -181,8 +182,9 @@ export const createValidSite = (
  * @returns Valid status history entry
  */
 export function createValidStatusHistory(
-    overrides: Partial<StatusHistoryData> = {}
+    ...args: [] | [Partial<StatusHistoryData>]
 ): StatusHistoryData {
+    const overrides = args[0] ?? {};
     const result = {
         responseTime: 150,
         status: "up" as const,
@@ -192,7 +194,7 @@ export function createValidStatusHistory(
 
     // Include details by default only when called with no arguments
     // When called with any arguments (even empty object), don't include unless explicit
-    if (arguments.length === 0) {
+    if (args.length === 0) {
         (result as any).details = "Response successful";
     }
 

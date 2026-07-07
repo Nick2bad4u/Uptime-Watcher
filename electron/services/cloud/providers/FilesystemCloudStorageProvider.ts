@@ -360,7 +360,7 @@ export class FilesystemCloudStorageProvider
                             );
                             results.push(cloudEntry);
                         } catch {
-                            continue;
+                            // Ignore files that disappear or become unreadable while listing.
                         }
                     }
                 }

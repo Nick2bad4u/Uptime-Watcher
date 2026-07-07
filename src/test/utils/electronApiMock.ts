@@ -1,4 +1,4 @@
-import type { PartialDeep } from "type-fest";
+import type { PartialDeep, UnknownRecord } from "type-fest";
 
 import { objectEntries, objectHasIn, safeCastTo } from "ts-extras";
 

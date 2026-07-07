@@ -14,6 +14,7 @@ import { safeCastTo, stringSplit } from "ts-extras";
 import { beforeEach, expect, type MockInstance, vi } from "vitest";
 
 import { useErrorStore } from "../stores/error/useErrorStore";
+import { mockElectronAPI } from "./mock-setup";
 // Custom test context setup for task and annotate properties
 // Note: The actual type definitions are in src/types/vitest-context.d.ts
 import "./vitest-context-setup";
@@ -640,4 +641,4 @@ if ((globalThis as any).fail === undefined) {
     };
 }
 
-export { mockElectronAPI } from "./mock-setup";
+export { mockElectronAPI };

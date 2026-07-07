@@ -198,7 +198,7 @@ function splitSegments(input: string): string[] {
         .map((segment) =>
             segment.length === 0
                 ? segment
-                : segment[0]!.toUpperCase() + segment.slice(1)
+                : segment.charAt(0).toUpperCase() + segment.slice(1)
         );
 }
 

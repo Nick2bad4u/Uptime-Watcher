@@ -563,10 +563,6 @@ export class WindowService {
 
         class ViteDevServerNotReadyError extends Error {
             public override readonly name = "ViteDevServerNotReadyError";
-
-            public constructor(message: string, options?: ErrorOptions) {
-                super(message, options);
-            }
         }
 
         const JITTER_MS = 200;
