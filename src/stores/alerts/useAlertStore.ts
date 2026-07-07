@@ -10,12 +10,10 @@
 import type { MonitorStatus } from "@shared/types";
 import type { Except } from "type-fest";
 
-import {
-    getCallableDataProperty,
-    getOwnPropertyValue,
-} from "@shared/utils/errorPropertyAccess";
 import { normalizeUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
+
+import { generateUuid } from "../../utils/data/generateUuid";
 
 /** Maximum number of alerts retained in memory. */
 export const MAX_ALERT_QUEUE_LENGTH = 20;
@@ -35,100 +33,10 @@ const normalizeAlertDisplayText = (value: string, fallback: string): string =>
     normalizeUserFacingErrorDetail(value) ?? fallback;
 
 /**
- * Generates monotonically increasing fallback counters without using top-level
- * mutable state.
- */
-const nextFallbackAlertCounter = (() => {
-    let counter = 0;
-    return (): number => {
-        counter += 1;
-        return counter;
-    };
-})();
-
-interface AlertCrypto {
-    readonly getRandomValues?: (buffer: Uint32Array) => Uint32Array;
-    readonly randomUUID?: () => string;
-}
-
-type AlertGetRandomValues = NonNullable<AlertCrypto["getRandomValues"]>;
-
-type AlertRandomUuid = NonNullable<AlertCrypto["randomUUID"]>;
-
-const isAlertCrypto = (value: unknown): value is AlertCrypto =>
-    typeof value === "object" && value !== null;
-
-const isAlertGetRandomValues = (
-    value: unknown
-): value is AlertGetRandomValues => typeof value === "function";
-
-const isAlertRandomUuid = (value: unknown): value is AlertRandomUuid =>
-    typeof value === "function";
-
-const getAlertCrypto = (): AlertCrypto | undefined => {
-    const property = getOwnPropertyValue(globalThis, "crypto");
-    const cryptoCandidate = property.found ? property.value : undefined;
-    return isAlertCrypto(cryptoCandidate) ? cryptoCandidate : undefined;
-};
-
-const getAlertRandomUuid = (
-    cryptoObject: AlertCrypto | undefined
-): AlertRandomUuid | undefined => {
-    if (!cryptoObject) {
-        return undefined;
-    }
-
-    const candidate = getCallableDataProperty(cryptoObject, "randomUUID");
-    return isAlertRandomUuid(candidate) ? candidate : undefined;
-};
-
-const getAlertGetRandomValues = (
-    cryptoObject: AlertCrypto | undefined
-): AlertGetRandomValues | undefined => {
-    if (!cryptoObject) {
-        return undefined;
-    }
-
-    const candidate = getCallableDataProperty(cryptoObject, "getRandomValues");
-    return isAlertGetRandomValues(candidate) ? candidate : undefined;
-};
-
-/**
  * Unique identifier generator that leverages the Web Crypto API when available,
- * falling back to a deterministic counter otherwise.
+ * falling back to the shared deterministic UUID helper otherwise.
  */
-const generateAlertId = (): string => {
-    const cryptoObject = getAlertCrypto();
-    const randomUUID = getAlertRandomUuid(cryptoObject);
-    if (randomUUID) {
-        try {
-            const candidate = randomUUID.call(cryptoObject);
-            if (candidate.trim().length > 0) {
-                return candidate;
-            }
-        } catch {
-            // Fall through to getRandomValues or the deterministic fallback.
-        }
-    }
-
-    const getRandomValues = getAlertGetRandomValues(cryptoObject);
-    if (getRandomValues) {
-        const buffer = new Uint32Array(2);
-        try {
-            getRandomValues.call(cryptoObject, buffer);
-        } catch {
-            return `alert-${Date.now()}-${nextFallbackAlertCounter()}`;
-        }
-        const first = buffer.at(0);
-        const second = buffer.at(1);
-
-        if (typeof first === "number" && typeof second === "number") {
-            return `alert-${first.toString(36)}-${second.toString(36)}`;
-        }
-    }
-
-    return `alert-${Date.now()}-${nextFallbackAlertCounter()}`;
-};
+const generateAlertId = (): string => `alert-${generateUuid()}`;
 
 /**
  * Normalized alert payload stored within the queue.

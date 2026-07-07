@@ -26,6 +26,7 @@ import { mapStatusUpdateToAlert } from "../../../stores/alerts/utils/alertPayloa
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const EXPECTED_MAX_TOAST_QUEUE_LENGTH = 20;
+const FALLBACK_ALERT_ID_REGEX = /^alert-site-[\da-z]{12}-\d{16}$/v;
 
 const resetAlertStore = (): void => {
     useAlertStore.setState({ alerts: [], toasts: [] });
@@ -506,7 +507,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+            expect(alert.id).toMatch(FALLBACK_ALERT_ID_REGEX);
         } finally {
             globalThis.crypto = originalCrypto;
         }
@@ -528,7 +529,12 @@ describe("useAlertStore identifier generation fallbacks", () => {
                 status: STATUS_KIND.DOWN,
             });
 
-            expect(alert.id).toMatch(/^alert-1730{10}-\d+$/v);
+            expect(alert.id).toMatch(
+                new RegExp(
+                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
+                    "v"
+                )
+            );
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
@@ -551,7 +557,12 @@ describe("useAlertStore identifier generation fallbacks", () => {
                 status: STATUS_KIND.DOWN,
             });
 
-            expect(alert.id).toMatch(/^alert-1730{9}1-\d+$/v);
+            expect(alert.id).toMatch(
+                new RegExp(
+                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
+                    "v"
+                )
+            );
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
@@ -583,7 +594,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+            expect(alert.id).toMatch(FALLBACK_ALERT_ID_REGEX);
         } finally {
             globalThis.crypto = originalCrypto;
         }
@@ -612,7 +623,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+            expect(alert.id).toMatch(FALLBACK_ALERT_ID_REGEX);
         } finally {
             globalThis.crypto = originalCrypto;
         }
@@ -651,7 +662,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
 
             expect(accessCount).toBe(0);
             expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/v);
+            expect(alert.id).toMatch(FALLBACK_ALERT_ID_REGEX);
             expect(alert.id).not.toBe("hidden-alert-id");
         } finally {
             globalThis.crypto = originalCrypto;
@@ -678,7 +689,12 @@ describe("useAlertStore identifier generation fallbacks", () => {
                 status: STATUS_KIND.DOWN,
             });
 
-            expect(alert.id).toMatch(/^alert-1730{9}2-\d+$/v);
+            expect(alert.id).toMatch(
+                new RegExp(
+                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
+                    "v"
+                )
+            );
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
@@ -714,7 +730,12 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(accessCount).toBe(0);
-            expect(alert.id).toMatch(/^alert-1730{9}3-\d+$/v);
+            expect(alert.id).toMatch(
+                new RegExp(
+                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
+                    "v"
+                )
+            );
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
