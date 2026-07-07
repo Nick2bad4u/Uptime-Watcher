@@ -17,6 +17,7 @@ import {
     isMonitorStatus,
     STATUS_HISTORY_VALUES,
 } from "@shared/types";
+import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
@@ -173,8 +174,10 @@ const isValidDateEpochMs = (value: unknown): value is number =>
     value <= MAX_VALID_DATE_EPOCH_MS;
 
 const normalizeDateValue = (value: unknown): Date | undefined => {
-    if (value instanceof Date && isValidDateEpochMs(value.getTime())) {
-        return value;
+    if (value instanceof Date) {
+        const epochMs = getNativeDateEpochMs(value);
+
+        return isValidDateEpochMs(epochMs) ? new Date(epochMs) : undefined;
     }
 
     if (isNonEmptyString(value)) {

@@ -202,6 +202,23 @@ describe("siteSnapshots", () => {
         });
         expect(overlayDate.lastChecked).toBeInstanceOf(Date);
 
+        const shadowedDate = new Date("2025-01-02T12:00:00.000Z");
+        const getTime = vi.fn(() => {
+            throw new Error("date getTime should not run");
+        });
+        Object.defineProperty(shadowedDate, "getTime", {
+            value: getTime,
+        });
+        const overlayShadowedDate = mergeMonitorSnapshots(canonical, {
+            lastChecked: shadowedDate,
+        });
+        expect(overlayShadowedDate.lastChecked).toBeInstanceOf(Date);
+        expect(overlayShadowedDate.lastChecked).not.toBe(shadowedDate);
+        expect(overlayShadowedDate.lastChecked?.toISOString()).toBe(
+            "2025-01-02T12:00:00.000Z"
+        );
+        expect(getTime).not.toHaveBeenCalled();
+
         const overlayEpoch = mergeSerializedMonitorOverlay(canonical, {
             lastChecked: Date.UTC(2025, 0, 3),
         });

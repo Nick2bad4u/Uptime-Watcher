@@ -1,8 +1,12 @@
 import type { Monitor, MonitorStatus, Site } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
+import {
+    getNativeDateEpochMs,
+    toNativeDateISOString,
+} from "@shared/utils/nativeDate";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { isDefined } from "ts-extras";
 
 import { logger } from "../../../services/logger";
 import {
@@ -12,8 +16,10 @@ import {
 
 function normalizeStatusUpdateSnapshotTimestamp(value: Date | string): string {
     if (value instanceof Date) {
-        return isFiniteNumber(value.getTime())
-            ? value.toISOString()
+        const epochMs = getNativeDateEpochMs(value);
+
+        return isDefined(epochMs)
+            ? (toNativeDateISOString(value) ?? new Date(epochMs).toISOString())
             : new Date().toISOString();
     }
 

@@ -107,6 +107,30 @@ describe(applyStatusUpdateSnapshot, () => {
         expect(getMergedEvent().timestamp).toBe(timestamp.toISOString());
     });
 
+    it("does not invoke shadowed Date methods while preserving timestamps", () => {
+        const timestamp = new Date("2026-07-03T09:15:00.000Z");
+        const getTime = vi.fn(() => {
+            throw new Error("date getTime should not run");
+        });
+        const toISOString = vi.fn(() => {
+            throw new Error("date toISOString should not run");
+        });
+        Object.defineProperty(timestamp, "getTime", {
+            value: getTime,
+        });
+        Object.defineProperty(timestamp, "toISOString", {
+            value: toISOString,
+        });
+
+        const payload = createPayload(timestamp);
+
+        applyStatusUpdateSnapshot([getPayloadSite(payload)], payload);
+
+        expect(getMergedEvent().timestamp).toBe("2026-07-03T09:15:00.000Z");
+        expect(getTime).not.toHaveBeenCalled();
+        expect(toISOString).not.toHaveBeenCalled();
+    });
+
     it("falls back for impossible ISO-like timestamp strings", () => {
         const payload = createPayload("2026-02-30T00:00:00.000Z");
 
