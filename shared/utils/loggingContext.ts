@@ -52,7 +52,7 @@ export interface SanitizedLogContext {
 
 type Mutable<T> = Writable<T>;
 
-export const LOG_CONTEXT_SYMBOL: unique symbol = Symbol(
+const LOG_CONTEXT_SYMBOL: unique symbol = Symbol(
     "uptime-watcher-log-context"
 );
 
@@ -521,7 +521,7 @@ export const withLogContext = (
     [LOG_CONTEXT_SYMBOL]: true,
 });
 
-export const isStructuredLogContext = (
+const isStructuredLogContext = (
     value: unknown
 ): value is StructuredLogContext => {
     if (typeof value !== "object" || value === null) {

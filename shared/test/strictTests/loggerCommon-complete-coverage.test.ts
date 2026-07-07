@@ -13,18 +13,9 @@ import type {
 import {
     buildErrorLogArguments,
     buildLogArguments,
-    formatLogMessage,
     serializeError,
 } from "@shared/utils/logger/common";
 import { describe, expect, it } from "vitest";
-
-describe(formatLogMessage, () => {
-    it("applies standard prefix formatting", () => {
-        expect(formatLogMessage("CORE", "hello world")).toBe(
-            "[CORE] hello world"
-        );
-    });
-});
 
 describe(serializeError, () => {
     it("returns null for non-error values", () => {

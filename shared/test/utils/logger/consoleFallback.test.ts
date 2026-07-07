@@ -1,68 +1,59 @@
 import { describe, expect, it, vi } from "vitest";
 
-import {
-    createConsoleFallbackLogger,
-    sharedFallbackLogger,
-    type ConsoleFallbackTransport,
-} from "../../../utils/logger/consoleFallback";
+import { sharedFallbackLogger } from "../../../utils/logger/consoleFallback";
 
-function createTransport(): ConsoleFallbackTransport {
-    return {
-        debug: vi.fn(),
-        error: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-    };
-}
-
-describe(createConsoleFallbackLogger, () => {
-    it("formats non-error log messages with the provided prefix", () => {
+describe("sharedFallbackLogger", () => {
+    it("formats non-error log messages with the shared prefix", () => {
         expect.assertions(2);
 
-        const transport = createTransport();
-        const logger = createConsoleFallbackLogger("TEST", transport);
+        const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
         const context = { feature: "fallback" };
 
-        logger.info("initialized", context);
+        sharedFallbackLogger.info("initialized", context);
 
-        expect(transport.info).toHaveBeenCalledTimes(1);
-        expect(transport.info).toHaveBeenCalledWith(
-            "[TEST] initialized",
+        expect(infoSpy).toHaveBeenCalledTimes(1);
+        expect(infoSpy).toHaveBeenCalledWith(
+            "[SHARED] initialized",
             context
         );
+
+        infoSpy.mockRestore();
     });
 
     it("serializes Error instances passed to error logs", () => {
         expect.assertions(2);
 
-        const transport = createTransport();
-        const logger = createConsoleFallbackLogger("TEST", transport);
+        const errorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
         const error = new Error("boom");
 
-        logger.error("failed", error);
+        sharedFallbackLogger.error("failed", error);
 
-        expect(transport.error).toHaveBeenCalledTimes(1);
-        expect(transport.error).toHaveBeenCalledWith(
-            "[TEST] failed",
+        expect(errorSpy).toHaveBeenCalledTimes(1);
+        expect(errorSpy).toHaveBeenCalledWith(
+            "[SHARED] failed",
             expect.objectContaining({
                 message: "boom",
                 name: "Error",
             })
         );
+
+        errorSpy.mockRestore();
     });
 
     it("does not throw when the fallback transport itself fails", () => {
         expect.assertions(1);
 
-        const transport = createTransport();
-        vi.mocked(transport.warn).mockImplementation(() => {
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {
             throw new Error("transport failed");
         });
-        const logger = createConsoleFallbackLogger("TEST", transport);
 
         expect(() => {
-            logger.warn("best effort diagnostic");
+            sharedFallbackLogger.warn("best effort diagnostic");
         }).not.toThrow();
+
+        warnSpy.mockRestore();
     });
 
     it("exports a shared fallback logger instance", () => {

@@ -12,7 +12,7 @@ import type { BaseLogger } from "./interfaces";
 
 import { buildErrorLogArguments, buildLogArguments } from "./common";
 
-export type ConsoleFallbackTransport = Pick<
+type ConsoleFallbackTransport = Pick<
     typeof console,
     | "debug"
     | "error"
@@ -36,7 +36,7 @@ function safelyInvokeTransport(operation: () => void): void {
  *
  * @returns Logger implementation for last-resort shared diagnostics.
  */
-export function createConsoleFallbackLogger(
+function createConsoleFallbackLogger(
     prefix = "SHARED",
     transport: ConsoleFallbackTransport = console
 ): BaseLogger {

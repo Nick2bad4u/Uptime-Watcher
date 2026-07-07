@@ -91,7 +91,7 @@ function safeSerializeErrorInternal(
  *
  * @returns Formatted log message.
  */
-export const formatLogMessage = (prefix: string, message: string): string =>
+const formatLogMessage = (prefix: string, message: string): string =>
     `[${prefix}] ${safeNormalizeLogString(message)}`;
 
 /**
