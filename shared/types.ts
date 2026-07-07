@@ -6,6 +6,7 @@ import type { DnsRecordType } from "@shared/types/schemaTypes";
  */
 import type { UnknownRecord, ValueOf } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
     arrayIncludes,
@@ -587,6 +588,11 @@ export function isSiteStatus(status: unknown): status is SiteStatus {
     );
 }
 
+function getOwnDataPropertyValue(source: object, key: PropertyKey): unknown {
+    const property = getOwnDataProperty(source, key);
+    return property.found ? property.value : undefined;
+}
+
 /**
  * Validates monitor payloads using shared runtime guards.
  *
@@ -605,19 +611,33 @@ export function validateMonitor(monitor: unknown): monitor is Monitor {
         return false;
     }
 
+    const activeOperations = getOwnDataPropertyValue(
+        monitor,
+        "activeOperations"
+    );
+    const checkInterval = getOwnDataPropertyValue(monitor, "checkInterval");
+    const history = getOwnDataPropertyValue(monitor, "history");
+    const id = getOwnDataPropertyValue(monitor, "id");
+    const monitoring = getOwnDataPropertyValue(monitor, "monitoring");
+    const responseTime = getOwnDataPropertyValue(monitor, "responseTime");
+    const retryAttempts = getOwnDataPropertyValue(monitor, "retryAttempts");
+    const status = getOwnDataPropertyValue(monitor, "status");
+    const timeout = getOwnDataPropertyValue(monitor, "timeout");
+    const type = getOwnDataPropertyValue(monitor, "type");
+
     return (
-        typeof monitor["id"] === "string" &&
-        typeof monitor["type"] === "string" &&
-        arrayIncludes(BASE_MONITOR_TYPE_STRING_VALUES, monitor["type"]) &&
-        typeof monitor["status"] === "string" &&
-        isMonitorStatus(monitor["status"]) &&
-        typeof monitor["monitoring"] === "boolean" &&
-        isFiniteMonitorNumber(monitor["responseTime"]) &&
-        isFiniteMonitorNumber(monitor["checkInterval"]) &&
-        isFiniteMonitorNumber(monitor["timeout"]) &&
-        isFiniteMonitorNumber(monitor["retryAttempts"]) &&
-        Array.isArray(monitor["history"]) &&
-        (!isDefined(monitor["activeOperations"]) ||
-            isValidActiveOperations(monitor["activeOperations"]))
+        typeof id === "string" &&
+        typeof type === "string" &&
+        arrayIncludes(BASE_MONITOR_TYPE_STRING_VALUES, type) &&
+        typeof status === "string" &&
+        isMonitorStatus(status) &&
+        typeof monitoring === "boolean" &&
+        isFiniteMonitorNumber(responseTime) &&
+        isFiniteMonitorNumber(checkInterval) &&
+        isFiniteMonitorNumber(timeout) &&
+        isFiniteMonitorNumber(retryAttempts) &&
+        Array.isArray(history) &&
+        (!isDefined(activeOperations) ||
+            isValidActiveOperations(activeOperations))
     );
 }

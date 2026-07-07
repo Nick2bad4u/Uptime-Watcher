@@ -276,6 +276,53 @@ describe("shared/types.ts function coverage", () => {
             expect(validateMonitor(validMonitor)).toBeTruthy();
         });
 
+        it("should return false for monitor fields inherited from the prototype", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const validMonitor: Monitor = {
+                activeOperations: [],
+                checkInterval: 60,
+                history: [],
+                id: "monitor-inherited",
+                monitoring: true,
+                responseTime: 150,
+                retryAttempts: 3,
+                status: "up",
+                timeout: 30,
+                type: "http",
+                url: "https://example.com",
+            };
+            const inheritedMonitor = Object.create(validMonitor) as unknown;
+
+            expect(validateMonitor(inheritedMonitor)).toBeFalsy();
+        });
+
+        it("should return false without invoking monitor field accessors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types.main-functions", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const accessorMonitor = {};
+            Object.defineProperty(accessorMonitor, "id", {
+                enumerable: true,
+                get: () => {
+                    throw new Error("id getter should not run");
+                },
+            });
+
+            expect(validateMonitor(accessorMonitor)).toBeFalsy();
+        });
+
         it("should return true for valid monitor with activeOperations", async ({
             task,
             annotate,
