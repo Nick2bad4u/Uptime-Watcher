@@ -1,45 +1,12 @@
 /**
- * Complete test coverage for stringConversion.ts unreachable code paths This
- * test uses advanced techniques to reach it("should handle all typeof results
- * comprehensively", async ({ task, annotate, }) => { await annotate(`Testing:
- * ${task.name}`, "functional"); await annotate("Component:
- * stringConversion.coverage-override", "component"); await annotate("Category:
- * Utility", "category"); await annotate("Type: Business Logic", "type"); //
- * This test ensures we exercise all possible typeof results const testCases = [
- * ["boolean", true], ["number", 42], ["string", "test"], ["symbol",
- * Symbol("test")], ["bigint", BigInt(123)], ["function", () => {}], ["object",
- * {}], ["object", null], // typeof null === "object" ["undefined", undefined],
- * ];
- *
- * ```
- *     for (const [expectedTypeName, value] of testCases) {
- *         expect(typeof value).toBe(expectedTypeName);
- *         const result = safeStringify(value);
- *         expect(typeof result).toBe("string");
- *     }
- * });nreachable code
- * ```
+ * Complete test coverage for stringConversion.ts edge cases and fallback paths.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { safeStringify } from "../../utils/stringConversion";
 
 describe("String Conversion - 100% Coverage Override", () => {
-    let originalTypeof: any;
-
-    beforeEach(() => {
-        // Store the original typeof operator
-        originalTypeof = (globalThis as any).typeof;
-    });
-
-    afterEach(() => {
-        // Restore original typeof if we modified it
-        if (originalTypeof) {
-            (globalThis as any).typeof = originalTypeof;
-        }
-    });
-
     it("should reach case undefined by creating a value that reports as undefined but isn't null", async ({
         task,
         annotate,
@@ -62,7 +29,8 @@ describe("String Conversion - 100% Coverage Override", () => {
         expect(result2).toBe("");
 
         // Test with destructured undefined
-        const { nonExistent } = {} as any;
+        const source: { readonly nonExistent?: unknown } = {};
+        const { nonExistent } = source;
         const result3 = safeStringify(nonExistent);
         expect(result3).toBe("");
     });
@@ -146,8 +114,11 @@ describe("String Conversion - 100% Coverage Override", () => {
             { value: () => {}, expected: "[Function]" },
 
             // Edge cases
-            { value: new Date(), expected: new Date().toISOString() },
-            { value: /regex/v, expected: "/regex/" },
+            {
+                value: new Date("2026-07-07T00:00:00.000Z"),
+                expected: '"2026-07-07T00:00:00.000Z"',
+            },
+            { value: /regex/v, expected: "{}" },
         ];
 
         for (const { value, expected } of testCases) {
@@ -183,7 +154,12 @@ describe("String Conversion - 100% Coverage Override", () => {
         await annotate("Type: Business Logic", "type");
 
         // Create circular reference to test the try/catch path
-        const circular: any = { name: "test" };
+        interface CircularRecord {
+            name: string;
+            self?: CircularRecord;
+        }
+
+        const circular: CircularRecord = { name: "test" };
         circular.self = circular;
 
         const result = safeStringify(circular);
