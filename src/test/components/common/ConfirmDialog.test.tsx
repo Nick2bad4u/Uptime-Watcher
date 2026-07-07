@@ -8,28 +8,43 @@
 
 import "@testing-library/jest-dom";
 import { act, render } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { ConfirmDialog } from "../../../components/common/ConfirmDialog/ConfirmDialog";
-import {
-    resetConfirmDialogState,
-    useConfirmDialogStore,
-} from "../../../stores/ui/useConfirmDialogStore";
+import { requestConfirmation } from "../../../stores/ui/useConfirmDialogStore";
+
+const getConfirmDialogBridge = (): {
+    cancel: () => void;
+} => {
+    const bridge = (
+        globalThis as typeof globalThis & {
+            playwrightConfirmDialog?: {
+                cancel: () => void;
+            };
+        }
+    ).playwrightConfirmDialog;
+
+    if (!bridge) {
+        throw new Error("Confirm dialog automation bridge is unavailable");
+    }
+
+    return bridge;
+};
 
 describe(ConfirmDialog, () => {
     beforeEach(() => {
         act(() => {
-            resetConfirmDialogState();
+            getConfirmDialogBridge().cancel();
         });
     });
 
     afterEach(() => {
         act(() => {
-            resetConfirmDialogState();
+            getConfirmDialogBridge().cancel();
         });
     });
 
-    it("applies a dedicated stacking class so the dialog stays above other modals", ({
+    it("applies a dedicated stacking class so the dialog stays above other modals", async ({
         annotate,
         task,
     }) => {
@@ -38,16 +53,13 @@ describe(ConfirmDialog, () => {
         annotate("Category: UI", "category");
         annotate("Type: Regression", "type");
 
+        let confirmation!: Promise<boolean>;
         act(() => {
-            useConfirmDialogStore.setState({
-                request: {
-                    cancelLabel: "Cancel",
-                    confirmLabel: "Delete",
-                    message: "Delete the selected site?",
-                    title: "Confirm Delete",
-                    tone: "danger",
-                },
-                resolve: vi.fn(),
+            confirmation = requestConfirmation({
+                confirmLabel: "Delete",
+                message: "Delete the selected site?",
+                title: "Confirm Delete",
+                tone: "danger",
             });
         });
 
@@ -57,5 +69,10 @@ describe(ConfirmDialog, () => {
         expect(overlay).not.toBeNull();
         expect(overlay).toHaveClass("modal-overlay--confirm");
         expect(overlay).toHaveClass("modal-overlay");
+
+        act(() => {
+            getConfirmDialogBridge().cancel();
+        });
+        await expect(confirmation).resolves.toBeFalsy();
     });
 });

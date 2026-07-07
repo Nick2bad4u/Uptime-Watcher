@@ -4,7 +4,7 @@
 
 import { fc, test as fcTest } from "@fast-check/vitest";
 import { act, renderHook } from "@testing-library/react";
-import { arrayAt, safeCastTo } from "ts-extras";
+import { arrayAt } from "ts-extras";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -12,15 +12,34 @@ import {
     type ConfirmDialogStoreState,
     type ConfirmDialogTone,
     requestConfirmation,
-    resetConfirmDialogState,
     useConfirmDialogControls,
-    useConfirmDialogStore,
     useConfirmDialogVisibility,
 } from "../../../stores/ui/useConfirmDialogStore";
 
-describe(useConfirmDialogStore, () => {
+interface ConfirmDialogAutomationBridge {
+    cancel: () => void;
+    confirm: () => void;
+    getState: () => ConfirmDialogStoreState;
+    subscribe: (listener: (state: ConfirmDialogStoreState) => void) => () => void;
+}
+
+function getConfirmDialogBridge(): ConfirmDialogAutomationBridge {
+    const bridge = (
+        globalThis as typeof globalThis & {
+            playwrightConfirmDialog?: ConfirmDialogAutomationBridge;
+        }
+    ).playwrightConfirmDialog;
+
+    if (!bridge) {
+        throw new Error("Confirm dialog automation bridge is unavailable");
+    }
+
+    return bridge;
+}
+
+describe("confirm dialog store", () => {
     beforeEach(() => {
-        resetConfirmDialogState();
+        getConfirmDialogBridge().cancel();
     });
 
     it("normalizes default confirmation options and resolves true on confirm", async () => {
@@ -28,7 +47,8 @@ describe(useConfirmDialogStore, () => {
             message: "Perform sync?",
             title: "Synchronize data",
         });
-        const state = useConfirmDialogStore.getState();
+        const bridge = getConfirmDialogBridge();
+        const state = bridge.getState();
 
         expect(state.request).toStrictEqual({
             cancelLabel: "Cancel",
@@ -38,10 +58,10 @@ describe(useConfirmDialogStore, () => {
             tone: "default",
         });
 
-        state.confirm();
+        bridge.confirm();
 
         await expect(confirmation).resolves.toBeTruthy();
-        expect(useConfirmDialogStore.getState().request).toBeNull();
+        expect(bridge.getState().request).toBeNull();
     });
 
     it("applies custom labels, tone, and details while resolving false on cancel", async () => {
@@ -53,7 +73,8 @@ describe(useConfirmDialogStore, () => {
             title: "Confirm removal",
             tone: "danger",
         });
-        const state = useConfirmDialogStore.getState();
+        const bridge = getConfirmDialogBridge();
+        const state = bridge.getState();
 
         expect(state.request).toStrictEqual({
             cancelLabel: "Back",
@@ -64,10 +85,10 @@ describe(useConfirmDialogStore, () => {
             tone: "danger",
         });
 
-        state.cancel();
+        bridge.cancel();
 
         await expect(confirmation).resolves.toBeFalsy();
-        expect(useConfirmDialogStore.getState().request).toBeNull();
+        expect(bridge.getState().request).toBeNull();
     });
 
     it("cancels an active dialog when opening a new confirmation request", async () => {
@@ -83,7 +104,8 @@ describe(useConfirmDialogStore, () => {
 
         await expect(firstConfirmation).resolves.toBeFalsy();
 
-        const state = useConfirmDialogStore.getState();
+        const bridge = getConfirmDialogBridge();
+        const state = bridge.getState();
         expect(state.request).toStrictEqual({
             cancelLabel: "Cancel",
             confirmLabel: "Confirm",
@@ -92,12 +114,12 @@ describe(useConfirmDialogStore, () => {
             tone: "default",
         });
 
-        state.confirm();
+        bridge.confirm();
 
         await expect(secondConfirmation).resolves.toBeTruthy();
     });
 
-    it("provides memoized confirm dialog controls", () => {
+    it("provides memoized confirm dialog controls", async () => {
         const { result, rerender } = renderHook(() =>
             useConfirmDialogControls()
         );
@@ -105,18 +127,12 @@ describe(useConfirmDialogStore, () => {
 
         expect(initialControls.request).toBeNull();
 
+        let confirmation!: Promise<boolean>;
         act(() => {
-            const { open } = useConfirmDialogStore.getState();
-            open(
-                {
-                    cancelLabel: "Cancel",
-                    confirmLabel: "Confirm",
-                    message: "Queued",
-                    title: "Queued",
-                    tone: "default",
-                },
-                () => {}
-            );
+            confirmation = requestConfirmation({
+                message: "Queued",
+                title: "Queued",
+            });
         });
 
         rerender();
@@ -129,6 +145,7 @@ describe(useConfirmDialogStore, () => {
         act(() => {
             activeControls.cancel();
         });
+        await expect(confirmation).resolves.toBeFalsy();
 
         rerender();
         const clearedControls = result.current;
@@ -138,25 +155,19 @@ describe(useConfirmDialogStore, () => {
         expect(clearedControls.confirm).toBe(initialControls.confirm);
     });
 
-    it("exposes visibility helpers that track store state", () => {
+    it("exposes visibility helpers that track store state", async () => {
         const { result, rerender } = renderHook(() =>
             useConfirmDialogVisibility()
         );
 
         expect(result.current.isOpen).toBeFalsy();
 
+        let confirmation!: Promise<boolean>;
         act(() => {
-            const { open } = useConfirmDialogStore.getState();
-            open(
-                {
-                    cancelLabel: "Cancel",
-                    confirmLabel: "Confirm",
-                    message: "Visible",
-                    title: "Visible",
-                    tone: "default",
-                },
-                () => {}
-            );
+            confirmation = requestConfirmation({
+                message: "Visible",
+                title: "Visible",
+            });
         });
 
         rerender();
@@ -165,6 +176,7 @@ describe(useConfirmDialogStore, () => {
         act(() => {
             result.current.cancel();
         });
+        await expect(confirmation).resolves.toBeFalsy();
 
         rerender();
         expect(result.current.isOpen).toBeFalsy();
@@ -217,13 +229,14 @@ describe(useConfirmDialogStore, () => {
     fcTest.prop([confirmDialogOptionsArb, fc.boolean()])(
         "resolves to the caller's decision for arbitrary dialog options",
         async (options, shouldConfirm) => {
-            resetConfirmDialogState();
+            const bridge = getConfirmDialogBridge();
+            bridge.cancel();
 
             const confirmation = requestConfirmation(
                 buildConfirmDialogOptions(options)
             );
 
-            const state = useConfirmDialogStore.getState();
+            const state = bridge.getState();
             const expectedRequest = {
                 cancelLabel: options.cancelLabel ?? "Cancel",
                 confirmLabel: options.confirmLabel ?? "Confirm",
@@ -236,13 +249,13 @@ describe(useConfirmDialogStore, () => {
             expect(state.request).toStrictEqual(expectedRequest);
 
             if (shouldConfirm) {
-                state.confirm();
+                bridge.confirm();
             } else {
-                state.cancel();
+                bridge.cancel();
             }
 
             await expect(confirmation).resolves.toBe(shouldConfirm);
-            expect(useConfirmDialogStore.getState().request).toBeNull();
+            expect(bridge.getState().request).toBeNull();
         }
     );
 
@@ -251,7 +264,8 @@ describe(useConfirmDialogStore, () => {
     ])(
         "cancels previous confirmations when a new dialog is requested",
         async (requests) => {
-            resetConfirmDialogState();
+            const bridge = getConfirmDialogBridge();
+            bridge.cancel();
 
             const confirmations = requests.map((request) =>
                 requestConfirmation(buildConfirmDialogOptions(request))
@@ -261,29 +275,15 @@ describe(useConfirmDialogStore, () => {
                 await expect(confirmations[index]).resolves.toBeFalsy();
             }
 
-            useConfirmDialogStore.getState().confirm();
+            bridge.confirm();
 
             await expect(arrayAt(confirmations, -1)).resolves.toBeTruthy();
-            expect(useConfirmDialogStore.getState().request).toBeNull();
+            expect(bridge.getState().request).toBeNull();
         }
     );
 
     it("exposes Playwright automation helpers on the global scope", async () => {
-        const automationTarget = safeCastTo<
-            typeof globalThis & {
-                playwrightConfirmDialog?: {
-                    cancel: () => void;
-                    confirm: () => void;
-                    getState: () => ConfirmDialogStoreState;
-                    subscribe: (
-                        listener: (state: ConfirmDialogStoreState) => void
-                    ) => () => void;
-                };
-            }
-        >(globalThis);
-
-        const bridge = automationTarget.playwrightConfirmDialog;
-        expect(bridge).toBeDefined();
+        const bridge = getConfirmDialogBridge();
 
         const confirmation = requestConfirmation({
             message: "Automated confirmation",
@@ -291,19 +291,19 @@ describe(useConfirmDialogStore, () => {
         });
 
         const snapshots: ConfirmDialogStoreState[] = [];
-        const unsubscribe = bridge?.subscribe((state) => {
+        const unsubscribe = bridge.subscribe((state) => {
             snapshots.push(state);
         });
 
-        expect(bridge?.getState().request?.message).toBe(
+        expect(bridge.getState().request?.message).toBe(
             "Automated confirmation"
         );
 
-        bridge?.confirm();
+        bridge.confirm();
 
         await expect(confirmation).resolves.toBeTruthy();
-        expect(bridge?.getState().request).toBeNull();
-        unsubscribe?.();
+        expect(bridge.getState().request).toBeNull();
+        unsubscribe();
         expect(snapshots.length).toBeGreaterThanOrEqual(1);
     });
 });

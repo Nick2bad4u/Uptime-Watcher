@@ -87,39 +87,34 @@ const selectRequest = (
 const selectIsOpen = (state: ConfirmDialogState): boolean =>
     state.request !== null;
 
-/**
- * Zustand store holding the active confirmation dialog state.
- *
- * @public
- */
-export const useConfirmDialogStore: UseBoundStore<
-    StoreApi<ConfirmDialogState>
-> = create<ConfirmDialogState>((set, get) => {
-    const resolveAndReset = (result: boolean): void => {
-        const { resolve } = get();
-        set({ request: null, resolve: null });
-        resolve?.(result);
-    };
+const useConfirmDialogStore: UseBoundStore<StoreApi<ConfirmDialogState>> =
+    create<ConfirmDialogState>((set, get) => {
+        const resolveAndReset = (result: boolean): void => {
+            const { resolve } = get();
+            set({ request: null, resolve: null });
+            resolve?.(result);
+        };
 
-    return {
-        cancel(): void {
-            resolveAndReset(false);
-        },
-        confirm(): void {
-            resolveAndReset(true);
-        },
-        open(request, resolver): void {
-            const { request: activeRequest, resolve: activeResolver } = get();
-            if (activeRequest) {
-                // Resolve outstanding request as cancelled before opening the new one.
-                activeResolver?.(false);
-            }
-            set({ request, resolve: resolver });
-        },
-        request: null,
-        resolve: null,
-    };
-});
+        return {
+            cancel(): void {
+                resolveAndReset(false);
+            },
+            confirm(): void {
+                resolveAndReset(true);
+            },
+            open(request, resolver): void {
+                const { request: activeRequest, resolve: activeResolver } =
+                    get();
+                if (activeRequest) {
+                    // Resolve outstanding request as cancelled before opening the new one.
+                    activeResolver?.(false);
+                }
+                set({ request, resolve: resolver });
+            },
+            request: null,
+            resolve: null,
+        };
+    });
 
 const shouldExposeConfirmDialogAutomationHooks =
     typeof window !== "undefined" && import.meta.env.MODE !== "production";
@@ -258,13 +253,4 @@ export async function requestConfirmation(
     return new Promise<boolean>((resolve) => {
         open(request, resolve);
     });
-}
-
-/**
- * Resets the confirm dialog state. Intended for test cleanup.
- *
- * @public
- */
-export function resetConfirmDialogState(): void {
-    useConfirmDialogStore.setState({ request: null, resolve: null });
 }
