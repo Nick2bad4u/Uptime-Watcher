@@ -159,8 +159,7 @@
             "getMonitorTypeConfig": "#",
             "hasValidHost": "#",
             "performSinglePortCheck": "#",
-            "useSiteAnalytics": "#",
-            "validateMonitorHost": "#"
+            "useSiteAnalytics": "#"
         },
         "validator": {
             "isEmail": "https://github.com/validatorjs/validator.js#validators",

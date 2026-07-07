@@ -67,7 +67,7 @@ export function createMonitorErrorResult(
  *
  * @returns Error message if validation fails, null if valid
  */
-export function validateMonitorHost(monitor: Monitor): null | string {
+function validateMonitorHost(monitor: Monitor): null | string {
     const rawHost = monitor.host;
     if (typeof rawHost !== "string") {
         return "Monitor missing valid host";
@@ -200,25 +200,6 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
     }
 
     return null;
-}
-
-/**
- * Returns the provided value when it is not `null`/`undefined`, otherwise
- * yields the specified fallback.
- *
- * @typeParam T - The value type.
- *
- * @param value - Candidate value to unwrap.
- * @param fallback - Fallback value to use when `value` is nullish.
- */
-export function withFallback<T>(
-    value:
-        | null
-        | T
-        | undefined,
-    fallback: T
-): T {
-    return value ?? fallback;
 }
 
 /**
