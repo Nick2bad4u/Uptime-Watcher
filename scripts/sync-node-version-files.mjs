@@ -159,16 +159,16 @@ const readPackageJson = async () => {
  * @returns {string | null}
  */
 const resolveMinimumEngineVersion = (enginesValue) => {
-    if (!isRecord(enginesValue) || typeof enginesValue["node"] !== "string") {
+    if (!isRecord(enginesValue) || typeof enginesValue.node !== "string") {
         return null;
     }
 
-    const nodeEngineRange = enginesValue["node"].trim();
+    const nodeEngineRange = enginesValue.node.trim();
     const match = /^>=\s*(?<minimumVersion>\d+\.\d+\.\d+)$/v.exec(
         nodeEngineRange
     );
 
-    return match?.groups?.["minimumVersion"] ?? null;
+    return match?.groups?.minimumVersion ?? null;
 };
 
 /**
@@ -322,7 +322,7 @@ const main = async (argumentList = process.argv.slice(2)) => {
         parseArguments(argumentList);
     const packageJson = await readPackageJson();
     const minimumEngineVersion = resolveMinimumEngineVersion(
-        packageJson["engines"]
+        packageJson.engines
     );
     const preferredVersion =
         explicitVersion ?? normalizeNodeVersion(process.versions.node);

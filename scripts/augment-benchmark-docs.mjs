@@ -96,9 +96,9 @@ function addDocToDefinitions(text, config) {
         );
         if (!match) continue;
 
-        const indent = match.groups?.["indent"] ?? "";
-        const kind = match.groups?.["kind"] ?? "interface";
-        const name = match.groups?.["name"] ?? "";
+        const indent = match.groups?.indent ?? "";
+        const kind = match.groups?.kind ?? "interface";
+        const name = match.groups?.name ?? "";
         const prevLine = lines[i - 1]?.trim();
 
         if (prevLine?.startsWith("/**")) {
@@ -136,8 +136,8 @@ function addDocToFunctions(text, config) {
         const match = line.match(/^(?<indent>\s*)function\s+(?<name>\w+)\s*\(/);
         if (!match) continue;
 
-        const indent = match.groups?.["indent"] ?? "";
-        const name = match.groups?.["name"] ?? "";
+        const indent = match.groups?.indent ?? "";
+        const name = match.groups?.name ?? "";
         const prevLine = lines[i - 1]?.trim();
 
         if (prevLine?.startsWith("/**")) {

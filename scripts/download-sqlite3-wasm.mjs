@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 // Source URL for WASM. Allow override (e.g., for air‑gapped or pinned artifact mirrors)
 const url =
-    process.env["SQLITE3_WASM_URL"] ||
+    process.env.SQLITE3_WASM_URL ||
     "https://github.com/tndrle/node-sqlite3-wasm/raw/refs/heads/main/dist/node-sqlite3-wasm.wasm";
 const destDir = path.resolve(__dirname, "../dist");
 const dest = path.join(destDir, "node-sqlite3-wasm.wasm");
@@ -32,7 +32,7 @@ const packageDest = path.resolve(
 
 // Expected SHA256 of the WASM (update when upstream changes). Allow override via env to facilitate controlled updates.
 // If no hash is provided, we'll download and verify against the upstream hash
-const EXPECTED_SHA256 = process.env["SQLITE3_WASM_SHA256"]?.toLowerCase();
+const EXPECTED_SHA256 = process.env.SQLITE3_WASM_SHA256?.toLowerCase();
 
 const MAX_REDIRECTS = 3;
 

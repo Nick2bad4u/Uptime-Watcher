@@ -118,15 +118,15 @@ function extractTestNames(filePath) {
 
         // Extract describe blocks
         for (const match of content.matchAll(describeRegex)) {
-            if (match.groups?.["name"]) {
-                testStructure.describes.push(match.groups["name"]);
+            if (match.groups?.name) {
+                testStructure.describes.push(match.groups.name);
             }
         }
 
         // Extract it/test blocks
         for (const match of content.matchAll(itRegex)) {
-            if (match.groups?.["name"]) {
-                testStructure.tests.push(match.groups["name"]);
+            if (match.groups?.name) {
+                testStructure.tests.push(match.groups.name);
             }
         }
 
@@ -292,8 +292,8 @@ function main(args = process.argv.slice(2)) {
             const structure = extractTestNames(filePath);
             const structCast = /** @type {any} */ (structure);
             if (
-                (structCast["describes"]?.length ?? 0) > 0 ||
-                (structCast["tests"]?.length ?? 0) > 0
+                (structCast.describes?.length ?? 0) > 0 ||
+                (structCast.tests?.length ?? 0) > 0
             ) {
                 testStructures.push(structure);
             }
@@ -306,11 +306,11 @@ function main(args = process.argv.slice(2)) {
         // Summary
         const totalDescribes = testStructures.reduce((sum, s) => {
             const sCast = /** @type {any} */ (s);
-            return sum + (sCast["describes"]?.length ?? 0);
+            return sum + (sCast.describes?.length ?? 0);
         }, 0);
         const totalTests = testStructures.reduce((sum, s) => {
             const sCast = /** @type {any} */ (s);
-            return sum + (sCast["tests"]?.length ?? 0);
+            return sum + (sCast.tests?.length ?? 0);
         }, 0);
 
         console.log(`\n--- Summary ---`);

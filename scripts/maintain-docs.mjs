@@ -97,7 +97,7 @@ function parseFrontmatter(content) {
         return { frontmatter: null, content, yamlLines: 0 };
     }
 
-    const yamlContent = frontmatterMatch.groups?.["yaml"] ?? "";
+    const yamlContent = frontmatterMatch.groups?.yaml ?? "";
 
     /**
      * +2 for the --- delimiters.
@@ -287,7 +287,7 @@ async function updateLastReviewedDate(filePath) {
             const isoDate = lastModified.toISOString().split("T")[0] || "";
 
             // Always update last_reviewed to the git modification date
-            frontmatter["last_reviewed"] = isoDate;
+            frontmatter.last_reviewed = isoDate;
 
             const newContent = serializeFrontmatter(frontmatter) + bodyContent;
             await writeFile(filePath, newContent, "utf8");
@@ -394,12 +394,12 @@ async function fixCrossReferences(filePath) {
             /**
              * From named capture group.
              */
-            const linkText = groups["text"];
+            const linkText = groups.text;
 
             /**
              * From named capture group.
              */
-            const linkUrl = groups["url"];
+            const linkUrl = groups.url;
 
             // Fix common path issues
             if (linkUrl?.includes("../") && !linkUrl.startsWith("http")) {

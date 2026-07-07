@@ -105,7 +105,7 @@ function parseArgs(args) {
 }
 
 function resolveNpmInvocation() {
-    const execPathCandidate = process.env["npm_execpath"];
+    const execPathCandidate = process.env.npm_execpath;
 
     if (typeof execPathCandidate === "string" && execPathCandidate !== "") {
         return {

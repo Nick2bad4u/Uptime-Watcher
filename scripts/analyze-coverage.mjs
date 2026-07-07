@@ -46,7 +46,7 @@ const DEFAULTS = {
     coverageRelativePath: path.join("coverage", "coverage-final.json"),
     defaultFormat: /** @type {OutputFormat} */ ("table"),
     fileDisplayLimit: parseOptionalPositiveInteger(
-        process.env["COVERAGE_FILE_LIMIT"],
+        process.env.COVERAGE_FILE_LIMIT,
         "COVERAGE_FILE_LIMIT",
         15
     ),

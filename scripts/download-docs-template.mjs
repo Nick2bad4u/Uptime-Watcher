@@ -417,8 +417,7 @@ class Logger {
      */
     constructor(verbose = false) {
         /** @type {boolean} */
-        this.verbose =
-            verbose || process.env["DOC_DOWNLOADER_VERBOSE"] === "true";
+        this.verbose = verbose || process.env.DOC_DOWNLOADER_VERBOSE === "true";
         /** @type {number} */
         this.startTime = Date.now();
     }
@@ -510,10 +509,10 @@ async function initialize(config = parseArguments()) {
     // Setup paths
     /** @type {string} */
     let outputDir;
-    if (process.env["DOCS_OUTPUT_DIR"]) {
-        outputDir = path.isAbsolute(process.env["DOCS_OUTPUT_DIR"])
-            ? process.env["DOCS_OUTPUT_DIR"]
-            : path.resolve(process.cwd(), process.env["DOCS_OUTPUT_DIR"]);
+    if (process.env.DOCS_OUTPUT_DIR) {
+        outputDir = path.isAbsolute(process.env.DOCS_OUTPUT_DIR)
+            ? process.env.DOCS_OUTPUT_DIR
+            : path.resolve(process.cwd(), process.env.DOCS_OUTPUT_DIR);
     } else {
         outputDir = path.join(process.cwd(), ...config.subdirs, config.docName);
     }
@@ -525,8 +524,7 @@ async function initialize(config = parseArguments()) {
         logFile: path.join(outputDir, `${config.docName}-Download-Log.md`),
         hashesFile: path.join(outputDir, `${config.docName}-Hashes.json`),
         cacheDir:
-            process.env["DOC_DOWNLOADER_CACHE"] ||
-            path.join(outputDir, ".cache"),
+            process.env.DOC_DOWNLOADER_CACHE || path.join(outputDir, ".cache"),
     };
 
     // Ensure directories exist
@@ -1150,7 +1148,7 @@ async function main(args = process.argv.slice(2)) {
         console.error(
             `❌ Application failed: ${error instanceof Error ? error.message : String(error)}`
         );
-        if (process.env["DOC_DOWNLOADER_VERBOSE"]) {
+        if (process.env.DOC_DOWNLOADER_VERBOSE) {
             console.error(error instanceof Error ? error.stack : error);
         }
         return false;

@@ -83,7 +83,7 @@ function extractFrontmatter(content) {
 
     try {
         // Simple YAML parser for basic frontmatter
-        const yamlContent = frontmatterMatch.groups?.["yaml"] ?? "";
+        const yamlContent = frontmatterMatch.groups?.yaml ?? "";
         /** @type {Frontmatter} */
         const frontmatter = {};
 
@@ -166,7 +166,7 @@ function checkInternalLinks(content, filePath, allFiles) {
         const { groups } = match;
         if (!groups) continue;
 
-        const rawLinkUrl = groups["url"];
+        const rawLinkUrl = groups.url;
         if (typeof rawLinkUrl !== "string" || rawLinkUrl.length === 0) {
             continue;
         }
@@ -239,7 +239,7 @@ async function analyzeDocumentation() {
         if (frontmatter) {
             // Check if documentation is outdated
             const lastReviewed =
-                frontmatter["last_reviewed"] || frontmatter["last_updated"];
+                frontmatter.last_reviewed || frontmatter.last_updated;
             if (lastReviewed) {
                 const reviewDate = new Date(lastReviewed);
                 if (reviewDate < threeMonthsAgo) {

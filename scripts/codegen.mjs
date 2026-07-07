@@ -421,7 +421,7 @@ function runCodegen(cmd) {
  * @returns {{ args: string[]; command: string }} Child process invocation.
  */
 function resolveNpmRunInvocation(scriptName) {
-    const npmExecPath = process.env["npm_execpath"];
+    const npmExecPath = process.env.npm_execpath;
 
     if (npmExecPath) {
         return {

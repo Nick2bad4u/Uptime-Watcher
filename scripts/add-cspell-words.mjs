@@ -176,10 +176,10 @@ function parseArguments(args = process.argv.slice(2)) {
     }
 
     // Apply environment variables
-    if (process.env["CUSTOM_WORDS_FILE"]) {
-        config.customWordsFile = path.resolve(process.env["CUSTOM_WORDS_FILE"]);
+    if (process.env.CUSTOM_WORDS_FILE) {
+        config.customWordsFile = path.resolve(process.env.CUSTOM_WORDS_FILE);
     }
-    if (process.env["CSPELL_VERBOSE"] === "true") {
+    if (process.env.CSPELL_VERBOSE === "true") {
         config.verbose = true;
     }
 
@@ -601,7 +601,7 @@ async function writeUpdatedWords(
  * @returns {Promise<boolean>} `true` when the command completes successfully.
  */
 async function main(args = process.argv.slice(2)) {
-    let verbose = process.env["CSPELL_VERBOSE"] === "true";
+    let verbose = process.env.CSPELL_VERBOSE === "true";
     let logger = new Logger(verbose);
 
     try {

@@ -270,7 +270,7 @@ function findSharedImports(filePath) {
 
         for (const match of content.matchAll(CONFIG.importPattern)) {
             const fullMatch = match[0];
-            const sharedPath = match.groups?.["sharedPath"] ?? "";
+            const sharedPath = match.groups?.sharedPath ?? "";
             const lineNumber = content
                 .slice(0, Math.max(0, match.index))
                 .split("\n").length;

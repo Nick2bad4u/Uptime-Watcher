@@ -103,8 +103,8 @@ function pascalToCamelCase(str) {
     }
 
     const leadingAcronym = /^(?<acronym>[A-Z]+)(?=[A-Z][a-z])/u.exec(str);
-    if (leadingAcronym?.groups?.["acronym"]) {
-        const acronym = leadingAcronym.groups["acronym"];
+    if (leadingAcronym?.groups?.acronym) {
+        const acronym = leadingAcronym.groups.acronym;
         return acronym.toLowerCase() + str.slice(acronym.length);
     }
 

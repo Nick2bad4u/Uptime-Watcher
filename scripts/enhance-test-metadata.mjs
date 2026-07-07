@@ -142,7 +142,7 @@ function parseArgs(args) {
         retries: 0,
         timeout: 30_000,
         validate: false,
-        verbose: process.env["DEBUG"] === "1",
+        verbose: process.env.DEBUG === "1",
     };
 
     for (let index = 0; index < args.length; index += 1) {
@@ -369,7 +369,7 @@ function timeOperation(operation, operationName) {
         const duration = performance.now() - start;
         perfCounters.processingTimeMs += duration;
         perfCounters.totalProcessingTime += duration;
-        if (process.env["DEBUG"]) {
+        if (process.env.DEBUG) {
             console.log(`⏱️  ${operationName}: ${duration.toFixed(2)}ms`);
         }
         return result;

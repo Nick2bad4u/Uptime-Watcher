@@ -234,7 +234,7 @@ function parseKeyBlocks(frontmatter) {
             }
 
             const match = keyLineRegex.exec(line);
-            currentKey = match?.groups?.["key"] ?? "";
+            currentKey = match?.groups?.key ?? "";
             currentLines = [line];
         } else {
             // Continuation line (indented or blank)

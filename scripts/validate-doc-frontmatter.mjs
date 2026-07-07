@@ -224,7 +224,7 @@ function parseFrontMatterYaml(yamlText, filePath) {
         const keyMatch = /^(?<key>[\w$]+):\s*(?<value>.*)$/.exec(trimmed);
         if (keyMatch) {
             const groups = keyMatch.groups;
-            const rawKey = groups?.["key"];
+            const rawKey = groups?.key;
             if (typeof rawKey !== "string") {
                 throw new TypeError(
                     `Unable to parse front-matter line '${trimmed}' in ${filePath}: missing 'key' capture group.`
@@ -232,7 +232,7 @@ function parseFrontMatterYaml(yamlText, filePath) {
             }
 
             const key = rawKey;
-            const rawValue = groups?.["value"] ?? "";
+            const rawValue = groups?.value ?? "";
             currentKey = key;
 
             if (rawValue === "" || rawValue === null) {
@@ -270,7 +270,7 @@ function parseFrontMatterYaml(yamlText, filePath) {
         const arrayMatch = /^-\s*(?<value>.*)$/.exec(trimmed);
         if (arrayMatch) {
             const groups = arrayMatch.groups;
-            const rawItem = groups?.["value"] ?? "";
+            const rawItem = groups?.value ?? "";
             if (currentKey === null) {
                 throw new TypeError(
                     `Array item without preceding key in front matter of ${filePath}`
@@ -337,11 +337,11 @@ function validateAgainstSchema(schema, data, filePath) {
     }
 
     const properties = /** @type {Record<string, unknown>} */ (
-        schema["properties"] ?? {}
+        schema.properties ?? {}
     );
     const allowedKeys = new Set(Object.keys(properties));
-    const required = Array.isArray(schema["required"])
-        ? new Set(schema["required"])
+    const required = Array.isArray(schema.required)
+        ? new Set(schema.required)
         : new Set();
 
     // Unknown keys
@@ -441,8 +441,7 @@ function validateAgainstSchema(schema, data, filePath) {
     }
 
     // Additional check for schema reference to catch path mistakes.
-    const schemaRef =
-        typeof data["schema"] === "string" ? data["schema"] : null;
+    const schemaRef = typeof data.schema === "string" ? data.schema : null;
 
     if (schemaRef === null) {
         errors.push(
