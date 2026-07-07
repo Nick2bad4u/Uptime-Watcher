@@ -58,51 +58,64 @@ const ALL_MONITOR_TYPES_CACHE_KEY =
 
 const createMonitorTypeConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
-): MonitorTypeConfig => ({
-    description: overrides.description ?? "Checks service reachability",
-    displayName: overrides.displayName ?? "HTTP Monitor",
-    fields: overrides.fields ?? [
+): MonitorTypeConfig => {
+    const config: MonitorTypeConfig = {
+        description: overrides.description ?? "Checks service reachability",
+        displayName: overrides.displayName ?? "HTTP Monitor",
+        fields: overrides.fields ?? [
+            {
+                label: "URL",
+                name: "url",
+                required: true,
+                type: "url",
+            },
+        ],
+        type: overrides.type ?? "http",
+        version: overrides.version ?? "1.0.0",
+    };
+
+    if (overrides.uiConfig) {
+        config.uiConfig = overrides.uiConfig;
+    }
+
+    return config;
+};
+
+const httpMonitorType = createMonitorTypeConfig({
+    displayName: "HTTP Monitor",
+    type: "http",
+});
+
+const pingMonitorType = createMonitorTypeConfig({
+    displayName: "Ping Monitor",
+    fields: [
         {
-            label: "URL",
-            name: "url",
+            label: "Host",
+            name: "host",
             required: true,
-            type: "url",
+            type: "text",
         },
     ],
-    type: overrides.type ?? "http",
-    uiConfig: overrides.uiConfig,
-    version: overrides.version ?? "1.0.0",
+    type: "ping",
+});
+
+const portMonitorType = createMonitorTypeConfig({
+    displayName: "Port Monitor",
+    fields: [
+        {
+            label: "Port",
+            name: "port",
+            required: true,
+            type: "number",
+        },
+    ],
+    type: "port",
 });
 
 const mockMonitorTypes: MonitorTypeConfig[] = [
-    createMonitorTypeConfig({
-        displayName: "HTTP Monitor",
-        type: "http",
-    }),
-    createMonitorTypeConfig({
-        displayName: "Ping Monitor",
-        fields: [
-            {
-                label: "Host",
-                name: "host",
-                required: true,
-                type: "text",
-            },
-        ],
-        type: "ping",
-    }),
-    createMonitorTypeConfig({
-        displayName: "Port Monitor",
-        fields: [
-            {
-                label: "Port",
-                name: "port",
-                required: true,
-                type: "number",
-            },
-        ],
-        type: "port",
-    }),
+    httpMonitorType,
+    pingMonitorType,
+    portMonitorType,
 ];
 
 const expectedOptionsFor = (
@@ -154,7 +167,7 @@ describe(getMonitorTypeConfig, () => {
         );
 
         await expect(getMonitorTypeConfig("ping")).resolves.toEqual(
-            mockMonitorTypes[1]
+            pingMonitorType
         );
 
         expect(AppCaches.monitorTypes.get).toHaveBeenCalledWith(
@@ -176,7 +189,7 @@ describe(getMonitorTypeConfig, () => {
         vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
 
         await expect(getMonitorTypeConfig("http")).resolves.toEqual(
-            mockMonitorTypes[0]
+            httpMonitorType
         );
 
         expect(monitorTypesStoreState.loadMonitorTypes).toHaveBeenCalledTimes(
@@ -191,13 +204,13 @@ describe(getMonitorTypeConfig, () => {
     it("clears invalid cache data before falling back to the store", async () => {
         vi.mocked(AppCaches.monitorTypes.get).mockReturnValue([
             {
-                ...mockMonitorTypes[0],
+                ...httpMonitorType,
                 fields: [],
             },
         ]);
 
         await expect(getMonitorTypeConfig("http")).resolves.toEqual(
-            mockMonitorTypes[0]
+            httpMonitorType
         );
 
         expect(AppCaches.monitorTypes.clear).toHaveBeenCalledTimes(1);
@@ -207,13 +220,13 @@ describe(getMonitorTypeConfig, () => {
 describe(getMonitorTypeOptions, () => {
     it("returns de-duplicated options in monitor type order", async () => {
         const duplicatedMonitorTypes = [
-            mockMonitorTypes[0],
+            httpMonitorType,
             {
-                ...mockMonitorTypes[0],
+                ...httpMonitorType,
                 displayName: "Duplicate HTTP Monitor",
                 version: "1.0.1",
             },
-            mockMonitorTypes[1],
+            pingMonitorType,
         ];
         vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
             duplicatedMonitorTypes

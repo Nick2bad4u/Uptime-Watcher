@@ -51,6 +51,13 @@ function createSite(partial: Partial<Site> = {}): Site {
     };
 }
 
+function mergeSerializedMonitorOverlay(
+    canonicalMonitor: Monitor,
+    overlaySource: Record<string, unknown>
+): Monitor {
+    return mergeMonitorSnapshots(canonicalMonitor, overlaySource);
+}
+
 describe("siteSnapshots", () => {
     it("deriveSiteSnapshot removes duplicates and deep clones results", () => {
         const site = createSite({ identifier: "dup" });
@@ -168,7 +175,7 @@ describe("siteSnapshots", () => {
             canonical
         );
 
-        const merged = mergeMonitorSnapshots(canonical, {
+        const merged = mergeSerializedMonitorOverlay(canonical, {
             history: [createHistory()],
             lastChecked: "2025-01-01T00:00:00.000Z",
             monitoring: false,
@@ -195,14 +202,14 @@ describe("siteSnapshots", () => {
         });
         expect(overlayDate.lastChecked).toBeInstanceOf(Date);
 
-        const overlayEpoch = mergeMonitorSnapshots(canonical, {
+        const overlayEpoch = mergeSerializedMonitorOverlay(canonical, {
             lastChecked: Date.UTC(2025, 0, 3),
         });
         expect(overlayEpoch.lastChecked?.toISOString()).toBe(
             "2025-01-03T00:00:00.000Z"
         );
 
-        const overlayMaxEpoch = mergeMonitorSnapshots(canonical, {
+        const overlayMaxEpoch = mergeSerializedMonitorOverlay(canonical, {
             lastChecked: MAX_VALID_DATE_EPOCH_MS,
         });
         expect(overlayMaxEpoch.lastChecked?.getTime()).toBe(
@@ -216,19 +223,19 @@ describe("siteSnapshots", () => {
             new Date(MAX_VALID_DATE_EPOCH_MS + 1),
         ]) {
             expect(
-                mergeMonitorSnapshots(canonical, {
+                mergeSerializedMonitorOverlay(canonical, {
                     lastChecked: invalidLastChecked,
                 })
             ).toBe(canonical);
         }
 
         expect(
-            mergeMonitorSnapshots(canonical, {
+            mergeSerializedMonitorOverlay(canonical, {
                 lastChecked: "July 3, 2026",
             })
         ).toBe(canonical);
         expect(
-            mergeMonitorSnapshots(canonical, {
+            mergeSerializedMonitorOverlay(canonical, {
                 lastChecked: "2026-02-30T00:00:00.000Z",
             })
         ).toBe(canonical);

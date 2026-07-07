@@ -8,7 +8,6 @@ import type { Monitor, Site } from "@shared/types";
 import type { ArrayElement } from "type-fest";
 
 import { fc } from "@fast-check/vitest";
-import { secureRandomFloat } from "@shared/test/testHelpers";
 import {
     BASE_MONITOR_TYPES,
     DEFAULT_MONITOR_STATUS,
@@ -47,8 +46,6 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
     const checkIntervalArb = fc.integer({ min: 30_000, max: 3_600_000 });
 
     const retryAttemptsArb = fc.integer({ min: 0, max: 10 });
-
-    const monitorStatusStringValues: readonly string[] = MONITOR_STATUS_VALUES;
 
     const statusHistoryStatusArb = fc.constantFrom<
         ArrayElement<Monitor["history"]>["status"]

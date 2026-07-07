@@ -10,7 +10,7 @@
 import type { Monitor, Site, StatusHistory } from "@shared/types";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
-import type { RequireAtLeastOne, UnknownRecord } from "type-fest";
+import type { RequireAtLeastOne } from "type-fest";
 
 import {
     BASE_MONITOR_TYPES,
@@ -217,6 +217,11 @@ export type MonitorSnapshotOverlay = Partial<
     >
 >;
 
+type MonitorSnapshotOverlaySource =
+    | Monitor
+    | MonitorSnapshotOverlay
+    | Record<string, unknown>;
+
 const isStatusHistoryEntry = (
     value: unknown
 ): value is StatusHistory => {
@@ -317,7 +322,7 @@ export const isSiteSnapshot = (candidate: unknown): candidate is Site => {
  */
 export function mergeMonitorSnapshots(
     canonicalMonitor: Monitor,
-    overlaySource?: Monitor | MonitorSnapshotOverlay
+    overlaySource?: MonitorSnapshotOverlaySource
 ): Monitor {
     const overlay = toMonitorSnapshotOverlay(overlaySource);
 
@@ -342,10 +347,7 @@ export function mergeMonitorSnapshots(
  *   `undefined` when no serializable data is present.
  */
 function toMonitorSnapshotOverlay(
-    source?:
-        | Monitor
-        | MonitorSnapshotOverlay
-        | UnknownRecord
+    source?: MonitorSnapshotOverlaySource
 ): MonitorSnapshotOverlay | undefined {
     if (!source || !isObject(source)) {
         return undefined;

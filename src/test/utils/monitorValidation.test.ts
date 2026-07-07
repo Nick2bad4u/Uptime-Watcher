@@ -4,6 +4,7 @@
  */
 
 import type { MonitorType } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
 import { test } from "@fast-check/vitest";
 // Import mocked functions
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";

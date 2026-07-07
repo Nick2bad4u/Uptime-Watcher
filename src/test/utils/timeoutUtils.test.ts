@@ -9,7 +9,6 @@
  */
 
 import { fc, test } from "@fast-check/vitest";
-import { standardTestAnnotationAsync } from "@shared/test/testUtils";
 import { describe, expect, it } from "vitest";
 
 import {

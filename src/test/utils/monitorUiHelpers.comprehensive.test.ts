@@ -44,21 +44,28 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
 
 const createConfig = (
     overrides: Partial<MonitorTypeConfig> = {}
-): MonitorTypeConfig => ({
-    description: overrides.description ?? "HTTP monitoring",
-    displayName: overrides.displayName ?? "HTTP Monitor",
-    fields: overrides.fields ?? [
-        {
-            label: "URL",
-            name: "url",
-            required: true,
-            type: "url",
-        },
-    ],
-    type: overrides.type ?? "http",
-    uiConfig: overrides.uiConfig,
-    version: overrides.version ?? "1.0.0",
-});
+): MonitorTypeConfig => {
+    const config: MonitorTypeConfig = {
+        description: overrides.description ?? "HTTP monitoring",
+        displayName: overrides.displayName ?? "HTTP Monitor",
+        fields: overrides.fields ?? [
+            {
+                label: "URL",
+                name: "url",
+                required: true,
+                type: "url",
+            },
+        ],
+        type: overrides.type ?? "http",
+        version: overrides.version ?? "1.0.0",
+    };
+
+    if (overrides.uiConfig) {
+        config.uiConfig = overrides.uiConfig;
+    }
+
+    return config;
+};
 
 const getCacheKeyForType = (type: string): string =>
     CacheKeys.config.byName(`monitor-config-${type}`);

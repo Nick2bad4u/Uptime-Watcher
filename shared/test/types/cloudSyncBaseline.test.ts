@@ -136,7 +136,11 @@ describe(parseCloudSyncBaseline, () => {
         });
 
         expect(result.success).toBeFalsy();
-        expect(result.error?.issues).toContainEqual(
+        if (result.success) {
+            throw new Error("Expected baseline validation to fail");
+        }
+
+        expect(result.error.issues).toContainEqual(
             expect.objectContaining({
                 message: "site identifier must match its baseline map key",
                 path: [
@@ -166,7 +170,11 @@ describe(parseCloudSyncBaseline, () => {
         });
 
         expect(result.success).toBeFalsy();
-        expect(result.error?.issues).toContainEqual(
+        if (result.success) {
+            throw new Error("Expected baseline validation to fail");
+        }
+
+        expect(result.error.issues).toContainEqual(
             expect.objectContaining({
                 message: "monitor id must match its baseline map key",
                 path: [

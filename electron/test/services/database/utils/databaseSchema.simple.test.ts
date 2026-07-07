@@ -9,8 +9,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createDatabaseSchema } from "../../../../services/database/utils/schema/databaseSchema";
 
+const RUN_RESULT: ReturnType<Database["run"]> = {
+    changes: 0,
+    lastInsertRowid: 0,
+};
+
 const createMockDatabase = (): Pick<Database, "run"> => ({
-    run: vi.fn(),
+    run: vi.fn<Database["run"]>(() => RUN_RESULT),
 });
 
 describe("Database Schema", () => {
@@ -71,7 +76,7 @@ describe("Database Schema", () => {
             if (sql.includes("CREATE TABLE")) {
                 throw new Error("Database error");
             }
-            return undefined;
+            return RUN_RESULT;
         });
 
         expect(() => {

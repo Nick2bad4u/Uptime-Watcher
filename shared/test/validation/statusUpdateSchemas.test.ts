@@ -36,7 +36,7 @@ const createValidStatusUpdate = (): StatusUpdate => {
     };
 };
 
-describe(typedStatusUpdateSchema, () => {
+describe("typedStatusUpdateSchema", () => {
     it("accepts consistent payloads", () => {
         const payload = createValidStatusUpdate();
         const result = typedStatusUpdateSchema.safeParse(payload);

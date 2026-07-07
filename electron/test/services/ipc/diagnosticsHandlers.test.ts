@@ -46,8 +46,9 @@ const createTrustedIpcEvent = () => ({
 });
 
 const createDiagnosticsHandlerHarness = () => {
+    const emitTyped = vi.fn().mockResolvedValue(undefined);
     const eventEmitter = {
-        emitTyped: vi.fn().mockResolvedValue(undefined),
+        emitTyped,
     } as unknown as TypedEventBus<any>;
 
     registerDiagnosticsHandlers({
@@ -62,6 +63,7 @@ const createDiagnosticsHandlerHarness = () => {
     expect(reportEntry).toBeDefined();
 
     return {
+        emitTyped,
         eventEmitter,
         reportHandler: reportEntry?.[1] as (
             event: ReturnType<typeof createTrustedIpcEvent>,
@@ -121,7 +123,7 @@ describe("sanitizeDiagnosticsReport", () => {
     });
 
     it("sanitizes and bounds report identifiers and reasons", async () => {
-        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
+        const { emitTyped, reportHandler } = createDiagnosticsHandlerHarness();
         const timestamp = Date.now();
         const result = await reportHandler(createTrustedIpcEvent(), {
             channel: "diagnostics-channel?access_token=SUPER_SECRET\nstatus",
@@ -131,9 +133,9 @@ describe("sanitizeDiagnosticsReport", () => {
         });
 
         expect(result.success).toBeTruthy();
-        expect(eventEmitter.emitTyped).toHaveBeenCalledOnce();
+        expect(emitTyped).toHaveBeenCalledOnce();
 
-        const [, emittedReport] = eventEmitter.emitTyped.mock.calls[0] ?? [];
+        const [, emittedReport] = emitTyped.mock.calls[0] ?? [];
         expect(emittedReport.channel).not.toContain("SUPER_SECRET");
         expect(emittedReport.channel).not.toContain("\n");
         expect(getUtfByteLength(emittedReport.channel)).toBeLessThanOrEqual(
@@ -151,7 +153,7 @@ describe("sanitizeDiagnosticsReport", () => {
     });
 
     it("bounds multibyte report fields by UTF-8 byte length", async () => {
-        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
+        const { emitTyped, reportHandler } = createDiagnosticsHandlerHarness();
         const timestamp = Date.now();
         const result = await reportHandler(createTrustedIpcEvent(), {
             channel: "監視".repeat(40),
@@ -161,9 +163,9 @@ describe("sanitizeDiagnosticsReport", () => {
         });
 
         expect(result.success).toBeTruthy();
-        expect(eventEmitter.emitTyped).toHaveBeenCalledOnce();
+        expect(emitTyped).toHaveBeenCalledOnce();
 
-        const [, emittedReport] = eventEmitter.emitTyped.mock.calls[0] ?? [];
+        const [, emittedReport] = emitTyped.mock.calls[0] ?? [];
 
         expect(getUtfByteLength(emittedReport.channel)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES
