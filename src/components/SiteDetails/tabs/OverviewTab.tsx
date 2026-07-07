@@ -309,7 +309,7 @@ export const OverviewTab = ({
                     title="Monitor ID"
                 >
                     <ThemedText
-                        className="max-w-full font-mono break-all"
+                        className="max-w-full break-all font-mono"
                         size="xs"
                         variant="secondary"
                     >

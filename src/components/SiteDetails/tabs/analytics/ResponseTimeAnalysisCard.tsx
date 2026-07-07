@@ -170,7 +170,7 @@ export const ResponseTimeAnalysisCard = ({
                 </div>
 
                 {showAdvancedMetrics ? (
-                    <div className="border-primary/20 grid grid-cols-2 gap-4 border-t pt-4">
+                    <div className="grid grid-cols-2 gap-4 border-primary/20 border-t pt-4">
                         <div className="flex flex-col items-center text-center">
                             <ThemedText
                                 className="mb-2"

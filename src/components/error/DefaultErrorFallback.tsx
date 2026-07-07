@@ -57,23 +57,23 @@ export const DefaultErrorFallback: FC<
             : DEFAULT_ERROR_MESSAGE;
 
     return (
-        <div className="border-error-default bg-error-muted flex flex-col items-center justify-center rounded-lg border p-8">
-            <div className="text-error-default mb-4">
-                <h2 className="mb-2 text-lg font-semibold">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-error-default bg-error-muted p-8">
+            <div className="mb-4 text-error-default">
+                <h2 className="mb-2 font-semibold text-lg">
                     Something went wrong
                 </h2>
                 <p className="text-sm">{errorMessage}</p>
             </div>
             <div className="flex gap-4">
                 <button
-                    className="hover:bg-error-alternative bg-error-default text-primary-inverse rounded-xs px-4 py-2 text-sm font-medium"
+                    className="rounded-xs bg-error-default px-4 py-2 font-medium text-primary-inverse text-sm hover:bg-error-alternative"
                     onClick={onRetry}
                     type="button"
                 >
                     Try Again
                 </button>
                 <button
-                    className="hover:bg-error-muted border-error-default bg-error-muted/50 text-error-default rounded-xs border px-4 py-2 text-sm font-medium"
+                    className="rounded-xs border border-error-default bg-error-muted/50 px-4 py-2 font-medium text-error-default text-sm hover:bg-error-muted"
                     onClick={handleReload}
                     type="button"
                 >

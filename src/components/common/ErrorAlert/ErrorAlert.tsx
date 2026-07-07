@@ -142,13 +142,13 @@ export const ErrorAlert = ({
             {icon}
 
             <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium wrap-break-word">{message}</p>
+                <p className="wrap-break-word font-medium text-sm">{message}</p>
             </div>
 
             {onDismiss ? (
                 <button
                     aria-label="Dismiss error"
-                    className="hover:bg-overlay-default/5 dark:hover:bg-overlay-inverse/5 -m-1 shrink-0 rounded-xs p-1 transition-colors"
+                    className="-m-1 shrink-0 rounded-xs p-1 transition-colors hover:bg-overlay-default/5 dark:hover:bg-overlay-inverse/5"
                     onClick={handleDismiss}
                     title="Dismiss this error message"
                     type="button"
