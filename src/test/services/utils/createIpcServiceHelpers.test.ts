@@ -96,6 +96,19 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
+const getStubbedElectronAPI = (): typeof window.electronAPI => {
+    const windowRef = Reflect.get(globalThis, "window");
+    if (windowRef === undefined || typeof windowRef !== "object") {
+        throw new Error("Stubbed window is not installed");
+    }
+
+    if (!("electronAPI" in windowRef)) {
+        throw new Error("Stubbed window.electronAPI is not installed");
+    }
+
+    return (windowRef as typeof window).electronAPI;
+};
+
 describe("getIpcServiceHelpers", () => {
     it("merges bridge options and contracts before waiting for readiness", async () => {
         const { module, waitForElectronBridge } = await setupModule();
@@ -218,7 +231,7 @@ describe("getIpcServiceHelpers", () => {
 
         expect(waitForElectronBridge).toHaveBeenCalledTimes(1);
         expect(handler).toHaveBeenCalledWith(
-            (globalThis as any).window.electronAPI,
+            getStubbedElectronAPI(),
             "site-123"
         );
         expect(ensureError).toHaveBeenCalledWith(handlerError);
