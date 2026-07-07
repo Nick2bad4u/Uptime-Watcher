@@ -226,6 +226,61 @@ describe("StateSyncService", () => {
         expect(serializedErrorCalls).not.toContain("rawEvent");
     });
 
+    it("does not invoke Symbol prototype toString while summarizing invalid payload keys", async () => {
+        const callback = vi.fn();
+        const fullSyncPayload = {
+            completedAt: Date.now(),
+            revision: 10,
+            siteCount: 0,
+            sites: [],
+            source: "database" as const,
+            synchronized: true,
+        };
+        const symbolKey = Symbol("state-sync-secret-key");
+        const invalidPayload = {};
+        const symbolToStringSpy = vi
+            .spyOn(Symbol.prototype, "toString")
+            .mockImplementation(() => {
+                throw new Error("Symbol.prototype.toString called");
+            });
+
+        Object.defineProperty(invalidPayload, symbolKey, {
+            configurable: true,
+            enumerable: true,
+            value: "hidden-value",
+        });
+        mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(
+            fullSyncPayload
+        );
+
+        try {
+            await StateSyncService.onStateSyncEvent(callback);
+            expect(capturedHandler).toBeTypeOf("function");
+            capturedHandler?.(invalidPayload);
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.stateSync.requestFullSync
+                ).toHaveBeenCalledTimes(1);
+            });
+
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[StateSyncService] Ignoring invalid state sync event payload",
+                expect.anything(),
+                {
+                    invalidPayload: {
+                        keyCount: 1,
+                        keys: ["Symbol(state-sync-secret-key)"],
+                        kind: "object",
+                    },
+                }
+            );
+            expect(symbolToStringSpy).not.toHaveBeenCalled();
+        } finally {
+            symbolToStringSpy.mockRestore();
+        }
+    });
+
     it("recovers via full sync when event is truncated", async () => {
         const callback = vi.fn();
         const fullSyncPayload = {

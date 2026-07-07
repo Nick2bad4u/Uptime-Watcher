@@ -60,9 +60,6 @@ interface PendingRecoveryExpectation {
     readonly source: StateSyncFullSyncResult["source"];
 }
 
-const formatPropertyKeyForLog = (key: PropertyKey): string =>
-    typeof key === "symbol" ? key.toString() : String(key);
-
 const summarizeInvalidEventPayload = (
     payload: unknown
 ): InvalidEventPayloadSummary => {
@@ -84,7 +81,7 @@ const summarizeInvalidEventPayload = (
         };
     }
 
-    const keys = Reflect.ownKeys(payload).map(formatPropertyKeyForLog);
+    const keys = Reflect.ownKeys(payload).map(String);
     const loggedKeys = keys.slice(0, MAX_INVALID_EVENT_KEYS_TO_LOG);
 
     return {
