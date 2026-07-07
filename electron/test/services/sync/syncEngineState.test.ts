@@ -63,6 +63,28 @@ describe(parseBaseline, () => {
             }
         }
     });
+
+    it("parses prototype-named baseline keys as own null-prototype entries", () => {
+        const result = parseBaseline(`{
+            "baselineVersion": ${CLOUD_SYNC_BASELINE_VERSION},
+            "createdAt": 0,
+            "monitors": {},
+            "settings": {
+                "__proto__": "prototype-setting-value"
+            },
+            "sites": {},
+            "syncSchemaVersion": ${CLOUD_SYNC_SCHEMA_VERSION}
+        }`);
+
+        expect(result.recovered).toBe(false);
+        expect(Object.getPrototypeOf(result.baseline.settings)).toBeNull();
+        expect(
+            Object.hasOwn(result.baseline.settings, PROTOTYPE_PROPERTY_NAME)
+        ).toBe(true);
+        expect(result.baseline.settings[PROTOTYPE_PROPERTY_NAME]).toBe(
+            "prototype-setting-value"
+        );
+    });
 });
 
 describe(normalizeCloudSyncState, () => {

@@ -51,6 +51,7 @@ import {
 import { stringifyJsonValueStable } from "@shared/utils/canonicalJson";
 import { readNumberEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import {
     isBoolean,
@@ -584,14 +585,16 @@ function parseBaselinePayload(raw: string): unknown {
         );
     }
 
-    try {
-        return JSON.parse(raw);
-    } catch (error) {
-        const resolved = ensureError(error);
-        throw new SyntaxError(`Invalid baseline JSON: ${resolved.message}`, {
-            cause: error,
-        });
+    const parsed = safeJsonParse(
+        raw,
+        (value): value is JsonValue => jsonValueSchema.safeParse(value).success
+    );
+
+    if (!parsed.success) {
+        throw new SyntaxError(`Invalid baseline JSON: ${parsed.error}`);
     }
+
+    return parsed.data;
 }
 
 /**
