@@ -1,5 +1,5 @@
 import { buildPayloadPreview } from "@electron/preload/utils/preloadLogger";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 describe(buildPayloadPreview, () => {
     it("serializes circular references instead of returning undefined", () => {
@@ -61,6 +61,31 @@ describe(buildPayloadPreview, () => {
         expect(preview).not.toContain("[unserializable-payload]");
     });
 
+    it("does not invoke shadowed Date methods while building previews", () => {
+        const checkedAt = new Date("2026-07-07T12:00:00.000Z");
+        const getTime = vi.fn(() => {
+            throw new Error("date getTime should not run");
+        });
+        const toISOString = vi.fn(() => {
+            throw new Error("date toISOString should not run");
+        });
+        Object.defineProperty(checkedAt, "getTime", {
+            configurable: true,
+            value: getTime,
+        });
+        Object.defineProperty(checkedAt, "toISOString", {
+            configurable: true,
+            value: toISOString,
+        });
+
+        const preview = buildPayloadPreview({ checkedAt });
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain("2026-07-07T12:00:00.000Z");
+        expect(getTime).not.toHaveBeenCalled();
+        expect(toISOString).not.toHaveBeenCalled();
+    });
+
     it("redacts mailto addresses", () => {
         const preview = buildPayloadPreview({
             url: "mailto:person@example.com?subject=hi",
@@ -69,6 +94,24 @@ describe(buildPayloadPreview, () => {
         expect(preview).toBeTypeOf("string");
         expect(preview).toContain("mailto:[redacted]");
         expect(preview).not.toContain("person@example.com");
+    });
+
+    it("does not invoke shadowed URL toString while building previews", () => {
+        const url = new URL("https://example.com/reset?token=secret");
+        const toString = vi.fn(() => {
+            throw new Error("url toString should not run");
+        });
+        Object.defineProperty(url, "toString", {
+            configurable: true,
+            value: toString,
+        });
+
+        const preview = buildPayloadPreview({ url });
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain("https://example.com/");
+        expect(preview).not.toContain("secret");
+        expect(toString).not.toHaveBeenCalled();
     });
 
     it("redacts secrets embedded in raw string payloads", () => {
@@ -107,6 +150,101 @@ describe(buildPayloadPreview, () => {
         expect(preview).not.toContain("refresh-secret");
         expect(preview).toContain("[REDACTED]");
         expect(preview).toContain("ordinary-value");
+    });
+
+    it("does not invoke shadowed array methods or item accessors", () => {
+        let getterCalls = 0;
+        const map = vi.fn(() => {
+            throw new Error("array map should not run");
+        });
+        const payload: unknown[] = ["visible"];
+        Object.defineProperty(payload, "map", {
+            configurable: true,
+            value: map,
+        });
+        Object.defineProperty(payload, "1", {
+            configurable: true,
+            enumerable: true,
+            get() {
+                getterCalls += 1;
+                return "hidden";
+            },
+        });
+        payload[2] = {
+            token: "SECRET",
+            value: "safe",
+        };
+
+        const preview = buildPayloadPreview(payload);
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain("visible");
+        expect(preview).toContain("[REDACTED]");
+        expect(preview).toContain("safe");
+        expect(preview).not.toContain("hidden");
+        expect(preview).not.toContain("SECRET");
+        expect(map).not.toHaveBeenCalled();
+        expect(getterCalls).toBe(0);
+    });
+
+    it("does not invoke shadowed Map iterator or size accessors", () => {
+        const iterator = vi.fn(() => {
+            throw new Error("map iterator should not run");
+        });
+        let sizeGetterCalls = 0;
+        const payload = new Map<string, string>([
+            ["refreshToken", "refresh-secret"],
+            ["visible", "ordinary-value"],
+        ]);
+        Object.defineProperty(payload, Symbol.iterator, {
+            configurable: true,
+            value: iterator,
+        });
+        Object.defineProperty(payload, "size", {
+            configurable: true,
+            get() {
+                sizeGetterCalls += 1;
+                return 999;
+            },
+        });
+
+        const preview = buildPayloadPreview(payload);
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain('"size": 2');
+        expect(preview).toContain("[REDACTED]");
+        expect(preview).toContain("ordinary-value");
+        expect(preview).not.toContain("refresh-secret");
+        expect(iterator).not.toHaveBeenCalled();
+        expect(sizeGetterCalls).toBe(0);
+    });
+
+    it("does not invoke shadowed Set iterator or size accessors", () => {
+        const iterator = vi.fn(() => {
+            throw new Error("set iterator should not run");
+        });
+        let sizeGetterCalls = 0;
+        const payload = new Set(["first", "second"]);
+        Object.defineProperty(payload, Symbol.iterator, {
+            configurable: true,
+            value: iterator,
+        });
+        Object.defineProperty(payload, "size", {
+            configurable: true,
+            get() {
+                sizeGetterCalls += 1;
+                return 999;
+            },
+        });
+
+        const preview = buildPayloadPreview(payload);
+
+        expect(preview).toBeTypeOf("string");
+        expect(preview).toContain('"size": 2');
+        expect(preview).toContain("first");
+        expect(preview).toContain("second");
+        expect(iterator).not.toHaveBeenCalled();
+        expect(sizeGetterCalls).toBe(0);
     });
 
     it("does not invoke object accessors while building previews", () => {

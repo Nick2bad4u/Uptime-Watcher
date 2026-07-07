@@ -44,9 +44,76 @@ const REDACTED_PLACEHOLDER = "[REDACTED]";
 const ACCESSOR_PLACEHOLDER = "[Accessor]";
 const CIRCULAR_PLACEHOLDER = "[Circular]";
 const INVALID_DATE_PLACEHOLDER = "[Invalid Date]";
+const INVALID_URL_PLACEHOLDER = "[Invalid URL]";
+const UNKNOWN_SIZE_PLACEHOLDER = "[Unknown]";
 
 const SENSITIVE_KEY_PATTERN =
     /api[-_]?key|authorization|passphrase|password|refresh|secret|token/iu;
+
+type NativeGetter = (this: unknown) => unknown;
+type NativeMethod = (this: unknown, ...arguments_: unknown[]) => unknown;
+
+function isNativeGetter(value: unknown): value is NativeGetter {
+    return typeof value === "function";
+}
+
+function isNativeMethod(value: unknown): value is NativeMethod {
+    return typeof value === "function";
+}
+
+function getPrototypeObject(value: object): object | null {
+    const prototype: unknown = Object.getPrototypeOf(value);
+
+    return typeof prototype === "object" && prototype !== null
+        ? prototype
+        : null;
+}
+
+function getNativeGetter(
+    holder: object,
+    key: PropertyKey
+): NativeGetter | undefined {
+    let current: object | null = holder;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, key);
+        const getter = descriptor
+            ? getOwnDataProperty(descriptor, "get")
+            : { found: false as const };
+
+        if (getter.found && isNativeGetter(getter.value)) {
+            return getter.value;
+        }
+
+        current = getPrototypeObject(current);
+    }
+
+    return undefined;
+}
+
+function getNativeMethod(
+    holder: object,
+    key: PropertyKey
+): NativeMethod | undefined {
+    let current: object | null = holder;
+
+    while (current) {
+        const method = getOwnDataProperty(current, key);
+        if (method.found && isNativeMethod(method.value)) {
+            return method.value;
+        }
+
+        current = getPrototypeObject(current);
+    }
+
+    return undefined;
+}
+
+function isIterable(value: unknown): value is Iterable<unknown> {
+    return (
+        isObject(value) && getNativeMethod(value, Symbol.iterator) !== undefined
+    );
+}
 
 function isSensitiveKeyName(candidate: string): boolean {
     return SENSITIVE_KEY_PATTERN.test(candidate);
@@ -95,10 +162,81 @@ const truncate = (value: string, limit: number): string =>
     value.length > limit ? `${value.slice(0, limit)}…` : value;
 
 const serializeDate = (value: Date): string => {
-    const timestamp = value.getTime();
-    return isFiniteNumber(timestamp)
-        ? value.toISOString()
-        : INVALID_DATE_PLACEHOLDER;
+    const getTime = getNativeMethod(Date.prototype, "getTime");
+    const toISOString = getNativeMethod(Date.prototype, "toISOString");
+    if (!getTime || !toISOString) {
+        return INVALID_DATE_PLACEHOLDER;
+    }
+
+    try {
+        const timestamp = Reflect.apply(getTime, value, []);
+        if (typeof timestamp !== "number" || !isFiniteNumber(timestamp)) {
+            return INVALID_DATE_PLACEHOLDER;
+        }
+
+        const serialized = Reflect.apply(toISOString, value, []);
+        return typeof serialized === "string"
+            ? serialized
+            : INVALID_DATE_PLACEHOLDER;
+    } catch {
+        return INVALID_DATE_PLACEHOLDER;
+    }
+};
+
+const serializeUrl = (value: URL): string => {
+    const toString = getNativeMethod(URL.prototype, "toString");
+    if (!toString) {
+        return INVALID_URL_PLACEHOLDER;
+    }
+
+    try {
+        const serialized = Reflect.apply(toString, value, []);
+        return typeof serialized === "string"
+            ? getSafeUrlForLogging(serialized)
+            : INVALID_URL_PLACEHOLDER;
+    } catch {
+        return INVALID_URL_PLACEHOLDER;
+    }
+};
+
+const getNativeCollectionSize = (
+    value: Map<unknown, unknown> | Set<unknown>,
+    prototype: typeof Map.prototype | typeof Set.prototype
+): number | string => {
+    const sizeGetter = getNativeGetter(prototype, "size");
+    if (!sizeGetter) {
+        return UNKNOWN_SIZE_PLACEHOLDER;
+    }
+
+    try {
+        const size = Reflect.apply(sizeGetter, value, []);
+        return typeof size === "number" && Number.isSafeInteger(size)
+            ? size
+            : UNKNOWN_SIZE_PLACEHOLDER;
+    } catch {
+        return UNKNOWN_SIZE_PLACEHOLDER;
+    }
+};
+
+const getNativeByteLength = (
+    value: ArrayBuffer | ArrayBufferView,
+    prototype: object
+): number | string => {
+    const byteLengthGetter = getNativeGetter(prototype, "byteLength");
+    if (!byteLengthGetter) {
+        return UNKNOWN_SIZE_PLACEHOLDER;
+    }
+
+    try {
+        const byteLength = Reflect.apply(byteLengthGetter, value, []);
+        return typeof byteLength === "number" &&
+            Number.isSafeInteger(byteLength) &&
+            byteLength >= 0
+            ? byteLength
+            : UNKNOWN_SIZE_PLACEHOLDER;
+    } catch {
+        return UNKNOWN_SIZE_PLACEHOLDER;
+    }
 };
 
 const sanitizePreviewString = (value: string): string => {
@@ -156,6 +294,150 @@ function serializeObjectPreview(
 
     return preview;
 }
+
+function serializeArrayItems(
+    value: readonly unknown[],
+    seen: WeakSet<object>,
+    limit: number
+): unknown[] {
+    const sample: unknown[] = [];
+    const sampleLength = Math.min(value.length, limit);
+    sample.length = sampleLength;
+
+    for (let index = 0; index < sampleLength; index += 1) {
+        const item = getOwnDataProperty(value, index);
+        if (!item.found) {
+            continue;
+        }
+
+        Object.defineProperty(sample, index, {
+            configurable: true,
+            enumerable: true,
+            value: serializeValue(item.value, seen),
+            writable: true,
+        });
+    }
+
+    return sample;
+}
+
+function serializeMapPreview(
+    value: Map<unknown, unknown>,
+    seen: WeakSet<object>
+): UnknownRecord {
+    const entriesMethod = getNativeMethod(Map.prototype, "entries");
+    const entries: unknown[] = [];
+
+    if (entriesMethod) {
+        try {
+            const nativeEntries = Reflect.apply(entriesMethod, value, []);
+            let index = 0;
+            if (!isIterable(nativeEntries)) {
+                return {
+                    entries,
+                    size: getNativeCollectionSize(value, Map.prototype),
+                    type: "Map",
+                };
+            }
+
+            for (const entry of nativeEntries) {
+                if (index >= 5) {
+                    break;
+                }
+
+                if (!Array.isArray(entry)) {
+                    continue;
+                }
+
+                const entryKey = getOwnDataProperty(entry, 0);
+                const entryValue = getOwnDataProperty(entry, 1);
+                if (!entryKey.found || !entryValue.found) {
+                    continue;
+                }
+
+                const serializedKey = serializeValue(entryKey.value, seen);
+
+                entries.push([
+                    serializedKey,
+                    typeof entryKey.value === "string" &&
+                    isSensitiveKeyName(entryKey.value)
+                        ? REDACTED_PLACEHOLDER
+                        : serializeValue(entryValue.value, seen),
+                ]);
+                index += 1;
+            }
+        } catch {
+            entries.length = 0;
+        }
+    }
+
+    return {
+        entries,
+        size: getNativeCollectionSize(value, Map.prototype),
+        type: "Map",
+    };
+}
+
+function serializeSetPreview(
+    value: Set<unknown>,
+    seen: WeakSet<object>
+): UnknownRecord {
+    const valuesMethod = getNativeMethod(Set.prototype, "values");
+    const sample: unknown[] = [];
+
+    if (valuesMethod) {
+        try {
+            const nativeValues = Reflect.apply(valuesMethod, value, []);
+            let index = 0;
+            if (!isIterable(nativeValues)) {
+                return {
+                    sample,
+                    size: getNativeCollectionSize(value, Set.prototype),
+                    type: "Set",
+                };
+            }
+
+            for (const entryValue of nativeValues) {
+                if (index >= 5) {
+                    break;
+                }
+
+                sample.push(serializeValue(entryValue, seen));
+                index += 1;
+            }
+        } catch {
+            sample.length = 0;
+        }
+    }
+
+    return {
+        sample,
+        size: getNativeCollectionSize(value, Set.prototype),
+        type: "Set",
+    };
+}
+
+function serializeArrayBufferView(value: ArrayBufferView): UnknownRecord {
+    const prototype = getPrototypeObject(value);
+    const constructor = prototype
+        ? getOwnDataProperty(prototype, "constructor")
+        : { found: false as const };
+    const constructorName =
+        constructor.found &&
+        typeof constructor.value === "function" &&
+        typeof constructor.value.name === "string"
+            ? constructor.value.name
+            : "ArrayBufferView";
+
+    return {
+        byteLength: prototype
+            ? getNativeByteLength(value, prototype)
+            : UNKNOWN_SIZE_PLACEHOLDER,
+        constructor: constructorName,
+        type: "ArrayBufferView",
+    };
+}
+
 function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     if (typeof value === "function") {
         return formatFunctionPlaceholder(value.name || "");
@@ -169,7 +451,7 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
         try {
             // Accept any parseable URL (including mailto/file) for redaction.
             const parsedUrl = new URL(value);
-            return getSafeUrlForLogging(parsedUrl.toString());
+            return serializeUrl(parsedUrl);
         } catch {
             // not a URL
         }
@@ -195,30 +477,11 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     }
 
     if (value instanceof Map) {
-        return {
-            entries: [...value].slice(0, 5).map(([entryKey, entryValue]) => {
-                const serializedKey = serializeValue(entryKey, seen);
-
-                return [
-                    serializedKey,
-                    typeof entryKey === "string" && isSensitiveKeyName(entryKey)
-                        ? REDACTED_PLACEHOLDER
-                        : serializeValue(entryValue, seen),
-                ];
-            }),
-            size: value.size,
-            type: "Map",
-        };
+        return serializeMapPreview(value, seen);
     }
 
     if (value instanceof Set) {
-        return {
-            sample: [...value]
-                .slice(0, 5)
-                .map((entryValue) => serializeValue(entryValue, seen)),
-            size: value.size,
-            type: "Set",
-        };
+        return serializeSetPreview(value, seen);
     }
 
     if (value instanceof Date) {
@@ -226,22 +489,18 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     }
 
     if (value instanceof URL) {
-        return getSafeUrlForLogging(value.toString());
+        return serializeUrl(value);
     }
 
     if (value instanceof ArrayBuffer) {
         return {
-            byteLength: value.byteLength,
+            byteLength: getNativeByteLength(value, ArrayBuffer.prototype),
             type: "ArrayBuffer",
         };
     }
 
     if (ArrayBuffer.isView(value)) {
-        return {
-            byteLength: value.byteLength,
-            constructor: value.constructor.name,
-            type: "ArrayBufferView",
-        };
+        return serializeArrayBufferView(value);
     }
 
     if (Error.isError(value)) {
@@ -260,14 +519,12 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
 
     if (Array.isArray(value)) {
         if (value.length <= MAX_PREVIEW_ARRAY_ITEMS) {
-            return value.map((item) => serializeValue(item, seen));
+            return serializeArrayItems(value, seen, MAX_PREVIEW_ARRAY_ITEMS);
         }
 
         return {
             length: value.length,
-            sample: value
-                .slice(0, MAX_PREVIEW_ARRAY_ITEMS)
-                .map((item) => serializeValue(item, seen)),
+            sample: serializeArrayItems(value, seen, MAX_PREVIEW_ARRAY_ITEMS),
             type: "Array",
         };
     }
