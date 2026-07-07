@@ -17,12 +17,6 @@ describe("useSettingsStore (module coverage)", () => {
             },
         }));
 
-        const { resetSettingsHydrationTimerForTesting } = await import(
-            // Webpack chunk name magic comment (kept separate to satisfy lint).
-            /* webpackChunkName: "settings-hydration" */ "../../../stores/settings/hydration"
-        );
-        resetSettingsHydrationTimerForTesting();
-
         const { useSettingsStore } = await import(
             // Webpack chunk name magic comment (kept separate to satisfy lint).
             /* webpackChunkName: "use-settings-store" */ "../../../stores/settings/useSettingsStore"
