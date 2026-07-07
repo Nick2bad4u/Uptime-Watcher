@@ -58,8 +58,9 @@ import {
     isValidMonitorId,
     isValidSiteIdentifier,
 } from "@shared/validation/identifierValidation";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
-import { arrayJoin, isEmpty, objectHasIn } from "ts-extras";
+import { arrayJoin, isEmpty } from "ts-extras";
 
 import type { DatabaseService } from "./DatabaseService";
 
@@ -116,16 +117,17 @@ function insertMonitorAndReturnId(args: {
         buildMonitorInsertSql(),
         parameters
     );
+    const idProperty = getOwnDataProperty(insertResult, "id");
 
     if (
-        !objectHasIn(insertResult, "id") ||
-        typeof insertResult.id !== "string" ||
-        insertResult.id.length === 0
+        !idProperty.found ||
+        typeof idProperty.value !== "string" ||
+        idProperty.value.length === 0
     ) {
         throw new Error(args.invalidResultMessage);
     }
 
-    return insertResult.id;
+    return idProperty.value;
 }
 
 /**

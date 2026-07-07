@@ -244,6 +244,35 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(result).toBe("monitor-456");
         });
+        it("should reject create results with inherited ids", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const inheritedResult = Object.create({ id: "monitor-inherited" });
+            mockDatabase.get.mockReturnValue(inheritedResult);
+
+            await expect(
+                repository.create("site-123", {
+                    id: "monitor-inherited",
+                    type: "http",
+                    url: "https://example.com",
+                    checkInterval: 60_000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    monitoring: true,
+                    status: "pending",
+                    responseTime: 0,
+                    history: [],
+                })
+            ).rejects.toThrow(
+                "Failed to create monitor for site site-123: invalid or missing ID in database response"
+            );
+        });
         it("should handle creation errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");
