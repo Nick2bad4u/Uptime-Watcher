@@ -25,6 +25,7 @@
 import { fc, test } from "@fast-check/vitest";
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 
+import type { ProcessSnapshot } from "../../utils/environment.js";
 import {
     getEnvironment,
     getEnvVar,
@@ -34,7 +35,39 @@ import {
     isNodeEnvironment,
     isProduction,
     isTest,
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
 } from "../../utils/environment.js";
+
+const deleteBrowserGlobalForTesting = (key: "document" | "window"): void => {
+    Reflect.deleteProperty(globalThis, key);
+};
+
+const setBrowserGlobalForTesting = (
+    key: "document" | "window",
+    value: unknown
+): void => {
+    if (value === undefined) {
+        deleteBrowserGlobalForTesting(key);
+        return;
+    }
+
+    Object.defineProperty(globalThis, key, {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
+const toProcessSnapshotForTesting = (
+    processLike: unknown
+): null | ProcessSnapshot => {
+    if (typeof processLike !== "object" || processLike === null) {
+        return null;
+    }
+
+    return processLike as ProcessSnapshot;
+};
 
 describe("environment comprehensive fuzzing tests", () => {
     // Use a broad type here so our synthetic assignments to `globalThis.process`
@@ -54,9 +87,10 @@ describe("environment comprehensive fuzzing tests", () => {
 
     afterEach(() => {
         // Restore original globals
+        resetProcessSnapshotOverrideForTesting();
         globalThis.process = originalProcess;
-        globalThis.window = originalWindow;
-        globalThis.document = originalDocument;
+        setBrowserGlobalForTesting("window", originalWindow);
+        setBrowserGlobalForTesting("document", originalDocument);
         vi.restoreAllMocks();
     });
 
@@ -64,7 +98,7 @@ describe("environment comprehensive fuzzing tests", () => {
         test.prop([fc.constantFrom("NODE_ENV", "CODECOV_TOKEN")])(
             "returns undefined when process is undefined",
             (envKey) => {
-                globalThis.process = undefined as any;
+                setProcessSnapshotOverrideForTesting(null);
 
                 const result = getEnvVar(envKey);
                 expect(result).toBeUndefined();
@@ -136,7 +170,7 @@ describe("environment comprehensive fuzzing tests", () => {
             globalThis.process = {
                 ...originalProcess,
 
-                env: null as any,
+                env: null as unknown as ProcessSnapshot["env"],
             };
 
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
@@ -185,7 +219,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test('returns "unknown" when process is undefined', () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             const result = getEnvironment();
             expect(result).toBe("unknown");
@@ -212,7 +246,7 @@ describe("environment comprehensive fuzzing tests", () => {
             globalThis.process = {
                 ...originalProcess,
                 env: {
-                    NODE_ENV: null as any,
+                    NODE_ENV: null as unknown as string | undefined,
                 },
             };
 
@@ -248,7 +282,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test('returns "development" when process is undefined', () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             const result = getNodeEnv();
             expect(result).toBe("development");
@@ -295,7 +329,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("returns false when window is undefined", () => {
-            globalThis.window = undefined as any;
+            setBrowserGlobalForTesting("window", undefined);
             globalThis.document = { ...originalDocument };
 
             const isResult = isBrowserEnvironment();
@@ -305,16 +339,16 @@ describe("environment comprehensive fuzzing tests", () => {
         test("returns false when document is undefined", () => {
             globalThis.window = { ...originalWindow };
 
-            globalThis.document = undefined as any;
+            setBrowserGlobalForTesting("document", undefined);
 
             const isResult = isBrowserEnvironment();
             expect(isResult).toBeFalsy();
         });
 
         test("returns false when both window and document are undefined", () => {
-            globalThis.window = undefined as any;
+            setBrowserGlobalForTesting("window", undefined);
 
-            globalThis.document = undefined as any;
+            setBrowserGlobalForTesting("document", undefined);
 
             const isResult = isBrowserEnvironment();
             expect(isResult).toBeFalsy();
@@ -323,9 +357,9 @@ describe("environment comprehensive fuzzing tests", () => {
         test.prop([fc.anything(), fc.anything()])(
             "handles various truthy/falsy values for window and document",
             (windowValue, documentValue) => {
-                globalThis.window = windowValue as any;
+                setBrowserGlobalForTesting("window", windowValue);
 
-                globalThis.document = documentValue as any;
+                setBrowserGlobalForTesting("document", documentValue);
 
                 const isResult = isBrowserEnvironment();
                 const isExpected =
@@ -376,7 +410,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("returns false when process is undefined", () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             const isResult = isDevelopment();
             expect(isResult).toBeFalsy();
@@ -431,7 +465,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("returns false when process is undefined", () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             const isResult = isNodeEnvironment();
             expect(isResult).toBeFalsy();
@@ -441,7 +475,7 @@ describe("environment comprehensive fuzzing tests", () => {
             globalThis.process = {
                 ...originalProcess,
 
-                versions: undefined as any,
+                versions: undefined,
             };
 
             const isResult = isNodeEnvironment();
@@ -452,7 +486,8 @@ describe("environment comprehensive fuzzing tests", () => {
             globalThis.process = {
                 ...originalProcess,
 
-                versions: "not-an-object" as any,
+                versions:
+                    "not-an-object" as unknown as ProcessSnapshot["versions"],
             };
 
             const isResult = isNodeEnvironment();
@@ -465,7 +500,7 @@ describe("environment comprehensive fuzzing tests", () => {
                 versions: {
                     ...originalProcess.versions,
 
-                    node: undefined as any,
+                    node: undefined,
                 },
             };
 
@@ -487,7 +522,7 @@ describe("environment comprehensive fuzzing tests", () => {
                     versions: {
                         ...originalProcess.versions,
 
-                        node: falsyValue as any,
+                        node: falsyValue,
                     },
                 };
 
@@ -554,7 +589,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("returns false when process is undefined", () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             const isResult = isProduction();
             expect(isResult).toBeFalsy();
@@ -631,7 +666,7 @@ describe("environment comprehensive fuzzing tests", () => {
         });
 
         test("returns false when process is undefined", () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             const isResult = isTest();
             expect(isResult).toBeFalsy();
@@ -740,7 +775,7 @@ describe("environment comprehensive fuzzing tests", () => {
         );
 
         test("all functions handle missing process gracefully", () => {
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
 
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
             expect(getEnvironment()).toBe("unknown");
@@ -784,9 +819,9 @@ describe("environment comprehensive fuzzing tests", () => {
                         globalThis.window = { ...originalWindow };
                         globalThis.document = { ...originalDocument };
                     } else {
-                        globalThis.window = undefined as any;
+                        setBrowserGlobalForTesting("window", undefined);
 
-                        globalThis.document = undefined as any;
+                        setBrowserGlobalForTesting("document", undefined);
                     }
 
                     expect(getNodeEnv()).toBe(env);
@@ -902,11 +937,13 @@ describe("environment comprehensive fuzzing tests", () => {
             ];
 
             for (const globals of corruptedGlobals) {
-                globalThis.process = globals.process as any;
+                setProcessSnapshotOverrideForTesting(
+                    toProcessSnapshotForTesting(globals.process)
+                );
 
-                globalThis.window = globals.window as any;
+                setBrowserGlobalForTesting("window", globals.window);
 
-                globalThis.document = globals.document as any;
+                setBrowserGlobalForTesting("document", globals.document);
 
                 // All functions should handle corrupted state gracefully
                 try {
