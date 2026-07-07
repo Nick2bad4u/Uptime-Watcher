@@ -1,9 +1,10 @@
 import type { Database } from "node-sqlite3-wasm";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { isObject } from "@shared/utils/typeGuards";
-import { isEmpty, objectHasIn, setHas } from "ts-extras";
+import { isEmpty, setHas } from "ts-extras";
 
 import { logger } from "../../../../utils/logger";
 import { getRegisteredMonitorTypes } from "../../../monitoring/MonitorTypeRegistry";
@@ -154,7 +155,7 @@ function ensureMonitorDynamicColumns(database: Database): void {
 const hasUserVersionProperty = (
     value: unknown
 ): value is { user_version?: unknown } =>
-    isObject(value) && objectHasIn(value, "user_version");
+    isObject(value) && getOwnDataProperty(value, "user_version").found;
 
 /**
  * Validates a generated SQL schema string before execution.

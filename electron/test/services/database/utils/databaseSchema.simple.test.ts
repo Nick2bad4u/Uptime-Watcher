@@ -7,7 +7,11 @@ import type { Database } from "node-sqlite3-wasm";
 import { fc } from "@fast-check/vitest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createDatabaseSchema } from "../../../../services/database/utils/schema/databaseSchema";
+import {
+    DATABASE_SCHEMA_VERSION,
+    createDatabaseSchema,
+    synchronizeDatabaseSchemaVersion,
+} from "../../../../services/database/utils/schema/databaseSchema";
 
 const RUN_RESULT: ReturnType<Database["run"]> = {
     changes: 0,
@@ -15,6 +19,21 @@ const RUN_RESULT: ReturnType<Database["run"]> = {
 };
 
 const createMockDatabase = (): Pick<Database, "run"> => ({
+    run: vi.fn<Database["run"]>(() => RUN_RESULT),
+});
+
+const createMockSchemaVersionDatabase = (
+    pragmaResult: unknown
+): Pick<
+    Database,
+    | "all"
+    | "get"
+    | "run"
+> => ({
+    all: vi.fn<Database["all"]>(() => []),
+    get: vi.fn<Database["get"]>(
+        () => pragmaResult as ReturnType<Database["get"]>
+    ),
     run: vi.fn<Database["run"]>(() => RUN_RESULT),
 });
 
@@ -85,6 +104,31 @@ describe("Database Schema", () => {
 
         expect(mockDatabase.run).toHaveBeenCalledWith("ROLLBACK");
         expect(mockDatabase.run).not.toHaveBeenCalledWith("COMMIT");
+    });
+
+    it("does not trust inherited user_version pragma values", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: databaseSchema", "component");
+        await annotate("Category: Service", "category");
+        await annotate("Type: Error Handling", "type");
+
+        const inheritedPragmaRow = Object.create({
+            user_version: DATABASE_SCHEMA_VERSION,
+        });
+        const mockDatabase =
+            createMockSchemaVersionDatabase(inheritedPragmaRow);
+
+        synchronizeDatabaseSchemaVersion(mockDatabase as Database);
+
+        expect(mockDatabase.get).toHaveBeenCalledWith("PRAGMA user_version");
+        expect(mockDatabase.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
+        expect(mockDatabase.run).toHaveBeenCalledWith(
+            `PRAGMA user_version = ${DATABASE_SCHEMA_VERSION}`
+        );
+        expect(mockDatabase.run).toHaveBeenCalledWith("COMMIT");
     });
 
     describe("Property-Based Database Schema Tests", () => {
