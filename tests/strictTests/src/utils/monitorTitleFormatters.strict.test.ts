@@ -136,28 +136,6 @@ describe("monitorTitleFormatters strict coverage", () => {
         );
     });
 
-    it("allows runtime overrides through registerTitleSuffixFormatter", async () => {
-        const {
-            formatTitleSuffix,
-            getTitleSuffixFormatter,
-            registerTitleSuffixFormatter,
-        } = await import("@app/utils/monitorTitleFormatters");
-
-        const monitor = createMonitor({
-            type: "http",
-            url: "https://original.example.com",
-        });
-        expect(formatTitleSuffix(monitor)).toBe(
-            " (https://original.example.com)"
-        );
-
-        registerTitleSuffixFormatter("http", () => " (overridden)");
-
-        const overriddenFormatter = getTitleSuffixFormatter("http");
-        expect(overriddenFormatter).toBeTypeOf("function");
-        expect(formatTitleSuffix(monitor)).toBe(" (overridden)");
-    });
-
     it("returns empty suffix when no formatter or source data is available", async () => {
         const { formatTitleSuffix } =
             await import("@app/utils/monitorTitleFormatters");

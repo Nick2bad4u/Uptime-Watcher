@@ -4,7 +4,7 @@ import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import { validateMonitorType } from "@shared/utils/validation";
 
 /** Function that produces a human-readable suffix for monitor titles. */
-export type TitleSuffixFormatter = (monitor: Monitor) => string;
+type TitleSuffixFormatter = (monitor: Monitor) => string;
 
 const getUrlString = (url: unknown): string => {
     if (
@@ -93,20 +93,13 @@ const defaultMonitorTitleSuffixFormatters: Partial<
     "websocket-keepalive": (monitor) => formatUrlSuffix(monitor.url),
 };
 
-const monitorTitleSuffixFormatters: Partial<
-    Record<MonitorType, TitleSuffixFormatter>
-> = { ...defaultMonitorTitleSuffixFormatters };
-
-const customMonitorTitleSuffixFormatters = new Map<
-    string,
-    TitleSuffixFormatter
->();
-
 /**
  * Formats a title suffix for the provided monitor configuration.
  */
 export function formatTitleSuffix(monitor: Monitor): string {
-    const formatter = getTitleSuffixFormatter(monitor.type);
+    const formatter = validateMonitorType(monitor.type)
+        ? defaultMonitorTitleSuffixFormatters[monitor.type]
+        : undefined;
     if (!formatter) {
         return "";
     }
@@ -117,33 +110,4 @@ export function formatTitleSuffix(monitor: Monitor): string {
     }
 
     return suffix;
-}
-
-/**
- * Retrieves a suffix formatter for a given monitor type.
- */
-export function getTitleSuffixFormatter(
-    monitorType: string
-): TitleSuffixFormatter | undefined {
-    if (validateMonitorType(monitorType)) {
-        return monitorTitleSuffixFormatters[monitorType];
-    }
-
-    return customMonitorTitleSuffixFormatters.get(monitorType);
-}
-
-/**
- * Registers a custom formatter for either built-in or user-defined monitor
- * types.
- */
-export function registerTitleSuffixFormatter(
-    monitorType: string,
-    formatter: TitleSuffixFormatter
-): void {
-    if (validateMonitorType(monitorType)) {
-        monitorTitleSuffixFormatters[monitorType] = formatter;
-        return;
-    }
-
-    customMonitorTitleSuffixFormatters.set(monitorType, formatter);
 }

@@ -15,14 +15,9 @@ import type { Monitor } from "@shared/types";
 import { test } from "@fast-check/vitest";
 import { getSafeUrlForDisplay } from "@shared/utils/urlSafety";
 import fc from "fast-check";
-import { beforeEach, describe, expect } from "vitest";
+import { describe, expect } from "vitest";
 
-import {
-    formatTitleSuffix,
-    getTitleSuffixFormatter,
-    registerTitleSuffixFormatter,
-    type TitleSuffixFormatter,
-} from "../../utils/monitorTitleFormatters";
+import { formatTitleSuffix } from "../../utils/monitorTitleFormatters";
 
 describe("monitorTitleFormatters Property-Based Tests", () => {
     /**
@@ -323,114 +318,6 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
         });
     });
 
-    describe(getTitleSuffixFormatter, () => {
-        test.prop([fc.string()])(
-            "should return function for known monitor types, undefined for unknown",
-            (monitorType) => {
-                const formatter = getTitleSuffixFormatter(monitorType);
-
-                const knownTypes = [
-                    "http",
-                    "port",
-                    "dns",
-                ];
-                if (knownTypes.includes(monitorType)) {
-                    expect(formatter).toBeTypeOf("function");
-                } else {
-                    expect(formatter).toBeUndefined();
-                }
-            }
-        );
-
-        test.prop([monitorTypeArbitrary])(
-            "should consistently return same result for same input",
-            (monitorType) => {
-                const formatter1 = getTitleSuffixFormatter(monitorType);
-                const formatter2 = getTitleSuffixFormatter(monitorType);
-
-                expect(formatter1).toBe(formatter2);
-            }
-        );
-    });
-
-    describe(registerTitleSuffixFormatter, () => {
-        beforeEach(() => {
-            // Clean up any previously registered custom formatters
-        });
-
-        test.prop([
-            fc.string({ maxLength: 20, minLength: 1 }).filter(
-                (s) =>
-                    ![
-                        "__proto__",
-                        "constructor",
-                        "dns",
-                        "http",
-                        "ping",
-                        "port",
-                        "prototype",
-                    ].includes(s)
-            ),
-            fc.string({ maxLength: 100, minLength: 1 }),
-        ])(
-            "should register and retrieve custom formatters",
-            (customType, customSuffix) => {
-                const customFormatter: TitleSuffixFormatter = () =>
-                    customSuffix;
-
-                registerTitleSuffixFormatter(customType, customFormatter);
-
-                const retrievedFormatter = getTitleSuffixFormatter(customType);
-
-                expect(retrievedFormatter).toBe(customFormatter);
-
-                // Test that the formatter works
-                const testMonitor = createBaseMonitor({
-                    type: customType as any,
-                });
-                const result = formatTitleSuffix(testMonitor);
-
-                expect(result).toBe(customSuffix);
-            }
-        );
-
-        test.prop([
-            fc
-                .string({ minLength: 1 })
-                .filter(
-                    (s) =>
-                        s !== "__proto__" &&
-                        s !== "constructor" &&
-                        s !== "prototype"
-                ),
-            fc.string({ minLength: 1 }),
-            fc.string({ minLength: 1 }),
-        ])(
-            "should allow overriding existing formatters",
-            (monitorType, firstSuffix, secondSuffix) => {
-                fc.pre(firstSuffix !== secondSuffix);
-
-                const firstFormatter: TitleSuffixFormatter = () => firstSuffix;
-                const secondFormatter: TitleSuffixFormatter = () =>
-                    secondSuffix;
-
-                registerTitleSuffixFormatter(monitorType, firstFormatter);
-                registerTitleSuffixFormatter(monitorType, secondFormatter);
-
-                const retrievedFormatter = getTitleSuffixFormatter(monitorType);
-
-                expect(retrievedFormatter).toBe(secondFormatter);
-
-                const testMonitor = createBaseMonitor({
-                    type: monitorType as any,
-                });
-                const result = formatTitleSuffix(testMonitor);
-
-                expect(result).toBe(secondSuffix);
-            }
-        );
-    });
-
     describe("edge cases and defensive programming", () => {
         test.prop([
             fc.oneof(
@@ -450,65 +337,6 @@ describe("monitorTitleFormatters Property-Based Tests", () => {
                 expect(result).toBe("");
             }
         );
-
-        describe("formatter function edge cases", () => {
-            test.prop([
-                fc.string({ minLength: 1 }).filter(
-                    (s) =>
-                        ![
-                            "__proto__",
-                            "constructor",
-                            "prototype",
-                        ].includes(s)
-                ),
-            ])("should handle formatters that throw errors", (customType) => {
-                const errorFormatter: TitleSuffixFormatter = () => {
-                    throw new Error("Formatter error");
-                };
-
-                registerTitleSuffixFormatter(customType, errorFormatter);
-
-                const testMonitor = createBaseMonitor({
-                    type: customType as any,
-                });
-
-                // The current implementation doesn't handle errors, but test that it fails predictably
-                expect(() => formatTitleSuffix(testMonitor)).toThrow();
-            });
-
-            test.prop([
-                fc.string({ minLength: 1 }).filter(
-                    (s) =>
-                        ![
-                            "__proto__",
-                            "constructor",
-                            "prototype",
-                        ].includes(s)
-                ),
-            ])(
-                "should handle formatters that return non-string values",
-                (customType) => {
-                    const nonStringFormatter: TitleSuffixFormatter = () =>
-                        null as any; // Return invalid type
-
-                    registerTitleSuffixFormatter(
-                        customType,
-                        nonStringFormatter
-                    );
-
-                    const testMonitor = createBaseMonitor({
-                        type: customType as any,
-                    });
-
-                    const result = formatTitleSuffix(testMonitor);
-
-                    // Should still work, as JavaScript coerces null to string
-                    expect(typeof result === "string" || result === null).toBe(
-                        true
-                    );
-                }
-            );
-        });
 
         test.prop([
             fc.array(fc.constantFrom("http", "port", "dns", "ping"), {
