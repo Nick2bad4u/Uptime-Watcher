@@ -187,10 +187,6 @@ const normalizeOperationalContext = (
     return freezeOperationalContext(context);
 };
 
-export const createOperationalHookContext = (
-    context?: OperationalHookContextInput
-): OperationalHookContext => normalizeOperationalContext(context);
-
 function normalizeMaxAttempts(maxRetries: number | undefined): number {
     if (!isDefined(maxRetries) || !Number.isFinite(maxRetries)) {
         return DEFAULT_MAX_ATTEMPTS;

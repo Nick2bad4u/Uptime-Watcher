@@ -10,47 +10,9 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { logger } from "../../utils/logger";
 import {
-    createOperationalHookContext,
     withDatabaseOperation,
     withOperationalHooks,
 } from "../../utils/operationalHooks";
-
-describe(createOperationalHookContext, () => {
-    it("should freeze and brand plain context objects", () => {
-        const contextInput = { userId: "user-123", operation: "seed" };
-        const context = createOperationalHookContext(contextInput);
-
-        expect(context).toEqual(contextInput);
-        expect(Object.isFrozen(context)).toBeTruthy();
-        expect(context).not.toBe(contextInput);
-    });
-
-    it("should reuse previously branded contexts", () => {
-        const branded = createOperationalHookContext({ region: "iad" });
-        const rehydrated = createOperationalHookContext(branded);
-
-        expect(rehydrated).toBe(branded);
-    });
-
-    it("should not invoke context accessors while freezing metadata", () => {
-        let getterCalls = 0;
-        const contextInput = { operation: "seed" };
-        Object.defineProperty(contextInput, "secret", {
-            enumerable: true,
-            get() {
-                getterCalls += 1;
-                throw new Error("context getter should not run");
-            },
-        });
-
-        const context = createOperationalHookContext(contextInput);
-
-        expect(context).toEqual({ operation: "seed" });
-        expect(Object.hasOwn(context, "secret")).toBeFalsy();
-        expect(Object.isFrozen(context)).toBeTruthy();
-        expect(getterCalls).toBe(0);
-    });
-});
 
 describe("Operational Hooks", () => {
     afterEach(() => {
@@ -451,6 +413,53 @@ describe("Operational Hooks", () => {
                 expect.objectContaining({
                     lifecycleStage: "success",
                     operation: "stage-success:completed",
+                })
+            );
+        });
+        it("should skip accessor-backed context metadata without invoking getters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
+            let getterCalls = 0;
+            const context = { seedOperation: "seed" };
+            Object.defineProperty(context, "secret", {
+                enumerable: true,
+                get() {
+                    getterCalls += 1;
+                    throw new Error("context getter should not run");
+                },
+            });
+
+            const eventEmitter = {
+                emitTyped: vi.fn().mockResolvedValue(undefined),
+            } as unknown as TypedEventBus<UptimeEvents>;
+
+            await withOperationalHooks(async () => "telemetry", {
+                context,
+                emitEvents: true,
+                eventEmitter,
+                maxRetries: 1,
+                operationName: "safe-context",
+            });
+
+            expect(getterCalls).toBe(0);
+            expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    lifecycleStage: "start",
+                    operation: "safe-context:started",
+                    seedOperation: "seed",
+                })
+            );
+            expect(eventEmitter.emitTyped).not.toHaveBeenCalledWith(
+                "database:transaction-completed",
+                expect.objectContaining({
+                    secret: expect.anything(),
                 })
             );
         });
