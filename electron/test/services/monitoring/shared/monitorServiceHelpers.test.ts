@@ -1,5 +1,5 @@
 import { type Monitor, STATUS_KIND } from "@shared/types";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     extractNestedFieldValue,
@@ -73,6 +73,19 @@ describe(normalizeTimestampValue, () => {
         expect(
             normalizeTimestampValue(new Date("2025-01-02T03:04:05.000Z"))
         ).toBe(1_735_787_045_000);
+    });
+
+    it("does not invoke shadowed Date methods while normalizing timestamps", () => {
+        const timestamp = new Date("2025-01-02T03:04:05.000Z");
+        const getTime = vi.fn(() => {
+            throw new Error("date getTime should not run");
+        });
+        Object.defineProperty(timestamp, "getTime", {
+            value: getTime,
+        });
+
+        expect(normalizeTimestampValue(timestamp)).toBe(1_735_787_045_000);
+        expect(getTime).not.toHaveBeenCalled();
     });
 
     it("rejects invalid Date values", () => {

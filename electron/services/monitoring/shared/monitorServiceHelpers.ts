@@ -1,5 +1,6 @@
 import type { Monitor } from "@shared/types";
 import { isStrictPlainDecimalNumberString } from "@shared/utils/decimalNumberString";
+import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 /**
  * Shared utilities for monitor services to reduce code duplication Contains
  * common patterns used across PingMonitor, PortMonitor, and HttpMonitor
@@ -272,8 +273,7 @@ const UNIX_SECONDS_THRESHOLD = 10_000_000_000;
  */
 export function normalizeTimestampValue(value: unknown): number | undefined {
     if (value instanceof Date) {
-        const timestamp = value.getTime();
-        return isFiniteNumber(timestamp) ? timestamp : undefined;
+        return getNativeDateEpochMs(value);
     }
 
     if (typeof value === "number" && isFiniteNumber(value)) {

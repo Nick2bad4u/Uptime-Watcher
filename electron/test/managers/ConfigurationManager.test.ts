@@ -673,6 +673,36 @@ describe(ConfigurationManager, () => {
             expect(result).toEqual(expectedResult);
         });
 
+        it("should not invoke shadowed Date methods when building validation cache keys", async () => {
+            const lastChecked = new Date("2023-01-01T00:00:00Z");
+            const getTime = vi.fn(() => {
+                throw new Error("date getTime should not run");
+            });
+            Object.defineProperty(lastChecked, "getTime", {
+                value: getTime,
+            });
+            const monitor = createMockMonitor({ lastChecked });
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
+
+            await expect(
+                configManager.validateMonitorConfiguration(monitor)
+            ).resolves.toEqual(expectedResult);
+            await expect(
+                configManager.validateMonitorConfiguration(monitor)
+            ).resolves.toEqual(expectedResult);
+
+            expect(getTime).not.toHaveBeenCalled();
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledTimes(1);
+        });
+
         it("should handle monitors with null values", async ({
             task,
             annotate,
