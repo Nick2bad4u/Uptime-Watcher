@@ -49,32 +49,58 @@ const WithFormatFailure = ({
 }): JSX.Element => {
     type FormatMonitorDetail =
         ElectronAPI["monitorTypes"]["formatMonitorDetail"];
+    type FormatMonitorDetailBridge = Pick<
+        ElectronAPI["monitorTypes"],
+        "formatMonitorDetail"
+    >;
+
+    const getMonitorTypesBridge = (): FormatMonitorDetailBridge => {
+        const { electronAPI } = globalThis as Partial<
+            Pick<Window, "electronAPI">
+        >;
+
+        if (!electronAPI) {
+            throw new Error("Storybook Electron API mock is not installed");
+        }
+
+        return electronAPI.monitorTypes;
+    };
+    const setFormatMonitorDetail = (
+        monitorTypes: FormatMonitorDetailBridge,
+        formatMonitorDetail: FormatMonitorDetail
+    ): void => {
+        if (
+            !Reflect.set(
+                monitorTypes,
+                "formatMonitorDetail",
+                formatMonitorDetail
+            )
+        ) {
+            throw new Error(
+                "Storybook Electron API mock rejected formatMonitorDetail override"
+            );
+        }
+    };
 
     const originalRef = useRef<FormatMonitorDetail | null>(null);
 
     useMount(
         () => {
-            const monitorTypes = (globalThis as any).electronAPI
-                .monitorTypes as {
-                formatMonitorDetail: FormatMonitorDetail;
-            };
+            const monitorTypes = getMonitorTypesBridge();
 
             originalRef.current = monitorTypes.formatMonitorDetail;
-            monitorTypes.formatMonitorDetail = async (): Promise<never> => {
+            setFormatMonitorDetail(monitorTypes, async (): Promise<never> => {
                 throw new Error("Simulated formatting failure");
-            };
+            });
         },
         () => {
             if (!originalRef.current) {
                 return;
             }
 
-            const monitorTypes = (globalThis as any).electronAPI
-                .monitorTypes as {
-                formatMonitorDetail: FormatMonitorDetail;
-            };
+            const monitorTypes = getMonitorTypesBridge();
 
-            monitorTypes.formatMonitorDetail = originalRef.current;
+            setFormatMonitorDetail(monitorTypes, originalRef.current);
         }
     );
 
