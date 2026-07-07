@@ -295,6 +295,29 @@ describe("logging context helpers", () => {
         expect(normalizeLogValue(date)).toBe("2025-01-02T03:04:05.000Z");
     });
 
+    it("does not invoke shadowed Date methods while serializing dates", () => {
+        const date = new Date("2025-01-02T03:04:05.000Z");
+        const getTime = vi.fn(() => {
+            throw new Error("date getTime should not run");
+        });
+        const toISOString = vi.fn(() => {
+            throw new Error("date toISOString should not run");
+        });
+
+        Object.defineProperty(date, "getTime", {
+            configurable: true,
+            value: getTime,
+        });
+        Object.defineProperty(date, "toISOString", {
+            configurable: true,
+            value: toISOString,
+        });
+
+        expect(normalizeLogValue(date)).toBe("2025-01-02T03:04:05.000Z");
+        expect(getTime).not.toHaveBeenCalled();
+        expect(toISOString).not.toHaveBeenCalled();
+    });
+
     it("serializes invalid Date values without throwing", () => {
         const invalidDate = new Date(Number.NaN);
 
@@ -313,6 +336,22 @@ describe("logging context helpers", () => {
         expect(String(sanitized)).not.toContain("pass");
         expect(String(sanitized)).not.toContain("token=abc");
         expect(String(sanitized)).toContain("token=[redacted]");
+    });
+
+    it("does not invoke shadowed URL toString while serializing URLs", () => {
+        const url = new URL("https://example.com/callback?token=abc");
+        const toString = vi.fn(() => {
+            throw new Error("url toString should not run");
+        });
+        Object.defineProperty(url, "toString", {
+            configurable: true,
+            value: toString,
+        });
+
+        const sanitized = normalizeLogValue(url);
+
+        expect(sanitized).toBe("https://example.com/callback?token=[redacted]");
+        expect(toString).not.toHaveBeenCalled();
     });
 
     it("serializes ArrayBuffer metadata to a summary", () => {

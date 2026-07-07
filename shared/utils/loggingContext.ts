@@ -129,6 +129,26 @@ const SECRET_METADATA_KEYS = new Set([
 
 const SECRET_PLACEHOLDER = "[redacted]" as const;
 const INVALID_DATE_PLACEHOLDER = "[Invalid Date]" as const;
+const INVALID_URL_PLACEHOLDER = "[Invalid URL]" as const;
+
+type NativePrototypeFunction = (this: unknown) => unknown;
+
+function isNativePrototypeFunction(
+    value: unknown
+): value is NativePrototypeFunction {
+    return typeof value === "function";
+}
+
+function getNativePrototypeFunction(
+    holder: object,
+    key: PropertyKey
+): NativePrototypeFunction | undefined {
+    const property = getOwnDataProperty(holder, key);
+
+    return property.found && isNativePrototypeFunction(property.value)
+        ? property.value
+        : undefined;
+}
 
 const toCanonicalSecretKey = (key: string): string =>
     // Do not use the `v` flag here; it is not available across all Electron
@@ -306,10 +326,44 @@ const normalizeLogString = (value: string): string =>
     maskAuthTokens(maskUrlSecrets(value));
 
 const normalizeLogDate = (value: Date): string => {
-    const timestamp = value.getTime();
-    return isFiniteNumber(timestamp)
-        ? value.toISOString()
-        : INVALID_DATE_PLACEHOLDER;
+    const getTime = getNativePrototypeFunction(Date.prototype, "getTime");
+    const toISOString = getNativePrototypeFunction(
+        Date.prototype,
+        "toISOString"
+    );
+    if (!getTime || !toISOString) {
+        return INVALID_DATE_PLACEHOLDER;
+    }
+
+    try {
+        const timestamp: unknown = Reflect.apply(getTime, value, []);
+        if (typeof timestamp !== "number" || !isFiniteNumber(timestamp)) {
+            return INVALID_DATE_PLACEHOLDER;
+        }
+
+        const serialized: unknown = Reflect.apply(toISOString, value, []);
+        return typeof serialized === "string"
+            ? serialized
+            : INVALID_DATE_PLACEHOLDER;
+    } catch {
+        return INVALID_DATE_PLACEHOLDER;
+    }
+};
+
+const normalizeLogUrl = (value: URL): string => {
+    const toString = getNativePrototypeFunction(URL.prototype, "toString");
+    if (!toString) {
+        return INVALID_URL_PLACEHOLDER;
+    }
+
+    try {
+        const serialized: unknown = Reflect.apply(toString, value, []);
+        return typeof serialized === "string"
+            ? normalizeLogString(serialized)
+            : INVALID_URL_PLACEHOLDER;
+    } catch {
+        return INVALID_URL_PLACEHOLDER;
+    }
 };
 
 const computeIdentifierHash = (value: string): string => {
@@ -352,7 +406,7 @@ function normalizeNonPlainObject(
     if (candidate instanceof URL) {
         return {
             kind: "normalized",
-            value: normalizeLogString(candidate.toString()),
+            value: normalizeLogUrl(candidate),
         };
     }
 
