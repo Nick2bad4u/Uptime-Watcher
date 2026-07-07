@@ -10,7 +10,6 @@
  * Key features:
  *
  * - Safe uptime string parsing with validation
- * - URL hostname extraction with error handling
  * - Input sanitization and range validation
  * - Comprehensive error logging for debugging
  * - Fallback values for invalid inputs
@@ -18,21 +17,15 @@
  * @example
  *
  * ```typescript
- * import { parseUptimeValue, safeGetHostname } from "./dataValidation";
+ * import { parseUptimeValue } from "./dataValidation";
  *
  * // Parse uptime strings safely
  * const uptime1 = parseUptimeValue("99.5%"); // Returns: 99.5
  * const uptime2 = parseUptimeValue("invalid"); // Returns: 0 (fallback)
- *
- * // Extract hostname safely
- * const hostname1 = safeGetHostname("https://example.com/path"); // Returns: "example.com"
- * const hostname2 = safeGetHostname("invalid-url"); // Returns: "" (fallback)
  * ```
  *
  * @packageDocumentation
  */
-
-import { validateHttpUrlCandidate } from "@shared/utils/urlSafety";
 
 import { logger } from "../../services/logger";
 
@@ -131,39 +124,4 @@ export const parseUptimeValue = (uptimeString: string): number => {
 
     // Clamp to 0-100 range for safety
     return Math.min(100, Math.max(0, parsed));
-};
-
-/**
- * Safely extracts hostname from a URL string.
- *
- * @remarks
- * Applies shared URL validation before attempting to construct a {@link URL}.
- * Any parsing failures return an empty string so consumers can fall back to a
- * neutral display value without crashing.
- *
- * @param urlString - The URL string to extract hostname from.
- *
- * @returns The hostname when the URL is valid; otherwise an empty string.
- *
- * @public
- */
-export const safeGetHostname = (urlString: string): string => {
-    const validation = validateHttpUrlCandidate(urlString, {
-        // Preserve previous behavior: `isValidUrl()` does not disallow auth by
-        // default, and hostname extraction is safe even when credentials are
-        // present.
-        disallowAuth: false,
-        // Keep this guard lenient enough to avoid changing runtime behavior for
-        // legitimate long-but-valid URLs, while still enforcing a hard budget.
-        maxBytes: 32_768,
-    });
-
-    if (!validation.ok) {
-        return "";
-    }
-    try {
-        return new URL(validation.normalizedUrl).hostname;
-    } catch {
-        return "";
-    }
 };

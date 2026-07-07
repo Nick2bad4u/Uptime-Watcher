@@ -1,6 +1,5 @@
 /**
- * @file Comprehensive tests for monitoring data validation utilities Tests
- *   parseUptimeValue and safeGetHostname functions for 100% coverage
+ * @file Comprehensive tests for monitoring data validation utilities.
  */
 
 import { test } from "@fast-check/vitest";
@@ -10,10 +9,7 @@ import { arrayJoin } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { logger } from "../../../services/logger";
-import {
-    parseUptimeValue,
-    safeGetHostname,
-} from "../../../utils/monitoring/dataValidation";
+import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 
 const alphaNumericChars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
@@ -448,144 +444,6 @@ describe("monitoring Data Validation", () => {
         );
     });
 
-    describe(safeGetHostname, () => {
-        it("should extract hostname from valid HTTPS URLs", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(safeGetHostname("https://example.com")).toBe("example.com");
-            expect(safeGetHostname("https://www.example.com")).toBe(
-                "www.example.com"
-            );
-            expect(safeGetHostname("https://sub.example.com")).toBe(
-                "sub.example.com"
-            );
-            expect(safeGetHostname("https://example.com:443")).toBe(
-                "example.com"
-            );
-        });
-
-        it("should extract hostname from URLs with paths and queries", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(safeGetHostname("https://example.com/path")).toBe(
-                "example.com"
-            );
-            expect(
-                safeGetHostname("https://example.com/path/to/resource")
-            ).toBe("example.com");
-            expect(
-                safeGetHostname("https://example.com/path?query=value")
-            ).toBe("example.com");
-            expect(
-                safeGetHostname(
-                    "https://example.com/path?query=value&other=test"
-                )
-            ).toBe("example.com");
-            expect(safeGetHostname("https://example.com/path#anchor")).toBe(
-                "example.com"
-            );
-        });
-
-        it("should return empty string for invalid URLs", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(safeGetHostname("not-a-url")).toBe("");
-            expect(safeGetHostname("example.com")).toBe(""); // Missing protocol
-            expect(safeGetHostname("://example.com")).toBe(""); // Missing scheme
-            expect(safeGetHostname("")).toBe("");
-        });
-
-        it("should return empty string for null, undefined, and non-string inputs", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(safeGetHostname(null as any)).toBe("");
-            expect(safeGetHostname(undefined as any)).toBe("");
-            expect(safeGetHostname(123 as any)).toBe("");
-            expect(safeGetHostname({} as any)).toBe("");
-            expect(safeGetHostname([] as any)).toBe("");
-            expect(safeGetHostname(true as any)).toBe("");
-        });
-
-        it("should handle edge cases and malformed URLs", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(safeGetHostname("https://[")).toBe("");
-            expect(safeGetHostname("https://]")).toBe("");
-            // Since validator.js now rejects "https://example..com", hostname extraction returns empty
-            expect(safeGetHostname("https://example..com")).toBe("");
-        });
-
-        it("should handle URLs with special hostnames", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(safeGetHostname("https://localhost")).toBe("localhost");
-            expect(safeGetHostname("https://127.0.0.1")).toBe("127.0.0.1");
-            expect(safeGetHostname("https://192.168.1.1")).toBe("192.168.1.1");
-            expect(safeGetHostname("https://[::1]")).toBe("[::1]"); // IPv6
-        });
-
-        it("should use isValidUrl internally", async ({ annotate, task }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: dataValidation", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Test that it relies on isValidUrl validation
-            expect(safeGetHostname("invalid-url")).toBe("");
-            expect(safeGetHostname("")).toBe("");
-        });
-
-        test.prop([safeHttpUrlArb], { numRuns: 50 })(
-            "matches URL.hostname for any valid http/https URL",
-            (url) => {
-                expect(safeGetHostname(url)).toBe(new URL(url).hostname);
-            }
-        );
-
-        test.prop([fc.domain()], { numRuns: 30 })(
-            "returns empty string for scheme-less domain strings",
-            (domain) => {
-                expect(safeGetHostname(domain)).toBe("");
-            }
-        );
-    });
-
     describe("integration tests", () => {
         it("should work together for URL processing workflow", async ({
             annotate,
@@ -603,20 +461,17 @@ describe("monitoring Data Validation", () => {
             ];
 
             const results = urls.map((url) => ({
-                hostname: safeGetHostname(url),
                 isValid: isValidUrl(url),
                 url,
             }));
 
             expect(results).toEqual([
                 {
-                    hostname: "example.com",
                     isValid: true,
                     url: "https://example.com",
                 },
-                { hostname: "", isValid: false, url: "invalid-url" },
+                { isValid: false, url: "invalid-url" },
                 {
-                    hostname: "test.com",
                     isValid: true,
                     url: "https://test.com:8080/path",
                 },
@@ -639,19 +494,17 @@ describe("monitoring Data Validation", () => {
             ];
 
             const processed = monitoringData.map((data) => ({
-                hostname: safeGetHostname(data.url),
                 isValidUrl: isValidUrl(data.url),
                 uptimeValue: parseUptimeValue(data.uptime),
             }));
 
             expect(processed).toEqual([
                 {
-                    hostname: "example.com",
                     isValidUrl: true,
                     uptimeValue: 95.5,
                 },
-                { hostname: "", isValidUrl: false, uptimeValue: 0 },
-                { hostname: "test.com", isValidUrl: true, uptimeValue: 100 },
+                { isValidUrl: false, uptimeValue: 0 },
+                { isValidUrl: true, uptimeValue: 100 },
             ]);
 
             // Should have logged warning for invalid uptime

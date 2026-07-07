@@ -47,10 +47,7 @@ import {
 import { arrayJoin, isInteger, isSafeInteger } from "ts-extras";
 import { describe, expect, beforeEach, afterEach, it } from "vitest";
 
-import {
-    parseUptimeValue,
-    safeGetHostname,
-} from "../../utils/monitoring/dataValidation";
+import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Domain Objects
@@ -1085,84 +1082,9 @@ describe("comprehensive Validation Function Fuzzing", () => {
                 }
             }
         );
-
-        fcTest.prop([comprehensiveUrls])(
-            "safeGetHostname: safe hostname extraction with comprehensive URL inputs",
-            (url) => {
-                const result = measureValidation(
-                    safeGetHostname,
-                    "safeGetHostname",
-                    url
-                );
-
-                expect(() => result).not.toThrow();
-                expect(result).toBeTypeOf("string");
-
-                // Property: Invalid URLs should return empty string
-                if (typeof url !== "string" || url.trim() === "") {
-                    expect(result).toBe("");
-                }
-
-                // Property: Malicious URLs should return empty string
-                if (
-                    typeof url === "string" &&
-                    (url.includes("<script>") || url.startsWith("javascript:"))
-                ) {
-                    expect(result).toBe("");
-                }
-
-                // Property: Valid URLs should extract hostname
-                if (
-                    typeof url === "string" &&
-                    (url.startsWith("https://") || url.startsWith("https://"))
-                ) {
-                    try {
-                        const urlObj = new URL(url);
-                        if (result !== "") {
-                            expect(result).toBe(urlObj.hostname);
-                        }
-                    } catch {
-                        // If URL constructor fails, result should be empty
-                        expect(result).toBe("");
-                    }
-                }
-            }
-        );
     });
 
     describe("cross-Validation Consistency Tests", () => {
-        fcTest.prop([fc.webUrl()])(
-            "URL validation consistency across different validators",
-            (url) => {
-                // Only test valid HTTP/HTTPS URLs
-                if (
-                    !url.startsWith("https://") &&
-                    !url.startsWith("https://")
-                ) {
-                    return;
-                }
-
-                const validationResult = measureValidation(
-                    isValidUrl,
-                    "isValidUrl",
-                    url
-                );
-
-                // Property: URL validation should be consistent
-
-                // Property: If URL is valid, hostname extraction should work
-                if (validationResult) {
-                    const hostname = measureValidation(
-                        safeGetHostname,
-                        "safeGetHostname",
-                        url
-                    );
-                    expect(hostname).not.toBe("");
-                    expect(typeof hostname).toBe("string");
-                }
-            }
-        );
-
         fcTest.prop([
             fc.constantFrom("http", "ping") as fc.Arbitrary<MonitorType>,
         ])(
