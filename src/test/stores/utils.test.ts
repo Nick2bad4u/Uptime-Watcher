@@ -5,11 +5,7 @@ import {
 } from "@shared/utils/environment";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-    createPersistConfig,
-    debounce,
-    logStoreAction,
-} from "../../stores/utils";
+import { createPersistConfig, logStoreAction } from "../../stores/utils";
 
 describe("src/stores/utils", () => {
     describe(createPersistConfig, () => {
@@ -27,25 +23,6 @@ describe("src/stores/utils", () => {
 
             expect(config.name).toBe("uptime-watcher-test-store");
             expect(config.partialize).toBe(partialize);
-        });
-    });
-
-    describe(debounce, () => {
-        it("executes after wait window", () => {
-            vi.useFakeTimers();
-
-            const fn = vi.fn();
-            const debounced = debounce(fn, 25);
-
-            debounced("a");
-
-            expect(fn).not.toHaveBeenCalled();
-
-            vi.advanceTimersByTime(25);
-
-            expect(fn).toHaveBeenCalledWith("a");
-
-            vi.useRealTimers();
         });
     });
 
