@@ -168,6 +168,44 @@ const normalizeSiteTableColumnWidths = (
 const createEmptySiteDetailsTabState = (): Record<string, SiteDetailsTab> =>
     createNullPrototypeObject<Record<string, SiteDetailsTab>>();
 
+const createEmptySiteDetailsHeaderCollapsedState = (): Record<
+    string,
+    boolean
+> => createNullPrototypeObject<Record<string, boolean>>();
+
+function cloneRecordWithEntry<T>(
+    source: Record<string, T>,
+    key: string,
+    value: T
+): Record<string, T> {
+    const cloned = createNullPrototypeObject<Record<string, T>>();
+
+    for (const [entryKey, entryValue] of objectEntries(source)) {
+        Object.defineProperty(cloned, entryKey, {
+            configurable: true,
+            enumerable: true,
+            value: entryValue,
+            writable: true,
+        });
+    }
+
+    Object.defineProperty(cloned, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
+
+    return cloned;
+}
+
+function getOwnRecordValue<T>(
+    source: Record<string, T>,
+    key: string
+): T | undefined {
+    return Object.hasOwn(source, key) ? source[key] : undefined;
+}
+
 function getOwnDataField(source: object, key: keyof UIPersistedState): unknown {
     const descriptor = Object.getOwnPropertyDescriptor(source, key);
     return descriptor && "value" in descriptor ? descriptor.value : undefined;
@@ -198,7 +236,7 @@ function normalizeBooleanRecord(
         return undefined;
     }
 
-    const normalized = createNullPrototypeObject<Record<string, boolean>>();
+    const normalized = createEmptySiteDetailsHeaderCollapsedState();
     for (const [key, candidate] of objectEntries(value)) {
         if (typeof candidate === "boolean") {
             Object.defineProperty(normalized, key, {
@@ -220,8 +258,7 @@ function normalizeSiteDetailsTabRecord(
         return undefined;
     }
 
-    const normalized =
-        createNullPrototypeObject<Record<string, SiteDetailsTab>>();
+    const normalized = createEmptySiteDetailsTabState();
     for (const [key, candidate] of objectEntries(value)) {
         if (isSiteDetailsTab(candidate)) {
             Object.defineProperty(normalized, key, {
@@ -342,8 +379,9 @@ const getDefaultUIPersistedState = (): UIPersistedState => ({
     sidebarCollapsedPreference: false,
     siteCardPresentation: ENTERPRISE_UI_DEFAULTS.siteCardPresentation,
     siteDetailsChartTimeRange: "24h",
-    siteDetailsHeaderCollapsedState: {},
-    siteDetailsTabState: {},
+    siteDetailsHeaderCollapsedState:
+        createEmptySiteDetailsHeaderCollapsedState(),
+    siteDetailsTabState: createEmptySiteDetailsTabState(),
     siteListLayout: ENTERPRISE_UI_DEFAULTS.siteListLayout,
     siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
     surfaceDensity: ENTERPRISE_UI_DEFAULTS.surfaceDensity,
@@ -523,10 +561,11 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
 
                     return {
                         activeSiteDetailsTab: tab,
-                        siteDetailsTabState: {
-                            ...siteDetailsTabState,
-                            [selectedSiteIdentifier]: tab,
-                        },
+                        siteDetailsTabState: cloneRecordWithEntry(
+                            siteDetailsTabState,
+                            selectedSiteIdentifier,
+                            tab
+                        ),
                     };
                 });
             },
@@ -575,10 +614,11 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     siteIdentifier,
                 });
                 set((state) => ({
-                    siteDetailsHeaderCollapsedState: {
-                        ...state.siteDetailsHeaderCollapsedState,
-                        [siteIdentifier]: collapsed,
-                    },
+                    siteDetailsHeaderCollapsedState: cloneRecordWithEntry(
+                        state.siteDetailsHeaderCollapsedState,
+                        siteIdentifier,
+                        collapsed
+                    ),
                 }));
             },
             setSiteListLayout: (layout: SiteListLayoutMode): void => {
@@ -609,7 +649,8 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             sidebarCollapsedPreference: false,
             siteCardPresentation: "grid",
             siteDetailsChartTimeRange: "24h",
-            siteDetailsHeaderCollapsedState: {},
+            siteDetailsHeaderCollapsedState:
+                createEmptySiteDetailsHeaderCollapsedState(),
             siteDetailsTabState: createEmptySiteDetailsTabState(),
             siteListLayout: "list",
             siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
@@ -619,16 +660,19 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     siteIdentifier,
                 });
                 set((state) => {
-                    const existingTab =
-                        state.siteDetailsTabState[siteIdentifier];
+                    const existingTab = getOwnRecordValue(
+                        state.siteDetailsTabState,
+                        siteIdentifier
+                    );
 
                     if (!isDefined(existingTab)) {
                         return {
                             activeSiteDetailsTab: "site-overview",
-                            siteDetailsTabState: {
-                                ...state.siteDetailsTabState,
-                                [siteIdentifier]: "site-overview",
-                            },
+                            siteDetailsTabState: cloneRecordWithEntry(
+                                state.siteDetailsTabState,
+                                siteIdentifier,
+                                "site-overview"
+                            ),
                         };
                     }
 
@@ -646,13 +690,16 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 });
                 set((state) => {
                     const isCurrent =
-                        state.siteDetailsHeaderCollapsedState[siteIdentifier] ??
-                        false;
+                        getOwnRecordValue(
+                            state.siteDetailsHeaderCollapsedState,
+                            siteIdentifier
+                        ) ?? false;
                     return {
-                        siteDetailsHeaderCollapsedState: {
-                            ...state.siteDetailsHeaderCollapsedState,
-                            [siteIdentifier]: !isCurrent,
-                        },
+                        siteDetailsHeaderCollapsedState: cloneRecordWithEntry(
+                            state.siteDetailsHeaderCollapsedState,
+                            siteIdentifier,
+                            !isCurrent
+                        ),
                     };
                 });
             },

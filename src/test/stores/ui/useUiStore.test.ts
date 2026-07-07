@@ -67,8 +67,14 @@ describe(useUIStore, () => {
         const store = useUIStore.getState();
         act(() => {
             useUIStore.setState({
-                siteDetailsHeaderCollapsedState: {},
-                siteDetailsTabState: {},
+                siteDetailsHeaderCollapsedState: Object.create(null) as Record<
+                    string,
+                    boolean
+                >,
+                siteDetailsTabState: Object.create(null) as Record<
+                    string,
+                    SiteDetailsTab
+                >,
                 siteTableColumnWidths: {
                     ...useUIStore.getInitialState().siteTableColumnWidths,
                 },
@@ -109,6 +115,14 @@ describe(useUIStore, () => {
             expect(result.current.siteCardPresentation).toBe("grid");
             expect(result.current.siteListLayout).toBe("list");
             expect(result.current.siteDetailsHeaderCollapsedState).toEqual({});
+            expect(
+                Object.getPrototypeOf(
+                    result.current.siteDetailsHeaderCollapsedState
+                )
+            ).toBeNull();
+            expect(
+                Object.getPrototypeOf(result.current.siteDetailsTabState)
+            ).toBeNull();
             expect(result.current.siteTableColumnWidths).toMatchObject({
                 controls: 16,
                 monitor: 14,
@@ -312,6 +326,40 @@ describe(useUIStore, () => {
             ).toBe("history");
         });
 
+        it("should preserve prototype-named site keys in tab state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: State Safety", "type");
+
+            const { result } = renderHook(() => useUIStore());
+            const prototypeNamedSite: Site = {
+                ...mockSite,
+                identifier: "__proto__",
+            };
+
+            act(() => {
+                result.current.selectSite(prototypeNamedSite);
+                result.current.setActiveSiteDetailsTab("history");
+            });
+
+            expect(
+                Object.getPrototypeOf(result.current.siteDetailsTabState)
+            ).toBeNull();
+            expect(
+                Object.hasOwn(result.current.siteDetailsTabState, "__proto__")
+            ).toBe(true);
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    result.current.siteDetailsTabState,
+                    "__proto__"
+                )?.value
+            ).toBe("history");
+        });
+
         it("should summarize and redact selected site telemetry", () => {
             const sensitiveSite: Site = {
                 identifier:
@@ -455,6 +503,54 @@ describe(useUIStore, () => {
                     mockSite.identifier
                 ]
             ).toBeFalsy();
+        });
+
+        it("should preserve prototype-named site keys in collapse state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: State Safety", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.toggleSiteDetailsHeaderCollapsed("__proto__");
+            });
+
+            expect(
+                Object.getPrototypeOf(
+                    result.current.siteDetailsHeaderCollapsedState
+                )
+            ).toBeNull();
+            expect(
+                Object.hasOwn(
+                    result.current.siteDetailsHeaderCollapsedState,
+                    "__proto__"
+                )
+            ).toBe(true);
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    result.current.siteDetailsHeaderCollapsedState,
+                    "__proto__"
+                )?.value
+            ).toBe(true);
+
+            act(() => {
+                result.current.setSiteDetailsHeaderCollapsed(
+                    "__proto__",
+                    false
+                );
+            });
+
+            expect(
+                Object.getOwnPropertyDescriptor(
+                    result.current.siteDetailsHeaderCollapsedState,
+                    "__proto__"
+                )?.value
+            ).toBe(false);
         });
 
         it("should toggle collapse state", async ({ task, annotate }) => {
