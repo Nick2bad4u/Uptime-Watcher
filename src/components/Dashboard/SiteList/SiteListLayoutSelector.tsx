@@ -233,12 +233,10 @@ export const SiteListLayoutSelector: NamedExoticComponent<SiteListLayoutSelector
         }
 
         return (
-            <div
-                aria-label="Site layout controls"
-                className="site-list__layout-selector"
-            >
+            <fieldset className="site-list__layout-selector">
+                <legend className="sr-only">Site layout controls</legend>
                 {secondarySegment}
                 {layoutSegment}
-            </div>
+            </fieldset>
         );
     });

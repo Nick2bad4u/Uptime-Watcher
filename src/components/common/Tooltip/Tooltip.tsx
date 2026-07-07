@@ -733,6 +733,7 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         return (
             <>
+                {/* biome-ignore lint/a11y/noStaticElementInteractions: Tooltip wrapper delegates hover/focus events so disabled child controls can still reveal tooltip content. */}
                 <div
                     className={containerClasses}
                     onBlur={disabled ? undefined : handleBlur}

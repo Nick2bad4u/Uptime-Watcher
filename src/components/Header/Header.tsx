@@ -102,7 +102,7 @@ export const Header = (): JSX.Element => {
     const shouldShowSummary = siteListLayout !== "card-large";
 
     return (
-        <header className="app-topbar" data-testid="app-header" role="banner">
+        <header className="app-topbar" data-testid="app-header">
             <ThemedBox
                 className="app-topbar__container relative overflow-hidden"
                 data-testid="app-header-container"
