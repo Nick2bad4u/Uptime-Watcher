@@ -154,6 +154,44 @@ describe("historyLimitManager", () => {
             );
         });
 
+        it("should persist history limit without invoking Number prototype string conversion", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Configuration", "type");
+
+            const toString = vi.spyOn(Number.prototype, "toString");
+            toString.mockImplementation(() => {
+                throw new Error("Number prototype toString should not run");
+            });
+
+            try {
+                await setHistoryLimit({
+                    databaseService: mockDatabaseService,
+                    limit: 100,
+                    repositories: {
+                        history: mockHistoryRepository,
+                        settings: mockSettingsRepository,
+                    },
+                    rules: DEFAULT_HISTORY_LIMIT_RULES,
+                    setHistoryLimit: vi.fn(),
+                    logger: mockLogger,
+                });
+
+                expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
+                    mockDatabase,
+                    "historyLimit",
+                    "100"
+                );
+                expect(toString).not.toHaveBeenCalled();
+            } finally {
+                toString.mockRestore();
+            }
+        });
+
         it("should apply configured minimum for small positive values", async ({
             task,
             annotate,

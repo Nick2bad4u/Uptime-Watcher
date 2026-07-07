@@ -111,7 +111,7 @@ export async function setHistoryLimit(
                 databaseService,
                 repositories,
                 ({ historyTx, settingsTx }) => {
-                    settingsTx.set("historyLimit", finalLimit.toString());
+                    settingsTx.set("historyLimit", String(finalLimit));
 
                     if (finalLimit > 0) {
                         historyTx.pruneAllHistory(finalLimit);
