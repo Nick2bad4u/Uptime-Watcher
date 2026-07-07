@@ -17,9 +17,11 @@ import type {
 } from "../../../../stores/ui/types";
 
 import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
+import type { SelectorHookMock } from "../../../utils/createSelectorHookMock";
 import { createSelectorHookMock } from "../../../utils/createSelectorHookMock";
 import {
     createSitesStoreMock,
+    type SitesStore,
     updateSitesStoreMock,
 } from "../../../utils/createSitesStoreMock";
 
@@ -35,6 +37,13 @@ interface UiStoreState {
 interface Invocation<TProps extends UnknownRecord> {
     readonly props: TProps;
 }
+
+interface SitesStoreMockGlobal {
+    __useSitesStoreMock_siteListLayout__?: SelectorHookMock<SitesStore>;
+}
+
+const getSitesStoreMockGlobal = (): SitesStoreMockGlobal & typeof globalThis =>
+    globalThis as SitesStoreMockGlobal & typeof globalThis;
 
 const {
     themeState,
@@ -96,14 +105,23 @@ vi.mock("../../../../stores/ui/useUiStore", () => ({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
-(globalThis as any).__useSitesStoreMock_siteListLayout__ = useSitesStoreMock;
+getSitesStoreMockGlobal().__useSitesStoreMock_siteListLayout__ =
+    useSitesStoreMock;
 
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock_siteListLayout__?.(
-            selector,
-            equality
-        ),
+    useSitesStore: <Result = SitesStore,>(
+        selector?: (state: SitesStore) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | SitesStore => {
+        const hook =
+            getSitesStoreMockGlobal().__useSitesStoreMock_siteListLayout__;
+
+        if (!hook) {
+            throw new Error("Sites store mock global was not initialized.");
+        }
+
+        return hook(selector, equality);
+    },
 }));
 
 vi.mock("../../../../theme/useTheme", () => ({

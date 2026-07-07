@@ -11,17 +11,40 @@ import { arrayFirst, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ThemeName } from "../../../../theme/types";
+import type {
+    InterfaceDensity,
+    SiteCardPresentation,
+    SiteListLayoutMode,
+} from "../../../../stores/ui/types";
 
 import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
+import type { SelectorHookMock } from "../../../utils/createSelectorHookMock";
 import { createSelectorHookMock } from "../../../utils/createSelectorHookMock";
 import {
     createSitesStoreMock,
+    type SitesStore,
     updateSitesStoreMock,
 } from "../../../utils/createSitesStoreMock";
 import { createMockSite } from "../../../utils/mockFactories";
 
+interface SitesStoreMockGlobal {
+    __useSitesStoreMock_siteList__?: SelectorHookMock<SitesStore>;
+}
+
+interface UiStoreState {
+    setSiteCardPresentation: ReturnType<typeof vi.fn>;
+    setSiteListLayout: ReturnType<typeof vi.fn>;
+    setSurfaceDensity: ReturnType<typeof vi.fn>;
+    siteCardPresentation: SiteCardPresentation;
+    siteListLayout: SiteListLayoutMode;
+    surfaceDensity: InterfaceDensity;
+}
+
+const getSitesStoreMockGlobal = (): SitesStoreMockGlobal & typeof globalThis =>
+    globalThis as SitesStoreMockGlobal & typeof globalThis;
+
 // Mock the stores and theme
-const uiStoreState = vi.hoisted(() => ({
+const uiStoreState = vi.hoisted((): UiStoreState => ({
     setSiteCardPresentation: vi.fn(),
     setSiteListLayout: vi.fn(),
     setSurfaceDensity: vi.fn(),
@@ -37,18 +60,27 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
-(globalThis as any).__useSitesStoreMock_siteList__ = useSitesStoreMock;
+getSitesStoreMockGlobal().__useSitesStoreMock_siteList__ = useSitesStoreMock;
 
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: (selector?: any, equality?: any) =>
-        (globalThis as any).__useSitesStoreMock_siteList__?.(
-            selector,
-            equality
-        ),
+    useSitesStore: <Result = SitesStore,>(
+        selector?: (state: SitesStore) => Result,
+        equality?: (a: Result, b: Result) => boolean
+    ): Result | SitesStore => {
+        const hook = getSitesStoreMockGlobal().__useSitesStoreMock_siteList__;
+
+        if (!hook) {
+            throw new Error("Sites store mock global was not initialized.");
+        }
+
+        return hook(selector, equality);
+    },
 }));
 
 vi.mock("../../../../stores/ui/useUiStore", () => ({
-    useUIStore: (selector?: any) =>
+    useUIStore: <Result = UiStoreState,>(
+        selector?: (state: UiStoreState) => Result
+    ): Result | UiStoreState =>
         typeof selector === "function" ? selector(uiStoreState) : uiStoreState,
 }));
 
