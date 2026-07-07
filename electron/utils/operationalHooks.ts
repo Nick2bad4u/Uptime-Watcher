@@ -164,7 +164,7 @@ const freezeOperationalContext = (
 
 const EMPTY_OPERATIONAL_CONTEXT: OperationalHookContext =
     ((): OperationalHookContext => {
-        const frozen = Object.freeze({});
+        const frozen = freezeOwnEnumerableDataProperties({});
         if (!isOperationalHookContext(frozen)) {
             throw new Error(
                 "Failed to initialize operational hook context store"
