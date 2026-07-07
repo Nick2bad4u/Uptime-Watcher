@@ -133,7 +133,13 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            const history = [{ timestamp: Date.now(), status: "up" }];
+            const history = [
+                {
+                    responseTime: 150,
+                    status: "up" as const,
+                    timestamp: Date.now(),
+                },
+            ];
             const monitor = createValidBaseMonitor({ history });
 
             expect(monitor.history).toBe(history);
@@ -533,9 +539,14 @@ describe("Test Helpers - Comprehensive Coverage", () => {
             const site = createValidSite({ monitors });
 
             expect(site.monitors).toHaveLength(3);
-            expect(site.monitors[0].type).toBe("http");
-            expect(site.monitors[1].type).toBe("port");
-            expect(site.monitors[2].type).toBe("ping");
+            const [
+                httpMonitor,
+                portMonitor,
+                pingMonitor,
+            ] = site.monitors;
+            expect(httpMonitor).toMatchObject({ type: "http" });
+            expect(portMonitor).toMatchObject({ type: "port" });
+            expect(pingMonitor).toMatchObject({ type: "ping" });
         });
     });
 
