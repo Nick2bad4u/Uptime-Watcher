@@ -4,7 +4,11 @@
 
 import { fc, test } from "@fast-check/vitest";
 import { normalizeHistoryLimit } from "@shared/constants/history";
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import {
+    type ErrorHandlingBackendContext,
+    type ErrorHandlingFrontendStore,
+    withErrorHandling,
+} from "@shared/utils/errorHandling";
 import { act, renderHook } from "@testing-library/react";
 import { arrayAt, isInteger, objectEntries } from "ts-extras";
 import {
@@ -94,6 +98,11 @@ vi.mock("../../../../shared/utils/errorHandling", async (importOriginal) => {
 const mockLogStoreAction = vi.mocked(logStoreAction);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
+const isFrontendErrorHandler = (
+    handler: ErrorHandlingBackendContext | ErrorHandlingFrontendStore
+): handler is ErrorHandlingFrontendStore =>
+    "setLoading" in handler && "clearError" in handler && "setError" in handler;
+
 // Mock window.electronAPI
 const mockElectronAPI = {
     data: {
@@ -181,22 +190,34 @@ describe(useSettingsStore, () => {
         mockElectronAPI.events.onStateSyncEvent.mockReturnValue(() => {});
 
         // Setup withErrorHandling to execute function properly
-        mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
-            try {
-                (handlers as any).setLoading?.(true);
-                (handlers as any).clearError?.();
-                return await fn();
-            } catch (error: unknown) {
-                // Match the real withErrorHandling behavior: extract error message
-                const errorMessage = Error.isError(error)
-                    ? error.message
-                    : String(error);
-                (handlers as any).setError?.(errorMessage);
-                throw error;
-            } finally {
-                (handlers as any).setLoading?.(false);
+        mockWithErrorHandling.mockImplementation(
+            async <T>(
+                fn: () => Promise<T>,
+                handlers:
+                    ErrorHandlingBackendContext | ErrorHandlingFrontendStore
+            ) => {
+                try {
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setLoading(true);
+                        handlers.clearError();
+                    }
+                    return await fn();
+                } catch (error: unknown) {
+                    // Match the real withErrorHandling behavior: extract error message
+                    const errorMessage = Error.isError(error)
+                        ? error.message
+                        : String(error);
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setError(errorMessage);
+                    }
+                    throw error;
+                } finally {
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setLoading(false);
+                    }
+                }
             }
-        });
+        );
     });
 
     afterEach(async () => {
@@ -756,8 +777,15 @@ describe(useSettingsStore, () => {
             await annotate("Type: Business Logic", "type");
 
             // Temporarily remove electronAPI
-            const originalAPI = (globalThis as any).electronAPI;
-            (globalThis as any).electronAPI = undefined;
+            const electronApiOwner = globalThis as typeof globalThis & {
+                electronAPI?: ElectronAPI;
+            };
+            const originalAPI = electronApiOwner.electronAPI;
+            Object.defineProperty(electronApiOwner, "electronAPI", {
+                configurable: true,
+                value: undefined,
+                writable: true,
+            });
 
             const { result } = renderHook(() => useSettingsStore());
 
@@ -774,7 +802,11 @@ describe(useSettingsStore, () => {
                 });
             } finally {
                 // Restore electronAPI
-                (globalThis as any).electronAPI = originalAPI;
+                Object.defineProperty(electronApiOwner, "electronAPI", {
+                    configurable: true,
+                    value: originalAPI,
+                    writable: true,
+                });
             }
         });
 
@@ -843,13 +875,17 @@ describe(useSettingsStore, () => {
             const loadingStatesDuringCall: boolean[] = [];
 
             mockWithErrorHandling.mockImplementation(async (fn, handlers) => {
-                (handlers as any).setLoading?.(true);
+                if (isFrontendErrorHandler(handlers)) {
+                    handlers.setLoading(true);
+                }
                 loadingStatesDuringCall.push(true);
 
                 try {
                     return await fn();
                 } finally {
-                    (handlers as any).setLoading?.(false);
+                    if (isFrontendErrorHandler(handlers)) {
+                        handlers.setLoading(false);
+                    }
                     loadingStatesDuringCall.push(false);
                 }
             });
