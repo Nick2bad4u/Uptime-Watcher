@@ -7,6 +7,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import all functions from environment utils
+import type { ProcessSnapshot } from "../../utils/environment";
 import {
     getEnvironment,
     getEnvVar,
@@ -19,11 +20,46 @@ import {
     normalizePositiveInteger,
     readBoundedPositiveIntegerEnv,
     readNumberEnv,
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
 } from "../../utils/environment";
 
+const deleteBrowserGlobalForTesting = (key: "document" | "window"): void => {
+    Reflect.deleteProperty(globalThis, key);
+};
+
+const setBrowserGlobalForTesting = (
+    key: "document" | "window",
+    value: object | undefined
+): void => {
+    if (value === undefined) {
+        deleteBrowserGlobalForTesting(key);
+        return;
+    }
+
+    Object.defineProperty(globalThis, key, {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
+const createProcessSnapshotWithThrowingEnv = (): ProcessSnapshot => {
+    const snapshot: ProcessSnapshot = {};
+
+    Object.defineProperty(snapshot, "env", {
+        configurable: true,
+        get() {
+            throw new Error("Access denied");
+        },
+    });
+
+    return snapshot;
+};
+
 describe("shared/utils/environment.ts - Complete Function Coverage", () => {
-    const originalProcess = process;
     const originalWindow = globalThis.window;
+    const originalDocument = globalThis.document;
 
     beforeEach(() => {
         // Reset global state before each test
@@ -32,19 +68,18 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
     afterEach(() => {
         // Restore original globals
-        globalThis.process = originalProcess;
+        resetProcessSnapshotOverrideForTesting();
 
         // Delete any property descriptors that might prevent restoration
-        if (Object.hasOwn(globalThis, "window")) {
-            delete (globalThis as any).window;
-        }
-        if (Object.hasOwn(globalThis, "document")) {
-            delete (globalThis as any).document;
-        }
+        deleteBrowserGlobalForTesting("window");
+        deleteBrowserGlobalForTesting("document");
 
         // Restore original window if it existed
         if (originalWindow !== undefined) {
-            globalThis.window = originalWindow;
+            setBrowserGlobalForTesting("window", originalWindow);
+        }
+        if (originalDocument !== undefined) {
+            setBrowserGlobalForTesting("document", originalDocument);
         }
     });
 
@@ -62,12 +97,12 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Mock process with env
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {
                     NODE_ENV: "test",
                     CODECOV_TOKEN: "test-token",
                 },
-            } as any;
+            });
 
             expect(getEnvVar("NODE_ENV")).toBe("test");
             expect(getEnvVar("CODECOV_TOKEN")).toBe("test-token");
@@ -85,7 +120,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
         });
 
@@ -101,12 +136,10 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Mock process that throws when accessing env
-            globalThis.process = {
-                get env() {
-                    throw new Error("Access denied");
-                },
-            } as any;
+            // Accessor descriptors must not be invoked by environment reads.
+            setProcessSnapshotOverrideForTesting(
+                createProcessSnapshotWithThrowingEnv()
+            );
 
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
         });
@@ -123,9 +156,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(getEnvVar("NODE_ENV")).toBeUndefined();
             expect(getEnvVar("CODECOV_TOKEN")).toBeUndefined();
@@ -145,9 +178,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
             expect(getEnvironment()).toBe("production");
         });
@@ -164,9 +197,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(getEnvironment()).toBe("unknown");
         });
@@ -183,7 +216,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(getEnvironment()).toBe("unknown");
         });
     });
@@ -201,9 +234,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "test" },
-            } as any;
+            });
 
             expect(getNodeEnv()).toBe("test");
         });
@@ -220,9 +253,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(getNodeEnv()).toBe("development");
         });
@@ -239,7 +272,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(getNodeEnv()).toBe("development");
         });
     });
@@ -257,9 +290,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { TEST_LIMIT: " 42 " },
-            } as any;
+            });
 
             expect(readNumberEnv("TEST_LIMIT", 10)).toBe(42);
         });
@@ -288,9 +321,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             ];
 
             for (const value of invalidValues) {
-                globalThis.process = {
+                setProcessSnapshotOverrideForTesting({
                     env: { TEST_LIMIT: value },
-                } as any;
+                });
 
                 expect(readNumberEnv("TEST_LIMIT", 10)).toBe(10);
             }
@@ -346,9 +379,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { TEST_LIMIT: "50" },
-            } as any;
+            });
 
             expect(
                 readBoundedPositiveIntegerEnv({
@@ -371,9 +404,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { TEST_LIMIT: "invalid" },
-            } as any;
+            });
 
             expect(
                 readBoundedPositiveIntegerEnv({
@@ -383,9 +416,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
                 })
             ).toBe(10);
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { TEST_LIMIT: "20" },
-            } as any;
+            });
 
             expect(
                 readBoundedPositiveIntegerEnv({
@@ -410,8 +443,8 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.window = {} as any;
-            globalThis.document = {} as any;
+            setBrowserGlobalForTesting("window", {});
+            setBrowserGlobalForTesting("document", {});
             expect(isBrowserEnvironment()).toBeTruthy();
         });
 
@@ -427,7 +460,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.window = undefined as any;
+            setBrowserGlobalForTesting("window", undefined);
             expect(isBrowserEnvironment()).toBeFalsy();
         });
 
@@ -445,8 +478,8 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             // Create a getter that throws - but isBrowserEnvironment doesn't use try/catch
             // so this test should actually fail, let's change the approach
-            delete (globalThis as any).window;
-            delete (globalThis as any).document;
+            deleteBrowserGlobalForTesting("window");
+            deleteBrowserGlobalForTesting("document");
 
             // Test with undefined which should return false
             expect(isBrowserEnvironment()).toBeFalsy();
@@ -466,9 +499,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "development" },
-            } as any;
+            });
 
             expect(isDevelopment()).toBeTruthy();
         });
@@ -485,9 +518,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
             expect(isDevelopment()).toBeFalsy();
         });
@@ -504,9 +537,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(isDevelopment()).toBeFalsy();
         });
@@ -523,7 +556,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(isDevelopment()).toBeFalsy();
         });
     });
@@ -541,10 +574,10 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
                 versions: { node: "18.0.0" },
-            } as any;
+            });
 
             expect(isNodeEnvironment()).toBeTruthy();
         });
@@ -561,7 +594,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(isNodeEnvironment()).toBeFalsy();
         });
 
@@ -579,9 +612,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
 
             // Since isNodeEnvironment doesn't use try/catch, let's test a different scenario
             // Test with process that has no versions property
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(isNodeEnvironment()).toBeFalsy();
         });
@@ -600,9 +633,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
             expect(isProduction()).toBeTruthy();
         });
@@ -619,9 +652,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "development" },
-            } as any;
+            });
 
             expect(isProduction()).toBeFalsy();
         });
@@ -638,9 +671,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(isProduction()).toBeFalsy();
         });
@@ -657,7 +690,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(isProduction()).toBeFalsy();
         });
     });
@@ -675,9 +708,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "test" },
-            } as any;
+            });
 
             expect(isTest()).toBeTruthy();
         });
@@ -694,9 +727,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "production" },
-            } as any;
+            });
 
             expect(isTest()).toBeFalsy();
         });
@@ -713,9 +746,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: {},
-            } as any;
+            });
 
             expect(isTest()).toBeFalsy();
         });
@@ -732,7 +765,7 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = undefined as any;
+            setProcessSnapshotOverrideForTesting(null);
             expect(isTest()).toBeFalsy();
         });
     });
@@ -750,9 +783,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "test" },
-            } as any;
+            });
 
             expect(isTest()).toBeTruthy();
             expect(isDevelopment()).toBeFalsy();
@@ -773,9 +806,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "" },
-            } as any;
+            });
 
             expect(getEnvironment()).toBe("");
             expect(getNodeEnv()).toBe("");
@@ -793,9 +826,9 @@ describe("shared/utils/environment.ts - Complete Function Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.process = {
+            setProcessSnapshotOverrideForTesting({
                 env: { NODE_ENV: "PRODUCTION" },
-            } as any;
+            });
 
             expect(isProduction()).toBeFalsy(); // Should be case sensitive
             expect(getEnvironment()).toBe("PRODUCTION");
