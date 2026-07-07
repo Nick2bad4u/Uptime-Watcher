@@ -30,6 +30,16 @@ import type { AppSettings } from "../types";
  */
 export interface SettingsStore {
     /**
+     * Disposes long-lived settings subscriptions.
+     *
+     * @remarks
+     * Cleans up renderer event listeners registered by settings
+     * initialization. Called during app cleanup and by tests that need an
+     * isolated store lifecycle.
+     */
+    disposeSettingsSubscriptions: () => void;
+
+    /**
      * Initializes settings from backend and local storage.
      *
      * @remarks

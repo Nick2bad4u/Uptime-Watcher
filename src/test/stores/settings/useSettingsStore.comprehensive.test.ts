@@ -20,7 +20,6 @@ import {
 import type { AppSettings } from "../../../stores/types";
 import type { ElectronAPI } from "../../../types";
 
-import { resetHistoryLimitSubscriptionForTesting } from "../../../stores/settings/operations";
 import {
     defaultSettings,
     normalizeAppSettings,
@@ -151,7 +150,7 @@ const createSettings = (overrides: Partial<AppSettings> = {}): AppSettings =>
 describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        resetHistoryLimitSubscriptionForTesting();
+        useSettingsStore.getState().disposeSettingsSubscriptions();
 
         mockWaitForElectronBridge.mockResolvedValue(undefined);
 
@@ -211,6 +210,7 @@ describe(useSettingsStore, () => {
         act(() => {
             result.current.updateSettings(defaultSettings);
         });
+        useSettingsStore.getState().disposeSettingsSubscriptions();
     });
 
     describe("Initial State", () => {

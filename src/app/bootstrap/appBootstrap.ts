@@ -73,6 +73,10 @@ export function cleanupAppBootstrap(options: {
         typeof useSitesStore.getState === "function"
             ? useSitesStore.getState()
             : undefined;
+    const currentSettingsStore =
+        typeof useSettingsStore.getState === "function"
+            ? useSettingsStore.getState()
+            : undefined;
 
     const unsubscribeFromStatusUpdates =
         currentSitesStore?.unsubscribeFromStatusUpdates;
@@ -99,6 +103,8 @@ export function cleanupAppBootstrap(options: {
         options.cleanupRefs.updateStatusEventsCleanupRef.current();
         options.cleanupRefs.updateStatusEventsCleanupRef.current = null;
     }
+
+    currentSettingsStore?.disposeSettingsSubscriptions();
 }
 
 /**

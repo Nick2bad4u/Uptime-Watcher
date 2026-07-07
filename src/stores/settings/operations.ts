@@ -35,22 +35,11 @@ const historyLimitSubscriptionInitRef: {
     current: undefined,
 };
 
-/**
- * Resets the cached history-limit subscription.
- *
- * @remarks
- * Exposed for test environments to allow deterministic validation of the
- * history-limit listener lifecycle. Invokes any existing cleanup callback and
- * clears the cached reference so subsequent store initialization re-registers
- * the renderer listener.
- *
- * @internal
- */
-export function resetHistoryLimitSubscriptionForTesting(): void {
+const disposeHistoryLimitSubscription = (): void => {
     historyLimitSubscriptionRef.current?.();
     historyLimitSubscriptionRef.current = undefined;
     historyLimitSubscriptionInitRef.current = undefined;
-}
+};
 
 /**
  * Creates the operational slice containing asynchronous settings actions.
@@ -60,6 +49,7 @@ export const createSettingsOperationsSlice = (
     getState: SettingsStoreGetter
 ): Pick<
     SettingsStore,
+    | "disposeSettingsSubscriptions"
     | "initializeSettings"
     | "persistHistoryLimit"
     | "resetSettings"
@@ -150,6 +140,9 @@ export const createSettingsOperationsSlice = (
     };
 
     return {
+        disposeSettingsSubscriptions: (): void => {
+            disposeHistoryLimitSubscription();
+        },
         initializeSettings: async (): Promise<{
             message: string;
             settingsLoaded: boolean;
