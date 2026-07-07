@@ -15,10 +15,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { StatusAlert } from "../../../stores/alerts/useAlertStore";
 
-import {
-    enqueueAlertFromStatusUpdate,
-    resetAlertToneInvoker,
-} from "../../../components/Alerts/alertCoordinator";
+import { enqueueAlertFromStatusUpdate } from "../../../components/Alerts/alertCoordinator";
 import { StatusAlertToast } from "../../../components/Alerts/StatusAlertToast";
 import { StatusAlertToaster } from "../../../components/Alerts/StatusAlertToaster";
 import { useAlertStore } from "../../../stores/alerts/useAlertStore";
@@ -38,6 +35,8 @@ const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
     }),
 });
 
+let statusUpdateSequence = 0;
+
 const createStatusUpdate = (
     overrides: Partial<StatusUpdate> = {}
 ): StatusUpdate => {
@@ -46,7 +45,7 @@ const createStatusUpdate = (
     const timestamp =
         "timestamp" in overrides
             ? overrides.timestamp
-            : new Date().toISOString();
+            : `2026-02-13T23:46:${String(statusUpdateSequence++).padStart(2, "0")}.000Z`;
 
     const fallbackSiteName =
         overrides.site?.name ?? sampleOne(siteNameArbitrary);
@@ -152,16 +151,17 @@ describe(StatusAlertToast, () => {
 describe(StatusAlertToaster, () => {
     beforeEach(() => {
         useSettingsStore.setState({
-            settings: { ...defaultSettings },
+            settings: {
+                ...defaultSettings,
+                inAppAlertsSoundEnabled: false,
+            },
         });
-        resetAlertToneInvoker();
     });
 
     afterEach(() => {
         act(() => {
             useAlertStore.setState({ alerts: [] });
         });
-        resetAlertToneInvoker();
     });
 
     it("returns null when no alerts are queued", () => {

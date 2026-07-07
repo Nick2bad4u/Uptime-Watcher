@@ -31,10 +31,14 @@ vi.mock("../../../services/NotificationPreferenceService", () => ({
     },
 }));
 
+let statusUpdateSequence = 0;
+
 const createStatusUpdate = (
     overrides: Partial<StatusUpdate> = {}
 ): StatusUpdate => {
-    const timestamp = overrides.timestamp ?? new Date().toISOString();
+    const timestamp =
+        overrides.timestamp ??
+        `2026-02-13T23:45:${String(statusUpdateSequence++).padStart(2, "0")}.000Z`;
     return {
         details: overrides.details ?? "",
         monitor: {
@@ -79,17 +83,94 @@ const resetStores = (): void => {
     });
 };
 
-describe("alertCoordinator", () => {
-    beforeEach(() => {
-        resetStores();
-        alertCoordinator.resetAlertToneInvoker();
-        alertCoordinator.resetStatusAlertDeduplicationForTesting();
+const mockAudioContextInstances: MockAudioContext[] = [];
+let gainRampValues: number[];
+let createOscillatorSpy: ReturnType<typeof vi.fn>;
+let createGainSpy: ReturnType<typeof vi.fn>;
+
+class MockGain {
+    public connect = vi.fn();
+    public disconnect = vi.fn();
+    public gain = {
+        exponentialRampToValueAtTime: vi.fn((value: number) => {
+            gainRampValues.push(value);
+        }),
+        setValueAtTime: vi.fn(),
+    };
+}
+
+class MockOscillator {
+    public type: OscillatorType = "triangle";
+    public frequency = {
+        setValueAtTime: vi.fn(),
+    };
+    public connect = vi.fn();
+    public disconnect = vi.fn();
+    public start = vi.fn();
+    public stop = vi.fn();
+    public addEventListener = vi.fn();
+    public removeEventListener = vi.fn();
+}
+
+class MockAudioContext {
+    public currentTime = 0;
+    public state: AudioContextState = "running";
+    public destination = {};
+    public createGain = createGainSpy;
+    public createOscillator = createOscillatorSpy;
+    public resume = vi.fn(async () => undefined);
+    public close = vi.fn(async () => {
+        this.state = "closed";
     });
 
-    afterEach(() => {
+    public constructor() {
+        mockAudioContextInstances.push(this);
+    }
+}
+
+const installMockAudioContext = (
+    AudioContextCtor: typeof AudioContext = MockAudioContext as unknown as typeof AudioContext
+): void => {
+    (
+        globalThis as unknown as { AudioContext: typeof AudioContext }
+    ).AudioContext = AudioContextCtor;
+};
+
+const closeMockAudioContexts = async (): Promise<void> => {
+    await Promise.all(
+        mockAudioContextInstances.map(async (context) => {
+            await context.close();
+        })
+    );
+    mockAudioContextInstances.length = 0;
+};
+
+describe("alertCoordinator", () => {
+    let originalAudioContext: typeof AudioContext | undefined;
+
+    beforeEach(() => {
         resetStores();
-        alertCoordinator.resetAlertToneInvoker();
-        alertCoordinator.resetStatusAlertDeduplicationForTesting();
+        gainRampValues = [];
+        createOscillatorSpy = vi.fn(() => new MockOscillator());
+        createGainSpy = vi.fn(() => new MockGain());
+        originalAudioContext = (
+            globalThis as unknown as { AudioContext?: typeof AudioContext }
+        ).AudioContext;
+        installMockAudioContext();
+    });
+
+    afterEach(async () => {
+        resetStores();
+        await closeMockAudioContexts();
+        if (originalAudioContext) {
+            (
+                globalThis as unknown as { AudioContext: typeof AudioContext }
+            ).AudioContext = originalAudioContext;
+        } else {
+            delete (
+                globalThis as unknown as { AudioContext?: typeof AudioContext }
+            ).AudioContext;
+        }
         vi.clearAllMocks();
     });
 
@@ -160,9 +241,6 @@ describe("alertCoordinator", () => {
     });
 
     it("plays a tone when sound alerts are enabled", () => {
-        const toneSpy = vi.fn().mockResolvedValue(undefined);
-        alertCoordinator.setAlertToneInvoker(toneSpy);
-
         useSettingsStore.setState((state) => ({
             settings: {
                 ...state.settings,
@@ -172,13 +250,10 @@ describe("alertCoordinator", () => {
 
         alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
 
-        expect(toneSpy).toHaveBeenCalledTimes(1);
+        expect(createOscillatorSpy).toHaveBeenCalledTimes(1);
     });
 
     it("does not play a tone when the alert volume is muted", () => {
-        const toneSpy = vi.fn().mockResolvedValue(undefined);
-        alertCoordinator.setAlertToneInvoker(toneSpy);
-
         useSettingsStore.setState((state) => ({
             settings: {
                 ...state.settings,
@@ -189,7 +264,7 @@ describe("alertCoordinator", () => {
 
         alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
 
-        expect(toneSpy).not.toHaveBeenCalled();
+        expect(createOscillatorSpy).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -197,9 +272,6 @@ describe("alertCoordinator", () => {
         ["infinite", Infinity],
         ["not-a-number", NaN],
     ])("normalizes %s alert volume candidates", (_, volume) => {
-        const toneSpy = vi.fn().mockResolvedValue(undefined);
-        alertCoordinator.setAlertToneInvoker(toneSpy);
-
         useSettingsStore.setState((state) => ({
             settings: {
                 ...state.settings,
@@ -210,13 +282,10 @@ describe("alertCoordinator", () => {
 
         alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
 
-        expect(toneSpy).toHaveBeenCalledTimes(1);
+        expect(createOscillatorSpy).toHaveBeenCalledTimes(1);
     });
 
     it("logs when sound is enabled but the normalized volume is zero", () => {
-        const toneSpy = vi.fn().mockResolvedValue(undefined);
-        alertCoordinator.setAlertToneInvoker(toneSpy);
-
         useSettingsStore.setState((state) => ({
             settings: {
                 ...state.settings,
@@ -227,7 +296,7 @@ describe("alertCoordinator", () => {
 
         alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
 
-        expect(toneSpy).not.toHaveBeenCalled();
+        expect(createOscillatorSpy).not.toHaveBeenCalled();
         expect(logger.debug).toHaveBeenCalledWith(
             "Skipping alert tone playback because the volume is muted"
         );
@@ -307,41 +376,8 @@ describe("alertCoordinator", () => {
 
 describe("playInAppAlertTone", () => {
     let originalAudioContext: typeof AudioContext | undefined;
-    let gainRampValues: number[];
-    let createOscillatorSpy: ReturnType<typeof vi.fn>;
-    let createGainSpy: ReturnType<typeof vi.fn>;
 
-    class MockGain {
-        public connect = vi.fn();
-        public gain = {
-            exponentialRampToValueAtTime: vi.fn((value: number) => {
-                gainRampValues.push(value);
-            }),
-            setValueAtTime: vi.fn(),
-        };
-    }
-
-    class MockOscillator {
-        public type: OscillatorType = "triangle";
-        public frequency = {
-            setValueAtTime: vi.fn(),
-        };
-        public connect = vi.fn();
-        public start = vi.fn();
-        public stop = vi.fn();
-        public addEventListener = vi.fn();
-    }
-
-    class TestAudioContext {
-        public currentTime = 0;
-        public state: AudioContextState = "running";
-        public createGain = createGainSpy;
-        public createOscillator = createOscillatorSpy;
-        public resume = vi.fn(async () => undefined);
-        public close = vi.fn(async () => undefined);
-    }
-
-    beforeEach(async () => {
+    beforeEach(() => {
         gainRampValues = [];
         createOscillatorSpy = vi.fn(() => new MockOscillator());
         createGainSpy = vi.fn(() => new MockGain());
@@ -349,14 +385,11 @@ describe("playInAppAlertTone", () => {
         originalAudioContext = (
             globalThis as unknown as { AudioContext?: typeof AudioContext }
         ).AudioContext;
-        (
-            globalThis as unknown as { AudioContext: typeof AudioContext }
-        ).AudioContext = TestAudioContext as unknown as typeof AudioContext;
-
-        await alertCoordinator.resetAlertAudioContextForTesting();
+        installMockAudioContext();
     });
 
     afterEach(async () => {
+        await closeMockAudioContexts();
         if (originalAudioContext) {
             (
                 globalThis as unknown as { AudioContext: typeof AudioContext }
@@ -366,8 +399,6 @@ describe("playInAppAlertTone", () => {
                 globalThis as unknown as { AudioContext?: typeof AudioContext }
             ).AudioContext;
         }
-
-        await alertCoordinator.resetAlertAudioContextForTesting();
     });
 
     it("skips oscillator creation when the volume is muted", async () => {
@@ -409,8 +440,6 @@ describe("playInAppAlertTone", () => {
             }
         ).webkitAudioContext;
 
-        await alertCoordinator.resetAlertAudioContextForTesting();
-
         await alertCoordinator.playInAppAlertTone();
 
         expect(logger.debug).toHaveBeenCalledWith(
@@ -427,7 +456,7 @@ describe("playInAppAlertTone", () => {
                 webkitAudioContext?: typeof AudioContext;
             }
         ).webkitAudioContext =
-            TestAudioContext as unknown as typeof AudioContext;
+            MockAudioContext as unknown as typeof AudioContext;
 
         useSettingsStore.setState((state) => ({
             settings: {
@@ -437,7 +466,6 @@ describe("playInAppAlertTone", () => {
             },
         }));
 
-        await alertCoordinator.resetAlertAudioContextForTesting();
         await alertCoordinator.playInAppAlertTone();
 
         expect(createOscillatorSpy).toHaveBeenCalledTimes(1);
@@ -454,7 +482,7 @@ describe("playInAppAlertTone", () => {
             .fn<() => Promise<undefined>>()
             .mockRejectedValue(new Error("resume-failed"));
 
-        class SuspendedAudioContext extends TestAudioContext {
+        class SuspendedAudioContext extends MockAudioContext {
             public override state: AudioContextState = "suspended";
             public override resume = resumeFailure;
         }
@@ -472,7 +500,6 @@ describe("playInAppAlertTone", () => {
             },
         }));
 
-        await alertCoordinator.resetAlertAudioContextForTesting();
         await alertCoordinator.playInAppAlertTone();
 
         expect(resumeFailure).toHaveBeenCalledTimes(1);
@@ -484,6 +511,6 @@ describe("playInAppAlertTone", () => {
 
         (
             globalThis as unknown as { AudioContext: typeof AudioContext }
-        ).AudioContext = TestAudioContext as unknown as typeof AudioContext;
+        ).AudioContext = MockAudioContext as unknown as typeof AudioContext;
     });
 });

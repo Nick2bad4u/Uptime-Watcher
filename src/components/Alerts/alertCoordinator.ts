@@ -149,8 +149,6 @@ const ensureAudioContext = (): AudioContext | null => {
     return context;
 };
 
-type AlertToneInvoker = () => Promise<void>;
-
 /**
  * Plays a short audible tone for in-app alerts when enabled.
  */
@@ -223,58 +221,6 @@ export async function playInAppAlertTone(): Promise<void> {
     oscillator.addEventListener("ended", handleToneEnded, { once: true });
 }
 
-const alertToneInvokerRef: { current: AlertToneInvoker } = {
-    current: playInAppAlertTone,
-};
-
-/**
- * Overrides the alert tone invoker implementation.
- *
- * @remarks
- * Primarily intended for testing to replace the tone playback with a spy or
- * no-op implementation without mutating global audio state.
- *
- * @param invoker - Replacement alert tone invoker.
- */
-export const setAlertToneInvoker = (invoker: AlertToneInvoker): void => {
-    alertToneInvokerRef.current = invoker;
-};
-
-/**
- * Restores the default alert tone invoker implementation.
- */
-export const resetAlertToneInvoker = (): void => {
-    alertToneInvokerRef.current = playInAppAlertTone;
-};
-
-/**
- * Resets the cached audio context used for alert tone playback.
- *
- * @internal
- */
-export const resetAlertAudioContextForTesting = async (): Promise<void> => {
-    const context = audioContextRef.current;
-
-    audioContextRef.current = null;
-
-    if (context && typeof context.close === "function") {
-        try {
-            await context.close();
-        } catch (error: unknown) {
-            logger.debug("Failed to close alert audio context", error);
-        }
-    }
-};
-
-/**
- * Clears the recent alert-fingerprint cache used for duplicate suppression.
- *
- * @internal
- */
-export const resetStatusAlertDeduplicationForTesting = (): void => {
-    recentStatusAlertFingerprints.clear();
-};
-
 /**
  * Helper to enqueue alerts when settings permit in-app notifications.
  *
@@ -338,7 +284,7 @@ export const enqueueAlertFromStatusUpdate = (
     const normalizedVolume = resolveAlertVolume(settings.inAppAlertVolume);
 
     if (settings.inAppAlertsSoundEnabled && normalizedVolume > 0) {
-        void alertToneInvokerRef.current();
+        void playInAppAlertTone();
     } else if (settings.inAppAlertsSoundEnabled) {
         logger.debug(
             "Skipping alert tone playback because the volume is muted"
