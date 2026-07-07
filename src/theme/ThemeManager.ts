@@ -221,11 +221,6 @@ export class ThemeManager {
         // of returning an incomplete theme. This prevents corrupted
         // configuration from breaking rendering while keeping the set of
         // selectable themes driven by the concrete `themes` registry.
-        if (!objectHasIn(themes, name)) {
-            const systemPreference = this.getSystemThemePreference();
-            return themes[systemPreference];
-        }
-
         if (!this.isThemeRegistryKey(name)) {
             const systemPreference = this.getSystemThemePreference();
             return themes[systemPreference];

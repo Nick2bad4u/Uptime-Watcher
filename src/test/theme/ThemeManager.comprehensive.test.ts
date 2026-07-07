@@ -152,6 +152,33 @@ describe(ThemeManager, () => {
                 }
             }
         });
+
+        it("should fall back for inherited object property names", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: ThemeManager", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            vi.mocked(matchMedia).mockReturnValue({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                matches: false,
+                media: "(prefers-color-scheme: dark)",
+                onchange: null,
+                removeEventListener: vi.fn(),
+            } as unknown as MediaQueryList);
+
+            const inheritedThemeName = "toString" as Parameters<
+                ThemeManager["getTheme"]
+            >[0];
+
+            expect(themeManager.getTheme(inheritedThemeName).name).toBe(
+                "light"
+            );
+        });
     });
 
     describe("getAvailableThemes", () => {
