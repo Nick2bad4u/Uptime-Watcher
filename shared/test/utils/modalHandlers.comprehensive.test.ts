@@ -77,7 +77,8 @@ describe(useEscapeKeyModalHandler, () => {
             useEscapeKeyModalHandler(modalConfigs);
         });
 
-        const listener = vi.mocked(document.addEventListener).mock.calls[0]?.[1];
+        const listener = vi.mocked(document.addEventListener).mock
+            .calls[0]?.[1];
         expect(listener).toEqual(expect.any(Function));
 
         const event = new KeyboardEvent("keydown", { key: "Escape" });
@@ -104,7 +105,8 @@ describe(useEscapeKeyModalHandler, () => {
             useEscapeKeyModalHandler(modalConfigs);
         });
 
-        const listener = vi.mocked(document.addEventListener).mock.calls[0]?.[1];
+        const listener = vi.mocked(document.addEventListener).mock
+            .calls[0]?.[1];
         expect(listener).toEqual(expect.any(Function));
 
         (listener as (event: KeyboardEvent) => void)(

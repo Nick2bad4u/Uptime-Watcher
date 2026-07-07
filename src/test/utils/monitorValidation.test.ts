@@ -1053,7 +1053,6 @@ describe("monitor Validation Utilities", () => {
             expect(result["customField"]).toBeNull();
             expect(result["anotherField"]).toBeUndefined();
         });
-
     });
 
     // Property-based Tests

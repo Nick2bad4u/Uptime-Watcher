@@ -19,9 +19,7 @@ import type {
 } from "./monitorValidation/monitorValidationTypes";
 
 import { getMonitorFormValidationErrors } from "./monitorValidation/monitorFormValidators";
-import {
-    runMonitorValidationOperation,
-} from "./monitorValidation/monitorValidationInternals";
+import { runMonitorValidationOperation } from "./monitorValidation/monitorValidationInternals";
 
 const isKnownMonitorType = (value: string): value is MonitorType =>
     validateMonitorType(value);

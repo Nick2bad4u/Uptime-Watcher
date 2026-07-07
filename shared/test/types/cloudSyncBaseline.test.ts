@@ -39,9 +39,9 @@ function createBaselineCandidate(): Record<string, unknown> {
     };
 }
 
-function safeParseCloudSyncBaseline(candidate: unknown):
-    | { error: z.ZodError; success: false }
-    | { success: true } {
+function safeParseCloudSyncBaseline(
+    candidate: unknown
+): { error: z.ZodError; success: false } | { success: true } {
     try {
         parseCloudSyncBaseline(candidate);
         return { success: true };

@@ -12,10 +12,7 @@ describe("sharedFallbackLogger", () => {
         sharedFallbackLogger.info("initialized", context);
 
         expect(infoSpy).toHaveBeenCalledTimes(1);
-        expect(infoSpy).toHaveBeenCalledWith(
-            "[SHARED] initialized",
-            context
-        );
+        expect(infoSpy).toHaveBeenCalledWith("[SHARED] initialized", context);
 
         infoSpy.mockRestore();
     });

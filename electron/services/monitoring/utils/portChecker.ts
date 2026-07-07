@@ -44,8 +44,8 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * without retry logic.
  *
  * @remarks
- * Uses the `is-port-reachable` library to test TCP connectivity to the
- * given host and port, measuring response time with high-precision
+ * Uses the `is-port-reachable` library to test TCP connectivity to the given
+ * host and port, measuring response time with high-precision
  * `performance.now()`. Debug logging is enabled in development mode. This
  * function does not mutate state or trigger events; it is intended for use
  * within repository or service layers that handle orchestration and event

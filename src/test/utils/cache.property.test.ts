@@ -87,7 +87,11 @@ describe("AppCaches property-based behavior", () => {
 
     fcTest.prop([
         fc.array(
-            fc.tuple(fc.string(), fc.string(), fc.integer({ max: 2000, min: 1 })),
+            fc.tuple(
+                fc.string(),
+                fc.string(),
+                fc.integer({ max: 2000, min: 1 })
+            ),
             {
                 maxLength: 15,
                 minLength: 1,
@@ -96,12 +100,17 @@ describe("AppCaches property-based behavior", () => {
     ])("cleanup removes expired entries", (entries) => {
         const uniqueEntries = new Map<string, readonly [string, number]>();
 
-        for (const [key, value, ttl] of entries) {
+        for (const [
+            key,
+            value,
+            ttl,
+        ] of entries) {
             AppCaches.general.set(key, value, ttl);
             uniqueEntries.set(key, [value, ttl]);
         }
 
-        mockTime += Math.max(...[...uniqueEntries.values()].map(([, ttl]) => ttl)) + 1;
+        mockTime +=
+            Math.max(...[...uniqueEntries.values()].map(([, ttl]) => ttl)) + 1;
         AppCaches.general.cleanup();
 
         expect(AppCaches.general.size).toBe(0);

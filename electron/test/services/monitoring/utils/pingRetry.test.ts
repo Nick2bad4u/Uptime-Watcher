@@ -162,7 +162,9 @@ describe("pingRetry", () => {
             ).resolves.toEqual(downResult);
             expect(handlePingCheckError).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    message: expect.stringMatching(/connectivity check failed/i),
+                    message: expect.stringMatching(
+                        /connectivity check failed/i
+                    ),
                 }),
                 expect.objectContaining({
                     host: "https://example.com/",
@@ -192,7 +194,9 @@ describe("pingRetry", () => {
             ).resolves.toEqual(downResult);
             expect(handlePingCheckError).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    message: expect.stringMatching(/connectivity check failed/i),
+                    message: expect.stringMatching(
+                        /connectivity check failed/i
+                    ),
                 }),
                 expect.objectContaining({
                     host: "https://example.com/",

@@ -78,7 +78,8 @@ describe("sanitizeDiagnosticsReport", () => {
     });
 
     it("preserves metadata within byte limits", async () => {
-        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
+        const { eventEmitter, reportHandler } =
+            createDiagnosticsHandlerHarness();
         const metadataValue = "x".repeat(100);
         const timestamp = Date.now();
 
@@ -101,7 +102,8 @@ describe("sanitizeDiagnosticsReport", () => {
     });
 
     it("preserves payload previews within the byte budget", async () => {
-        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
+        const { eventEmitter, reportHandler } =
+            createDiagnosticsHandlerHarness();
         const timestamp = Date.now();
         const preview = "payload-preview".repeat(100);
 
@@ -147,9 +149,9 @@ describe("sanitizeDiagnosticsReport", () => {
         );
         expect(emittedReport.reason).not.toContain("SUPER_SECRET");
         expect(emittedReport.reason).not.toContain("\n");
-        expect(getUtfByteLength(emittedReport.reason ?? "")).toBeLessThanOrEqual(
-            MAX_DIAGNOSTICS_REPORT_REASON_BYTES
-        );
+        expect(
+            getUtfByteLength(emittedReport.reason ?? "")
+        ).toBeLessThanOrEqual(MAX_DIAGNOSTICS_REPORT_REASON_BYTES);
     });
 
     it("bounds multibyte report fields by UTF-8 byte length", async () => {
@@ -173,8 +175,8 @@ describe("sanitizeDiagnosticsReport", () => {
         expect(getUtfByteLength(emittedReport.guard)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_GUARD_BYTES
         );
-        expect(getUtfByteLength(emittedReport.reason ?? "")).toBeLessThanOrEqual(
-            MAX_DIAGNOSTICS_REPORT_REASON_BYTES
-        );
+        expect(
+            getUtfByteLength(emittedReport.reason ?? "")
+        ).toBeLessThanOrEqual(MAX_DIAGNOSTICS_REPORT_REASON_BYTES);
     });
 });

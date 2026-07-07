@@ -41,8 +41,8 @@ export function isNumber(value: unknown): value is number {
  * Verifies that a value exposes a set of own properties.
  *
  * @remarks
- * Uses `objectHasOwn` from ts-extras to avoid prototype traversal and
- * preserve own-property narrowing.
+ * Uses `objectHasOwn` from ts-extras to avoid prototype traversal and preserve
+ * own-property narrowing.
  *
  * @example
  *

@@ -20,7 +20,9 @@ interface ConfirmDialogAutomationBridge {
     cancel: () => void;
     confirm: () => void;
     getState: () => ConfirmDialogStoreState;
-    subscribe: (listener: (state: ConfirmDialogStoreState) => void) => () => void;
+    subscribe: (
+        listener: (state: ConfirmDialogStoreState) => void
+    ) => () => void;
 }
 
 function getConfirmDialogBridge(): ConfirmDialogAutomationBridge {

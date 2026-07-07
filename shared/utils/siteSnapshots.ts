@@ -222,9 +222,7 @@ type MonitorSnapshotOverlaySource =
     | MonitorSnapshotOverlay
     | Record<string, unknown>;
 
-const isStatusHistoryEntry = (
-    value: unknown
-): value is StatusHistory => {
+const isStatusHistoryEntry = (value: unknown): value is StatusHistory => {
     if (!isObject(value)) {
         return false;
     }
@@ -244,9 +242,8 @@ const isStatusHistoryEntry = (
     );
 };
 
-const isStatusHistoryArray = (
-    value: unknown
-): value is StatusHistory[] => isArray(value, isStatusHistoryEntry);
+const isStatusHistoryArray = (value: unknown): value is StatusHistory[] =>
+    isArray(value, isStatusHistoryEntry);
 
 const isValidResponseTime = (value: unknown): value is number =>
     isFiniteNumber(value) && Number.isInteger(value) && value >= -1;

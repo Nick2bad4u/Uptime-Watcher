@@ -53,10 +53,10 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  * Service for performing ping monitoring checks.
  *
  * @remarks
- * Implements the `IMonitorService` interface to provide ICMP ping
- * connectivity monitoring with advanced features for reliability and
- * performance. Uses the node-ping wrapper around system ping utilities for
- * cross-platform compatibility.
+ * Implements the `IMonitorService` interface to provide ICMP ping connectivity
+ * monitoring with advanced features for reliability and performance. Uses the
+ * node-ping wrapper around system ping utilities for cross-platform
+ * compatibility.
  *
  * The service automatically handles different types of network failures and
  * provides detailed error reporting for troubleshooting connectivity issues.
@@ -132,8 +132,8 @@ export class PingMonitor extends ConfigurableMonitorServiceBase<"ping"> {
      * @returns Promise resolving to {@link MonitorCheckResult} with status,
      *   timing, and error data
      *
-     * @throws `Error` when monitor validation fails (wrong type or
-     *   missing host)
+     * @throws `Error` when monitor validation fails (wrong type or missing
+     *   host)
      *
      * @see {@link resolveMonitorHost} - Host validation utility
      * @see {@link createMonitorConfig} - Timeout and retry normalization utility

@@ -6,9 +6,7 @@ import { isAsciiDigits as sharedIsAsciiDigits } from "@shared/utils/ascii";
  * This module intentionally holds low-level helpers (validation + bounded
  * concurrency) used by {@link electron/services/sync/SyncEngine#SyncEngine}.
  */
-import {
-    isValidPersistedDeviceId as sharedIsValidPersistedDeviceId,
-} from "@shared/validation/persistedDeviceIdValidation";
+import { isValidPersistedDeviceId as sharedIsValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
 
 import { mapWithConcurrency as mapWithConcurrencyImpl } from "../../utils/boundedConcurrency";
 

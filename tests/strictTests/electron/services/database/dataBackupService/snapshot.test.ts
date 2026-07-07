@@ -93,9 +93,7 @@ describe("snapshot (strict coverage)", () => {
         expect(
             execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))
         ).toBeTruthy();
-        const vacuumSql = execCalls.find((sql) =>
-            sql.includes("VACUUM INTO")
-        );
+        const vacuumSql = execCalls.find((sql) => sql.includes("VACUUM INTO"));
         expect(vacuumSql).toContain("mock''dir");
         expect(vacuumSql).toContain("backup-snapshot.sqlite");
         expect(databaseInstances[0]?.close).toHaveBeenCalledTimes(1);

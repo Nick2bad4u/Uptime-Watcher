@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-    convertHashLinksToBangLinksInComment,
-} from "../../../docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs";
+import { convertHashLinksToBangLinksInComment } from "../../../docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs";
 
 const rewriteInlineTagText = (text: string): string => {
     const comment = {

@@ -127,10 +127,10 @@ function ensureValidRows<TRow extends object>(
  * Common database result shapes for type-safe queries.
  *
  * @remarks
- * These interfaces deliberately avoid extending `UnknownRecord` so callers
- * are encouraged to treat them as narrow, well-defined result contracts rather
- * than generic bags of data. The low-level validation layer still widens rows
- * to `UnknownRecord` internally via {@link EnforcedRow} where necessary.
+ * These interfaces deliberately avoid extending `UnknownRecord` so callers are
+ * encouraged to treat them as narrow, well-defined result contracts rather than
+ * generic bags of data. The low-level validation layer still widens rows to
+ * `UnknownRecord` internally via {@link EnforcedRow} where necessary.
  */
 export interface CountResult {
     /** Aggregate row count returned by COUNT(*) style queries. */

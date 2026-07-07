@@ -183,8 +183,8 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
      * @returns Promise resolving to {@link MonitorCheckResult} with status,
      *   timing, and error data
      *
-     * @throws `Error` when monitor validation fails (wrong type or
-     *   missing hostname)
+     * @throws `Error` when monitor validation fails (wrong type or missing
+     *   hostname)
      *
      * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#resolveMonitorHost} - Host validation utility
      * @see {@link createMonitorConfig} - Config normalization utility

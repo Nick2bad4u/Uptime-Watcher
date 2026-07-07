@@ -31,7 +31,6 @@ const waitForDeferredObjectUrlCleanup = async (): Promise<void> => {
     });
 };
 
-
 describe("file Download Utility", () => {
     let mockAnchor: any;
 
@@ -480,5 +479,4 @@ describe("file Download Utility", () => {
             );
         });
     });
-
 });

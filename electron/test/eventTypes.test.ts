@@ -39,5 +39,4 @@ describe("UptimeEventName", () => {
 
         expect(isUptimeEventNameAllowsAnyString).toBeFalsy();
     });
-
 });

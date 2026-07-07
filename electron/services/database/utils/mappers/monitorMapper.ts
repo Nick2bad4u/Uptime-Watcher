@@ -350,7 +350,6 @@ function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
  * @returns Array of mapped monitor objects.
  *
  * @public
- *
  */
 export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
     return rows.map((row) => rowToMonitor(row));
@@ -396,7 +395,6 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  * @throws Error if mapping fails for a valid row.
  *
  * @public
- *
  */
 export function rowToMonitorOrUndefined(
     row:

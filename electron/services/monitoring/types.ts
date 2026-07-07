@@ -69,8 +69,8 @@ export interface IMonitorService {
      *
      * @returns Promise resolving to the check result
      *
-     * @throws `Error` when monitor configuration is invalid or check
-     *   fails catastrophically
+     * @throws `Error` when monitor configuration is invalid or check fails
+     *   catastrophically
      */
     check: (
         monitor: Site["monitors"][0],

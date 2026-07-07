@@ -175,8 +175,8 @@ function normalizeIpcResponseMetadata(metadata: UnknownRecord): UnknownRecord {
 }
 
 /**
- * Converts an `ArrayBufferView` into a standalone {@link ArrayBuffer}
- * containing exactly the view's bytes.
+ * Converts an `ArrayBufferView` into a standalone {@link ArrayBuffer} containing
+ * exactly the view's bytes.
  *
  * @remarks
  * Useful for IPC payloads when you want to send a plain ArrayBuffer to the

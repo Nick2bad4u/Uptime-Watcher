@@ -273,5 +273,4 @@ describe("siteSnapshots", () => {
         });
         expect(mergedWithInvalidHistory).toBe(canonical);
     });
-
 });

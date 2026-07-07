@@ -48,8 +48,11 @@ vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
 
 vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
-        async <T>(operation: () => Promise<T>, _context: string, _fallback: T) =>
-            operation()
+        async <T>(
+            operation: () => Promise<T>,
+            _context: string,
+            _fallback: T
+        ) => operation()
     ),
 }));
 
@@ -147,8 +150,11 @@ beforeEach(() => {
     monitorTypesStoreState.monitorTypes = [...mockMonitorTypes];
 
     vi.mocked(errorHandling.withUtilityErrorHandling).mockImplementation(
-        async <T>(operation: () => Promise<T>, _context: string, _fallback: T) =>
-            operation()
+        async <T>(
+            operation: () => Promise<T>,
+            _context: string,
+            _fallback: T
+        ) => operation()
     );
 });
 
@@ -162,9 +168,7 @@ describe(clearMonitorTypeCache, () => {
 
 describe(getMonitorTypeConfig, () => {
     it("reads matching monitor type configs from the cache", async () => {
-        vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
-            mockMonitorTypes
-        );
+        vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(mockMonitorTypes);
 
         await expect(getMonitorTypeConfig("ping")).resolves.toEqual(
             pingMonitorType
@@ -177,9 +181,7 @@ describe(getMonitorTypeConfig, () => {
     });
 
     it("returns undefined when the requested monitor type is absent", async () => {
-        vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(
-            mockMonitorTypes
-        );
+        vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(mockMonitorTypes);
 
         await expect(getMonitorTypeConfig("missing")).resolves.toBeUndefined();
     });
@@ -239,9 +241,7 @@ describe(getMonitorTypeOptions, () => {
 
     it("returns an empty option list from the error fallback", async () => {
         vi.mocked(AppCaches.monitorTypes.get).mockReturnValue(undefined);
-        vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue(
-            []
-        );
+        vi.mocked(errorHandling.withUtilityErrorHandling).mockResolvedValue([]);
 
         await expect(getMonitorTypeOptions()).resolves.toEqual([]);
 

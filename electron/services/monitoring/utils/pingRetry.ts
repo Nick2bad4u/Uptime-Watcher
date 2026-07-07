@@ -30,7 +30,6 @@
  * ```typescript
  * // Basic connectivity check with retries
  * const result = await performPingCheckWithRetry("google.com", 5000, 3);
- *
  * ```
  *
  * @public
@@ -65,7 +64,8 @@ import { handlePingCheckError } from "./pingErrorHandling";
  * This function performs a single connectivity attempt to the specified host
  * using native Node.js modules. It automatically detects HTTP/HTTPS URLs and
  * uses appropriate connectivity check methods (HTTP for URLs, TCP/DNS for
- * hosts). This function is used internally by {@link performPingCheckWithRetry}.
+ * hosts). This function is used internally by
+ * {@link performPingCheckWithRetry}.
  *
  * Uses native connectivity checking with TCP port scanning and DNS resolution
  * for maximum compatibility without requiring elevated privileges.
@@ -152,11 +152,10 @@ async function performSinglePingCheck(
  * Performs a connectivity check with retry logic and exponential backoff.
  *
  * @remarks
- * This function wraps the internal single-attempt connectivity check with
- * retry logic using {@link withOperationalHooks}. It attempts to check
- * connectivity to the
- * specified host, retrying on failure up to `maxRetries` times (for a total of
- * `maxRetries` + `1` attempts). Exponential backoff is applied between
+ * This function wraps the internal single-attempt connectivity check with retry
+ * logic using {@link withOperationalHooks}. It attempts to check connectivity to
+ * the specified host, retrying on failure up to `maxRetries` times (for a total
+ * of `maxRetries` + `1` attempts). Exponential backoff is applied between
  * attempts.
  *
  * Process flow:

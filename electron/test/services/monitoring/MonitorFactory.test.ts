@@ -102,25 +102,26 @@ describe("MonitorFactory", () => {
             };
 
             vi.resetModules();
-            const registry =
-                await vi.importActual<
-                    typeof import("../../../services/monitoring/MonitorTypeRegistry")
-                >("../../../services/monitoring/MonitorTypeRegistry");
+            const registry = await vi.importActual<
+                typeof import("../../../services/monitoring/MonitorTypeRegistry")
+            >("../../../services/monitoring/MonitorTypeRegistry");
 
-            vi.doMock("../../../services/monitoring/MonitorTypeRegistry", () => ({
-                ...registry,
-                getMonitorServiceFactory: (type: string) => {
-                    if (type === "ping") {
-                        return () => failingService;
-                    }
+            vi.doMock(
+                "../../../services/monitoring/MonitorTypeRegistry",
+                () => ({
+                    ...registry,
+                    getMonitorServiceFactory: (type: string) => {
+                        if (type === "ping") {
+                            return () => failingService;
+                        }
 
-                    return registry.getMonitorServiceFactory(type);
-                },
-            }));
-
-            const { getMonitor } = await import(
-                "../../../services/monitoring/MonitorFactory"
+                        return registry.getMonitorServiceFactory(type);
+                    },
+                })
             );
+
+            const { getMonitor } =
+                await import("../../../services/monitoring/MonitorFactory");
 
             expect(() => getMonitor("ping", mockMonitorConfig)).toThrow(
                 /Failed to apply configuration/v

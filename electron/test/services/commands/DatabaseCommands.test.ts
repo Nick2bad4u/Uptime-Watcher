@@ -1377,6 +1377,5 @@ describe("DatabaseCommands", () => {
                 "Service unavailable"
             );
         });
-
     });
 });

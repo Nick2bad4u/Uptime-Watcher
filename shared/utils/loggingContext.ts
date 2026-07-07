@@ -52,9 +52,7 @@ export interface SanitizedLogContext {
 
 type Mutable<T> = Writable<T>;
 
-const LOG_CONTEXT_SYMBOL: unique symbol = Symbol(
-    "uptime-watcher-log-context"
-);
+const LOG_CONTEXT_SYMBOL: unique symbol = Symbol("uptime-watcher-log-context");
 
 /** Tagged log context stored on arguments after normalization. */
 export type StructuredLogContext = LogContextInput & {

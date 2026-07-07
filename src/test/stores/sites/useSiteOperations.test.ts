@@ -91,7 +91,9 @@ vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
         ),
     })),
     validateMonitorExists: vi.fn((site, monitorId) => {
-        if (!site?.monitors.some((monitor: Monitor) => monitor.id === monitorId)) {
+        if (
+            !site?.monitors.some((monitor: Monitor) => monitor.id === monitorId)
+        ) {
             throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
         }
     }),

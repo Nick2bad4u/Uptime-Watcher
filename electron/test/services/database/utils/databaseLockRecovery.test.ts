@@ -12,9 +12,7 @@ import { tmpdir } from "node:os";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-    cleanupDatabaseLockArtifacts,
-} from "../../../../services/database/utils/maintenance/databaseLockRecovery";
+import { cleanupDatabaseLockArtifacts } from "../../../../services/database/utils/maintenance/databaseLockRecovery";
 
 /**
  * Generates a unique temporary directory for each test.

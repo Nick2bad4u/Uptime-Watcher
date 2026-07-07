@@ -234,9 +234,7 @@ describe("deleteSiteWithAdapters", () => {
             expect(deletionError.name).toBe("SiteDeletionError");
             expect(deletionError.stage).toBe("site");
             expect(deletionError.cause).toBe(failure);
-            expect(deletionError.message).toBe(
-                "Failed to delete site site-42"
-            );
+            expect(deletionError.message).toBe("Failed to delete site site-42");
 
             capturedError = deletionError;
         }

@@ -40,7 +40,11 @@ describe("event middleware", () => {
             const middleware = createLoggingMiddleware({ level: "info" });
             const next = vi.fn();
 
-            await middleware("site:added", asEventPayload({ id: "site-1" }), next);
+            await middleware(
+                "site:added",
+                asEventPayload({ id: "site-1" }),
+                next
+            );
 
             expect(logger.info).toHaveBeenCalledWith(
                 "[EventBus] Event emitted",
@@ -103,9 +107,13 @@ describe("event middleware", () => {
             const error = new Error("listener failed");
 
             await expect(
-                middleware("monitor:down", asEventPayload({ id: "monitor-1" }), () => {
-                    throw error;
-                })
+                middleware(
+                    "monitor:down",
+                    asEventPayload({ id: "monitor-1" }),
+                    () => {
+                        throw error;
+                    }
+                )
             ).resolves.toBeUndefined();
 
             expect(logger.error).toHaveBeenCalledWith(
@@ -129,9 +137,13 @@ describe("event middleware", () => {
             const error = new Error("listener failed");
 
             await expect(
-                middleware("monitor:down", asEventPayload({ id: "monitor-1" }), () => {
-                    throw error;
-                })
+                middleware(
+                    "monitor:down",
+                    asEventPayload({ id: "monitor-1" }),
+                    () => {
+                        throw error;
+                    }
+                )
             ).rejects.toThrow(error);
         });
     });

@@ -30,10 +30,7 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
  *
  * @public
  */
-function findMonitorInSite(
-    site: Site,
-    monitorId: string
-): Monitor | undefined {
+function findMonitorInSite(site: Site, monitorId: string): Monitor | undefined {
     return site.monitors.find((monitor) => monitor.id === monitorId);
 }
 

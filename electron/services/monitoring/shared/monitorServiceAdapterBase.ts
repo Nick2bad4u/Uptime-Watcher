@@ -22,8 +22,8 @@ import type {
 } from "../types";
 
 /**
- * Base class implementing the shared, non-behavioral parts of
- * `IMonitorService` adapters.
+ * Base class implementing the shared, non-behavioral parts of `IMonitorService`
+ * adapters.
  */
 export abstract class MonitorServiceAdapterBase<
     TType extends Site["monitors"][number]["type"],

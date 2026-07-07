@@ -1315,5 +1315,4 @@ describe("monitorOperations", () => {
             }).toThrow("Monitor not found");
         });
     });
-
 });

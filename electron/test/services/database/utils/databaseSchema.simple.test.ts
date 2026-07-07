@@ -122,20 +122,17 @@ describe("Database Schema", () => {
 
         it("handles repeated schema creation attempts consistently", async () => {
             await fc.assert(
-                fc.property(
-                    fc.integer({ min: 1, max: 10 }),
-                    (attemptCount) => {
-                        const mockDatabase = createMockDatabase();
+                fc.property(fc.integer({ min: 1, max: 10 }), (attemptCount) => {
+                    const mockDatabase = createMockDatabase();
 
-                        for (let index = 0; index < attemptCount; index++) {
-                            createDatabaseSchema(mockDatabase as Database);
-                        }
-
-                        expect(mockDatabase.run).toHaveBeenCalledTimes(
-                            attemptCount * 13
-                        );
+                    for (let index = 0; index < attemptCount; index++) {
+                        createDatabaseSchema(mockDatabase as Database);
                     }
-                )
+
+                    expect(mockDatabase.run).toHaveBeenCalledTimes(
+                        attemptCount * 13
+                    );
+                })
             );
         });
     });

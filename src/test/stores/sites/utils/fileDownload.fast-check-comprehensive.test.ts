@@ -26,7 +26,6 @@ vi.mock("../../../../services/logger", () => ({
     },
 }));
 
-
 describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
     // Mock DOM APIs
     let mockURL: any;
@@ -262,5 +261,4 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
             );
         });
     });
-
 });
