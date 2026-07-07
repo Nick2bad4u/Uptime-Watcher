@@ -153,6 +153,19 @@ describe("dynamic schema conversion", () => {
         expect(Object.hasOwn(monitor, "__proto__")).toBeFalsy();
     });
 
+    it("ignores inherited standard monitor fields while mapping rows", async () => {
+        const { mapMonitorToRow } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
+
+        const monitor = Object.assign(Object.create({ monitoring: false }), {
+            type: "port",
+        }) as Parameters<typeof mapMonitorToRow>[0];
+
+        const row = mapMonitorToRow(monitor);
+
+        expect(Object.hasOwn(row, "enabled")).toBeFalsy();
+    });
+
     it("defaults invalid persisted monitor status values", async ({
         annotate,
         task,

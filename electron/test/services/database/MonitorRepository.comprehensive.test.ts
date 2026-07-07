@@ -468,6 +468,37 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
         });
+        it("should not update enabled from inherited monitoring state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitorRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Update", "type");
+
+            const updateData = Object.assign(
+                Object.create({ monitoring: false }),
+                { url: "https://example.com" }
+            ) as Partial<Site["monitors"][0]>;
+
+            mockDatabase.run.mockReturnValue({ changes: 1 });
+
+            await repository.update("monitor-123", updateData);
+
+            const updateSql = vi
+                .mocked(mockDatabase.run)
+                .mock.calls.find((call: readonly unknown[]) => {
+                    const sql = call[0];
+                    return (
+                        typeof sql === "string" &&
+                        sql.startsWith("UPDATE monitors SET")
+                    );
+                })?.[0];
+
+            expect(updateSql).toContain('"url" = ?');
+            expect(updateSql).not.toContain('"enabled" = ?');
+        });
         it("should handle update errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitorRepository", "component");

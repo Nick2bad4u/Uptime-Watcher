@@ -10,7 +10,7 @@ import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
-import { arrayJoin, isDefined, objectEntries, objectHasIn } from "ts-extras";
+import { arrayJoin, isDefined, objectEntries } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
@@ -75,8 +75,8 @@ function shouldSkipMonitoringFields(
 ): boolean {
     if (
         key === "enabled" &&
-        !objectHasIn(monitor, "monitoring") &&
-        !objectHasIn(monitor, "enabled")
+        !Object.hasOwn(monitor, "monitoring") &&
+        !Object.hasOwn(monitor, "enabled")
     ) {
         if (isDev()) {
             logger.debug(

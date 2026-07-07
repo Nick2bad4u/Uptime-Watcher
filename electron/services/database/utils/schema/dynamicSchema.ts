@@ -380,8 +380,8 @@ export interface DatabaseFieldDefinition {
  *
  * @internal
  */
-function convertMonitoringToDbEnabled(monitor: UnknownRecord): 0 | 1 {
-    return monitor["monitoring"] ? 1 : 0;
+function convertMonitoringToDbEnabled(monitoring: unknown): 0 | 1 {
+    return monitoring ? 1 : 0;
 }
 
 function convertIntegerSqlValue(value: unknown): number {
@@ -437,10 +437,10 @@ function convertSqlValue(
  */
 function processFieldMapping(
     mapping: FieldMapping,
+    sourceValue: unknown,
     monitor: UnknownRecord
 ): FieldMappingResult {
     try {
-        const sourceValue = monitor[mapping.sourceField];
         if (!isDefined(sourceValue)) {
             return {
                 dbField: mapping.dbField,
@@ -708,16 +708,20 @@ function mapDynamicRowFields(row: MonitorRow, monitor: Monitor): void {
 
 function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
     // Persist enabled state from the canonical monitor.monitoring boolean.
-    const monitoringValue = monitor["monitoring"];
-    if (isDefined(monitoringValue)) {
-        row["enabled"] = convertMonitoringToDbEnabled(monitor);
+    const monitoringProperty = getOwnDataProperty(monitor, "monitoring");
+    if (monitoringProperty.found && isDefined(monitoringProperty.value)) {
+        row["enabled"] = convertMonitoringToDbEnabled(monitoringProperty.value);
     }
 
     // Process all other standard field mappings with enhanced error handling
     for (const mapping of STANDARD_FIELD_MAPPINGS) {
-        const sourceValue = monitor[mapping.sourceField];
-        if (isDefined(sourceValue)) {
-            const result = processFieldMapping(mapping, monitor);
+        const sourceProperty = getOwnDataProperty(monitor, mapping.sourceField);
+        if (sourceProperty.found && isDefined(sourceProperty.value)) {
+            const result = processFieldMapping(
+                mapping,
+                sourceProperty.value,
+                monitor
+            );
             if (result.success) {
                 row[result.dbField] = result.value;
             } else {
