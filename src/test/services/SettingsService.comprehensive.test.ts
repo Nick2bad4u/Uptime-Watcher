@@ -88,14 +88,18 @@ describe("SettingsService", () => {
         };
 
         // Set up global window.electronAPI mock
-        (globalThis as any).window = {
-            electronAPI: mockElectronAPI,
-        };
+        Object.defineProperty(globalThis, "window", {
+            configurable: true,
+            value: {
+                electronAPI: mockElectronAPI,
+            },
+            writable: true,
+        });
     });
 
     afterEach(() => {
         vi.resetAllMocks();
-        delete (globalThis as any).window;
+        Reflect.deleteProperty(globalThis, "window");
     });
 
     describe("Service Structure", () => {

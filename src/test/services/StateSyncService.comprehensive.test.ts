@@ -71,14 +71,18 @@ describe("StateSyncService", () => {
             }),
         };
 
-        (globalThis as any).window = {
-            electronAPI: mockElectronAPI,
-        };
+        Object.defineProperty(globalThis, "window", {
+            configurable: true,
+            value: {
+                electronAPI: mockElectronAPI,
+            },
+            writable: true,
+        });
     });
 
     afterEach(() => {
         vi.resetAllMocks();
-        delete (globalThis as any).window;
+        Reflect.deleteProperty(globalThis, "window");
     });
 
     it("recovers via full sync when event validation fails", async () => {
