@@ -14,7 +14,6 @@ import {
 } from "vitest";
 
 import {
-    createTypedEventBus,
     type EventBusDiagnostics,
     type EventMiddleware,
     type EventPayloadValue,
@@ -154,39 +153,6 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
 
             const bus = new TypedEventBus<TestEvents>();
             expect(bus.getMaxListeners()).toBe(50);
-        });
-    });
-    describe("Factory Function", () => {
-        it("should create TypedEventBus instance via factory", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: TypedEventBus - Comprehensive Coverage",
-                "component"
-            );
-
-            const bus = createTypedEventBus<TestEvents>("factory-test", {
-                maxMiddleware: 15,
-            });
-            expect(bus).toBeInstanceOf(TypedEventBus);
-            const diagnostics = bus.getDiagnostics();
-            expect(diagnostics.busId).toBe("factory-test");
-            expect(diagnostics.maxMiddleware).toBe(15);
-        });
-        it("should create with default options via factory", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: TypedEventBus - Comprehensive Coverage",
-                "component"
-            );
-
-            const bus = createTypedEventBus<TestEvents>();
-            expect(bus).toBeInstanceOf(TypedEventBus);
         });
     });
     describe("Middleware System", () => {

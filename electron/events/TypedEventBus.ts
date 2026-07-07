@@ -886,33 +886,3 @@ export class TypedEventBus<
         return isObject(value);
     }
 }
-
-/**
- * Factory function to create a new typed event bus instance.
- *
- * @remarks
- * This function is a convenience wrapper for the {@link TypedEventBus}
- * constructor.
- *
- * @example
- *
- * ```typescript
- * const bus = createTypedEventBus<MyEvents>("my-bus", {
- *     maxMiddleware: 30,
- * });
- * ```
- *
- * @typeParam EventMap - Map of event names to their data types. Values can be
- *   any type.
- *
- * @param name - Optional name for the bus (used in logging and diagnostics).
- * @param options - Optional configuration options for the event bus.
- *
- * @returns A new {@link TypedEventBus} instance.
- */
-export function createTypedEventBus<EventMap extends TypedEventMap>(
-    name?: string,
-    options?: { maxMiddleware?: number }
-): TypedEventBus<EventMap> {
-    return new TypedEventBus<EventMap>(name, options);
-}
