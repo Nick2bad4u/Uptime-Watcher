@@ -36,6 +36,7 @@ import {
     createTemplateLogger,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isObject } from "@shared/utils/typeGuards";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { EventEmitter } from "node:events";
@@ -89,6 +90,23 @@ export interface EventBusDiagnostics {
     middlewareCount: number;
     /** Percentage of middleware slots used (0-100). */
     middlewareUtilization: number;
+}
+
+function createListenerCountMap<EventMap extends TypedEventMap>(
+    entries: readonly [EventKey<EventMap>, number][]
+): Record<string, number> {
+    const listenerCounts = createNullPrototypeObject<Record<string, number>>();
+
+    for (const [eventName, count] of entries) {
+        Object.defineProperty(listenerCounts, eventName, {
+            configurable: true,
+            enumerable: true,
+            value: count,
+            writable: true,
+        });
+    }
+
+    return listenerCounts;
 }
 
 /**
@@ -539,7 +557,7 @@ export class TypedEventBus<
                 this.listenerCount(eventName),
             ]);
         }
-        const listenerCounts = Object.fromEntries(listenerCountEntries);
+        const listenerCounts = createListenerCountMap(listenerCountEntries);
 
         return {
             busId: this.busId,

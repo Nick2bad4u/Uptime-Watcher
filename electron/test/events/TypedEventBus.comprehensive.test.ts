@@ -106,6 +106,20 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
             const diagnostics = bus.getDiagnostics();
             expect(diagnostics.busId).toBe("custom-name");
         });
+        it("should report inherited-name event listener counts as own entries", () => {
+            const listener = vi.fn();
+            eventBus.onTyped("toString", listener);
+
+            const diagnostics = eventBus.getDiagnostics();
+
+            expect(
+                Object.getPrototypeOf(diagnostics.listenerCounts)
+            ).toBeNull();
+            expect(Object.hasOwn(diagnostics.listenerCounts, "toString")).toBe(
+                true
+            );
+            expect(diagnostics.listenerCounts["toString"]).toBe(1);
+        });
         it("should use custom maxMiddleware option", async ({
             task,
             annotate,
