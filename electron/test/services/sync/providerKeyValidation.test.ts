@@ -1,6 +1,5 @@
 import {
     assertOpsObjectKey,
-    assertSafeProviderKey,
     assertSnapshotKey,
     assertValidSyncDeviceId,
     isValidOpsObjectKey,
@@ -24,35 +23,23 @@ describe("providerKeyValidation", () => {
         });
     });
 
-    describe("assertSafeProviderKey behavior", () => {
-        it("accepts canonical provider keys", () => {
-            expect(() => {
-                assertSafeProviderKey("sync/devices/device-a/ops/1-1-1.ndjson");
-            }).not.toThrow();
-        });
-
-        it("rejects traversal segments", () => {
-            expect(() => {
-                assertSafeProviderKey(
-                    "sync/devices/device-a/ops/../evil.ndjson"
-                );
-            }).toThrow(/traversal/i);
-        });
-
-        it("rejects backslashes", () => {
-            expect(() => {
-                assertSafeProviderKey(
-                    String.raw`sync\devices\device-a\ops\1-1-1.ndjson`
-                );
-            }).toThrow(/backslashes/i);
-        });
-    });
-
     describe("assertOpsObjectKey and isValidOpsObjectKey", () => {
         it("accepts canonical operations object keys", () => {
             expect(() => {
                 assertOpsObjectKey("sync/devices/device-a/ops/123-1-9.ndjson");
             }).not.toThrow();
+        });
+
+        it("rejects unsafe provider-key syntax before parsing operation metadata", () => {
+            expect(() => {
+                assertOpsObjectKey("sync/devices/device-a/ops/../evil.ndjson");
+            }).toThrow(/traversal/i);
+
+            expect(() => {
+                assertOpsObjectKey(
+                    String.raw`sync\devices\device-a\ops\1-1-1.ndjson`
+                );
+            }).toThrow(/backslashes/i);
         });
 
         it("rejects invalid filename metadata", () => {

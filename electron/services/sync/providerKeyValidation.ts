@@ -81,7 +81,7 @@ export function assertOpsObjectKey(key: string): void {
  * This rejects traversal segments, control characters, URL-like tokens, and
  * other malformed key patterns.
  */
-export function assertSafeProviderKey(key: string): void {
+function assertSafeProviderKey(key: string): void {
     if (typeof key !== "string" || key.trim().length === 0) {
         throw new Error("Key must be a non-empty string");
     }
