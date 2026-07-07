@@ -198,9 +198,9 @@ function validateGeneratedSchema(schema: string): void {
  * @throws When index creation fails. Errors are logged and re-thrown for
  *   upstream handling.
  *
- * @public
+ * @internal
  */
-export function createDatabaseIndexes(db: Database): void {
+function createDatabaseIndexes(db: Database): void {
     try {
         // Index on monitor site_identifier for faster site queries
         db.run(SCHEMA_QUERIES.CREATE_INDEX_MONITORS_SITE_IDENTIFIER);
@@ -251,9 +251,9 @@ export function createDatabaseIndexes(db: Database): void {
  * @throws When table creation fails. Errors are logged and re-thrown for
  *   upstream handling.
  *
- * @public
+ * @internal
  */
-export function createDatabaseTables(db: Database): void {
+function createDatabaseTables(db: Database): void {
     try {
         // Sites table with INTEGER boolean for SQLite consistency
         db.run(SCHEMA_QUERIES.CREATE_TABLE_SITES);
@@ -300,9 +300,9 @@ export function createDatabaseTables(db: Database): void {
  * @throws When validation setup fails. Errors are logged but not re-thrown, as
  *   this is a non-critical enhancement.
  *
- * @public
+ * @internal
  */
-export function setupMonitorTypeValidation(): void {
+function setupMonitorTypeValidation(): void {
     try {
         // Get all currently registered monitor types
         const validTypes = getRegisteredMonitorTypes();
