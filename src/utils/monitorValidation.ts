@@ -9,7 +9,6 @@ import type { Monitor, MonitorType } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 import type { UnknownRecord } from "type-fest";
 
-import { isRecord } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
 import {
     validateMonitorData as sharedValidateMonitorData,
@@ -17,7 +16,6 @@ import {
 } from "@shared/validation/monitorSchemas";
 import { isEmpty } from "ts-extras";
 
-import type { MonitorFormData } from "../types/monitorFormData";
 import type {
     EnhancedValidationResult as EnhancedValidationResultInternal,
     MonitorFieldName,
@@ -93,48 +91,6 @@ export function createMonitorObject<TType extends MonitorType>(
         ...fields,
         type,
     };
-}
-
-/**
- * Executes a monitor validation helper with standardized error handling.
- *
- * @typeParam TResult - Result produced by the validation operation.
- *
- * @param description - Context string describing the operation for logging.
- * @param fallback - Value returned when the validation operation fails.
- * @param operation - Callback encapsulating the validation logic.
- *
- * @returns Result of the validation operation or the fallback when errors
- *   occur.
- */
-
-/**
- * Type guard to check if form data is valid and complete.
- *
- * @param data - Form data to validate.
- *
- * @returns `true` if form data is valid and complete; otherwise `false`.
- *
- * @public
- */
-export function isMonitorFormData(data: unknown): data is MonitorFormData {
-    if (!isRecord(data)) {
-        return false;
-    }
-
-    const candidateType = data["type"];
-
-    if (typeof candidateType !== "string") {
-        return false;
-    }
-
-    if (!isKnownMonitorType(candidateType)) {
-        return false;
-    }
-
-    const result = sharedValidateMonitorData(candidateType, data);
-
-    return result.success;
 }
 
 /**

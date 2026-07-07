@@ -12,7 +12,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import {
     createMonitorObject,
-    isMonitorFormData,
     validateMonitorData,
     validateMonitorDataClientSide,
     validateMonitorField,
@@ -252,13 +251,5 @@ describe("monitorValidation error handling", () => {
 
         expect(result.metadata).toEqual({ field: "url" });
         expect(result.errors).toEqual(["bad"]);
-    });
-
-    it("reports false when isMonitorFormData fails shared schema validation", () => {
-        mockedSharedSchemas.validateMonitorData.mockReturnValueOnce(
-            resolveValidationResult({ success: false })
-        );
-
-        expect(isMonitorFormData({})).toBe(false);
     });
 });
