@@ -20,7 +20,7 @@
  * @public
  */
 
-import type { Monitor, MonitorType } from "@shared/types";
+import type { MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { Promisable } from "type-fest";
 
@@ -28,15 +28,11 @@ import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { isAbortError } from "@shared/utils/abortUtils";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
-import { validateMonitorType } from "@shared/utils/validation";
 import { arrayFirst } from "ts-extras";
 
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { AppCaches } from "./cache";
-import {
-    getAvailableMonitorTypes,
-    getMonitorTypeConfig,
-} from "./monitorTypeHelper";
+import { getMonitorTypeConfig } from "./monitorTypeHelper";
 
 /**
  * Help text configuration for monitor types.
@@ -70,69 +66,6 @@ export interface MonitorHelpTexts {
 }
 
 /**
- * Check if all monitor types in array support advanced analytics.
- *
- * @param monitorTypes - Array of monitor types to check.
- *
- * @returns `true` when every monitor type in the provided array supports
- *   advanced analytics.
- *
- * @public
- */
-export async function allSupportsAdvancedAnalytics(
-    monitorTypes: MonitorType[]
-): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const supportChecks = await Promise.all(
-                monitorTypes.map((type) => supportsAdvancedAnalytics(type))
-            );
-            return supportChecks.every(Boolean);
-        },
-        "Check advanced analytics support for multiple types",
-        false
-    );
-}
-
-/**
- * Check if all monitor types in array support response time.
- *
- * @param monitorTypes - Array of monitor types to check.
- *
- * @returns `true` when every monitor type in the list supports response time
- *   analytics.
- *
- * @public
- */
-export async function allSupportsResponseTime(
-    monitorTypes: MonitorType[]
-): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const supportChecks = await Promise.all(
-                monitorTypes.map((type) => supportsResponseTime(type))
-            );
-            return supportChecks.every(Boolean);
-        },
-        "Check response time support for multiple types",
-        false
-    );
-}
-
-/**
- * Clears the configuration cache.
- *
- * @remarks
- * Removes all cached monitor type configurations. Useful for tests or when
- * monitor types change and require cache invalidation.
- *
- * @public
- */
-export function clearConfigCache(): void {
-    AppCaches.uiHelpers.clear();
-}
-
-/**
  * Format detail label dynamically based on monitor type configuration.
  *
  * @example
@@ -160,64 +93,6 @@ export async function formatMonitorDetail(
             const store = useMonitorTypesStore.getState();
             return store.formatMonitorDetail(monitorType, details);
         }
-    );
-}
-
-/**
- * Format title suffix dynamically based on monitor type configuration.
- *
- * @example
- *
- * ```typescript
- * const suffix = await formatMonitorTitleSuffix("http", {
- *     url: "https://example.com",
- * }); // " (https://example.com)"
- * const suffix = await formatMonitorTitleSuffix("port", {
- *     host: "localhost",
- *     port: 80,
- * }); // " (localhost:80)"
- * ```
- *
- * @param monitorType - Type of monitor.
- * @param monitor - Monitor data.
- *
- * @returns Title suffix string suitable for rendering in the UI.
- *
- * @public
- */
-export async function formatMonitorTitleSuffix(
-    monitorType: MonitorType,
-    monitor: Monitor
-): Promise<string> {
-    return runMonitorUiOperation(
-        `Format monitor title suffix for ${monitorType}`,
-        "",
-        async () => {
-            const store = useMonitorTypesStore.getState();
-            return store.formatMonitorTitleSuffix(monitorType, monitor);
-        }
-    );
-}
-
-/**
- * Get analytics label for monitor type.
- *
- * @param monitorType - Type of monitor.
- *
- * @returns Analytics label from configuration or a fallback string.
- *
- * @public
- */
-export async function getAnalyticsLabel(
-    monitorType: MonitorType
-): Promise<string> {
-    const fallbackLabel = `${monitorType.toUpperCase()} Response Time`;
-    return readMonitorUiConfigValue(
-        monitorType,
-        `Get analytics label for ${monitorType}`,
-        fallbackLabel,
-        (config) =>
-            config?.uiConfig?.detailFormats?.analyticsLabel ?? fallbackLabel
     );
 }
 
@@ -259,83 +134,6 @@ export async function getMonitorHelpTexts(
         {},
         (config) => config?.uiConfig?.helpTexts ?? {},
         signal
-    );
-}
-
-/**
- * Get available monitor types that support a specific feature.
- *
- * @param feature - Feature to check for (`"responseTime"` or
- *   `"advancedAnalytics"`).
- *
- * @returns Array of monitor types that support the requested feature.
- *
- * @public
- */
-export async function getTypesWithFeature(
-    feature: "advancedAnalytics" | "responseTime"
-): Promise<MonitorType[]> {
-    return runMonitorUiOperation(
-        `Get types with feature ${feature}`,
-        [],
-        async () => {
-            const allTypes = await getAvailableMonitorTypes();
-            const supportedTypes: MonitorType[] = [];
-
-            for (const config of allTypes) {
-                const supports =
-                    feature === "responseTime"
-                        ? config.uiConfig?.supportsResponseTime
-                        : config.uiConfig?.supportsAdvancedAnalytics;
-
-                if (supports && validateMonitorType(config.type)) {
-                    supportedTypes.push(config.type);
-                }
-            }
-
-            return supportedTypes;
-        }
-    );
-}
-
-/**
- * Check if monitor type should show URL in display.
- *
- * @param monitorType - Type of monitor.
- *
- * @returns `true` when URLs should appear in UI for the given monitor type.
- *
- * @public
- */
-export async function shouldShowUrl(
-    monitorType: MonitorType
-): Promise<boolean> {
-    return readMonitorUiConfigValue(
-        monitorType,
-        `Check URL display for ${monitorType}`,
-        false,
-        (config) => config?.uiConfig?.display?.showUrl ?? false
-    );
-}
-
-/**
- * Check if monitor type supports advanced analytics.
- *
- * @param monitorType - Type of monitor.
- *
- * @returns `true` when the monitor supports advanced analytics; otherwise
- *   `false`.
- *
- * @public
- */
-export async function supportsAdvancedAnalytics(
-    monitorType: MonitorType
-): Promise<boolean> {
-    return readMonitorUiConfigValue(
-        monitorType,
-        `Check advanced analytics support for ${monitorType}`,
-        false,
-        (config) => config?.uiConfig?.supportsAdvancedAnalytics ?? false
     );
 }
 

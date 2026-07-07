@@ -565,20 +565,6 @@ describe("Function Coverage Boost Tests", () => {
             const monitorUiModule = await import("../utils/monitorUiHelpers");
 
             try {
-                if (monitorUiModule.getTypesWithFeature) {
-                    const responseTimeTypes =
-                        await monitorUiModule.getTypesWithFeature(
-                            "responseTime"
-                        );
-                    expect(Array.isArray(responseTimeTypes)).toBeTruthy();
-
-                    const analyticsTypes =
-                        await monitorUiModule.getTypesWithFeature(
-                            "advancedAnalytics"
-                        );
-                    expect(Array.isArray(analyticsTypes)).toBeTruthy();
-                }
-
                 const moduleKeys = objectKeys(monitorUiModule);
                 for (const key of moduleKeys) {
                     const exportedValue = (monitorUiModule as any)[key];
