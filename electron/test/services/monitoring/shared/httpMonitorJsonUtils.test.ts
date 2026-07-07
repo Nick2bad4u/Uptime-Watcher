@@ -57,6 +57,25 @@ describe(parseJsonPayload, () => {
         });
     });
 
+    it("normalizes parsed JSON objects without prototypes", () => {
+        const result = parseJsonPayload(
+            '{"__proto__":{"polluted":true},"nested":{"prototype":"data"}}'
+        );
+
+        expect(result.ok).toBeTruthy();
+        if (result.ok) {
+            const payload = result.payload as Record<string, unknown>;
+            const nested = payload["nested"];
+
+            expect(Object.getPrototypeOf(payload)).toBeNull();
+            expect(Object.hasOwn(payload, "__proto__")).toBeTruthy();
+            expect(Reflect.get(payload, "__proto__")).toEqual({
+                polluted: true,
+            });
+            expect(Object.getPrototypeOf(nested)).toBeNull();
+        }
+    });
+
     it("returns decoded payloads without reparsing", () => {
         const payload = {
             status: "ok",

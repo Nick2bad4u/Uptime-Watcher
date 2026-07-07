@@ -1,5 +1,10 @@
+import type { JsonValue } from "type-fest";
+
 import { ensureError } from "@shared/utils/errorHandling";
+import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { isObject } from "@shared/utils/typeGuards";
+import { objectEntries } from "ts-extras";
 
 import { extractMonitorValueAtPath } from "./monitorPathTraversal";
 
@@ -65,6 +70,30 @@ function createJsonPayloadSizeError(sizeBytes: number): Error {
     );
 }
 
+function isJsonValue(value: unknown): value is JsonValue {
+    if (value === null) {
+        return true;
+    }
+
+    const valueType = typeof value;
+    if (
+        valueType === "boolean" ||
+        valueType === "number" ||
+        valueType === "string"
+    ) {
+        return true;
+    }
+
+    if (Array.isArray(value)) {
+        return value.every(isJsonValue);
+    }
+
+    return (
+        isObject(value) &&
+        objectEntries(value).every(([, entry]) => isJsonValue(entry))
+    );
+}
+
 /**
  * Parses an HTTP payload into JSON when it is a string.
  *
@@ -90,19 +119,22 @@ export function parseJsonPayload(
             };
         }
 
-        try {
+        const parseResult = safeJsonParse(data, isJsonValue);
+        if (parseResult.success && parseResult.data !== undefined) {
             return {
                 ok: true,
-                payload: JSON.parse(data),
-            };
-        } catch (error) {
-            const parseError = createJsonPayloadParseError(error);
-            onParseError?.(parseError);
-            return {
-                error: parseError,
-                ok: false,
+                payload: parseResult.data,
             };
         }
+
+        const parseError = createJsonPayloadParseError(
+            parseResult.error ?? "Unknown JSON parsing failure"
+        );
+        onParseError?.(parseError);
+        return {
+            error: parseError,
+            ok: false,
+        };
     }
 
     return { ok: true, payload: data };
