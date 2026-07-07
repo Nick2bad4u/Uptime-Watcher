@@ -299,6 +299,59 @@ describe(useSettingsStore, () => {
             expect(normalized).toEqual(fallback);
         });
 
+        it("should ignore inherited and accessor-backed runtime settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Validation", "type");
+
+            const fallback = createSettings({
+                autoStart: false,
+                historyLimit: 250,
+                systemNotificationsEnabled: false,
+                theme: "light",
+            });
+            const inheritedSettings = Object.create({
+                autoStart: true,
+                historyLimit: 900,
+                systemNotificationsEnabled: true,
+                theme: "dark",
+            }) as Partial<AppSettings>;
+            const getter = vi.fn(() => {
+                throw new Error("setting getter should not run");
+            });
+            const accessorSettings = {} as Partial<AppSettings>;
+
+            Object.defineProperty(accessorSettings, "theme", {
+                enumerable: true,
+                get: getter,
+            });
+
+            expect(normalizeAppSettings(inheritedSettings, fallback)).toEqual(
+                fallback
+            );
+            expect(() =>
+                normalizeAppSettings(accessorSettings, fallback)
+            ).not.toThrow();
+            expect(getter).not.toHaveBeenCalled();
+            expect(normalizeAppSettings(accessorSettings, fallback)).toEqual(
+                fallback
+            );
+
+            const { result } = renderHook(() => useSettingsStore());
+
+            act(() => {
+                result.current.updateSettings(inheritedSettings);
+                result.current.updateSettings(accessorSettings);
+            });
+
+            expect(result.current.settings).toEqual(defaultSettings);
+            expect(getter).not.toHaveBeenCalled();
+        });
+
         it("should reject invalid muted site identifiers during normalization", async ({
             task,
             annotate,

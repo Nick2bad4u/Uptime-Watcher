@@ -4,9 +4,10 @@ import {
     DEFAULT_HISTORY_LIMIT_RULES,
     normalizeHistoryLimit,
 } from "@shared/constants/history";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { safeNumberConversion } from "@shared/utils/safeConversions";
 import { isValidSiteIdentifier } from "@shared/validation/identifierValidation";
-import { isFinite as isFiniteNumber } from "ts-extras";
+import { isFinite as isFiniteNumber, objectKeys } from "ts-extras";
 
 /**
  * Basic state slice for the settings store.
@@ -119,41 +120,69 @@ const normalizeThemeSetting = (
 ): AppSettings["theme"] =>
     typeof value === "string" && isThemeName(value) ? value : fallback;
 
+const getSettingsCandidateValue = (
+    candidate: AppSettingsCandidate,
+    key: keyof AppSettings
+): unknown => {
+    const property = getOwnDataProperty(candidate, key);
+    return property.found ? property.value : undefined;
+};
+
 const buildSettingsUpdateTelemetry = (
     newSettings: Partial<AppSettings>
 ): Record<string, unknown> => {
-    const changedFields = Object.keys(newSettings).toSorted((left, right) =>
-        left.localeCompare(right)
-    );
+    const changedFields = objectKeys(newSettings)
+        .filter((key) => getOwnDataProperty(newSettings, key).found)
+        .toSorted((left, right) => left.localeCompare(right));
     const telemetry: Record<string, unknown> = { changedFields };
 
-    if ("autoStart" in newSettings) {
-        telemetry["autoStart"] = newSettings.autoStart;
+    const autoStart = getSettingsCandidateValue(newSettings, "autoStart");
+    if (autoStart !== undefined) {
+        telemetry["autoStart"] = autoStart;
     }
 
-    if ("historyLimit" in newSettings) {
-        telemetry["historyLimit"] = newSettings.historyLimit;
+    const historyLimit = getSettingsCandidateValue(newSettings, "historyLimit");
+    if (historyLimit !== undefined) {
+        telemetry["historyLimit"] = historyLimit;
     }
 
-    if ("inAppAlertsEnabled" in newSettings) {
-        telemetry["inAppAlertsEnabled"] = newSettings.inAppAlertsEnabled;
+    const inAppAlertsEnabled = getSettingsCandidateValue(
+        newSettings,
+        "inAppAlertsEnabled"
+    );
+    if (inAppAlertsEnabled !== undefined) {
+        telemetry["inAppAlertsEnabled"] = inAppAlertsEnabled;
     }
 
-    if ("inAppAlertsSoundEnabled" in newSettings) {
-        telemetry["inAppAlertsSoundEnabled"] =
-            newSettings.inAppAlertsSoundEnabled;
+    const inAppAlertsSoundEnabled = getSettingsCandidateValue(
+        newSettings,
+        "inAppAlertsSoundEnabled"
+    );
+    if (inAppAlertsSoundEnabled !== undefined) {
+        telemetry["inAppAlertsSoundEnabled"] = inAppAlertsSoundEnabled;
     }
 
-    if ("inAppAlertVolume" in newSettings) {
-        telemetry["inAppAlertVolume"] = newSettings.inAppAlertVolume;
+    const inAppAlertVolume = getSettingsCandidateValue(
+        newSettings,
+        "inAppAlertVolume"
+    );
+    if (inAppAlertVolume !== undefined) {
+        telemetry["inAppAlertVolume"] = inAppAlertVolume;
     }
 
-    if ("minimizeToTray" in newSettings) {
-        telemetry["minimizeToTray"] = newSettings.minimizeToTray;
+    const minimizeToTray = getSettingsCandidateValue(
+        newSettings,
+        "minimizeToTray"
+    );
+    if (minimizeToTray !== undefined) {
+        telemetry["minimizeToTray"] = minimizeToTray;
     }
 
-    if ("mutedSiteNotificationIdentifiers" in newSettings) {
-        const mutedIdentifiers = newSettings.mutedSiteNotificationIdentifiers;
+    const mutedIdentifiers = getSettingsCandidateValue(
+        newSettings,
+        "mutedSiteNotificationIdentifiers"
+    );
+    if (mutedIdentifiers !== undefined) {
         telemetry["mutedSiteNotificationIdentifierCount"] = Array.isArray(
             mutedIdentifiers
         )
@@ -161,18 +190,26 @@ const buildSettingsUpdateTelemetry = (
             : undefined;
     }
 
-    if ("systemNotificationsEnabled" in newSettings) {
-        telemetry["systemNotificationsEnabled"] =
-            newSettings.systemNotificationsEnabled;
+    const systemNotificationsEnabled = getSettingsCandidateValue(
+        newSettings,
+        "systemNotificationsEnabled"
+    );
+    if (systemNotificationsEnabled !== undefined) {
+        telemetry["systemNotificationsEnabled"] = systemNotificationsEnabled;
     }
 
-    if ("systemNotificationsSoundEnabled" in newSettings) {
+    const systemNotificationsSoundEnabled = getSettingsCandidateValue(
+        newSettings,
+        "systemNotificationsSoundEnabled"
+    );
+    if (systemNotificationsSoundEnabled !== undefined) {
         telemetry["systemNotificationsSoundEnabled"] =
-            newSettings.systemNotificationsSoundEnabled;
+            systemNotificationsSoundEnabled;
     }
 
-    if ("theme" in newSettings) {
-        telemetry["theme"] = newSettings.theme;
+    const theme = getSettingsCandidateValue(newSettings, "theme");
+    if (theme !== undefined) {
+        telemetry["theme"] = theme;
     }
 
     return telemetry;
@@ -195,42 +232,70 @@ export const normalizeAppSettings = (
     fallback: AppSettings = defaultSettings
 ): AppSettings => {
     const rest = candidate;
+    const autoStart = getSettingsCandidateValue(rest, "autoStart");
+    const historyLimit = getSettingsCandidateValue(rest, "historyLimit");
+    const inAppAlertsEnabled = getSettingsCandidateValue(
+        rest,
+        "inAppAlertsEnabled"
+    );
+    const inAppAlertsSoundEnabled = getSettingsCandidateValue(
+        rest,
+        "inAppAlertsSoundEnabled"
+    );
+    const inAppAlertVolume = getSettingsCandidateValue(
+        rest,
+        "inAppAlertVolume"
+    );
+    const minimizeToTray = getSettingsCandidateValue(rest, "minimizeToTray");
+    const mutedSiteNotificationIdentifiers = getSettingsCandidateValue(
+        rest,
+        "mutedSiteNotificationIdentifiers"
+    );
+    const systemNotificationsEnabled = getSettingsCandidateValue(
+        rest,
+        "systemNotificationsEnabled"
+    );
+    const systemNotificationsSoundEnabled = getSettingsCandidateValue(
+        rest,
+        "systemNotificationsSoundEnabled"
+    );
+    const theme = getSettingsCandidateValue(rest, "theme");
 
     return {
-        autoStart: normalizeBooleanSetting(rest.autoStart, fallback.autoStart),
+        autoStart: normalizeBooleanSetting(autoStart, fallback.autoStart),
         historyLimit: normalizeHistoryLimitSetting(
-            rest.historyLimit,
+            historyLimit,
             fallback.historyLimit
         ),
         inAppAlertsEnabled: normalizeBooleanSetting(
-            rest.inAppAlertsEnabled,
+            inAppAlertsEnabled,
             fallback.inAppAlertsEnabled
         ),
         inAppAlertsSoundEnabled: normalizeBooleanSetting(
-            rest.inAppAlertsSoundEnabled,
+            inAppAlertsSoundEnabled,
             fallback.inAppAlertsSoundEnabled
         ),
         inAppAlertVolume: clampInAppAlertVolume(
-            rest.inAppAlertVolume,
+            inAppAlertVolume,
             fallback.inAppAlertVolume
         ),
         minimizeToTray: normalizeBooleanSetting(
-            rest.minimizeToTray,
+            minimizeToTray,
             fallback.minimizeToTray
         ),
         mutedSiteNotificationIdentifiers: normalizeMutedSiteIdentifiers(
-            rest.mutedSiteNotificationIdentifiers,
+            mutedSiteNotificationIdentifiers,
             fallback.mutedSiteNotificationIdentifiers
         ),
         systemNotificationsEnabled: normalizeBooleanSetting(
-            rest.systemNotificationsEnabled,
+            systemNotificationsEnabled,
             fallback.systemNotificationsEnabled
         ),
         systemNotificationsSoundEnabled: normalizeBooleanSetting(
-            rest.systemNotificationsSoundEnabled,
+            systemNotificationsSoundEnabled,
             fallback.systemNotificationsSoundEnabled
         ),
-        theme: normalizeThemeSetting(rest.theme, fallback.theme),
+        theme: normalizeThemeSetting(theme, fallback.theme),
     };
 };
 
@@ -258,13 +323,7 @@ export const createSettingsStateSlice = (
             buildSettingsUpdateTelemetry(newSettings)
         );
         setState((state) => ({
-            settings: normalizeAppSettings(
-                {
-                    ...state.settings,
-                    ...newSettings,
-                },
-                state.settings
-            ),
+            settings: normalizeAppSettings(newSettings, state.settings),
         }));
     },
 });
