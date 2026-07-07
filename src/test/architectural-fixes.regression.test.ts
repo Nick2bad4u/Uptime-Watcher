@@ -9,9 +9,10 @@
 import type { Monitor } from "@shared/types";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+import { objectValues } from "ts-extras";
 import { describe, expect, it } from "vitest";
 
-import { TypedCache } from "../utils/cache";
+import { AppCaches } from "../utils/cache";
 
 describe("Architectural Fixes Regression Tests", () => {
     describe("DNS Monitor Field Inclusion", () => {
@@ -63,7 +64,7 @@ describe("Architectural Fixes Regression Tests", () => {
     });
 
     describe("Cache TTL Configuration Mapping", () => {
-        it("should correctly map CACHE_CONFIG ttl to TypedCache configuration", () => {
+        it("should correctly map CACHE_CONFIG ttl to app cache configuration", () => {
             // Test the adapter pattern by checking configuration structure
             const monitorConfig = CACHE_CONFIG.MONITORS;
 
@@ -75,19 +76,11 @@ describe("Architectural Fixes Regression Tests", () => {
             expect(monitorConfig.ttl).toBeGreaterThan(0);
             expect(monitorConfig.maxSize).toBeGreaterThan(0);
 
-            // Create adapted config as done in the fix
-            const adaptedConfig = {
-                maxSize: monitorConfig.maxSize,
-                ttl: monitorConfig.ttl,
-            };
+            AppCaches.monitorTypes.clear();
+            AppCaches.monitorTypes.set("test-key", "test-value");
 
-            // Verify the adapter works by creating a cache
-            const cache = new TypedCache<string, string>(adaptedConfig);
-
-            // Test basic cache functionality
-            cache.set("test-key", "test-value");
-            expect(cache.get("test-key")).toBe("test-value");
-            expect(cache.size).toBe(1);
+            expect(AppCaches.monitorTypes.get("test-key")).toBe("test-value");
+            expect(AppCaches.monitorTypes.size).toBe(1);
         });
 
         it("should handle all cache configurations correctly", () => {
@@ -107,18 +100,13 @@ describe("Architectural Fixes Regression Tests", () => {
                     config.maxSize,
                     `${name} should have maxSize`
                 ).toBeGreaterThan(0);
+            }
 
-                // Verify adapter pattern works for each config
-                const adaptedConfig = {
-                    maxSize: config.maxSize,
-                    ttl: config.ttl,
-                };
-
-                expect(() => {
-                    const cache = new TypedCache<string, number>(adaptedConfig);
-                    cache.set("test", 1);
-                    return cache.get("test");
-                }).not.toThrow();
+            for (const cache of objectValues(AppCaches)) {
+                expect(cache.clear).toEqual(expect.any(Function));
+                expect(cache.cleanup).toEqual(expect.any(Function));
+                expect(cache.get).toEqual(expect.any(Function));
+                expect(cache.set).toEqual(expect.any(Function));
             }
         });
 

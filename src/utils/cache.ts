@@ -9,25 +9,19 @@
  * objects. The eviction strategy scans entries for the oldest `lastAccessed`
  * timestamp when `maxSize` is reached (O(n) selection).
  *
- * The module also exposes a set of preconfigured caches (`AppCaches`) and a
- * helper (`getCachedOrFetch`) to compute and cache values on cache misses.
+ * The module exposes a set of preconfigured caches (`AppCaches`) for shared
+ * renderer utility state.
  *
  * @example
  *
  * ```ts
- * import { AppCaches, getCachedOrFetch } from "./cache";
+ * import { AppCaches } from "./cache";
  *
  * // direct set/get
  * AppCaches.general.set("user-preference", { theme: "dark" });
  * const pref = AppCaches.general.get("user-preference");
  *
- * // compute-on-miss with TTL override
- * const value = await getCachedOrFetch(
- *     AppCaches.monitorTypes,
- *     "config",
- *     async () => fetchConfig(),
- *     30_000
- * );
+ * AppCaches.monitorTypes.set("config", { enabled: true }, 30_000);
  * ```
  *
  * @public
@@ -36,18 +30,10 @@
 import type { CacheValue } from "@shared/types/configTypes";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
-import { castUnchecked } from "@shared/utils/typeHelpers";
 import { isDefined } from "ts-extras";
 
 import { logger } from "../services/logger";
 
-/**
- * In-flight fetch registry used by {@link getCachedOrFetch}.
- *
- * @remarks
- * Stored as a WeakMap keyed by cache instance to avoid memory leaks.
- */
-const inFlightFetches = new WeakMap<object, Map<string, Promise<unknown>>>();
 const DEFAULT_MAX_SIZE = 100;
 
 function normalizeMaxSize(maxSize: number | undefined): number {
@@ -70,9 +56,9 @@ function normalizeTtl(ttl: number | undefined): number | undefined {
  * for `maxSize` and no default TTL (entries will not expire unless a TTL is
  * provided at `set` time).
  *
- * @public
+ * @internal
  */
-export interface CacheOptions {
+interface CacheOptions {
     /**
      * Maximum number of entries the cache will retain before evicting the
      * least-recently-used entries.
@@ -101,17 +87,80 @@ interface AppCachesInterface {
      * General-purpose cache used for miscellaneous computed values and small
      * app artifacts.
      */
-    readonly general: TypedCache<string, CacheValue>;
+    readonly general: AppCache<string, CacheValue>;
 
     /**
      * Cache reserved for monitor type configurations and metadata.
      */
-    readonly monitorTypes: TypedCache<string, CacheValue>;
+    readonly monitorTypes: AppCache<string, CacheValue>;
 
     /**
      * Cache for UI helper values and component-level ephemeral data.
      */
-    readonly uiHelpers: TypedCache<string, CacheValue>;
+    readonly uiHelpers: AppCache<string, CacheValue>;
+}
+
+/**
+ * Public cache operations exposed by the shared app cache instances.
+ *
+ * @typeParam K - Type of cache keys.
+ * @typeParam V - Type of cached values.
+ *
+ * @internal
+ */
+interface AppCache<K, V> {
+    /**
+     * Current number of entries in the cache.
+     */
+    readonly size: number;
+
+    /**
+     * Remove expired entries from the cache.
+     */
+    readonly cleanup: () => void;
+
+    /**
+     * Remove all entries from the cache.
+     */
+    readonly clear: () => void;
+
+    /**
+     * Delete a specific key from the cache.
+     *
+     * @param key - The cache key to remove.
+     *
+     * @returns True if the key existed and was removed; false otherwise.
+     */
+    readonly delete: (key: K) => boolean;
+
+    /**
+     * Retrieve a value if present and not expired.
+     *
+     * @param key - The cache key to look up.
+     *
+     * @returns The cached value, or `undefined` when the key does not exist or
+     *   the entry has expired.
+     */
+    readonly get: (key: K) => undefined | V;
+
+    /**
+     * Check whether a non-expired entry exists for the given key.
+     *
+     * @param key - The cache key to test.
+     *
+     * @returns True when a valid value exists; false otherwise.
+     */
+    readonly has: (key: K) => boolean;
+
+    /**
+     * Insert or update an entry in the cache and optionally specify a per-entry
+     * TTL that overrides the cache default.
+     *
+     * @param key - The cache key to set.
+     * @param value - The value to store under the provided key.
+     * @param ttl - Optional per-entry TTL in milliseconds.
+     */
+    readonly set: (key: K, value: V, ttl?: number) => void;
 }
 
 /**
@@ -149,9 +198,9 @@ interface CacheEntry<T> {
  * @typeParam K - Type of cache keys.
  * @typeParam V - Type of cached values.
  *
- * @public
+ * @internal
  */
-export class TypedCache<K, V> {
+class TypedCache<K, V> implements AppCache<K, V> {
     /**
      * Current number of entries in the cache.
      *
@@ -185,16 +234,6 @@ export class TypedCache<K, V> {
      * @internal
      */
     private readonly defaultTtl: number | undefined;
-
-    /**
-     * Cache generation counter.
-     *
-     * @remarks
-     * Incremented whenever the cache is cleared. Used by higher-level helpers
-     * (for example {@link getCachedOrFetch}) to avoid caching values fetched
-     * before an invalidation/clear event.
-     */
-    private generation = 0;
 
     /**
      * Maximum number of entries allowed in the cache.
@@ -260,7 +299,6 @@ export class TypedCache<K, V> {
      * @public
      */
     public clear(): void {
-        this.generation += 1;
         this.cache.clear();
     }
 
@@ -274,7 +312,6 @@ export class TypedCache<K, V> {
      * @public
      */
     public delete(key: K): boolean {
-        this.generation += 1;
         return this.cache.delete(key);
     }
 
@@ -306,17 +343,6 @@ export class TypedCache<K, V> {
         entry.lastAccessed = Date.now();
 
         return entry.value;
-    }
-
-    /**
-     * Returns the current cache generation.
-     *
-     * @remarks
-     * Consumers can capture this value before starting a long-running fetch and
-     * ensure the cache has not been invalidated before storing results.
-     */
-    public getGeneration(): number {
-        return this.generation;
     }
 
     /**
@@ -386,8 +412,7 @@ export class TypedCache<K, V> {
  *
  * @remarks
  * Each cache is tuned with conservative `maxSize` and `ttl` values suitable for
- * its domain. Consumers can use these shared caches or create their own
- * {@link TypedCache} instances when different characteristics are needed.
+ * its domain.
  *
  * @public
  */
@@ -401,146 +426,3 @@ export const AppCaches: AppCachesInterface = {
     /** UI helper data and component state */
     uiHelpers: new TypedCache<string, CacheValue>(CACHE_CONFIG.VALIDATION),
 } as const;
-
-/**
- * Remove expired entries from all predefined app caches.
- *
- * @remarks
- * Iterates the caches in {@link AppCaches} and calls {@link TypedCache.cleanup}
- * on each. This is a convenience for scheduled maintenance tasks.
- *
- * @public
- */
-export function cleanupAllCaches(): void {
-    const caches: TypedCache<string, CacheValue>[] = [
-        AppCaches.general,
-        AppCaches.monitorTypes,
-        AppCaches.uiHelpers,
-    ];
-
-    for (const cache of caches) {
-        cache.cleanup();
-    }
-}
-
-/**
- * Clear all entries from the predefined app caches.
- *
- * @remarks
- * This removes all data from the {@link AppCaches} instances. Use sparingly as
- * it may cause increased computation or I/O until caches refill.
- *
- * @public
- */
-export function clearAllCaches(): void {
-    const caches: TypedCache<string, CacheValue>[] = [
-        AppCaches.general,
-        AppCaches.monitorTypes,
-        AppCaches.uiHelpers,
-    ];
-
-    for (const cache of caches) {
-        cache.clear();
-    }
-}
-
-/**
- * Retrieve a value from a cache or compute and store it on a cache miss.
- *
- * @remarks
- * The function first attempts to read from the supplied {@link TypedCache}. If
- * the key is absent or expired it invokes `fetcher` to obtain the value, stores
- * the result in the cache (honoring an optional `ttl`), and returns the value.
- * Any exception thrown by `fetcher` is propagated to the caller and no value is
- * cached in that case.
- *
- * @example
- *
- * ```ts
- * const value = await getCachedOrFetch(
- *     AppCaches.general,
- *     "user:123",
- *     async () => {
- *         const resp = await apiClient.get("/user/123");
- *         return resp.data;
- *     },
- *     60_000
- * );
- * ```
- *
- * @typeParam T - Type of the cached value.
- *
- * @param cache - Cache instance to use for lookup and storage.
- * @param key - Cache key to look up.
- * @param fetcher - Async function that computes or fetches the value on a cache
- *   miss.
- * @param ttl - Optional per-entry TTL in milliseconds to apply when storing the
- *   fetched value; when omitted the cache's default TTL (if any) applies.
- *
- * @returns A promise that resolves to the cached or freshly fetched value.
- *
- * @throws Any error thrown by `fetcher` is propagated to the caller.
- *
- * @public
- */
-export async function getCachedOrFetch<T extends Exclude<unknown, undefined>>(
-    cache: TypedCache<string, T>,
-    key: string,
-    fetcher: () => Promise<T>,
-    ttl?: number
-): Promise<T> {
-    // Track in-flight fetches per cache instance to avoid duplicate work.
-    // WeakMap ensures entries are GC'd once caches are no longer referenced.
-    const ensureInFlightRegistry = (): Map<string, Promise<unknown>> => {
-        const existing = inFlightFetches.get(cache);
-        if (existing) {
-            return existing;
-        }
-
-        const created = new Map<string, Promise<unknown>>();
-        inFlightFetches.set(cache, created);
-        return created;
-    };
-
-    // Try to get from cache first
-    const cached = cache.get(key);
-    if (isDefined(cached)) {
-        return cached;
-    }
-
-    const inFlight = ensureInFlightRegistry();
-    const existingPromise = inFlight.get(key);
-    if (existingPromise) {
-        return castUnchecked<Promise<T>>(existingPromise);
-    }
-
-    const generationAtStart = cache.getGeneration();
-
-    const fetchPromise: Promise<T> = (async (): Promise<T> => {
-        const value = await fetcher();
-
-        // Avoid caching stale results when the cache was cleared/invalidate
-        // while the fetch was in progress.
-        if (cache.getGeneration() !== generationAtStart) {
-            return value;
-        }
-
-        // Avoid overwriting newer values set while the fetch was in flight.
-        if (!isDefined(cache.get(key))) {
-            cache.set(key, value, ttl);
-        }
-
-        return value;
-    })();
-
-    inFlight.set(key, fetchPromise);
-
-    try {
-        return await fetchPromise;
-    } finally {
-        inFlight.delete(key);
-        if (inFlight.size === 0) {
-            inFlightFetches.delete(cache);
-        }
-    }
-}
