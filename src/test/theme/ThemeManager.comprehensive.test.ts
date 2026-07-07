@@ -7,6 +7,28 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ThemeManager } from "../../theme/ThemeManager";
 
+const deleteBrowserGlobalForTesting = (key: "document"): void => {
+    Reflect.deleteProperty(globalThis, key);
+};
+
+const setBrowserGlobalForTesting = (key: "document", value: unknown): void => {
+    Object.defineProperty(globalThis, key, {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
+const setMatchMediaForTesting = (
+    value: typeof globalThis.matchMedia | undefined
+): void => {
+    Object.defineProperty(globalThis, "matchMedia", {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
 // Mock window.matchMedia
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
@@ -200,13 +222,13 @@ describe(ThemeManager, () => {
 
             const originalMatchMedia = matchMedia;
             // Testing missing matchMedia for fallback behavior
-            (globalThis as any).matchMedia = undefined;
+            setMatchMediaForTesting(undefined);
 
             const preference = themeManager.getSystemThemePreference();
             expect(preference).toBe("light"); // Default fallback
 
             // Restore matchMedia
-            globalThis.matchMedia = originalMatchMedia;
+            setMatchMediaForTesting(originalMatchMedia);
         });
     });
 
@@ -274,7 +296,7 @@ describe(ThemeManager, () => {
             await annotate("Type: Business Logic", "type");
 
             const originalDocument = document;
-            delete (globalThis as any).document;
+            deleteBrowserGlobalForTesting("document");
 
             const lightTheme = themeManager.getTheme("light");
             expect(() => {
@@ -282,7 +304,7 @@ describe(ThemeManager, () => {
             }).not.toThrow();
 
             // Restore document
-            globalThis.document = originalDocument;
+            setBrowserGlobalForTesting("document", originalDocument);
         });
 
         it("should apply all theme properties", async ({ task, annotate }) => {
@@ -523,7 +545,7 @@ describe(ThemeManager, () => {
             await annotate("Type: Business Logic", "type");
 
             const originalDocument = document;
-            delete (globalThis as any).document;
+            deleteBrowserGlobalForTesting("document");
 
             const theme = themeManager.getTheme("light");
             expect(() => {
@@ -531,7 +553,7 @@ describe(ThemeManager, () => {
             }).not.toThrow();
 
             // Restore document
-            globalThis.document = originalDocument;
+            setBrowserGlobalForTesting("document", originalDocument);
         });
     });
 

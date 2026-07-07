@@ -21,6 +21,21 @@ Object.defineProperty(globalThis, "matchMedia", {
     })),
 });
 
+const deleteBrowserGlobalForTesting = (key: "document" | "window"): void => {
+    Reflect.deleteProperty(globalThis, key);
+};
+
+const setBrowserGlobalForTesting = (
+    key: "document" | "window",
+    value: unknown
+): void => {
+    Object.defineProperty(globalThis, key, {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
 describe(ThemeManager, () => {
     let themeManager: ThemeManager;
     let mockDocumentElement: any;
@@ -260,13 +275,13 @@ describe(ThemeManager, () => {
 
             const originalWindow = globalThis.window;
             // Intentionally deleting window for testing fallback behavior
-            delete (globalThis as any).window;
+            deleteBrowserGlobalForTesting("window");
 
             const preference = themeManager.getSystemThemePreference();
 
             expect(preference).toBe("light");
 
-            globalThis.window = originalWindow;
+            setBrowserGlobalForTesting("window", originalWindow);
         });
     });
 
@@ -358,7 +373,7 @@ describe(ThemeManager, () => {
 
             const originalWindow = globalThis.window;
             // Intentionally deleting window for testing fallback behavior
-            delete (globalThis as any).window;
+            deleteBrowserGlobalForTesting("window");
 
             const callback = vi.fn();
             const cleanup = themeManager.onSystemThemeChange(callback);
@@ -368,7 +383,7 @@ describe(ThemeManager, () => {
                 cleanup();
             }).not.toThrow();
 
-            globalThis.window = originalWindow;
+            setBrowserGlobalForTesting("window", originalWindow);
         });
     });
 
@@ -636,7 +651,7 @@ describe(ThemeManager, () => {
 
             // Mock document to be undefined to trigger line 302
             const originalDocument = document;
-            delete (globalThis as any).document;
+            deleteBrowserGlobalForTesting("document");
 
             // This should handle undefined document gracefully
             expect(() => {
@@ -644,7 +659,7 @@ describe(ThemeManager, () => {
             }).not.toThrow();
 
             // Restore document
-            globalThis.document = originalDocument;
+            setBrowserGlobalForTesting("document", originalDocument);
         });
     });
 });
