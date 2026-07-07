@@ -18,7 +18,6 @@ import {
     DuplicateSiteIdentifierError,
     ensureUniqueSiteIdentifiers,
 } from "@shared/validation/siteIntegrity";
-import { objectHasIn } from "ts-extras";
 
 import type { SiteOperationsDependencies } from "../types";
 
@@ -81,7 +80,7 @@ const isTelemetryConfig = (
         return false;
     }
 
-    return TELEMETRY_CONFIG_KEYS.some((key) => objectHasIn(value, key));
+    return TELEMETRY_CONFIG_KEYS.some((key) => Object.hasOwn(value, key));
 };
 
 const normalizeTelemetry = (
@@ -141,7 +140,7 @@ const createTelemetryEmitter =
             payload["success"] ??= true;
         } else if (stage === "failure") {
             payload["success"] = false;
-        } else if (objectHasIn(payload, "success")) {
+        } else if (Object.hasOwn(payload, "success")) {
             payload = safeObjectOmit(payload, ["success"]);
         }
 

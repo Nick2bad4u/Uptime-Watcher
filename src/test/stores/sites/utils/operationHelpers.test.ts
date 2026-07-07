@@ -26,6 +26,7 @@ import { updateMonitorInSite } from "../../../../stores/sites/utils/monitorOpera
 import {
     applySavedSiteToStore,
     getSiteByIdentifier,
+    type SiteOperationOptions,
     updateMonitorAndSave,
     withSiteOperation,
     withSiteOperationReturning,
@@ -696,6 +697,46 @@ describe("OperationHelpers", () => {
                 status: "success",
                 success: true,
             });
+        });
+
+        it("treats inherited telemetry config keys as flat metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Telemetry", "type");
+
+            const mockOperation = vi.fn().mockResolvedValue(undefined);
+            const telemetry = Object.assign(
+                Object.create({ base: { inherited: true } }) as Record<
+                    string,
+                    unknown
+                >,
+                { siteIdentifier: "site-own" }
+            ) as SiteOperationOptions["telemetry"];
+
+            await withSiteOperation("testOperation", mockOperation, mockDeps, {
+                telemetry,
+                syncAfter: false,
+            });
+
+            const [pendingCall, successCall] = mockLogStoreAction.mock.calls;
+            const pendingPayload = pendingCall?.[2];
+            const successPayload = successCall?.[2];
+
+            expect(pendingPayload).toMatchObject({
+                siteIdentifier: "site-own",
+                status: "pending",
+            });
+            expect(pendingPayload).not.toHaveProperty("inherited");
+            expect(successPayload).toMatchObject({
+                siteIdentifier: "site-own",
+                status: "success",
+                success: true,
+            });
+            expect(successPayload).not.toHaveProperty("inherited");
         });
 
         it("applies stage-specific telemetry metadata on failure", async ({
