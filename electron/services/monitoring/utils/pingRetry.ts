@@ -11,7 +11,9 @@
  * All connectivity operations use native Node.js modules (net, DNS, fetch) for
  * consistent behavior across Windows, macOS, and Linux platforms without
  * requiring elevated privileges or external system utilities. The module
- * provides both single-attempt and retry-enabled connectivity functions.
+ * exposes retry-enabled connectivity checks while keeping the single-attempt
+ * implementation internal so callers consistently use the same retry,
+ * cancellation, and error-normalization path.
  *
  * Key features:
  *
@@ -29,20 +31,11 @@
  * // Basic connectivity check with retries
  * const result = await performPingCheckWithRetry("google.com", 5000, 3);
  *
- * // Single connectivity attempt
- * const result = await performSinglePingCheck("192.168.1.1", 3000);
- *
- * // HTTP/HTTPS connectivity check
- * const result = await performSinglePingCheck(
- *     "https://api.example.com",
- *     5000
- * );
  * ```
  *
  * @public
  *
  * @see {@link performPingCheckWithRetry} - Main retry-enabled connectivity function
- * @see {@link performSinglePingCheck} - Single-attempt connectivity function
  * @see {@link withOperationalHooks} - Operational hooks integration
  * @see {@link handlePingCheckError} - Error handling utilities
  * @see {@link checkConnectivity} - Native connectivity checking
@@ -72,8 +65,7 @@ import { handlePingCheckError } from "./pingErrorHandling";
  * This function performs a single connectivity attempt to the specified host
  * using native Node.js modules. It automatically detects HTTP/HTTPS URLs and
  * uses appropriate connectivity check methods (HTTP for URLs, TCP/DNS for
- * hosts). This function is used internally by {@link performPingCheckWithRetry}
- * and can also be used directly for single-attempt checks.
+ * hosts). This function is used internally by {@link performPingCheckWithRetry}.
  *
  * Uses native connectivity checking with TCP port scanning and DNS resolution
  * for maximum compatibility without requiring elevated privileges.
@@ -87,13 +79,13 @@ import { handlePingCheckError } from "./pingErrorHandling";
  *
  * @throws Error if the connectivity operation fails or times out.
  *
- * @public
+ * @internal
  *
  * @see {@link performPingCheckWithRetry}
  * @see {@link checkConnectivity}
  * @see {@link checkHttpConnectivity}
  */
-export async function performSinglePingCheck(
+async function performSinglePingCheck(
     host: string,
     timeout: number,
     signal?: AbortSignal
@@ -160,8 +152,9 @@ export async function performSinglePingCheck(
  * Performs a connectivity check with retry logic and exponential backoff.
  *
  * @remarks
- * This function wraps {@link performSinglePingCheck} with retry logic using
- * {@link withOperationalHooks}. It attempts to check connectivity to the
+ * This function wraps the internal single-attempt connectivity check with
+ * retry logic using {@link withOperationalHooks}. It attempts to check
+ * connectivity to the
  * specified host, retrying on failure up to `maxRetries` times (for a total of
  * `maxRetries` + `1` attempts). Exponential backoff is applied between
  * attempts.
@@ -208,7 +201,6 @@ export async function performSinglePingCheck(
  * @public
  *
  * @see {@link withOperationalHooks} - Retry logic implementation
- * @see {@link performSinglePingCheck} - Single connectivity attempt function
  * @see {@link handlePingCheckError} - Error handling utility
  */
 export async function performPingCheckWithRetry(

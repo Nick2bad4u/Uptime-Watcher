@@ -1,9 +1,8 @@
 /**
  * Integration-focused unit tests for the retry-enabled ping utilities.
  *
- * These tests deliberately exercise both the single-attempt connectivity helper
- * and the retry wrapper to ensure the surrounding orchestration logic is fully
- * covered without hitting real network resources.
+ * These tests exercise the retry wrapper while mocking operational hooks to run
+ * the wrapped connectivity operation without hitting real network resources.
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -73,11 +72,12 @@ describe("pingRetry utilities", () => {
     it("routes HTTP URLs through checkHttpConnectivity", async () => {
         const module =
             await import("../../../../../../electron/services/monitoring/utils/pingRetry");
-        const { performSinglePingCheck } = module;
+        const { performPingCheckWithRetry } = module;
 
-        const result = await performSinglePingCheck(
+        const result = await performPingCheckWithRetry(
             "https://api.example.com",
-            1000
+            1000,
+            0
         );
 
         const connectivity = vi.mocked(
@@ -96,9 +96,9 @@ describe("pingRetry utilities", () => {
     it("routes non-HTTP hosts through checkConnectivity", async () => {
         const module =
             await import("../../../../../../electron/services/monitoring/utils/pingRetry");
-        const { performSinglePingCheck } = module;
+        const { performPingCheckWithRetry } = module;
 
-        const result = await performSinglePingCheck("example.com", 2500);
+        const result = await performPingCheckWithRetry("example.com", 2500, 0);
 
         const connectivity = vi.mocked(
             await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
@@ -115,7 +115,7 @@ describe("pingRetry utilities", () => {
         expect(result).toEqual(MOCK_RESULT);
     });
 
-    it("wraps connectivity failures with a descriptive error", async () => {
+    it("returns standardized failures when connectivity fails", async () => {
         const connectivity = vi.mocked(
             await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
         );
@@ -123,10 +123,24 @@ describe("pingRetry utilities", () => {
 
         const module =
             await import("../../../../../../electron/services/monitoring/utils/pingRetry");
-        const { performSinglePingCheck } = module;
+        const { performPingCheckWithRetry } = module;
 
-        await expect(performSinglePingCheck("unlucky", 10)).rejects.toThrow(
-            /Connectivity check failed: boom/
+        await expect(
+            performPingCheckWithRetry("unlucky", 10, 0)
+        ).resolves.toEqual(
+            expect.objectContaining({
+                context: {
+                    host: "unlucky",
+                    maxRetries: 0,
+                    timeout: 10,
+                },
+                error: expect.objectContaining({
+                    message: expect.stringMatching(
+                        /Connectivity check failed: boom/
+                    ),
+                }),
+                status: "down",
+            })
         );
     });
 

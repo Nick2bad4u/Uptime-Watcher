@@ -15,10 +15,8 @@ import {
     checkConnectivity,
     checkHttpConnectivity,
 } from "../../../../services/monitoring/utils/nativeConnectivity";
-import {
-    performPingCheckWithRetry,
-    performSinglePingCheck,
-} from "../../../../services/monitoring/utils/pingRetry";
+import { handlePingCheckError } from "../../../../services/monitoring/utils/pingErrorHandling";
+import { performPingCheckWithRetry } from "../../../../services/monitoring/utils/pingRetry";
 import { withOperationalHooks } from "../../../../utils/operationalHooks";
 
 // Mock dependencies before importing module under test
@@ -79,7 +77,7 @@ describe("pingRetry", () => {
         vi.clearAllMocks();
     });
 
-    describe(performSinglePingCheck, () => {
+    describe(performPingCheckWithRetry, () => {
         it("threads AbortSignal into HTTP connectivity checks", async ({
             task,
             annotate,
@@ -91,11 +89,15 @@ describe("pingRetry", () => {
 
             const abortController = new AbortController();
             vi.mocked(checkHttpConnectivity).mockResolvedValueOnce(upResult);
+            vi.mocked(withOperationalHooks).mockImplementationOnce(
+                async (operation) => operation()
+            );
 
             await expect(
-                performSinglePingCheck(
+                performPingCheckWithRetry(
                     "https://example.com/health",
                     1234,
+                    0,
                     abortController.signal
                 )
             ).resolves.toEqual(upResult);
@@ -118,11 +120,15 @@ describe("pingRetry", () => {
 
             const abortController = new AbortController();
             vi.mocked(checkConnectivity).mockResolvedValueOnce(upResult);
+            vi.mocked(withOperationalHooks).mockImplementationOnce(
+                async (operation) => operation()
+            );
 
             await expect(
-                performSinglePingCheck(
+                performPingCheckWithRetry(
                     "example.com",
                     5000,
+                    0,
                     abortController.signal
                 )
             ).resolves.toEqual(upResult);
@@ -134,7 +140,7 @@ describe("pingRetry", () => {
             );
         });
 
-        it("throws when connectivity is degraded", async ({
+        it("returns a standardized failure when connectivity is degraded", async ({
             task,
             annotate,
         }) => {
@@ -146,27 +152,56 @@ describe("pingRetry", () => {
             vi.mocked(checkHttpConnectivity).mockResolvedValueOnce(
                 degradedResult
             );
+            vi.mocked(withOperationalHooks).mockImplementationOnce(
+                async (operation) => operation()
+            );
+            vi.mocked(handlePingCheckError).mockReturnValueOnce(downResult);
 
             await expect(
-                performSinglePingCheck("https://example.com", 1000)
-            ).rejects.toThrow(/connectivity check failed/i);
+                performPingCheckWithRetry("https://example.com", 1000, 0)
+            ).resolves.toEqual(downResult);
+            expect(handlePingCheckError).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: expect.stringMatching(/connectivity check failed/i),
+                }),
+                expect.objectContaining({
+                    host: "https://example.com/",
+                    maxRetries: 0,
+                    timeout: 1000,
+                })
+            );
         });
 
-        it("throws when connectivity is down", async ({ task, annotate }) => {
+        it("returns a standardized failure when connectivity is down", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: pingRetry", "component");
             await annotate("Category: Monitoring", "category");
             await annotate("Type: Retry", "type");
 
             vi.mocked(checkHttpConnectivity).mockResolvedValueOnce(downResult);
+            vi.mocked(withOperationalHooks).mockImplementationOnce(
+                async (operation) => operation()
+            );
+            vi.mocked(handlePingCheckError).mockReturnValueOnce(downResult);
 
             await expect(
-                performSinglePingCheck("https://example.com", 1000)
-            ).rejects.toThrow(/connectivity check failed/i);
+                performPingCheckWithRetry("https://example.com", 1000, 0)
+            ).resolves.toEqual(downResult);
+            expect(handlePingCheckError).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: expect.stringMatching(/connectivity check failed/i),
+                }),
+                expect.objectContaining({
+                    host: "https://example.com/",
+                    maxRetries: 0,
+                    timeout: 1000,
+                })
+            );
         });
-    });
 
-    describe(performPingCheckWithRetry, () => {
         it("configures withOperationalHooks with total attempts", async ({
             task,
             annotate,
