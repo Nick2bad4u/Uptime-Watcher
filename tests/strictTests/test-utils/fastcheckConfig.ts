@@ -17,11 +17,10 @@ import fc from "fast-check";
  * These values are chosen to balance test runtime and coverage in CI. Tests may
  * override them on a per-property basis when necessary.
  */
-const defaultFastCheckParameters: Readonly<{ numRuns: number }> = Object.freeze(
-    {
+const defaultFastCheckParameters: Readonly<fc.Parameters<unknown>> =
+    Object.freeze({
         numRuns: 200,
-    }
-);
+    });
 
 /**
  * Asserts a fast-check property using the shared defaults, with optional
@@ -33,16 +32,12 @@ const defaultFastCheckParameters: Readonly<{ numRuns: number }> = Object.freeze(
  */
 export function assertProperty(
     property: fc.IProperty<unknown>,
-    overrides?: Partial<typeof defaultFastCheckParameters>
+    overrides?: Partial<fc.Parameters<unknown>>
 ): void {
     const parameters = {
         ...defaultFastCheckParameters,
         ...overrides,
     };
 
-    // The `parameters` object is structurally compatible with the
-    // fast-check `Parameters` type; we use a cast here to avoid leaking
-    // fast-check's generic type constraints into every test.
-
-    fc.assert(property as fc.IProperty<unknown>, parameters as any);
+    fc.assert(property, parameters);
 }
