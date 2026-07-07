@@ -138,18 +138,16 @@ const SITE_LIST_LAYOUT_MODE_SET = new Set<string>(SITE_LIST_LAYOUT_MODES);
 /**
  * Default width allocation (percentages) for list mode columns.
  */
-export const DEFAULT_SITE_TABLE_COLUMN_WIDTHS: Record<
-    SiteTableColumnKey,
-    number
-> = Object.freeze({
-    controls: 16,
-    monitor: 14,
-    response: 12,
-    running: 10,
-    site: 24,
-    status: 12,
-    uptime: 12,
-});
+const DEFAULT_SITE_TABLE_COLUMN_WIDTHS: Record<SiteTableColumnKey, number> =
+    Object.freeze({
+        controls: 16,
+        monitor: 14,
+        response: 12,
+        running: 10,
+        site: 24,
+        status: 12,
+        uptime: 12,
+    });
 
 const normalizeSiteTableColumnWidths = (
     widths?: Partial<Record<SiteTableColumnKey, number>>,

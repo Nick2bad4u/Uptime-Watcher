@@ -22,10 +22,7 @@ import type { UIStore } from "../../../stores/ui/types";
 
 import { Header } from "../../../components/Header/Header";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
-import {
-    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
-    useUIStore,
-} from "../../../stores/ui/useUiStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import {
     createSerializedBackupResult,
@@ -51,6 +48,16 @@ const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 
 let uiStoreState: UIStore;
+
+const defaultSiteTableColumnWidths = {
+    controls: 16,
+    monitor: 14,
+    response: 12,
+    running: 10,
+    site: 24,
+    status: 12,
+    uptime: 12,
+} as const;
 
 /**
  * Builds a mock UI store state matching the modular store contract.
@@ -83,7 +90,7 @@ const createMockUiStoreState = (): UIStore => ({
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "list",
-    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    siteTableColumnWidths: { ...defaultSiteTableColumnWidths },
     surfaceDensity: "compact",
     sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: vi.fn(),

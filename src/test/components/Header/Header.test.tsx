@@ -6,10 +6,7 @@ import type { UIStore } from "../../../stores/ui/types";
 
 import { Header } from "../../../components/Header/Header";
 import { useGlobalMonitoringMetrics } from "../../../hooks/useGlobalMonitoringMetrics";
-import {
-    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
-    useUIStore,
-} from "../../../stores/ui/useUiStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 
 vi.mock("../../../stores/ui/useUiStore", async () => {
@@ -33,6 +30,16 @@ const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 const mockUseGlobalMonitoringMetrics = vi.mocked(useGlobalMonitoringMetrics);
+
+const defaultSiteTableColumnWidths = {
+    controls: 16,
+    monitor: 14,
+    response: 12,
+    running: 10,
+    site: 24,
+    status: 12,
+    uptime: 12,
+} as const;
 
 const createUiState = (): UIStore => ({
     activeSiteDetailsTab: "site-overview",
@@ -60,7 +67,7 @@ const createUiState = (): UIStore => ({
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "list",
-    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    siteTableColumnWidths: { ...defaultSiteTableColumnWidths },
     surfaceDensity: "compact",
     sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: vi.fn(),

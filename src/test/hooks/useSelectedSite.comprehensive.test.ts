@@ -17,8 +17,6 @@ import type {
     UIStore,
 } from "../../stores/ui/types";
 
-import { DEFAULT_SITE_TABLE_COLUMN_WIDTHS } from "../../stores/ui/useUiStore";
-
 let useSelectedSite: typeof import("../../hooks/useSelectedSite").useSelectedSite;
 let renderHook: typeof import("@testing-library/react").renderHook;
 
@@ -43,6 +41,15 @@ let mockUseSitesStore: Mocked<SitesModule>["useSitesStore"];
 let mockUseUIStore: Mocked<UiModule>["useUIStore"];
 
 const defaultChartTimeRange: ChartTimeRange = "24h";
+const defaultSiteTableColumnWidths = {
+    controls: 16,
+    monitor: 14,
+    response: 12,
+    running: 10,
+    site: 24,
+    status: 12,
+    uptime: 12,
+} as const;
 
 const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     activeSiteDetailsTab: "site-overview",
@@ -70,7 +77,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
-    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    siteTableColumnWidths: { ...defaultSiteTableColumnWidths },
     surfaceDensity: "comfortable",
     sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: (_siteIdentifier: string) => {},

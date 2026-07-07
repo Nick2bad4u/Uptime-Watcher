@@ -13,10 +13,7 @@ import type {
     SiteListLayoutMode,
 } from "../../../stores/ui/types";
 
-import {
-    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
-    useUIStore,
-} from "../../../stores/ui/useUiStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
 import { logStoreAction } from "../../../stores/utils";
 
 // Mock the store utils (partial) so createPersistConfig remains available.
@@ -73,7 +70,7 @@ describe(useUIStore, () => {
                 siteDetailsHeaderCollapsedState: {},
                 siteDetailsTabState: {},
                 siteTableColumnWidths: {
-                    ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+                    ...useUIStore.getInitialState().siteTableColumnWidths,
                 },
             });
             store.setActiveSiteDetailsTab("site-overview");
