@@ -64,7 +64,6 @@ const knipConfig: KnipConfig = {
         "@theme/.*",
         "cli-table3",
         "cssnano.*",
-        "detect-secrets",
         "electron-builder-squirrel-windows",
         "eslint.*",
         "estree",
