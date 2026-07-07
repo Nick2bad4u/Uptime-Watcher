@@ -585,6 +585,11 @@ const config = [
             "vitest/require-to-throw-message": "off",
             "vitest/require-top-level-describe": "off",
             "vitest/require-mock-type-parameters": "off",
+            // @vitest/eslint-plugin 1.6.21 reports Vitest asymmetric matcher
+            // helpers such as `expect.any()` and `expect.objectContaining()`
+            // as invalid standalone expect calls. This suite uses those
+            // helpers heavily inside real assertions.
+            "vitest/valid-expect": "off",
         },
     },
     {
