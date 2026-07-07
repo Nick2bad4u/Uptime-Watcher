@@ -119,12 +119,6 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
                 );
             });
 
-            it("should contain history templates", () => {
-                expect(SERVICE_LOGS.HISTORY_BULK_INSERT).toContain(
-                    "[HistoryManipulation]"
-                );
-            });
-
             it("should contain updater templates", () => {
                 expect(SERVICE_LOGS.UPDATER_QUIT_INSTALL).toContain(
                     "[AutoUpdaterService]"
@@ -303,9 +297,6 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
 
             it("should contain history error templates", () => {
                 expect(ERROR_LOGS.HISTORY_ADD_FAILED).toContain(
-                    "[HistoryManipulation]"
-                );
-                expect(ERROR_LOGS.HISTORY_BULK_INSERT_FAILED).toContain(
                     "[HistoryManipulation]"
                 );
                 expect(ERROR_LOGS.HISTORY_FETCH_FAILED).toContain(

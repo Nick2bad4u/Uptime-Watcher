@@ -20,9 +20,9 @@ const getSafeIdentifier = (identifier: string): string =>
  * Utility functions for manipulating monitor history data in the database.
  *
  * @remarks
- * Provides low-level helpers for adding, bulk inserting, deleting, and pruning
- * monitor history entries. All functions are intended for internal use by
- * repository classes and assume transaction context is managed by the caller.
+ * Provides low-level helpers for adding, deleting, and pruning monitor history
+ * entries. All functions are intended for internal use by repository classes
+ * and assume transaction context is managed by the caller.
  *
  * @internal
  */
@@ -94,71 +94,6 @@ export function addHistoryEntry(
             interpolateLogTemplate(LOG_TEMPLATES.errors.HISTORY_ADD_FAILED, {
                 monitorId: safeMonitorId,
             }),
-            error
-        );
-        throw error;
-    }
-}
-
-/**
- * Bulk insert history entries (for import functionality).
- *
- * @remarks
- * Assumes it's called within an existing transaction context. Uses a prepared
- * statement for better performance during bulk operations.
- *
- * @param db - Database connection instance
- * @param monitorId - Unique identifier of the monitor
- * @param historyEntries - Array of StatusHistory objects
- *
- * @throws {@link Error} When database bulk insertion fails
- *
- * @internal
- */
-export function bulkInsertHistory(
-    db: Database,
-    monitorId: string,
-    historyEntries: StatusHistory[]
-): void {
-    if (isEmpty(historyEntries)) {
-        return;
-    }
-
-    const safeMonitorId = getSafeIdentifier(monitorId);
-
-    try {
-        // Prepare the statement once for better performance
-        const stmt = db.prepare(HISTORY_MANIPULATION_QUERIES.INSERT_ENTRY);
-
-        try {
-            for (const entry of historyEntries) {
-                stmt.run([
-                    monitorId,
-                    entry.timestamp,
-                    entry.status,
-                    entry.responseTime,
-                    entry.details ?? null,
-                ]);
-            }
-
-            logger.info(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.services.HISTORY_BULK_INSERT,
-                    {
-                        count: historyEntries.length,
-                        monitorId: safeMonitorId,
-                    }
-                )
-            );
-        } finally {
-            stmt.finalize();
-        }
-    } catch (error) {
-        logger.error(
-            interpolateLogTemplate(
-                LOG_TEMPLATES.errors.HISTORY_BULK_INSERT_FAILED,
-                { monitorId: safeMonitorId }
-            ),
             error
         );
         throw error;

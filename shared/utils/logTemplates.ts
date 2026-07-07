@@ -125,10 +125,6 @@ export const SERVICE_LOGS = {
     /** Database tables created */
     DATABASE_TABLES_CREATED: "[DatabaseSchema] All tables created successfully",
 
-    /** History bulk insert */
-    HISTORY_BULK_INSERT:
-        "[HistoryManipulation] Bulk inserted {count} history entries for monitor: {monitorId}",
-
     /** Delete-all-sites IPC handler completed */
     IPC_DELETE_ALL_SITES_COMPLETED:
         "[IpcService] delete-all-sites completed, deleted {deletedCount} site(s)",
@@ -335,8 +331,6 @@ export const ERROR_LOGS = {
     /** History errors */
     HISTORY_ADD_FAILED:
         "[HistoryManipulation] Failed to add history entry for monitor: {monitorId}",
-    HISTORY_BULK_INSERT_FAILED:
-        "[HistoryManipulation] Failed to bulk insert history for monitor: {monitorId}",
     HISTORY_FETCH_FAILED:
         "[HistoryQuery] Failed to fetch history for monitor: {monitorId}",
     HISTORY_LATEST_FETCH_FAILED:
