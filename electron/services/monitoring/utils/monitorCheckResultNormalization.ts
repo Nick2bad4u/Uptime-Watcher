@@ -1,7 +1,8 @@
 import type { StatusUpdate } from "@shared/types";
 
+import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 import { isRecord } from "@shared/utils/typeHelpers";
-import { isFinite as isFiniteNumber } from "ts-extras";
+import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { StatusUpdateMonitorCheckResult } from "../MonitorStatusUpdateService";
 import type { MonitorCheckResult } from "../types";
@@ -98,8 +99,12 @@ export function buildStatusUpdateMonitorCheckResult(args: {
 }
 
 function resolveStatusUpdateTimestamp(timestamp: Date | undefined): Date {
-    if (timestamp instanceof Date && isFiniteNumber(timestamp.getTime())) {
-        return timestamp;
+    if (timestamp instanceof Date) {
+        const epochMs = getNativeDateEpochMs(timestamp);
+
+        if (isDefined(epochMs)) {
+            return new Date(epochMs);
+        }
     }
 
     return new Date();

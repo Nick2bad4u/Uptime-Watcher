@@ -20,6 +20,7 @@ import type { MonitorRow } from "@shared/types/database";
 import type { Simplify, UnknownRecord } from "type-fest";
 
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
@@ -177,7 +178,7 @@ export type MonitorRowSource = Monitor &
  */
 function convertLastCheckedField(lastChecked: unknown): null | number {
     if (lastChecked instanceof Date) {
-        const timestamp = lastChecked.getTime();
+        const timestamp = getNativeDateEpochMs(lastChecked);
         if (isValidEpochMs(timestamp)) {
             return timestamp;
         }
@@ -217,7 +218,7 @@ function convertRequiredTimestampField(
     }
 
     if (value instanceof Date) {
-        const timestamp = value.getTime();
+        const timestamp = getNativeDateEpochMs(value);
         if (isValidEpochMs(timestamp)) {
             return timestamp;
         }

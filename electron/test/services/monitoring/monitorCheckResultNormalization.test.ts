@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     buildStatusUpdateMonitorCheckResult,
@@ -63,6 +63,32 @@ describe("monitorCheckResultNormalization", () => {
                 status: "up",
                 timestamp,
             });
+        });
+
+        it("does not invoke shadowed Date methods while preserving timestamps", () => {
+            const timestamp = new Date("2024-01-01T00:00:00.000Z");
+            const getTime = vi.fn(() => {
+                throw new Error("date getTime should not run");
+            });
+            Object.defineProperty(timestamp, "getTime", {
+                value: getTime,
+            });
+
+            const result = buildStatusUpdateMonitorCheckResult({
+                monitorId: "monitor-1",
+                operationId: "operation-1",
+                serviceResult: {
+                    responseTime: 321,
+                    status: "up",
+                },
+                timestamp,
+            });
+
+            expect(result.timestamp).toEqual(
+                new Date("2024-01-01T00:00:00.000Z")
+            );
+            expect(result.timestamp).not.toBe(timestamp);
+            expect(getTime).not.toHaveBeenCalled();
         });
 
         it("replaces invalid timestamps with a valid completion date", () => {

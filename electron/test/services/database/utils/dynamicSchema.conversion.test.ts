@@ -280,6 +280,32 @@ describe("dynamic schema conversion", () => {
         ).toBe(1_680_000_000_000);
     });
 
+    it("does not invoke shadowed Date methods when writing timestamp fields", async () => {
+        const { mapMonitorToRow } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
+        const lastChecked = new Date("2026-01-01T00:00:00.000Z");
+        const updatedAt = new Date("2026-01-01T00:00:01.000Z");
+        const getTime = vi.fn(() => {
+            throw new Error("date getTime should not run");
+        });
+        Object.defineProperty(lastChecked, "getTime", {
+            value: getTime,
+        });
+        Object.defineProperty(updatedAt, "getTime", {
+            value: getTime,
+        });
+
+        const row = mapMonitorToRow({
+            lastChecked,
+            type: "port",
+            updatedAt: updatedAt as unknown as number,
+        });
+
+        expect(row.last_checked).toBe(1_767_225_600_000);
+        expect(row.updated_at).toBe(1_767_225_601_000);
+        expect(getTime).not.toHaveBeenCalled();
+    });
+
     it.each([
         ["fractional timestamp", 1.5],
         ["missing timestamp", undefined],
