@@ -10,10 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { MonitorServiceConfig } from "../../../../services/monitoring/types";
 
-import {
-    createHttpClient,
-    setupTimingInterceptors,
-} from "../../../../services/monitoring/utils/httpClient";
+import { createHttpClient } from "../../../../services/monitoring/utils/httpClient";
 
 // Mock axios
 vi.mock("axios", () => ({
@@ -48,6 +45,37 @@ describe("HTTP Client Utils", () => {
         vi.clearAllMocks();
         mockAxiosCreate.mockReturnValue(mockAxiosInstance);
     });
+
+    const createMockAxiosInstance = (): AxiosInstance =>
+        ({
+            interceptors: {
+                request: {
+                    use: vi.fn(),
+                },
+                response: {
+                    use: vi.fn(),
+                },
+            },
+        }) as unknown as AxiosInstance;
+
+    const setupClientAndGetInterceptors = (
+        instance: AxiosInstance = createMockAxiosInstance()
+    ) => {
+        mockAxiosCreate.mockReturnValueOnce(instance);
+        createHttpClient({});
+
+        return {
+            instance,
+            requestErrorHandler: (instance.interceptors.request.use as any).mock
+                .calls[0][1],
+            requestInterceptor: (instance.interceptors.request.use as any).mock
+                .calls[0][0],
+            responseErrorHandler: (instance.interceptors.response.use as any)
+                .mock.calls[0][1],
+            responseInterceptor: (instance.interceptors.response.use as any)
+                .mock.calls[0][0],
+        };
+    };
     describe(createHttpClient, () => {
         it("should create axios instance with default config", async ({
             task,
@@ -269,7 +297,7 @@ describe("HTTP Client Utils", () => {
             ).toHaveBeenCalled();
         });
     });
-    describe(setupTimingInterceptors, () => {
+    describe("timing interceptors", () => {
         it("should setup request and response interceptors", async ({
             task,
             annotate,
@@ -278,19 +306,10 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
+            const mockInstance = createMockAxiosInstance();
 
             // Act
-            setupTimingInterceptors(mockInstance);
+            setupClientAndGetInterceptors(mockInstance);
 
             // Assert
             expect(mockInstance.interceptors.request.use).toHaveBeenCalledWith(
@@ -310,26 +329,10 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
-
             vi.spyOn(performance, "now").mockReturnValue(1_234_567_890);
 
             // Act
-            setupTimingInterceptors(mockInstance);
-
-            // Get the request interceptor function
-            const requestInterceptor = (
-                mockInstance.interceptors.request.use as any
-            ).mock.calls[0][0];
+            const { requestInterceptor } = setupClientAndGetInterceptors();
             const config = {} as any;
             const result = requestInterceptor(config);
 
@@ -348,28 +351,12 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
-
             const startTime = 1000;
             const endTime = 1500;
             vi.spyOn(performance, "now").mockReturnValue(endTime);
 
             // Act
-            setupTimingInterceptors(mockInstance);
-
-            // Get the response interceptor function
-            const responseInterceptor = (
-                mockInstance.interceptors.response.use as any
-            ).mock.calls[0][0];
+            const { responseInterceptor } = setupClientAndGetInterceptors();
             const response = {
                 config: {
                     metadata: {
@@ -391,25 +378,10 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
-
             vi.spyOn(performance, "now").mockReturnValue(250);
 
             // Act
-            setupTimingInterceptors(mockInstance);
-
-            const responseInterceptor = (
-                mockInstance.interceptors.response.use as any
-            ).mock.calls[0][0];
+            const { responseInterceptor } = setupClientAndGetInterceptors();
             const response = {
                 config: {
                     metadata: {
@@ -431,24 +403,8 @@ describe("HTTP Client Utils", () => {
             await annotate("Component: types", "component");
 
             // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
-
             // Act
-            setupTimingInterceptors(mockInstance);
-
-            // Get the response interceptor function
-            const responseInterceptor = (
-                mockInstance.interceptors.response.use as any
-            ).mock.calls[0][0];
+            const { responseInterceptor } = setupClientAndGetInterceptors();
             const response = {
                 config: {},
             } as any;
@@ -459,28 +415,9 @@ describe("HTTP Client Utils", () => {
             expect(result.responseTime).toBeUndefined();
         });
         it("should handle request and response interceptor errors", async () => {
-            // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
-
             // Act
-            setupTimingInterceptors(mockInstance);
-
-            // Get the interceptor error handlers
-            const requestErrorHandler = (
-                mockInstance.interceptors.request.use as any
-            ).mock.calls[0][1];
-            const responseErrorHandler = (
-                mockInstance.interceptors.response.use as any
-            ).mock.calls[0][1];
+            const { requestErrorHandler, responseErrorHandler } =
+                setupClientAndGetInterceptors();
 
             // Test request error handler
             const requestError = new Error("Request error");
@@ -503,29 +440,12 @@ describe("HTTP Client Utils", () => {
             );
         });
         it("should calculate response time for error responses", async () => {
-            // Arrange
-            const mockInstance = {
-                interceptors: {
-                    request: {
-                        use: vi.fn(),
-                    },
-                    response: {
-                        use: vi.fn(),
-                    },
-                },
-            } as unknown as AxiosInstance;
-
             const startTime = 1000;
             const endTime = 1750;
             vi.spyOn(performance, "now").mockReturnValue(endTime);
 
             // Act
-            setupTimingInterceptors(mockInstance);
-
-            // Get the response error handler
-            const responseErrorHandler = (
-                mockInstance.interceptors.response.use as any
-            ).mock.calls[0][1];
+            const { responseErrorHandler } = setupClientAndGetInterceptors();
             const error = {
                 config: {
                     metadata: {

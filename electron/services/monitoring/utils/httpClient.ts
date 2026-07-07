@@ -5,12 +5,10 @@ import type { AxiosInstance, AxiosRequestConfig } from "axios";
  * @remarks
  * Provides standardized HTTP client setup and interceptors for precise timing
  * and connection pooling. All HTTP responses are treated as "successful" for
- * manual status code handling in monitoring logic. All exported functions are
- * type-safe and never throw.
+ * manual status code handling in monitoring logic.
  *
  * @public
  *
- * @see {@link setupTimingInterceptors}
  * @see {@link MonitorServiceConfig}
  */
 
@@ -44,7 +42,7 @@ import type { MonitorServiceConfig } from "../types";
  *
  * @returns An {@link Error} instance for consistent error handling.
  *
- * @public
+ * @internal
  */
 function ensureErrorInstance(error: unknown): Error {
     return Error.isError(error)
@@ -78,7 +76,7 @@ function ensureErrorInstance(error: unknown): Error {
  *
  * @see {@link createHttpClient}
  */
-export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
+function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
     // Add request interceptor to record start time
     axiosInstance.interceptors.request.use(
         (config) => {
@@ -163,7 +161,6 @@ export function setupTimingInterceptors(axiosInstance: AxiosInstance): void {
  * @public
  *
  * @see {@link MonitorServiceConfig}
- * @see {@link setupTimingInterceptors}
  */
 // Security / performance tunables (can be overridden via env for emergency mitigation)
 const MAX_REDIRECTS_CAP = 10;
