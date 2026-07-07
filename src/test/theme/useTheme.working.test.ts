@@ -9,7 +9,6 @@ import "@testing-library/jest-dom";
 // Import the hooks directly
 import {
     useAvailabilityColors,
-    useStatusColors,
     useTheme,
     useThemeClasses,
     useThemeValue,
@@ -89,29 +88,6 @@ describe("useTheme Hooks - Working Tests", () => {
             expect(typeof result.current.getAvailabilityDescription(0)).toBe(
                 "string"
             );
-        });
-    });
-
-    describe(useStatusColors, () => {
-        it("should return status colors from current theme", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useTheme", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { result } = renderHook(() => useStatusColors());
-
-            expect(result.current).toHaveProperty("down");
-            expect(result.current).toHaveProperty("pending");
-            expect(result.current).toHaveProperty("unknown");
-            expect(result.current).toHaveProperty("up");
-            expect(typeof result.current.down).toBe("string");
-            expect(typeof result.current.pending).toBe("string");
-            expect(typeof result.current.unknown).toBe("string");
-            expect(typeof result.current.up).toBe("string");
         });
     });
 

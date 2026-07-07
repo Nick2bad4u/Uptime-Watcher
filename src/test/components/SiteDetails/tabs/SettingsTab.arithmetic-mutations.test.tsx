@@ -167,12 +167,6 @@ vi.mock("../../../../theme/useTheme", () => ({
         getAvailabilityDescription: vi.fn(() => "Excellent"),
         getAvailabilityVariant: vi.fn(() => "success" as const),
     }),
-    useStatusColors: () => ({
-        down: "#ef4444",
-        pending: "#f59e0b",
-        unknown: "#6b7280",
-        up: "#10b981",
-    }),
     useThemeValue: () => "mockValue",
 }));
 

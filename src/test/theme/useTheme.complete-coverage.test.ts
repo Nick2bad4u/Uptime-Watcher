@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UI_DELAYS } from "../../constants";
 import {
     useAvailabilityColors,
-    useStatusColors,
     useTheme,
     useThemeClasses,
     useThemeValue,
@@ -349,30 +348,6 @@ describe("useTheme - Complete Coverage", () => {
         });
     });
 
-    describe("useStatusColors hook", () => {
-        it("should return status color object", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate(
-                "Component: useTheme.complete-coverage-fixed",
-                "component"
-            );
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { result } = renderHook(() => useStatusColors());
-
-            expect(result.current).toHaveProperty("up");
-            expect(result.current).toHaveProperty("down");
-            expect(result.current).toHaveProperty("pending");
-            expect(result.current).toHaveProperty("unknown");
-
-            expect(typeof result.current.up).toBe("string");
-            expect(typeof result.current.down).toBe("string");
-            expect(typeof result.current.pending).toBe("string");
-            expect(typeof result.current.unknown).toBe("string");
-        });
-    });
-
     describe("useThemeClasses hook", () => {
         it("should return theme class functions", async ({
             task,
@@ -529,19 +504,14 @@ describe("useTheme - Complete Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result: themeResult } = renderHook(() => useTheme());
-            const { result: statusResult } = renderHook(() =>
-                useStatusColors()
-            );
             const { result: _classesResult } = renderHook(() =>
                 useThemeClasses()
             );
 
             // Status colors should be consistent
             const themeUpColor = themeResult.current.getStatusColor("up");
-            const statusUpColor = statusResult.current.up;
 
             expect(typeof themeUpColor).toBe("string");
-            expect(typeof statusUpColor).toBe("string");
         });
 
         it("should handle theme changes across all hooks", async ({

@@ -7,7 +7,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     useAvailabilityColors,
-    useStatusColors,
     useTheme,
     useThemeClasses,
     useThemeValue,
@@ -65,20 +64,6 @@ describe("useTheme Basic Coverage", () => {
         expect(typeof color).toBe("string");
         expect(typeof variant).toBe("string");
         expect(typeof description).toBe("string");
-    });
-
-    it("should cover useStatusColors", async ({ task, annotate }) => {
-        await annotate(`Testing: ${task.name}`, "functional");
-        await annotate("Component: useTheme.basic", "component");
-        await annotate("Category: Core", "category");
-        await annotate("Type: Business Logic", "type");
-
-        const { result } = renderHook(() => useStatusColors());
-
-        expect(result.current).toHaveProperty("up");
-        expect(result.current).toHaveProperty("down");
-        expect(result.current).toHaveProperty("pending");
-        expect(result.current).toHaveProperty("unknown");
     });
 
     it("should cover useThemeClasses", async ({ task, annotate }) => {

@@ -120,12 +120,6 @@ vi.mock("../../../theme/useTheme", () => ({
             return "danger";
         }),
     })),
-    useStatusColors: vi.fn(() => ({
-        up: "#10b981",
-        down: "#ef4444",
-        pending: "#f59e0b",
-        unknown: "#6b7280",
-    })),
     useThemeClasses: vi.fn(() => ({
         getBackgroundClass: vi.fn(() => ({ backgroundColor: "#ffffff" })),
         getBorderClass: vi.fn(() => ({ borderColor: "#e0e0e0" })),

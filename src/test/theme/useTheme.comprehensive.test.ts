@@ -3,8 +3,8 @@
  *
  * @module useTheme
  *
- * @file Tests for useTheme, useAvailabilityColors, useStatusColors,
- *   useThemeClasses, and useThemeValue hooks to achieve 100% coverage
+ * @file Tests for useTheme, useAvailabilityColors, useThemeClasses, and
+ *   useThemeValue hooks to achieve 100% coverage
  *
  * @author GitHub Copilot
  *
@@ -22,7 +22,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import {
     useAvailabilityColors,
-    useStatusColors,
     useTheme,
     useThemeClasses,
     useThemeValue,
@@ -672,25 +671,6 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
         });
     });
 
-    describe(useStatusColors, () => {
-        it("should return all status colors from current theme", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useTheme", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const { result } = renderHook(() => useStatusColors());
-
-            expect(result.current.up).toBe("#10b981");
-            expect(result.current.down).toBe("#ef4444");
-            expect(result.current.pending).toBe("#f59e0b");
-            expect(result.current.unknown).toBe("#6b7280");
-        });
-    });
-
     describe(useThemeClasses, () => {
         it("should return background classes with CSS custom properties", async ({
             task,
@@ -902,9 +882,6 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const { result: themeResult } = renderHook(() => useTheme());
-            const { result: statusResult } = renderHook(() =>
-                useStatusColors()
-            );
             const { result: availabilityResult } = renderHook(() =>
                 useAvailabilityColors()
             );
@@ -913,7 +890,6 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
             expect(themeResult.current.currentTheme.colors.status.up).toBe(
                 "#10b981"
             );
-            expect(statusResult.current.up).toBe("#10b981");
             expect(availabilityResult.current.getAvailabilityColor(100)).toBe(
                 "#10b981"
             );

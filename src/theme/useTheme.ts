@@ -50,16 +50,6 @@ interface UseAvailabilityColorsReturn {
 }
 
 /**
- * Interface for useStatusColors hook return type.
- */
-interface UseStatusColorsReturn {
-    down: string;
-    pending: string;
-    unknown: string;
-    up: string;
-}
-
-/**
  * Interface for useThemeClasses hook return type.
  */
 interface UseThemeClassesReturn {
@@ -230,22 +220,6 @@ export function useAvailabilityColors(): UseAvailabilityColorsReturn {
         getAvailabilityColor,
         getAvailabilityDescription,
         getAvailabilityVariant,
-    };
-}
-
-/**
- * Hook for accessing theme-aware status colors.
- *
- * @returns Object containing status colors from the current theme
- */
-export function useStatusColors(): UseStatusColorsReturn {
-    const { currentTheme } = useTheme();
-
-    return {
-        down: currentTheme.colors.status.down,
-        pending: currentTheme.colors.status.pending,
-        unknown: currentTheme.colors.status.unknown,
-        up: currentTheme.colors.status.up,
     };
 }
 

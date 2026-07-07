@@ -594,12 +594,6 @@ vi.mock("../theme/useTheme", () => ({
             return "danger";
         }),
     }),
-    useStatusColors: () => ({
-        down: mockTheme.colors.status.down,
-        pending: mockTheme.colors.status.pending,
-        unknown: mockTheme.colors.status.unknown,
-        up: mockTheme.colors.status.up,
-    }),
     useThemeClasses: () => ({
         getBackgroundClass: vi.fn((variant = "primary") => ({
             backgroundColor: `var(--color-background-${variant})`,
