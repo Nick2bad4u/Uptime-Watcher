@@ -2,7 +2,7 @@ import type { MonitorRow } from "@shared/types/database";
 
 import { describe, expect, it } from "vitest";
 
-import { rowToMonitor } from "../../../../services/database/utils/mappers/monitorMapper";
+import { rowToMonitorOrUndefined } from "../../../../services/database/utils/mappers/monitorMapper";
 
 const makeHttpStatusRow = (expectedStatusCode: number): MonitorRow => ({
     active_operations: "[]",
@@ -19,7 +19,7 @@ const makeHttpStatusRow = (expectedStatusCode: number): MonitorRow => ({
     url: "https://example.com",
 });
 
-describe(rowToMonitor, () => {
+describe(rowToMonitorOrUndefined, () => {
     it("omits non-finite and fractional expected status codes from rows", async ({
         task,
         annotate,
@@ -29,12 +29,12 @@ describe(rowToMonitor, () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        expect(rowToMonitor(makeHttpStatusRow(Infinity))).not.toHaveProperty(
-            "expectedStatusCode"
-        );
-        expect(rowToMonitor(makeHttpStatusRow(200.5))).not.toHaveProperty(
-            "expectedStatusCode"
-        );
+        expect(
+            rowToMonitorOrUndefined(makeHttpStatusRow(Infinity))
+        ).not.toHaveProperty("expectedStatusCode");
+        expect(
+            rowToMonitorOrUndefined(makeHttpStatusRow(200.5))
+        ).not.toHaveProperty("expectedStatusCode");
     });
 
     it("omits out-of-range expected status codes from rows", async ({
@@ -46,12 +46,12 @@ describe(rowToMonitor, () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        expect(rowToMonitor(makeHttpStatusRow(99))).not.toHaveProperty(
-            "expectedStatusCode"
-        );
-        expect(rowToMonitor(makeHttpStatusRow(600))).not.toHaveProperty(
-            "expectedStatusCode"
-        );
+        expect(
+            rowToMonitorOrUndefined(makeHttpStatusRow(99))
+        ).not.toHaveProperty("expectedStatusCode");
+        expect(
+            rowToMonitorOrUndefined(makeHttpStatusRow(600))
+        ).not.toHaveProperty("expectedStatusCode");
     });
 
     it("preserves valid expected status codes from rows", async ({
@@ -63,7 +63,7 @@ describe(rowToMonitor, () => {
         await annotate("Category: Database Utils", "category");
         await annotate("Type: Validation", "type");
 
-        expect(rowToMonitor(makeHttpStatusRow(204))).toHaveProperty(
+        expect(rowToMonitorOrUndefined(makeHttpStatusRow(204))).toHaveProperty(
             "expectedStatusCode",
             204
         );

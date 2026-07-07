@@ -318,23 +318,17 @@ export function isValidMonitorRow(row: UnknownRecord): boolean {
  * - Adds security validation for activeOperations JSON.
  * - Performs safe type conversions with fallbacks.
  *
- * @example
- *
- * ```typescript
- * const monitor = rowToMonitor(dbRow);
- * ```
- *
  * @param row - The raw database row to convert.
  *
  * @returns The mapped monitor object.
  *
  * @throws Error if mapping fails or required fields are invalid.
  *
- * @public
+ * @internal
  *
  * @see {@link mapRowToMonitor}
  */
-export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
+function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
     try {
         const dynamicMonitor = mapRowToMonitor(row);
         const monitor = createBaseMonitor(dynamicMonitor);
@@ -374,7 +368,7 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
  * Converts an array of database rows to an array of monitor objects.
  *
  * @remarks
- * Each row is mapped using {@link rowToMonitor}. History is not loaded here.
+ * Each row is mapped using the internal row mapper. History is not loaded here.
  *
  * @example
  *
@@ -388,7 +382,6 @@ export function rowToMonitor(row: DatabaseMonitorRow): Site["monitors"][0] {
  *
  * @public
  *
- * @see {@link rowToMonitor}
  */
 export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
     return rows.map((row) => rowToMonitor(row));
@@ -418,7 +411,7 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  *
  * Returns `undefined` if the input row is `undefined` or `null`.
  *
- * - Otherwise, delegates to {@link rowToMonitor}.
+ * - Otherwise, delegates to the internal row mapper.
  * - Used by repository methods where a missing monitor is not an error.
  *
  * @example
@@ -435,7 +428,6 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  *
  * @public
  *
- * @see {@link rowToMonitor}
  */
 export function rowToMonitorOrUndefined(
     row:
