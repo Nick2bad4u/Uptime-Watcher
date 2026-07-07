@@ -3,7 +3,7 @@
  * functions
  */
 
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { isNumber, isString } from "../../utils/typeGuards";
 import {
@@ -260,6 +260,29 @@ describe("Shared Type Helpers", () => {
             expect(safePropertyAccess("string", "any")).toBeUndefined();
             expect(safePropertyAccess(["a", "b"], "length")).toBe(2);
             expect(safePropertyAccess(["a", "b"], "0")).toBeUndefined();
+        });
+
+        it("should ignore accessor-backed properties without invoking getters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "unit");
+            await annotate("Component: Type Helpers", "component");
+            await annotate("Operation: Safe Property Access", "operation");
+
+            const getter = vi.fn(() => {
+                throw new Error("safePropertyAccess getter should not run");
+            });
+            const obj = {};
+
+            Object.defineProperty(obj, "secret", {
+                configurable: true,
+                enumerable: true,
+                get: getter,
+            });
+
+            expect(safePropertyAccess(obj, "secret")).toBeUndefined();
+            expect(getter).not.toHaveBeenCalled();
         });
     });
 

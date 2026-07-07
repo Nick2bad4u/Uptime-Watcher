@@ -11,7 +11,10 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { getCallableDataProperty } from "./errorPropertyAccess";
+import {
+    getCallableDataProperty,
+    getOwnDataProperty,
+} from "./errorPropertyAccess";
 
 /**
  * Safely casts IPC response to expected type with basic validation.
@@ -167,7 +170,8 @@ export function safePropertyAccess(obj: unknown, key: string): unknown {
         return undefined;
     }
 
-    return Object.hasOwn(obj, key) ? obj[key] : undefined;
+    const property = getOwnDataProperty(obj, key);
+    return property.found ? property.value : undefined;
 }
 
 /**
