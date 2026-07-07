@@ -52,9 +52,9 @@ export function clearMonitorTypeCache(): void {
  *
  * @returns Promise resolving to array of monitor type configurations.
  *
- * @public
+ * @internal
  */
-export async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
+async function getAvailableMonitorTypes(): Promise<MonitorTypeConfig[]> {
     const cacheKey = CacheKeys.config.byName("all-monitor-types");
 
     // Try cache first
