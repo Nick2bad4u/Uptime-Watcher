@@ -7,7 +7,6 @@ import { isAsciiDigits as sharedIsAsciiDigits } from "@shared/utils/ascii";
  * concurrency) used by {@link electron/services/sync/SyncEngine#SyncEngine}.
  */
 import {
-    getPersistedDeviceIdValidationError as sharedGetPersistedDeviceIdValidationError,
     isValidPersistedDeviceId as sharedIsValidPersistedDeviceId,
 } from "@shared/validation/persistedDeviceIdValidation";
 
@@ -23,26 +22,6 @@ import { mapWithConcurrency as mapWithConcurrencyImpl } from "../../utils/bounde
  */
 export function isAsciiDigits(value: string): boolean {
     return sharedIsAsciiDigits(value);
-}
-
-/**
- * Returns a stable validation error string for persisted device IDs.
- *
- * @remarks
- * The cloud sync subsystem stores device ids inside provider object keys
- * (`sync/devices/<deviceId>/...`). This helper is shared across multiple
- * modules so the accept/reject policy cannot drift.
- *
- * The returned messages are intentionally aligned with the historical error
- * strings thrown by ProviderCloudSyncTransport so existing tests and telemetry
- * remain stable.
- */
-export function getPersistedDeviceIdValidationError(
-    candidate: string
-): null | string {
-    const impl: (candidate: string) => null | string =
-        sharedGetPersistedDeviceIdValidationError;
-    return impl(candidate);
 }
 
 /**
