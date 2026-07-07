@@ -9,7 +9,7 @@ import {
     safeJsonStringifyWithFallback,
     tryParseJsonRecord,
 } from "@shared/utils/jsonSafety";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     acceptAnyJsonValue,
@@ -50,6 +50,47 @@ describe("jsonSafety behavior", () => {
             const result = safeJsonStringify(
                 unsafeJsonifiable({ handler: () => null })
             );
+            expect(result.success).toBeFalsy();
+            expect(result.error).toContain("JSON serialization failed");
+        });
+
+        it("rejects objects with mixed unsupported values instead of dropping fields", () => {
+            const result = safeJsonStringify(
+                unsafeJsonifiable({
+                    enabled: true,
+                    handler: () => null,
+                })
+            );
+
+            expect(result.success).toBeFalsy();
+            expect(result.error).toContain("JSON serialization failed");
+        });
+
+        it("rejects accessor-backed properties without invoking getters", () => {
+            const getter = vi.fn(() => "secret");
+            const payload = { enabled: true };
+
+            Object.defineProperty(payload, "token", {
+                enumerable: true,
+                get: getter,
+            });
+
+            const result = safeJsonStringify(unsafeJsonifiable(payload));
+
+            expect(result.success).toBeFalsy();
+            expect(result.error).toContain("JSON serialization failed");
+            expect(getter).not.toHaveBeenCalled();
+        });
+
+        it("rejects enumerable symbol keys instead of silently omitting them", () => {
+            const symbolKey = Symbol("secret");
+            const payload = {
+                enabled: true,
+                [symbolKey]: "hidden",
+            };
+
+            const result = safeJsonStringify(unsafeJsonifiable(payload));
+
             expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON serialization failed");
         });
@@ -211,6 +252,16 @@ describe("jsonSafety behavior", () => {
                 unsafeJsonifiable({ fn: () => null }),
                 fallback
             );
+            expect(json).toBe(fallback);
+        });
+
+        it("returns fallback for mixed unsupported values", () => {
+            const fallback = '{ "ok": false }';
+            const json = safeJsonStringifyWithFallback(
+                unsafeJsonifiable({ enabled: true, fn: () => null }),
+                fallback
+            );
+
             expect(json).toBe(fallback);
         });
     });

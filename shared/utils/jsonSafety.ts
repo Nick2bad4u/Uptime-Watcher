@@ -13,7 +13,6 @@ import type {
 } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { collectOwnPropertyValuesSafely } from "@shared/utils/objectIntrospection";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isObject } from "@shared/utils/typeGuards";
 import { isDefined, isEmpty, objectEntries, objectHasOwn } from "ts-extras";
@@ -180,8 +179,6 @@ function safeOperation<T>(
     }
 }
 
-const collectObjectValues = collectOwnPropertyValuesSafely;
-
 const hasDescriptorValue = (
     descriptor: PropertyDescriptor | undefined
 ): descriptor is PropertyDescriptor & { value: unknown } =>
@@ -190,7 +187,7 @@ const hasDescriptorValue = (
 const isNonNullObject = (value: unknown): value is object =>
     typeof value === "object" && value !== null;
 
-const hasSerializableContent = (
+const isJsonSerializableValue = (
     value: unknown,
     seen = new WeakSet<object>()
 ): boolean => {
@@ -214,14 +211,28 @@ const hasSerializableContent = (
 
     seen.add(target);
 
-    const entries = collectObjectValues(target);
-
     try {
-        if (isEmpty(entries)) {
+        const keys = Reflect.ownKeys(target);
+        if (isEmpty(keys)) {
             return true;
         }
 
-        return entries.some((entry) => hasSerializableContent(entry, seen));
+        for (const key of keys) {
+            const descriptor = Object.getOwnPropertyDescriptor(target, key);
+            if (!descriptor?.enumerable) {
+                continue;
+            }
+
+            if (typeof key === "symbol" || !hasDescriptorValue(descriptor)) {
+                return false;
+            }
+
+            if (!isJsonSerializableValue(descriptor.value, seen)) {
+                return false;
+            }
+        }
+
+        return true;
     } finally {
         seen.delete(target);
     }
@@ -464,7 +475,7 @@ export function safeJsonStringify(
     space?: number | string
 ): SafeJsonResult<string> {
     return safeOperation(() => {
-        if (!hasSerializableContent(value)) {
+        if (!isJsonSerializableValue(value)) {
             throw new TypeError("Value cannot be serialized to JSON");
         }
 
