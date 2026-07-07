@@ -404,7 +404,11 @@ function isPrivateIpvFourOctets(
         number,
     ]
 ): boolean {
-    const [a, b] = octets;
+    const [
+        a,
+        b,
+        c,
+    ] = octets;
 
     // 0.0.0.0/8 current network / unspecified addresses
     if (a === 0) {
@@ -436,8 +440,37 @@ function isPrivateIpvFourOctets(
         return true;
     }
 
+    // 192.0.0.0/24 IETF protocol assignments
+    if (a === 192 && b === 0 && c === 0) {
+        return true;
+    }
+
+    // 192.0.2.0/24, 198.51.100.0/24, and 203.0.113.0/24 documentation ranges
+    if (
+        (a === 192 && b === 0 && c === 2) ||
+        (a === 198 && b === 51 && c === 100) ||
+        (a === 203 && b === 0 && c === 113)
+    ) {
+        return true;
+    }
+
+    // 192.88.99.0/24 deprecated 6to4 relay anycast
+    if (a === 192 && b === 88 && c === 99) {
+        return true;
+    }
+
+    // 198.18.0.0/15 benchmarking range
+    if (a === 198 && (b === 18 || b === 19)) {
+        return true;
+    }
+
     // 100.64.0.0/10 (CGNAT)
-    return a === 100 && b >= 64 && b <= 127;
+    if (a === 100 && b >= 64 && b <= 127) {
+        return true;
+    }
+
+    // 224.0.0.0/4 multicast and 240.0.0.0/4 reserved/broadcast ranges
+    return a >= 224;
 }
 
 /**

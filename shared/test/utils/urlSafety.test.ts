@@ -54,6 +54,19 @@ describe("urlSafety", () => {
             expect(isPrivateNetworkHostname("100.64.0.1")).toBeTruthy();
         });
 
+        it("detects special-use IPv4 ranges that should not reach third parties", () => {
+            expect(isPrivateNetworkHostname("192.0.0.8")).toBeTruthy();
+            expect(isPrivateNetworkHostname("192.0.2.10")).toBeTruthy();
+            expect(isPrivateNetworkHostname("192.88.99.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("198.18.0.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("198.19.255.254")).toBeTruthy();
+            expect(isPrivateNetworkHostname("198.51.100.20")).toBeTruthy();
+            expect(isPrivateNetworkHostname("203.0.113.30")).toBeTruthy();
+            expect(isPrivateNetworkHostname("224.0.0.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("240.0.0.1")).toBeTruthy();
+            expect(isPrivateNetworkHostname("255.255.255.255")).toBeTruthy();
+        });
+
         it("detects private IPv4 ranges in browser-normalized legacy forms", () => {
             expect(isPrivateNetworkHostname("0177.0.0.1")).toBeTruthy();
             expect(isPrivateNetworkHostname("0x7f.0.0.1")).toBeTruthy();
@@ -368,6 +381,22 @@ describe("urlSafety", () => {
             expect(tryGetSafeThirdPartyHttpUrl("https://[::c0a8:101]")).toBe(
                 null
             );
+        });
+
+        it("returns null for IPv4 special-use hostnames", () => {
+            expect(tryGetSafeThirdPartyHttpUrl("https://192.0.2.10")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://198.18.0.1")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://198.51.100.20")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://203.0.113.30")).toBe(
+                null
+            );
+            expect(tryGetSafeThirdPartyHttpUrl("https://224.0.0.1")).toBe(null);
         });
 
         it("returns null for URLs with credentials", () => {
