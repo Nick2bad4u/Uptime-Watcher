@@ -45,8 +45,6 @@ import {
     getMonitorTypeDisplayLabel,
     truncateForLogging,
     UiDefaults,
-    MonitorDefaults,
-    SiteDefaults,
 } from "../../utils/fallbacks";
 
 describe("fallback Utils Property-Based Tests", () => {
@@ -862,26 +860,6 @@ describe("fallback Utils Property-Based Tests", () => {
             expect(UiDefaults.notAvailableLabel).toBeTypeOf("string");
             expect(UiDefaults.pageSize).toBeTypeOf("number");
             expect(UiDefaults.unknownLabel).toBeTypeOf("string");
-        });
-
-        it("should have well-defined MonitorDefaults object with expected properties", () => {
-            expect(MonitorDefaults).toHaveProperty("checkInterval", 300_000);
-            expect(MonitorDefaults).toHaveProperty("responseTime", -1);
-            expect(MonitorDefaults).toHaveProperty("retryAttempts", 3);
-            expect(MonitorDefaults).toHaveProperty("status", "pending");
-            expect(MonitorDefaults).toHaveProperty("timeout", 10_000);
-
-            // Test that all values have correct types
-            expect(MonitorDefaults.checkInterval).toBeTypeOf("number");
-            expect(MonitorDefaults.responseTime).toBeTypeOf("number");
-            expect(MonitorDefaults.retryAttempts).toBeTypeOf("number");
-            expect(MonitorDefaults.status).toBeTypeOf("string");
-            expect(MonitorDefaults.timeout).toBeTypeOf("number");
-        });
-
-        it("should have valid SiteDefaults object", () => {
-            expect(SiteDefaults).toHaveProperty("monitoring", true);
-            expect(SiteDefaults.monitoring).toBeTypeOf("boolean");
         });
     });
 

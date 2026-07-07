@@ -23,8 +23,6 @@ import {
     getMonitorTypeDisplayLabel,
     truncateForLogging,
     UiDefaults,
-    MonitorDefaults,
-    SiteDefaults,
 } from "../../utils/fallbacks";
 
 const monitorIdArbitrary = fc.uuid();
@@ -2016,73 +2014,6 @@ describe("fallback Utilities", () => {
             });
         });
 
-        describe("monitorDefaults", () => {
-            it("should have correct monitoring defaults", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Monitoring", "type");
-
-                expect(MonitorDefaults.checkInterval).toBe(300_000); // 5 minutes
-                expect(MonitorDefaults.responseTime).toBe(-1);
-                expect(MonitorDefaults.retryAttempts).toBe(3);
-                expect(MonitorDefaults.status).toBe("pending");
-                expect(MonitorDefaults.timeout).toBe(10_000); // 10 seconds
-            });
-
-            it("should be deeply frozen (readonly)", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                // Note: 'as const' provides type-level readonly but not runtime immutability
-                expect(MonitorDefaults.checkInterval).toBe(300_000);
-                expect(MonitorDefaults.timeout).toBe(10_000);
-
-                // Test that values are accessible and correct
-                (MonitorDefaults as any).timeout = 5000;
-                // The object should be treated as readonly in TypeScript
-            });
-        });
-
-        describe("siteDefaults", () => {
-            it("should have correct site defaults", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                expect(SiteDefaults.monitoring).toBe(true);
-            });
-
-            it("should be deeply frozen (readonly)", async ({
-                annotate,
-                task,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: fallbacks", "component");
-                await annotate("Category: Utility", "category");
-                await annotate("Type: Business Logic", "type");
-
-                // Note: 'as const' provides type-level readonly but not runtime immutability
-                expect(SiteDefaults.monitoring).toBe(true);
-
-                // Test that values are accessible and correct
-                (SiteDefaults as any).monitoring = false;
-                // The object should be treated as readonly in TypeScript
-            });
-        });
-
         describe("property-based Tests", () => {
             test.prop([fc.string().filter((s) => s.trim().length > 0)])(
                 "should validate UiDefaults properties maintain consistent types",
@@ -2091,34 +2022,6 @@ describe("fallback Utilities", () => {
                     expect(UiDefaults).toEqual(expect.any(Object));
                     expect(UiDefaults).toBeTypeOf("object");
                     expect(UiDefaults).not.toBeNull();
-                }
-            );
-
-            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
-                "should validate MonitorDefaults maintains correct type structure",
-                (_propertyName) => {
-                    // Test that MonitorDefaults has expected numeric properties
-                    expect(MonitorDefaults.checkInterval).toBeTypeOf("number");
-                    expect(MonitorDefaults.responseTime).toBeTypeOf("number");
-                    expect(MonitorDefaults.retryAttempts).toBeTypeOf("number");
-                    expect(MonitorDefaults.timeout).toBeTypeOf("number");
-                    expect(MonitorDefaults.status).toBeTypeOf("string");
-
-                    // Verify reasonable ranges
-                    expect(MonitorDefaults.checkInterval).toBeGreaterThan(0);
-                    expect(
-                        MonitorDefaults.retryAttempts
-                    ).toBeGreaterThanOrEqual(0);
-                    expect(MonitorDefaults.timeout).toBeGreaterThan(0);
-                }
-            );
-
-            test.prop([fc.string().filter((s) => s.trim().length > 0)])(
-                "should validate SiteDefaults has consistent boolean monitoring property",
-                (_propertyName) => {
-                    expect(SiteDefaults.monitoring).toBeTypeOf("boolean");
-                    expect(SiteDefaults).toEqual(expect.any(Object));
-                    expect(SiteDefaults).not.toBeNull();
                 }
             );
         });

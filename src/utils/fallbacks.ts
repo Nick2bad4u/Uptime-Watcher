@@ -197,40 +197,6 @@ export function withFallback<T>(
     return value ?? fallback;
 }
 
-/**
- * Monitor-specific default values with deep immutability.
- *
- * @remarks
- * Standard defaults for monitor configuration to ensure consistent behavior
- * when monitors are created or when values are missing. Uses
- * {@link ReadonlyDeep} to guarantee immutability of the configuration object.
- *
- * @public
- */
-export const MonitorDefaults: ReadonlyDeep<{
-    /** Default check interval in milliseconds (5 minutes) */
-    checkInterval: number;
-    /** Sentinel value indicating monitor has never been checked */
-    responseTime: number;
-    /** Default number of retry attempts on failure */
-    retryAttempts: number;
-    /** Default status for new monitors */
-    status: "pending";
-    /** Default request timeout in milliseconds (10 seconds) */
-    timeout: number;
-}> = {
-    /** Default check interval in milliseconds (5 minutes) */
-    checkInterval: 300_000, // 5 minutes
-    /** Sentinel value indicating monitor has never been checked */
-    responseTime: -1, // Sentinel for "never checked"
-    /** Default number of retry attempts on failure */
-    retryAttempts: 3,
-    /** Default status for new monitors */
-    status: "pending" as const,
-    /** Default request timeout in milliseconds (10 seconds) */
-    timeout: 10_000, // 10 seconds
-} as const;
-
 const getSafeUrlForDisplayIdentifier = (
     url: string | undefined
 ): string | undefined => {
@@ -585,17 +551,3 @@ function splitCamelCase(value: string): string {
 
     return result;
 }
-
-/**
- * Site-specific default values.
- *
- * @remarks
- * Standard defaults for site configuration to ensure consistent behavior when
- * sites are created or when values are missing.
- *
- * @public
- */
-export const SiteDefaults = {
-    /** Default monitoring state for new sites */
-    monitoring: true,
-} as const;
