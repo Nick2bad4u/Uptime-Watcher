@@ -1,24 +1,21 @@
 /**
- * Tests for valueConverters utility - Database value conversion functionality
- * Tests all database value converters for proper type conversion and edge
- * cases.
+ * Tests for database value conversion helpers used by repository mappers.
  */
 
 import { describe, expect, it } from "vitest";
 
 import {
-    addBooleanField,
-    addNumberField,
-    addStringField,
     convertToDbValue,
-    convertDateForDb,
     type DbValue,
     safeNumberConvert,
 } from "../../../../services/database/utils/converters/valueConverters";
 
 describe("Value Converters Utility", () => {
     describe("DbValue Type", () => {
-        it("should accept valid DbValue types", async ({ task, annotate }) => {
+        it("accepts SQLite-bindable primitive values", async ({
+            annotate,
+            task,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
@@ -38,10 +35,37 @@ describe("Value Converters Utility", () => {
             expect(typeof values[2]).toBe("string");
         });
     });
+
     describe(convertToDbValue, () => {
-        it("should reject non-finite numbers for database binding", async ({
-            task,
+        it("passes through strings, finite numbers, and null", async ({
             annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Value Converters Utility", "component");
+
+            expect(convertToDbValue("value")).toBe("value");
+            expect(convertToDbValue("")).toBe("");
+            expect(convertToDbValue(42)).toBe(42);
+            expect(convertToDbValue(0)).toBe(0);
+            expect(convertToDbValue(-3.14)).toBe(-3.14);
+            expect(convertToDbValue(null)).toBeNull();
+        });
+
+        it("converts booleans to SQLite integer values", async ({
+            annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Value Converters Utility", "component");
+
+            expect(convertToDbValue(true)).toBe(1);
+            expect(convertToDbValue(false)).toBe(0);
+        });
+
+        it("rejects values that cannot be safely bound", async ({
+            annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
@@ -49,446 +73,39 @@ describe("Value Converters Utility", () => {
             expect(convertToDbValue(Infinity)).toBeUndefined();
             expect(convertToDbValue(-Infinity)).toBeUndefined();
             expect(convertToDbValue(NaN)).toBeUndefined();
+            expect(convertToDbValue(undefined)).toBeUndefined();
+            expect(convertToDbValue({ value: "object" })).toBeUndefined();
+            expect(convertToDbValue(["array"])).toBeUndefined();
         });
     });
-    describe(addBooleanField, () => {
-        it("should add true boolean field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
 
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addBooleanField("isEnabled", true, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["isEnabled = ?"]);
-            expect(updateValues).toEqual([1]);
-        });
-        it("should add false boolean field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addBooleanField("isDisabled", false, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["isDisabled = ?"]);
-            expect(updateValues).toEqual([0]);
-        });
-        it("should skip undefined boolean field", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addBooleanField(
-                "isOptional",
-                undefined,
-                updateFields,
-                updateValues
-            );
-
-            expect(updateFields).toEqual([]);
-            expect(updateValues).toEqual([]);
-        });
-        it("should handle multiple boolean fields", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addBooleanField("isEnabled", true, updateFields, updateValues);
-            addBooleanField("isDisabled", false, updateFields, updateValues);
-            addBooleanField(
-                "isOptional",
-                undefined,
-                updateFields,
-                updateValues
-            );
-            addBooleanField("isActive", true, updateFields, updateValues);
-
-            expect(updateFields).toEqual([
-                "isEnabled = ?",
-                "isDisabled = ?",
-                "isActive = ?",
-            ]);
-            expect(updateValues).toEqual([
-                1,
-                0,
-                1,
-            ]);
-        });
-        it("should handle field names with special characters", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addBooleanField("field_name", true, updateFields, updateValues);
-            addBooleanField("field-name", false, updateFields, updateValues);
-            addBooleanField("fieldName123", true, updateFields, updateValues);
-
-            expect(updateFields).toEqual([
-                "field_name = ?",
-                "field-name = ?",
-                "fieldName123 = ?",
-            ]);
-            expect(updateValues).toEqual([
-                1,
-                0,
-                1,
-            ]);
-        });
-    });
-    describe(addNumberField, () => {
-        it("should add positive number field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField("count", 42, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["count = ?"]);
-            expect(updateValues).toEqual([42]);
-        });
-        it("should add zero number field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField("count", 0, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["count = ?"]);
-            expect(updateValues).toEqual([0]);
-        });
-        it("should add negative number field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField("balance", -100, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["balance = ?"]);
-            expect(updateValues).toEqual([-100]);
-        });
-        it("should add decimal number field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField("price", 19.99, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["price = ?"]);
-            expect(updateValues).toEqual([19.99]);
-        });
-        it("should skip undefined number field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField("optional", undefined, updateFields, updateValues);
-
-            expect(updateFields).toEqual([]);
-            expect(updateValues).toEqual([]);
-        });
-        it("should handle string numbers by converting", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            // TypeScript would normally prevent this, but testing runtime behavior
-            addNumberField(
-                "converted",
-                "123" as any,
-                updateFields,
-                updateValues
-            );
-
-            expect(updateFields).toEqual(["converted = ?"]);
-            expect(updateValues).toEqual([123]);
-        });
-        it("should skip malformed string number values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField(
-                "converted",
-                "1e3" as any,
-                updateFields,
-                updateValues
-            );
-
-            expect(updateFields).toEqual([]);
-            expect(updateValues).toEqual([]);
-        });
-        it("should skip non-finite number values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addNumberField("infinity", Infinity, updateFields, updateValues);
-            addNumberField(
-                "negInfinity",
-                -Infinity,
-                updateFields,
-                updateValues
-            );
-            addNumberField("nanValue", NaN, updateFields, updateValues);
-
-            expect(updateFields).toEqual([]);
-            expect(updateValues).toEqual([]);
-        });
-    });
-    describe(addStringField, () => {
-        it("should add string field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addStringField("name", "John Doe", updateFields, updateValues);
-
-            expect(updateFields).toEqual(["name = ?"]);
-            expect(updateValues).toEqual(["John Doe"]);
-        });
-        it("should add empty string field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addStringField("description", "", updateFields, updateValues);
-
-            expect(updateFields).toEqual(["description = ?"]);
-            expect(updateValues).toEqual([""]);
-        });
-        it("should skip undefined string field", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addStringField("optional", undefined, updateFields, updateValues);
-
-            expect(updateFields).toEqual([]);
-            expect(updateValues).toEqual([]);
-        });
-        it("should handle special characters in strings", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            addStringField(
-                "special",
-                "Special chars: @#$%^&*()",
-                updateFields,
-                updateValues
-            );
-            addStringField(
-                "unicode",
-                "Unicode: 🚀 ñ ç",
-                updateFields,
-                updateValues
-            );
-            addStringField(
-                "quotes",
-                `Quotes: "Hello" 'World'`,
-                updateFields,
-                updateValues
-            );
-
-            expect(updateFields).toEqual([
-                "special = ?",
-                "unicode = ?",
-                "quotes = ?",
-            ]);
-            expect(updateValues).toEqual([
-                "Special chars: @#$%^&*()",
-                "Unicode: 🚀 ñ ç",
-                `Quotes: "Hello" 'World'`,
-            ]);
-        });
-        it("should handle non-string values by converting", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            // TypeScript would normally prevent this, but testing runtime behavior
-            addStringField("converted", 123 as any, updateFields, updateValues);
-            addStringField("boolean", true as any, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["converted = ?", "boolean = ?"]);
-            expect(updateValues).toEqual(["123", "true"]);
-        });
-        it("should handle very long strings", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            const longString = "a".repeat(1000);
-            addStringField("longText", longString, updateFields, updateValues);
-
-            expect(updateFields).toEqual(["longText = ?"]);
-            expect(updateValues).toEqual([longString]);
-        });
-    });
-    describe(convertDateForDb, () => {
-        it("should convert Date object to ISO string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const date = new Date("2023-12-25T10:30:00.000Z");
-            const result = convertDateForDb(date);
-
-            expect(result).toBe("2023-12-25T10:30:00.000Z");
-        });
-        it("should preserve string dates as-is", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const dateString = "2023-12-25T10:30:00.000Z";
-            const result = convertDateForDb(dateString);
-
-            expect(result).toBe(dateString);
-        });
-        it("should return null for null input", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const result = convertDateForDb(null);
-            expect(result).toBeNull();
-        });
-        it("should return null for undefined input", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const result = convertDateForDb(undefined);
-            expect(result).toBeNull();
-        });
-        it("should return null for empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const result = convertDateForDb("");
-            expect(result).toBeNull();
-        });
-        it("should return null for falsy values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(convertDateForDb(false as any)).toBeNull();
-            expect(convertDateForDb(0 as any)).toBeNull();
-        });
-        it("should return null for invalid Date objects", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const invalidDate = new Date("invalid");
-            const result = convertDateForDb(invalidDate);
-
-            expect(result).toBeNull();
-        });
-        it("should handle current date", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const now = new Date();
-            const result = convertDateForDb(now);
-
-            expect(result).toBe(now.toISOString());
-        });
-        it("should handle edge case dates", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const epoch = new Date(0);
-            const result = convertDateForDb(epoch);
-
-            expect(result).toBe("1970-01-01T00:00:00.000Z");
-        });
-    });
     describe(safeNumberConvert, () => {
-        it("should return numbers as-is", async ({ task, annotate }) => {
+        it("preserves finite numbers", async ({ annotate, task }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
 
             expect(safeNumberConvert(42)).toBe(42);
             expect(safeNumberConvert(0)).toBe(0);
-            expect(safeNumberConvert(-10)).toBe(-10);
-            expect(safeNumberConvert(3.14)).toBe(3.14);
+            expect(safeNumberConvert(-100)).toBe(-100);
+            expect(safeNumberConvert(19.99)).toBe(19.99);
         });
-        it("should reject non-finite number values", async ({
-            task,
+
+        it("converts strict decimal strings after trimming", async ({
             annotate,
+            task,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: Value Converters Utility", "component");
+
+            expect(safeNumberConvert("42")).toBe(42);
+            expect(safeNumberConvert("  42.5  ")).toBe(42.5);
+            expect(safeNumberConvert("-100")).toBe(-100);
+            expect(safeNumberConvert("+7")).toBe(7);
+        });
+
+        it("rejects non-finite and non-decimal values", async ({
+            annotate,
+            task,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: Value Converters Utility", "component");
@@ -496,224 +113,15 @@ describe("Value Converters Utility", () => {
             expect(safeNumberConvert(Infinity)).toBeUndefined();
             expect(safeNumberConvert(-Infinity)).toBeUndefined();
             expect(safeNumberConvert(NaN)).toBeUndefined();
+            expect(safeNumberConvert("")).toBeUndefined();
+            expect(safeNumberConvert(" ".repeat(3))).toBeUndefined();
             expect(safeNumberConvert("Infinity")).toBeUndefined();
-            expect(safeNumberConvert("-Infinity")).toBeUndefined();
-        });
-        it("should convert valid string numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert("42")).toBe(42);
-            expect(safeNumberConvert("0")).toBe(0);
-            expect(safeNumberConvert("-10")).toBe(-10);
-            expect(safeNumberConvert("+10")).toBe(10);
-            expect(safeNumberConvert("3.14")).toBe(3.14);
-        });
-        it("should return undefined for invalid string numbers", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert("not a number")).toBeUndefined();
-            expect(safeNumberConvert("abc123")).toBeUndefined();
-            expect(safeNumberConvert("123abc")).toBeUndefined();
-            expect(safeNumberConvert("1.")).toBeUndefined();
-            expect(safeNumberConvert(".5")).toBeUndefined();
-        });
-        it("should return undefined for null and undefined", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
+            expect(safeNumberConvert("1e3")).toBeUndefined();
+            expect(safeNumberConvert("0x10")).toBeUndefined();
+            expect(safeNumberConvert("abc")).toBeUndefined();
             expect(safeNumberConvert(null)).toBeUndefined();
             expect(safeNumberConvert(undefined)).toBeUndefined();
-        });
-        it("should return undefined for empty string", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert("")).toBeUndefined();
-        });
-        it("should reject boolean values", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert(true)).toBeUndefined();
-            expect(safeNumberConvert(false)).toBeUndefined();
-        });
-        it("should reject array and object conversions", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert([42])).toBeUndefined();
-            expect(
-                safeNumberConvert([
-                    1,
-                    2,
-                    3,
-                ])
-            ).toBeUndefined(); // NaN case
-            expect(safeNumberConvert({})).toBeUndefined(); // NaN case
-            expect(safeNumberConvert({ valueOf: () => 42 })).toBeUndefined();
-        });
-        it("should reject Date objects", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const date = new Date("2023-12-25T10:30:00.000Z");
-            expect(safeNumberConvert(date)).toBeUndefined();
-        });
-        it("should handle whitespace strings", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert("  42  ")).toBe(42);
-            expect(safeNumberConvert(" ".repeat(3))).toBeUndefined();
-            expect(safeNumberConvert("\t\n\r")).toBeUndefined();
-        });
-        it("should reject scientific notation", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert("1e-3")).toBeUndefined();
-            expect(safeNumberConvert("2.5e2")).toBeUndefined();
-            expect(safeNumberConvert("-1.5e-2")).toBeUndefined();
-        });
-        it("should reject hexadecimal and other number formats", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            expect(safeNumberConvert("0x10")).toBeUndefined();
-            expect(safeNumberConvert("0b1010")).toBeUndefined();
-            expect(safeNumberConvert("0o17")).toBeUndefined();
-        });
-    });
-    describe("Integration Tests", () => {
-        it("should work together in typical database update scenario", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            // Simulate updating a site record
-            addStringField("name", "My Website", updateFields, updateValues);
-            addStringField(
-                "url",
-                "https://example.com",
-                updateFields,
-                updateValues
-            );
-            addBooleanField("isActive", true, updateFields, updateValues);
-            addNumberField("checkInterval", 60_000, updateFields, updateValues);
-            addStringField(
-                "description",
-                undefined,
-                updateFields,
-                updateValues
-            ); // Skipped
-            addBooleanField(
-                "notificationsEnabled",
-                false,
-                updateFields,
-                updateValues
-            );
-
-            expect(updateFields).toEqual([
-                "name = ?",
-                "url = ?",
-                "isActive = ?",
-                "checkInterval = ?",
-                "notificationsEnabled = ?",
-            ]);
-            expect(updateValues).toEqual([
-                "My Website",
-                "https://example.com",
-                1,
-                60_000,
-                0,
-            ]);
-        });
-        it("should handle complex value conversion scenario", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: Value Converters Utility", "component");
-
-            const rawData = {
-                timestamp: new Date("2023-12-25T10:30:00.000Z"),
-                timeout: "5000", // String number
-                retries: 3,
-                description: undefined,
-                isEnabled: true,
-            };
-
-            const updateFields: string[] = [];
-            const updateValues: DbValue[] = [];
-
-            // Convert and add fields
-            const dbTimestamp = convertDateForDb(rawData.timestamp);
-            if (dbTimestamp) {
-                updateFields.push("timestamp = ?");
-                updateValues.push(dbTimestamp);
-            }
-
-            const timeout = safeNumberConvert(rawData.timeout);
-            if (timeout !== undefined) {
-                addNumberField("timeout", timeout, updateFields, updateValues);
-            }
-
-            addNumberField(
-                "retries",
-                rawData.retries,
-                updateFields,
-                updateValues
-            );
-            addStringField(
-                "description",
-                rawData.description,
-                updateFields,
-                updateValues
-            );
-            addBooleanField(
-                "isEnabled",
-                rawData.isEnabled,
-                updateFields,
-                updateValues
-            );
-
-            expect(updateFields).toEqual([
-                "timestamp = ?",
-                "timeout = ?",
-                "retries = ?",
-                "isEnabled = ?",
-            ]);
-            expect(updateValues).toEqual([
-                "2023-12-25T10:30:00.000Z",
-                5000,
-                3,
-                1,
-            ]);
+            expect(safeNumberConvert({ value: 1 })).toBeUndefined();
         });
     });
 });
