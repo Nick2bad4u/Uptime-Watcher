@@ -67,6 +67,30 @@ const mockWindow = {
     })),
 };
 
+const setBrowserGlobalForTesting = (
+    key: "document" | "window",
+    value: unknown
+): void => {
+    if (value === undefined) {
+        Reflect.deleteProperty(globalThis, key);
+        return;
+    }
+
+    Object.defineProperty(globalThis, key, {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
+const setMatchMediaForTesting = (value: typeof globalThis.matchMedia): void => {
+    Object.defineProperty(globalThis, "matchMedia", {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
 // Arbitraries for theme generation
 const colorArbitrary = fc
     .tuple(
@@ -267,9 +291,11 @@ describe("themeManager Property-Based Tests", () => {
         originalDocument = document;
         originalMatchMedia = globalThis.matchMedia;
         originalWindow = globalThis.window;
-        globalThis.document = mockDocument as any;
-        globalThis.window = mockWindow as any;
-        globalThis.matchMedia = mockWindow.matchMedia as any;
+        setBrowserGlobalForTesting("document", mockDocument);
+        setBrowserGlobalForTesting("window", mockWindow);
+        setMatchMediaForTesting(
+            mockWindow.matchMedia as unknown as typeof globalThis.matchMedia
+        );
 
         // Reset singleton instance after the mocked browser APIs are installed.
         (ThemeManager as any).instance = undefined;
@@ -281,9 +307,9 @@ describe("themeManager Property-Based Tests", () => {
 
     afterEach(() => {
         // Restore original environment
-        globalThis.document = originalDocument;
-        globalThis.matchMedia = originalMatchMedia;
-        globalThis.window = originalWindow;
+        setBrowserGlobalForTesting("document", originalDocument);
+        setMatchMediaForTesting(originalMatchMedia);
+        setBrowserGlobalForTesting("window", originalWindow);
         vi.clearAllMocks();
     });
 
@@ -563,7 +589,7 @@ describe("themeManager Property-Based Tests", () => {
     );
 
     it("should handle missing document gracefully", () => {
-        globalThis.document = undefined as any;
+        setBrowserGlobalForTesting("document", undefined);
 
         const theme = themes.light;
 
@@ -573,7 +599,7 @@ describe("themeManager Property-Based Tests", () => {
     });
 
     it("should handle missing window gracefully", () => {
-        globalThis.window = undefined as any;
+        setBrowserGlobalForTesting("window", undefined);
 
         const preference = themeManager.getSystemThemePreference();
 
