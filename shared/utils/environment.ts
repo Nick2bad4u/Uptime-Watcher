@@ -19,11 +19,9 @@ import {
     isDefined,
     isFinite as isFiniteNumber,
     isSafeInteger,
-    objectKeys,
 } from "ts-extras";
 
 import { getOwnDataProperty, getOwnPropertyValue } from "./errorPropertyAccess";
-import { createNullPrototypeObject } from "./objectSafety";
 
 export interface KnownEnvironmentVariables {
     /** Token used by coverage reporting tooling when present. */
@@ -181,31 +179,6 @@ export function getEnvVar(key: string): string | undefined {
     return property.found && typeof property.value === "string"
         ? property.value
         : undefined;
-}
-
-/**
- * Returns a sanitized snapshot of the current process.env state.
- */
-export function getEnvSummary(): Record<string, string> {
-    const env = getProcessEnv();
-    if (!env) {
-        return {};
-    }
-
-    const summary = createNullPrototypeObject<Record<string, string>>();
-    for (const key of objectKeys(env)) {
-        const property = getOwnDataProperty(env, key);
-        if (property.found && typeof property.value === "string") {
-            Object.defineProperty(summary, key, {
-                configurable: true,
-                enumerable: true,
-                value: property.value,
-                writable: true,
-            });
-        }
-    }
-
-    return summary;
 }
 
 /**

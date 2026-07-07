@@ -3,14 +3,12 @@ import {
     cloudSyncWriteKeySchema,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
-import {
-    MAX_PERSISTED_DEVICE_ID_BYTES,
-    getPersistedDeviceIdValidationError,
-} from "@shared/validation/persistedDeviceIdValidation";
+import { getPersistedDeviceIdValidationError } from "@shared/validation/persistedDeviceIdValidation";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
 
 const PROTOTYPE_KEY = "__proto__" as const;
+const OVERSIZED_DEVICE_ID = "d".repeat(257);
 
 describe("cloudSync", () => {
     it("preserves leading and trailing whitespace in JSON string values", () => {
@@ -81,7 +79,7 @@ describe("cloudSync", () => {
         "device/1",
         "device:1",
         "__proto__",
-        "d".repeat(MAX_PERSISTED_DEVICE_ID_BYTES + 1),
+        OVERSIZED_DEVICE_ID,
     ])("rejects unsafe operation deviceId %s", (deviceId) => {
         const input = {
             deviceId,

@@ -15,7 +15,7 @@ import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import * as z from "zod";
 
 /** Maximum byte budget accepted for persisted sync device IDs. */
-export const MAX_PERSISTED_DEVICE_ID_BYTES = 256;
+const MAX_PERSISTED_DEVICE_ID_BYTES = 256;
 
 /**
  * Returns a stable validation error string for persisted device IDs.

@@ -370,7 +370,7 @@ const isValidMonitorTypeUiConfig = (
  *
  * @returns `true` when the candidate satisfies {@link MonitorFieldDefinition}.
  */
-export function isMonitorFieldDefinition(
+function isMonitorFieldDefinition(
     candidate: unknown
 ): candidate is MonitorFieldDefinition {
     if (!isObject(candidate)) {

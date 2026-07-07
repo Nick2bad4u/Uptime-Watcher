@@ -1,49 +1,62 @@
-import {
-    isMonitorFieldDefinition,
-    isMonitorTypeConfig,
-} from "@shared/types/monitorTypes";
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { describe, expect, it } from "vitest";
 
 describe("monitor type runtime guards", () => {
-    it("accepts valid field definitions", () => {
-        const field = {
-            label: "URL",
-            name: "url",
-            required: true,
-            type: "url" as const,
-        };
-
-        expect(isMonitorFieldDefinition(field)).toBeTruthy();
+    const buildConfig = (fields: unknown[]) => ({
+        description: "HTTP endpoint monitoring",
+        displayName: "HTTP Monitor",
+        fields,
+        type: "http",
+        version: "1.0.0",
     });
 
-    it("rejects invalid field definitions", () => {
-        expect(isMonitorFieldDefinition({})).toBeFalsy();
+    it("accepts valid field definitions through monitor type configs", () => {
         expect(
-            isMonitorFieldDefinition({
-                label: "URL",
-                name: "url",
-                required: "yes",
-                type: "url",
-            })
+            isMonitorTypeConfig(
+                buildConfig([
+                    {
+                        label: "URL",
+                        name: "url",
+                        required: true,
+                        type: "url" as const,
+                    },
+                ])
+            )
+        ).toBeTruthy();
+    });
+
+    it("rejects invalid field definitions through monitor type configs", () => {
+        expect(isMonitorTypeConfig(buildConfig([{}]))).toBeFalsy();
+        expect(
+            isMonitorTypeConfig(
+                buildConfig([
+                    {
+                        label: "URL",
+                        name: "url",
+                        required: "yes",
+                        type: "url",
+                    },
+                ])
+            )
         ).toBeFalsy();
     });
 
     it("rejects non-finite numeric field bounds", () => {
         const baseField = {
-            label: "Port",
+            label: "URL",
             name: "port",
             required: true,
             type: "number" as const,
         };
 
         expect(
-            isMonitorFieldDefinition({ ...baseField, max: Infinity })
+            isMonitorTypeConfig(buildConfig([{ ...baseField, max: Infinity }]))
         ).toBeFalsy();
         expect(
-            isMonitorFieldDefinition({ ...baseField, min: -Infinity })
+            isMonitorTypeConfig(buildConfig([{ ...baseField, min: -Infinity }]))
         ).toBeFalsy();
         expect(
-            isMonitorFieldDefinition({ ...baseField, min: NaN })
+            isMonitorTypeConfig(buildConfig([{ ...baseField, min: NaN }]))
         ).toBeFalsy();
     });
 
