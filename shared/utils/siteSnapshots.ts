@@ -46,8 +46,7 @@ export interface SiteSnapshotDetails {
 /**
  * Non-empty subset of {@link SiteSyncDelta} describing concrete changes.
  */
-export type SiteSyncDeltaChangeSet =
-    RequireAtLeastOne<SiteSyncDeltaChangeSetBase>;
+type SiteSyncDeltaChangeSet = RequireAtLeastOne<SiteSyncDeltaChangeSetBase>;
 
 /**
  * Result of preparing a site synchronization payload including deltas.
@@ -104,7 +103,7 @@ export function deriveSiteSnapshot(sites: Site[]): SiteSnapshotDetails {
 /**
  * Derives a change-set view of a delta, containing only populated sections.
  */
-export function deriveSiteSyncChangeSet(
+function deriveSiteSyncChangeSet(
     delta: SiteSyncDelta
 ): null | SiteSyncDeltaChangeSet {
     const changeSet: SiteSyncDeltaChangeSetBase = {};
@@ -218,12 +217,7 @@ export type MonitorSnapshotOverlay = Partial<
     >
 >;
 
-/** Snapshot overlay for sites that can include normalized monitor snapshots. */
-export type SiteSnapshotOverlay = Partial<Pick<Site, "monitoring">> & {
-    monitors?: Monitor[];
-};
-
-export const isStatusHistoryEntry = (
+const isStatusHistoryEntry = (
     value: unknown
 ): value is StatusHistory => {
     if (!isObject(value)) {
@@ -245,7 +239,7 @@ export const isStatusHistoryEntry = (
     );
 };
 
-export const isStatusHistoryArray = (
+const isStatusHistoryArray = (
     value: unknown
 ): value is StatusHistory[] => isArray(value, isStatusHistoryEntry);
 
@@ -339,48 +333,6 @@ export function mergeMonitorSnapshots(
 }
 
 /**
- * Combines a canonical site snapshot with overlay details, including the set of
- * monitor overlays provided by the source payload.
- *
- * @param canonicalSite - Primary site snapshot used as the base state.
- * @param overlaySource - Overlay or partial site snapshot providing updated
- *   monitoring flags or monitor snapshots.
- *
- * @returns Site snapshot enriched with overlay data when available.
- */
-export function mergeSiteSnapshots(
-    canonicalSite: Site,
-    overlaySource?: Site | SiteSnapshotOverlay
-): Site {
-    const overlay = toSiteSnapshotOverlay(overlaySource);
-
-    if (!overlay) {
-        return canonicalSite;
-    }
-
-    const overlayMonitors = new Map<string, MonitorSnapshotOverlay>();
-    for (const candidate of overlay.monitors ?? []) {
-        const snapshot = toMonitorSnapshotOverlay(candidate);
-        if (snapshot) {
-            overlayMonitors.set(candidate.id, snapshot);
-        }
-    }
-
-    const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
-        mergeMonitorSnapshots(
-            canonicalMonitor,
-            overlayMonitors.get(canonicalMonitor.id)
-        )
-    );
-
-    return {
-        ...canonicalSite,
-        monitoring: overlay.monitoring ?? canonicalSite.monitoring,
-        monitors,
-    } satisfies Site;
-}
-
-/**
  * Derives a normalized overlay describing the mutable portions of a monitor
  * snapshot.
  *
@@ -389,7 +341,7 @@ export function mergeSiteSnapshots(
  * @returns Overlay populated with the validated subset of monitor fields, or
  *   `undefined` when no serializable data is present.
  */
-export function toMonitorSnapshotOverlay(
+function toMonitorSnapshotOverlay(
     source?:
         | Monitor
         | MonitorSnapshotOverlay
@@ -438,42 +390,6 @@ export function toMonitorSnapshotOverlay(
     const normalizedDate = normalizeDateValue(lastChecked);
     if (normalizedDate) {
         overlay.lastChecked = normalizedDate;
-    }
-
-    return hasOverlayValues(overlay) ? overlay : undefined;
-}
-
-/**
- * Builds a site-level overlay containing the monitoring flag and any valid
- * monitor snapshots discovered in the source payload.
- *
- * @param source - Site snapshot candidate or partial overlay.
- *
- * @returns Structured overlay when at least one field is present; otherwise
- *   `undefined`.
- */
-export function toSiteSnapshotOverlay(
-    source?:
-        | Site
-        | SiteSnapshotOverlay
-        | UnknownRecord
-): SiteSnapshotOverlay | undefined {
-    if (!source || !isObject(source)) {
-        return undefined;
-    }
-
-    const overlay: Partial<SiteSnapshotOverlay> = {};
-    const { monitoring, monitors } = source;
-
-    if (isBoolean(monitoring)) {
-        overlay.monitoring = monitoring;
-    }
-
-    if (Array.isArray(monitors)) {
-        const normalizedMonitors = monitors.filter(isMonitorSnapshot);
-        if (normalizedMonitors.length > 0) {
-            overlay.monitors = normalizedMonitors;
-        }
     }
 
     return hasOverlayValues(overlay) ? overlay : undefined;

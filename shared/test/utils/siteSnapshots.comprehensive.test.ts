@@ -8,17 +8,11 @@ import type { SiteSyncDelta } from "@shared/types/stateSync";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     deriveSiteSnapshot,
-    deriveSiteSyncChangeSet,
     hasSiteSyncChanges,
     isMonitorSnapshot,
     isSiteSnapshot,
-    isStatusHistoryArray,
-    isStatusHistoryEntry,
     mergeMonitorSnapshots,
-    mergeSiteSnapshots,
     prepareSiteSyncSnapshot,
-    toMonitorSnapshotOverlay,
-    toSiteSnapshotOverlay,
 } from "@shared/utils/siteSnapshots";
 import { describe, expect, it } from "vitest";
 
@@ -81,28 +75,29 @@ describe("siteSnapshots", () => {
         expect(hasSiteSyncChanges(result.delta)).toBeFalsy();
     });
 
-    it("deriveSiteSyncChangeSet returns null for empty delta and a subset for changes", () => {
+    it("hasSiteSyncChanges detects empty and populated deltas", () => {
         const emptyDelta: SiteSyncDelta = {
             addedSites: [],
             removedSiteIdentifiers: [],
             updatedSites: [],
         };
-        expect(deriveSiteSyncChangeSet(emptyDelta)).toBeNull();
+        expect(hasSiteSyncChanges(emptyDelta)).toBeFalsy();
 
         const changedDelta: SiteSyncDelta = {
             addedSites: [createSite({ identifier: "a" })],
             removedSiteIdentifiers: [],
             updatedSites: [],
         };
-        expect(deriveSiteSyncChangeSet(changedDelta)).toEqual({
-            addedSites: changedDelta.addedSites,
-        });
         expect(hasSiteSyncChanges(changedDelta)).toBeTruthy();
     });
 
-    it("validates status history entries and arrays", () => {
-        expect(isStatusHistoryEntry(createHistory())).toBeTruthy();
-        expect(isStatusHistoryEntry({})).toBeFalsy();
+    it("validates status history through monitor snapshots", () => {
+        expect(
+            isMonitorSnapshot(createMonitor({ history: [createHistory()] }))
+        ).toBeTruthy();
+        expect(
+            isMonitorSnapshot(createMonitor({ history: [{} as any] }))
+        ).toBeFalsy();
 
         for (const invalidHistory of [
             createHistory({ responseTime: -2 }),
@@ -112,11 +107,10 @@ describe("siteSnapshots", () => {
             createHistory({ timestamp: 1.5 }),
             createHistory({ timestamp: MAX_VALID_DATE_EPOCH_MS + 1 }),
         ]) {
-            expect(isStatusHistoryEntry(invalidHistory)).toBeFalsy();
+            expect(
+                isMonitorSnapshot(createMonitor({ history: [invalidHistory] }))
+            ).toBeFalsy();
         }
-
-        expect(isStatusHistoryArray([createHistory()])).toBeTruthy();
-        expect(isStatusHistoryArray([{}])).toBeFalsy();
     });
 
     it("validates monitor and site snapshot shapes", () => {
@@ -166,12 +160,15 @@ describe("siteSnapshots", () => {
         ).toBeFalsy();
     });
 
-    it("toMonitorSnapshotOverlay omits empty history arrays and normalizes lastChecked", () => {
-        expect(toMonitorSnapshotOverlay(undefined)).toBeUndefined();
+    it("mergeMonitorSnapshots omits empty history arrays and normalizes lastChecked", () => {
+        const canonical = createMonitor({ id: "m" });
 
-        expect(toMonitorSnapshotOverlay({ history: [] })).toBeUndefined();
+        expect(mergeMonitorSnapshots(canonical, undefined)).toBe(canonical);
+        expect(mergeMonitorSnapshots(canonical, { history: [] })).toBe(
+            canonical
+        );
 
-        const overlay = toMonitorSnapshotOverlay({
+        const merged = mergeMonitorSnapshots(canonical, {
             history: [createHistory()],
             lastChecked: "2025-01-01T00:00:00.000Z",
             monitoring: false,
@@ -180,33 +177,35 @@ describe("siteSnapshots", () => {
             activeOperations: ["op"],
         });
 
-        expect(overlay).toBeDefined();
-        expect(overlay?.history).toHaveLength(1);
-        expect(overlay?.lastChecked).toBeInstanceOf(Date);
-        expect(overlay?.monitoring).toBeFalsy();
-        expect(overlay?.activeOperations).toEqual(["op"]);
+        expect(merged).not.toBe(canonical);
+        expect(merged.history).toHaveLength(1);
+        expect(merged.lastChecked).toBeInstanceOf(Date);
+        expect(merged.monitoring).toBeFalsy();
+        expect(merged.activeOperations).toEqual(["op"]);
 
         for (const responseTime of [-2, 10.5]) {
-            expect(toMonitorSnapshotOverlay({ responseTime })).toBeUndefined();
+            expect(mergeMonitorSnapshots(canonical, { responseTime })).toBe(
+                canonical
+            );
         }
 
         // Cover Date passthrough branch.
-        const overlayDate = toMonitorSnapshotOverlay({
+        const overlayDate = mergeMonitorSnapshots(canonical, {
             lastChecked: new Date("2025-01-02T00:00:00.000Z"),
         });
-        expect(overlayDate?.lastChecked).toBeInstanceOf(Date);
+        expect(overlayDate.lastChecked).toBeInstanceOf(Date);
 
-        const overlayEpoch = toMonitorSnapshotOverlay({
+        const overlayEpoch = mergeMonitorSnapshots(canonical, {
             lastChecked: Date.UTC(2025, 0, 3),
         });
-        expect(overlayEpoch?.lastChecked?.toISOString()).toBe(
+        expect(overlayEpoch.lastChecked?.toISOString()).toBe(
             "2025-01-03T00:00:00.000Z"
         );
 
-        const overlayMaxEpoch = toMonitorSnapshotOverlay({
+        const overlayMaxEpoch = mergeMonitorSnapshots(canonical, {
             lastChecked: MAX_VALID_DATE_EPOCH_MS,
         });
-        expect(overlayMaxEpoch?.lastChecked?.getTime()).toBe(
+        expect(overlayMaxEpoch.lastChecked?.getTime()).toBe(
             MAX_VALID_DATE_EPOCH_MS
         );
 
@@ -217,42 +216,29 @@ describe("siteSnapshots", () => {
             new Date(MAX_VALID_DATE_EPOCH_MS + 1),
         ]) {
             expect(
-                toMonitorSnapshotOverlay({
+                mergeMonitorSnapshots(canonical, {
                     lastChecked: invalidLastChecked,
                 })
-            ).toBeUndefined();
+            ).toBe(canonical);
         }
 
         expect(
-            toMonitorSnapshotOverlay({
+            mergeMonitorSnapshots(canonical, {
                 lastChecked: "July 3, 2026",
             })
-        ).toBeUndefined();
+        ).toBe(canonical);
         expect(
-            toMonitorSnapshotOverlay({
+            mergeMonitorSnapshots(canonical, {
                 lastChecked: "2026-02-30T00:00:00.000Z",
             })
-        ).toBeUndefined();
+        ).toBe(canonical);
 
         // Cover invalid status branch (should produce no overlay).
         expect(
-            toMonitorSnapshotOverlay({ status: "not-a-status" as any })
-        ).toBeUndefined();
-    });
-
-    it("toSiteSnapshotOverlay filters invalid monitors and returns undefined when empty", () => {
-        expect(toSiteSnapshotOverlay(undefined)).toBeUndefined();
-
-        expect(toSiteSnapshotOverlay({ monitors: [{}] })).toBeUndefined();
-
-        const overlay = toSiteSnapshotOverlay({
-            monitoring: false,
-            monitors: [createMonitor({ id: "m1" }), { id: "bad" }],
-        });
-
-        expect(overlay?.monitoring).toBeFalsy();
-        expect(overlay?.monitors).toHaveLength(1);
-        expect(overlay?.monitors?.[0]?.id).toBe("m1");
+            mergeMonitorSnapshots(canonical, {
+                status: "not-a-status" as any,
+            })
+        ).toBe(canonical);
     });
 
     it("mergeMonitorSnapshots returns canonical when no overlay and applies overlay when provided", () => {
@@ -281,49 +267,4 @@ describe("siteSnapshots", () => {
         expect(mergedWithInvalidHistory).toBe(canonical);
     });
 
-    it("mergeSiteSnapshots merges monitor overlays by id", () => {
-        const canonicalSite = createSite({
-            identifier: "site",
-            monitors: [
-                createMonitor({ id: "m1" }),
-                createMonitor({ id: "m2" }),
-            ],
-        });
-
-        const overlaySite: Site = {
-            identifier: "site",
-            monitoring: false,
-            name: "Ignored",
-            monitors: [
-                createMonitor({
-                    id: "m2",
-                    monitoring: false,
-                    responseTime: 999,
-                }),
-            ],
-        };
-
-        const merged = mergeSiteSnapshots(canonicalSite, overlaySite);
-
-        expect(merged).not.toBe(canonicalSite);
-        expect(merged.monitoring).toBeFalsy();
-        expect(
-            merged.monitors.find((m) => m.id === "m1")?.monitoring
-        ).toBeTruthy();
-        expect(
-            merged.monitors.find((m) => m.id === "m2")?.monitoring
-        ).toBeFalsy();
-        expect(merged.monitors.find((m) => m.id === "m2")?.responseTime).toBe(
-            999
-        );
-
-        // Exercise the merge path that skips invalid overlay monitors.
-        const mergedWithInvalid = mergeSiteSnapshots(canonicalSite, {
-            identifier: "site",
-            monitoring: false,
-            name: "Ignored",
-            monitors: [{ id: "missing-fields" } as any],
-        });
-        expect(mergedWithInvalid.monitors).toHaveLength(2);
-    });
 });
