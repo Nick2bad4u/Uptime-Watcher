@@ -48,20 +48,6 @@ vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
 
-vi.mock(
-    "../../services/utils/createIpcServiceHelpers",
-    async (importOriginal) => {
-        const actual =
-            await importOriginal<
-                typeof import("../../services/utils/createIpcServiceHelpers")
-            >();
-        return {
-            ...actual,
-            createIpcServiceHelpers: actual.createIpcServiceHelpers,
-        };
-    }
-);
-
 describe("StateSyncService", () => {
     let capturedHandler: ((event: unknown) => void) | undefined;
     let cleanupSpy: ReturnType<typeof vi.fn>;

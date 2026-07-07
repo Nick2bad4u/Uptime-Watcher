@@ -96,7 +96,7 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-describe("createIpcServiceHelpers", () => {
+describe("getIpcServiceHelpers", () => {
     it("merges bridge options and contracts before waiting for readiness", async () => {
         const { module, waitForElectronBridge } = await setupModule();
         waitForElectronBridge.mockResolvedValueOnce(undefined);
@@ -105,7 +105,7 @@ describe("createIpcServiceHelpers", () => {
             methods: ["publish"],
         };
 
-        const helpers = module.createIpcServiceHelpers("SitesService", {
+        const helpers = module.getIpcServiceHelpers("SitesService", {
             bridgeContracts: [contract],
             bridgeOptions: {
                 baseDelay: 75,
@@ -135,7 +135,7 @@ describe("createIpcServiceHelpers", () => {
 
         waitForElectronBridge.mockReturnValueOnce(pending);
 
-        const helpers = module.createIpcServiceHelpers("SitesService");
+        const helpers = module.getIpcServiceHelpers("SitesService");
 
         const first = helpers.ensureInitialized();
         const second = helpers.ensureInitialized();
@@ -168,7 +168,7 @@ describe("createIpcServiceHelpers", () => {
         );
         waitForElectronBridge.mockRejectedValueOnce(failure);
 
-        const helpers = module.createIpcServiceHelpers("SiteSync");
+        const helpers = module.getIpcServiceHelpers("SiteSync");
 
         await expect(helpers.ensureInitialized()).rejects.toBe(failure);
 
@@ -186,7 +186,7 @@ describe("createIpcServiceHelpers", () => {
         const failure = new Error("something exploded");
         waitForElectronBridge.mockRejectedValueOnce(failure);
 
-        const helpers = module.createIpcServiceHelpers("MetricsService");
+        const helpers = module.getIpcServiceHelpers("MetricsService");
 
         await expect(helpers.ensureInitialized()).rejects.toBe(failure);
 
@@ -201,7 +201,7 @@ describe("createIpcServiceHelpers", () => {
         const { ensureError, loggerError, module, waitForElectronBridge } =
             await setupModule();
         waitForElectronBridge.mockResolvedValueOnce(undefined);
-        const helpers = module.createIpcServiceHelpers("HistoryService");
+        const helpers = module.getIpcServiceHelpers("HistoryService");
         const handlerError = new Error("handler failed");
         const handler = vi.fn(
             async (
@@ -253,7 +253,7 @@ describe("createIpcServiceHelpers", () => {
             },
         });
 
-        const helpers = module.createIpcServiceHelpers("AccessorService");
+        const helpers = module.getIpcServiceHelpers("AccessorService");
         const handler = vi.fn(async (api: typeof window.electronAPI) => api);
 
         await expect(helpers.wrap("load", handler)()).resolves.toBe(
@@ -287,7 +287,7 @@ describe("createIpcServiceHelpers", () => {
             })
         );
 
-        const helpers = module.createIpcServiceHelpers("AccessorService", {
+        const helpers = module.getIpcServiceHelpers("AccessorService", {
             bridgeContracts: [{ domain: "sites" }],
         });
         const handler = vi.fn(async () => undefined);
@@ -330,7 +330,7 @@ describe("createIpcServiceHelpers", () => {
         });
         waitForElectronBridge.mockResolvedValueOnce(undefined);
 
-        const helpers = module.createIpcServiceHelpers("FallbackService");
+        const helpers = module.getIpcServiceHelpers("FallbackService");
         const failure = new Error("operation failed");
         const handler = vi.fn(async () => {
             throw failure;

@@ -139,7 +139,7 @@ const createStructuredFallbackLogger = (serviceName: string): LoggerLike => {
 };
 
 /**
- * Options for configuring {@link createIpcServiceHelpers} behavior.
+ * Options for configuring IPC helper behavior.
  *
  * @internal
  */
@@ -156,9 +156,8 @@ interface CreateIpcServiceHelpersOptions {
  * Typed wrapper utilities for building guarded IPC services.
  *
  * @remarks
- * Returned by {@link createIpcServiceHelpers} and {@link getIpcServiceHelpers}.
- * Consumers typically spread these helpers into service objects exposed from
- * `src/services`.
+ * Returned by {@link getIpcServiceHelpers}. Consumers typically spread these
+ * helpers into service objects exposed from `src/services`.
  *
  * @public
  */
@@ -188,9 +187,9 @@ export interface GuardedIpcServiceHelpers {
  *
  * @returns Helper functions for building guarded IPC service methods.
  *
- * @public
+ * @internal
  */
-export function createIpcServiceHelpers(
+function createIpcServiceHelpers(
     serviceName: string,
     options: CreateIpcServiceHelpersOptions = {}
 ): GuardedIpcServiceHelpers {
