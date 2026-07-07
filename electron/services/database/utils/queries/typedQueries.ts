@@ -273,7 +273,7 @@ export function queryForIds(
  *
  * @returns Array of records
  */
-export function queryForRecords<T extends object = UnknownRecord>(
+function queryForRecords<T extends object = UnknownRecord>(
     db: Database,
     sql: string,
     params?: DbValue[],
@@ -297,7 +297,7 @@ export function queryForRecords<T extends object = UnknownRecord>(
  *
  * @returns Single record or undefined
  */
-export function queryForSingleRecord<TRow extends object = UnknownRecord>(
+function queryForSingleRecord<TRow extends object = UnknownRecord>(
     db: Database,
     sql: string,
     params?: DbValue[],
