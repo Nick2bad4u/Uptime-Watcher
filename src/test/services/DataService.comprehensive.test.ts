@@ -162,8 +162,38 @@ function createMockDataApi() {
     };
 }
 
+interface MockElectronAPI {
+    data: ReturnType<typeof createMockDataApi>;
+}
+
+interface MockWindow {
+    electronAPI?: MockElectronAPI;
+}
+
+const getMockWindow = (): MockWindow | undefined => {
+    const windowRef = Reflect.get(globalThis, "window");
+    return windowRef !== undefined && typeof windowRef === "object"
+        ? (windowRef as unknown as MockWindow)
+        : undefined;
+};
+
+const getMockGlobalElectronAPI = (): MockElectronAPI | undefined => {
+    const bridge = Reflect.get(globalThis, "electronAPI");
+    return bridge !== undefined && typeof bridge === "object"
+        ? (bridge as MockElectronAPI)
+        : undefined;
+};
+
+const getRequiredMockElectronAPI = (): MockElectronAPI => {
+    const bridge = getMockWindow()?.electronAPI ?? getMockGlobalElectronAPI();
+    if (!bridge) {
+        throw new Error("Mock Electron API is not installed");
+    }
+    return bridge;
+};
+
 describe("DataService", () => {
-    let mockElectronAPI: { data: ReturnType<typeof createMockDataApi> };
+    let mockElectronAPI: MockElectronAPI;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -174,16 +204,19 @@ describe("DataService", () => {
         };
 
         // Set up global window.electronAPI mock
-        (globalThis as any).window = {
-            electronAPI: mockElectronAPI,
-        };
+        Object.defineProperty(globalThis, "window", {
+            configurable: true,
+            value: {
+                electronAPI: mockElectronAPI,
+            } satisfies MockWindow,
+            writable: true,
+        });
 
         // Default successful initialization
         mockWaitForElectronBridge.mockReset();
         mockWaitForElectronBridge.mockImplementation(async () => {
             const bridge =
-                (globalThis as any).window?.electronAPI ??
-                (globalThis as any).electronAPI;
+                getMockWindow()?.electronAPI ?? getMockGlobalElectronAPI();
 
             if (!bridge) {
                 throw new MockElectronBridgeNotReadyError({
@@ -196,7 +229,7 @@ describe("DataService", () => {
 
     afterEach(() => {
         vi.resetAllMocks();
-        delete (globalThis as any).window;
+        Reflect.deleteProperty(globalThis, "window");
     });
 
     describe("Service Structure", () => {
@@ -644,7 +677,11 @@ describe("DataService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             // Remove the electronAPI
-            Reflect.deleteProperty((globalThis as any).window, "electronAPI");
+            const mockWindow = getMockWindow();
+            if (!mockWindow) {
+                throw new Error("Mock window is not installed");
+            }
+            Reflect.deleteProperty(mockWindow, "electronAPI");
 
             await expect(DataService.exportData()).rejects.toThrow();
         });
@@ -652,7 +689,7 @@ describe("DataService", () => {
         it("should handle partial electron API gracefully", async () => {
             // Remove specific method
             Reflect.deleteProperty(
-                (globalThis as any).window.electronAPI.data,
+                getRequiredMockElectronAPI().data,
                 "exportData"
             );
 
