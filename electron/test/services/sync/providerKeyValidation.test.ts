@@ -21,6 +21,12 @@ describe("providerKeyValidation", () => {
                 assertValidSyncDeviceId("device/a");
             }).toThrow(/path separators/i);
         });
+
+        it("rejects non-string IDs with the historical TypeError", () => {
+            expect(() => {
+                assertValidSyncDeviceId(123);
+            }).toThrow(TypeError);
+        });
     });
 
     describe("assertOpsObjectKey and isValidOpsObjectKey", () => {
@@ -31,6 +37,10 @@ describe("providerKeyValidation", () => {
         });
 
         it("rejects unsafe provider-key syntax before parsing operation metadata", () => {
+            expect(() => {
+                assertOpsObjectKey(123);
+            }).toThrow(/non-empty string/i);
+
             expect(() => {
                 assertOpsObjectKey("sync/devices/device-a/ops/../evil.ndjson");
             }).toThrow(/traversal/i);

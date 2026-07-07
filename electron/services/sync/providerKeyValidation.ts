@@ -21,7 +21,7 @@ const MAX_SYNC_KEY_BYTES = 2048;
  * Expected format:
  * `sync/devices/<deviceId>/ops/<createdAt>-<firstOpId>-<lastOpId>.ndjson`
  */
-export function assertOpsObjectKey(key: string): void {
+export function assertOpsObjectKey(key: unknown): void {
     assertSafeProviderKey(key);
 
     const segments = stringSplit(key, "/");
@@ -81,7 +81,7 @@ export function assertOpsObjectKey(key: string): void {
  * This rejects traversal segments, control characters, URL-like tokens, and
  * other malformed key patterns.
  */
-function assertSafeProviderKey(key: string): void {
+function assertSafeProviderKey(key: unknown): asserts key is string {
     if (typeof key !== "string" || key.trim().length === 0) {
         throw new Error("Key must be a non-empty string");
     }
@@ -132,7 +132,7 @@ function assertSafeProviderKey(key: string): void {
  * - `<createdAt>.json` (legacy)
  * - `<createdAt>-<nonceHex>.json` (v2)
  */
-export function assertSnapshotKey(key: string): void {
+export function assertSnapshotKey(key: unknown): void {
     assertSafeProviderKey(key);
 
     const segments = stringSplit(key, "/");
@@ -168,9 +168,10 @@ export function assertSnapshotKey(key: string): void {
  * Keeps historical error messages stable so existing tests and telemetry
  * comparisons do not regress.
  */
-export function assertValidSyncDeviceId(deviceId: string): void {
-    // Keep the historical TypeError for non-string values (even though call
-    // sites are typed as string).
+export function assertValidSyncDeviceId(
+    deviceId: unknown
+): asserts deviceId is string {
+    // Keep the historical TypeError for non-string values.
     if (typeof deviceId !== "string") {
         throw new TypeError("deviceId must be a non-empty string");
     }
@@ -184,7 +185,7 @@ export function assertValidSyncDeviceId(deviceId: string): void {
 /**
  * Returns true when a cloud sync operation key is valid.
  */
-export function isValidOpsObjectKey(key: string): boolean {
+export function isValidOpsObjectKey(key: unknown): boolean {
     try {
         assertOpsObjectKey(key);
         return true;
