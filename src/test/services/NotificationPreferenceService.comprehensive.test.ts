@@ -22,7 +22,13 @@ const wrapMock = vi.hoisted(() =>
         ) =>
             vi.fn(async (preferences: NotificationPreferenceUpdate) => {
                 await ensureInitializedMock();
-                return handler((globalThis as any).electronAPI, preferences);
+                return handler(
+                    Reflect.get(
+                        globalThis,
+                        "electronAPI"
+                    ) as typeof window.electronAPI,
+                    preferences
+                );
             })
     )
 );
@@ -46,18 +52,65 @@ const createElectronApi = () => ({
     },
 });
 
+type MockElectronAPI = ReturnType<typeof createElectronApi>;
+
+interface MockWindow {
+    electronAPI?: MockElectronAPI;
+}
+
+const getMockGlobal = (): typeof globalThis & {
+    electronAPI?: MockElectronAPI;
+} => globalThis as typeof globalThis & { electronAPI?: MockElectronAPI };
+
+const getMockWindow = (): MockWindow | undefined => {
+    const windowRef = Reflect.get(globalThis, "window");
+    return windowRef !== undefined && typeof windowRef === "object"
+        ? (windowRef as unknown as MockWindow)
+        : undefined;
+};
+
+const getRequiredMockElectronAPI = (): MockElectronAPI => {
+    const bridge = getMockWindow()?.electronAPI ?? getMockGlobal().electronAPI;
+    if (!bridge) {
+        throw new Error("Mock Electron API is not installed");
+    }
+    return bridge;
+};
+
 describe("NotificationPreferenceService", () => {
+    let originalElectronAPI: MockElectronAPI | undefined;
+
     beforeEach(() => {
         ensureInitializedMock.mockClear();
         vi.mocked(NotificationPreferenceService.updatePreferences).mockClear();
         vi.mocked(NotificationPreferenceService.initialize).mockClear();
-        (globalThis as any).window = {
-            electronAPI: createElectronApi(),
-        };
+
+        const electronAPI = createElectronApi();
+        const globalWithElectronAPI = getMockGlobal();
+        originalElectronAPI = globalWithElectronAPI.electronAPI;
+
+        Object.defineProperty(globalThis, "window", {
+            configurable: true,
+            value: {
+                electronAPI,
+            } satisfies MockWindow,
+            writable: true,
+        });
+        Object.defineProperty(globalWithElectronAPI, "electronAPI", {
+            configurable: true,
+            value: electronAPI,
+            writable: true,
+        });
     });
 
     afterEach(() => {
-        delete (globalThis as any).window;
+        Reflect.deleteProperty(globalThis, "window");
+        Object.defineProperty(getMockGlobal(), "electronAPI", {
+            configurable: true,
+            value: originalElectronAPI,
+            writable: true,
+        });
+        originalElectronAPI = undefined;
     });
 
     it("configures IPC helpers with the notifications bridge contract", () => {
@@ -88,11 +141,7 @@ describe("NotificationPreferenceService", () => {
             systemNotificationsSoundEnabled: false,
         };
 
-        const bridge = (
-            (globalThis as any).electronAPI as unknown as ReturnType<
-                typeof createElectronApi
-            >
-        ).notifications;
+        const bridge = getRequiredMockElectronAPI().notifications;
 
         await expect(
             NotificationPreferenceService.updatePreferences(preferences)
@@ -109,7 +158,11 @@ describe("NotificationPreferenceService", () => {
     });
 
     it("throws a descriptive error when the electronAPI bridge is unavailable", async () => {
-        (globalThis as any).electronAPI = undefined;
+        Object.defineProperty(getMockGlobal(), "electronAPI", {
+            configurable: true,
+            value: undefined,
+            writable: true,
+        });
 
         await expect(
             NotificationPreferenceService.updatePreferences({
@@ -121,9 +174,13 @@ describe("NotificationPreferenceService", () => {
     });
 
     it("throws when the notifications bridge lacks an updatePreferences method", async () => {
-        (globalThis as any).electronAPI = {
-            notifications: {},
-        };
+        Object.defineProperty(getMockGlobal(), "electronAPI", {
+            configurable: true,
+            value: {
+                notifications: {},
+            },
+            writable: true,
+        });
 
         await expect(
             NotificationPreferenceService.updatePreferences({
