@@ -4,7 +4,9 @@
 
 import { describe, expect, it } from "vitest";
 
-import { darkTheme, lightTheme } from "../theme/themes";
+import { themes } from "../theme/themes";
+
+const { dark: darkTheme, light: lightTheme } = themes;
 
 describe("Theme Definitions", () => {
     describe("lightTheme", () => {

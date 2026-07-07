@@ -4,7 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Theme } from "../theme/types";
 
 import { ThemeManager } from "../theme/ThemeManager";
-import { darkTheme, lightTheme } from "../theme/themes";
+import { themes } from "../theme/themes";
+
+const { dark: darkTheme, light: lightTheme } = themes;
 
 // Mock DOM environment
 Object.defineProperty(globalThis, "matchMedia", {

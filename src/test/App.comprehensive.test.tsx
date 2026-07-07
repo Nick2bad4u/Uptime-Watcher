@@ -26,7 +26,7 @@ import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
 import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
-import { darkTheme, lightTheme } from "../theme/themes";
+import { themes } from "../theme/themes";
 import { useTheme } from "../theme/useTheme";
 
 // Mock all required modules
@@ -216,7 +216,7 @@ describe("App Component - Comprehensive Coverage", () => {
     };
 
     const createMockTheme = (isDark = false) => {
-        const baseTheme = isDark ? darkTheme : lightTheme;
+        const baseTheme = isDark ? themes.dark : themes.light;
         const currentTheme = cloneTheme(baseTheme);
         const mockGetColor = vi.fn((path: string) =>
             getThemeColorByPath(currentTheme, path)

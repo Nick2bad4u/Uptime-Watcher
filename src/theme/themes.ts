@@ -163,11 +163,11 @@ function createTheme(overrides: Partial<Theme>): Theme {
  * @example
  *
  * ```typescript
- * import { lightTheme } from "./themes";
- * themeManager.applyTheme(lightTheme);
+ * import { themes } from "./themes";
+ * themeManager.applyTheme(themes.light);
  * ```
  */
-export const lightTheme: Theme = createTheme({
+const lightTheme: Theme = createTheme({
     // Light theme uses base theme values (no overrides needed)
 });
 
@@ -183,11 +183,11 @@ export const lightTheme: Theme = createTheme({
  * @example
  *
  * ```typescript
- * import { darkTheme } from "./themes";
- * themeManager.applyTheme(darkTheme);
+ * import { themes } from "./themes";
+ * themeManager.applyTheme(themes.dark);
  * ```
  */
-export const darkTheme: Theme = createTheme({
+const darkTheme: Theme = createTheme({
     colors: {
         background: {
             modal: "rgba(5, 9, 18, 0.82)",
