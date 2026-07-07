@@ -55,6 +55,46 @@ describe("CloudBackupMetadataFile buffer parsing", () => {
         ).toThrow(/Backup metadata file contained invalid JSON/u);
     });
 
+    it("rejects prototype-named metadata keys without mutating Object.prototype", () => {
+        const entry = createEntry();
+        const payloadObject = { ...entry };
+        Object.defineProperty(payloadObject, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: { polluted: true },
+            writable: true,
+        });
+        const payload = JSON.stringify(payloadObject);
+
+        expect(() =>
+            parseCloudBackupMetadataFileBuffer(Buffer.from(payload, "utf8"))
+        ).toThrow(/Backup metadata file did not match the expected format/u);
+        expect(Object.hasOwn(Object.prototype, "polluted")).toBeFalsy();
+    });
+
+    it("rejects prototype-named nested backup metadata keys", () => {
+        const entry = createEntry();
+        const metadata = { ...entry.metadata };
+        Object.defineProperty(metadata, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: { polluted: true },
+            writable: true,
+        });
+        const payload = JSON.stringify({ ...entry, metadata });
+
+        expect(() =>
+            parseCloudBackupMetadataFileBuffer(Buffer.from(payload, "utf8"))
+        ).toThrow(/Backup metadata file did not match the expected format/u);
+        expect(Object.hasOwn(Object.prototype, "polluted")).toBeFalsy();
+    });
+
+    it("reports valid non-object JSON as an invalid metadata shape", () => {
+        expect(() =>
+            parseCloudBackupMetadataFileBuffer(Buffer.from("[]", "utf8"))
+        ).toThrow(/Backup metadata file did not match the expected format/u);
+    });
+
     it("returns null when best-effort metadata parsing receives invalid UTF-8", () => {
         expect(
             tryParseCloudBackupMetadataFileBuffer(

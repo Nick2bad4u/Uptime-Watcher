@@ -1,7 +1,7 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 
 import { ensureError } from "@shared/utils/errorHandling";
-import { tryParseJsonRecord } from "@shared/utils/jsonSafety";
+import { safeJsonParseValue } from "@shared/utils/jsonSafety";
 import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import { validateCloudBackupEntry } from "@shared/validation/cloudBackupSchemas";
 import { arrayJoin } from "ts-extras";
@@ -70,18 +70,14 @@ export function parseCloudBackupMetadataFileBuffer(
     buffer: Buffer
 ): CloudBackupEntry {
     const text = decodeMetadataBufferStrict(buffer);
-    let parsed: unknown;
-    try {
-        parsed = JSON.parse(text);
-    } catch (error: unknown) {
-        const normalized = ensureError(error);
+    const parsed = safeJsonParseValue(text);
+    if (!parsed.success) {
         throw new TypeError(
-            `Backup metadata file contained invalid JSON: ${normalized.message}`,
-            { cause: error }
+            `Backup metadata file contained invalid JSON: ${parsed.error ?? "unknown error"}`
         );
     }
 
-    return parseCloudBackupMetadataFile(parsed);
+    return parseCloudBackupMetadataFile(parsed.data);
 }
 
 /**
@@ -115,13 +111,13 @@ export function tryParseCloudBackupMetadataFileBuffer(
         return null;
     }
 
-    const parsed = tryParseJsonRecord(text);
-    if (!parsed) {
+    const parsed = safeJsonParseValue(text);
+    if (!parsed.success) {
         return null;
     }
 
     try {
-        return parseCloudBackupMetadataFile(parsed);
+        return parseCloudBackupMetadataFile(parsed.data);
     } catch {
         return null;
     }

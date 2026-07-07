@@ -3,6 +3,7 @@ import type { JsonValue } from "type-fest";
 import {
     safeJsonParse,
     safeJsonParseArray,
+    safeJsonParseValue,
     safeJsonParseWithFallback,
     safeJsonStringify,
     safeJsonStringifyWithFallback,
@@ -88,6 +89,34 @@ describe("jsonSafety behavior", () => {
 
         it("returns detailed errors when JSON is invalid", () => {
             const result = safeJsonParse("{invalid", acceptAnyJsonValue);
+            expect(result.success).toBeFalsy();
+            expect(result.error).toContain("JSON parsing failed");
+        });
+    });
+
+    describe(safeJsonParseValue, () => {
+        it("parses any JSON value without a domain validator", () => {
+            const result = safeJsonParseValue(
+                '{"__proto__":{"polluted":true},"items":[{"constructor":"data"}]}'
+            );
+
+            expect(result.success).toBeTruthy();
+            expect(Object.getPrototypeOf(result.data)).toBeNull();
+            expect(
+                Object.getOwnPropertyDescriptor(result.data, "__proto__")
+            ).toMatchObject({
+                enumerable: true,
+                value: { polluted: true },
+            });
+
+            const items = (result.data as Record<string, unknown>)["items"];
+            expect(Array.isArray(items)).toBeTruthy();
+            expect(Object.getPrototypeOf((items as unknown[])[0])).toBeNull();
+        });
+
+        it("returns detailed errors when JSON is invalid", () => {
+            const result = safeJsonParseValue("{invalid");
+
             expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON parsing failed");
         });

@@ -6,7 +6,10 @@ import {
 } from "@shared/utils/cloudKeyNormalization";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
-import { serializedDatabaseBackupMetadataSchema } from "@shared/validation/dataSchemas";
+import {
+    hasForbiddenRecordKey,
+    serializedDatabaseBackupMetadataSchema,
+} from "@shared/validation/dataSchemas";
 import { stringSplit } from "ts-extras";
 import * as z from "zod";
 
@@ -88,13 +91,20 @@ const cloudBackupKeySchema = z
  * Treat unknown fields as corruption or incompatible schema changes.
  */
 const cloudBackupEntrySchema: z.ZodType<CloudBackupEntry> = z
-    .object({
-        encrypted: z.boolean(),
-        fileName: cloudBackupFileNameSchema,
-        key: cloudBackupKeySchema,
-        metadata: serializedDatabaseBackupMetadataSchema,
-    })
-    .strict()
+    .custom<unknown>(
+        (value) => !hasForbiddenRecordKey(value),
+        "Cloud backup metadata file must not include reserved object keys"
+    )
+    .pipe(
+        z
+            .object({
+                encrypted: z.boolean(),
+                fileName: cloudBackupFileNameSchema,
+                key: cloudBackupKeySchema,
+                metadata: serializedDatabaseBackupMetadataSchema,
+            })
+            .strict()
+    )
     .superRefine((entry, context) => {
         const expectedFileName = stringSplit(entry.key, "/").pop() ?? "";
         if (entry.fileName !== expectedFileName) {

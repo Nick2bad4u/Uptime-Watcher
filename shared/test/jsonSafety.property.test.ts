@@ -4,6 +4,7 @@ import { fc, test } from "@fast-check/vitest";
 import {
     safeJsonParse,
     safeJsonParseArray,
+    safeJsonParseValue,
     safeJsonParseWithFallback,
     safeJsonStringify,
     safeJsonStringifyWithFallback,
@@ -95,6 +96,22 @@ describe("jsonSafety property tests", () => {
             const result = safeJsonParse(JSON.stringify(payload), validator);
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual(payload);
+        });
+    });
+
+    describe(safeJsonParseValue, () => {
+        test.prop([fc.jsonValue()])("round-trips values", (sample) => {
+            const encoded = JSON.stringify(sample);
+            const result = safeJsonParseValue(encoded);
+            expect(result.success).toBeTruthy();
+            const normalizedSample = JSON.parse(encoded) as JsonValue;
+            expect(result.data).toEqual(normalizedSample);
+        });
+
+        it("returns detailed errors for invalid JSON", () => {
+            const result = safeJsonParseValue("{invalid");
+            expect(result.success).toBeFalsy();
+            expect(result.error).toContain("JSON parsing failed");
         });
     });
 

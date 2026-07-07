@@ -112,6 +112,33 @@ export function tryParseJsonRecord(text: string): null | UnknownRecord {
 }
 
 /**
+ * Parses a JSON string into a normalized JSON value.
+ *
+ * @remarks
+ * Use this at trust boundaries that need the raw parsed value for downstream
+ * schema validation. Object entries are cloned into null-prototype records with
+ * data-backed own properties, matching the safer behavior of the typed parse
+ * helpers without requiring a domain-specific validator at this layer.
+ *
+ * @param json - Raw JSON string to parse.
+ *
+ * @returns Structured result containing the normalized JSON value or a message.
+ */
+export function safeJsonParseValue(json: string): SafeJsonResult<JsonValue> {
+    return safeOperation(() => {
+        const parsed: unknown = JSON.parse(json);
+
+        if (!isParsedJsonValue(parsed)) {
+            throw new JsonValidationError(
+                "Parsed data does not match expected JSON value"
+            );
+        }
+
+        return cloneParsedJsonData(parsed);
+    }, "JSON parsing failed");
+}
+
+/**
  * Executes an operation and converts thrown errors into {@link SafeJsonResult}
  * objects.
  *

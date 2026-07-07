@@ -32,7 +32,7 @@ const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
     "Expected transferable ArrayBuffer"
 );
 
-const hasForbiddenRecordKey = (value: unknown): boolean =>
+export const hasForbiddenRecordKey = (value: unknown): boolean =>
     typeof value === "object" &&
     value !== null &&
     FORBIDDEN_RECORD_KEYS.some((key) => Object.hasOwn(value, key));
@@ -119,16 +119,25 @@ const exactNonEmptyStringSchema = (label: string): z.ZodType<string> =>
 
 export const serializedDatabaseBackupMetadataSchema: z.ZodType<SerializedDatabaseBackupMetadata> =
     z
-        .object({
-            appVersion: exactNonEmptyStringSchema("Backup app version"),
-            checksum: exactNonEmptyStringSchema("Backup checksum"),
-            createdAt: epochMsSchema,
-            originalPath: exactNonEmptyStringSchema("Backup original path"),
-            retentionHintDays: z.int().nonnegative(),
-            schemaVersion: z.int().nonnegative(),
-            sizeBytes: z.int().nonnegative(),
-        })
-        .strict();
+        .custom<unknown>(
+            (value) => !hasForbiddenRecordKey(value),
+            "Backup metadata must not include reserved object keys"
+        )
+        .pipe(
+            z
+                .object({
+                    appVersion: exactNonEmptyStringSchema("Backup app version"),
+                    checksum: exactNonEmptyStringSchema("Backup checksum"),
+                    createdAt: epochMsSchema,
+                    originalPath: exactNonEmptyStringSchema(
+                        "Backup original path"
+                    ),
+                    retentionHintDays: z.int().nonnegative(),
+                    schemaVersion: z.int().nonnegative(),
+                    sizeBytes: z.int().nonnegative(),
+                })
+                .strict()
+        );
 
 const serializedDatabaseBackupResultSchema: z.ZodType<{
     buffer: ArrayBuffer;
