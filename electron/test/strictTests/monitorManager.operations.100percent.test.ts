@@ -19,7 +19,6 @@ import {
 import { createMonitorActionDelegate } from "../../managers/monitorManager/createMonitorActionDelegate";
 import { handleScheduledCheckOperation } from "../../managers/monitorManager/handleScheduledCheckOperation";
 import {
-    MonitoringAllOperationError,
     startMonitoringAllOperation,
     stopMonitoringAllOperation,
 } from "../../managers/monitorManager/toggleMonitoringAllOperation";
@@ -639,8 +638,8 @@ describe("monitorManager helper operations", () => {
             thrown = error;
         }
 
-        expect(thrown).toBeInstanceOf(MonitoringAllOperationError);
         expect(thrown).toMatchObject({
+            name: "MonitoringAllOperationError",
             summary,
         });
     });

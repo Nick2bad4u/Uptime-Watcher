@@ -26,7 +26,7 @@ type MonitoringAllOperationSummary =
  * Error raised when a global monitoring lifecycle operation returns an
  * internally inconsistent summary.
  */
-export class MonitoringAllOperationError extends Error {
+class MonitoringAllOperationError extends Error {
     public readonly summary: MonitoringAllOperationSummary;
 
     public constructor(
