@@ -133,7 +133,7 @@ const toJsonifiable = (value: unknown): Jsonifiable => {
     }
 
     if (typeof value === "bigint" || typeof value === "symbol") {
-        return value.toString();
+        return String(value);
     }
 
     if (typeof value === "function") {

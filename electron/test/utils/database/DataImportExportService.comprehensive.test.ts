@@ -466,6 +466,66 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(Object.hasOwn(exportedSettings, "prototype")).toBe(false);
         });
 
+        it("should not invoke primitive prototype toString while exporting non-schema values", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Export", "category");
+
+            const { safeJsonStringifyWithFallback } =
+                await import("@shared/utils/jsonSafety");
+            const safeJsonStringifyWithFallbackMock = vi.mocked(
+                safeJsonStringifyWithFallback
+            );
+            const bigintToStringSpy = vi
+                .spyOn(BigInt.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("BigInt.prototype.toString called");
+                });
+            const symbolToStringSpy = vi
+                .spyOn(Symbol.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("Symbol.prototype.toString called");
+                });
+            const symbolValue = Symbol("exported-setting");
+
+            mockRepositories.site.exportAllRows.mockResolvedValue([]);
+            mockRepositories.settings.getAll.mockResolvedValue({
+                numeric: 123n,
+                symbolic: symbolValue,
+            });
+            safeJsonStringifyWithFallbackMock.mockReturnValue(
+                '{"exported":true}'
+            );
+
+            try {
+                await expect(service.exportAllData()).resolves.toBe(
+                    '{"exported":true}'
+                );
+
+                const [firstCall] =
+                    safeJsonStringifyWithFallbackMock.mock.calls;
+                expect(firstCall).toBeDefined();
+
+                const [payload] = firstCall!;
+                const exportedSettings = (
+                    payload as { settings: Record<string, string> }
+                ).settings;
+
+                expect(exportedSettings).toMatchObject({
+                    numeric: "123",
+                    symbolic: "Symbol(exported-setting)",
+                });
+                expect(bigintToStringSpy).not.toHaveBeenCalled();
+                expect(symbolToStringSpy).not.toHaveBeenCalled();
+            } finally {
+                bigintToStringSpy.mockRestore();
+                symbolToStringSpy.mockRestore();
+            }
+        });
+
         it("should handle export errors and emit database error event", async ({
             task,
             annotate,
