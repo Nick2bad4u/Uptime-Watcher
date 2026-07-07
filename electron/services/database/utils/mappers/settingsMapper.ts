@@ -31,9 +31,9 @@ export interface SettingRow {
  *
  * @returns True if row is valid
  *
- * @public
+ * @internal
  */
-export function isValidSettingRow(row: DatabaseSettingsRow): boolean {
+function isValidSettingRow(row: DatabaseSettingsRow): boolean {
     return isNonEmptyString(row.key);
 }
 
@@ -70,9 +70,9 @@ export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
  *
  * @throws {@link Error} When row has invalid key
  *
- * @public
+ * @internal
  */
-export function rowToSetting(row: DatabaseSettingsRow): SettingRow {
+function rowToSetting(row: DatabaseSettingsRow): SettingRow {
     try {
         // Handle key (required field) with validator-based checking
         const { key } = row;
@@ -136,23 +136,6 @@ export function rowToSettingValue(
 
     return safeStringify(row.value);
 }
-
-/**
- * Convert a database row to a SettingRow object.
- *
- * @remarks
- * Handles type conversion and ensures consistent data transformation across all
- * settings-related database operations. Uses precise type checking instead of
- * loose falsy checks for better type safety.
- *
- * @param row - Raw database row
- *
- * @returns Mapped SettingRow object
- *
- * @throws {@link Error} When row has invalid key
- *
- * @public
- */
 
 /**
  * Convert SettingRow array to a Record object mapping keys to values.
