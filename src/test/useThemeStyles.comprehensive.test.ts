@@ -272,13 +272,16 @@ describe(useThemeStyles, () => {
         const originalMatchMedia = matchMedia;
         // Remove matchMedia to test defensive programming
 
-        delete (globalThis as any).matchMedia;
+        Reflect.deleteProperty(globalThis, "matchMedia");
 
         expect(() => {
             renderHook(() => useThemeStyles());
         }).not.toThrow();
 
-        globalThis.matchMedia = originalMatchMedia;
+        Object.defineProperty(globalThis, "matchMedia", {
+            value: originalMatchMedia,
+            writable: true,
+        });
     });
 
     it("should provide transition effects", async ({ task, annotate }) => {
