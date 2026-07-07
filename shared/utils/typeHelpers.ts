@@ -124,7 +124,7 @@ export function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 
 /**
  * Asserts that a value is record-like (a non-null, non-array object) and
- * returns it as an {@link UnknownRecord}.
+ * returns it as an `UnknownRecord`.
  *
  * @remarks
  * Use this when a record-like shape is required for correct operation. Prefer

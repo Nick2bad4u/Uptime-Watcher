@@ -33,7 +33,7 @@
  *
  * @public
  *
- * @see {@link IMonitorService} - Interface contract for monitor services
+ * @see `IMonitorService` - Interface contract for monitor services
  * @see {@link MonitorServiceConfig} - Service-level configuration options
  * @see {@link performPingCheckWithRetry} - Core ping checking functionality
  */
@@ -53,7 +53,7 @@ import { performPingCheckWithRetry } from "./utils/pingRetry";
  * Service for performing ping monitoring checks.
  *
  * @remarks
- * Implements the {@link IMonitorService} interface to provide ICMP ping
+ * Implements the `IMonitorService` interface to provide ICMP ping
  * connectivity monitoring with advanced features for reliability and
  * performance. Uses the node-ping wrapper around system ping utilities for
  * cross-platform compatibility.
@@ -132,7 +132,7 @@ export class PingMonitor extends ConfigurableMonitorServiceBase<"ping"> {
      * @returns Promise resolving to {@link MonitorCheckResult} with status,
      *   timing, and error data
      *
-     * @throws {@link Error} When monitor validation fails (wrong type or
+     * @throws `Error` when monitor validation fails (wrong type or
      *   missing host)
      *
      * @see {@link resolveMonitorHost} - Host validation utility

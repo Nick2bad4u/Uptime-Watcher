@@ -150,7 +150,7 @@ export class DatabaseService {
      *
      * @returns Promise resolving to the operation result.
      *
-     * @throws {@link Error} When transaction fails or operation throws.
+     * @throws `Error` when transaction fails or operation throws.
      */
     public async executeTransaction<T>(
         operation: (db: Database) => Promise<T>
@@ -323,7 +323,7 @@ export class DatabaseService {
      *
      * @returns Void
      *
-     * @throws {@link Error} When connection close fails.
+     * @throws `Error` when connection close fails.
      */
     public close(): void {
         if (this.db) {
@@ -383,7 +383,7 @@ export class DatabaseService {
      *
      * @returns The active database connection.
      *
-     * @throws {@link Error} When database is not initialized.
+     * @throws `Error` when database is not initialized.
      */
     public getDatabase(): Database {
         if (!this.db) {
@@ -427,7 +427,7 @@ export class DatabaseService {
      *
      * @returns The initialized database instance.
      *
-     * @throws {@link Error} When database initialization fails.
+     * @throws `Error` when database initialization fails.
      */
     public initialize(): Database {
         if (this.db) {

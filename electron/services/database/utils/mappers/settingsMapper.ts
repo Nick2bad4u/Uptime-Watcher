@@ -68,7 +68,7 @@ export function rowsToSettings(rows: DatabaseSettingsRow[]): SettingRow[] {
  *
  * @returns Mapped SettingRow object
  *
- * @throws {@link Error} When row has invalid key
+ * @throws `Error` when row has invalid key
  *
  * @internal
  */
@@ -123,7 +123,7 @@ function rowToSetting(row: DatabaseSettingsRow): SettingRow {
  *
  * @returns Setting value as string or undefined if not found
  *
- * @throws {@link Error} When safeStringify conversion fails for complex objects
+ * @throws `Error` when safeStringify conversion fails for complex objects
  *
  * @public
  */

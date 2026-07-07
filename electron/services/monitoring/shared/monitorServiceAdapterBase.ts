@@ -7,7 +7,7 @@
  *
  * - Store an Axios instance
  * - Store the resolved monitor service config
- * - Expose {@link IMonitorService.getType}
+ * - Expose `IMonitorService.getType`
  *
  * Centralizing these pieces reduces duplication without changing behavior.
  */
@@ -23,7 +23,7 @@ import type {
 
 /**
  * Base class implementing the shared, non-behavioral parts of
- * {@link IMonitorService} adapters.
+ * `IMonitorService` adapters.
  */
 export abstract class MonitorServiceAdapterBase<
     TType extends Site["monitors"][number]["type"],

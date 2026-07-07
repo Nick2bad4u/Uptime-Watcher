@@ -60,7 +60,7 @@ const HISTORY_MANIPULATION_QUERIES = {
  * @param entry - StatusHistory object containing check results
  * @param details - Optional additional details about the check
  *
- * @throws {@link Error} When database insertion fails
+ * @throws `Error` when database insertion fails
  *
  * @internal
  */
@@ -108,7 +108,7 @@ export function addHistoryEntry(
  *
  * @param db - Database connection instance
  *
- * @throws {@link Error} When database deletion fails
+ * @throws `Error` when database deletion fails
  *
  * @internal
  */
@@ -133,7 +133,7 @@ export function deleteAllHistory(db: Database): void {
  * @param db - Database connection instance
  * @param monitorId - Unique identifier of the monitor
  *
- * @throws {@link Error} When database deletion fails
+ * @throws `Error` when database deletion fails
  *
  * @internal
  */
@@ -177,7 +177,7 @@ export function deleteHistoryByMonitorId(
  * @param monitorId - Unique identifier of the monitor
  * @param limit - Maximum number of history entries to retain
  *
- * @throws {@link Error} When database operations fail
+ * @throws `Error` when database operations fail
  *
  * @internal
  */

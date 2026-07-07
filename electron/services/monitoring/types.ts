@@ -69,7 +69,7 @@ export interface IMonitorService {
      *
      * @returns Promise resolving to the check result
      *
-     * @throws {@link Error} When monitor configuration is invalid or check
+     * @throws `Error` when monitor configuration is invalid or check
      *   fails catastrophically
      */
     check: (

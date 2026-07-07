@@ -166,7 +166,7 @@ const hasUserVersionProperty = (
  *
  * @param schema - The generated SQL schema string to validate.
  *
- * @throws {@link Error} When schema validation fails.
+ * @throws `Error` when schema validation fails.
  */
 function validateGeneratedSchema(schema: string): void {
     if (!schema || typeof schema !== "string") {

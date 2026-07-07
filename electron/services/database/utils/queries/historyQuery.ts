@@ -67,7 +67,7 @@ const HISTORY_QUERY_QUERIES = {
  *
  * @returns Array of StatusHistory objects ordered by timestamp (newest first)
  *
- * @throws {@link Error} When database query fails
+ * @throws `Error` when database query fails
  *
  * @internal
  */
@@ -111,7 +111,7 @@ export function findHistoryByMonitorId(
  *
  * @returns Number of history entries for the monitor (returns 0 if none found)
  *
- * @throws {@link Error} When database query fails
+ * @throws `Error` when database query fails
  *
  * @internal
  */
@@ -167,7 +167,7 @@ export function getHistoryCount(db: Database, monitorId: string): number {
  *
  * @returns Most recent StatusHistory object, or undefined if no entries exist
  *
- * @throws {@link Error} When database query fails
+ * @throws `Error` when database query fails
  *
  * @internal
  */

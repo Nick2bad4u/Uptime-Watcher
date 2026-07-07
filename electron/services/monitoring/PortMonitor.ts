@@ -27,7 +27,7 @@ import type { Site } from "@shared/types";
  *
  * @packageDocumentation
  *
- * @see {@link IMonitorService} for interface contract
+ * @see `IMonitorService` for interface contract
  * @see {@link MonitorServiceConfig} for configuration options
  */
 
@@ -77,7 +77,7 @@ export class PortMonitor extends ConfigurableMonitorServiceBase<"port"> {
      *
      * @returns Promise resolving to check result with status and timing data
      *
-     * @throws {@link Error} When monitor type is not "port"
+     * @throws `Error` when monitor type is not "port"
      */
     public async check(
         monitor: Site["monitors"][0],

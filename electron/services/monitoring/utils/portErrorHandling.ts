@@ -92,7 +92,7 @@ export interface PortCheckErrorResult {
  * information.
  *
  * @remarks
- * Extends the standard {@link Error} class to include timing data, supporting
+ * Extends the standard `Error` class to include timing data, supporting
  * diagnostics and retry/backoff strategies.
  *
  * @example
@@ -157,7 +157,7 @@ export class PortCheckError extends Error {
  * ```
  *
  * @param error - The error thrown during port checking. May be any type, but
- *   typically an {@link Error} or {@link PortCheckError}.
+ *   typically an `Error` or {@link PortCheckError}.
  * @param host - The hostname or IP address being checked.
  * @param port - The port number being checked.
  *

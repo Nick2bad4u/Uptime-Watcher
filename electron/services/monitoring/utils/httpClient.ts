@@ -40,7 +40,7 @@ import type { MonitorServiceConfig } from "../types";
  *
  * @param error - The unknown error value.
  *
- * @returns An {@link Error} instance for consistent error handling.
+ * @returns An `Error` instance for consistent error handling.
  *
  * @internal
  */

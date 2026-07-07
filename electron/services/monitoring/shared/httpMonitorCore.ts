@@ -98,7 +98,7 @@ type MonitorValidationResult<TContext> =
 
 /**
  * Concrete monitor service instance produced by
- * {@link createHttpMonitorService}, exposing the standard {@link IMonitorService}
+ * {@link createHttpMonitorService}, exposing the standard `IMonitorService`
  * contract plus access to the resolved {@link MonitorServiceConfig}.
  */
 export type HttpMonitorServiceInstance = IMonitorService & {

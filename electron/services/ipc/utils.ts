@@ -114,7 +114,7 @@ function isTrustedIpcSender(event: IpcMainInvokeEvent): boolean {
  * Structured metadata describing IPC handler execution characteristics.
  *
  * @remarks
- * This type intentionally extends {@link UnknownRecord} so additional diagnostic
+ * This type intentionally extends `UnknownRecord` so additional diagnostic
  * fields can be attached without weakening the metadata contract for known
  * properties like {@link handler}, {@link duration}, and {@link paramCount}.
  * Callers outside this module should continue to treat the public
@@ -175,7 +175,7 @@ function normalizeIpcResponseMetadata(metadata: UnknownRecord): UnknownRecord {
 }
 
 /**
- * Converts an {@link ArrayBufferView} into a standalone {@link ArrayBuffer}
+ * Converts an `ArrayBufferView` into a standalone {@link ArrayBuffer}
  * containing exactly the view's bytes.
  *
  * @remarks

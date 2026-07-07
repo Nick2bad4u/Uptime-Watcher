@@ -5,7 +5,7 @@
 import { useCallback, useMemo } from "react";
 
 /**
- * Color palette used by {@link getResponseTimeColorFromPalette}.
+ * Color palette used by the response-time color resolver.
  */
 export interface ResponseTimeColorPalette {
     readonly error: string;

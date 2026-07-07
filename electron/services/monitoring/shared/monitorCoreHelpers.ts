@@ -54,8 +54,8 @@ function buildMonitorExecutionBaseArgs<TContext>(args: {
 }
 
 /**
- * Convenience wrapper around {@link buildMonitorExecutionBaseArgs} that accepts
- * a `signal` typed as `AbortSignal | undefined`.
+ * Convenience wrapper around the internal `buildMonitorExecutionBaseArgs` that
+ * accepts a `signal` typed as `AbortSignal | undefined`.
  *
  * @remarks
  * With `exactOptionalPropertyTypes`, passing `{ signal }` where `signal` is

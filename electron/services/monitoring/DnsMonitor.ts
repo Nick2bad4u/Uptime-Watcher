@@ -37,7 +37,7 @@
  *
  * @public
  *
- * @see {@link IMonitorService} - Interface contract for monitor services
+ * @see `IMonitorService` - Interface contract for monitor services
  * @see {@link MonitorServiceConfig} - Service-level configuration defaults
  * @see {@link performDnsCheckWithRetry} - Core DNS checking functionality
  */
@@ -103,7 +103,7 @@ function isDnsAttemptFailedError(
 /**
  * Service for performing DNS monitoring checks.
  *
- * Implements the {@link IMonitorService} interface to provide DNS resolution
+ * Implements the `IMonitorService` interface to provide DNS resolution
  * monitoring with advanced features for reliability and performance. Uses the
  * native Node.js DNS module for cross-platform DNS resolution.
  *
@@ -183,7 +183,7 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
      * @returns Promise resolving to {@link MonitorCheckResult} with status,
      *   timing, and error data
      *
-     * @throws {@link Error} When monitor validation fails (wrong type or
+     * @throws `Error` when monitor validation fails (wrong type or
      *   missing hostname)
      *
      * @see {@link electron/services/monitoring/shared/monitorServiceHelpers#resolveMonitorHost} - Host validation utility

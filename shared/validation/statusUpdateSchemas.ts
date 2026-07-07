@@ -46,7 +46,7 @@ type StatusUpdateSchema = z.ZodObject<{
 /**
  * Constructs the canonical {@link StatusUpdate} validation schema.
  *
- * @returns A strict {@link z.ZodObject} that models the full status update
+ * @returns A strict `z.ZodObject` that models the full status update
  *   payload exchanged between renderer and orchestrator layers.
  */
 const createStatusUpdateSchema = (): StatusUpdateSchema =>

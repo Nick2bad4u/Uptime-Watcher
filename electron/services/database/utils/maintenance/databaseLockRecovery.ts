@@ -26,7 +26,7 @@ const RECOVERY_DIRECTORY_NAME = "stale-lock-artifacts" as const;
  * @returns A normalized absolute path guaranteed to remain inside the provided
  *   directory.
  *
- * @throws {@link Error} When the resolved candidate would escape the allowed
+ * @throws `Error` when the resolved candidate would escape the allowed
  *   directory.
  */
 const resolveCandidatePath = (directory: string, candidate: string): string => {
@@ -110,7 +110,7 @@ const ensureRecoveryDirectory = (
  *
  * @returns Structured metadata describing the relocation outcome.
  *
- * @throws {@link Error} When relocation cannot be completed.
+ * @throws `Error` when relocation cannot be completed.
  */
 const performRelocation = (
     resolvedCandidate: string,

@@ -125,7 +125,7 @@ const serviceInstances = new Map<string, IMonitorService>();
  * @returns Result object containing the service instance and configuration
  *   status.
  *
- * @throws {@link Error} If the monitor type is not supported or no service
+ * @throws `Error` if the monitor type is not supported or no service
  *   factory is registered for the type.
  *
  * @internal
@@ -232,13 +232,13 @@ function getMonitorWithResult(
  *
  * @returns The monitor service instance for the specified type.
  *
- * @throws {@link Error} If the monitor type is not supported or no service
+ * @throws `Error` if the monitor type is not supported or no service
  *   factory is registered for the type.
  * @throws When configuration application fails.
  *
  * @public
  *
- * @see {@link IMonitorService}
+ * @see `IMonitorService`
  * @see {@link MonitorServiceConfig}
  * @see {@link getMonitorServiceFactory}
  * @see {@link isValidMonitorType}
