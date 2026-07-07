@@ -8,6 +8,7 @@
     }
 
     element.addEventListener("mouseenter", function () {
+        // biome-ignore lint/suspicious/noDebugger: DevTools snippet intentionally pauses execution on hover for inspection.
         debugger; // Pauses immediately on hover
     });
 

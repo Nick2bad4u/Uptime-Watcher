@@ -7,6 +7,7 @@
     );
 
     setTimeout(function () {
+        // biome-ignore lint/suspicious/noDebugger: DevTools snippet intentionally pauses execution for element inspection.
         debugger; // Pauses here - use this time to hover/interact with elements
     }, delayMs);
 })();

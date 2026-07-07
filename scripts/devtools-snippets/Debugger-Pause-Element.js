@@ -13,6 +13,7 @@
         function () {
             console.log("Element hovered! Pausing debugger in", delayMs, "ms");
             setTimeout(function () {
+                // biome-ignore lint/suspicious/noDebugger: DevTools snippet intentionally pauses execution after hover for inspection.
                 debugger;
             }, delayMs);
         },

@@ -15,6 +15,7 @@
                 "click",
                 function pauseOnClick() {
                     isPaused = true;
+                    // biome-ignore lint/suspicious/noDebugger: DevTools snippet intentionally pauses execution on click for inspection.
                     debugger;
                     target.removeEventListener("click", pauseOnClick);
                 },
