@@ -62,13 +62,39 @@ vi.mock("../../../stores/sites/utils/fileDownload", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/monitorOperations", () => ({
+    addMonitorToSite: vi.fn((site, monitor) => ({
+        ...site,
+        monitors: [...site.monitors, monitor],
+    })),
+    createDefaultMonitor: vi.fn(() => ({
+        history: [],
+        id: "default-monitor",
+        monitoring: true,
+        responseTime: -1,
+        retryAttempts: 3,
+        status: "pending",
+        timeout: 30_000,
+        type: "http",
+        url: "https://example.com",
+    })),
     normalizeMonitor: vi.fn((monitor) => monitor),
+    removeMonitorFromSite: vi.fn((site, monitorId) => ({
+        ...site,
+        monitors: site.monitors.filter(
+            (monitor: Monitor) => monitor.id !== monitorId
+        ),
+    })),
     updateMonitorInSite: vi.fn((site, monitorId, updates) => ({
         ...site,
         monitors: site.monitors.map((m: any) =>
             m.id === monitorId ? { ...m, ...updates } : m
         ),
     })),
+    validateMonitorExists: vi.fn((site, monitorId) => {
+        if (!site?.monitors.some((monitor: Monitor) => monitor.id === monitorId)) {
+            throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
+        }
+    }),
 }));
 
 // Access the global electronAPI mock

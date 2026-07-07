@@ -24,9 +24,14 @@ import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
 import { logger } from "../../services/logger";
-import { generateUuid } from "../../utils/data/generateUuid";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
-import { normalizeMonitor } from "./utils/monitorOperations";
+import {
+    addMonitorToSite,
+    createDefaultMonitor,
+    normalizeMonitor,
+    removeMonitorFromSite,
+    validateMonitorExists,
+} from "./utils/monitorOperations";
 import {
     applySavedSiteToStore,
     getSiteByIdentifier,
@@ -272,10 +277,10 @@ export const createSiteOperationsActions = (
                     "Failed to normalize monitor before adding to site"
                 );
 
-                const updatedMonitors = [...site.monitors, normalizedMonitor];
+                const updatedSite = addMonitorToSite(site, normalizedMonitor);
 
                 return deps.services.site.updateSite(siteIdentifier, {
-                    monitors: updatedMonitors,
+                    monitors: updatedSite.monitors,
                 });
             },
             deps,
@@ -295,13 +300,7 @@ export const createSiteOperationsActions = (
             "createSite",
             async () => {
                 // Default to HTTP monitor if none provided
-                const defaultMonitor: Partial<Monitor> = {
-                    history: [],
-                    id: generateUuid(),
-                    monitoring: true,
-                    status: "pending",
-                    type: "http",
-                };
+                const defaultMonitor = createDefaultMonitor();
                 const monitors: Monitor[] = (
                     siteData.monitors && siteData.monitors.length > 0
                         ? siteData.monitors
@@ -410,6 +409,12 @@ export const createSiteOperationsActions = (
 
                 if (site.monitors.length <= 1) {
                     throw new Error(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+                }
+                validateMonitorExists(site, monitorId);
+
+                const previewSite = removeMonitorFromSite(site, monitorId);
+                if (previewSite.monitors.length >= site.monitors.length) {
+                    throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
                 }
 
                 const savedSite = await deps.services.site.removeMonitor(
