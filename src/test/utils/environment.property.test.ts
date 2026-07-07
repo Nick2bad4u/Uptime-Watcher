@@ -8,11 +8,7 @@ import { fc, test as fcTest } from "@fast-check/vitest";
 import { safeCastTo } from "ts-extras";
 import { describe, expect } from "vitest";
 
-import {
-    isPlaywrightAutomation,
-    readProcessEnv,
-    setPlaywrightAutomationMarker,
-} from "../../utils/environment";
+import { isPlaywrightAutomation } from "../../utils/environment";
 
 interface ProcessStub {
     env?: Record<string, string | undefined>;
@@ -68,15 +64,6 @@ const withSandbox = <Value>(action: () => Value): Value => {
     }
 };
 
-const envKeyArbitrary = fc
-    .string({ maxLength: 12, minLength: 1 })
-    .filter((key) => /^[A-Z_][\dA-Z_]*$/v.test(key));
-
-const envValueArbitrary = fc.oneof(
-    fc.string({ maxLength: 32 }),
-    fc.constant(undefined)
-);
-
 const trueStringArbitrary = fc
     .tuple(fc.boolean(), fc.boolean(), fc.boolean(), fc.boolean())
     .map(
@@ -111,43 +98,6 @@ const playwrightUAArbitrary = fc
     );
 
 describe("environment utilities", () => {
-    fcTest.prop<[string]>([envKeyArbitrary])(
-        "readProcessEnv returns undefined when process env is missing",
-        async (key) => {
-            await withSandbox(() => {
-                delete globalTarget.process;
-
-                expect(readProcessEnv(key)).toBeUndefined();
-            });
-        }
-    );
-
-    fcTest.prop<[string]>([envKeyArbitrary])(
-        "readProcessEnv returns undefined when env object absent",
-        async (key) => {
-            await withSandbox(() => {
-                globalTarget.process = {};
-
-                expect(readProcessEnv(key)).toBeUndefined();
-            });
-        }
-    );
-
-    fcTest.prop<[string, string | undefined]>([
-        envKeyArbitrary,
-        envValueArbitrary,
-    ])("readProcessEnv reflects non-empty env values", async (key, value) => {
-        await withSandbox(() => {
-            globalTarget.process = { env: { [key]: value } };
-
-            expect(readProcessEnv(key)).toBe(
-                typeof value === "string" && value.length > 0
-                    ? value
-                    : undefined
-            );
-        });
-    });
-
     fcTest.prop<[string]>([trueStringArbitrary])(
         "isPlaywrightAutomation detects true env flags",
         async (truthyValue) => {
@@ -210,7 +160,7 @@ describe("environment utilities", () => {
             await withSandbox(() => {
                 globalTarget.process = { env: {} };
                 delete globalTarget.navigator;
-                setPlaywrightAutomationMarker();
+                Reflect.set(globalThis, "playwrightAutomation", true);
 
                 expect(isPlaywrightAutomation()).toBe(true);
             });

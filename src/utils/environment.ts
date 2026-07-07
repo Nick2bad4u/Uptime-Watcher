@@ -61,27 +61,6 @@ export function isPlaywrightAutomation(): boolean {
     return automationMarker.found && automationMarker.value === true;
 }
 
-/**
- * Reads an environment variable from the ambient Node.js process if available.
- *
- * @param key - Environment variable name.
- *
- * @returns Environment variable value or `undefined` when unavailable.
- *
- * @public
- */
-export function readProcessEnv(key: string): string | undefined {
+function readProcessEnv(key: string): string | undefined {
     return readSharedProcessEnv(key);
-}
-
-/**
- * Marks the current runtime as Playwright automation.
- *
- * @remarks
- * Useful for tests that execute before environment flags are applied.
- *
- * @public
- */
-export function setPlaywrightAutomationMarker(): void {
-    Reflect.set(globalThis, "playwrightAutomation", true);
 }
