@@ -349,12 +349,9 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         generateUuid()
     ); // Lazy initialization
 
-    const setSanitizedName = useCallback(
-        (value: string): void => {
-            setName(trimLeadingWhitespace(value));
-        },
-        [setName]
-    );
+    const setSanitizedName = useCallback((value: string): void => {
+        setName(trimLeadingWhitespace(value));
+    }, []);
 
     const monitorFieldValues = useMemo<MonitorFieldValues>(
         () =>
@@ -468,30 +465,6 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
             getFields,
             monitorFieldValues,
             monitorType,
-            setBaselineUrl,
-            setBodyKeyword,
-            setCertificateWarningDays,
-            setEdgeLocations,
-            setExpectedHeaderValue,
-            setExpectedJsonValue,
-            setExpectedStatusCode,
-            setExpectedValue,
-            setHeaderName,
-            setHeartbeatExpectedStatus,
-            setHeartbeatMaxDriftSeconds,
-            setHeartbeatStatusField,
-            setHeartbeatTimestampField,
-            setHost,
-            setJsonPath,
-            setMaxPongDelayMs,
-            setMaxReplicationLagSeconds,
-            setMaxResponseTimeMs,
-            setPort,
-            setPrimaryStatusUrl,
-            setRecordType,
-            setReplicaStatusUrl,
-            setReplicationTimestampField,
-            setUrl,
         ]
     );
 
@@ -505,11 +478,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
                 setSiteIdentifier,
             });
         },
-        [
-            addMode,
-            setSanitizedName,
-            setSiteIdentifier,
-        ]
+        [addMode, setSanitizedName]
     );
 
     const isFormValid = useCallback(() => {
@@ -605,39 +574,7 @@ export function useAddSiteForm(): UseAddSiteFormReturnWithMonitorFields {
         setAddMode("new");
         setSelectedExistingSite("");
         setFormError(undefined);
-    }, [
-        setAddMode,
-        setBaselineUrl,
-        setBodyKeyword,
-        setCertificateWarningDays,
-        setCheckIntervalMs,
-        setEdgeLocations,
-        setExpectedHeaderValue,
-        setExpectedJsonValue,
-        setExpectedStatusCode,
-        setExpectedValue,
-        setFormError,
-        setHeaderName,
-        setHeartbeatExpectedStatus,
-        setHeartbeatMaxDriftSeconds,
-        setHeartbeatStatusField,
-        setHeartbeatTimestampField,
-        setHost,
-        setJsonPath,
-        setMaxPongDelayMs,
-        setMaxReplicationLagSeconds,
-        setMaxResponseTimeMs,
-        setMonitorType,
-        setPort,
-        setPrimaryStatusUrl,
-        setRecordType,
-        setReplicaStatusUrl,
-        setReplicationTimestampField,
-        setSanitizedName,
-        setSelectedExistingSite,
-        setSiteIdentifier,
-        setUrl,
-    ]);
+    }, [setSanitizedName]);
 
     return {
         addMode,

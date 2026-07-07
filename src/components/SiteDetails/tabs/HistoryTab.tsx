@@ -373,11 +373,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 selectedMonitorHistoryLengthRef.current =
                     selectedMonitor.history.length;
             },
-            [
-                selectedMonitor.history.length,
-                selectedMonitor.id,
-                selectedMonitor.type,
-            ]
+            [selectedMonitor.history.length]
         );
 
         // Log when history tab is viewed - only when monitor actually changes

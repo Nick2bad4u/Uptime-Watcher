@@ -765,7 +765,6 @@ export const useSettingsController = ({
             MaintenanceIcon,
             refreshButtonIcon,
             resetButtonIcon,
-            restoreFileInputRef,
             showButtonLoading,
             uploadButtonIcon,
         ]

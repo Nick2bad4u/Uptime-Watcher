@@ -46,7 +46,7 @@ export const usePrefersReducedMotion = (): boolean => {
         unsubscribeRef.current = subscribeToPreferenceChanges(
             setPrefersReducedMotion
         );
-    }, [setPrefersReducedMotion]);
+    }, []);
 
     const unmount = useCallback((): void => {
         unsubscribeRef.current?.();

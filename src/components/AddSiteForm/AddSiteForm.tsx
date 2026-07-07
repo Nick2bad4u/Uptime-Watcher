@@ -293,11 +293,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             resetForm();
             setHasSubmitted(false);
             onSuccess?.();
-        }, [
-            onSuccess,
-            resetForm,
-            setHasSubmitted,
-        ]);
+        }, [onSuccess, resetForm]);
 
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
@@ -529,11 +525,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
                 setAddMode(value);
             },
-            [
-                addMode,
-                setAddMode,
-                setHasSubmitted,
-            ]
+            [addMode, setAddMode]
         );
 
         // Memoized options arrays to prevent unnecessary re-renders
