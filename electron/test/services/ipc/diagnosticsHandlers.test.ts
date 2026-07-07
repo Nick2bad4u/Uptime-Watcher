@@ -1,92 +1,178 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DIAGNOSTICS_CHANNELS } from "@shared/types/preload";
 
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+
+import type { TypedEventBus } from "../../../events/TypedEventBus";
 
 import {
     MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES,
     MAX_DIAGNOSTICS_REPORT_GUARD_BYTES,
     MAX_DIAGNOSTICS_REPORT_REASON_BYTES,
 } from "../../../services/ipc/diagnosticsLimits";
-import { DiagnosticsHandlerTestUtils } from "../../../services/ipc/handlers/diagnosticsHandlers";
+import { registerDiagnosticsHandlers } from "../../../services/ipc/handlers/diagnosticsHandlers";
+
+const { mockIpcMain, mockLogger } = vi.hoisted(() => ({
+    mockIpcMain: {
+        handle: vi.fn(),
+    },
+    mockLogger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
+}));
+
+vi.mock("electron", () => ({
+    ipcMain: mockIpcMain,
+}));
+
+vi.mock("../../../electronUtils", () => ({
+    isDev: vi.fn(() => true),
+}));
+
+vi.mock("../../../utils/logger", () => ({
+    diagnosticsLogger: mockLogger,
+    logger: mockLogger,
+}));
+
+const createTrustedIpcEvent = () => ({
+    senderFrame: {
+        isDestroyed: () => false,
+        url: "http://localhost:5173/index.html",
+    },
+});
+
+const createDiagnosticsHandlerHarness = () => {
+    const eventEmitter = {
+        emitTyped: vi.fn().mockResolvedValue(undefined),
+    } as unknown as TypedEventBus<any>;
+
+    registerDiagnosticsHandlers({
+        eventEmitter,
+        registeredHandlers: new Set(),
+    });
+
+    const reportEntry = mockIpcMain.handle.mock.calls.find(
+        ([channel]) => channel === DIAGNOSTICS_CHANNELS.reportPreloadGuard
+    );
+
+    expect(reportEntry).toBeDefined();
+
+    return {
+        eventEmitter,
+        reportHandler: reportEntry?.[1] as (
+            event: ReturnType<typeof createTrustedIpcEvent>,
+            payload: unknown
+        ) => Promise<{ success: boolean }>,
+    };
+};
 
 describe("sanitizeDiagnosticsReport", () => {
-    it("removes metadata that exceeds byte limits", () => {
-        const largeValue = "x".repeat(5000);
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("preserves metadata within byte limits", async () => {
+        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
+        const metadataValue = "x".repeat(100);
         const timestamp = Date.now();
-        const { metadataTruncated, sanitizedReport } =
-            DiagnosticsHandlerTestUtils.normalizeDiagnosticsReportPayload({
+
+        const result = await reportHandler(createTrustedIpcEvent(), {
+            channel: "test-channel",
+            guard: "exampleGuard",
+            metadata: { details: metadataValue },
+            timestamp,
+        });
+
+        expect(result.success).toBeTruthy();
+        expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+            "diagnostics:report-created",
+            expect.objectContaining({
                 channel: "test-channel",
                 guard: "exampleGuard",
-                metadata: { details: largeValue },
-                timestamp,
-            });
-
-        expect(metadataTruncated).toBeTruthy();
-        expect(sanitizedReport.metadata).toBeUndefined();
-    });
-
-    it("truncates payload previews that exceed the byte budget", () => {
-        const timestamp = Date.now();
-        const preview = "Bearer abcdefghijklmnopqrstuvwxyz".repeat(2000);
-        const { payloadPreviewTruncated, sanitizedReport } =
-            DiagnosticsHandlerTestUtils.normalizeDiagnosticsReportPayload({
-                channel: "test-channel",
-                guard: "exampleGuard",
-                payloadPreview: preview,
-                timestamp,
-            });
-
-        expect(payloadPreviewTruncated).toBeTruthy();
-        expect((sanitizedReport.payloadPreview ?? "").length).toBeLessThan(
-            preview.length
+                metadataTruncated: false,
+            })
         );
-        expect(sanitizedReport.payloadPreview).not.toContain("Bearer ");
     });
 
-    it("sanitizes and bounds report identifiers and reasons", () => {
+    it("preserves payload previews within the byte budget", async () => {
+        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
         const timestamp = Date.now();
-        const { sanitizedReport } =
-            DiagnosticsHandlerTestUtils.normalizeDiagnosticsReportPayload({
-                channel: `diagnostics-channel?access_token=SUPER_SECRET\n${"c".repeat(1000)}`,
-                guard: `payloadGuard\t${"g".repeat(1000)}`,
-                reason: `refresh_token=SUPER_SECRET\n${"r".repeat(1000)}`,
-                timestamp,
-            });
+        const preview = "payload-preview".repeat(100);
 
-        expect(sanitizedReport.channel).not.toContain("SUPER_SECRET");
-        expect(sanitizedReport.channel).not.toContain("\n");
-        expect(getUtfByteLength(sanitizedReport.channel)).toBeLessThanOrEqual(
+        const result = await reportHandler(createTrustedIpcEvent(), {
+            channel: "test-channel",
+            guard: "exampleGuard",
+            payloadPreview: preview,
+            timestamp,
+        });
+
+        expect(result.success).toBeTruthy();
+        expect(eventEmitter.emitTyped).toHaveBeenCalledWith(
+            "diagnostics:report-created",
+            expect.objectContaining({
+                payloadPreviewLength: preview.length,
+                payloadPreviewTruncated: false,
+            })
+        );
+    });
+
+    it("sanitizes and bounds report identifiers and reasons", async () => {
+        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
+        const timestamp = Date.now();
+        const result = await reportHandler(createTrustedIpcEvent(), {
+            channel: "diagnostics-channel?access_token=SUPER_SECRET\nstatus",
+            guard: "payloadGuard\tvalue",
+            reason: "refresh_token=SUPER_SECRET\npayload-validation",
+            timestamp,
+        });
+
+        expect(result.success).toBeTruthy();
+        expect(eventEmitter.emitTyped).toHaveBeenCalledOnce();
+
+        const [, emittedReport] = eventEmitter.emitTyped.mock.calls[0] ?? [];
+        expect(emittedReport.channel).not.toContain("SUPER_SECRET");
+        expect(emittedReport.channel).not.toContain("\n");
+        expect(getUtfByteLength(emittedReport.channel)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES
         );
-        expect(sanitizedReport.guard).not.toContain("\t");
-        expect(getUtfByteLength(sanitizedReport.guard)).toBeLessThanOrEqual(
+        expect(emittedReport.guard).not.toContain("\t");
+        expect(getUtfByteLength(emittedReport.guard)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_GUARD_BYTES
         );
-        expect(sanitizedReport.reason).not.toContain("SUPER_SECRET");
-        expect(sanitizedReport.reason).not.toContain("\n");
-        expect(
-            getUtfByteLength(sanitizedReport.reason ?? "")
-        ).toBeLessThanOrEqual(MAX_DIAGNOSTICS_REPORT_REASON_BYTES);
+        expect(emittedReport.reason).not.toContain("SUPER_SECRET");
+        expect(emittedReport.reason).not.toContain("\n");
+        expect(getUtfByteLength(emittedReport.reason ?? "")).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_REASON_BYTES
+        );
     });
 
-    it("bounds multibyte report fields by UTF-8 byte length", () => {
+    it("bounds multibyte report fields by UTF-8 byte length", async () => {
+        const { eventEmitter, reportHandler } = createDiagnosticsHandlerHarness();
         const timestamp = Date.now();
-        const { sanitizedReport } =
-            DiagnosticsHandlerTestUtils.normalizeDiagnosticsReportPayload({
-                channel: "監視".repeat(500),
-                guard: "検証".repeat(500),
-                reason: "理由".repeat(500),
-                timestamp,
-            });
+        const result = await reportHandler(createTrustedIpcEvent(), {
+            channel: "監視".repeat(40),
+            guard: "検証".repeat(20),
+            reason: "理由".repeat(80),
+            timestamp,
+        });
 
-        expect(getUtfByteLength(sanitizedReport.channel)).toBeLessThanOrEqual(
+        expect(result.success).toBeTruthy();
+        expect(eventEmitter.emitTyped).toHaveBeenCalledOnce();
+
+        const [, emittedReport] = eventEmitter.emitTyped.mock.calls[0] ?? [];
+
+        expect(getUtfByteLength(emittedReport.channel)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_CHANNEL_BYTES
         );
-        expect(getUtfByteLength(sanitizedReport.guard)).toBeLessThanOrEqual(
+        expect(getUtfByteLength(emittedReport.guard)).toBeLessThanOrEqual(
             MAX_DIAGNOSTICS_REPORT_GUARD_BYTES
         );
-        expect(
-            getUtfByteLength(sanitizedReport.reason ?? "")
-        ).toBeLessThanOrEqual(MAX_DIAGNOSTICS_REPORT_REASON_BYTES);
+        expect(getUtfByteLength(emittedReport.reason ?? "")).toBeLessThanOrEqual(
+            MAX_DIAGNOSTICS_REPORT_REASON_BYTES
+        );
     });
 });

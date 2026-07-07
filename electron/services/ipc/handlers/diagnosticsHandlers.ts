@@ -303,10 +303,3 @@ export function registerDiagnosticsHandlers({
         SystemHandlerValidators.reportPreloadGuard
     );
 }
-
-/** @internal */
-export const DiagnosticsHandlerTestUtils: {
-    normalizeDiagnosticsReportPayload: typeof normalizeDiagnosticsReportPayload;
-} = {
-    normalizeDiagnosticsReportPayload,
-};
