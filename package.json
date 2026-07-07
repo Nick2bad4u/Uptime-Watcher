@@ -305,7 +305,7 @@
         "lint:orphans": "npm run madge:orphans",
         "lint:package": "npm run lint:package-sort && npm run lint:packagelintrc && echo \"Package.json lint done!\"",
         "lint:package:strict": "npm run lint:package-sort && npm run lint:package-check && npm run lint:packagelintrc && echo \"Package.json lint done!\"",
-        "lint:package-check": "publint && attw --pack .",
+        "lint:package-check": "npm run publint",
         "lint:package-json": "node scripts/run-node-cli.mjs npmPkgJsonLint . --config .npmpackagejsonlintrc.json",
         "lint:package-sort": "node scripts/run-node-cli.mjs sort-package-json \"./package.json\" \"./docs/docusaurus/package.json\"",
         "lint:package-sort-check": "node scripts/run-node-cli.mjs sort-package-json --check \"./package.json\" \"./docs/docusaurus/package.json\"",
