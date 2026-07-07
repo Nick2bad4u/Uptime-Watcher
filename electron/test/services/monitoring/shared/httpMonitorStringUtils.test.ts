@@ -41,6 +41,14 @@ describe("httpMonitorStringUtils", () => {
         it("returns null when header is missing", () => {
             expect(resolveHeaderValue({}, "x-missing")).toBeNull();
         });
+
+        it("ignores inherited direct header values", () => {
+            const headers = Object.create({
+                "x-inherited": "inherited-value",
+            }) as Record<string, unknown>;
+
+            expect(resolveHeaderValue(headers, "x-inherited")).toBeNull();
+        });
     });
 
     describe(resolveRequiredMonitorStringContext, () => {

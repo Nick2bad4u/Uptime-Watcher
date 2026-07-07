@@ -16,6 +16,7 @@ import {
     normalizePositiveInteger,
     readBoundedPositiveIntegerEnv,
 } from "@shared/utils/environment";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { ensureRecordLike, isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import axios from "axios";
@@ -292,7 +293,7 @@ function enforceRedirectSafety(options: unknown): void {
  *   interceptors enabled.
  */
 export function createHttpClient(config: MonitorServiceConfig): AxiosInstance {
-    const headers: Record<string, string> = {};
+    const headers = createNullPrototypeObject<Record<string, string>>();
     if (isDefined(config.userAgent)) {
         headers["User-Agent"] = config.userAgent;
     }

@@ -96,10 +96,10 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result).toBe(mockAxiosInstance);
             expect(mockAxiosCreate).toHaveBeenCalledWith({
-                headers: {
+                headers: expect.objectContaining({
                     Accept: "*/*",
                     "User-Agent": "test-agent",
-                },
+                }),
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
                 maxBodyLength: 8 * 1024, // 8KB default
@@ -110,6 +110,11 @@ describe("HTTP Client Utils", () => {
                 timeout: 5000,
                 validateStatus: expect.any(Function),
             });
+            expect(
+                Object.getPrototypeOf(
+                    mockAxiosCreate.mock.calls[0]?.[0]?.headers
+                )
+            ).toBeNull();
         });
         it("should create axios instance with minimal config", async ({
             task,
@@ -127,7 +132,7 @@ describe("HTTP Client Utils", () => {
             // Assert
             expect(result).toBe(mockAxiosInstance);
             expect(mockAxiosCreate).toHaveBeenCalledWith({
-                headers: { Accept: "*/*" },
+                headers: expect.objectContaining({ Accept: "*/*" }),
                 httpAgent: expect.any(Object),
                 httpsAgent: expect.any(Object),
                 maxBodyLength: 8 * 1024,
@@ -137,6 +142,11 @@ describe("HTTP Client Utils", () => {
                 responseType: "text",
                 validateStatus: expect.any(Function),
             });
+            expect(
+                Object.getPrototypeOf(
+                    mockAxiosCreate.mock.calls[0]?.[0]?.headers
+                )
+            ).toBeNull();
         });
         it("should configure validateStatus to accept all statuses (lenient)", async ({
             task,

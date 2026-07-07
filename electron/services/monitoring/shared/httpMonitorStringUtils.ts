@@ -1,6 +1,6 @@
 import type { UnknownRecord } from "type-fest";
 
-import { arrayJoin, objectEntries } from "ts-extras";
+import { arrayJoin, objectEntries, objectHasOwn } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 
@@ -26,7 +26,9 @@ export function resolveHeaderValue(
     headers: UnknownRecord,
     headerName: string
 ): null | string {
-    const direct = headers[headerName];
+    const direct = objectHasOwn(headers, headerName)
+        ? headers[headerName]
+        : undefined;
 
     if (typeof direct === "string") {
         return direct;
