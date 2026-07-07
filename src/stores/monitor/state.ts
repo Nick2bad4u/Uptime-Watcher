@@ -20,7 +20,7 @@ export type MonitorTypesStoreSetter = StoreApi<MonitorTypesStore>["setState"];
 /**
  * Initial state for monitor types management.
  */
-export const initialMonitorTypesState: Pick<
+const initialMonitorTypesState: Pick<
     MonitorTypesStore,
     | "fieldConfigs"
     | "isLoaded"

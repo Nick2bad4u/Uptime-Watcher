@@ -10,7 +10,6 @@ import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
 import type { MonitorTypeOption as ConstantsMonitorTypeOption } from "../../constants";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../../constants";
-import { initialMonitorTypesState } from "../../stores/monitor/state";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import {
     clearMonitorTypeCache,
@@ -23,7 +22,7 @@ import {
 describe("Shared contract consistency", () => {
     afterEach(() => {
         clearMonitorTypeCache();
-        useMonitorTypesStore.setState(initialMonitorTypesState);
+        useMonitorTypesStore.setState(useMonitorTypesStore.getInitialState());
     });
 
     it("re-exports canonical MonitorTypeOption from renderer constants", () => {
@@ -59,7 +58,7 @@ describe("Shared contract consistency", () => {
         ] satisfies MonitorTypeConfig[];
 
         useMonitorTypesStore.setState({
-            ...initialMonitorTypesState,
+            ...useMonitorTypesStore.getInitialState(),
             isLoaded: true,
             monitorTypes,
         });
