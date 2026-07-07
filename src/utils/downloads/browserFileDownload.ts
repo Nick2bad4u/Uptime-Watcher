@@ -13,7 +13,7 @@ import { getOwnPropertyValue } from "@shared/utils/errorPropertyAccess";
 /**
  * Thrown when the download anchor cannot be attached to the DOM.
  */
-export class FileDownloadDomAttachmentError extends Error {
+class FileDownloadDomAttachmentError extends Error {
     public constructor(message: string, options?: ErrorOptions) {
         super(message, options);
         this.name = "FileDownloadDomAttachmentError";
@@ -146,21 +146,6 @@ function clickDownloadAnchor(args: {
             // Ignore cleanup errors.
         }
     }
-}
-
-/**
- * Creates and triggers a file download from an {@link ArrayBuffer}.
- */
-export function triggerArrayBufferDownload(args: {
-    attachToDom: boolean;
-    buffer: ArrayBuffer;
-    fileName: string;
-    mimeType: string;
-}): void {
-    const { attachToDom, buffer, fileName, mimeType } = args;
-    const blob = new Blob([buffer], { type: mimeType });
-
-    triggerBlobDownload({ attachToDom, blob, fileName });
 }
 
 /**

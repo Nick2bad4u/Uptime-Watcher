@@ -7,7 +7,6 @@
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { isWindowsReservedFileBasename } from "@shared/utils/fileNameSafety";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
@@ -15,15 +14,10 @@ import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { stringSplit } from "ts-extras";
 
 import { logger } from "../../../services/logger";
-import {
-    FileDownloadDomAttachmentError,
-    triggerArrayBufferDownload,
-    triggerBlobDownload,
-} from "../../../utils/downloads/browserFileDownload";
+import { triggerBlobDownload } from "../../../utils/downloads/browserFileDownload";
 import { parseSerializedDatabaseBackupResult } from "../../../utils/downloads/serializedBackupResult";
 import { isPlaywrightAutomation } from "../../../utils/environment";
 
-const DEFAULT_DOWNLOAD_FILE_NAME = "download.bin";
 const DEFAULT_BACKUP_FILE_NAME_PREFIX = "backup";
 const DEFAULT_BACKUP_FILE_NAME_EXTENSION = "sqlite";
 
@@ -36,179 +30,6 @@ const WINDOWS_RESERVED_FILE_NAME_CHARACTERS = new Set([
     "?",
     "|",
 ]);
-
-/**
- * Options for downloading a file in the browser.
- *
- * @remarks
- * Used to specify the file buffer, filename, and optional MIME type for
- * download operations.
- *
- * @public
- */
-export interface FileDownloadOptions {
-    /** The file buffer to download */
-    buffer: ArrayBuffer;
-    /** The filename for the download */
-    fileName: string;
-    /** The MIME type of the file */
-    mimeType?: string;
-}
-
-/**
- * Helper function to create and trigger a file download.
- *
- * @remarks
- * Creates a Blob from the buffer and uses an anchor element to initiate the
- * download. Falls back to direct click if DOM manipulation fails. Object URL is
- * properly managed to avoid memory leaks.
- *
- * @param buffer - File data as ArrayBuffer
- * @param fileName - Name for the downloaded file
- * @param mimeType - MIME type for the file
- *
- * @throws Error if browser APIs are unavailable or download cannot be triggered
- */
-function createAndTriggerDownload(
-    buffer: ArrayBuffer,
-    fileName: string,
-    mimeType: string,
-    attachToDom: boolean
-): void {
-    triggerArrayBufferDownload({
-        attachToDom,
-        buffer,
-        fileName,
-        mimeType,
-    });
-}
-
-/**
- * Determines if an error should be re-thrown without retry.
- *
- * @param error - The error to check.
- *
- * @returns True if the error should be re-thrown, false otherwise.
- */
-function shouldRethrowError(error: Error): boolean {
-    const rethrownErrorMessages = [
-        "createObjectURL",
-        "createElement",
-        "Click failed",
-        "Failed to create object URL",
-        "Failed to create element",
-        "createElement not available",
-    ];
-
-    return rethrownErrorMessages.some((message) =>
-        error.message.includes(message)
-    );
-}
-
-/**
- * Attempts a fallback download method if the primary method fails.
- *
- * @param buffer - The file buffer.
- * @param fileName - The filename.
- * @param mimeType - The MIME type.
- *
- * @throws `Error` if both primary and fallback methods fail.
- */
-function tryFallbackDownload(
-    buffer: ArrayBuffer,
-    fileName: string,
-    mimeType: string
-): void {
-    try {
-        createAndTriggerDownload(buffer, fileName, mimeType, false);
-    } catch (fallbackError) {
-        logger.error(
-            "File download failed: both primary and fallback methods failed",
-            ensureError(fallbackError)
-        );
-        throw new Error("File download failed", { cause: fallbackError });
-    }
-}
-
-/**
- * Handles download errors and applies fallback strategies if possible.
- *
- * @remarks
- * Logs errors and attempts fallback download for DOM-related issues.
- *
- * @param error - The error encountered during download.
- * @param buffer - The file buffer.
- * @param fileName - The filename.
- * @param mimeType - The MIME type.
- *
- * @throws `Error` always throws after logging and attempting fallback.
- */
-function handleDownloadError(
-    error: unknown,
-    buffer: ArrayBuffer,
-    fileName: string,
-    mimeType: string
-): void {
-    if (!Error.isError(error)) {
-        logger.error("File download failed", ensureError(error));
-        throw new Error("File download failed");
-    }
-
-    // Re-throw specific errors that should not be retried
-    if (shouldRethrowError(error)) {
-        throw error;
-    }
-
-    // Try fallback for DOM attachment failures.
-    if (error instanceof FileDownloadDomAttachmentError) {
-        tryFallbackDownload(buffer, fileName, mimeType);
-        return;
-    }
-
-    logger.error("File download failed", error);
-    throw new Error("File download failed");
-}
-
-/**
- * Triggers a file download in the browser.
- *
- * @remarks
- * This function creates a Blob from the provided buffer and initiates a
- * download using an anchor element. If the primary method fails, a fallback
- * strategy is attempted. The download filename is constrained to a single safe
- * filename segment before it is assigned to the browser download attribute.
- *
- * @example
- *
- * ```typescript
- * downloadFile({
- *     buffer: myArrayBuffer,
- *     fileName: "report.txt",
- *     mimeType: "text/plain",
- * });
- * ```
- *
- * @param options - The file download options including buffer, fileName, and
- *   optional mimeType.
- *
- * @throws `Error` if the download fails due to browser API issues or DOM
- *   manipulation errors.
- *
- * @public
- */
-export function downloadFile(options: FileDownloadOptions): void {
-    const { buffer, fileName, mimeType = "application/octet-stream" } = options;
-    const normalizedFileName = normalizeDownloadFileName(
-        fileName,
-        DEFAULT_DOWNLOAD_FILE_NAME
-    );
-
-    try {
-        createAndTriggerDownload(buffer, normalizedFileName, mimeType, true);
-    } catch (error) {
-        handleDownloadError(error, buffer, normalizedFileName, mimeType);
-    }
-}
 
 /**
  * Generates a default backup filename with a timestamp.
@@ -227,10 +48,8 @@ export function downloadFile(options: FileDownloadOptions): void {
  * @param extension - The file extension (default: "sqlite").
  *
  * @returns The generated filename string.
- *
- * @public
  */
-export function generateBackupFileName(
+function generateBackupFileName(
     prefix: string = DEFAULT_BACKUP_FILE_NAME_PREFIX,
     extension: string = DEFAULT_BACKUP_FILE_NAME_EXTENSION
 ): string {
