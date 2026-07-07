@@ -156,8 +156,6 @@ export const preloadDiagnosticsLogger: Logger =
 const formatFunctionPlaceholder = (name: string): string =>
     `[Function ${name.length > 0 ? name : "anonymous"}]`;
 
-const formatBigintPlaceholder = (value: bigint): string => value.toString();
-
 const truncate = (value: string, limit: number): string =>
     value.length > limit ? `${value.slice(0, limit)}…` : value;
 
@@ -444,7 +442,7 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
     }
 
     if (typeof value === "bigint") {
-        return formatBigintPlaceholder(value);
+        return String(value);
     }
 
     if (typeof value === "string") {

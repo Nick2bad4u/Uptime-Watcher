@@ -114,6 +114,24 @@ describe(buildPayloadPreview, () => {
         expect(toString).not.toHaveBeenCalled();
     });
 
+    it("does not invoke BigInt prototype toString while building previews", () => {
+        const bigintToStringSpy = vi
+            .spyOn(BigInt.prototype, "toString")
+            .mockImplementation(() => {
+                throw new Error("BigInt.prototype.toString called");
+            });
+
+        try {
+            const preview = buildPayloadPreview({ count: 123n });
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"count": "123"');
+            expect(bigintToStringSpy).not.toHaveBeenCalled();
+        } finally {
+            bigintToStringSpy.mockRestore();
+        }
+    });
+
     it("redacts secrets embedded in raw string payloads", () => {
         const preview = buildPayloadPreview(
             "Authorization: Bearer super-secret refresh_token=refresh-secret"
