@@ -174,7 +174,7 @@ export interface DatabaseLockCleanupResult {
  *
  * @returns A de-duplicated list of candidate artifact paths to evaluate.
  */
-export const generateLockArtifactCandidates = (dbPath: string): string[] => {
+const generateLockArtifactCandidates = (dbPath: string): string[] => {
     const directory = path.dirname(dbPath);
     const baseName = path.basename(dbPath);
     const candidates = new Set<string>();
@@ -202,39 +202,6 @@ export const generateLockArtifactCandidates = (dbPath: string): string[] => {
     }
 
     return [...candidates];
-};
-
-/**
- * Resolves and filters candidate paths to only those artifacts that currently
- * exist on disk.
- *
- * @param dbPath - Absolute path to the SQLite database file.
- *
- * @returns A list of existing artifact paths still present in the filesystem.
- */
-export const listExistingLockArtifacts = (dbPath: string): string[] => {
-    const directory = path.dirname(dbPath);
-    const existing: string[] = [];
-
-    for (const candidate of generateLockArtifactCandidates(dbPath)) {
-        try {
-            const resolvedCandidate = resolveCandidatePath(
-                directory,
-                candidate
-            );
-            const isCandidateExists =
-                // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path validated to remain within the user data directory; synchronous check keeps startup deterministic.
-                existsSync(resolvedCandidate);
-
-            if (isCandidateExists) {
-                existing.push(resolvedCandidate);
-            }
-        } catch {
-            // Invalid paths are ignored here; they will surface during cleanup instead.
-        }
-    }
-
-    return existing;
 };
 
 /**

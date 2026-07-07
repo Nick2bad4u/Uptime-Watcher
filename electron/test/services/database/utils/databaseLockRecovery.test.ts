@@ -14,8 +14,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     cleanupDatabaseLockArtifacts,
-    generateLockArtifactCandidates,
-    listExistingLockArtifacts,
 } from "../../../../services/database/utils/maintenance/databaseLockRecovery";
 
 /**
@@ -38,10 +36,10 @@ describe("databaseLockRecovery utilities", () => {
         rmSync(tempDir, { recursive: true, force: true });
     });
 
-    it("should generate a comprehensive list of lock artifact candidates", () => {
-        const candidates = generateLockArtifactCandidates(dbPath);
+    it("should report a comprehensive list of missing lock artifact candidates", () => {
+        const result = cleanupDatabaseLockArtifacts(dbPath);
 
-        expect(candidates).toEqual(
+        expect(result.missing).toEqual(
             expect.arrayContaining([
                 `${dbPath}-wal`,
                 `${dbPath}-shm`,
@@ -51,14 +49,18 @@ describe("databaseLockRecovery utilities", () => {
         );
     });
 
-    it("should list only existing lock artifacts", () => {
+    it("should relocate only existing lock artifacts", () => {
         const walPath = `${dbPath}-wal`;
+        const shmPath = `${dbPath}-shm`;
         writeFileSync(walPath, "wal");
 
-        const artifacts = listExistingLockArtifacts(dbPath);
+        const result = cleanupDatabaseLockArtifacts(dbPath);
 
-        expect(artifacts).toContain(walPath);
-        expect(artifacts).not.toContain(`${dbPath}-shm`);
+        expect(result.failed).toHaveLength(0);
+        expect(result.relocated).toEqual([
+            expect.objectContaining({ originalPath: walPath }),
+        ]);
+        expect(result.missing).toContain(shmPath);
     });
 
     it("should relocate stale artifacts into the recovery directory", () => {
