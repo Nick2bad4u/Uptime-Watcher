@@ -4,13 +4,11 @@ import { MONITOR_STATUS } from "@shared/types";
 import { describe, expect, it } from "vitest";
 
 import {
-    createMonitorWithTypeGuards,
     getAllMonitorTypeConfigs,
     getMonitorServiceFactory,
     getMonitorTypeConfig,
     getRegisteredMonitorTypes,
     isValidMonitorType,
-    isValidMonitorTypeGuard,
 } from "../../../services/monitoring/MonitorTypeRegistry";
 
 const monitorFixtures: Record<MonitorType, Partial<Monitor>> = {
@@ -115,33 +113,6 @@ describe("MonitorTypeRegistry runtime coverage", () => {
         expect(getMonitorServiceFactory("non-existent")).toBeUndefined();
         expect(isValidMonitorType("http")).toBeTruthy();
         expect(isValidMonitorType("non-existent")).toBeFalsy();
-        expect(isValidMonitorTypeGuard("http")).toBeTruthy();
-        expect(isValidMonitorTypeGuard(123)).toBeFalsy();
-    });
-
-    it("creates monitors with sensible defaults and respects validation", () => {
-        const created = createMonitorWithTypeGuards("http", {
-            id: "http-monitor",
-            url: "https://example.com",
-        });
-
-        expect(created.success).toBeTruthy();
-        expect(created.errors).toStrictEqual([]);
-        expect(created.monitor).toMatchObject({
-            history: [],
-            monitoring: true,
-            responseTime: -1,
-            retryAttempts: 3,
-            status: MONITOR_STATUS.PENDING,
-            timeout: 10_000,
-            type: "http",
-            url: "https://example.com",
-        });
-
-        const invalid = createMonitorWithTypeGuards("non-existent", {});
-
-        expect(invalid.success).toBeFalsy();
-        expect(invalid.errors[0]).toMatch(/Invalid monitor type/v);
     });
 
     it("invokes UI formatters and service factories for every monitor type", () => {

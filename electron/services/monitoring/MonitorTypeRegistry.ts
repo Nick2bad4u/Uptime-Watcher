@@ -12,20 +12,12 @@
 import type { MonitorType } from "@shared/types";
 import type * as z from "zod";
 
-import { MONITOR_STATUS } from "@shared/types";
-import { arrayJoin, objectHasIn } from "ts-extras";
-
 import type {
     BaseMonitorConfig,
     HttpMonitorRegistration,
 } from "./MonitorTypeRegistry.types";
-import type {
-    IMonitorService,
-    MonitorConfiguration,
-    MonitorConfigurationInput,
-} from "./types";
+import type { IMonitorService } from "./types";
 
-import { logger } from "../../utils/logger";
 import { registerHttpMonitorTypes } from "./monitorTypeRegistry/registerHttpMonitorTypes";
 import { registerNonHttpMonitorTypes } from "./monitorTypeRegistry/registerNonHttpMonitorTypes";
 import { createHttpMonitorUiConfig } from "./utils/httpMonitorUiConfig";
@@ -98,53 +90,6 @@ export function isValidMonitorType(type: string): type is MonitorType {
 }
 
 /**
- * Simple monitor type validation for internal use.
- *
- * @remarks
- * Breaks circular dependency with EnhancedTypeGuards by providing basic
- * validation. Used internally by registry functions that need type validation
- * without importing external validation utilities.
- *
- * Validation logic:
- *
- * - Checks if type is a string
- * - Verifies type is registered in the monitor registry
- * - Returns structured result compatible with type guard patterns
- *
- * @param type - The monitor type to validate.
- *
- * @returns Validation result compatible with EnhancedTypeGuard interface.
- *
- * @internal
- */
-type MonitorTypeValidationResult =
-    { error: string; success: false } | { success: true; value: MonitorType };
-
-function validateMonitorTypeInternal(
-    type: unknown
-): MonitorTypeValidationResult {
-    if (typeof type !== "string") {
-        return {
-            error: "Monitor type must be a string",
-            success: false,
-        };
-    }
-
-    if (!isValidMonitorType(type)) {
-        const validTypes = getRegisteredMonitorTypes();
-        return {
-            error: `Invalid monitor type: ${type}. Valid types: ${arrayJoin(validTypes, ", ")}`,
-            success: false,
-        };
-    }
-
-    return {
-        success: true,
-        value: type,
-    };
-}
-
-/**
  * Gets all registered monitor types with their configurations.
  *
  * @remarks
@@ -189,9 +134,9 @@ export function getMonitorServiceFactory(
  *
  * @param config - The monitor type configuration object to register.
  *
- * @public
+ * @internal
  */
-export function registerMonitorType(config: BaseMonitorConfig): void {
+function registerMonitorType(config: BaseMonitorConfig): void {
     monitorTypes.set(config.type, config);
 }
 
@@ -215,117 +160,6 @@ registerHttpMonitorTypes({
 registerNonHttpMonitorTypes({
     registerMonitorType,
 });
-
-/**
- * Create monitor object with runtime type validation.
- *
- * @remarks
- * Provides runtime type safety by validating monitor type and creating properly
- * structured monitor objects with sensible defaults.
- *
- * Process:
- *
- * 1. Validates monitor type using internal validation
- * 2. Creates monitor object with default values
- * 3. Merges provided data with defaults
- * 4. Returns structured result for error handling
- *
- * @example
- *
- * ```typescript
- * import { monitorLogger } from "../../utils/logger";
- *
- * const result = createMonitorWithTypeGuards("http", {
- *     url: "https://example.com",
- * });
- * if (result.success) {
- *     monitorLogger.info("Created monitor", result.monitor);
- * } else {
- *     monitorLogger.error("Monitor validation failed", result.errors);
- * }
- * ```
- *
- * @param type - Monitor type string to validate
- * @param data - Monitor data to merge with defaults
- *
- * @returns Validation result with created monitor or errors
- */
-export interface MonitorCreationResult {
-    errors: string[];
-    monitor?: MonitorConfiguration;
-    success: boolean;
-}
-
-/**
- * Validates monitor type input and returns a normalized configuration object.
- *
- * @param type - Monitor type identifier supplied by the caller.
- * @param data - Optional monitor configuration overrides.
- *
- * @returns Structured result containing either a monitor configuration or
- *   validation errors.
- */
-export function createMonitorWithTypeGuards(
-    type: string,
-    data: MonitorConfigurationInput = {}
-): MonitorCreationResult {
-    // Use internal type validation to avoid circular dependency
-    const validationResult = validateMonitorTypeInternal(type);
-    if (!validationResult.success) {
-        const errorMessage = objectHasIn(validationResult, "error")
-            ? validationResult.error
-            : "Invalid monitor type";
-        return {
-            errors: [errorMessage],
-            success: false,
-        };
-    }
-
-    const validMonitorType = validationResult.value;
-
-    const { type: userProvidedType, ...restData } = data;
-    if (
-        typeof userProvidedType === "string" &&
-        userProvidedType !== validMonitorType
-    ) {
-        logger.warn(
-            `[MonitorTypeRegistry] Ignoring mismatched monitor type override`,
-            {
-                providedType: userProvidedType,
-                validatedType: validMonitorType,
-            }
-        );
-    }
-
-    const monitor: MonitorConfiguration = {
-        history: [],
-        monitoring: true,
-        responseTime: -1,
-        retryAttempts: 3,
-        status: MONITOR_STATUS.PENDING,
-        timeout: 10_000,
-        type: validMonitorType,
-        ...restData,
-    };
-
-    return {
-        errors: [],
-        monitor,
-        success: true,
-    };
-}
-
-/**
- * Runtime type guard that verifies a value is a string corresponding to a
- * registered monitor type.
- *
- * @param type - Unknown value to validate.
- *
- * @returns `true` when the value is a registered monitor type string.
- */
-export function isValidMonitorTypeGuard(type: unknown): type is MonitorType {
-    return typeof type === "string" && isValidMonitorType(type);
-}
 
 /**
  * Monitor configuration migrations are intentionally not supported in this
