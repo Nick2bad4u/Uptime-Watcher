@@ -24,7 +24,7 @@ import type { DatabaseBackupResult } from "../../../services/database/utils/back
 
 // Import after mocks are set up
 import { DataBackupService } from "../../../services/database/DataBackupService";
-import { createVacuumSnapshot } from "../../../services/database/dataBackupService/snapshot";
+import { createConsistentSnapshot } from "../../../services/database/dataBackupService/snapshot";
 import { SiteLoadingError } from "../../../services/database/interfaces";
 import {
     assertSqliteDatabaseIntegrity,
@@ -158,9 +158,15 @@ describe(DataBackupService, () => {
             await annotate("Type: Security", "type");
 
             expect(() => {
-                createVacuumSnapshot({
+                const localDatabaseService = createMockDatabaseService();
+                const localLogger = createMockLogger();
+
+                createConsistentSnapshot({
+                    databaseService: localDatabaseService as never,
                     dbPath: "/tmp/mock-db.sqlite",
-                    snapshotPath: "/tmp/backup\0snapshot.sqlite",
+                    logger: localLogger as never,
+                    snapshotDir: "/tmp/backup\0dir",
+                    snapshotFileName: "backup-snapshot.sqlite",
                 });
             }).toThrow(/nul bytes/i);
 

@@ -53,7 +53,7 @@ export function createConsistentSnapshot(args: {
 /**
  * Creates a database snapshot via `VACUUM INTO`.
  */
-export function createVacuumSnapshot(args: {
+function createVacuumSnapshot(args: {
     readonly dbPath: string;
     readonly snapshotPath: string;
 }): void {

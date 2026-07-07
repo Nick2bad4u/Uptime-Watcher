@@ -59,7 +59,7 @@ describe("snapshot (strict coverage)", () => {
     });
 
     it("creates a VACUUM snapshot, escaping single-quotes", async () => {
-        const { createVacuumSnapshot } =
+        const { createConsistentSnapshot } =
             await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         const execCalls: string[] = [];
@@ -67,9 +67,21 @@ describe("snapshot (strict coverage)", () => {
             execCalls.push(sql);
         };
 
-        createVacuumSnapshot({
+        const databaseService = {
+            close: vi.fn(),
+            initialize: vi.fn(),
+        };
+
+        const logger = {
+            warn: vi.fn(),
+        };
+
+        createConsistentSnapshot({
+            databaseService: databaseService as never,
             dbPath: "/tmp/mock-db.sqlite",
-            snapshotPath: "/tmp/backup-snap'shot.sqlite",
+            logger: logger as never,
+            snapshotDir: "/tmp/mock'dir",
+            snapshotFileName: "backup-snapshot.sqlite",
         });
 
         expect(databaseInstances).toHaveLength(1);
@@ -81,14 +93,16 @@ describe("snapshot (strict coverage)", () => {
         expect(
             execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))
         ).toBeTruthy();
-        expect(execCalls).toContain(
-            "VACUUM INTO '/tmp/backup-snap''shot.sqlite'"
+        const vacuumSql = execCalls.find((sql) =>
+            sql.includes("VACUUM INTO")
         );
+        expect(vacuumSql).toContain("mock''dir");
+        expect(vacuumSql).toContain("backup-snapshot.sqlite");
         expect(databaseInstances[0]?.close).toHaveBeenCalledTimes(1);
     });
 
     it("continues when PRAGMA busy_timeout fails", async () => {
-        const { createVacuumSnapshot } =
+        const { createConsistentSnapshot } =
             await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         const execCalls: string[] = [];
@@ -99,22 +113,38 @@ describe("snapshot (strict coverage)", () => {
             }
         };
 
-        createVacuumSnapshot({
+        const databaseService = {
+            close: vi.fn(),
+            initialize: vi.fn(),
+        };
+
+        const logger = {
+            warn: vi.fn(),
+        };
+
+        createConsistentSnapshot({
+            databaseService: databaseService as never,
             dbPath: "/tmp/mock-db.sqlite",
-            snapshotPath: "/tmp/backup-snapshot.sqlite",
+            logger: logger as never,
+            snapshotDir: "/tmp",
+            snapshotFileName: "backup-snapshot.sqlite",
         });
 
         expect(
             execCalls.some((sql) => sql.includes("PRAGMA busy_timeout"))
         ).toBeTruthy();
-        expect(execCalls).toContain(
-            "VACUUM INTO '/tmp/backup-snapshot.sqlite'"
-        );
+        expect(
+            execCalls.some(
+                (sql) =>
+                    sql.includes("VACUUM INTO") &&
+                    sql.includes("backup-snapshot.sqlite")
+            )
+        ).toBeTruthy();
         expect(databaseInstances[0]?.close).toHaveBeenCalledTimes(1);
     });
 
     it("rejects NUL bytes in snapshotPath but still closes the temp connection", async () => {
-        const { createVacuumSnapshot } =
+        const { createConsistentSnapshot } =
             await import("../../../../../../electron/services/database/dataBackupService/snapshot");
 
         const execCalls: string[] = [];
@@ -122,10 +152,22 @@ describe("snapshot (strict coverage)", () => {
             execCalls.push(sql);
         };
 
+        const databaseService = {
+            close: vi.fn(),
+            initialize: vi.fn(),
+        };
+
+        const logger = {
+            warn: vi.fn(),
+        };
+
         expect(() => {
-            createVacuumSnapshot({
+            createConsistentSnapshot({
+                databaseService: databaseService as never,
                 dbPath: "/tmp/mock-db.sqlite",
-                snapshotPath: "/tmp/backup\0snapshot.sqlite",
+                logger: logger as never,
+                snapshotDir: "/tmp/backup\0dir",
+                snapshotFileName: "backup-snapshot.sqlite",
             });
         }).toThrow(/nul bytes/i);
 
