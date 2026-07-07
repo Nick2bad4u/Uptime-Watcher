@@ -4,6 +4,7 @@ import { isFinite as isFiniteValue, isInteger, objectHasOwn } from "ts-extras";
 
 import type { PortNumber } from "../types/units";
 
+import { getNativeDateEpochMs } from "./nativeDate";
 import { isRecord } from "./typeHelpers";
 
 /**
@@ -161,7 +162,7 @@ export function isBoolean(value: unknown): value is boolean {
  * @returns `true` when the value is a `Date` with a finite timestamp.
  */
 export function isDate(value: unknown): value is Date {
-    return value instanceof Date && !Number.isNaN(value.getTime());
+    return value instanceof Date && getNativeDateEpochMs(value) !== undefined;
 }
 
 /**

@@ -470,6 +470,19 @@ describe("Type Guards - Comprehensive Coverage", () => {
             expect(isDate(new Date(Date.now()))).toBeTruthy();
         });
 
+        it("should not invoke shadowed Date methods", () => {
+            const date = new Date("2023-01-01T00:00:00.000Z");
+            const getTime = vi.fn(() => {
+                throw new Error("date getTime should not run");
+            });
+            Object.defineProperty(date, "getTime", {
+                value: getTime,
+            });
+
+            expect(isDate(date)).toBeTruthy();
+            expect(getTime).not.toHaveBeenCalled();
+        });
+
         it("should return false for invalid Date objects", async ({
             task,
             annotate,
