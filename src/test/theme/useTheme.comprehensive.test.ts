@@ -20,6 +20,7 @@ import { arrayIncludes, safeCastTo } from "ts-extras";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
+import type { Theme } from "../../theme/types";
 import {
     useAvailabilityColors,
     useTheme,
@@ -366,6 +367,36 @@ describe("Theme Hooks - Comprehensive Coverage", () => {
 
             const nullPath = result.current.getColor("status.nonexistent");
             expect(nullPath).toBe("#111827");
+        });
+
+        it("should return fallback color for inherited path segments", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useTheme", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Retrieval", "type");
+
+            const baseTheme = mockThemeManager.getTheme() as Theme;
+            const textColors = Object.assign(
+                Object.create({ danger: "#ff0000" }) as Record<string, unknown>,
+                baseTheme.colors.text
+            ) as Theme["colors"]["text"];
+
+            mockThemeManager.getTheme.mockReturnValueOnce({
+                ...baseTheme,
+                colors: {
+                    ...baseTheme.colors,
+                    text: textColors,
+                },
+            });
+
+            const { result } = renderHook(() => useTheme());
+
+            expect(result.current.getColor("text.danger")).toBe(
+                baseTheme.colors.text.primary
+            );
         });
 
         it("should provide getStatusColor function for valid statuses", async ({
