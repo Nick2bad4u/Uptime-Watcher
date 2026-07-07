@@ -128,46 +128,6 @@ describe("High-Impact Branch Coverage Tests", () => {
                         );
                     expect(noCorrelationResult.status).toBe("down");
                 }
-
-                if (errorHandlingModule.handleAxiosError) {
-                    // Test axios error handling branches
-                    const axiosError = {
-                        isAxiosError: true,
-                        response: {
-                            status: 500,
-                            statusText: "Internal Server Error",
-                            data: "Error data",
-                        },
-                        request: {},
-                        message: "Request failed",
-                        name: "AxiosError",
-                        toJSON: () => ({}),
-                    };
-
-                    const axiosResult = errorHandlingModule.handleAxiosError(
-                        axiosError as any,
-                        "https://example.com",
-                        5000
-                    );
-                    expect(axiosResult.status).toBe("down");
-
-                    // Test axios error without response
-                    const noResponseError = {
-                        isAxiosError: true,
-                        request: {},
-                        message: "Network Error",
-                        name: "AxiosError",
-                        toJSON: () => ({}),
-                    };
-
-                    const noResponseResult =
-                        errorHandlingModule.handleAxiosError(
-                            noResponseError as any,
-                            "https://example.com",
-                            5000
-                        );
-                    expect(noResponseResult.status).toBe("down");
-                }
             } catch (importError) {
                 expect(importError).toBeDefined();
             }

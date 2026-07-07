@@ -50,11 +50,9 @@ import { logger } from "../../../utils/logger";
  *
  * @returns A {@link MonitorCheckResult} object indicating failure.
  *
- * @public
- *
  * @see {@link MonitorCheckResult}
  */
-export function createErrorResult(
+function createErrorResult(
     error: string,
     responseTime: number,
     correlationId?: string
@@ -196,12 +194,10 @@ export function isCancellationError(
  *
  * @returns A {@link MonitorCheckResult} object representing the network error.
  *
- * @public
- *
  * @see {@link AxiosError}
  * @see {@link MonitorCheckResult}
  */
-export function handleAxiosError(
+function handleAxiosError(
     error: AxiosError,
     url: string,
     responseTime: number,
