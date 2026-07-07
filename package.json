@@ -250,7 +250,7 @@
         "lint:ci": "npm run lint:all && npm run lint:strict && npm run docs:check-links",
         "lint:circular": "npm run madge:circular && echo \"Circular Lint Madge done!\"",
         "lint:circular:electron": "npm run lint:madge:electron",
-        "lint:circular:shared": "madge --circular --ts-config tsconfig.shared.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])\"",
+        "lint:circular:shared": "node scripts/run-node-cli.mjs -- madge --circular --ts-config tsconfig.shared.json --extensions ts,tsx,js,jsx,mjs,cjs,cts,mts src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])\"",
         "lint:clean": "rimraf .cache/.eslintcache .cache/stylelintcache .cache/.prettier-cache",
         "lint:commit": "commitlint --config config/linting/commitlint.config.mjs --from HEAD~1 --to HEAD --verbose",
         "lint:config:build": "npm run build:eslint-inspector",
