@@ -68,6 +68,10 @@ class SpyAbortSignal {
     }
 }
 
+interface PrototypeWithToString {
+    toString: () => string;
+}
+
 describe("AbortUtils Function Coverage Tests", () => {
     afterEach(() => {
         vi.restoreAllMocks();
@@ -272,6 +276,56 @@ describe("AbortUtils Function Coverage Tests", () => {
             });
 
             expect(toStringCalls).toBe(0);
+        });
+
+        test("should not invoke primitive reason prototype toString methods", async () => {
+            const numberToStringSpy = vi
+                .spyOn(Number.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("Number.prototype.toString called");
+                });
+            const booleanToStringSpy = vi
+                .spyOn(
+                    Boolean.prototype as unknown as PrototypeWithToString,
+                    "toString"
+                )
+                .mockImplementation(() => {
+                    throw new Error("Boolean.prototype.toString called");
+                });
+            const bigintToStringSpy = vi
+                .spyOn(BigInt.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("BigInt.prototype.toString called");
+                });
+
+            try {
+                await expect(
+                    retryWithAbort(() => Promise.reject(123), {
+                        maxRetries: 0,
+                    })
+                ).rejects.toMatchObject({ cause: 123, message: "123" });
+                await expect(
+                    retryWithAbort(() => Promise.reject(false), {
+                        maxRetries: 0,
+                    })
+                ).rejects.toMatchObject({
+                    cause: false,
+                    message: "false",
+                });
+                await expect(
+                    retryWithAbort(() => Promise.reject(123n), {
+                        maxRetries: 0,
+                    })
+                ).rejects.toMatchObject({ cause: 123n, message: "123" });
+
+                expect(numberToStringSpy).not.toHaveBeenCalled();
+                expect(booleanToStringSpy).not.toHaveBeenCalled();
+                expect(bigintToStringSpy).not.toHaveBeenCalled();
+            } finally {
+                numberToStringSpy.mockRestore();
+                booleanToStringSpy.mockRestore();
+                bigintToStringSpy.mockRestore();
+            }
         });
     });
 

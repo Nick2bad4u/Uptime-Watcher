@@ -100,7 +100,7 @@ function createErrorFromUnknownReason(reason: unknown): Error {
             typeof reason === "boolean" ||
             typeof reason === "bigint"
         ) {
-            return reason.toString();
+            return String(reason);
         }
 
         if (typeof reason === "symbol") {
