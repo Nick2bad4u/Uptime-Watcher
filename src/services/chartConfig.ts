@@ -32,25 +32,6 @@ import { arrayJoin } from "ts-extras";
 import type { Theme } from "../theme/types";
 
 /**
- * Bundle of chart options returned by {@link createChartConfigs}.
- *
- * @remarks
- * Provides preconfigured Chart.js options scoped to the app's monitoring
- * dashboard. Consumers typically spread these options when rendering `<Bar />`,
- * `<Doughnut />`, or `<Line />` components.
- *
- * @public
- */
-export interface ChartConfigs {
-    /** Configuration options for bar charts */
-    barChartOptions: ChartOptions<"bar">;
-    /** Configuration options for doughnut charts */
-    doughnutOptions: ChartOptions<"doughnut">;
-    /** Configuration options for line charts */
-    lineChartOptions: ChartOptions<"line">;
-}
-
-/**
  * Response time line chart data structure.
  *
  * @remarks
@@ -245,8 +226,6 @@ interface BaseChartConfigCommon {
  * colors, fonts, and spacing to all chart configurations.
  *
  * @public
- *
- * @see {@link createChartConfigs} for the functional wrapper.
  */
 export class ChartConfigService {
     /** Current theme instance for styling configuration */
@@ -511,46 +490,4 @@ export class ChartConfigService {
             text,
         };
     }
-}
-
-/**
- * Creates a set of theme-aware Chart.js configuration objects.
- *
- * @remarks
- * Thin wrapper around {@link ChartConfigService} for callers that prefer a
- * functional API. Returns memo-friendly plain objects ready to be passed to
- * Chart.js components.
- *
- * @example
- *
- * ```typescript
- * const { barChartOptions, doughnutOptions, lineChartOptions } =
- *     createChartConfigs(theme, 100);
- *
- * <Bar data={chartData} options={barChartOptions} />
- * <Doughnut data={statusData} options={doughnutOptions} />
- * <Line data={timeSeriesData} options={lineChartOptions} />
- * ```
- *
- * @param theme - Current theme object for styling charts.
- * @param totalChecks - Total number of checks for doughnut percentage
- *   formatting.
- *
- * @returns {@link ChartConfigs} Containing theme-aware chart options.
- *
- * @public
- *
- * @see {@link ChartConfigService} for the class-based implementation.
- */
-export function createChartConfigs(
-    theme: Theme,
-    totalChecks = 0
-): ChartConfigs {
-    const chartService = new ChartConfigService(theme);
-
-    return {
-        barChartOptions: chartService.getBarChartConfig(),
-        doughnutOptions: chartService.getDoughnutChartConfig(totalChecks),
-        lineChartOptions: chartService.getLineChartConfig(),
-    };
 }
