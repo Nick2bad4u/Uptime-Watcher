@@ -90,6 +90,13 @@ describe("main.tsx - Application Entry Point", () => {
                 message: "Root element not found",
             })
         );
+        expect(document.body).toHaveTextContent(
+            "Uptime Watcher could not start"
+        );
+        expect(document.body).toHaveTextContent(
+            "The app failed before the interface loaded."
+        );
+        expect(document.body).toHaveTextContent("Root element not found");
     });
 
     it("logs an error when createRoot throws", async ({ task, annotate }) => {
@@ -114,5 +121,7 @@ describe("main.tsx - Application Entry Point", () => {
                 message: expect.stringContaining("ReactDOM createRoot failed"),
             })
         );
+        expect(root).toHaveTextContent("Uptime Watcher could not start");
+        expect(root).toHaveTextContent("ReactDOM createRoot failed");
     });
 });

@@ -52,11 +52,41 @@ function initializeApp(): void {
     );
 }
 
+function renderStartupFailure(error: Error): void {
+    const fallbackHost =
+        document.querySelector<HTMLElement>("#root") ?? document.body;
+    const container = document.createElement("main");
+    const title = document.createElement("h1");
+    const message = document.createElement("p");
+    const detail = document.createElement("p");
+
+    container.className =
+        "flex min-h-screen flex-col items-center justify-center gap-3 bg-primary p-6 text-center text-primary";
+    container.setAttribute("role", "alert");
+
+    title.className = "font-semibold text-2xl";
+    title.textContent = "Uptime Watcher could not start";
+
+    message.className = "max-w-md text-secondary text-sm";
+    message.textContent = "The app failed before the interface loaded.";
+
+    detail.className = "max-w-md text-error-default text-xs";
+    detail.textContent = error.message;
+
+    container.append(title, message, detail);
+    fallbackHost.replaceChildren(container);
+}
+
 // Initialize the app
 try {
     initializeApp();
 } catch (error) {
     const normalizedError = ensureError(error);
     logger.app.error("initializeApp", normalizedError);
-    // Could show an error boundary or fallback UI here
+
+    try {
+        renderStartupFailure(normalizedError);
+    } catch (fallbackError) {
+        logger.app.error("renderStartupFailure", ensureError(fallbackError));
+    }
 }
