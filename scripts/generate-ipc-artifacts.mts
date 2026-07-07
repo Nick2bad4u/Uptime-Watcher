@@ -602,5 +602,3 @@ if (isDirectRun()) {
         }
     }
 }
-
-export { main, parseArgs };

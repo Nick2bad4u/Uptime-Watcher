@@ -800,17 +800,3 @@ if (isDirectInvocation()) {
             process.exitCode = 1;
         });
 }
-
-export {
-    collectTestFiles,
-    escapeRegularExpressionLiteral,
-    evaluateTestFile,
-    getVitestInvocation,
-    isDirectInvocation,
-    main,
-    parseCliArguments,
-    parsePositiveIntegerOption,
-    prepareReportDirectory,
-    runVitestCommand,
-    splitOptionValue,
-};

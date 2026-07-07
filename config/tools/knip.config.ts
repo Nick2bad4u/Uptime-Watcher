@@ -48,7 +48,9 @@ const knipConfig: KnipConfig = {
         // Invoked as package-script binaries; Knip's dependency graph doesn't
         // connect binary usage back to the owning package dependency.
         "@biomejs/biome",
+        "jscpd",
         "secretlint",
+        "yamllint-js",
         // Loaded by Storybook/Docusaurus config strings, CSS plugin directives,
         // or shared lint/documentation configs rather than JavaScript imports
         // Knip can statically follow.

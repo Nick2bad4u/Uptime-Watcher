@@ -2,7 +2,7 @@ const shouldDropForceColor = (
     environment: Readonly<NodeJS.ProcessEnv>
 ): boolean => Boolean(environment["NO_COLOR"] && environment["FORCE_COLOR"]);
 
-export const sanitizeProcessEnvInPlace = (
+const sanitizeProcessEnvInPlace = (
     environment: NodeJS.ProcessEnv = process.env
 ): void => {
     if (shouldDropForceColor(environment)) {
