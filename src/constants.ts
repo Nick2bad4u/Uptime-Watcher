@@ -330,22 +330,6 @@ export const TIMEOUT_CONSTRAINTS = {
 } as const;
 
 /**
- * Internal timeout constraints in milliseconds for backend operations.
- *
- * @remarks
- * These values correspond to TIMEOUT_CONSTRAINTS but are converted to
- * milliseconds for actual timeout implementation.
- */
-export const TIMEOUT_CONSTRAINTS_MS = {
-    /** Maximum timeout in milliseconds */
-    MAX: 300_000, // 300 seconds maximum
-    /** Minimum timeout in milliseconds */
-    MIN: 1000, // 1 second minimum
-    /** Step increment in milliseconds */
-    STEP: 1000, // 1 second increments
-} as const;
-
-/**
  * Retry attempt constraints for per-monitor retry configuration.
  *
  * @remarks

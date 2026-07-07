@@ -27,7 +27,6 @@ import {
     type IntervalOption,
     RETRY_CONSTRAINTS,
     TIMEOUT_CONSTRAINTS,
-    TIMEOUT_CONSTRAINTS_MS,
     TRANSITION_ALL,
     UI_DELAYS,
 } from "../constants";
@@ -400,42 +399,6 @@ describe("Application Constants", () => {
             expect(TIMEOUT_CONSTRAINTS).toHaveProperty("MIN");
             expect(TIMEOUT_CONSTRAINTS).toHaveProperty("MAX");
             expect(TIMEOUT_CONSTRAINTS).toHaveProperty("STEP");
-        });
-
-        it("should export TIMEOUT_CONSTRAINTS_MS", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Export Operation", "type");
-
-            expect(TIMEOUT_CONSTRAINTS_MS).toBeDefined();
-            expect(typeof TIMEOUT_CONSTRAINTS_MS).toBe("object");
-            expect(TIMEOUT_CONSTRAINTS_MS).toHaveProperty("MIN");
-            expect(TIMEOUT_CONSTRAINTS_MS).toHaveProperty("MAX");
-            expect(TIMEOUT_CONSTRAINTS_MS).toHaveProperty("STEP");
-        });
-
-        it("should have consistent timeout constraint values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBe(
-                TIMEOUT_CONSTRAINTS.MIN * 1000
-            );
-            expect(TIMEOUT_CONSTRAINTS_MS.MAX).toBe(
-                TIMEOUT_CONSTRAINTS.MAX * 1000
-            );
-            expect(TIMEOUT_CONSTRAINTS_MS.STEP).toBe(
-                TIMEOUT_CONSTRAINTS.STEP * 1000
-            );
         });
 
         it("should have reasonable timeout constraints", async ({
@@ -913,28 +876,14 @@ describe("Application Constants", () => {
             "should maintain timeout constraint invariants",
             (constraintType) => {
                 expect(TIMEOUT_CONSTRAINTS).toBeDefined();
-                expect(TIMEOUT_CONSTRAINTS_MS).toBeDefined();
 
                 // Verify constraints are logically consistent
                 expect(TIMEOUT_CONSTRAINTS.MIN).toBeLessThanOrEqual(
                     TIMEOUT_CONSTRAINTS.MAX
                 );
-                expect(TIMEOUT_CONSTRAINTS_MS.MIN).toBeLessThanOrEqual(
-                    TIMEOUT_CONSTRAINTS_MS.MAX
-                );
 
                 // All values should be positive
                 expect(TIMEOUT_CONSTRAINTS[constraintType]).toBeGreaterThan(0);
-                expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBeGreaterThan(
-                    0
-                );
-
-                // MS values should be 1000x the second values (except STEP)
-                if (constraintType === "MIN" || constraintType === "MAX") {
-                    expect(TIMEOUT_CONSTRAINTS_MS[constraintType]).toBe(
-                        TIMEOUT_CONSTRAINTS[constraintType] * 1000
-                    );
-                }
             }
         );
 

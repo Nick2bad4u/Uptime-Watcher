@@ -16,40 +16,7 @@ import { isFinite as isFiniteNumber } from "ts-extras";
 import {
     DEFAULT_REQUEST_TIMEOUT_SECONDS,
     TIMEOUT_CONSTRAINTS,
-    TIMEOUT_CONSTRAINTS_MS,
 } from "../constants";
-
-/**
- * Clamps timeout to valid range in milliseconds.
- *
- * @remarks
- * Ensures timeout values are within system-defined bounds to prevent extreme
- * values that could cause performance issues or timeouts that are too short to
- * be useful.
- *
- * @example
- *
- * ```typescript
- * const clamped = clampTimeoutMs(100); // Returns minimum valid timeout
- * const large = clampTimeoutMs(999_999); // Returns maximum valid timeout
- * ```
- *
- * @param timeoutMs - Timeout value in milliseconds.
- *
- * @returns Clamped timeout value within valid range.
- *
- * @public
- */
-export function clampTimeoutMs(timeoutMs: number): number {
-    if (!isFiniteNumber(timeoutMs)) {
-        return TIMEOUT_CONSTRAINTS_MS.MIN;
-    }
-
-    return Math.max(
-        TIMEOUT_CONSTRAINTS_MS.MIN,
-        Math.min(TIMEOUT_CONSTRAINTS_MS.MAX, timeoutMs)
-    );
-}
 
 /**
  * Clamps timeout to valid range in seconds.
@@ -116,64 +83,6 @@ export function getTimeoutSeconds(monitorTimeout?: number): number {
 }
 
 /**
- * Validates timeout value in milliseconds.
- *
- * @remarks
- * Checks if a timeout value is within acceptable system bounds. Used for
- * backend validation before storing or using timeout values.
- *
- * @example
- *
- * ```typescript
- * const isValid = isValidTimeoutMs(5000); // true for 5 seconds
- * const isTooShort = isValidTimeoutMs(100); // false if below minimum
- * ```
- *
- * @param timeoutMs - Timeout value in milliseconds.
- *
- * @returns `true` if the timeout is valid; otherwise `false`.
- *
- * @public
- */
-export function isValidTimeoutMs(timeoutMs: number): boolean {
-    return (
-        isFiniteNumber(timeoutMs) &&
-        timeoutMs >= TIMEOUT_CONSTRAINTS_MS.MIN &&
-        timeoutMs <= TIMEOUT_CONSTRAINTS_MS.MAX
-    );
-}
-
-/**
- * Validates timeout value in seconds.
- *
- * @remarks
- * Checks if a timeout value is within acceptable user-facing bounds. Used for
- * UI validation before converting to milliseconds for storage.
- *
- * @example
- *
- * ```typescript
- * const isValid = isValidTimeoutSeconds(30); // true for 30 seconds
- * const isTooLong = isValidTimeoutSeconds(1000); // false if above maximum
- * ```
- *
- * @param timeoutSeconds - Timeout value in seconds.
- *
- * @returns `true` if the timeout is valid; otherwise `false`.
- *
- * @public
- */
-export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
-    if (!isFiniteNumber(timeoutSeconds)) {
-        return false;
-    }
-    return (
-        timeoutSeconds >= TIMEOUT_CONSTRAINTS.MIN &&
-        timeoutSeconds <= TIMEOUT_CONSTRAINTS.MAX
-    );
-}
-
-/**
  * Converts timeout from milliseconds to seconds for UI display.
  *
  * @remarks
@@ -192,10 +101,8 @@ export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
  * @param timeoutMs - Timeout value in milliseconds.
  *
  * @returns Timeout value in seconds (may include decimal places).
- *
- * @public
  */
-export function timeoutMsToSeconds(timeoutMs: number): number {
+function timeoutMsToSeconds(timeoutMs: number): number {
     return timeoutMs / 1000;
 }
 

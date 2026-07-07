@@ -81,8 +81,8 @@ export const VALIDATION_CONSTRAINTS: MonitorValidationConstraints = {
         MIN: 0, // 0 retries minimum (from RETRY_CONSTRAINTS)
     },
     TIMEOUT: {
-        MAX: 300_000, // 300 seconds (from TIMEOUT_CONSTRAINTS_MS)
-        MIN: 1000, // 1 second (from TIMEOUT_CONSTRAINTS_MS)
+        MAX: 300_000, // 300 seconds
+        MIN: 1000, // 1 second
     },
 };
 
