@@ -438,7 +438,10 @@ export function rowsToMonitors(rows: DatabaseMonitorRow[]): Site["monitors"] {
  * @see {@link rowToMonitor}
  */
 export function rowToMonitorOrUndefined(
-    row: DatabaseMonitorRow | null | undefined
+    row:
+        | DatabaseMonitorRow
+        | null
+        | undefined
 ): Site["monitors"][0] | undefined {
     if (!row) {
         return undefined;

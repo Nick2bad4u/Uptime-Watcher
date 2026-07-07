@@ -49,7 +49,10 @@ export interface ZodIssueLike {
     path?: readonly ZodIssuePathPart[];
 }
 
-export type ZodIssuePathPart = number | string | symbol;
+export type ZodIssuePathPart =
+    | number
+    | string
+    | symbol;
 
 /**
  * Formats Zod issues into user-facing strings.

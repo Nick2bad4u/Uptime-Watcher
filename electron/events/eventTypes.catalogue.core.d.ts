@@ -50,7 +50,10 @@ declare module "./eventTypes" {
             /** The configuration key that changed. */
             setting: string;
             /** Origin of the change (user, system, migration). */
-            source: "migration" | "system" | "user";
+            source:
+                | "migration"
+                | "system"
+                | "user";
             /** Unix timestamp (ms) when the change occurred. */
             timestamp: number;
         };
@@ -103,7 +106,10 @@ declare module "./eventTypes" {
              * user-initiated backups, "scheduled" for automatic backups, or
              * "shutdown" for app shutdown backups.
              */
-            triggerType: "manual" | "scheduled" | "shutdown";
+            triggerType:
+                | "manual"
+                | "scheduled"
+                | "shutdown";
         };
 
         /**
@@ -115,7 +121,10 @@ declare module "./eventTypes" {
             schemaVersion: number;
             size: number;
             timestamp: number;
-            triggerType: "manual" | "scheduled" | "shutdown";
+            triggerType:
+                | "manual"
+                | "scheduled"
+                | "shutdown";
         };
 
         /**
@@ -282,7 +291,10 @@ declare module "./eventTypes" {
              * When present, indicates whether the emission represents the
              * "start", "success", or "failure" stage of a tracked operation.
              */
-            lifecycleStage?: "failure" | "start" | "success";
+            lifecycleStage?:
+                | "failure"
+                | "start"
+                | "success";
 
             /**
              * The database operation performed in the transaction.

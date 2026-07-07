@@ -294,7 +294,12 @@ describe("Precision Function Coverage - Targeted Functions", () => {
         await annotate("Type: Business Logic", "type");
 
         // Test date formatting utility
-        const formatDate = (date: Date | number | string): string => {
+        const formatDate = (
+            date:
+                | Date
+                | number
+                | string
+        ): string => {
             const d = new Date(date);
             if (Number.isNaN(d.getTime())) return "Invalid Date";
             return (

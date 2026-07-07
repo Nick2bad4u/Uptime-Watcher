@@ -28,7 +28,11 @@ interface VNodeProps {
     style?: Record<string, string | number>;
     onClick?: (event: Event) => void;
     onChange?: (event: Event) => void;
-    children?: VNode | VNode[] | string | number;
+    children?:
+        | VNode
+        | VNode[]
+        | string
+        | number;
 }
 
 interface VNodeRef {
@@ -70,7 +74,10 @@ type EffectTag =
 
 interface Update {
     id: string;
-    type: "state" | "props" | "callback";
+    type:
+        | "state"
+        | "props"
+        | "callback";
     payload: any;
     callback?: () => void;
     priority: number;
@@ -88,7 +95,12 @@ interface DiffResult {
 }
 
 interface Patch {
-    type: "INSERT" | "DELETE" | "UPDATE" | "MOVE" | "REPLACE";
+    type:
+        | "INSERT"
+        | "DELETE"
+        | "UPDATE"
+        | "MOVE"
+        | "REPLACE";
     targetId: string;
     parentId?: string;
     index?: number;
@@ -130,7 +142,11 @@ class MockVirtualDOM {
     createElement(
         type: string | ComponentConstructor,
         props: VNodeProps | null = null,
-        ...children: (VNode | string | number)[]
+        ...children: (
+            | VNode
+            | string
+            | number
+        )[]
     ): VNode {
         const normalizedProps = props || {};
         const normalizedChildren = this.normalizeChildren(children);
@@ -151,7 +167,13 @@ class MockVirtualDOM {
         return vnode;
     }
 
-    private normalizeChildren(children: (VNode | string | number)[]): VNode[] {
+    private normalizeChildren(
+        children: (
+            | VNode
+            | string
+            | number
+        )[]
+    ): VNode[] {
         const normalized: VNode[] = [];
 
         for (const child of children) {
@@ -1163,7 +1185,10 @@ describe("React Virtual DOM Performance", () => {
     bench("stress test - large virtual DOM operations", () => {
         const vdom = new MockVirtualDOM();
         const operations: {
-            type: "create" | "diff" | "reconcile";
+            type:
+                | "create"
+                | "diff"
+                | "reconcile";
             time: number;
             nodesProcessed: number;
         }[] = [];
@@ -1176,7 +1201,9 @@ describe("React Virtual DOM Performance", () => {
                 "diff",
                 "reconcile",
             ][Math.floor(secureRandomFloat() * 3)] as
-                "create" | "diff" | "reconcile";
+                | "create"
+                | "diff"
+                | "reconcile";
             const startTime = performance.now();
 
             switch (operationType) {

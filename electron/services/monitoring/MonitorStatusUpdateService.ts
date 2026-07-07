@@ -48,7 +48,10 @@ export interface StatusUpdateMonitorCheckResult {
     /** Response time in milliseconds */
     responseTime: number;
     /** Check result status */
-    status: "degraded" | "down" | "up";
+    status:
+        | "degraded"
+        | "down"
+        | "up";
     /** When check completed */
     timestamp: Date;
 }

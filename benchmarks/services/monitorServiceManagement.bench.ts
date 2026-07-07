@@ -16,7 +16,11 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 interface BenchmarkMonitor {
     id: string;
     siteIdentifier: string;
-    type: "http" | "port" | "dns" | "ping";
+    type:
+        | "http"
+        | "port"
+        | "dns"
+        | "ping";
     name: string;
     url?: string;
     host?: string;
@@ -26,7 +30,11 @@ interface BenchmarkMonitor {
     retryAttempts: number;
     enabled: boolean;
     lastChecked?: number;
-    status: "pending" | "up" | "down" | "degraded";
+    status:
+        | "pending"
+        | "up"
+        | "down"
+        | "degraded";
     responseTime?: number;
     metadata: Record<string, unknown>;
 }
@@ -37,7 +45,10 @@ interface BenchmarkMonitor {
  */
 interface MonitorCheckResult {
     monitorId: string;
-    status: "up" | "down" | "degraded";
+    status:
+        | "up"
+        | "down"
+        | "degraded";
     responseTime: number;
     timestamp: number;
     error?: string;
@@ -54,7 +65,11 @@ interface MonitorSchedule {
     nextCheck: number;
     lastCheck: number;
     intervalMs: number;
-    priority: "critical" | "high" | "normal" | "low";
+    priority:
+        | "critical"
+        | "high"
+        | "normal"
+        | "low";
     consecutiveFailures: number;
     adaptiveInterval: number;
 }
@@ -87,7 +102,10 @@ interface MonitorServiceMetrics {
  */
 interface HealthCheckReport {
     serviceId: string;
-    status: "healthy" | "degraded" | "unhealthy";
+    status:
+        | "healthy"
+        | "degraded"
+        | "unhealthy";
     lastCheck: number;
     metrics: MonitorServiceMetrics;
     issues: string[];
@@ -326,7 +344,10 @@ class MockMonitorServiceManager {
                 : 0;
 
         // Determine service status
-        let status: "healthy" | "degraded" | "unhealthy";
+        let status:
+            | "healthy"
+            | "degraded"
+            | "unhealthy";
         if (successRate >= 0.95 && averageResponseTime < 2000) {
             status = "healthy";
         } else if (successRate >= 0.8 && averageResponseTime < 5000) {
@@ -612,9 +633,11 @@ class MockMonitorServiceManager {
         schedule.nextCheck = result.timestamp + interval;
     }
 
-    private determinePriority(
-        monitor: BenchmarkMonitor
-    ): "critical" | "high" | "normal" | "low" {
+    private determinePriority(monitor: BenchmarkMonitor):
+        | "critical"
+        | "high"
+        | "normal"
+        | "low" {
         // Simple priority determination based on interval
         if (monitor.interval <= 30_000) return "critical";
         if (monitor.interval <= 60_000) return "high";

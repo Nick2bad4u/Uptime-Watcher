@@ -132,9 +132,11 @@ describe("DatabaseManager - Coverage Tests", () => {
         );
 
         mockDependencies = {
-            configurationManager: mockConfigurationManager,
+            configurationManager:
+                mockConfigurationManager as unknown as DatabaseManagerDependencies["configurationManager"],
             eventEmitter: eventEmitter as any,
-            repositories: mockRepositories,
+            repositories:
+                mockRepositories as unknown as DatabaseManagerDependencies["repositories"],
         };
 
         databaseManager = new DatabaseManager(mockDependencies);

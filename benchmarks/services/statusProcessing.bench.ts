@@ -15,7 +15,10 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
  */
 interface StatusEntry {
     timestamp: number;
-    status: "up" | "down" | "degraded";
+    status:
+        | "up"
+        | "down"
+        | "degraded";
     responseTime: number;
     details?: string;
     monitorId: string;
@@ -44,9 +47,15 @@ interface OutageEvent {
     start: number;
     end: number;
     duration: number;
-    severity: "minor" | "major" | "critical";
+    severity:
+        | "minor"
+        | "major"
+        | "critical";
     affectedMonitors: string[];
-    impactScope: "single" | "multiple" | "site-wide";
+    impactScope:
+        | "single"
+        | "multiple"
+        | "site-wide";
 }
 
 /**
@@ -82,14 +91,24 @@ interface StatusAggregationResult {
     siteIdentifier: string;
     totalMonitors: number;
     activeMonitors: number;
-    overallStatus: "healthy" | "degraded" | "critical" | "unknown";
+    overallStatus:
+        | "healthy"
+        | "degraded"
+        | "critical"
+        | "unknown";
     statistics: UptimeStatistics;
     recentOutages: OutageEvent[];
     slaCompliance: SLACompliance;
     timeWindowStats: TimeWindowStats[];
     trends: {
-        responseTimeTrend: "improving" | "degrading" | "stable";
-        uptimeTrend: "improving" | "degrading" | "stable";
+        responseTimeTrend:
+            | "improving"
+            | "degrading"
+            | "stable";
+        uptimeTrend:
+            | "improving"
+            | "degrading"
+            | "stable";
         reliabilityScore: number;
     };
 }
@@ -486,7 +505,11 @@ class MockStatusProcessingService {
     private determineOverallStatus(
         recentEntries: StatusEntry[],
         totalMonitors: number
-    ): "healthy" | "degraded" | "critical" | "unknown" {
+    ):
+        | "healthy"
+        | "degraded"
+        | "critical"
+        | "unknown" {
         if (recentEntries.length === 0) return "unknown";
 
         const downCount = recentEntries.filter(
@@ -660,7 +683,10 @@ function generateStatusEntries(
         const timestamp = now - secureRandomFloat() * timeSpan;
 
         // Simulate realistic failure patterns (5% down, 2% degraded)
-        let status: "up" | "down" | "degraded" = "up";
+        let status:
+            | "up"
+            | "down"
+            | "degraded" = "up";
         const rand = secureRandomFloat();
         if (rand < 0.05) status = "down";
         else if (rand < 0.07) status = "degraded";

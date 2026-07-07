@@ -133,16 +133,26 @@ function focusElementSafely(element: FocusRestoreElement): void {
 }
 
 /** Accent styling applied to the modal shell. */
-export type ModalAccent = "danger" | "default" | "success" | "warning";
+export type ModalAccent =
+    | "danger"
+    | "default"
+    | "success"
+    | "warning";
 
 /** Variant styling applied to the modal shell. */
-export type ModalVariant = "default" | "form" | "site-details";
+export type ModalVariant =
+    | "default"
+    | "form"
+    | "site-details";
 
 /** Overlay z-index variant. */
 export type ModalOverlayVariant = "confirm" | "default";
 
 /** Width sizing for the modal shell. */
-export type ModalSize = "lg" | "md" | "sm";
+export type ModalSize =
+    | "lg"
+    | "md"
+    | "sm";
 
 /**
  * Props for {@link Modal}.

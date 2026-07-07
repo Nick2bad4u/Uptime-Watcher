@@ -67,7 +67,15 @@ export interface StatusBadgeProperties extends CoreComponentProperties {
     /** Whether to show the status icon */
     readonly showIcon?: boolean;
     /** Text size (affects both text and icon sizing) */
-    readonly size?: "2xl" | "3xl" | "4xl" | "base" | "lg" | "sm" | "xl" | "xs";
+    readonly size?:
+        | "2xl"
+        | "3xl"
+        | "4xl"
+        | "base"
+        | "lg"
+        | "sm"
+        | "xl"
+        | "xs";
     /** Current status to display */
     readonly status: MonitorStatus;
 }
@@ -105,7 +113,10 @@ export const StatusBadge: NamedExoticComponent<StatusBadgeProperties> = memo(
          */
         const getIndicatorSize = (
             textSize: typeof size
-        ): "lg" | "md" | "sm" => {
+        ):
+            | "lg"
+            | "md"
+            | "sm" => {
             switch (textSize) {
                 case "2xl":
                 case "3xl":

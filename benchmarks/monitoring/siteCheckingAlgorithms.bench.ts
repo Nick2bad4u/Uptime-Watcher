@@ -143,7 +143,13 @@ interface CircuitBreakerConfig {
 }
 
 type HttpMethod =
-    "GET" | "POST" | "PUT" | "DELETE" | "HEAD" | "OPTIONS" | "PATCH";
+    | "GET"
+    | "POST"
+    | "PUT"
+    | "DELETE"
+    | "HEAD"
+    | "OPTIONS"
+    | "PATCH";
 type CheckType =
     | "http"
     | "https"
@@ -153,8 +159,17 @@ type CheckType =
     | "dns"
     | "content"
     | "performance";
-type Priority = "low" | "normal" | "high" | "critical";
-type CheckStatus = "success" | "failure" | "timeout" | "error" | "warning";
+type Priority =
+    | "low"
+    | "normal"
+    | "high"
+    | "critical";
+type CheckStatus =
+    | "success"
+    | "failure"
+    | "timeout"
+    | "error"
+    | "warning";
 type ErrorType =
     | "network"
     | "timeout"
@@ -852,7 +867,10 @@ interface SiteCheckerInstance {
     activeChecks: Map<string, SiteCheckRequest>;
     checkQueue: SiteCheckRequest[];
     metrics: CheckerPerformanceMetrics;
-    state: "idle" | "checking" | "monitoring";
+    state:
+        | "idle"
+        | "checking"
+        | "monitoring";
     lastActivity: number;
 }
 
@@ -1000,7 +1018,10 @@ class MockContentValidator {
 }
 
 class CircuitBreaker {
-    private state: "closed" | "open" | "half-open" = "closed";
+    private state:
+        | "closed"
+        | "open"
+        | "half-open" = "closed";
     private failures = 0;
     private lastFailureTime = 0;
     private successes = 0;

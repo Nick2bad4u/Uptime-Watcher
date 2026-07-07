@@ -42,7 +42,12 @@ interface Logger {
  * Template variable values for log interpolation. Uses Partial to make all
  * variables optional.
  */
-type TemplateValue = boolean | null | number | string | undefined;
+type TemplateValue =
+    | boolean
+    | null
+    | number
+    | string
+    | undefined;
 type TemplateVariables = Simplify<Partial<Record<string, TemplateValue>>>;
 
 // Export enhanced types for external use

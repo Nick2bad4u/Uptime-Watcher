@@ -89,7 +89,12 @@ export interface ThemedInputProperties
     /** Step value for number inputs (incremental value) */
     readonly step?: number | string;
     /** HTML input type attribute */
-    readonly type?: "email" | "number" | "password" | "text" | "url";
+    readonly type?:
+        | "email"
+        | "number"
+        | "password"
+        | "text"
+        | "url";
     /** Current value of the input */
     readonly value?: number | string;
 }

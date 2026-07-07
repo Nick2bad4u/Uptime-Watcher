@@ -56,7 +56,10 @@ const stripHttpScheme = (value: string): string => {
  */
 export interface ConnectivityOptions {
     /** Check method to use (TCP port scanning, DNS resolution, or HTTP) */
-    method?: "dns" | "http" | "tcp";
+    method?:
+        | "dns"
+        | "http"
+        | "tcp";
     /** Array of ports to try for TCP connectivity */
     ports?: number[];
     /** Timeout for each connectivity attempt in milliseconds */

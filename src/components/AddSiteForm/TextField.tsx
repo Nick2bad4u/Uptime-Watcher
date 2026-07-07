@@ -77,7 +77,10 @@ export interface TextFieldProperties extends StringFieldPropsBase {
     /** Placeholder text displayed when input is empty */
     readonly placeholder?: string;
     /** Input type - text, URL, or number */
-    readonly type?: "number" | "text" | "url";
+    readonly type?:
+        | "number"
+        | "text"
+        | "url";
 }
 
 /**

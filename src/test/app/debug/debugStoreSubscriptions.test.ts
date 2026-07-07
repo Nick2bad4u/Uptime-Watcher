@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-type StoreKey = "alerts" | "error" | "sites" | "ui" | "updates";
+type StoreKey =
+    | "alerts"
+    | "error"
+    | "sites"
+    | "ui"
+    | "updates";
 
 const logger = {
     error: vi.fn(),

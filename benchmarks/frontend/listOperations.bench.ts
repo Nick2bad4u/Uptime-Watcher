@@ -134,7 +134,11 @@ type FilterOperator =
     | "lessThan"
     | "between"
     | "in";
-type SelectionMode = "none" | "single" | "multiple" | "range";
+type SelectionMode =
+    | "none"
+    | "single"
+    | "multiple"
+    | "range";
 type SortDirection = "asc" | "desc";
 
 // Mock React List Renderer

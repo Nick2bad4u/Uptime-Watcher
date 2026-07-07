@@ -30,13 +30,20 @@ function isStringArray(value: unknown): value is string[] {
     );
 }
 
-function toStringHeaderRecord(
-    headers: object
-): Record<string, string | string[] | undefined> {
-    const normalizedHeaders =
-        createNullPrototypeObject<
-            Record<string, string | string[] | undefined>
-        >();
+function toStringHeaderRecord(headers: object): Record<
+    string,
+    | string
+    | string[]
+    | undefined
+> {
+    const normalizedHeaders = createNullPrototypeObject<
+        Record<
+            string,
+            | string
+            | string[]
+            | undefined
+        >
+    >();
 
     for (const [key, value] of objectEntries(headers)) {
         if (typeof value === "string" || isStringArray(value)) {

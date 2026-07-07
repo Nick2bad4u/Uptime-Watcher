@@ -187,7 +187,10 @@ interface ThemedButtonProperties {
     readonly fullWidth?: boolean;
     readonly loading?: boolean;
     readonly onClick?: () => void;
-    readonly type?: "button" | "reset" | "submit";
+    readonly type?:
+        | "button"
+        | "reset"
+        | "submit";
     readonly variant?: string;
 }
 
@@ -195,7 +198,10 @@ interface ThemedButtonSnapshot {
     readonly dataTestId: string | undefined;
     readonly disabled: boolean;
     readonly loading: boolean;
-    readonly type: "button" | "reset" | "submit";
+    readonly type:
+        | "button"
+        | "reset"
+        | "submit";
 }
 
 let themedButtonProps: ThemedButtonSnapshot | undefined;

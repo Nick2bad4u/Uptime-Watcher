@@ -14,7 +14,11 @@ import {
 } from "ts-extras";
 
 /** Supported logging severity levels emitted by the structured logger. */
-export type LogSeverity = "debug" | "error" | "info" | "warn";
+export type LogSeverity =
+    | "debug"
+    | "error"
+    | "info"
+    | "warn";
 
 /** Shape of contextual metadata accepted by logging helpers. */
 export interface LogContextInput {
@@ -325,7 +329,12 @@ const computeOptionalIdentifierHash = (
 const buildBaseLogContext = (
     context: StructuredLogContext | undefined,
     severity: LogSeverity
-): Pick<SanitizedLogContext, "correlationId" | "severity" | "timestamp"> => ({
+): Pick<
+    SanitizedLogContext,
+    | "correlationId"
+    | "severity"
+    | "timestamp"
+> => ({
     correlationId: context?.correlationId?.trim() ?? generateCorrelationId(),
     severity: context?.severity ?? severity,
     timestamp: context?.timestamp ?? Date.now(),

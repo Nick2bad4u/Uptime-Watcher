@@ -30,7 +30,13 @@ interface AggregatedMetric {
     name: string;
     value: number;
     unit: string;
-    aggregationType: "sum" | "avg" | "min" | "max" | "count" | "percentile";
+    aggregationType:
+        | "sum"
+        | "avg"
+        | "min"
+        | "max"
+        | "count"
+        | "percentile";
     timeRange: {
         start: Date;
         end: Date;
@@ -46,7 +52,13 @@ interface AnalyticsQuery {
         end: Date;
     };
     aggregation: {
-        type: "sum" | "avg" | "min" | "max" | "count" | "percentile";
+        type:
+            | "sum"
+            | "avg"
+            | "min"
+            | "max"
+            | "count"
+            | "percentile";
         interval?: number; // In milliseconds
         percentile?: number; // For percentile aggregation
     };
@@ -78,7 +90,11 @@ interface Dashboard {
 /** Captures widget configuration and its backing query. */
 interface DashboardWidget {
     id: string;
-    type: "chart" | "metric" | "table" | "status";
+    type:
+        | "chart"
+        | "metric"
+        | "table"
+        | "status";
     title: string;
     query: AnalyticsQuery;
     configuration: Record<string, any>;
@@ -90,7 +106,13 @@ interface AlertRule {
     name: string;
     metricName: string;
     condition: {
-        operator: ">" | "<" | ">=" | "<=" | "==" | "!=";
+        operator:
+            | ">"
+            | "<"
+            | ">="
+            | "<="
+            | "=="
+            | "!=";
         threshold: number;
         duration: number; // In milliseconds
     };

@@ -109,7 +109,10 @@ const googleDriveFileSchema: z.ZodType<GoogleDriveListedFile> = z
 
 const googleDriveListResponseSchema: z.ZodType<{
     files?: GoogleDriveListedFile[] | undefined;
-    nextPageToken?: null | string | undefined;
+    nextPageToken?:
+        | null
+        | string
+        | undefined;
 }> = z
     .object({
         files: z.array(googleDriveFileSchema).optional(),

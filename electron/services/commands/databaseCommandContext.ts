@@ -9,7 +9,7 @@ import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { DatabaseRestorePayload } from "../database/utils/backup/databaseBackup";
-import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
+import type { DatabaseCommandServiceFactory } from "../factories/DatabaseServiceFactory";
 
 /**
  * Dependencies required by database commands.
@@ -33,7 +33,7 @@ export interface DatabaseCommandContext {
     /** Event bus for emitting command execution events. */
     eventEmitter: TypedEventBus<UptimeEvents>;
     /** Factory for creating database services/repositories. */
-    serviceFactory: DatabaseServiceFactory;
+    serviceFactory: DatabaseCommandServiceFactory;
     /** Optional history-limit updater for settings propagation. */
     updateHistoryLimit?: ((limit: number) => Promise<void>) | undefined;
 }
@@ -88,7 +88,7 @@ function normalizeDatabaseCommandContext(
         eventEmitter: castUnchecked<TypedEventBus<UptimeEvents>>(
             getRequiredContextProperty(context, "eventEmitter")
         ),
-        serviceFactory: castUnchecked<DatabaseServiceFactory>(
+        serviceFactory: castUnchecked<DatabaseCommandServiceFactory>(
             getRequiredContextProperty(context, "serviceFactory")
         ),
         updateHistoryLimit: castUnchecked<
@@ -139,7 +139,7 @@ export function isRestoreContext(
  * Normalizes the supported constructor patterns into a context object.
  */
 export function resolveDatabaseCommandContext(
-    value: DatabaseCommandContext | DatabaseServiceFactory,
+    value: DatabaseCommandContext | DatabaseCommandServiceFactory,
     eventEmitter?: TypedEventBus<UptimeEvents>,
     cache?: StandardizedCache<Site>
 ): DatabaseCommandContext {

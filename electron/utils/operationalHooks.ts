@@ -106,7 +106,11 @@ function toOperationalErrorMetadata(error: Error): OperationalErrorMetadata {
     };
 }
 
-type OperationalLogLevel = "debug" | "error" | "info" | "warn";
+type OperationalLogLevel =
+    | "debug"
+    | "error"
+    | "info"
+    | "warn";
 
 type OperationalHookContextTag = "OperationalHookContext";
 

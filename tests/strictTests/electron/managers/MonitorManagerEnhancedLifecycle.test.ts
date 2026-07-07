@@ -64,7 +64,10 @@ function createSite(
 }
 
 type LoggerMock = Record<
-    "debug" | "info" | "warn" | "error",
+    | "debug"
+    | "info"
+    | "warn"
+    | "error",
     ReturnType<typeof vi.fn>
 >;
 

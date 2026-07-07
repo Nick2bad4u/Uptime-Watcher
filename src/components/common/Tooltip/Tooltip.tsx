@@ -39,7 +39,11 @@ import "./tooltip.css";
 /**
  * Tooltip position relative to the trigger element.
  */
-export type TooltipPosition = "bottom" | "left" | "right" | "top";
+export type TooltipPosition =
+    | "bottom"
+    | "left"
+    | "right"
+    | "top";
 
 /**
  * Props for the Tooltip component.

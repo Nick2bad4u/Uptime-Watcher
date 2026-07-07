@@ -345,9 +345,7 @@ const isHistoryLimitUpdatedEventDataPayload = (
         return false;
     }
 
-    return !(
-        isDefined(previousLimit) && !isNonNegativeSafeInteger(previousLimit)
-    );
+    return !isDefined(previousLimit) || isNonNegativeSafeInteger(previousLimit);
 };
 
 const isSiteAddedSource = createStringUnionGuard(SITE_ADDED_SOURCES);

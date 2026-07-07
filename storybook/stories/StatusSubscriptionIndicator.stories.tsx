@@ -13,7 +13,11 @@ import { useEffect, useMemo } from "react";
 import { action } from "storybook/actions";
 
 type IndicatorVariant =
-    "connecting" | "degraded" | "disabled" | "failed" | "healthy";
+    | "connecting"
+    | "degraded"
+    | "disabled"
+    | "failed"
+    | "healthy";
 
 const isIndicatorVariant = (value: unknown): value is IndicatorVariant =>
     value === "connecting" ||

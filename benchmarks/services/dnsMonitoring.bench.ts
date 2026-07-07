@@ -31,7 +31,11 @@ interface DnsCheckRequest {
     expectedValue?: string;
     timeout: number;
     retryAttempts: number;
-    priority: "critical" | "high" | "normal" | "low";
+    priority:
+        | "critical"
+        | "high"
+        | "normal"
+        | "low";
     metadata: {
         siteIdentifier: string;
         siteName: string;

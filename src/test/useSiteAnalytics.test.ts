@@ -47,7 +47,10 @@ describe(useSiteAnalytics, () => {
 
     const createStatusRecord = (
         timestamp: number,
-        status: "degraded" | "down" | "up",
+        status:
+            | "degraded"
+            | "down"
+            | "up",
         responseTime: number
     ): StatusHistory => ({
         responseTime,

@@ -54,9 +54,10 @@ export interface SiteOverviewTabProperties {
 /**
  * Get monitor badge variant
  */
-function getMonitorBadgeVariant(
-    monitor: Monitor
-): "error" | "success" | "warning" {
+function getMonitorBadgeVariant(monitor: Monitor):
+    | "error"
+    | "success"
+    | "warning" {
     return monitor.monitoring ? "success" : "warning";
 }
 
@@ -122,7 +123,10 @@ export const SiteOverviewTab = ({
      */
     const getUptimeVariant = (
         percentage: number
-    ): "error" | "success" | "warning" => {
+    ):
+        | "error"
+        | "success"
+        | "warning" => {
         const variant = getAvailabilityVariant(percentage);
         if (variant === "danger") {
             return "error";

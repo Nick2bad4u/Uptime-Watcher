@@ -585,7 +585,9 @@ describe("Cache Utilities", () => {
 
                 const cache = new TypedCache<
                     string,
-                    null | string | undefined
+                    | null
+                    | string
+                    | undefined
                 >();
                 cache.set("null", null);
                 cache.set("undefined", undefined);

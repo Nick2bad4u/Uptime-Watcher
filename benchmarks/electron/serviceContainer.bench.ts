@@ -15,7 +15,10 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 interface ServiceDefinition {
     id: string;
     name: string;
-    type: "singleton" | "transient" | "scoped";
+    type:
+        | "singleton"
+        | "transient"
+        | "scoped";
     dependencies: string[];
     factory?: boolean;
     lazy: boolean;
@@ -30,7 +33,11 @@ interface ServiceInstance {
     lastAccessedAt: number;
     accessCount: number;
     memoryUsage: number;
-    state: "initializing" | "active" | "disposing" | "disposed";
+    state:
+        | "initializing"
+        | "active"
+        | "disposing"
+        | "disposed";
     dependencies: ServiceInstance[];
     children: ServiceInstance[];
 }
@@ -716,7 +723,11 @@ describe("Service Container Benchmarks", () => {
         const serviceScopes: ServiceScope[] = [];
         const scopeOperations: {
             operationId: string;
-            type: "create" | "resolve" | "dispose" | "inherit";
+            type:
+                | "create"
+                | "resolve"
+                | "dispose"
+                | "inherit";
             scopeId: string;
             parentScopeId?: string;
             serviceId?: string;
@@ -740,7 +751,11 @@ describe("Service Container Benchmarks", () => {
         // Simulate scope operations
         for (let operation = 0; operation < 300; operation++) {
             const operationType = secureRandomFloat();
-            let opType: "create" | "resolve" | "dispose" | "inherit";
+            let opType:
+                | "create"
+                | "resolve"
+                | "dispose"
+                | "inherit";
             let targetScope: ServiceScope;
 
             if (operationType < 0.3) {

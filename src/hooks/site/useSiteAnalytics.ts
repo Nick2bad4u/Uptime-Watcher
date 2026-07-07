@@ -505,9 +505,11 @@ export const SiteAnalyticsUtils = {
      *
      * @public
      */
-    getAvailabilityStatus(
-        uptime: number
-    ): "critical" | "excellent" | "good" | "warning" {
+    getAvailabilityStatus(uptime: number):
+        | "critical"
+        | "excellent"
+        | "good"
+        | "warning" {
         if (uptime >= 99.9) {
             return "excellent";
         }
@@ -532,9 +534,11 @@ export const SiteAnalyticsUtils = {
      *
      * @public
      */
-    getPerformanceStatus(
-        responseTime: number
-    ): "critical" | "excellent" | "good" | "warning" {
+    getPerformanceStatus(responseTime: number):
+        | "critical"
+        | "excellent"
+        | "good"
+        | "warning" {
         if (responseTime <= 200) {
             return "excellent";
         }

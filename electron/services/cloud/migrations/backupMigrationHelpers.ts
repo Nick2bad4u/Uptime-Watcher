@@ -28,11 +28,11 @@ export async function collectSourceDeletionErrors(args: {
     ]);
 
     return deletions
-        .flatMap((result) =>
-            result.status === "rejected"
-                ? [getUserFacingErrorDetail(result.reason)]
-                : []
+        .filter(
+            (result): result is PromiseRejectedResult =>
+                result.status === "rejected"
         )
+        .map((result) => getUserFacingErrorDetail(result.reason))
         .filter((message) => message.trim().length > 0);
 }
 

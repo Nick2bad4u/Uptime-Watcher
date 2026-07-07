@@ -18,7 +18,10 @@ import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
  *
  * @public
  */
-export type DbValue = null | number | string;
+export type DbValue =
+    | null
+    | number
+    | string;
 
 /**
  * Converts an unknown input to a SQLite-bindable {@link DbValue}.
@@ -212,7 +215,11 @@ export function addStringField(
  * @public
  */
 export function convertDateForDb(
-    value: Date | null | string | undefined
+    value:
+        | Date
+        | null
+        | string
+        | undefined
 ): null | string {
     if (!value) {
         return null;

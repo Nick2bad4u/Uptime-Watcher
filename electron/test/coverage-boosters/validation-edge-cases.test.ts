@@ -555,7 +555,10 @@ describe("Validation Error Paths and Edge Cases", () => {
             }
 
             const mergeConfig = (
-                partial: null | Partial<Config> | undefined
+                partial:
+                    | null
+                    | Partial<Config>
+                    | undefined
             ): Config => {
                 const defaults: Config = {
                     timeout: 5000,

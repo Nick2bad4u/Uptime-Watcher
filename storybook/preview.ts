@@ -97,7 +97,12 @@ const storybookAccessibilityTestMode = resolveStorybookAccessibilityMode();
 
 type StoryGlobals = Parameters<Decorator>[1]["globals"];
 
-type StoryThemeName = Extract<ThemeName, "dark" | "high-contrast" | "light">;
+type StoryThemeName = Extract<
+    ThemeName,
+    | "dark"
+    | "high-contrast"
+    | "light"
+>;
 
 const STORYBOOK_THEME_CLASS_MAP: Record<StoryThemeName, string> = {
     dark: "theme-dark dark",
@@ -176,7 +181,11 @@ const STORYBOOK_VIEWPORTS = {
             height: string;
             width: string;
         };
-        type: "desktop" | "mobile" | "other" | "tablet";
+        type:
+            | "desktop"
+            | "mobile"
+            | "other"
+            | "tablet";
     }
 >;
 

@@ -15,7 +15,11 @@ interface Task {
     id: string;
     type: string;
     payload: any;
-    priority: "low" | "normal" | "high" | "urgent";
+    priority:
+        | "low"
+        | "normal"
+        | "high"
+        | "urgent";
     status:
         | "pending"
         | "running"

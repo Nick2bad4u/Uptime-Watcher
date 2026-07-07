@@ -49,7 +49,10 @@ export interface ErrorAlertProperties extends CoreComponentProperties {
  *
  * @public
  */
-export type ErrorAlertVariant = "error" | "info" | "warning";
+export type ErrorAlertVariant =
+    | "error"
+    | "info"
+    | "warning";
 
 /**
  * Get the appropriate icon for the error variant.

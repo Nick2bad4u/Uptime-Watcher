@@ -145,9 +145,12 @@ export interface CreateDefaultFormData {
     (
         type: "server-heartbeat"
     ): SetOptional<ServerHeartbeatFormData, ServerHeartbeatOptionalKeys>;
-    (
-        type: "ssl"
-    ): SetOptional<SslFormData, "certificateWarningDays" | "host" | "port">;
+    (type: "ssl"): SetOptional<
+        SslFormData,
+        | "certificateWarningDays"
+        | "host"
+        | "port"
+    >;
     (
         type: "websocket-keepalive"
     ): SetOptional<WebsocketKeepaliveFormData, WebsocketKeepaliveOptionalKeys>;
@@ -395,9 +398,15 @@ interface HeartbeatRequirementShape {
     heartbeatTimestampField?: string;
 }
 
-type HttpHeaderOptionalKeys = "expectedHeaderValue" | "headerName" | "url";
+type HttpHeaderOptionalKeys =
+    | "expectedHeaderValue"
+    | "headerName"
+    | "url";
 
-type HttpJsonOptionalKeys = "expectedJsonValue" | "jsonPath" | "url";
+type HttpJsonOptionalKeys =
+    | "expectedJsonValue"
+    | "jsonPath"
+    | "url";
 
 type HttpLatencyOptionalKeys = "maxResponseTime" | "url";
 type JsonExpectationFields = RequireAllOrNoneFields<JsonExpectationShape>;

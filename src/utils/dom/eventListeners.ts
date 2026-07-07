@@ -51,7 +51,10 @@ export function subscribeToGlobalEvent(
     type: string,
     listener: DomEventListener,
     options?: AddEventListenerOptions | boolean,
-    removeOptions: AddEventListenerOptions | boolean | undefined = options
+    removeOptions:
+        | AddEventListenerOptions
+        | boolean
+        | undefined = options
 ): () => void {
     const globalProperty = getOwnPropertyValue(globalThis, globalKey);
 

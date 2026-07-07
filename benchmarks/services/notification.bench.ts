@@ -15,7 +15,13 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
  */
 interface NotificationChannel {
     id: string;
-    type: "email" | "sms" | "slack" | "webhook" | "push" | "in-app";
+    type:
+        | "email"
+        | "sms"
+        | "slack"
+        | "webhook"
+        | "push"
+        | "in-app";
     name: string;
     configuration: Record<string, any>;
     isActive: boolean;
@@ -47,7 +53,11 @@ interface NotificationRequest {
     channelIds: string[];
     recipients: string[];
     variables: Record<string, any>;
-    priority: "low" | "normal" | "high" | "urgent";
+    priority:
+        | "low"
+        | "normal"
+        | "high"
+        | "urgent";
     scheduledAt?: Date;
     metadata?: Record<string, any>;
 }
@@ -58,7 +68,12 @@ interface NotificationRequest {
 interface QueuedNotification {
     id: string;
     request: NotificationRequest;
-    status: "pending" | "processing" | "sent" | "failed" | "retrying";
+    status:
+        | "pending"
+        | "processing"
+        | "sent"
+        | "failed"
+        | "retrying";
     attempts: number;
     maxAttempts: number;
     createdAt: Date;
@@ -75,7 +90,11 @@ interface QueuedNotification {
 interface DeliveryReceipt {
     channelId: string;
     recipient: string;
-    status: "delivered" | "failed" | "bounced" | "unsubscribed";
+    status:
+        | "delivered"
+        | "failed"
+        | "bounced"
+        | "unsubscribed";
     timestamp: Date;
     response?: any;
     error?: string;

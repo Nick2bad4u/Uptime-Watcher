@@ -130,7 +130,10 @@ function isValidDriveSizeNumber(value: number): boolean {
 }
 
 function parseDriveSizeBytes(
-    value: number | string | undefined,
+    value:
+        | number
+        | string
+        | undefined,
     fallback: number
 ): number {
     if (typeof value === "number") {

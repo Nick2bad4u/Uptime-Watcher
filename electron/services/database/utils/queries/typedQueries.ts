@@ -302,7 +302,10 @@ export function queryForSingleRecord<TRow extends object = UnknownRecord>(
     sql: string,
     params?: DbValue[],
     options?: RowValidationOptions<TRow>
-): null | TRow | undefined {
+):
+    | null
+    | TRow
+    | undefined {
     const row: unknown = db.get(sql, params ?? undefined);
     if (!isDefined(row)) {
         return undefined;
@@ -388,7 +391,10 @@ export function queryHistoryRow(
     db: Database,
     sql: string,
     params?: DbValue[]
-): HistoryRow | null | undefined {
+):
+    | HistoryRow
+    | null
+    | undefined {
     return queryForSingleRecord<HistoryRow>(
         db,
         sql,
@@ -415,7 +421,10 @@ export function queryMonitorRow(
     db: Database,
     sql: string,
     params?: DbValue[]
-): MonitorRow | null | undefined {
+):
+    | MonitorRow
+    | null
+    | undefined {
     return queryForSingleRecord(db, sql, params, MONITOR_ROW_VALIDATION);
 }
 
@@ -453,6 +462,9 @@ export function querySiteRow(
     db: Database,
     sql: string,
     params?: DbValue[]
-): null | SiteRow | undefined {
+):
+    | null
+    | SiteRow
+    | undefined {
     return queryForSingleRecord<SiteRow>(db, sql, params, SITE_ROW_VALIDATION);
 }

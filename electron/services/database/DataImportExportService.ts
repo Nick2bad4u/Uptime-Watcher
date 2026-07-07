@@ -321,7 +321,10 @@ export class DataImportExportService {
      */
     public async persistImportedData(
         sites: ImportSite[],
-        settings: null | Record<string, string> | undefined
+        settings:
+            | null
+            | Record<string, string>
+            | undefined
     ): Promise<void> {
         const safeSettings = this.stripCloudSettings(settings ?? {}, "persist");
         const normalizedSites = sites.map((site) =>
@@ -451,7 +454,10 @@ export class DataImportExportService {
 
     private stripCloudSettings(
         settings: Record<string, string>,
-        context: "export" | "import" | "persist"
+        context:
+            | "export"
+            | "import"
+            | "persist"
     ): Record<string, string> {
         const result: Record<string, string> = {};
         const strippedKeys: string[] = [];

@@ -41,7 +41,10 @@ const metricsState: { current: DiagnosticsMetricsSnapshot } = {
 
 interface DiagnosticsSnapshotContext {
     readonly channel?: string;
-    readonly event: "guard-failure" | "missing" | "success";
+    readonly event:
+        | "guard-failure"
+        | "missing"
+        | "success";
 }
 
 function logDiagnosticsSnapshot({

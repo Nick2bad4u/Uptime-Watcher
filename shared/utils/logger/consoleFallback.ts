@@ -14,7 +14,10 @@ import { buildErrorLogArguments, buildLogArguments } from "./common";
 
 export type ConsoleFallbackTransport = Pick<
     typeof console,
-    "debug" | "error" | "info" | "warn"
+    | "debug"
+    | "error"
+    | "info"
+    | "warn"
 >;
 
 function safelyInvokeTransport(operation: () => void): void {

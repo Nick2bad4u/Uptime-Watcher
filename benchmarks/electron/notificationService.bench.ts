@@ -17,7 +17,10 @@ interface NotificationRequest {
     title: string;
     body: string;
     icon?: string;
-    urgency: "low" | "normal" | "critical";
+    urgency:
+        | "low"
+        | "normal"
+        | "critical";
     category: string;
     actions?: NotificationAction[];
     metadata: Record<string, unknown>;
@@ -190,7 +193,10 @@ describe("Notification Service Benchmarks", () => {
 
             // Determine urgency based on distribution
             const urgencyRand = secureRandomFloat();
-            let urgency: "low" | "normal" | "critical";
+            let urgency:
+                | "low"
+                | "normal"
+                | "critical";
             if (urgencyRand < template.urgencyDistribution.low) {
                 urgency = "low";
             } else if (

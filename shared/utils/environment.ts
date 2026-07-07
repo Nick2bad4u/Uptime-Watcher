@@ -34,7 +34,10 @@ export interface KnownEnvironmentVariables {
      */
     readonly HEADLESS?: string;
     /** Standard Node.js environment discriminator. */
-    readonly NODE_ENV?: "development" | "production" | "test";
+    readonly NODE_ENV?:
+        | "development"
+        | "production"
+        | "test";
     /** Flag used to enable Playwright-specific coverage collection. */
     readonly PLAYWRIGHT_COVERAGE?: string;
     /** Flag injected by Playwright to signal automation mode in preload. */
@@ -71,7 +74,10 @@ export interface ProcessSnapshot {
           };
 }
 
-type ProcessSnapshotOverride = null | ProcessSnapshot | undefined;
+type ProcessSnapshotOverride =
+    | null
+    | ProcessSnapshot
+    | undefined;
 
 const processSnapshotState: {
     override: ProcessSnapshotOverride;

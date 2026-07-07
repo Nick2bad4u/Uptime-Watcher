@@ -59,7 +59,10 @@ export interface SettingsTabMonitoringConfigurationCardProperties {
 function getMaxDurationVariant(
     maxTotalSeconds: number,
     backoffSeconds: number
-): "error" | "success" | "warning" {
+):
+    | "error"
+    | "success"
+    | "warning" {
     if (backoffSeconds >= 16 || maxTotalSeconds >= 180) {
         return "error";
     }

@@ -13,7 +13,11 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 // Define comprehensive interfaces for type safety
 interface QueryOperation {
     operationId: string;
-    queryType: "SELECT" | "INSERT" | "UPDATE" | "DELETE";
+    queryType:
+        | "SELECT"
+        | "INSERT"
+        | "UPDATE"
+        | "DELETE";
     tableName: string;
     recordCount: number;
     startTime: number;
@@ -31,7 +35,10 @@ interface ExecutionPlan {
     planId: string;
     estimatedCost: number;
     actualCost: number;
-    scanType: "table" | "index" | "key";
+    scanType:
+        | "table"
+        | "index"
+        | "key";
     joinOperations: number;
     sortOperations: number;
     filterOperations: number;

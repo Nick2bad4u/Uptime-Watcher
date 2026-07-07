@@ -26,7 +26,12 @@ interface VNode {
 }
 
 interface VDOMPatch {
-    type: "CREATE" | "UPDATE" | "DELETE" | "REPLACE" | "REORDER";
+    type:
+        | "CREATE"
+        | "UPDATE"
+        | "DELETE"
+        | "REPLACE"
+        | "REORDER";
     node?: VNode;
     props?: Record<string, any>;
     index?: number;

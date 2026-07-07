@@ -35,7 +35,10 @@ import { logger } from "./logger";
 import { resolveCleanupHandler } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-type RecoveryTrigger = "invalid-event" | "revision-gap" | "truncated-event";
+type RecoveryTrigger =
+    | "invalid-event"
+    | "revision-gap"
+    | "truncated-event";
 
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 

@@ -50,9 +50,7 @@ export class DropboxTokenManager {
 
     public constructor(args: {
         appKey: string;
-        authFactory?: (
-            tokens: DropboxTokens
-        ) => Pick<
+        authFactory?: (tokens: DropboxTokens) => Pick<
             DropboxAuth,
             | "getAccessToken"
             | "getAccessTokenExpiresAt"

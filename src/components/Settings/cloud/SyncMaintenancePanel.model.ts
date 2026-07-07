@@ -74,9 +74,9 @@ export interface PreviewViewModel {
 export type SyncMaintenanceCopyResult =
     | null
     | {
-          readonly kind: "error";
-          readonly message: string;
-      }
+        readonly kind: "error";
+        readonly message: string;
+    }
     | {
-          readonly kind: "success";
-      };
+        readonly kind: "success";
+    };

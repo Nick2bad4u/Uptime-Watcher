@@ -24,7 +24,10 @@ interface IpcMessage {
     channel: string;
     data: IpcPayload;
     timestamp: number;
-    type: "request" | "response" | "notification";
+    type:
+        | "request"
+        | "response"
+        | "notification";
 }
 
 type IpcPayload = unknown;
@@ -45,7 +48,10 @@ interface SiteRecord {
 interface MonitorRecord {
     id: string;
     siteIdentifier: string;
-    type: "http" | "ping" | "tcp";
+    type:
+        | "http"
+        | "ping"
+        | "tcp";
     interval: number;
     status: "active" | "paused";
 }

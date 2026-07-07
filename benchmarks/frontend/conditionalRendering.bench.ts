@@ -93,7 +93,11 @@ type RenderMethod =
     | "switch-case"
     | "guard-clause"
     | "early-return";
-type OptimizationLevel = "none" | "basic" | "advanced" | "aggressive";
+type OptimizationLevel =
+    | "none"
+    | "basic"
+    | "advanced"
+    | "aggressive";
 type OptimizationType =
     | "memoization"
     | "lazy-loading"
@@ -795,7 +799,10 @@ class MockConditionalRenderer {
     private checkMemoizationCache(
         context: ConditionalRenderingContext,
         key: string
-    ): ReactElement | null | undefined {
+    ):
+        | ReactElement
+        | null
+        | undefined {
         // Simple cache implementation (in real scenario, would use WeakMap or similar)
         const cache = (context as any).memoCache || new Map();
         return cache.get(key);

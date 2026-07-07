@@ -33,7 +33,10 @@ interface CorrelationChain {
     events: CorrelatedEvent[];
     startTime: number;
     endTime?: number;
-    status: "active" | "completed" | "failed";
+    status:
+        | "active"
+        | "completed"
+        | "failed";
     metadata?: Record<string, any>;
 }
 

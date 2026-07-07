@@ -184,7 +184,13 @@ const buildFinalArgs = (
           ]
         : [...logArgs];
 
-type LogMethodName = "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+type LogMethodName =
+    | "debug"
+    | "error"
+    | "info"
+    | "silly"
+    | "verbose"
+    | "warn";
 
 const isInvoke = (
     value: unknown

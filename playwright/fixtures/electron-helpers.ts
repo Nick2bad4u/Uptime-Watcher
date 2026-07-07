@@ -108,7 +108,10 @@ const ensureElectronRuntimeWasm = async (): Promise<void> => {
 };
 
 const hasChildProcessExited = (
-    childProcess: ChildProcess | null | undefined
+    childProcess:
+        | ChildProcess
+        | null
+        | undefined
 ): boolean =>
     !childProcess ||
     childProcess.exitCode !== null ||
@@ -145,7 +148,10 @@ const forceTerminateChildProcess = (childProcess: ChildProcess): void => {
 };
 
 const waitForChildProcessExit = async (
-    childProcess: ChildProcess | null | undefined,
+    childProcess:
+        | ChildProcess
+        | null
+        | undefined,
     timeoutMs: number
 ): Promise<void> => {
     if (hasChildProcessExited(childProcess)) {

@@ -90,7 +90,10 @@ beforeAll(() => {
     globalThis.IntersectionObserver = class MockIntersectionObserver implements IntersectionObserver {
         private readonly callback: IntersectionObserverCallback;
 
-        public readonly root: Document | Element | null;
+        public readonly root:
+            | Document
+            | Element
+            | null;
 
         public readonly rootMargin: string;
 
@@ -303,7 +306,10 @@ beforeAll(() => {
 
         public readyState: FileReader["readyState"] = MockFileReader.EMPTY;
 
-        public result: ArrayBuffer | null | string = null;
+        public result:
+            | ArrayBuffer
+            | null
+            | string = null;
 
         public abort: FileReader["abort"] = vi.fn(() => {
             this.readyState = MockFileReader.DONE;
@@ -360,7 +366,11 @@ beforeAll(() => {
         );
 
         private emitProgressEvent(
-            type: "abort" | "load" | "loadend" | "loadstart"
+            type:
+                | "abort"
+                | "load"
+                | "loadend"
+                | "loadstart"
         ): void {
             const event = new ProgressEvent(type);
             switch (type) {

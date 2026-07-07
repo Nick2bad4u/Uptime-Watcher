@@ -154,7 +154,10 @@ export const OverviewTab = ({
     // Map availability variant to progress/badge variant
     const mapAvailabilityToBadgeVariant = (
         availability: number
-    ): "error" | "success" | "warning" => {
+    ):
+        | "error"
+        | "success"
+        | "warning" => {
         const variant = getAvailabilityVariant(availability);
         if (variant === "danger") return "error";
         return variant; // "success" | "warning"

@@ -64,7 +64,15 @@ export interface DomIdentityProperties {
  * @public
  */
 export type DataAttributeProperties = Readonly<
-    Partial<Record<`data-${string}`, boolean | number | string | undefined>>
+    Partial<
+        Record<
+            `data-${string}`,
+            | boolean
+            | number
+            | string
+            | undefined
+        >
+    >
 >;
 
 /**
@@ -98,7 +106,12 @@ export interface AccessibilityProperties {
  *
  * @public
  */
-export type ComponentSize = "lg" | "md" | "sm" | "xl" | "xs";
+export type ComponentSize =
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl"
+    | "xs";
 
 /**
  * Standard visual variants for component theming.
@@ -373,7 +386,10 @@ export interface StandardButtonProperties
     /** Tooltip text for hover states */
     readonly title?: string;
     /** HTML button type */
-    readonly type?: "button" | "reset" | "submit";
+    readonly type?:
+        | "button"
+        | "reset"
+        | "submit";
     /**
      * Optional string value assigned to the underlying HTML button.
      *
@@ -407,7 +423,12 @@ export interface StandardInputProperties
     /** Placeholder text for empty inputs */
     readonly placeholder?: string;
     /** Input type for different input behaviors */
-    readonly type?: "email" | "number" | "password" | "text" | "url";
+    readonly type?:
+        | "email"
+        | "number"
+        | "password"
+        | "text"
+        | "url";
     /** Current input value */
     readonly value: string;
 }

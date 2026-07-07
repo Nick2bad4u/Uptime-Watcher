@@ -18,7 +18,13 @@ interface IndexDefinition {
     tableName: string;
     columns: string[];
     indexType:
-        "btree" | "hash" | "gin" | "gist" | "bitmap" | "clustered" | "covering";
+        | "btree"
+        | "hash"
+        | "gin"
+        | "gist"
+        | "bitmap"
+        | "clustered"
+        | "covering";
     isUnique: boolean;
     isPrimaryKey: boolean;
     isClustered: boolean;
@@ -36,12 +42,19 @@ interface IndexCreationOperation {
     startTime: number;
     endTime: number;
     success: boolean;
-    creationMethod: "online" | "offline" | "concurrent" | "parallel";
+    creationMethod:
+        | "online"
+        | "offline"
+        | "concurrent"
+        | "parallel";
     resourceUsage: {
         cpuPercent: number;
         memoryMB: number;
         diskIOMB: number;
-        lockingLevel: "none" | "shared" | "exclusive";
+        lockingLevel:
+            | "none"
+            | "shared"
+            | "exclusive";
     };
     affectedRows: number;
     blockedQueries: number;
@@ -82,7 +95,10 @@ interface QueryOptimizationResult {
     costBefore: number;
     costAfter: number;
     scanType:
-        "table-scan" | "index-scan" | "index-seek" | "clustered-index-scan";
+        | "table-scan"
+        | "index-scan"
+        | "index-seek"
+        | "clustered-index-scan";
     cardinalityEstimate: number;
     optimizationTechnique: string[];
 }
@@ -102,7 +118,11 @@ interface IndexUsageStatistics {
     lastUserLookup?: number;
     lastUserUpdate?: number;
     indexEfficiencyScore: number;
-    recommendedAction: "keep" | "modify" | "drop" | "rebuild";
+    recommendedAction:
+        | "keep"
+        | "modify"
+        | "drop"
+        | "rebuild";
 }
 
 interface IndexFragmentationAnalysis {
@@ -115,10 +135,17 @@ interface IndexFragmentationAnalysis {
     recordCount: number;
     averageRecordSize: number;
     forwardedRecords: number;
-    compressionType: "none" | "row" | "page" | "columnstore";
+    compressionType:
+        | "none"
+        | "row"
+        | "page"
+        | "columnstore";
     hotspotPages: number;
     coldPages: number;
-    fragmentationType: "internal" | "external" | "mixed";
+    fragmentationType:
+        | "internal"
+        | "external"
+        | "mixed";
     recommendedMaintenance: string;
 }
 

@@ -270,7 +270,10 @@ const setOnCacheInvalidatedHandler = (
         const cleanup = await (
             handler as unknown as (
                 cb: (event: unknown) => Promise<unknown> | unknown
-            ) => (() => void) | Promise<(() => void) | undefined> | undefined
+            ) =>
+                | (() => void)
+                | Promise<(() => void) | undefined>
+                | undefined
         )(async (candidate: unknown) =>
             callback(
                 normalize

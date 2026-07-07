@@ -116,7 +116,10 @@ export function updateMonitorEditStateById(args: {
  * @public
  */
 export async function validateMonitorFieldOrThrow(args: {
-    readonly fieldName: "checkInterval" | "retryAttempts" | "timeout";
+    readonly fieldName:
+        | "checkInterval"
+        | "retryAttempts"
+        | "timeout";
     readonly monitorType: Monitor["type"];
     readonly siteIdentifier: string;
     readonly value: number;

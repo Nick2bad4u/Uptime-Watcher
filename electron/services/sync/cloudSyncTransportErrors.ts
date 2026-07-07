@@ -17,7 +17,10 @@ export class CloudSyncCorruptRemoteObjectError extends Error {
     public readonly key: string;
 
     /** High-level artifact type for diagnostics. */
-    public readonly kind: "manifest" | "operations" | "snapshot";
+    public readonly kind:
+        | "manifest"
+        | "operations"
+        | "snapshot";
 
     public constructor(
         message: string,

@@ -202,7 +202,11 @@ export interface ThemeColors {
  * Available theme names in the app.
  */
 export type ThemeName =
-    "custom" | "dark" | "high-contrast" | "light" | "system";
+    | "custom"
+    | "dark"
+    | "high-contrast"
+    | "light"
+    | "system";
 
 /**
  * Shadow system interface for elevation and depth. Defines consistent shadow

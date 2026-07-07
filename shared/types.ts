@@ -139,7 +139,12 @@ export type MonitorStatus = MonitorStatusTuple[number];
  *
  * @public
  */
-export type HttpMethod = "DELETE" | "GET" | "HEAD" | "POST" | "PUT";
+export type HttpMethod =
+    | "DELETE"
+    | "GET"
+    | "HEAD"
+    | "POST"
+    | "PUT";
 
 /**
  * Base monitor types - source of truth for type safety.
@@ -348,7 +353,11 @@ export interface MonitorFieldDefinition {
     /** Whether field is required */
     required: boolean;
     /** Input type for form rendering */
-    type: "number" | "select" | "text" | "url";
+    type:
+        | "number"
+        | "select"
+        | "text"
+        | "url";
 }
 
 /**

@@ -193,7 +193,12 @@ describe("IPC Communication Fuzzing Tests", () => {
                         fc.constant(undefined),
                         fc.constant(null)
                     ),
-                    (error: null | string | undefined) => {
+                    (
+                        error:
+                            | null
+                            | string
+                            | undefined
+                    ) => {
                         const response = {
                             success: false,
                             error: error ?? undefined,

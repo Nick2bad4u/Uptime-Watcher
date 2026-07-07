@@ -63,7 +63,10 @@ const sharedLaunchArgs = coerceEnvFlag(readEnv("PLAYWRIGHT_DISABLE_GPU"))
     : ["--disable-gpu"];
 
 interface ElectronProjectOptions {
-    readonly layer: "e2e" | "main" | "renderer";
+    readonly layer:
+        | "e2e"
+        | "main"
+        | "renderer";
     readonly name: string;
     readonly pattern: string;
     readonly timeout?: number;

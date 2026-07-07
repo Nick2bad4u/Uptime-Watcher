@@ -28,13 +28,19 @@ interface BenchmarkSite {
 
 interface BenchmarkMonitor {
     id: string;
-    type: "http" | "ping" | "port";
+    type:
+        | "http"
+        | "ping"
+        | "port";
     monitoring: boolean;
     checkInterval: number;
     timeout: number;
     retryAttempts: number;
     responseTime: number;
-    status: "up" | "down" | "pending";
+    status:
+        | "up"
+        | "down"
+        | "pending";
     history: StatusHistory[];
     url?: string;
     host?: string;

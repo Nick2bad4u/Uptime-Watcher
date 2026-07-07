@@ -37,8 +37,14 @@ interface BenchmarkSite {
  */
 interface BenchmarkMonitor {
     id: string;
-    type: "http" | "ping" | "port";
-    status: "up" | "down" | "pending";
+    type:
+        | "http"
+        | "ping"
+        | "port";
+    status:
+        | "up"
+        | "down"
+        | "pending";
     responseTime: number;
     history: StatusEntry[];
     monitoring: boolean;

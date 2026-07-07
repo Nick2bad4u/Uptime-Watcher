@@ -637,7 +637,10 @@ describe("Edge Cases and Complex Scenarios", () => {
 
         const monitors: {
             monitoring: boolean;
-            status: "down" | "pending" | "up";
+            status:
+                | "down"
+                | "pending"
+                | "up";
         }[] = Array.from({ length: 100 }, (_, i) => ({
             monitoring: i % 2 === 0, // Half monitoring, half not
             status: i % 3 === 0 ? "up" : i % 3 === 1 ? "down" : "pending",

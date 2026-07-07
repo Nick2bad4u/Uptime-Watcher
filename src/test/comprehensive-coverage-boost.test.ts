@@ -568,15 +568,25 @@ describe("Comprehensive Coverage Boost Tests", () => {
             // Test fallbacks.ts edge cases (lines 100,164)
             const mockFallbacks = {
                 getFallbackValue: <T>(
-                    value: null | T | undefined,
+                    value:
+                        | null
+                        | T
+                        | undefined,
                     fallback: T
                 ): T => value ?? fallback,
                 getFallbackFunction: <T>(
-                    fn: (() => T) | null | undefined,
+                    fn:
+                        | (() => T)
+                        | null
+                        | undefined,
                     fallback: () => T
                 ): (() => T) => fn ?? fallback,
-                getFallbackArray: <T>(arr: null | T[] | undefined): T[] =>
-                    arr ?? [],
+                getFallbackArray: <T>(
+                    arr:
+                        | null
+                        | T[]
+                        | undefined
+                ): T[] => arr ?? [],
             };
 
             expect(mockFallbacks.getFallbackValue(null, "default")).toBe(

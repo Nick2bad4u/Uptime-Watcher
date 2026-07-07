@@ -9,7 +9,10 @@ logger.debug("monitor update", {
     tags: ["prod", "edge"],
 });
 
-const stateSyncAction: "bulk-sync" | "delete" | "update" = "bulk-sync";
+const stateSyncAction:
+    | "bulk-sync"
+    | "delete"
+    | "update" = "bulk-sync";
 
 logger.debug("state sync", {
     action: stateSyncAction,

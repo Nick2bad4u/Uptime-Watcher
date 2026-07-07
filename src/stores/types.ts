@@ -48,7 +48,11 @@ export interface AppSettings {
 /**
  * Chart time range options for data visualization.
  */
-export type ChartTimeRange = "1h" | "7d" | "24h" | "30d";
+export type ChartTimeRange =
+    | "1h"
+    | "7d"
+    | "24h"
+    | "30d";
 
 /**
  * Application update status enumeration.

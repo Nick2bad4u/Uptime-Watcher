@@ -18,9 +18,16 @@ interface BaseMonitorData {
     monitoring: boolean;
     responseTime: number;
     retryAttempts: number;
-    status: "down" | "paused" | "pending" | "up";
+    status:
+        | "down"
+        | "paused"
+        | "pending"
+        | "up";
     timeout: number;
-    type: "http" | "ping" | "port";
+    type:
+        | "http"
+        | "ping"
+        | "port";
 }
 
 interface HttpMonitorData extends BaseMonitorData {
@@ -42,9 +49,17 @@ interface PingMonitorData extends BaseMonitorData {
 interface SiteData {
     createdAt: Date;
     id: string;
-    monitors: (HttpMonitorData | PingMonitorData | PortMonitorData)[];
+    monitors: (
+        | HttpMonitorData
+        | PingMonitorData
+        | PortMonitorData
+    )[];
     name: string;
-    status: "down" | "paused" | "pending" | "up";
+    status:
+        | "down"
+        | "paused"
+        | "pending"
+        | "up";
     updatedAt: Date;
 }
 

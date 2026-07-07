@@ -183,7 +183,10 @@ class MockReactContext {
     updateContextValue(
         providerId: string,
         newValue: ContextValue,
-        mergeStrategy: "replace" | "merge" | "selective" = "merge"
+        mergeStrategy:
+            | "replace"
+            | "merge"
+            | "selective" = "merge"
     ): ContextUpdate {
         const startTime = performance.now();
         const provider = this.providers.get(providerId);
@@ -422,7 +425,10 @@ class MockReactContext {
     // Context splitting for performance
     splitContext(
         originalContextId: string,
-        splitStrategy: "by-key" | "by-usage" | "by-update-frequency"
+        splitStrategy:
+            | "by-key"
+            | "by-usage"
+            | "by-update-frequency"
     ): string[] {
         const provider = this.findProviderForContext(originalContextId);
         if (!provider) return [];

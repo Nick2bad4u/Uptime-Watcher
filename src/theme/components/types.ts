@@ -6,11 +6,20 @@
  */
 
 /** Size variants for badge components */
-export type BadgeSize = "lg" | "md" | "sm" | "xs";
+export type BadgeSize =
+    | "lg"
+    | "md"
+    | "sm"
+    | "xs";
 
 /** Visual style variants for badge components */
 export type BadgeVariant =
-    "error" | "info" | "primary" | "secondary" | "success" | "warning";
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning";
 
 /** HTML element types that can be used as box containers */
 export type BoxElement =
@@ -25,22 +34,49 @@ export type BoxElement =
     | "section";
 
 /** Padding size variants for box components */
-export type BoxPadding = "lg" | "md" | "sm" | "xl" | "xs";
+export type BoxPadding =
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl"
+    | "xs";
 
 /** Border radius variants for box components */
-export type BoxRounded = "full" | "lg" | "md" | "none" | "sm" | "xl";
+export type BoxRounded =
+    | "full"
+    | "lg"
+    | "md"
+    | "none"
+    | "sm"
+    | "xl";
 
 /** Shadow depth variants for box components */
-export type BoxShadow = "inner" | "lg" | "md" | "sm" | "xl";
+export type BoxShadow =
+    | "inner"
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl";
 
 /** Surface depth variants for box components */
-export type BoxSurface = "base" | "elevated" | "overlay";
+export type BoxSurface =
+    | "base"
+    | "elevated"
+    | "overlay";
 
 /** Visual style variants for box components */
-export type BoxVariant = "primary" | "secondary" | "tertiary";
+export type BoxVariant =
+    | "primary"
+    | "secondary"
+    | "tertiary";
 
 /** Size variants for button components */
-export type ButtonSize = "lg" | "md" | "sm" | "xl" | "xs";
+export type ButtonSize =
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl"
+    | "xs";
 
 /** Visual style variants for button components */
 export type ButtonVariant =
@@ -54,21 +90,43 @@ export type ButtonVariant =
     | "warning";
 
 /** Size variants for progress components */
-export type ProgressSize = "lg" | "md" | "sm" | "xl" | "xs";
+export type ProgressSize =
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl"
+    | "xs";
 
 /** Visual style variants for progress components */
 export type ProgressVariant =
-    "error" | "info" | "primary" | "secondary" | "success" | "warning";
+    | "error"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning";
 
 /** System theme preference options */
 export type SystemThemePreference = "dark" | "light";
 
 /** Text alignment options for text components */
-export type TextAlign = "center" | "justify" | "left" | "right";
+export type TextAlign =
+    | "center"
+    | "justify"
+    | "left"
+    | "right";
 
 /** Font size variants for text components */
 export type TextSize =
-    "2xl" | "3xl" | "4xl" | "base" | "lg" | "md" | "sm" | "xl" | "xs";
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "base"
+    | "lg"
+    | "md"
+    | "sm"
+    | "xl"
+    | "xs";
 
 /** Color and semantic variants for text components */
 export type TextVariant =
@@ -83,7 +141,11 @@ export type TextVariant =
     | "warning";
 
 /** Font weight variants for text components */
-export type TextWeight = "bold" | "medium" | "normal" | "semibold";
+export type TextWeight =
+    | "bold"
+    | "medium"
+    | "normal"
+    | "semibold";
 
 /**
  * CSS class name constants for themed components.

@@ -341,8 +341,15 @@ describe("Validation Fuzzing Tests", () => {
                     }),
                     (config: {
                         host: string;
-                        port: null | number | string | undefined;
-                        url: null | string | undefined;
+                        port:
+                            | null
+                            | number
+                            | string
+                            | undefined;
+                        url:
+                            | null
+                            | string
+                            | undefined;
                     }) => {
                         // None of these validation functions should throw
                         expect(() => {

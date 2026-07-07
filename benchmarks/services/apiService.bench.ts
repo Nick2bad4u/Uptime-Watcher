@@ -15,7 +15,12 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
  */
 interface ApiRequest {
     id: string;
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    method:
+        | "GET"
+        | "POST"
+        | "PUT"
+        | "DELETE"
+        | "PATCH";
     path: string;
     headers: Record<string, string>;
     query: Record<string, any>;
@@ -78,7 +83,12 @@ interface Middleware {
  */
 interface ValidationRule {
     field: string;
-    type: "string" | "number" | "boolean" | "object" | "array";
+    type:
+        | "string"
+        | "number"
+        | "boolean"
+        | "object"
+        | "array";
     required: boolean;
     rules: string[];
 }

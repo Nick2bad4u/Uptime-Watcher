@@ -14,7 +14,11 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 // Define comprehensive interfaces for type safety
 interface BackupOperation {
     backupId: string;
-    backupType: "full" | "incremental" | "differential" | "transaction-log";
+    backupType:
+        | "full"
+        | "incremental"
+        | "differential"
+        | "transaction-log";
     startTime: number;
     endTime: number;
     success: boolean;
@@ -31,7 +35,11 @@ interface BackupOperation {
 interface RestoreOperation {
     restoreId: string;
     backupId: string;
-    restoreType: "complete" | "partial" | "point-in-time" | "table-level";
+    restoreType:
+        | "complete"
+        | "partial"
+        | "point-in-time"
+        | "table-level";
     targetTimestamp?: number;
     startTime: number;
     endTime: number;
@@ -66,12 +74,20 @@ interface CompressionAnalysis {
 
 interface RecoveryScenario {
     scenarioId: string;
-    scenarioType: "corruption" | "hardware-failure" | "user-error" | "disaster";
+    scenarioType:
+        | "corruption"
+        | "hardware-failure"
+        | "user-error"
+        | "disaster";
     dataLoss: number;
     downtime: number;
     recoveryMethod: string;
     recoverySuccess: boolean;
-    businessImpact: "low" | "medium" | "high" | "critical";
+    businessImpact:
+        | "low"
+        | "medium"
+        | "high"
+        | "critical";
 }
 
 describe("Database Backup and Restore Benchmarks", () => {

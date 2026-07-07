@@ -14,7 +14,10 @@ export type OwnDataPropertyResult =
 
 export type CallableDataProperty = (this: unknown) => unknown;
 
-export type ErrorStringPropertyKey = "message" | "name" | "stack";
+export type ErrorStringPropertyKey =
+    | "message"
+    | "name"
+    | "stack";
 
 function isDescriptorTarget(candidate: unknown): candidate is object {
     return (

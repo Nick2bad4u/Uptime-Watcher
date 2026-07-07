@@ -42,7 +42,10 @@ import {
 } from "./utils/siteTelemetry";
 import type { SitesTelemetryPayload } from "./utils/siteTelemetryTypes";
 
-type MonitorNumericField = "checkInterval" | "retryAttempts" | "timeout";
+type MonitorNumericField =
+    | "checkInterval"
+    | "retryAttempts"
+    | "timeout";
 type MonitorNumericUpdateOperationName =
     | "updateMonitorRetryAttempts"
     | "updateMonitorTimeout"

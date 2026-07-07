@@ -78,7 +78,10 @@ declare module "./eventTypes" {
              * @remarks
              * Indicates the cause or trigger for this operation.
              */
-            reason: "error" | "shutdown" | "user";
+            reason:
+                | "error"
+                | "shutdown"
+                | "user";
             /**
              * Unix timestamp (ms) when the operation completed.
              */
@@ -176,7 +179,10 @@ declare module "./eventTypes" {
             identifier: string;
             monitorId?: string;
             operation: "stopped";
-            reason: "error" | "shutdown" | "user";
+            reason:
+                | "error"
+                | "shutdown"
+                | "user";
             summary?: MonitoringStopSummary;
             timestamp: number;
         };
@@ -222,7 +228,10 @@ declare module "./eventTypes" {
          */
         "internal:site:cache-updated": {
             identifier: string;
-            operation: "background-load" | "cache-updated" | "manual-refresh";
+            operation:
+                | "background-load"
+                | "cache-updated"
+                | "manual-refresh";
             timestamp: number;
         };
 

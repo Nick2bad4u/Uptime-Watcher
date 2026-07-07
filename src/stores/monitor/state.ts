@@ -22,7 +22,9 @@ export type MonitorTypesStoreSetter = StoreApi<MonitorTypesStore>["setState"];
  */
 export const initialMonitorTypesState: Pick<
     MonitorTypesStore,
-    "fieldConfigs" | "isLoaded" | "monitorTypes"
+    | "fieldConfigs"
+    | "isLoaded"
+    | "monitorTypes"
 > = {
     fieldConfigs: {},
     isLoaded: false,
@@ -37,7 +39,10 @@ export const createMonitorTypesStateSlice = (
     getState: MonitorTypesStoreGetter
 ): Pick<
     MonitorTypesStore,
-    "fieldConfigs" | "getFieldConfig" | "isLoaded" | "monitorTypes"
+    | "fieldConfigs"
+    | "getFieldConfig"
+    | "isLoaded"
+    | "monitorTypes"
 > => ({
     ...initialMonitorTypesState,
     getFieldConfig: (

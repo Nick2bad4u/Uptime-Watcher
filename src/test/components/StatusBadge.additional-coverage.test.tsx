@@ -147,7 +147,10 @@ describe("StatusBadge - Additional Coverage", () => {
         // This is an integration test to ensure the getIndicatorSize function handles all possible code paths including the default case
 
         interface TestCase {
-            expectedIndicatorSize: "lg" | "md" | "sm";
+            expectedIndicatorSize:
+                | "lg"
+                | "md"
+                | "sm";
             size: any;
         }
 

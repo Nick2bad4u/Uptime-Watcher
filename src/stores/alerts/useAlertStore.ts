@@ -157,7 +157,10 @@ export interface StatusAlert {
 /**
  * Toast variant.
  */
-export type ToastVariant = "error" | "info" | "success";
+export type ToastVariant =
+    | "error"
+    | "info"
+    | "success";
 
 /**
  * Generic, user-facing toast message.

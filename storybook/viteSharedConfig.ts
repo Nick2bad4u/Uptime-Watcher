@@ -22,7 +22,9 @@ export type ReactPluginOptions = NonNullable<Parameters<typeof viteReact>[0]>;
  */
 export type StorybookBaseConfig = Pick<
     UserConfig,
-    "css" | "optimizeDeps" | "resolve"
+    | "css"
+    | "optimizeDeps"
+    | "resolve"
 >;
 
 /**

@@ -19,7 +19,12 @@ import { setHas } from "ts-extras";
 import { buildSanitizedIncomingSiteSyncDelta } from "../useSiteSync.deltaSanitizer";
 
 /** Minimal logger contract required by the sync handler. */
-export type SiteSyncEventLogger = Pick<BaseLogger, "debug" | "error" | "warn">;
+export type SiteSyncEventLogger = Pick<
+    BaseLogger,
+    | "debug"
+    | "error"
+    | "warn"
+>;
 
 /**
  * Contract for store telemetry logging.

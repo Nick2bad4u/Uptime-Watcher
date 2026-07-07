@@ -64,7 +64,11 @@ vi.mock("../../theme/components/ThemedButton", () => ({
             type,
             ...rest
         } = props;
-        const resolvedType: "button" | "reset" | "submit" | undefined =
+        const resolvedType:
+            | "button"
+            | "reset"
+            | "submit"
+            | undefined =
             type === "submit" || type === "reset" || type === "button"
                 ? type
                 : "button";

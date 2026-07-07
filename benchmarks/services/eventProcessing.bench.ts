@@ -29,8 +29,14 @@ interface SiteStatusChangedEvent extends BaseEvent {
     type: "site-status-changed";
     payload: {
         siteIdentifier: string;
-        previousStatus: "up" | "down" | "degraded";
-        currentStatus: "up" | "down" | "degraded";
+        previousStatus:
+            | "up"
+            | "down"
+            | "degraded";
+        currentStatus:
+            | "up"
+            | "down"
+            | "degraded";
         responseTime: number;
         monitorId: string;
     };
@@ -45,7 +51,10 @@ interface MonitorCheckCompletedEvent extends BaseEvent {
     payload: {
         monitorId: string;
         siteIdentifier: string;
-        status: "up" | "down" | "degraded";
+        status:
+            | "up"
+            | "down"
+            | "degraded";
         responseTime: number;
         details?: string;
         error?: string;
@@ -59,7 +68,11 @@ interface AlertTriggeredEvent extends BaseEvent {
     type: "alert-triggered";
     payload: {
         alertId: string;
-        severity: "low" | "medium" | "high" | "critical";
+        severity:
+            | "low"
+            | "medium"
+            | "high"
+            | "critical";
         message: string;
         affectedSites: string[];
         triggerCondition: string;
@@ -72,7 +85,11 @@ interface AlertTriggeredEvent extends BaseEvent {
 interface DatabaseOperationEvent extends BaseEvent {
     type: "database-operation";
     payload: {
-        operation: "insert" | "update" | "delete" | "select";
+        operation:
+            | "insert"
+            | "update"
+            | "delete"
+            | "select";
         table: string;
         recordCount: number;
         duration: number;
@@ -260,7 +277,10 @@ class MockTypedEventBus {
      */
     async emitConcurrent<T extends BaseEvent>(
         events: T[],
-        strategy: "parallel" | "sequential" | "batch",
+        strategy:
+            | "parallel"
+            | "sequential"
+            | "batch",
         batchSize: number = 10
     ): Promise<void> {
         switch (strategy) {

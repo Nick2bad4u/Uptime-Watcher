@@ -76,7 +76,10 @@ describe("ArrayDeclaration Mutations - React Dependencies", () => {
             function TestComponent({
                 setterIndex,
             }: {
-                setterIndex: 0 | 1 | 2;
+                setterIndex:
+                    | 0
+                    | 1
+                    | 2;
             }) {
                 const currentSetter = mockSetters[setterIndex];
 

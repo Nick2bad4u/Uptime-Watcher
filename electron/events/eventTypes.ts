@@ -62,7 +62,11 @@ export type UptimeEventName = Extract<keyof UptimeEvents, string>;
  *
  * @public
  */
-export type EventCategory = "database" | "monitoring" | "system" | "ui";
+export type EventCategory =
+    | "database"
+    | "monitoring"
+    | "system"
+    | "ui";
 
 /**
  * Type of monitoring check that triggered an event.
@@ -96,7 +100,10 @@ export type EventCheckType = "manual" | "scheduled";
  *
  * @public
  */
-export type EventEnvironment = "development" | "production" | "test";
+export type EventEnvironment =
+    | "development"
+    | "production"
+    | "test";
 
 /**
  * Reason for an event occurrence.
@@ -113,7 +120,10 @@ export type EventEnvironment = "development" | "production" | "test";
  *
  * @public
  */
-export type EventReason = "error" | "shutdown" | "user";
+export type EventReason =
+    | "error"
+    | "shutdown"
+    | "user";
 
 /**
  * Severity level of an event for prioritization and alerting.
@@ -129,7 +139,11 @@ export type EventReason = "error" | "shutdown" | "user";
  *
  * @public
  */
-export type EventSeverity = "critical" | "high" | "low" | "medium";
+export type EventSeverity =
+    | "critical"
+    | "high"
+    | "low"
+    | "medium";
 
 /**
  * Source that triggered an event.
@@ -146,7 +160,11 @@ export type EventSeverity = "critical" | "high" | "low" | "medium";
  *
  * @public
  */
-export type EventSource = "import" | "migration" | "system" | "user";
+export type EventSource =
+    | "import"
+    | "migration"
+    | "system"
+    | "user";
 
 /**
  * What triggered a monitoring or system event.
@@ -163,7 +181,10 @@ export type EventSource = "import" | "migration" | "system" | "user";
  *
  * @public
  */
-export type EventTriggerType = "manual" | "scheduled" | "shutdown";
+export type EventTriggerType =
+    | "manual"
+    | "scheduled"
+    | "shutdown";
 
 /**
  * Event categories for filtering and middleware processing.

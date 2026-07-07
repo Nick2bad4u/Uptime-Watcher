@@ -487,7 +487,11 @@ export function createLoggingMiddleware<
     options: {
         filter?: (eventName: EventKey<EventMap>) => boolean;
         includeData?: boolean;
-        level?: "debug" | "error" | "info" | "warn";
+        level?:
+            | "debug"
+            | "error"
+            | "info"
+            | "warn";
     } = {}
 ): EventMiddleware<EventMap> {
     const { filter, includeData = false, level = "info" } = options;

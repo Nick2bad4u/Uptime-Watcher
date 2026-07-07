@@ -32,7 +32,12 @@ interface DowntimePeriod {
     start: number;
 }
 
-type TimePeriod = "1h" | "12h" | "24h" | "7d" | "30d";
+type TimePeriod =
+    | "1h"
+    | "12h"
+    | "24h"
+    | "7d"
+    | "30d";
 
 // Mock data generators for benchmarking
 function generateStatusHistory(count: number): StatusHistory[] {

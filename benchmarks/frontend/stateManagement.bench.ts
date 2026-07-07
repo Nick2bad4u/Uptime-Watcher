@@ -28,7 +28,10 @@ interface SitesState {
             id: string;
             name: string;
             type: "http" | "ping";
-            status: "up" | "down" | "unknown";
+            status:
+                | "up"
+                | "down"
+                | "unknown";
         }[];
     }[];
     selectedSiteIdentifier?: string;
@@ -89,7 +92,10 @@ function createSitesStore(): StoreApi<SitesState & SitesActions> {
 // Real application state patterns - Settings Store
 interface SettingsState {
     settings: {
-        theme: "light" | "dark" | "system";
+        theme:
+            | "light"
+            | "dark"
+            | "system";
         autoStart: boolean;
         inAppAlertsEnabled: boolean;
         inAppAlertsSoundEnabled: boolean;
@@ -149,7 +155,10 @@ function createSettingsStore(): StoreApi<SettingsState & SettingsActions> {
 interface UIState {
     showSettings: boolean;
     showAddSite: boolean;
-    activeTab: "sites" | "monitors" | "history";
+    activeTab:
+        | "sites"
+        | "monitors"
+        | "history";
     theme: "light" | "dark";
     sidebarCollapsed: boolean;
 }

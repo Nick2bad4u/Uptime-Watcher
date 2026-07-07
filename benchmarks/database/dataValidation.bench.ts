@@ -21,13 +21,22 @@ interface ValidationRule {
         | "format"
         | "reference"
         | "custom";
-    severity: "error" | "warning" | "info";
+    severity:
+        | "error"
+        | "warning"
+        | "info";
     description: string;
     targetTable: string;
     targetColumns: string[];
     validationQuery?: string;
-    enforcementLevel: "strict" | "flexible" | "advisory";
-    performanceImpact: "low" | "medium" | "high";
+    enforcementLevel:
+        | "strict"
+        | "flexible"
+        | "advisory";
+    performanceImpact:
+        | "low"
+        | "medium"
+        | "high";
     isActive: boolean;
 }
 
@@ -39,9 +48,16 @@ interface ValidationExecution {
     endTime: number;
     recordsValidated: number;
     violationsFound: number;
-    validationMethod: "real-time" | "batch" | "scheduled" | "trigger-based";
+    validationMethod:
+        | "real-time"
+        | "batch"
+        | "scheduled"
+        | "trigger-based";
     validationScope:
-        "single-record" | "table-level" | "cross-table" | "database-wide";
+        | "single-record"
+        | "table-level"
+        | "cross-table"
+        | "database-wide";
     resourceUsage: {
         cpuTime: number;
         memoryMB: number;
@@ -64,13 +80,25 @@ interface DataQualityMetrics {
         | "uniqueness"
         | "timeliness";
     measurementValue: number;
-    measurementUnit: "percentage" | "count" | "ratio" | "score";
+    measurementUnit:
+        | "percentage"
+        | "count"
+        | "ratio"
+        | "score";
     benchmarkValue?: number;
     qualityScore: number;
-    qualityGrade: "A" | "B" | "C" | "D" | "F";
+    qualityGrade:
+        | "A"
+        | "B"
+        | "C"
+        | "D"
+        | "F";
     issuesIdentified: number;
     measurementDate: number;
-    trendDirection: "improving" | "stable" | "degrading";
+    trendDirection:
+        | "improving"
+        | "stable"
+        | "degrading";
 }
 
 interface ValidationViolation {
@@ -89,7 +117,11 @@ interface ValidationViolation {
     violationValue: any;
     expectedValue?: any;
     violationMessage: string;
-    severityLevel: "critical" | "major" | "minor" | "informational";
+    severityLevel:
+        | "critical"
+        | "major"
+        | "minor"
+        | "informational";
     detectedTime: number;
     resolvedTime?: number;
     resolutionAction?: string;
@@ -114,7 +146,10 @@ interface ValidationStage {
     stageId: string;
     stageName: string;
     stageType:
-        "pre-validation" | "core-validation" | "post-validation" | "cleanup";
+        | "pre-validation"
+        | "core-validation"
+        | "post-validation"
+        | "cleanup";
     executionOrder: number;
     executionTime: number;
     recordsProcessed: number;
@@ -142,7 +177,11 @@ interface ConstraintPerformance {
     enforcementCost: number;
     maintenanceCost: number;
     businessValue: number;
-    recommendedAction: "keep" | "modify" | "remove" | "optimize";
+    recommendedAction:
+        | "keep"
+        | "modify"
+        | "remove"
+        | "optimize";
 }
 
 describe("Database Data Validation Benchmarks", () => {

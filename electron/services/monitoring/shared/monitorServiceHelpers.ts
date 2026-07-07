@@ -211,7 +211,13 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
  * @param value - Candidate value to unwrap.
  * @param fallback - Fallback value to use when `value` is nullish.
  */
-export function withFallback<T>(value: null | T | undefined, fallback: T): T {
+export function withFallback<T>(
+    value:
+        | null
+        | T
+        | undefined,
+    fallback: T
+): T {
     return value ?? fallback;
 }
 

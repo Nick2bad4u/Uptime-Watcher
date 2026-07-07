@@ -39,7 +39,10 @@ interface ComponentProps {
  */
 interface ComponentUpdate {
     id: string;
-    type: "props" | "state" | "force";
+    type:
+        | "props"
+        | "state"
+        | "force";
     timestamp: number;
     payload: any;
     source: string;

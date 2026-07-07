@@ -73,9 +73,15 @@ describe(DropboxAuthFlow, () => {
                         redirectUri: string,
                         state?: string,
                         authType?: "code" | "token",
-                        tokenAccessType?: "offline" | "online" | null,
+                        tokenAccessType?:
+                            | "offline"
+                            | "online"
+                            | null,
                         scope?: string[],
-                        includeGrantedScopes?: "none" | "team" | "user",
+                        includeGrantedScopes?:
+                            | "none"
+                            | "team"
+                            | "user",
                         usePKCE?: boolean
                     ) => Promise<string>
                 >()

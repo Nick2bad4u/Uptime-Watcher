@@ -21,12 +21,22 @@ interface TransactionOperation {
         | "read-committed"
         | "repeatable-read"
         | "serializable";
-    operationType: "select" | "insert" | "update" | "delete" | "mixed";
+    operationType:
+        | "select"
+        | "insert"
+        | "update"
+        | "delete"
+        | "mixed";
     affectedTables: string[];
     affectedRows: number;
     lockCount: number;
     lockWaitTime: number;
-    status: "active" | "committed" | "rolled-back" | "deadlocked" | "timeout";
+    status:
+        | "active"
+        | "committed"
+        | "rolled-back"
+        | "deadlocked"
+        | "timeout";
     logSizeBytes: number;
     resourceUsage: {
         cpuTime: number;
@@ -48,7 +58,10 @@ interface DeadlockScenario {
         edges: { from: string; to: string; resource: string }[];
     };
     resolutionMethod:
-        "timeout" | "victim-selection" | "priority-based" | "cost-based";
+        | "timeout"
+        | "victim-selection"
+        | "priority-based"
+        | "cost-based";
     preventionMechanism?: string;
     cycleLength: number;
     resourcesInvolved: string[];
@@ -56,7 +69,13 @@ interface DeadlockScenario {
 
 interface LockingStatistics {
     lockId: string;
-    resourceType: "table" | "page" | "row" | "key" | "extent" | "database";
+    resourceType:
+        | "table"
+        | "page"
+        | "row"
+        | "key"
+        | "extent"
+        | "database";
     lockMode:
         | "shared"
         | "exclusive"
@@ -78,7 +97,11 @@ interface TransactionLogMetrics {
     logId: string;
     logSequenceNumber: number;
     operationType:
-        "begin" | "commit" | "rollback" | "checkpoint" | "data-change";
+        | "begin"
+        | "commit"
+        | "rollback"
+        | "checkpoint"
+        | "data-change";
     timestamp: number;
     sizeBytes: number;
     flushTime: number;
@@ -105,7 +128,11 @@ interface ConcurrencyMetrics {
 
 interface ACIDComplianceTest {
     testId: string;
-    testType: "atomicity" | "consistency" | "isolation" | "durability";
+    testType:
+        | "atomicity"
+        | "consistency"
+        | "isolation"
+        | "durability";
     scenario: string;
     transactionsInvolved: number;
     testDuration: number;

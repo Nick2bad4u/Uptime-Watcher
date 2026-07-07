@@ -49,9 +49,16 @@ vi.mock("../../electron/utils/logger", () => ({
 interface AlertRule {
     id: string;
     name: string;
-    type: "threshold" | "anomaly" | "status_change";
+    type:
+        | "threshold"
+        | "anomaly"
+        | "status_change";
     conditions: Record<string, any>;
-    severity: "low" | "medium" | "high" | "critical";
+    severity:
+        | "low"
+        | "medium"
+        | "high"
+        | "critical";
     isEnabled: boolean;
 }
 
@@ -62,7 +69,11 @@ interface Alert {
     severity: string;
     message: string;
     timestamp: number;
-    status: "pending" | "sent" | "acknowledged" | "resolved";
+    status:
+        | "pending"
+        | "sent"
+        | "acknowledged"
+        | "resolved";
 }
 
 // Real notification service instances for benchmarking

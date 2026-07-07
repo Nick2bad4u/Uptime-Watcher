@@ -18,7 +18,12 @@ const formatValidDate = (value: Date): string =>
         ? value.toLocaleString()
         : UiDefaults.notAvailableLabel;
 
-const formatTimestampLabel = (timestamp: Date | number | string): string => {
+const formatTimestampLabel = (
+    timestamp:
+        | Date
+        | number
+        | string
+): string => {
     if (timestamp instanceof Date) {
         return formatValidDate(timestamp);
     }
@@ -52,7 +57,10 @@ export interface MiniChartBarProperties extends CoreComponentProperties {
      */
     readonly status: SiteStatus;
     /** Timestamp when the status was recorded */
-    readonly timestamp: Date | number | string;
+    readonly timestamp:
+        | Date
+        | number
+        | string;
 }
 
 export const MiniChartBar: NamedExoticComponent<MiniChartBarProperties> = memo(

@@ -238,7 +238,10 @@ beforeEach(() => {
         getAvailabilityColor: vi.fn(() => "status-success"),
         getAvailabilityDescription: vi.fn(() => "Operational"),
         getAvailabilityVariant: vi.fn<
-            (percentage: number) => "danger" | "success" | "warning"
+            (percentage: number) =>
+                | "danger"
+                | "success"
+                | "warning"
         >(() => "success"),
     });
 
@@ -306,7 +309,10 @@ describe(Header, () => {
             getAvailabilityColor,
             getAvailabilityDescription: vi.fn(),
             getAvailabilityVariant: vi.fn<
-                (percentage: number) => "danger" | "success" | "warning"
+                (percentage: number) =>
+                    | "danger"
+                    | "success"
+                    | "warning"
             >(() => "success"),
         });
 

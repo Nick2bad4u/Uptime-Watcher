@@ -47,7 +47,9 @@ const dropboxTokenExchangeResponseSchema = z
 
 type DropboxAuthClient = Pick<
     DropboxAuth,
-    "getAccessTokenFromCode" | "getAuthenticationUrl" | "setClientId"
+    | "getAccessTokenFromCode"
+    | "getAuthenticationUrl"
+    | "setClientId"
 >;
 
 /**

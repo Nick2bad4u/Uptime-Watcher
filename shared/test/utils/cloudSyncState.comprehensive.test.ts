@@ -26,7 +26,10 @@ function setField(
 function deleteEntity(
     partial: Omit<CloudSyncOperation, "kind"> & {
         entityId: string;
-        entityType: "monitor" | "settings" | "site";
+        entityType:
+            | "monitor"
+            | "settings"
+            | "site";
     }
 ): CloudSyncOperation {
     return {

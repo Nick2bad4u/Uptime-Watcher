@@ -185,7 +185,11 @@ declare module "./eventTypes" {
              * The metric category ("database", "monitoring", "system", or
              * "ui").
              */
-            category: "database" | "monitoring" | "system" | "ui";
+            category:
+                | "database"
+                | "monitoring"
+                | "system"
+                | "ui";
             /** The metric name. */
             metric: string;
             /** Unix timestamp (ms) when the metric was recorded. */
@@ -318,7 +322,11 @@ declare module "./eventTypes" {
              * The severity of the error ("critical", "high", "low", or
              * "medium").
              */
-            severity: "critical" | "high" | "low" | "medium";
+            severity:
+                | "critical"
+                | "high"
+                | "low"
+                | "medium";
             /** Unix timestamp (ms) when the error occurred. */
             timestamp: number;
         };
@@ -333,7 +341,10 @@ declare module "./eventTypes" {
          */
         "system:shutdown": {
             /** The reason for shutdown ("error", "update", or "user"). */
-            reason: "error" | "update" | "user";
+            reason:
+                | "error"
+                | "update"
+                | "user";
             /** Unix timestamp (ms) when shutdown started. */
             timestamp: number;
             /** The system uptime in ms. */
@@ -350,7 +361,10 @@ declare module "./eventTypes" {
          */
         "system:startup": {
             /** The runtime environment ("development", "production", or "test"). */
-            environment: "development" | "production" | "test";
+            environment:
+                | "development"
+                | "production"
+                | "test";
             /** Unix timestamp (ms) when startup completed. */
             timestamp: number;
             /** The app version string. */

@@ -93,7 +93,10 @@ export interface SiteRepositoryDependencies {
  * Used to restrict the fields accepted by {@link SiteRepository.upsert} and
  * related transactional helpers to the values persisted by the database.
  */
-type SiteRowUpsertFields = "identifier" | "monitoring" | "name";
+type SiteRowUpsertFields =
+    | "identifier"
+    | "monitoring"
+    | "name";
 
 /**
  * Operations available within a site repository transaction context.
@@ -640,7 +643,12 @@ export class SiteRepository {
      */
     private upsertInternal(
         db: Database,
-        site: Pick<SiteRow, "identifier" | "monitoring" | "name">
+        site: Pick<
+            SiteRow,
+            | "identifier"
+            | "monitoring"
+            | "name"
+        >
     ): void {
         // Apply consistent data normalization
         const { identifier } = site;

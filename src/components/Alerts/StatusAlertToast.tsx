@@ -21,7 +21,10 @@ const AUTO_DISMISS_DURATION_MS = 12_000;
 
 const STATUS_TONE: Record<
     MonitorStatus,
-    "info" | "negative" | "positive" | "warning"
+    | "info"
+    | "negative"
+    | "positive"
+    | "warning"
 > = {
     degraded: "warning",
     down: "negative",

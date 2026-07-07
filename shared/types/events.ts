@@ -467,7 +467,11 @@ export interface DatabaseConnectionEventData extends BaseEventData {
     /** Additional context about the connection state */
     details?: string;
     /** Current connection state */
-    state: "connected" | "connecting" | "disconnected" | "error";
+    state:
+        | "connected"
+        | "connecting"
+        | "disconnected"
+        | "error";
 }
 
 /**
@@ -748,7 +752,9 @@ export interface MonitoringControlEventData extends BaseEventData {
  */
 export type MonitoringStartedEventData = Except<
     MonitoringControlEventData,
-    "monitorCount" | "siteCount" | "summary"
+    | "monitorCount"
+    | "siteCount"
+    | "summary"
 > & {
     readonly monitorCount: number;
     readonly siteCount: number;
@@ -760,7 +766,9 @@ export type MonitoringStartedEventData = Except<
  */
 export type MonitoringStoppedEventData = Except<
     MonitoringControlEventData,
-    "activeMonitors" | "reason" | "summary"
+    | "activeMonitors"
+    | "reason"
+    | "summary"
 > & {
     readonly activeMonitors: number;
     readonly reason: MonitoringControlReason;
@@ -863,7 +871,12 @@ export interface UpdateStatusEventData {
  * @public
  */
 export type DatabaseOperation =
-    "connect" | "create" | "delete" | "insert" | "query" | "update";
+    | "connect"
+    | "create"
+    | "delete"
+    | "insert"
+    | "query"
+    | "update";
 
 /**
  * Payload for test events (used in development/testing).

@@ -9,6 +9,11 @@ import { vi, type Mock } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
+import type {
+    IDataBackupService,
+    IDataImportExportService,
+    ISiteRepositoryService,
+} from "../../services/factories/DatabaseServiceFactory";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
 type MockFunction = Mock<(...args: unknown[]) => unknown>;
@@ -47,6 +52,7 @@ interface MockRepositories {
 
 interface MockConfigurationManager extends Record<string, unknown> {
     configCache: Map<unknown, unknown>;
+    getHistoryRetentionRules: MockFunction;
     validationCache: Map<unknown, unknown>;
 }
 
@@ -61,9 +67,9 @@ interface MockCommandExecutor {
 }
 
 interface MockServiceFactory {
-    createBackupService: MockFunction;
-    createImportExportService: MockFunction;
-    createSiteRepositoryService: MockFunction;
+    createBackupService: Mock<() => IDataBackupService>;
+    createImportExportService: Mock<() => IDataImportExportService>;
+    createSiteRepositoryService: Mock<() => ISiteRepositoryService>;
     dependencies: Record<string, unknown>;
     loggerAdapter: Record<string, unknown>;
 }

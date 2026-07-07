@@ -65,7 +65,10 @@ describe("useSitesState", () => {
     });
 
     const ensureDefined = <T>(
-        value: null | T | undefined,
+        value:
+            | null
+            | T
+            | undefined,
         message: string
     ): T => {
         if (value === null || value === undefined) {

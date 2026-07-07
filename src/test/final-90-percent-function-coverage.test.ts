@@ -435,7 +435,11 @@ describe("Final 90% Function Coverage Push", () => {
 
             const baseConfig = { timeout: 5000, retries: 3, enabled: true };
             const override = { timeout: 10_000 };
-            const required: ("enabled" | "retries" | "timeout")[] = [
+            const required: (
+                | "enabled"
+                | "retries"
+                | "timeout"
+            )[] = [
                 "timeout",
                 "retries",
             ];

@@ -15,7 +15,12 @@ import { bench, describe } from "vitest";
 type ConfigurationSchema = Record<
     string,
     {
-        type: "string" | "number" | "boolean" | "object" | "array";
+        type:
+            | "string"
+            | "number"
+            | "boolean"
+            | "object"
+            | "array";
         default?: any;
         required?: boolean;
         validation?: (value: any) => boolean;

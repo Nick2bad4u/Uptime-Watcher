@@ -9,13 +9,13 @@ type MaybeStorage =
     | null
     | undefined
     | {
-          clear?: () => unknown;
-          getItem?: (key: string) => unknown;
-          key?: (index: number) => unknown;
-          readonly length?: number;
-          removeItem?: (key: string) => unknown;
-          setItem?: (key: string, value: string) => unknown;
-      };
+        clear?: () => unknown;
+        getItem?: (key: string) => unknown;
+        key?: (index: number) => unknown;
+        readonly length?: number;
+        removeItem?: (key: string) => unknown;
+        setItem?: (key: string, value: string) => unknown;
+    };
 
 interface StorageLike {
     clear: () => void;

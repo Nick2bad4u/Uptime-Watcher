@@ -1770,9 +1770,41 @@ describe("DatabaseCommands", () => {
             await annotate("Type: Business Logic", "type");
 
             mockServiceFactory.createBackupService.mockReturnValue({
+                applyDatabaseBackupResult: vi.fn().mockResolvedValue({
+                    appVersion: "0.0.0-test",
+                    checksum: "unused",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/unused.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 0,
+                }),
                 downloadDatabaseBackup: vi
                     .fn()
                     .mockRejectedValue(new Error("Service unavailable")),
+                restoreDatabaseBackup: vi.fn().mockResolvedValue({
+                    metadata: {
+                        appVersion: "0.0.0-test",
+                        checksum: "unused",
+                        createdAt: Date.now(),
+                        originalPath: "/tmp/unused.sqlite",
+                        retentionHintDays: 30,
+                        schemaVersion: 1,
+                        sizeBytes: 0,
+                    },
+                    preRestoreBackup: undefined,
+                    preRestoreFileName: "unused.sqlite",
+                    restoredAt: Date.now(),
+                }),
+                saveDatabaseBackupToPath: vi.fn().mockResolvedValue({
+                    appVersion: "0.0.0-test",
+                    checksum: "unused",
+                    createdAt: Date.now(),
+                    originalPath: "/tmp/unused.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 0,
+                }),
             });
 
             const command = new DownloadBackupCommand(

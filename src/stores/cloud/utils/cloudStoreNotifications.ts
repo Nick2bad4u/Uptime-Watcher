@@ -40,7 +40,10 @@ export function enqueueCloudToast(args: {
     message?: string | undefined;
     title: string;
     ttlMs?: number | undefined;
-    variant: "error" | "info" | "success";
+    variant:
+        | "error"
+        | "info"
+        | "success";
 }): string {
     // Store actions are allowed to use Zustand stores directly.
     const toast = useAlertStore.getState().enqueueToast({

@@ -187,7 +187,13 @@ export const UiDefaults: ReadonlyDeep<{
  *
  * @public
  */
-export function withFallback<T>(value: null | T | undefined, fallback: T): T {
+export function withFallback<T>(
+    value:
+        | null
+        | T
+        | undefined,
+    fallback: T
+): T {
     return value ?? fallback;
 }
 

@@ -22,7 +22,11 @@ export class FileDownloadDomAttachmentError extends Error {
 
 type DownloadAnchorElement = Pick<
     HTMLAnchorElement,
-    "click" | "download" | "href" | "remove" | "style"
+    | "click"
+    | "download"
+    | "href"
+    | "remove"
+    | "style"
 >;
 
 const isObjectLike = (value: unknown): value is object =>

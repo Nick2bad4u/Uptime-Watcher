@@ -98,7 +98,10 @@ const config: StorybookConfig = {
         const shouldUseRelativeBase = options.configType === "PRODUCTION";
 
         const toArray = (
-            plugins: PluginOption | PluginOption[] | undefined
+            plugins:
+                | PluginOption
+                | PluginOption[]
+                | undefined
         ): PluginOption[] => {
             if (!plugins) {
                 return [];

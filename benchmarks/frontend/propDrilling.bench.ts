@@ -39,7 +39,12 @@ interface PropTransfer {
 }
 
 interface PropTransformation {
-    type: "rename" | "merge" | "split" | "filter" | "compute";
+    type:
+        | "rename"
+        | "merge"
+        | "split"
+        | "filter"
+        | "compute";
     input: any;
     output: any;
     processingTime: number;
@@ -450,7 +455,11 @@ class MockPropDrillingSystem {
     // Prop drilling optimization simulation
     optimizePropDrilling(
         rootComponent: ComponentInstance,
-        strategy: "context" | "composition" | "memoization" | "state-lifting"
+        strategy:
+            | "context"
+            | "composition"
+            | "memoization"
+            | "state-lifting"
     ): {
         strategy: string;
         originalMetrics: PropDrillingMetrics;

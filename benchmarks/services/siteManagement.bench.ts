@@ -19,7 +19,11 @@ interface BenchmarkSite {
     id: string;
     name: string;
     url: string;
-    status: "online" | "offline" | "unknown" | "maintenance";
+    status:
+        | "online"
+        | "offline"
+        | "unknown"
+        | "maintenance";
     isActive: boolean;
     checkInterval: number;
     createdAt: Date;

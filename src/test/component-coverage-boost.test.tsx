@@ -975,7 +975,11 @@ describe("Component Coverage Boost", () => {
                     name: string;
                     options?: string[];
                     required: boolean;
-                    type: "boolean" | "number" | "select" | "text";
+                    type:
+                        | "boolean"
+                        | "number"
+                        | "select"
+                        | "text";
                     validation?: (value: any) => null | string;
                 }[];
                 type: string;
@@ -1060,7 +1064,11 @@ describe("Component Coverage Boost", () => {
             // Test MonitorUiComponents.tsx functionality (lines 43-114)
             interface MonitorUIComponent {
                 props: Record<string, any>;
-                type: "action" | "chart" | "metric" | "status";
+                type:
+                    | "action"
+                    | "chart"
+                    | "metric"
+                    | "status";
                 visible: boolean;
             }
 
@@ -1165,7 +1173,10 @@ describe("Component Coverage Boost", () => {
             interface StatusBadgeProps {
                 showIcon?: boolean;
                 showText?: boolean;
-                size?: "large" | "medium" | "small";
+                size?:
+                    | "large"
+                    | "medium"
+                    | "small";
                 status: string;
             }
 
@@ -1325,7 +1336,11 @@ describe("Component Coverage Boost", () => {
                     timestamp: string;
                 }[];
                 showResponseTime: boolean;
-                timeRange: "1h" | "6h" | "7d" | "24h";
+                timeRange:
+                    | "1h"
+                    | "6h"
+                    | "7d"
+                    | "24h";
             }
 
             const historyChartLogic = {

@@ -31,7 +31,10 @@ export interface StatusIndicatorProperties extends CoreComponentProperties {
     /** Whether to display status text alongside the indicator */
     readonly showText?: boolean;
     /** Size variant for the status indicator */
-    readonly size?: "lg" | "md" | "sm";
+    readonly size?:
+        | "lg"
+        | "md"
+        | "sm";
     /** Current status to display */
     readonly status: SiteStatus;
 }

@@ -74,12 +74,18 @@ export interface SiteOperationsServiceDependencies {
     /** Data export operations */
     data: Pick<
         DataBackupService,
-        "downloadSqliteBackup" | "restoreSqliteBackup" | "saveSqliteBackup"
+        | "downloadSqliteBackup"
+        | "restoreSqliteBackup"
+        | "saveSqliteBackup"
     >;
     /** Site service operations */
     site: Pick<
         SiteDataService,
-        "addSite" | "getSites" | "removeMonitor" | "removeSite" | "updateSite"
+        | "addSite"
+        | "getSites"
+        | "removeMonitor"
+        | "removeSite"
+        | "updateSite"
     >;
 }
 

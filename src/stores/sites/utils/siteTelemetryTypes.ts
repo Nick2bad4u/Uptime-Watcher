@@ -26,7 +26,10 @@ export type SitesTelemetryPayload = Readonly<UnknownRecord>;
  *
  * @public
  */
-export type SitesTelemetryStage = "failure" | "pending" | "success";
+export type SitesTelemetryStage =
+    | "failure"
+    | "pending"
+    | "success";
 
 /**
  * Discriminated union describing the canonical keys emitted by the sites store
@@ -41,14 +44,14 @@ export type SitesTelemetryStage = "failure" | "pending" | "success";
  */
 export type SitesTelemetryStagePayload =
     | (SitesTelemetryPayload & {
-          readonly error: string;
-          readonly status: "failure";
-          readonly success: false;
-      })
+        readonly error: string;
+        readonly status: "failure";
+        readonly success: false;
+    })
     | (SitesTelemetryPayload & { readonly status: "pending" })
     | (SitesTelemetryPayload & {
-          readonly status: "success";
-          readonly success: true;
-      });
+        readonly status: "success";
+        readonly success: true;
+    });
 
 export type MutableSitesTelemetryPayload = UnknownRecord;

@@ -32,7 +32,9 @@ import { CloudProviderOperationError } from "./cloudProviderErrors";
  */
 export abstract class BaseCloudStorageProvider implements Pick<
     CloudStorageProvider,
-    "downloadBackup" | "listBackups" | "uploadBackup"
+    | "downloadBackup"
+    | "listBackups"
+    | "uploadBackup"
 > {
     /** Provider kind for error attribution and diagnostics. */
     public abstract readonly kind: CloudProviderKind;

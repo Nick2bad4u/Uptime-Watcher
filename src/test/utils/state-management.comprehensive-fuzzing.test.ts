@@ -45,14 +45,22 @@ interface MonitorState {
     retries: number;
     status: MonitorStatus;
     timeout: number;
-    type: "dns" | "http" | "ping" | "port";
+    type:
+        | "dns"
+        | "http"
+        | "ping"
+        | "port";
     updatedAt: Date;
     uptime: number;
     url: string;
 }
 
 interface SettingsState {
-    language: "de" | "en" | "es" | "fr";
+    language:
+        | "de"
+        | "en"
+        | "es"
+        | "fr";
     monitoring: {
         defaultInterval: number;
         defaultTimeout: number;
@@ -65,7 +73,10 @@ interface SettingsState {
         enabled: boolean;
         sound: boolean;
     };
-    theme: "auto" | "dark" | "light";
+    theme:
+        | "auto"
+        | "dark"
+        | "light";
     ui: {
         animationsEnabled: boolean;
         compactMode: boolean;
@@ -88,21 +99,24 @@ interface SiteState {
 type StateAction =
     | { payload: any; type: "BULK_STATUS_UPDATE" | "UPDATE_STATUS" }
     | {
-          payload: MonitorState | Partial<MonitorState>;
-          type:
-              | "ADD_MONITOR"
-              | "DELETE_MONITOR"
-              | "TOGGLE_MONITOR"
-              | "UPDATE_MONITOR";
-      }
+        payload: MonitorState | Partial<MonitorState>;
+        type:
+            | "ADD_MONITOR"
+            | "DELETE_MONITOR"
+            | "TOGGLE_MONITOR"
+            | "UPDATE_MONITOR";
+    }
     | {
-          payload: object | Partial<SettingsState>;
-          type: "RESET_SETTINGS" | "UPDATE_SETTINGS";
-      }
+        payload: object | Partial<SettingsState>;
+        type: "RESET_SETTINGS" | "UPDATE_SETTINGS";
+    }
     | {
-          payload: Partial<SiteState> | SiteState;
-          type: "ADD_SITE" | "DELETE_SITE" | "UPDATE_SITE";
-      };
+        payload: Partial<SiteState> | SiteState;
+        type:
+            | "ADD_SITE"
+            | "DELETE_SITE"
+            | "UPDATE_SITE";
+    };
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for State Management

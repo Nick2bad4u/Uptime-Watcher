@@ -89,7 +89,10 @@ export function createFieldWrapper<
  */
 export function createStringField<
     TProps extends StringFieldPropsBase,
-    TElement extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+    TElement extends
+        | HTMLInputElement
+        | HTMLSelectElement
+        | HTMLTextAreaElement,
 >(options: {
     readonly displayName: string;
     readonly renderControl: (

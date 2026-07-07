@@ -36,7 +36,10 @@ export interface StatusSubscriptionHealth {
  * Discrete health states for the realtime status subscription.
  */
 export type StatusSubscriptionHealthState =
-    "degraded" | "failed" | "healthy" | "unknown";
+    | "degraded"
+    | "failed"
+    | "healthy"
+    | "unknown";
 
 /**
  * Creates a normalized health snapshot from the latest subscription summary.

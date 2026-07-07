@@ -16,7 +16,12 @@ interface DatabaseConnection {
     createdAt: number;
     lastUsedAt: number;
     usageCount: number;
-    state: "idle" | "active" | "validating" | "broken" | "closed";
+    state:
+        | "idle"
+        | "active"
+        | "validating"
+        | "broken"
+        | "closed";
     queryCount: number;
     totalQueryTime: number;
     maxIdleTime: number;
@@ -36,7 +41,12 @@ interface ConnectionPoolConfig {
 interface ConnectionOperation {
     operationId: string;
     operationType:
-        "acquire" | "release" | "validate" | "create" | "destroy" | "timeout";
+        | "acquire"
+        | "release"
+        | "validate"
+        | "create"
+        | "destroy"
+        | "timeout";
     startTime: number;
     endTime: number;
     success: boolean;
@@ -62,7 +72,10 @@ interface PoolMetrics {
 interface ConnectionRequest {
     requestId: string;
     requestTime: number;
-    priority: "low" | "medium" | "high";
+    priority:
+        | "low"
+        | "medium"
+        | "high";
     timeoutMs: number;
     fulfilled: boolean;
     connectionId?: string;
@@ -468,7 +481,11 @@ describe("Database Connection Pooling Benchmarks", () => {
         interface ScalingEvent {
             eventId: string;
             timestamp: number;
-            eventType: "scale-up" | "scale-down" | "load-spike" | "load-drop";
+            eventType:
+                | "scale-up"
+                | "scale-down"
+                | "load-spike"
+                | "load-drop";
             beforeConnections: number;
             afterConnections: number;
             triggerCondition: string;
@@ -725,7 +742,11 @@ describe("Database Connection Pooling Benchmarks", () => {
                 | "query-validation"
                 | "timeout-check"
                 | "resource-check";
-            result: "healthy" | "degraded" | "unhealthy" | "timeout";
+            result:
+                | "healthy"
+                | "degraded"
+                | "unhealthy"
+                | "timeout";
             responseTime: number;
             details: Record<string, unknown>;
         }

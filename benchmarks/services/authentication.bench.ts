@@ -192,7 +192,12 @@ class MockUserRepository {
 
     /** Persists a new synthetic user record. */
     async create(
-        userData: Omit<User, "id" | "createdAt" | "updatedAt">
+        userData: Omit<
+            User,
+            | "id"
+            | "createdAt"
+            | "updatedAt"
+        >
     ): Promise<User> {
         const id = `user-${this.nextId++}`;
         const now = new Date();

@@ -146,7 +146,9 @@ type NonArrayObjectPayload = InternalNonArrayObjectPayload;
  * Supported event payload value for the typed event bus.
  */
 export type EventPayloadValue =
-    ArrayPayload | NonArrayObjectPayload | PrimitivePayload;
+    | ArrayPayload
+    | NonArrayObjectPayload
+    | PrimitivePayload;
 
 type PrimitiveEventPayload<Value extends PrimitivePayload> = Readonly<{
     _meta: EventMetadata;

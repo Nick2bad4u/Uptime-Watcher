@@ -19,7 +19,10 @@ import type { ChartTimeRange } from "../types";
  *
  * @public
  */
-export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
+export type SiteListLayoutMode =
+    | "card-compact"
+    | "card-large"
+    | "list";
 
 /**
  * Presentation modes available for large site cards.
@@ -34,7 +37,10 @@ export type SiteCardPresentation = "grid" | "stacked";
  *
  * @public
  */
-export type InterfaceDensity = "comfortable" | "compact" | "cozy";
+export type InterfaceDensity =
+    | "comfortable"
+    | "compact"
+    | "cozy";
 
 /**
  * Resizable column identifiers for the list layout table.

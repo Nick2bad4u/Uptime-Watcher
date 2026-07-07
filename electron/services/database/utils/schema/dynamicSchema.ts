@@ -88,7 +88,11 @@ const normalizeMonitorType = (value: unknown): MonitorType =>
  *
  * @internal
  */
-type FieldDefaultValue = (() => unknown) | null | number | string;
+type FieldDefaultValue =
+    | (() => unknown)
+    | null
+    | number
+    | string;
 
 interface FieldMapping {
     /** Database column name */

@@ -63,9 +63,10 @@ const DEGRADED_HTTP_STATUS_CODES = [
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status | MDN: HTTP response status codes}
  */
-export function determineMonitorStatus(
-    httpStatus: number
-): "degraded" | "down" | "up" {
+export function determineMonitorStatus(httpStatus: number):
+    | "degraded"
+    | "down"
+    | "up" {
     // Input validation - HTTP status codes are defined in 100-599 range
     if (!isValidHttpStatus(httpStatus)) {
         return "down";

@@ -12,7 +12,10 @@ export type EnhancedValidationResult = Simplify<
         /** Field that was validated (if applicable). */
         fieldName?: string;
         /** Type information about the validation. */
-        validationType: "field" | "full" | "partial";
+        validationType:
+            | "field"
+            | "full"
+            | "partial";
     }
 >;
 

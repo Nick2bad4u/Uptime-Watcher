@@ -77,24 +77,24 @@ export function validateExternalOpenUrlCandidateWithPolicy(
  */
 export type TryOpenExternalValidatedResult =
     | Readonly<{
-          errorCode?: string;
-          errorName: string;
-          ok: false;
-          outcome: "open-failed";
-          safeUrlForLogging: string;
-      }>
+        errorCode?: string;
+        errorName: string;
+        ok: false;
+        outcome: "open-failed";
+        safeUrlForLogging: string;
+    }>
     | Readonly<{
-          normalizedUrl: string;
-          ok: true;
-          outcome: "opened";
-          safeUrlForLogging: string;
-      }>
+        normalizedUrl: string;
+        ok: true;
+        outcome: "opened";
+        safeUrlForLogging: string;
+    }>
     | Readonly<{
-          ok: false;
-          outcome: "blocked";
-          reason: string;
-          safeUrlForLogging: string;
-      }>;
+        ok: false;
+        outcome: "blocked";
+        reason: string;
+        safeUrlForLogging: string;
+    }>;
 
 /**
  * Best-effort external URL open that never throws.

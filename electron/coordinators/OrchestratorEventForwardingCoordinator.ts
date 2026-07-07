@@ -45,7 +45,10 @@ export interface OrchestratorEventForwardingCoordinatorOptions {
     siteManager: SiteManager;
 }
 
-type MonitoringOperationScope = "global" | "monitor" | "site";
+type MonitoringOperationScope =
+    | "global"
+    | "monitor"
+    | "site";
 
 const determineMonitoringScope = (
     identifier: string,

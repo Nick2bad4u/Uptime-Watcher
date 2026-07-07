@@ -41,7 +41,10 @@ interface FilePermissions {
  */
 interface FileContent {
     data: Buffer | string;
-    encoding: "utf8" | "base64" | "binary";
+    encoding:
+        | "utf8"
+        | "base64"
+        | "binary";
     compressed: boolean;
 }
 
@@ -96,7 +99,10 @@ class MockFileSystem {
         path: string,
         content: Buffer | string,
         options?: {
-            encoding?: "utf8" | "base64" | "binary";
+            encoding?:
+                | "utf8"
+                | "base64"
+                | "binary";
             compress?: boolean;
             permissions?: Partial<FilePermissions>;
             tags?: string[];
@@ -468,7 +474,10 @@ class MockFileManagementService {
         path: string,
         content: Buffer | string,
         options?: {
-            encoding?: "utf8" | "base64" | "binary";
+            encoding?:
+                | "utf8"
+                | "base64"
+                | "binary";
             compress?: boolean;
             tags?: string[];
             metadata?: Record<string, any>;
@@ -577,7 +586,12 @@ class MockFileManagementService {
 
     async batchOperations(
         operations: {
-            type: "create" | "update" | "delete" | "copy" | "move";
+            type:
+                | "create"
+                | "update"
+                | "delete"
+                | "copy"
+                | "move";
             sourcePath?: string;
             destPath?: string;
             content?: Buffer | string;

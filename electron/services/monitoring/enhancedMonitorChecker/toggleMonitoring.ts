@@ -22,7 +22,9 @@ import { monitorLogger as logger } from "../../../utils/logger";
 
 type ToggleMonitoringDependencies = Pick<
     EnhancedMonitoringDependencies,
-    "eventEmitter" | "monitorRepository" | "operationRegistry"
+    | "eventEmitter"
+    | "monitorRepository"
+    | "operationRegistry"
 >;
 
 interface ToggleMonitoringOperationArgs {

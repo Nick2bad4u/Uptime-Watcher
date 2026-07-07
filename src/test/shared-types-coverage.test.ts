@@ -134,7 +134,11 @@ describe("Shared Types Coverage", () => {
                 name: string;
                 retryAttempts: number;
                 timeout: number;
-                type: "dns" | "http" | "ping" | "port";
+                type:
+                    | "dns"
+                    | "http"
+                    | "ping"
+                    | "port";
             }
 
             const httpMonitor: MonitorConfig = {
@@ -448,7 +452,11 @@ describe("Shared Types Coverage", () => {
                 field: string;
                 message: string;
                 parameters?: Record<string, any>;
-                type: "custom" | "format" | "range" | "required";
+                type:
+                    | "custom"
+                    | "format"
+                    | "range"
+                    | "required";
                 validator?: (value: any) => boolean;
             }
 

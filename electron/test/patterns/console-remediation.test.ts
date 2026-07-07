@@ -64,7 +64,12 @@ describe("Console Statement Remediation", () => {
         content: string;
         context: string;
         line: number;
-        type: "debug" | "error" | "info" | "log" | "warn";
+        type:
+            | "debug"
+            | "error"
+            | "info"
+            | "log"
+            | "warn";
     }[] {
         const content = fs.readFileSync(filePath, "utf8");
         const lines = content.split(String.raw`\n`);
@@ -72,7 +77,12 @@ describe("Console Statement Remediation", () => {
             content: string;
             context: string;
             line: number;
-            type: "debug" | "error" | "info" | "log" | "warn";
+            type:
+                | "debug"
+                | "error"
+                | "info"
+                | "log"
+                | "warn";
         }[] = [];
 
         const consoleRegex =
@@ -82,7 +92,11 @@ describe("Console Statement Remediation", () => {
             const match = consoleRegex.exec(line);
             if (match) {
                 const type = match.groups?.["method"] as
-                    "debug" | "error" | "info" | "log" | "warn";
+                    | "debug"
+                    | "error"
+                    | "info"
+                    | "log"
+                    | "warn";
 
                 // Get some context around the line
                 const startLine = Math.max(0, index - 2);
@@ -115,7 +129,10 @@ describe("Console Statement Remediation", () => {
         },
         filePath: string
     ): {
-        category: "legitimate" | "needs-replacement" | "test-file";
+        category:
+            | "legitimate"
+            | "needs-replacement"
+            | "test-file";
         reason: string;
         replacement?: string;
     } {

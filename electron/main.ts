@@ -237,7 +237,12 @@ const configureLogging = (): LoggingConfiguration => {
 log.initialize({ preload: true });
 
 type ElectronLogLevel =
-    "debug" | "error" | "info" | "silly" | "verbose" | "warn";
+    | "debug"
+    | "error"
+    | "info"
+    | "silly"
+    | "verbose"
+    | "warn";
 
 interface LoggingConfiguration {
     readonly consoleLevel: ElectronLogLevel;

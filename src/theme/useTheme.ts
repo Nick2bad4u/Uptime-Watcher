@@ -43,9 +43,10 @@ const resolveThemeColorPath = (
 interface UseAvailabilityColorsReturn {
     getAvailabilityColor: (percentage: number) => string;
     getAvailabilityDescription: (percentage: number) => string;
-    getAvailabilityVariant: (
-        percentage: number
-    ) => "danger" | "success" | "warning";
+    getAvailabilityVariant: (percentage: number) =>
+        | "danger"
+        | "success"
+        | "warning";
 }
 
 /**
@@ -62,21 +63,40 @@ interface UseStatusColorsReturn {
  * Interface for useThemeClasses hook return type.
  */
 interface UseThemeClassesReturn {
-    getBackgroundClass: (variant?: "primary" | "secondary" | "tertiary") => {
+    getBackgroundClass: (
+        variant?:
+            | "primary"
+            | "secondary"
+            | "tertiary"
+    ) => {
         backgroundColor: string;
     };
-    getBorderClass: (variant?: "focus" | "primary" | "secondary") => {
+    getBorderClass: (
+        variant?:
+            | "focus"
+            | "primary"
+            | "secondary"
+    ) => {
         borderColor: string;
     };
     getColor: (path: string) => string;
     getStatusClass: (status: SiteStatus) => {
         color: string;
     };
-    getSurfaceClass: (variant?: "base" | "elevated" | "overlay") => {
+    getSurfaceClass: (
+        variant?:
+            | "base"
+            | "elevated"
+            | "overlay"
+    ) => {
         backgroundColor: string;
     };
     getTextClass: (
-        variant?: "inverse" | "primary" | "secondary" | "tertiary"
+        variant?:
+            | "inverse"
+            | "primary"
+            | "secondary"
+            | "tertiary"
     ) => {
         color: string;
     };
@@ -461,7 +481,12 @@ export function useThemeClasses(): UseThemeClassesReturn {
     const { getColor } = useTheme();
 
     const getBackgroundClass = useCallback(
-        (variant: "primary" | "secondary" | "tertiary" = "primary") => ({
+        (
+            variant:
+                | "primary"
+                | "secondary"
+                | "tertiary" = "primary"
+        ) => ({
             backgroundColor: `var(--color-background-${variant})`,
         }),
         []
@@ -470,7 +495,10 @@ export function useThemeClasses(): UseThemeClassesReturn {
     const getTextClass = useCallback(
         (
             variant:
-                "inverse" | "primary" | "secondary" | "tertiary" = "primary"
+                | "inverse"
+                | "primary"
+                | "secondary"
+                | "tertiary" = "primary"
         ) => ({
             color: `var(--color-text-${variant})`,
         }),
@@ -478,14 +506,24 @@ export function useThemeClasses(): UseThemeClassesReturn {
     );
 
     const getBorderClass = useCallback(
-        (variant: "focus" | "primary" | "secondary" = "primary") => ({
+        (
+            variant:
+                | "focus"
+                | "primary"
+                | "secondary" = "primary"
+        ) => ({
             borderColor: `var(--color-border-${variant})`,
         }),
         []
     );
 
     const getSurfaceClass = useCallback(
-        (variant: "base" | "elevated" | "overlay" = "base") => ({
+        (
+            variant:
+                | "base"
+                | "elevated"
+                | "overlay" = "base"
+        ) => ({
             backgroundColor: `var(--color-surface-${variant})`,
         }),
         []

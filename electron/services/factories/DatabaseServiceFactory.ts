@@ -108,6 +108,23 @@ export interface ISiteRepositoryService {
 }
 
 /**
+ * Minimal service-factory surface required by database command objects.
+ *
+ * @remarks
+ * Commands should not depend on {@link DatabaseServiceFactory}'s concrete class
+ * shape. Keeping this structural interface allows tests and alternate callers
+ * to provide narrow factory doubles without inheriting private implementation
+ * details from the production factory.
+ *
+ * @public
+ */
+export interface DatabaseCommandServiceFactory {
+    createBackupService: () => IDataBackupService;
+    createImportExportService: () => IDataImportExportService;
+    createSiteRepositoryService: () => ISiteRepositoryService;
+}
+
+/**
  * Factory for creating database-related services with proper dependency
  * injection.
  *

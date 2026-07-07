@@ -9,7 +9,13 @@ import type { RendererLogger } from "electron-log";
  * initialization. This stub preserves the subset of the API that the renderer
  * code expects (log methods + `transports.console` formatting).
  */
-const stub: Pick<RendererLogger, "debug" | "error" | "info" | "warn"> & {
+const stub: Pick<
+    RendererLogger,
+    | "debug"
+    | "error"
+    | "info"
+    | "warn"
+> & {
     transports: {
         console: {
             format: string;

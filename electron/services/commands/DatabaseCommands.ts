@@ -41,7 +41,7 @@ import type {
     DatabaseRestoreSummary,
 } from "../database/utils/backup/databaseBackup";
 import { parseHistoryLimitSetting } from "../database/utils/historyLimitSettingParser";
-import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
+import type { DatabaseCommandServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import {
     IMPORT_SITE_EVENT_EMIT_CONCURRENCY,
@@ -143,7 +143,7 @@ export abstract class DatabaseCommand<
     protected readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
     /** Factory for accessing database services and repositories */
-    protected readonly serviceFactory: DatabaseServiceFactory;
+    protected readonly serviceFactory: DatabaseCommandServiceFactory;
 
     /** Optional configuration manager used for validation flows */
     protected readonly configurationManager: ConfigurationManager | undefined;
@@ -208,7 +208,7 @@ export abstract class DatabaseCommand<
     }
 
     public constructor(
-        serviceFactory: DatabaseServiceFactory,
+        serviceFactory: DatabaseCommandServiceFactory,
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>
     );
@@ -216,7 +216,7 @@ export abstract class DatabaseCommand<
     public constructor(context: DatabaseCommandContext);
 
     public constructor(
-        a: DatabaseCommandContext | DatabaseServiceFactory,
+        a: DatabaseCommandContext | DatabaseCommandServiceFactory,
         b?: TypedEventBus<UptimeEvents>,
         c?: StandardizedCache<Site>
     ) {
@@ -775,7 +775,7 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
     }
 
     public constructor(
-        serviceFactory: DatabaseServiceFactory,
+        serviceFactory: DatabaseCommandServiceFactory,
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>,
         data: string
@@ -784,7 +784,9 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
     public constructor(context: DatabaseCommandContext & { data: string });
 
     public constructor(
-        a: (DatabaseCommandContext & { data: string }) | DatabaseServiceFactory,
+        a:
+            | (DatabaseCommandContext & { data: string })
+            | DatabaseCommandServiceFactory,
         b?: TypedEventBus<UptimeEvents>,
         c?: StandardizedCache<Site>,
         d?: string
@@ -901,7 +903,7 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
     }
 
     public constructor(
-        serviceFactory: DatabaseServiceFactory,
+        serviceFactory: DatabaseCommandServiceFactory,
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>,
         payload: DatabaseRestorePayload
@@ -914,7 +916,7 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
     public constructor(
         a:
             | (DatabaseCommandContext & { payload: DatabaseRestorePayload })
-            | DatabaseServiceFactory,
+            | DatabaseCommandServiceFactory,
         b?: TypedEventBus<UptimeEvents>,
         c?: StandardizedCache<Site>,
         d?: DatabaseRestorePayload

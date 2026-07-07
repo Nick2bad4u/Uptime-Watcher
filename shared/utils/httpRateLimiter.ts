@@ -53,7 +53,9 @@ function numberConfigValue(
     config: HttpRateLimiterConfig,
     key: keyof Pick<
         HttpRateLimiterConfig,
-        "maxConcurrent" | "maxWaitMs" | "minIntervalMs"
+        | "maxConcurrent"
+        | "maxWaitMs"
+        | "minIntervalMs"
     >,
     fallback: number
 ): number {

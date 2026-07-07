@@ -18,7 +18,10 @@ interface AppRootInertSnapshot {
 
 type AppRootElement = Pick<
     HTMLElement,
-    "getAttribute" | "hasAttribute" | "removeAttribute" | "setAttribute"
+    | "getAttribute"
+    | "hasAttribute"
+    | "removeAttribute"
+    | "setAttribute"
 >;
 
 const modalStackState: {

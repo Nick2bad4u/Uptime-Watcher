@@ -16,12 +16,18 @@ interface MigrationDefinition {
     migrationId: string;
     version: string;
     name: string;
-    type: "schema" | "data" | "mixed";
+    type:
+        | "schema"
+        | "data"
+        | "mixed";
     operations: MigrationOperation[];
     dependencies: string[];
     rollbackSupported: boolean;
     estimatedDuration: number;
-    riskLevel: "low" | "medium" | "high";
+    riskLevel:
+        | "low"
+        | "medium"
+        | "high";
 }
 
 interface MigrationOperation {

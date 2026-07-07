@@ -16,10 +16,19 @@ import { isEmpty } from "ts-extras";
 
 type SiteStatusMonitor = SiteForStatus["monitors"][number];
 type SiteStatusMonitorInput =
-    null | readonly (null | SiteStatusMonitor | undefined)[] | undefined;
+    | null
+    | readonly (
+        | null
+        | SiteStatusMonitor
+        | undefined
+    )[]
+    | undefined;
 
 const isSiteStatusMonitor = (
-    monitor: null | SiteStatusMonitor | undefined
+    monitor:
+        | null
+        | SiteStatusMonitor
+        | undefined
 ): monitor is SiteStatusMonitor => monitor !== null && monitor !== undefined;
 
 /**
@@ -64,9 +73,10 @@ const normalizeMonitors = (
  *
  * @returns The monitoring state: `"running"`, `"stopped"`, or `"partial"`.
  */
-export function calculateSiteMonitoringStatus(
-    site: SiteForStatus
-): "partial" | "running" | "stopped" {
+export function calculateSiteMonitoringStatus(site: SiteForStatus):
+    | "partial"
+    | "running"
+    | "stopped" {
     const monitors = normalizeMonitors(site.monitors);
 
     if (isEmpty(monitors)) {
@@ -285,9 +295,11 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
  *
  * @returns The color variant: `"success"`, `"error"`, `"warning"`, or `"info"`.
  */
-export function getSiteStatusVariant(
-    status: SiteStatus
-): "error" | "info" | "success" | "warning" {
+export function getSiteStatusVariant(status: SiteStatus):
+    | "error"
+    | "info"
+    | "success"
+    | "warning" {
     switch (status) {
         case STATUS_KIND.DEGRADED: {
             return "warning";

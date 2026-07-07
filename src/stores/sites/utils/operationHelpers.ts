@@ -27,7 +27,10 @@ import { logStoreAction } from "../../utils";
 import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
 import { updateMonitorInSite } from "./monitorOperations";
 
-type OperationStage = "failure" | "pending" | "success";
+type OperationStage =
+    | "failure"
+    | "pending"
+    | "success";
 
 const SITE_NOT_FOUND_MESSAGE = ERROR_CATALOG.sites.NOT_FOUND;
 
@@ -46,7 +49,9 @@ export interface OperationTelemetryConfig {
 }
 
 type OperationTelemetryInput =
-    OperationTelemetryConfig | SitesTelemetryPayload | undefined;
+    | OperationTelemetryConfig
+    | SitesTelemetryPayload
+    | undefined;
 
 interface NormalizedTelemetry {
     readonly base: MutableSitesTelemetryPayload;
@@ -224,7 +229,11 @@ export const getSiteByIdentifier = (
     siteIdentifier: string,
     deps: SiteOperationsDependencies
 ): Site => {
-    const sites: readonly (null | Site | undefined)[] = deps.getSites();
+    const sites: readonly (
+        | null
+        | Site
+        | undefined
+    )[] = deps.getSites();
     const site = sites.find((s) => s?.identifier === siteIdentifier);
     if (!site) {
         throw new Error(ERROR_CATALOG.sites.NOT_FOUND);

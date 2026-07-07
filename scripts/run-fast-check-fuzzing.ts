@@ -17,7 +17,10 @@ import * as path from "node:path";
 type MutableProcessEnv = Record<string, string | undefined>;
 
 /** Supported fuzzing targets that can be invoked by the script. */
-type FuzzTarget = "base" | "electron" | "shared";
+type FuzzTarget =
+    | "base"
+    | "electron"
+    | "shared";
 
 const TARGET_TO_SCRIPT: Record<FuzzTarget, string> = {
     base: "fuzz",

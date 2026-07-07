@@ -26,9 +26,18 @@ describe("Database Performance Monitoring", () => {
     interface PerformanceThreshold {
         id: string;
         metricType: string;
-        operator: ">" | "<" | "==" | ">=" | "<=";
+        operator:
+            | ">"
+            | "<"
+            | "=="
+            | ">="
+            | "<=";
         value: number;
-        severity: "low" | "medium" | "high" | "critical";
+        severity:
+            | "low"
+            | "medium"
+            | "high"
+            | "critical";
         description: string;
         enabled: boolean;
     }
@@ -78,9 +87,18 @@ describe("Database Performance Monitoring", () => {
             cpuUtilization: number;
         };
         trends: {
-            latencyTrend: "increasing" | "decreasing" | "stable";
-            throughputTrend: "increasing" | "decreasing" | "stable";
-            errorTrend: "increasing" | "decreasing" | "stable";
+            latencyTrend:
+                | "increasing"
+                | "decreasing"
+                | "stable";
+            throughputTrend:
+                | "increasing"
+                | "decreasing"
+                | "stable";
+            errorTrend:
+                | "increasing"
+                | "decreasing"
+                | "stable";
         };
         anomalies: {
             timestamp: number;
@@ -94,7 +112,11 @@ describe("Database Performance Monitoring", () => {
     interface PerformanceReport {
         id: string;
         generatedAt: number;
-        reportType: "daily" | "weekly" | "monthly" | "custom";
+        reportType:
+            | "daily"
+            | "weekly"
+            | "monthly"
+            | "custom";
         timeRange: {
             start: number;
             end: number;
@@ -171,14 +193,25 @@ describe("Database Performance Monitoring", () => {
             "throughput",
             "error_rate",
         ];
-        const operators: (">" | "<" | "==" | ">=" | "<=")[] = [
+        const operators: (
+            | ">"
+            | "<"
+            | "=="
+            | ">="
+            | "<="
+        )[] = [
             ">",
             "<",
             "==",
             ">=",
             "<=",
         ];
-        const severities: ("low" | "medium" | "high" | "critical")[] = [
+        const severities: (
+            | "low"
+            | "medium"
+            | "high"
+            | "critical"
+        )[] = [
             "low",
             "medium",
             "high",

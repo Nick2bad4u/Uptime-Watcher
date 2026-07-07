@@ -21,7 +21,11 @@ import { secureRandomFloat } from "@shared/test/testHelpers";
 // Mock monitor types
 interface MonitorConfig {
     id: string;
-    type: "http" | "ping" | "port" | "dns";
+    type:
+        | "http"
+        | "ping"
+        | "port"
+        | "dns";
     target: string;
     interval: number;
     timeout: number;

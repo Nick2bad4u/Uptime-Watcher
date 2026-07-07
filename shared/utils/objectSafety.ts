@@ -241,12 +241,18 @@ export function safeObjectOmit(
  * Omits the provided keys from the object.
  */
 export function safeObjectOmit<T extends object, K extends keyof T>(
-    obj: null | T | undefined,
+    obj:
+        | null
+        | T
+        | undefined,
     keys: readonly K[]
 ): Except<T, K>;
 
 export function safeObjectOmit<T extends object, K extends PropertyKey>(
-    obj: null | T | undefined,
+    obj:
+        | null
+        | T
+        | undefined,
     keys: readonly K[]
 ): Except<T, Extract<K, keyof T>> | Record<string, never> {
     // Handle null/undefined inputs by returning empty object

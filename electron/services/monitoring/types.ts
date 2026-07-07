@@ -151,7 +151,10 @@ export interface MonitorCheckResult {
      *   resolves but ports unreachable, HTTP responds with non-2xx status)
      * - `"down"`: Monitor endpoint is failing, unreachable, or returned an error
      */
-    status: "degraded" | "down" | "up";
+    status:
+        | "degraded"
+        | "down"
+        | "up";
 }
 
 /**

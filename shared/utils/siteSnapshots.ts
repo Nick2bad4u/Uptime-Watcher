@@ -390,7 +390,10 @@ export function mergeSiteSnapshots(
  *   `undefined` when no serializable data is present.
  */
 export function toMonitorSnapshotOverlay(
-    source?: Monitor | MonitorSnapshotOverlay | UnknownRecord
+    source?:
+        | Monitor
+        | MonitorSnapshotOverlay
+        | UnknownRecord
 ): MonitorSnapshotOverlay | undefined {
     if (!source || !isObject(source)) {
         return undefined;
@@ -450,7 +453,10 @@ export function toMonitorSnapshotOverlay(
  *   `undefined`.
  */
 export function toSiteSnapshotOverlay(
-    source?: Site | SiteSnapshotOverlay | UnknownRecord
+    source?:
+        | Site
+        | SiteSnapshotOverlay
+        | UnknownRecord
 ): SiteSnapshotOverlay | undefined {
     if (!source || !isObject(source)) {
         return undefined;

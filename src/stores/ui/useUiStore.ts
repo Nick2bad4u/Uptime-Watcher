@@ -83,7 +83,9 @@ const ENTERPRISE_UI_DEFAULTS = {
     surfaceDensity: "compact",
 } as const satisfies Pick<
     UIPersistedState,
-    "siteCardPresentation" | "siteListLayout" | "surfaceDensity"
+    | "siteCardPresentation"
+    | "siteListLayout"
+    | "surfaceDensity"
 >;
 
 const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [

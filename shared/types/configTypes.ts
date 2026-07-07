@@ -58,7 +58,9 @@ export interface KnownConfigValues {
  * Supported app themes with open-ended extension support.
  */
 export type ThemeIdentifier = LiteralUnion<
-    "dark" | "high-contrast" | "light",
+    | "dark"
+    | "high-contrast"
+    | "light",
     string
 >;
 
@@ -141,7 +143,12 @@ export type CacheValue = Simplify<
  *
  * @public
  */
-export type ConfigValue = boolean | null | number | string | string[];
+export type ConfigValue =
+    | boolean
+    | null
+    | number
+    | string
+    | string[];
 
 /**
  * Monitor status information with support for specific status values.
@@ -149,7 +156,11 @@ export type ConfigValue = boolean | null | number | string | string[];
  * @public
  */
 export type MonitorStatus = LiteralUnion<
-    "degraded" | "down" | "paused" | "pending" | "up",
+    | "degraded"
+    | "down"
+    | "paused"
+    | "pending"
+    | "up",
     string
 >;
 
