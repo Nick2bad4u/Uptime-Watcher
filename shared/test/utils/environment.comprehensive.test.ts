@@ -91,6 +91,26 @@ const resetProcessSnapshot = (): void => {
     ensureEnvironmentModule().resetProcessSnapshotOverrideForTesting();
 };
 
+const deleteBrowserGlobalForTesting = (key: "document" | "window"): void => {
+    Reflect.deleteProperty(globalThis, key);
+};
+
+const setBrowserGlobalForTesting = (
+    key: "document" | "window",
+    value: object | undefined
+): void => {
+    if (value === undefined) {
+        deleteBrowserGlobalForTesting(key);
+        return;
+    }
+
+    Object.defineProperty(globalThis, key, {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
 describe("Environment Detection Utilities", () => {
     beforeAll(async () => {
         environmentModule = await import("../../utils/environment");
@@ -414,8 +434,8 @@ describe("Environment Detection Utilities", () => {
     });
 
     describe("isBrowserEnvironment", () => {
-        let originalWindow: any;
-        let originalDocument: any;
+        let originalWindow: object | undefined;
+        let originalDocument: object | undefined;
 
         beforeEach(() => {
             originalWindow = globalThis.window;
@@ -423,8 +443,8 @@ describe("Environment Detection Utilities", () => {
         });
 
         afterEach(() => {
-            globalThis.window = originalWindow;
-            globalThis.document = originalDocument;
+            setBrowserGlobalForTesting("window", originalWindow);
+            setBrowserGlobalForTesting("document", originalDocument);
         });
 
         it("should return true when window and document exist", async ({
@@ -436,8 +456,8 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.window = {} as any;
-            globalThis.document = {} as any;
+            setBrowserGlobalForTesting("window", {});
+            setBrowserGlobalForTesting("document", {});
 
             const { isBrowserEnvironment } =
                 await import("../../utils/environment");
@@ -454,8 +474,8 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.window = undefined as any;
-            globalThis.document = {} as any;
+            setBrowserGlobalForTesting("window", undefined);
+            setBrowserGlobalForTesting("document", {});
 
             const { isBrowserEnvironment } =
                 await import("../../utils/environment");
@@ -472,8 +492,8 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.window = {} as any;
-            globalThis.document = undefined as any;
+            setBrowserGlobalForTesting("window", {});
+            setBrowserGlobalForTesting("document", undefined);
 
             const { isBrowserEnvironment } =
                 await import("../../utils/environment");
@@ -490,8 +510,8 @@ describe("Environment Detection Utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.window = undefined as any;
-            globalThis.document = undefined as any;
+            setBrowserGlobalForTesting("window", undefined);
+            setBrowserGlobalForTesting("document", undefined);
 
             const { isBrowserEnvironment } =
                 await import("../../utils/environment");
@@ -648,7 +668,8 @@ describe("Environment Detection Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const envModule = applyMockProcessSnapshot({
-                versions: "not-an-object" as any,
+                versions:
+                    "not-an-object" as unknown as ProcessSnapshot["versions"],
             });
 
             expect(envModule.isNodeEnvironment()).toBeFalsy();
