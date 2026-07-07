@@ -33,10 +33,12 @@ const knipConfig: KnipConfig = {
     ],
     ignoreBinaries: [
         // These package scripts intentionally call host-installed tools.
+        "actionlint",
         "gitleaks",
         "grype",
         "powershell",
         "shellcheck",
+        "taskkill",
         "winget",
     ],
     ignoreDependencies: [
@@ -58,7 +60,6 @@ const knipConfig: KnipConfig = {
         "@easyops-cn/docusaurus-theme-docusaurus-search-local",
         "@easyops-cn/docusaurus-search-local",
         "@eslint.*",
-        "@storybook/addon-vitest",
         "@tailwindcss/forms",
         "@tailwindcss/typography",
         "@theme/.*",

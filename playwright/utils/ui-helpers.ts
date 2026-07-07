@@ -12,8 +12,8 @@ import type { Locator, Page } from "@playwright/test";
 
 import { expect } from "@playwright/test";
 
-import type { Site } from "@/shared/types";
-import type { ConfirmDialogRequest } from "@/stores/ui/useConfirmDialogStore";
+import type { ConfirmDialogRequest } from "@app/stores/ui/useConfirmDialogStore";
+import type { Site } from "@shared/types";
 
 import { isIsolatedUserDataPage } from "./userDataDirectoryRegistry";
 
