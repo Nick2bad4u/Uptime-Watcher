@@ -19,6 +19,8 @@ import {
 import type { MonitorRow } from "@shared/types/database";
 import type { Simplify, UnknownRecord } from "type-fest";
 
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { safeStringify } from "@shared/utils/stringConversion";
 import { requireRecordLike } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
@@ -47,6 +49,19 @@ function assertSafeSqlIdentifier(identifier: string, context: string): void {
 function escapeSqlIdentifier(identifier: string, context: string): string {
     assertSafeSqlIdentifier(identifier, context);
     return `"${identifier.replaceAll('"', '""')}"`;
+}
+
+function setOwnDataProperty(
+    target: object,
+    key: PropertyKey,
+    value: unknown
+): void {
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true,
+    });
 }
 
 const RESERVED_MONITOR_COLUMN_NAMES = new Set<string>([
@@ -643,28 +658,54 @@ export function generateDatabaseFieldDefinitions(): DatabaseFieldDefinition[] {
 function mapDynamicFields(monitor: UnknownRecord, row: UnknownRecord): void {
     const fieldDefs = generateDatabaseFieldDefinitions();
     for (const fieldDef of fieldDefs) {
-        const value = monitor[fieldDef.sourceField];
-        if (isDefined(value)) {
-            row[fieldDef.columnName] = convertToDatabase(
-                value,
-                fieldDef.sqlType
+        const property = getOwnDataProperty(monitor, fieldDef.sourceField);
+        if (property.found && isDefined(property.value)) {
+            setOwnDataProperty(
+                row,
+                fieldDef.columnName,
+                convertToDatabase(property.value, fieldDef.sqlType)
             );
         }
     }
 }
 
-/**
- * Maps standard monitor fields from a monitor object to a database row.
- *
- * @remarks
- * Uses a configuration-driven approach to map fields, reducing complexity and
- * improving maintainability. Now enhanced with type-safe field processing.
- *
- * @param monitor - Monitor object to map.
- * @param row - Database row object to populate.
- *
- * @internal
- */
+function mapDynamicRowFields(row: MonitorRow, monitor: Monitor): void {
+    const monitorTypeConfig = getAllMonitorTypeConfigs().find(
+        (config) => config.type === monitor.type
+    );
+
+    if (monitorTypeConfig) {
+        const mutableMonitor = requireRecordLike(
+            monitor,
+            "Expected monitor to be record-like"
+        );
+
+        for (const field of monitorTypeConfig.fields) {
+            const columnName = toSnakeCase(field.name);
+            const property = getOwnDataProperty(row, columnName);
+
+            if (property.found && isDefined(property.value)) {
+                setOwnDataProperty(
+                    mutableMonitor,
+                    field.name,
+                    convertFromDatabase(
+                        property.value,
+                        getSqlTypeFromFieldType(field.type)
+                    )
+                );
+            }
+        }
+
+        return;
+    }
+
+    // Log warning if monitor type config is missing to prevent silent field loss
+    dbLogger.warn(
+        "Monitor type configuration not found; dynamic fields may be lost",
+        { monitorType: monitor.type }
+    );
+}
+
 function mapStandardFields(monitor: UnknownRecord, row: UnknownRecord): void {
     // Persist enabled state from the canonical monitor.monitoring boolean.
     const monitoringValue = monitor["monitoring"];
@@ -810,7 +851,7 @@ export function mapMonitorToRow(
         monitor,
         "Expected monitor to be record-like"
     );
-    const row: MonitorRow = {};
+    const row = createNullPrototypeObject<MonitorRow>();
 
     // Map standard fields first
     mapStandardFields(monitorRecord, row);
@@ -871,41 +912,7 @@ export function mapRowToMonitor(row: MonitorRow): Monitor {
     };
 
     // Dynamically map monitor type specific fields ONLY for the current monitor type
-    const monitorTypeConfig = getAllMonitorTypeConfigs().find(
-        (config) => config.type === monitor.type
-    );
-
-    if (monitorTypeConfig) {
-        // Create a mutable version for dynamic field assignment
-        const mutableMonitor = requireRecordLike(
-            monitor,
-            "Expected monitor to be record-like"
-        );
-
-        // Only add fields that are specifically defined for this monitor type
-        for (const field of monitorTypeConfig.fields) {
-            const columnName = toSnakeCase(field.name);
-            const value = row[columnName];
-
-            // Add field if value exists (dynamic fields from monitor type registry)
-            if (isDefined(value)) {
-                // Type-safe dynamic field assignment using Record interface
-                // field.name is validated by monitor type configuration
-                mutableMonitor[field.name] = convertFromDatabase(
-                    value,
-                    getSqlTypeFromFieldType(field.type)
-                );
-            }
-        }
-
-        return monitor;
-    }
-
-    // Log warning if monitor type config is missing to prevent silent field loss
-    dbLogger.warn(
-        "Monitor type configuration not found; dynamic fields may be lost",
-        { monitorType: monitor.type }
-    );
+    mapDynamicRowFields(row, monitor);
 
     return monitor;
 }

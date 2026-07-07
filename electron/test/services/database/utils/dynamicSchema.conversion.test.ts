@@ -19,6 +19,12 @@ const mockMonitorConfigs = [
                 required: false,
                 type: "number",
             },
+            {
+                label: "Prototype Sentinel",
+                name: "__proto__",
+                required: false,
+                type: "number",
+            },
         ] as MonitorFieldDefinition[],
         serviceFactory: vi.fn(),
         type: "port",
@@ -75,6 +81,76 @@ describe("dynamic schema conversion", () => {
 
         expect(row.port).toBe(443);
         expect(monitor.port).toBe(443);
+    });
+
+    it("preserves prototype-named dynamic fields as own row data properties", async () => {
+        const { mapMonitorToRow } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
+        const monitorSource = {
+            port: 443,
+            type: "port",
+        } as unknown as Parameters<typeof mapMonitorToRow>[0];
+
+        Object.defineProperty(monitorSource, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: 7,
+            writable: true,
+        });
+
+        const row = mapMonitorToRow(monitorSource);
+
+        expect(Object.getPrototypeOf(row)).toBeNull();
+        expect(Object.hasOwn(row, "__proto__")).toBeTruthy();
+        expect(Object.getOwnPropertyDescriptor(row, "__proto__")).toEqual({
+            configurable: true,
+            enumerable: true,
+            value: 7,
+            writable: true,
+        });
+    });
+
+    it("preserves prototype-named row fields as own monitor data properties", async () => {
+        const { mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
+        const row = {
+            id: "monitor-1",
+            port: 443,
+            site_identifier: "site-1",
+            type: "port",
+        } as unknown as Parameters<typeof mapRowToMonitor>[0];
+
+        Object.defineProperty(row, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: 7,
+            writable: true,
+        });
+
+        const monitor = mapRowToMonitor(row);
+
+        expect(Object.getPrototypeOf(monitor)).toBe(Object.prototype);
+        expect(Object.hasOwn(monitor, "__proto__")).toBeTruthy();
+        expect(Object.getOwnPropertyDescriptor(monitor, "__proto__")).toEqual({
+            configurable: true,
+            enumerable: true,
+            value: 7,
+            writable: true,
+        });
+    });
+
+    it("ignores inherited prototype values for dynamic row fields", async () => {
+        const { mapRowToMonitor } =
+            await import("../../../../services/database/utils/schema/dynamicSchema");
+
+        const monitor = mapRowToMonitor({
+            id: "monitor-1",
+            port: 443,
+            site_identifier: "site-1",
+            type: "port",
+        });
+
+        expect(Object.hasOwn(monitor, "__proto__")).toBeFalsy();
     });
 
     it("defaults invalid persisted monitor status values", async ({

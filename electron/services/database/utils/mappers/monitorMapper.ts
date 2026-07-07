@@ -73,9 +73,12 @@ function copyDynamicFields(
 
     for (const [key, value] of objectEntries(dynamicMonitor)) {
         if (!setHas(excludedFields, key)) {
-            // Dynamic field assignment for monitor type system
-            // Key is validated from dynamicMonitor which comes from typed database mapping
-            monitorRecord[key] = value;
+            Object.defineProperty(monitorRecord, key, {
+                configurable: true,
+                enumerable: true,
+                value,
+                writable: true,
+            });
         }
     }
 }
