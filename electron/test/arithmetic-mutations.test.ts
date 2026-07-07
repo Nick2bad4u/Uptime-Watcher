@@ -20,42 +20,6 @@ describe("ArithmeticOperator Mutation Tests", () => {
         vi.clearAllMocks();
     });
 
-    describe("Middleware Duration Calculation", () => {
-        it("should calculate duration correctly using subtraction (kills Date.now() + startTime mutant)", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: middleware", "component");
-            await annotate("Category: Timing", "category");
-            await annotate("Type: Arithmetic", "type");
-
-            // This test specifically targets the mutation:
-            // File: electron/events/middleware.ts, Line: 328
-            // Original: const duration = Date.now() - startTime;
-            // Mutated: Date.now() + startTime
-
-            const startTime = Date.now() - 100; // 100ms ago
-            const currentTime = Date.now();
-
-            // The correct calculation should be a small positive number
-            const correctDuration = currentTime - startTime;
-
-            // The mutated version would be a huge number (around 2 * Date.now())
-            const mutatedDuration = currentTime + startTime;
-
-            // Verify the correct calculation produces a reasonable duration (< 1000ms)
-            expect(correctDuration).toBeGreaterThanOrEqual(0);
-            expect(correctDuration).toBeLessThan(1000);
-
-            // Verify the mutated version would produce an unreasonably large value
-            expect(mutatedDuration).toBeGreaterThan(1_000_000_000); // Much larger than any reasonable duration
-
-            // Ensure they are different (mutation detection)
-            expect(correctDuration).not.toEqual(mutatedDuration);
-        });
-    });
-
     describe("DatabaseCommands Loop Index Calculation", () => {
         it("should start loop from correct index using subtraction (kills length + 1 mutant)", async ({
             task,

@@ -129,31 +129,12 @@ await eventBus.emitTyped("site:added", {
 ### 4. Production-Ready Middleware Support
 
 ```typescript
-// Logging middleware with correlation tracking
-eventBus.use(async (eventName, data, next) => {
- const correlationId = data._meta?.correlationId;
- logger.debug(`[Event] ${eventName} [${correlationId}]`, data);
- await next();
- logger.debug(`[Event] ${eventName} completed [${correlationId}]`);
-});
-
-// Rate limiting middleware
-eventBus.use(
- createRateLimitMiddleware({
-  maxEventsPerSecond: 100,
-  burstLimit: 10,
-  onRateLimit: ({ event, reason }) => {
-   logger.warn(`Rate limit exceeded for ${event} (${reason})`);
-  },
- })
+// UptimeOrchestrator registers the production middleware chain explicitly.
+this.registerMiddleware(
+ createErrorHandlingMiddleware({ continueOnError: true })
 );
-
-// Validation middleware
-eventBus.use(
- createValidationMiddleware({
-  "monitor:status-changed": (data) => validateMonitorStatusData(data),
-  "site:added": (data) => validateSiteData(data),
- })
+this.registerMiddleware(
+ createLoggingMiddleware({ includeData: false, level: "info" })
 );
 ```
 
