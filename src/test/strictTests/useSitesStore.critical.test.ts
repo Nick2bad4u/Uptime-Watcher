@@ -13,7 +13,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitoringService } from "../../services/MonitoringService";
 import { SiteService } from "../../services/SiteService";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { mockElectronAPI } from "../setup";
+import { mockElectronAPI } from "../mock-setup";
 
 const mockStateSyncService = vi.hoisted(() => ({
     getSyncStatus: vi.fn(),

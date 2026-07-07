@@ -338,6 +338,78 @@ const uptimeStrings = fc.oneof(
     maliciousStrings
 );
 
+const isDigit = (character: string): boolean =>
+    character >= "0" && character <= "9";
+
+const isSignedDecimalLiteral = (value: string): boolean => {
+    let hasDigit = false;
+    let hasDecimalPoint = false;
+    let hasExponent = false;
+    let hasExponentDigit = false;
+
+    for (let index = 0; index < value.length; index += 1) {
+        const character = value[index];
+        if (character === undefined) {
+            return false;
+        }
+
+        if (character === "+" || character === "-") {
+            const previousCharacter = index > 0 ? value[index - 1] : undefined;
+            if (
+                index !== 0 &&
+                previousCharacter !== "e" &&
+                previousCharacter !== "E"
+            ) {
+                return false;
+            }
+            continue;
+        }
+
+        if (character === ".") {
+            if (hasDecimalPoint || hasExponent) {
+                return false;
+            }
+            hasDecimalPoint = true;
+            continue;
+        }
+
+        if (character === "e" || character === "E") {
+            if (hasExponent || !hasDigit) {
+                return false;
+            }
+            hasExponent = true;
+            continue;
+        }
+
+        if (!isDigit(character)) {
+            return false;
+        }
+
+        hasDigit = true;
+        hasExponentDigit ||= hasExponent;
+    }
+
+    return hasDigit && (!hasExponent || hasExponentDigit);
+};
+
+const parseAcceptedUptimeCandidate = (uptime: string): number | undefined => {
+    const trimmedUptime = uptime.trim();
+    const numericUptime = trimmedUptime.endsWith("%")
+        ? trimmedUptime.slice(0, -1)
+        : trimmedUptime;
+
+    if (
+        numericUptime.length === 0 ||
+        numericUptime !== numericUptime.trim() ||
+        !isSignedDecimalLiteral(numericUptime)
+    ) {
+        return undefined;
+    }
+
+    const parsed = Number.parseFloat(numericUptime);
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
+
 // =============================================================================
 // Comprehensive Validation Function Fuzzing Tests
 // =============================================================================
@@ -1003,19 +1075,12 @@ describe("comprehensive Validation Function Fuzzing", () => {
 
                 // Property: Valid percentage strings should parse correctly
                 if (typeof uptimeStr === "string") {
-                    // Match the function's actual behavior: remove ALL % signs and spaces
-                    const cleanStr = uptimeStr.replaceAll(/[\s%]/gu, "");
-                    const num = Number.parseFloat(cleanStr);
-                    if (
-                        !Number.isNaN(num) &&
-                        Number.isFinite(num) &&
-                        num >= 0 &&
-                        num <= 100
-                    ) {
-                        // Match the function's clamping behavior
-                        const clampedNum = Math.min(100, Math.max(0, num));
+                    const num = parseAcceptedUptimeCandidate(uptimeStr);
 
-                        expect(result).toBe(clampedNum);
+                    if (num === undefined) {
+                        expect(result).toBe(0);
+                    } else {
+                        expect(result).toBe(Math.min(100, Math.max(0, num)));
                     }
                 }
             }
