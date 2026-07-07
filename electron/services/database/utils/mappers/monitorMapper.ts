@@ -276,37 +276,6 @@ export function buildMonitorParameters(
 }
 
 /**
- * Validates that a database row contains the minimum required fields for a
- * monitor.
- *
- * @remarks
- * Checks for the presence and type of critical fields in a raw database row.
- * Expects snake_case keys as returned by SQLite.
- *
- * @example
- *
- * ```typescript
- * if (isValidMonitorRow(row)) { ... }
- * ```
- *
- * @param row - The raw database row to validate.
- *
- * @returns `true` if the row is valid for monitor mapping, otherwise `false`.
- *
- * @public
- */
-export function isValidMonitorRow(row: UnknownRecord): boolean {
-    return (
-        isDefined(row["id"]) &&
-        isDefined(row["site_identifier"]) &&
-        isDefined(row["type"]) &&
-        (typeof row["id"] === "string" || typeof row["id"] === "number") &&
-        typeof row["site_identifier"] === "string" &&
-        typeof row["type"] === "string"
-    );
-}
-
-/**
  * Converts a single database row to a monitor object using the dynamic schema
  * system.
  *

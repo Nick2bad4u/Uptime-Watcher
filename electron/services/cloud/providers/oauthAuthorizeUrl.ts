@@ -1,7 +1,7 @@
 import {
     EXTERNAL_OPEN_HTTPS_REQUIRED_REASON,
     validateExternalOpenUrlCandidateWithPolicy,
-} from "@electron/services/shell/validatedExternalOpen";
+} from "../../shell/validatedExternalOpen";
 
 /**
  * Validates an OAuth authorization URL before opening it via

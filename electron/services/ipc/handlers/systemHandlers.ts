@@ -3,13 +3,13 @@ import type {
     IpcInvokeChannelParams,
 } from "@shared/types/ipc";
 
-import { getElectronErrorCodeSuffix } from "@electron/services/shell/openExternalUtils";
-import { openExternalValidatedOrThrow } from "@electron/services/shell/validatedExternalOpen";
 import { SYSTEM_CHANNELS } from "@shared/types/preload";
 import { clipboard } from "electron";
 
 import type { AutoUpdaterService } from "../../updater/AutoUpdaterService";
 
+import { getElectronErrorCodeSuffix } from "../../shell/openExternalUtils";
+import { openExternalValidatedOrThrow } from "../../shell/validatedExternalOpen";
 import { createStandardizedIpcRegistrar } from "../utils";
 import { SystemHandlerValidators } from "../validators/system";
 
