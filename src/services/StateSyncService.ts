@@ -422,11 +422,13 @@ export const StateSyncService: StateSyncServiceContract = {
 
                     lastSeenRevision = parsedEvent.data.revision;
 
+                    const expectedLocalRecoveryRevision =
+                        pendingRecoveryExpectation?.appliedLocally === true
+                            ? pendingRecoveryExpectation.expectedRevision
+                            : null;
                     const shouldSkipCallback =
-                        pendingRecoveryExpectation !== null &&
-                        pendingRecoveryExpectation.appliedLocally &&
                         parsedEvent.data.revision ===
-                            pendingRecoveryExpectation.expectedRevision;
+                        expectedLocalRecoveryRevision;
 
                     if (!shouldSkipCallback) {
                         handler(parsedEvent.data);

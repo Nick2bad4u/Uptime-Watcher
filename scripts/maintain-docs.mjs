@@ -402,11 +402,7 @@ async function fixCrossReferences(filePath) {
             const linkUrl = groups["url"];
 
             // Fix common path issues
-            if (
-                linkUrl &&
-                linkUrl.includes("../") &&
-                !linkUrl.startsWith("http")
-            ) {
+            if (linkUrl?.includes("../") && !linkUrl.startsWith("http")) {
                 const correctedUrl = linkUrl.replaceAll(/\.\.\/+/g, "../");
                 if (correctedUrl !== linkUrl) {
                     updatedContent = updatedContent.replace(

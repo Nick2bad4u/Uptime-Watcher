@@ -59,7 +59,7 @@ const main = async () => {
     } catch (error) {
         const cause = error instanceof Error ? error : undefined;
         const normalizedMessage = (() => {
-            if (cause && cause.message.trim()) {
+            if (cause?.message.trim()) {
                 return cause.message;
             }
 

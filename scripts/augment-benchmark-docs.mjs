@@ -101,7 +101,7 @@ function addDocToDefinitions(text, config) {
         const name = match.groups?.["name"] ?? "";
         const prevLine = lines[i - 1]?.trim();
 
-        if (prevLine && prevLine.startsWith("/**")) {
+        if (prevLine?.startsWith("/**")) {
             continue;
         }
 
@@ -140,7 +140,7 @@ function addDocToFunctions(text, config) {
         const name = match.groups?.["name"] ?? "";
         const prevLine = lines[i - 1]?.trim();
 
-        if (prevLine && prevLine.startsWith("/**")) {
+        if (prevLine?.startsWith("/**")) {
             continue;
         }
 
