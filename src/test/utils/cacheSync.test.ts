@@ -204,6 +204,19 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
 
 type MockElectronAPI = ReturnType<typeof createMockElectronAPI>;
 
+const setWindowForTesting = (value: unknown): void => {
+    if (value === undefined) {
+        Reflect.deleteProperty(globalThis, "window");
+        return;
+    }
+
+    Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value,
+        writable: true,
+    });
+};
+
 const DEFAULT_EVENT_TIMESTAMP = 1_700_000_000_000;
 
 const BASE_CACHE_INVALIDATION_EVENT: CacheInvalidatedEventData = {
@@ -373,7 +386,7 @@ describe("cacheSync", () => {
         // Clean up any existing window.electronAPI
         if (globalThis.window !== undefined) {
             // Delete window.electronAPI;
-            (globalThis as any).electronAPI = undefined;
+            Reflect.deleteProperty(globalThis, "electronAPI");
         }
     });
 
@@ -391,7 +404,7 @@ describe("cacheSync", () => {
                 // Mock window as undefined
                 const originalWindow = globalThis.window;
 
-                delete (globalThis as any).window;
+                setWindowForTesting(undefined);
 
                 const cleanup = setupCacheSync();
 
@@ -404,7 +417,7 @@ describe("cacheSync", () => {
                 cleanup();
 
                 // Restore window
-                globalThis.window = originalWindow;
+                setWindowForTesting(originalWindow);
             });
         });
 
@@ -418,7 +431,7 @@ describe("cacheSync", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Business Logic", "type");
 
-                (globalThis as any).window = {};
+                setWindowForTesting({});
 
                 mockEventsService.onCacheInvalidated.mockRejectedValue(
                     new Error("Events API unavailable")
@@ -448,9 +461,9 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                (globalThis as any).window = {
+                setWindowForTesting({
                     electronAPI: createMockElectronAPI(true, true),
-                };
+                });
 
                 setOnCacheInvalidatedHandler(mockOnCacheInvalidated);
             });
@@ -1013,12 +1026,12 @@ describe("cacheSync", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Event Processing", "type");
 
-                (globalThis as any).window = {
+                setWindowForTesting({
                     electronAPI: {
                         ...createMockElectronAPI(true, false),
                         events: undefined,
                     },
-                } as any;
+                });
 
                 mockEventsService.onCacheInvalidated.mockRejectedValueOnce(
                     new Error("Events interface missing")
@@ -1047,9 +1060,9 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                (globalThis as any).window = {
+                setWindowForTesting({
                     electronAPI: createMockElectronAPI(true, true),
-                };
+                });
 
                 setOnCacheInvalidatedHandler(mockOnCacheInvalidated);
             });
@@ -1152,9 +1165,9 @@ describe("cacheSync", () => {
                 mockCleanup = vi.fn();
                 mockOnCacheInvalidated.mockReturnValue(mockCleanup);
 
-                (globalThis as any).window = {
+                setWindowForTesting({
                     electronAPI: createMockElectronAPI(true, true),
-                };
+                });
 
                 setOnCacheInvalidatedHandler(mockOnCacheInvalidated);
 
@@ -1200,9 +1213,9 @@ describe("cacheSync", () => {
                 mockCleanup();
             });
 
-            (globalThis as any).window = {
+            setWindowForTesting({
                 electronAPI: createMockElectronAPI(true, true),
-            };
+            });
 
             setOnCacheInvalidatedHandler(mockOnCacheInvalidated);
         });
@@ -1383,16 +1396,16 @@ describe("cacheSync", () => {
 
                 // Setup different environment configurations
                 if (!normalizedEnvironment.hasWindow) {
-                    delete (globalThis as any).window;
+                    setWindowForTesting(undefined);
                 } else if (!normalizedEnvironment.hasElectronAPI) {
-                    (globalThis as any).window = {};
+                    setWindowForTesting({});
                 } else if (!normalizedEnvironment.hasEvents) {
-                    (globalThis as any).window = {
+                    setWindowForTesting({
                         electronAPI: {
                             ...createMockElectronAPI(true, false),
                             events: undefined,
                         },
-                    };
+                    });
                 }
 
                 mockEventsService.onCacheInvalidated.mockImplementation(
