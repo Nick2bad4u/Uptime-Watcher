@@ -276,7 +276,7 @@ export type StateSyncFullSyncResultParseResult = ReturnType<
  *
  * @returns The validated summary when successful.
  *
- * @throws {@link z.ZodError} When validation fails.
+ * @throws `z.ZodError` when validation fails.
  */
 export function parseStateSyncStatusSummary(
     candidate: unknown
@@ -304,7 +304,7 @@ export function safeParseStateSyncStatusSummary(
  *
  * @returns The validated full sync result when successful.
  *
- * @throws {@link z.ZodError} When validation fails.
+ * @throws `z.ZodError` when validation fails.
  */
 export function parseStateSyncFullSyncResult(
     candidate: unknown

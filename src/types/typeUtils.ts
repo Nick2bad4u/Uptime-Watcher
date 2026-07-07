@@ -2,7 +2,7 @@
  * Utility types for strict type-level invariants.
  *
  * @remarks
- * This mirrors the behavior of {@link type-fest#RequireAllOrNone} from type-fest
+ * This mirrors the behavior of `type-fest`'s `RequireAllOrNone`
  * without introducing redundant intersection constituents that trip our lint
  * rules.
  */

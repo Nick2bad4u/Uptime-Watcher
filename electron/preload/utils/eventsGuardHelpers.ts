@@ -15,7 +15,7 @@ export function createStringUnionGuard<T extends string>(
 }
 
 /**
- * Narrow an unknown value to {@link UnknownRecord}.
+ * Narrow an unknown value to `UnknownRecord`.
  */
 export const isUnknownRecord = (value: unknown): value is UnknownRecord =>
     isSharedRecord(value);

@@ -112,7 +112,7 @@ function shouldRethrowError(error: Error): boolean {
  * @param fileName - The filename.
  * @param mimeType - The MIME type.
  *
- * @throws {@link Error} If both primary and fallback methods fail.
+ * @throws `Error` if both primary and fallback methods fail.
  */
 function tryFallbackDownload(
     buffer: ArrayBuffer,
@@ -141,7 +141,7 @@ function tryFallbackDownload(
  * @param fileName - The filename.
  * @param mimeType - The MIME type.
  *
- * @throws {@link Error} Always throws after logging and attempting fallback.
+ * @throws `Error` always throws after logging and attempting fallback.
  */
 function handleDownloadError(
     error: unknown,
@@ -191,7 +191,7 @@ function handleDownloadError(
  * @param options - The file download options including buffer, fileName, and
  *   optional mimeType.
  *
- * @throws {@link Error} If the download fails due to browser API issues or DOM
+ * @throws `Error` if the download fails due to browser API issues or DOM
  *   manipulation errors.
  *
  * @public

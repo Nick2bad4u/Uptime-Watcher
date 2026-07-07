@@ -514,7 +514,7 @@ export async function sleepUnref(
  * @returns Promise that resolves with the operation result.
  *
  * @throws The last captured error when retries are exhausted.
- * @throws {@link Error} When the supplied signal aborts before completion.
+ * @throws `Error` when the supplied signal aborts before completion.
  *
  * @public
  */
@@ -671,7 +671,7 @@ export function isAbortError(error: unknown): boolean {
  *
  * @returns The first settled result between the promise and the abort event.
  *
- * @throws {@link Error} When the signal aborts before the operation settles.
+ * @throws `Error` when the signal aborts before the operation settles.
  *
  * @public
  */

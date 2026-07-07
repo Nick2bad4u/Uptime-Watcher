@@ -308,7 +308,7 @@ export function validateServicePayload<T>(
  *
  * @returns The boolean value when valid.
  *
- * @throws {@link ApplicationError} When the response is not a boolean.
+ * @throws `ApplicationError` when the response is not a boolean.
  */
 export function parseServiceBooleanResponse(
     operation: string,

@@ -61,7 +61,7 @@ function withSyncErrorHandling<T>(
  *
  * @remarks
  * Centralized defaults that ensure consistent behavior across the app when data
- * is missing or components need fallback values. Uses {@link ReadonlyDeep} to
+ * is missing or components need fallback values. Uses `ReadonlyDeep` to
  * guarantee immutability of the configuration object.
  *
  * @public
