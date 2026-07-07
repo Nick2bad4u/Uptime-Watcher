@@ -20,11 +20,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
     MAX_ALERT_QUEUE_LENGTH,
-    MAX_TOAST_QUEUE_LENGTH,
     useAlertStore,
 } from "../../../stores/alerts/useAlertStore";
 import { mapStatusUpdateToAlert } from "../../../stores/alerts/utils/alertPayload";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+
+const EXPECTED_MAX_TOAST_QUEUE_LENGTH = 20;
 
 const resetAlertStore = (): void => {
     useAlertStore.setState({ alerts: [], toasts: [] });
@@ -302,7 +303,11 @@ describe(useAlertStore, () => {
     it("trims the toast queue to the maximum length", () => {
         const { enqueueToast } = useAlertStore.getState();
 
-        for (let index = 0; index < MAX_TOAST_QUEUE_LENGTH + 5; index += 1) {
+        for (
+            let index = 0;
+            index < EXPECTED_MAX_TOAST_QUEUE_LENGTH + 5;
+            index += 1
+        ) {
             enqueueToast({
                 title: `Toast ${index}`,
                 variant: "info",
@@ -311,7 +316,7 @@ describe(useAlertStore, () => {
 
         const queuedToasts = useAlertStore.getState().toasts;
 
-        expect(queuedToasts).toHaveLength(MAX_TOAST_QUEUE_LENGTH);
+        expect(queuedToasts).toHaveLength(EXPECTED_MAX_TOAST_QUEUE_LENGTH);
         expect(arrayAt(queuedToasts, -1)?.title).toBe("Toast 5");
     });
 

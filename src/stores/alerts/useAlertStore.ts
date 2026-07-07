@@ -21,7 +21,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 export const MAX_ALERT_QUEUE_LENGTH = 20;
 
 /** Maximum number of generic toasts retained in memory. */
-export const MAX_TOAST_QUEUE_LENGTH = 20;
+const MAX_TOAST_QUEUE_LENGTH = 20;
 
 const DEFAULT_TOAST_TTL_MS = 5000;
 
