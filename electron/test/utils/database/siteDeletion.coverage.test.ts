@@ -118,18 +118,18 @@ describe("deleteSiteWithAdapters runtime coverage", () => {
             }),
         });
         const { adapter: siteAdapter } = createSiteAdapter();
-        const { deleteSiteWithAdapters, SiteDeletionError } = await import(
-            modulePath
-        );
+        const { deleteSiteWithAdapters } = await import(modulePath);
 
-        await expect(() =>
+        expect(() =>
             deleteSiteWithAdapters({
                 identifier: "site-failure",
                 monitorAdapter: monitorAdapter,
                 preloadedMonitors: [] as never,
                 siteAdapter: siteAdapter,
             })
-        ).toThrow(SiteDeletionError);
+        ).toThrow(
+            "Failed to delete monitors for site site-failure: normalized boom"
+        );
 
         const thrown = vi.mocked(ensureErrorSpy).mock.calls[0]?.[0];
         expect(thrown).toBe(failure);

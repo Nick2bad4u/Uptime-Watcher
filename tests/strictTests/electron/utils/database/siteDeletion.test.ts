@@ -29,6 +29,11 @@ interface SiteAdapterMocks {
 
 type SiteMonitorsStub = { id: string }[];
 
+type SiteDeletionThrownError = Error & {
+    readonly cause?: unknown;
+    readonly stage?: unknown;
+};
+
 function createMonitorAdapter(overrides: Partial<MonitorAdapterMocks> = {}) {
     const monitorMocks: MonitorAdapterMocks = {
         deleteBySiteIdentifier: vi.fn(),
@@ -127,11 +132,9 @@ describe("deleteSiteWithAdapters", () => {
                 }),
             });
         const { adapter: siteAdapter, mocks: siteMocks } = createSiteAdapter();
-        const { deleteSiteWithAdapters, SiteDeletionError } = await import(
-            modulePath
-        );
+        const { deleteSiteWithAdapters } = await import(modulePath);
 
-        let capturedError: InstanceType<typeof SiteDeletionError> | null = null;
+        let capturedError: SiteDeletionThrownError | null = null;
         try {
             deleteSiteWithAdapters({
                 identifier: "site-err",
@@ -140,10 +143,10 @@ describe("deleteSiteWithAdapters", () => {
                 siteAdapter: siteAdapter as unknown,
             });
         } catch (error) {
-            const deletionError = error as InstanceType<
-                typeof SiteDeletionError
-            >;
+            expect(error).toBeInstanceOf(Error);
+            const deletionError = error as SiteDeletionThrownError;
 
+            expect(deletionError.name).toBe("SiteDeletionError");
             expect(deletionError.stage).toBe("monitors");
             expect(deletionError.cause).toBe(failure);
             expect(deletionError.message).toBe(
@@ -153,7 +156,7 @@ describe("deleteSiteWithAdapters", () => {
             capturedError = deletionError;
         }
 
-        expect(capturedError).toBeInstanceOf(SiteDeletionError);
+        expect(capturedError).toBeInstanceOf(Error);
         expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledTimes(1);
 
         expect(siteMocks.delete).not.toHaveBeenCalled();
@@ -171,11 +174,9 @@ describe("deleteSiteWithAdapters", () => {
             }),
         });
         const { adapter: siteAdapter } = createSiteAdapter();
-        const { deleteSiteWithAdapters, SiteDeletionError } = await import(
-            modulePath
-        );
+        const { deleteSiteWithAdapters } = await import(modulePath);
 
-        let capturedError: InstanceType<typeof SiteDeletionError> | null = null;
+        let capturedError: SiteDeletionThrownError | null = null;
         try {
             deleteSiteWithAdapters({
                 identifier: "site-non-error",
@@ -188,10 +189,10 @@ describe("deleteSiteWithAdapters", () => {
                 "Expected site deletion to throw when monitor removal fails"
             );
         } catch (error) {
-            const deletionError = error as InstanceType<
-                typeof SiteDeletionError
-            >;
+            expect(error).toBeInstanceOf(Error);
+            const deletionError = error as SiteDeletionThrownError;
 
+            expect(deletionError.name).toBe("SiteDeletionError");
             expect(deletionError.stage).toBe("monitors");
             expect(deletionError.cause).toBe(normalized);
             expect(deletionError.message).toBe(
@@ -201,19 +202,46 @@ describe("deleteSiteWithAdapters", () => {
             capturedError = deletionError;
         }
 
-        expect(capturedError).toBeInstanceOf(SiteDeletionError);
+        expect(capturedError).toBeInstanceOf(Error);
         expect(ensureErrorSpy).toHaveBeenCalledWith("boom");
         expect(ensureErrorSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("provides stage-aware messaging for site-level failures", async () => {
-        const { SiteDeletionError } = await import(modulePath);
+    it("wraps site-level delete failures with stage-aware messaging", async () => {
+        const failure = new Error("site row locked");
+        const { adapter: monitorAdapter } = createMonitorAdapter();
+        const { adapter: siteAdapter } = createSiteAdapter({
+            delete: vi.fn(() => {
+                throw failure;
+            }),
+        });
+        const { deleteSiteWithAdapters } = await import(modulePath);
 
-        const deletionError = new SiteDeletionError("site", "site-42");
+        let capturedError: SiteDeletionThrownError | null = null;
+        try {
+            deleteSiteWithAdapters({
+                identifier: "site-42",
+                monitorAdapter: monitorAdapter as unknown,
+                preloadedMonitors: [] as unknown,
+                siteAdapter: siteAdapter as unknown,
+            });
 
-        expect(deletionError.stage).toBe("site");
-        expect(deletionError.message).toBe("Failed to delete site site-42");
-        expect(deletionError.cause).toBeUndefined();
+            expect.fail("Expected site deletion failure to be wrapped");
+        } catch (error) {
+            expect(error).toBeInstanceOf(Error);
+            const deletionError = error as SiteDeletionThrownError;
+
+            expect(deletionError.name).toBe("SiteDeletionError");
+            expect(deletionError.stage).toBe("site");
+            expect(deletionError.cause).toBe(failure);
+            expect(deletionError.message).toBe(
+                "Failed to delete site site-42"
+            );
+
+            capturedError = deletionError;
+        }
+
+        expect(capturedError).toBeInstanceOf(Error);
     });
 
     describe("Property-based Tests", () => {
@@ -278,16 +306,25 @@ describe("deleteSiteWithAdapters", () => {
             "should create correct error message for any site identifier",
             async (siteId) => {
                 vi.resetModules();
-                const { SiteDeletionError } = await import(modulePath);
+                const failure = new Error("property failure");
+                const { adapter: monitorAdapter } = createMonitorAdapter({
+                    deleteBySiteIdentifier: vi.fn(() => {
+                        throw failure;
+                    }),
+                });
+                const { adapter: siteAdapter } = createSiteAdapter();
+                const { deleteSiteWithAdapters } = await import(modulePath);
 
-                const siteError = new SiteDeletionError("site", siteId);
-                expect(siteError.stage).toBe("site");
-                expect(siteError.message).toBe(
-                    `Failed to delete site ${siteId}`
+                expect(() =>
+                    deleteSiteWithAdapters({
+                        identifier: siteId,
+                        monitorAdapter: monitorAdapter as unknown,
+                        preloadedMonitors: [] as unknown,
+                        siteAdapter: siteAdapter as unknown,
+                    })
+                ).toThrow(
+                    `Failed to delete monitors for site ${siteId}: property failure`
                 );
-
-                const monitorError = new SiteDeletionError("monitors", siteId);
-                expect(monitorError.stage).toBe("monitors");
             }
         );
     });

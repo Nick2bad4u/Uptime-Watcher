@@ -63,10 +63,8 @@ export interface SiteDeletionOperationResult {
 
 /**
  * Error thrown when a transactional site deletion fails.
- *
- * @public
  */
-export class SiteDeletionError extends Error {
+class SiteDeletionError extends Error {
     /** Stage of the deletion flow that triggered the failure. */
     public readonly stage: "monitors" | "site";
 
@@ -125,7 +123,12 @@ export function deleteSiteWithAdapters(
     } catch (error) {
         throw new SiteDeletionError("monitors", identifier, { cause: error });
     }
-    const isSiteDeleted = siteAdapter.delete(identifier);
+    let isSiteDeleted: boolean;
+    try {
+        isSiteDeleted = siteAdapter.delete(identifier);
+    } catch (error) {
+        throw new SiteDeletionError("site", identifier, { cause: error });
+    }
 
     return {
         monitorCount: monitors.length,
