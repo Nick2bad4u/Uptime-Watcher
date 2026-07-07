@@ -85,15 +85,26 @@ export function createCloudSyncManifestDevices(
 ): CloudSyncManifest["devices"] {
     const devices = createNullPrototypeObject<CloudSyncManifest["devices"]>();
     for (const [deviceId, meta] of entries) {
-        Object.defineProperty(devices, deviceId, {
-            configurable: true,
-            enumerable: true,
-            value: meta,
-            writable: true,
-        });
+        setCloudSyncManifestDevice(devices, deviceId, meta);
     }
 
     return devices;
+}
+
+/**
+ * Writes a manifest device entry as an own data property.
+ */
+export function setCloudSyncManifestDevice(
+    devices: CloudSyncManifest["devices"],
+    deviceId: string,
+    meta: CloudSyncManifestDeviceCompaction
+): void {
+    Object.defineProperty(devices, deviceId, {
+        configurable: true,
+        enumerable: true,
+        value: meta,
+        writable: true,
+    });
 }
 
 /**

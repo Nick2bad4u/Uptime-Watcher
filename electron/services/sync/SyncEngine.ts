@@ -15,7 +15,10 @@ import {
     CLOUD_SYNC_BASELINE_VERSION,
     type CloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
-import { createCloudSyncManifestDevices } from "@shared/types/cloudSyncManifest";
+import {
+    createCloudSyncManifestDevices,
+    setCloudSyncManifestDevice,
+} from "@shared/types/cloudSyncManifest";
 import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
 import {
     createNullPrototypeObject,
@@ -317,19 +320,19 @@ export class SyncEngine {
         for (const [device, maxOpId] of objectEntries(maxOps)) {
             const currentDevice = nextManifest.devices[device];
             const previousCompacted = currentDevice?.compactedUpToOpId ?? -1;
-            nextManifest.devices[device] = {
+            setCloudSyncManifestDevice(nextManifest.devices, device, {
                 compactedUpToOpId: Math.max(previousCompacted, maxOpId),
                 lastSeenAt: now,
-            };
+            });
         }
 
-        nextManifest.devices[deviceId] = {
+        setCloudSyncManifestDevice(nextManifest.devices, deviceId, {
             compactedUpToOpId: Math.max(
                 nextManifest.devices[deviceId]?.compactedUpToOpId ?? -1,
                 maxOps[deviceId] ?? -1
             ),
             lastSeenAt: now,
-        };
+        });
 
         await transport.writeManifest(nextManifest);
 

@@ -3,6 +3,7 @@ import {
     CLOUD_SYNC_MANIFEST_VERSION,
     createCloudSyncManifestDevices,
     parseCloudSyncManifest,
+    setCloudSyncManifestDevice,
 } from "@shared/types/cloudSyncManifest";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
@@ -31,6 +32,22 @@ describe("cloudSyncManifest", () => {
         expect(Object.getPrototypeOf(devices)).toBeNull();
         expect(Object.hasOwn(devices, "device-a")).toBeTruthy();
         expect(devices["device-a"]?.lastSeenAt).toBe(10);
+    });
+
+    it("sets manifest device entries as own data properties", () => {
+        const devices = createCloudSyncManifestDevices();
+        const meta = { compactedUpToOpId: 3, lastSeenAt: 30 };
+
+        setCloudSyncManifestDevice(devices, "toString", meta);
+
+        expect(Object.getPrototypeOf(devices)).toBeNull();
+        expect(Object.hasOwn(devices, "toString")).toBeTruthy();
+        expect(Object.getOwnPropertyDescriptor(devices, "toString")).toEqual({
+            configurable: true,
+            enumerable: true,
+            value: meta,
+            writable: true,
+        });
     });
 
     it("accepts manifest timestamps at the Date upper bound", () => {
