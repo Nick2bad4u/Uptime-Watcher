@@ -12,10 +12,7 @@ import { withLogContext } from "@shared/utils/loggingContext";
 
 import { diagnosticsLogger as diagnosticsLog } from "../../utils/logger";
 
-/**
- * Snapshot of IPC diagnostics metrics maintained by the main process.
- */
-export interface DiagnosticsMetricsSnapshot {
+interface DiagnosticsMetricsSnapshot {
     lastMissingChannel?: string;
     lastPreloadGuard?: {
         channel: string;
@@ -142,24 +139,4 @@ export function recordPreloadGuardFailure(
         channel: report.channel,
         event: "guard-failure",
     });
-}
-
-/**
- * Retrieves a snapshot of the current diagnostics metrics.
- *
- * @returns Diagnostics metrics snapshot with counters and metadata.
- *
- * @public
- */
-export function getDiagnosticsMetrics(): DiagnosticsMetricsSnapshot {
-    return { ...metricsState.current };
-}
-
-/**
- * Resets diagnostics metrics.
- *
- * @internal
- */
-export function resetDiagnosticsMetrics(): void {
-    metricsState.current = createInitialDiagnosticsMetrics();
 }

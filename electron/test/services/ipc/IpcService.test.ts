@@ -6,10 +6,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CloudService } from "../../../services/cloud/CloudService";
-import {
-    getDiagnosticsMetrics,
-    resetDiagnosticsMetrics,
-} from "../../../services/ipc/diagnosticsMetrics";
 import { IpcService } from "../../../services/ipc/IpcService";
 import { InMemorySecretStore } from "../../utils/InMemorySecretStore";
 
@@ -190,7 +186,6 @@ describe(IpcService, () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        resetDiagnosticsMetrics();
         mockNotificationService.updateConfig.mockReset();
 
         const syncEngine = {
@@ -251,7 +246,7 @@ describe(IpcService, () => {
             const handleCallCount = mockIpcMain.handle.mock.calls.length;
             expect(handleCallCount).toBeGreaterThan(20); // Ensure reasonable number of handlers
         });
-        it("records diagnostics metrics during handler verification", async ({
+        it("verifies diagnostics handler registration state", async ({
             task,
             annotate,
         }) => {
@@ -276,20 +271,12 @@ describe(IpcService, () => {
             expect(successResponse.success).toBeTruthy();
             expect(successResponse.data?.registered).toBeTruthy();
 
-            let metrics = getDiagnosticsMetrics();
-            expect(metrics.successfulHandlerChecks).toBe(1);
-            expect(metrics.missingHandlerChecks).toBe(0);
-
             const failureResponse = await diagnosticsHandler(
                 createTrustedIpcEvent(),
                 "missing-channel"
             );
             expect(failureResponse.success).toBeTruthy();
             expect(failureResponse.data?.registered).toBeFalsy();
-
-            metrics = getDiagnosticsMetrics();
-            expect(metrics.missingHandlerChecks).toBe(1);
-            expect(metrics.lastMissingChannel).toBe("missing-channel");
         });
         it("records preload guard diagnostics", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -316,14 +303,6 @@ describe(IpcService, () => {
                 timestamp,
             });
 
-            const metrics = getDiagnosticsMetrics();
-            expect(metrics.preloadGuardReports).toBe(1);
-            expect(metrics.lastPreloadGuard).toEqual({
-                channel: "monitor:status-changed",
-                guard: "isMonitorStatusChangedEventData",
-                reason: "payload-validation",
-                timestamp,
-            });
             expect(mockUptimeOrchestrator.emitTyped).toHaveBeenCalledWith(
                 "diagnostics:report-created",
                 expect.objectContaining({
