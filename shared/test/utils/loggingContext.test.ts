@@ -134,6 +134,30 @@ describe("logging context helpers", () => {
         expect(getterCalls).toBe(0);
     });
 
+    it("normalizes object metadata into prototype-free records", () => {
+        const input = {
+            stable: "value",
+        };
+        Object.defineProperty(input, "__proto__", {
+            configurable: true,
+            enumerable: true,
+            value: "metadata-value",
+        });
+
+        const sanitized = normalizeLogValue(input);
+
+        expect(typeof sanitized).toBe("object");
+        expect(sanitized).not.toBeNull();
+
+        const sanitizedRecord = sanitized as Record<string, unknown>;
+        expect(Object.getPrototypeOf(sanitizedRecord)).toBeNull();
+        expect(Object.hasOwn(sanitizedRecord, "__proto__")).toBeTruthy();
+        expect(Reflect.get(sanitizedRecord, "__proto__")).toBe(
+            "metadata-value"
+        );
+        expect(Object.hasOwn({}, "__proto__")).toBeFalsy();
+    });
+
     it("handles circular references safely", () => {
         const input: Record<string, unknown> = {
             name: "root",

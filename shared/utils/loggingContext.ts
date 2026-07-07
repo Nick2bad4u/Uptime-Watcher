@@ -5,6 +5,7 @@ import {
     getErrorStringProperty,
     getOwnDataProperty,
 } from "@shared/utils/errorPropertyAccess";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
     isDefined,
@@ -433,7 +434,7 @@ export const normalizeLogValue = (value: unknown): unknown => {
         }
 
         if (isRecord(candidate)) {
-            const sanitizedRecord: UnknownRecord = {};
+            const sanitizedRecord = createNullPrototypeObject<UnknownRecord>();
             for (const key of Reflect.ownKeys(candidate)) {
                 if (typeof key !== "string") {
                     continue;
