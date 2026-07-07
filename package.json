@@ -562,7 +562,7 @@
         "test:stryker:dry": "npm run mutation:dry",
         "test:stryker:incremental": "npm run mutation:incremental",
         "test:verbose": "node scripts/run-node-cli.mjs vitest run --reporter=verbose",
-        "test:zero-coverage": "tsx scripts/detect-zero-coverage-tests.ts",
+        "test:zero-coverage": "node scripts/run-node-cli.mjs -- tsx scripts/detect-zero-coverage-tests.ts",
         "test-enhance:metadata": "node scripts/enhance-test-metadata.mjs",
         "test-enhance:metadata:dry": "node scripts/enhance-test-metadata.mjs --dry-run",
         "test-enhance:metadata:force": "node scripts/enhance-test-metadata.mjs --force",
