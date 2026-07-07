@@ -58,8 +58,6 @@ const isThemeDocument = (
 const isThemeRootElement = (value: unknown): value is HTMLElement =>
     isThemeClassElement(value) && objectHasIn(value, "style");
 
-const toCssToken = (value: CssVariableKey): string => value.toString();
-
 function getThemeDomTargets(): ThemeDomTargets | undefined {
     const documentProperty = getOwnPropertyValue(globalThis, "document");
 
@@ -508,10 +506,7 @@ export class ThemeManager {
     ): void {
         for (const [shadeKey, nestedValue] of objectEntries(shades)) {
             if (isCssVariableKey(shadeKey) && typeof nestedValue === "string") {
-                visitor(
-                    `--color-${categoryToken}-${toCssToken(shadeKey)}`,
-                    nestedValue
-                );
+                visitor(`--color-${categoryToken}-${shadeKey}`, nestedValue);
             }
         }
     }
@@ -543,7 +538,7 @@ export class ThemeManager {
                 continue;
             }
 
-            const categoryToken = toCssToken(categoryKey);
+            const categoryToken = categoryKey;
             this.emitColorValue(categoryToken, colorValue, visitor);
         }
     }
