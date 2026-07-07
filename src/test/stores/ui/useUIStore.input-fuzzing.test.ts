@@ -101,6 +101,58 @@ vi.mock("../../../services/SystemService", () => ({
 // Get the mocked SystemService function
 const mockOpenExternal = vi.mocked(SystemService.openExternal);
 
+interface MockElectronAPI {
+    system: {
+        openExternal: ReturnType<typeof vi.fn>;
+    };
+}
+
+interface MockWindow {
+    electronAPI?: MockElectronAPI;
+}
+
+const getMockGlobal = (): typeof globalThis & {
+    electronAPI?: MockElectronAPI;
+} => globalThis as typeof globalThis & { electronAPI?: MockElectronAPI };
+
+const getMockWindow = (): MockWindow | undefined => {
+    const windowRef = Reflect.get(globalThis, "window");
+    return windowRef !== undefined && typeof windowRef === "object"
+        ? (windowRef as unknown as MockWindow)
+        : undefined;
+};
+
+const createMockElectronAPI = (): MockElectronAPI => ({
+    system: {
+        openExternal: vi.fn().mockResolvedValue(true),
+    },
+});
+
+const ensureMockWindowElectronAPI = (): void => {
+    const mockWindow = getMockWindow();
+    if (mockWindow?.electronAPI) {
+        return;
+    }
+
+    const electronAPI = createMockElectronAPI();
+    if (mockWindow) {
+        Object.defineProperty(mockWindow, "electronAPI", {
+            configurable: true,
+            value: electronAPI,
+            writable: true,
+        });
+        return;
+    }
+
+    Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: {
+            electronAPI,
+        } satisfies MockWindow,
+        writable: true,
+    });
+};
+
 // Test utilities for UI store state management
 const resetUIStore = () => {
     // Reset store to initial state
@@ -309,17 +361,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         // Reset store to initial state
         resetUIStore();
 
-        // Mock window.electronAPI if needed
-        if (!(globalThis.window as any)?.electronAPI) {
-            (globalThis.window as any) = {
-                ...globalThis,
-                electronAPI: {
-                    system: {
-                        openExternal: vi.fn().mockResolvedValue(true),
-                    },
-                },
-            };
-        }
+        ensureMockWindowElectronAPI();
     });
 
     describe("Modal Visibility Management", () => {
@@ -1106,10 +1148,13 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             "should handle external URL opening when electronAPI is unavailable",
             (url) => {
                 // Arrange - temporarily remove electronAPI
-                const originalAPI = (globalThis.window as any)?.electronAPI;
-                if (globalThis.window) {
-                    (globalThis as any).electronAPI = undefined;
-                }
+                const globalWithElectronAPI = getMockGlobal();
+                const originalAPI = globalWithElectronAPI.electronAPI;
+                Object.defineProperty(globalWithElectronAPI, "electronAPI", {
+                    configurable: true,
+                    value: undefined,
+                    writable: true,
+                });
 
                 try {
                     // Act & Assert - should not crash
@@ -1118,9 +1163,15 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     }).not.toThrow();
                 } finally {
                     // Restore electronAPI
-                    if (globalThis.window && originalAPI) {
-                        (globalThis as any).electronAPI = originalAPI;
-                    }
+                    Object.defineProperty(
+                        globalWithElectronAPI,
+                        "electronAPI",
+                        {
+                            configurable: true,
+                            value: originalAPI,
+                            writable: true,
+                        }
+                    );
                 }
             }
         );
