@@ -95,6 +95,51 @@ describe("event middleware", () => {
             );
             expect(next).toHaveBeenCalledTimes(1);
         });
+
+        it("formats primitive bigint and symbol payloads without prototype toString", async () => {
+            const middleware = createLoggingMiddleware({
+                includeData: true,
+                level: "debug",
+            });
+            const next = vi.fn();
+            const payloadSymbol = Symbol("payload");
+            const bigintToStringSpy = vi
+                .spyOn(BigInt.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("BigInt.prototype.toString called");
+                });
+            const symbolToStringSpy = vi
+                .spyOn(Symbol.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("Symbol.prototype.toString called");
+                });
+
+            try {
+                await middleware("monitor:up", asEventPayload(123n), next);
+                await middleware(
+                    "monitor:down",
+                    asEventPayload(payloadSymbol),
+                    next
+                );
+
+                expect(logger.debug).toHaveBeenNthCalledWith(
+                    1,
+                    "[EventBus] Event emitted",
+                    { data: "123", event: "monitor:up" }
+                );
+                expect(logger.debug).toHaveBeenNthCalledWith(
+                    2,
+                    "[EventBus] Event emitted",
+                    { data: "Symbol(payload)", event: "monitor:down" }
+                );
+                expect(bigintToStringSpy).not.toHaveBeenCalled();
+                expect(symbolToStringSpy).not.toHaveBeenCalled();
+                expect(next).toHaveBeenCalledTimes(2);
+            } finally {
+                bigintToStringSpy.mockRestore();
+                symbolToStringSpy.mockRestore();
+            }
+        });
     });
 
     describe(createErrorHandlingMiddleware, () => {

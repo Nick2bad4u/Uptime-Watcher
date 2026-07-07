@@ -4,7 +4,7 @@
  */
 
 import { fc, test } from "@fast-check/vitest";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { safeStringify } from "../../utils/stringConversion";
 
@@ -167,6 +167,37 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             expect(safeStringify(-456n)).toBe("-456");
         });
 
+        it("should not call primitive prototype toString methods", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: stringConversion", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Security", "type");
+
+            const bigintToStringSpy = vi
+                .spyOn(BigInt.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("BigInt.prototype.toString called");
+                });
+            const symbolToStringSpy = vi
+                .spyOn(Symbol.prototype, "toString")
+                .mockImplementation(() => {
+                    throw new Error("Symbol.prototype.toString called");
+                });
+
+            try {
+                expect(safeStringify(123n)).toBe("123");
+                expect(safeStringify(Symbol("safe"))).toBe("Symbol(safe)");
+                expect(bigintToStringSpy).not.toHaveBeenCalled();
+                expect(symbolToStringSpy).not.toHaveBeenCalled();
+            } finally {
+                bigintToStringSpy.mockRestore();
+                symbolToStringSpy.mockRestore();
+            }
+        });
+
         it("should document unreachable code paths", async ({
             task,
             annotate,
@@ -212,13 +243,23 @@ describe("String Conversion Utilities - Comprehensive Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const obj = {
-                toString: () => "custom",
-                valueOf: () => 42,
-                normalProp: "value",
-            };
+            const toStringSpy = vi.fn(() => "custom");
+            const valueOfSpy = vi.fn(() => 42);
+            const obj = { normalProp: "value" };
+
+            Object.defineProperties(obj, {
+                toString: {
+                    value: toStringSpy,
+                },
+                valueOf: {
+                    value: valueOfSpy,
+                },
+            });
+
             const result = safeStringify(obj);
             expect(result).toContain("normalProp");
+            expect(toStringSpy).not.toHaveBeenCalled();
+            expect(valueOfSpy).not.toHaveBeenCalled();
         });
 
         it("should handle Date objects", async ({ task, annotate }) => {

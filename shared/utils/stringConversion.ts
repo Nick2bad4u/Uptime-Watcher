@@ -34,12 +34,11 @@ const isJsonSerializableObject = (
  *
  * - Returns an empty string for `null` or `undefined`.
  * - Returns the value as-is if it is already a string.
- * - Converts numbers and booleans using `String()`.
+ * - Converts primitive numbers, booleans, bigints, and symbols using `String()`.
  * - For objects, attempts to use {@link safeJsonStringifyWithFallback} for
  *   serialization. If serialization fails (e.g., circular references), returns
  *   a descriptive placeholder.
  * - For functions, returns the string `"[Function]"`.
- * - For symbols, returns the result of `Symbol.prototype.toString()`.
  * - For all other types, returns `"[Unknown Type]"`.
  *
  * This approach guarantees that the result is always a string and never the
@@ -75,7 +74,7 @@ export function safeStringify(value: unknown): string {
     // Handle each type explicitly to avoid redundant condition warnings
     switch (typeof value) {
         case "bigint": {
-            return value.toString();
+            return String(value);
         }
         case "boolean": {
             return String(value);
@@ -106,7 +105,7 @@ export function safeStringify(value: unknown): string {
             return value;
         }
         case "symbol": {
-            return value.toString();
+            return String(value);
         }
         case "undefined": {
             return "";

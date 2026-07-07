@@ -145,11 +145,11 @@ function safeSerialize(data: unknown): string {
     }
 
     if (typeof data === "bigint") {
-        return data.toString();
+        return String(data);
     }
 
     if (typeof data === "symbol") {
-        return data.toString();
+        return String(data);
     }
 
     if (typeof data === "function") {
