@@ -10,7 +10,6 @@ import type { DatabaseServiceFactory } from "../../../services/factories/Databas
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 
 import {
-    isDatabaseCommandContext,
     isImportContext,
     isRestoreContext,
     resolveDatabaseCommandContext,
@@ -30,7 +29,6 @@ describe("databaseCommandContext", () => {
     it("accepts context objects with own data properties", () => {
         const context = createDatabaseCommandContext();
 
-        expect(isDatabaseCommandContext(context)).toBeTruthy();
         expect(resolveDatabaseCommandContext(context)).toStrictEqual(context);
     });
 
@@ -89,7 +87,6 @@ describe("databaseCommandContext", () => {
             });
         }
 
-        expect(isDatabaseCommandContext(context)).toBeFalsy();
         expect(() =>
             resolveDatabaseCommandContext(context as DatabaseCommandContext)
         ).toThrow(TypeError);

@@ -41,7 +41,7 @@ export interface DatabaseCommandContext {
 /**
  * Runtime type guard for {@link DatabaseCommandContext}.
  */
-export function isDatabaseCommandContext(
+function isDatabaseCommandContext(
     value: unknown
 ): value is DatabaseCommandContext {
     if (!isObject(value)) {
