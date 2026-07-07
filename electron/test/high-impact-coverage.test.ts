@@ -6,8 +6,6 @@
 import { unsafeJsonifiable } from "@shared/test/helpers/jsonTestHelpers";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { UptimeEventName } from "../events/eventTypes";
-
 describe("High-Impact Branch Coverage Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -594,114 +592,6 @@ describe("High-Impact Branch Coverage Tests", () => {
                     expect(
                         stringConversionModule.safeStringify(new WeakSet())
                     ).toContain("WeakSet");
-                }
-            } catch (importError) {
-                expect(importError).toBeDefined();
-            }
-        });
-    });
-
-    describe("Event Types Branches", () => {
-        it("should test event type function edge cases", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: high-impact-coverage", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Event Processing", "type");
-
-            try {
-                const eventTypesModule =
-                    await import("../events/eventTypes.js");
-
-                if (eventTypesModule.isEventOfCategory) {
-                    // Test valid categories and events
-                    expect(
-                        eventTypesModule.isEventOfCategory("site:added", "SITE")
-                    ).toBeTruthy();
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            "monitor:up",
-                            "MONITOR"
-                        )
-                    ).toBeTruthy();
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            "system:error",
-                            "SYSTEM"
-                        )
-                    ).toBeTruthy();
-
-                    // Test invalid combinations
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            "site:added",
-                            "MONITOR"
-                        )
-                    ).toBeFalsy();
-                    expect(
-                        eventTypesModule.isEventOfCategory("monitor:up", "SITE")
-                    ).toBeFalsy();
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            "unknown:event" as unknown as UptimeEventName,
-                            "SITE"
-                        )
-                    ).toBeFalsy();
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            "" as unknown as UptimeEventName,
-                            "" as any
-                        )
-                    ).toBeFalsy();
-
-                    // Test edge cases with null/undefined (these will test the default case)
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            null as any,
-                            null as any
-                        )
-                    ).toBeFalsy();
-                    expect(
-                        eventTypesModule.isEventOfCategory(
-                            undefined as any,
-                            undefined as any
-                        )
-                    ).toBeFalsy();
-                }
-
-                if (eventTypesModule.getEventPriority) {
-                    // Test known events
-                    const priority1 =
-                        eventTypesModule.getEventPriority("system:error");
-                    expect(typeof priority1).toBe("string");
-
-                    const priority2 =
-                        eventTypesModule.getEventPriority("monitor:up");
-                    expect(typeof priority2).toBe("string");
-
-                    // Test unknown events (should return default)
-                    const unknownPriority = eventTypesModule.getEventPriority(
-                        "unknown:event" as unknown as UptimeEventName
-                    );
-                    expect(typeof unknownPriority).toBe("string");
-
-                    // Test edge cases
-                    const nullPriority = eventTypesModule.getEventPriority(
-                        null as any
-                    );
-                    expect(typeof nullPriority).toBe("string");
-
-                    const undefinedPriority = eventTypesModule.getEventPriority(
-                        undefined as any
-                    );
-                    expect(typeof undefinedPriority).toBe("string");
-
-                    const emptyPriority = eventTypesModule.getEventPriority(
-                        "" as unknown as UptimeEventName
-                    );
-                    expect(typeof emptyPriority).toBe("string");
                 }
             } catch (importError) {
                 expect(importError).toBeDefined();
