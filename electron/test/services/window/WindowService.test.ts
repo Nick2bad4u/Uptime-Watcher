@@ -11,6 +11,10 @@ import { BrowserWindow, shell } from "electron";
 import { pathToFileURL } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+    resetProcessSnapshotOverrideForTesting,
+    setProcessSnapshotOverrideForTesting,
+} from "@shared/utils/environment";
 import { isDev } from "../../../electronUtils";
 import { WindowService } from "../../../services/window/WindowService";
 import { logger } from "../../../utils/logger";
@@ -95,8 +99,15 @@ vi.mock("../../../../shared/utils/environment", async () => {
 // WindowService relies on real path and file URL behaviour for production
 // navigation hardening (e.g., path.resolve + fileURLToPath).
 
+const createFetchResponse = (ok: boolean, status = ok ? 200 : 503): Response =>
+    ({ ok, status }) as Response;
+
+const setFetchForTesting = (replacement: typeof fetch): void => {
+    globalThis.fetch = replacement;
+};
+
 // Mock global fetch for Vite server checking
-globalThis.fetch = vi.fn();
+globalThis.fetch = vi.fn<typeof fetch>();
 
 describe(WindowService, () => {
     let windowService: WindowService;
@@ -104,6 +115,7 @@ describe(WindowService, () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+        resetProcessSnapshotOverrideForTesting();
 
         // Setup default mock returns
         vi.mocked(isDev).mockReturnValue(false);
@@ -1520,10 +1532,10 @@ describe(WindowService, () => {
 
             const originalFetch = fetch;
 
-            const plainFetch = async () => ({ ok: true }) as Response;
+            const plainFetch: typeof fetch = async () =>
+                createFetchResponse(true);
 
-            (globalThis as unknown as { fetch: typeof plainFetch }).fetch =
-                plainFetch;
+            setFetchForTesting(plainFetch);
 
             vi.mocked(logger.debug).mockClear();
 
@@ -1538,7 +1550,7 @@ describe(WindowService, () => {
                     "[WindowService] Vite dev server is ready"
                 );
             } finally {
-                (globalThis as any).fetch = originalFetch;
+                setFetchForTesting(originalFetch);
             }
         });
 
@@ -1554,12 +1566,12 @@ describe(WindowService, () => {
             const originalFetch = fetch;
 
             let attempts = 0;
-            const retryingFetch = async () => {
+            const retryingFetch: typeof fetch = async () => {
                 attempts += 1;
-                return { ok: attempts > 1 } as Response;
+                return createFetchResponse(attempts > 1);
             };
 
-            (globalThis as any).fetch = retryingFetch;
+            setFetchForTesting(retryingFetch);
 
             try {
                 const waitPromise = (
@@ -1575,7 +1587,7 @@ describe(WindowService, () => {
                     expect.stringMatching(/Waiting \d+ms before retry 2\/20/v)
                 );
             } finally {
-                (globalThis as any).fetch = originalFetch;
+                setFetchForTesting(originalFetch);
             }
         });
 
@@ -1589,11 +1601,11 @@ describe(WindowService, () => {
             await annotate("Type: Error Handling", "type");
 
             const originalFetch = fetch;
-            const failingFetch = vi.fn().mockResolvedValue({
-                ok: false,
-            });
+            const failingFetch = vi.fn<typeof fetch>(async () =>
+                createFetchResponse(false)
+            );
 
-            (globalThis as any).fetch = failingFetch;
+            setFetchForTesting(failingFetch);
 
             await expect(
                 (
@@ -1605,7 +1617,7 @@ describe(WindowService, () => {
                 "Mocked fetch reported Vite server as unavailable"
             );
 
-            (globalThis as any).fetch = originalFetch;
+            setFetchForTesting(originalFetch);
         });
 
         it("should exhaust retries when the server never becomes available", async ({
@@ -1623,10 +1635,11 @@ describe(WindowService, () => {
             const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
 
             let attempts = 0;
-            (globalThis as any).fetch = async () => {
+            const unavailableFetch: typeof fetch = async () => {
                 attempts += 1;
-                return { ok: false } as Response;
+                return createFetchResponse(false);
             };
+            setFetchForTesting(unavailableFetch);
 
             try {
                 const waitPromise = (
@@ -1644,7 +1657,7 @@ describe(WindowService, () => {
                 );
                 expect(attempts).toBe(20);
             } finally {
-                (globalThis as any).fetch = originalFetch;
+                setFetchForTesting(originalFetch);
                 randomSpy.mockRestore();
                 vi.useRealTimers();
             }
@@ -1666,13 +1679,14 @@ describe(WindowService, () => {
             vi.mocked(logger.debug).mockClear();
 
             let attempts = 0;
-            (globalThis as any).fetch = async () => {
+            const eventuallyAvailableFetch: typeof fetch = async () => {
                 attempts += 1;
                 if (attempts === 1) {
                     throw new Error("network down");
                 }
-                return { ok: true } as Response;
+                return createFetchResponse(true);
             };
+            setFetchForTesting(eventuallyAvailableFetch);
 
             try {
                 const waitPromise = (
@@ -1689,7 +1703,7 @@ describe(WindowService, () => {
                     expect.stringContaining("network down")
                 );
             } finally {
-                (globalThis as any).fetch = originalFetch;
+                setFetchForTesting(originalFetch);
                 randomSpy.mockRestore();
                 vi.useRealTimers();
             }
@@ -1711,15 +1725,16 @@ describe(WindowService, () => {
             vi.mocked(logger.debug).mockClear();
 
             let attempts = 0;
-            (globalThis as any).fetch = async () => {
+            const abortingFetch: typeof fetch = async () => {
                 attempts += 1;
                 if (attempts < 3) {
                     const abortError = new Error("timeout");
                     abortError.name = "AbortError";
                     throw abortError;
                 }
-                return { ok: true } as Response;
+                return createFetchResponse(true);
             };
+            setFetchForTesting(abortingFetch);
 
             try {
                 const waitPromise = (
@@ -1743,7 +1758,7 @@ describe(WindowService, () => {
                 expect(retryLogs).toHaveLength(0);
                 expect(attempts).toBe(3);
             } finally {
-                (globalThis as any).fetch = originalFetch;
+                setFetchForTesting(originalFetch);
                 randomSpy.mockRestore();
                 vi.useRealTimers();
             }
@@ -1782,10 +1797,8 @@ describe(WindowService, () => {
 
     describe("environment flag helper", () => {
         it("should return false when process is undefined", () => {
-            const originalProcess = process;
-
             try {
-                (globalThis as any).process = undefined;
+                setProcessSnapshotOverrideForTesting(null);
                 expect(
                     (
                         windowService as unknown as {
@@ -1794,7 +1807,7 @@ describe(WindowService, () => {
                     ).getEnvFlag("SHOULD_NOT_EXIST")
                 ).toBeFalsy();
             } finally {
-                (globalThis as any).process = originalProcess;
+                resetProcessSnapshotOverrideForTesting();
             }
         });
 
