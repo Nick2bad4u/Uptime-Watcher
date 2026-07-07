@@ -176,7 +176,7 @@
             "complexity": {
                 "noForEach": "warn",
                 "useFlatMap": "error",
-                "useLiteralKeys": "warn",
+                "useLiteralKeys": "off",
                 "useOptionalChain": "warn",
                 "useSimpleNumberKeys": "warn"
             },
