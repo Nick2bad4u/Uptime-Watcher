@@ -9,16 +9,8 @@ import type { Except, UnknownArray, UnknownRecord } from "type-fest";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 
-import { isEventMetadata as isEventMetadataGuard } from "../events/eventMetadataGuards";
+import { isEventMetadata } from "../events/eventMetadataGuards";
 import { ORIGINAL_METADATA_SYMBOL } from "../events/TypedEventBus";
-
-/**
- * Determines whether the provided value conforms to {@link EventMetadata}.
- *
- * @public
- */
-export const isEventMetadata = (value: unknown): value is EventMetadata =>
-    isEventMetadataGuard(value);
 
 /** Metadata property key used when forwarding typed event metadata. */
 export const FORWARDED_METADATA_PROPERTY_KEY = "_meta" as const;
@@ -121,7 +113,7 @@ export function attachForwardedMetadata<TPayload extends object>(
         FORWARDED_METADATA_PROPERTY_KEY
     );
 
-    if (!isEventMetadataGuard(metaCandidate)) {
+    if (!isEventMetadata(metaCandidate)) {
         return payload;
     }
 
@@ -130,7 +122,7 @@ export function attachForwardedMetadata<TPayload extends object>(
         ORIGINAL_METADATA_PROPERTY_KEY
     );
 
-    const originalMeta = isEventMetadataGuard(originalMetaCandidate)
+    const originalMeta = isEventMetadata(originalMetaCandidate)
         ? originalMetaCandidate
         : metaCandidate;
 
