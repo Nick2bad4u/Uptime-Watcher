@@ -450,7 +450,7 @@ npm run electron -- --log-debug
 
 ### For AI Assistants
 
-1. **Patterns**: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
+1. **Patterns**: Reference [`docs/Architecture/`](../Architecture/README.md) for coding patterns
 2. **Examples**: Use templates in [`docs/Architecture/Templates/README.md`](../Architecture/Templates/README.md)
 
 ---

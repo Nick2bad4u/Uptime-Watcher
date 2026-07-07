@@ -122,8 +122,8 @@ Moved **30+ historical documents** to organized archive:
 
 1. **[API\_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - IPC and API reference
 2. **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Debug and fix issues
-3. **[Architecture/](../Architecture/)** - Patterns, ADRs, templates
-4. **[Guides/](../Guides/)** - Implementation guides
+3. **[Architecture/](../Architecture/README.md)** - Patterns, ADRs, templates
+4. **[Guides/](../Guides/README.md)** - Implementation guides
 
 ### 📖 **For Understanding**
 

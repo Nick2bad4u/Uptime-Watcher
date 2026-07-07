@@ -9,6 +9,7 @@ import type { EventMetadata } from "@shared/types/events";
  */
 import type {
     SiteIdentifierSnapshot,
+    StateSyncAction,
     StateSyncSource,
 } from "@shared/types/stateSync";
 
@@ -26,7 +27,7 @@ import { isNonEmptyString } from "@shared/validation/validatorUtils";
 export type NormalizedStateSyncStatusEvent =
     | {
           readonly _meta?: EventMetadata | undefined;
-          readonly action: typeof STATE_SYNC_ACTION.BULK_SYNC;
+          readonly action: Extract<StateSyncAction, "bulk-sync">;
           readonly revision: number;
           readonly siteCount: number;
           readonly sites: readonly SiteIdentifierSnapshot[];
@@ -36,8 +37,7 @@ export type NormalizedStateSyncStatusEvent =
       }
     | {
           readonly _meta?: EventMetadata | undefined;
-          readonly action:
-              typeof STATE_SYNC_ACTION.DELETE | typeof STATE_SYNC_ACTION.UPDATE;
+          readonly action: Extract<StateSyncAction, "delete" | "update">;
           readonly delta: {
               readonly addedSites: readonly SiteIdentifierSnapshot[];
               readonly removedSiteIdentifiers: readonly string[];

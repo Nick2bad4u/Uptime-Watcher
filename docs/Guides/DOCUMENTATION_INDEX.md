@@ -212,7 +212,7 @@ Relevant historical context and lessons learned:
 
 **Focus Areas**:
 
-- [Architecture/ADRs/](../Architecture/ADRs/) - All architectural decisions
+- [Architecture/ADRs/](../Architecture/ADRs/README.md) - All architectural decisions
 - [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - System patterns
 - Historical documents for evolution understanding
 
@@ -280,7 +280,7 @@ Track documentation health:
 
 1. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
 2. [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment
-3. [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
+3. [Architecture/ADRs/](../Architecture/ADRs/README.md) - Design decisions
 4. [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interfaces
 
 ### ⚡ Quick Start (Experienced Developer)
@@ -296,7 +296,7 @@ Track documentation health:
 
 ### 🏗️ Architecture Deep Dive
 
-1. [Architecture/ADRs/](../Architecture/ADRs/) - All decisions
+1. [Architecture/ADRs/](../Architecture/ADRs/README.md) - All decisions
 2. Historical documents for evolution context
 3. [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Implementation patterns
 
