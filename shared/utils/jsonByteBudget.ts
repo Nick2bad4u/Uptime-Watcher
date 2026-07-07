@@ -10,6 +10,7 @@
 
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { getOwnDataProperty } from "./errorPropertyAccess";
 import {
     isDefined,
     isFinite as isFiniteNumber,
@@ -19,6 +20,67 @@ import {
 
 const JSON_BYTE_BUDGET_LEAVE = Symbol("json-byte-budget-leave");
 const INVALID_DATE_JSON_VALUE = "[Invalid Date]" as const;
+const UNSERIALIZABLE_OBJECT_JSON_VALUE = "[Unserializable Object]" as const;
+
+type NativeGetter = (this: unknown) => unknown;
+type NativeMethod = (this: unknown) => unknown;
+
+function isNativeFunction(
+    value: unknown
+): value is NativeGetter & NativeMethod {
+    return typeof value === "function";
+}
+
+function getPrototypeObject(value: object): object | null {
+    const prototype: unknown = Object.getPrototypeOf(value);
+
+    return typeof prototype === "object" && prototype !== null
+        ? prototype
+        : null;
+}
+
+function getNativeGetter(
+    holder: object,
+    key: PropertyKey
+): NativeGetter | undefined {
+    let current: object | null = holder;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, key);
+        const getter = descriptor
+            ? getOwnDataProperty(descriptor, "get")
+            : { found: false as const };
+        if (getter.found && isNativeFunction(getter.value)) {
+            return getter.value;
+        }
+
+        current = getPrototypeObject(current);
+    }
+
+    return undefined;
+}
+
+function getNativeMethod(
+    holder: object,
+    key: PropertyKey
+): NativeMethod | undefined {
+    let current: object | null = holder;
+
+    while (current) {
+        const descriptor = Object.getOwnPropertyDescriptor(current, key);
+        if (
+            descriptor &&
+            "value" in descriptor &&
+            isNativeFunction(descriptor.value)
+        ) {
+            return descriptor.value;
+        }
+
+        current = getPrototypeObject(current);
+    }
+
+    return undefined;
+}
 
 interface JsonByteBudgetState {
     bytes: number;
@@ -81,17 +143,27 @@ function addJsonBytesForObject(
     }
 
     if (value instanceof URL) {
-        addBytes(state, getJsonBytesForString(value.toString()));
+        addBytes(state, getJsonBytesForUrl(value));
         return;
     }
 
     if (value instanceof ArrayBuffer) {
-        addBytes(state, value.byteLength);
+        addBytes(
+            state,
+            getNativeByteLength(value, ArrayBuffer.prototype) ??
+                state.maxBytes + 1
+        );
         return;
     }
 
     if (ArrayBuffer.isView(value)) {
-        addBytes(state, value.byteLength);
+        const prototype = getPrototypeObject(value);
+        addBytes(
+            state,
+            prototype
+                ? (getNativeByteLength(value, prototype) ?? state.maxBytes + 1)
+                : state.maxBytes + 1
+        );
         return;
     }
 
@@ -230,12 +302,72 @@ function getJsonBytesForNumber(value: number): number {
 }
 
 function getJsonBytesForDate(value: Date): number {
-    const timestamp = value.getTime();
-    return getJsonBytesForString(
-        isFiniteNumber(timestamp)
-            ? value.toISOString()
-            : INVALID_DATE_JSON_VALUE
-    );
+    const getTime = getNativeMethod(Date.prototype, "getTime");
+    const toISOString = getNativeMethod(Date.prototype, "toISOString");
+    if (!getTime || !toISOString) {
+        return getJsonBytesForString(INVALID_DATE_JSON_VALUE);
+    }
+
+    let timestamp: unknown;
+    try {
+        timestamp = Reflect.apply(getTime, value, []);
+    } catch {
+        return getJsonBytesForString(INVALID_DATE_JSON_VALUE);
+    }
+
+    if (typeof timestamp !== "number" || !isFiniteNumber(timestamp)) {
+        return getJsonBytesForString(INVALID_DATE_JSON_VALUE);
+    }
+
+    try {
+        const serialized: unknown = Reflect.apply(toISOString, value, []);
+        return getJsonBytesForString(
+            typeof serialized === "string"
+                ? serialized
+                : INVALID_DATE_JSON_VALUE
+        );
+    } catch {
+        return getJsonBytesForString(INVALID_DATE_JSON_VALUE);
+    }
+}
+
+function getJsonBytesForUrl(value: URL): number {
+    const toString = getNativeMethod(URL.prototype, "toString");
+    if (!toString) {
+        return getJsonBytesForString(UNSERIALIZABLE_OBJECT_JSON_VALUE);
+    }
+
+    try {
+        const serialized: unknown = Reflect.apply(toString, value, []);
+        return getJsonBytesForString(
+            typeof serialized === "string"
+                ? serialized
+                : UNSERIALIZABLE_OBJECT_JSON_VALUE
+        );
+    } catch {
+        return getJsonBytesForString(UNSERIALIZABLE_OBJECT_JSON_VALUE);
+    }
+}
+
+function getNativeByteLength(
+    value: ArrayBuffer | ArrayBufferView,
+    prototype: object
+): number | undefined {
+    const byteLength = getNativeGetter(prototype, "byteLength");
+    if (!byteLength) {
+        return undefined;
+    }
+
+    try {
+        const valueByteLength: unknown = Reflect.apply(byteLength, value, []);
+        return typeof valueByteLength === "number" &&
+            Number.isSafeInteger(valueByteLength) &&
+            valueByteLength >= 0
+            ? valueByteLength
+            : undefined;
+    } catch {
+        return undefined;
+    }
 }
 
 function getJsonBytesForString(value: string): number {
