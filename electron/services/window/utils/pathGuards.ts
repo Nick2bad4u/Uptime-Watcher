@@ -53,7 +53,7 @@ export function isPathWithinDirectory(
  * - Normalizes path separators
  * - On Windows, comparisons are case-insensitive
  */
-export function normalizePathForComparison(
+function normalizePathForComparison(
     value: string,
     platform: NodeJS.Platform = process.platform
 ): string {

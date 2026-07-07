@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-    isPathWithinDirectory,
-    normalizePathForComparison,
-} from "../../../../services/window/utils/pathGuards";
+import { isPathWithinDirectory } from "../../../../services/window/utils/pathGuards";
 
 describe("pathGuards", () => {
     it("keeps POSIX child paths within their directory", () => {
@@ -54,21 +51,5 @@ describe("pathGuards", () => {
                 "win32"
             )
         ).toBeFalsy();
-    });
-
-    it("normalizes paths with the requested platform semantics", () => {
-        expect(
-            normalizePathForComparison(
-                String.raw`C:\Apps\Uptime-Watcher\DIST\..\dist\index.html`,
-                "win32"
-            )
-        ).toBe(String.raw`c:\apps\uptime-watcher\dist\index.html`);
-
-        expect(
-            normalizePathForComparison(
-                "/opt/uptime-watcher/dist/../dist/index.html",
-                "linux"
-            )
-        ).toBe("/opt/uptime-watcher/dist/index.html");
     });
 });

@@ -7,26 +7,6 @@ describe("pathGuards (strict coverage)", () => {
         vi.clearAllMocks();
     });
 
-    it("normalizePathForComparison lowercases on win32", async () => {
-        const { normalizePathForComparison } =
-            await import("../../../../../../electron/services/window/utils/pathGuards");
-
-        const input = "/tmp/SomePath";
-        const expected = path.resolve(input).toLowerCase();
-
-        expect(normalizePathForComparison(input, "win32")).toBe(expected);
-    });
-
-    it("normalizePathForComparison preserves casing on non-win32 platforms", async () => {
-        const { normalizePathForComparison } =
-            await import("../../../../../../electron/services/window/utils/pathGuards");
-
-        const input = "/tmp/SomePath";
-        const expected = path.posix.resolve(input);
-
-        expect(normalizePathForComparison(input, "linux")).toBe(expected);
-    });
-
     it("isPathWithinDirectory returns true for the directory itself (inclusive)", async () => {
         const { isPathWithinDirectory } =
             await import("../../../../../../electron/services/window/utils/pathGuards");
