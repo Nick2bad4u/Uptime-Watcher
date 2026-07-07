@@ -73,16 +73,36 @@ process.on("unhandledRejection", (reason, promise) => {
 
 // Also suppress specific warning types during tests
 const originalStderr = process.stderr.write;
-process.stderr.write = function (chunk: any, encoding?: any, fd?: any) {
-    const output = chunk.toString();
+function filteredStderrWrite(
+    this: NodeJS.WriteStream,
+    chunk: string | Uint8Array,
+    callback?: (err?: Error | null) => void
+): boolean;
+function filteredStderrWrite(
+    this: NodeJS.WriteStream,
+    chunk: string | Uint8Array,
+    encoding?: BufferEncoding,
+    callback?: (err?: Error | null) => void
+): boolean;
+function filteredStderrWrite(
+    this: NodeJS.WriteStream,
+    chunk: string | Uint8Array,
+    encodingOrCallback?: BufferEncoding | ((err?: Error | null) => void),
+    callback?: (err?: Error | null) => void
+): boolean {
+    const output = String(chunk);
     if (
         output.includes("PromiseRejectionHandledWarning") ||
         output.includes("UnhandledPromiseRejectionWarning")
     ) {
         return true; // Suppress these warnings in test environment
     }
-    return originalStderr.call(this, chunk, encoding, fd);
-};
+    if (typeof encodingOrCallback === "function") {
+        return originalStderr.call(this, chunk, undefined, encodingOrCallback);
+    }
+    return originalStderr.call(this, chunk, encodingOrCallback, callback);
+}
+process.stderr.write = filteredStderrWrite;
 
 // Mock electron before any imports
 vi.mock("electron", () => ({

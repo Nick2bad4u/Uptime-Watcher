@@ -12,7 +12,7 @@ import type { StatusHistoryStatus } from "../../types";
 
 interface BaseMonitorData {
     checkInterval: number;
-    history: any[];
+    history: StatusHistoryData[];
     id: string;
     lastChecked?: Date;
     monitoring: boolean;
@@ -42,7 +42,7 @@ interface PingMonitorData extends BaseMonitorData {
 interface SiteData {
     createdAt: Date;
     id: string;
-    monitors: any[];
+    monitors: Array<HttpMonitorData | PingMonitorData | PortMonitorData>;
     name: string;
     status: "down" | "paused" | "pending" | "up";
     updatedAt: Date;
@@ -70,6 +70,7 @@ export function createValidBaseMonitor(
         checkInterval: 30_000,
         history: [], // Required field that was missing in many tests
         id: "test-monitor",
+        ...(args.length === 0 ? { lastChecked: new Date() } : {}),
         monitoring: true,
         responseTime: 200,
         retryAttempts: 3,
@@ -78,12 +79,6 @@ export function createValidBaseMonitor(
         type: "http" as const,
         ...overrides,
     };
-
-    // Include lastChecked by default only when called with no arguments
-    // When called with any arguments (even empty object), don't include unless explicit
-    if (args.length === 0) {
-        (result as any).lastChecked = new Date();
-    }
 
     return result;
 }
@@ -186,17 +181,12 @@ export function createValidStatusHistory(
 ): StatusHistoryData {
     const overrides = args[0] ?? {};
     const result = {
+        ...(args.length === 0 ? { details: "Response successful" } : {}),
         responseTime: 150,
         status: "up" as const,
         timestamp: Date.now(),
         ...overrides,
     };
-
-    // Include details by default only when called with no arguments
-    // When called with any arguments (even empty object), don't include unless explicit
-    if (args.length === 0) {
-        (result as any).details = "Response successful";
-    }
 
     return result;
 }

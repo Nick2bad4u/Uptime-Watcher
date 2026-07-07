@@ -121,7 +121,7 @@ export interface CompleteSite {
  *
  * @returns A Vitest mock constrained to the supplied signature.
  */
-export function createMockFunction<Fn extends (...args: any[]) => any>(
+export function createMockFunction<Fn extends (...args: never[]) => unknown>(
     implementation?: Fn
 ): Mock<Fn> {
     if (implementation !== undefined) {

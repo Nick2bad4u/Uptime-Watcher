@@ -519,6 +519,24 @@ const mockTheme = {
     },
 };
 
+type GlobalWithFail = typeof globalThis & {
+    fail?: (message?: string) => never;
+};
+
+const readThemeColorPath = (path: string): string => {
+    const keys = stringSplit(path, ".");
+    let value: unknown = mockTheme.colors;
+    for (const key of keys) {
+        if (value && typeof value === "object" && key in value) {
+            value = (value as Record<string, unknown>)[key];
+        } else {
+            value = undefined;
+            break;
+        }
+    }
+    return typeof value === "string" ? value : mockTheme.colors.text.primary;
+};
+
 // Mock theme context globally with complete functionality
 vi.mock("../theme/useTheme", () => ({
     useTheme: () => ({
@@ -530,19 +548,7 @@ vi.mock("../theme/useTheme", () => ({
         ],
         currentTheme: mockTheme,
         getColor: vi.fn((path: string) => {
-            const keys = stringSplit(path, ".");
-            let value: any = mockTheme.colors;
-            for (const key of keys) {
-                if (value && typeof value === "object" && key in value) {
-                    value = value[key];
-                } else {
-                    value = undefined;
-                    break;
-                }
-            }
-            return typeof value === "string"
-                ? value
-                : mockTheme.colors.text.primary;
+            return readThemeColorPath(path);
         }),
         getStatusColor: vi.fn(
             (status: string) =>
@@ -604,19 +610,7 @@ vi.mock("../theme/useTheme", () => ({
             borderColor: `var(--color-border-${variant})`,
         })),
         getColor: vi.fn((path: string) => {
-            const keys = stringSplit(path, ".");
-            let value: any = mockTheme.colors;
-            for (const key of keys) {
-                if (value && typeof value === "object" && key in value) {
-                    value = value[key];
-                } else {
-                    value = undefined;
-                    break;
-                }
-            }
-            return typeof value === "string"
-                ? value
-                : mockTheme.colors.text.primary;
+            return readThemeColorPath(path);
         }),
         getStatusClass: vi.fn((status: string) => ({
             color: `var(--color-status-${status})`,
@@ -635,8 +629,9 @@ vi.mock("../theme/useTheme", () => ({
 export { mockTheme };
 
 // Provide global fail function if not already defined
-if ((globalThis as any).fail === undefined) {
-    (globalThis as any).fail = (message?: string): never => {
+const globalWithFail = globalThis as GlobalWithFail;
+if (globalWithFail.fail === undefined) {
+    globalWithFail.fail = (message?: string): never => {
         throw new Error(message ?? "Test failed");
     };
 }
