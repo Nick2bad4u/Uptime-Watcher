@@ -19,51 +19,8 @@ import {
     isFinite as isFiniteNumber,
 } from "ts-extras";
 
-import type { Theme } from "../../theme/types";
-
 import { CHART_TIME_PERIODS } from "../../constants";
 import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
-
-/**
- * Chart data structure for line charts.
- *
- * @public
- */
-export interface ChartData {
-    /** Chart.js compatible line chart data configuration */
-    lineChartData: {
-        /** Array of datasets for the chart */
-        datasets: {
-            /** Background color for data points */
-            backgroundColor: string;
-            /** Border color for the line */
-            borderColor: string;
-            /** Width of the line border */
-            borderWidth: number;
-            /** Array of data points with x,y coordinates */
-            data: {
-                /** X-axis value (typically timestamp) */
-                x: number;
-                /** Y-axis value (typically response time or status) */
-                y: number;
-            }[];
-            /** Whether to fill the area under the line */
-            fill: boolean;
-            /** Label for the dataset in legend */
-            label: string;
-            /** Background colors for individual data points */
-            pointBackgroundColor: string[];
-            /** Border colors for individual data points */
-            pointBorderColor: string[];
-            /** Radius of data points when hovered */
-            pointHoverRadius: number;
-            /** Radius of data points in normal state */
-            pointRadius: number;
-            /** Curve tension for the line (0 = straight, 1 = curved) */
-            tension: number;
-        }[];
-    };
-}
 
 /**
  * Represents a period of downtime with start, end, and duration.
@@ -305,59 +262,6 @@ function filterHistoryByTimeRange(
 }
 
 /**
- * Generates chart-ready datasets for a site's monitor history.
- *
- * @remarks
- * Separates data preparation from component logic and applies theme-aware
- * styling to the resulting Chart.js configuration.
- *
- * @param monitor - Monitor whose history should populate the chart.
- * @param theme - Theme palette used to style the datasets.
- *
- * @returns {@link ChartData} Suitable for Chart.js line charts.
- *
- * @public
- */
-export function useChartData(monitor: Monitor, theme: Theme): ChartData {
-    return useMemo(() => {
-        const sortedHistory = monitor.history
-            .filter(isResponseTimeHistoryRecord)
-            .toSorted((a, b) => a.timestamp - b.timestamp);
-
-        const lineChartData = {
-            datasets: [
-                {
-                    backgroundColor: `${theme.colors.primary[500]}20`,
-                    borderColor: theme.colors.primary[500],
-                    borderWidth: 2,
-                    data: sortedHistory.map((record) => ({
-                        x: record.timestamp,
-                        y: record.responseTime,
-                    })),
-                    fill: true,
-                    label: "Response Time",
-                    pointBackgroundColor: sortedHistory.map((record) =>
-                        record.status === "up"
-                            ? theme.colors.success
-                            : theme.colors.error
-                    ),
-                    pointBorderColor: sortedHistory.map((record) =>
-                        record.status === "up"
-                            ? theme.colors.success
-                            : theme.colors.error
-                    ),
-                    pointHoverRadius: 6,
-                    pointRadius: 4,
-                    tension: 0.1,
-                },
-            ],
-        };
-
-        return { lineChartData };
-    }, [monitor.history, theme]);
-}
-
-/**
  * Hook for calculating comprehensive site analytics and metrics.
  *
  * Performs complex calculations on monitor data to provide detailed insights
@@ -389,7 +293,6 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
  * @public
  *
  * @see {@link SiteAnalytics} for the complete interface specification.
- * @see {@link useChartData} for chart-friendly transformations.
  */
 export function useSiteAnalytics(
     monitor: Monitor | undefined,
@@ -453,101 +356,3 @@ export function useSiteAnalytics(
         };
     }, [monitor?.history, timeRange]);
 }
-
-/**
- * Utility functions for common calculations.
- *
- * @public
- */
-export const SiteAnalyticsUtils = {
-    /**
-     * Calculate SLA compliance.
-     *
-     * @returns Object describing the SLA compliance evaluation.
-     *
-     * @public
-     */
-    calculateSLA(
-        uptime: number,
-        targetSLA = 99.9
-    ): {
-        /** Actual downtime percentage (0-1). */
-        actualDowntime: number;
-        /** Allowed downtime percentage for target SLA (0-1). */
-        allowedDowntime: number;
-        /** Whether the uptime meets the target SLA. */
-        compliant: boolean;
-        /** Percentage points below target SLA (0 if compliant). */
-        deficit: number;
-    } {
-        const isCompliant = uptime >= targetSLA;
-        const deficit = Math.max(0, targetSLA - uptime);
-        const allowedDowntime = (100 - targetSLA) / 100;
-        const actualDowntime = (100 - uptime) / 100;
-
-        return {
-            actualDowntime,
-            allowedDowntime,
-            compliant: isCompliant,
-            deficit,
-        };
-    },
-    /**
-     * Get availability status based on uptime percentage.
-     *
-     * @remarks
-     * Thresholds: `≥99.9%` = excellent, `≥99%` = good, `≥95%` = warning, `<95%`
-     * = critical
-     *
-     * @param uptime - Uptime percentage (0-100).
-     *
-     * @returns Status level based on uptime thresholds.
-     *
-     * @public
-     */
-    getAvailabilityStatus(uptime: number):
-        | "critical"
-        | "excellent"
-        | "good"
-        | "warning" {
-        if (uptime >= 99.9) {
-            return "excellent";
-        }
-        if (uptime >= 99) {
-            return "good";
-        }
-        if (uptime >= 95) {
-            return "warning";
-        }
-        return "critical";
-    },
-    /**
-     * Get performance status based on response time.
-     *
-     * @remarks
-     * Thresholds: `≤200ms` = excellent, `≤500ms` = good, `≤1000ms` = warning,
-     * `>1000ms` = critical
-     *
-     * @param responseTime - Average response time in milliseconds.
-     *
-     * @returns Status level based on response time thresholds.
-     *
-     * @public
-     */
-    getPerformanceStatus(responseTime: number):
-        | "critical"
-        | "excellent"
-        | "good"
-        | "warning" {
-        if (responseTime <= 200) {
-            return "excellent";
-        }
-        if (responseTime <= 500) {
-            return "good";
-        }
-        if (responseTime <= 1000) {
-            return "warning";
-        }
-        return "critical";
-    },
-};
