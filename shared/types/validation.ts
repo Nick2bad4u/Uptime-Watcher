@@ -10,7 +10,8 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { isDefined, objectHasIn } from "ts-extras";
+import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
+import { isDefined } from "ts-extras";
 
 import { isRecord } from "../utils/typeHelpers";
 
@@ -188,11 +189,31 @@ export function isValidationResult(
     // Type-safe property access after narrowing
     const obj: UnknownRecord = result;
 
-    if (!objectHasIn(obj, "errors") || !objectHasIn(obj, "success")) {
+    const errorsProperty = getOwnDataProperty(obj, "errors");
+    const successProperty = getOwnDataProperty(obj, "success");
+
+    if (!errorsProperty.found || !successProperty.found) {
         return false;
     }
 
-    const { errors, metadata, success, warnings } = obj;
+    const metadataProperty = getOwnDataProperty(obj, "metadata");
+    const warningsProperty = getOwnDataProperty(obj, "warnings");
+
+    if (
+        (Object.hasOwn(obj, "metadata") && !metadataProperty.found) ||
+        (Object.hasOwn(obj, "warnings") && !warningsProperty.found)
+    ) {
+        return false;
+    }
+
+    const errors = errorsProperty.value;
+    const metadata = metadataProperty.found
+        ? metadataProperty.value
+        : undefined;
+    const success = successProperty.value;
+    const warnings = warningsProperty.found
+        ? warningsProperty.value
+        : undefined;
 
     if (typeof success !== "boolean") {
         return false;

@@ -367,6 +367,51 @@ describe("Validation Types and Functions", () => {
             expect(isValidationResult({ success: true })).toBeFalsy();
         });
 
+        it("should return false for inherited required properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const result = Object.create({
+                errors: [],
+                success: true,
+            });
+
+            expect(isValidationResult(result)).toBeFalsy();
+        });
+
+        it("should return false for accessor validation properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validation", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Business Logic", "type");
+
+            let wasAccessed = false;
+            const result = {
+                errors: [],
+                success: true,
+            };
+
+            Object.defineProperty(result, "warnings", {
+                configurable: true,
+                enumerable: true,
+                get() {
+                    wasAccessed = true;
+                    return [];
+                },
+            });
+
+            expect(isValidationResult(result)).toBeFalsy();
+            expect(wasAccessed).toBeFalsy();
+        });
+
         it("should return false for object with invalid property types", async ({
             task,
             annotate,
