@@ -71,12 +71,10 @@ repos:
     - hooks:
           - additional_dependencies: ["@biomejs/biome@2.4.14"]
             args:
-                [
-                    "--config-path",
-                    "config/linting/biome.json",
-                    "--write",
-                    "--unsafe",
-                ]
+                - "--config-path"
+                - "config/linting/biome.json"
+                - "--write"
+                - "--unsafe"
             id: "biome-lint"
             name: "🟨 typescript/react · Lint & safe fixes"
             types_or: ["ts", "tsx", "js", "jsx", "json", "jsonc"]

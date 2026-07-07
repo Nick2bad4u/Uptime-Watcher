@@ -42,7 +42,7 @@ interface PingMonitorData extends BaseMonitorData {
 interface SiteData {
     createdAt: Date;
     id: string;
-    monitors: Array<HttpMonitorData | PingMonitorData | PortMonitorData>;
+    monitors: (HttpMonitorData | PingMonitorData | PortMonitorData)[];
     name: string;
     status: "down" | "paused" | "pending" | "up";
     updatedAt: Date;
@@ -70,7 +70,7 @@ export function createValidBaseMonitor(
         checkInterval: 30_000,
         history: [], // Required field that was missing in many tests
         id: "test-monitor",
-        ...(args.length === 0 ? { lastChecked: new Date() } : {}),
+        ...(args.length === 0 && { lastChecked: new Date() }),
         monitoring: true,
         responseTime: 200,
         retryAttempts: 3,
@@ -181,7 +181,7 @@ export function createValidStatusHistory(
 ): StatusHistoryData {
     const overrides = args[0] ?? {};
     const result = {
-        ...(args.length === 0 ? { details: "Response successful" } : {}),
+        ...(args.length === 0 && { details: "Response successful" }),
         responseTime: 150,
         status: "up" as const,
         timestamp: Date.now(),

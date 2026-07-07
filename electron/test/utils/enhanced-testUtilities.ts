@@ -5,26 +5,39 @@
 
 import type { Monitor, Site } from "@shared/types";
 
-import { vi } from "vitest";
+import { vi, type Mock } from "vitest";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
-type MockRecord = Record<string, ReturnType<typeof vi.fn>>;
+type MockFunction = Mock<(...args: unknown[]) => unknown>;
+type MockRecord = Record<string, MockFunction>;
 
 interface MockRepository extends MockRecord {
-    createTransactionAdapter: ReturnType<typeof vi.fn>;
+    addEntryInternal: MockFunction;
+    bulkInsertInternal: MockFunction;
+    clearActiveOperationsInternal: MockFunction;
+    createInternal: MockFunction;
+    createTransactionAdapter: MockFunction;
+    deleteAllInternal: MockFunction;
+    deleteByMonitorIdInternal: MockFunction;
+    deleteBySiteIdentifierInternal: MockFunction;
+    deleteInternal: MockFunction;
+    getHistoryCountInternal: MockFunction;
+    pruneAllHistoryInternal: MockFunction;
+    setInternal: MockFunction;
+    updateInternal: MockFunction;
 }
 
 interface MockRepositories {
     database: {
-        close: ReturnType<typeof vi.fn>;
-        execute: ReturnType<typeof vi.fn>;
-        executeTransaction: ReturnType<typeof vi.fn>;
-        getDatabase: ReturnType<typeof vi.fn>;
-        initialize: ReturnType<typeof vi.fn>;
-        query: ReturnType<typeof vi.fn>;
+        close: MockFunction;
+        execute: MockFunction;
+        executeTransaction: MockFunction;
+        getDatabase: MockFunction;
+        initialize: MockFunction;
+        query: MockFunction;
     };
     history: MockRepository;
     monitor: MockRepository;
@@ -38,19 +51,19 @@ interface MockConfigurationManager extends Record<string, unknown> {
 }
 
 interface MockSiteLoadingOrchestrator {
-    loadSitesFromDatabase: ReturnType<typeof vi.fn>;
+    loadSitesFromDatabase: MockFunction;
 }
 
 interface MockCommandExecutor {
-    clear: ReturnType<typeof vi.fn>;
-    execute: ReturnType<typeof vi.fn>;
-    rollbackAll: ReturnType<typeof vi.fn>;
+    clear: MockFunction;
+    execute: MockFunction;
+    rollbackAll: MockFunction;
 }
 
 interface MockServiceFactory {
-    createBackupService: ReturnType<typeof vi.fn>;
-    createImportExportService: ReturnType<typeof vi.fn>;
-    createSiteRepositoryService: ReturnType<typeof vi.fn>;
+    createBackupService: MockFunction;
+    createImportExportService: MockFunction;
+    createSiteRepositoryService: MockFunction;
     dependencies: Record<string, unknown>;
     loggerAdapter: Record<string, unknown>;
 }
@@ -231,62 +244,62 @@ export function createMockRepository(): MockRepository {
         .mockImplementation((db: unknown) => {
             const adapter: MockRecord = {};
 
-            if (repository["bulkInsertInternal"].mock) {
+            if (repository.bulkInsertInternal.mock) {
                 adapter["bulkInsert"] = vi.fn((payload: unknown) =>
-                    repository["bulkInsertInternal"](db, payload)
+                    repository.bulkInsertInternal(db, payload)
                 );
             }
 
-            if (repository["deleteAllInternal"].mock) {
+            if (repository.deleteAllInternal.mock) {
                 adapter["deleteAll"] = vi.fn(() =>
-                    repository["deleteAllInternal"](db)
+                    repository.deleteAllInternal(db)
                 );
             }
 
-            if (repository["deleteInternal"].mock) {
+            if (repository.deleteInternal.mock) {
                 adapter["delete"] = vi.fn((identifier: unknown) =>
-                    repository["deleteInternal"](db, identifier)
+                    repository.deleteInternal(db, identifier)
                 );
                 adapter["deleteByKey"] = vi.fn((key: unknown) =>
-                    repository["deleteInternal"](db, key)
+                    repository.deleteInternal(db, key)
                 );
                 adapter["deleteById"] = vi.fn((identifier: unknown) =>
-                    repository["deleteInternal"](db, identifier)
+                    repository.deleteInternal(db, identifier)
                 );
             }
 
-            if (repository["deleteBySiteIdentifierInternal"].mock) {
+            if (repository.deleteBySiteIdentifierInternal.mock) {
                 adapter["deleteBySiteIdentifier"] = vi.fn(
                     (siteIdentifier: unknown) =>
-                        repository["deleteBySiteIdentifierInternal"](
+                        repository.deleteBySiteIdentifierInternal(
                             db,
                             siteIdentifier
                         )
                 );
             }
 
-            if (repository["createInternal"].mock) {
+            if (repository.createInternal.mock) {
                 adapter["create"] = vi.fn((...args: unknown[]) =>
-                    repository["createInternal"](db, ...args)
+                    repository.createInternal(db, ...args)
                 );
             }
 
-            if (repository["updateInternal"].mock) {
+            if (repository.updateInternal.mock) {
                 adapter["update"] = vi.fn((...args: unknown[]) =>
-                    repository["updateInternal"](db, ...args)
+                    repository.updateInternal(db, ...args)
                 );
             }
 
-            if (repository["clearActiveOperationsInternal"].mock) {
+            if (repository.clearActiveOperationsInternal.mock) {
                 adapter["clearActiveOperations"] = vi.fn((monitorId: unknown) =>
-                    repository["clearActiveOperationsInternal"](db, monitorId)
+                    repository.clearActiveOperationsInternal(db, monitorId)
                 );
             }
 
-            if (repository["addEntryInternal"].mock) {
+            if (repository.addEntryInternal.mock) {
                 adapter["addEntry"] = vi.fn(
                     (monitorId: unknown, entry: unknown, details?: unknown) =>
-                        repository["addEntryInternal"](
+                        repository.addEntryInternal(
                             db,
                             monitorId,
                             entry,
@@ -295,27 +308,27 @@ export function createMockRepository(): MockRepository {
                 );
             }
 
-            if (repository["deleteByMonitorIdInternal"].mock) {
+            if (repository.deleteByMonitorIdInternal.mock) {
                 adapter["deleteByMonitorId"] = vi.fn((monitorId: unknown) =>
-                    repository["deleteByMonitorIdInternal"](db, monitorId)
+                    repository.deleteByMonitorIdInternal(db, monitorId)
                 );
             }
 
-            if (repository["getHistoryCountInternal"].mock) {
+            if (repository.getHistoryCountInternal.mock) {
                 adapter["getHistoryCount"] = vi.fn((monitorId: unknown) =>
-                    repository["getHistoryCountInternal"](db, monitorId)
+                    repository.getHistoryCountInternal(db, monitorId)
                 );
             }
 
-            if (repository["pruneAllHistoryInternal"].mock) {
+            if (repository.pruneAllHistoryInternal.mock) {
                 adapter["pruneAllHistory"] = vi.fn((limit: unknown) =>
-                    repository["pruneAllHistoryInternal"](db, limit)
+                    repository.pruneAllHistoryInternal(db, limit)
                 );
             }
 
-            if (repository["setInternal"].mock) {
+            if (repository.setInternal.mock) {
                 adapter["set"] = vi.fn((key: unknown, value: unknown) =>
-                    repository["setInternal"](db, key, value)
+                    repository.setInternal(db, key, value)
                 );
             }
 

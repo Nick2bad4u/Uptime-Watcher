@@ -14,7 +14,7 @@ import { safeCastTo, stringSplit } from "ts-extras";
 import { beforeEach, expect, type MockInstance, vi } from "vitest";
 
 import { useErrorStore } from "../stores/error/useErrorStore";
-import { mockElectronAPI } from "./mock-setup";
+import "./mock-setup";
 // Custom test context setup for task and annotate properties
 // Note: The actual type definitions are in src/types/vitest-context.d.ts
 import "./vitest-context-setup";
@@ -547,9 +547,7 @@ vi.mock("../theme/useTheme", () => ({
             "system",
         ],
         currentTheme: mockTheme,
-        getColor: vi.fn((path: string) => {
-            return readThemeColorPath(path);
-        }),
+        getColor: vi.fn((path: string) => readThemeColorPath(path)),
         getStatusColor: vi.fn(
             (status: string) =>
                 mockTheme.colors.status[
@@ -609,9 +607,7 @@ vi.mock("../theme/useTheme", () => ({
         getBorderClass: vi.fn((variant = "primary") => ({
             borderColor: `var(--color-border-${variant})`,
         })),
-        getColor: vi.fn((path: string) => {
-            return readThemeColorPath(path);
-        }),
+        getColor: vi.fn((path: string) => readThemeColorPath(path)),
         getStatusClass: vi.fn((status: string) => ({
             color: `var(--color-status-${status})`,
         })),
@@ -635,5 +631,3 @@ if (globalWithFail.fail === undefined) {
         throw new Error(message ?? "Test failed");
     };
 }
-
-export { mockElectronAPI };

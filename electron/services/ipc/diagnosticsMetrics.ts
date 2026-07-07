@@ -35,7 +35,9 @@ const createInitialDiagnosticsMetrics = (): DiagnosticsMetricsSnapshot => ({
     successfulHandlerChecks: 0,
 });
 
-let metrics: DiagnosticsMetricsSnapshot = createInitialDiagnosticsMetrics();
+const metricsState: { current: DiagnosticsMetricsSnapshot } = {
+    current: createInitialDiagnosticsMetrics(),
+};
 
 interface DiagnosticsSnapshotContext {
     readonly channel?: string;
@@ -56,7 +58,7 @@ function logDiagnosticsSnapshot({
         {
             event,
             ...(channel && { channel }),
-            snapshot: { ...metrics },
+            snapshot: { ...metricsState.current },
         }
     );
 }
@@ -67,8 +69,8 @@ function logDiagnosticsSnapshot({
  * @public
  */
 export function recordSuccessfulHandlerCheck(): void {
-    metrics.successfulHandlerChecks += 1;
-    metrics.lastUpdatedAt = Date.now();
+    metricsState.current.successfulHandlerChecks += 1;
+    metricsState.current.lastUpdatedAt = Date.now();
     logDiagnosticsSnapshot({ event: "success" });
 }
 
@@ -80,9 +82,9 @@ export function recordSuccessfulHandlerCheck(): void {
  * @public
  */
 export function recordMissingHandler(channel: string): void {
-    metrics.missingHandlerChecks += 1;
-    metrics.lastMissingChannel = channel;
-    metrics.lastUpdatedAt = Date.now();
+    metricsState.current.missingHandlerChecks += 1;
+    metricsState.current.lastMissingChannel = channel;
+    metricsState.current.lastUpdatedAt = Date.now();
 
     diagnosticsLog.warn(
         "[IpcDiagnostics] Missing handler detected",
@@ -93,7 +95,7 @@ export function recordMissingHandler(channel: string): void {
         }),
         {
             channel,
-            missingHandlerChecks: metrics.missingHandlerChecks,
+            missingHandlerChecks: metricsState.current.missingHandlerChecks,
         }
     );
 
@@ -108,9 +110,9 @@ export function recordMissingHandler(channel: string): void {
 export function recordPreloadGuardFailure(
     report: PreloadGuardDiagnosticsReport
 ): void {
-    metrics.preloadGuardReports += 1;
-    metrics.lastUpdatedAt = report.timestamp;
-    metrics.lastPreloadGuard = {
+    metricsState.current.preloadGuardReports += 1;
+    metricsState.current.lastUpdatedAt = report.timestamp;
+    metricsState.current.lastPreloadGuard = {
         channel: report.channel,
         guard: report.guard,
         timestamp: report.timestamp,
@@ -147,7 +149,7 @@ export function recordPreloadGuardFailure(
  * @public
  */
 export function getDiagnosticsMetrics(): DiagnosticsMetricsSnapshot {
-    return { ...metrics };
+    return { ...metricsState.current };
 }
 
 /**
@@ -156,5 +158,5 @@ export function getDiagnosticsMetrics(): DiagnosticsMetricsSnapshot {
  * @internal
  */
 export function resetDiagnosticsMetrics(): void {
-    metrics = createInitialDiagnosticsMetrics();
+    metricsState.current = createInitialDiagnosticsMetrics();
 }
