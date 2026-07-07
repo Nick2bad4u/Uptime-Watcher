@@ -324,6 +324,36 @@ describe(useErrorStore, () => {
                 "Yet another error"
             );
         });
+
+        it("should store prototype-named store errors as own entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useErrorStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Security: Prototype-named store keys", "security");
+
+            const { result } = renderHook(() => useErrorStore());
+
+            act(() => {
+                result.current.setStoreError("__proto__", "Prototype error");
+            });
+
+            expect(
+                Object.getPrototypeOf(result.current.storeErrors)
+            ).toBeNull();
+            expect(Object.hasOwn(result.current.storeErrors, "__proto__")).toBe(
+                true
+            );
+            expect(Reflect.get(result.current.storeErrors, "__proto__")).toBe(
+                "Prototype error"
+            );
+            expect(result.current.getStoreError("__proto__")).toBe(
+                "Prototype error"
+            );
+            expect(Object.hasOwn({}, "__proto__")).toBe(false);
+        });
     });
 
     describe("Loading State Management", () => {
@@ -441,6 +471,34 @@ describe(useErrorStore, () => {
             expect(
                 result.current.getOperationLoading("operation.with.dots")
             ).toBeTruthy();
+        });
+
+        it("should store inherited-name operation loading keys as own entries", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useErrorStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate(
+                "Security: Inherited-name operation keys",
+                "security"
+            );
+
+            const { result } = renderHook(() => useErrorStore());
+
+            act(() => {
+                result.current.setOperationLoading("toString", true);
+            });
+
+            expect(
+                Object.getPrototypeOf(result.current.operationLoading)
+            ).toBeNull();
+            expect(
+                Object.hasOwn(result.current.operationLoading, "toString")
+            ).toBe(true);
+            expect(result.current.operationLoading["toString"]).toBe(true);
+            expect(result.current.getOperationLoading("toString")).toBe(true);
         });
     });
 

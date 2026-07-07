@@ -33,7 +33,8 @@
  */
 
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { isPresent, objectEntries, objectFromEntries } from "ts-extras";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { isPresent, objectEntries } from "ts-extras";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { ErrorStore } from "./types";
@@ -46,6 +47,66 @@ const normalizeStoredErrorMessage = (
     error === undefined || error.trim().length === 0
         ? error
         : getUserFacingErrorDetail(error);
+
+const createOperationLoadingMap = (): ErrorStore["operationLoading"] =>
+    createNullPrototypeObject<ErrorStore["operationLoading"]>();
+
+const createStoreErrorMap = (): ErrorStore["storeErrors"] =>
+    createNullPrototypeObject<ErrorStore["storeErrors"]>();
+
+const setOperationLoadingEntry = (
+    target: ErrorStore["operationLoading"],
+    operation: string,
+    loading: boolean
+): void => {
+    Object.defineProperty(target, operation, {
+        configurable: true,
+        enumerable: true,
+        value: loading,
+        writable: true,
+    });
+};
+
+const setStoreErrorEntry = (
+    target: ErrorStore["storeErrors"],
+    store: string,
+    error: string | undefined
+): void => {
+    Object.defineProperty(target, store, {
+        configurable: true,
+        enumerable: true,
+        value: error,
+        writable: true,
+    });
+};
+
+const cloneOperationLoading = (
+    operationLoading: ErrorStore["operationLoading"]
+): ErrorStore["operationLoading"] => {
+    const nextOperationLoading = createOperationLoadingMap();
+
+    for (const [operation, loading] of objectEntries(operationLoading)) {
+        if (typeof loading === "boolean") {
+            setOperationLoadingEntry(nextOperationLoading, operation, loading);
+        }
+    }
+
+    return nextOperationLoading;
+};
+
+const cloneStoreErrors = (
+    storeErrors: ErrorStore["storeErrors"]
+): ErrorStore["storeErrors"] => {
+    const nextStoreErrors = createStoreErrorMap();
+
+    for (const [store, error] of objectEntries(storeErrors)) {
+        if (error === undefined || typeof error === "string") {
+            setStoreErrorEntry(nextStoreErrors, store, error);
+        }
+    }
+
+    return nextStoreErrors;
+};
 
 /**
  * Zustand store for centralized error management across the app.
@@ -65,7 +126,7 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
             logStoreAction("ErrorStore", "clearAllErrors");
             set({
                 lastError: undefined,
-                storeErrors: {},
+                storeErrors: createStoreErrorMap(),
                 // Note: isLoading and operationLoading are NOT cleared as they track loading states, not errors
             });
         },
@@ -76,15 +137,8 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
         clearStoreError: (store: string): void => {
             logStoreAction("ErrorStore", "clearStoreError", { store });
             set((state) => {
-                const newStoreErrors = {
-                    ...state.storeErrors,
-                };
-                // Filter out the specified store error
-                const remainingErrors = objectFromEntries(
-                    objectEntries(newStoreErrors).filter(
-                        ([key]) => key !== store
-                    )
-                );
+                const remainingErrors = cloneStoreErrors(state.storeErrors);
+                Reflect.deleteProperty(remainingErrors, store);
                 return { storeErrors: remainingErrors };
             });
         },
@@ -109,7 +163,7 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
         // State
         isLoading: false,
         lastError: undefined,
-        operationLoading: {},
+        operationLoading: createOperationLoadingMap(),
         setError: (error: string | undefined): void => {
             const lastError = normalizeStoredErrorMessage(error);
             logStoreAction("ErrorStore", "setError", { error: lastError });
@@ -125,10 +179,17 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                 operation,
             });
             set((state) => ({
-                operationLoading: {
-                    ...state.operationLoading,
-                    [operation]: loading,
-                },
+                operationLoading: (() => {
+                    const operationLoading = cloneOperationLoading(
+                        state.operationLoading
+                    );
+                    setOperationLoadingEntry(
+                        operationLoading,
+                        operation,
+                        loading
+                    );
+                    return operationLoading;
+                })(),
             }));
         },
         setStoreError: (store: string, error: string | undefined): void => {
@@ -138,11 +199,12 @@ export const useErrorStore: UseBoundStore<StoreApi<ErrorStore>> =
                 store,
             });
             set((state) => ({
-                storeErrors: {
-                    ...state.storeErrors,
-                    [store]: storeError,
-                },
+                storeErrors: (() => {
+                    const storeErrors = cloneStoreErrors(state.storeErrors);
+                    setStoreErrorEntry(storeErrors, store, storeError);
+                    return storeErrors;
+                })(),
             }));
         },
-        storeErrors: {},
+        storeErrors: createStoreErrorMap(),
     }));
