@@ -6,7 +6,6 @@ import type { StatusUpdateSubscriptionSummary } from "../../../stores/sites/base
 
 import { StatusSubscriptionIndicator } from "../../../components/Header/StatusSubscriptionIndicator";
 import {
-    formatChannelLabel,
     formatListenerDetail,
     formatListenerSummary,
     formatRetryAttemptSummary,
@@ -173,11 +172,6 @@ describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
 });
 
 describe("status subscription formatting helpers", () => {
-    it("pluralizes channel labels based on count", () => {
-        expect(formatChannelLabel(1)).toBe("channel");
-        expect(formatChannelLabel(2)).toBe("channels");
-    });
-
     it("summarizes listener attachment progress across all states", () => {
         expect(formatListenerSummary(undefined)).toBe("Connection pending");
         expect(formatListenerSummary(zeroChannelSummary)).toBe(
@@ -208,6 +202,9 @@ describe("status subscription formatting helpers", () => {
 
     it("summarizes retry attempts when available", () => {
         expect(formatRetryAttemptSummary(null)).toBeUndefined();
+        expect(formatRetryAttemptSummary(singleChannelSummary)).toBe(
+            "Last retry attached 1/1 channel."
+        );
         expect(formatRetryAttemptSummary(fallbackSummary)).toBe(
             "Last retry attached 0/4 channels."
         );

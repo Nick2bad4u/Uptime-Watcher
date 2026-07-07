@@ -16,7 +16,7 @@ import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTyp
  *
  * @internal
  */
-export const formatChannelLabel = (count: number): string =>
+const formatChannelLabel = (count: number): string =>
     count === 1 ? "channel" : "channels";
 
 /**
