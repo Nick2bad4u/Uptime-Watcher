@@ -22,8 +22,6 @@ import { describe, expect, it } from "vitest";
 import {
     addMonitorToSite,
     createDefaultMonitor,
-    findMonitorInSite,
-    monitorOperations,
     normalizeMonitor,
     removeMonitorFromSite,
     updateMonitorInSite,
@@ -279,77 +277,6 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         for (const monitor of monitorsToAdd) {
                             expect(currentSite.monitors).toContain(monitor);
                         }
-                    }
-                )
-            );
-        });
-    });
-
-    describe("findMonitorInSite function coverage", () => {
-        it("should find monitors by ID when they exist", () => {
-            fc.assert(
-                fc.property(
-                    siteArb.filter((site) => site.monitors.length > 0),
-                    (site) => {
-                        // Pick a random monitor from the site
-                        const randomIndex = Math.floor(
-                            secureRandomFloat() * site.monitors.length
-                        );
-                        const targetMonitor = site.monitors[randomIndex];
-                        expect(targetMonitor).toBeDefined(); // Assert it exists
-
-                        const foundMonitor = findMonitorInSite(
-                            site,
-                            targetMonitor!.id
-                        );
-
-                        expect(foundMonitor).toBeDefined();
-                        // When duplicate IDs exist, findMonitorInSite returns the first match
-                        // This is expected behavior - we check the ID matches and type is correct
-                        expect(foundMonitor?.id).toBe(targetMonitor!.id);
-                        expect(foundMonitor?.type).toBe(targetMonitor!.type);
-                    }
-                )
-            );
-        });
-
-        it("should return undefined for non-existent monitor IDs", () => {
-            fc.assert(
-                fc.property(
-                    siteArb,
-                    fc.string({ minLength: 1, maxLength: 50 }),
-                    (site, potentialId) => {
-                        // Ensure the ID doesn't exist in the site
-                        if (site.monitors.some((m) => m.id === potentialId)) {
-                            return; // Skip this test case
-                        }
-
-                        const foundMonitor = findMonitorInSite(
-                            site,
-                            potentialId
-                        );
-                        expect(foundMonitor).toBeUndefined();
-                    }
-                )
-            );
-        });
-
-        it("should handle empty sites correctly", () => {
-            fc.assert(
-                fc.property(
-                    fc.record({
-                        identifier: siteIdArb,
-                        name: fc.string({ minLength: 1, maxLength: 100 }),
-                        monitoring: fc.boolean(),
-                        monitors: fc.constant(safeCastTo<Monitor[]>([])),
-                    }),
-                    fc.string({ minLength: 1, maxLength: 50 }),
-                    (emptySite, anyId) => {
-                        const foundMonitor = findMonitorInSite(
-                            emptySite,
-                            anyId
-                        );
-                        expect(foundMonitor).toBeUndefined();
                     }
                 )
             );
@@ -651,9 +578,8 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                             site.monitors.length
                         );
 
-                        const updatedMonitor = findMonitorInSite(
-                            updatedSite,
-                            targetMonitor!.id
+                        const updatedMonitor = updatedSite.monitors.find(
+                            (monitor) => monitor.id === targetMonitor!.id
                         );
                         expect(updatedMonitor).toBeDefined();
                         expect(updatedMonitor!.id).toBe(targetMonitor!.id); // ID should be preserved
@@ -730,104 +656,6 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         });
     });
 
-    describe("monitorOperations object coverage", () => {
-        it("should toggle monitoring state", () => {
-            fc.assert(
-                fc.property(monitorArb, (monitor) => {
-                    const toggled = monitorOperations.toggleMonitoring(monitor);
-                    expect(toggled.monitoring).toBe(!monitor.monitoring);
-                    expect(toggled.id).toBe(monitor.id);
-                    expect(toggled.type).toBe(monitor.type);
-                })
-            );
-        });
-
-        it("should update check interval", () => {
-            fc.assert(
-                fc.property(
-                    monitorArb,
-                    checkIntervalArb,
-                    (monitor, newInterval) => {
-                        const updated = monitorOperations.updateCheckInterval(
-                            monitor,
-                            newInterval
-                        );
-                        expect(updated.checkInterval).toBe(newInterval);
-                        expect(updated.id).toBe(monitor.id);
-                    }
-                )
-            );
-        });
-
-        it("should update retry attempts", () => {
-            fc.assert(
-                fc.property(
-                    monitorArb,
-                    retryAttemptsArb,
-                    (monitor, newRetries) => {
-                        const updated = monitorOperations.updateRetryAttempts(
-                            monitor,
-                            newRetries
-                        );
-                        expect(updated.retryAttempts).toBe(newRetries);
-                        expect(updated.id).toBe(monitor.id);
-                    }
-                )
-            );
-        });
-
-        it("should update status with valid values", () => {
-            fc.assert(
-                fc.property(
-                    monitorArb,
-                    fc.constantFrom<Monitor["status"]>(
-                        ...MONITOR_STATUS_VALUES
-                    ),
-                    (monitor, newStatus) => {
-                        const updated = monitorOperations.updateStatus(
-                            monitor,
-                            newStatus
-                        );
-                        expect(updated.status).toBe(newStatus);
-                        expect(updated.id).toBe(monitor.id);
-                    }
-                )
-            );
-        });
-
-        it("should throw for invalid status values", () => {
-            fc.assert(
-                fc.property(
-                    monitorArb,
-                    fc
-                        .string()
-                        .filter((s) => !monitorStatusStringValues.includes(s)),
-                    (monitor, invalidStatus) => {
-                        expect(() =>
-                            monitorOperations.updateStatus(
-                                monitor,
-                                invalidStatus as any
-                            )
-                        ).toThrow();
-                    }
-                )
-            );
-        });
-
-        it("should update timeout", () => {
-            fc.assert(
-                fc.property(monitorArb, timeoutArb, (monitor, newTimeout) => {
-                    const updated = monitorOperations.updateTimeout(
-                        monitor,
-                        newTimeout
-                    );
-                    expect(updated.timeout).toBe(newTimeout);
-                    expect(updated.id).toBe(monitor.id);
-                })
-            );
-        });
-    });
-
     describe("Integration and edge cases", () => {
         it("should work together for complex site management workflows", () => {
             fc.assert(
@@ -847,9 +675,8 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
                         // Verify each added monitor can be found
                         for (const monitor of newMonitors) {
-                            const found = findMonitorInSite(
-                                currentSite,
-                                monitor.id
+                            const found = currentSite.monitors.find(
+                                (candidate) => candidate.id === monitor.id
                             );
                             expect(found).toBeDefined();
                             expect(found?.id).toBe(monitor.id);
@@ -857,9 +684,8 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
 
                         // Verify original monitors are still findable
                         for (const monitor of initialSite.monitors) {
-                            const found = findMonitorInSite(
-                                currentSite,
-                                monitor.id
+                            const found = currentSite.monitors.find(
+                                (candidate) => candidate.id === monitor.id
                             );
                             expect(found).toBeDefined();
                             expect(found?.id).toBe(monitor.id);
@@ -927,22 +753,19 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
                         const originalMonitor = arrayFirst(site.monitors);
                         expect(originalMonitor).toBeDefined(); // Assert it exists
 
-                        // Test that operations don't mutate original objects
-                        const toggled = monitorOperations.toggleMonitoring(
-                            originalMonitor!
+                        const updated = updateMonitorInSite(
+                            site,
+                            originalMonitor!.id,
+                            { timeout: 10_000 }
                         );
-                        expect(originalMonitor!.monitoring).not.toBe(
-                            toggled.monitoring
+                        const updatedMonitor = updated.monitors.find(
+                            (monitor) => monitor.id === originalMonitor!.id
                         );
-
-                        const updated = monitorOperations.updateTimeout(
-                            originalMonitor!,
-                            10_000
-                        );
+                        expect(updatedMonitor).toBeDefined();
                         expect(originalMonitor!.timeout).not.toBe(
-                            updated.timeout
+                            updatedMonitor!.timeout
                         );
-                        expect(originalMonitor === updated).toBeFalsy();
+                        expect(originalMonitor === updatedMonitor).toBeFalsy();
                     }
                 )
             );

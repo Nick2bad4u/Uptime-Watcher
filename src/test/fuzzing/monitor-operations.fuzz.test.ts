@@ -33,8 +33,6 @@ import { describe, expect, it } from "vitest";
 import {
     addMonitorToSite,
     createDefaultMonitor,
-    findMonitorInSite,
-    monitorOperations,
     normalizeMonitor,
     updateMonitorInSite,
     validateMonitorExists,
@@ -497,119 +495,6 @@ describe("Monitor Operations Fuzzing Tests", () => {
         });
     });
 
-    describe("monitorOperations", () => {
-        it("updateStatus should validate status values", () => {
-            fc.assert(
-                fc.property(
-                    arbitraryPartialMonitor(),
-                    arbitraryMixedValue(),
-                    (monitorData, statusValue) => {
-                        const monitor = normalizeMonitor(monitorData);
-
-                        if (
-                            [
-                                "down",
-                                "paused",
-                                "pending",
-                                "up",
-                            ].includes(statusValue as string)
-                        ) {
-                            const updated = monitorOperations.updateStatus(
-                                monitor,
-                                statusValue as MonitorStatus
-                            );
-                            expect(updated.status).toBe(statusValue);
-                            expect(updated.id).toBe(monitor.id); // Other fields preserved
-                        } else {
-                            expect(() =>
-                                monitorOperations.updateStatus(
-                                    monitor,
-                                    statusValue as MonitorStatus
-                                )
-                            ).toThrow("Invalid monitor status");
-                        }
-                    }
-                )
-            );
-        });
-
-        it("updateTimeout should preserve monitor integrity", () => {
-            fc.assert(
-                fc.property(
-                    arbitraryPartialMonitor(),
-                    arbitraryTimeout(),
-                    (monitorData, timeout) => {
-                        const monitor = normalizeMonitor(monitorData);
-                        const updated = monitorOperations.updateTimeout(
-                            monitor,
-                            timeout
-                        );
-
-                        expect(updated.timeout).toBe(timeout);
-                        expect(updated.id).toBe(monitor.id);
-                        expect(updated.type).toBe(monitor.type);
-                        expect(updated.status).toBe(monitor.status);
-                        // All other fields should be preserved
-                    }
-                )
-            );
-        });
-
-        it("updateCheckInterval should handle any numeric input", () => {
-            fc.assert(
-                fc.property(
-                    arbitraryPartialMonitor(),
-                    arbitraryCheckInterval(),
-                    (monitorData, interval) => {
-                        const monitor = normalizeMonitor(monitorData);
-                        const updated = monitorOperations.updateCheckInterval(
-                            monitor,
-                            interval
-                        );
-
-                        expect(updated.checkInterval).toBe(interval);
-                        expect(updated.id).toBe(monitor.id);
-                        // Other fields preserved
-                    }
-                )
-            );
-        });
-
-        it("updateRetryAttempts should handle any numeric input", () => {
-            fc.assert(
-                fc.property(
-                    arbitraryPartialMonitor(),
-                    arbitraryRetryAttempts(),
-                    (monitorData, retries) => {
-                        const monitor = normalizeMonitor(monitorData);
-                        const updated = monitorOperations.updateRetryAttempts(
-                            monitor,
-                            retries
-                        );
-
-                        expect(updated.retryAttempts).toBe(retries);
-                        expect(updated.id).toBe(monitor.id);
-                        // Other fields preserved
-                    }
-                )
-            );
-        });
-
-        it("toggleMonitoring should flip boolean state", () => {
-            fc.assert(
-                fc.property(arbitraryPartialMonitor(), (monitorData) => {
-                    const monitor = normalizeMonitor(monitorData);
-                    const isOriginalState = monitor.monitoring;
-                    const toggled = monitorOperations.toggleMonitoring(monitor);
-
-                    expect(toggled.monitoring).toBe(!isOriginalState);
-                    expect(toggled.id).toBe(monitor.id);
-                    // All other fields preserved
-                })
-            );
-        });
-    });
-
     describe("site monitor operations", () => {
         const arbitrarySite = (): fc.Arbitrary<Site> =>
             fc.record({
@@ -643,24 +528,6 @@ describe("Monitor Operations Fuzzing Tests", () => {
             );
         });
 
-        it("findMonitorInSite should handle various monitor IDs", () => {
-            fc.assert(
-                fc.property(arbitrarySite(), fc.string(), (site, searchId) => {
-                    const found = findMonitorInSite(site, searchId);
-
-                    const isExistsInSite = site.monitors.some(
-                        (m) => m.id === searchId
-                    );
-                    if (isExistsInSite) {
-                        expect(found).toBeDefined();
-                        expect(found!.id).toBe(searchId);
-                    } else {
-                        expect(found).toBeUndefined();
-                    }
-                })
-            );
-        });
-
         it("updateMonitorInSite should handle update failures gracefully", () => {
             fc.assert(
                 fc.property(
@@ -691,9 +558,8 @@ describe("Monitor Operations Fuzzing Tests", () => {
                         expect(updated).toHaveProperty("monitors");
 
                         // Should still have the monitor (with the actual ID)
-                        const monitor = findMonitorInSite(
-                            updated,
-                            actualMonitorId
+                        const monitor = updated.monitors.find(
+                            (candidate) => candidate.id === actualMonitorId
                         );
                         expect(monitor).toBeDefined();
                     }

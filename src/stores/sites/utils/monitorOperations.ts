@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import { isMonitorStatus, type Monitor, type Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -30,7 +30,7 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
  *
  * @public
  */
-export function findMonitorInSite(
+function findMonitorInSite(
     site: Site,
     monitorId: string
 ): Monitor | undefined {
@@ -232,56 +232,3 @@ export function validateMonitorExists(
         throw new Error(ERROR_CATALOG.monitors.NOT_FOUND);
     }
 }
-
-/**
- * Creates monitor update operations.
- */
-export const monitorOperations = {
-    /** Toggle monitor monitoring state. */
-    toggleMonitoring: (monitor: Monitor): Monitor => ({
-        ...monitor,
-        monitoring: !monitor.monitoring,
-    }),
-
-    /** Update monitor check interval. */
-    updateCheckInterval: (monitor: Monitor, interval: number): Monitor => ({
-        ...monitor,
-        checkInterval: interval,
-    }),
-
-    /** Update monitor retry attempts. */
-    updateRetryAttempts: (
-        monitor: Monitor,
-        retryAttempts: number
-    ): Monitor => ({
-        ...monitor,
-        retryAttempts,
-    }),
-
-    /**
-     * Update monitor status.
-     *
-     * @param monitor - The monitor to update.
-     * @param status - The new status to set.
-     *
-     * @returns Updated monitor with validated status.
-     *
-     * @throws Error if status is not valid.
-     */
-    updateStatus: (monitor: Monitor, status: Monitor["status"]): Monitor => {
-        if (!isMonitorStatus(status)) {
-            throw new Error("Invalid monitor status");
-        }
-
-        return {
-            ...monitor,
-            status,
-        };
-    },
-
-    /** Update monitor timeout. */
-    updateTimeout: (monitor: Monitor, timeout: number): Monitor => ({
-        ...monitor,
-        timeout,
-    }),
-};
