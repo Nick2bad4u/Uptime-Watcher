@@ -360,19 +360,3 @@ export function applyCloudSyncOperationsToState(
 
     return state;
 }
-
-/**
- * Applies operations to produce a derived state from scratch.
- */
-export function applyCloudSyncOperations(
-    operations: readonly CloudSyncOperation[]
-): CloudSyncState {
-    const state = createEmptyState();
-
-    const sorted = [...operations].toSorted(compareOperationsDeterministic);
-    for (const operation of sorted) {
-        applyOperation(state, operation);
-    }
-
-    return state;
-}

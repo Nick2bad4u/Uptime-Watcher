@@ -74,7 +74,7 @@ function isModuleSourceLike(moduleSource) {
  *
  * @param {string} inlineTagText The inline-tag payload stored by TypeDoc.
  */
-export function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
+function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
     const pipeIndex = inlineTagText.indexOf("|");
     const beforePipe =
         pipeIndex === -1 ? inlineTagText : inlineTagText.slice(0, pipeIndex);
@@ -122,7 +122,7 @@ export function convertHashLinksToBangLinksInInlineTagText(inlineTagText) {
 /**
  * @param {CommentDisplayPart[]} parts
  */
-export function convertHashLinksToBangLinksInParts(parts) {
+function convertHashLinksToBangLinksInParts(parts) {
     for (const part of parts) {
         if (
             part.kind !== "inline-tag" ||

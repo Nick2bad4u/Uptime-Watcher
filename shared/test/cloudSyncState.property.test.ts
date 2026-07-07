@@ -3,9 +3,22 @@ import {
     type CloudSyncOperation,
     parseCloudSyncOperation,
 } from "@shared/types/cloudSync";
-import { applyCloudSyncOperations } from "@shared/utils/cloudSyncState";
+import type { CloudSyncState } from "@shared/types/cloudSyncState";
+
+import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+
+const createEmptyCloudSyncState = (): CloudSyncState => ({
+    monitor: {},
+    settings: {},
+    site: {},
+});
+
+const applyCloudSyncOperations = (
+    operations: readonly CloudSyncOperation[]
+): CloudSyncState =>
+    applyCloudSyncOperationsToState(createEmptyCloudSyncState(), operations);
 
 const hexCharArb = fc.constantFrom(
     ...([..."0123456789abcdef"] as readonly string[])

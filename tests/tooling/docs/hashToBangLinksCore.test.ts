@@ -1,76 +1,76 @@
 import { describe, expect, it } from "vitest";
 
 import {
-    convertHashLinksToBangLinksInInlineTagText,
-    convertHashLinksToBangLinksInParts,
+    convertHashLinksToBangLinksInComment,
 } from "../../../docs/docusaurus/typedoc-plugins/hashToBangLinksCore.mjs";
 
-describe(convertHashLinksToBangLinksInInlineTagText, () => {
+const rewriteInlineTagText = (text: string): string => {
+    const comment = {
+        blockTags: [],
+        summary: [
+            {
+                kind: "inline-tag",
+                tag: "@link",
+                text,
+            },
+        ],
+    };
+
+    convertHashLinksToBangLinksInComment(comment);
+
+    return comment.summary[0]!.text;
+};
+
+describe(convertHashLinksToBangLinksInComment, () => {
     it("rewrites module#Export to module!Export", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#Bar")).toBe(
-            "src/foo!Bar"
-        );
+        expect(rewriteInlineTagText("src/foo#Bar")).toBe("src/foo!Bar");
     });
 
     it("preserves a | label suffix", () => {
-        expect(
-            convertHashLinksToBangLinksInInlineTagText("src/foo#Bar | Label")
-        ).toBe("src/foo!Bar | Label");
+        expect(rewriteInlineTagText("src/foo#Bar | Label")).toBe(
+            "src/foo!Bar | Label"
+        );
     });
 
     it("preserves leading/trailing whitespace around the core", () => {
-        expect(
-            convertHashLinksToBangLinksInInlineTagText(
-                "   src/foo#Bar   | Label"
-            )
-        ).toBe("   src/foo!Bar   | Label");
+        expect(rewriteInlineTagText("   src/foo#Bar   | Label")).toBe(
+            "   src/foo!Bar   | Label"
+        );
     });
 
     it("does not rewrite URL fragments", () => {
-        expect(
-            convertHashLinksToBangLinksInInlineTagText(
-                "https://example.com/a#b"
-            )
-        ).toBe("https://example.com/a#b");
+        expect(rewriteInlineTagText("https://example.com/a#b")).toBe(
+            "https://example.com/a#b"
+        );
     });
 
     it("does not rewrite non-:// URL-like schemes", () => {
-        expect(
-            convertHashLinksToBangLinksInInlineTagText(
-                "mailto:me@example.com#x"
-            )
-        ).toBe("mailto:me@example.com#x");
-        expect(
-            convertHashLinksToBangLinksInInlineTagText("data:text/plain#x")
-        ).toBe("data:text/plain#x");
-        expect(
-            convertHashLinksToBangLinksInInlineTagText(
-                "urn:example:animal:ferret:nose#x"
-            )
-        ).toBe("urn:example:animal:ferret:nose#x");
+        expect(rewriteInlineTagText("mailto:me@example.com#x")).toBe(
+            "mailto:me@example.com#x"
+        );
+        expect(rewriteInlineTagText("data:text/plain#x")).toBe(
+            "data:text/plain#x"
+        );
+        expect(rewriteInlineTagText("urn:example:animal:ferret:nose#x")).toBe(
+            "urn:example:animal:ferret:nose#x"
+        );
     });
 
     it("does not rewrite non-module-looking references", () => {
         // A plain identifier `Foo#bar` is likely intended as TypeDoc instance-member navigation.
-        expect(convertHashLinksToBangLinksInInlineTagText("Foo#bar")).toBe(
-            "Foo#bar"
-        );
+        expect(rewriteInlineTagText("Foo#bar")).toBe("Foo#bar");
     });
 
     it("rewrites node: specifiers", () => {
-        expect(
-            convertHashLinksToBangLinksInInlineTagText("node:fs#promises")
-        ).toBe("node:fs!promises");
+        expect(rewriteInlineTagText("node:fs#promises")).toBe(
+            "node:fs!promises"
+        );
     });
 
     it("does not rewrite when the # has no right-hand side", () => {
-        expect(convertHashLinksToBangLinksInInlineTagText("src/foo#")).toBe(
-            "src/foo#"
-        );
+        expect(rewriteInlineTagText("src/foo#")).toBe("src/foo#");
     });
-});
 
-describe(convertHashLinksToBangLinksInParts, () => {
     it("rewrites inline-tag @link parts and clears resolved link fields", () => {
         /** @type {any[]} */
         const parts = [
@@ -86,8 +86,12 @@ describe(convertHashLinksToBangLinksInParts, () => {
                 text: " (not touched)",
             },
         ];
+        const comment = {
+            blockTags: [],
+            summary: parts,
+        };
 
-        convertHashLinksToBangLinksInParts(parts);
+        convertHashLinksToBangLinksInComment(comment);
 
         expect(parts[0]!.text).toBe("src/foo!Bar");
         expect("target" in parts[0]!).toBeFalsy();
@@ -104,9 +108,34 @@ describe(convertHashLinksToBangLinksInParts, () => {
                 text: "mailto:me@example.com#x",
             },
         ];
+        const comment = {
+            blockTags: [],
+            summary: parts,
+        };
 
-        convertHashLinksToBangLinksInParts(parts);
+        convertHashLinksToBangLinksInComment(comment);
 
         expect(parts[0]!.text).toBe("mailto:me@example.com#x");
+    });
+
+    it("rewrites block tag content", () => {
+        const comment = {
+            blockTags: [
+                {
+                    content: [
+                        {
+                            kind: "inline-tag",
+                            tag: "@linkcode",
+                            text: "src/foo#Bar",
+                        },
+                    ],
+                },
+            ],
+            summary: [],
+        };
+
+        convertHashLinksToBangLinksInComment(comment);
+
+        expect(comment.blockTags[0]!.content[0]!.text).toBe("src/foo!Bar");
     });
 });

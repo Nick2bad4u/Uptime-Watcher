@@ -5,11 +5,19 @@
 import type { CloudSyncOperation } from "@shared/types/cloudSync";
 import type { CloudSyncState } from "@shared/types/cloudSyncState";
 
-import {
-    applyCloudSyncOperations,
-    applyCloudSyncOperationsToState,
-} from "@shared/utils/cloudSyncState";
+import { applyCloudSyncOperationsToState } from "@shared/utils/cloudSyncState";
 import { describe, expect, it } from "vitest";
+
+const createEmptyCloudSyncState = (): CloudSyncState => ({
+    monitor: {},
+    settings: {},
+    site: {},
+});
+
+const applyCloudSyncOperations = (
+    operations: readonly CloudSyncOperation[]
+): CloudSyncState =>
+    applyCloudSyncOperationsToState(createEmptyCloudSyncState(), operations);
 
 function setField(
     partial: Omit<CloudSyncOperation, "kind"> & {
