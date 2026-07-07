@@ -28,7 +28,6 @@ import {
     formatFullTimestamp,
     formatIntervalDuration,
     formatRelativeTimestamp,
-    formatResponseDuration,
     formatResponseTime,
     formatRetryAttemptsText,
     getIntervalLabel,
@@ -295,47 +294,6 @@ describe("time Utils Property-Based Tests", () => {
         );
     });
 
-    describe("formatResponseDuration function", () => {
-        fcTest.prop([fc.integer({ max: 999, min: 0 })])(
-            "should format milliseconds for durations under 1 second",
-            (ms) => {
-                const result = formatResponseDuration(ms);
-
-                expect(result).toBe(`${ms}ms`);
-                expect(result).toMatch(/^\d+ms$/v);
-            }
-        );
-
-        fcTest.prop([fc.integer({ max: 59_999, min: 1000 })])(
-            "should format to seconds for durations under 1 minute",
-            (ms) => {
-                const result = formatResponseDuration(ms);
-                const expectedSeconds = Math.round(ms / 1000);
-
-                expect(result).toBe(`${expectedSeconds}s`);
-                expect(result).toMatch(/^\d+s$/v);
-            }
-        );
-
-        fcTest.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
-            "should format to minutes for durations under 1 hour",
-            (ms) => {
-                const result = formatResponseDuration(ms);
-                const expectedMinutes = Math.round(ms / 60_000);
-
-                expect(result).toBe(`${expectedMinutes}m`);
-                expect(result).toMatch(/^\d+m$/v);
-            }
-        );
-
-        fcTest.prop([fc.constantFrom(Number.NaN, Infinity, -Infinity)])(
-            "should return fallback for non-finite durations",
-            (ms) => {
-                expect(formatResponseDuration(ms)).toBe("N/A");
-            }
-        );
-    });
-
     describe("formatResponseTime function", () => {
         fcTest.prop([fc.integer({ max: 999, min: 0 })])(
             "should format milliseconds for fast response times",
@@ -532,7 +490,6 @@ describe("time Utils Property-Based Tests", () => {
         ])("should handle negative durations gracefully", (negativeMs) => {
             expect(formatDuration(negativeMs)).toBe("N/A");
             expect(formatIntervalDuration(negativeMs)).toBe("N/A");
-            expect(formatResponseDuration(negativeMs)).toBe("N/A");
         });
 
         fcTest.prop([
@@ -545,10 +502,6 @@ describe("time Utils Property-Based Tests", () => {
             const result = formatDuration(ms);
 
             expect(result).toBe("0s"); // Should round down to 0 seconds
-
-            const responseResult = formatResponseDuration(ms);
-
-            expect(responseResult).toBe("0ms"); // Should round to 0 milliseconds
         });
 
         fcTest.prop([

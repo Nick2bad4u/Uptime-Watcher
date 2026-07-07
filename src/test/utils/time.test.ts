@@ -9,7 +9,6 @@ import {
     formatFullTimestamp,
     formatIntervalDuration,
     formatRelativeTimestamp,
-    formatResponseDuration,
     formatResponseTime,
     formatRetryAttemptsText,
     getIntervalLabel,
@@ -444,104 +443,6 @@ describe("time Utilities", () => {
         });
     });
 
-    describe(formatResponseDuration, () => {
-        it("should format milliseconds for values under 1 second", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(formatResponseDuration(0)).toBe("0ms");
-            expect(formatResponseDuration(123)).toBe("123ms");
-            expect(formatResponseDuration(500)).toBe("500ms");
-            expect(formatResponseDuration(999)).toBe("999ms");
-        });
-
-        it("should format seconds for values under 1 minute", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(formatResponseDuration(1000)).toBe("1s");
-            expect(formatResponseDuration(5000)).toBe("5s");
-            expect(formatResponseDuration(30_000)).toBe("30s");
-            expect(formatResponseDuration(59_999)).toBe("60s"); // Rounds up
-        });
-
-        it("should format minutes for values under 1 hour", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(formatResponseDuration(60_000)).toBe("1m");
-            expect(formatResponseDuration(150_000)).toBe("3m"); // 2.5 minutes rounds up
-            expect(formatResponseDuration(1_800_000)).toBe("30m");
-            expect(formatResponseDuration(3_599_999)).toBe("60m");
-        });
-
-        it("should format hours for values 1 hour and above", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(formatResponseDuration(3_600_000)).toBe("1h");
-            expect(formatResponseDuration(5_400_000)).toBe("2h"); // 1.5 hours rounds up
-            expect(formatResponseDuration(7_200_000)).toBe("2h");
-        });
-
-        it("should handle edge cases", async ({ annotate, task }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(formatResponseDuration(999.9)).toBe("999.9ms");
-            expect(formatResponseDuration(1000.1)).toBe("1s");
-        });
-
-        it("should return fallback for non-finite durations", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
-
-            expect(formatResponseDuration(Number.NaN)).toBe("N/A");
-            expect(formatResponseDuration(Infinity)).toBe("N/A");
-            expect(formatResponseDuration(-Infinity)).toBe("N/A");
-        });
-
-        it("should return fallback for negative response durations", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: time", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Validation", "type");
-
-            expect(formatResponseDuration(-1)).toBe("N/A");
-            expect(formatResponseDuration(-1000)).toBe("N/A");
-        });
-    });
-
     describe(formatResponseTime, () => {
         it("should return 'N/A' for missing or non-finite values", async ({
             annotate,
@@ -874,7 +775,6 @@ describe("time Utilities", () => {
             // These should not throw errors
             expect(() => formatDuration(largeNumber)).not.toThrow();
             expect(() => formatIntervalDuration(largeNumber)).not.toThrow();
-            expect(() => formatResponseDuration(largeNumber)).not.toThrow();
             expect(() => formatResponseTime(largeNumber)).not.toThrow();
         });
 
@@ -890,7 +790,6 @@ describe("time Utilities", () => {
             // These should not throw errors, though behavior may vary
             expect(() => formatDuration(-1000)).not.toThrow();
             expect(() => formatIntervalDuration(-1000)).not.toThrow();
-            expect(() => formatResponseDuration(-1000)).not.toThrow();
             expect(() => formatResponseTime(-1000)).not.toThrow();
         });
 
@@ -1190,57 +1089,6 @@ describe("time Utilities", () => {
             );
         });
 
-        describe("formatResponseDuration property tests", () => {
-            test.prop([fc.integer({ max: 999, min: 0 })])(
-                "should format milliseconds for values < 1000ms",
-                (ms) => {
-                    const result = formatResponseDuration(ms);
-
-                    expect(result).toMatch(/^\d+ms$/v);
-                    expect(result).toBe(`${ms}ms`);
-                }
-            );
-
-            test.prop([fc.integer({ max: 59_999, min: 1000 })])(
-                "should format seconds for values 1s-59s",
-                (ms) => {
-                    const result = formatResponseDuration(ms);
-
-                    expect(result).toMatch(/^\d+s$/v);
-
-                    const expectedSeconds = Math.round(ms / 1000);
-
-                    expect(result).toBe(`${expectedSeconds}s`);
-                }
-            );
-
-            test.prop([fc.integer({ max: 3_599_999, min: 60_000 })])(
-                "should format minutes for values 1m-59m",
-                (ms) => {
-                    const result = formatResponseDuration(ms);
-
-                    expect(result).toMatch(/^\d+m$/v);
-
-                    const expectedMinutes = Math.round(ms / 60_000);
-
-                    expect(result).toBe(`${expectedMinutes}m`);
-                }
-            );
-
-            test.prop([fc.integer({ max: 86_400_000, min: 3_600_000 })])(
-                "should format hours for values >= 1h",
-                (ms) => {
-                    const result = formatResponseDuration(ms);
-
-                    expect(result).toMatch(/^\d+h$/v);
-
-                    const expectedHours = Math.round(ms / 3_600_000);
-
-                    expect(result).toBe(`${expectedHours}h`);
-                }
-            );
-        });
-
         describe("formatResponseTime property tests", () => {
             test.prop([fc.integer({ max: 999, min: 0 })])(
                 "should format milliseconds for times < 1000ms",
@@ -1376,22 +1224,6 @@ describe("time Utilities", () => {
         });
 
         describe("cross-function property tests", () => {
-            test.prop([fc.integer({ max: 86_400_000, min: 0 })])(
-                "formatDuration and formatResponseDuration should handle same inputs consistently",
-                (ms) => {
-                    const duration = formatDuration(ms);
-                    const response = formatResponseDuration(ms);
-
-                    // Property: Both should return non-empty strings
-                    expect(duration.length).toBeGreaterThan(0);
-                    expect(response.length).toBeGreaterThan(0);
-
-                    // Property: Both should not contain negative values
-                    expect(duration).not.toMatch(/-\d/v);
-                    expect(response).not.toMatch(/-\d/v);
-                }
-            );
-
             test.prop([fc.integer({ max: 1000, min: 0 })])(
                 "TIME_PERIOD_LABELS should have consistent structure",
                 () => {

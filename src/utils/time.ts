@@ -231,32 +231,6 @@ export function formatRelativeTimestamp(timestamp: number): string {
 }
 
 /**
- * Format time duration with milliseconds for response times (detailed format).
- * Used for displaying response times and performance metrics.
- *
- * @param milliseconds - Time duration in milliseconds.
- *
- * @returns Formatted time string (e.g., "123ms", "30s", "5m", "1h").
- *
- * @public
- */
-export function formatResponseDuration(milliseconds: number): string {
-    if (!Number.isFinite(milliseconds) || milliseconds < 0) {
-        return UiDefaults.notAvailableLabel;
-    }
-
-    // Handle extremely small values (effectively zero) by rounding to 0
-    // Only round to 0 for values smaller than or equal to 1e-10 to avoid scientific notation
-    if (milliseconds <= 1e-10 && milliseconds > 0) {
-        return "0ms";
-    }
-    if (milliseconds < 1000) {
-        return `${milliseconds}ms`;
-    }
-    return formatRoundedDuration(milliseconds, SHORT_DURATION_UNITS);
-}
-
-/**
  * Formats response time in a human-readable format with automatic unit
  * selection.
  *
