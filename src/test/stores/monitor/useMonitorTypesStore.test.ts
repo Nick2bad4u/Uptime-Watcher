@@ -8,11 +8,12 @@ import type { ValidationResult } from "@shared/types/validation";
 
 import { act, renderHook } from "@testing-library/react";
 import { safeCastTo } from "ts-extras";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 import { createMonitorTypeConfig } from "../../utils/createMonitorTypeConfig";
+import { installElectronApiMock } from "../../utils/electronApiMock";
 
 // Mock the store utils module
 vi.mock("../../../stores/utils", () => ({
@@ -69,10 +70,7 @@ const mockElectronAPI = {
     monitoring: {},
 };
 
-// Mock the global window object
-globalThis.window = {
-    electronAPI: mockElectronAPI,
-} as never;
+let restoreElectronApi: (() => void) | undefined;
 
 describe(useMonitorTypesStore, () => {
     beforeEach(() => {
@@ -91,11 +89,19 @@ describe(useMonitorTypesStore, () => {
             monitorTypes: [],
         });
 
-        // Ensure electronAPI is properly set (protect against global state pollution)
-        if (!globalThis.window) {
-            globalThis.window = {} as never;
-        }
-        (globalThis as any).electronAPI = mockElectronAPI;
+        ({ restore: restoreElectronApi } = installElectronApiMock(
+            {
+                monitorTypes: mockElectronAPI.monitorTypes,
+            },
+            {
+                ensureWindow: true,
+            }
+        ));
+    });
+
+    afterEach(() => {
+        restoreElectronApi?.();
+        restoreElectronApi = undefined;
     });
 
     it("should initialize with default state", async ({ task, annotate }) => {
