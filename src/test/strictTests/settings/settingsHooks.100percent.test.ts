@@ -273,4 +273,32 @@ describe(useSettingsChangeHandlers, () => {
 
         expect(updateSettings).not.toHaveBeenCalled();
     });
+
+    it("ignores inherited setting changes", async () => {
+        const settings = createBaseSettings();
+
+        const updateSettings = vi
+            .fn<(changes: Partial<AppSettings>) => Promise<void>>()
+            .mockResolvedValue(undefined);
+
+        const { result } = renderHook(() =>
+            useSettingsChangeHandlers({
+                settings,
+                updateSettings,
+            })
+        );
+
+        mockedLogger.user.settingsChange.mockClear();
+
+        const inheritedChanges = Object.create({
+            theme: "light",
+        }) as Partial<AppSettings>;
+
+        await act(async () => {
+            await result.current.applySettingChanges(inheritedChanges);
+        });
+
+        expect(updateSettings).not.toHaveBeenCalled();
+        expect(mockedLogger.user.settingsChange).not.toHaveBeenCalled();
+    });
 });
