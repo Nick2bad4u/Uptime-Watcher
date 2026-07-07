@@ -30,6 +30,7 @@ import {
     buildLogArguments,
 } from "@shared/utils/logger/common";
 import { extractLogContext } from "@shared/utils/loggingContext";
+import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import log from "electron-log/renderer";
 import { arrayFirst } from "ts-extras";
@@ -360,7 +361,8 @@ const loggerInstance: LoggerInterface = {
             oldValue: unknown,
             newValue: unknown
         ): void => {
-            const details: Record<string, unknown> = {};
+            const details =
+                createNullPrototypeObject<Record<string, unknown>>();
             Object.defineProperty(details, setting, {
                 configurable: true,
                 enumerable: true,

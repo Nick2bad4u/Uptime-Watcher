@@ -644,6 +644,32 @@ describe("Logger Service - Basic Coverage", () => {
                 }
             );
         });
+
+        it("should log prototype-like settings as inert details", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: logger.basic", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            logger.user.settingsChange("__proto__", "enabled", "disabled");
+
+            expect(mockInfo).toHaveBeenCalledWith(
+                "[UPTIME-WATCHER] Settings change: __proto__",
+                expect.any(Object)
+            );
+
+            const [, details] = mockInfo.mock.calls.at(-1) ?? [];
+
+            expect(Object.getPrototypeOf(details)).toBeNull();
+            expect(Object.hasOwn(details as object, "__proto__")).toBeTruthy();
+            expect(Reflect.get(details as object, "__proto__")).toEqual({
+                newValue: "disabled",
+                oldValue: "enabled",
+            });
+        });
     });
 
     describe("Raw Logger Access", () => {
