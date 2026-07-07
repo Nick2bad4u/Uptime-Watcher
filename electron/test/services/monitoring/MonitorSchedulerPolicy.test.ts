@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { MIN_CHECK_INTERVAL } from "../../../services/monitoring/constants";
-import {
-    applySchedulerJitter,
-    computeMonitorSchedulerDelay,
-} from "../../../services/monitoring/MonitorSchedulerPolicy";
+import { computeMonitorSchedulerDelay } from "../../../services/monitoring/MonitorSchedulerPolicy";
 
 const midpointRandomInt = (min: number, max: number): number =>
     Math.floor((min + max - 1) / 2);
@@ -36,12 +33,24 @@ describe("MonitorSchedulerPolicy", () => {
         ).toBe(60 * 60_000);
     });
 
-    it("clamps non-positive jitter targets to the minimum interval", () => {
-        expect(applySchedulerJitter(0, midpointRandomInt)).toBe(
-            MIN_CHECK_INTERVAL
-        );
-        expect(applySchedulerJitter(-1, midpointRandomInt)).toBe(
-            MIN_CHECK_INTERVAL
-        );
+    it("clamps non-positive base intervals to the minimum interval", () => {
+        expect(
+            computeMonitorSchedulerDelay(
+                {
+                    backoffAttempt: 0,
+                    baseIntervalMs: 0,
+                },
+                midpointRandomInt
+            )
+        ).toBe(MIN_CHECK_INTERVAL);
+        expect(
+            computeMonitorSchedulerDelay(
+                {
+                    backoffAttempt: 0,
+                    baseIntervalMs: -1,
+                },
+                midpointRandomInt
+            )
+        ).toBe(MIN_CHECK_INTERVAL);
     });
 });

@@ -21,7 +21,7 @@ export interface MonitorSchedulerDelayInput {
  * Applies bounded jitter around a target delay while respecting the scheduler
  * minimum.
  */
-export function applySchedulerJitter(
+function applySchedulerJitter(
     value: number,
     getRandomInt: RandomInt = randomInt
 ): number {
