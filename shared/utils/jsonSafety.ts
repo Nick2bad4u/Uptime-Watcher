@@ -268,7 +268,17 @@ const hasUnsupportedJsonValue = (
 
     try {
         if (Array.isArray(value)) {
-            return value.some((entry) => hasUnsupportedJsonValue(entry, seen));
+            for (const key of Reflect.ownKeys(target)) {
+                const descriptor = Object.getOwnPropertyDescriptor(target, key);
+                if (
+                    hasDescriptorValue(descriptor) &&
+                    hasUnsupportedJsonValue(descriptor.value, seen)
+                ) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         for (const key of Reflect.ownKeys(target)) {

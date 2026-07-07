@@ -264,6 +264,26 @@ describe("jsonSafety behavior", () => {
 
             expect(json).toBe(fallback);
         });
+
+        it("does not invoke nested array methods while checking unsupported values", () => {
+            const fallback = '{ "ok": false }';
+            const some = vi.fn(() => {
+                throw new Error("array some should not run");
+            });
+            const nested = ["safe", Symbol("unsupported")];
+            Object.defineProperty(nested, "some", {
+                configurable: true,
+                value: some,
+            });
+
+            const json = safeJsonStringifyWithFallback(
+                unsafeJsonifiable({ nested }),
+                fallback
+            );
+
+            expect(json).toBe(fallback);
+            expect(some).not.toHaveBeenCalled();
+        });
     });
 
     describe(tryParseJsonRecord, () => {
