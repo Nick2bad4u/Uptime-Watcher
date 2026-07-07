@@ -173,11 +173,3 @@ if (isDirectInvocation()) {
             process.exitCode = 1;
         });
 }
-
-export {
-    isDirectInvocation,
-    loadCoverageFragments,
-    main,
-    mergeCoverage,
-    parseCoverageThreshold,
-};

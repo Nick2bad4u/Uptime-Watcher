@@ -45,6 +45,10 @@ const knipConfig: KnipConfig = {
         // Loaded by config/linting/commitlint.config.mjs through commitlint's
         // extends resolution rather than a normal import.
         "@commitlint/config-conventional",
+        // Invoked as package-script binaries; Knip's dependency graph doesn't
+        // connect binary usage back to the owning package dependency.
+        "@biomejs/biome",
+        "secretlint",
         // Loaded by Storybook/Docusaurus config strings, CSS plugin directives,
         // or shared lint/documentation configs rather than JavaScript imports
         // Knip can statically follow.
