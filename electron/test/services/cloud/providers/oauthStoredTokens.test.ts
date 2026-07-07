@@ -3,10 +3,9 @@ import type { UnknownRecord } from "type-fest";
 import { describe, expect, it, vi } from "vitest";
 
 import { EphemeralSecretStore } from "../../../../services/cloud/secrets/SecretStore";
-import {
-    MAX_STORED_OAUTH_TOKEN_JSON_BYTES,
-    readStoredJsonSecret,
-} from "../../../../services/cloud/providers/oauthStoredTokens";
+import { readStoredJsonSecret } from "../../../../services/cloud/providers/oauthStoredTokens";
+
+const MAX_STORED_OAUTH_TOKEN_JSON_BYTES = 64 * 1024;
 
 describe(readStoredJsonSecret, () => {
     it("clears oversized token JSON before parsing", async () => {

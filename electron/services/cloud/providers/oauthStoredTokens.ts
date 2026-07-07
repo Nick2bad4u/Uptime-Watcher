@@ -20,7 +20,7 @@ import type { SecretStore } from "../secrets/SecretStore";
 export type OAuthStoredTokensLogger = Pick<Logger, "warn">;
 
 /** Maximum stored OAuth token JSON size accepted before clearing. */
-export const MAX_STORED_OAUTH_TOKEN_JSON_BYTES: number = 64 * 1024;
+const MAX_STORED_OAUTH_TOKEN_JSON_BYTES: number = 64 * 1024;
 
 /** Arguments for {@link readStoredJsonSecret}. */
 export interface ReadStoredJsonSecretArgs<T> {

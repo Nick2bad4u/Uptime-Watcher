@@ -1,10 +1,11 @@
 import {
     createSnapshotNonceHex,
     isValidSnapshotFileName,
-    SNAPSHOT_NONCE_HEX_CHARS,
 } from "@electron/services/sync/snapshotKeyUtils";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
+
+const SNAPSHOT_NONCE_HEX_CHARS = 32;
 
 describe("snapshotKeyUtils", () => {
     describe(isValidSnapshotFileName, () => {

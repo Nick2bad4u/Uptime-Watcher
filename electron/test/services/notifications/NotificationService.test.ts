@@ -3,11 +3,12 @@ import type { Site } from "@shared/types";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
-    DEFAULT_DOWN_ALERT_COOLDOWN_MS,
     type NotificationConfig,
     NotificationService,
 } from "../../../services/notifications/NotificationService";
 import { logger } from "../../../utils/logger";
+
+const DEFAULT_DOWN_ALERT_COOLDOWN_MS = 90_000;
 
 vi.mock("../../../utils/logger", () => ({
     logger: {

@@ -7,10 +7,10 @@ import type { withOperationalHooks as withOperationalHooksType } from "../../../
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES } from "../../../services/monitoring/shared/httpMonitorJsonUtils";
 import { ServerHeartbeatMonitor } from "../../../services/monitoring/ServerHeartbeatMonitor";
 
 const httpGetMock = vi.fn();
+const MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES = 1 * 1024 * 1024;
 
 type OperationalHookOptions = Parameters<typeof withOperationalHooksType>[1];
 

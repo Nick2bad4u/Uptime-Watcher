@@ -4,7 +4,7 @@ import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { extractMonitorValueAtPath } from "./monitorPathTraversal";
 
 /** Maximum UTF-8 byte budget accepted for monitor JSON payload parsing. */
-export const MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES: number = 1 * 1024 * 1024;
+const MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES: number = 1 * 1024 * 1024;
 
 /**
  * Result of attempting to parse a JSON payload.

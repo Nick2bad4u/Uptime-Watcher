@@ -12,7 +12,7 @@ import {
     tryParseCloudBackupMetadataFileBuffer,
 } from "./CloudBackupMetadataFile";
 
-export const CLOUD_BACKUP_METADATA_READ_CONCURRENCY = 8;
+const CLOUD_BACKUP_METADATA_READ_CONCURRENCY = 8;
 
 /**
  * Lists backups by discovering metadata objects and hydrating them.

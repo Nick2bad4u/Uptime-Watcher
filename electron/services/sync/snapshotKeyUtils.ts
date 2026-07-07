@@ -21,7 +21,7 @@ import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isAsciiDigits } from "./syncEngineUtils";
 
 /** Number of lowercase hex chars used for snapshot nonce suffix. */
-export const SNAPSHOT_NONCE_HEX_CHARS = 32 as const;
+const SNAPSHOT_NONCE_HEX_CHARS = 32 as const;
 
 /** Metadata encoded in a snapshot filename. */
 export type SnapshotFileNameMetadata = Readonly<{

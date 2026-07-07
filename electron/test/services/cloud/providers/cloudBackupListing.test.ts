@@ -2,10 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { CloudObjectEntry } from "../../../../services/cloud/providers/CloudStorageProvider.types";
 
-import {
-    CLOUD_BACKUP_METADATA_READ_CONCURRENCY,
-    listBackupsFromMetadataObjects,
-} from "../../../../services/cloud/providers/cloudBackupListing";
+import { listBackupsFromMetadataObjects } from "../../../../services/cloud/providers/cloudBackupListing";
 import { MAX_CLOUD_BACKUP_METADATA_FILE_BYTES } from "../../../../services/cloud/providers/CloudBackupMetadataFile";
 
 vi.mock("../../../../utils/logger", () => ({
@@ -14,9 +11,11 @@ vi.mock("../../../../utils/logger", () => ({
     },
 }));
 
+const EXPECTED_METADATA_READ_CONCURRENCY = 8;
+
 describe(listBackupsFromMetadataObjects, () => {
     it("bounds concurrent metadata sidecar downloads", async () => {
-        const backupCount = CLOUD_BACKUP_METADATA_READ_CONCURRENCY + 4;
+        const backupCount = EXPECTED_METADATA_READ_CONCURRENCY + 4;
         const metadataByKey = new Map<string, Buffer>();
         const objects = Array.from(
             { length: backupCount },
@@ -92,7 +91,7 @@ describe(listBackupsFromMetadataObjects, () => {
         expect(results).toHaveLength(backupCount);
         expect(downloadObjectBuffer).toHaveBeenCalledTimes(backupCount);
         expect(maxActiveDownloads).toBeLessThanOrEqual(
-            CLOUD_BACKUP_METADATA_READ_CONCURRENCY
+            EXPECTED_METADATA_READ_CONCURRENCY
         );
     });
 

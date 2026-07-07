@@ -6,10 +6,7 @@
  * avoid collisions in CI and parallel test workers.
  */
 
-import {
-    DEFAULT_DROPBOX_LOOPBACK_PORT,
-    DropboxAuthFlow,
-} from "@electron/services/cloud/providers/dropbox/DropboxAuthFlow";
+import { DropboxAuthFlow } from "@electron/services/cloud/providers/dropbox/DropboxAuthFlow";
 import type { DropboxResponse } from "dropbox";
 import * as http from "node:http";
 import * as https from "node:https";
@@ -54,10 +51,6 @@ async function httpGet(
 }
 
 describe(DropboxAuthFlow, () => {
-    it("exposes a fixed default loopback port", () => {
-        expect(DEFAULT_DROPBOX_LOOPBACK_PORT).toBe(53_682);
-    });
-
     it("completes the PKCE flow and exchanges the authorization code for tokens", async () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));

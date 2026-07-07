@@ -2,9 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
     extractJsonValueAtPath,
-    MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES,
     parseJsonPayload,
 } from "../../../../services/monitoring/shared/httpMonitorJsonUtils";
+
+const MAX_HTTP_JSON_PAYLOAD_PARSE_BYTES = 1 * 1024 * 1024;
 
 describe(extractJsonValueAtPath, () => {
     it("resolves nested object values", () => {
