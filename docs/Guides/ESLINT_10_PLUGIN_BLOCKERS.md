@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 doc_title: "ESLint 10 Plugin Blockers"
 summary: "Tracks ESLint plugins and rules that are temporarily wrapped or disabled while the repository migrates to ESLint 10."
 created: "2026-02-17"
-last_reviewed: "2026-02-26"
+last_reviewed: "2026-07-07"
 doc_category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -41,7 +41,6 @@ These were explicitly wrapped for ESLint 10 compatibility:
 - `no-explicit-type-exports`
 - `no-unsanitized`
 - `prefer-arrow`
-- `security`
 - `sort-class-members`
 - `styled-components-a11y`
 - `write-good-comments`
@@ -83,17 +82,21 @@ Additional wrapped compatibility candidates:
 These packages are either still in use or already removed because their peer
 dependency metadata blocks non-forced installs with ESLint 10:
 
-| Package                                    | Current status | ESLint peer range | Resolution status                                                      |
-| ------------------------------------------ | -------------- | ----------------- | ---------------------------------------------------------------------- |
-| `@rushstack/eslint-plugin-security`        | Enabled        | 6 through 9       | Kept for `@rushstack/security/no-unsafe-regexp`; no newer npm release. |
-| `@arthurgeron/eslint-plugin-react-usememo` | Removed        | 9 only            | Removed because all configured rules were already `off`.               |
+| Package                                    | Current status | ESLint peer range | Resolution status                                        |
+| ------------------------------------------ | -------------- | ----------------- | -------------------------------------------------------- |
+| `eslint-plugin-jsx-a11y`                   | Enabled        | 3 through 9       | Kept for accessibility lint signal; no newer npm release. |
+| `@arthurgeron/eslint-plugin-react-usememo` | Removed        | 9 only            | Removed because all configured rules were already `off`. |
+| `@rushstack/eslint-plugin-security`        | Removed        | 6 through 9       | Removed because `eslint-plugin-security@4.0.1` supplies the active `security/*` rules. |
+| `eslint-find-rules`                        | Removed        | 8 through 9       | Removed with its convenience scripts because it is not needed for CI lint signal. |
+| `eslint-plugin-github`                     | Removed        | 8 through 9       | Removed because no local `github/*` rules are configured. |
 
 ## Completed migrations
 
 - `eslint-plugin-deprecation` has been removed in favor of `@typescript-eslint/no-deprecated`.
 - `eslint-plugin-sort-react-dependency-arrays` has been removed; `eslint-plugin-canonical` now provides `canonical/sort-react-dependencies`.
-- `@rushstack/eslint-plugin-security` is re-enabled (v0.14.2) via `fixupPluginRules(...)`.
 - `eslint-plugin-node-dependencies` package.json rules are re-enabled (v2.1.0).
+- `@rushstack/eslint-plugin-security` has been removed; `eslint-plugin-security@4.0.1`
+  now supplies the active `security/*` rules through the shared ESLint config.
 
 ## Re-enable checklist
 
