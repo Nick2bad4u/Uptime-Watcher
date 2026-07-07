@@ -11,6 +11,50 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 
+type MockRecord = Record<string, ReturnType<typeof vi.fn>>;
+
+interface MockRepository extends MockRecord {
+    createTransactionAdapter: ReturnType<typeof vi.fn>;
+}
+
+interface MockRepositories {
+    database: {
+        close: ReturnType<typeof vi.fn>;
+        execute: ReturnType<typeof vi.fn>;
+        executeTransaction: ReturnType<typeof vi.fn>;
+        getDatabase: ReturnType<typeof vi.fn>;
+        initialize: ReturnType<typeof vi.fn>;
+        query: ReturnType<typeof vi.fn>;
+    };
+    history: MockRepository;
+    monitor: MockRepository;
+    settings: MockRepository;
+    site: MockRepository;
+}
+
+interface MockConfigurationManager extends Record<string, unknown> {
+    configCache: Map<unknown, unknown>;
+    validationCache: Map<unknown, unknown>;
+}
+
+interface MockSiteLoadingOrchestrator {
+    loadSitesFromDatabase: ReturnType<typeof vi.fn>;
+}
+
+interface MockCommandExecutor {
+    clear: ReturnType<typeof vi.fn>;
+    execute: ReturnType<typeof vi.fn>;
+    rollbackAll: ReturnType<typeof vi.fn>;
+}
+
+interface MockServiceFactory {
+    createBackupService: ReturnType<typeof vi.fn>;
+    createImportExportService: ReturnType<typeof vi.fn>;
+    createSiteRepositoryService: ReturnType<typeof vi.fn>;
+    dependencies: Record<string, unknown>;
+    loggerAdapter: Record<string, unknown>;
+}
+
 /**
  * Creates a properly typed and mocked StandardizedCache instance
  */
@@ -136,8 +180,8 @@ export function createTestMonitor(
 /**
  * Creates a comprehensive mock for a database repository
  */
-export function createMockRepository(): any {
-    const repository: Record<string, any> = {
+export function createMockRepository(): MockRepository {
+    const repository: MockRepository = {
         // Standard CRUD operations
         getAll: vi.fn().mockResolvedValue([]),
         getByIdentifier: vi.fn().mockResolvedValue(undefined),
@@ -179,12 +223,13 @@ export function createMockRepository(): any {
 
         // Monitor-specific operations
         getAllMonitorIds: vi.fn().mockResolvedValue([]),
+        createTransactionAdapter: vi.fn(),
     };
 
     repository["createTransactionAdapter"] = vi
         .fn()
         .mockImplementation((db: unknown) => {
-            const adapter: Record<string, any> = {};
+            const adapter: MockRecord = {};
 
             if (repository["bulkInsertInternal"].mock) {
                 adapter["bulkInsert"] = vi.fn((payload: unknown) =>
@@ -283,7 +328,7 @@ export function createMockRepository(): any {
 /**
  * Creates a comprehensive mock for all database repositories
  */
-export function createMockRepositories(): any {
+export function createMockRepositories(): MockRepositories {
     return {
         database: {
             close: vi.fn().mockResolvedValue(undefined),
@@ -291,7 +336,13 @@ export function createMockRepositories(): any {
             query: vi.fn().mockResolvedValue([]),
             executeTransaction: vi
                 .fn()
-                .mockImplementation((operation) => operation({})),
+                .mockImplementation(
+                    (
+                        operation: (
+                            database: Record<string, unknown>
+                        ) => unknown
+                    ) => operation({})
+                ),
             getDatabase: vi.fn().mockReturnValue({}),
             initialize: vi.fn().mockResolvedValue(undefined),
         },
@@ -305,7 +356,7 @@ export function createMockRepositories(): any {
 /**
  * Creates a comprehensive mock configuration manager
  */
-export function createMockConfigurationManager(): any {
+export function createMockConfigurationManager(): MockConfigurationManager {
     return {
         getMonitoringConfiguration: vi.fn().mockReturnValue({
             setHistoryLimit: vi.fn().mockResolvedValue(undefined),
@@ -341,7 +392,7 @@ export function createMockConfigurationManager(): any {
 /**
  * Creates a mock site loading orchestrator
  */
-export function createMockSiteLoadingOrchestrator(): any {
+export function createMockSiteLoadingOrchestrator(): MockSiteLoadingOrchestrator {
     return {
         loadSitesFromDatabase: vi.fn().mockResolvedValue({
             success: true,
@@ -359,13 +410,13 @@ export function createMockSiteLoadingOrchestrator(): any {
 /**
  * Resets all mocks in an object deeply
  */
-export function resetAllMocks(obj: any): void {
-    for (const key in obj) {
-        if (obj[key] && typeof obj[key] === "object") {
-            if (vi.isMockFunction(obj[key])) {
-                obj[key].mockReset();
+export function resetAllMocks(obj: Record<string, unknown>): void {
+    for (const value of Object.values(obj)) {
+        if (value && typeof value === "object") {
+            if (vi.isMockFunction(value)) {
+                value.mockReset();
             } else {
-                resetAllMocks(obj[key]);
+                resetAllMocks(value as Record<string, unknown>);
             }
         }
     }
@@ -375,10 +426,10 @@ export function resetAllMocks(obj: any): void {
  * Creates a properly mocked database command executor that can handle different
  * command types
  */
-export function createMockCommandExecutor(): any {
+export function createMockCommandExecutor(): MockCommandExecutor {
     return {
         execute: vi.fn().mockImplementation(
-            async (_command: any) =>
+            async (_command: unknown) =>
                 // Default response for any command
                 "mock-result"
         ),
@@ -390,10 +441,10 @@ export function createMockCommandExecutor(): any {
 /**
  * Creates a mock service factory with all required services
  */
-export function createMockServiceFactory(): any {
+export function createMockServiceFactory(): MockServiceFactory {
     return {
-        dependencies: {} as any,
-        loggerAdapter: {} as any,
+        dependencies: {},
+        loggerAdapter: {},
         createBackupService: vi.fn().mockReturnValue({
             downloadDatabaseBackup: vi.fn().mockResolvedValue({
                 buffer: Buffer.from("test-backup-data"),
