@@ -285,35 +285,9 @@ export const AppIcons: {
 } as const;
 
 /**
- * Type-safe icon getter function.
- *
- * @example
- *
- * ```tsx
- * const RefreshIcon = getIcon("actions", "refresh");
- * <RefreshIcon size={20} />;
- * ```
- *
- * @param category - Icon category.
- * @param name - Icon name within category.
- *
- * @returns Icon component from `react-icons`.
- *
- * @public
- */
-export function getIcon<
-    TCategory extends keyof typeof AppIcons,
-    TName extends keyof (typeof AppIcons)[TCategory],
->(category: TCategory, name: TName): (typeof AppIcons)[TCategory][TName] {
-    return AppIcons[category][name];
-}
-
-/**
  * Common icon size presets in pixels.
- *
- * @public
  */
-export const IconSizes = {
+const IconSizes = {
     lg: 24,
     md: 20,
     sm: 16,

@@ -4,17 +4,15 @@
 
 import { describe, expect, it } from "vitest";
 
-import { AppIcons, getIcon, getIconSize, IconSizes } from "../../utils/icons";
+import { AppIcons, getIconSize } from "../../utils/icons";
 
 describe("icon utilities", () => {
-    it("returns the exact icon reference for a given category and name", () => {
-        const icon = getIcon("actions", "refresh");
-
-        expect(icon).toBe(AppIcons.actions.refresh);
+    it("exposes icon references by semantic category", () => {
+        expect(AppIcons.actions.refresh).toBeTypeOf("function");
     });
 
     it("provides pixel sizes for named presets", () => {
-        expect(getIconSize("xs")).toBe(IconSizes.xs);
-        expect(getIconSize("xl")).toBe(IconSizes.xl);
+        expect(getIconSize("xs")).toBe(12);
+        expect(getIconSize("xl")).toBe(32);
     });
 });
