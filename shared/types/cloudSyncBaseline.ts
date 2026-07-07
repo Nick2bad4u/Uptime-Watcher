@@ -104,7 +104,7 @@ const cloudSyncBaselineInternalSchema = z
         }
     });
 
-export const cloudSyncBaselineSchema: z.ZodType<CloudSyncBaseline> =
+const cloudSyncBaselineSchema: z.ZodType<CloudSyncBaseline> =
     cloudSyncBaselineInternalSchema.transform((baseline) => ({
         ...baseline,
         monitors: createCloudSyncBaselineMonitors(

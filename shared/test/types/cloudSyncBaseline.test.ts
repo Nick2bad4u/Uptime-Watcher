@@ -1,11 +1,11 @@
 import {
     CLOUD_SYNC_BASELINE_VERSION,
-    cloudSyncBaselineSchema,
     parseCloudSyncBaseline,
 } from "@shared/types/cloudSyncBaseline";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { describe, expect, it } from "vitest";
+import * as z from "zod";
 
 const PROTOTYPE_KEY = "__proto__" as const;
 
@@ -37,6 +37,21 @@ function createBaselineCandidate(): Record<string, unknown> {
         },
         syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
     };
+}
+
+function safeParseCloudSyncBaseline(candidate: unknown):
+    | { error: z.ZodError; success: false }
+    | { success: true } {
+    try {
+        parseCloudSyncBaseline(candidate);
+        return { success: true };
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            return { error, success: false };
+        }
+
+        throw error;
+    }
 }
 
 describe(parseCloudSyncBaseline, () => {
@@ -100,7 +115,7 @@ describe(parseCloudSyncBaseline, () => {
     });
 
     it("rejects createdAt outside the Date range", () => {
-        const result = cloudSyncBaselineSchema.safeParse({
+        const result = safeParseCloudSyncBaseline({
             ...createBaselineCandidate(),
             createdAt: MAX_VALID_DATE_EPOCH_MS + 1,
         });
@@ -109,7 +124,7 @@ describe(parseCloudSyncBaseline, () => {
     });
 
     it("rejects baseline sites whose identifier differs from the map key", () => {
-        const result = cloudSyncBaselineSchema.safeParse({
+        const result = safeParseCloudSyncBaseline({
             ...createBaselineCandidate(),
             sites: {
                 "site-1": {
@@ -134,7 +149,7 @@ describe(parseCloudSyncBaseline, () => {
     });
 
     it("rejects baseline monitors whose id differs from the map key", () => {
-        const result = cloudSyncBaselineSchema.safeParse({
+        const result = safeParseCloudSyncBaseline({
             ...createBaselineCandidate(),
             monitors: {
                 "monitor-1": {
@@ -164,7 +179,7 @@ describe(parseCloudSyncBaseline, () => {
     });
 
     it("rejects baseline site identifiers with control characters", () => {
-        const result = cloudSyncBaselineSchema.safeParse({
+        const result = safeParseCloudSyncBaseline({
             ...createBaselineCandidate(),
             sites: {
                 "site\n1": {
@@ -179,7 +194,7 @@ describe(parseCloudSyncBaseline, () => {
     });
 
     it("rejects baseline monitor identifiers with control characters", () => {
-        const result = cloudSyncBaselineSchema.safeParse({
+        const result = safeParseCloudSyncBaseline({
             ...createBaselineCandidate(),
             monitors: {
                 "monitor\n1": {

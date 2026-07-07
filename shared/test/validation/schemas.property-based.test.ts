@@ -5,12 +5,12 @@ import { describe, expect } from "vitest";
 import type { MonitorStatus, StatusHistoryStatus } from "../../types";
 
 import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "../../types";
-import {
-    baseMonitorSchema,
-    httpMonitorSchema,
-} from "../../validation/monitorSchemas";
+import { httpMonitorSchema } from "../../validation/monitorSchemas";
+import { createBaseMonitorSchema } from "../../validation/monitorSchemas.common";
 import { MONITOR_ID_MAX_LENGTH } from "../../validation/monitorFieldConstants";
 import { MAX_VALID_DATE_EPOCH_MS } from "../../validation/timestampSchemas";
+
+const baseMonitorSchema = createBaseMonitorSchema();
 
 /**
  * Custom fast-check arbitraries for Zod schemas Replacing zod-fast-check due to

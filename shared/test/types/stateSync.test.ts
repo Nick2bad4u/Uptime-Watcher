@@ -5,7 +5,6 @@
 import {
     safeParseStateSyncFullSyncResult,
     safeParseStateSyncStatusSummary,
-    siteIdentifierSnapshotSchema,
     siteSyncDeltaSchema,
     STATE_SYNC_SOURCE,
 } from "@shared/types/stateSync";
@@ -59,14 +58,6 @@ describe("stateSync", () => {
         });
 
         expect(parsed.success).toBeTruthy();
-    });
-
-    it("preserves exact site identifier snapshot strings", () => {
-        const parsed = siteIdentifierSnapshotSchema.parse({
-            identifier: " site-a ",
-        });
-
-        expect(parsed.identifier).toBe(" site-a ");
     });
 
     it("preserves exact removed site identifiers in deltas", () => {

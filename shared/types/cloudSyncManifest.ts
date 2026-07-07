@@ -99,7 +99,7 @@ export function createCloudSyncManifestDevices(
 /**
  * Runtime schema for validating {@link CloudSyncManifest}.
  */
-export const cloudSyncManifestSchema: z.ZodType<CloudSyncManifest> =
+const cloudSyncManifestSchema: z.ZodType<CloudSyncManifest> =
     cloudSyncManifestInternalSchema.transform((manifest) =>
         normalizeCloudSyncManifest(manifest)
     );

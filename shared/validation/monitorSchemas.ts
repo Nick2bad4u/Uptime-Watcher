@@ -111,8 +111,7 @@ const jsonPathSchema = createJsonPathSchema();
 const websocketUrlSchema = createWebsocketUrlSchema();
 const edgeLocationListSchema = createEdgeLocationListSchema();
 
-export const baseMonitorSchema: BaseMonitorSchemaType =
-    createBaseMonitorSchema();
+const baseMonitorSchema: BaseMonitorSchemaType = createBaseMonitorSchema();
 
 export const httpMonitorSchema: HttpMonitorSchemaType = createHttpMonitorSchema(
     {

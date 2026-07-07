@@ -101,7 +101,7 @@ const createStatusUpdateSchema = (): StatusUpdateSchema =>
  * Generated via {@link createStatusUpdateSchema} to keep type inference in sync
  * with the runtime schema definition.
  */
-export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
+const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
     createStatusUpdateSchema();
 
 // NOTE: Some downstream consumers (e.g. preload bridges) rely on `safeParse`

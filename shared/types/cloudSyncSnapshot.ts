@@ -111,7 +111,7 @@ export interface CloudSyncSnapshot {
 }
 
 /** Runtime schema for validating {@link CloudSyncSnapshot}. */
-export const cloudSyncSnapshotSchema: z.ZodType<CloudSyncSnapshot> = z
+const cloudSyncSnapshotSchema: z.ZodType<CloudSyncSnapshot> = z
     .object({
         createdAt: epochMsSchema,
         snapshotVersion: z.literal(CLOUD_SYNC_SNAPSHOT_VERSION),

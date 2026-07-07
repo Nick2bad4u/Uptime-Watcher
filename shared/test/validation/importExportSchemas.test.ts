@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { createSiteSnapshot } from "../fixtures/siteFactories";
 import {
-    exportDataSchema,
+    validateExportData,
     validateImportData,
 } from "../../validation/importExportSchemas";
 
@@ -59,44 +59,32 @@ describe("importExportSchemas", () => {
         expect(result.ok).toBeFalsy();
     });
 
-    it("preserves export setting keys while trimming setting values", () => {
-        const result = exportDataSchema.safeParse({
+    it("accepts export payloads with non-blank setting keys", () => {
+        const result = validateExportData({
             exportedAt: "2026-07-02T00:00:00.000Z",
             settings: {
-                [paddedSettingKey]: " enabled ",
+                [paddedSettingKey]: "enabled",
             },
             sites: [createSiteSnapshot({ identifier: "example.com" })],
             version: "1.0",
         });
 
-        expect(result.success).toBeTruthy();
-        if (!result.success) {
-            throw new Error("Expected export payload to pass validation");
-        }
-
-        expect(result.data.settings).toEqual({
-            [paddedSettingKey]: "enabled",
-        });
+        expect(result).toBeTruthy();
     });
 
     it("accepts empty-site export payloads from fresh app state", () => {
-        const result = exportDataSchema.safeParse({
+        const result = validateExportData({
             exportedAt: "2026-07-02T00:00:00.000Z",
             settings: {},
             sites: [],
             version: "1.0",
         });
 
-        expect(result.success).toBeTruthy();
-        if (!result.success) {
-            throw new Error("Expected empty-site export payload to pass");
-        }
-
-        expect(result.data.sites).toEqual([]);
+        expect(result).toBeTruthy();
     });
 
     it("rejects blank export setting keys", () => {
-        const result = exportDataSchema.safeParse({
+        const result = validateExportData({
             exportedAt: "2026-07-02T00:00:00.000Z",
             settings: {
                 "   ": "value",
@@ -105,6 +93,6 @@ describe("importExportSchemas", () => {
             version: "1.0",
         });
 
-        expect(result.success).toBeFalsy();
+        expect(result).toBeFalsy();
     });
 });

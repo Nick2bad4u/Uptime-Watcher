@@ -8,7 +8,6 @@ import { describe, expect, it } from "vitest";
 import type { ValidationResult } from "../../types/validation";
 
 import {
-    baseMonitorSchema,
     httpKeywordMonitorSchema,
     type HttpMonitor,
     httpMonitorSchema,
@@ -21,12 +20,15 @@ import {
     validateMonitorData,
     validateMonitorField,
 } from "../../validation/monitorSchemas";
+import { createBaseMonitorSchema } from "../../validation/monitorSchemas.common";
 import {
     type Site,
     siteSchema,
     validateSiteData,
 } from "../../validation/siteSchemas";
 import { createValidBaseMonitor } from "./testHelpers";
+
+const baseMonitorSchema = createBaseMonitorSchema();
 
 describe("Validation Schemas - Comprehensive Coverage", () => {
     describe("baseMonitorSchema", () => {

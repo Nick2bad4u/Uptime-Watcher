@@ -29,15 +29,6 @@ import * as z from "zod";
  */
 export type SiteIdentifierSnapshot = Pick<Site, "identifier">;
 
-/**
- * Zod schema validating {@link SiteIdentifierSnapshot} payloads.
- */
-export const siteIdentifierSnapshotSchema: z.ZodType<SiteIdentifierSnapshot> = z
-    .object({
-        identifier: siteIdentifierSchema,
-    })
-    .strict();
-
 const STATE_SYNC_SOURCE_VALUES = [
     "cache",
     "database",

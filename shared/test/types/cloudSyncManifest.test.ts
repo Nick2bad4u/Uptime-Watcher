@@ -2,7 +2,6 @@ import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import {
     CLOUD_SYNC_MANIFEST_VERSION,
     createCloudSyncManifestDevices,
-    cloudSyncManifestSchema,
     parseCloudSyncManifest,
 } from "@shared/types/cloudSyncManifest";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
@@ -56,20 +55,20 @@ describe("cloudSyncManifest", () => {
     });
 
     it("rejects manifest timestamps outside the Date range", () => {
-        const result = cloudSyncManifestSchema.safeParse({
-            devices: {
-                "device-a": {
-                    compactedUpToOpId: 1,
-                    lastSeenAt: MAX_VALID_DATE_EPOCH_MS + 1,
+        expect(() =>
+            parseCloudSyncManifest({
+                devices: {
+                    "device-a": {
+                        compactedUpToOpId: 1,
+                        lastSeenAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                    },
                 },
-            },
-            lastCompactionAt: MAX_VALID_DATE_EPOCH_MS + 1,
-            manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
-            resetAt: MAX_VALID_DATE_EPOCH_MS + 1,
-            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-        });
-
-        expect(result.success).toBeFalsy();
+                lastCompactionAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+                resetAt: MAX_VALID_DATE_EPOCH_MS + 1,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            })
+        ).toThrow();
     });
 
     it("drops invalid device IDs from the manifest devices map", () => {
@@ -91,8 +90,8 @@ describe("cloudSyncManifest", () => {
         expect(Object.getPrototypeOf(parsed.devices)).toBeNull();
     });
 
-    it("normalizes device IDs when using the exported schema directly", () => {
-        const result = cloudSyncManifestSchema.safeParse({
+    it("normalizes device IDs through manifest parsing", () => {
+        const parsed = parseCloudSyncManifest({
             devices: {
                 "ok-device": { compactedUpToOpId: 0, lastSeenAt: 1 },
                 "bad/device": { compactedUpToOpId: 0, lastSeenAt: 2 },
@@ -101,11 +100,8 @@ describe("cloudSyncManifest", () => {
             syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
         });
 
-        expect(result.success).toBeTruthy();
-        if (result.success) {
-            expect(Object.keys(result.data.devices)).toEqual(["ok-device"]);
-            expect(Object.getPrototypeOf(result.data.devices)).toBeNull();
-        }
+        expect(Object.keys(parsed.devices)).toEqual(["ok-device"]);
+        expect(Object.getPrototypeOf(parsed.devices)).toBeNull();
     });
 
     it("caps the devices map to the most recently seen devices", () => {

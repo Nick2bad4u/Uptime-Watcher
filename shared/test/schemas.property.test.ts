@@ -16,7 +16,6 @@ import {
     STATUS_HISTORY_VALUES,
 } from "../types";
 import {
-    baseMonitorSchema,
     dnsMonitorSchema,
     httpMonitorSchema,
     monitorSchema,
@@ -24,8 +23,11 @@ import {
     portMonitorSchema,
     validateMonitorData,
 } from "../validation/monitorSchemas";
+import { createBaseMonitorSchema } from "../validation/monitorSchemas.common";
 import { siteSchema, validateSiteData } from "../validation/siteSchemas";
 import { MAX_VALID_DATE_EPOCH_MS } from "../validation/timestampSchemas";
+
+const baseMonitorSchema = createBaseMonitorSchema();
 
 const monitorStatusArbitrary = fc.constantFrom<MonitorStatus>(
     ...MONITOR_STATUS_VALUES

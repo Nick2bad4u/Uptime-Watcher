@@ -79,7 +79,7 @@ export interface ExportData {
     readonly version: "1.0";
 }
 
-export const exportDataSchema: z.ZodType<ExportData> = z
+const exportDataSchema: z.ZodType<ExportData> = z
     .object({
         exportedAt: z.string().trim().min(1),
         settings: z.record(settingKeySchema, z.string().trim()).optional(),

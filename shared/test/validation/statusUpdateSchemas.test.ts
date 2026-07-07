@@ -13,7 +13,7 @@ import type { StatusUpdate } from "../../types";
 
 import {
     safeParseIsoTimestamp,
-    statusUpdateSchema,
+    typedStatusUpdateSchema,
 } from "../../validation/statusUpdateSchemas";
 import { createValidHttpMonitor } from "./testHelpers";
 
@@ -36,10 +36,10 @@ const createValidStatusUpdate = (): StatusUpdate => {
     };
 };
 
-describe("statusUpdateSchema", () => {
+describe(typedStatusUpdateSchema, () => {
     it("accepts consistent payloads", () => {
         const payload = createValidStatusUpdate();
-        const result = statusUpdateSchema.safeParse(payload);
+        const result = typedStatusUpdateSchema.safeParse(payload);
 
         expect(result.success).toBeTruthy();
     });
@@ -48,7 +48,7 @@ describe("statusUpdateSchema", () => {
         const payload = createValidStatusUpdate();
         payload.timestamp = "  2026-07-03T00:00:00.000Z  ";
 
-        const result = statusUpdateSchema.safeParse(payload);
+        const result = typedStatusUpdateSchema.safeParse(payload);
 
         expect(result.success).toBeTruthy();
         if (result.success) {
@@ -66,7 +66,7 @@ describe("statusUpdateSchema", () => {
             const payload = createValidStatusUpdate();
             payload.timestamp = timestamp;
 
-            const result = statusUpdateSchema.safeParse(payload);
+            const result = typedStatusUpdateSchema.safeParse(payload);
 
             expect(result.success).toBeFalsy();
         }
@@ -76,7 +76,7 @@ describe("statusUpdateSchema", () => {
         const payload = createValidStatusUpdate();
         payload.responseTime = 100.5;
 
-        const result = statusUpdateSchema.safeParse(payload);
+        const result = typedStatusUpdateSchema.safeParse(payload);
 
         expect(result.success).toBeFalsy();
     });
@@ -85,7 +85,7 @@ describe("statusUpdateSchema", () => {
         const payload = createValidStatusUpdate();
         payload.monitorId = "different-monitor";
 
-        const result = statusUpdateSchema.safeParse(payload);
+        const result = typedStatusUpdateSchema.safeParse(payload);
 
         expect(result.success).toBeFalsy();
         if (!result.success) {
@@ -99,7 +99,7 @@ describe("statusUpdateSchema", () => {
         const payload = createValidStatusUpdate();
         payload.siteIdentifier = "different-site";
 
-        const result = statusUpdateSchema.safeParse(payload);
+        const result = typedStatusUpdateSchema.safeParse(payload);
 
         expect(result.success).toBeFalsy();
         if (!result.success) {
@@ -113,7 +113,7 @@ describe("statusUpdateSchema", () => {
         const payload = createValidStatusUpdate();
         payload.site.monitors = [];
 
-        const result = statusUpdateSchema.safeParse(payload);
+        const result = typedStatusUpdateSchema.safeParse(payload);
 
         expect(result.success).toBeFalsy();
         if (!result.success) {

@@ -14,7 +14,6 @@ import fc from "fast-check";
 import { describe, expect, it, vi } from "vitest";
 
 import {
-    baseMonitorSchema,
     cdnEdgeConsistencyMonitorSchema,
     type HttpMonitor,
     httpMonitorSchema,
@@ -33,6 +32,7 @@ import {
     validateMonitorField,
     websocketKeepaliveMonitorSchema,
 } from "../../validation/monitorSchemas";
+import { createBaseMonitorSchema } from "../../validation/monitorSchemas.common";
 import {
     type Site,
     siteSchema,
@@ -44,6 +44,8 @@ import { isValidHost, isValidUrl } from "../../validation/validatorUtils";
 const MAX_MONITOR_CHECK_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
 const MIN_TIMEOUT_MS = 1e3;
 const MAX_TIMEOUT_MS = 3e5;
+
+const baseMonitorSchema = createBaseMonitorSchema();
 
 const monitorStatusArbitrary = fc.constantFrom(
     STATUS_KIND.DEGRADED,

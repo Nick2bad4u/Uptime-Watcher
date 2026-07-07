@@ -1,6 +1,5 @@
 import {
     CLOUD_SYNC_SNAPSHOT_VERSION,
-    cloudSyncSnapshotSchema,
     parseCloudSyncSnapshot,
 } from "@shared/types/cloudSyncSnapshot";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
@@ -96,139 +95,95 @@ describe(parseCloudSyncSnapshot, () => {
     });
 
     it("rejects createdAt outside the Date range", () => {
-        const result = cloudSyncSnapshotSchema.safeParse({
-            ...(createSnapshotCandidate() as Record<string, unknown>),
-            createdAt: MAX_VALID_DATE_EPOCH_MS + 1,
-        });
-
-        expect(result.success).toBeFalsy();
+        expect(() =>
+            parseCloudSyncSnapshot({
+                ...(createSnapshotCandidate() as Record<string, unknown>),
+                createdAt: MAX_VALID_DATE_EPOCH_MS + 1,
+            })
+        ).toThrow();
     });
 
     it("rejects snapshot entities whose entityId differs from the map key", () => {
-        const result = cloudSyncSnapshotSchema.safeParse({
-            createdAt: 0,
-            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
-            state: {
-                monitor: {},
-                settings: {},
-                site: {
-                    "site-1": {
-                        entityId: "site-2",
-                        entityType: "site",
-                        fields: {},
+        expect(() =>
+            parseCloudSyncSnapshot({
+                createdAt: 0,
+                snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+                state: {
+                    monitor: {},
+                    settings: {},
+                    site: {
+                        "site-1": {
+                            entityId: "site-2",
+                            entityType: "site",
+                            fields: {},
+                        },
                     },
                 },
-            },
-            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-        });
-
-        expect(result.success).toBeFalsy();
-        expect(result.error?.issues).toContainEqual(
-            expect.objectContaining({
-                message: "entityId must match its state map key",
-                path: [
-                    "state",
-                    "site",
-                    "site-1",
-                    "entityId",
-                ],
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             })
-        );
+        ).toThrow("entityId must match its state map key");
     });
 
     it("rejects snapshot entities whose entityType differs from the containing map", () => {
-        const result = cloudSyncSnapshotSchema.safeParse({
-            createdAt: 0,
-            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
-            state: {
-                monitor: {
-                    "monitor-1": {
-                        entityId: "monitor-1",
-                        entityType: "site",
-                        fields: {},
+        expect(() =>
+            parseCloudSyncSnapshot({
+                createdAt: 0,
+                snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+                state: {
+                    monitor: {
+                        "monitor-1": {
+                            entityId: "monitor-1",
+                            entityType: "site",
+                            fields: {},
+                        },
                     },
+                    settings: {},
+                    site: {},
                 },
-                settings: {},
-                site: {},
-            },
-            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-        });
-
-        expect(result.success).toBeFalsy();
-        expect(result.error?.issues).toContainEqual(
-            expect.objectContaining({
-                message: "entityType must match its state map",
-                path: [
-                    "state",
-                    "monitor",
-                    "monitor-1",
-                    "entityType",
-                ],
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             })
-        );
+        ).toThrow("entityType must match its state map");
     });
 
     it("rejects monitor snapshot entity IDs with control characters", () => {
-        const result = cloudSyncSnapshotSchema.safeParse({
-            createdAt: 0,
-            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
-            state: {
-                monitor: {
-                    "monitor\n1": {
-                        entityId: "monitor\n1",
-                        entityType: "monitor",
-                        fields: {},
+        expect(() =>
+            parseCloudSyncSnapshot({
+                createdAt: 0,
+                snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+                state: {
+                    monitor: {
+                        "monitor\n1": {
+                            entityId: "monitor\n1",
+                            entityType: "monitor",
+                            fields: {},
+                        },
                     },
+                    settings: {},
+                    site: {},
                 },
-                settings: {},
-                site: {},
-            },
-            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-        });
-
-        expect(result.success).toBeFalsy();
-        expect(result.error?.issues).toContainEqual(
-            expect.objectContaining({
-                message: "monitor entityId is invalid",
-                path: [
-                    "state",
-                    "monitor",
-                    "monitor\n1",
-                    "entityId",
-                ],
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             })
-        );
+        ).toThrow("monitor entityId is invalid");
     });
 
     it("rejects site snapshot entity IDs with control characters", () => {
-        const result = cloudSyncSnapshotSchema.safeParse({
-            createdAt: 0,
-            snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
-            state: {
-                monitor: {},
-                settings: {},
-                site: {
-                    "site\n1": {
-                        entityId: "site\n1",
-                        entityType: "site",
-                        fields: {},
+        expect(() =>
+            parseCloudSyncSnapshot({
+                createdAt: 0,
+                snapshotVersion: CLOUD_SYNC_SNAPSHOT_VERSION,
+                state: {
+                    monitor: {},
+                    settings: {},
+                    site: {
+                        "site\n1": {
+                            entityId: "site\n1",
+                            entityType: "site",
+                            fields: {},
+                        },
                     },
                 },
-            },
-            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
-        });
-
-        expect(result.success).toBeFalsy();
-        expect(result.error?.issues).toContainEqual(
-            expect.objectContaining({
-                message: "site entityId is invalid",
-                path: [
-                    "state",
-                    "site",
-                    "site\n1",
-                    "entityId",
-                ],
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
             })
-        );
+        ).toThrow("site entityId is invalid");
     });
 });
