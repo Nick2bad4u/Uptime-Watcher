@@ -87,7 +87,7 @@ function extractFrontmatter(content) {
         /** @type {Frontmatter} */
         const frontmatter = {};
 
-        yamlContent.split("\n").forEach((line) => {
+        for (const line of yamlContent.split("\n")) {
             const colonIndex = line.indexOf(":");
             if (colonIndex > 0) {
                 const key = line.slice(0, colonIndex).trim();
@@ -97,7 +97,7 @@ function extractFrontmatter(content) {
                     .replaceAll(/^["']|["']$/g, "");
                 frontmatter[key] = value;
             }
-        });
+        }
 
         return frontmatter;
     } catch {
@@ -306,17 +306,17 @@ function displayReport(stats) {
         console.log(
             `   Missing frontmatter (${stats.missingFrontmatter.length}):`
         );
-        stats.missingFrontmatter.forEach((file) => {
+        for (const file of stats.missingFrontmatter) {
             console.log(`     - ${file}`);
-        });
+        }
         console.log();
     }
 
     if (stats.outdatedDocs.length > 0) {
         console.log(`   Outdated docs (${stats.outdatedDocs.length}):`);
-        stats.outdatedDocs.forEach((file) => {
+        for (const file of stats.outdatedDocs) {
             console.log(`     - ${file}`);
-        });
+        }
         console.log();
     }
 
@@ -324,21 +324,21 @@ function displayReport(stats) {
         console.log(
             `   Missing table of contents (${stats.missingTOC.length}):`
         );
-        stats.missingTOC.forEach((file) => {
+        for (const file of stats.missingTOC) {
             console.log(`     - ${file}`);
-        });
+        }
         console.log();
     }
 
     // Broken links
     if (Object.keys(stats.brokenLinks).length > 0) {
         console.log(`   Broken internal links:`);
-        Object.entries(stats.brokenLinks).forEach(([file, links]) => {
+        for (const [file, links] of Object.entries(stats.brokenLinks)) {
             console.log(`     ${file}:`);
-            links.forEach((link) => {
+            for (const link of links) {
                 console.log(`       - ${link}`);
-            });
-        });
+            }
+        }
         console.log();
     }
 
@@ -351,9 +351,9 @@ function displayReport(stats) {
 
     if (complexFiles.length > 0) {
         console.log("   Most complex documents:");
-        complexFiles.forEach(([file, score]) => {
+        for (const [file, score] of complexFiles) {
             console.log(`     - ${file} (complexity: ${score}/10)`);
-        });
+        }
     }
     console.log();
 

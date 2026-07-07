@@ -225,32 +225,32 @@ function serializeFrontmatter(frontmatter) {
         "version",
     ];
 
-    fieldOrder.forEach((field) => {
+    for (const field of fieldOrder) {
         if (frontmatter[field] !== undefined) {
             if (Array.isArray(frontmatter[field])) {
                 lines.push(`${field}:`);
-                frontmatter[field].forEach((item) => {
+                for (const item of frontmatter[field]) {
                     lines.push(`  - "${item}"`);
-                });
+                }
             } else {
                 lines.push(`${field}: "${frontmatter[field]}"`);
             }
         }
-    });
+    }
 
     // Add any additional fields not in the standard order
-    Object.keys(frontmatter).forEach((field) => {
+    for (const field of Object.keys(frontmatter)) {
         if (!fieldOrder.includes(field)) {
             if (Array.isArray(frontmatter[field])) {
                 lines.push(`${field}:`);
-                frontmatter[field].forEach((item) => {
+                for (const item of frontmatter[field]) {
                     lines.push(`  - "${item}"`);
-                });
+                }
             } else {
                 lines.push(`${field}: "${frontmatter[field]}"`);
             }
         }
-    });
+    }
 
     lines.push("---", "");
     return lines.join("\n");
@@ -550,9 +550,9 @@ function displayMaintenanceReport(report) {
         console.log(
             `📅 Updated last_reviewed dates (${report.updatedFiles.length}):`
         );
-        report.updatedFiles.forEach((file) => {
+        for (const file of report.updatedFiles) {
             console.log(`   - ${file}`);
-        });
+        }
         console.log();
     }
 
@@ -560,25 +560,25 @@ function displayMaintenanceReport(report) {
         console.log(
             `📋 Generated table of contents (${report.tocGenerated.length}):`
         );
-        report.tocGenerated.forEach((file) => {
+        for (const file of report.tocGenerated) {
             console.log(`   - ${file}`);
-        });
+        }
         console.log();
     }
 
     if (report.linksFixed.length > 0) {
         console.log(`🔗 Fixed links (${report.linksFixed.length}):`);
-        report.linksFixed.forEach((file) => {
+        for (const file of report.linksFixed) {
             console.log(`   - ${file}`);
-        });
+        }
         console.log();
     }
 
     if (report.warnings.length > 0) {
         console.log(`⚠️  Warnings (${report.warnings.length}):`);
-        report.warnings.forEach((warning) => {
+        for (const warning of report.warnings) {
             console.log(`   - ${warning}`);
-        });
+        }
         console.log();
     }
 

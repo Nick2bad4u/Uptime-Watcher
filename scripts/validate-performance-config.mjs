@@ -24,10 +24,10 @@ const expectedScripts = [
 ];
 
 console.log("📦 Checking package.json scripts:");
-expectedScripts.forEach((script) => {
+for (const script of expectedScripts) {
     const exists = packageJson.scripts[script];
     console.log(`  ${exists ? "✅" : "❌"} ${script}: ${exists || "MISSING"}`);
-});
+}
 
 // Check if vite.config.ts has warmup configuration
 const viteConfigPath = path.join(import.meta.dirname, "..", "vite.config.ts");
@@ -67,14 +67,14 @@ if (warmupFiles.length > 0) {
         Shared: warmupFiles.filter((f) => f.includes("shared/")),
     };
 
-    Object.entries(categories).forEach(([category, files]) => {
+    for (const [category, files] of Object.entries(categories)) {
         if (files.length > 0) {
             console.log(`  ${category} (${files.length} files):`);
-            files.forEach((file) => {
+            for (const file of files) {
                 console.log(`    - ${file}`);
-            });
+            }
         }
-    });
+    }
 }
 
 console.log("\n🎯 Performance Benefits:");

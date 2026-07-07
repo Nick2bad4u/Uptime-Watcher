@@ -359,12 +359,12 @@ export function mergeSiteSnapshots(
     }
 
     const overlayMonitors = new Map<string, MonitorSnapshotOverlay>();
-    overlay.monitors?.forEach((candidate) => {
+    for (const candidate of overlay.monitors ?? []) {
         const snapshot = toMonitorSnapshotOverlay(candidate);
         if (snapshot) {
             overlayMonitors.set(candidate.id, snapshot);
         }
-    });
+    }
 
     const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
         mergeMonitorSnapshots(

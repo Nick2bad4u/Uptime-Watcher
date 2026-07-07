@@ -1006,19 +1006,19 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
     if (failed.length > 0) {
         logger.warn(`Failed downloads:`);
-        failed.forEach((f) => {
+        for (const f of failed) {
             logger.warn(`  - ${f.page}: ${f.error}`);
-        });
+        }
     }
 
     // Update hashes file
     /** @type {HashRecord} */
     const newHashes = {};
-    successful.forEach((r) => {
+    for (const r of successful) {
         if (r.hash) {
             newHashes[r.page] = r.hash;
         }
-    });
+    }
 
     if (Object.keys(newHashes).length > 0) {
         await fs.writeFile(
@@ -1043,19 +1043,19 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
         if (changed.length > 0) {
             logEntry += `### Changed Files\n`;
-            changed.forEach((r) => {
+            for (const r of changed) {
                 logEntry += `- ✅ ${r.page}\n`;
                 logEntry += `  ↳ Hash: \`${r.hash}\`\n`;
                 logEntry += `  ↳ Size: ${r.size} bytes\n`;
-            });
+            }
         }
 
         if (failed.length > 0) {
             logEntry += `\n### Failed Files\n`;
-            failed.forEach((r) => {
+            for (const r of failed) {
                 logEntry += `- ❌ ${r.page}\n`;
                 logEntry += `  ↳ Error: ${r.error}\n`;
-            });
+            }
         }
 
         logEntry += `\n---\n\n`;

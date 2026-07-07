@@ -205,7 +205,7 @@ function processImports(content) {
         /(?<temp3>\bexport\s+(?:{[^}]*}|\*)\s+from\s+["'`])(?<temp2>[^"'`]+)(?<temp1>["'`])/g,
     ];
 
-    importPatterns.forEach((pattern) => {
+    for (const pattern of importPatterns) {
         updated = updated.replace(
             pattern,
             (
@@ -223,7 +223,7 @@ function processImports(content) {
                 return match;
             }
         );
-    });
+    }
 
     log.info(`Updated ${changeCount} import statements`);
     return updated;

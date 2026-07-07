@@ -199,41 +199,42 @@ function formatTestNames(testStructures, format = "list") {
 
         case "tree": {
             let treeOutput = "";
-            testStructures.forEach((/** @type {any} */ structure) => {
+            for (const rawStructure of testStructures) {
+                const structure = /** @type {any} */ (rawStructure);
                 if (
                     structure.describes.length > 0 ||
                     structure.tests.length > 0
                 ) {
                     treeOutput += `\n📁 ${structure.file}\n`;
 
-                    structure.describes.forEach(
-                        (/** @type {any} */ describe) => {
-                            treeOutput += `  📝 ${describe}\n`;
-                        }
-                    );
+                    for (const describe of structure.describes) {
+                        treeOutput += `  📝 ${describe}\n`;
+                    }
 
-                    structure.tests.forEach((/** @type {any} */ test) => {
+                    for (const test of structure.tests) {
                         treeOutput += `  ✅ ${test}\n`;
-                    });
+                    }
                 }
-            });
+            }
             return treeOutput;
         }
 
         case "flat": {
             /** @type {string[]} */
             const allTests = [];
-            testStructures.forEach((/** @type {any} */ structure) => {
-                structure.tests.forEach((/** @type {any} */ test) => {
+            for (const rawStructure of testStructures) {
+                const structure = /** @type {any} */ (rawStructure);
+                for (const test of structure.tests) {
                     allTests.push(test);
-                });
-            });
+                }
+            }
             return allTests.join("\n");
         }
 
         default: {
             let listOutput = "";
-            testStructures.forEach((/** @type {any} */ structure) => {
+            for (const rawStructure of testStructures) {
+                const structure = /** @type {any} */ (rawStructure);
                 if (
                     structure.describes.length > 0 ||
                     structure.tests.length > 0
@@ -242,21 +243,19 @@ function formatTestNames(testStructures, format = "list") {
 
                     if (structure.describes.length > 0) {
                         listOutput += "\nDescribe blocks:\n";
-                        structure.describes.forEach(
-                            (/** @type {any} */ describe) => {
-                                listOutput += `  - ${describe}\n`;
-                            }
-                        );
+                        for (const describe of structure.describes) {
+                            listOutput += `  - ${describe}\n`;
+                        }
                     }
 
                     if (structure.tests.length > 0) {
                         listOutput += "\nTest cases:\n";
-                        structure.tests.forEach((/** @type {any} */ test) => {
+                        for (const test of structure.tests) {
                             listOutput += `  - ${test}\n`;
-                        });
+                        }
                     }
                 }
-            });
+            }
             return listOutput;
         }
     }
@@ -289,7 +288,7 @@ function main(args = process.argv.slice(2)) {
         // Extract test names from all files
         /** @type {object[]} */
         const testStructures = [];
-        testFiles.forEach((filePath) => {
+        for (const filePath of testFiles) {
             const structure = extractTestNames(filePath);
             const structCast = /** @type {any} */ (structure);
             if (
@@ -298,7 +297,7 @@ function main(args = process.argv.slice(2)) {
             ) {
                 testStructures.push(structure);
             }
-        });
+        }
 
         // Output results
         const output = formatTestNames(testStructures, options.format);

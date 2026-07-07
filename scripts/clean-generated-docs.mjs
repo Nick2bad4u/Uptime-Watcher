@@ -144,9 +144,9 @@ const main = async () => {
             "No generated documentation artifacts were found to remove."
         );
     } else {
-        removed.forEach((entry) => {
+        for (const entry of removed) {
             console.log(entry.reason);
-        });
+        }
     }
 
     if (typedocOutputs.size > 0) {
