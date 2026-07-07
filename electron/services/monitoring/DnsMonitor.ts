@@ -251,6 +251,7 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
      * @param expectedValue - Optional expected value for verification
      * @param timeout - Timeout in milliseconds
      * @param retryAttempts - Number of retry attempts
+     * @param signal - Optional abort signal for cancellation.
      *
      * @returns Promise resolving to MonitorCheckResult
      */
@@ -346,9 +347,11 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
      * @private
      *
      * @param host - The hostname to resolve
+     * @param resolver - Resolver function selected for the DNS record type.
      * @param recordType - The DNS record type to query
      * @param expectedValue - Optional expected value for verification
      * @param timeout - Timeout in milliseconds
+     * @param signal - Optional abort signal for cancellation.
      *
      * @returns Promise resolving to check result with success flag and details
      */
@@ -429,7 +432,6 @@ export class DnsMonitor extends ConfigurableMonitorServiceBase<"dns"> {
      *
      * @private
      *
-     * @param host - The hostname to resolve
      * @param recordType - The DNS record type to query
      *
      * @returns Promise for DNS resolution or null if unsupported

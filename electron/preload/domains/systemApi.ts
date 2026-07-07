@@ -43,7 +43,7 @@ function createSystemApi(): SystemApiInterface {
             /**
              * Opens an external URL in the default browser
              *
-             * @param URL - URL to open externally
+             * @param url - URL to open externally
              *
              * @returns Promise resolving to true if URL was opened successfully
              */

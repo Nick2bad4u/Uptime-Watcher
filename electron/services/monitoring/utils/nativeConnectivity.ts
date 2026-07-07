@@ -374,7 +374,7 @@ async function checkTcpPorts(
  * }
  * ```
  *
- * @param URL - Complete URL to check (including protocol)
+ * @param url - Complete URL to check (including protocol)
  * @param timeout - Request timeout in milliseconds
  *
  * @returns Promise resolving to MonitorCheckResult

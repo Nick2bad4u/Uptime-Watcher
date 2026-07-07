@@ -166,7 +166,7 @@ const COUNT_RESULT_VALIDATION: RowValidationOptions<CountResult> = {
  * result to the expected type.
  *
  * @param db - Database instance
- * @param SQL - INSERT SQL with RETURNING clause
+ * @param sql - INSERT SQL with RETURNING clause
  * @param params - Query parameters
  *
  * @returns Inserted record with generated fields
@@ -192,7 +192,7 @@ export function insertWithReturning<TRow extends object = UnknownRecord>(
  * This function handles COUNT() queries which return `{count: number}`.
  *
  * @param db - Database instance
- * @param SQL - SQL query that returns a count
+ * @param sql - SQL query that returns a count
  * @param params - Query parameters
  *
  * @returns Count result object
@@ -268,7 +268,7 @@ export function queryForIds(
  * this when you know the SQL structure and expected return type.
  *
  * @param db - Database instance
- * @param SQL - SQL query string
+ * @param sql - SQL query string
  * @param params - Query parameters
  *
  * @returns Array of records
@@ -292,7 +292,7 @@ function queryForRecords<T extends object = UnknownRecord>(
  * Callers should cast the result to the expected type.
  *
  * @param db - Database instance
- * @param SQL - SQL query string
+ * @param sql - SQL query string
  * @param params - Query parameters
  *
  * @returns Single record or undefined

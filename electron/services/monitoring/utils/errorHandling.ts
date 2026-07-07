@@ -186,7 +186,7 @@ export function isCancellationError(
  *
  * @param error - The {@link AxiosError} instance containing request/response
  *   details.
- * @param URL - The URL that was being monitored when the error occurred.
+ * @param url - The URL that was being monitored when the error occurred.
  * @param responseTime - The response time in milliseconds at the point of
  *   failure.
  * @param correlationId - Optional correlation ID for event tracking and
@@ -280,7 +280,7 @@ function handleAxiosError(
  * ```
  *
  * @param error - The unknown error thrown during monitoring (can be any type).
- * @param URL - The URL being monitored when the error occurred.
+ * @param url - The URL being monitored when the error occurred.
  * @param correlationId - Optional correlation ID for event tracking and
  *   logging.
  *

@@ -87,7 +87,7 @@ export interface UIStore {
     /**
      * Opens an external URL using the system's default browser.
      *
-     * @param URL - The URL to open externally.
+     * @param url - The URL to open externally.
      * @param context - Optional context for logging purposes.
      */
     openExternal: (url: string, context?: { siteName?: string }) => void;
