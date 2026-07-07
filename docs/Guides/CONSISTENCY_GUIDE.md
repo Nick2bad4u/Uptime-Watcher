@@ -221,7 +221,7 @@ export class HttpMonitor implements IMonitorService {
 
  constructor(config: MonitorConfig = {}) {
   this.config = {
-   timeout: DEFAULT_REQUEST_TIMEOUT,
+   timeout: DEFAULT_REQUEST_TIMEOUT_SECONDS,
    userAgent: USER_AGENT,
    ...config,
   };

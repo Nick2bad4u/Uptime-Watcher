@@ -269,15 +269,6 @@ export const CHECK_INTERVALS: IntervalOption[] = [
 export const DEFAULT_CHECK_INTERVAL = 300_000;
 
 /**
- * Default request timeout in milliseconds.
- *
- * @remarks
- * Set to 10 seconds to balance between allowing slow responses and preventing
- * indefinite hangs.
- */
-export const DEFAULT_REQUEST_TIMEOUT = 10_000;
-
-/**
  * Default request timeout in seconds for UI display.
  *
  * @remarks

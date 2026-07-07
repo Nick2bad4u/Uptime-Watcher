@@ -19,7 +19,6 @@ import {
     CHECK_INTERVALS,
     DEFAULT_CHECK_INTERVAL,
     DEFAULT_HISTORY_LIMIT,
-    DEFAULT_REQUEST_TIMEOUT,
     DEFAULT_REQUEST_TIMEOUT_SECONDS,
     FALLBACK_MONITOR_TYPE_OPTIONS,
     FONT_FAMILY_MONO,
@@ -302,20 +301,6 @@ describe("Application Constants", () => {
             );
         });
 
-        it("should export DEFAULT_REQUEST_TIMEOUT", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Export Operation", "type");
-
-            expect(DEFAULT_REQUEST_TIMEOUT).toBeDefined();
-            expect(typeof DEFAULT_REQUEST_TIMEOUT).toBe("number");
-            expect(DEFAULT_REQUEST_TIMEOUT).toBe(10_000); // 10 seconds
-        });
-
         it("should export DEFAULT_REQUEST_TIMEOUT_SECONDS", async ({
             task,
             annotate,
@@ -342,20 +327,6 @@ describe("Application Constants", () => {
             expect(DEFAULT_HISTORY_LIMIT).toBeDefined();
             expect(typeof DEFAULT_HISTORY_LIMIT).toBe("number");
             expect(DEFAULT_HISTORY_LIMIT).toBe(500);
-        });
-
-        it("should have consistent timeout values", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: constants", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(DEFAULT_REQUEST_TIMEOUT).toBe(
-                DEFAULT_REQUEST_TIMEOUT_SECONDS * 1000
-            );
         });
     });
 
@@ -800,7 +771,7 @@ describe("Application Constants", () => {
                 FONT_FAMILY_MONO,
                 FONT_FAMILY_SANS,
                 DEFAULT_CHECK_INTERVAL,
-                DEFAULT_REQUEST_TIMEOUT,
+                DEFAULT_REQUEST_TIMEOUT_SECONDS,
                 CHART_TIME_PERIODS,
             ];
 
@@ -860,8 +831,8 @@ describe("Application Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(DEFAULT_REQUEST_TIMEOUT).toBeGreaterThan(1000); // At least 1 second
-            expect(DEFAULT_REQUEST_TIMEOUT).toBeLessThan(60_000); // Less than 1 minute
+            expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeGreaterThan(1);
+            expect(DEFAULT_REQUEST_TIMEOUT_SECONDS).toBeLessThan(60);
         });
 
         it("should have reasonable default check interval", async ({
