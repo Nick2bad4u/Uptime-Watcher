@@ -29,11 +29,13 @@ export interface DiagnosticsMetricsSnapshot {
     successfulHandlerChecks: number;
 }
 
-const metrics: DiagnosticsMetricsSnapshot = {
+const createInitialDiagnosticsMetrics = (): DiagnosticsMetricsSnapshot => ({
     missingHandlerChecks: 0,
     preloadGuardReports: 0,
     successfulHandlerChecks: 0,
-};
+});
+
+let metrics: DiagnosticsMetricsSnapshot = createInitialDiagnosticsMetrics();
 
 interface DiagnosticsSnapshotContext {
     readonly channel?: string;
@@ -154,10 +156,5 @@ export function getDiagnosticsMetrics(): DiagnosticsMetricsSnapshot {
  * @internal
  */
 export function resetDiagnosticsMetrics(): void {
-    delete metrics.lastMissingChannel;
-    delete metrics.lastPreloadGuard;
-    delete metrics.lastUpdatedAt;
-    metrics.missingHandlerChecks = 0;
-    metrics.preloadGuardReports = 0;
-    metrics.successfulHandlerChecks = 0;
+    metrics = createInitialDiagnosticsMetrics();
 }

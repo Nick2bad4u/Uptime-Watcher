@@ -439,8 +439,6 @@ function applyDnsMonitorDefaults(
 
     if (typeof expectedValue === "string" && expectedValue.trim()) {
         monitor.expectedValue = expectedValue;
-    } else {
-        delete monitor.expectedValue;
     }
 }
 

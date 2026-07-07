@@ -398,7 +398,7 @@ export function createHttpMonitorService<
         }
 
         public updateConfig(config: Partial<MonitorServiceConfig>): void {
-            const nextConfig: MonitorServiceConfig = { ...this.config };
+            let nextConfig: MonitorServiceConfig = { ...this.config };
             const configRecord = config as Partial<MonitorServiceConfig> &
                 Record<string, unknown>;
             const remaining = safeObjectOmit(
@@ -423,7 +423,7 @@ export function createHttpMonitorService<
                 if (isDefined(timeout)) {
                     nextConfig.timeout = timeout;
                 } else {
-                    delete nextConfig.timeout;
+                    nextConfig = safeObjectOmit(nextConfig, ["timeout"]);
                 }
             }
 
@@ -437,7 +437,7 @@ export function createHttpMonitorService<
                 if (isDefined(userAgent)) {
                     nextConfig.userAgent = userAgent;
                 } else {
-                    delete nextConfig.userAgent;
+                    nextConfig = safeObjectOmit(nextConfig, ["userAgent"]);
                 }
             }
 

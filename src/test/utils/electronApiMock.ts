@@ -1,4 +1,4 @@
-import type { PartialDeep, UnknownRecord } from "type-fest";
+import type { PartialDeep } from "type-fest";
 
 import { objectEntries, objectHasIn, safeCastTo } from "ts-extras";
 
@@ -134,7 +134,7 @@ export const installElectronApiMock = (
         }
 
         if (isCreatedWindow) {
-            delete safeCastTo<UnknownRecord>(globalThis)["window"];
+            Reflect.deleteProperty(globalThis, "window");
         }
     };
 

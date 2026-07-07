@@ -31,6 +31,18 @@ const DEFAULT_TARGETS: readonly FuzzTarget[] = [
     "shared",
 ];
 
+const omitFastCheckSeed = (env: MutableProcessEnv): MutableProcessEnv => {
+    const nextEnv: MutableProcessEnv = {};
+
+    for (const [key, value] of Object.entries(env)) {
+        if (key !== "FAST_CHECK_SEED") {
+            nextEnv[key] = value;
+        }
+    }
+
+    return nextEnv;
+};
+
 interface NpmInvocation {
     readonly command: string;
     readonly argsPrefix: readonly string[];
@@ -325,13 +337,13 @@ async function main(
 ): Promise<number> {
     try {
         const options = parseCliOptions(argv);
-        const childEnv: MutableProcessEnv = {
+        let childEnv: MutableProcessEnv = {
             ...process.env,
             FAST_CHECK_NUM_RUNS: String(options.runs),
         };
 
         if (options.seed === undefined) {
-            delete childEnv.FAST_CHECK_SEED;
+            childEnv = omitFastCheckSeed(childEnv);
         } else {
             childEnv.FAST_CHECK_SEED = String(options.seed);
         }

@@ -210,11 +210,13 @@ export const createSiteSyncActions = (
     let pendingSyncPromise: null | Promise<void> = null;
 
     const syncEventSubscription: {
-        cleanup?: () => void;
-        pending?: Promise<void>;
+        cleanup: (() => void) | undefined;
+        pending: Promise<void> | undefined;
         refCount: number;
         shouldCleanupOnReady: boolean;
     } = {
+        cleanup: undefined,
+        pending: undefined,
         refCount: 0,
         shouldCleanupOnReady: false,
     };
@@ -529,14 +531,14 @@ export const createSiteSyncActions = (
 
                         syncEventSubscription.shouldCleanupOnReady = false;
                     } finally {
-                        delete syncEventSubscription.pending;
+                        syncEventSubscription.pending = undefined;
 
                         if (
                             syncEventSubscription.refCount === 0 &&
                             syncEventSubscription.cleanup
                         ) {
                             syncEventSubscription.cleanup();
-                            delete syncEventSubscription.cleanup;
+                            syncEventSubscription.cleanup = undefined;
                             syncEventSubscription.shouldCleanupOnReady = false;
                         }
                     }
@@ -565,7 +567,7 @@ export const createSiteSyncActions = (
 
                 if (syncEventSubscription.cleanup) {
                     syncEventSubscription.cleanup();
-                    delete syncEventSubscription.cleanup;
+                    syncEventSubscription.cleanup = undefined;
                     syncEventSubscription.shouldCleanupOnReady = false;
                     return;
                 }

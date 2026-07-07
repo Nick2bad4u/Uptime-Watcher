@@ -12,6 +12,7 @@ import type {
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { safeObjectOmit } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
     DuplicateSiteIdentifierError,
@@ -125,7 +126,7 @@ const selectStageMetadata = (
 const createTelemetryEmitter =
     (operationName: string, telemetry: NormalizedTelemetry) =>
     (stage: OperationStage, additional: SitesTelemetryPayload): void => {
-        const payload: MutableSitesTelemetryPayload = {
+        let payload: MutableSitesTelemetryPayload = {
             ...telemetry.base,
             ...selectStageMetadata(stage, telemetry),
             ...additional,
@@ -136,7 +137,7 @@ const createTelemetryEmitter =
         } else if (stage === "failure") {
             payload["success"] = false;
         } else if (objectHasIn(payload, "success")) {
-            delete payload.success;
+            payload = safeObjectOmit(payload, ["success"]);
         }
 
         logStoreAction("SitesStore", operationName, payload);
