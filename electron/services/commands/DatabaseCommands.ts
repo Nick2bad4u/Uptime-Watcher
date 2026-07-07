@@ -133,7 +133,7 @@ export interface IDatabaseCommand<TResult = void> {
  * @typeParam TResult - The result type produced by the command when
  *   {@link DatabaseCommand.execute} resolves.
  */
-export abstract class DatabaseCommand<
+abstract class DatabaseCommand<
     TResult = void,
 > implements IDatabaseCommand<TResult> {
     /** Site cache for data synchronization during operations */
@@ -151,35 +151,6 @@ export abstract class DatabaseCommand<
     /** Optional history limit updater for settings propagation */
     protected readonly updateHistoryLimit:
         ((limit: number) => Promise<void>) | undefined;
-
-    /**
-     * Emits a failure event for the command operation.
-     *
-     * @remarks
-     * Used internally to emit a typed event indicating command failure,
-     * including error details and additional event data.
-     *
-     * @param eventType - The event type to emit.
-     * @param error - The {@link Error} that occurred.
-     * @param data - Additional event data to include in the event payload.
-     *
-     * @internal
-     */
-    protected async emitFailureEvent<K extends EventKey<UptimeEvents>>(
-        eventType: K,
-        error: Error,
-        data: Partial<EventPayload<UptimeEvents, K>> = {}
-    ): Promise<void> {
-        await this.eventEmitter.emitTyped(
-            eventType,
-            castUnchecked<EventPayload<UptimeEvents, K>>({
-                error: error.message,
-                success: false,
-                timestamp: Date.now(),
-                ...data,
-            })
-        );
-    }
 
     /**
      * Emits a success event for the command operation.
@@ -945,84 +916,5 @@ export class RestoreBackupCommand extends DatabaseCommand<DatabaseRestoreSummary
 
     public getDescription(): string {
         return "Restore SQLite database backup";
-    }
-}
-
-/**
- * Command for loading sites from the database into the in-memory cache.
- *
- * @remarks
- * Encapsulates the logic for loading all sites from the database and atomically
- * replacing the cache. Rollback restores the previous cache state. Validation
- * is a no-op.
- *
- * @public
- */
-export class LoadSitesCommand extends DatabaseCommand<Site[]> {
-    /** Backup of original cache state for rollback functionality */
-    private readonly originalCacheState = new Map<string, Site>();
-
-    public async execute(): Promise<Site[]> {
-        // Backup current cache state
-        this.originalCacheState.clear();
-        for (const [key, site] of this.cache.entries()) {
-            this.originalCacheState.set(key, structuredClone(site));
-        }
-
-        const siteRepositoryService =
-            this.serviceFactory.createSiteRepositoryService();
-        const sites = await siteRepositoryService.getSitesFromDatabase();
-
-        // Atomic cache replacement
-        this.cache.clear();
-        for (const site of sites) {
-            this.cache.set(site.identifier, structuredClone(site));
-        }
-
-        return sites.map((site) => structuredClone(site));
-    }
-
-    /**
-     * Restores the cache to its previous state.
-     *
-     * @remarks
-     * Performs a synchronous cache restoration operation by clearing the
-     * current cache and restoring the backup state. Returns a resolved promise
-     * to satisfy the IDatabaseCommand interface contract.
-     *
-     * @returns Resolved promise after cache restoration is complete
-     */
-    public async rollback(): Promise<void> {
-        // Restore original cache state
-        this.cache.clear();
-        for (const [key, site] of this.originalCacheState) {
-            this.cache.set(key, structuredClone(site));
-        }
-        await Promise.resolve();
-    }
-
-    /**
-     * Validates site loading operation prerequisites.
-     *
-     * @remarks
-     * Site loading operations have minimal prerequisites, so validation always
-     * succeeds. Returns a resolved promise to satisfy the IDatabaseCommand
-     * interface contract.
-     *
-     * @returns Resolved promise with validation result indicating success
-     */
-    public async validate(): Promise<{
-        /** Array of error messages if validation fails */
-        errors: string[];
-        /** Boolean indicating whether validation passed */
-        isValid: boolean;
-    }> {
-        // No specific validation needed for loading
-        await Promise.resolve();
-        return { errors: [], isValid: true };
-    }
-
-    public getDescription(): string {
-        return "Load sites from database into cache";
     }
 }
