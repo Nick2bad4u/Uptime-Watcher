@@ -1407,6 +1407,25 @@ describe("useSitesState", () => {
                 expect(Object.hasOwn({}, "__proto__")).toBe(false);
             }
         });
+
+        it("should ignore inherited selected monitor site IDs", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate(
+                "Security: Inherited selected monitor IDs are ignored",
+                "security"
+            );
+
+            const selectedMonitorIds = Object.create({
+                "test-site": "inherited-monitor",
+            }) as SitesState["selectedMonitorIds"];
+            mockGet.mockReturnValue(createState({ selectedMonitorIds }));
+
+            expect(
+                stateActions.getSelectedMonitorId("test-site")
+            ).toBeUndefined();
+        });
     });
 
     describe("registerOptimisticMonitoringLock", () => {

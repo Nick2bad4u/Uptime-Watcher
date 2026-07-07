@@ -66,6 +66,12 @@ const setOptimisticMonitoringLockEntry = (
     });
 };
 
+const getOptimisticMonitoringLockEntry = (
+    locks: SitesState["optimisticMonitoringLocks"],
+    key: OptimisticLockKey
+): OptimisticMonitoringLock | undefined =>
+    Object.hasOwn(locks, key) ? locks[key] : undefined;
+
 const cloneOptimisticMonitoringLocks = (
     locks: SitesState["optimisticMonitoringLocks"]
 ): SitesState["optimisticMonitoringLocks"] => {
@@ -111,6 +117,14 @@ const setSelectedMonitorIdEntry = (
         writable: true,
     });
 };
+
+const getSelectedMonitorIdEntry = (
+    selectedMonitorIds: SitesState["selectedMonitorIds"],
+    siteIdentifier: Site["identifier"]
+): Monitor["id"] | undefined =>
+    Object.hasOwn(selectedMonitorIds, siteIdentifier)
+        ? selectedMonitorIds[siteIdentifier]
+        : undefined;
 
 const collectSelectedMonitorEntries = (
     selectedMonitorIds: SitesState["selectedMonitorIds"]
@@ -318,7 +332,10 @@ export const createSitesStateActions = (
             lockExpiryTimers.delete(key);
             const now = Date.now();
             set((state) => {
-                const lock = state.optimisticMonitoringLocks[key];
+                const lock = getOptimisticMonitoringLockEntry(
+                    state.optimisticMonitoringLocks,
+                    key
+                );
                 if (!lock || lock.expiresAt > now) {
                     return {};
                 }
@@ -386,7 +403,11 @@ export const createSitesStateActions = (
                         siteIdentifier,
                         monitorId
                     );
-                    if (isDefined(currentLocks[key])) {
+                    if (
+                        isDefined(
+                            getOptimisticMonitoringLockEntry(currentLocks, key)
+                        )
+                    ) {
                         const isRemoved = Reflect.deleteProperty(
                             currentLocks,
                             key
@@ -410,7 +431,7 @@ export const createSitesStateActions = (
         ): Monitor["id"] | undefined => {
             const ids = get().selectedMonitorIds;
 
-            return ids[siteIdentifier];
+            return getSelectedMonitorIdEntry(ids, siteIdentifier);
         },
         getSelectedSite: (): Site | undefined => {
             const { selectedSiteIdentifier, sites } = get();
@@ -615,7 +636,10 @@ export const createSitesStateActions = (
                                   monitor.id
                               );
                               const lock = setHas(applicableLockKeys, lockKey)
-                                  ? locks[lockKey]
+                                  ? getOptimisticMonitoringLockEntry(
+                                        locks,
+                                        lockKey
+                                    )
                                   : undefined;
 
                               if (!lock) {
