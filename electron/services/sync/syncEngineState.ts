@@ -134,6 +134,20 @@ function setSiteConfig(
     setRecordValue(target, key, value);
 }
 
+function getOwnRecordValue<T>(
+    source: Readonly<Record<string, T>>,
+    key: string
+): T | undefined {
+    return objectHasOwn(source, key) ? source[key] : undefined;
+}
+
+function getOwnPropertyValue<T extends object, K extends keyof T>(
+    source: T | undefined,
+    key: K
+): T[K] | undefined {
+    return source && Object.hasOwn(source, key) ? source[key] : undefined;
+}
+
 function normalizeCloudSyncFieldValue<
     T extends CloudSyncFieldValue["value"],
 >(args: {
@@ -272,9 +286,9 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
 }
 
 export const EMPTY_STATE: CloudSyncState = {
-    monitor: {},
-    settings: {},
-    site: {},
+    monitor: createEntityMap(),
+    settings: createEntityMap(),
+    site: createEntityMap(),
 };
 
 /**
@@ -291,10 +305,10 @@ export function shouldSyncSettingKey(key: string): boolean {
 }
 
 function removeUndefinedEntries(value: UnknownRecord): UnknownRecord {
-    const result: UnknownRecord = {};
+    const result = createNullPrototypeObject<UnknownRecord>();
     for (const [key, entryValue] of objectEntries(value)) {
         if (isDefined(entryValue)) {
-            result[key] = entryValue;
+            setRecordValue<unknown>(result, key, entryValue);
         }
     }
 
@@ -453,8 +467,11 @@ export function buildDesiredSitesFromSyncState(
             continue;
         }
 
-        const nameValue = entity.fields["name"]?.value;
-        const monitoringValue = entity.fields["monitoring"]?.value;
+        const nameValue = getOwnRecordValue(entity.fields, "name")?.value;
+        const monitoringValue = getOwnRecordValue(
+            entity.fields,
+            "monitoring"
+        )?.value;
 
         const parsed = cloudSyncSiteConfigSchema.safeParse({
             identifier: siteId,
@@ -540,7 +557,7 @@ export function buildDesiredSettingsFromSyncState(
             continue;
         }
 
-        const value = entity.fields["value"]?.value;
+        const value = getOwnRecordValue(entity.fields, "value")?.value;
         if (typeof value === "string") {
             setSettingConfig(desiredSettings, key, value);
         }
@@ -736,15 +753,20 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     };
 
     for (const [siteId, config] of objectEntries(args.current.sites)) {
-        const baselineConfig = baselineSites[siteId];
+        const baselineConfig = getOwnRecordValue(baselineSites, siteId);
 
-        if (!areJsonValuesEqual(baselineConfig?.name ?? null, config.name)) {
+        if (
+            !areJsonValuesEqual(
+                getOwnPropertyValue(baselineConfig, "name") ?? null,
+                config.name
+            )
+        ) {
             emitSetField("site", siteId, "name", config.name);
         }
 
         if (
             !areJsonValuesEqual(
-                baselineConfig?.monitoring ?? null,
+                getOwnPropertyValue(baselineConfig, "monitoring") ?? null,
                 config.monitoring
             )
         ) {
@@ -759,11 +781,12 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     }
 
     for (const [monitorId, config] of objectEntries(args.current.monitors)) {
-        const baselineConfig = baselineMonitors[monitorId];
+        const baselineConfig = getOwnRecordValue(baselineMonitors, monitorId);
 
         for (const field of monitorFields) {
-            const baselineValue = baselineConfig?.[field] ?? null;
-            const currentValue = config[field] ?? null;
+            const baselineValue =
+                getOwnPropertyValue(baselineConfig, field) ?? null;
+            const currentValue = getOwnPropertyValue(config, field) ?? null;
 
             if (!areJsonValuesEqual(baselineValue, currentValue)) {
                 emitSetField("monitor", monitorId, field, currentValue);
@@ -783,8 +806,8 @@ export function buildLocalOperations(args: BuildLocalOperationsArgs): {
     ]);
 
     for (const key of settingsKeys) {
-        const currentValue = args.current.settings[key];
-        const baselineValue = baselineSettings[key];
+        const currentValue = getOwnRecordValue(args.current.settings, key);
+        const baselineValue = getOwnRecordValue(baselineSettings, key);
 
         if (!isDefined(currentValue)) {
             if (isDefined(baselineValue)) {
@@ -809,7 +832,11 @@ export function getMaxOpIdByDevice(
     const result = createNullPrototypeObject<Record<string, number>>();
 
     for (const op of operations) {
-        result[op.deviceId] = Math.max(result[op.deviceId] ?? -1, op.opId);
+        setRecordValue(
+            result,
+            op.deviceId,
+            Math.max(getOwnRecordValue(result, op.deviceId) ?? -1, op.opId)
+        );
     }
 
     return result;

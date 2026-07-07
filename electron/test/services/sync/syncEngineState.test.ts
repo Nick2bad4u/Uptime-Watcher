@@ -9,6 +9,7 @@ import {
     buildDesiredSettingsFromSyncState,
     buildDesiredSitesFromSyncState,
     buildLocalOperations,
+    EMPTY_STATE,
     getMaxOpIdByDevice,
     normalizeCloudSyncState,
     parseBaseline,
@@ -209,9 +210,50 @@ describe(buildLocalOperations, () => {
             })
         );
     });
+
+    it("ignores inherited current settings when deleting baseline settings", () => {
+        const currentSettings = Object.create({
+            [INHERITED_PROPERTY_NAME]: "inherited-setting",
+        }) as Record<string, string>;
+
+        const { operations } = buildLocalOperations({
+            baseline: {
+                baselineVersion: 1,
+                createdAt: 0,
+                monitors: {},
+                settings: {
+                    [INHERITED_PROPERTY_NAME]: "baseline-setting",
+                },
+                sites: {},
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            },
+            current: {
+                monitors: {},
+                settings: currentSettings,
+                sites: {},
+            },
+            deviceId: "device-1",
+            nextOpId: 1,
+            now: 10,
+        });
+
+        expect(operations).toEqual([
+            expect.objectContaining({
+                entityId: INHERITED_PROPERTY_NAME,
+                entityType: "settings",
+                kind: "delete-entity",
+            }),
+        ]);
+    });
 });
 
 describe("syncEngineState map builders", () => {
+    it("exports empty sync state with null-prototype maps", () => {
+        expect(Object.getPrototypeOf(EMPTY_STATE.monitor)).toBeNull();
+        expect(Object.getPrototypeOf(EMPTY_STATE.settings)).toBeNull();
+        expect(Object.getPrototypeOf(EMPTY_STATE.site)).toBeNull();
+    });
+
     it("builds canonical local state with null-prototype maps", () => {
         const site: Site = {
             identifier: PROTOTYPE_PROPERTY_NAME,
