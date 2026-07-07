@@ -35,6 +35,7 @@ import { arrayIncludes, objectHasOwn } from "ts-extras";
  * @see {@link EventTriggerType}
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- Interface is intentionally augmented in eventTypes.catalogue.*.ts
+// biome-ignore lint/suspicious/noEmptyInterface: Interface is intentionally augmented in eventTypes.catalogue.*.ts.
 export interface UptimeEvents {}
 
 /**
