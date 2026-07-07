@@ -13,7 +13,7 @@ import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { castUnchecked } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import { isValidInteger } from "@shared/validation/validatorUtils";
-import { arrayIncludes, isDefined, objectHasIn, stringSplit } from "ts-extras";
+import { arrayIncludes, isDefined, stringSplit } from "ts-extras";
 
 /**
  * Base interface for all database row types.
@@ -247,6 +247,12 @@ export const RowValidationUtils = {
     },
 } as const;
 
+function getRequiredRowProperty(row: UnknownRecord, property: string): unknown {
+    const rowProperty = getOwnDataProperty(row, property);
+
+    return rowProperty.found ? rowProperty.value : undefined;
+}
+
 /**
  * Determines if an object conforms to the {@link HistoryRow} interface.
  *
@@ -264,17 +270,18 @@ export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
         return false;
     }
 
+    const monitorId = getRequiredRowProperty(obj, "monitorId");
+    const status = getRequiredRowProperty(obj, "status");
+    const timestamp = getRequiredRowProperty(obj, "timestamp");
+
     // Explicit property and type checking
     return (
-        objectHasIn(obj, "monitorId") &&
-        objectHasIn(obj, "status") &&
-        objectHasIn(obj, "timestamp") &&
-        isDefined(obj.monitorId) &&
-        isDefined(obj.status) &&
-        isDefined(obj.timestamp) &&
-        typeof obj.monitorId === "string" &&
-        RowValidationUtils.isValidStatus(obj.status) &&
-        RowValidationUtils.isValidTimestamp(obj.timestamp)
+        isDefined(monitorId) &&
+        isDefined(status) &&
+        isDefined(timestamp) &&
+        typeof monitorId === "string" &&
+        RowValidationUtils.isValidStatus(status) &&
+        RowValidationUtils.isValidTimestamp(timestamp)
     );
 }
 
@@ -295,17 +302,18 @@ export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
         return false;
     }
 
+    const id = getRequiredRowProperty(obj, "id");
+    const siteIdentifier = getRequiredRowProperty(obj, "site_identifier");
+    const type = getRequiredRowProperty(obj, "type");
+
     // Explicit property and type checking
     return (
-        objectHasIn(obj, "id") &&
-        objectHasIn(obj, "site_identifier") &&
-        objectHasIn(obj, "type") &&
-        isDefined(obj.id) &&
-        isDefined(obj.site_identifier) &&
-        isDefined(obj.type) &&
-        (typeof obj.id === "string" || typeof obj.id === "number") &&
-        typeof obj.site_identifier === "string" &&
-        typeof obj.type === "string"
+        isDefined(id) &&
+        isDefined(siteIdentifier) &&
+        isDefined(type) &&
+        (typeof id === "string" || typeof id === "number") &&
+        typeof siteIdentifier === "string" &&
+        typeof type === "string"
     );
 }
 
@@ -331,12 +339,13 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
     }
 
     const row = obj;
+    const key = getRequiredRowProperty(row, "key");
+
     return (
-        objectHasIn(row, "key") &&
-        isDefined(row.key) &&
-        row.key !== null &&
-        typeof row.key === "string" &&
-        row.key.length > 0
+        isDefined(key) &&
+        key !== null &&
+        typeof key === "string" &&
+        key.length > 0
     );
 }
 
@@ -362,12 +371,13 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
     }
 
     const row = obj;
+    const identifier = getRequiredRowProperty(row, "identifier");
+
     return (
-        objectHasIn(row, "identifier") &&
-        isDefined(row.identifier) &&
-        row.identifier !== null &&
-        typeof row.identifier === "string" &&
-        row.identifier.trim().length > 0
+        isDefined(identifier) &&
+        identifier !== null &&
+        typeof identifier === "string" &&
+        identifier.trim().length > 0
     );
 }
 

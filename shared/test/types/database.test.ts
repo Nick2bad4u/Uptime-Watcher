@@ -19,6 +19,33 @@ import {
     type SiteRow,
 } from "../../types/database";
 
+function createAccessorRow(properties: Record<string, unknown>): {
+    readonly row: object;
+    readonly wasAccessed: () => boolean;
+} {
+    let wasAccessed = false;
+    const descriptors: PropertyDescriptorMap = {};
+
+    for (const [property, value] of Object.entries(properties)) {
+        descriptors[property] = {
+            configurable: true,
+            enumerable: true,
+            get() {
+                wasAccessed = true;
+                return value;
+            },
+        };
+    }
+
+    const row = {};
+    Object.defineProperties(row, descriptors);
+
+    return {
+        row,
+        wasAccessed: () => wasAccessed,
+    };
+}
+
 describe("Shared Database Types - Backend Coverage", () => {
     describe(isValidHistoryRow, () => {
         it("should validate correct history row", async ({
@@ -58,6 +85,43 @@ describe("Shared Database Types - Backend Coverage", () => {
             };
 
             expect(isValidHistoryRow(validRow)).toBeTruthy();
+        });
+        it("should reject history rows with inherited required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const inheritedRow = Object.create({
+                monitorId: "test-monitor",
+                status: "up",
+                timestamp: Date.now(),
+            });
+
+            expect(isValidHistoryRow(inheritedRow)).toBeFalsy();
+        });
+        it("should reject history rows with accessor required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const { row, wasAccessed } = createAccessorRow({
+                monitorId: "test-monitor",
+                status: "up",
+                timestamp: Date.now(),
+            });
+
+            expect(isValidHistoryRow(row)).toBeFalsy();
+            expect(wasAccessed()).toBeFalsy();
         });
         it("should validate degraded history row status", async ({
             task,
@@ -268,6 +332,43 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidMonitorRow(validRow)).toBeTruthy();
         });
+        it("should reject monitor rows with inherited required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const inheritedRow = Object.create({
+                id: 1,
+                site_identifier: "test-site",
+                type: "http",
+            });
+
+            expect(isValidMonitorRow(inheritedRow)).toBeFalsy();
+        });
+        it("should reject monitor rows with accessor required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const { row, wasAccessed } = createAccessorRow({
+                id: 1,
+                site_identifier: "test-site",
+                type: "http",
+            });
+
+            expect(isValidMonitorRow(row)).toBeFalsy();
+            expect(wasAccessed()).toBeFalsy();
+        });
         it("should reject invalid monitor rows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
@@ -346,6 +447,39 @@ describe("Shared Database Types - Backend Coverage", () => {
 
             expect(isValidSettingsRow(validRow)).toBeTruthy();
         });
+        it("should reject settings rows with inherited required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const inheritedRow = Object.create({
+                key: "setting-key",
+            });
+
+            expect(isValidSettingsRow(inheritedRow)).toBeFalsy();
+        });
+        it("should reject settings rows with accessor required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const { row, wasAccessed } = createAccessorRow({
+                key: "setting-key",
+            });
+
+            expect(isValidSettingsRow(row)).toBeFalsy();
+            expect(wasAccessed()).toBeFalsy();
+        });
         it("should reject invalid settings rows", async ({
             task,
             annotate,
@@ -400,6 +534,39 @@ describe("Shared Database Types - Backend Coverage", () => {
             };
 
             expect(isValidSiteRow(validRow)).toBeTruthy();
+        });
+        it("should reject site rows with inherited required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const inheritedRow = Object.create({
+                identifier: "test-site",
+            });
+
+            expect(isValidSiteRow(inheritedRow)).toBeFalsy();
+        });
+        it("should reject site rows with accessor required fields", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Database Types - Backend Coverage",
+                "component"
+            );
+
+            const { row, wasAccessed } = createAccessorRow({
+                identifier: "test-site",
+            });
+
+            expect(isValidSiteRow(row)).toBeFalsy();
+            expect(wasAccessed()).toBeFalsy();
         });
         it("should reject invalid site rows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
