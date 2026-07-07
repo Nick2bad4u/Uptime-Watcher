@@ -541,6 +541,29 @@ describe(ConfigurationManager, () => {
             ).toHaveBeenCalledTimes(2);
         });
 
+        it("should validate monitors with cyclic own data instead of failing cache key generation", async () => {
+            const monitor = createMockMonitor() as Monitor & {
+                self?: unknown;
+            };
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+
+            monitor.self = monitor;
+            mockMonitorValidator.validateMonitorConfiguration.mockReturnValue(
+                expectedResult
+            );
+
+            await expect(
+                configManager.validateMonitorConfiguration(monitor)
+            ).resolves.toEqual(expectedResult);
+
+            expect(
+                mockMonitorValidator.validateMonitorConfiguration
+            ).toHaveBeenCalledWith(monitor);
+        });
+
         it("should return cached monitor validation results without exposing cached errors", async () => {
             const monitor = createMockMonitor();
             const expectedResult: ValidationResult = {
@@ -794,6 +817,29 @@ describe(ConfigurationManager, () => {
             expect(
                 mockSiteValidator.validateSiteConfiguration
             ).toHaveBeenCalledTimes(2);
+        });
+
+        it("should validate sites with cyclic own data instead of failing cache key generation", async () => {
+            const site = createMockSite() as Site & {
+                self?: unknown;
+            };
+            const expectedResult: ValidationResult = {
+                success: true,
+                errors: [],
+            };
+
+            site.self = site;
+            mockSiteValidator.validateSiteConfiguration.mockReturnValue(
+                expectedResult
+            );
+
+            await expect(
+                configManager.validateSiteConfiguration(site)
+            ).resolves.toEqual(expectedResult);
+
+            expect(
+                mockSiteValidator.validateSiteConfiguration
+            ).toHaveBeenCalledWith(site);
         });
 
         it("should return cached site validation results without exposing cached errors", async () => {

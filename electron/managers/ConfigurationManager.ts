@@ -100,35 +100,59 @@ function cloneValidationResult(result: ValidationResult): ValidationResult {
     };
 }
 
-function normalizeValidationCacheKeyValue(value: unknown): unknown {
+function normalizeValidationCacheKeyValue(
+    value: unknown,
+    seen = new WeakSet<object>()
+): unknown {
     if (value instanceof Date) {
         return { $date: value.getTime() };
     }
 
     if (Array.isArray(value)) {
-        return value.map(normalizeValidationCacheKeyValue);
+        if (seen.has(value)) {
+            return { $circular: true };
+        }
+
+        seen.add(value);
+        try {
+            return value.map((entry) =>
+                normalizeValidationCacheKeyValue(entry, seen)
+            );
+        } finally {
+            seen.delete(value);
+        }
     }
 
     if (!isRecord(value)) {
         return value;
     }
 
+    if (seen.has(value)) {
+        return { $circular: true };
+    }
+
+    seen.add(value);
+
     const normalized = createNullPrototypeObject<Record<string, unknown>>();
 
-    for (const key of Object.keys(value).toSorted((a, b) =>
-        a.localeCompare(b)
-    )) {
-        const property = getOwnDataProperty(value, key);
-        if (!property.found) {
-            continue;
-        }
+    try {
+        for (const key of Object.keys(value).toSorted((a, b) =>
+            a.localeCompare(b)
+        )) {
+            const property = getOwnDataProperty(value, key);
+            if (!property.found) {
+                continue;
+            }
 
-        Object.defineProperty(normalized, key, {
-            configurable: true,
-            enumerable: true,
-            value: normalizeValidationCacheKeyValue(property.value),
-            writable: true,
-        });
+            Object.defineProperty(normalized, key, {
+                configurable: true,
+                enumerable: true,
+                value: normalizeValidationCacheKeyValue(property.value, seen),
+                writable: true,
+            });
+        }
+    } finally {
+        seen.delete(value);
     }
 
     return normalized;
