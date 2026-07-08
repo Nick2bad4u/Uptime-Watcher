@@ -762,6 +762,12 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
                 { key: "site1", data: sites[0] },
                 { key: "site2", data: sites[1] },
             ]);
+            const cachedEntries = vi.mocked(mockSiteCache.replaceAll).mock
+                .calls[0]?.[0];
+            expect(cachedEntries?.[0]?.data).toEqual(sites[0]);
+            expect(cachedEntries?.[0]?.data).not.toBe(sites[0]);
+            expect(cachedEntries?.[1]?.data).toEqual(sites[1]);
+            expect(cachedEntries?.[1]?.data).not.toBe(sites[1]);
             expect(mockSiteCache.clear).not.toHaveBeenCalled();
             expect(mockSiteCache.set).not.toHaveBeenCalled();
             expect(mockLogger.info).toHaveBeenCalledWith(

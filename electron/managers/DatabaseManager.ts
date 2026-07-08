@@ -833,7 +833,7 @@ export class DatabaseManager {
         // Atomically replace the main cache (prevents race conditions)
         const serializedEntries = Array.from(
             tempCache.entries(),
-            ([key, site]) => ({ data: site, key })
+            ([key, site]) => ({ data: structuredClone(site), key })
         );
         this.siteCache.replaceAll(serializedEntries);
 

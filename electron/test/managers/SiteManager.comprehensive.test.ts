@@ -807,6 +807,9 @@ describe("SiteManager - Comprehensive", () => {
             expect(mockCache.get(databaseSite.identifier)).toEqual(
                 databaseSite
             );
+            expect(mockCache.get(databaseSite.identifier)).not.toBe(
+                databaseSite
+            );
         });
 
         it("should throw when the site cannot be located", async ({
@@ -1641,6 +1644,9 @@ describe("SiteManager - Comprehensive", () => {
             await siteManager["loadSiteInBackground"]("site-1");
 
             expect(mockCache.set).toHaveBeenCalledWith("site-1", mockSite);
+            const cachedSite = vi.mocked(mockCache.set).mock.calls[0]?.[1];
+            expect(cachedSite).toEqual(mockSite);
+            expect(cachedSite).not.toBe(mockSite);
             expect(
                 mockSiteRepositoryServiceInstance.getSiteFromDatabase
             ).toHaveBeenCalledWith("site-1");

@@ -256,7 +256,7 @@ export class SiteRepositoryService {
             const sites = await this.getSitesFromDatabase();
             siteCache.replaceAll(
                 sites.map((site) => ({
-                    data: site,
+                    data: structuredClone(site),
                     key: site.identifier,
                 }))
             );

@@ -32,6 +32,6 @@ export async function getSiteSnapshotForMutation(
         throw new Error(`Site with identifier ${identifier} not found`);
     }
 
-    sitesCache.set(identifier, siteFromDatabase);
+    sitesCache.set(identifier, structuredClone(siteFromDatabase));
     return structuredClone(siteFromDatabase);
 }

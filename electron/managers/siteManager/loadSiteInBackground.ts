@@ -75,7 +75,7 @@ export async function loadSiteInBackground(
         );
 
         if (site) {
-            deps.sitesCache.set(deps.identifier, site);
+            deps.sitesCache.set(deps.identifier, structuredClone(site));
 
             const timestamp = Date.now();
 
