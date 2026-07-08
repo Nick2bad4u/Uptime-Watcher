@@ -394,4 +394,34 @@ describe("logging context helpers", () => {
             type: "ArrayBuffer",
         });
     });
+
+    it("does not invoke shadowed ArrayBuffer byteLength accessors", () => {
+        const buffer = new ArrayBuffer(12);
+        const byteLength = vi.fn(() => {
+            throw new Error("array buffer byteLength should not run");
+        });
+        Object.defineProperty(buffer, "byteLength", {
+            configurable: true,
+            get: byteLength,
+        });
+
+        expect(normalizeLogValue(buffer)).toEqual({
+            byteLength: 12,
+            type: "ArrayBuffer",
+        });
+        expect(byteLength).not.toHaveBeenCalled();
+    });
+
+    it("does not treat ArrayBuffer prototype impostors as native buffers", () => {
+        const impostor = Object.create(ArrayBuffer.prototype) as ArrayBuffer;
+
+        expect(impostor).toBeInstanceOf(ArrayBuffer);
+        expect(() => normalizeLogValue(impostor)).not.toThrow();
+
+        const sanitized = normalizeLogValue(impostor);
+        expect(sanitized).not.toEqual({
+            byteLength: expect.any(Number),
+            type: "ArrayBuffer",
+        });
+    });
 });

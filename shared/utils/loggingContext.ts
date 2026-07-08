@@ -5,6 +5,7 @@ import {
     getErrorStringProperty,
     getOwnDataProperty,
 } from "@shared/utils/errorPropertyAccess";
+import { getNativeArrayBufferByteLength } from "@shared/utils/nativeArrayBuffer";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
@@ -439,11 +440,12 @@ function normalizeNonPlainObject(
         };
     }
 
-    if (candidate instanceof ArrayBuffer) {
+    const arrayBufferByteLength = getNativeArrayBufferByteLength(candidate);
+    if (arrayBufferByteLength !== undefined) {
         return {
             kind: "normalized",
             value: {
-                byteLength: candidate.byteLength,
+                byteLength: arrayBufferByteLength,
                 type: "ArrayBuffer",
             } satisfies UnknownRecord,
         };
