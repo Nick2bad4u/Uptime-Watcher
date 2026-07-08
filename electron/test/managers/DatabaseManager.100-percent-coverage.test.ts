@@ -700,6 +700,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             // Assert
             expect(mockLoadSites).toHaveBeenCalled();
             expect(result).toEqual(mockSites);
+            expect(result[0]).not.toBe(mockSites[0]);
+            expect(result[1]).not.toBe(mockSites[1]);
+            result[0]!.name = "Mutated Return";
+            expect(mockSites[0]!.name).toBe("Site 1");
             expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:database:sites-refreshed",
                 expect.objectContaining({

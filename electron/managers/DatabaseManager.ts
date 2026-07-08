@@ -515,9 +515,9 @@ export class DatabaseManager {
      *
      * @remarks
      * Loads all sites from the database, updates the cache, emits a
-     * sites-refreshed event, and returns the loaded sites. If an error occurs,
-     * emits a sites-refreshed event with zero count and returns an empty
-     * array.
+     * sites-refreshed event, and returns cloned snapshots of the loaded sites.
+     * If an error occurs, emits a sites-refreshed event with zero count and
+     * returns an empty array.
      *
      * @returns A promise resolving to an array of loaded {@link Site} objects.
      *
@@ -527,11 +527,11 @@ export class DatabaseManager {
         // Load sites first
         await this.loadSites();
 
-        // Then get them from cache - return actual site data from cache
+        // Then get snapshots from cache without exposing live cache objects.
         try {
             const sites = Array.from(
                 this.siteCache.entries(),
-                ([, site]) => site
+                ([, site]) => structuredClone(site)
             );
 
             // Emit typed sites refreshed event
@@ -544,7 +544,6 @@ export class DatabaseManager {
                 }
             );
 
-            // Return actual site data instead of hardcoded values
             return sites;
         } catch (error) {
             // Handle error case - log and re-emit event with zero count
