@@ -190,6 +190,27 @@ describe("MonitoringService edge cases", () => {
         );
     });
 
+    it("rejects invalid startMonitoringForMonitor identifiers before IPC", async () => {
+        await expect(
+            MonitoringService.startMonitoringForMonitor(
+                " ".repeat(3),
+                "monitor-y"
+            )
+        ).rejects.toThrow(
+            "[MonitoringService] Invalid site identifier for startMonitoringForMonitor: Site identifier is required"
+        );
+
+        await expect(
+            MonitoringService.startMonitoringForMonitor("site-x", "bad\nid")
+        ).rejects.toThrow(
+            "[MonitoringService] Invalid monitor ID for startMonitoringForMonitor: Monitor ID must not contain control characters"
+        );
+
+        expect(
+            monitoringApi.startMonitoringForMonitor
+        ).not.toHaveBeenCalled();
+    });
+
     it("throws when startMonitoringForSite reports backend failure", async () => {
         monitoringApi.startMonitoringForSite.mockResolvedValueOnce(false);
 
@@ -203,6 +224,16 @@ describe("MonitoringService edge cases", () => {
             message:
                 "[MonitoringService] Failed to start monitoring for site site-z: backend returned false",
         });
+    });
+
+    it("rejects invalid startMonitoringForSite identifiers before IPC", async () => {
+        await expect(
+            MonitoringService.startMonitoringForSite("site\nz")
+        ).rejects.toThrow(
+            "[MonitoringService] Invalid site identifier for startMonitoringForSite: Site identifier must not contain control characters"
+        );
+
+        expect(monitoringApi.startMonitoringForSite).not.toHaveBeenCalled();
     });
 
     it("warns about partial failures during stopMonitoring", async () => {
@@ -291,6 +322,19 @@ describe("MonitoringService edge cases", () => {
         });
     });
 
+    it("rejects invalid stopMonitoringForMonitor identifiers before IPC", async () => {
+        await expect(
+            MonitoringService.stopMonitoringForMonitor(
+                "site-err",
+                " ".repeat(3)
+            )
+        ).rejects.toThrow(
+            "[MonitoringService] Invalid monitor ID for stopMonitoringForMonitor: Monitor ID is required"
+        );
+
+        expect(monitoringApi.stopMonitoringForMonitor).not.toHaveBeenCalled();
+    });
+
     it("rejects malformed stopMonitoringForSite acknowledgements", async () => {
         monitoringApi.stopMonitoringForSite.mockResolvedValueOnce(
             "true" as unknown as boolean
@@ -301,6 +345,16 @@ describe("MonitoringService edge cases", () => {
         ).rejects.toThrow(
             "[MonitoringService] stopMonitoringForSite returned invalid boolean response"
         );
+    });
+
+    it("rejects invalid checkSiteNow identifiers before IPC", async () => {
+        await expect(
+            MonitoringService.checkSiteNow("", "monitor-y")
+        ).rejects.toThrow(
+            "[MonitoringService] Invalid site identifier for checkSiteNow: Site identifier is required"
+        );
+
+        expect(monitoringApi.checkSiteNow).not.toHaveBeenCalled();
     });
 
     it("throws when stopMonitoringForSite reports backend failure", async () => {

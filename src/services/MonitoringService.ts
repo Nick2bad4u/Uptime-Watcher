@@ -43,11 +43,13 @@ import type * as z from "zod";
 import { ApplicationError, ensureError } from "@shared/utils/errorHandling";
 import { isNonEmptyString } from "@shared/utils/typeGuards";
 import { validateStatusUpdate } from "@shared/validation/guards";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import {
     validateMonitoringStartSummary,
     validateMonitoringStopSummary,
 } from "@shared/validation/monitoringSummarySchemas";
-import { isDefined } from "ts-extras";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -102,6 +104,38 @@ const resolveIdentifier = (candidate: unknown, fallback: string): string => {
 
     return fallback;
 };
+
+const formatZodIssueMessages = (
+    issues: readonly { readonly message: string }[]
+): string => arrayJoin(issues.map(({ message }) => message), ", ");
+
+const parseMonitoringIdentifier = (
+    operation: string,
+    fieldName: string,
+    value: string,
+    schema: z.ZodType<string>
+): string => {
+    const parsed = schema.safeParse(value);
+
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    throw new TypeError(
+        `[MonitoringService] Invalid ${fieldName} for ${operation}: ${formatZodIssueMessages(parsed.error.issues)}`
+    );
+};
+
+const parseSiteIdentifier = (operation: string, value: string): string =>
+    parseMonitoringIdentifier(
+        operation,
+        "site identifier",
+        value,
+        siteIdentifierSchema
+    );
+
+const parseMonitorId = (operation: string, value: string): string =>
+    parseMonitoringIdentifier(operation, "monitor ID", value, monitorIdSchema);
 
 /**
  * Logs an invalid status update and throws a descriptive error.
@@ -244,9 +278,14 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<StatusUpdate | undefined> => {
+            const parsedSiteIdentifier = parseSiteIdentifier(
+                "checkSiteNow",
+                siteIdentifier
+            );
+            const parsedMonitorId = parseMonitorId("checkSiteNow", monitorId);
             const rawStatusUpdate = await api.monitoring.checkSiteNow(
-                siteIdentifier,
-                monitorId
+                parsedSiteIdentifier,
+                parsedMonitorId
             );
 
             if (!isDefined(rawStatusUpdate)) {
@@ -257,8 +296,8 @@ export const MonitoringService: MonitoringServiceContract = {
 
             if (!validationResult.success) {
                 return logInvalidStatusUpdateAndThrow(validationResult.error, {
-                    monitorId,
-                    siteIdentifier,
+                    monitorId: parsedMonitorId,
+                    siteIdentifier: parsedSiteIdentifier,
                 });
             }
 
@@ -380,16 +419,24 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
+            const parsedSiteIdentifier = parseSiteIdentifier(
+                "startMonitoringForMonitor",
+                siteIdentifier
+            );
+            const parsedMonitorId = parseMonitorId(
+                "startMonitoringForMonitor",
+                monitorId
+            );
             const isSuccess = parseServiceBooleanResponse(
                 "startMonitoringForMonitor",
                 await api.monitoring.startMonitoringForMonitor(
-                    siteIdentifier,
-                    monitorId
+                    parsedSiteIdentifier,
+                    parsedMonitorId
                 ),
                 {
                     details: {
-                        monitorId,
-                        siteIdentifier,
+                        monitorId: parsedMonitorId,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
                     serviceName: "MonitoringService",
                 }
@@ -399,12 +446,12 @@ export const MonitoringService: MonitoringServiceContract = {
                 throw new ApplicationError({
                     code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                     details: {
-                        monitorId,
+                        monitorId: parsedMonitorId,
                         operation: "startMonitoringForMonitor",
                         serviceName: "MonitoringService",
-                        siteIdentifier,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
-                    message: `[MonitoringService] Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: backend returned false`,
+                    message: `[MonitoringService] Failed to start monitoring for monitor ${parsedMonitorId} of site ${parsedSiteIdentifier}: backend returned false`,
                 });
             }
         }
@@ -422,12 +469,18 @@ export const MonitoringService: MonitoringServiceContract = {
     startMonitoringForSite: wrap(
         "startMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
+            const parsedSiteIdentifier = parseSiteIdentifier(
+                "startMonitoringForSite",
+                siteIdentifier
+            );
             const isSuccess = parseServiceBooleanResponse(
                 "startMonitoringForSite",
-                await api.monitoring.startMonitoringForSite(siteIdentifier),
+                await api.monitoring.startMonitoringForSite(
+                    parsedSiteIdentifier
+                ),
                 {
                     details: {
-                        siteIdentifier,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
                     serviceName: "MonitoringService",
                 }
@@ -439,9 +492,9 @@ export const MonitoringService: MonitoringServiceContract = {
                     details: {
                         operation: "startMonitoringForSite",
                         serviceName: "MonitoringService",
-                        siteIdentifier,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
-                    message: `[MonitoringService] Failed to start monitoring for site ${siteIdentifier}: backend returned false`,
+                    message: `[MonitoringService] Failed to start monitoring for site ${parsedSiteIdentifier}: backend returned false`,
                 });
             }
         }
@@ -525,16 +578,24 @@ export const MonitoringService: MonitoringServiceContract = {
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
+            const parsedSiteIdentifier = parseSiteIdentifier(
+                "stopMonitoringForMonitor",
+                siteIdentifier
+            );
+            const parsedMonitorId = parseMonitorId(
+                "stopMonitoringForMonitor",
+                monitorId
+            );
             const isSuccess = parseServiceBooleanResponse(
                 "stopMonitoringForMonitor",
                 await api.monitoring.stopMonitoringForMonitor(
-                    siteIdentifier,
-                    monitorId
+                    parsedSiteIdentifier,
+                    parsedMonitorId
                 ),
                 {
                     details: {
-                        monitorId,
-                        siteIdentifier,
+                        monitorId: parsedMonitorId,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
                     serviceName: "MonitoringService",
                 }
@@ -544,12 +605,12 @@ export const MonitoringService: MonitoringServiceContract = {
                 throw new ApplicationError({
                     code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                     details: {
-                        monitorId,
+                        monitorId: parsedMonitorId,
                         operation: "stopMonitoringForMonitor",
                         serviceName: "MonitoringService",
-                        siteIdentifier,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
-                    message: `[MonitoringService] Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: backend returned false`,
+                    message: `[MonitoringService] Failed to stop monitoring for monitor ${parsedMonitorId} of site ${parsedSiteIdentifier}: backend returned false`,
                 });
             }
         }
@@ -567,12 +628,18 @@ export const MonitoringService: MonitoringServiceContract = {
     stopMonitoringForSite: wrap(
         "stopMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
+            const parsedSiteIdentifier = parseSiteIdentifier(
+                "stopMonitoringForSite",
+                siteIdentifier
+            );
             const isSuccess = parseServiceBooleanResponse(
                 "stopMonitoringForSite",
-                await api.monitoring.stopMonitoringForSite(siteIdentifier),
+                await api.monitoring.stopMonitoringForSite(
+                    parsedSiteIdentifier
+                ),
                 {
                     details: {
-                        siteIdentifier,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
                     serviceName: "MonitoringService",
                 }
@@ -584,9 +651,9 @@ export const MonitoringService: MonitoringServiceContract = {
                     details: {
                         operation: "stopMonitoringForSite",
                         serviceName: "MonitoringService",
-                        siteIdentifier,
+                        siteIdentifier: parsedSiteIdentifier,
                     },
-                    message: `[MonitoringService] Failed to stop monitoring for site ${siteIdentifier}: backend returned false`,
+                    message: `[MonitoringService] Failed to stop monitoring for site ${parsedSiteIdentifier}: backend returned false`,
                 });
             }
         }
