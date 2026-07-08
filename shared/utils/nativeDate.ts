@@ -1,46 +1,33 @@
 import { isFinite as isFiniteNumber } from "ts-extras";
 
-import { getOwnDataProperty } from "./errorPropertyAccess";
-
 type NativeDateMethod = (this: Date) => unknown;
 
 function isNativeDateMethod(value: unknown): value is NativeDateMethod {
     return typeof value === "function";
 }
 
-function getPrototypeObject(value: object): object | null {
-    const prototype: unknown = Object.getPrototypeOf(value);
-
-    return typeof prototype === "object" && prototype !== null
-        ? prototype
-        : null;
-}
-
 function getNativeDateMethod(
-    value: Date,
+    holder: object,
     key: "getTime" | "toISOString"
 ): NativeDateMethod | undefined {
-    let current = getPrototypeObject(value);
+    const descriptor = Object.getOwnPropertyDescriptor(holder, key);
 
-    while (current) {
-        const property = getOwnDataProperty(current, key);
-        if (property.found && isNativeDateMethod(property.value)) {
-            return property.value;
-        }
-
-        current = getPrototypeObject(current);
-    }
-
-    return undefined;
+    return descriptor &&
+        "value" in descriptor &&
+        isNativeDateMethod(descriptor.value)
+        ? descriptor.value
+        : undefined;
 }
 
+const DATE_GET_TIME = getNativeDateMethod(Date.prototype, "getTime");
+const DATE_TO_ISO_STRING = getNativeDateMethod(Date.prototype, "toISOString");
+
 export function getNativeDateEpochMs(value: Date): number | undefined {
-    const getTime = getNativeDateMethod(value, "getTime");
-    if (!getTime) {
+    if (!DATE_GET_TIME) {
         return undefined;
     }
 
-    const epochMs: unknown = Reflect.apply(getTime, value, []);
+    const epochMs: unknown = Reflect.apply(DATE_GET_TIME, value, []);
 
     return typeof epochMs === "number" && isFiniteNumber(epochMs)
         ? epochMs
@@ -48,13 +35,16 @@ export function getNativeDateEpochMs(value: Date): number | undefined {
 }
 
 export function toNativeDateISOString(value: Date): string | undefined {
-    const toISOString = getNativeDateMethod(value, "toISOString");
-    if (!toISOString) {
+    if (!DATE_TO_ISO_STRING) {
         return undefined;
     }
 
     try {
-        const serialized: unknown = Reflect.apply(toISOString, value, []);
+        const serialized: unknown = Reflect.apply(
+            DATE_TO_ISO_STRING,
+            value,
+            []
+        );
 
         return typeof serialized === "string" ? serialized : undefined;
     } catch {
