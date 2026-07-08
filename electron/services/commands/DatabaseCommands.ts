@@ -668,13 +668,15 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         try {
             await this.updateHistoryLimit(parsedHistoryLimit);
         } catch (error) {
+            const normalizedError = ensureError(error);
             backendLogger.error(
                 "[ImportDataCommand] Failed to apply imported history limit",
-                ensureError(error),
+                normalizedError,
                 {
                     parsedHistoryLimit,
                 }
             );
+            throw normalizedError;
         }
     }
 

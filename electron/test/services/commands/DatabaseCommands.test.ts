@@ -656,6 +656,34 @@ describe("DatabaseCommands", () => {
             expect(mockUpdateHistoryLimit).toHaveBeenCalledWith(2048);
         });
 
+        it("should fail import when imported history limit cannot be applied", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const updateError = new Error("history limit rejected");
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                sites: [createTestSite("test1")],
+                settings: { historyLimit: "2048" },
+            });
+            mockUpdateHistoryLimit.mockRejectedValueOnce(updateError);
+
+            await expect(command.execute()).rejects.toThrow(updateError);
+
+            expect(mockUpdateHistoryLimit).toHaveBeenCalledWith(2048);
+            expect(
+                mockSiteRepositoryService.getSitesFromDatabase
+            ).not.toHaveBeenCalled();
+            expect(mockEventBus.emitTyped).not.toHaveBeenCalledWith(
+                "internal:database:data-imported",
+                expect.anything()
+            );
+        });
+
         it("should skip history limit propagation when value invalid", async ({
             task,
             annotate,
