@@ -142,9 +142,9 @@ export function useMonitorTypes(): UseMonitorTypesResult {
     }, [loadMonitorTypes]);
 
     useMount(
-        useCallback(() => {
+        useCallback(async () => {
             isMountedRef.current = true;
-            void loadMonitorTypes();
+            await loadMonitorTypes();
         }, [loadMonitorTypes]),
         useCallback(() => {
             isMountedRef.current = false;

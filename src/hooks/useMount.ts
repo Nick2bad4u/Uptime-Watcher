@@ -64,6 +64,7 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { useEffect } from "react";
 
 import { logger } from "../services/logger";
+import { fireAndForget } from "../utils/async/fireAndForget";
 
 /**
  * React hook for mount and unmount lifecycle management with StrictMode
@@ -89,18 +90,14 @@ export function useMount(
         function handleMountLifecycle() {
             let didCleanup = false;
 
-            const executeMountCallback = async (): Promise<void> => {
-                try {
-                    await mountCallback();
-                } catch (error: unknown) {
+            fireAndForget(mountCallback, {
+                onError: (error) => {
                     logger.error(
                         "Error in useMount callback:",
                         ensureError(error)
                     );
-                }
-            };
-
-            void executeMountCallback();
+                },
+            });
 
             return (): void => {
                 if (didCleanup) {
