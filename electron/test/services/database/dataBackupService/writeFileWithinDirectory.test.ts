@@ -117,6 +117,57 @@ describe(writeFileWithinDirectory, () => {
         );
     });
 
+    it("refuses to write through a symlinked base directory", async () => {
+        const outsideDirectory = path.join(tempDirectory, "outside");
+        const symlinkPath = path.join(tempDirectory, "base-link");
+
+        await mkdir(outsideDirectory);
+
+        try {
+            await symlink(
+                outsideDirectory,
+                symlinkPath,
+                process.platform === "win32" ? "junction" : "dir"
+            );
+        } catch (error) {
+            const errorCode = (error as NodeJS.ErrnoException).code;
+            if (errorCode === "EPERM" || errorCode === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        await expect(
+            writeFileWithinDirectory({
+                baseDirectory: symlinkPath,
+                contents: "new",
+                fileName: "backup.sqlite",
+            })
+        ).rejects.toThrow("non-directory base path");
+
+        await expect(
+            readFile(path.join(outsideDirectory, "backup.sqlite"), "utf8")
+        ).rejects.toThrow();
+    });
+
+    it("refuses to write when the base path is a regular file", async () => {
+        const filePath = path.join(tempDirectory, "base-file");
+        await writeFile(filePath, "not-a-directory");
+
+        await expect(
+            writeFileWithinDirectory({
+                baseDirectory: filePath,
+                contents: "new",
+                fileName: "backup.sqlite",
+            })
+        ).rejects.toThrow("non-directory base path");
+
+        await expect(readFile(filePath, "utf8")).resolves.toBe(
+            "not-a-directory"
+        );
+    });
+
     it("refuses to write temporary files through symlinks", async () => {
         const fixedUuid = "00000000-0000-4000-8000-000000000000";
         const outsideFilePath = path.join(tempDirectory, "outside.sqlite");

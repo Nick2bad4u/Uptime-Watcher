@@ -12,6 +12,16 @@ import {
 } from "../../../utils/fsSafeOps";
 import { resolvePathWithinDirectory } from "./pathWithinDirectory";
 
+async function assertSafeBaseDirectory(baseDirectory: string): Promise<void> {
+    const baseStat = await lstatIfExists(baseDirectory);
+
+    if (!baseStat || !baseStat.isDirectory() || baseStat.isSymbolicLink()) {
+        throw new Error(
+            `[DataBackupService] Refusing to write backup artifact into non-directory base path: ${baseDirectory}`
+        );
+    }
+}
+
 /**
  * Writes a file within a directory, using an atomic rename.
  *
@@ -26,6 +36,8 @@ export async function writeFileWithinDirectory(args: {
     readonly logger?: Logger;
 }): Promise<string> {
     const { baseDirectory, contents, fileName, logger } = args;
+
+    await assertSafeBaseDirectory(baseDirectory);
 
     const targetPath = resolvePathWithinDirectory(baseDirectory, fileName);
     const tmpPath = resolvePathWithinDirectory(
