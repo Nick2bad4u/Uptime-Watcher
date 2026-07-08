@@ -143,6 +143,17 @@ describe("importExportSchemas", () => {
         expect(result).toBeTruthy();
     });
 
+    it("rejects export payloads with non-ISO exportedAt metadata", () => {
+        const result = validateExportData({
+            exportedAt: "July 2, 2026",
+            settings: {},
+            sites: [createSiteSnapshot({ identifier: "example.com" })],
+            version: "1.0",
+        });
+
+        expect(result).toBeFalsy();
+    });
+
     it("accepts empty-site export payloads from fresh app state", () => {
         const result = validateExportData({
             exportedAt: "2026-07-02T00:00:00.000Z",

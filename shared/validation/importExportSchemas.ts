@@ -22,6 +22,8 @@ const isoLastCheckedSchema = z
     .pipe(z.iso.datetime())
     .transform((value) => new Date(value));
 
+const isoExportedAtSchema = z.string().trim().pipe(z.iso.datetime());
+
 function normalizeSerializedMonitorDates(value: unknown): unknown {
     if (typeof value !== "object" || value === null || Array.isArray(value)) {
         return value;
@@ -144,7 +146,7 @@ export interface ExportData {
 
 const exportDataSchema: z.ZodType<ExportData> = z
     .object({
-        exportedAt: z.string().trim().min(1),
+        exportedAt: isoExportedAtSchema,
         settings: settingsSchema.optional(),
         sites: z.array(exportSiteSchema),
         version: importExportVersionSchema,
