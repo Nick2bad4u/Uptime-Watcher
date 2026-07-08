@@ -189,11 +189,73 @@ export async function configureFilesystemProvider(
             );
         }
 
-        await ctx.settings.set(
-            SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
-            canonical
-        );
-        await ctx.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
+        const previousProvider =
+            (await ctx.settings.get(SETTINGS_KEY_PROVIDER)) ?? "";
+        const previousFilesystemBaseDirectory =
+            (await ctx.settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)) ??
+            "";
+        const previousGoogleDriveAccountLabel =
+            (await ctx.settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)) ??
+            "";
+
+        let isFilesystemBaseDirectoryCommitted = false;
+        let isProviderCommitted = false;
+        let isGoogleDriveAccountLabelCommitted = false;
+
+        try {
+            await ctx.settings.set(
+                SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                canonical
+            );
+            isFilesystemBaseDirectoryCommitted = true;
+            await ctx.settings.set(SETTINGS_KEY_PROVIDER, "filesystem");
+            isProviderCommitted = true;
+            await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
+            isGoogleDriveAccountLabelCommitted = true;
+        } catch (error: unknown) {
+            const persistenceError = ensureError(error);
+            const rollbackErrors: Error[] = [];
+
+            if (isProviderCommitted) {
+                await ctx.settings
+                    .set(SETTINGS_KEY_PROVIDER, previousProvider)
+                    .catch((rollbackError: unknown) => {
+                        rollbackErrors.push(ensureError(rollbackError));
+                    });
+            }
+
+            if (isFilesystemBaseDirectoryCommitted) {
+                await ctx.settings
+                    .set(
+                        SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY,
+                        previousFilesystemBaseDirectory
+                    )
+                    .catch((rollbackError: unknown) => {
+                        rollbackErrors.push(ensureError(rollbackError));
+                    });
+            }
+
+            if (isGoogleDriveAccountLabelCommitted) {
+                await ctx.settings
+                    .set(
+                        SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL,
+                        previousGoogleDriveAccountLabel
+                    )
+                    .catch((rollbackError: unknown) => {
+                        rollbackErrors.push(ensureError(rollbackError));
+                    });
+            }
+
+            if (rollbackErrors.length > 0) {
+                throw new AggregateError(
+                    [persistenceError, ...rollbackErrors],
+                    "Filesystem provider configuration failed and previous provider settings could not be restored",
+                    { cause: error }
+                );
+            }
+
+            throw persistenceError;
+        }
 
         // Switching to the filesystem provider means OAuth-based providers are
         // no longer configured. Clear any stored OAuth secrets so we don't
@@ -206,7 +268,6 @@ export async function configureFilesystemProvider(
             ],
             secretStore: ctx.secretStore,
         });
-        await ctx.settings.set(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL, "");
 
         logger.info("[CloudService] Configured filesystem provider", {
             baseDirectory: canonical,

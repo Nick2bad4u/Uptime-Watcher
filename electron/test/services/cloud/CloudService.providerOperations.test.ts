@@ -384,6 +384,70 @@ describe("CloudService.providerOperations", () => {
         }
     });
 
+    it("rolls back filesystem provider settings when provider persistence fails", async () => {
+        const baseDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-provider-")
+        );
+
+        try {
+            const secretStore = new InMemorySecretStore();
+            const baseSettings = createSettingsAdapter({
+                [SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY]: "/tmp/previous",
+                [SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL]: "old-label",
+                [SETTINGS_KEY_PROVIDER]: "dropbox",
+            });
+
+            const settings: CloudServiceOperationContext["settings"] = {
+                ...baseSettings,
+                set: async (key, value) => {
+                    if (
+                        key === SETTINGS_KEY_PROVIDER &&
+                        value === "filesystem"
+                    ) {
+                        throw new Error("provider persistence failed");
+                    }
+
+                    await baseSettings.set(key, value);
+                },
+            };
+
+            await secretStore.setSecret(
+                SETTINGS_KEY_DROPBOX_TOKENS,
+                "dropbox-tokens"
+            );
+
+            const ctx = createOperationContext({
+                loadDropboxDeps: async () => {
+                    throw new Error("not used");
+                },
+                loadGoogleDriveDeps: async () => {
+                    throw new Error("not used");
+                },
+                secretStore,
+                settings,
+            });
+
+            await expect(
+                configureFilesystemProvider(ctx, { baseDirectory })
+            ).rejects.toThrow("provider persistence failed");
+
+            await expect(settings.get(SETTINGS_KEY_PROVIDER)).resolves.toBe(
+                "dropbox"
+            );
+            await expect(
+                settings.get(SETTINGS_KEY_FILESYSTEM_BASE_DIRECTORY)
+            ).resolves.toBe("/tmp/previous");
+            await expect(
+                settings.get(SETTINGS_KEY_GOOGLE_DRIVE_ACCOUNT_LABEL)
+            ).resolves.toBe("old-label");
+            await expect(
+                secretStore.getSecret(SETTINGS_KEY_DROPBOX_TOKENS)
+            ).resolves.toBe("dropbox-tokens");
+        } finally {
+            await fs.rm(baseDirectory, { force: true, recursive: true });
+        }
+    });
+
     it("logs failed Dropbox token revocation while clearing local disconnect state", async () => {
         const secretStore = new InMemorySecretStore();
         const settings = createSettingsAdapter({
