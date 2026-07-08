@@ -50,6 +50,7 @@ import { arrayIncludes, objectHasOwn, setHas } from "ts-extras";
 
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
+import { fireAndForget } from "../../utils/fireAndForget";
 import { tryOpenExternalValidated } from "../shell/validatedExternalOpen";
 import {
     getProductionDistDirectory,
@@ -301,7 +302,7 @@ export class WindowService {
     private readonly handleWindowOpen = (
         details: HandlerDetails
     ): { action: "deny" } => {
-        void this.openExternalIfSafe(details.url, "window-open");
+        this.openExternalIfSafeInBackground(details.url, "window-open");
         return { action: "deny" };
     };
 
@@ -311,7 +312,7 @@ export class WindowService {
         }
 
         event.preventDefault();
-        void this.openExternalIfSafe(url, "will-navigate");
+        this.openExternalIfSafeInBackground(url, "will-navigate");
     };
 
     private readonly handleWillRedirect = (event: Event, url: string): void => {
@@ -320,7 +321,7 @@ export class WindowService {
         }
 
         event.preventDefault();
-        void this.openExternalIfSafe(url, "will-redirect");
+        this.openExternalIfSafeInBackground(url, "will-redirect");
     };
 
     /**
@@ -421,6 +422,29 @@ export class WindowService {
             ...(typeof result.errorCode === "string" &&
                 result.errorCode.length > 0 && { errorCode: result.errorCode }),
         });
+    }
+
+    private openExternalIfSafeInBackground(
+        targetUrl: string,
+        context: string
+    ): void {
+        fireAndForget(
+            async () => {
+                await this.openExternalIfSafe(targetUrl, context);
+            },
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[WindowService] Unexpected external navigation handler failure",
+                        ensureError(error),
+                        {
+                            context,
+                            url: getSafeUrlForLogging(targetUrl),
+                        }
+                    );
+                },
+            }
+        );
     }
 
     /**

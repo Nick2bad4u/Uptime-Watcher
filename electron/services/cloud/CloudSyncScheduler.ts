@@ -5,6 +5,7 @@ import { isFinite as isFiniteNumber } from "ts-extras";
 import type { CloudService } from "./CloudService";
 
 import { logger } from "../../utils/logger";
+import { fireAndForget } from "../../utils/fireAndForget";
 import { isCloudProviderOperationError } from "./providers/cloudProviderErrors";
 
 const DEFAULT_SYNC_INTERVAL_MS = 10 * 60_000;
@@ -118,7 +119,19 @@ export class CloudSyncScheduler {
         this.timer = setTimeout(
             () => {
                 this.timer = undefined;
-                void this.runOnce();
+                fireAndForget(
+                    async () => {
+                        await this.runOnce();
+                    },
+                    {
+                        onError: (error) => {
+                            logger.error(
+                                "[CloudSyncScheduler] Unexpected scheduler failure",
+                                ensureError(error)
+                            );
+                        },
+                    }
+                );
             },
             Math.max(0, delayMs)
         );
