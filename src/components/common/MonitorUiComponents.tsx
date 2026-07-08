@@ -10,6 +10,7 @@ import type { JSX } from "react/jsx-runtime";
 import { type ReactNode, useEffect, useState } from "react";
 
 import { logger } from "../../services/logger";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import {
     supportsResponseTime as checkSupportsResponseTime,
     formatMonitorDetail,
@@ -92,7 +93,11 @@ export function ConditionalResponseTime({
                 }
             };
 
-            void checkSupport();
+            fireAndForget(checkSupport, {
+                onError: (error: unknown) => {
+                    logger.warn("Failed to check response time support", error);
+                },
+            });
 
             return (): void => {
                 isCancelled = true;
@@ -155,7 +160,11 @@ export const DetailLabel = ({
                 }
             };
 
-            void formatLabel();
+            fireAndForget(formatLabel, {
+                onError: (error: unknown) => {
+                    logger.warn("Failed to format detail label", error);
+                },
+            });
 
             return (): void => {
                 isCancelled = true;

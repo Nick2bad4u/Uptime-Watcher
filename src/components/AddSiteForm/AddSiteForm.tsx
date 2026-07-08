@@ -25,6 +25,7 @@ import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { AppIcons } from "../../utils/icons";
 import { buildMonitorValidationFieldValues } from "../../utils/monitorValidationFields";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
@@ -497,7 +498,19 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 }
 
                 setFormError(undefined);
-                void onSubmit(e);
+                fireAndForget(
+                    async () => {
+                        await onSubmit(e);
+                    },
+                    {
+                        onError: (error: unknown) => {
+                            logger.error(
+                                "Form submission failed:",
+                                ensureError(error)
+                            );
+                        },
+                    }
+                );
             },
             [
                 addMode,

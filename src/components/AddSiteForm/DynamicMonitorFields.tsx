@@ -25,6 +25,7 @@ import type { ErrorStore } from "../../stores/error/types";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { DynamicField } from "./DynamicField";
 
@@ -130,7 +131,14 @@ export const DynamicMonitorFields: NamedExoticComponent<DynamicMonitorFieldsProp
         useEffect(
             function loadMonitorTypesOnMount() {
                 if (!isLoaded && !monitorTypesError) {
-                    void loadMonitorTypes();
+                    fireAndForget(loadMonitorTypes, {
+                        onError: (error: unknown) => {
+                            logger.error(
+                                "Failed to load monitor types for dynamic fields",
+                                error
+                            );
+                        },
+                    });
                 }
             },
             [
