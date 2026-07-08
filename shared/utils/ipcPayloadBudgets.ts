@@ -17,6 +17,10 @@ import {
     MAX_IPC_JSON_IMPORT_BYTES,
     MAX_IPC_SQLITE_RESTORE_BYTES,
 } from "@shared/constants/backup";
+import {
+    getNativeArrayBufferByteLength,
+    isNativeArrayBuffer,
+} from "@shared/utils/nativeArrayBuffer";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 /**
@@ -40,17 +44,19 @@ export function assertSqliteRestorePayloadWithinIpcBudget(
 ): void {
     const bufferCandidate: unknown = payload.buffer;
 
-    if (!(bufferCandidate instanceof ArrayBuffer)) {
+    if (!isNativeArrayBuffer(bufferCandidate)) {
         throw new TypeError("Restore payload buffer must be an ArrayBuffer");
     }
 
-    if (bufferCandidate.byteLength === 0) {
+    const byteLength = getNativeArrayBufferByteLength(bufferCandidate);
+
+    if (byteLength === undefined || byteLength === 0) {
         throw new Error("Restore payload buffer must not be empty");
     }
 
-    if (bufferCandidate.byteLength > MAX_IPC_SQLITE_RESTORE_BYTES) {
+    if (byteLength > MAX_IPC_SQLITE_RESTORE_BYTES) {
         throw new Error(
-            `SQLite restore payload is too large (${bufferCandidate.byteLength} > ${MAX_IPC_SQLITE_RESTORE_BYTES} bytes).`
+            `SQLite restore payload is too large (${byteLength} > ${MAX_IPC_SQLITE_RESTORE_BYTES} bytes).`
         );
     }
 }

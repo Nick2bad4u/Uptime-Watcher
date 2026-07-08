@@ -12,6 +12,10 @@ import {
     MAX_SQLITE_RESTORE_FILE_NAME_BYTES,
 } from "@shared/constants/backup";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import {
+    getNativeArrayBufferByteLength,
+    isNativeArrayBuffer,
+} from "@shared/utils/nativeArrayBuffer";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
@@ -28,7 +32,7 @@ const FORBIDDEN_RECORD_KEYS = [
 ] as const;
 
 const arrayBufferSchema: z.ZodType<ArrayBuffer> = z.custom<ArrayBuffer>(
-    (value): value is ArrayBuffer => value instanceof ArrayBuffer,
+    (value): value is ArrayBuffer => isNativeArrayBuffer(value),
     "Expected transferable ArrayBuffer"
 );
 
@@ -147,7 +151,9 @@ const serializedDatabaseBackupResultSchema: z.ZodType<{
     .object({
         buffer: arrayBufferSchema.refine(
             (buffer) =>
-                buffer.byteLength <= DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
+                (getNativeArrayBufferByteLength(buffer) ??
+                    Number.POSITIVE_INFINITY) <=
+                DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES,
             {
                 message: `Backup buffer exceeds maximum IPC transfer size (${DEFAULT_MAX_IPC_BACKUP_TRANSFER_BYTES} bytes)`,
             }
@@ -190,12 +196,18 @@ const serializedDatabaseRestorePayloadSchema: z.ZodType<{
         z
             .object({
                 buffer: arrayBufferSchema
-                    .refine((buffer) => buffer.byteLength > 0, {
-                        message: "Restore buffer must not be empty",
-                    })
                     .refine(
                         (buffer) =>
-                            buffer.byteLength <= MAX_IPC_SQLITE_RESTORE_BYTES,
+                            (getNativeArrayBufferByteLength(buffer) ?? 0) > 0,
+                        {
+                            message: "Restore buffer must not be empty",
+                        }
+                    )
+                    .refine(
+                        (buffer) =>
+                            (getNativeArrayBufferByteLength(buffer) ??
+                                Number.POSITIVE_INFINITY) <=
+                            MAX_IPC_SQLITE_RESTORE_BYTES,
                         {
                             message: `Restore buffer exceeds maximum IPC transfer size (${MAX_IPC_SQLITE_RESTORE_BYTES} bytes)`,
                         }

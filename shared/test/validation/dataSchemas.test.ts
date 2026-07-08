@@ -153,6 +153,27 @@ describe("dataSchemas", () => {
         expect(parsed.success).toBeFalsy();
     });
 
+    it("rejects objects that spoof ArrayBuffer shape", () => {
+        const parsed = validateSerializedDatabaseRestorePayload({
+            buffer: {
+                byteLength: 8,
+                [Symbol.toStringTag]: "ArrayBuffer",
+            },
+            fileName: "backup.sqlite",
+        });
+
+        expect(parsed.success).toBeFalsy();
+    });
+
+    it("rejects objects that inherit from ArrayBuffer.prototype without native slots", () => {
+        const parsed = validateSerializedDatabaseRestorePayload({
+            buffer: Object.create(ArrayBuffer.prototype) as ArrayBuffer,
+            fileName: "backup.sqlite",
+        });
+
+        expect(parsed.success).toBeFalsy();
+    });
+
     it("validates restore payload buffer and filename invariants", () => {
         const valid = validateSerializedDatabaseRestorePayload({
             buffer: new ArrayBuffer(8),
