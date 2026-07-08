@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { parseSerializedDatabaseBackupResult } from "../../utils/downloads/serializedBackupResult";
 import { createSerializedBackupResult } from "./createSerializedBackupResult";
@@ -54,5 +54,32 @@ describe(parseSerializedDatabaseBackupResult, () => {
         expect(() => {
             parseSerializedDatabaseBackupResult(payload);
         }).toThrow(INVALID_SERIALIZED_BACKUP_DATA_MESSAGE);
+    });
+
+    it("does not trust shadowed ArrayBuffer byteLength accessors", () => {
+        const baselinePayload = createSerializedBackupResult();
+        const buffer = new Uint8Array([
+            1,
+            2,
+            3,
+            4,
+        ]).buffer;
+        const byteLength = vi.fn(() => 100);
+        Object.defineProperty(buffer, "byteLength", {
+            configurable: true,
+            get: byteLength,
+        });
+        const payload = createSerializedBackupResult({
+            buffer,
+            metadata: {
+                ...baselinePayload.metadata,
+                sizeBytes: 4,
+            },
+        });
+
+        expect(parseSerializedDatabaseBackupResult(payload)).toStrictEqual(
+            payload
+        );
+        expect(byteLength).not.toHaveBeenCalled();
     });
 });

@@ -12,6 +12,7 @@
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
+import { getNativeArrayBufferByteLength } from "@shared/utils/nativeArrayBuffer";
 import { validateSerializedDatabaseBackupResult } from "@shared/validation/dataSchemas";
 
 /** Canonical error message used when backup payload validation fails. */
@@ -24,8 +25,8 @@ const INVALID_SERIALIZED_BACKUP_DATA_MESSAGE = "Invalid backup data received";
  * Validation is two-step:
  *
  * 1. Schema validation through the shared canonical Zod schema.
- * 2. Cross-field invariant check ensuring `metadata.sizeBytes` exactly matches
- *    `buffer.byteLength`.
+ * 2. Cross-field invariant check ensuring `metadata.sizeBytes` exactly matches the
+ *    payload's native ArrayBuffer byte length.
  *
  * @param value - Unknown payload to validate.
  *
@@ -62,5 +63,8 @@ export function parseSerializedDatabaseBackupResult(
 function hasConsistentBackupByteLength(
     backupResult: SerializedDatabaseBackupResult
 ): boolean {
-    return backupResult.metadata.sizeBytes === backupResult.buffer.byteLength;
+    return (
+        backupResult.metadata.sizeBytes ===
+        getNativeArrayBufferByteLength(backupResult.buffer)
+    );
 }
