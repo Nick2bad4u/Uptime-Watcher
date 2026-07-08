@@ -18,6 +18,7 @@ import { useShallow } from "zustand/react/shallow";
 import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { useUIStore } from "../../stores/ui/useUiStore";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 
 /**
  * Result interface for the useSiteActions hook.
@@ -266,20 +267,21 @@ export function useSiteActions(
         // Handle async operation with proper error handling
         // Note: This is a fire-and-forget operation that continues after
         // component unmount
-        void (async (): Promise<void> => {
-            try {
+        fireAndForget(
+            async () => {
                 await checkSiteNow(site.identifier, monitor.id);
                 logger.user.action("Manual site check completed successfully", {
                     monitorId: monitor.id,
                     siteIdentifier: site.identifier,
                     siteName: site.name,
                 });
-            } catch (error) {
-                const errorObj = ensureError(error);
-                logger.site.error(site.identifier, errorObj);
-                // Don't re-throw here since this is a fire-and-forget operation
+            },
+            {
+                onError: (error) => {
+                    logger.site.error(site.identifier, ensureError(error));
+                },
             }
-        })();
+        );
     }, [
         checkSiteNow,
         monitor,
@@ -325,12 +327,15 @@ function runLoggedSiteOperation(args: {
     readonly siteIdentifier: string;
 }): void {
     // Fire-and-forget: actions may outlive the component that initiated them.
-    void (async (): Promise<void> => {
-        try {
+    fireAndForget(
+        async () => {
             await args.operation();
             args.onSuccess();
-        } catch (error) {
-            logger.site.error(args.siteIdentifier, ensureError(error));
+        },
+        {
+            onError: (error) => {
+                logger.site.error(args.siteIdentifier, ensureError(error));
+            },
         }
-    })();
+    );
 }

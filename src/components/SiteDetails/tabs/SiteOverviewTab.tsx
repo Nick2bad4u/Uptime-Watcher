@@ -22,6 +22,7 @@ import { ThemedIconButton } from "../../../theme/components/ThemedIconButton";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { fireAndForget } from "../../../utils/async/fireAndForget";
 import { AppIcons } from "../../../utils/icons";
 import { getMonitorDisplayIdentifier } from "../../../utils/fallbacks";
 import { formatDuration, formatResponseTime } from "../../../utils/time";
@@ -241,29 +242,39 @@ export const SiteOverviewTab = ({
     }, [handleRemoveSite]);
 
     const handleCopySiteIdentifierClick = useCallback(() => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForget(
+            async () => {
                 await SystemService.writeClipboardText(siteIdentifier);
-            } catch (error: unknown) {
-                const ensuredError = ensureError(error);
-                logger.warn("Failed to copy site identifier", ensuredError, {
-                    siteIdentifier,
-                });
+            },
+            {
+                onError: (error) => {
+                    logger.warn(
+                        "Failed to copy site identifier",
+                        ensureError(error),
+                        { siteIdentifier }
+                    );
+                },
             }
-        })();
+        );
     }, [siteIdentifier]);
 
     const handleCopySiteNameClick = useCallback(() => {
-        void (async (): Promise<void> => {
-            try {
+        fireAndForget(
+            async () => {
                 await SystemService.writeClipboardText(siteName);
-            } catch (error: unknown) {
-                const ensuredError = ensureError(error);
-                logger.warn("Failed to copy site name", ensuredError, {
-                    siteName,
-                });
+            },
+            {
+                onError: (error) => {
+                    logger.warn(
+                        "Failed to copy site name",
+                        ensureError(error),
+                        {
+                            siteName,
+                        }
+                    );
+                },
             }
-        })();
+        );
     }, [siteName]);
 
     const domainIcon = useMemo(() => <SiteIcon />, [SiteIcon]);
