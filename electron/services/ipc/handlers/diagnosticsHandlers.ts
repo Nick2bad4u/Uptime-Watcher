@@ -24,6 +24,7 @@ import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
 
 import { isDev } from "../../../electronUtils";
+import { fireAndForget } from "../../../utils/fireAndForget";
 import { diagnosticsLogger, logger } from "../../../utils/logger";
 import {
     getUtfByteLength,
@@ -329,16 +330,28 @@ export function registerDiagnosticsHandlers({
                 }
             );
 
-            void eventEmitter.emitTyped("diagnostics:report-created", {
-                channel: report.channel,
-                correlationId,
-                guard: report.guard,
-                metadataTruncated,
-                payloadPreviewLength: report.payloadPreview?.length ?? 0,
-                payloadPreviewTruncated,
-                ...(report.reason && { reason: report.reason }),
-                timestamp: report.timestamp,
-            });
+            fireAndForget(
+                () =>
+                    eventEmitter.emitTyped("diagnostics:report-created", {
+                        channel: report.channel,
+                        correlationId,
+                        guard: report.guard,
+                        metadataTruncated,
+                        payloadPreviewLength:
+                            report.payloadPreview?.length ?? 0,
+                        payloadPreviewTruncated,
+                        ...(report.reason && { reason: report.reason }),
+                        timestamp: report.timestamp,
+                    }),
+                {
+                    onError(error) {
+                        logger.error(
+                            "[IpcDiagnostics] Failed to emit diagnostics report-created event",
+                            error
+                        );
+                    },
+                }
+            );
         },
         SystemHandlerValidators.reportPreloadGuard
     );
