@@ -215,6 +215,38 @@ describe("Events Domain API", () => {
             );
         });
 
+        it("should reject cache invalidation payloads with invalid epoch timestamps", () => {
+            const callback = vi.fn();
+
+            eventsApi.onCacheInvalidated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            for (const timestamp of [
+                -1,
+                1.5,
+                8_640_000_000_000_001,
+            ]) {
+                eventHandler?.(
+                    {},
+                    {
+                        reason: "update",
+                        timestamp,
+                        type: "site",
+                    }
+                );
+            }
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(guardFailureSpy).toHaveBeenCalledTimes(3);
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "cache:invalidated",
+                    guard: "isCacheInvalidatedEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
+        });
+
         it("should cleanup listener when cleanup function is called", () => {
             const callback = vi.fn();
 
