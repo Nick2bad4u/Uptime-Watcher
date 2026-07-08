@@ -1542,12 +1542,12 @@ describe("useSitesState", () => {
             }
         });
 
-        it("should avoid scheduling expirations when duration is zero", async ({
+        it("should avoid writing locks when duration is zero", async ({
             annotate,
         }) => {
             await annotate("Component: useSitesState", "component");
             await annotate("Category: Optimistic Locks", "category");
-            await annotate("Type: Timer Bypass", "type");
+            await annotate("Type: Timer and State Bypass", "type");
 
             const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
@@ -1559,6 +1559,7 @@ describe("useSitesState", () => {
             );
 
             expect(setTimeoutSpy).not.toHaveBeenCalled();
+            expect(mockSet).not.toHaveBeenCalled();
             setTimeoutSpy.mockRestore();
         });
     });

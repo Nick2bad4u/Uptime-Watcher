@@ -460,7 +460,16 @@ export const createSitesStateActions = (
                 return;
             }
 
-            const expiresAt = Date.now() + Math.max(durationMs, 0);
+            if (durationMs <= 0) {
+                for (const monitorId of monitorIds) {
+                    cancelLockExpiryTimer(
+                        buildMonitoringLockKey(siteIdentifier, monitorId)
+                    );
+                }
+                return;
+            }
+
+            const expiresAt = Date.now() + durationMs;
 
             set((state) => {
                 const optimisticMonitoringLocks =
@@ -487,12 +496,7 @@ export const createSitesStateActions = (
             });
 
             for (const monitorId of monitorIds) {
-                const key = buildMonitoringLockKey(siteIdentifier, monitorId);
-                if (durationMs > 0) {
-                    scheduleLockExpiry(siteIdentifier, monitorId, durationMs);
-                } else {
-                    cancelLockExpiryTimer(key);
-                }
+                scheduleLockExpiry(siteIdentifier, monitorId, durationMs);
             }
         },
         removeSite: (identifier: Site["identifier"]): void => {
