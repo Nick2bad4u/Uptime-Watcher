@@ -53,7 +53,7 @@ function copyOwnEnumerableDataRecord(
 /**
  * Returns errors for keys that are frequently abused for prototype pollution.
  */
-export function getForbiddenRecordKeyErrors(
+function getForbiddenRecordKeyErrors(
     record: UnknownRecord,
     paramName: string
 ): string[] {
