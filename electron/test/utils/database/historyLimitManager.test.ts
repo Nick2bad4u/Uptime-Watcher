@@ -192,6 +192,46 @@ describe("historyLimitManager", () => {
             }
         });
 
+        it("should not update in-memory state when persistence fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: historyLimitManager", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const setHistoryLimitCallback = vi.fn();
+            const writeError = new Error("settings write failed");
+
+            mockSettingsRepositoryBase.createTransactionAdapter.mockReturnValue(
+                {
+                    set: vi.fn(() => {
+                        throw writeError;
+                    }),
+                }
+            );
+
+            await expect(
+                setHistoryLimit({
+                    databaseService: mockDatabaseService,
+                    limit: 100,
+                    repositories: {
+                        history: mockHistoryRepository,
+                        settings: mockSettingsRepository,
+                    },
+                    rules: DEFAULT_HISTORY_LIMIT_RULES,
+                    setHistoryLimit: setHistoryLimitCallback,
+                    logger: mockLogger,
+                })
+            ).rejects.toThrow(writeError);
+
+            expect(setHistoryLimitCallback).not.toHaveBeenCalled();
+            expect(
+                mockHistoryRepository.pruneAllHistoryInternal
+            ).not.toHaveBeenCalled();
+        });
+
         it("should apply configured minimum for small positive values", async ({
             task,
             annotate,

@@ -64,10 +64,9 @@ interface SetHistoryLimitParams {
      * Callback to update the internal history limit
      *
      * @remarks
-     * This callback updates the in-memory history limit value immediately,
-     * providing synchronous access for other components while the database
-     * update happens asynchronously. Should be called before database
-     * operations to ensure consistency between memory and database state.
+     * This callback updates the in-memory history limit value after the
+     * database transaction commits so runtime state cannot drift from
+     * persistence when settings writes or pruning fail.
      */
     setHistoryLimit: (limit: number) => void;
 }
@@ -100,9 +99,6 @@ export async function setHistoryLimit(
 
     const finalLimit = normalizeHistoryLimit(limit, rules);
 
-    // Update the internal limit
-    updateHistoryLimit(finalLimit);
-
     // Use single transaction for atomicity - either both operations succeed or
     // both fail
     await withDatabaseOperation(
@@ -122,6 +118,8 @@ export async function setHistoryLimit(
         undefined,
         { limit: finalLimit }
     );
+
+    updateHistoryLimit(finalLimit);
 
     if (logger) {
         logger.debug("History limit set", { limit: finalLimit });
