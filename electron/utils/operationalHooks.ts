@@ -112,6 +112,8 @@ type OperationalLogLevel =
     | "info"
     | "warn";
 
+type OperationalHookOperation<T> = () => Promisable<T>;
+
 type OperationalHookContextTag = "OperationalHookContext";
 
 /**
@@ -599,15 +601,15 @@ async function handleSuccess<T>(
  * emission.
  */
 export async function withOperationalHooks<T>(
-    operation: () => Promise<T>,
+    operation: OperationalHookOperation<T>,
     config: ThrowingOperationalHooksConfig<T>
 ): Promise<T>;
 export async function withOperationalHooks<T>(
-    operation: () => Promise<T>,
+    operation: OperationalHookOperation<T>,
     config: OperationalHooksConfig<T>
 ): Promise<T | null>;
 export async function withOperationalHooks<T>(
-    operation: () => Promise<T>,
+    operation: OperationalHookOperation<T>,
     config: OperationalHooksConfig<T>
 ): Promise<T | null> {
     const {
@@ -792,7 +794,7 @@ export async function withOperationalHooks<T>(
  * @returns Promise resolving to the operation result
  */
 export async function withDatabaseOperation<T>(
-    operation: () => Promise<T>,
+    operation: OperationalHookOperation<T>,
     operationName: string,
     eventEmitter?: TypedEventBus<UptimeEvents>,
     context?: OperationalHookContextInput

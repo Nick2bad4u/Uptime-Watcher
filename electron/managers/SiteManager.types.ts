@@ -12,6 +12,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { Promisable } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -40,7 +41,7 @@ export interface IMonitoringOperations {
      * @param site - The site containing new monitors.
      * @param newMonitorIds - Array of new monitor IDs to set up.
      */
-    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promisable<void>;
 
     /**
      * Start monitoring for a specific site and monitor.

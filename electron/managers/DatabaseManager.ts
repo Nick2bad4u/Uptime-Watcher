@@ -779,17 +779,13 @@ export class DatabaseManager {
                 // Centralized history limit event emission
                 await this.emitHistoryLimitUpdated(limit);
             },
-            setupNewMonitors: (
-                site: Site,
-                newMonitorIds: string[]
-            ): Promise<void> => {
+            setupNewMonitors: (site: Site, newMonitorIds: string[]): void => {
                 // For database loading, we don't need to setup new monitors
                 // This is only used during site updates
                 const safeIdentifier = getSafeIdentifier(site.identifier);
                 monitorLogger.debug(
                     `[DatabaseManager:${operationId}] setupNewMonitors called for site ${safeIdentifier} with ${newMonitorIds.length} monitors - no action needed during loading`
                 );
-                return Promise.resolve();
             },
             startMonitoring: async (
                 identifier: string,

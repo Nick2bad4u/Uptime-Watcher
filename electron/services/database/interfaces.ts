@@ -5,6 +5,7 @@
 
 import type { Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
+import type { Promisable } from "type-fest";
 
 import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 
@@ -34,7 +35,7 @@ export interface MonitoringConfig {
      */
     setHistoryLimit: (limit: number) => Promise<void>;
     /** Function to setup new monitors for a site */
-    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
+    setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promisable<void>;
     /** Function to start monitoring for a site/monitor */
     startMonitoring: (
         identifier: string,

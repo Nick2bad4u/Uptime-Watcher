@@ -39,6 +39,25 @@ describe("Operational Hooks", () => {
             expect(result).toBe("success");
             expect(mockOperation).toHaveBeenCalledTimes(1);
         });
+        it("should successfully execute synchronous operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationalHooks", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const mockOperation = vi.fn(() => "sync-success");
+
+            const result = await withOperationalHooks(mockOperation, {
+                operationName: "test-sync-operation",
+                maxRetries: 1,
+                emitEvents: false,
+            });
+            expect(result).toBe("sync-success");
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+        });
         it("should retry on failure", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationalHooks", "component");

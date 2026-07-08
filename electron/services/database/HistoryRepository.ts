@@ -607,7 +607,6 @@ export class HistoryRepository {
                     monitorId,
                     normalizedLimit
                 );
-                return Promise.resolve();
             },
             "history-prune",
             undefined,
