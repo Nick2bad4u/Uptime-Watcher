@@ -424,4 +424,67 @@ describe("logging context helpers", () => {
             type: "ArrayBuffer",
         });
     });
+
+    it("serializes Map and Set metadata to summaries", () => {
+        expect(normalizeLogValue(new Map([["key", "value"]]))).toEqual({
+            size: 1,
+            type: "Map",
+        });
+        expect(normalizeLogValue(new Set(["value"]))).toEqual({
+            size: 1,
+            type: "Set",
+        });
+    });
+
+    it("does not invoke shadowed Map or Set size accessors", () => {
+        const map = new Map([["key", "value"]]);
+        const set = new Set(["value"]);
+        const mapSize = vi.fn(() => {
+            throw new Error("map size should not run");
+        });
+        const setSize = vi.fn(() => {
+            throw new Error("set size should not run");
+        });
+        Object.defineProperty(map, "size", {
+            configurable: true,
+            get: mapSize,
+        });
+        Object.defineProperty(set, "size", {
+            configurable: true,
+            get: setSize,
+        });
+
+        expect(normalizeLogValue(map)).toEqual({
+            size: 1,
+            type: "Map",
+        });
+        expect(normalizeLogValue(set)).toEqual({
+            size: 1,
+            type: "Set",
+        });
+        expect(mapSize).not.toHaveBeenCalled();
+        expect(setSize).not.toHaveBeenCalled();
+    });
+
+    it("does not treat Map or Set prototype impostors as native collections", () => {
+        const mapImpostor = Object.create(Map.prototype) as Map<
+            unknown,
+            unknown
+        >;
+        const setImpostor = Object.create(Set.prototype) as Set<unknown>;
+
+        expect(mapImpostor).toBeInstanceOf(Map);
+        expect(setImpostor).toBeInstanceOf(Set);
+        expect(() => normalizeLogValue(mapImpostor)).not.toThrow();
+        expect(() => normalizeLogValue(setImpostor)).not.toThrow();
+
+        expect(normalizeLogValue(mapImpostor)).not.toEqual({
+            size: expect.any(Number),
+            type: "Map",
+        });
+        expect(normalizeLogValue(setImpostor)).not.toEqual({
+            size: expect.any(Number),
+            type: "Set",
+        });
+    });
 });

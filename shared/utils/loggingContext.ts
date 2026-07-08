@@ -133,10 +133,17 @@ const INVALID_DATE_PLACEHOLDER = "[Invalid Date]" as const;
 const INVALID_URL_PLACEHOLDER = "[Invalid URL]" as const;
 
 type NativePrototypeFunction = (this: unknown) => unknown;
+type NativePrototypeGetter = (this: unknown) => unknown;
 
 function isNativePrototypeFunction(
     value: unknown
 ): value is NativePrototypeFunction {
+    return typeof value === "function";
+}
+
+function isNativePrototypeGetter(
+    value: unknown
+): value is NativePrototypeGetter {
     return typeof value === "function";
 }
 
@@ -151,11 +158,27 @@ function getNativePrototypeFunction(
         : undefined;
 }
 
+function getNativePrototypeGetter(
+    holder: object,
+    key: PropertyKey
+): NativePrototypeGetter | undefined {
+    const descriptor = Object.getOwnPropertyDescriptor(holder, key);
+    const getter = descriptor
+        ? getOwnDataProperty(descriptor, "get")
+        : { found: false as const };
+
+    return getter.found && isNativePrototypeGetter(getter.value)
+        ? getter.value
+        : undefined;
+}
+
 const DATE_GET_TIME = getNativePrototypeFunction(Date.prototype, "getTime");
 const DATE_TO_ISO_STRING = getNativePrototypeFunction(
     Date.prototype,
     "toISOString"
 );
+const MAP_SIZE = getNativePrototypeGetter(Map.prototype, "size");
+const SET_SIZE = getNativePrototypeGetter(Set.prototype, "size");
 const URL_TO_STRING = getNativePrototypeFunction(URL.prototype, "toString");
 
 const serializeUrl = (value: URL): string | undefined => {
@@ -377,6 +400,26 @@ const normalizeLogUrl = (value: URL): string => {
         : normalizeLogString(serialized);
 };
 
+const getNativeCollectionSize = (
+    value: object,
+    getter: NativePrototypeGetter | undefined
+): number | undefined => {
+    if (!getter) {
+        return undefined;
+    }
+
+    try {
+        const size: unknown = Reflect.apply(getter, value, []);
+        return typeof size === "number" &&
+            Number.isSafeInteger(size) &&
+            size >= 0
+            ? size
+            : undefined;
+    } catch {
+        return undefined;
+    }
+};
+
 const computeIdentifierHash = (value: string): string => {
     let hash = 0;
     for (const char of value) {
@@ -451,21 +494,23 @@ function normalizeNonPlainObject(
         };
     }
 
-    if (candidate instanceof Map) {
+    const mapSize = getNativeCollectionSize(candidate, MAP_SIZE);
+    if (mapSize !== undefined) {
         return {
             kind: "normalized",
             value: {
-                size: candidate.size,
+                size: mapSize,
                 type: "Map",
             } satisfies UnknownRecord,
         };
     }
 
-    if (candidate instanceof Set) {
+    const setSize = getNativeCollectionSize(candidate, SET_SIZE);
+    if (setSize !== undefined) {
         return {
             kind: "normalized",
             value: {
-                size: candidate.size,
+                size: setSize,
                 type: "Set",
             } satisfies UnknownRecord,
         };
