@@ -8,7 +8,8 @@ import type { UnknownRecord } from "type-fest";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { freezeOwnEnumerableDataProperties } from "@shared/utils/objectSafety";
+import { isPlainRecord, isRecord } from "@shared/utils/typeHelpers";
 import { validateMonitorType } from "@shared/utils/validation";
 import { validateMonitorData } from "@shared/validation/monitorSchemas";
 import {
@@ -43,27 +44,46 @@ const pickOptionalString = (value: unknown): string | undefined =>
 const pickBooleanWithFallback = (value: unknown, fallback: boolean): boolean =>
     typeof value === "boolean" ? value : fallback;
 
+const copyPlainDataRecord = (value: unknown): UnknownRecord | undefined => {
+    if (!isPlainRecord(value)) {
+        return undefined;
+    }
+
+    try {
+        return freezeOwnEnumerableDataProperties(value);
+    } catch {
+        return undefined;
+    }
+};
+
 const buildMonitorValidationCandidate = (
     monitorType: string,
     data: unknown
 ): unknown => {
-    if (!isRecord(data)) {
+    const dataRecord = copyPlainDataRecord(data);
+    if (!dataRecord) {
         return data;
     }
 
     const checkInterval =
-        typeof data["checkInterval"] === "number"
-            ? data["checkInterval"]
+        typeof dataRecord["checkInterval"] === "number"
+            ? dataRecord["checkInterval"]
             : 300_000;
     const isMonitoring =
-        typeof data["monitoring"] === "boolean" ? data["monitoring"] : true;
+        typeof dataRecord["monitoring"] === "boolean"
+            ? dataRecord["monitoring"]
+            : true;
     const retryAttempts =
-        typeof data["retryAttempts"] === "number" ? data["retryAttempts"] : 3;
+        typeof dataRecord["retryAttempts"] === "number"
+            ? dataRecord["retryAttempts"]
+            : 3;
     const timeout =
-        typeof data["timeout"] === "number" ? data["timeout"] : 10_000;
+        typeof dataRecord["timeout"] === "number"
+            ? dataRecord["timeout"]
+            : 10_000;
 
     return {
-        ...data,
+        ...dataRecord,
         activeOperations: [],
         checkInterval,
         history: [],
@@ -391,7 +411,9 @@ export function registerMonitorTypeHandlers({
             }
 
             if (config.uiConfig?.formatTitleSuffix) {
-                return config.uiConfig.formatTitleSuffix(monitor);
+                return config.uiConfig.formatTitleSuffix(
+                    copyPlainDataRecord(monitor) ?? monitor
+                );
             }
 
             return "";
