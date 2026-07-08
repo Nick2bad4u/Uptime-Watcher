@@ -173,6 +173,40 @@ describe(normalizeCloudSyncState, () => {
         expect(monitor?.fields["timeout"]?.value).toBeGreaterThan(0);
         expect(site?.fields["name"]?.value).toBe(PROTOTYPE_PROPERTY_NAME);
     });
+
+    it("replaces invalid required monitor numeric fields with defaults", () => {
+        const state = {
+            monitor: {
+                "monitor-1": {
+                    entityId: "monitor-1",
+                    entityType: "monitor",
+                    fields: {
+                        checkInterval: {
+                            value: 0,
+                            write: WRITE,
+                        },
+                        retryAttempts: {
+                            value: 999,
+                            write: WRITE,
+                        },
+                        timeout: {
+                            value: 0,
+                            write: WRITE,
+                        },
+                    },
+                },
+            },
+            settings: {},
+            site: {},
+        } satisfies CloudSyncState;
+
+        const normalized = normalizeCloudSyncState(state);
+        const fields = normalized.monitor["monitor-1"]?.fields;
+
+        expect(fields?.["checkInterval"]?.value).toBe(300_000);
+        expect(fields?.["retryAttempts"]?.value).toBe(3);
+        expect(fields?.["timeout"]?.value).toBe(10_000);
+    });
 });
 
 describe(buildLocalOperations, () => {
@@ -383,6 +417,53 @@ describe("syncEngineState map builders", () => {
         expect(desired[INHERITED_PROPERTY_NAME]?.id).toBe(
             INHERITED_PROPERTY_NAME
         );
+    });
+
+    it("defaults invalid required monitor numeric fields before validation", () => {
+        const state = {
+            "monitor-1": {
+                entityId: "monitor-1",
+                entityType: "monitor",
+                fields: {
+                    checkInterval: {
+                        value: 0,
+                        write: WRITE,
+                    },
+                    monitoring: {
+                        value: true,
+                        write: WRITE,
+                    },
+                    retryAttempts: {
+                        value: 999,
+                        write: WRITE,
+                    },
+                    siteIdentifier: {
+                        value: "site-1",
+                        write: WRITE,
+                    },
+                    timeout: {
+                        value: 0,
+                        write: WRITE,
+                    },
+                    type: {
+                        value: "http",
+                        write: WRITE,
+                    },
+                    url: {
+                        value: "https://example.com",
+                        write: WRITE,
+                    },
+                },
+            },
+        } satisfies CloudSyncState["monitor"];
+
+        const desired = buildDesiredMonitorsFromSyncState(state);
+
+        expect(desired["monitor-1"]).toMatchObject({
+            checkInterval: 300_000,
+            retryAttempts: 3,
+            timeout: 10_000,
+        });
     });
 
     it("builds desired settings maps with inherited-property keys", () => {

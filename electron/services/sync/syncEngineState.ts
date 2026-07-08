@@ -53,11 +53,7 @@ import { readNumberEnv } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeJsonParse } from "@shared/utils/jsonSafety";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
-import {
-    isBoolean,
-    isFiniteNumber,
-    isNonEmptyString,
-} from "@shared/utils/typeGuards";
+import { isBoolean, isNonEmptyString } from "@shared/utils/typeGuards";
 import {
     type CloudSyncEntityStateMap,
     type CloudSyncFieldValueMap,
@@ -68,6 +64,7 @@ import {
     setCloudSyncRecordValue as setRecordValue,
 } from "@shared/utils/cloudSyncStateMaps";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { VALIDATION_CONSTRAINTS } from "@shared/validation/monitorSchemas.common";
 import { isDefined, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
 
 import {
@@ -96,6 +93,30 @@ function getMaxBaselineBytes(): number {
         "UW_CLOUD_SYNC_MAX_BASELINE_BYTES",
         DEFAULT_MAX_BASELINE_BYTES
     );
+}
+
+function isIntegerInRange(
+    value: unknown,
+    constraints: Readonly<{ MAX: number; MIN: number }>
+): value is number {
+    return (
+        typeof value === "number" &&
+        Number.isInteger(value) &&
+        value >= constraints.MIN &&
+        value <= constraints.MAX
+    );
+}
+
+function isValidCheckInterval(value: unknown): value is number {
+    return isIntegerInRange(value, VALIDATION_CONSTRAINTS.CHECK_INTERVAL);
+}
+
+function isValidRetryAttempts(value: unknown): value is number {
+    return isIntegerInRange(value, VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS);
+}
+
+function isValidTimeout(value: unknown): value is number {
+    return isIntegerInRange(value, VALIDATION_CONSTRAINTS.TIMEOUT);
 }
 
 function createMonitorConfigMap(): CloudSyncMonitorConfigMap {
@@ -249,7 +270,7 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
             normalizeCloudSyncFieldValue({
                 current: fields["checkInterval"],
                 defaultValue: DEFAULT_CHECK_INTERVAL,
-                isValid: isFiniteNumber,
+                isValid: isValidCheckInterval,
             })
         );
         setFieldValue(
@@ -258,7 +279,7 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
             normalizeCloudSyncFieldValue({
                 current: fields["retryAttempts"],
                 defaultValue: DEFAULT_RETRY_ATTEMPTS,
-                isValid: isFiniteNumber,
+                isValid: isValidRetryAttempts,
             })
         );
         setFieldValue(
@@ -267,7 +288,7 @@ export function normalizeCloudSyncState(state: CloudSyncState): CloudSyncState {
             normalizeCloudSyncFieldValue({
                 current: fields["timeout"],
                 defaultValue: DEFAULT_REQUEST_TIMEOUT,
-                isValid: isFiniteNumber,
+                isValid: isValidTimeout,
             })
         );
 
@@ -523,13 +544,13 @@ export function buildDesiredMonitorsFromSyncState(
         if (!isBoolean(candidate["monitoring"])) {
             candidate["monitoring"] = true;
         }
-        if (!isFiniteNumber(candidate["checkInterval"])) {
+        if (!isValidCheckInterval(candidate["checkInterval"])) {
             candidate["checkInterval"] = DEFAULT_CHECK_INTERVAL;
         }
-        if (!isFiniteNumber(candidate["retryAttempts"])) {
+        if (!isValidRetryAttempts(candidate["retryAttempts"])) {
             candidate["retryAttempts"] = DEFAULT_RETRY_ATTEMPTS;
         }
-        if (!isFiniteNumber(candidate["timeout"])) {
+        if (!isValidTimeout(candidate["timeout"])) {
             candidate["timeout"] = DEFAULT_REQUEST_TIMEOUT;
         }
 
