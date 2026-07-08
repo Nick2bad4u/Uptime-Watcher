@@ -1,3 +1,4 @@
+import { MAX_IPC_CLIPBOARD_TEXT_BYTES } from "@shared/constants/ipc";
 import { isJsonByteBudgetExceeded } from "@shared/utils/jsonByteBudget";
 
 import type { IpcParameterValidator } from "../../types";
@@ -10,9 +11,6 @@ import {
 } from "./parameterValidation";
 import { requireRecordParamValue } from "./recordValidation";
 import { validateRequiredStringPayload } from "./stringPayloadValidation";
-
-/** Maximum byte budget accepted for clipboard payloads transported over IPC. */
-const MAX_CLIPBOARD_TEXT_BYTES: number = 5 * 1024 * 1024;
 
 /**
  * Creates a validator for handlers expecting no parameters.
@@ -139,8 +137,8 @@ export function createClipboardTextValidator(): IpcParameterValidator {
     return createParamValidator(1, [
         (value): ParameterValueValidationResult => {
             const errors = validateRequiredStringPayload(value, {
-                maxBytes: MAX_CLIPBOARD_TEXT_BYTES,
-                maxBytesMessage: `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`,
+                maxBytes: MAX_IPC_CLIPBOARD_TEXT_BYTES,
+                maxBytesMessage: `text must not exceed ${MAX_IPC_CLIPBOARD_TEXT_BYTES} bytes`,
                 paramName: "text",
             });
 

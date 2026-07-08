@@ -11,10 +11,13 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { MAX_IPC_CLIPBOARD_TEXT_BYTES } from "@shared/constants/ipc";
 import {
     getSafeUrlForLogging,
     validateExternalOpenUrlCandidate,
 } from "@shared/utils/urlSafety";
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 
 import type { ElectronAPI } from "../types";
 
@@ -169,6 +172,19 @@ export const SystemService: SystemServiceContract = {
     writeClipboardText: wrap(
         "writeClipboardText",
         async (api: ElectronAPI, text: string): Promise<void> => {
+            if (!isNonEmptyString(text)) {
+                throw new TypeError(
+                    "Clipboard text must be a non-empty string"
+                );
+            }
+
+            const byteLength = getUtfByteLength(text);
+            if (byteLength > MAX_IPC_CLIPBOARD_TEXT_BYTES) {
+                throw new Error(
+                    `Clipboard text is too large (${byteLength} > ${MAX_IPC_CLIPBOARD_TEXT_BYTES} bytes).`
+                );
+            }
+
             const isResult = await api.system.writeClipboardText(text);
 
             if (typeof isResult !== "boolean") {

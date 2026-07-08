@@ -10,6 +10,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { MAX_IPC_CLIPBOARD_TEXT_BYTES } from "@shared/constants/ipc";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SystemService } from "../../services/SystemService";
@@ -311,6 +312,28 @@ describe("SystemService", () => {
             expect(
                 mockElectronAPI.system.writeClipboardText
             ).toHaveBeenCalledWith("hello");
+        });
+
+        it("should reject empty clipboard text before invoking Electron", async () => {
+            await expect(SystemService.writeClipboardText("")).rejects.toThrow(
+                "Clipboard text must be a non-empty string"
+            );
+
+            expect(
+                mockElectronAPI.system.writeClipboardText
+            ).not.toHaveBeenCalled();
+        });
+
+        it("should reject oversized clipboard text before invoking Electron", async () => {
+            await expect(
+                SystemService.writeClipboardText(
+                    "x".repeat(MAX_IPC_CLIPBOARD_TEXT_BYTES + 1)
+                )
+            ).rejects.toThrow(/Clipboard text is too large/v);
+
+            expect(
+                mockElectronAPI.system.writeClipboardText
+            ).not.toHaveBeenCalled();
         });
     });
 

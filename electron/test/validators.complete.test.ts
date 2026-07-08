@@ -14,6 +14,7 @@
  */
 
 import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
+import { MAX_IPC_CLIPBOARD_TEXT_BYTES } from "@shared/constants/ipc";
 import type { SerializedDatabaseRestoreResult } from "@shared/types/ipc";
 import {
     MONITOR_ID_MAX_LENGTH,
@@ -34,8 +35,6 @@ import { SettingsHandlerValidators } from "../services/ipc/validators/settings";
 import { SiteHandlerValidators } from "../services/ipc/validators/sites";
 import { StateSyncHandlerValidators } from "../services/ipc/validators/stateSync";
 import { SystemHandlerValidators } from "../services/ipc/validators/system";
-
-const MAX_CLIPBOARD_TEXT_BYTES = 5 * 1024 * 1024;
 
 /**
  * Helper function to check if validation result indicates success
@@ -1872,7 +1871,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
             await annotate("Type: Validation", "type");
 
             const result = SystemHandlerValidators.writeClipboardText([
-                "x".repeat(MAX_CLIPBOARD_TEXT_BYTES),
+                "x".repeat(MAX_IPC_CLIPBOARD_TEXT_BYTES),
             ]);
 
             expect(isValidationSuccess(result)).toBeTruthy();
@@ -1888,11 +1887,11 @@ describe("IPC Validators - Exported Validator Groups", () => {
             await annotate("Type: Error Handling", "type");
 
             const result = SystemHandlerValidators.writeClipboardText([
-                "x".repeat(MAX_CLIPBOARD_TEXT_BYTES + 1),
+                "x".repeat(MAX_IPC_CLIPBOARD_TEXT_BYTES + 1),
             ]);
 
             expect(result).toContain(
-                `text must not exceed ${MAX_CLIPBOARD_TEXT_BYTES} bytes`
+                `text must not exceed ${MAX_IPC_CLIPBOARD_TEXT_BYTES} bytes`
             );
         });
 
