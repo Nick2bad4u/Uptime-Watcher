@@ -76,6 +76,7 @@ import { fireAndForget } from "../utils/async/fireAndForget";
  * StrictMode development behavior where effects can run multiple times.
  *
  * @param mountCallback - Function to execute on component mount (can be async).
+ *   Receives an `AbortSignal` that is aborted before unmount cleanup runs.
  * @param unmountCallback - Optional function to execute on component unmount.
  *
  * @returns `void` – the hook performs side effects only.
@@ -83,14 +84,15 @@ import { fireAndForget } from "../utils/async/fireAndForget";
  * @public
  */
 export function useMount(
-    mountCallback: () => Promisable<void>,
+    mountCallback: (signal: AbortSignal) => Promisable<void>,
     unmountCallback?: () => void
 ): void {
     useEffect(
         function handleMountLifecycle() {
+            const abortController = new AbortController();
             let didCleanup = false;
 
-            fireAndForget(mountCallback, {
+            fireAndForget(() => mountCallback(abortController.signal), {
                 onError: (error) => {
                     logger.error(
                         "Error in useMount callback:",
@@ -105,6 +107,7 @@ export function useMount(
                 }
 
                 didCleanup = true;
+                abortController.abort();
 
                 try {
                     unmountCallback?.();

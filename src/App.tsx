@@ -282,25 +282,29 @@ export const App: NamedExoticComponent = memo(
          *
          * @throws Error When store initialization fails
          */
-        const initializeApp = useCallback(async () => {
-            await runAppBootstrap({
-                cleanupRefs: {
-                    cacheSyncCleanupRef,
-                    syncEventsCleanupRef,
-                    updateStatusEventsCleanupRef,
-                },
-                setIsInitialized,
-                subscribeToUpdateStatusEvents,
-                updateCountRefs: {
-                    alertsUpdateCountRef,
-                    errorUpdateCountRef,
-                    settingsUpdateCountRef,
-                    sitesUpdateCountRef,
-                    uiUpdateCountRef,
-                    updatesUpdateCountRef,
-                },
-            });
-        }, [subscribeToUpdateStatusEvents]);
+        const initializeApp = useCallback(
+            async (signal: AbortSignal) => {
+                await runAppBootstrap({
+                    abortSignal: signal,
+                    cleanupRefs: {
+                        cacheSyncCleanupRef,
+                        syncEventsCleanupRef,
+                        updateStatusEventsCleanupRef,
+                    },
+                    setIsInitialized,
+                    subscribeToUpdateStatusEvents,
+                    updateCountRefs: {
+                        alertsUpdateCountRef,
+                        errorUpdateCountRef,
+                        settingsUpdateCountRef,
+                        sitesUpdateCountRef,
+                        uiUpdateCountRef,
+                        updatesUpdateCountRef,
+                    },
+                });
+            },
+            [subscribeToUpdateStatusEvents]
+        );
 
         /**
          * Cleans up app resources when the component unmounts.

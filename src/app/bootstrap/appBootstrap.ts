@@ -56,6 +56,8 @@ export interface AppBootstrapUpdateCountRefs {
  * Options for {@link runAppBootstrap}.
  */
 export interface RunAppBootstrapOptions {
+    /** Signal aborted when the owning React lifecycle has been cleaned up. */
+    abortSignal?: AbortSignal;
     cleanupRefs: AppBootstrapCleanupRefs;
     /** Mark the app as fully initialized (used to enable loading overlays). */
     setIsInitialized: (next: boolean) => void;
@@ -115,6 +117,21 @@ export async function runAppBootstrap(
 ): Promise<void> {
     logger.debug("[App:init] initializeApp invoked");
 
+    const cleanupIfAborted = (): boolean => {
+        if (options.abortSignal?.aborted !== true) {
+            return false;
+        }
+
+        cleanupAppBootstrap({
+            cleanupRefs: options.cleanupRefs,
+        });
+        return true;
+    };
+
+    if (cleanupIfAborted()) {
+        return;
+    }
+
     if (isProduction()) {
         logger.app.started();
     }
@@ -136,6 +153,9 @@ export async function runAppBootstrap(
         if (typeof initializeSettings === "function") {
             logger.debug("[App:init] invoking settings initialize");
             await initializeSettings.call(settingsStore);
+            if (cleanupIfAborted()) {
+                return;
+            }
             logger.debug("[App:init] settings initialized");
         } else {
             warnMissingImplementation(
@@ -148,6 +168,9 @@ export async function runAppBootstrap(
                 "[App:init] initializing notification preference bridge"
             );
             await NotificationPreferenceService.initialize();
+            if (cleanupIfAborted()) {
+                return;
+            }
         } catch (error) {
             logger.warn(
                 "Failed to initialize notification preference bridge",
@@ -159,6 +182,9 @@ export async function runAppBootstrap(
             "[App:init] running initial notification preference synchronization"
         );
         await synchronizeNotificationPreferences();
+        if (cleanupIfAborted()) {
+            return;
+        }
         logger.debug(
             "[App:init] initial notification preference synchronization completed"
         );
@@ -167,6 +193,9 @@ export async function runAppBootstrap(
         if (typeof initializeSites === "function") {
             logger.debug("[App:init] invoking sites initialize");
             await initializeSites.call(sitesStore);
+            if (cleanupIfAborted()) {
+                return;
+            }
             logger.debug("[App:init] sites initialized");
         } else {
             warnMissingImplementation(
@@ -178,6 +207,9 @@ export async function runAppBootstrap(
         const cacheSyncCleanup = setupCacheSync();
         logger.debug("[App:init] cache synchronization enabled");
         options.cleanupRefs.cacheSyncCleanupRef.current = cacheSyncCleanup;
+        if (cleanupIfAborted()) {
+            return;
+        }
 
         const subscribeToSyncEvents = sitesStore?.subscribeToSyncEvents;
 
@@ -185,6 +217,9 @@ export async function runAppBootstrap(
             logger.debug("[App:init] subscribing to sync events");
             options.cleanupRefs.syncEventsCleanupRef.current =
                 subscribeToSyncEvents();
+            if (cleanupIfAborted()) {
+                return;
+            }
             logger.debug("[App:init] sync events subscription established");
         } else {
             warnMissingImplementation(
@@ -202,6 +237,9 @@ export async function runAppBootstrap(
                     logStatusUpdateDebugInfo(update);
                 }
             );
+            if (cleanupIfAborted()) {
+                return;
+            }
 
             reportSubscriptionDiagnostics(subscriptionResult);
             logger.debug("[App:init] status updates subscription completed");
@@ -214,6 +252,9 @@ export async function runAppBootstrap(
         logger.debug("[App:init] subscribing to update status events");
         options.cleanupRefs.updateStatusEventsCleanupRef.current =
             options.subscribeToUpdateStatusEvents();
+        if (cleanupIfAborted()) {
+            return;
+        }
         logger.debug(
             "[App:init] update status events subscription established"
         );
@@ -234,6 +275,10 @@ export async function runAppBootstrap(
                 options.updateCountRefs.updatesUpdateCountRef.current,
         });
     } catch (error) {
+        if (cleanupIfAborted()) {
+            return;
+        }
+
         const normalizedError = ensureError(error);
         logger.error(
             "[App:init] Unhandled error during initialization pipeline",

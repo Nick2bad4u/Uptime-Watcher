@@ -137,4 +137,65 @@ describe("appBootstrap", () => {
         expect(cleanupRefs.updateStatusEventsCleanupRef.current).toBeNull();
         expect(mocks.setError).toHaveBeenCalledWith(failure.message);
     });
+
+    it("cleans up partial subscriptions when bootstrap is aborted", async () => {
+        const { runAppBootstrap } =
+            await import("../../../app/bootstrap/appBootstrap");
+
+        const abortController = new AbortController();
+        const initializeSettings = vi.fn().mockResolvedValue(undefined);
+        const initializeSites = vi.fn().mockResolvedValue(undefined);
+        const unsubscribeFromStatusUpdates = vi.fn();
+        const subscribeToStatusUpdates = vi.fn();
+        const subscribeToSyncEvents = vi.fn(() => {
+            abortController.abort();
+            return mocks.subscribeToSyncEventsCleanup;
+        });
+        const subscribeToUpdateStatusEvents = vi.fn(() => vi.fn());
+        const setIsInitialized = vi.fn();
+
+        mocks.useSettingsStore.getState.mockReturnValue({
+            disposeSettingsSubscriptions: vi.fn(),
+            initializeSettings,
+        });
+        mocks.useSitesStore.getState.mockReturnValue({
+            initializeSites,
+            subscribeToStatusUpdates,
+            subscribeToSyncEvents,
+            unsubscribeFromStatusUpdates,
+        });
+
+        const cleanupRefs = {
+            cacheSyncCleanupRef: { current: null },
+            syncEventsCleanupRef: { current: null },
+            updateStatusEventsCleanupRef: { current: null },
+        };
+
+        await runAppBootstrap({
+            abortSignal: abortController.signal,
+            cleanupRefs,
+            setIsInitialized,
+            subscribeToUpdateStatusEvents,
+            updateCountRefs: {
+                alertsUpdateCountRef: { current: 0 },
+                errorUpdateCountRef: { current: 0 },
+                settingsUpdateCountRef: { current: 0 },
+                sitesUpdateCountRef: { current: 0 },
+                uiUpdateCountRef: { current: 0 },
+                updatesUpdateCountRef: { current: 0 },
+            },
+        });
+
+        expect(subscribeToSyncEvents).toHaveBeenCalledTimes(1);
+        expect(subscribeToStatusUpdates).not.toHaveBeenCalled();
+        expect(subscribeToUpdateStatusEvents).not.toHaveBeenCalled();
+        expect(setIsInitialized).not.toHaveBeenCalled();
+        expect(unsubscribeFromStatusUpdates).toHaveBeenCalledTimes(1);
+        expect(mocks.cacheCleanup).toHaveBeenCalledTimes(1);
+        expect(mocks.subscribeToSyncEventsCleanup).toHaveBeenCalledTimes(1);
+        expect(cleanupRefs.cacheSyncCleanupRef.current).toBeNull();
+        expect(cleanupRefs.syncEventsCleanupRef.current).toBeNull();
+        expect(cleanupRefs.updateStatusEventsCleanupRef.current).toBeNull();
+        expect(mocks.setError).not.toHaveBeenCalled();
+    });
 });

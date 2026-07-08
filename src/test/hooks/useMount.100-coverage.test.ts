@@ -107,4 +107,34 @@ describe("useMount - 100% Coverage Tests", () => {
             cleanupError
         );
     });
+
+    it("aborts the mount signal before running cleanup", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useMount.100-coverage", "component");
+        await annotate("Category: Hook", "category");
+        await annotate("Type: Lifecycle", "type");
+
+        let receivedSignal: AbortSignal | undefined;
+        const mountCallback = vi.fn((signal: AbortSignal) => {
+            receivedSignal = signal;
+        });
+        const unmountCallback = vi.fn(() => {
+            expect(receivedSignal?.aborted).toBeTruthy();
+        });
+
+        const { unmount } = renderHook(() => {
+            useMount(mountCallback, unmountCallback);
+        });
+
+        expect(receivedSignal?.aborted).toBeFalsy();
+
+        unmount();
+
+        expect(mountCallback).toHaveBeenCalledTimes(1);
+        expect(unmountCallback).toHaveBeenCalledTimes(1);
+        expect(receivedSignal?.aborted).toBeTruthy();
+    });
 });
