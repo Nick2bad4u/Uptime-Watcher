@@ -430,7 +430,7 @@ export class FilesystemCloudStorageProvider
             tempPath = `${targetPath}.tmp-${randomUUID()}`;
             const backupPath = `${targetPath}.bak-${randomUUID()}`;
 
-            await fs.writeFile(tempPath, args.buffer);
+            await fs.writeFile(tempPath, args.buffer, { flag: "wx" });
 
             const renameTempToTarget = async (): Promise<void> => {
                 if (!tempPath) {

@@ -619,6 +619,83 @@ describe("FilesystemCloudStorageProvider", () => {
         }
     });
 
+    it("refuses to write upload temp files through symlinks", async () => {
+        const fixedUuid = "00000000-0000-4000-8000-000000000000";
+        const appRoot = path.resolve(baseDirectory, "uptime-watcher");
+        const syncDirectory = path.join(appRoot, "sync");
+        const tempPath = path.join(
+            syncDirectory,
+            `state.json.tmp-${fixedUuid}`
+        );
+        const outsideDirectory = await fs.mkdtemp(
+            path.join(os.tmpdir(), "uw-cloud-temp-link-outside-")
+        );
+        const outsideFile = path.join(outsideDirectory, "outside.txt");
+
+        await fs.mkdir(syncDirectory, { recursive: true });
+        await fs.writeFile(outsideFile, "outside");
+
+        try {
+            await fs.symlink(outsideFile, tempPath, "file");
+        } catch (error: unknown) {
+            const code =
+                typeof error === "object" && error !== null && "code" in error
+                    ? String(error.code)
+                    : "";
+
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+
+            if (code === "EPERM" || code === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        vi.resetModules();
+        vi.doMock("fs", async () => vi.importActual("fs"));
+        vi.doMock("node:fs", async () => vi.importActual("node:fs"));
+        vi.doMock("path", async () => vi.importActual("path"));
+        vi.doMock("node:path", async () => vi.importActual("node:path"));
+        vi.doMock("node:crypto", async () => {
+            const actual =
+                await vi.importActual<typeof import("node:crypto")>(
+                    "node:crypto"
+                );
+            return {
+                ...actual,
+                randomUUID: () => fixedUuid,
+            };
+        });
+
+        const providerModule =
+            await import("../../../services/cloud/providers/FilesystemCloudStorageProvider");
+        const errorModule =
+            await import("../../../services/cloud/providers/cloudProviderErrors");
+        const provider = new providerModule.FilesystemCloudStorageProvider({
+            baseDirectory,
+        });
+
+        try {
+            await expect(
+                provider.uploadObject({
+                    buffer: Buffer.from("escape"),
+                    key: "sync/state.json",
+                    overwrite: true,
+                })
+            ).rejects.toThrow(errorModule.CloudProviderOperationError);
+
+            await expect(fs.readFile(outsideFile, "utf8")).resolves.toBe(
+                "outside"
+            );
+            await expect(fs.lstat(tempPath)).rejects.toThrow();
+        } finally {
+            vi.doUnmock("node:crypto");
+            await fs.rm(tempPath, { force: true });
+            await fs.rm(outsideDirectory, { force: true, recursive: true });
+        }
+    });
+
     it("rechecks directories created by a concurrent EEXIST race", async () => {
         const appRoot = path.resolve(baseDirectory, "uptime-watcher");
         const outsideDirectory = await fs.mkdtemp(
