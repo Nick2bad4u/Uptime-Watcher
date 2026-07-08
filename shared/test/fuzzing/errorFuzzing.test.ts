@@ -7,6 +7,7 @@ import {
     type ErrorHandlingBackendContext,
     withErrorHandling,
 } from "@shared/utils/errorHandling";
+import { buildErrorLogArguments } from "@shared/utils/logger/common";
 import { describe, expect, it, vi } from "vitest";
 
 const sharedLogMessage = (message: string) => `[SHARED] ${message}`;
@@ -183,8 +184,12 @@ describe("ErrorHandling Fuzzing - Line 141", () => {
 
                 // Should still call console.error regardless of error type
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
-                    sharedLogMessage("Failed to fuzz test"),
-                    errorValue
+                    ...buildErrorLogArguments(
+                        "SHARED",
+                        "Failed to fuzz test",
+                        errorValue,
+                        []
+                    )
                 );
 
                 consoleErrorSpy.mockRestore();

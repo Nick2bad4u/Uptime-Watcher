@@ -11,6 +11,7 @@ import type { HistoryRow as DatabaseHistoryRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import { STATUS_HISTORY_VALUES } from "@shared/types";
+import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
 import { fc, test } from "@fast-check/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -46,6 +47,8 @@ describe("historyQuery utilities", () => {
     const mockMonitorId = "monitor-123";
     const rawMonitorId =
         "https://monitor.example/check?token=monitor-token#private-monitor";
+    const getExpectedLoggedMonitorId = (monitorId: string): string =>
+        getSafeIdentifierForLogging(monitorId) ?? monitorId;
 
     const expectLogPayloadToRedactRawMonitorId = (): void => {
         const logPayload = JSON.stringify(vi.mocked(logger.error).mock.calls);
@@ -810,7 +813,7 @@ describe("historyQuery utilities", () => {
                         errorMessage
                     );
                     expect(logger.error).toHaveBeenCalledWith(
-                        `[HistoryQuery] Failed to get history count for monitor: ${monitorId}`,
+                        `[HistoryQuery] Failed to get history count for monitor: ${getExpectedLoggedMonitorId(monitorId)}`,
                         dbError
                     );
                 }
@@ -1197,7 +1200,7 @@ describe("historyQuery utilities", () => {
                         getLatestHistoryEntry(mockDb, monitorId)
                     ).toThrow(errorMessage);
                     expect(logger.error).toHaveBeenCalledWith(
-                        `[HistoryQuery] Failed to get latest history entry for monitor: ${monitorId}`,
+                        `[HistoryQuery] Failed to get latest history entry for monitor: ${getExpectedLoggedMonitorId(monitorId)}`,
                         dbError
                     );
                 }
