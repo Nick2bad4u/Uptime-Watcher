@@ -299,7 +299,7 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 (insertQuery, params) => {
                     // Arrange
                     const expectedResult = {
-                        id: Math.floor(Math.random() * 1000) + 1,
+                        id: 101,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                     };

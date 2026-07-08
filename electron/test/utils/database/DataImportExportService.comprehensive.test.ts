@@ -1694,7 +1694,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                                         ? ("up" as const)
                                         : ("down" as const),
                                 timestamp: Date.now() - i * 1000,
-                                responseTime: Math.random() * 200,
+                                responseTime: (i + 1) * 40,
                             })),
                         },
                         {

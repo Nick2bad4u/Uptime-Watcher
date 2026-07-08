@@ -572,13 +572,13 @@ describe("Utility Files - Missing Branch Coverage", () => {
             const start = Date.now();
 
             for (let i = 0; i < 1000; i++) {
-                const random = Math.random();
+                const deterministicRatio = i / 1000;
                 const timestamp = Date.now();
                 const stringValue = String(i);
                 const numberValue = Number(stringValue);
 
                 // Use values to avoid unused variable warnings
-                expect(typeof random).toBe("number");
+                expect(typeof deterministicRatio).toBe("number");
                 expect(typeof timestamp).toBe("number");
                 expect(typeof stringValue).toBe("string");
                 expect(typeof numberValue).toBe("number");

@@ -268,7 +268,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
                     new Promise((resolve) =>
                         setTimeout(() => {
                             resolve(`result-${i}`);
-                        }, Math.random() * 10)
+                        }, i % 10)
                     )
             );
 
@@ -570,7 +570,7 @@ describe("Service Edge Cases - Missing Branch Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const operations = [
-                () => Math.random(),
+                () => 0.5,
                 () => Date.now(),
                 () => JSON.stringify({ test: "data" }),
                 () => Array.from({ length: 100 }, (_, i) => i),
