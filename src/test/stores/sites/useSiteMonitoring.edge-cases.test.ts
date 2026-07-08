@@ -337,6 +337,111 @@ describe("useSiteMonitoring edge cases", () => {
         }
     });
 
+    it("preserves unrelated site changes when reverting failed optimistic updates", async () => {
+        vi.useFakeTimers();
+        try {
+            const site: Site = {
+                identifier: "site-concurrent-revert",
+                monitoring: true,
+                monitors: [
+                    {
+                        activeOperations: [],
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "monitor-concurrent-revert",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 10_000,
+                        type: "http",
+                        url: "https://monitor.example.com",
+                    },
+                ],
+                name: "Concurrent Revert Site",
+            } satisfies Site;
+            const unrelatedSite: Site = {
+                identifier: "site-added-while-pending",
+                monitoring: true,
+                monitors: [],
+                name: "Added While Pending",
+            } satisfies Site;
+
+            let currentSites: Site[] = [structuredClone(site)];
+            const getSites = vi.fn(() => currentSites);
+            const setSites = vi.fn((sites: Site[]) => {
+                currentSites = sites;
+            });
+            const registerMonitoringLock = vi.fn();
+            const clearOptimisticMonitoringLocks = vi.fn();
+
+            const failure = new Error("stop failed after concurrent update");
+            let rejectOperation: ((error: Error) => void) | undefined;
+            monitoringService.stopMonitoringForMonitor.mockImplementationOnce(
+                async () =>
+                    new Promise<void>((_resolve, reject) => {
+                        rejectOperation = reject;
+                    })
+            );
+
+            const actions = createSiteMonitoringActions({
+                applyStatusUpdate,
+                clearOptimisticMonitoringLocks,
+                getSites,
+                monitoringService,
+                registerMonitoringLock,
+                setSites,
+            });
+
+            const pending = actions.stopSiteMonitorMonitoring(
+                site.identifier,
+                "monitor-concurrent-revert"
+            );
+
+            await vi.advanceTimersByTimeAsync(75);
+            currentSites = [
+                {
+                    ...site,
+                    monitors: site.monitors.map((monitor) => ({
+                        ...monitor,
+                        monitoring: false,
+                        responseTime: 42,
+                    })),
+                },
+                unrelatedSite,
+            ];
+
+            if (!rejectOperation) {
+                throw new Error("Expected pending monitoring operation");
+            }
+            rejectOperation(failure);
+
+            await expect(pending).rejects.toThrow(failure);
+
+            const revertedSite = currentSites.find(
+                ({ identifier }) => identifier === site.identifier
+            );
+            const revertedMonitor = revertedSite?.monitors.find(
+                ({ id }) => id === "monitor-concurrent-revert"
+            );
+
+            expect(
+                currentSites.some(
+                    ({ identifier }) =>
+                        identifier === unrelatedSite.identifier
+                )
+            ).toBeTruthy();
+            expect(revertedMonitor?.monitoring).toBeTruthy();
+            expect(revertedMonitor?.responseTime).toBe(42);
+            expect(clearOptimisticMonitoringLocks).toHaveBeenCalledWith(
+                site.identifier,
+                ["monitor-concurrent-revert"]
+            );
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     it("applies optimistic updates for individual monitor operations", async () => {
         vi.useFakeTimers();
         try {

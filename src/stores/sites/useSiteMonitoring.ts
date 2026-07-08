@@ -228,11 +228,11 @@ export const createSiteMonitoringActions = (
             readonly snapshotForRollback?: boolean;
         } = {}
     ): { readonly revert: () => void; readonly whenReady: Promise<void> } => {
-        const previousSites: Site[] | undefined = snapshotForRollback
-            ? structuredClone(getSites())
-            : undefined;
-
         let isApplied = false;
+        const rollbackMonitorStates = new Map<
+            Monitor["id"],
+            Monitor["monitoring"]
+        >();
         const updatedMonitorIds = new Set<string>();
         let resolveReady: (() => void) | null = null;
         const whenReady = new Promise<void>((resolve) => {
@@ -266,6 +266,15 @@ export const createSiteMonitoringActions = (
                 } else {
                     isMonitorStateChanged = true;
                     updatedMonitorIds.add(monitor.id);
+                    if (
+                        snapshotForRollback &&
+                        !rollbackMonitorStates.has(monitor.id)
+                    ) {
+                        rollbackMonitorStates.set(
+                            monitor.id,
+                            monitor.monitoring
+                        );
+                    }
                     updatedMonitors.push({
                         ...monitor,
                         monitoring,
@@ -371,8 +380,55 @@ export const createSiteMonitoringActions = (
                 clearOptimisticMonitoringLocks(siteIdentifier, monitorIds);
             }
 
-            if (previousSites) {
-                setSites(previousSites);
+            if (rollbackMonitorStates.size > 0) {
+                const currentSites = getSites();
+                let isRollbackApplied = false;
+                const revertedSites: Site[] = [];
+
+                for (const site of currentSites) {
+                    if (site.identifier !== siteIdentifier) {
+                        revertedSites.push(site);
+                        continue;
+                    }
+
+                    let isSiteChanged = false;
+                    const revertedMonitors: Monitor[] = [];
+
+                    for (const monitor of site.monitors) {
+                        const previousMonitoring = rollbackMonitorStates.get(
+                            monitor.id
+                        );
+
+                        if (
+                            !isDefined(previousMonitoring) ||
+                            monitor.monitoring === previousMonitoring
+                        ) {
+                            revertedMonitors.push(monitor);
+                            continue;
+                        }
+
+                        isSiteChanged = true;
+                        revertedMonitors.push({
+                            ...monitor,
+                            monitoring: previousMonitoring,
+                        });
+                    }
+
+                    if (!isSiteChanged) {
+                        revertedSites.push(site);
+                        continue;
+                    }
+
+                    isRollbackApplied = true;
+                    revertedSites.push({
+                        ...site,
+                        monitors: revertedMonitors,
+                    });
+                }
+
+                if (isRollbackApplied) {
+                    setSites(revertedSites);
+                }
             }
         };
 
