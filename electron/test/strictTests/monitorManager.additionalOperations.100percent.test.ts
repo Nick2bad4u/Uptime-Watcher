@@ -340,6 +340,55 @@ describe("monitorManager additional operations", () => {
             );
         });
 
+        it("refreshes the cached monitor snapshot after a successful manual check", async () => {
+            const eventEmitter =
+                createMockEventBus() as unknown as TypedEventBus<UptimeEvents>;
+            const sitesCache =
+                createMockStandardizedCache<Site>() as unknown as StandardizedCache<Site>;
+
+            const staleMonitor = createTestMonitor("m1", {
+                responseTime: 0,
+                status: "pending",
+            });
+            const site = createTestSite("s1", {
+                monitors: [staleMonitor],
+            });
+            sitesCache.set(site.identifier, site);
+
+            const freshMonitor = {
+                ...staleMonitor,
+                responseTime: 42,
+                status: "up",
+            } satisfies Monitor;
+            const statusUpdate = createStatusUpdate({
+                monitor: freshMonitor,
+                site,
+            });
+
+            const checkMonitor = vi.fn().mockResolvedValue(statusUpdate);
+            const dependencies = {
+                checkMonitor,
+                eventEmitter,
+                logger: { warn: vi.fn() } as unknown as Logger,
+                sitesCache,
+            };
+
+            await expect(
+                checkSiteManuallyOperation({
+                    dependencies,
+                    identifier: "s1",
+                    monitorId: "m1",
+                })
+            ).resolves.toBe(statusUpdate);
+
+            const cachedSite = sitesCache.get("s1");
+            expect(cachedSite).toBeDefined();
+            expect(cachedSite).not.toBe(site);
+            expect(cachedSite?.monitors[0]).toEqual(freshMonitor);
+            expect(site.monitors[0]).toBe(staleMonitor);
+            expect(site.monitors[0]?.status).toBe("pending");
+        });
+
         it("falls back to the first monitor ID when monitorId is omitted", async () => {
             const eventEmitter =
                 createMockEventBus() as unknown as TypedEventBus<UptimeEvents>;

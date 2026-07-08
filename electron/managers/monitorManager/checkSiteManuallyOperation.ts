@@ -36,6 +36,28 @@ export interface CheckSiteManuallyDependencies {
     readonly sitesCache: StandardizedCache<Site>;
 }
 
+function refreshManualCheckCache(args: {
+    readonly result: StatusUpdate;
+    readonly site: Site;
+    readonly sitesCache: StandardizedCache<Site>;
+}): void {
+    const { result, site, sitesCache } = args;
+
+    const monitorIndex = site.monitors.findIndex(
+        (monitor) => monitor.id === result.monitorId
+    );
+    if (monitorIndex === -1) {
+        return;
+    }
+
+    const updatedSite = structuredClone(site);
+    updatedSite.monitors = updatedSite.monitors.map((monitor, index) =>
+        index === monitorIndex ? structuredClone(result.monitor) : monitor
+    );
+
+    sitesCache.set(site.identifier, updatedSite);
+}
+
 /**
  * Triggers a manual check for a site monitor and emits completion events.
  *
@@ -61,6 +83,12 @@ export async function checkSiteManuallyOperation(args: {
 
             // Only emit event if result is available
             if (result) {
+                refreshManualCheckCache({
+                    result,
+                    site,
+                    sitesCache: dependencies.sitesCache,
+                });
+
                 await dependencies.eventEmitter.emitTyped(
                     "internal:monitor:manual-check-completed",
                     {
