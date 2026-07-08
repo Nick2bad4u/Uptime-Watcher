@@ -2,10 +2,10 @@ import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
 
 /** Maximum byte budget accepted for cloud encryption passphrases. */
-export const CLOUD_ENCRYPTION_PASSPHRASE_MAX_BYTES = 1024;
+const CLOUD_ENCRYPTION_PASSPHRASE_MAX_BYTES = 1024;
 
 /** Minimum trimmed character length accepted for cloud encryption passphrases. */
-export const CLOUD_ENCRYPTION_PASSPHRASE_MIN_TRIMMED_LENGTH = 8;
+const CLOUD_ENCRYPTION_PASSPHRASE_MIN_TRIMMED_LENGTH = 8;
 
 export interface CloudEncryptionPassphraseMessages {
     readonly controlCharacters: string;
