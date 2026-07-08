@@ -227,6 +227,10 @@ export function validateHttpUrlCandidate(
     if (
         !isValidUrl(normalizedUrl, {
             disallowAuth,
+            protocols: ["http", "https"],
+            require_host: true,
+            require_protocol: true,
+            require_tld: false,
         })
     ) {
         return {

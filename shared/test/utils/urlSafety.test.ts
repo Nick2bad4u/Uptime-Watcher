@@ -273,8 +273,17 @@ describe("urlSafety", () => {
         });
 
         it("rejects non-http(s) protocols", () => {
-            const result = validateHttpUrlCandidate("mailto:test@example.com");
-            expect(result.ok).toBeFalsy();
+            expect(
+                validateHttpUrlCandidate("mailto:test@example.com").ok
+            ).toBeFalsy();
+            expect(
+                validateHttpUrlCandidate("ftp://example.com/file.txt").ok
+            ).toBeFalsy();
+        });
+
+        it("rejects HTTP URLs without an explicit protocol", () => {
+            expect(validateHttpUrlCandidate("example.com").ok).toBeFalsy();
+            expect(validateHttpUrlCandidate("//example.com").ok).toBeFalsy();
         });
 
         it("rejects http(s) URLs containing CR/LF", () => {
