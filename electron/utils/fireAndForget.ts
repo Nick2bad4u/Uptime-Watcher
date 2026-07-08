@@ -11,7 +11,9 @@
 /**
  * Minimal logger shape for background task error reporting.
  */
-import type { UnknownArray } from "type-fest";
+import type { Promisable, UnknownArray } from "type-fest";
+
+type BackgroundTask = () => Promisable<void>;
 
 export interface BackgroundTaskLogger {
     error: (message: string, error?: unknown, ...args: unknown[]) => void;
@@ -25,7 +27,7 @@ export interface FireAndForgetLoggedArgs {
     /** Optional extra logger args (structured context, etc.). */
     loggerArgs?: Readonly<UnknownArray>;
     message: string;
-    task: () => Promise<void>;
+    task: BackgroundTask;
 }
 
 /**
@@ -45,7 +47,7 @@ export interface FireAndForgetOptions {
  * Starts an async task without awaiting it, ensuring rejections are handled.
  */
 export function fireAndForget(
-    task: () => Promise<void>,
+    task: BackgroundTask,
     options: FireAndForgetOptions
 ): void {
     void (async (): Promise<void> => {
