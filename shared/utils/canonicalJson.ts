@@ -9,15 +9,8 @@ import type { JsonValue } from "@shared/types/cloudSync";
 import type { JsonObject } from "type-fest";
 
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { objectEntries } from "ts-extras";
-
-function compareJsonObjectKeys(left: string, right: string): number {
-    if (left === right) {
-        return 0;
-    }
-
-    return left < right ? -1 : 1;
-}
 
 /**
  * Returns a JSON value with all object keys sorted recursively.
@@ -29,7 +22,7 @@ function createCanonicalJsonValue(value: JsonValue): JsonValue {
 
     if (isJsonRecord(value)) {
         const entries = objectEntries(value).toSorted(([a], [b]) =>
-            compareJsonObjectKeys(a, b)
+            compareStringsCodeUnit(a, b)
         );
         const result = createNullPrototypeObject<JsonObject>();
         for (const [key, entryValue] of entries) {

@@ -25,6 +25,7 @@ import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
 import { persistedDeviceIdSchema } from "@shared/validation/persistedDeviceIdValidation";
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import * as z from "zod";
 
 /**
@@ -204,14 +205,6 @@ const cloudSyncOperationInternalSchema: z.ZodType<CloudSyncOperation> = z
 const cloudSyncOperationSchema: typeof cloudSyncOperationInternalSchema =
     cloudSyncOperationInternalSchema;
 
-function compareSyncStrings(a: string, b: string): number {
-    if (a === b) {
-        return 0;
-    }
-
-    return a < b ? -1 : 1;
-}
-
 /**
  * Parses a candidate into a {@link CloudSyncOperation}.
  *
@@ -241,7 +234,7 @@ export function compareCloudSyncWriteKey(
         return a.timestamp - b.timestamp;
     }
 
-    const deviceCompare = compareSyncStrings(a.deviceId, b.deviceId);
+    const deviceCompare = compareStringsCodeUnit(a.deviceId, b.deviceId);
     if (deviceCompare !== 0) {
         return deviceCompare;
     }

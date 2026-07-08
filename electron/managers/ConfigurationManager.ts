@@ -61,6 +61,7 @@ import { CacheKeys } from "@shared/utils/cacheKeys";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { getNativeDateEpochMs } from "@shared/utils/nativeDate";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { isEmpty } from "ts-extras";
 
@@ -137,9 +138,7 @@ function normalizeValidationCacheKeyValue(
     const normalized = createNullPrototypeObject<Record<string, unknown>>();
 
     try {
-        for (const key of Object.keys(value).toSorted((a, b) =>
-            a.localeCompare(b)
-        )) {
+        for (const key of Object.keys(value).toSorted(compareStringsCodeUnit)) {
             const property = getOwnDataProperty(value, key);
             if (!property.found) {
                 continue;

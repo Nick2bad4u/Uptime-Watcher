@@ -19,6 +19,7 @@ import { readNumberEnv } from "@shared/utils/environment";
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeJsonParse } from "@shared/utils/jsonSafety";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
 import {
     arrayJoin,
@@ -543,7 +544,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
         }
 
         return [...byKey.values()].toSorted((a, b) =>
-            a.key.localeCompare(b.key)
+            compareStringsCodeUnit(a.key, b.key)
         );
     }
 

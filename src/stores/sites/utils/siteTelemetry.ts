@@ -7,6 +7,7 @@
 import type { Monitor, Site } from "@shared/types";
 
 import { getSafeIdentifierForLogging } from "@shared/utils/identifierLogging";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { isDefined } from "ts-extras";
 
@@ -76,9 +77,7 @@ export const buildSiteUpdateTelemetry = (
     updates: Partial<Site>
 ): SitesTelemetryPayload => ({
     siteIdentifier: safeTextForTelemetry(identifier),
-    updateFields: Object.keys(updates).toSorted((left, right) =>
-        left.localeCompare(right)
-    ),
+    updateFields: Object.keys(updates).toSorted(compareStringsCodeUnit),
     ...(isDefined(updates.monitoring) && { monitoring: updates.monitoring }),
     ...buildMonitorListTelemetry(updates.monitors),
 });

@@ -11,6 +11,7 @@
 
 import type { Site } from "@shared/types";
 
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { arrayJoin, isEmpty, setHas } from "ts-extras";
 
 /**
@@ -92,7 +93,7 @@ function collectDuplicateSiteIdentifiers(
         .filter((entry): entry is IdentifierCountEntry => entry[1] > 1)
         .map(([identifier, occurrences]) => ({ identifier, occurrences }))
         .toSorted((left, right) =>
-            left.identifier.localeCompare(right.identifier)
+            compareStringsCodeUnit(left.identifier, right.identifier)
         );
 }
 

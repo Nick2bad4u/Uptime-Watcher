@@ -15,6 +15,7 @@ import {
     normalizeLogValue,
     withLogContext,
 } from "@shared/utils/loggingContext";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { MAX_VALID_DATE_EPOCH_MS } from "@shared/validation/timestampSchemas";
@@ -246,9 +247,7 @@ export function registerDiagnosticsHandlers({
             const isRegistered = setHas(registeredHandlerSet, channelRaw);
 
             const availableChannels = includeInventory
-                ? [...registeredHandlers].toSorted((left, right) =>
-                      left.localeCompare(right)
-                  )
+                ? [...registeredHandlers].toSorted(compareStringsCodeUnit)
                 : [];
 
             if (isRegistered) {

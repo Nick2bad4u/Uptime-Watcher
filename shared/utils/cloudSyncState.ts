@@ -22,6 +22,7 @@ import {
     setCloudSyncEntityValue as setEntityValue,
     setCloudSyncFieldValue as setFieldValue,
 } from "@shared/utils/cloudSyncStateMaps";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import {
     isDefined,
     objectEntries,
@@ -40,34 +41,6 @@ const OPERATION_KIND_RANK: Readonly<
     "delete-entity": 1,
     "set-field": 0,
 });
-
-function compareStrings(a: string, b: string): number {
-    if (a === b) {
-        return 0;
-    }
-
-    const aChars = [...a];
-    const bChars = [...b];
-    const length = Math.min(aChars.length, bChars.length);
-
-    for (let index = 0; index < length; index += 1) {
-        const charA = aChars[index];
-        const charB = bChars[index];
-
-        if (charA !== charB) {
-            const safeCodePointA = charA?.codePointAt(0) ?? 0;
-            const safeCodePointB = charB?.codePointAt(0) ?? 0;
-
-            if (safeCodePointA === safeCodePointB) {
-                return 0;
-            }
-
-            return safeCodePointA < safeCodePointB ? -1 : 1;
-        }
-    }
-
-    return aChars.length < bChars.length ? -1 : 1;
-}
 
 function getWriteKey(operation: CloudSyncOperation): CloudSyncWriteKey {
     return {
@@ -99,12 +72,15 @@ function compareOperationsDeterministic(
     }
 
     // Secondary: entity identity.
-    const entityTypeCompare = compareStrings(left.entityType, right.entityType);
+    const entityTypeCompare = compareStringsCodeUnit(
+        left.entityType,
+        right.entityType
+    );
     if (entityTypeCompare !== 0) {
         return entityTypeCompare;
     }
 
-    const idCompare = compareStrings(left.entityId, right.entityId);
+    const idCompare = compareStringsCodeUnit(left.entityId, right.entityId);
     if (idCompare !== 0) {
         return idCompare;
     }
@@ -117,14 +93,14 @@ function compareOperationsDeterministic(
     }
 
     if (left.kind === "set-field" && right.kind === "set-field") {
-        const fieldCompare = compareStrings(left.field, right.field);
+        const fieldCompare = compareStringsCodeUnit(left.field, right.field);
         if (fieldCompare !== 0) {
             return fieldCompare;
         }
 
         const leftValue = stringifyJsonValueStable(left.value);
         const rightValue = stringifyJsonValueStable(right.value);
-        const valueCompare = compareStrings(leftValue, rightValue);
+        const valueCompare = compareStringsCodeUnit(leftValue, rightValue);
         if (valueCompare !== 0) {
             return valueCompare;
         }
@@ -162,7 +138,7 @@ function compareOperationsDeterministic(
                 : undefined,
     });
 
-    return compareStrings(leftKey, rightKey);
+    return compareStringsCodeUnit(leftKey, rightKey);
 }
 
 function createEmptyState(): MutableCloudSyncState {

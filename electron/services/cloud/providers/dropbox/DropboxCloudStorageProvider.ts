@@ -5,6 +5,7 @@ import {
     normalizeProviderObjectKey,
 } from "@shared/utils/cloudKeyNormalization";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
@@ -407,7 +408,7 @@ export class DropboxCloudStorageProvider
             hasMore = nextHasMore;
         }
 
-        objects.sort((a, b) => a.key.localeCompare(b.key));
+        objects.sort((a, b) => compareStringsCodeUnit(a.key, b.key));
         return objects;
     }
 

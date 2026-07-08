@@ -10,6 +10,7 @@ import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isAsciiDigits } from "@shared/utils/ascii";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { safeParseIsoTimestamp } from "@shared/validation/statusUpdateSchemas";
 import {
     arrayAt,
@@ -363,7 +364,9 @@ export class GoogleDriveCloudStorageProvider
                 startPrefix
             );
 
-            return entries.toSorted((a, b) => a.key.localeCompare(b.key));
+            return entries.toSorted((a, b) =>
+                compareStringsCodeUnit(a.key, b.key)
+            );
         } catch (error) {
             const detail = tryDescribeGoogleDriveApiError(error);
             const suffix = detail ? `: ${detail}` : "";

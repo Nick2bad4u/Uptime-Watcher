@@ -11,6 +11,7 @@ import {
 import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { randomUUID } from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
@@ -368,7 +369,7 @@ export class FilesystemCloudStorageProvider
 
             await walk(startDirectory);
 
-            results.sort((a, b) => a.key.localeCompare(b.key));
+            results.sort((a, b) => compareStringsCodeUnit(a.key, b.key));
             return results;
         } catch (error) {
             const code = tryGetErrorCode(error);

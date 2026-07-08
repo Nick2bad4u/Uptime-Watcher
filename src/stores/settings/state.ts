@@ -7,6 +7,7 @@ import {
 import { MAX_MUTED_SITE_NOTIFICATION_IDENTIFIERS } from "@shared/types/notifications";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { safeNumberConversion } from "@shared/utils/safeConversions";
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { isValidSiteIdentifier } from "@shared/validation/identifierValidation";
 import { isFinite as isFiniteNumber, objectKeys } from "ts-extras";
 
@@ -134,7 +135,7 @@ const buildSettingsUpdateTelemetry = (
 ): Record<string, unknown> => {
     const changedFields = objectKeys(newSettings)
         .filter((key) => getOwnDataProperty(newSettings, key).found)
-        .toSorted((left, right) => left.localeCompare(right));
+        .toSorted(compareStringsCodeUnit);
     const telemetry: Record<string, unknown> = { changedFields };
 
     const autoStart = getSettingsCandidateValue(newSettings, "autoStart");

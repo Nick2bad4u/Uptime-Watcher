@@ -1,6 +1,7 @@
 import type { CloudSyncManifest } from "@shared/types/cloudSyncManifest";
 import type { CloudSyncResetPreview } from "@shared/types/cloudSyncResetPreview";
 
+import { compareStringsCodeUnit } from "@shared/utils/stringOrdering";
 import { isDefined, objectKeys } from "ts-extras";
 
 import type { CloudObjectEntry } from "../providers/CloudStorageProvider.types";
@@ -78,10 +79,12 @@ export function buildCloudSyncResetPreview(args: {
     }
 
     const perDevice = [...perDeviceMap.values()];
-    perDevice.sort((a, b) => a.deviceId.localeCompare(b.deviceId));
+    perDevice.sort((a, b) =>
+        compareStringsCodeUnit(a.deviceId, b.deviceId)
+    );
 
     const deviceIds = objectKeys(args.manifest.devices);
-    deviceIds.sort((a, b) => a.localeCompare(b));
+    deviceIds.sort(compareStringsCodeUnit);
 
     return {
         deviceIds,
