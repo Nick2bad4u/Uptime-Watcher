@@ -8,12 +8,25 @@ function getEnumerableOwnDataEntries(
         return null;
     }
 
-    const entries: [string, unknown][] = [];
-    for (const key of Object.keys(value)) {
-        const descriptor = Object.getOwnPropertyDescriptor(value, key);
-        if (descriptor?.enumerable && "value" in descriptor) {
-            entries.push([key, descriptor.value]);
+    try {
+        const prototype: unknown = Object.getPrototypeOf(value);
+        if (prototype !== null && prototype !== Object.prototype) {
+            return null;
         }
+    } catch {
+        return null;
+    }
+
+    const entries: [string, unknown][] = [];
+    try {
+        for (const key of Object.keys(value)) {
+            const descriptor = Object.getOwnPropertyDescriptor(value, key);
+            if (descriptor?.enumerable && "value" in descriptor) {
+                entries.push([key, descriptor.value]);
+            }
+        }
+    } catch {
+        return null;
     }
 
     return entries;
