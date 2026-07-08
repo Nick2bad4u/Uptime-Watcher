@@ -27,8 +27,8 @@ import {
     safeParseStringResult,
 } from "../core/bridgeFactory";
 import {
-    acceptUnusedPreloadArguments,
     createPreloadDomain,
+    rejectUnavailablePreloadCall,
 } from "../utils/preloadDomainFactory";
 
 /**
@@ -178,30 +178,18 @@ const createMonitorTypesApiFallback = (
     ({
         formatMonitorDetail: (
             ...args: Parameters<MonitorTypesApiInterface["formatMonitorDetail"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         formatMonitorTitleSuffix: (
             ...args: Parameters<
                 MonitorTypesApiInterface["formatMonitorTitleSuffix"]
             >
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         getMonitorTypes: (
             ...args: Parameters<MonitorTypesApiInterface["getMonitorTypes"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         validateMonitorData: (
             ...args: Parameters<MonitorTypesApiInterface["validateMonitorData"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
     }) as const;
 
 export const monitorTypesApi: MonitorTypesApiInterface = createPreloadDomain({

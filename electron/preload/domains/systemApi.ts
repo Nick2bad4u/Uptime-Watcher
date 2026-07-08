@@ -21,8 +21,8 @@ import {
     safeParseBooleanResult,
 } from "../core/bridgeFactory";
 import {
-    acceptUnusedPreloadArguments,
     createPreloadDomain,
+    rejectUnavailablePreloadCall,
 } from "../utils/preloadDomainFactory";
 
 /**
@@ -98,22 +98,13 @@ const createSystemApiFallback = (unavailableError: Error): SystemApiInterface =>
     ({
         openExternal: (
             ...args: Parameters<SystemApiInterface["openExternal"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         quitAndInstall: (
             ...args: Parameters<SystemApiInterface["quitAndInstall"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         writeClipboardText: (
             ...args: Parameters<SystemApiInterface["writeClipboardText"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
     }) as const;
 
 export const systemApi: SystemApiInterface = createPreloadDomain({

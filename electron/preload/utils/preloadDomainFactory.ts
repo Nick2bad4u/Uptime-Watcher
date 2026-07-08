@@ -46,6 +46,22 @@ export function acceptUnusedPreloadArguments(
 }
 
 /**
+ * Rejects a preload fallback method call with the domain initialization error.
+ *
+ * @remarks
+ * Fallback methods intentionally keep the same async shape as the real bridge
+ * methods. Returning `Promise<never>` preserves assignability to any concrete
+ * preload method promise while keeping the rejection behavior centralized.
+ */
+export async function rejectUnavailablePreloadCall(
+    unavailableError: Error,
+    ...args: Readonly<UnknownArray>
+): Promise<never> {
+    acceptUnusedPreloadArguments(...args);
+    throw unavailableError;
+}
+
+/**
  * Safely constructs a preload domain API.
  *
  * @remarks

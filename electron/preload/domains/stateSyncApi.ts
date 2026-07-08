@@ -23,8 +23,8 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import { createValidatedInvoker } from "../core/bridgeFactory";
 import {
-    acceptUnusedPreloadArguments,
     createPreloadDomain,
+    rejectUnavailablePreloadCall,
 } from "../utils/preloadDomainFactory";
 
 /**
@@ -95,16 +95,10 @@ const createStateSyncApiFallback = (
     ({
         getSyncStatus: (
             ...args: Parameters<StateSyncApiInterface["getSyncStatus"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         requestFullSync: (
             ...args: Parameters<StateSyncApiInterface["requestFullSync"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
     }) as const;
 
 export const stateSyncApi: StateSyncApiInterface = createPreloadDomain({

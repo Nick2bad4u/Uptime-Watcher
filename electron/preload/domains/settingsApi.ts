@@ -21,8 +21,8 @@ import {
     safeParseNonNegativeIntResult,
 } from "../core/bridgeFactory";
 import {
-    acceptUnusedPreloadArguments,
     createPreloadDomain,
+    rejectUnavailablePreloadCall,
 } from "../utils/preloadDomainFactory";
 
 /**
@@ -109,22 +109,13 @@ const createSettingsApiFallback = (
     ({
         getHistoryLimit: (
             ...args: Parameters<SettingsApiInterface["getHistoryLimit"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         resetSettings: (
             ...args: Parameters<SettingsApiInterface["resetSettings"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         updateHistoryLimit: (
             ...args: Parameters<SettingsApiInterface["updateHistoryLimit"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
     }) as const;
 
 export const settingsApi: SettingsApiInterface = createPreloadDomain({

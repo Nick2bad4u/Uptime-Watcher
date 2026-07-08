@@ -16,8 +16,8 @@ import { ensureError } from "@shared/utils/errorHandling";
 
 import { createVoidInvoker } from "../core/bridgeFactory";
 import {
-    acceptUnusedPreloadArguments,
     createPreloadDomain,
+    rejectUnavailablePreloadCall,
 } from "../utils/preloadDomainFactory";
 
 /**
@@ -71,16 +71,10 @@ const createNotificationsApiFallback = (
     ({
         notifyAppEvent: (
             ...args: Parameters<NotificationsApiInterface["notifyAppEvent"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         updatePreferences: (
             ...args: Parameters<NotificationsApiInterface["updatePreferences"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
     }) as const;
 
 export const notificationsApi: NotificationsApiInterface = createPreloadDomain({

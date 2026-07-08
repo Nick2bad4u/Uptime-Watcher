@@ -26,8 +26,8 @@ import {
     safeParseStringResult,
 } from "../core/bridgeFactory";
 import {
-    acceptUnusedPreloadArguments,
     createPreloadDomain,
+    rejectUnavailablePreloadCall,
 } from "../utils/preloadDomainFactory";
 
 /**
@@ -153,30 +153,17 @@ const createDataApiFallback = (unavailableError: Error): DataApiInterface =>
     ({
         downloadSqliteBackup: (
             ...args: Parameters<DataApiInterface["downloadSqliteBackup"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
-        exportData: (...args: Parameters<DataApiInterface["exportData"]>) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
-        importData: (...args: Parameters<DataApiInterface["importData"]>) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
+        exportData: (...args: Parameters<DataApiInterface["exportData"]>) =>
+            rejectUnavailablePreloadCall(unavailableError, ...args),
+        importData: (...args: Parameters<DataApiInterface["importData"]>) =>
+            rejectUnavailablePreloadCall(unavailableError, ...args),
         restoreSqliteBackup: (
             ...args: Parameters<DataApiInterface["restoreSqliteBackup"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
         saveSqliteBackup: (
             ...args: Parameters<DataApiInterface["saveSqliteBackup"]>
-        ) => {
-            acceptUnusedPreloadArguments(...args);
-            return Promise.reject(unavailableError);
-        },
+        ) => rejectUnavailablePreloadCall(unavailableError, ...args),
     }) as const;
 
 export const dataApi: DataApiInterface = createPreloadDomain({
