@@ -54,6 +54,17 @@ const normalizeHistoryLimitError = (
     return primaryError;
 };
 
+const createHistoryLimitUpdateRejectedLogContext = (
+    error: Error,
+    requestedLimit: number
+): {
+    readonly error: string;
+    readonly requestedLimit: number;
+} => ({
+    error: error.message,
+    requestedLimit,
+});
+
 type IpcServiceHelpers = ReturnType<typeof getIpcServiceHelpers>;
 
 const { ensureInitialized, wrap } = ((): IpcServiceHelpers => {
@@ -180,9 +191,9 @@ export const SettingsService: SettingsServiceContract = {
      *
      * - If the caller supplies an invalid limit (for example, exceeding the
      *   configured maximum), the shared normaliser raises a {@link RangeError}.
-     *   In that case, this method ultimately throws a {@link TypeError} via
-     *   {@link normalizeHistoryLimitError} so renderer code can surface a
-     *   user-facing validation failure.
+     *   In that case, this method fails before invoking IPC and ultimately
+     *   throws a {@link TypeError} via {@link normalizeHistoryLimitError} so
+     *   renderer code can surface a user-facing validation failure.
      * - If the caller supplies a valid limit but the backend returns an invalid
      *   value, the method falls back to the sanitised version of the requested
      *   limit and logs a structured warning.
@@ -224,28 +235,32 @@ export const SettingsService: SettingsServiceContract = {
                 requestNormalizationError = ensureError(error);
             }
 
-            const updatedLimit = await api.settings.updateHistoryLimit(limit);
+            if (!isDefined(sanitizedRequestLimit)) {
+                const normalizedError =
+                    requestNormalizationError ??
+                    new Error("History limit request could not be normalised");
+
+                logger.warn(
+                    "History limit update rejected: requested limit could not be normalised",
+                    createHistoryLimitUpdateRejectedLogContext(
+                        normalizedError,
+                        limit
+                    )
+                );
+
+                throw normalizeHistoryLimitError(
+                    normalizedError,
+                    requestNormalizationError
+                );
+            }
+
+            const updatedLimit =
+                await api.settings.updateHistoryLimit(sanitizedRequestLimit);
 
             try {
                 return normalizeHistoryLimit(updatedLimit, historyRules);
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
-
-                if (!isDefined(sanitizedRequestLimit)) {
-                    logger.warn(
-                        "History limit update rejected: requested limit could not be normalised",
-                        {
-                            error: normalizedError.message,
-                            receivedValue: updatedLimit,
-                            requestedLimit: limit,
-                        }
-                    );
-
-                    throw normalizeHistoryLimitError(
-                        normalizedError,
-                        requestNormalizationError
-                    );
-                }
 
                 logger.warn(
                     "Received invalid history limit from backend; falling back to requested value",

@@ -386,7 +386,9 @@ describe("SettingsService", () => {
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
-                ).toHaveBeenCalledWith(limit);
+                ).toHaveBeenCalledWith(
+                    normalizeHistoryLimit(limit, DEFAULT_HISTORY_LIMIT_RULES)
+                );
                 expect(result).toBe(expectedLimit);
             }
 
@@ -412,7 +414,9 @@ describe("SettingsService", () => {
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
-                ).toHaveBeenCalledWith(limit);
+                ).toHaveBeenCalledWith(
+                    normalizeHistoryLimit(limit, DEFAULT_HISTORY_LIMIT_RULES)
+                );
                 expect(result).toBe(expectedLimit);
             }
 
@@ -420,19 +424,20 @@ describe("SettingsService", () => {
 
             for (const limit of rejectingEdgeCases) {
                 mockLogger.warn.mockClear();
-                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
-                    limit
-                );
+                mockElectronAPI.settings.updateHistoryLimit.mockClear();
 
                 await expect(
                     SettingsService.updateHistoryLimit(limit)
                 ).rejects.toThrow(RangeError);
 
+                expect(
+                    mockElectronAPI.settings.updateHistoryLimit
+                ).not.toHaveBeenCalled();
+
                 expect(mockLogger.warn).toHaveBeenCalledWith(
                     "History limit update rejected: requested limit could not be normalised",
                     expect.objectContaining({
                         error: expect.any(String),
-                        receivedValue: limit,
                         requestedLimit: limit,
                     })
                 );
@@ -448,17 +453,17 @@ describe("SettingsService", () => {
             ];
 
             for (const limit of floatValues) {
+                const expectedLimit = normalizeHistoryLimit(
+                    limit,
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
-                    Math.floor(limit)
+                    expectedLimit
                 );
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
-                ).toHaveBeenCalledWith(limit);
-                const expectedLimit = normalizeHistoryLimit(
-                    Math.floor(limit),
-                    DEFAULT_HISTORY_LIMIT_RULES
-                );
+                ).toHaveBeenCalledWith(expectedLimit);
                 expect(result).toBe(expectedLimit);
             }
         });
@@ -668,19 +673,20 @@ describe("SettingsService", () => {
                 expect(mockLogger.warn).not.toHaveBeenCalled();
             }
 
-            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
-                Number.MAX_VALUE
-            );
+            mockElectronAPI.settings.updateHistoryLimit.mockClear();
 
             await expect(
                 SettingsService.updateHistoryLimit(Number.MAX_VALUE)
             ).rejects.toThrow(TypeError);
 
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
+            ).not.toHaveBeenCalled();
+
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "History limit update rejected: requested limit could not be normalised",
                 expect.objectContaining({
                     error: expect.any(String),
-                    receivedValue: Number.MAX_VALUE,
                     requestedLimit: Number.MAX_VALUE,
                 })
             );
@@ -706,7 +712,12 @@ describe("SettingsService", () => {
                         await SettingsService.updateHistoryLimit(value);
                     expect(
                         mockElectronAPI.settings.updateHistoryLimit
-                    ).toHaveBeenCalledWith(value);
+                    ).toHaveBeenCalledWith(
+                        normalizeHistoryLimit(
+                            value,
+                            DEFAULT_HISTORY_LIMIT_RULES
+                        )
+                    );
                     expect(result).toBe(
                         normalizeHistoryLimit(
                             value,
@@ -715,20 +726,17 @@ describe("SettingsService", () => {
                     );
                     expect(mockLogger.warn).not.toHaveBeenCalled();
                 } else {
-                    mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
-                        value
-                    );
+                    mockElectronAPI.settings.updateHistoryLimit.mockClear();
                     await expect(
                         SettingsService.updateHistoryLimit(value)
                     ).rejects.toThrow();
                     expect(
                         mockElectronAPI.settings.updateHistoryLimit
-                    ).toHaveBeenCalledWith(value);
+                    ).not.toHaveBeenCalled();
                     expect(mockLogger.warn).toHaveBeenCalledWith(
                         "History limit update rejected: requested limit could not be normalised",
                         expect.objectContaining({
                             error: expect.any(String),
-                            receivedValue: value,
                             requestedLimit: value,
                         })
                     );
