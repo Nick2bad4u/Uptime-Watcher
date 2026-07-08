@@ -1,6 +1,5 @@
 import type { UnknownRecord } from "type-fest";
 
-import { isRecord as isSharedRecord } from "@shared/utils/typeHelpers";
 import { isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 /**
@@ -17,8 +16,18 @@ export function createStringUnionGuard<T extends string>(
 /**
  * Narrow an unknown value to `UnknownRecord`.
  */
-export const isUnknownRecord = (value: unknown): value is UnknownRecord =>
-    isSharedRecord(value);
+export function isUnknownRecord(value: unknown): value is UnknownRecord {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false;
+    }
+
+    try {
+        const prototype: unknown = Object.getPrototypeOf(value);
+        return prototype === null || prototype === Object.prototype;
+    } catch {
+        return false;
+    }
+}
 
 /**
  * Checks that a value is a finite number suitable for timestamps.

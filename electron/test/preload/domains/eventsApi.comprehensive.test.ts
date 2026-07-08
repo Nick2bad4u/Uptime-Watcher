@@ -1077,6 +1077,55 @@ describe("Events Domain API", () => {
 
             expect(callback).toHaveBeenCalledWith(mockEventData);
         });
+
+        it("should handle null-prototype test event data", () => {
+            const callback = vi.fn();
+            const mockEventData = Object.assign(Object.create(null), {
+                message: "Test event triggered",
+                timestamp: Date.now(),
+            }) as TestEventData;
+
+            eventsApi.onTestEvent(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, mockEventData);
+
+            expect(callback).toHaveBeenCalledWith(mockEventData);
+        });
+
+        it("should drop exotic object test event data", () => {
+            for (const mockEventData of [
+                new Date(),
+                new Map<string, unknown>(),
+                Object.create({ inherited: true }) as Record<string, unknown>,
+            ]) {
+                mockIpcRenderer.on.mockClear();
+                diagnosticsWarnSpy.mockClear();
+                guardFailureSpy.mockClear();
+                const callback = vi.fn();
+
+                eventsApi.onTestEvent(callback);
+
+                const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+                eventHandler?.({}, mockEventData);
+
+                expect(callback).not.toHaveBeenCalled();
+                expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                    "[eventsApi] Dropped malformed payload for 'test-event'",
+                    expect.objectContaining({
+                        guard: "isTestEventDataPayload",
+                        payloadType: "object",
+                    })
+                );
+                expect(guardFailureSpy).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        channel: "test-event",
+                        guard: "isTestEventDataPayload",
+                        reason: "payload-validation",
+                    })
+                );
+            }
+        });
     });
 
     describe("onUpdateStatus", () => {
