@@ -11,10 +11,14 @@ import { arrayJoin } from "ts-extras";
 
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { deriveStatusSubscriptionHealth } from "../../hooks/useStatusSubscriptionHealth";
+import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { AppIcons } from "../../utils/icons";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import {
@@ -105,14 +109,24 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
 
     const handleRetry = useCallback(() => {
         setIsRetrying(true);
-        void (async (): Promise<void> => {
-            try {
-                const result = await retryStatusSubscription();
-                setLastAttempt(result);
-            } finally {
-                setIsRetrying(false);
+        fireAndForget(
+            async () => {
+                try {
+                    const result = await retryStatusSubscription();
+                    setLastAttempt(result);
+                } finally {
+                    setIsRetrying(false);
+                }
+            },
+            {
+                onError: (error) => {
+                    logger.warn(
+                        "Failed to retry realtime status subscription",
+                        ensureError(error)
+                    );
+                },
             }
-        })();
+        );
     }, [retryStatusSubscription]);
 
     const tooltipContent = useMemo(

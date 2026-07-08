@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { safeCastTo } from "ts-extras";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { StatusUpdateSubscriptionSummary } from "../../../stores/sites/baseTypes";
 
@@ -10,6 +10,7 @@ import {
     formatListenerSummary,
     formatRetryAttemptSummary,
 } from "../../../components/Header/StatusSubscriptionIndicator.utils";
+import { logger } from "../../../services/logger";
 
 const healthySummary: StatusUpdateSubscriptionSummary = {
     errors: [],
@@ -80,6 +81,10 @@ describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
         mockStore.statusSubscriptionSummary = healthySummary;
     });
 
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it("displays healthy metadata", () => {
         render(<StatusSubscriptionIndicator />);
 
@@ -138,6 +143,34 @@ describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
         await waitFor(() => {
             expect(mockStore.retryStatusSubscription).toHaveBeenCalledTimes(1);
         });
+    });
+
+    it("clears retry loading state when retry action rejects", async () => {
+        const retryError = new Error("retry rejected");
+        const warnSpy = vi.spyOn(logger, "warn").mockReturnValue(undefined);
+        mockStore.statusSubscriptionSummary = fallbackSummary;
+        mockStore.retryStatusSubscription.mockRejectedValueOnce(retryError);
+
+        render(<StatusSubscriptionIndicator />);
+
+        const retryButton = screen.getByRole("button", {
+            name: /retry realtime listeners/i,
+        });
+
+        fireEvent.click(retryButton);
+
+        await waitFor(() => {
+            expect(mockStore.retryStatusSubscription).toHaveBeenCalledTimes(1);
+        });
+
+        await waitFor(() => {
+            expect(retryButton).not.toBeDisabled();
+        });
+
+        expect(warnSpy).toHaveBeenCalledWith(
+            "Failed to retry realtime status subscription",
+            retryError
+        );
     });
 
     it("uses singular channel language when a single listener is attached", () => {

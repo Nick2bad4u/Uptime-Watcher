@@ -13,6 +13,8 @@
 
 import { isPromiseLike } from "@shared/utils/typeHelpers";
 
+import { fireAndForget } from "../../utils/async/fireAndForget";
+
 /**
  * Callback contract used when validating cleanup handlers returned from the
  * preload bridge.
@@ -115,13 +117,12 @@ export const resolveCleanupHandler = (
             if (isPromiseLike(cleanupResult)) {
                 // Cleanup must remain synchronous. We still attach a rejection
                 // handler to prevent unhandled promise rejections.
-                void (async (): Promise<void> => {
-                    try {
+                fireAndForget(
+                    async () => {
                         await cleanupResult;
-                    } catch (error: unknown) {
-                        handlers.handleCleanupError(error);
-                    }
-                })();
+                    },
+                    { onError: handlers.handleCleanupError }
+                );
             }
         } catch (error) {
             handlers.handleCleanupError(error);
