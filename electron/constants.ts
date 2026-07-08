@@ -104,9 +104,9 @@ export const CDN_EDGE_CONSISTENCY_CONCURRENCY = 4;
  * Sent as the `User-Agent` header in all outbound HTTP requests performed by
  * the backend.
  *
- * @defaultValue "Uptime-Watcher/1.0"
+ * @defaultValue "Uptime-Watcher/23.8.0"
  */
-export const USER_AGENT = "Uptime-Watcher/1.0";
+export const USER_AGENT = "Uptime-Watcher/23.8.0";
 
 /**
  * Retry backoff configuration for failed operations.

@@ -16,6 +16,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { createRequire } from "node:module";
 
 // Import all constants from the module under test
 import {
@@ -28,6 +29,10 @@ import {
     RETRY_BACKOFF,
     USER_AGENT,
 } from "../constants";
+
+const packageJson = createRequire(import.meta.url)("../../package.json") as {
+    readonly version: string;
+};
 
 describe("Backend Constants", () => {
     describe("Network and Request Constants", () => {
@@ -70,7 +75,7 @@ describe("Backend Constants", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Export Operation", "type");
 
-            expect(USER_AGENT).toBe("Uptime-Watcher/1.0");
+            expect(USER_AGENT).toBe(`Uptime-Watcher/${packageJson.version}`);
             expect(typeof USER_AGENT).toBe("string");
             expect(USER_AGENT.length).toBeGreaterThan(0);
         });

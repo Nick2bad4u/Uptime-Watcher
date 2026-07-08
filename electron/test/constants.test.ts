@@ -4,6 +4,7 @@
  */
 
 import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -16,6 +17,10 @@ import {
     RETRY_BACKOFF,
     USER_AGENT,
 } from "../constants";
+
+const packageJson = createRequire(import.meta.url)("../../package.json") as {
+    readonly version: string;
+};
 
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {
@@ -93,7 +98,7 @@ describe("Electron Constants", () => {
             await annotate("Expected Format: Application/Version", "format");
             await annotate("Purpose: HTTP Request Identification", "purpose");
 
-            expect(USER_AGENT).toBe("Uptime-Watcher/1.0");
+            expect(USER_AGENT).toBe(`Uptime-Watcher/${packageJson.version}`);
             expect(typeof USER_AGENT).toBe("string");
         });
 
