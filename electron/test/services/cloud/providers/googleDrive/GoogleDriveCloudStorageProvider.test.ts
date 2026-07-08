@@ -187,6 +187,46 @@ describe(GoogleDriveCloudStorageProvider, () => {
         }
     });
 
+    it("throws EEXIST when overwrite is omitted and object exists", async () => {
+        const tokenManager = {
+            isConnected: vi.fn().mockResolvedValue(true),
+        };
+
+        // GetOrCreateFolderId for ["uptime-watcher", "sync"]:
+        // 1) find uptime-watcher under appDataFolder
+        // 2) find sync under uptime-watcher
+        // 3) find existing.txt under sync
+        googleDriveClientMocks.driveStub.files.list
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "root-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "sync-id" }], nextPageToken: null },
+            })
+            .mockResolvedValueOnce({
+                data: { files: [{ id: "file-id" }], nextPageToken: null },
+            });
+
+        const provider = new GoogleDriveCloudStorageProvider({
+            tokenManager: tokenManager as never,
+        });
+
+        try {
+            await provider.uploadObject({
+                buffer: Buffer.from("payload", "utf8"),
+                key: "sync/existing.txt",
+            });
+            throw new Error("Expected uploadObject to throw");
+        } catch (error: unknown) {
+            expect(error).toBeInstanceOf(CloudProviderOperationError);
+            const typed = error as CloudProviderOperationError;
+            expect(typed.code).toBe("EEXIST");
+            expect(typed.operation).toBe("uploadObject");
+            expect(typed.providerKind).toBe("google-drive");
+            expect(typed.target).toBe("sync/existing.txt");
+        }
+    });
+
     it("normalizes invalid Drive list metadata to finite object values", async () => {
         const tokenManager = {
             isConnected: vi.fn().mockResolvedValue(true),

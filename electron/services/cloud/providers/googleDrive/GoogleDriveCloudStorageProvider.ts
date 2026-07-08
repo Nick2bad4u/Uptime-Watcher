@@ -400,7 +400,7 @@ export class GoogleDriveCloudStorageProvider
                 parentId,
             });
 
-            if (existing && args.overwrite === false) {
+            if (existing && args.overwrite !== true) {
                 throw new CloudProviderOperationError(
                     `Google Drive object already exists: ${normalizedKey}`,
                     {
