@@ -26,6 +26,7 @@ import type {
 } from "@shared/types/cloudSyncState";
 import type { UnknownRecord } from "type-fest";
 
+import { MONITOR_VALIDATION_CONSTRAINTS } from "@shared/constants/monitoring";
 import {
     CLOUD_SYNC_SCHEMA_VERSION,
     type CloudSyncOperation,
@@ -64,7 +65,6 @@ import {
     setCloudSyncRecordValue as setRecordValue,
 } from "@shared/utils/cloudSyncStateMaps";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
-import { VALIDATION_CONSTRAINTS } from "@shared/validation/monitorSchemas.common";
 import { isDefined, objectEntries, objectHasOwn, objectKeys } from "ts-extras";
 
 import {
@@ -108,15 +108,21 @@ function isIntegerInRange(
 }
 
 function isValidCheckInterval(value: unknown): value is number {
-    return isIntegerInRange(value, VALIDATION_CONSTRAINTS.CHECK_INTERVAL);
+    return isIntegerInRange(
+        value,
+        MONITOR_VALIDATION_CONSTRAINTS.CHECK_INTERVAL
+    );
 }
 
 function isValidRetryAttempts(value: unknown): value is number {
-    return isIntegerInRange(value, VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS);
+    return isIntegerInRange(
+        value,
+        MONITOR_VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS
+    );
 }
 
 function isValidTimeout(value: unknown): value is number {
-    return isIntegerInRange(value, VALIDATION_CONSTRAINTS.TIMEOUT);
+    return isIntegerInRange(value, MONITOR_VALIDATION_CONSTRAINTS.TIMEOUT);
 }
 
 function createMonitorConfigMap(): CloudSyncMonitorConfigMap {

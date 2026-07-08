@@ -11,10 +11,12 @@
  */
 
 import type { BaseMonitorSchemaType } from "@shared/types/schemaTypes";
+import type { MonitorValidationConstraints } from "@shared/constants/monitoring";
 
 import {
     MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
+    MONITOR_VALIDATION_CONSTRAINTS,
 } from "@shared/constants/monitoring";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import {
@@ -56,34 +58,10 @@ const statusHistorySchema = z
  * @remarks
  * These values must match the UI constants in `@shared/constants`.
  */
-interface MonitorValidationConstraints {
-    readonly CHECK_INTERVAL: {
-        readonly MAX: number;
-        readonly MIN: number;
-    };
-    readonly RETRY_ATTEMPTS: {
-        readonly MAX: number;
-        readonly MIN: number;
-    };
-    readonly TIMEOUT: {
-        readonly MAX: number;
-        readonly MIN: number;
-    };
-}
-
 export const VALIDATION_CONSTRAINTS: MonitorValidationConstraints = {
-    CHECK_INTERVAL: {
-        MAX: 2_592_000_000, // 30 days (maximum from CHECK_INTERVALS)
-        MIN: MIN_MONITOR_CHECK_INTERVAL_MS,
-    },
-    RETRY_ATTEMPTS: {
-        MAX: 10, // 10 retries maximum (from RETRY_CONSTRAINTS)
-        MIN: 0, // 0 retries minimum (from RETRY_CONSTRAINTS)
-    },
-    TIMEOUT: {
-        MAX: 300_000, // 300 seconds
-        MIN: 1000, // 1 second
-    },
+    CHECK_INTERVAL: MONITOR_VALIDATION_CONSTRAINTS.CHECK_INTERVAL,
+    RETRY_ATTEMPTS: MONITOR_VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS,
+    TIMEOUT: MONITOR_VALIDATION_CONSTRAINTS.TIMEOUT,
 };
 
 /**

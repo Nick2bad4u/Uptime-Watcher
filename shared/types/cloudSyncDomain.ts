@@ -2,9 +2,9 @@
  * Canonical domain payloads for true multi-device sync (ADR-016).
  */
 
+import { MONITOR_VALIDATION_CONSTRAINTS } from "@shared/constants/monitoring";
 import { BASE_MONITOR_TYPES } from "@shared/types";
 import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
-import { VALIDATION_CONSTRAINTS } from "@shared/validation/monitorSchemas.common";
 import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
 import * as z from "zod";
@@ -70,8 +70,8 @@ export const cloudSyncMonitorConfigSchema: z.ZodType<CloudSyncMonitorConfig> = z
         certificateWarningDays: z.int().nonnegative().optional(),
         checkInterval: z
             .int()
-            .min(VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN)
-            .max(VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX),
+            .min(MONITOR_VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MIN)
+            .max(MONITOR_VALIDATION_CONSTRAINTS.CHECK_INTERVAL.MAX),
         edgeLocations: z.string().min(1).optional(),
         expectedHeaderValue: z.string().min(1).optional(),
         expectedJsonValue: z.string().min(1).optional(),
@@ -96,13 +96,13 @@ export const cloudSyncMonitorConfigSchema: z.ZodType<CloudSyncMonitorConfig> = z
         replicationTimestampField: z.string().min(1).optional(),
         retryAttempts: z
             .int()
-            .min(VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN)
-            .max(VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX),
+            .min(MONITOR_VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MIN)
+            .max(MONITOR_VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX),
         siteIdentifier: siteIdentifierSchema,
         timeout: z
             .int()
-            .min(VALIDATION_CONSTRAINTS.TIMEOUT.MIN)
-            .max(VALIDATION_CONSTRAINTS.TIMEOUT.MAX),
+            .min(MONITOR_VALIDATION_CONSTRAINTS.TIMEOUT.MIN)
+            .max(MONITOR_VALIDATION_CONSTRAINTS.TIMEOUT.MAX),
         type: z.enum(BASE_MONITOR_TYPES),
         url: z.string().min(1).optional(),
     })

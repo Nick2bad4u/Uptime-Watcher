@@ -85,7 +85,7 @@ describe(HistoryRepository, () => {
 
         // Setup default mocks
         vi.mocked(operationalHooks.withDatabaseOperation).mockImplementation(
-            (operation) => operation()
+            async (operation) => await operation()
         );
         vi.mocked(electronUtils.isDev).mockReturnValue(true);
 
