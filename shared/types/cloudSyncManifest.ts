@@ -8,6 +8,7 @@ import {
 } from "@shared/types/cloudEncryption";
 import { CLOUD_SYNC_SCHEMA_VERSION } from "@shared/types/cloudSync";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import { isValidPersistedDeviceId } from "@shared/validation/persistedDeviceIdValidation";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import { objectEntries } from "ts-extras";
@@ -28,7 +29,7 @@ const cloudSyncManifestInternalSchema = z
     .object({
         // Accept arbitrary JSON object keys and sanitize them in
         // parseCloudSyncManifest().
-        devices: z.record(z.string(), deviceCompactionSchema),
+        devices: createOwnDataRecordSchema(deviceCompactionSchema, z.string()),
         encryption: cloudEncryptionConfigSchema.optional(),
         lastCompactionAt: epochMsSchema.optional(),
         latestSnapshotKey: z.string().min(1).optional(),

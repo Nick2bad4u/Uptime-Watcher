@@ -121,6 +121,20 @@ describe("cloudSyncManifest", () => {
         expect(Object.getPrototypeOf(parsed.devices)).toBeNull();
     });
 
+    it.each([
+        new Date(0),
+        new Map<string, { compactedUpToOpId: number; lastSeenAt: number }>(),
+        Object.create({ inherited: { compactedUpToOpId: 0, lastSeenAt: 1 } }),
+    ])("rejects non-record manifest device maps: %p", (devices) => {
+        expect(() =>
+            parseCloudSyncManifest({
+                devices,
+                manifestVersion: CLOUD_SYNC_MANIFEST_VERSION,
+                syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+            })
+        ).toThrow();
+    });
+
     it("caps the devices map to the most recently seen devices", () => {
         const devices: Record<
             string,
