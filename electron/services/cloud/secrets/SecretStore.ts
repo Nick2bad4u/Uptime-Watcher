@@ -1,9 +1,12 @@
 import { safeStorage } from "electron";
 
+import { getUtfByteLength } from "@shared/utils/utfByteLength";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
 
 import { logger } from "../../../utils/logger";
 import { decodeCanonicalBase64 } from "../internal/cloudServicePrimitives";
+
+const MAX_STORED_ENCRYPTED_SECRET_BYTES: number = 256 * 1024;
 
 /**
  * Secret storage abstraction for cloud provider credentials.
@@ -146,6 +149,28 @@ export class SafeStorageSecretStore implements SecretStore {
             return undefined;
         }
 
+        if (getUtfByteLength(stored) > MAX_STORED_ENCRYPTED_SECRET_BYTES) {
+            logger.warn(
+                "[SafeStorageSecretStore] Stored secret exceeded encrypted size limit; clearing",
+                {
+                    key,
+                    maxBytes: MAX_STORED_ENCRYPTED_SECRET_BYTES,
+                }
+            );
+            try {
+                await this.settings.set(key, "");
+            } catch (clearError) {
+                logger.warn(
+                    "[SafeStorageSecretStore] Failed to clear oversized stored secret",
+                    {
+                        key,
+                        message: getUserFacingErrorDetail(clearError),
+                    }
+                );
+            }
+            return undefined;
+        }
+
         if (!safeStorage.isEncryptionAvailable()) {
             throw new Error(
                 "Secure storage is not available on this system (Electron safeStorage)."
@@ -190,6 +215,13 @@ export class SafeStorageSecretStore implements SecretStore {
         }
 
         const encrypted = safeStorage.encryptString(value);
-        await this.settings.set(key, encrypted.toString("base64"));
+        const stored = encrypted.toString("base64");
+        if (getUtfByteLength(stored) > MAX_STORED_ENCRYPTED_SECRET_BYTES) {
+            throw new Error(
+                `Encrypted secret exceeds maximum size of ${MAX_STORED_ENCRYPTED_SECRET_BYTES} bytes.`
+            );
+        }
+
+        await this.settings.set(key, stored);
     }
 }

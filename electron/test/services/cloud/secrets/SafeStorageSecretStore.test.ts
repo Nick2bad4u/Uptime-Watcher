@@ -86,6 +86,57 @@ describe(SafeStorageSecretStore, () => {
         expect(settings.get("cloud.dropbox.tokens")).toBe("");
     });
 
+    it("clears oversized stored secrets before decoding", async () => {
+        const loggerWarn = vi
+            .spyOn(logger, "warn")
+            .mockImplementation(() => {});
+        const settings = new Map<string, string>();
+
+        const store = new SafeStorageSecretStore({
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+        });
+
+        settings.set("cloud.dropbox.tokens", "a".repeat(300 * 1024));
+
+        await expect(store.getSecret("cloud.dropbox.tokens")).resolves.toBe(
+            undefined
+        );
+
+        expect(settings.get("cloud.dropbox.tokens")).toBe("");
+        expect(loggerWarn).toHaveBeenCalledWith(
+            "[SafeStorageSecretStore] Stored secret exceeded encrypted size limit; clearing",
+            {
+                key: "cloud.dropbox.tokens",
+                maxBytes: 256 * 1024,
+            }
+        );
+
+        loggerWarn.mockRestore();
+    });
+
+    it("rejects secrets that exceed the encrypted storage size limit", async () => {
+        const settings = new Map<string, string>();
+
+        const store = new SafeStorageSecretStore({
+            settings: {
+                get: async (key) => settings.get(key),
+                set: async (key, value) => {
+                    settings.set(key, value);
+                },
+            },
+        });
+
+        await expect(
+            store.setSecret("cloud.dropbox.tokens", "x".repeat(300 * 1024))
+        ).rejects.toThrow("Encrypted secret exceeds maximum size");
+        expect(settings.has("cloud.dropbox.tokens")).toBeFalsy();
+    });
+
     it("logs when an undecryptable secret cannot be cleared", async () => {
         const loggerWarn = vi
             .spyOn(logger, "warn")
