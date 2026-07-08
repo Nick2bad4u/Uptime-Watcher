@@ -37,6 +37,53 @@ import { createTimeoutSignal } from "../shared/abortSignalUtils";
 const HTTP_SCHEME = "http".concat("://");
 const HTTPS_SCHEME = "https://";
 
+function validateHttpConnectivityUrl(url: string):
+    | {
+          ok: false;
+          reason: string;
+      }
+    | {
+          ok: true;
+          url: string;
+      } {
+    const trimmed = url.trim();
+    if (trimmed.length === 0) {
+        return {
+            ok: false,
+            reason: "HTTP URL is empty",
+        };
+    }
+
+    let parsed: URL;
+    try {
+        parsed = new URL(trimmed);
+    } catch {
+        return {
+            ok: false,
+            reason: "HTTP URL is invalid",
+        };
+    }
+
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return {
+            ok: false,
+            reason: "HTTP URL must use http or https",
+        };
+    }
+
+    if (parsed.username.length > 0 || parsed.password.length > 0) {
+        return {
+            ok: false,
+            reason: "HTTP URL must not include credentials",
+        };
+    }
+
+    return {
+        ok: true,
+        url: trimmed,
+    };
+}
+
 const stripHttpScheme = (value: string): string => {
     const normalized = value.trim();
     const lower = normalized.toLowerCase();
@@ -425,10 +472,20 @@ export async function checkHttpConnectivity(
         });
     }
 
+    const validation = validateHttpConnectivityUrl(url);
+    if (!validation.ok) {
+        return {
+            details: "HTTP request failed",
+            error: validation.reason,
+            responseTime: 0,
+            status: "down",
+        };
+    }
+
     const startTime = performance.now();
 
     try {
-        const response = await fetch(url, {
+        const response = await fetch(validation.url, {
             headers: {
                 "User-Agent": USER_AGENT,
             },

@@ -148,6 +148,34 @@ describe("Native Connectivity with Degraded State", () => {
             expect(result.error).toBe("Network error");
             expect(result.responseTime).toBe(50);
         });
+        it("should reject HTTP URLs containing credentials before fetch", async () => {
+            // Act
+            const result = await checkHttpConnectivity(
+                "https://user:pass@example.com/status"
+            );
+
+            // Assert
+            expect(result).toEqual({
+                details: "HTTP request failed",
+                error: "HTTP URL must not include credentials",
+                responseTime: 0,
+                status: "down",
+            });
+            expect(mockFetch).not.toHaveBeenCalled();
+        });
+        it("should reject non-HTTP URLs before fetch", async () => {
+            // Act
+            const result = await checkHttpConnectivity("file:///etc/passwd");
+
+            // Assert
+            expect(result).toEqual({
+                details: "HTTP request failed",
+                error: "HTTP URL must use http or https",
+                responseTime: 0,
+                status: "down",
+            });
+            expect(mockFetch).not.toHaveBeenCalled();
+        });
         it("should handle timeout properly", async () => {
             // Arrange
             const timeoutError = new Error("Request timeout");
@@ -279,6 +307,25 @@ describe("Native Connectivity with Degraded State", () => {
             // Assert
             expect(result.status).toBe("degraded");
             expect(mockDns.resolve4).toHaveBeenCalledWith("example.com");
+        });
+        it("should reject credentialed URL-shaped targets before fetch", async () => {
+            // Act
+            const result = await checkConnectivity(
+                "https://user:pass@example.com/status",
+                {
+                    method: "http",
+                }
+            );
+
+            // Assert
+            expect(result).toEqual({
+                details: "HTTP request failed",
+                error: "HTTP URL must not include credentials",
+                responseTime: 0,
+                status: "down",
+            });
+            expect(mockFetch).not.toHaveBeenCalled();
+            expect(mockDns.resolve4).not.toHaveBeenCalled();
         });
         it("should avoid echoing URL paths or queries in failed DNS details", async () => {
             // Arrange
