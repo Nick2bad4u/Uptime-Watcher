@@ -53,6 +53,62 @@ describe("HttpRateLimiter abort support", () => {
         expect(getterCalls).toBe(0);
     });
 
+    it("redacts malformed URL keys before reporting max wait telemetry", async () => {
+        vi.useFakeTimers();
+
+        try {
+            const onMaxWaitExceeded = vi.fn();
+            const limiter = new HttpRateLimiter({
+                maxConcurrent: 1,
+                maxWaitMs: 0,
+                minIntervalMs: 0,
+                onMaxWaitExceeded,
+            });
+            const sensitiveMalformedUrl =
+                "not a url access_token=secret-token password=secret-password";
+
+            let resolveSlow: () => void = () => {};
+            const slowBarrier = new Promise<boolean>((resolve) => {
+                resolveSlow = () => {
+                    resolve(true);
+                };
+            });
+            const slowOperation = vi.fn(async () => {
+                await slowBarrier;
+                return "slow";
+            });
+            const fastOperation = vi.fn(async () => "fast");
+
+            const first = limiter.schedule(
+                sensitiveMalformedUrl,
+                slowOperation
+            );
+            const second = limiter.schedule(
+                sensitiveMalformedUrl,
+                fastOperation
+            );
+
+            await vi.advanceTimersByTimeAsync(25);
+
+            await expect(second).resolves.toBe("fast");
+            expect(onMaxWaitExceeded).toHaveBeenCalledWith({
+                key: "[unparseable-url]",
+                waitedMs: 25,
+            });
+            expect(onMaxWaitExceeded).not.toHaveBeenCalledWith(
+                expect.objectContaining({
+                    key: expect.stringContaining("secret-token"),
+                })
+            );
+            expect(fastOperation).toHaveBeenCalledTimes(1);
+
+            resolveSlow();
+            await expect(first).resolves.toBe("slow");
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
     it("rejects without invoking the operation when aborted while waiting for a slot", async () => {
         vi.useFakeTimers();
 

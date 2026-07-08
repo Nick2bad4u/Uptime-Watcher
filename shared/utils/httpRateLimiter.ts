@@ -1,5 +1,6 @@
 import { createAbortError } from "@shared/utils/abortError";
 import { getAbortSignalReason, sleepUnref } from "@shared/utils/abortUtils";
+import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 
 const DEFAULT_MAX_CONCURRENT = 1;
 const DEFAULT_MAX_WAIT_MS = 30_000;
@@ -236,8 +237,7 @@ export class HttpRateLimiter {
         try {
             return new URL(url).host;
         } catch {
-            // Fallback: treat the whole string as the key.
-            return url;
+            return getSafeUrlForLogging(url);
         }
     }
 }
