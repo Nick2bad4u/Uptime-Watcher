@@ -27,6 +27,20 @@ import { useErrorStore } from "../stores/error/useErrorStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { generateUuid } from "../utils/data/generateUuid";
 
+const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable";
+
+const createMockGetRandomValues = () => {
+    let callCount = 0;
+    return vi.fn((buffer: Uint32Array): Uint32Array => {
+        callCount += 1;
+        buffer[0] = callCount;
+        buffer[1] = callCount + 1000;
+        return buffer;
+    });
+};
+
 const buildAddSiteFormState = (
     overrides: Partial<ReturnType<typeof useAddSiteForm>> = {}
 ): ReturnType<typeof useAddSiteForm> =>
@@ -286,6 +300,7 @@ describe("100% Coverage Edge Cases", () => {
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
                 value: {
+                    getRandomValues: createMockGetRandomValues(),
                     randomUUID: vi.fn().mockImplementation(() => {
                         throw new Error("Crypto error");
                     }),
@@ -293,28 +308,31 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
 
-        it("should handle undefined crypto", () => {
+        it("should fail closed with undefined crypto", () => {
             // Ensure crypto is undefined
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
                 value: undefined,
             });
 
-            const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/v);
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
         });
 
-        it("should handle crypto without randomUUID method", () => {
+        it("should use getRandomValues when randomUUID is missing", () => {
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
-                value: {},
+                value: {
+                    getRandomValues: createMockGetRandomValues(),
+                },
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
     });
 

@@ -10,6 +10,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { generateUuid } from "../utils/data/generateUuid";
 
 const cryptoBaseline = webcrypto;
+const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable";
+
+const createMockGetRandomValues = () => {
+    let callCount = 0;
+    return vi.fn((buffer: Uint32Array): Uint32Array => {
+        callCount += 1;
+        buffer[0] = callCount;
+        buffer[1] = callCount + 1000;
+        return buffer;
+    });
+};
 
 afterEach(() => {
     vi.stubGlobal("crypto", cryptoBaseline);
@@ -61,49 +74,39 @@ describe("UUID Generation", () => {
 
     describe("with crypto.randomUUID unavailable", () => {
         beforeEach(() => {
-            // Temporarily remove crypto to test fallback
+            vi.stubGlobal("crypto", {
+                getRandomValues: createMockGetRandomValues(),
+            });
+        });
+
+        it("should use secure fallback implementation when randomUUID is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const uuid = generateUuid();
+
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
+        });
+
+        it("should fail closed when crypto is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
             vi.stubGlobal("crypto", undefined);
-        });
 
-        it("should use fallback implementation when crypto is undefined", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const uuid = generateUuid();
-
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
-        });
-
-        it("should include timestamp in fallback", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Core", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const beforeTime = Date.now();
-            const uuid = generateUuid();
-            const afterTime = Date.now();
-
-            // Extract timestamp (before microseconds) from format: site-xxxxx-tttttttttttttmmm
-            const timestampMatch = /(?<full>\d+)$/v.exec(uuid);
-            expect(timestampMatch).toBeTruthy();
-
-            if (timestampMatch?.groups) {
-                const fullDigits = timestampMatch.groups["full"];
-                // Remove the last 3 digits (microseconds) to get the timestamp
-                const timestampStr = fullDigits?.slice(0, -3) ?? "";
-                const timestamp = Number.parseInt(timestampStr, 10);
-                expect(timestamp).toBeGreaterThanOrEqual(beforeTime);
-                expect(timestamp).toBeLessThanOrEqual(afterTime);
-            }
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
         });
 
         it("should generate unique IDs in fallback mode", async ({
@@ -131,7 +134,7 @@ describe("UUID Generation", () => {
         beforeEach(() => {
             // Mock crypto without randomUUID
             vi.stubGlobal("crypto", {
-                getRandomValues: vi.fn(),
+                getRandomValues: createMockGetRandomValues(),
                 // RandomUUID is not defined
             });
         });
@@ -147,7 +150,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
     });
 
@@ -158,7 +161,7 @@ describe("UUID Generation", () => {
                 randomUUID: vi.fn(() => {
                     throw new Error("randomUUID not supported");
                 }),
-                getRandomValues: vi.fn(),
+                getRandomValues: createMockGetRandomValues(),
             });
         });
 
@@ -174,7 +177,7 @@ describe("UUID Generation", () => {
             const uuid = generateUuid();
 
             expect(crypto.randomUUID).toHaveBeenCalled();
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
 
         it("should handle multiple calls when randomUUID throws", async ({
@@ -190,8 +193,8 @@ describe("UUID Generation", () => {
             const uuid2 = generateUuid();
 
             expect(crypto.randomUUID).toHaveBeenCalledTimes(2);
-            expect(uuid1).toMatch(/^site-[\da-z]+-\d+$/v);
-            expect(uuid2).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(uuid1).toMatch(FALLBACK_ID_REGEX);
+            expect(uuid2).toMatch(FALLBACK_ID_REGEX);
             expect(uuid1).not.toBe(uuid2);
         });
 
@@ -219,11 +222,11 @@ describe("UUID Generation", () => {
                     randomUUID: vi.fn(() => {
                         throw error;
                     }),
-                    getRandomValues: vi.fn(),
+                    getRandomValues: createMockGetRandomValues(),
                 });
 
                 const uuid = generateUuid();
-                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
+                expect(uuid).toMatch(FALLBACK_ID_REGEX);
             }
         });
     });
@@ -233,7 +236,7 @@ describe("UUID Generation", () => {
             // Mock crypto with randomUUID as a non-function value
             vi.stubGlobal("crypto", {
                 randomUUID: "not-a-function",
-                getRandomValues: vi.fn(),
+                getRandomValues: createMockGetRandomValues(),
             });
         });
 
@@ -248,7 +251,7 @@ describe("UUID Generation", () => {
 
             const uuid = generateUuid();
 
-            expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
     });
 
@@ -296,8 +299,9 @@ describe("UUID Generation", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Remove crypto to force fallback
-            vi.stubGlobal("crypto", undefined);
+            vi.stubGlobal("crypto", {
+                getRandomValues: createMockGetRandomValues(),
+            });
 
             const ids: string[] = [];
             for (let i = 0; i < 10; i++) {
@@ -306,7 +310,7 @@ describe("UUID Generation", () => {
 
             // All should be valid and different
             for (const id of ids) {
-                expect(id).toMatch(/^site-[\da-z]+-\d+$/v);
+                expect(id).toMatch(FALLBACK_ID_REGEX);
             }
 
             // Should have different random parts (high probability)
@@ -371,7 +375,7 @@ describe("UUID Generation", () => {
 
             // Mock crypto to return predictable values
             vi.stubGlobal("crypto", {
-                randomUUID: vi.fn(() => `rapid-test-${Date.now()}`),
+                randomUUID: vi.fn(() => "00000000-0000-4000-8000-000000000999"),
             });
 
             const uuids: string[] = [];
@@ -397,8 +401,9 @@ describe("UUID Generation", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Remove crypto to force fallback
-            vi.stubGlobal("crypto", undefined);
+            vi.stubGlobal("crypto", {
+                getRandomValues: createMockGetRandomValues(),
+            });
 
             const uuids: string[] = [];
             for (let i = 0; i < 5; i++) {
@@ -408,7 +413,7 @@ describe("UUID Generation", () => {
             // All should be valid fallback format
             for (const uuid of uuids) {
                 expect(typeof uuid).toBe("string");
-                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
+                expect(uuid).toMatch(FALLBACK_ID_REGEX);
             }
         });
 
@@ -421,18 +426,17 @@ describe("UUID Generation", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Force fallback by removing crypto
-            vi.stubGlobal("crypto", undefined);
+            vi.stubGlobal("crypto", {
+                getRandomValues: createMockGetRandomValues(),
+            });
 
             const uuid = generateUuid();
             const parts = stringSplit(uuid, "-");
 
-            expect(parts).toHaveLength(3);
+            expect(parts).toHaveLength(2);
             expect(arrayFirst(parts)).toBe("site");
             expect(parts[1]).toMatch(/^[\da-z]+$/v);
             expect(parts[1]?.length).toBe(12); // Two random parts of 6 chars each = 12 characters
-            expect(parts[2]).toMatch(/^\d+$/v);
-            expect(Number.parseInt(parts[2] ?? "0", 10)).toBeGreaterThan(0);
         });
     });
 
@@ -440,7 +444,9 @@ describe("UUID Generation", () => {
         test.prop([fc.integer({ min: 1, max: 1000 })])(
             "should generate unique UUIDs for any number of iterations",
             (iterations) => {
-                vi.stubGlobal("crypto", undefined);
+                vi.stubGlobal("crypto", {
+                    getRandomValues: createMockGetRandomValues(),
+                });
 
                 const uuids = new Set<string>();
 
@@ -480,7 +486,9 @@ describe("UUID Generation", () => {
                         ),
                     });
                 } else {
-                    vi.stubGlobal("crypto", undefined);
+                    vi.stubGlobal("crypto", {
+                        getRandomValues: createMockGetRandomValues(),
+                    });
                 }
 
                 const uuid = generateUuid();
@@ -495,8 +503,7 @@ describe("UUID Generation", () => {
                     // Should use crypto UUID format
                     expect(uuid).toBe("00000000-0000-4000-8000-000000000123");
                 } else {
-                    // Should use fallback format
-                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
+                    expect(uuid).toMatch(FALLBACK_ID_REGEX);
                 }
             }
         );
@@ -504,9 +511,9 @@ describe("UUID Generation", () => {
         test.prop([fc.integer({ min: 10, max: 30 })])(
             "should maintain uniqueness under realistic concurrent generation",
             async (numRequests) => {
-                // Force the deterministic fallback path and verify that it
-                // still maintains a high uniqueness ratio under concurrent use.
-                vi.stubGlobal("crypto", undefined);
+                vi.stubGlobal("crypto", {
+                    getRandomValues: createMockGetRandomValues(),
+                });
 
                 // Generate UUIDs in a more realistic concurrent pattern
                 // Simulate small delays that might occur in real usage
@@ -552,7 +559,9 @@ describe("UUID Generation", () => {
                         break;
                     }
                     case "object": {
-                        vi.stubGlobal("crypto", {});
+                        vi.stubGlobal("crypto", {
+                            getRandomValues: createMockGetRandomValues(),
+                        });
                         break;
                     }
                     case "undefined": {
@@ -561,46 +570,29 @@ describe("UUID Generation", () => {
                     }
                 }
 
+                if (cryptoState !== "object") {
+                    expect(() => generateUuid()).toThrow(
+                        SECURE_RANDOM_UNAVAILABLE_MESSAGE
+                    );
+                    return;
+                }
+
                 const uuid = generateUuid();
                 expect(typeof uuid).toBe("string");
                 expect(uuid.length).toBeGreaterThan(0);
-
-                // Should always fall back to site-* format when crypto is not available
-                if (
-                    cryptoState !== "object" ||
-                    !crypto ||
-                    typeof crypto.randomUUID !== "function"
-                ) {
-                    expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
-                }
+                expect(uuid).toMatch(FALLBACK_ID_REGEX);
             }
         );
 
         test.prop([fc.integer({ min: 1000, max: 2_000_000_000 })])(
-            "should include reasonable timestamp in fallback mode",
+            "should not include timestamps in secure fallback mode",
             (mockNow) => {
-                vi.stubGlobal("crypto", undefined);
+                vi.stubGlobal("crypto", {
+                    getRandomValues: createMockGetRandomValues(),
+                });
                 vi.spyOn(Date, "now").mockReturnValue(mockNow);
 
-                const uuid = generateUuid();
-                expect(uuid).toMatch(/^site-[\da-z]+-\d+$/v);
-
-                // Extract all digits from the timestamp+microseconds part, then remove last 3 digits (microseconds)
-                const timestampMatch = /(?<full>\d+)$/v.exec(uuid);
-                expect(timestampMatch).toBeTruthy();
-
-                if (timestampMatch?.groups) {
-                    const fullDigits = timestampMatch.groups["full"];
-                    // Remove the last 3 digits (microseconds) to get the timestamp
-                    const timestampStr = fullDigits?.slice(0, -3) ?? "";
-                    const extractedTimestamp = Number.parseInt(
-                        timestampStr,
-                        10
-                    );
-                    expect(extractedTimestamp).toBe(mockNow);
-                }
-
-                vi.restoreAllMocks();
+                expect(generateUuid()).toMatch(FALLBACK_ID_REGEX);
             }
         );
     });

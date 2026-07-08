@@ -9,6 +9,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { generateUuid } from "../../../utils/data/generateUuid";
 
 const originalCrypto = crypto;
+const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable";
+const createMockGetRandomValues = (): Crypto["getRandomValues"] =>
+    ((array: Uint32Array): Uint32Array => {
+        array[0] = 1;
+        array[1] = 1000;
+        return array;
+    }) as Crypto["getRandomValues"];
 
 describe(generateUuid, () => {
     beforeEach(() => {
@@ -103,12 +112,13 @@ describe(generateUuid, () => {
             try {
                 globalThis.crypto = {
                     ...original,
+                    getRandomValues: createMockGetRandomValues(),
                     randomUUID: mockRandomUUID,
                 };
 
                 const result = generateUuid();
 
-                expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
+                expect(result).toMatch(FALLBACK_ID_REGEX);
                 expect(mockRandomUUID).toHaveBeenCalledTimes(1);
             } finally {
                 globalThis.crypto = original;
@@ -117,7 +127,7 @@ describe(generateUuid, () => {
     });
 
     describe("fallback Behavior", () => {
-        it("should use fallback when crypto is undefined", async ({
+        it("should fail closed when crypto is undefined", async ({
             annotate,
             task,
         }) => {
@@ -129,10 +139,9 @@ describe(generateUuid, () => {
             const originalCrypto = crypto;
             globalThis.crypto = undefined as any;
 
-            const result = generateUuid();
-
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
-            expect(result.startsWith("site-")).toBe(true);
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
 
             // Restore original
             globalThis.crypto = originalCrypto;
@@ -154,7 +163,7 @@ describe(generateUuid, () => {
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(result).toMatch(FALLBACK_ID_REGEX);
             expect(result.startsWith("site-")).toBe(true);
         });
 
@@ -175,12 +184,12 @@ describe(generateUuid, () => {
             const result = generateUuid();
             const parts = stringSplit(result, "-");
 
-            expect(parts).toHaveLength(3);
+            expect(parts).toHaveLength(2);
             expect(parts[1]).toMatch(/^[\da-z]+$/v);
-            expect(parts[1]!.length).toBeGreaterThan(0);
+            expect(parts[1]).toHaveLength(12);
         });
 
-        it("should use consistent format across calls", async ({
+        it("should use consistent secure fallback format across calls", async ({
             annotate,
             task,
         }) => {
@@ -189,23 +198,20 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Force fallback by removing crypto
-            const tempCrypto = crypto;
-            globalThis.crypto = undefined as any;
+            vi.stubGlobal("crypto", {
+                getRandomValues: webcrypto.getRandomValues.bind(webcrypto),
+            });
 
             const results = Array.from({ length: 10 }, () => generateUuid());
 
             for (const result of results) {
-                expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
+                expect(result).toMatch(FALLBACK_ID_REGEX);
             }
-
-            // Restore
-            globalThis.crypto = tempCrypto;
         });
     });
 
     describe("edge Cases", () => {
-        it("should handle very large timestamps in fallback", async ({
+        it("should fail closed instead of using timestamp fallbacks", async ({
             annotate,
             task,
         }) => {
@@ -214,43 +220,11 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const originalCrypto = crypto;
             globalThis.crypto = undefined as any;
 
-            const mockNow = vi
-                .spyOn(Date, "now")
-                .mockReturnValue(9_999_999_999_999);
-
-            const result = generateUuid();
-
-            expect(result).toMatch(/^site-[\da-z]+-9{13}\d{3}$/v);
-            expect(result).toContain("9999999999999");
-
-            mockNow.mockRestore();
-            globalThis.crypto = originalCrypto;
-        });
-
-        it("should handle timestamp of 0 in fallback", async ({
-            annotate,
-            task,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const originalCrypto = crypto;
-            globalThis.crypto = undefined as any;
-
-            const mockNow = vi.spyOn(Date, "now").mockReturnValue(0);
-
-            const result = generateUuid();
-
-            expect(result).toMatch(/^site-[\da-z]+-0\d{3}$/v);
-            expect(result.split("-", 3)[2]).toMatch(/^0\d{3}$/v); // Should start with 0 followed by 3-digit microseconds
-
-            mockNow.mockRestore();
-            globalThis.crypto = originalCrypto;
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
         });
     });
 
@@ -295,10 +269,9 @@ describe(generateUuid, () => {
             const originalCrypto = crypto;
             globalThis.crypto = undefined as any;
 
-            const fallbackResult = generateUuid();
-
-            expect(fallbackResult).toBeTypeOf("string");
-            expect(fallbackResult).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
 
             // Restore
             globalThis.crypto = originalCrypto;
@@ -381,7 +354,7 @@ describe(generateUuid, () => {
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(result).toMatch(FALLBACK_ID_REGEX);
         });
 
         it("should use fallback when crypto.randomUUID is not a function", async ({
@@ -398,10 +371,10 @@ describe(generateUuid, () => {
 
             const result = generateUuid();
 
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(result).toMatch(FALLBACK_ID_REGEX);
         });
 
-        it("should use fallback when crypto is unavailable", async ({
+        it("should fail closed when crypto is unavailable", async ({
             annotate,
             task,
         }) => {
@@ -412,9 +385,9 @@ describe(generateUuid, () => {
 
             Reflect.deleteProperty(globalThis, "crypto");
 
-            const result = generateUuid();
-
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/v);
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
 
             globalThis.crypto = originalCrypto;
         });

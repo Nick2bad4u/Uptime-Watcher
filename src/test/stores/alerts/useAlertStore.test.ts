@@ -26,7 +26,9 @@ import { mapStatusUpdateToAlert } from "../../../stores/alerts/utils/alertPayloa
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const EXPECTED_MAX_TOAST_QUEUE_LENGTH = 20;
-const FALLBACK_ALERT_ID_REGEX = /^alert-site-[\da-z]{12}-\d{16}$/v;
+const FALLBACK_ALERT_ID_REGEX = /^alert-site-[\da-z]{12}$/v;
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable";
 
 const resetAlertStore = (): void => {
     useAlertStore.setState({ alerts: [], toasts: [] });
@@ -513,58 +515,42 @@ describe("useAlertStore identifier generation fallbacks", () => {
         }
     });
 
-    it("falls back to Date.now-based identifiers when crypto is unavailable", () => {
+    it("fails closed when crypto is unavailable", () => {
         const originalCrypto = crypto;
-        const fixedNow = 1_730_000_000_000;
-        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
 
         try {
             globalThis.crypto = undefined as any;
 
-            const alert = useAlertStore.getState().enqueueAlert({
-                monitorId: sampleOne(monitorIdArbitrary),
-                monitorName: sampleOne(monitorNameArbitrary),
-                siteIdentifier: sampleOne(siteIdentifierArbitrary),
-                siteName: sampleOne(siteNameArbitrary),
-                status: STATUS_KIND.DOWN,
-            });
-
-            expect(alert.id).toMatch(
-                new RegExp(
-                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
-                    "v"
-                )
-            );
+            expect(() =>
+                useAlertStore.getState().enqueueAlert({
+                    monitorId: sampleOne(monitorIdArbitrary),
+                    monitorName: sampleOne(monitorNameArbitrary),
+                    siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                    siteName: sampleOne(siteNameArbitrary),
+                    status: STATUS_KIND.DOWN,
+                })
+            ).toThrow(SECURE_RANDOM_UNAVAILABLE_MESSAGE);
         } finally {
-            nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
         }
     });
 
-    it("falls back when crypto is deleted from globalThis", () => {
+    it("fails closed when crypto is deleted from globalThis", () => {
         const originalCrypto = crypto;
-        const fixedNow = 1_730_000_000_001;
-        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
 
         try {
             Reflect.deleteProperty(globalThis, "crypto");
 
-            const alert = useAlertStore.getState().enqueueAlert({
-                monitorId: sampleOne(monitorIdArbitrary),
-                monitorName: sampleOne(monitorNameArbitrary),
-                siteIdentifier: sampleOne(siteIdentifierArbitrary),
-                siteName: sampleOne(siteNameArbitrary),
-                status: STATUS_KIND.DOWN,
-            });
-
-            expect(alert.id).toMatch(
-                new RegExp(
-                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
-                    "v"
-                )
-            );
+            expect(() =>
+                useAlertStore.getState().enqueueAlert({
+                    monitorId: sampleOne(monitorIdArbitrary),
+                    monitorName: sampleOne(monitorNameArbitrary),
+                    siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                    siteName: sampleOne(siteNameArbitrary),
+                    status: STATUS_KIND.DOWN,
+                })
+            ).toThrow(SECURE_RANDOM_UNAVAILABLE_MESSAGE);
         } finally {
-            nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
         }
     });
@@ -669,10 +655,8 @@ describe("useAlertStore identifier generation fallbacks", () => {
         }
     });
 
-    it("falls back to Date.now-based identifiers when getRandomValues throws", () => {
+    it("fails closed when getRandomValues throws", () => {
         const originalCrypto = crypto;
-        const fixedNow = 1_730_000_000_002;
-        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
 
         try {
             globalThis.crypto = {
@@ -681,30 +665,22 @@ describe("useAlertStore identifier generation fallbacks", () => {
                 }),
             } as unknown as Crypto;
 
-            const alert = useAlertStore.getState().enqueueAlert({
-                monitorId: sampleOne(monitorIdArbitrary),
-                monitorName: sampleOne(monitorNameArbitrary),
-                siteIdentifier: sampleOne(siteIdentifierArbitrary),
-                siteName: sampleOne(siteNameArbitrary),
-                status: STATUS_KIND.DOWN,
-            });
-
-            expect(alert.id).toMatch(
-                new RegExp(
-                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
-                    "v"
-                )
-            );
+            expect(() =>
+                useAlertStore.getState().enqueueAlert({
+                    monitorId: sampleOne(monitorIdArbitrary),
+                    monitorName: sampleOne(monitorNameArbitrary),
+                    siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                    siteName: sampleOne(siteNameArbitrary),
+                    status: STATUS_KIND.DOWN,
+                })
+            ).toThrow(SECURE_RANDOM_UNAVAILABLE_MESSAGE);
         } finally {
-            nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
         }
     });
 
     it("does not invoke accessor-backed getRandomValues properties", () => {
         const originalCrypto = crypto;
-        const fixedNow = 1_730_000_000_003;
-        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
         let accessCount = 0;
         const cryptoCandidate = {};
         Object.defineProperty(cryptoCandidate, "getRandomValues", {
@@ -721,23 +697,17 @@ describe("useAlertStore identifier generation fallbacks", () => {
         try {
             globalThis.crypto = cryptoCandidate as unknown as Crypto;
 
-            const alert = useAlertStore.getState().enqueueAlert({
-                monitorId: sampleOne(monitorIdArbitrary),
-                monitorName: sampleOne(monitorNameArbitrary),
-                siteIdentifier: sampleOne(siteIdentifierArbitrary),
-                siteName: sampleOne(siteNameArbitrary),
-                status: STATUS_KIND.DOWN,
-            });
-
+            expect(() =>
+                useAlertStore.getState().enqueueAlert({
+                    monitorId: sampleOne(monitorIdArbitrary),
+                    monitorName: sampleOne(monitorNameArbitrary),
+                    siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                    siteName: sampleOne(siteNameArbitrary),
+                    status: STATUS_KIND.DOWN,
+                })
+            ).toThrow(SECURE_RANDOM_UNAVAILABLE_MESSAGE);
             expect(accessCount).toBe(0);
-            expect(alert.id).toMatch(
-                new RegExp(
-                    String.raw`^alert-site-[\da-z]{12}-${fixedNow}\d{3}$`,
-                    "v"
-                )
-            );
         } finally {
-            nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;
         }
     });

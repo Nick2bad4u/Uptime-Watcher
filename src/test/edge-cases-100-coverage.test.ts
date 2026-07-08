@@ -17,6 +17,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Import utilities to test
 import { generateUuid } from "../utils/data/generateUuid";
 
+const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable";
+
+const createMockGetRandomValues = () => {
+    let callCount = 0;
+    return vi.fn((buffer: Uint32Array): Uint32Array => {
+        callCount += 1;
+        buffer[0] = callCount;
+        buffer[1] = callCount + 1000;
+        return buffer;
+    });
+};
+
 const serializedErrorLike = (message: string) =>
     expect.objectContaining({
         message,
@@ -50,6 +64,7 @@ describe("100% Coverage Edge Cases", () => {
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
                 value: {
+                    getRandomValues: createMockGetRandomValues(),
                     randomUUID: vi.fn().mockImplementation(() => {
                         throw new Error("Crypto error");
                     }),
@@ -57,28 +72,31 @@ describe("100% Coverage Edge Cases", () => {
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
 
-        it("should handle undefined crypto", () => {
+        it("should fail closed with undefined crypto", () => {
             // Ensure crypto is undefined
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
                 value: undefined,
             });
 
-            const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/v);
+            expect(() => generateUuid()).toThrow(
+                SECURE_RANDOM_UNAVAILABLE_MESSAGE
+            );
         });
 
-        it("should handle crypto without randomUUID method", () => {
+        it("should use getRandomValues when randomUUID is missing", () => {
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
-                value: {},
+                value: {
+                    getRandomValues: createMockGetRandomValues(),
+                },
             });
 
             const uuid = generateUuid();
-            expect(uuid).toMatch(/^site-\w+-\d+$/v);
+            expect(uuid).toMatch(FALLBACK_ID_REGEX);
         });
 
         it("should use crypto.randomUUID when available", () => {
@@ -95,17 +113,19 @@ describe("100% Coverage Edge Cases", () => {
             expect(crypto.randomUUID).toHaveBeenCalled();
         });
 
-        it("should generate consistent fallback format", () => {
+        it("should generate consistent secure fallback format", () => {
             Object.defineProperty(globalThis, "crypto", {
                 configurable: true,
-                value: undefined,
+                value: {
+                    getRandomValues: createMockGetRandomValues(),
+                },
             });
 
             const uuid1 = generateUuid();
             const uuid2 = generateUuid();
 
-            expect(uuid1).toMatch(/^site-\w+-\d+$/v);
-            expect(uuid2).toMatch(/^site-\w+-\d+$/v);
+            expect(uuid1).toMatch(FALLBACK_ID_REGEX);
+            expect(uuid2).toMatch(FALLBACK_ID_REGEX);
             expect(uuid1).not.toBe(uuid2); // Should be different
         });
     });

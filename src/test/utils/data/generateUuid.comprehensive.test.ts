@@ -11,7 +11,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { generateUuid } from "../../../utils/data/generateUuid";
 
-const FALLBACK_ID_REGEX = /^site-[\da-z]{12}-\d{16}$/v;
+const FALLBACK_ID_REGEX = /^site-[\da-z]{12}$/v;
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable";
 
 const toBaseThirtySixSixChars = (value: number): string =>
     value.toString(36).padStart(6, "0").slice(-6);
@@ -81,11 +83,22 @@ describe(generateUuid, () => {
             await annotate("Type: Business Logic", "type");
 
             const randomUUID = vi.fn().mockReturnValue("");
-            const { restore } = installCryptoMock({ randomUUID });
+            const getRandomValues = vi
+                .fn()
+                .mockImplementation((array: Uint32Array) => {
+                    array[0] = 1;
+                    array[1] = 2;
+                    return array;
+                });
+            const { restore } = installCryptoMock({
+                getRandomValues,
+                randomUUID,
+            });
 
             try {
                 expect(generateUuid()).toMatch(FALLBACK_ID_REGEX);
                 expect(randomUUID).toHaveBeenCalledTimes(1);
+                expect(getRandomValues).toHaveBeenCalledTimes(1);
             } finally {
                 restore();
             }
@@ -101,11 +114,22 @@ describe(generateUuid, () => {
             await annotate("Type: Validation", "type");
 
             const randomUUID = vi.fn().mockReturnValue("not-a-real-uuid");
-            const { restore } = installCryptoMock({ randomUUID });
+            const getRandomValues = vi
+                .fn()
+                .mockImplementation((array: Uint32Array) => {
+                    array[0] = 3;
+                    array[1] = 4;
+                    return array;
+                });
+            const { restore } = installCryptoMock({
+                getRandomValues,
+                randomUUID,
+            });
 
             try {
                 expect(generateUuid()).toMatch(FALLBACK_ID_REGEX);
                 expect(randomUUID).toHaveBeenCalledTimes(1);
+                expect(getRandomValues).toHaveBeenCalledTimes(1);
             } finally {
                 restore();
             }
@@ -120,9 +144,6 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            vi.useFakeTimers();
-            vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
-            const now = Date.now();
             let accessorCalls = 0;
             const cryptoCandidate = {};
             Object.defineProperty(cryptoCandidate, "randomUUID", {
@@ -144,12 +165,9 @@ describe(generateUuid, () => {
 
             const { restore } = installCryptoMock(cryptoCandidate);
             try {
-                const result = generateUuid();
-
                 expect(accessorCalls).toBe(0);
-                expect(result).toMatch(FALLBACK_ID_REGEX);
-                expect(result).toMatch(
-                    new RegExp(String.raw`^site-[\da-z]{12}-${now}\d{3}$`)
+                expect(() => generateUuid()).toThrow(
+                    SECURE_RANDOM_UNAVAILABLE_MESSAGE
                 );
             } finally {
                 restore();
@@ -158,7 +176,7 @@ describe(generateUuid, () => {
     });
 
     describe("fallback Behavior", () => {
-        it("should use the fallback format when crypto is unavailable", async ({
+        it("should fail closed when crypto is unavailable", async ({
             annotate,
             task,
         }) => {
@@ -167,17 +185,10 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.useFakeTimers();
-            vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
-            const now = Date.now();
-
             const { restore } = installCryptoMock(undefined);
             try {
-                const result = generateUuid();
-
-                expect(result).toMatch(FALLBACK_ID_REGEX);
-                expect(result).toMatch(
-                    new RegExp(String.raw`^site-[\da-z]{12}-${now}\d{3}$`)
+                expect(() => generateUuid()).toThrow(
+                    SECURE_RANDOM_UNAVAILABLE_MESSAGE
                 );
             } finally {
                 restore();
@@ -192,10 +203,6 @@ describe(generateUuid, () => {
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
-
-            vi.useFakeTimers();
-            vi.setSystemTime(new Date("2023-03-15T10:15:30.500Z"));
-            const now = Date.now();
 
             const partA = 0x12_34_56_78;
             const partB = 0x9a_bc_de_f0;
@@ -223,17 +230,13 @@ describe(generateUuid, () => {
                 expect(randomUUID).toHaveBeenCalledTimes(1);
                 expect(getRandomValues).toHaveBeenCalledTimes(1);
                 expect(result).toMatch(FALLBACK_ID_REGEX);
-                expect(result).toMatch(
-                    new RegExp(
-                        String.raw`^site-${expectedRandomPart}-${now}\d{3}$`
-                    )
-                );
+                expect(result).toBe(`site-${expectedRandomPart}`);
             } finally {
                 restore();
             }
         });
 
-        it("should fall back to the deterministic strategy when crypto.getRandomValues throws", async ({
+        it("should fail closed when crypto.getRandomValues throws", async ({
             annotate,
             task,
         }) => {
@@ -242,23 +245,16 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.useFakeTimers();
-            vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
-            const now = Date.now();
-
             const getRandomValues = vi.fn(() => {
                 throw new Error("getRandomValues failure");
             });
 
             const { restore } = installCryptoMock({ getRandomValues });
             try {
-                const result = generateUuid();
-
-                expect(getRandomValues).toHaveBeenCalledTimes(1);
-                expect(result).toMatch(FALLBACK_ID_REGEX);
-                expect(result).toMatch(
-                    new RegExp(String.raw`^site-[\da-z]{12}-${now}\d{3}$`)
+                expect(() => generateUuid()).toThrow(
+                    SECURE_RANDOM_UNAVAILABLE_MESSAGE
                 );
+                expect(getRandomValues).toHaveBeenCalledTimes(1);
             } finally {
                 restore();
             }
@@ -278,7 +274,17 @@ describe(generateUuid, () => {
             vi.useFakeTimers();
             vi.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
 
-            const { restore } = installCryptoMock(undefined);
+            let counter = 0;
+            const getRandomValues = vi
+                .fn()
+                .mockImplementation((array: Uint32Array) => {
+                    counter += 1;
+                    array[0] = counter;
+                    array[1] = counter + 1000;
+                    return array;
+                });
+
+            const { restore } = installCryptoMock({ getRandomValues });
             try {
                 const ids = Array.from({ length: 1000 }, () => generateUuid());
 

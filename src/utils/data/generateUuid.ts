@@ -2,8 +2,9 @@
  * Utility function for generating unique identifiers.
  *
  * @remarks
- * Uses `crypto.randomUUID` when available and falls back to a timestamp-based
- * identifier otherwise.
+ * Uses `crypto.randomUUID` when available and falls back to
+ * `crypto.getRandomValues` otherwise. Throws when secure randomness is not
+ * available.
  *
  * @public
  */
@@ -13,9 +14,8 @@ import {
     getOwnPropertyValue,
 } from "@shared/utils/errorPropertyAccess";
 
-const fallbackSequence: { value: number } = {
-    value: 0,
-};
+const SECURE_RANDOM_UNAVAILABLE_MESSAGE =
+    "Secure random ID generation is unavailable" as const;
 
 const STANDARD_UUID_PATTERN =
     /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
@@ -64,17 +64,21 @@ function getCryptoRandomValues(
  *
  * @remarks
  * When crypto.randomUUID is available, returns a standard UUID. When
- * unavailable, falls back to a custom ID format: `site-{random}-{timestamp}`.
+ * unavailable, falls back to a custom ID format backed by
+ * `crypto.getRandomValues`: `site-{random}`.
  *
  * @example
  *
  * ```typescript
  * const id = generateUuid();
  * // Returns: "123e4567-e89b-12d3-a456-426614174000" (when crypto is available)
- * // or: "site-abc123-1234567890123" (fallback)
+ * // or: "site-abc123def456" (getRandomValues fallback)
  * ```
  *
- * @returns A UUID string in standard format or fallback format.
+ * @returns A UUID string in standard format or secure fallback format.
+ *
+ * @throws Error when neither `crypto.randomUUID` nor `crypto.getRandomValues`
+ *   is available.
  *
  * @public
  */
@@ -91,46 +95,19 @@ export function generateUuid(): string {
             }
         }
     } catch {
-        // Crypto is not available, fall through to fallback
+        // Crypto.randomUUID failed; try the getRandomValues fallback below.
     }
 
-    // Fallback: preserve the historical ID shape (`site-{random}-{timestamp}`)
-    // without relying on Math.random.
-    const now = Date.now();
-    const sequence = nextFallbackSequence();
-    const timestampSuffix = (sequence % 1000).toString(10).padStart(3, "0");
-    const timestampPart = `${now}${timestampSuffix}`;
+    const randomPart = tryGenerateCryptoFallbackId();
+    if (randomPart) {
+        return `site-${randomPart}`;
+    }
 
-    const randomPart =
-        tryGenerateCryptoFallbackId() ??
-        generateDeterministicFallbackId(now, sequence);
-
-    return `site-${randomPart}-${timestampPart}`;
-}
-
-function generateDeterministicFallbackId(
-    nowMs: number,
-    sequence: number
-): string {
-    const low = toUint32(nowMs + sequence);
-    // 2654435761 is the 32-bit golden ratio constant (0x9E3779B1).
-    const high = toUint32(Math.floor(nowMs / 1000) + sequence * 2_654_435_761);
-    return `${toBaseThirtySixSixChars(low)}${toBaseThirtySixSixChars(high)}`;
-}
-
-function nextFallbackSequence(): number {
-    fallbackSequence.value = (fallbackSequence.value + 1) % 1_000_000;
-    return fallbackSequence.value;
+    throw new Error(SECURE_RANDOM_UNAVAILABLE_MESSAGE);
 }
 
 function toBaseThirtySixSixChars(value: number): string {
     return value.toString(36).padStart(6, "0").slice(-6);
-}
-
-function toUint32(value: number): number {
-    const modulus = 2 ** 32;
-    const remainder = value % modulus;
-    return remainder < 0 ? remainder + modulus : remainder;
 }
 
 function tryGenerateCryptoFallbackId(): string | undefined {
