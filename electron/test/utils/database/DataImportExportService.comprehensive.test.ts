@@ -714,6 +714,39 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(Object.hasOwn(result.settings, "prototype")).toBe(false);
         });
 
+        it("accepts exported sites with empty monitor arrays", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Validation", "type");
+
+            const { safeJsonParse } =
+                await import("../../../../shared/utils/jsonSafety");
+            const mockJsonData =
+                '{"sites":[{"identifier":"example.com","monitors":[]}]}';
+            const mockParsedData = {
+                sites: [
+                    {
+                        identifier: "example.com",
+                        monitors: [],
+                    },
+                ],
+            };
+
+            (safeJsonParse as MockedFunction<any>).mockReturnValue({
+                success: true,
+                data: mockParsedData,
+                error: null,
+            });
+
+            const result = await service.importDataFromJson(mockJsonData);
+
+            expect(result.sites).toEqual(mockParsedData.sites);
+        });
+
         it("should handle parsing failure with invalid JSON", async ({
             task,
             annotate,

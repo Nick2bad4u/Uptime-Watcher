@@ -78,6 +78,31 @@ describe("importExportSchemas", () => {
         expect(result.value.sites).toEqual([]);
     });
 
+    it("accepts exported sites that have no monitors", () => {
+        const result = validateImportData({
+            exportedAt: "2026-07-02T00:00:00.000Z",
+            settings: {},
+            sites: [
+                {
+                    identifier: "example.com",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Example",
+                },
+            ],
+            version: "1.0",
+        });
+
+        expect(result.ok).toBeTruthy();
+        if (!result.ok) {
+            throw new Error(
+                `Expected monitorless site import to pass: ${result.error.message}`
+            );
+        }
+
+        expect(result.value.sites[0]?.monitors).toEqual([]);
+    });
+
     it("rejects blank import setting keys without trimming valid keys", () => {
         const result = validateImportData({
             settings: {

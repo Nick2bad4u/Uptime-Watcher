@@ -38,7 +38,7 @@ const importSiteSchema: z.ZodType<ImportSite> = z
     .object({
         identifier: siteIdentifierSchema,
         monitoring: z.boolean().optional(),
-        monitors: z.array(monitorSchema).min(1).optional(),
+        monitors: z.array(monitorSchema).optional(),
         name: siteNameSchema.optional(),
     })
     .strict();
