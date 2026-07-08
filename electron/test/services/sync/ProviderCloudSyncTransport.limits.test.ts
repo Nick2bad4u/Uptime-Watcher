@@ -555,6 +555,34 @@ describe("ProviderCloudSyncTransport outbound artifact validation", () => {
         expect(uploaded).toBeFalsy();
     });
 
+    it("rejects manifests with invalid latestSnapshotKey before upload", async () => {
+        let uploaded = false;
+        const provider = createProvider({
+            uploadObject: async (): Promise<CloudObjectEntry> => {
+                uploaded = true;
+                return {
+                    key: "manifest.json",
+                    lastModifiedAt: Date.now(),
+                    sizeBytes: 1,
+                };
+            },
+        });
+
+        const transport = ProviderCloudSyncTransport.create(provider);
+        const invalidManifest = {
+            devices: {},
+            latestSnapshotKey: "../evil.json",
+            manifestVersion: 1,
+            syncSchemaVersion: CLOUD_SYNC_SCHEMA_VERSION,
+        } satisfies CloudSyncManifest;
+
+        await expect(transport.writeManifest(invalidManifest)).rejects.toThrow(
+            /latestsnapshotkey is invalid/iu
+        );
+
+        expect(uploaded).toBeFalsy();
+    });
+
     it("validates snapshots before upload", async () => {
         let uploaded = false;
         const provider = createProvider({

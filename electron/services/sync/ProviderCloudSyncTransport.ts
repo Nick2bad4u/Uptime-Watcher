@@ -787,6 +787,7 @@ export class ProviderCloudSyncTransport implements CloudSyncTransport {
 
     public async writeManifest(manifest: CloudSyncManifest): Promise<void> {
         const parsedManifest = parseCloudSyncManifest(manifest);
+        validateManifestSnapshotKey(parsedManifest);
         const json = JSON.stringify(parsedManifest, null, 2);
         await this.provider.uploadObject({
             buffer: encodeUtf8(json),
