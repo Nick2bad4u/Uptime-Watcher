@@ -10,7 +10,7 @@ import * as z from "zod";
  */
 const dropboxFilesUploadResultSchema = z
     .object({
-        path_display: z.string().trim().min(1),
+        path_display: z.string().min(1),
         server_modified: z.string().trim().min(1),
         size: z.int().nonnegative(),
     })
@@ -112,7 +112,7 @@ export function parseDropboxFilesDownloadResult(
 const dropboxListFolderFileEntrySchema = z
     .object({
         ".tag": z.literal("file"),
-        path_display: z.string().trim().min(1),
+        path_display: z.string().min(1),
         server_modified: z.string().trim().min(1),
         size: z.int().nonnegative(),
     })

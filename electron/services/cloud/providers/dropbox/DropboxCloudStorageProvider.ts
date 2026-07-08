@@ -95,11 +95,21 @@ function fromDropboxPathOrNull(pathDisplay: string): null | string {
         return null;
     }
 
+    const rawKey = normalized.slice(prefix.length);
+
     try {
-        return normalizeKey(normalized.slice(prefix.length));
+        const key = normalizeKey(rawKey);
+        return key === rawKey ? key : null;
     } catch {
         return null;
     }
+}
+
+function isDropboxAppRootPath(pathDisplay: string): boolean {
+    const normalized = normalizePathSeparatorsToPosix(pathDisplay);
+    const root = `/${APP_ROOT_DIRECTORY_NAME}`;
+
+    return normalized === root || normalized.startsWith(`${root}/`);
 }
 
 function parseDropboxTimestamp(value: string): number | null {
@@ -359,8 +369,14 @@ export class DropboxCloudStorageProvider
                 }
 
                 const key = fromDropboxPathOrNull(parsed.pathDisplay);
+                if (key === null) {
+                    return {
+                        cloudObject: null,
+                        isInvalid: isDropboxAppRootPath(parsed.pathDisplay),
+                    };
+                }
+
                 const isMatchesPrefix =
-                    typeof key === "string" &&
                     key.length > 0 &&
                     (!normalizedPrefix || key.startsWith(normalizedPrefix));
 
