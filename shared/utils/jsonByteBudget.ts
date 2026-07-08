@@ -84,6 +84,17 @@ function getNativeMethod(
 
 const DATE_GET_TIME = getNativeMethod(Date.prototype, "getTime");
 const DATE_TO_ISO_STRING = getNativeMethod(Date.prototype, "toISOString");
+const TYPED_ARRAY_PROTOTYPE =
+    getPrototypeObject(Uint8Array.prototype) ?? Uint8Array.prototype;
+const ARRAY_BUFFER_BYTE_LENGTH = getNativeGetter(
+    ArrayBuffer.prototype,
+    "byteLength"
+);
+const DATA_VIEW_BYTE_LENGTH = getNativeGetter(DataView.prototype, "byteLength");
+const TYPED_ARRAY_BYTE_LENGTH = getNativeGetter(
+    TYPED_ARRAY_PROTOTYPE,
+    "byteLength"
+);
 const URL_TO_STRING = getNativeMethod(URL.prototype, "toString");
 
 interface JsonByteBudgetState {
@@ -154,19 +165,17 @@ function addJsonBytesForObject(
     if (value instanceof ArrayBuffer) {
         addBytes(
             state,
-            getNativeByteLength(value, ArrayBuffer.prototype) ??
+            getNativeByteLength(value, ARRAY_BUFFER_BYTE_LENGTH) ??
                 state.maxBytes + 1
         );
         return;
     }
 
     if (ArrayBuffer.isView(value)) {
-        const prototype = getPrototypeObject(value);
         addBytes(
             state,
-            prototype
-                ? (getNativeByteLength(value, prototype) ?? state.maxBytes + 1)
-                : state.maxBytes + 1
+            getNativeByteLength(value, getByteLengthGetterForView(value)) ??
+                state.maxBytes + 1
         );
         return;
     }
@@ -356,9 +365,8 @@ function getJsonBytesForUrl(value: URL): number {
 
 function getNativeByteLength(
     value: ArrayBuffer | ArrayBufferView,
-    prototype: object
+    byteLength: NativeGetter | undefined
 ): number | undefined {
-    const byteLength = getNativeGetter(prototype, "byteLength");
     if (!byteLength) {
         return undefined;
     }
@@ -373,6 +381,14 @@ function getNativeByteLength(
     } catch {
         return undefined;
     }
+}
+
+function getByteLengthGetterForView(
+    value: ArrayBufferView
+): NativeGetter | undefined {
+    return value instanceof DataView
+        ? DATA_VIEW_BYTE_LENGTH
+        : TYPED_ARRAY_BYTE_LENGTH;
 }
 
 function getJsonBytesForString(value: string): number {

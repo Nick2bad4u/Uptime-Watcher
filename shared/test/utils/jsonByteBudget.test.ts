@@ -163,6 +163,20 @@ describe("json byte budget helpers", () => {
         expect(byteLength).not.toHaveBeenCalled();
     });
 
+    it("does not invoke patched ArrayBuffer prototype byteLength while counting buffers", () => {
+        const byteLength = vi.spyOn(ArrayBuffer.prototype, "byteLength", "get");
+        byteLength.mockImplementation(() => {
+            throw new Error("ArrayBuffer prototype byteLength should not run");
+        });
+
+        try {
+            expect(getJsonByteLengthUpTo(new ArrayBuffer(4), 100)).toBe(4);
+            expect(byteLength).not.toHaveBeenCalled();
+        } finally {
+            byteLength.mockRestore();
+        }
+    });
+
     it("does not invoke shadowed view byteLength accessors", () => {
         const view = new Uint8Array(6);
         const byteLength = vi.fn(() => {
@@ -175,6 +189,39 @@ describe("json byte budget helpers", () => {
 
         expect(getJsonByteLengthUpTo(view, 100)).toBe(6);
         expect(byteLength).not.toHaveBeenCalled();
+    });
+
+    it("does not invoke patched typed-array prototype byteLength while counting views", () => {
+        const typedArrayPrototype = Object.getPrototypeOf(
+            Uint8Array.prototype
+        ) as { readonly byteLength: number };
+        const byteLength = vi.spyOn(typedArrayPrototype, "byteLength", "get");
+        byteLength.mockImplementation(() => {
+            throw new Error("TypedArray prototype byteLength should not run");
+        });
+
+        try {
+            expect(getJsonByteLengthUpTo(new Uint8Array(6), 100)).toBe(6);
+            expect(byteLength).not.toHaveBeenCalled();
+        } finally {
+            byteLength.mockRestore();
+        }
+    });
+
+    it("does not invoke patched DataView prototype byteLength while counting views", () => {
+        const byteLength = vi.spyOn(DataView.prototype, "byteLength", "get");
+        byteLength.mockImplementation(() => {
+            throw new Error("DataView prototype byteLength should not run");
+        });
+
+        try {
+            expect(
+                getJsonByteLengthUpTo(new DataView(new ArrayBuffer(5)), 100)
+            ).toBe(5);
+            expect(byteLength).not.toHaveBeenCalled();
+        } finally {
+            byteLength.mockRestore();
+        }
     });
 
     it("treats enumerable array accessors as over budget without invoking them", () => {
