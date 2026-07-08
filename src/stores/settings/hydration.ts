@@ -1,14 +1,15 @@
+/**
+ * Utilities for synchronizing the settings store after persistence hydration.
+ */
 import { ensureError } from "@shared/utils/errorHandling";
 import { objectHasOwn } from "ts-extras";
 
 import type { SettingsStore } from "./types";
 
+import { UI_DELAYS } from "../../constants";
 import { logger } from "../../services/logger";
-import { fireAndForget } from "../../utils/async/fireAndForget";
-/**
- * Utilities for synchronizing the settings store after persistence hydration.
- */
 import { SettingsService } from "../../services/SettingsService";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { defaultSettings, normalizeAppSettings } from "./state";
 
 const hasOwn = <T extends object>(
@@ -130,5 +131,5 @@ export const syncSettingsAfterRehydration = (
                 },
             }
         );
-    }, 100);
+    }, UI_DELAYS.STATE_UPDATE_DEFER);
 };
