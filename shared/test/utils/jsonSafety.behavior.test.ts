@@ -94,6 +94,31 @@ describe("jsonSafety behavior", () => {
             expect(result.success).toBeFalsy();
             expect(result.error).toContain("JSON serialization failed");
         });
+
+        it("rejects collection objects instead of serializing them as empty objects", () => {
+            const topLevelMapResult = safeJsonStringify(
+                unsafeJsonifiable(
+                    new Map([
+                        [
+                            "token",
+                            "secret",
+                        ],
+                    ])
+                )
+            );
+            const nestedSetResult = safeJsonStringify(
+                unsafeJsonifiable({
+                    values: new Set(["secret"]),
+                })
+            );
+
+            expect(topLevelMapResult.success).toBeFalsy();
+            expect(topLevelMapResult.error).toContain(
+                "JSON serialization failed"
+            );
+            expect(nestedSetResult.success).toBeFalsy();
+            expect(nestedSetResult.error).toContain("JSON serialization failed");
+        });
     });
 
     describe(safeJsonParse, () => {
@@ -283,6 +308,18 @@ describe("jsonSafety behavior", () => {
 
             expect(json).toBe(fallback);
             expect(some).not.toHaveBeenCalled();
+        });
+
+        it("returns fallback for collection objects", () => {
+            const fallback = '{ "ok": false }';
+            const json = safeJsonStringifyWithFallback(
+                unsafeJsonifiable({
+                    values: new Set(["secret"]),
+                }),
+                fallback
+            );
+
+            expect(json).toBe(fallback);
         });
     });
 

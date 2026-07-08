@@ -187,6 +187,12 @@ const hasDescriptorValue = (
 const isNonNullObject = (value: unknown): value is object =>
     typeof value === "object" && value !== null;
 
+const isJsonLossyCollection = (value: object): boolean =>
+    value instanceof Map ||
+    value instanceof Set ||
+    value instanceof WeakMap ||
+    value instanceof WeakSet;
+
 const isJsonSerializableValue = (
     value: unknown,
     seen = new WeakSet<object>()
@@ -205,6 +211,10 @@ const isJsonSerializableValue = (
     }
 
     const target: object = value;
+    if (isJsonLossyCollection(target)) {
+        return false;
+    }
+
     if (seen.has(target)) {
         throw new TypeError("Circular reference detected");
     }
