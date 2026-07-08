@@ -1,5 +1,6 @@
 import type { UnknownRecord } from "type-fest";
 
+import { isPlainRecord } from "@shared/utils/typeHelpers";
 import { isFinite as isFiniteNumber, setHas } from "ts-extras";
 
 /**
@@ -16,18 +17,8 @@ export function createStringUnionGuard<T extends string>(
 /**
  * Narrow an unknown value to `UnknownRecord`.
  */
-export function isUnknownRecord(value: unknown): value is UnknownRecord {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-        return false;
-    }
-
-    try {
-        const prototype: unknown = Object.getPrototypeOf(value);
-        return prototype === null || prototype === Object.prototype;
-    } catch {
-        return false;
-    }
-}
+export const isUnknownRecord = (value: unknown): value is UnknownRecord =>
+    isPlainRecord(value);
 
 /**
  * Checks that a value is a finite number suitable for timestamps.

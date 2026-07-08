@@ -124,6 +124,20 @@ describe("ipcResponse", () => {
         expect(getterCalls).toBe(0);
     });
 
+    it("rejects exotic response envelope prototypes", () => {
+        for (const response of [
+            Object.assign(new Date(), { success: true }),
+            Object.assign(new Map<string, unknown>(), { success: true }),
+            Object.assign(Object.create({ inherited: true }), {
+                success: true,
+            }) as Record<string, unknown>,
+        ]) {
+            expect(() => extractIpcResponseData(response)).toThrow(
+                "Invalid IPC response format"
+            );
+        }
+    });
+
     it("does not invoke accessor-backed error fields", () => {
         let getterCalls = 0;
         const response = { success: false };

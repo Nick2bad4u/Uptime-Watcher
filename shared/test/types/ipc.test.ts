@@ -45,6 +45,25 @@ describe("IPC type guards", () => {
 
             expect(isIpcCorrelationEnvelope(accessorEnvelope)).toBeFalsy();
         });
+
+        it("rejects exotic correlation envelope prototypes", () => {
+            for (const envelope of [
+                Object.assign(
+                    new Date(),
+                    createIpcCorrelationEnvelope(generateCorrelationId())
+                ),
+                Object.assign(
+                    new Map<string, unknown>(),
+                    createIpcCorrelationEnvelope(generateCorrelationId())
+                ),
+                Object.assign(
+                    Object.create({ inherited: true }),
+                    createIpcCorrelationEnvelope(generateCorrelationId())
+                ) as unknown,
+            ]) {
+                expect(isIpcCorrelationEnvelope(envelope)).toBeFalsy();
+            }
+        });
     });
 
     describe(isIpcHandlerVerificationResult, () => {
@@ -86,6 +105,28 @@ describe("IPC type guards", () => {
             });
 
             expect(isIpcHandlerVerificationResult(accessorResult)).toBeFalsy();
+        });
+
+        it("rejects exotic handler verification result prototypes", () => {
+            for (const result of [
+                Object.assign(new Date(), {
+                    availableChannels: ["get-sites"],
+                    channel: "get-sites",
+                    registered: true,
+                }),
+                Object.assign(new Map<string, unknown>(), {
+                    availableChannels: ["get-sites"],
+                    channel: "get-sites",
+                    registered: true,
+                }),
+                Object.assign(Object.create({ inherited: true }), {
+                    availableChannels: ["get-sites"],
+                    channel: "get-sites",
+                    registered: true,
+                }) as unknown,
+            ]) {
+                expect(isIpcHandlerVerificationResult(result)).toBeFalsy();
+            }
         });
     });
 });

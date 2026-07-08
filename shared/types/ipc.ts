@@ -43,7 +43,7 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { ExclusifyUnion, Simplify, UnknownRecord } from "type-fest";
 
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { isPlainRecord } from "@shared/utils/typeHelpers";
 
 /**
  * Standardized IPC response envelope shared across renderer, preload, and main.
@@ -81,7 +81,7 @@ export const createIpcCorrelationEnvelope = (
 export const isIpcCorrelationEnvelope = (
     value: unknown
 ): value is IpcCorrelationEnvelope => {
-    if (!isRecord(value)) {
+    if (!isPlainRecord(value)) {
         return false;
     }
 
@@ -184,7 +184,7 @@ export interface SerializedDatabaseRestoreResult {
 export const isIpcHandlerVerificationResult = (
     value: unknown
 ): value is IpcHandlerVerificationResult => {
-    if (!isRecord(value)) {
+    if (!isPlainRecord(value)) {
         return false;
     }
 

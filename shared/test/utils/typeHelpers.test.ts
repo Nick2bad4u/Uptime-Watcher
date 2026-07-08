@@ -56,8 +56,15 @@ describe("shared/utils/typeHelpers Function Coverage Validation", () => {
 
             // Test isRecord function
             expect(helpersModule.isRecord({ key: "value" })).toBeTruthy();
+            expect(helpersModule.isPlainRecord({ key: "value" })).toBeTruthy();
+            expect(
+                helpersModule.isPlainRecord(Object.create(null))
+            ).toBeTruthy();
+            expect(helpersModule.isPlainRecord(new Date())).toBeFalsy();
             expect(helpersModule.isRecord([])).toBeFalsy();
+            expect(helpersModule.isPlainRecord([])).toBeFalsy();
             expect(helpersModule.isRecord(null)).toBeFalsy();
+            expect(helpersModule.isPlainRecord(null)).toBeFalsy();
             expect(helpersModule.isRecord(undefined)).toBeFalsy();
             expect(helpersModule.isRecord("string")).toBeFalsy();
 

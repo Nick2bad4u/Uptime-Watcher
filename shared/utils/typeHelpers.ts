@@ -107,6 +107,27 @@ export function isRecord(value: unknown): value is UnknownRecord {
 }
 
 /**
+ * Safely checks whether an unknown value is a plain data record.
+ *
+ * @remarks
+ * This is stricter than {@link isRecord}: built-in instances such as `Date`,
+ * `Map`, and custom class objects are rejected. Use this at IPC and validation
+ * boundaries that expect structured-clone-style object payloads.
+ */
+export function isPlainRecord(value: unknown): value is UnknownRecord {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    try {
+        const prototype: unknown = Object.getPrototypeOf(value);
+        return prototype === null || prototype === Object.prototype;
+    } catch {
+        return false;
+    }
+}
+
+/**
  * Safely checks whether a value follows the PromiseLike contract.
  *
  * @remarks

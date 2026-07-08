@@ -4,7 +4,7 @@ import {
     createNullPrototypeObject,
     defineOwnEnumerableDataProperties,
 } from "@shared/utils/objectSafety";
-import { isRecord } from "@shared/utils/typeHelpers";
+import { isPlainRecord } from "@shared/utils/typeHelpers";
 import { objectHasOwn } from "ts-extras";
 
 import type { ParameterValueValidationResult } from "./parameterValidation";
@@ -37,19 +37,6 @@ const FORBIDDEN_RECORD_KEYS = new Set<string>([
     "constructor",
     "prototype",
 ]);
-
-function isPlainRecordLike(value: unknown): value is UnknownRecord {
-    if (!isRecord(value)) {
-        return false;
-    }
-
-    try {
-        const prototype: unknown = Object.getPrototypeOf(value);
-        return prototype === null || prototype === Object.prototype;
-    } catch {
-        return false;
-    }
-}
 
 function copyOwnEnumerableDataRecord(
     record: UnknownRecord
@@ -88,7 +75,7 @@ function requireRecordParam(
     value: unknown,
     paramName: string
 ): RequiredRecordResult {
-    if (!isPlainRecordLike(value)) {
+    if (!isPlainRecord(value)) {
         return {
             error: toValidationResult(`${paramName} must be a valid object`),
             ok: false,

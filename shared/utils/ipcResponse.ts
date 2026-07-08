@@ -18,7 +18,7 @@
 
 import type { IpcResponse } from "@shared/types/ipc";
 
-import { castUnchecked, isRecord } from "@shared/utils/typeHelpers";
+import { castUnchecked, isPlainRecord } from "@shared/utils/typeHelpers";
 import { isDefined } from "ts-extras";
 
 const getOwnDataProperty = (source: object, key: PropertyKey): unknown => {
@@ -38,7 +38,7 @@ const getOwnDataProperty = (source: object, key: PropertyKey): unknown => {
  * fields and matches the fuzzing expectations in the test suite.
  */
 export function isIpcResponseEnvelope(value: unknown): value is IpcResponse {
-    if (!isRecord(value)) {
+    if (!isPlainRecord(value)) {
         return false;
     }
 
