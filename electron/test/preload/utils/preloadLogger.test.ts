@@ -175,6 +175,71 @@ describe(buildPayloadPreview, () => {
         }
     });
 
+    it("does not invoke patched ArrayBuffer prototype byteLength while building previews", () => {
+        const byteLength = vi.spyOn(ArrayBuffer.prototype, "byteLength", "get");
+        byteLength.mockImplementation(() => {
+            throw new Error("ArrayBuffer prototype byteLength should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview({
+                buffer: new ArrayBuffer(4),
+            });
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"byteLength": 4');
+            expect(preview).toContain('"type": "ArrayBuffer"');
+            expect(byteLength).not.toHaveBeenCalled();
+        } finally {
+            byteLength.mockRestore();
+        }
+    });
+
+    it("does not invoke patched typed-array prototype byteLength while building previews", () => {
+        const typedArrayPrototype = Object.getPrototypeOf(
+            Uint8Array.prototype
+        ) as { readonly byteLength: number };
+        const byteLength = vi.spyOn(typedArrayPrototype, "byteLength", "get");
+        byteLength.mockImplementation(() => {
+            throw new Error("TypedArray prototype byteLength should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview({
+                view: new Uint8Array(6),
+            });
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"byteLength": 6');
+            expect(preview).toContain('"constructor": "Uint8Array"');
+            expect(preview).toContain('"type": "ArrayBufferView"');
+            expect(byteLength).not.toHaveBeenCalled();
+        } finally {
+            byteLength.mockRestore();
+        }
+    });
+
+    it("does not invoke patched DataView prototype byteLength while building previews", () => {
+        const byteLength = vi.spyOn(DataView.prototype, "byteLength", "get");
+        byteLength.mockImplementation(() => {
+            throw new Error("DataView prototype byteLength should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview({
+                view: new DataView(new ArrayBuffer(5)),
+            });
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"byteLength": 5');
+            expect(preview).toContain('"constructor": "DataView"');
+            expect(preview).toContain('"type": "ArrayBufferView"');
+            expect(byteLength).not.toHaveBeenCalled();
+        } finally {
+            byteLength.mockRestore();
+        }
+    });
+
     it("redacts secrets embedded in raw string payloads", () => {
         const preview = buildPayloadPreview(
             "Authorization: Bearer super-secret refresh_token=refresh-secret"

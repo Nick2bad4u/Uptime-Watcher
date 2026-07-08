@@ -52,6 +52,8 @@ const SENSITIVE_KEY_PATTERN =
 
 type NativeGetter = (this: unknown) => unknown;
 type NativeMethod = (this: unknown, ...arguments_: unknown[]) => unknown;
+const TYPED_ARRAY_PROTOTYPE =
+    getPrototypeObject(Uint8Array.prototype) ?? Uint8Array.prototype;
 
 function isNativeGetter(value: unknown): value is NativeGetter {
     return typeof value === "function";
@@ -111,10 +113,19 @@ function getNativeMethod(
 
 const DATE_GET_TIME = getNativeMethod(Date.prototype, "getTime");
 const DATE_TO_ISO_STRING = getNativeMethod(Date.prototype, "toISOString");
+const ARRAY_BUFFER_BYTE_LENGTH = getNativeGetter(
+    ArrayBuffer.prototype,
+    "byteLength"
+);
+const DATA_VIEW_BYTE_LENGTH = getNativeGetter(DataView.prototype, "byteLength");
 const MAP_ENTRIES = getNativeMethod(Map.prototype, "entries");
 const MAP_SIZE = getNativeGetter(Map.prototype, "size");
 const SET_SIZE = getNativeGetter(Set.prototype, "size");
 const SET_VALUES = getNativeMethod(Set.prototype, "values");
+const TYPED_ARRAY_BYTE_LENGTH = getNativeGetter(
+    TYPED_ARRAY_PROTOTYPE,
+    "byteLength"
+);
 const URL_TO_STRING = getNativeMethod(URL.prototype, "toString");
 
 function isIterable(value: unknown): value is Iterable<unknown> {
@@ -222,9 +233,8 @@ const getNativeCollectionSize = (
 
 const getNativeByteLength = (
     value: ArrayBuffer | ArrayBufferView,
-    prototype: object
+    byteLengthGetter: NativeGetter | undefined
 ): number | string => {
-    const byteLengthGetter = getNativeGetter(prototype, "byteLength");
     if (!byteLengthGetter) {
         return UNKNOWN_SIZE_PLACEHOLDER;
     }
@@ -240,6 +250,11 @@ const getNativeByteLength = (
         return UNKNOWN_SIZE_PLACEHOLDER;
     }
 };
+
+const getByteLengthGetterForView = (
+    value: ArrayBufferView
+): NativeGetter | undefined =>
+    value instanceof DataView ? DATA_VIEW_BYTE_LENGTH : TYPED_ARRAY_BYTE_LENGTH;
 
 const sanitizePreviewString = (value: string): string => {
     try {
@@ -430,9 +445,10 @@ function serializeArrayBufferView(value: ArrayBufferView): UnknownRecord {
             : "ArrayBufferView";
 
     return {
-        byteLength: prototype
-            ? getNativeByteLength(value, prototype)
-            : UNKNOWN_SIZE_PLACEHOLDER,
+        byteLength: getNativeByteLength(
+            value,
+            getByteLengthGetterForView(value)
+        ),
         constructor: constructorName,
         type: "ArrayBufferView",
     };
@@ -494,7 +510,7 @@ function serializeValue(value: unknown, seen: WeakSet<object>): unknown {
 
     if (value instanceof ArrayBuffer) {
         return {
-            byteLength: getNativeByteLength(value, ArrayBuffer.prototype),
+            byteLength: getNativeByteLength(value, ARRAY_BUFFER_BYTE_LENGTH),
             type: "ArrayBuffer",
         };
     }
