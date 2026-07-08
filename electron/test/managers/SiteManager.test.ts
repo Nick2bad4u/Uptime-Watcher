@@ -786,7 +786,12 @@ describe(SiteManager, () => {
             const result = manager.getSiteFromCache("site1");
 
             expect(result).toEqual(testSite);
+            expect(result).not.toBe(testSite);
             expect(manager["sitesCache"].get).toHaveBeenCalledWith("site1");
+
+            result!.name = "Mutated Result";
+
+            expect(testSite.name).toBe("Test Site");
         });
         it("should return undefined when site does not exist in cache", () => {
             vi.spyOn(manager["sitesCache"], "get").mockReturnValue(undefined);
@@ -823,7 +828,13 @@ describe(SiteManager, () => {
             const result = manager.getSitesFromCache();
 
             expect(result).toEqual(testSites);
+            expect(result).not.toBe(testSites);
+            expect(result[0]).not.toBe(testSites[0]);
             expect(manager["sitesCache"].getAll).toHaveBeenCalled();
+
+            result[0]!.name = "Mutated Result";
+
+            expect(testSites[0]!.name).toBe("Site 1");
         });
         it("should return empty array when cache is empty", () => {
             vi.spyOn(manager["sitesCache"], "getAll").mockReturnValue([]);

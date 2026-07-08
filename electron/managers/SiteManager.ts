@@ -943,7 +943,7 @@ export class SiteManager {
             );
         }
 
-        return site;
+        return site ? structuredClone(site) : undefined;
     }
 
     /**
@@ -974,11 +974,11 @@ export class SiteManager {
      * @returns Array of site objects currently in cache.
      */
     public getSitesFromCache(): Site[] {
-        return this.sitesCache.getAll();
+        return this.sitesCache.getAll().map((site) => structuredClone(site));
     }
 
     private getSitesSnapshot(): Site[] {
-        return this.getSitesFromCache().map((site) => structuredClone(site));
+        return this.getSitesFromCache();
     }
 
     /**
