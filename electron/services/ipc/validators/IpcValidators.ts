@@ -2,6 +2,7 @@ import {
     validateExternalOpenUrlCandidate,
     validateHttpUrlCandidate,
 } from "@shared/utils/urlSafety";
+import { isPlainRecord } from "@shared/utils/typeHelpers";
 import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import { isDefined } from "ts-extras";
 
@@ -76,11 +77,7 @@ export const IpcValidators = {
      * Validates a required object parameter.
      */
     requiredObject: (value: unknown, paramName: string): null | string => {
-        if (
-            typeof value !== "object" ||
-            value === null ||
-            Array.isArray(value)
-        ) {
+        if (!isPlainRecord(value)) {
             return `${paramName} must be a valid object`;
         }
         return null;

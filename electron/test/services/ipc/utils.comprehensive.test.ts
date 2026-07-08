@@ -517,6 +517,26 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(result).toBeNull();
             });
 
+            it("should return null for null-prototype objects", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const value = Object.create(null) as Record<string, unknown>;
+                value["key"] = "value";
+
+                const result = IpcValidators.requiredObject(
+                    value,
+                    "testParam"
+                );
+
+                expect(result).toBeNull();
+            });
+
             it("should return null for complex objects", async ({
                 task,
                 annotate,
@@ -634,6 +654,47 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Type: Error Handling", "type");
 
                 const result = IpcValidators.requiredObject(true, "testParam");
+                expect(result).toBe("testParam must be a valid object");
+            });
+
+            it("should return error for built-in object instances", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                expect(
+                    IpcValidators.requiredObject(new Date(), "testParam")
+                ).toBe("testParam must be a valid object");
+                expect(
+                    IpcValidators.requiredObject(new Map(), "testParam")
+                ).toBe("testParam must be a valid object");
+                expect(
+                    IpcValidators.requiredObject(new Set(), "testParam")
+                ).toBe("testParam must be a valid object");
+            });
+
+            it("should return error for class instances", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                class Payload {
+                    public readonly key = "value";
+                }
+
+                const result = IpcValidators.requiredObject(
+                    new Payload(),
+                    "testParam"
+                );
+
                 expect(result).toBe("testParam must be a valid object");
             });
         });
