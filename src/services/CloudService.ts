@@ -45,6 +45,8 @@ import {
     validateCloudSyncResetResult,
 } from "@shared/validation/cloudSchemas";
 import { validateSerializedDatabaseRestoreResult } from "@shared/validation/dataSchemas";
+import { collectCloudEncryptionPassphraseIssues } from "@shared/validation/cloudEncryptionPassphrase";
+import { arrayJoin } from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -257,11 +259,19 @@ export const CloudService: CloudServiceContract = {
     setEncryptionPassphrase: wrap(
         "setEncryptionPassphrase",
         async (api, passphrase) => {
-            if (
-                typeof passphrase !== "string" ||
-                passphrase.trim().length === 0
-            ) {
-                throw new TypeError("Passphrase must be a non-empty string");
+            if (typeof passphrase !== "string") {
+                throw new TypeError("Passphrase must be a string");
+            }
+
+            const passphraseIssues =
+                collectCloudEncryptionPassphraseIssues(passphrase);
+            if (passphraseIssues.length > 0) {
+                throw new TypeError(
+                    `Invalid cloud encryption passphrase: ${arrayJoin(
+                        passphraseIssues,
+                        ", "
+                    )}`
+                );
             }
 
             // Never log the passphrase.

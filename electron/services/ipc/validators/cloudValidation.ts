@@ -13,6 +13,7 @@ import {
     MAX_FILESYSTEM_BASE_DIRECTORY_BYTES,
     validateFilesystemBaseDirectoryCandidate,
 } from "@shared/validation/filesystemBaseDirectoryValidation";
+import { collectCloudEncryptionPassphraseIssues } from "@shared/validation/cloudEncryptionPassphrase";
 import { isDefined, isInteger, stringSplit } from "ts-extras";
 
 import type { IpcParameterValidator } from "../types";
@@ -31,9 +32,6 @@ import {
 
 /** Maximum byte budget accepted for cloud backup object keys. */
 const MAX_BACKUP_KEY_BYTES = 2048;
-
-/** Maximum byte budget accepted for encryption passphrases. */
-const MAX_ENCRYPTION_PASSPHRASE_BYTES = 1024;
 
 export const validateCloudFilesystemProviderConfig: IpcParameterValidator =
     createParamValidator(1, [
@@ -183,24 +181,7 @@ export const validateEncryptionPassphrasePayload: IpcParameterValidator =
             }
 
             const passphrase = requiredString.value;
-            errors.push(
-                ...collectStringSafetyErrors(passphrase, {
-                    forbidControlChars: {
-                        message:
-                            "passphrase must not contain control characters",
-                    },
-                    maxBytes: {
-                        limit: MAX_ENCRYPTION_PASSPHRASE_BYTES,
-                        message: `passphrase must not exceed ${MAX_ENCRYPTION_PASSPHRASE_BYTES} bytes`,
-                    },
-                })
-            );
-
-            if (passphrase.trim().length < 8) {
-                errors.push(
-                    "passphrase must be at least 8 characters (after trimming)"
-                );
-            }
+            errors.push(...collectCloudEncryptionPassphraseIssues(passphrase));
 
             return errors.length > 0 ? errors : null;
         },

@@ -355,18 +355,36 @@ describe("CloudService", () => {
     });
 
     it("sets encryption passphrase", async () => {
-        const status = await CloudService.setEncryptionPassphrase("pass");
+        const status = await CloudService.setEncryptionPassphrase(
+            "correct horse battery staple"
+        );
         expect(status.encryptionMode).toBe("passphrase");
         expect(
             mockElectronAPI.cloud.setEncryptionPassphrase
-        ).toHaveBeenCalledWith("pass");
+        ).toHaveBeenCalledWith("correct horse battery staple");
         expect(mockLogger.info).toHaveBeenCalled();
     });
 
-    it("rejects empty encryption passphrase", async () => {
-        await expect(CloudService.setEncryptionPassphrase(" ")).rejects.toThrow(
-            TypeError
+    it("rejects weak encryption passphrases before invoking Electron", async () => {
+        await expect(
+            CloudService.setEncryptionPassphrase("pass")
+        ).rejects.toThrow(
+            "Invalid cloud encryption passphrase: passphrase must be at least 8 characters"
         );
+        expect(
+            mockElectronAPI.cloud.setEncryptionPassphrase
+        ).not.toHaveBeenCalled();
+    });
+
+    it("rejects unsafe encryption passphrases before invoking Electron", async () => {
+        await expect(
+            CloudService.setEncryptionPassphrase("correct\nhorse")
+        ).rejects.toThrow(
+            "Invalid cloud encryption passphrase: passphrase must not contain control characters"
+        );
+        expect(
+            mockElectronAPI.cloud.setEncryptionPassphrase
+        ).not.toHaveBeenCalled();
     });
 
     it("migrates backups", async () => {
