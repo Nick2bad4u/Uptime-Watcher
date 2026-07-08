@@ -3,7 +3,7 @@ import { getOwnStringDataProperty } from "./errorPropertyAccess";
 import { normalizeLogValue } from "./loggingContext";
 import { isRecord } from "./typeHelpers";
 
-const DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS = 1000;
+export const DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS = 1000;
 
 /**
  * Options for {@link normalizeUserFacingErrorDetail}.

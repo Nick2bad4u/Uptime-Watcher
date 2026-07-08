@@ -20,6 +20,7 @@ import {
     sampleOne,
     siteNameArbitrary,
 } from "@shared/test/arbitraries/siteArbitraries";
+import { DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS } from "@shared/utils/userFacingErrors";
 import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -1154,6 +1155,37 @@ describe("Events Domain API", () => {
             eventHandler?.({}, mockEventData);
 
             expect(callback).toHaveBeenCalledWith(mockEventData);
+        });
+
+        it("should drop update errors that exceed the user-facing detail limit", () => {
+            const callback = vi.fn();
+            const oversizedPayload: UpdateStatusEventData = {
+                error: "x".repeat(
+                    DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS + 1
+                ),
+                status: "error",
+            };
+
+            eventsApi.onUpdateStatus(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, oversizedPayload);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'update-status'",
+                expect.objectContaining({
+                    guard: "isUpdateStatusEventDataPayload",
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "update-status",
+                    guard: "isUpdateStatusEventDataPayload",
+                    reason: "payload-validation",
+                })
+            );
         });
     });
 

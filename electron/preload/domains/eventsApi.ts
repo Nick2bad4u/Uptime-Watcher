@@ -44,6 +44,7 @@ import {
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
 import { isNonNegativeSafeInteger } from "@shared/utils/typeGuards";
+import { DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS } from "@shared/utils/userFacingErrors";
 import { validateSiteSnapshot } from "@shared/validation/guards";
 import {
     isEnrichedMonitorStatusChangedEventData,
@@ -279,7 +280,11 @@ const isUpdateStatusEventDataPayload = (
         return false;
     }
 
-    return !isDefined(error) || typeof error === "string";
+    return (
+        !isDefined(error) ||
+        (typeof error === "string" &&
+            error.length <= DEFAULT_MAX_USER_FACING_ERROR_DETAIL_CHARS)
+    );
 };
 
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
