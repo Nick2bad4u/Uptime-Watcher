@@ -1,5 +1,7 @@
 import type { SerializedDatabaseRestorePayload } from "@shared/types/ipc";
 
+import { isSafeInteger } from "ts-extras";
+
 /**
  * Result for building a restore payload from a user-selected SQLite file.
  */
@@ -26,6 +28,13 @@ export async function tryBuildSerializedDatabaseRestorePayloadFromFile(args: {
     readonly maxBytes: number;
 }): Promise<SqliteRestorePayloadBuildResult> {
     const { file, maxBytes } = args;
+
+    if (!isSafeInteger(maxBytes) || maxBytes <= 0) {
+        return {
+            message: "SQLite restore byte limit is invalid.",
+            ok: false,
+        };
+    }
 
     if (file.size === 0) {
         return {
