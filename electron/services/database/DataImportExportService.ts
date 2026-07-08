@@ -743,7 +743,7 @@ export class DataImportExportService {
                     status: entry.status,
                     timestamp: entry.timestamp,
                 },
-                entry.details ?? ""
+                entry.details
             );
         }
     }

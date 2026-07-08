@@ -1639,7 +1639,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 mockDatabase,
                 "new-monitor-id",
                 { status: "up", timestamp: 1000, responseTime: 50 },
-                ""
+                undefined
             );
             expect(
                 mockRepositories.history.addEntryInternal
@@ -1648,7 +1648,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 mockDatabase,
                 "new-monitor-id",
                 { status: "down", timestamp: 2000, responseTime: 0 },
-                ""
+                undefined
             );
         });
 
@@ -1715,7 +1715,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 mockDatabase,
                 "first-monitor-id",
                 { status: "up", timestamp: 1000, responseTime: 50 },
-                ""
+                undefined
             );
             expect(
                 mockRepositories.history.addEntryInternal
@@ -1724,7 +1724,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 mockDatabase,
                 "second-monitor-id",
                 { status: "down", timestamp: 2000, responseTime: 0 },
-                ""
+                undefined
             );
         });
 
