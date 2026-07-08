@@ -7,8 +7,8 @@
  *
  * This helper:
  *
- * - Mutates the cached monitor + site objects
  * - Persists the monitor changes inside a transaction
+ * - Mutates the cached monitor + site objects only after persistence succeeds
  * - Emits the canonical `monitor:status-changed` payload
  *
  * @packageDocumentation
@@ -68,18 +68,6 @@ export async function applyMonitorStateOperation(args: {
         RESERVED_MONITOR_STATE_CHANGE_KEYS
     );
 
-    // Update cached monitor object
-    defineOwnEnumerableDataProperties(monitor, sanitizedChanges);
-
-    // Update monitor in cached site
-    const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
-    if (monitorIndex !== -1) {
-        site.monitors[monitorIndex] = monitor;
-    }
-
-    // Update cached site
-    dependencies.sitesCache.set(site.identifier, site);
-
     // Persist to database within transaction
     await withDatabaseOperation(
         async () =>
@@ -93,6 +81,17 @@ export async function applyMonitorStateOperation(args: {
         dependencies.eventEmitter,
         { changes: sanitizedChanges, monitorId: monitor.id }
     );
+
+    // Publish cache changes only after persistence succeeds. Otherwise a
+    // failed transaction can leave monitoring state inconsistent until reload.
+    defineOwnEnumerableDataProperties(monitor, sanitizedChanges);
+
+    const monitorIndex = site.monitors.findIndex((m) => m.id === monitor.id);
+    if (monitorIndex !== -1) {
+        site.monitors[monitorIndex] = monitor;
+    }
+
+    dependencies.sitesCache.set(site.identifier, site);
 
     // Emit status-changed event with full payload
     const statusUpdate: StatusUpdate = {

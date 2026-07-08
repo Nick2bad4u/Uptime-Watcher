@@ -224,6 +224,63 @@ describe(applyMonitorStateOperation, () => {
         );
     });
 
+    it("does not mutate cache state or emit when persistence fails", async () => {
+        const eventEmitter =
+            createMockEventBus() as unknown as TypedEventBus<UptimeEvents>;
+        const sitesCache =
+            createMockStandardizedCache<Site>() as unknown as StandardizedCache<Site>;
+
+        const monitor = createTestMonitor("m1", {
+            monitoring: false,
+            responseTime: 123,
+            status: "down",
+        });
+        const site = createTestSite("s1", {
+            monitors: [monitor],
+        });
+        const databaseError = new Error("database unavailable");
+
+        const update = vi.fn(() => {
+            throw databaseError;
+        });
+        const monitorRepository = {
+            createTransactionAdapter: vi.fn().mockReturnValue({ update }),
+        } as unknown as MonitorRepository;
+
+        const databaseService = {
+            executeTransaction: vi
+                .fn()
+                .mockImplementation(
+                    async (fn: (db: unknown) => Promise<void>) => {
+                        await fn({});
+                    }
+                ),
+        } as unknown as DatabaseService;
+
+        await expect(
+            applyMonitorStateOperation({
+                changes: { monitoring: true, status: "up" },
+                dependencies: {
+                    databaseService,
+                    eventEmitter,
+                    monitorRepository,
+                    sitesCache,
+                },
+                monitor,
+                newStatus: "up",
+                site,
+            })
+        ).rejects.toThrow(databaseError);
+
+        expect(monitor.monitoring).toBeFalsy();
+        expect(monitor.status).toBe("down");
+        expect(site.monitors[0]).toBe(monitor);
+        expect(site.monitors[0]?.monitoring).toBeFalsy();
+        expect(site.monitors[0]?.status).toBe("down");
+        expect(sitesCache.set).not.toHaveBeenCalled();
+        expect(eventEmitter.emitTyped).not.toHaveBeenCalled();
+    });
+
     it("drops reserved prototype keys before mutating cache or persisting changes", async () => {
         const eventEmitter =
             createMockEventBus() as unknown as TypedEventBus<UptimeEvents>;
