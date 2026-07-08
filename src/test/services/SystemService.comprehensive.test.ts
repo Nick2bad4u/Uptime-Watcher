@@ -205,6 +205,7 @@ describe("SystemService", () => {
                 "https://example.com/path with spaces",
                 // Disallow embedded credentials in URLs.
                 "https://user:pass@example.com:8080/path",
+                "mailto:test@example.com?subject=Hi%0D%0ABcc:evil@example.com",
             ];
 
             for (const url of invalidUrls) {

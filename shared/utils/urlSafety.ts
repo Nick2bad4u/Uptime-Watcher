@@ -590,6 +590,14 @@ export function validateExternalOpenUrlCandidate(
 
     if (normalizedUrlLower.startsWith("mailto:")) {
         const mailtoUrl = new URL(normalizedUrl);
+        if (mailtoUrl.search.length > 0 || mailtoUrl.hash.length > 0) {
+            return {
+                ok: false,
+                reason: "mailto URL must not include query or hash parameters",
+                safeUrlForLogging,
+            };
+        }
+
         const email = mailtoUrl.pathname;
         if (!validator.isEmail(email)) {
             return {

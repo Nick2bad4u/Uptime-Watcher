@@ -1800,6 +1800,22 @@ describe("IPC Validators - Exported Validator Groups", () => {
             expect(isValidationSuccess(result)).toBeTruthy();
         });
 
+        it("rejects mailto URLs with query parameters", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const result = SystemHandlerValidators.openExternal([
+                "mailto:test@example.com?subject=Hi%0D%0ABcc:evil@example.com",
+            ]);
+
+            expect(isValidationFailure(result)).toBeTruthy();
+        });
+
         it("rejects file URLs", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: validators.complete", "component");

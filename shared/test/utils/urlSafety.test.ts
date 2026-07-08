@@ -155,6 +155,25 @@ describe("urlSafety", () => {
             expect(result.ok).toBeFalsy();
         });
 
+        it("rejects mailto URLs with query or hash parameters", () => {
+            expect(
+                validateExternalOpenUrlCandidate(
+                    "mailto:test@example.com?subject=hello"
+                ).ok
+            ).toBeFalsy();
+
+            expect(
+                validateExternalOpenUrlCandidate(
+                    "mailto:test@example.com?subject=Hi%0D%0ABcc:evil@example.com"
+                ).ok
+            ).toBeFalsy();
+
+            expect(
+                validateExternalOpenUrlCandidate("mailto:test@example.com#body")
+                    .ok
+            ).toBeFalsy();
+        });
+
         it("rejects javascript/file URLs", () => {
             expect(
                 validateExternalOpenUrlCandidate("file:///C:/Windows/System32")
