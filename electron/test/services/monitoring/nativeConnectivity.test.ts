@@ -24,6 +24,7 @@ import { performance } from "node:perf_hooks";
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { USER_AGENT } from "../../../constants";
 import type { ConnectivityOptions } from "../../../services/monitoring/utils/nativeConnectivity";
 
 import {
@@ -92,6 +93,15 @@ describe("Native Connectivity with Degraded State", () => {
             expect(result.details).toBe("HTTP 200 - OK");
             expect(result.responseTime).toBe(50);
             expect(result.error).toBeUndefined();
+            expect(mockFetch).toHaveBeenCalledWith(
+                "https://example.com",
+                expect.objectContaining({
+                    headers: expect.objectContaining({
+                        "User-Agent": USER_AGENT,
+                    }),
+                    method: "HEAD",
+                })
+            );
         });
         it("should return 'degraded' status for client errors (400-499)", async () => {
             // Arrange

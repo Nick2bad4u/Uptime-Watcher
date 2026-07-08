@@ -31,6 +31,7 @@ import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { MonitorCheckResult } from "../types";
 
+import { USER_AGENT } from "../../../constants";
 import { createTimeoutSignal } from "../shared/abortSignalUtils";
 
 const HTTP_SCHEME = "http".concat("://");
@@ -395,7 +396,7 @@ export async function checkHttpConnectivity(
     try {
         const response = await fetch(url, {
             headers: {
-                "User-Agent": "Uptime-Watcher/15.4.0",
+                "User-Agent": USER_AGENT,
             },
             method: "HEAD",
             signal: createTimeoutSignal(timeout, signal),
