@@ -16,6 +16,7 @@ import type { StatusAlert } from "../../stores/alerts/useAlertStore";
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { AppIcons } from "../../utils/icons";
 import { formatStatusLabel } from "../../utils/status";
+import { formatToastTimestamp } from "./toastTimestamp";
 
 const AUTO_DISMISS_DURATION_MS = 12_000;
 
@@ -76,28 +77,10 @@ export const StatusAlertToast = ({
     const tone = STATUS_TONE[resolvedStatus];
     const headline = STATUS_HEADLINE[resolvedStatus];
 
-    const { timestampDateTime, timestampLabel } = useMemo(() => {
-        const date = new Date(alert.timestamp);
-
-        if (Number.isNaN(date.getTime())) {
-            const now = new Date();
-            return {
-                timestampDateTime: now.toISOString(),
-                timestampLabel: "Just now",
-            } as const;
-        }
-
-        const localizedLabel = new Intl.DateTimeFormat(undefined, {
-            hour: "numeric",
-            minute: "2-digit",
-            second: "2-digit",
-        }).format(date);
-
-        return {
-            timestampDateTime: date.toISOString(),
-            timestampLabel: localizedLabel,
-        } as const;
-    }, [alert.timestamp]);
+    const { dateTime: timestampDateTime, label: timestampLabel } = useMemo(
+        () => formatToastTimestamp(alert.timestamp),
+        [alert.timestamp]
+    );
 
     const previousLabel =
         typeof alert.previousStatus === "string" &&

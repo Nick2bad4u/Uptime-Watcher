@@ -6,6 +6,7 @@ import { objectHasOwn } from "ts-extras";
 import type { AppToast } from "../../stores/alerts/useAlertStore";
 
 import { AppIcons } from "../../utils/icons";
+import { formatToastTimestamp } from "./toastTimestamp";
 
 const TOAST_TONE = {
     error: "negative",
@@ -16,25 +17,6 @@ const TOAST_TONE = {
 type ToastTone = ValueOf<typeof TOAST_TONE>;
 
 const CloseIcon = AppIcons.ui.close;
-
-function formatToastTimestamp(epochMs: number): {
-    dateTime: string;
-    label: string;
-} {
-    const date = new Date(epochMs);
-    if (Number.isNaN(date.getTime())) {
-        const now = new Date();
-        return { dateTime: now.toISOString(), label: "Just now" };
-    }
-
-    const label = new Intl.DateTimeFormat(undefined, {
-        hour: "numeric",
-        minute: "2-digit",
-        second: "2-digit",
-    }).format(date);
-
-    return { dateTime: date.toISOString(), label };
-}
 
 /**
  * Properties for the {@link AppToastToast} component.
