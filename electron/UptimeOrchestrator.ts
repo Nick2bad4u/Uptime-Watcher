@@ -771,9 +771,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             // Clear all middleware
             this.clearMiddleware();
 
-            // Async boundary required by lint rules (async + await).
-            await Promise.resolve();
-
             logger.info("[UptimeOrchestrator] Shutdown completed successfully");
         } catch (error) {
             throw this.createContextualError({
