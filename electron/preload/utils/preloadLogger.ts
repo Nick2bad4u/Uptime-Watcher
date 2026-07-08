@@ -111,8 +111,10 @@ function getNativeMethod(
 
 const DATE_GET_TIME = getNativeMethod(Date.prototype, "getTime");
 const DATE_TO_ISO_STRING = getNativeMethod(Date.prototype, "toISOString");
+const MAP_ENTRIES = getNativeMethod(Map.prototype, "entries");
 const MAP_SIZE = getNativeGetter(Map.prototype, "size");
 const SET_SIZE = getNativeGetter(Set.prototype, "size");
+const SET_VALUES = getNativeMethod(Set.prototype, "values");
 const URL_TO_STRING = getNativeMethod(URL.prototype, "toString");
 
 function isIterable(value: unknown): value is Iterable<unknown> {
@@ -325,12 +327,11 @@ function serializeMapPreview(
     value: Map<unknown, unknown>,
     seen: WeakSet<object>
 ): UnknownRecord {
-    const entriesMethod = getNativeMethod(Map.prototype, "entries");
     const entries: unknown[] = [];
 
-    if (entriesMethod) {
+    if (MAP_ENTRIES) {
         try {
-            const nativeEntries = Reflect.apply(entriesMethod, value, []);
+            const nativeEntries = Reflect.apply(MAP_ENTRIES, value, []);
             let index = 0;
             if (!isIterable(nativeEntries)) {
                 return {
@@ -382,12 +383,11 @@ function serializeSetPreview(
     value: Set<unknown>,
     seen: WeakSet<object>
 ): UnknownRecord {
-    const valuesMethod = getNativeMethod(Set.prototype, "values");
     const sample: unknown[] = [];
 
-    if (valuesMethod) {
+    if (SET_VALUES) {
         try {
-            const nativeValues = Reflect.apply(valuesMethod, value, []);
+            const nativeValues = Reflect.apply(SET_VALUES, value, []);
             let index = 0;
             if (!isIterable(nativeValues)) {
                 return {

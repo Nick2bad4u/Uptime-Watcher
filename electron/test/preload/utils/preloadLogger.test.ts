@@ -305,6 +305,31 @@ describe(buildPayloadPreview, () => {
         }
     });
 
+    it("does not invoke patched Map prototype entries while building previews", () => {
+        const entries = vi.spyOn(Map.prototype, "entries");
+        entries.mockImplementation(() => {
+            throw new Error("Map prototype entries should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview(
+                new Map<string, string>([
+                    ["refreshToken", "refresh-secret"],
+                    ["visible", "ordinary-value"],
+                ])
+            );
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"size": 2');
+            expect(preview).toContain("[REDACTED]");
+            expect(preview).toContain("ordinary-value");
+            expect(preview).not.toContain("refresh-secret");
+            expect(entries).not.toHaveBeenCalled();
+        } finally {
+            entries.mockRestore();
+        }
+    });
+
     it("does not invoke shadowed Set iterator or size accessors", () => {
         const iterator = vi.fn(() => {
             throw new Error("set iterator should not run");
@@ -349,6 +374,25 @@ describe(buildPayloadPreview, () => {
             expect(size).not.toHaveBeenCalled();
         } finally {
             size.mockRestore();
+        }
+    });
+
+    it("does not invoke patched Set prototype values while building previews", () => {
+        const values = vi.spyOn(Set.prototype, "values");
+        values.mockImplementation(() => {
+            throw new Error("Set prototype values should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview(new Set(["first", "second"]));
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain('"size": 2');
+            expect(preview).toContain("first");
+            expect(preview).toContain("second");
+            expect(values).not.toHaveBeenCalled();
+        } finally {
+            values.mockRestore();
         }
     });
 
