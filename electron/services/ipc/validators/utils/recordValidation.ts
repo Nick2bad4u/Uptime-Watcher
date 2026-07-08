@@ -1,5 +1,9 @@
 import type { UnknownRecord } from "type-fest";
 
+import {
+    createNullPrototypeObject,
+    defineOwnEnumerableDataProperties,
+} from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import { objectHasOwn } from "ts-extras";
 
@@ -34,6 +38,31 @@ const FORBIDDEN_RECORD_KEYS = new Set<string>([
     "prototype",
 ]);
 
+function isPlainRecordLike(value: unknown): value is UnknownRecord {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    try {
+        const prototype: unknown = Object.getPrototypeOf(value);
+        return prototype === null || prototype === Object.prototype;
+    } catch {
+        return false;
+    }
+}
+
+function copyOwnEnumerableDataRecord(
+    record: UnknownRecord
+): UnknownRecord | undefined {
+    try {
+        const safeRecord = createNullPrototypeObject<UnknownRecord>();
+        defineOwnEnumerableDataProperties(safeRecord, record);
+        return safeRecord;
+    } catch {
+        return undefined;
+    }
+}
+
 /**
  * Returns errors for keys that are frequently abused for prototype pollution.
  */
@@ -59,7 +88,7 @@ function requireRecordParam(
     value: unknown,
     paramName: string
 ): RequiredRecordResult {
-    if (!isRecord(value)) {
+    if (!isPlainRecordLike(value)) {
         return {
             error: toValidationResult(`${paramName} must be a valid object`),
             ok: false,
@@ -71,7 +100,15 @@ function requireRecordParam(
         return { error: forbiddenKeyErrors, ok: false };
     }
 
-    return { ok: true, record: value };
+    const record = copyOwnEnumerableDataRecord(value);
+    if (!record) {
+        return {
+            error: toValidationResult(`${paramName} must be a valid object`),
+            ok: false,
+        };
+    }
+
+    return { ok: true, record };
 }
 
 /**
