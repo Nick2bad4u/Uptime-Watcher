@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DatabaseService } from "../../../../services/database/DatabaseService";
 
 import { replaceDatabaseFile } from "../../../../services/database/dataBackupService/replaceDatabaseFile";
+import * as fsSafeOps from "../../../../utils/fsSafeOps";
 
 type DatabaseConnection = ReturnType<DatabaseService["initialize"]>;
 
@@ -41,6 +42,7 @@ describe(replaceDatabaseFile, () => {
     });
 
     afterEach(async () => {
+        vi.restoreAllMocks();
         await rm(tempDirectory, { force: true, recursive: true });
     });
 
@@ -134,6 +136,42 @@ describe(replaceDatabaseFile, () => {
         await expect(readFile(targetPath, "utf8")).resolves.toBe("old-db");
         expect(databaseService.close).toHaveBeenCalledTimes(1);
         expect(databaseService.initialize).toHaveBeenCalledTimes(2);
+    });
+
+    it("restores relocated sidecars when replacement fails before the main database moves", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const walPath = `${targetPath}-wal`;
+        const shmPath = `${targetPath}-shm`;
+        const databaseService = createDatabaseService();
+        const originalRenameIfExists = fsSafeOps.renameIfExists;
+
+        await writeFile(sourcePath, "new-db");
+        await writeFile(targetPath, "old-db");
+        await writeFile(walPath, "old-wal");
+        await writeFile(shmPath, "old-shm");
+
+        vi.spyOn(fsSafeOps, "renameIfExists").mockImplementation(
+            async (from, to) => {
+                if (from === shmPath) {
+                    throw new Error("sidecar move failed");
+                }
+
+                return await originalRenameIfExists(from, to);
+            }
+        );
+
+        await expect(
+            replaceDatabaseFile({
+                databaseService,
+                sourcePath,
+                targetPath,
+            })
+        ).rejects.toThrow("sidecar move failed");
+
+        await expect(readFile(targetPath, "utf8")).resolves.toBe("old-db");
+        await expect(readFile(walPath, "utf8")).resolves.toBe("old-wal");
+        await expect(readFile(shmPath, "utf8")).resolves.toBe("old-shm");
     });
 
     it("refuses to replace an existing target directory", async () => {

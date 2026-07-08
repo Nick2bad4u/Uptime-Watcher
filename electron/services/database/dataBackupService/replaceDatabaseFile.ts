@@ -39,6 +39,30 @@ async function assertReplaceableFilePath(args: {
     }
 }
 
+async function restoreRelocatedSidecars(args: {
+    isJournalRollbackCreated: boolean;
+    isShmRollbackCreated: boolean;
+    isWalRollbackCreated: boolean;
+    journalPath: string;
+    rollbackJournalPath: string;
+    rollbackShmPath: string;
+    rollbackWalPath: string;
+    shmPath: string;
+    walPath: string;
+}): Promise<void> {
+    if (args.isWalRollbackCreated) {
+        await renameIfExists(args.rollbackWalPath, args.walPath);
+    }
+
+    if (args.isShmRollbackCreated) {
+        await renameIfExists(args.rollbackShmPath, args.shmPath);
+    }
+
+    if (args.isJournalRollbackCreated) {
+        await renameIfExists(args.rollbackJournalPath, args.journalPath);
+    }
+}
+
 /**
  * Replaces the primary database file with another file on disk.
  *
@@ -98,6 +122,9 @@ export async function replaceDatabaseFile(args: {
     databaseService.close();
 
     let isHadExistingTarget = false;
+    let isJournalRollbackCreated = false;
+    let isShmRollbackCreated = false;
+    let isWalRollbackCreated = false;
     let copyError: Error | undefined;
 
     try {
@@ -113,9 +140,12 @@ export async function replaceDatabaseFile(args: {
         // We relocate them alongside the main DB so rollback restores
         // the *exact* prior state and we avoid corrupting the restored
         // DB with a mismatched WAL.
-        await renameIfExists(walPath, rollbackWalPath);
-        await renameIfExists(shmPath, rollbackShmPath);
-        await renameIfExists(journalPath, rollbackJournalPath);
+        isWalRollbackCreated = await renameIfExists(walPath, rollbackWalPath);
+        isShmRollbackCreated = await renameIfExists(shmPath, rollbackShmPath);
+        isJournalRollbackCreated = await renameIfExists(
+            journalPath,
+            rollbackJournalPath
+        );
 
         isHadExistingTarget = await renameIfExists(targetPath, rollbackPath);
         if (isHadExistingTarget) {
@@ -129,20 +159,31 @@ export async function replaceDatabaseFile(args: {
         copyError = ensureError(error);
     }
 
-    // If we failed to copy the restored DB into place but we moved the
-    // original DB out of the way, restore the original before we
-    // re-initialize.
-    if (copyError && isHadExistingTarget) {
+    // If replacement failed after moving the original DB or any sidecars out
+    // of the way, restore them before re-initializing.
+    if (copyError) {
         try {
-            await fs.rm(targetPath, { force: true });
-            // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
-            await fs.rename(rollbackPath, targetPath);
+            if (isHadExistingTarget) {
+                await fs.rm(targetPath, { force: true });
+                // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
+                await fs.rename(rollbackPath, targetPath);
+                isHadExistingTarget = false;
+            }
 
-            // Restore sidecars if we relocated them.
-            await renameIfExists(rollbackWalPath, walPath);
-            await renameIfExists(rollbackShmPath, shmPath);
-            await renameIfExists(rollbackJournalPath, journalPath);
-            isHadExistingTarget = false;
+            await restoreRelocatedSidecars({
+                isJournalRollbackCreated,
+                isShmRollbackCreated,
+                isWalRollbackCreated,
+                journalPath,
+                rollbackJournalPath,
+                rollbackShmPath,
+                rollbackWalPath,
+                shmPath,
+                walPath,
+            });
+            isWalRollbackCreated = false;
+            isShmRollbackCreated = false;
+            isJournalRollbackCreated = false;
         } catch (rollbackError: unknown) {
             logger?.warn(
                 "[DataBackupService] Failed to rollback database replacement after copy failure",
@@ -164,10 +205,22 @@ export async function replaceDatabaseFile(args: {
                 await fs.rm(targetPath, { force: true });
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
                 await fs.rename(rollbackPath, targetPath);
+                isHadExistingTarget = false;
 
-                await renameIfExists(rollbackWalPath, walPath);
-                await renameIfExists(rollbackShmPath, shmPath);
-                await renameIfExists(rollbackJournalPath, journalPath);
+                await restoreRelocatedSidecars({
+                    isJournalRollbackCreated,
+                    isShmRollbackCreated,
+                    isWalRollbackCreated,
+                    journalPath,
+                    rollbackJournalPath,
+                    rollbackShmPath,
+                    rollbackWalPath,
+                    shmPath,
+                    walPath,
+                });
+                isWalRollbackCreated = false;
+                isShmRollbackCreated = false;
+                isJournalRollbackCreated = false;
                 databaseService.initialize();
             } catch (rollbackError: unknown) {
                 logger?.warn(
