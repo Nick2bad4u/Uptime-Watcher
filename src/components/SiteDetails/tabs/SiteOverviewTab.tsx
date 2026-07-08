@@ -22,6 +22,7 @@ import { ThemedIconButton } from "../../../theme/components/ThemedIconButton";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { runSiteDetailsBackgroundOperation } from "../../../hooks/site/useSiteDetails.utils";
 import { fireAndForget } from "../../../utils/async/fireAndForget";
 import { AppIcons } from "../../../utils/icons";
 import { getMonitorDisplayIdentifier } from "../../../utils/fallbacks";
@@ -230,15 +231,24 @@ export const SiteOverviewTab = ({
 
     // UseCallback handlers for jsx-no-bind compliance
     const handleStopSiteMonitoringClick = useCallback(() => {
-        void handleStopSiteMonitoring();
+        runSiteDetailsBackgroundOperation(
+            "SiteOverviewTab.handleStopSiteMonitoringClick",
+            handleStopSiteMonitoring
+        );
     }, [handleStopSiteMonitoring]);
 
     const handleStartSiteMonitoringClick = useCallback(() => {
-        void handleStartSiteMonitoring();
+        runSiteDetailsBackgroundOperation(
+            "SiteOverviewTab.handleStartSiteMonitoringClick",
+            handleStartSiteMonitoring
+        );
     }, [handleStartSiteMonitoring]);
 
     const handleRemoveSiteClick = useCallback(() => {
-        void handleRemoveSite();
+        runSiteDetailsBackgroundOperation(
+            "SiteOverviewTab.handleRemoveSiteClick",
+            handleRemoveSite
+        );
     }, [handleRemoveSite]);
 
     const handleCopySiteIdentifierClick = useCallback(() => {

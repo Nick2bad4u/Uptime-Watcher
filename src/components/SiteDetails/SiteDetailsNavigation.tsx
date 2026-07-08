@@ -19,6 +19,7 @@ import {
 
 import type { SiteDetailsTab } from "../../stores/ui/types";
 
+import { runSiteDetailsBackgroundOperation } from "../../hooks/site/useSiteDetails.utils";
 import { logger } from "../../services/logger";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
@@ -138,11 +139,17 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         // Memoized handlers to prevent unnecessary re-renders of
         // SiteMonitoringButton
         const handleStartSiteMonitoringMemoized = useCallback(() => {
-            void handleStartSiteMonitoring();
+            runSiteDetailsBackgroundOperation(
+                "SiteDetailsNavigation.handleStartSiteMonitoringMemoized",
+                handleStartSiteMonitoring
+            );
         }, [handleStartSiteMonitoring]);
 
         const handleStopSiteMonitoringMemoized = useCallback(() => {
-            void handleStopSiteMonitoring();
+            runSiteDetailsBackgroundOperation(
+                "SiteDetailsNavigation.handleStopSiteMonitoringMemoized",
+                handleStopSiteMonitoring
+            );
         }, [handleStopSiteMonitoring]);
 
         // Site-level monitoring state calculation
@@ -213,11 +220,17 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         ]);
 
         const handleStopMonitoringClick = useCallback(() => {
-            void handleStopMonitoring();
+            runSiteDetailsBackgroundOperation(
+                "SiteDetailsNavigation.handleStopMonitoringClick",
+                handleStopMonitoring
+            );
         }, [handleStopMonitoring]);
 
         const handleStartMonitoringClick = useCallback(() => {
-            void handleStartMonitoring();
+            runSiteDetailsBackgroundOperation(
+                "SiteDetailsNavigation.handleStartMonitoringClick",
+                handleStartMonitoring
+            );
         }, [handleStartMonitoring]);
 
         const SiteOverviewIcon = AppIcons.ui.home;

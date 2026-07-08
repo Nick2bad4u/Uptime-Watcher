@@ -17,6 +17,7 @@ import {
     getMonitorTypeDisplayLabel,
     UiDefaults,
 } from "../../../utils/fallbacks";
+import { runSiteDetailsBackgroundOperation } from "../../../hooks/site/useSiteDetails.utils";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 
 /**
@@ -85,7 +86,10 @@ export function useIdentifierLabel(selectedMonitor: Monitor): string {
                 }
             };
 
-            void loadLabel();
+            runSiteDetailsBackgroundOperation(
+                "SettingsTab.useIdentifierLabel.loadLabel",
+                loadLabel
+            );
 
             return (): void => {
                 isCancelled = true;

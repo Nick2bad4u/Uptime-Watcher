@@ -10,6 +10,7 @@ import type { ChangeEvent, JSX } from "react";
 import { useCallback, useMemo } from "react";
 import { arrayIncludes } from "ts-extras";
 
+import { runSiteDetailsBackgroundOperation } from "../../../hooks/site/useSiteDetails.utils";
 import { logger } from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { SettingsTabDangerZoneCard } from "./SettingsTab.DangerZoneCard";
@@ -242,19 +243,31 @@ export const SettingsTab = ({
     );
 
     const handleSaveNameClick = useCallback(() => {
-        void loggedHandleSaveName();
+        runSiteDetailsBackgroundOperation(
+            "SettingsTab.handleSaveNameClick",
+            loggedHandleSaveName
+        );
     }, [loggedHandleSaveName]);
 
     const handleSaveTimeoutClick = useCallback(() => {
-        void loggedHandleSaveTimeout();
+        runSiteDetailsBackgroundOperation(
+            "SettingsTab.handleSaveTimeoutClick",
+            loggedHandleSaveTimeout
+        );
     }, [loggedHandleSaveTimeout]);
 
     const handleSaveRetryAttemptsClick = useCallback(() => {
-        void loggedHandleSaveRetryAttempts();
+        runSiteDetailsBackgroundOperation(
+            "SettingsTab.handleSaveRetryAttemptsClick",
+            loggedHandleSaveRetryAttempts
+        );
     }, [loggedHandleSaveRetryAttempts]);
 
     const handleRemoveSiteClick = useCallback(() => {
-        void loggedHandleRemoveSite();
+        runSiteDetailsBackgroundOperation(
+            "SettingsTab.handleRemoveSiteClick",
+            loggedHandleRemoveSite
+        );
     }, [loggedHandleRemoveSite]);
 
     const displayIdentifier = useMemo(

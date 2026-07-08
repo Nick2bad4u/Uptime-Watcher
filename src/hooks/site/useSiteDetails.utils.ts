@@ -5,6 +5,7 @@ import { arrayJoin } from "ts-extras";
 
 import { RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services/logger";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { validateMonitorFieldClientSide } from "../../utils/monitorValidation";
 
 /**
@@ -90,6 +91,23 @@ export async function runSiteDetailsOperation(
     } catch (error: unknown) {
         logger.app.error(context, ensureError(error));
     }
+}
+
+/**
+ * Starts a site-details operation from synchronous UI handlers and logs
+ * failures that are not handled by the operation itself.
+ *
+ * @public
+ */
+export function runSiteDetailsBackgroundOperation(
+    context: string,
+    operation: () => Promise<void>
+): void {
+    fireAndForget(operation, {
+        onError: (error: unknown) => {
+            logger.app.error(context, ensureError(error));
+        },
+    });
 }
 
 /**

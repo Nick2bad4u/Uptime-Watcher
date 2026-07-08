@@ -54,6 +54,7 @@ import {
     formatFullTimestamp,
     formatResponseTime,
 } from "../../utils/time";
+import { runSiteDetailsBackgroundOperation } from "../../hooks/site/useSiteDetails.utils";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
@@ -188,11 +189,17 @@ export const SiteDetails = ({
     } = useSiteDetailsCharts(analytics, currentTheme);
 
     const handleCheckNowClick = useCallback(() => {
-        void handleCheckNow();
+        runSiteDetailsBackgroundOperation(
+            "SiteDetails.handleCheckNowClick",
+            handleCheckNow
+        );
     }, [handleCheckNow]);
 
     const handleSaveIntervalClick = useCallback(() => {
-        void handleSaveInterval();
+        runSiteDetailsBackgroundOperation(
+            "SiteDetails.handleSaveIntervalClick",
+            handleSaveInterval
+        );
     }, [handleSaveInterval]);
 
     const handleOverlayDismissClick = useCallback((): void => {

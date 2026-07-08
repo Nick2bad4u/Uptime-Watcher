@@ -22,6 +22,7 @@ import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { runSiteDetailsBackgroundOperation } from "../../../hooks/site/useSiteDetails.utils";
 import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
@@ -200,11 +201,17 @@ export const OverviewTab = ({
 
     // Click handlers to avoid inline functions in JSX
     const handleSaveIntervalClick = useCallback(() => {
-        void handleSaveInterval();
+        runSiteDetailsBackgroundOperation(
+            "OverviewTab.handleSaveIntervalClick",
+            handleSaveInterval
+        );
     }, [handleSaveInterval]);
 
     const handleSaveTimeoutClick = useCallback(() => {
-        void handleSaveTimeout();
+        runSiteDetailsBackgroundOperation(
+            "OverviewTab.handleSaveTimeoutClick",
+            handleSaveTimeout
+        );
     }, [handleSaveTimeout]);
 
     const handleRemoveClick = useCallback(() => {
@@ -213,7 +220,10 @@ export const OverviewTab = ({
             monitorType: selectedMonitor.type,
             monitorUrl: safeMonitorUrlForLogging(selectedMonitor.url),
         });
-        void handleRemoveMonitor();
+        runSiteDetailsBackgroundOperation(
+            "OverviewTab.handleRemoveClick",
+            handleRemoveMonitor
+        );
     }, [
         handleRemoveMonitor,
         selectedMonitor.id,
