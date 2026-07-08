@@ -11,6 +11,7 @@ import type { EventPayload, TypedEventBus } from "../../events/TypedEventBus";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
+import { fireAndForget } from "../../utils/fireAndForget";
 import { logger as backendLogger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
 import { computeMonitorSchedulerDelay } from "./MonitorSchedulerPolicy";
@@ -362,6 +363,31 @@ export class MonitorScheduler {
         }
     }
 
+    private emitEventInBackground<K extends UptimeEventName>(
+        eventName: K,
+        payload: EventPayload<UptimeEvents, K>
+    ): void {
+        fireAndForget(() => this.emitEvent(eventName, payload), {
+            onError: (error) => {
+                this.logger.error(
+                    `[MonitorScheduler] Unexpected background event failure for ${eventName}`,
+                    error
+                );
+            },
+        });
+    }
+
+    private runJobInBackground(intervalKey: string): void {
+        fireAndForget(() => this.runJob(intervalKey), {
+            onError: (error) => {
+                this.logger.error(
+                    `[MonitorScheduler] Unexpected background job failure for ${intervalKey}`,
+                    error
+                );
+            },
+        });
+    }
+
     /**
      * Attempts to start a queued manual check for the specified job.
      *
@@ -395,7 +421,7 @@ export class MonitorScheduler {
         // to begin.
         job.correlationId = correlationId;
 
-        void this.runJob(intervalKey);
+        this.runJobInBackground(intervalKey);
         return true;
     }
 
@@ -616,7 +642,7 @@ export class MonitorScheduler {
             );
         }
 
-        void this.runJob(intervalKey);
+        this.runJobInBackground(intervalKey);
         return true;
     }
 
@@ -898,7 +924,7 @@ export class MonitorScheduler {
 
         job.timer = setTimeout(() => {
             job.timer = undefined;
-            void this.runJob(intervalKey);
+            this.runJobInBackground(intervalKey);
         }, delayMs);
 
         // Avoid keeping the Node/Electron process alive solely because of a
@@ -922,7 +948,7 @@ export class MonitorScheduler {
 
     /** Emits a schedule updated event with correlation metadata. */
     private emitScheduleUpdatedEvent(job: MonitorJob, delayMs: number): void {
-        void this.emitEvent("monitor:schedule-updated", {
+        this.emitEventInBackground("monitor:schedule-updated", {
             backoffAttempt: job.backoffAttempt,
             correlationId: job.correlationId,
             delayMs,
@@ -933,7 +959,7 @@ export class MonitorScheduler {
     }
 
     private emitBackoffAppliedEvent(job: MonitorJob, delayMs: number): void {
-        void this.emitEvent("monitor:backoff-applied", {
+        this.emitEventInBackground("monitor:backoff-applied", {
             backoffAttempt: job.backoffAttempt,
             correlationId: job.correlationId,
             delayMs,
@@ -948,7 +974,7 @@ export class MonitorScheduler {
         monitorId: string;
         siteIdentifier: string;
     }): void {
-        void this.emitEvent("monitor:manual-check-started", {
+        this.emitEventInBackground("monitor:manual-check-started", {
             correlationId: job.correlationId,
             monitorId: job.monitorId,
             siteIdentifier: job.siteIdentifier,
@@ -957,7 +983,7 @@ export class MonitorScheduler {
     }
 
     private emitMonitorTimeoutEvent(job: MonitorJob, timeoutMs: number): void {
-        void this.emitEvent("monitor:timeout", {
+        this.emitEventInBackground("monitor:timeout", {
             correlationId: job.correlationId,
             monitorId: job.monitorId,
             siteIdentifier: job.siteIdentifier,
