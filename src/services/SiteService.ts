@@ -8,15 +8,26 @@
  */
 
 import type { Site } from "@shared/types";
+import type { ZodIssueLike } from "@shared/utils/zodIssueFormatting";
 import type { UnknownRecord } from "type-fest";
 import type * as z from "zod";
 
 import { ApplicationError, ensureError } from "@shared/utils/errorHandling";
+import { formatZodIssues } from "@shared/utils/zodIssueFormatting";
 import {
     validateSiteSnapshot,
     validateSiteSnapshots,
+    validateSiteUpdate,
 } from "@shared/validation/guards";
-import { arrayFirst, arrayJoin, isEmpty, isSafeInteger } from "ts-extras";
+import { monitorIdSchema } from "@shared/validation/monitorFieldSchemas";
+import { siteIdentifierSchema } from "@shared/validation/siteFieldSchemas";
+import {
+    arrayFirst,
+    arrayJoin,
+    isEmpty,
+    isSafeInteger,
+    objectKeys,
+} from "ts-extras";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -90,6 +101,66 @@ const parseDeletedSiteCount = (value: unknown): number => {
     });
 };
 
+const formatValidationIssues = (issues: readonly ZodIssueLike[]): string =>
+    arrayJoin(formatZodIssues(issues), ", ");
+
+const parseSiteIdentifier = (operation: string, value: string): string => {
+    const parsed = siteIdentifierSchema.safeParse(value);
+
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    throw new TypeError(
+        `[SiteService] Invalid site identifier for ${operation}: ${formatValidationIssues(parsed.error.issues)}`
+    );
+};
+
+const parseMonitorId = (operation: string, value: string): string => {
+    const parsed = monitorIdSchema.safeParse(value);
+
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    throw new TypeError(
+        `[SiteService] Invalid monitor ID for ${operation}: ${formatValidationIssues(parsed.error.issues)}`
+    );
+};
+
+const parseSitePayload = (operation: string, value: Site): Site => {
+    const parsed = validateSiteSnapshot(value);
+
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    throw new TypeError(
+        `[SiteService] Invalid site payload for ${operation}: ${formatValidationIssues(parsed.error.issues)}`
+    );
+};
+
+const parseSiteUpdates = (
+    operation: string,
+    updates: Partial<Site>
+): Partial<Site> => {
+    if (isEmpty(objectKeys(updates))) {
+        throw new TypeError(
+            `[SiteService] Invalid site updates for ${operation}: updates must not be empty`
+        );
+    }
+
+    const parsed = validateSiteUpdate(updates);
+
+    if (parsed.success) {
+        return parsed.data;
+    }
+
+    throw new TypeError(
+        `[SiteService] Invalid site updates for ${operation}: ${formatValidationIssues(parsed.error.issues)}`
+    );
+};
+
 /**
  * Renderer-side contract for site operations routed through the preload bridge.
  */
@@ -140,7 +211,8 @@ export const SiteService: SiteServiceContract = {
      *   fails.
      */
     addSite: wrap("addSite", async (api, site: Site) => {
-        const savedSite = await api.sites.addSite(site);
+        const parsedSite = parseSitePayload("addSite", site);
+        const savedSite = await api.sites.addSite(parsedSite);
         const parseResult = validateSiteSnapshot(savedSite);
 
         if (parseResult.success) {
@@ -152,9 +224,9 @@ export const SiteService: SiteServiceContract = {
             parseResult.error,
             {
                 operation: "addSite",
-                siteIdentifier: site.identifier,
+                siteIdentifier: parsedSite.identifier,
             },
-            `Site creation returned an invalid site snapshot for ${site.identifier}`
+            `Site creation returned an invalid site snapshot for ${parsedSite.identifier}`
         );
     }),
 
@@ -273,9 +345,17 @@ export const SiteService: SiteServiceContract = {
     removeMonitor: wrap(
         "removeMonitor",
         async (api, siteIdentifier: string, monitorId: string) => {
-            const savedSite = await api.sites.removeMonitor(
-                siteIdentifier,
+            const parsedSiteIdentifier = parseSiteIdentifier(
+                "removeMonitor",
+                siteIdentifier
+            );
+            const parsedMonitorId = parseMonitorId(
+                "removeMonitor",
                 monitorId
+            );
+            const savedSite = await api.sites.removeMonitor(
+                parsedSiteIdentifier,
+                parsedMonitorId
             );
             const parseResult = validateSiteSnapshot(savedSite);
 
@@ -287,11 +367,11 @@ export const SiteService: SiteServiceContract = {
                 "Invalid site snapshot returned after monitor removal",
                 parseResult.error,
                 {
-                    monitorId,
+                    monitorId: parsedMonitorId,
                     operation: "removeMonitor",
-                    siteIdentifier,
+                    siteIdentifier: parsedSiteIdentifier,
                 },
-                `Monitor removal returned an invalid site snapshot for ${siteIdentifier}/${monitorId}`
+                `Monitor removal returned an invalid site snapshot for ${parsedSiteIdentifier}/${parsedMonitorId}`
             );
         }
     ),
@@ -313,21 +393,22 @@ export const SiteService: SiteServiceContract = {
      *   fails.
      */
     removeSite: wrap("removeSite", async (api, identifier: string) => {
+        const parsedIdentifier = parseSiteIdentifier("removeSite", identifier);
         const isRemoved = parseServiceBooleanResponse(
             "removeSite",
-            await api.sites.removeSite(identifier),
-            { details: { identifier }, serviceName: "SiteService" }
+            await api.sites.removeSite(parsedIdentifier),
+            { details: { identifier: parsedIdentifier }, serviceName: "SiteService" }
         );
 
         if (!isRemoved) {
             throw new ApplicationError({
                 code: "RENDERER_SERVICE_BACKEND_OPERATION_FAILED",
                 details: {
-                    identifier,
+                    identifier: parsedIdentifier,
                     operation: "removeSite",
                     serviceName: "SiteService",
                 },
-                message: `[SiteService] Site removal failed for site ${identifier}: backend returned false`,
+                message: `[SiteService] Site removal failed for site ${parsedIdentifier}: backend returned false`,
             });
         }
 
@@ -354,7 +435,15 @@ export const SiteService: SiteServiceContract = {
     updateSite: wrap(
         "updateSite",
         async (api, identifier: string, updates: Partial<Site>) => {
-            const updatedSite = await api.sites.updateSite(identifier, updates);
+            const parsedIdentifier = parseSiteIdentifier(
+                "updateSite",
+                identifier
+            );
+            const parsedUpdates = parseSiteUpdates("updateSite", updates);
+            const updatedSite = await api.sites.updateSite(
+                parsedIdentifier,
+                parsedUpdates
+            );
             const parseResult = validateSiteSnapshot(updatedSite);
 
             if (parseResult.success) {
@@ -366,10 +455,10 @@ export const SiteService: SiteServiceContract = {
                 parseResult.error,
                 {
                     operation: "updateSite",
-                    siteIdentifier: identifier,
-                    updates,
+                    siteIdentifier: parsedIdentifier,
+                    updates: parsedUpdates,
                 },
-                `Site update returned an invalid site snapshot for ${identifier}`
+                `Site update returned an invalid site snapshot for ${parsedIdentifier}`
             );
         }
     ),

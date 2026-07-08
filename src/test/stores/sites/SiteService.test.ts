@@ -62,6 +62,7 @@ const mockElectronAPI = {
         addSite: vi.fn(),
         deleteAllSites: vi.fn(),
         getSites: vi.fn(),
+        removeMonitor: vi.fn(),
         removeSite: vi.fn(),
         updateSite: vi.fn(),
     },
@@ -302,12 +303,10 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const newSite: Omit<Site, "id"> = {
-                identifier: "new-site",
-                monitors: [],
+            const newSite: Site = createValidSite("new-site", {
                 name: "New Site",
                 monitoring: false,
-            };
+            });
 
             const error = new Error("Failed to create site");
             mockElectronAPI.sites.addSite.mockRejectedValueOnce(error);
@@ -317,7 +316,10 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle validation errors", async ({ task, annotate }) => {
+        it("should reject invalid site payloads before invoking Electron", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteService", "component");
             await annotate("Category: Store", "category");
@@ -330,14 +332,10 @@ describe("SiteService", () => {
                 monitoring: false,
             };
 
-            const validationError = new Error("Invalid site data");
-            mockElectronAPI.sites.addSite.mockRejectedValueOnce(
-                validationError
-            );
-
             await expect(SiteService.addSite(invalidSite)).rejects.toThrow(
-                "Invalid site data"
+                "[SiteService] Invalid site payload for addSite"
             );
+            expect(mockElectronAPI.sites.addSite).not.toHaveBeenCalled();
         });
 
         it("should handle duplicate site errors", async ({
@@ -349,12 +347,10 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const duplicateSite: Omit<Site, "id"> = {
-                identifier: "existing-site",
-                monitors: [],
+            const duplicateSite: Site = createValidSite("existing-site", {
                 name: "Existing Site",
                 monitoring: false,
-            };
+            });
 
             const duplicateError = new Error("Site already exists");
             mockElectronAPI.sites.addSite.mockRejectedValueOnce(duplicateError);
@@ -552,7 +548,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should handle empty site identifier", async ({
+        it("should reject empty site identifiers before invoking Electron", async ({
             task,
             annotate,
         }) => {
@@ -562,11 +558,12 @@ describe("SiteService", () => {
             await annotate("Type: Business Logic", "type");
 
             const identifier = "";
-            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
 
-            await SiteService.removeSite(identifier);
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                "[SiteService] Invalid site identifier for removeSite: Site identifier is required"
+            );
 
-            expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith("");
+            expect(mockElectronAPI.sites.removeSite).not.toHaveBeenCalled();
         });
     });
 
@@ -766,7 +763,7 @@ describe("SiteService", () => {
             );
         });
 
-        it("should propagate validation errors from backend", async ({
+        it("should reject invalid site payloads before backend validation", async ({
             task,
             annotate,
         }) => {
@@ -775,14 +772,25 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const validationError = new Error("Invalid site data");
-            mockElectronAPI.sites.addSite.mockRejectedValueOnce(
-                validationError
-            );
-
             await expect(
                 SiteService.addSite({} as Omit<Site, "id">)
-            ).rejects.toThrow("Invalid site data");
+            ).rejects.toThrow("[SiteService] Invalid site payload for addSite");
+            expect(mockElectronAPI.sites.addSite).not.toHaveBeenCalled();
+        });
+
+        it("should reject empty update payloads before invoking Electron", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            await expect(SiteService.updateSite("test", {})).rejects.toThrow(
+                "[SiteService] Invalid site updates for updateSite: updates must not be empty"
+            );
+            expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
         });
 
         it("should handle timeout errors", async ({ task, annotate }) => {
@@ -796,9 +804,26 @@ describe("SiteService", () => {
                 timeoutError
             );
 
-            await expect(SiteService.updateSite("test", {})).rejects.toThrow(
-                "Request timeout"
+            await expect(
+                SiteService.updateSite("test", { name: "Updated" })
+            ).rejects.toThrow("Request timeout");
+        });
+
+        it("should reject invalid monitor removal identifiers before IPC", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            await expect(
+                SiteService.removeMonitor("site-1", "bad\nmonitor")
+            ).rejects.toThrow(
+                "[SiteService] Invalid monitor ID for removeMonitor: Monitor ID must not contain control characters"
             );
+            expect(mockElectronAPI.sites.removeMonitor).not.toHaveBeenCalled();
         });
     });
 });
