@@ -18,6 +18,7 @@ import {
 } from "@shared/utils/nativeArrayBuffer";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { getUtfByteLength } from "@shared/utils/utfByteLength";
+import { createOwnDataRecordSchema } from "@shared/validation/ownDataRecordSchema";
 import { epochMsSchema } from "@shared/validation/timestampSchemas";
 import * as z from "zod";
 
@@ -248,7 +249,10 @@ const validationResultSchema: z.ZodType<{
     .object({
         data: anyValueSchema.optional(),
         errors: z.array(z.string().trim()),
-        metadata: z.record(z.string().trim(), anyValueSchema).optional(),
+        metadata: createOwnDataRecordSchema(
+            anyValueSchema,
+            z.string().trim()
+        ).optional(),
         success: z.boolean(),
         warnings: z.array(z.string().trim()).optional(),
     })

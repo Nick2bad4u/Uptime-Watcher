@@ -371,6 +371,50 @@ describe("dataSchemas", () => {
         expect(parsed.success).toBeTruthy();
     });
 
+    it("preserves prototype-named validation metadata as own data", () => {
+        const metadata = Object.defineProperty(
+            { source: "test" },
+            "__proto__",
+            {
+                configurable: true,
+                enumerable: true,
+                value: "metadata-value",
+                writable: true,
+            }
+        );
+
+        const parsed = validateValidationResult({
+            errors: [],
+            metadata,
+            success: true,
+        });
+
+        expect(parsed.success).toBeTruthy();
+        if (!parsed.success) {
+            throw new Error("Expected validation result to pass");
+        }
+
+        expect(Object.getPrototypeOf(parsed.data.metadata)).toBeNull();
+        expect(Object.hasOwn(parsed.data.metadata!, "__proto__")).toBeTruthy();
+        expect(Reflect.get(parsed.data.metadata!, "__proto__")).toBe(
+            "metadata-value"
+        );
+    });
+
+    it.each([
+        new Date(0),
+        new Map<string, unknown>(),
+        Object.create({ inherited: "value" }),
+    ])("rejects non-record validation metadata: %p", (metadata) => {
+        const parsed = validateValidationResult({
+            errors: [],
+            metadata,
+            success: true,
+        });
+
+        expect(parsed.success).toBeFalsy();
+    });
+
     it("returns a failure result when restore result validation fails", () => {
         const parsed = validateSerializedDatabaseRestoreResult({
             restoredAt: "no",
