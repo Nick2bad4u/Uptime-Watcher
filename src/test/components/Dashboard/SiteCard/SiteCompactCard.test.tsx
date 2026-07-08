@@ -194,7 +194,7 @@ describe(SiteCompactCard, () => {
         );
         expect(metricValues).toEqual([
             "—",
-            "—",
+            "N/A",
             "0",
             "1/2",
         ]);

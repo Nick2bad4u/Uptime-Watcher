@@ -21,6 +21,7 @@ import type { UseSiteResult } from "../../../../hooks/site/useSite";
 
 import { getMonitorRuntimeSummary } from "../../../../utils/monitoring/monitorRuntime";
 import { toSentenceCase } from "../../../../utils/text/toSentenceCase";
+import { formatResponseTime } from "../../../../utils/time";
 
 interface MarqueeStubProps {
     readonly dependencies: Readonly<UnknownArray>;
@@ -354,10 +355,7 @@ describe("SiteTableRow fast-check coverage", () => {
                 handleStopSiteMonitoring
             );
 
-            const expectedResponseText =
-                typeof responseTime === "number" && responseTime > 0
-                    ? `${responseTime} ms`
-                    : "—";
+            const expectedResponseText = formatResponseTime(responseTime);
             expect(
                 screen.getByText(expectedResponseText, { exact: true })
             ).toBeInTheDocument();

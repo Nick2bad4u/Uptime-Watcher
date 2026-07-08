@@ -20,7 +20,7 @@
 import type { Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
-import { arrayJoin, isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { arrayJoin, isFinite as isFiniteNumber } from "ts-extras";
 
 import type { SiteCardPresentation } from "../../../stores/ui/types";
 
@@ -36,6 +36,7 @@ import {
     formatFullTimestamp,
     formatIntervalDuration,
     formatRelativeTimestamp,
+    formatResponseTime,
 } from "../../../utils/time";
 import { SiteCardHeader } from "./SiteCardHeader";
 import { SiteCardHistory } from "./SiteCardHistory";
@@ -190,11 +191,9 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         const uptimeDisplay = isFiniteNumber(uptime)
             ? `${uptime.toFixed(1)}%`
             : "—";
-        const lastResponseDisplay = isDefined(responseTime)
-            ? `${responseTime} ms`
-            : "—";
+        const lastResponseDisplay = formatResponseTime(responseTime);
         const avgResponseDisplay =
-            checkCount === 0 ? "—" : `${averageResponseTime} ms`;
+            checkCount === 0 ? "—" : formatResponseTime(averageResponseTime);
         const checksDisplay = checkCount.toLocaleString();
         const lastCheckTimestamp = useMemo(
             () =>

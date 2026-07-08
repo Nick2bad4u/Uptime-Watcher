@@ -239,7 +239,7 @@ describe(SiteTableRow, () => {
 
         expect(screen.queryByText(baseSite.identifier)).not.toBeInTheDocument();
         expect(screen.getByText("99.9%")).toBeInTheDocument();
-        expect(screen.getByText("88 ms")).toBeInTheDocument();
+        expect(screen.getByText("88ms")).toBeInTheDocument();
         expect(screen.getByText("2/2")).toBeInTheDocument();
         expect(arrayAt(marqueeTextCalls, -1)).toBe(baseSite.name);
         expect(arrayAt(monitorSelectorCalls, -1)?.selectedMonitorId).toBe(
@@ -271,11 +271,22 @@ describe(SiteTableRow, () => {
             { site: customSite }
         );
 
-        expect(screen.getByText("—")).toBeInTheDocument();
+        expect(screen.getByText("N/A")).toBeInTheDocument();
         expect(actionButtonProps).toMatchObject({
             allMonitorsRunning: false,
             disabled: true,
         });
+    });
+
+    it("formats zero and sentinel response times with the shared formatter", () => {
+        const { unmount } = renderRow({ responseTime: 0 });
+
+        expect(screen.getByText("0ms")).toBeInTheDocument();
+
+        unmount();
+        renderRow({ responseTime: -1 });
+
+        expect(screen.getByText("N/A")).toBeInTheDocument();
     });
 
     it("activates the row via clicks and keyboard interactions", async () => {
@@ -352,7 +363,8 @@ describe(SiteTableRow, () => {
         );
 
         expect(screen.queryByText("NaN%")).not.toBeInTheDocument();
-        expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
+        expect(screen.getByText("N/A")).toBeInTheDocument();
+        expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText("1/2")).toBeInTheDocument();
         expect(actionButtonProps).toMatchObject({
             disabled: true,

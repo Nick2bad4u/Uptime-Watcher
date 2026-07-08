@@ -186,6 +186,12 @@ describe("SiteCard Component - Complete Coverage", () => {
         expect(
             screen.getByTestId("site-card-metrics-content")
         ).toHaveTextContent(/Uptime: 98\.0%/v);
+        expect(
+            screen.getByTestId("site-card-metrics-content")
+        ).toHaveTextContent(/Last Response: 150ms/v);
+        expect(
+            screen.getByTestId("site-card-metrics-content")
+        ).toHaveTextContent(/Avg Response: N\/A/v);
         expect(screen.getByTestId("site-card-history")).toHaveTextContent(
             "History: 0 items"
         );

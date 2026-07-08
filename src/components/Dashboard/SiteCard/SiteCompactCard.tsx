@@ -9,7 +9,7 @@
 import type { MonitorStatus, Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
-import { isDefined, isFinite as isFiniteNumber } from "ts-extras";
+import { isFinite as isFiniteNumber } from "ts-extras";
 
 import { useSite } from "../../../hooks/site/useSite";
 import { StatusIndicator } from "../../../theme/components/StatusIndicator";
@@ -20,6 +20,7 @@ import {
     getMonitorTypeDisplayLabel,
 } from "../../../utils/fallbacks";
 import { toSentenceCase } from "../../../utils/text/toSentenceCase";
+import { formatResponseTime } from "../../../utils/time";
 import {
     MarqueeText,
     type MarqueeTextProperties,
@@ -151,9 +152,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             typeof uptime === "number" && isFiniteNumber(uptime)
                 ? `${uptime.toFixed(1)}%`
                 : "—";
-        const responseDisplay = isDefined(responseTime)
-            ? `${responseTime} ms`
-            : "—";
+        const responseDisplay = formatResponseTime(responseTime);
         const checksDisplay = checkCount.toLocaleString();
         const runningSummary = useMemo(
             () => `${runningMonitors}/${totalMonitors}`,

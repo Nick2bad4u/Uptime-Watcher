@@ -18,6 +18,7 @@ import { arrayJoin, isDefined, isFinite as isFiniteNumber } from "ts-extras";
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { toSentenceCase } from "../../../utils/text/toSentenceCase";
+import { formatResponseTime } from "../../../utils/time";
 import {
     MarqueeText,
     type MarqueeTextProperties,
@@ -226,11 +227,7 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 </td>
                 <td className="site-table__cell site-table__cell--response">
                     <ThemedText size="sm">
-                        {typeof responseTime === "number" &&
-                        isFiniteNumber(responseTime) &&
-                        responseTime > 0
-                            ? `${responseTime} ms`
-                            : "—"}
+                        {formatResponseTime(responseTime)}
                     </ThemedText>
                 </td>
                 <td className="site-table__cell site-table__cell--running">

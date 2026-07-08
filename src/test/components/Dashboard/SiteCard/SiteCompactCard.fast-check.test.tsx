@@ -332,7 +332,7 @@ describe("SiteCompactCard", () => {
                 screen.getByText("97.2%", { selector: "span" })
             ).toBeInTheDocument();
             expect(
-                screen.getByText("215 ms", { selector: "span" })
+                screen.getByText("215ms", { selector: "span" })
             ).toBeInTheDocument();
             expect(
                 screen.getByText("1,234", { selector: "span" })
@@ -409,7 +409,7 @@ describe("SiteCompactCard", () => {
             }
 
             expect(within(uptimeMetric).getByText("—")).toBeInTheDocument();
-            expect(within(responseMetric).getByText("—")).toBeInTheDocument();
+            expect(within(responseMetric).getByText("N/A")).toBeInTheDocument();
 
             const lastActionCall = ActionButtonGroupMock.mock.lastCall?.[0];
             expect(lastActionCall?.disabled).toBeTruthy();
