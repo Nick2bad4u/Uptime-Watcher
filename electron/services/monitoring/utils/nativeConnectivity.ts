@@ -52,6 +52,40 @@ const stripHttpScheme = (value: string): string => {
     return normalized;
 };
 
+function getFirstHostDelimiterIndex(value: string): number {
+    const delimiterIndexes = [
+        value.indexOf("/"),
+        value.indexOf("?"),
+        value.indexOf("#"),
+    ].filter((index) => index >= 0);
+
+    return delimiterIndexes.length > 0 ? Math.min(...delimiterIndexes) : -1;
+}
+
+function stripAuthorityCredentials(value: string): string {
+    const credentialsDelimiterIndex = value.lastIndexOf("@");
+    if (credentialsDelimiterIndex === -1) {
+        return value;
+    }
+
+    return value.slice(credentialsDelimiterIndex + 1);
+}
+
+function normalizeConnectivityProbeHost(value: string): string {
+    try {
+        return new URL(value).hostname;
+    } catch {
+        const withoutScheme = stripHttpScheme(value);
+        const delimiterIndex = getFirstHostDelimiterIndex(withoutScheme);
+        const authority =
+            delimiterIndex >= 0
+                ? withoutScheme.slice(0, delimiterIndex)
+                : withoutScheme;
+
+        return stripAuthorityCredentials(authority).trim();
+    }
+}
+
 /**
  * Configuration options for connectivity checking
  */
@@ -493,7 +527,9 @@ export async function checkConnectivity(
         return checkHttpConnectivity(normalizedHost, opts.timeout, signal);
     }
 
-    const cleanHost: string = stripHttpScheme(normalizedHost);
+    const cleanHost: string = normalizeConnectivityProbeHost(normalizedHost);
+    const targetHostForDetails =
+        cleanHost.length > 0 ? cleanHost : "[invalid-host]";
 
     if (opts.method === "tcp" || opts.method === "http") {
         try {
@@ -535,7 +571,7 @@ export async function checkConnectivity(
     }
 
     return {
-        details: `Failed to connect to ${normalizedHost}`,
+        details: `Failed to connect to ${targetHostForDetails}`,
         error: isDefined(tcpProbeError)
             ? getUserFacingErrorDetail(tcpProbeError)
             : "Host unreachable - all connectivity checks failed",

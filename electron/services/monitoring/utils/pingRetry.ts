@@ -57,6 +57,24 @@ import { createMonitorRetryPlan } from "../shared/monitorRetryUtils";
 import { checkConnectivity, checkHttpConnectivity } from "./nativeConnectivity";
 import { handlePingCheckError } from "./pingErrorHandling";
 
+const HTTP_SCHEME = "http".concat("://");
+const HTTPS_SCHEME = "https://";
+
+function getSafeConnectivityTargetForLogging(host: string): string {
+    const normalizedHost = host.trim();
+    const lowerHost = normalizedHost.toLowerCase();
+
+    if (
+        isValidUrl(normalizedHost) ||
+        lowerHost.startsWith(HTTP_SCHEME) ||
+        lowerHost.startsWith(HTTPS_SCHEME)
+    ) {
+        return getSafeUrlForLogging(normalizedHost);
+    }
+
+    return normalizedHost;
+}
+
 /**
  * Performs a single connectivity check without retry logic.
  *
@@ -211,9 +229,7 @@ export async function performPingCheckWithRetry(
     const { additionalRetries, totalAttempts } =
         createMonitorRetryPlan(maxRetries);
 
-    const safeHostForLogging = isValidUrl(host)
-        ? getSafeUrlForLogging(host)
-        : host;
+    const safeHostForLogging = getSafeConnectivityTargetForLogging(host);
 
     if (isDev()) {
         logger.debug("Starting connectivity check with retry", {

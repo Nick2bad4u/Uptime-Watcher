@@ -205,6 +205,42 @@ describe("pingRetry", () => {
                 })
             );
         });
+        it("redacts URL-shaped targets in failure context", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: pingRetry", "component");
+            await annotate("Category: Monitoring", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(checkConnectivity).mockResolvedValueOnce(downResult);
+            vi.mocked(withOperationalHooks).mockImplementationOnce(
+                async (operation) => operation()
+            );
+            vi.mocked(handlePingCheckError).mockReturnValueOnce(downResult);
+
+            await expect(
+                performPingCheckWithRetry(
+                    "https://example.com/path with spaces?token=secret",
+                    1000,
+                    0
+                )
+            ).resolves.toEqual(downResult);
+
+            expect(handlePingCheckError).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: expect.stringMatching(
+                        /connectivity check failed/i
+                    ),
+                }),
+                expect.objectContaining({
+                    host: "https://example.com/path%20with%20spaces",
+                    maxRetries: 0,
+                    timeout: 1000,
+                })
+            );
+        });
 
         it("configures withOperationalHooks with total attempts", async ({
             task,

@@ -264,6 +264,40 @@ describe("Native Connectivity with Degraded State", () => {
                 "Failed to connect to nonexistent.example.com"
             );
         });
+        it("should normalize URL-shaped targets before DNS fallback", async () => {
+            // Arrange
+            mockDns.resolve4.mockResolvedValue(["203.0.113.10"]);
+
+            // Act
+            const result = await checkConnectivity(
+                "https://example.com/path with spaces?token=secret",
+                {
+                    method: "dns",
+                }
+            );
+
+            // Assert
+            expect(result.status).toBe("degraded");
+            expect(mockDns.resolve4).toHaveBeenCalledWith("example.com");
+        });
+        it("should avoid echoing URL paths or queries in failed DNS details", async () => {
+            // Arrange
+            mockDns.resolve4.mockRejectedValue(
+                new Error("DNS resolution failed")
+            );
+
+            // Act
+            const result = await checkConnectivity(
+                "https://example.com/path with spaces?token=secret",
+                {
+                    method: "dns",
+                }
+            );
+
+            // Assert
+            expect(result.status).toBe("down");
+            expect(result.details).toBe("Failed to connect to example.com");
+        });
         it("should handle DNS timeout with Promise.race", async () => {
             // Arrange
             mockDns.resolve4.mockReturnValue(
