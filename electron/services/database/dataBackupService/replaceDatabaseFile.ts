@@ -125,6 +125,7 @@ export async function replaceDatabaseFile(args: {
     let isHadExistingTarget = false;
     let isJournalRollbackCreated = false;
     let isShmRollbackCreated = false;
+    let isTargetReplaced = false;
     let isWalRollbackCreated = false;
     let copyError: Error | undefined;
 
@@ -155,6 +156,7 @@ export async function replaceDatabaseFile(args: {
 
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- incomingPath/targetPath are within app-controlled userData directory.
         await fs.rename(incomingPath, targetPath);
+        isTargetReplaced = true;
         await syncDirectorySafely(targetDir);
     } catch (error: unknown) {
         copyError = ensureError(error);
@@ -206,6 +208,7 @@ export async function replaceDatabaseFile(args: {
                 await fs.rm(targetPath, { force: true });
                 // eslint-disable-next-line security/detect-non-literal-fs-filename -- rollbackPath/targetPath are within app-controlled userData directory.
                 await fs.rename(rollbackPath, targetPath);
+                isTargetReplaced = true;
                 isHadExistingTarget = false;
 
                 await restoreRelocatedSidecars({
@@ -230,6 +233,34 @@ export async function replaceDatabaseFile(args: {
                     { targetPath }
                 );
                 // If rollback fails, we still surface the init error below.
+            }
+        } else if (isTargetReplaced) {
+            try {
+                await fs.rm(targetPath, { force: true });
+                isTargetReplaced = false;
+
+                await restoreRelocatedSidecars({
+                    isJournalRollbackCreated,
+                    isShmRollbackCreated,
+                    isWalRollbackCreated,
+                    journalPath,
+                    rollbackJournalPath,
+                    rollbackShmPath,
+                    rollbackWalPath,
+                    shmPath,
+                    walPath,
+                });
+                isWalRollbackCreated = false;
+                isShmRollbackCreated = false;
+                isJournalRollbackCreated = false;
+                databaseService.initialize();
+            } catch (cleanupError: unknown) {
+                logger?.warn(
+                    "[DataBackupService] Failed to remove uninitialized database replacement",
+                    ensureError(cleanupError),
+                    { targetPath }
+                );
+                // If cleanup fails, we still surface the init error below.
             }
         }
 

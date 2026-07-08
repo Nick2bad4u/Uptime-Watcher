@@ -83,6 +83,33 @@ describe(replaceDatabaseFile, () => {
         expect(databaseService.initialize).toHaveBeenCalledTimes(1);
     });
 
+    it("removes the placed database when initializing a new target fails", async () => {
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const initializeError = new Error("initialize failed");
+        const databaseService = createDatabaseService();
+
+        vi.mocked(databaseService.initialize)
+            .mockImplementationOnce(() => {
+                throw initializeError;
+            })
+            .mockImplementationOnce(createMockDatabaseConnection);
+
+        await writeFile(sourcePath, "new-db");
+
+        await expect(
+            replaceDatabaseFile({
+                databaseService,
+                sourcePath,
+                targetPath,
+            })
+        ).rejects.toThrow(initializeError);
+
+        await expect(readFile(targetPath, "utf8")).rejects.toThrow();
+        expect(databaseService.close).toHaveBeenCalledTimes(1);
+        expect(databaseService.initialize).toHaveBeenCalledTimes(2);
+    });
+
     it("does not clobber stale timestamp-named staging files", async () => {
         const sourcePath = path.join(tempDirectory, "incoming.sqlite");
         const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
