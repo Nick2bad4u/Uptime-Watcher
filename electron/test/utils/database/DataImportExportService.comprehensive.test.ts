@@ -1290,6 +1290,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                             status: "up" as const,
                             timestamp: Date.now(),
                             responseTime: 100,
+                            details: "HTTP 200 OK",
                         },
                     ],
                 },
@@ -1328,7 +1329,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                     timestamp: expect.any(Number),
                     responseTime: 100,
                 },
-                "" // Empty details
+                "HTTP 200 OK"
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 "[DataImportExportService] Imported 1 monitors for site: https://example.com/path"

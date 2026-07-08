@@ -704,7 +704,7 @@ export class DataImportExportService {
                     status: entry.status,
                     timestamp: entry.timestamp,
                 },
-                "" // No details available in import data
+                entry.details ?? ""
             );
         }
     }
