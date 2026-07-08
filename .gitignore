@@ -858,3 +858,5 @@ temp/
 
 # VS Code
 !.vscode/mcp.json
+.lychee.report.md
+.lycheecache
