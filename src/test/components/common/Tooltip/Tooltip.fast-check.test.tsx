@@ -57,6 +57,53 @@ describe("Tooltip fast-check coverage", () => {
         unmount();
     });
 
+    it("cancels pending show timers when disabled before delay completes", () => {
+        vi.useFakeTimers();
+
+        const { rerender, unmount } = render(
+            <Tooltip content="Delayed helper" delay={200}>
+                {(triggerProps) => (
+                    <button type="button" {...triggerProps}>
+                        Trigger
+                    </button>
+                )}
+            </Tooltip>
+        );
+
+        const container = document.querySelector(".tooltip-container")!;
+        fireEvent.mouseEnter(container);
+
+        rerender(
+            <Tooltip content="Delayed helper" delay={200} disabled>
+                {(triggerProps) => (
+                    <button type="button" {...triggerProps}>
+                        Trigger
+                    </button>
+                )}
+            </Tooltip>
+        );
+
+        act(() => {
+            vi.advanceTimersByTime(250);
+        });
+
+        expect(document.querySelector(".tooltip")).toBeNull();
+
+        rerender(
+            <Tooltip content="Delayed helper" delay={200}>
+                {(triggerProps) => (
+                    <button type="button" {...triggerProps}>
+                        Trigger
+                    </button>
+                )}
+            </Tooltip>
+        );
+
+        expect(document.querySelector(".tooltip")).toBeNull();
+
+        unmount();
+    });
+
     it("shows on focus and hides on blur with configured delays", async () => {
         const { unmount } = render(
             <Tooltip content="Focus helper" delay={10}>

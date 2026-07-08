@@ -419,6 +419,20 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         useMount(noop, clearTimers);
 
+        useLayoutEffect(() => {
+            if (!disabled) {
+                return noop;
+            }
+
+            clearTimers();
+            // eslint-disable-next-line @eslint-react/set-state-in-effect -- Disabling the tooltip must synchronously discard stale delayed visibility state before a later re-enable can render it.
+            setIsVisible(false);
+            // eslint-disable-next-line @eslint-react/set-state-in-effect -- Disabling the tooltip must synchronously discard stale delayed render state before a later re-enable can render it.
+            setShouldRender(false);
+
+            return noop;
+        }, [clearTimers, disabled]);
+
         const handleFocus: FocusEventHandler<HTMLElement> = useCallback(() => {
             showTooltip();
         }, [showTooltip]);
