@@ -110,6 +110,67 @@ describe(replaceDatabaseFile, () => {
         );
     });
 
+    it("does not copy staged database bytes through an incoming symlink", async () => {
+        const operationId = "00000000-0000-4000-8000-000000000000";
+        const sourcePath = path.join(tempDirectory, "incoming.sqlite");
+        const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");
+        const incomingPath = path.join(
+            tempDirectory,
+            `uptime-watcher.sqlite.incoming-${operationId}`
+        );
+        const outsidePath = path.join(tempDirectory, "outside.sqlite");
+        const databaseService = createDatabaseService();
+
+        await writeFile(sourcePath, "new-db");
+        await writeFile(targetPath, "old-db");
+        await writeFile(outsidePath, "outside-db");
+
+        try {
+            await symlink(outsidePath, incomingPath);
+        } catch (error: unknown) {
+            const errorCode = (error as NodeJS.ErrnoException).code;
+            if (errorCode === "EPERM" || errorCode === "EACCES") {
+                return;
+            }
+
+            throw error;
+        }
+
+        vi.resetModules();
+        vi.doMock("node:crypto", async () => {
+            const actual =
+                await vi.importActual<typeof import("node:crypto")>(
+                    "node:crypto"
+                );
+            return {
+                ...actual,
+                randomUUID: () => operationId,
+            };
+        });
+
+        const { replaceDatabaseFile: replaceWithMockedUuid } =
+            await import("../../../../services/database/dataBackupService/replaceDatabaseFile");
+
+        try {
+            await expect(
+                replaceWithMockedUuid({
+                    databaseService,
+                    sourcePath,
+                    targetPath,
+                })
+            ).rejects.toThrow();
+
+            await expect(readFile(targetPath, "utf8")).resolves.toBe("old-db");
+            await expect(readFile(outsidePath, "utf8")).resolves.toBe(
+                "outside-db"
+            );
+            expect(databaseService.close).toHaveBeenCalledTimes(1);
+            expect(databaseService.initialize).toHaveBeenCalledTimes(1);
+        } finally {
+            vi.doUnmock("node:crypto");
+        }
+    });
+
     it("restores the original database when reinitialization fails", async () => {
         const sourcePath = path.join(tempDirectory, "incoming.sqlite");
         const targetPath = path.join(tempDirectory, "uptime-watcher.sqlite");

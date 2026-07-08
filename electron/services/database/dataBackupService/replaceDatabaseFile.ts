@@ -2,6 +2,7 @@ import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
+import { constants as fsConstants } from "node:fs";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 
@@ -132,7 +133,7 @@ export async function replaceDatabaseFile(args: {
         // `targetPath` is missing. This also ensures we never move the live
         // DB aside unless we have a fully-written replacement ready.
 
-        await fs.copyFile(sourcePath, incomingPath);
+        await fs.copyFile(sourcePath, incomingPath, fsConstants.COPYFILE_EXCL);
         await syncFileSafely(incomingPath);
 
         // Move the existing DB out of the way (so rename into place is safe).
