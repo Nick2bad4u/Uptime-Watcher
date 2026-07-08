@@ -67,6 +67,15 @@ export const ScreenshotThumbnail = ({
     const { themeName } = useTheme();
     const openExternal = useUIStore(selectOpenExternal);
 
+    const clearHoverTimeout = useCallback((): void => {
+        if (!timeoutRef.current) {
+            return;
+        }
+
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = undefined;
+    }, []);
+
     // Set portal container after component mounts to avoid SSR issues
     useMount(
         useCallback(function initializePortalContainer() {
@@ -79,11 +88,7 @@ export const ScreenshotThumbnail = ({
         useCallback(function setupComponent(): void {
             // No setup needed, just using for cleanup
         }, []),
-        useCallback(function cleanupTimeout(): void {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        }, [])
+        clearHoverTimeout
     );
 
     // Calculate safe values using useMemo to avoid infinite loops
@@ -184,37 +189,27 @@ export const ScreenshotThumbnail = ({
     );
 
     const handleMouseEnter = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = undefined;
-        }
+        clearHoverTimeout();
         setHovered(true);
-    }, []);
+    }, [clearHoverTimeout]);
 
     const handleMouseLeave = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
+        clearHoverTimeout();
         timeoutRef.current = setTimeout(() => {
+            timeoutRef.current = undefined;
             setHovered(false);
         }, 100);
-    }, []);
+    }, [clearHoverTimeout]);
 
     const handleFocus = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = undefined;
-        }
+        clearHoverTimeout();
         setHovered(true);
-    }, []);
+    }, [clearHoverTimeout]);
 
     const handleBlur = useCallback(() => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = undefined;
-        }
+        clearHoverTimeout();
         setHovered(false);
-    }, []);
+    }, [clearHoverTimeout]);
 
     // Simple portal - let CSS handle positioning to avoid complex state management
     const portalJSX =
