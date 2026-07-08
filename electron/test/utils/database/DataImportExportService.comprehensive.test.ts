@@ -120,6 +120,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             },
             settings: {
                 deleteAllInternal: vi.fn(),
+                deleteInternal: vi.fn(),
                 bulkInsertInternal: vi.fn(),
                 getAll: vi.fn().mockResolvedValue({}),
             },
@@ -191,6 +192,8 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
         attachTransactionAdapter(mockRepositories.settings, {
             deleteAll: (db: unknown) =>
                 mockRepositories.settings.deleteAllInternal(db),
+            deleteByKey: (db: unknown, key: string) =>
+                mockRepositories.settings.deleteInternal(db, key),
             bulkInsert: (db: unknown, values: unknown) =>
                 mockRepositories.settings.bulkInsertInternal(db, values),
         });
@@ -899,6 +902,10 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 { identifier: "site2", name: "Site 2" }, // No monitors
             ];
             const mockSettings = { theme: "dark", historyLimit: "500" };
+            mockRepositories.settings.getAll.mockResolvedValue({
+                historyLimit: "1000",
+                theme: "light",
+            });
 
             (withDatabaseOperation as MockedFunction<any>).mockImplementation(
                 async (operation: any) => await operation()
@@ -925,7 +932,13 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             ).toHaveBeenCalledWith(mockDatabase);
             expect(
                 mockRepositories.settings.deleteAllInternal
-            ).toHaveBeenCalledWith(mockDatabase);
+            ).not.toHaveBeenCalled();
+            expect(
+                mockRepositories.settings.deleteInternal
+            ).toHaveBeenCalledWith(mockDatabase, "historyLimit");
+            expect(
+                mockRepositories.settings.deleteInternal
+            ).toHaveBeenCalledWith(mockDatabase, "theme");
             expect(
                 mockRepositories.monitor.deleteAllInternal
             ).toHaveBeenCalledWith(mockDatabase);
@@ -979,6 +992,61 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Successfully imported 0 sites and 1 settings"
             );
+        });
+
+        it("should preserve protected existing settings while replacing import-managed settings", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "security");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Import Operation", "category");
+
+            const { withDatabaseOperation } =
+                await import("../../../utils/operationalHooks");
+
+            mockRepositories.settings.getAll.mockResolvedValue({
+                ["__proto__"]: "evil-existing",
+                "cloud.dropbox.tokens": "existing-token",
+                "cloud.sync.deviceId": "existing-device",
+                constructor: "existing-constructor",
+                historyLimit: "1000",
+                prototype: "existing-prototype",
+                theme: "light",
+            });
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            await service.persistImportedData([], { theme: "dark" });
+
+            expect(
+                mockRepositories.settings.deleteAllInternal
+            ).not.toHaveBeenCalled();
+            expect(
+                mockRepositories.settings.deleteInternal
+            ).toHaveBeenCalledWith(mockDatabase, "historyLimit");
+            expect(
+                mockRepositories.settings.deleteInternal
+            ).toHaveBeenCalledWith(mockDatabase, "theme");
+
+            const deletedKeys =
+                mockRepositories.settings.deleteInternal.mock.calls.map(
+                    (call: unknown[]) => call[1]
+                );
+            expect(deletedKeys).not.toEqual(
+                expect.arrayContaining([
+                    "__proto__",
+                    "cloud.dropbox.tokens",
+                    "cloud.sync.deviceId",
+                    "constructor",
+                    "prototype",
+                ])
+            );
+            expect(
+                mockRepositories.settings.bulkInsertInternal
+            ).toHaveBeenCalledWith(mockDatabase, { theme: "dark" });
         });
 
         it("should reject duplicate site identifiers after import normalization", async ({

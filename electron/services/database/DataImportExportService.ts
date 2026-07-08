@@ -328,6 +328,10 @@ export class DataImportExportService {
             | undefined
     ): Promise<void> {
         const safeSettings = this.stripCloudSettings(settings ?? {}, "persist");
+        const existingSettings = await this.repositories.settings.getAll();
+        const replaceableSettingsKeys = objectKeys(existingSettings).filter(
+            (key) => !DataImportExportService.isProtectedSettingsKey(key)
+        );
         const normalizedSites = sites.map((site) =>
             this.normalizeImportSite(site)
         );
@@ -338,7 +342,9 @@ export class DataImportExportService {
                 await this.withImportTransactionAdapters(
                     ({ historyTx, monitorTx, settingsTx, siteTx }) => {
                         siteTx.deleteAll();
-                        settingsTx.deleteAll();
+                        for (const key of replaceableSettingsKeys) {
+                            settingsTx.deleteByKey(key);
+                        }
                         monitorTx.deleteAll();
                         historyTx.deleteAll();
 
