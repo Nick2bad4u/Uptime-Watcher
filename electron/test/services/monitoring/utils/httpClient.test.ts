@@ -510,7 +510,11 @@ describe("HTTP Client Utils", () => {
             });
 
             expect(() => {
-                beforeRedirect?.(options);
+                beforeRedirect?.(
+                    options,
+                    { headers: {}, statusCode: 302 },
+                    { headers: {}, method: "GET", url: "https://example.com" }
+                );
             }).not.toThrow();
             expect(getter).not.toHaveBeenCalled();
         });

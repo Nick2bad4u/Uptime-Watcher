@@ -4,12 +4,12 @@ import { DropboxResponseError } from "dropbox";
 import { describe, expect, it, vi } from "vitest";
 
 function createAxiosError(args: {
-    headers?: AxiosResponse["headers"];
+    headers?: unknown;
     status?: number;
 }): AxiosError {
     const response: Partial<AxiosResponse> = {
         data: {},
-        headers: args.headers ?? {},
+        headers: (args.headers ?? {}) as AxiosResponse["headers"],
         status: args.status ?? 0,
         statusText: "",
     };

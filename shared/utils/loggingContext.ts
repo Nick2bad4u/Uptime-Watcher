@@ -6,7 +6,7 @@ import {
     getOwnDataProperty,
 } from "@shared/utils/errorPropertyAccess";
 import { getNativeArrayBufferByteLength } from "@shared/utils/nativeArrayBuffer";
-import { createNullPrototypeObject } from "@shared/utils/objectSafety";
+import { createNullPrototypeObject } from "@shared/utils/objectCreation";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
     isDefined,

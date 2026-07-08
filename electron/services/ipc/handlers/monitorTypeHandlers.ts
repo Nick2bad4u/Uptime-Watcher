@@ -44,7 +44,9 @@ const pickOptionalString = (value: unknown): string | undefined =>
 const pickBooleanWithFallback = (value: unknown, fallback: boolean): boolean =>
     typeof value === "boolean" ? value : fallback;
 
-const copyPlainDataRecord = (value: unknown): UnknownRecord | undefined => {
+function copyPlainDataRecord<T extends object>(value: T): T | undefined;
+function copyPlainDataRecord(value: unknown): UnknownRecord | undefined;
+function copyPlainDataRecord(value: unknown): UnknownRecord | undefined {
     if (!isPlainRecord(value)) {
         return undefined;
     }
@@ -54,7 +56,7 @@ const copyPlainDataRecord = (value: unknown): UnknownRecord | undefined => {
     } catch {
         return undefined;
     }
-};
+}
 
 const buildMonitorValidationCandidate = (
     monitorType: string,

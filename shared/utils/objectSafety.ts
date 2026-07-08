@@ -20,6 +20,7 @@ import {
 import { getOwnDataProperty } from "./errorPropertyAccess";
 import { sharedFallbackLogger } from "./logger/consoleFallback";
 import { normalizeLogValue } from "./loggingContext";
+import { createNullPrototypeObject as createNullPrototypeObjectBase } from "./objectCreation";
 import { isObject } from "./typeGuards";
 import { castUnchecked } from "./typeHelpers";
 
@@ -27,19 +28,13 @@ import { castUnchecked } from "./typeHelpers";
  * Creates a null-prototype object with a specific compile-time shape.
  *
  * @remarks
- * This centralizes the only “unsafe” assertion needed for prototype-pollution
- * hardening so callers do not need their own eslint-disable comments.
+ * This compatibility wrapper keeps existing object-safety imports stable while
+ * the underlying helper lives in a dependency-light module.
  *
  * @public
  */
 export function createNullPrototypeObject<T extends object>(shape?: T): T {
-    if (shape) {
-        // Touch the phantom parameter in a side-effect-free way so lints do not
-        // treat it as unused.
-        objectKeys(shape);
-    }
-
-    return castUnchecked<T>(Object.create(null));
+    return createNullPrototypeObjectBase(shape);
 }
 
 function getOwnEnumerableDataEntries(obj: object): [PropertyKey, unknown][] {
