@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
     extractNestedFieldValue,
+    isValidHttpMonitorUrl,
     normalizeResponseTime,
     normalizeTimestampValue,
     validateMonitorUrl,
@@ -39,6 +40,23 @@ describe(validateMonitorUrl, () => {
         expect(
             validateMonitorUrl(createMonitorWithUrl("ftp://example.com"))
         ).not.toBeNull();
+    });
+});
+
+describe(isValidHttpMonitorUrl, () => {
+    it("accepts trimmed HTTP monitor URLs", () => {
+        expect(
+            isValidHttpMonitorUrl("  https://example.com/health  ")
+        ).toBeTruthy();
+        expect(
+            isValidHttpMonitorUrl("http://localhost:3000/status")
+        ).toBeTruthy();
+    });
+
+    it("rejects unsupported or malformed monitor URLs", () => {
+        expect(isValidHttpMonitorUrl("file:///etc/passwd")).toBeFalsy();
+        expect(isValidHttpMonitorUrl("https://")).toBeFalsy();
+        expect(isValidHttpMonitorUrl("not-a-url")).toBeFalsy();
     });
 });
 

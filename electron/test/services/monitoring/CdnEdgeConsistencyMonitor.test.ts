@@ -128,6 +128,47 @@ describe("CdnEdgeConsistencyMonitor service", () => {
         );
     });
 
+    it("normalizes schema-compatible CDN URLs before making requests", async () => {
+        const baselineBuffer = Buffer.from("baseline-response");
+        monitor = createMonitor({
+            baselineUrl: "  https://baseline.example.com/status  ",
+            edgeLocations:
+                "  https://edge-a.example.com/status  \n  https://edge-b.example.com/status  ",
+        });
+
+        httpGetMock.mockResolvedValue({
+            data: baselineBuffer,
+            responseTime: 45,
+            status: 200,
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("up");
+        expect(httpGetMock).toHaveBeenNthCalledWith(
+            1,
+            "https://baseline.example.com/status",
+            expect.objectContaining({
+                responseType: "arraybuffer",
+                timeout: 5000,
+            })
+        );
+        expect(httpGetMock).toHaveBeenCalledWith(
+            "https://edge-a.example.com/status",
+            expect.objectContaining({
+                responseType: "arraybuffer",
+                timeout: 5000,
+            })
+        );
+        expect(httpGetMock).toHaveBeenCalledWith(
+            "https://edge-b.example.com/status",
+            expect.objectContaining({
+                responseType: "arraybuffer",
+                timeout: 5000,
+            })
+        );
+    });
+
     it("returns degraded when an edge response differs from the baseline", async () => {
         const baselineBuffer = Buffer.from("baseline-response");
         httpGetMock.mockImplementation(async (url: string) => {
@@ -327,6 +368,19 @@ describe("CdnEdgeConsistencyMonitor service", () => {
 
         expect(result.status).toBe("down");
         expect(result.error).toContain("Baseline URL");
+    });
+
+    it("rejects invalid edge endpoint URLs before making requests", async () => {
+        monitor = createMonitor({
+            edgeLocations:
+                "https://edge-a.example.com/status\nfile:///etc/passwd",
+        });
+
+        const result = await service.check(monitor);
+
+        expect(result.status).toBe("down");
+        expect(result.error).toBe("Invalid edge endpoint URL: file:[redacted]");
+        expect(httpGetMock).not.toHaveBeenCalled();
     });
 
     it("rejects excessive edge endpoint lists before making requests", async () => {

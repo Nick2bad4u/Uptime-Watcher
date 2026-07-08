@@ -16,7 +16,6 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { getOwnDataProperty } from "@shared/utils/errorPropertyAccess";
 import { getSafeUrlForLogging } from "@shared/utils/urlSafety";
 import { getUserFacingErrorDetail } from "@shared/utils/userFacingErrors";
-import { isValidUrl } from "@shared/validation/validatorUtils";
 import { createHash } from "node:crypto";
 import { performance } from "node:perf_hooks";
 import { arrayJoin, isEmpty, isFinite as isFiniteNumber } from "ts-extras";
@@ -45,6 +44,7 @@ import {
     createMonitorErrorResult,
     normalizeResponseTime,
     parseMonitorUrlList,
+    resolveHttpMonitorUrl,
 } from "./shared/monitorServiceHelpers";
 import { createHttpClient } from "./utils/httpClient";
 
@@ -73,6 +73,16 @@ const HASH_ALGORITHM = "sha256";
 const describeEndpointForMessage = (endpoint: string): string =>
     getSafeUrlForLogging(endpoint);
 
+const getOwnStringDataProperty = (
+    source: object,
+    key: PropertyKey
+): string | undefined => {
+    const property = getOwnDataProperty(source, key);
+    return property.found && typeof property.value === "string"
+        ? property.value
+        : undefined;
+};
+
 class CdnEdgeConsistencyFailureError extends Error {
     public constructor(message: string) {
         super(message);
@@ -98,13 +108,12 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
             );
         }
 
-        const validationError = this.validateConfiguration(monitor);
-        if (validationError) {
-            return createMonitorErrorResult(validationError, 0);
+        const validation = this.resolveConfiguration(monitor);
+        if (!validation.ok) {
+            return createMonitorErrorResult(validation.message, 0);
         }
 
-        const baselineUrl = monitor.baselineUrl?.trim() ?? "";
-        const edgeEndpoints = parseMonitorUrlList(monitor.edgeLocations ?? "");
+        const { baselineUrl, edgeEndpoints } = validation;
         const baselineUrlForMessage = describeEndpointForMessage(baselineUrl);
 
         const { retryAttempts, timeout } = createMonitorConfig(monitor, {
@@ -315,29 +324,56 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         }
     }
 
-    private validateConfiguration(
-        monitor: Site["monitors"][0]
-    ): string | undefined {
-        if (!monitor.baselineUrl || !isValidUrl(monitor.baselineUrl)) {
-            return "Baseline URL is required for CDN edge consistency monitors";
+    private resolveConfiguration(monitor: Site["monitors"][0]):
+        | {
+              baselineUrl: string;
+              edgeEndpoints: string[];
+              ok: true;
+          }
+        | {
+              message: string;
+              ok: false;
+          } {
+        const baselineUrlResult = resolveHttpMonitorUrl(
+            getOwnStringDataProperty(monitor, "baselineUrl"),
+            "Baseline URL is required for CDN edge consistency monitors"
+        );
+        if (!baselineUrlResult.ok) {
+            return baselineUrlResult;
         }
 
-        const edges = parseMonitorUrlList(monitor.edgeLocations ?? "");
+        const edges = parseMonitorUrlList(
+            getOwnStringDataProperty(monitor, "edgeLocations") ?? ""
+        );
         if (isEmpty(edges)) {
-            return "At least one edge endpoint is required";
+            return {
+                message: "At least one edge endpoint is required",
+                ok: false,
+            };
         }
 
         if (edges.length > MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS) {
-            return `CDN edge consistency monitors support up to ${MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS} edge endpoints`;
+            return {
+                message: `CDN edge consistency monitors support up to ${MAX_CDN_EDGE_CONSISTENCY_ENDPOINTS} edge endpoints`,
+                ok: false,
+            };
         }
 
         for (const edge of edges) {
-            if (!isValidUrl(edge)) {
-                return `Invalid edge endpoint URL: ${describeEndpointForMessage(edge)}`;
+            const edgeUrlResult = resolveHttpMonitorUrl(
+                edge,
+                `Invalid edge endpoint URL: ${describeEndpointForMessage(edge)}`
+            );
+            if (!edgeUrlResult.ok) {
+                return edgeUrlResult;
             }
         }
 
-        return undefined;
+        return {
+            baselineUrl: baselineUrlResult.value,
+            edgeEndpoints: edges,
+            ok: true,
+        };
     }
 
     public constructor(config: MonitorServiceConfig = {}) {

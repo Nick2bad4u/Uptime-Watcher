@@ -166,19 +166,34 @@ export function validateMonitorHostAndPort(monitor: Monitor): null | string {
  */
 export function validateMonitorUrl(monitor: Monitor): null | string {
     const rawUrl = monitor.url;
-    if (typeof rawUrl !== "string") {
-        return "Monitor missing or invalid URL";
+
+    return isValidHttpMonitorUrl(rawUrl)
+        ? null
+        : "Monitor missing or invalid URL";
+}
+
+/**
+ * Validates a URL using the HTTP monitor runtime policy.
+ *
+ * @remarks
+ * Keep this aligned with the shared monitor schema policy: trim user input,
+ * restrict protocols to HTTP/S, accept local/intranet hosts, and require a
+ * WHATWG-parsed hostname that passes shared host validation.
+ *
+ * @param value - Candidate URL value.
+ *
+ * @returns `true` when the value is a valid HTTP/S monitor URL.
+ */
+export function isValidHttpMonitorUrl(value: unknown): value is string {
+    if (typeof value !== "string") {
+        return false;
     }
 
-    const url = rawUrl.trim();
+    const url = value.trim();
     if (url.length === 0) {
-        return "Monitor missing or invalid URL";
+        return false;
     }
 
-    // Align with the monitor URL schema policy:
-    // - validator.js-backed syntax validation
-    // - allow single quotes in path
-    // - parse with WHATWG URL and validate hostname semantics
     if (
         !isValidUrl(url, {
             allow_protocol_relative_urls: false,
@@ -188,19 +203,48 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
             require_tld: false,
         })
     ) {
-        return "Monitor missing or invalid URL";
+        return false;
     }
 
     try {
         const parsed = new URL(url);
-        if (!isValidHost(parsed.hostname)) {
-            return "Monitor missing or invalid URL";
-        }
+        return isValidHost(parsed.hostname);
     } catch {
-        return "Monitor missing or invalid URL";
+        return false;
+    }
+}
+
+/**
+ * Resolves a trimmed HTTP monitor URL or a standardized error message.
+ *
+ * @param value - Candidate URL value.
+ * @param errorMessage - Message returned when validation fails.
+ *
+ * @returns Validated URL resolution result.
+ */
+export function resolveHttpMonitorUrl(
+    value: unknown,
+    errorMessage: string
+):
+    | {
+          ok: false;
+          message: string;
+      }
+    | {
+          ok: true;
+          value: string;
+      } {
+    if (!isValidHttpMonitorUrl(value)) {
+        return {
+            message: errorMessage,
+            ok: false,
+        };
     }
 
-    return null;
+    return {
+        ok: true,
+        value: value.trim(),
+    };
 }
 
 /**
