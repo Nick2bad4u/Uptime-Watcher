@@ -284,6 +284,32 @@ describe("WebsocketKeepaliveMonitor service", () => {
         expect(result.details ?? result.error).toContain("canceled");
         expect(socket!.terminate).toHaveBeenCalled();
     });
+
+    it("reports cancellation when terminate emits close synchronously during abort", async () => {
+        const monitor = createMonitor();
+        const controller = new AbortController();
+
+        const checkPromise = service.check(monitor, controller.signal);
+        const socket = socketInstances.at(-1);
+        expect(socket).toBeDefined();
+
+        socket!.readyState = socketReadyState.OPEN;
+        socket!.emit("open");
+        socket!.terminate.mockImplementation(() => {
+            socket!.readyState = socketReadyState.CLOSED;
+            socket!.emit("close", 1006, Buffer.alloc(0));
+        });
+
+        controller.abort("Monitor cancelled");
+
+        const result = await checkPromise;
+        expect(result.status).toBe("down");
+        expect(result.details ?? result.error).toContain("canceled");
+        expect(result.details ?? result.error).not.toContain(
+            "Connection closed"
+        );
+        expect(socket!.terminate).toHaveBeenCalled();
+    });
 });
 
 /* eslint-enable unicorn/prefer-event-target */

@@ -139,6 +139,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
             let handshakeTimer: NodeJS.Timeout | null = null;
             let pongTimer: NodeJS.Timeout | null = null;
             let isSettled = false;
+            let shouldTerminateSocket = false;
 
             const cleanupCallbacks: (() => void)[] = [];
 
@@ -279,11 +280,7 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
             if (signal) {
                 const abortHandler = (): void => {
-                    try {
-                        socket.terminate();
-                    } catch {
-                        // Ignore termination errors
-                    }
+                    shouldTerminateSocket = true;
                     rejectOnce(
                         createAbortError({
                             cause: getAbortSignalReason(signal),
@@ -300,6 +297,14 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
 
             cleanupCallbacks.push(() => {
                 socket.removeAllListeners();
+
+                if (
+                    shouldTerminateSocket &&
+                    socket.readyState !== NodeWebSocket.CLOSED
+                ) {
+                    socket.terminate();
+                    return;
+                }
 
                 switch (socket.readyState) {
                     case NodeWebSocket.CLOSED: {
