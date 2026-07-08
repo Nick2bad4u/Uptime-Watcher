@@ -21,6 +21,7 @@ import type { ListenerAttachmentState } from "../baseTypes";
 import type { MonitorStatusChangedEvent } from "./statusUpdateMerge";
 
 import { logger } from "../../../services/logger";
+import { fireAndForget } from "../../../utils/async/fireAndForget";
 import {
     createInitialListenerStates,
     createStatusUpdateListenerDescriptors,
@@ -327,7 +328,7 @@ export class StatusUpdateManager {
                     this.handleMonitoringLifecycleEvent("stopped", event);
                 },
                 processStatusUpdateCandidate: (candidate, source) => {
-                    void this.processStatusUpdateCandidate(candidate, source);
+                    this.startStatusUpdateProcessing(candidate, source);
                 },
             });
 
@@ -429,6 +430,24 @@ export class StatusUpdateManager {
                 { source }
             );
         }
+    }
+
+    private startStatusUpdateProcessing(
+        candidate: unknown,
+        source: string
+    ): void {
+        fireAndForget(
+            () => this.processStatusUpdateCandidate(candidate, source),
+            {
+                onError: (error) => {
+                    logger.error(
+                        "[StatusUpdateHandler] Unexpected status update processing failure",
+                        ensureError(error),
+                        { source }
+                    );
+                },
+            }
+        );
     }
 
     /**
