@@ -31,6 +31,7 @@ describe("useTheme - Complete Coverage", () => {
 
         // Mock window.matchMedia for system theme detection
         Object.defineProperty(globalThis, "matchMedia", {
+            configurable: true,
             writable: true,
             value: vi.fn().mockImplementation((query) => ({
                 addEventListener: vi.fn(),

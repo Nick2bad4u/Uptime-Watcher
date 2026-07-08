@@ -29,7 +29,10 @@ import {
     buildErrorLogArguments,
     buildLogArguments,
 } from "@shared/utils/logger/common";
-import { extractLogContext } from "@shared/utils/loggingContext";
+import {
+    extractLogContext,
+    normalizeLogValue,
+} from "@shared/utils/loggingContext";
 import { createNullPrototypeObject } from "@shared/utils/objectSafety";
 import { isRecord } from "@shared/utils/typeHelpers";
 import log from "electron-log/renderer";
@@ -185,6 +188,17 @@ const buildFinalArgs = (
           ]
         : [...logArgs];
 
+const normalizeLogStringValue = (value: string): string => {
+    const normalized = normalizeLogValue(value);
+    return typeof normalized === "string" ? normalized : value;
+};
+
+const buildSiteLogContext = (
+    identifier: string
+): { readonly siteIdentifier: string } => ({
+    siteIdentifier: normalizeLogStringValue(identifier),
+});
+
 type LogMethodName =
     | "debug"
     | "error"
@@ -297,9 +311,10 @@ const loggerInstance: LoggerInterface = {
     // Log site monitoring events
     site: {
         added: (identifier: string): void => {
-            baseLoggerMethods.info("Site added", {
-                siteIdentifier: identifier,
-            });
+            baseLoggerMethods.info(
+                "Site added",
+                buildSiteLogContext(identifier)
+            );
         },
         check: (
             identifier: string,
@@ -308,19 +323,22 @@ const loggerInstance: LoggerInterface = {
         ): void => {
             baseLoggerMethods.info("Site check", {
                 ...(typeof responseTime === "number" && { responseTime }),
-                siteIdentifier: identifier,
+                ...buildSiteLogContext(identifier),
                 status,
             });
         },
         error: (identifier: string, error: Error | string): void => {
-            baseLoggerMethods.error("Site check error", error, {
-                siteIdentifier: identifier,
-            });
+            baseLoggerMethods.error(
+                "Site check error",
+                error,
+                buildSiteLogContext(identifier)
+            );
         },
         removed: (identifier: string): void => {
-            baseLoggerMethods.info("Site removed", {
-                siteIdentifier: identifier,
-            });
+            baseLoggerMethods.info(
+                "Site removed",
+                buildSiteLogContext(identifier)
+            );
         },
         statusChange: (
             identifier: string,
@@ -330,7 +348,7 @@ const loggerInstance: LoggerInterface = {
             baseLoggerMethods.info("Site status change", {
                 newStatus,
                 oldStatus,
-                siteIdentifier: identifier,
+                ...buildSiteLogContext(identifier),
             });
         },
     },

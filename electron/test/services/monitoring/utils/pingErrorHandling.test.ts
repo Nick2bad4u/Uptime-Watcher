@@ -79,8 +79,9 @@ describe("pingErrorHandling", () => {
             expect(result).toEqual({
                 status: "down",
                 responseTime: 0,
-                details: "Ping failed: [object Object]",
-                error: "[object Object]",
+                details:
+                    'Ping failed: {"code":"ENOTFOUND","message":"Host not found"}',
+                error: '{"code":"ENOTFOUND","message":"Host not found"}',
             });
         });
         it("should handle null errors", async ({ task, annotate }) => {

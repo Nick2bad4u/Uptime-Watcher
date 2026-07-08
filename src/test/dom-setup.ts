@@ -75,6 +75,7 @@ fc.configureGlobal({
 beforeAll(() => {
     // Mock window.matchMedia for responsive design testing
     Object.defineProperty(globalThis, "matchMedia", {
+        configurable: true,
         writable: true,
         value: vi.fn().mockImplementation((query) => ({
             matches: false,

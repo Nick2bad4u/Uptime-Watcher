@@ -337,6 +337,7 @@ console.warn = suppressCssParseWarning(originalConsoleWarn);
 // Mock window.matchMedia for theme tests
 Object.defineProperties(globalThis, {
     matchMedia: {
+        configurable: true,
         writable: true,
         value: vi.fn().mockImplementation((query) => ({
             matches: false,

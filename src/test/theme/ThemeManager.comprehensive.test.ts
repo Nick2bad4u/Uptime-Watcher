@@ -31,6 +31,7 @@ const setMatchMediaForTesting = (
 
 // Mock window.matchMedia
 Object.defineProperty(globalThis, "matchMedia", {
+    configurable: true,
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         addEventListener: vi.fn(),

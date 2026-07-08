@@ -373,7 +373,7 @@ describe("logging context helpers", () => {
                     "https://user:pass@example.com/callback?token=abc"
                 )
             ).toBe(
-                "https://%5Bredacted%5D:%5Bredacted%5D@example.com/callback?token=[redacted]"
+                "https://redacted:redacted@example.com/callback?token=[redacted]"
             );
             expect(toString).not.toHaveBeenCalled();
         } finally {

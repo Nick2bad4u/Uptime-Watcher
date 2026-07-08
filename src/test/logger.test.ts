@@ -27,6 +27,8 @@ vi.mock("electron-log/renderer", () => ({
     default: mockLog,
 }));
 
+const stringifyMockCalls = (calls: unknown): string => JSON.stringify(calls);
+
 describe("Frontend Logger Service", () => {
     let logger: any;
 
@@ -210,7 +212,7 @@ describe("Frontend Logger Service", () => {
                         "https://example.com/callback?access_token=[redacted]",
                 }
             );
-            expect(String(mockLog.error.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.error.mock.calls)).not.toContain(
                 "context-secret"
             );
         });
@@ -365,16 +367,16 @@ describe("Frontend Logger Service", () => {
                 "[UPTIME-WATCHER] Site added",
                 {
                     siteIdentifier:
-                        "https://%5Bredacted%5D:%5Bredacted%5D@example.com/path?access_token=[redacted]",
+                        "https://redacted:redacted@example.com/path?access_token=[redacted]",
                 }
             );
-            expect(String(mockLog.info.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.info.mock.calls)).not.toContain(
                 "user-secret"
             );
-            expect(String(mockLog.info.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.info.mock.calls)).not.toContain(
                 "password-secret"
             );
-            expect(String(mockLog.info.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.info.mock.calls)).not.toContain(
                 "query-secret"
             );
         });
@@ -415,7 +417,7 @@ describe("Frontend Logger Service", () => {
                     title: "Sync failed",
                 }
             );
-            expect(String(mockLog.debug.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.debug.mock.calls)).not.toContain(
                 "notification-secret"
             );
         });
@@ -556,10 +558,10 @@ describe("Frontend Logger Service", () => {
                     password: "[redacted]",
                 }
             );
-            expect(String(mockLog.info.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.info.mock.calls)).not.toContain(
                 "old-password-secret"
             );
-            expect(String(mockLog.info.mock.calls)).not.toContain(
+            expect(stringifyMockCalls(mockLog.info.mock.calls)).not.toContain(
                 "new-password-secret"
             );
         });

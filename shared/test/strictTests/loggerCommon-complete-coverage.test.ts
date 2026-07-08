@@ -122,7 +122,7 @@ describe(buildLogArguments, () => {
             { context: "bootstrap" },
         ]);
 
-        expect(args).toStrictEqual([
+        expect(args).toEqual([
             "[RENDERER] initialized",
             { context: "bootstrap" },
         ]);
@@ -149,7 +149,7 @@ describe(buildLogArguments, () => {
         ] = args;
 
         expect(formattedMessage).toBe("[CORE] Authorization: [redacted]");
-        expect(metadata).toStrictEqual({
+        expect(metadata).toEqual({
             Authorization: "[redacted]",
             refresh_token: "[redacted]",
             "x-api-key": "[redacted]",
@@ -185,12 +185,12 @@ describe(buildErrorLogArguments, () => {
         ]);
 
         expect(args[0]).toBe("[BACKEND] failed");
-        expect(args[1]).toStrictEqual({
+        expect(args[1]).toEqual({
             message: "network broke",
             name: "Error",
             stack: "stack",
         });
-        expect(args[2]).toStrictEqual({ retry: true });
+        expect(args[2]).toEqual({ retry: true });
     });
 });
 

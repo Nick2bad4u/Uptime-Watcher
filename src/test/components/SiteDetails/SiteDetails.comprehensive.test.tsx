@@ -30,6 +30,7 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 
 // Mock window.matchMedia before other imports
 Object.defineProperty(globalThis, "matchMedia", {
+    configurable: true,
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         addEventListener: vi.fn(),

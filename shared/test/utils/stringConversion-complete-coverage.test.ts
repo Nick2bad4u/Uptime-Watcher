@@ -275,11 +275,19 @@ describe("shared/utils/stringConversion.ts - Complete Function Coverage", () => 
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const objWithToJSON = {
+            const objWithToJSON: {
+                name: string;
+                toJSON?: () => { custom: string };
+                value: number;
+            } = {
                 name: "test",
                 value: 123,
-                toJSON: () => ({ custom: "serialization" }),
             };
+
+            Object.defineProperty(objWithToJSON, "toJSON", {
+                configurable: true,
+                value: () => ({ custom: "serialization" }),
+            });
 
             expect(safeStringify(objWithToJSON)).toBe(
                 '{"custom":"serialization"}'

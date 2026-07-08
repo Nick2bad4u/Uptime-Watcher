@@ -131,7 +131,7 @@ describe("SafeConversions - Property-Based Tests", () => {
             value: fc
                 .string()
                 .filter((s) => Number.isNaN(Number.parseFloat(s))),
-            defaultValue: fc.float(),
+            defaultValue: fc.float().filter(Number.isFinite),
         })("should return default for unparseable strings", (props) => {
             const result = safeParseFloat(props.value, props.defaultValue);
             expect(result).toBe(props.defaultValue);

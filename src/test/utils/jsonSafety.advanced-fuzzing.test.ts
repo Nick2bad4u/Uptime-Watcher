@@ -519,9 +519,9 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
     });
 
     describe("safeJsonStringify - Complex Object Serialization", () => {
-        // Test with objects containing functions (should be filtered)
+        // Test with objects containing functions (strict mode rejects them)
         fcTest.prop([fc.string()])(
-            "should handle objects with function properties",
+            "should reject objects with enumerable function properties",
             (stringProp) => {
                 const objectWithFunction = safeCastTo<UnknownRecord>({
                     functionProp: () => "test",
@@ -533,15 +533,10 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
                     objectWithFunction as unknown as Jsonifiable
                 );
 
-                expect(result.success).toBe(true);
-
-                if (result.success && result.data) {
-                    const parsed = JSON.parse(result.data);
-
-                    expect(parsed.validProp).toBe(stringProp);
-                    expect(parsed.functionProp).toBeUndefined();
-                    expect(parsed.undefinedProp).toBeUndefined();
-                }
+                expect(result.success).toBe(false);
+                expect(result.error).toContain(
+                    "Value cannot be serialized to JSON"
+                );
             }
         );
 
@@ -678,9 +673,20 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
         );
 
         // Test successful stringification vs fallback
-        fcTest.prop([fc.record({ data: fc.string() }), fc.string()])(
+        fcTest.prop([
+            fc.record({ data: fc.string() }).chain((validObj) =>
+                fc.tuple(
+                    fc.constant(validObj),
+                    fc
+                        .string()
+                        .filter(
+                            (fallback) => fallback !== JSON.stringify(validObj)
+                        )
+                )
+            ),
+        ])(
             "should stringify valid objects instead of using fallback",
-            (validObj, fallback) => {
+            ([validObj, fallback]) => {
                 const result = safeJsonStringifyWithFallback(
                     validObj,
                     fallback
@@ -696,9 +702,14 @@ describe("JSON Safety Advanced Fuzzing Tests", () => {
             "should respect toJSON methods",
             (originalValue, toJsonValue) => {
                 const objWithToJSON = {
-                    toJSON: () => ({ customValue: toJsonValue }),
                     value: originalValue,
                 };
+                Object.defineProperty(objWithToJSON, "toJSON", {
+                    configurable: true,
+                    enumerable: false,
+                    value: () => ({ customValue: toJsonValue }),
+                    writable: true,
+                });
 
                 const result = safeJsonStringifyWithFallback(
                     objWithToJSON,

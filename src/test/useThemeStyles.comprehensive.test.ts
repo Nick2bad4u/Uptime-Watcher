@@ -5,6 +5,7 @@ import { useThemeStyles } from "../hooks/useThemeStyles";
 
 // Mock window.matchMedia
 Object.defineProperty(globalThis, "matchMedia", {
+    configurable: true,
     value: vi.fn().mockImplementation((query) => ({
         addEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
@@ -279,6 +280,7 @@ describe(useThemeStyles, () => {
         }).not.toThrow();
 
         Object.defineProperty(globalThis, "matchMedia", {
+            configurable: true,
             value: originalMatchMedia,
             writable: true,
         });

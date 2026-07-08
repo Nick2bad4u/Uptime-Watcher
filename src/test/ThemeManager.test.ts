@@ -10,6 +10,7 @@ const { dark: darkTheme, light: lightTheme } = themes;
 
 // Mock DOM environment
 Object.defineProperty(globalThis, "matchMedia", {
+    configurable: true,
     writable: true,
     value: vi.fn().mockImplementation((query) => ({
         addEventListener: vi.fn(),

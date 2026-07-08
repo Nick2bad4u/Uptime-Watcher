@@ -129,6 +129,7 @@ const SECRET_METADATA_KEYS = new Set([
 ]);
 
 const SECRET_PLACEHOLDER = "[redacted]" as const;
+const URL_CREDENTIAL_PLACEHOLDER = "redacted" as const;
 const INVALID_DATE_PLACEHOLDER = "[Invalid Date]" as const;
 const INVALID_URL_PLACEHOLDER = "[Invalid URL]" as const;
 
@@ -348,10 +349,10 @@ const maskUrlSecrets = (value: string): string => {
     try {
         const url = new URL(value);
         if (url.username) {
-            url.username = SECRET_PLACEHOLDER;
+            url.username = URL_CREDENTIAL_PLACEHOLDER;
         }
         if (url.password) {
-            url.password = SECRET_PLACEHOLDER;
+            url.password = URL_CREDENTIAL_PLACEHOLDER;
         }
 
         for (const key of SECRET_QUERY_KEYS) {
@@ -366,8 +367,55 @@ const maskUrlSecrets = (value: string): string => {
     }
 };
 
+const URL_AUTHORITY_SEPARATOR = "://" as const;
+const URL_SCHEMES = [
+    "http",
+    "https",
+    "ws",
+    "wss",
+] as const;
+
+const findUrlAuthorityEnd = (value: string, startIndex: number): number => {
+    const endIndexes = [
+        value.indexOf("/", startIndex),
+        value.indexOf("?", startIndex),
+        value.indexOf("#", startIndex),
+    ].filter((index) => index !== -1);
+
+    return endIndexes.length === 0 ? value.length : Math.min(...endIndexes);
+};
+
+const maskUrlCredentials = (value: string): string => {
+    const lowerValue = value.toLowerCase();
+    const scheme =
+        URL_SCHEMES.find((prefix) =>
+            lowerValue.startsWith(`${prefix}${URL_AUTHORITY_SEPARATOR}`)
+        ) ?? undefined;
+    if (!scheme) {
+        return value;
+    }
+
+    const authorityStart = scheme.length + URL_AUTHORITY_SEPARATOR.length;
+    const authorityEnd = findUrlAuthorityEnd(value, authorityStart);
+    const atIndex = value.indexOf("@", authorityStart);
+    if (atIndex === -1 || atIndex >= authorityEnd) {
+        return value;
+    }
+
+    const credentials = value.slice(authorityStart, atIndex);
+    if (credentials.length === 0) {
+        return value;
+    }
+
+    const replacement = credentials.includes(":")
+        ? `${URL_CREDENTIAL_PLACEHOLDER}:${URL_CREDENTIAL_PLACEHOLDER}`
+        : URL_CREDENTIAL_PLACEHOLDER;
+
+    return `${value.slice(0, authorityStart)}${replacement}${value.slice(atIndex)}`;
+};
+
 const normalizeLogString = (value: string): string =>
-    maskAuthTokens(maskUrlSecrets(value));
+    maskAuthTokens(maskUrlCredentials(maskUrlSecrets(value)));
 
 const normalizeLogDate = (value: Date): string => {
     if (!DATE_GET_TIME || !DATE_TO_ISO_STRING) {

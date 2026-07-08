@@ -275,8 +275,15 @@ describe("useMonitorTypes Hook", () => {
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "Failed to load monitor types from backend",
-                new Error("[object Object]")
+                expect.any(Error)
             );
+
+            const loggedError = mockLogger.error.mock.calls[0]?.[1];
+            expect(loggedError).toBeInstanceOf(Error);
+            if (Error.isError(loggedError)) {
+                expect(loggedError.message).toBe(JSON.stringify(objectError));
+                expect(loggedError.cause).toEqual(objectError);
+            }
         });
 
         it("should sanitize Error messages before exposing hook state", async ({

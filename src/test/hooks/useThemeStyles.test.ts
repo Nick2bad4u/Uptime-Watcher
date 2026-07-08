@@ -24,6 +24,7 @@ const createMockMediaQuery = (matches: boolean): MediaQueryList =>
 
 // Setup window.matchMedia mock before any tests run
 Object.defineProperty(globalThis, "matchMedia", {
+    configurable: true,
     writable: true,
     value: vi
         .fn()
@@ -57,6 +58,7 @@ describe("useThemeStyles Hook", () => {
 
         mockMediaQuery = createMockMediaQuery(false);
         Object.defineProperty(globalThis, "matchMedia", {
+            configurable: true,
             writable: true,
             value: vi.fn().mockReturnValue(mockMediaQuery),
         });
@@ -67,6 +69,7 @@ describe("useThemeStyles Hook", () => {
         // Restore original matchMedia
         if (originalMatchMedia) {
             Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
                 writable: true,
                 value: originalMatchMedia,
             });
@@ -439,6 +442,7 @@ describe("useThemeStyles Hook", () => {
 
             // Mock environment without matchMedia
             Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
                 writable: true,
                 value: undefined,
             });
@@ -461,6 +465,7 @@ describe("useThemeStyles Hook", () => {
 
             // Mock matchMedia that throws
             Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
                 writable: true,
                 value: vi.fn().mockImplementation(() => {
                     throw new Error("matchMedia not supported");
