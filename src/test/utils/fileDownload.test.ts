@@ -17,6 +17,7 @@ import { handleSQLiteBackupDownload } from "../../stores/sites/utils/fileDownloa
 vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
+        info: vi.fn(),
         warn: vi.fn(),
     },
 }));
@@ -37,6 +38,8 @@ describe("file Download Utility", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+        Reflect.deleteProperty(globalThis, "playwrightAutomation");
+        Reflect.deleteProperty(globalThis, "playwrightLastBackup");
 
         // Mock URL API
         globalThis.URL = {
@@ -86,6 +89,8 @@ describe("file Download Utility", () => {
         await waitForDeferredObjectUrlCleanup();
 
         vi.clearAllMocks();
+        Reflect.deleteProperty(globalThis, "playwrightAutomation");
+        Reflect.deleteProperty(globalThis, "playwrightLastBackup");
         if (originalBlob) {
             globalThis.Blob = originalBlob;
         } else {
@@ -299,6 +304,49 @@ describe("file Download Utility", () => {
                 );
             }
         );
+
+        it("should return the normalized filename used for unsafe download names", async () => {
+            const payload = new Uint8Array([1, 2]);
+            const backup = buildBackupResult(payload, {
+                fileName: "../backup.sqlite",
+            });
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
+
+            const result = await handleSQLiteBackupDownload(
+                mockDownloadFunction
+            );
+
+            expect(result.fileName).toBe(mockAnchor.download);
+            expect(result.fileName).toMatch(
+                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/u
+            );
+        });
+
+        it("should normalize automation backup filenames before storing globally", async () => {
+            Reflect.set(globalThis, "playwrightAutomation", true);
+            const payload = new Uint8Array([1, 2]);
+            const backup = buildBackupResult(payload, {
+                fileName: "../backup.sqlite",
+            });
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
+
+            const result = await handleSQLiteBackupDownload(
+                mockDownloadFunction
+            );
+
+            expect(result.fileName).toMatch(
+                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/u
+            );
+            expect(
+                (
+                    Reflect.get(
+                        globalThis,
+                        "playwrightLastBackup"
+                    ) as SerializedDatabaseBackupResult
+                ).fileName
+            ).toBe(result.fileName);
+            expect(mockAnchor.click).not.toHaveBeenCalled();
+        });
 
         it("should handle click errors with proper error message", async ({
             annotate,

@@ -125,23 +125,29 @@ export async function handleSQLiteBackupDownload(
     const backupResult = parseSerializedDatabaseBackupResult(
         await downloadFunction()
     );
-
-    if (isPlaywrightAutomation()) {
-        Reflect.set(globalThis, "playwrightLastBackup", backupResult);
-        logger.info("SQLite backup captured in automation mode", {
-            fileName: backupResult.fileName,
-            sizeBytes: backupResult.metadata.sizeBytes,
-        });
-        return backupResult;
-    }
-
     const normalizedFileName = normalizeDownloadFileName(
         backupResult.fileName,
         generateBackupFileName("uptime-watcher", "db")
     );
+    const normalizedBackupResult =
+        normalizedFileName === backupResult.fileName
+            ? backupResult
+            : {
+                  ...backupResult,
+                  fileName: normalizedFileName,
+              };
+
+    if (isPlaywrightAutomation()) {
+        Reflect.set(globalThis, "playwrightLastBackup", normalizedBackupResult);
+        logger.info("SQLite backup captured in automation mode", {
+            fileName: normalizedBackupResult.fileName,
+            sizeBytes: normalizedBackupResult.metadata.sizeBytes,
+        });
+        return normalizedBackupResult;
+    }
 
     // Create blob from the backup data using a fresh typed array view
-    const blobData = new Uint8Array(backupResult.buffer);
+    const blobData = new Uint8Array(normalizedBackupResult.buffer);
     const blob = new Blob([blobData], {
         type: "application/x-sqlite3",
     });
@@ -165,5 +171,5 @@ export async function handleSQLiteBackupDownload(
         );
     }
 
-    return backupResult;
+    return normalizedBackupResult;
 }
