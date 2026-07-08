@@ -70,6 +70,7 @@ import { ThemedBox } from "./theme/components/ThemedBox";
 import { ThemedText } from "./theme/components/ThemedText";
 import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
+import { fireAndForget } from "./utils/async/fireAndForget";
 
 /**
  * Main app component that serves as the root of the Uptime Watcher app.
@@ -351,7 +352,14 @@ export const App: NamedExoticComponent = memo(
                     soundEnabled: isSystemNotificationsSoundEnabled,
                     systemEnabled: isSystemNotificationsEnabled,
                 });
-                void synchronizeNotificationPreferences();
+                fireAndForget(synchronizeNotificationPreferences, {
+                    onError: (error) => {
+                        logger.error(
+                            "[App] Notification preference synchronization failed",
+                            error
+                        );
+                    },
+                });
             },
             [isSystemNotificationsEnabled, isSystemNotificationsSoundEnabled]
         );
@@ -536,7 +544,11 @@ export const App: NamedExoticComponent = memo(
             ) : null;
 
         const handleUpdateButtonClick = useCallback(() => {
-            void handleUpdateAction();
+            fireAndForget(handleUpdateAction, {
+                onError: (error) => {
+                    logger.error("[App] Update action failed", error);
+                },
+            });
         }, [handleUpdateAction]);
 
         return (
