@@ -1,7 +1,11 @@
+import { tryGetErrorCode } from "@shared/utils/errorCodes";
 import { ensureError } from "@shared/utils/errorHandling";
 import { randomUUID } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, renameSync } from "node:fs";
+import type { Stats } from "node:fs";
+import { lstatSync, mkdirSync, renameSync } from "node:fs";
 import * as path from "node:path";
+
+type FileSystemEntryStats = Stats;
 
 const DATABASE_LOCK_ARTIFACT_SUFFIXES = Object.freeze([
     "-journal",
@@ -94,6 +98,31 @@ const ensureRecoveryDirectory = (
     }
 
     recoveryState.ensured = true;
+};
+
+const getExistingLockArtifactStats = (
+    resolvedCandidate: string
+): FileSystemEntryStats | undefined => {
+    try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Candidate path is resolved to remain within the database directory before this audited metadata check.
+        return lstatSync(resolvedCandidate);
+    } catch (error) {
+        if (tryGetErrorCode(error) === "ENOENT") {
+            return undefined;
+        }
+
+        throw ensureError(error);
+    }
+};
+
+const validateRelocatableLockArtifact = (stats: FileSystemEntryStats): void => {
+    if (stats.isSymbolicLink()) {
+        throw new Error("Lock artifact must not be a symlink");
+    }
+
+    if (!stats.isFile()) {
+        throw new Error("Lock artifact must be a regular file");
+    }
 };
 
 /**
@@ -241,11 +270,11 @@ export const cleanupDatabaseLockArtifacts = (
 
         if (resolvedCandidate) {
             try {
-                const isCandidateExists =
-                    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path validated to remain within the user data directory; synchronous check keeps startup deterministic.
-                    existsSync(resolvedCandidate);
+                const stats = getExistingLockArtifactStats(resolvedCandidate);
 
-                if (isCandidateExists) {
+                if (stats) {
+                    validateRelocatableLockArtifact(stats);
+
                     const artifact = performRelocation(
                         resolvedCandidate,
                         directory,

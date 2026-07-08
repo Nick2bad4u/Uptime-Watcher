@@ -120,6 +120,24 @@ describe("databaseLockRecovery utilities", () => {
         renameSpy.mockRestore();
     });
 
+    it("should refuse to relocate directory lock artifact candidates", () => {
+        const walPath = `${dbPath}-wal`;
+        mkdirSync(walPath);
+
+        const result = cleanupDatabaseLockArtifacts(dbPath);
+
+        expect(result.relocated).toHaveLength(0);
+        expect(result.failed).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    path: walPath,
+                    reason: expect.stringMatching(/regular file/iu),
+                }),
+            ])
+        );
+        expect(existsSync(walPath)).toBeTruthy();
+    });
+
     it("should refuse to relocate artifacts through a symlinked recovery directory", () => {
         const walPath = `${dbPath}-wal`;
         writeFileSync(walPath, "wal");
