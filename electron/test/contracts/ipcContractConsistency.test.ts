@@ -113,6 +113,10 @@ describe("IPC contract consistency", () => {
     it("ensures every standardized invoke handler registration has a validator", () => {
         expect(extractRegistrationValidatorGaps()).toEqual([]);
     });
+
+    it("ensures cloud invoke handlers validate success payloads", () => {
+        expect(extractCloudResultValidatorGaps()).toEqual([]);
+    });
 });
 
 /**
@@ -305,6 +309,72 @@ function collectRegistrationValidatorGapsFromFile(
     };
 
     visit(sourceFile);
+}
+
+function extractCloudResultValidatorGaps(): string[] {
+    const cloudHandlersPath = path.join(
+        process.cwd(),
+        "electron",
+        "services",
+        "ipc",
+        "handlers",
+        "cloudHandlers.ts"
+    );
+    const source = readFileSync(cloudHandlersPath, "utf8");
+    const sourceFile = ts.createSourceFile(
+        cloudHandlersPath,
+        source,
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS
+    );
+    const gaps: string[] = [];
+
+    const resolveChannelName = (
+        expression: ts.Expression
+    ): string | undefined => {
+        if (!ts.isPropertyAccessExpression(expression)) {
+            return undefined;
+        }
+
+        const objectExpression = expression.expression;
+        if (!ts.isIdentifier(objectExpression)) {
+            return undefined;
+        }
+
+        return CHANNEL_MAPS[objectExpression.text]?.[expression.name.text];
+    };
+
+    const visit = (node: ts.Node): void => {
+        if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+            const channelArgument = node.arguments[0];
+            const resultValidatorArgument = node.arguments[3];
+            const channelName = channelArgument
+                ? resolveChannelName(channelArgument)
+                : undefined;
+
+            if (
+                node.expression.text === "register" &&
+                channelName?.startsWith("cloud-") &&
+                channelName !== "cloud-request-sync-now" &&
+                (!resultValidatorArgument ||
+                    resultValidatorArgument.kind === ts.SyntaxKind.NullKeyword)
+            ) {
+                const location = sourceFile.getLineAndCharacterOfPosition(
+                    node.getStart(sourceFile)
+                );
+                gaps.push(
+                    `electron/services/ipc/handlers/cloudHandlers.ts:${location.line + 1} ${channelName} omits validateResult`
+                );
+            }
+        }
+
+        ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
+
+    return gaps.sort();
 }
 
 function collectChannelsFromFile(

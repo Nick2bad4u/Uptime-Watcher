@@ -10,7 +10,10 @@ import { createSingleFlight } from "@shared/utils/singleFlight";
 import type { CloudService } from "../../cloud/CloudService";
 
 import { createStandardizedIpcRegistrar } from "../utils";
-import { CloudHandlerValidators } from "../validators/cloud";
+import {
+    CloudHandlerResultValidators,
+    CloudHandlerValidators,
+} from "../validators/cloud";
 
 /**
  * Dependencies required for registering cloud IPC handlers.
@@ -43,25 +46,29 @@ export function registerCloudHandlers({
     register(
         CLOUD_CHANNELS.clearEncryptionKey,
         () => cloudService.clearEncryptionKey(),
-        CloudHandlerValidators.clearEncryptionKey
+        CloudHandlerValidators.clearEncryptionKey,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
         CLOUD_CHANNELS.disconnect,
         () => cloudService.disconnect(),
-        CloudHandlerValidators.disconnect
+        CloudHandlerValidators.disconnect,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
         CLOUD_CHANNELS.enableSync,
         (config: CloudEnableSyncConfig) => cloudService.enableSync(config),
-        CloudHandlerValidators.enableSync
+        CloudHandlerValidators.enableSync,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
         CLOUD_CHANNELS.getStatus,
         () => cloudService.getStatus(),
-        CloudHandlerValidators.getStatus
+        CloudHandlerValidators.getStatus,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
@@ -71,7 +78,8 @@ export function registerCloudHandlers({
                 typeof CLOUD_CHANNELS.configureFilesystemProvider
             >[0]
         ) => cloudService.configureFilesystemProvider(config),
-        CloudHandlerValidators.configureFilesystemProvider
+        CloudHandlerValidators.configureFilesystemProvider,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
@@ -81,31 +89,36 @@ export function registerCloudHandlers({
                 typeof CLOUD_CHANNELS.setEncryptionPassphrase
             >[0]
         ) => cloudService.setEncryptionPassphrase(passphrase),
-        CloudHandlerValidators.setEncryptionPassphrase
+        CloudHandlerValidators.setEncryptionPassphrase,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
         CLOUD_CHANNELS.connectDropbox,
         () => cloudService.connectDropbox(),
-        CloudHandlerValidators.connectDropbox
+        CloudHandlerValidators.connectDropbox,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
         CLOUD_CHANNELS.connectGoogleDrive,
         () => cloudService.connectGoogleDrive(),
-        CloudHandlerValidators.connectGoogleDrive
+        CloudHandlerValidators.connectGoogleDrive,
+        CloudHandlerResultValidators.statusSummary
     );
 
     register(
         CLOUD_CHANNELS.listBackups,
         () => cloudService.listBackups(),
-        CloudHandlerValidators.listBackups
+        CloudHandlerValidators.listBackups,
+        CloudHandlerResultValidators.backupEntryArray
     );
 
     register(
         CLOUD_CHANNELS.deleteBackup,
         (key: string) => cloudService.deleteBackup(key),
-        CloudHandlerValidators.deleteBackup
+        CloudHandlerValidators.deleteBackup,
+        CloudHandlerResultValidators.backupEntryArray
     );
 
     register(
@@ -115,32 +128,37 @@ export function registerCloudHandlers({
                 typeof CLOUD_CHANNELS.migrateBackups
             >[0]
         ) => cloudService.migrateBackups(config),
-        CloudHandlerValidators.migrateBackups
+        CloudHandlerValidators.migrateBackups,
+        CloudHandlerResultValidators.backupMigrationResult
     );
 
     register(
         CLOUD_CHANNELS.previewResetRemoteSyncState,
         () => cloudService.previewResetRemoteSyncState(),
-        CloudHandlerValidators.previewResetRemoteSyncState
+        CloudHandlerValidators.previewResetRemoteSyncState,
+        CloudHandlerResultValidators.syncResetPreview
     );
 
     register(
         CLOUD_CHANNELS.resetRemoteSyncState,
         () => cloudService.resetRemoteSyncState(),
-        CloudHandlerValidators.resetRemoteSyncState
+        CloudHandlerValidators.resetRemoteSyncState,
+        CloudHandlerResultValidators.syncResetResult
     );
 
     register(
         CLOUD_CHANNELS.uploadLatestBackup,
         () => uploadLatestBackupSingleFlight(),
-        CloudHandlerValidators.uploadLatestBackup
+        CloudHandlerValidators.uploadLatestBackup,
+        CloudHandlerResultValidators.backupEntry
     );
 
     register(
         CLOUD_CHANNELS.restoreBackup,
         (key: IpcInvokeChannelParams<typeof CLOUD_CHANNELS.restoreBackup>[0]) =>
             cloudService.restoreBackup(key),
-        CloudHandlerValidators.restoreBackup
+        CloudHandlerValidators.restoreBackup,
+        CloudHandlerResultValidators.restoreBackup
     );
 
     register(
