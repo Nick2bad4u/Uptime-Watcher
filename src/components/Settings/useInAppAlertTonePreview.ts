@@ -9,6 +9,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
+import { logger } from "../../services/logger";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 import { clampNormalizedVolume } from "./utils/volumeNormalization";
 
 /**
@@ -46,6 +48,17 @@ export function useInAppAlertTonePreview(args: {
         volumePreviewTimeoutRef.current = null;
     }, []);
 
+    const playPreviewTone = useCallback((): void => {
+        fireAndForget(playInAppAlertTone, {
+            onError: (error) => {
+                logger.warn(
+                    "[Settings] Failed to play in-app alert tone preview",
+                    error
+                );
+            },
+        });
+    }, [playInAppAlertTone]);
+
     const setPendingVolume = useCallback((normalizedVolume: number) => {
         pendingVolumeRef.current = clampNormalizedVolume(normalizedVolume);
     }, []);
@@ -53,9 +66,9 @@ export function useInAppAlertTonePreview(args: {
     const playPreviewAtVolume = useCallback(
         (normalizedVolume: number) => {
             setPendingVolume(normalizedVolume);
-            void playInAppAlertTone();
+            playPreviewTone();
         },
-        [playInAppAlertTone, setPendingVolume]
+        [playPreviewTone, setPendingVolume]
     );
 
     const scheduleVolumePreview = useCallback(
@@ -88,13 +101,13 @@ export function useInAppAlertTonePreview(args: {
 
             volumePreviewTimeoutRef.current = globalThis.setTimeout(() => {
                 volumePreviewTimeoutRef.current = null;
-                void playInAppAlertTone();
+                playPreviewTone();
             }, 180);
         },
         [
             clearVolumePreviewTimeout,
             inAppAlertsSoundEnabled,
-            playInAppAlertTone,
+            playPreviewTone,
             prefersReducedMotion,
             setPendingVolume,
         ]
