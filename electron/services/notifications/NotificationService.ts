@@ -109,6 +109,18 @@ function getMonitorUrlLabel(monitor: Monitor): string | undefined {
 const getSafeIdentifier = (identifier: string): string =>
     getSafeIdentifierForLogging(identifier) ?? identifier;
 
+function formatLastResponseMetric(responseTime: number | undefined): string {
+    if (
+        !isDefined(responseTime) ||
+        !isFiniteNumber(responseTime) ||
+        responseTime < 0
+    ) {
+        return "Last response unavailable.";
+    }
+
+    return `Last response ${responseTime}ms.`;
+}
+
 /**
  * Central notification orchestrator that enforces throttling and ordering rules
  * before emitting system notifications for monitor outages/restores.
@@ -514,9 +526,7 @@ export class NotificationService {
     }
 
     private composeDownBody(context: NotificationContext): string {
-        const metric = isDefined(context.responseTime)
-            ? `Last response ${context.responseTime}ms.`
-            : "Last response unavailable.";
+        const metric = formatLastResponseMetric(context.responseTime);
         const monitorLabel = this.describeMonitor(context.monitor);
         return `${monitorLabel} reported DOWN at ${new Date().toLocaleTimeString()}. ${metric}`;
     }

@@ -279,6 +279,34 @@ describe(NotificationService, () => {
             );
         });
 
+        it("describes unavailable response times without exposing sentinel values", () => {
+            const sampleMonitor = sampleSite.monitors.at(0);
+            if (!sampleMonitor) {
+                throw new Error("Expected sample site to include a monitor");
+            }
+
+            for (const responseTime of [
+                -1,
+                Number.NaN,
+                Number.POSITIVE_INFINITY,
+            ]) {
+                service = new NotificationService();
+                notificationCtor.mockClear();
+
+                service.notifyMonitorDown(
+                    {
+                        ...sampleSite,
+                        monitors: [{ ...sampleMonitor, responseTime }],
+                    },
+                    "monitor-1"
+                );
+
+                const options = getFirstNotificationOptionsWithBody();
+                expect(options.body).toContain("Last response unavailable.");
+                expect(options.body).not.toMatch(/(?:-1|Infinity|NaN)ms/u);
+            }
+        });
+
         it("skips notification when down alerts disabled", () => {
             service.updateConfig({ showDownAlerts: false });
 
