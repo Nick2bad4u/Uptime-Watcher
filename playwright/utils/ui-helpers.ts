@@ -15,6 +15,7 @@ import { expect } from "@playwright/test";
 import type { ConfirmDialogRequest } from "@app/stores/ui/useConfirmDialogStore";
 import type { Site } from "@shared/types";
 
+import { generateSiteName } from "./testData";
 import { isIsolatedUserDataPage } from "./userDataDirectoryRegistry";
 
 /**
@@ -431,9 +432,7 @@ export async function createSiteViaModal(
     page: Page,
     options: CreateSiteOptions = {}
 ): Promise<CreatedSiteResult> {
-    const siteName =
-        options.name ??
-        `Playwright Site ${Date.now().toString(36)}-${Math.floor(Math.random() * 10_000)}`;
+    const siteName = options.name ?? generateSiteName("Playwright Site");
     const monitorType = options.monitorType ?? "http";
     const siteUrl =
         options.url ??
