@@ -39,9 +39,7 @@ export interface PreloadDomainFactoryOptions<T> {
  * intentionally ignore them. This helper is used to satisfy strict lint rules
  * (unused vars, function scoping) without relying on the `void` operator.
  */
-export function acceptUnusedPreloadArguments(
-    ...args: Readonly<UnknownArray>
-): number {
+function acceptUnusedPreloadArguments(...args: Readonly<UnknownArray>): number {
     return args.length;
 }
 
