@@ -875,10 +875,15 @@ describe("SiteManager - Comprehensive", () => {
             ).toHaveBeenCalledWith(mockCache, siteWithTwoMonitors.identifier, {
                 monitors: [expect.objectContaining({ id: "monitor-2" })],
             });
+            expect(result).not.toBe(updatedSite);
             expect(result.monitors).toHaveLength(1);
             const [remainingMonitor] = result.monitors;
             expect(remainingMonitor).toBeDefined();
             expect(remainingMonitor?.id).toBe("monitor-2");
+            result.name = "Mutated Return";
+            result.monitors[0]!.id = "mutated-monitor";
+            expect(updatedSite.name).toBe(siteWithTwoMonitors.name);
+            expect(updatedSite.monitors[0]?.id).toBe("monitor-2");
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:updated",
                 expect.objectContaining({
@@ -1099,6 +1104,9 @@ describe("SiteManager - Comprehensive", () => {
                 updates
             );
             expect(result).toEqual(updatedSite);
+            expect(result).not.toBe(updatedSite);
+            result.name = "Mutated Return";
+            expect(updatedSite.name).toBe("Updated Site");
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:updated",
                 expect.objectContaining({
@@ -1172,6 +1180,9 @@ describe("SiteManager - Comprehensive", () => {
                 mockSiteWriterService.handleMonitorIntervalChanges
             ).not.toHaveBeenCalled();
             expect(result).toEqual(updatedSite);
+            expect(result).not.toBe(updatedSite);
+            result.name = "Mutated Return";
+            expect(updatedSite.name).toBe(mockSite.name);
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:updated",
                 expect.objectContaining({

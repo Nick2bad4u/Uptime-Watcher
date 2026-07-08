@@ -601,7 +601,7 @@ export class SiteManager {
             updatedFields: ["monitors"],
         });
 
-        return updatedSite;
+        return structuredClone(updatedSite);
     }
 
     /**
@@ -694,7 +694,7 @@ export class SiteManager {
             updatedFields: objectKeys(sanitizedUpdates),
         });
 
-        return refreshedSite;
+        return structuredClone(refreshedSite);
     }
 
     /**
