@@ -208,6 +208,10 @@ export function isValidHttpMonitorUrl(value: unknown): value is string {
 
     try {
         const parsed = new URL(url);
+        if (parsed.username.length > 0 || parsed.password.length > 0) {
+            return false;
+        }
+
         return isValidHost(parsed.hostname);
     } catch {
         return false;

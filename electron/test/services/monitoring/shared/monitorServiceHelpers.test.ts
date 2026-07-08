@@ -41,6 +41,14 @@ describe(validateMonitorUrl, () => {
             validateMonitorUrl(createMonitorWithUrl("ftp://example.com"))
         ).not.toBeNull();
     });
+
+    it("rejects URLs containing credentials", () => {
+        expect(
+            validateMonitorUrl(
+                createMonitorWithUrl("https://user:pass@example.com")
+            )
+        ).not.toBeNull();
+    });
 });
 
 describe(isValidHttpMonitorUrl, () => {
@@ -57,6 +65,15 @@ describe(isValidHttpMonitorUrl, () => {
         expect(isValidHttpMonitorUrl("file:///etc/passwd")).toBeFalsy();
         expect(isValidHttpMonitorUrl("https://")).toBeFalsy();
         expect(isValidHttpMonitorUrl("not-a-url")).toBeFalsy();
+    });
+
+    it("rejects URLs containing username or password credentials", () => {
+        expect(
+            isValidHttpMonitorUrl("https://user@example.com/status")
+        ).toBeFalsy();
+        expect(
+            isValidHttpMonitorUrl("https://user:pass@example.com/status")
+        ).toBeFalsy();
     });
 });
 
