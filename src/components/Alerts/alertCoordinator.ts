@@ -15,6 +15,7 @@ import {
 } from "../../stores/alerts/useAlertStore";
 import { mapStatusUpdateToAlert } from "../../stores/alerts/utils/alertPayload";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
+import { fireAndForget } from "../../utils/async/fireAndForget";
 
 const audioContextRef: { current: AudioContext | null } = {
     current: null,
@@ -284,7 +285,11 @@ export const enqueueAlertFromStatusUpdate = (
     const normalizedVolume = resolveAlertVolume(settings.inAppAlertVolume);
 
     if (settings.inAppAlertsSoundEnabled && normalizedVolume > 0) {
-        void playInAppAlertTone();
+        fireAndForget(playInAppAlertTone, {
+            onError: (error) => {
+                logger.warn("Failed to play in-app status alert tone", error);
+            },
+        });
     } else if (settings.inAppAlertsSoundEnabled) {
         logger.debug(
             "Skipping alert tone playback because the volume is muted"
