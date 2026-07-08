@@ -1,4 +1,5 @@
 import { isWindowsReservedFileBasename } from "@shared/utils/fileNameSafety";
+import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import * as path from "node:path";
 
 const UNSAFE_FILENAME_PATTERN = /[^\p{L}\p{N}\-._]/gu;
@@ -15,7 +16,9 @@ export function createSanitizedFileName(fileName: string): string {
     const MAX_FILE_NAME_LENGTH = 200;
     const fallback = "backup.sqlite";
 
-    const rawBase = path.basename(fileName);
+    const rawBase = path.posix.basename(
+        normalizePathSeparatorsToPosix(fileName)
+    );
     const normalizedBase = rawBase.replaceAll(UNSAFE_FILENAME_PATTERN, "_");
     let withoutTrailingDotsOrSpaces = normalizedBase;
     while (

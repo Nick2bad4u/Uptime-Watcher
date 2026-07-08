@@ -16,6 +16,15 @@ describe(createSanitizedFileName, () => {
         expect(createSanitizedFileName("CON.sqlite")).toBe("CON_.sqlite");
     });
 
+    it("normalizes Windows path separators before taking the basename", () => {
+        expect(
+            createSanitizedFileName(String.raw`C:\Users\Nick\backup.sqlite`)
+        ).toBe("backup.sqlite");
+        expect(createSanitizedFileName(String.raw`..\backup.sqlite`)).toBe(
+            "backup.sqlite"
+        );
+    });
+
     it("limits long base names while preserving normal extensions", () => {
         const result = createSanitizedFileName(`${"a".repeat(300)}.sqlite`);
 
