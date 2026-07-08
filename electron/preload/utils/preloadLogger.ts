@@ -109,6 +109,10 @@ function getNativeMethod(
     return undefined;
 }
 
+const DATE_GET_TIME = getNativeMethod(Date.prototype, "getTime");
+const DATE_TO_ISO_STRING = getNativeMethod(Date.prototype, "toISOString");
+const URL_TO_STRING = getNativeMethod(URL.prototype, "toString");
+
 function isIterable(value: unknown): value is Iterable<unknown> {
     return (
         isObject(value) && getNativeMethod(value, Symbol.iterator) !== undefined
@@ -160,19 +164,17 @@ const truncate = (value: string, limit: number): string =>
     value.length > limit ? `${value.slice(0, limit)}…` : value;
 
 const serializeDate = (value: Date): string => {
-    const getTime = getNativeMethod(Date.prototype, "getTime");
-    const toISOString = getNativeMethod(Date.prototype, "toISOString");
-    if (!getTime || !toISOString) {
+    if (!DATE_GET_TIME || !DATE_TO_ISO_STRING) {
         return INVALID_DATE_PLACEHOLDER;
     }
 
     try {
-        const timestamp = Reflect.apply(getTime, value, []);
+        const timestamp = Reflect.apply(DATE_GET_TIME, value, []);
         if (typeof timestamp !== "number" || !isFiniteNumber(timestamp)) {
             return INVALID_DATE_PLACEHOLDER;
         }
 
-        const serialized = Reflect.apply(toISOString, value, []);
+        const serialized = Reflect.apply(DATE_TO_ISO_STRING, value, []);
         return typeof serialized === "string"
             ? serialized
             : INVALID_DATE_PLACEHOLDER;
@@ -182,13 +184,12 @@ const serializeDate = (value: Date): string => {
 };
 
 const serializeUrl = (value: URL): string => {
-    const toString = getNativeMethod(URL.prototype, "toString");
-    if (!toString) {
+    if (!URL_TO_STRING) {
         return INVALID_URL_PLACEHOLDER;
     }
 
     try {
-        const serialized = Reflect.apply(toString, value, []);
+        const serialized = Reflect.apply(URL_TO_STRING, value, []);
         return typeof serialized === "string"
             ? getSafeUrlForLogging(serialized)
             : INVALID_URL_PLACEHOLDER;

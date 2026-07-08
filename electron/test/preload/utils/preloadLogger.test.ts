@@ -86,6 +86,30 @@ describe(buildPayloadPreview, () => {
         expect(toISOString).not.toHaveBeenCalled();
     });
 
+    it("does not invoke patched Date prototype methods while building previews", () => {
+        const checkedAt = new Date("2026-07-07T12:00:00.000Z");
+        const getTime = vi.spyOn(Date.prototype, "getTime");
+        const toISOString = vi.spyOn(Date.prototype, "toISOString");
+        getTime.mockImplementation(() => {
+            throw new Error("Date prototype getTime should not run");
+        });
+        toISOString.mockImplementation(() => {
+            throw new Error("Date prototype toISOString should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview({ checkedAt });
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain("2026-07-07T12:00:00.000Z");
+            expect(getTime).not.toHaveBeenCalled();
+            expect(toISOString).not.toHaveBeenCalled();
+        } finally {
+            getTime.mockRestore();
+            toISOString.mockRestore();
+        }
+    });
+
     it("redacts mailto addresses", () => {
         const preview = buildPayloadPreview({
             url: "mailto:person@example.com?subject=hi",
@@ -112,6 +136,25 @@ describe(buildPayloadPreview, () => {
         expect(preview).toContain("https://example.com/");
         expect(preview).not.toContain("secret");
         expect(toString).not.toHaveBeenCalled();
+    });
+
+    it("does not invoke patched URL prototype toString while building previews", () => {
+        const url = new URL("https://example.com/reset?token=secret");
+        const toString = vi.spyOn(URL.prototype, "toString");
+        toString.mockImplementation(() => {
+            throw new Error("URL prototype toString should not run");
+        });
+
+        try {
+            const preview = buildPayloadPreview({ url });
+
+            expect(preview).toBeTypeOf("string");
+            expect(preview).toContain("https://example.com/");
+            expect(preview).not.toContain("secret");
+            expect(toString).not.toHaveBeenCalled();
+        } finally {
+            toString.mockRestore();
+        }
     });
 
     it("does not invoke BigInt prototype toString while building previews", () => {
