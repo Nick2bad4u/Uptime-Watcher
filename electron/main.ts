@@ -501,13 +501,13 @@ class Main {
     private readonly handleUnhandledRejection = (reason: unknown): void => {
         const normalizedError = ensureError(reason);
         logger.error("[Main] Unhandled promise rejection", normalizedError);
-        void this.performFatalShutdown("unhandledRejection", normalizedError);
+        this.startFatalShutdown("unhandledRejection", normalizedError);
     };
 
     private readonly handleUncaughtException = (error: unknown): void => {
         const normalizedError = ensureError(error);
         logger.error("[Main] Uncaught exception", normalizedError);
-        void this.performFatalShutdown("uncaughtException", normalizedError);
+        this.startFatalShutdown("uncaughtException", normalizedError);
     };
 
     private readonly handleRenderProcessGone = (
@@ -695,6 +695,22 @@ class Main {
         }
 
         app.exit(1);
+    }
+
+    private startFatalShutdown(
+        reason: "uncaughtException" | "unhandledRejection",
+        error: Error
+    ): void {
+        fireAndForget(() => this.performFatalShutdown(reason, error), {
+            onError: (shutdownError) => {
+                logger.error(
+                    "[Main] Fatal shutdown handler failed",
+                    shutdownError,
+                    { reason }
+                );
+                app.exit(1);
+            },
+        });
     }
 
     /**
