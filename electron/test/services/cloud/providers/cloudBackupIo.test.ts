@@ -237,6 +237,58 @@ describe(uploadBackupWithMetadata, () => {
         expect(uploadObject).not.toHaveBeenCalled();
     });
 
+    it("rejects overlong generated provider keys before uploading backup bytes", async () => {
+        const uploadObject =
+            vi.fn<(args: { buffer: Buffer; key: string }) => Promise<void>>();
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("backup", "utf8"),
+                encrypted: false,
+                fileName: `${"a".repeat(4090)}.sqlite`,
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 6,
+                },
+                uploadObject,
+            })
+        ).rejects.toThrow(/4096 bytes/iv);
+
+        expect(uploadObject).not.toHaveBeenCalled();
+    });
+
+    it("rejects overlong generated metadata sidecar keys before uploading backup bytes", async () => {
+        const uploadObject =
+            vi.fn<(args: { buffer: Buffer; key: string }) => Promise<void>>();
+
+        await expect(
+            uploadBackupWithMetadata({
+                backupsPrefix: "backups/",
+                buffer: Buffer.from("backup", "utf8"),
+                encrypted: false,
+                fileName: `${"a".repeat(4070)}.sqlite`,
+                metadata: {
+                    appVersion: "1.0.0",
+                    checksum: "abc",
+                    createdAt: 1,
+                    originalPath: "backup.sqlite",
+                    retentionHintDays: 30,
+                    schemaVersion: 1,
+                    sizeBytes: 6,
+                },
+                uploadObject,
+            })
+        ).rejects.toThrow(/4096 bytes/iv);
+
+        expect(uploadObject).not.toHaveBeenCalled();
+    });
+
     it("allows encrypted uploads whose metadata size describes plaintext bytes", async () => {
         const uploadObject = vi
             .fn<(args: { buffer: Buffer; key: string }) => Promise<void>>()

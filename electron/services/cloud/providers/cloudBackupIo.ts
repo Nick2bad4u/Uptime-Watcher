@@ -1,6 +1,10 @@
 import type { CloudBackupEntry } from "@shared/types/cloud";
 import type { SerializedDatabaseBackupMetadata } from "@shared/types/databaseBackup";
 
+import {
+    assertCloudObjectKey,
+    normalizeProviderObjectKey,
+} from "@shared/utils/cloudKeyNormalization";
 import { normalizePathSeparatorsToPosix } from "@shared/utils/pathSeparators";
 import { hasAsciiControlCharacters } from "@shared/utils/stringSafety";
 import { stringSplit } from "ts-extras";
@@ -112,6 +116,15 @@ function assertCanonicalBackupFileName(fileName: string): void {
     }
 }
 
+function assertCanonicalProviderObjectKey(key: string, label: string): void {
+    const normalized = normalizeProviderObjectKey(key);
+    assertCloudObjectKey(normalized);
+
+    if (normalized !== key) {
+        throw new Error(`${label} must be a canonical provider object key`);
+    }
+}
+
 export async function uploadBackupWithMetadata(args: {
     /** Provider-specific backups key prefix (typically `backups/`). */
     readonly backupsPrefix: string;
@@ -142,6 +155,10 @@ export async function uploadBackupWithMetadata(args: {
     assertCanonicalBackupFileName(args.fileName);
 
     const backupKey = `${args.backupsPrefix}${args.fileName}`;
+    assertCanonicalProviderObjectKey(backupKey, "Backup key");
+
+    const metadataKey = backupMetadataKeyForBackupKey(backupKey);
+    assertCanonicalProviderObjectKey(metadataKey, "Backup metadata key");
 
     const entry = parseCloudBackupMetadataFile({
         encrypted: args.encrypted,
@@ -165,7 +182,6 @@ export async function uploadBackupWithMetadata(args: {
         overwrite: true,
     });
 
-    const metadataKey = backupMetadataKeyForBackupKey(backupKey);
     try {
         await args.uploadObject({
             buffer: Buffer.from(
