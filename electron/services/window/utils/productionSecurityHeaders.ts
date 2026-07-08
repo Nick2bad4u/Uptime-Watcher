@@ -21,6 +21,32 @@ export interface ApplyProductionDocumentSecurityHeadersArgs {
 
 export type ElectronResponseHeaders = Record<string, Arrayable<string>>;
 
+const HARDENED_SECURITY_HEADER_NAMES = new Set(
+    [
+        "Content-Security-Policy",
+        "Permissions-Policy",
+        "Referrer-Policy",
+        "X-Content-Type-Options",
+        "X-Frame-Options",
+    ].map((headerName) => headerName.toLowerCase())
+);
+
+function omitHardenedSecurityHeaders(
+    responseHeaders: ElectronResponseHeaders
+): ElectronResponseHeaders {
+    const retainedHeaders: ElectronResponseHeaders = {};
+
+    for (const [headerName, headerValue] of Object.entries(responseHeaders)) {
+        if (HARDENED_SECURITY_HEADER_NAMES.has(headerName.toLowerCase())) {
+            continue;
+        }
+
+        retainedHeaders[headerName] = headerValue;
+    }
+
+    return retainedHeaders;
+}
+
 /**
  * Applies strict production security headers to a response header set.
  */
@@ -41,7 +67,7 @@ export function applyProductionDocumentSecurityHeaders(
 
     return responseHeaders
         ? {
-              ...responseHeaders,
+              ...omitHardenedSecurityHeaders(responseHeaders),
               ...hardenedHeaders,
           }
         : hardenedHeaders;
